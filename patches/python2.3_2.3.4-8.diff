@@ -1,40 +1,7 @@
 
-Description: Detect gnu pth in pthread emulation, and disable tests.
-Status: Former in BTS, latter needs proper fixing.
+Description: Disable tests.
+Status: Won't merge. Needs proper fixing.
 
-diff -ur python2.3-2.3.4.old/Python/thread.c python2.3-2.3.4/Python/thread.c
---- python2.3-2.3.4.old/Python/thread.c	2003-09-20 13:13:18.000000000 +0200
-+++ python2.3-2.3.4/Python/thread.c	2004-08-08 08:43:44.000000000 +0200
-@@ -7,6 +7,16 @@
- 
- #include "Python.h"
- 
-+
-+#ifndef _POSIX_THREADS
-+/* This means pthreads are not implemented in libc headers, hence the macro
-+   not present in unistd.h. But they still can be implemented as an external
-+   library (e.g. gnu pth in pthread emulation) */
-+# ifdef HAVE_PTHREAD_H
-+#  include <pthread.h> /* _POSIX_THREADS */
-+# endif
-+#endif
-+
- #ifndef DONT_HAVE_STDIO_H
- #include <stdio.h>
- #endif
-diff -ur python2.3-2.3.4.old/configure.in python2.3-2.3.4/configure.in
---- python2.3-2.3.4.old/configure.in	2004-05-07 21:13:47.000000000 +0200
-+++ python2.3-2.3.4/configure.in	2004-08-08 08:51:29.000000000 +0200
-@@ -1579,7 +1579,8 @@
-     fi
- 
-     # According to the POSIX spec, a pthreads implementation must
--    # define _POSIX_THREADS in unistd.h. Some apparently don't (which ones?)
-+    # define _POSIX_THREADS in unistd.h. Some apparently don't
-+    # (e.g. gnu pth with pthread emulation)
-     AC_MSG_CHECKING(for _POSIX_THREADS in unistd.h)
-     AC_EGREP_CPP(yes,
-     [
 diff -ur python2.3-2.3.4.old/debian/rules python2.3-2.3.4/debian/rules
 --- python2.3-2.3.4.old/debian/rules	2004-08-08 08:51:52.000000000 +0200
 +++ python2.3-2.3.4/debian/rules	2004-08-08 08:39:52.000000000 +0200
