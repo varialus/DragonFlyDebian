@@ -62,7 +62,7 @@ union semun
 
 
 int
-sane_semctl (int semid, int semnum, int cmd, ...)
+semctl (int semid, int semnum, int cmd, ...)
 {
   va_list ap;
   union semun semun;
