@@ -1,0 +1,87 @@
+diff -ur gnome-vfs2-2.6.2.old/configure.in gnome-vfs2-2.6.2/configure.in
+--- gnome-vfs2-2.6.2.old/configure.in	2004-08-12 22:00:06.000000000 +0200
++++ gnome-vfs2-2.6.2/configure.in	2004-08-18 20:37:12.000000000 +0200
+@@ -105,6 +105,8 @@
+ 
+ dnl semaphore functions are in librt.so on solaris
+ AC_SEARCH_LIBS(sem_wait, rt)
++dnl and in libsem.so on systems that use libsem
++AC_SEARCH_LIBS(sem_wait, sem)
+ 
+ dnl Don't blindly #define them if they're typedef'ed in <sys/types.h>
+ AM_GNOME_SIZE_T
+diff -ur gnome-vfs2-2.6.2.old/libgnomevfs/gnome-vfs-cdrom.c gnome-vfs2-2.6.2/libgnomevfs/gnome-vfs-cdrom.c
+--- gnome-vfs2-2.6.2.old/libgnomevfs/gnome-vfs-cdrom.c	2004-07-20 19:50:44.000000000 +0200
++++ gnome-vfs2-2.6.2/libgnomevfs/gnome-vfs-cdrom.c	2004-08-18 20:29:35.000000000 +0200
+@@ -89,9 +89,9 @@
+ 	return type;
+ #elif defined(HAVE_SYS_MNTCTL_H)
+ 	return CDS_NO_INFO;
+-#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__) || defined(__NetBSD__)
+ 	struct ioc_toc_header header;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	struct ioc_read_toc_single_entry entry;
+ #else
+ 	struct ioc_read_toc_entry entries;
+@@ -113,7 +113,7 @@
+ 	}
+ 
+ 	type = CDS_DATA_1;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	for (entry.track = header.starting_track;
+ 		entry.track <= header.ending_track;
+ 		entry.track++) {
+@@ -126,7 +126,7 @@
+ 		}
+ 	}
+ 
+-#else /* defined(__FreeBSD__) */
++#else /* defined(__FreeBSD__) || defined(__FreeBSD_kernel__) */
+ 	entries.data_len = sizeof(entry);
+ 	entries.data = &entry;
+ 	for (i = header.starting_track; i <= header.ending_track; i++) {
+@@ -140,7 +140,7 @@
+ 		}
+ 	}
+ 
+-#endif /* defined(__FreeBSD__) */
++#endif /* defined(__FreeBSD__) || defined(__FreeBSD_kernel__) */
+ 	return type;
+ #else
+ 	*fd = open (vol_dev_path, O_RDONLY|O_NONBLOCK);
+diff -ur gnome-vfs2-2.6.2.old/libgnomevfs/gnome-vfs-volume-ops.c gnome-vfs2-2.6.2/libgnomevfs/gnome-vfs-volume-ops.c
+--- gnome-vfs2-2.6.2.old/libgnomevfs/gnome-vfs-volume-ops.c	2004-03-05 16:08:12.000000000 +0100
++++ gnome-vfs2-2.6.2/libgnomevfs/gnome-vfs-volume-ops.c	2004-08-18 20:28:40.000000000 +0200
+@@ -259,7 +259,7 @@
+ 	}
+ 
+ 	if (info->should_eject) {
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	    	char *argv[5] = {
+ 		    	"cdcontrol",
+ 			"-f",
+diff -ur gnome-vfs2-2.6.2.old/modules/cdda-method.c gnome-vfs2-2.6.2/modules/cdda-method.c
+--- gnome-vfs2-2.6.2.old/modules/cdda-method.c	2004-01-22 13:29:10.000000000 +0100
++++ gnome-vfs2-2.6.2/modules/cdda-method.c	2004-08-18 20:28:13.000000000 +0200
+@@ -625,7 +625,7 @@
+ 		if (global_context != NULL) {
+ #ifdef __linux__
+ 			if (strcmp (drive->cdda_device_name, global_context->drive->cdda_device_name) == 0) {
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 			if (strcmp (drive->dev->device_path, global_context->drive->dev->device_path) == 0) {
+ #endif
+ 				use_cache = TRUE;
+@@ -715,7 +715,7 @@
+ 		if (global_context != NULL) {
+ #ifdef __linux__
+ 				if (strcmp (drive->cdda_device_name, global_context->drive->cdda_device_name) != 0) {
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 				if (strcmp (drive->dev->device_path, global_context->drive->dev->device_path) != 0) {
+ #endif
+ 					/*	Clear old cache */

@@ -10,5 +10,8 @@ esac
 
 echo "#include \"$hdr\"" > $tmp
 set +e
-gcc -w -c $tmp -o /dev/null
-rm -f $tmp
+if gcc -w -c $tmp -o /dev/null ; then
+  rm -f $tmp
+else
+  exit 1
+fi
