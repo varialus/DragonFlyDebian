@@ -1,9 +1,5 @@
 #!/usr/bin/make -f
 
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
-export DH_COMPAT=4
-
 major		= 5
 version		= $(major).2.1
 
@@ -11,6 +7,9 @@ DEB_AUTO_UPDATE_DEBIAN_CONTROL	= yes
 PWD = $(shell pwd)
 DEB_TAR_SRCDIR=src
 DEB_DH_SHLIBDEPS_ARGS=-X/boot
+
+# dpkg-architecture
+include /usr/share/cdbs/1/rules/buildvars.mk
 
 include debian/mk/build.mk
 include debian/mk/mkdirs.mk
