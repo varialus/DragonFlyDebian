@@ -1,5 +1,18 @@
 #!/usr/bin/make -f
 
+package = kfreebsd-headers
+major = 5
+
 DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
 
 include /usr/share/cdbs/1/rules/debhelper.mk
+
+kfreebsd_cpu   := $(DEB_HOST_GNU_CPU)
+ifeq ($(kfreebsd_cpu), x86_64)
+kfreebsd_cpu   := amd64
+endif
+
+binary/$(package):: common-install-prehook-arch
+	mkdir -p debian/$(package)/usr/src/kfreebsd$(major)-headers
+	ln -sf $(kfreebsd_cpu)/include \
+		debian/$(package)/usr/src/kfreebsd$(major)-headers/machine
