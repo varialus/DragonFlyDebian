@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+
+SHELL=bash
+DEB_TAR_SRCDIR := src/usr.sbin/moused
+PATH:=/usr/lib/freebsd:$(PATH)
+DESTDIR=$(CURDIR)/debian/moused
+MAKE=make DESTDIR=$(DESTDIR)
+
+build/moused:: apply-patches
+	cd $(DEB_SRCDIR) && $(MAKE)
+
+binary/moused:: common-install-prehook-arch
+	cd $(DEB_SRCDIR) && $(MAKE) install
+	# geez
+	mv $(DESTDIR)/{moused,usr/sbin/}
+
+clean::
+	cat debian/control.in \
+		| sed "s/@kfreebsd-gnu@/`type-handling any kfreebsd-gnu`/g" \
+		> debian/control
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/tarball.mk
+include /usr/share/cdbs/1/rules/simple-patchsys.mk
