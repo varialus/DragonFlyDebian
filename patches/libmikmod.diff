@@ -1,0 +1,24 @@
+ --- libmikmod-3.1.11.old/debian/rules   2004-08-04 22:24:54.000000000 +0200
+ +++ libmikmod-3.1.11/debian/rules       2004-08-04 22:19:29.000000000 +0200
+ @@ -12,10 +12,18 @@
+  endif
+  export CFLAGS
+ 
+ -# Work around outdated configure.guess (still need an up-to-date configure.sub)
+ -export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ -export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+ +DEB_HOST_GNU_TYPE      ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ +DEB_BUILD_GNU_TYPE     ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+ +DEB_BUILD_GNU_CPU      ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
+ +DEB_BUILD_GNU_SYSTEM   ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_SYSTEM)
+ 
+ +ifneq (, $(filter $(DEB_BUILD_GNU_SYSTEM),kfreebsd-gnu knetbsd-gnu))
+ +DEB_BUILD_GNU_TYPE = $(DEB_BUILD_GNU_CPU)-gnu
+ +endif
+ +
+ +# Work around outdated config.guess (still need an up-to-date config.sub)
+ +export DEB_HOST_GNU_TYPE
+ +export DEB_BUILD_GNU_TYPE
+ 
+  PWD=$(shell pwd)
+ 

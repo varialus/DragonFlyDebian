@@ -1,0 +1,112 @@
+diff -ur qt-x11-free-3.2.3.old/debian/rules qt-x11-free-3.2.3/debian/rules
+--- qt-x11-free-3.2.3.old/debian/rules	2004-08-05 00:34:39.000000000 +0200
++++ qt-x11-free-3.2.3/debian/rules	2004-08-05 00:42:50.000000000 +0200
+@@ -202,7 +202,14 @@
+ 	find $(P_DOC) -type f -perm +0100 | xargs --no-run-if-empty rm -f
+ 
+ 	install -d $(P_DOC)/usr/share/man/man3/
++ifeq ($(DEB_BUILD_GNU_SYSTEM),kfreebsd-gnu)
++	# avoid E2BIG on GNU/kFreeBSD
++	for i in $(P_DOC)/usr/share/qt3/doc/doc/man/man3/* ; do \
++		mv $$i $(P_DOC)/usr/share/man/man3/ ; \
++	done
++else
+ 	mv $(P_DOC)/usr/share/qt3/doc/doc/man/man3/* $(P_DOC)/usr/share/man/man3/
++endif
+ 	-rm -rf $(P_DOC)/usr/share/qt3/doc/doc
+ 
+ 	# other i18n files
+diff -ur qt-x11-free-3.2.3.old/configure qt-x11-free-3.2.3/configure
+--- qt-x11-free-3.2.3.old/configure	2003-10-21 12:04:20.000000000 +0200
++++ qt-x11-free-3.2.3/configure	2004-08-05 00:33:56.000000000 +0200
+@@ -1248,7 +1248,7 @@
+ 	    XPLATFORM="qws/solaris-$CFG_EMBEDDED-g++"
+ 	fi
+ 	;;
+-    Linux:*)
++    Linux:*|GNU:*|GNU/*:*)
+ 	if [ -z "$PLATFORM" ]; then
+ 	    case "$UNAME_MACHINE" in
+ 	    *86)
+@@ -1303,9 +1303,6 @@
+      QNX:*)
+ 	PLATFORM=qnx-g++
+ 	;;
+-     GNU:*)
+-	PLATFORM=hurd-g++
+-	;;
+      dgux:*)
+ 	PLATFORM=dgux-g++
+ 	;;
+@@ -1353,7 +1350,7 @@
+ 	    - Also available for Tru64: tru64-g++
+ 	"
+ 	;;
+-     Linux:*)
++     Linux:*|GNU:*|GNU/*:*)
+ 	PLATFORM=linux-g++
+ 	PLATFORM_NOTES="
+ 	    - Also available for Linux: linux-kcc linux-icc linux-cxx
+diff -ur qt-x11-free-3.2.3.old/doc/html/qglobal-h.html qt-x11-free-3.2.3/doc/html/qglobal-h.html
+--- qt-x11-free-3.2.3.old/doc/html/qglobal-h.html	2003-11-10 13:06:43.000000000 +0100
++++ qt-x11-free-3.2.3/doc/html/qglobal-h.html	2004-08-05 00:39:47.000000000 +0200
+@@ -148,7 +148,7 @@
+ #  define Q_OS_ULTRIX
+ #elif defined(sinix)
+ #  define Q_OS_RELIANT
+-#elif defined(__linux__) || defined(__linux)
++#elif defined(__linux__) || defined(__linux) || defined(__GNU__) || defined(__GLIBC__)
+ #  define Q_OS_LINUX
+ #elif defined(__FreeBSD__)
+ #  define Q_OS_FREEBSD
+@@ -170,8 +170,6 @@
+ #  define Q_OS_AIX
+ #elif defined(__Lynx__)
+ #  define Q_OS_LYNX
+-#elif defined(__GNU_HURD__)
+-#  define Q_OS_HURD
+ #elif defined(__DGUX__)
+ #  define Q_OS_DGUX
+ #elif defined(__QNXNTO__)
+diff -ur qt-x11-free-3.2.3.old/include/qglobal.h qt-x11-free-3.2.3/include/qglobal.h
+--- qt-x11-free-3.2.3.old/include/qglobal.h	2003-11-10 11:21:38.000000000 +0100
++++ qt-x11-free-3.2.3/include/qglobal.h	2004-08-05 00:40:23.000000000 +0200
+@@ -112,7 +112,7 @@
+ #  define Q_OS_ULTRIX
+ #elif defined(sinix)
+ #  define Q_OS_RELIANT
+-#elif defined(__linux__) || defined(__linux)
++#elif defined(__linux__) || defined(__linux) || defined(__GNU__) || defined(__GLIBC__)
+ #  define Q_OS_LINUX
+ #elif defined(__FreeBSD__)
+ #  define Q_OS_FREEBSD
+@@ -134,8 +134,6 @@
+ #  define Q_OS_AIX
+ #elif defined(__Lynx__)
+ #  define Q_OS_LYNX
+-#elif defined(__GNU_HURD__)
+-#  define Q_OS_HURD
+ #elif defined(__DGUX__)
+ #  define Q_OS_DGUX
+ #elif defined(__QNXNTO__)
+diff -ur qt-x11-free-3.2.3.old/src/tools/qglobal.h qt-x11-free-3.2.3/src/tools/qglobal.h
+--- qt-x11-free-3.2.3.old/src/tools/qglobal.h	2003-11-10 11:21:38.000000000 +0100
++++ qt-x11-free-3.2.3/src/tools/qglobal.h	2004-08-05 00:40:23.000000000 +0200
+@@ -112,7 +112,7 @@
+ #  define Q_OS_ULTRIX
+ #elif defined(sinix)
+ #  define Q_OS_RELIANT
+-#elif defined(__linux__) || defined(__linux)
++#elif defined(__linux__) || defined(__linux) || defined(__GNU__) || defined(__GLIBC__)
+ #  define Q_OS_LINUX
+ #elif defined(__FreeBSD__)
+ #  define Q_OS_FREEBSD
+@@ -134,8 +134,6 @@
+ #  define Q_OS_AIX
+ #elif defined(__Lynx__)
+ #  define Q_OS_LYNX
+-#elif defined(__GNU_HURD__)
+-#  define Q_OS_HURD
+ #elif defined(__DGUX__)
+ #  define Q_OS_DGUX
+ #elif defined(__QNXNTO__)
