@@ -102,6 +102,7 @@ finish() {
 
 # Glibc
 unpack glibc-${TARBALL_VERSION}.tar.bz2 in . creating glibc-${TARBALL_VERSION}
+overlay glibc-linuxthreads-${TARBALL_VERSION}.tar.bz2 on glibc-${TARBALL_VERSION}
 finish glibc-${TARBALL_VERSION} ./glibc-${VERSION}
 cp -a /usr/src/glibc-kbsd/sysdeps glibc-${VERSION}/
 ln -s /usr/src/kfreebsd4-headers \

@@ -10,6 +10,8 @@ $(libc): $(stamp_install) debian/control $(mkdir)/sysdeps.mk debian/libc/DEBIAN/
 	$(INSTALL_DATA) $(install_root)/lib/libSegFault.so $(tmpdir)/$@/lib/.
 ifeq ($(threads),yes)
 	$(INSTALL_DATA) $(install_root)/lib/libpthread-0.10.so $(tmpdir)/$@/lib/.
+	cp $(install_root)/lib/libthread_db.so \
+		$(install_root)/lib/libthread_db-1.0.so
 	$(INSTALL_DATA) $(install_root)/lib/libthread_db-1.0.so $(tmpdir)/$@/lib/.
 endif
 	@set -ex; cd $(install_root)/lib && \
