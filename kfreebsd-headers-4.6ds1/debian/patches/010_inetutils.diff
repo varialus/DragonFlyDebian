@@ -1,0 +1,192 @@
+diff -ur src.old/sys/netinet/ip.h src/sys/netinet/ip.h
+--- src.old/sys/netinet/ip.h	1999-12-22 20:13:20.000000000 +0100
++++ src/sys/netinet/ip.h	2004-08-13 18:02:09.000000000 +0200
+@@ -37,6 +37,10 @@
+ #ifndef _NETINET_IP_H_
+ #define _NETINET_IP_H_
+ 
++#include <sys/types.h>		/* u_int */
++#include <netinet/in.h>		/* in_addr */
++#include <netinet/in_systm.h>	/* n_long */
++
+ /*
+  * Definitions for internet protocol version 4.
+  * Per RFC 791, September 1981.
+diff -ur src.old/sys/netinet/ip_icmp.h src/sys/netinet/ip_icmp.h
+--- src.old/sys/netinet/ip_icmp.h	1999-12-29 05:41:01.000000000 +0100
++++ src/sys/netinet/ip_icmp.h	2004-08-13 18:04:42.000000000 +0200
+@@ -37,6 +37,11 @@
+ #ifndef _NETINET_IP_ICMP_H_
+ #define _NETINET_IP_ICMP_H_
+ 
++#include <sys/types.h>		/* u_int32_t, u_char */
++#include <netinet/in.h>		/* in_addr */
++#include <netinet/in_systm.h>	/* n_short */
++#include <netinet/ip.h>		/* idi_ip */
++
+ /*
+  * Interface Control Message Protocol Definitions.
+  * Per RFC 792, September 1981.
+diff -ur src.old/sys/netinet/ip_var.h src/sys/netinet/ip_var.h
+--- src.old/sys/netinet/ip_var.h	2001-12-07 10:23:14.000000000 +0100
++++ src/sys/netinet/ip_var.h	2004-08-13 18:05:28.000000000 +0200
+@@ -38,6 +38,8 @@
+ #define	_NETINET_IP_VAR_H_
+ 
+ #include <sys/queue.h>
++#include <sys/types.h>		/* u_char, u_short */
++#include <netinet/in.h>		/* in_addr */
+ 
+ /*
+  * Overlay for ip header used by other protocols (tcp, udp).
+diff -ur src.old/sys/net/if_var.h src/sys/net/if_var.h
+--- src.old/sys/net/if_var.h	2002-02-21 00:34:09.000000000 +0100
++++ src/sys/net/if_var.h	2004-08-13 18:58:11.000000000 +0200
+@@ -37,6 +37,9 @@
+ #ifndef	_NET_IF_VAR_H_
+ #define	_NET_IF_VAR_H_
+ 
++#include <sys/types.h>
++#include <net/if.h>
++
+ /*
+  * Structures defining a network interface, providing a packet
+  * transport mechanism (ala level 0 of the PUP protocols).
+diff -ur src.old/sys/netinet/in_var.h src/sys/netinet/in_var.h
+--- src.old/sys/netinet/in_var.h	2001-12-14 21:09:34.000000000 +0100
++++ src/sys/netinet/in_var.h	2004-08-13 19:06:39.000000000 +0200
+@@ -38,7 +38,9 @@
+ #define _NETINET_IN_VAR_H_
+ 
+ #include <sys/queue.h>
++#include <net/if_var.h>		/* ifaddr */
+ #include <sys/fnv_hash.h>
++#include <netinet/in.h>		/* in_addr */
+ 
+ /*
+  * Interface address, Internet version.  One of these structures
+diff -ur src.old/sys/netinet6/in6.h src/sys/netinet6/in6.h
+--- src.old/sys/netinet6/in6.h	2002-04-28 07:40:26.000000000 +0200
++++ src/sys/netinet6/in6.h	2004-08-13 18:42:25.000000000 +0200
+@@ -72,6 +72,8 @@
+ #ifndef _NETINET6_IN6_H_
+ #define _NETINET6_IN6_H_
+ 
++#include <sys/types.h>
++
+ /*
+  * Identification of the network protocol stack
+  * for *BSD-current/release: http://www.kame.net/dev/cvsweb.cgi/kame/COVERAGE
+diff -ur src.old/sys/netinet6/in6_var.h src/sys/netinet6/in6_var.h
+--- src.old/sys/netinet6/in6_var.h	2004-08-13 18:08:17.000000000 +0200
++++ src/sys/netinet6/in6_var.h	2004-08-13 18:46:49.000000000 +0200
+@@ -68,6 +68,9 @@
+ #ifndef _NETINET6_IN6_VAR_H_
+ #define _NETINET6_IN6_VAR_H_
+ 
++#include <sys/types.h>		/* __kernel_time_t */
++#include <netinet/in_var.h>	/* ifaddr */
++
+ /*
+  * Interface address, Internet version.  One of these structures
+  * is allocated for each interface with an Internet address.
+diff -ur src.old/sys/sys/fnv_hash.h src/sys/sys/fnv_hash.h
+--- src.old/sys/sys/fnv_hash.h	2001-03-21 11:50:59.000000000 +0100
++++ src/sys/sys/fnv_hash.h	2004-08-13 19:08:43.000000000 +0200
+@@ -8,6 +8,8 @@
+  * $FreeBSD: src/sys/sys/fnv_hash.h,v 1.2.2.1 2001/03/21 10:50:59 peter Exp $
+  */
+ 
++#include <sys/types.h>
++
+ typedef u_int32_t Fnv32_t;
+ typedef u_int64_t Fnv64_t;
+ 
+@@ -58,7 +60,7 @@
+ fnv_64_str(const char *str, Fnv64_t hval)
+ {
+ 	const u_int8_t *s = (const u_int8_t *)str;
+-	u_register_t c;		 /* 32 bit on i386, 64 bit on alpha,ia64 */
++	long int c;		 /* 32 bit on i386, 64 bit on alpha,ia64 */
+ 
+ 	while ((c = *s++) != 0) {
+ 		hval *= FNV_64_PRIME;
+--- src.old/sys/netinet6/in6.h	2004-08-13 19:18:55.000000000 +0200
++++ src/sys/netinet6/in6.h	2004-08-13 19:36:27.000000000 +0200
+@@ -65,7 +65,7 @@
+  *	@(#)in.h	8.3 (Berkeley) 1/3/94
+  */
+ 
+-#ifndef __KAME_NETINET_IN_H_INCLUDED_
++#ifndef _NETINET_IN_H
+ #error "do not include netinet6/in6.h directly, include netinet/in.h.  see RFC2553"
+ #endif
+ 
+@@ -116,17 +116,6 @@
+ #define	IPV6PORT_RESERVEDMIN	600
+ #define	IPV6PORT_RESERVEDMAX	(IPV6PORT_RESERVED-1)
+ 
+-/*
+- * IPv6 address
+- */
+-struct in6_addr {
+-	union {
+-		u_int8_t   __u6_addr8[16];
+-		u_int16_t  __u6_addr16[8];
+-		u_int32_t  __u6_addr32[4];
+-	} __u6_addr;			/* 128-bit IP6 address */
+-};
+-
+ #define s6_addr   __u6_addr.__u6_addr8
+ #ifdef _KERNEL	/* XXX nonstandard */
+ #define s6_addr8  __u6_addr.__u6_addr8
+@@ -142,14 +131,6 @@
+ #ifndef _XOPEN_SOURCE
+ #define SIN6_LEN
+ #endif
+-struct sockaddr_in6 {
+-	u_int8_t	sin6_len;	/* length of this struct(sa_family_t)*/
+-	u_int8_t	sin6_family;	/* AF_INET6 (sa_family_t) */
+-	u_int16_t	sin6_port;	/* Transport layer port # (in_port_t)*/
+-	u_int32_t	sin6_flowinfo;	/* IP6 flow information */
+-	struct in6_addr	sin6_addr;	/* IP6 address */
+-	u_int32_t	sin6_scope_id;	/* scope zone index */
+-};
+ 
+ /*
+  * Local definition for masks
+@@ -447,22 +428,6 @@
+ #define IPV6_DEFAULT_MULTICAST_LOOP 1	/* normally hear sends if a member */
+ 
+ /*
+- * Argument structure for IPV6_JOIN_GROUP and IPV6_LEAVE_GROUP.
+- */
+-struct ipv6_mreq {
+-	struct in6_addr	ipv6mr_multiaddr;
+-	unsigned int	ipv6mr_interface;
+-};
+-
+-/*
+- * IPV6_PKTINFO: Packet information(RFC2292 sec 5)
+- */
+-struct in6_pktinfo {
+-	struct in6_addr	ipi6_addr;	/* src/dst IPv6 address */
+-	unsigned int	ipi6_ifindex;	/* send/recv interface index */
+-};
+-
+-/*
+  * Argument for IPV6_PORTRANGE:
+  * - which range to search when port is unspecified at bind() or connect()
+  */
+--- src/sys/netinet6/in6.h~	2004-08-13 19:36:58.000000000 +0200
++++ src/sys/netinet6/in6.h	2004-08-13 19:53:02.000000000 +0200
+@@ -216,9 +216,6 @@
+ #ifdef _KERNEL
+ #define IN6_ARE_ADDR_EQUAL(a, b)			\
+     (bcmp(&(a)->s6_addr[0], &(b)->s6_addr[0], sizeof(struct in6_addr)) == 0)
+-#else
+-#define IN6_ARE_ADDR_EQUAL(a, b)			\
+-    (memcmp(&(a)->s6_addr[0], &(b)->s6_addr[0], sizeof(struct in6_addr)) == 0)
+ #endif
+ 
+ #ifdef _KERNEL			/* non standard */
