@@ -1,30 +1,50 @@
-#!/bin/bash -ex
+#!/bin/bash -x
 #
-# Build-Depends: wget, gnupg, mkisofs, crosshurd
+# Build-Depends: grub, wget, gnupg, mkisofs, crosshurd, fakeroot, binutils
+#
+# Copyright 2004  Robert Millan <rmh@debian.org>
+# See /usr/share/common-licenses/GPL for license terms.
 
-[ "$UID" == "0" ]
+if [ "$UID" != "0" ] ; then
+  # I call that incest, don't you?
+  fakeroot $0 $@
+  exit 0
+fi
 
-version=5
+cpu=`dpkg-architecture -qDEB_BUILD_GNU_CPU`
+uname="GNU/kFreeBSD"
+tmp=`tempfile` && rm -f ${tmp} && mkdir -p ${tmp}
+pwd=`pwd`
+version=6
 
-rm -rf *~ out
-mkdir -p stand/boot/grub out
+/usr/share/crosshurd/makehurddir.sh ${tmp} ${cpu} kfreebsd-gnu
+
+##################
+#  add some trickery
+###########################
+
+cd ${tmp}
+
+# we can't run native-install (since we might be cross-building) so we
+# mimic the essentials here
+ln -s /usr/share/sysvinit/inittab etc/inittab
 
 # GRUB stuff
-cp /lib/grub/i386-pc/stage2_eltorito stand/boot/grub/
-cat > stand/boot/grub/menu.lst << EOF
+mkdir -p boot/grub
+cp /lib/grub/${cpu}-*/stage2_eltorito boot/grub/
+cat > boot/grub/menu.lst << EOF
 timeout 30
 default 0
-title  GNU/kFreeBSD (cdrom 0)
+title  ${uname} (cdrom 0)
 root (cd)
 kernel /boot/kfreebsd.gz root=cd9660:acd0
-title  GNU/kFreeBSD (cdrom 1)
+title  ${uname} (cdrom 1)
 root (cd)
 kernel /boot/kfreebsd.gz root=cd9660:acd1
 EOF
 
-# add this to make it safe
-cp /boot/device.hints stand/boot/
-cat >> stand/boot/device.hints << EOF
+# add this to make it a safe boot
+cat >> boot/device.hints << EOF
 hint.acpi.0.disabled=1
 loader.acpi_disabled_by_user=1
 hint.apic.0.disabled=1
@@ -33,21 +53,27 @@ hw.ata.atapi_dma=0
 hw.ata.wc=0
 hw.eisa_slots=0
 EOF
-
-# prepare the base system
-cat > stand/etc/issue << EOF
-Debian GNU/kFreeBSD testing/unstable \n \l
+cat > etc/issue << EOF
+Debian ${uname} testing/unstable \n \l
 
 You may login as root, with no password.
 
 EOF
-cat > stand/etc/fstab << EOF
+cat > etc/fstab << EOF
 /dev/acd0 / cd9660 ro 1 1
 EOF
 # keep inetutils-syslogd from bitching
-cp stand/{bin/true,usr/sbin/syslogd}
+cp bin/true usr/sbin/syslogd
 
-# ignition!
+
+#########################
+#                    ignition!
+#################################
 mkisofs -b boot/grub/stage2_eltorito \
   -no-emul-boot -boot-load-size 4 -boot-info-table \
-  -o out/livecd${version}.iso -r stand
+  -o ${pwd}/livecd${version}.iso -r .
+
+cd ${pwd}/
+if [ "${LIVECD_DEBUG}" != "yes" ] ; then
+  rm -rf ${tmp}
+fi
