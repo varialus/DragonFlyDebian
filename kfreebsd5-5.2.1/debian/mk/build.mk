@@ -8,7 +8,7 @@ kfreebsd_cpu = $(DEB_HOST_GNU_CPU)
 
 build/kfreebsd5:: pre-build apply-patches
 	if ! test -e debian/stamp-build ; then \
-	cd build-tree/src/sys/i386/conf && \
+	cd build-tree/src/sys/$(kfreebsd_cpu)/conf && \
 		config $(KERNEL) ; \
 	cd ../compile/$(KERNEL)/ && \
 		$(MAKE) depend && $(MAKE) ; \
@@ -23,7 +23,7 @@ binary/kfreebsd5:: common-install-prehook-arch
 	done
 	# install device.hints
 	install -o root -g root -m 644 \
-		build-tree/src/sys/i386/conf/GENERIC.hints \
+		build-tree/src/sys/$(kfreebsd_cpu)/conf/GENERIC.hints \
 		$(DESTDIR)/boot/device.hints
 	install -o root -g root -m 644 \
 		build-tree/src/sys/boot/forth/loader.conf \
@@ -32,7 +32,7 @@ binary/kfreebsd5:: common-install-prehook-arch
 		build-tree/src/sys/boot/forth/loader.conf \
 		 $(DESTDIR)/boot/defaults/loader.conf
 	# now install the kernel
-	cd build-tree/src/sys/i386/compile/$(KERNEL) && \
+	cd build-tree/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL) && \
 		$(MAKE) install
 	chmod 644 $(DESTDIR)/boot/kernel/kernel
 	gzip -c9 $(DESTDIR)/boot/kernel/kernel > \
@@ -44,14 +44,14 @@ binary/kfreebsd5:: common-install-prehook-arch
 
 clean::
 	grep -q src/sys/$(kfreebsd_cpu)/conf/GENERIC \
-		debian/patches/003_config.diff
+		debian/patches/*.diff
 
-	cat debian/patches/004_version.diff.in \
+	cat debian/patches/902_debian_version.diff.in \
 		| sed "s/@revision@/$(revision)/g" \
-		> debian/patches/004_version.diff
+		> debian/patches/902_debian_version.diff
 
-	cat debian/control.in \
+	cat debian/control.in.in \
 		| sed "s/@kfreebsd-gnu@/`type-handling any kfreebsd-gnu`/g" \
-		> debian/control
+		> debian/control.in
 
 	rm -f debian/stamp-build

@@ -1,3 +1,21 @@
+kfreebsd5 (5.2.1-7) unreleased; urgency=low
+
+  * Fix local memory leak vulnerability (FreeBSD-SA-04:15.syscons /
+    CAN-2004-0919).
+    - patches/000_syscons_vulnerability.diff: New.  Patch from upstream.
+  * Fix wrong permissions in some device files.
+    - patches/900_devfs_perm_fixes.diff: New.  Sync uids/gids of kernel devices
+      with debian base-passwd ones.
+  * Rename some patches to follow the guidelines in README.
+    - README: New.
+    - etc.
+  * Use cdbs debian/control autogen feature.
+    - control.in: Rename to control.in.in and set the @cdbs@ tag.
+    - rules: Set DEB_AUTO_UPDATE_DEBIAN_CONTROL = yes.
+    - mk/build.mk (clean): Generate control.in from control.in.in.
+
+ -- Robert Millan <rmh@debian.org>  Tue,  5 Oct 2004 00:58:50 +0200
+
 kfreebsd5 (5.2.1-6) unreleased; urgency=low
 
   * Use type-handling to auto-generate kfreebsd-gnu architecture list for dpkg.
