@@ -1,0 +1,22 @@
+diff -u lockdev-1.0.1/src/lockdev.c lockdev-1.0.1/src/lockdev.c
+--- lockdev-1.0.1/src/lockdev.c
++++ lockdev-1.0.1/src/lockdev.c
+@@ -126,6 +126,9 @@
+ #if defined (__linux__)
+ #include <linux/kdev_t.h>
+ #include <linux/major.h>
++#elif defined (__FreeBSD_kernel__) || defined(__NetBSD_kernel__) || defined(__OpenBSD_kernel__)
++#  define MAJOR(dev) ((dev & 0xff00) >> 8)
++#  define MINOR(dev) (dev & 0xffff00ff)
+ #else
+ #  error "put here a define for MAJOR and MINOR"
+ #endif
+@@ -188,7 +191,7 @@
+  * All types uses the macro LOCK_PATH
+  */
+ 
+-#if defined (__linux__)
++#if defined (__linux__) || defined (__FreeBSD_kernel__) || defined(__NetBSD_kernel__) || defined(__OpenBSD_kernel__)
+ 
+ /* for internal use */
+ static inline int
