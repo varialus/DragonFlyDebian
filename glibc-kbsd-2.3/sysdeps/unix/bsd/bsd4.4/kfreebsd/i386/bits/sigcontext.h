@@ -74,7 +74,7 @@ struct sigcontext
 #define FPE_INTDIV	1 /* integer divide by zero */
 #define FPE_INTOVF	2 /* integer overflow */
 
-#if 0 /* XXX These need verification.  */
+#if 1 /* FIXME: These need verification.  */
 
 #define FPE_FLTDIV	3 /* floating divide by zero */
 #define FPE_FLTOVF	4 /* floating overflow */
