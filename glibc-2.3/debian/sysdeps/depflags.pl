@@ -42,11 +42,15 @@ if ($DEB_HOST_GNU_SYSTEM eq "kfreebsd-gnu") {
     push @{$libc_dev_c{'Depends'}}, ('kfreebsd-headers');
     push @{$libc_dev_c{'Conflicts'}}, ('libpthread-dev');
     push @{$libc_dev_c{'Replaces'}}, ('libpthread-dev');
+    push @{$libc_dev_c{'Conflicts'}}, ('libsem-dev');
+    push @{$libc_dev_c{'Replaces'}}, ('libsem-dev');
 }
 if ($DEB_HOST_GNU_SYSTEM eq "knetbsd-gnu") {
     push @{$libc_dev_c{'Depends'}}, ('knetbsd-headers');
     push @{$libc_dev_c{'Conflicts'}}, ('libpthread-dev');
     push @{$libc_dev_c{'Replaces'}}, ('libpthread-dev');
+    push @{$libc_dev_c{'Conflicts'}}, ('libsem-dev');
+    push @{$libc_dev_c{'Replaces'}}, ('libsem-dev');
 }
 
 # nss-db is now seperate
