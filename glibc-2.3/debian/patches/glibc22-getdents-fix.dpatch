@@ -1,0 +1,78 @@
+#! /bin/sh -e
+
+# All lines beginning with `# DP:' are a description of the patch.
+# DP: A patch I got from Trond Myklebust to fix NFS problems
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p1 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p1 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+--- glibc-2.2.2/sysdeps/unix/sysv/linux/getdents.c~	Tue Feb 20 14:53:40 2001
++++ glibc-2.2.2/sysdeps/unix/sysv/linux/getdents.c	Tue Feb 20 14:59:46 2001
+@@ -47,6 +47,8 @@
+ #endif
+ 
+ #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
++#define test_overflow(VAR, SIZE) ((((VAR) < 0 ? -(VAR):(VAR)) >> 8*(SIZE)) != 0)
++
+ 
+ extern int __syscall_getdents (int fd, char *__unbounded buf, unsigned int nbytes);
+ extern int __syscall_getdents64 (int fd, char *__unbounded buf, unsigned int nbytes);
+@@ -98,7 +100,6 @@
+ __GETDENTS (int fd, char *buf, size_t nbytes)
+ {
+   DIRENT_TYPE *dp;
+-  off64_t last_offset = -1;
+   ssize_t retval;
+ 
+ #ifdef __NR_getdents64
+@@ -126,6 +127,7 @@
+ # endif
+ 	{
+ 	  struct kernel_dirent64 *kdp;
++	  int64_t last_offset = 0;
+ 	  const size_t size_diff = (offsetof (struct kernel_dirent64, d_name)
+ 				    - offsetof (DIRENT_TYPE, d_name));
+ 
+@@ -157,12 +159,12 @@
+ 	      if ((sizeof (dp->d_ino) != sizeof (kdp->d_ino)
+ 		   && dp->d_ino != d_ino)
+ 		  || (sizeof (dp->d_off) != sizeof (kdp->d_off)
+-		      && dp->d_off != d_off))
++		      && test_overflow(d_off, sizeof(dp->d_off))))
+ 		{
+ 		  /* Overflow.  If there was at least one entry
+ 		     before this one, return them without error,
+ 		     otherwise signal overflow.  */
+-		  if (last_offset != -1)
++		  if (dp != buf)
+ 		    {
+ 		      __lseek64 (fd, last_offset, SEEK_SET);
+ 		      return (char *) dp - buf;
+@@ -193,6 +195,7 @@
+   {
+     size_t red_nbytes;
+     struct kernel_dirent *skdp, *kdp;
++    __kernel_off_t last_offset = 0;
+     const size_t size_diff = (offsetof (DIRENT_TYPE, d_name)
+ 			      - offsetof (struct kernel_dirent, d_name));
+ 
+@@ -221,7 +224,7 @@
+ 	  {
+ 	    /* Our heuristic failed.  We read too many entries.  Reset
+ 	       the stream.  */
+-	    assert (last_offset != -1);
++	    assert (dp != buf);
+ 	    __lseek64 (fd, last_offset, SEEK_SET);
+ 
+ 	    if ((char *) dp == buf)

@@ -1,0 +1,73 @@
+#! /bin/sh -e
+
+# All lines beginning with `# DP:' are a description of the patch.
+# DP: Description: Fix the value of SIGRTMIN in non-threaded applications
+# DP: Author: Andreas Schwab
+# DP: Upstream status: In CVS
+# DP: Date: 2002-10-29
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p1 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p1 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+On Tue, Oct 29, 2002 at 09:52:54AM +0100, Andreas Schwab wrote:
+> Daniel Jacobowitz <dan@debian.org> writes:
+> 
+> |> SIGRTMIN has changed behavior recently in 2.3; at the same time as:
+> |> 
+> |> 2002-09-18  Ulrich Drepper  <drepper@redhat.com>
+> |> 
+> |>         * signal/allocrtsig.c: Move to...
+> |>         * sysdeps/generic/allocrtsig.c: ...here.  New file.
+> |> 
+> |> as far as I can tell.
+> |> 
+> |> The problem is something I ran into in GDB today: the location of a
+> |> source file overrides the normal search path.  If a file in
+> |> sysdeps/generic/ includes a header using "", the copy in
+> |> sysdeps/generic/ will win.  So we get sysdeps/generic/testrtsig.h
+> |> instead of the sysdeps/unix/sysv/linux/testrtsig.h, and
+> |> kernel_has_rtsig always returns 0.
+> 
+> The right fix is probably to change "..." to <...>.  Could you try that
+> please?
+
+That of course works just fine (tested it even when it is obvious).
+As for why allocrtsig.c was moved from signal to sysdeps/generic,
+look at nptl/sysdeps/unix/sysv/linux/allocrtsig.c.
+Can you or AJ please check it in? Thanks.
+
+	* sysdeps/generic/allocrtsig.c: Include <testrtsig.h>, not
+	"testrtsig.h".
+
+--- libc/sysdeps/generic/allocrtsig.c.jj	2002-09-18 08:16:29.000000000 +0200
++++ libc/sysdeps/generic/allocrtsig.c	2002-10-29 11:20:32.000000000 +0100
+@@ -33,7 +33,7 @@ static int current_rtmax;
+ 
+ static int initialized;
+ 
+-#include "testrtsig.h"
++#include <testrtsig.h>
+ 
+ static void
+ init (void)
+
+
+	Jakub
+
+
+-- 
+To UNSUBSCRIBE, email to debian-glibc-request@lists.debian.org
+with a subject of "unsubscribe". Trouble? Contact listmaster@lists.debian.org
+
+

@@ -1,0 +1,43 @@
+#! /bin/sh -e
+
+# DP: Description: Return Malloc to 8-byte alignments. 
+# DP: Author: Carlos O'Donell <carlos@baldric.uwo.ca>
+# DP: Upstream status: Not submitted
+# DP: Status Details: Writing Changelog, will get submitted in the next week or so... 
+# DP: Date: March 1st, 2003
+
+# Since GCC can't assure 16-byte alignment in all situations we have moved
+# to the much more robust self aligning setup where an alignment of 8-bytes
+# is perfectly okay. This patch reverts our malloc alignments to 8-bytes and
+# allows us to have a more optimal situation from the viewpoint of the malloc
+# algorithm.
+#
+#	- Carlos.
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p1 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p1 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+--- glibc-2.3.1/sysdeps/hppa/Makefile	2003-01-20 23:47:12.000000000 -0500
++++ glibc-2.3.1/sysdeps/hppa/Makefile	2003-01-20 23:47:19.000000000 -0500
+@@ -22,10 +22,6 @@
+ # CFLAGS-.os += -ffunction-sections
+ LDFLAGS-c_pic.os += -Wl,--unique=.text*
+ 
+-ifeq ($(subdir),malloc)
+-CFLAGS-malloc.c += -DMALLOC_ALIGNMENT=16
+-endif
+-
+ ifeq ($(subdir),elf)
+ CFLAGS-rtld.c += -mdisable-fpregs
+ dl-routines += dl-symaddr dl-fptr

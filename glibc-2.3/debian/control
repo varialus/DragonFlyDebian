@@ -1,0 +1,399 @@
+Source: glibc
+Section: libs
+Priority: required
+Build-Depends: gettext (>= 0.10.37-1), make (>= 3.78-4), dpkg-dev (>= 1.4.1.5), debianutils (>= 1.13.1), tar (>= 1.13.11), bzip2, texinfo (>= 4.0), kernel-headers-2.4 |not+linux-gnu, mig (>= 1.3-2) [hurd-i386], hurd-dev (>= 20020608-1) [hurd-i386], gnumach-dev [hurd-i386], texi2html, file, gcc-3.2, autoconf2.13, binutils (= 2.14.90.0.2-0.1)
+Build-Depends-Indep: perl, latex2html, po-debconf
+Build-Conflicts: kernel-headers-2.4.19-sparc [!sparc], kernel-headers-2.4.18-sparc [!sparc]
+Maintainer: GNU Libc Maintainers <debian-glibc@lists.debian.org>
+Uploaders: Ben Collins <bcollins@debian.org>, GOTO Masanori <gotom@debian.or.jp>, Philip Blundell <pb@nexus.co.uk>, Jeff Bailey <jbailey@nisa.net>, Daniel Jacobowitz <dan@debian.org>
+Standards-Version: 3.5.7.0
+
+Package: glibc-doc
+Architecture: all
+Section: doc
+Priority: optional
+Conflicts: libc-doc, libc6-doc, glibcdoc
+Replaces: libc-doc, libc6-doc, glibcdoc
+Provides: libc-doc
+Description: GNU C Library: Documentation
+ Contains The GNU C Library Reference manual in info and html format as
+ well as man pages for libpthread functions. Also included is the complete
+ GNU C Library ChangeLog.
+
+Package: locales
+Architecture: all
+Section: base
+Priority: standard
+Provides: i18ndata
+Conflicts: localebin, wg15-locale, i18ndata, locale-ja, locale-ko, locale-vi, locale-zh
+Replaces: localebin, wg15-locale, libc0.1-bin, i18ndata, glibc2, locale-ja, locale-ko, locale-vi, locale-zh
+Description: GNU C Library: National Language (locale) data [support]
+ Machine-readable data files, shared objects and programs used by the
+ C library for localization (l10n) and internationalization (i18n) support.
+ .
+ This package contains the libc.mo i18n files, plus tools to generate
+ locale definitions from source files (included in this package). It allows
+ you to customize which definitions actually get generated. This is a
+ savings over how this package used to be, where all locales were generated
+ by default. This created a package that unpacked to an excess of 30 megs.
+
+Package: nscd
+Architecture: alpha arm i386 m68k mips mipsel powerpc sparc ia64 hppa s390 sh3 sh4 sh3eb sh4eb
+Section: admin
+Priority: optional
+Depends: libc0.1 (>= ${Source-Version})
+Replaces: libc0.1 (<< 2.1-4)
+Description: GNU C Library: Name Service Cache Daemon
+ A daemon which handles passwd, group and host lookups
+ for running programs and caches the results for the next
+ query. You should install this package only if you use
+ slow Services like LDAP, NIS or NIS+
+
+Package: libc6
+Architecture: arm i386 m68k mips mipsel powerpc sparc s390 hppa sh3 sh4 sh3eb sh4eb
+Section: base
+Priority: required
+Description: GNU C Library: Shared libraries and Timezone data
+ Contains the standard libraries that are used by nearly all programs on
+ the system. This package includes shared versions of the standard C library
+ and the standard math library, as well as many others.
+ Timezone data is also included.
+
+Package: libc6-dev
+Architecture: arm i386 m68k mips mipsel powerpc sparc s390 hppa sh3 sh4 sh3eb sh4eb
+Section: devel
+Priority: standard
+Depends: libc6 (= ${Source-Version})
+Provides: libc-dev
+Conflicts: libc-dev
+Recommends: c-compiler
+Suggests: glibc-doc
+Description: GNU C Library: Development Libraries and Header Files.
+ Contains the symlinks, headers, and object files needed to compile
+ and link programs which use the standard C library.
+
+Package: libc6-dbg
+Architecture: arm i386 m68k mips mipsel powerpc sparc s390 hppa sh3 sh4 sh3eb sh4eb
+Section: devel
+Priority: extra
+Depends: libc6 (= ${Source-Version})
+Description: GNU C Library: Libraries with debugging symbols
+ Contains unstripped shared libraries.
+ This package is provided primarily to provide a backtrace with
+ names in a debugger, this makes it somewhat easier to interpret core
+ dumps. The libraries are installed in /usr/lib/debug and can be
+ used by placing that directory in LD_LIBRARY_PATH.
+ Most people will not need this package.
+
+Package: libc6-prof
+Architecture: arm i386 m68k mips mipsel powerpc sparc s390 hppa sh3 sh4 sh3eb sh4eb
+Section: devel
+Priority: extra
+Depends: libc6 (= ${Source-Version})
+Description: GNU C Library: Profiling Libraries.
+ Static libraries compiled with profiling info (-pg) suitable for use
+ with gprof.
+
+Package: libc6-pic
+Architecture: arm i386 m68k mips mipsel powerpc sparc s390 hppa sh3 sh4 sh3eb sh4eb
+Section: devel
+Priority: optional
+Conflicts: libc-pic
+Provides: libc-pic, glibc-pic
+Depends: libc6 (= ${Source-Version})
+Description: GNU C Library: PIC archive library
+ Contains an archive library (ar file) composed of individual shared objects.
+ This is used for creating a library which is a smaller subset of the
+ standard libc shared library. The reduced library is used on the Debian
+ boot floppies. If you are not making your own set of Debian boot floppies
+ using the `boot-floppies' package, you probably don't need this package.
+
+Package: libc6.1
+Architecture: alpha ia64
+Section: base
+Priority: required
+Description: GNU C Library: Shared libraries and Timezone data
+ Contains the standard libraries that are used by nearly all programs on
+ the system. This package includes shared versions of the standard C library
+ and the standard math library, as well as many others.
+ Timezone data is also included.
+
+Package: libc6.1-dev
+Architecture: alpha ia64
+Section: devel
+Priority: standard
+Depends: libc6.1 (= ${Source-Version})
+Provides: libc-dev
+Conflicts: libc-dev
+Recommends: c-compiler
+Suggests: glibc-doc
+Description: GNU C Library: Development Libraries and Header Files.
+ Contains the symlinks, headers, and object files needed to compile
+ and link programs which use the standard C library.
+
+Package: libc6.1-dbg
+Architecture: alpha ia64
+Section: devel
+Priority: extra
+Depends: libc6.1 (= ${Source-Version})
+Description: GNU C Library: Libraries with debugging symbols
+ Contains unstripped shared libraries.
+ This package is provided primarily to provide a backtrace with
+ names in a debugger, this makes it somewhat easier to interpret core
+ dumps. The libraries are installed in /usr/lib/debug and can be
+ used by placing that directory in LD_LIBRARY_PATH.
+ Most people will not need this package.
+
+Package: libc6.1-prof
+Architecture: alpha ia64
+Section: devel
+Priority: extra
+Depends: libc6.1 (= ${Source-Version})
+Description: GNU C Library: Profiling Libraries.
+ Static libraries compiled with profiling info (-pg) suitable for use
+ with gprof.
+
+Package: libc6.1-pic
+Architecture: alpha ia64
+Section: devel
+Priority: optional
+Conflicts: libc-pic
+Provides: libc-pic, glibc-pic
+Depends: libc6.1 (= ${Source-Version})
+Description: GNU C Library: PIC archive library
+ Contains an archive library (ar file) composed of individual shared objects.
+ This is used for creating a library which is a smaller subset of the
+ standard libc shared library. The reduced library is used on the Debian
+ boot floppies. If you are not making your own set of Debian boot floppies
+ using the `boot-floppies' package, you probably don't need this package.
+
+Package: libc0.3
+Architecture: hurd-i386
+Section: base
+Priority: required
+Description: GNU C Library: Shared libraries and Timezone data
+ Contains the standard libraries that are used by nearly all programs on
+ the system. This package includes shared versions of the standard C library
+ and the standard math library, as well as many others.
+ Timezone data is also included.
+
+Package: libc0.3-dev
+Architecture: hurd-i386
+Section: devel
+Priority: standard
+Depends: libc0.3 (= ${Source-Version})
+Provides: libc-dev
+Conflicts: libc-dev
+Recommends: c-compiler
+Suggests: glibc-doc
+Description: GNU C Library: Development Libraries and Header Files.
+ Contains the symlinks, headers, and object files needed to compile
+ and link programs which use the standard C library.
+
+Package: libc0.3-dbg
+Architecture: hurd-i386
+Section: devel
+Priority: extra
+Depends: libc0.3 (= ${Source-Version})
+Description: GNU C Library: Libraries with debugging symbols
+ Contains unstripped shared libraries.
+ This package is provided primarily to provide a backtrace with
+ names in a debugger, this makes it somewhat easier to interpret core
+ dumps. The libraries are installed in /usr/lib/debug and can be
+ used by placing that directory in LD_LIBRARY_PATH.
+ Most people will not need this package.
+
+Package: libc0.3-prof
+Architecture: hurd-i386
+Section: devel
+Priority: extra
+Depends: libc0.3 (= ${Source-Version})
+Description: GNU C Library: Profiling Libraries.
+ Static libraries compiled with profiling info (-pg) suitable for use
+ with gprof.
+
+Package: libc0.3-pic
+Architecture: hurd-i386
+Section: devel
+Priority: optional
+Conflicts: libc-pic
+Provides: libc-pic, glibc-pic
+Depends: libc0.3 (= ${Source-Version})
+Description: GNU C Library: PIC archive library
+ Contains an archive library (ar file) composed of individual shared objects.
+ This is used for creating a library which is a smaller subset of the
+ standard libc shared library. The reduced library is used on the Debian
+ boot floppies. If you are not making your own set of Debian boot floppies
+ using the `boot-floppies' package, you probably don't need this package.
+
+Package: libc0.1
+Architecture: kfreebsd-i386
+Section: base
+Priority: required
+Description: GNU C Library: Shared libraries and Timezone data
+ Contains the standard libraries that are used by nearly all programs on
+ the system. This package includes shared versions of the standard C library
+ and the standard math library, as well as many others.
+ Timezone data is also included.
+
+Package: libc0.1-dev
+Architecture: kfreebsd-i386
+Section: devel
+Priority: standard
+Depends: libc0.1 (= ${Source-Version})
+Provides: libc-dev
+Conflicts: libc-dev
+Recommends: c-compiler
+Suggests: glibc-doc
+Description: GNU C Library: Development Libraries and Header Files.
+ Contains the symlinks, headers, and object files needed to compile
+ and link programs which use the standard C library.
+
+Package: libc0.1-dbg
+Architecture: kfreebsd-i386
+Section: devel
+Priority: extra
+Depends: libc0.1 (= ${Source-Version})
+Description: GNU C Library: Libraries with debugging symbols
+ Contains unstripped shared libraries.
+ This package is provided primarily to provide a backtrace with
+ names in a debugger, this makes it somewhat easier to interpret core
+ dumps. The libraries are installed in /usr/lib/debug and can be
+ used by placing that directory in LD_LIBRARY_PATH.
+ Most people will not need this package.
+
+Package: libc0.1-prof
+Architecture: kfreebsd-i386
+Section: devel
+Priority: extra
+Depends: libc0.1 (= ${Source-Version})
+Description: GNU C Library: Profiling Libraries.
+ Static libraries compiled with profiling info (-pg) suitable for use
+ with gprof.
+
+Package: libc0.1-pic
+Architecture: kfreebsd-i386
+Section: devel
+Priority: optional
+Conflicts: libc-pic
+Provides: libc-pic, glibc-pic
+Depends: libc0.1 (= ${Source-Version})
+Description: GNU C Library: PIC archive library
+ Contains an archive library (ar file) composed of individual shared objects.
+ This is used for creating a library which is a smaller subset of the
+ standard libc shared library. The reduced library is used on the Debian
+ boot floppies. If you are not making your own set of Debian boot floppies
+ using the `boot-floppies' package, you probably don't need this package.
+
+Package: libc1
+Architecture: netbsd-i386
+Section: base
+Priority: required
+Description: GNU C Library: Shared libraries and Timezone data
+ Contains the standard libraries that are used by nearly all programs on
+ the system. This package includes shared versions of the standard C library
+ and the standard math library, as well as many others.
+ Timezone data is also included.
+
+Package: libc1-dev
+Architecture: netbsd-i386
+Section: devel
+Priority: standard
+Depends: libc1 (= ${Source-Version})
+Provides: libc-dev
+Conflicts: libc-dev
+Recommends: c-compiler
+Suggests: glibc-doc
+Description: GNU C Library: Development Libraries and Header Files.
+ Contains the symlinks, headers, and object files needed to compile
+ and link programs which use the standard C library.
+
+Package: libc1-dbg
+Architecture: netbsd-i386
+Section: devel
+Priority: extra
+Depends: libc1 (= ${Source-Version})
+Description: GNU C Library: Libraries with debugging symbols
+ Contains unstripped shared libraries.
+ This package is provided primarily to provide a backtrace with
+ names in a debugger, this makes it somewhat easier to interpret core
+ dumps. The libraries are installed in /usr/lib/debug and can be
+ used by placing that directory in LD_LIBRARY_PATH.
+ Most people will not need this package.
+
+Package: libc1-prof
+Architecture: netbsd-i386
+Section: devel
+Priority: extra
+Depends: libc1 (= ${Source-Version})
+Description: GNU C Library: Profiling Libraries.
+ Static libraries compiled with profiling info (-pg) suitable for use
+ with gprof.
+
+Package: libc1-pic
+Architecture: netbsd-i386
+Section: devel
+Priority: optional
+Conflicts: libc-pic
+Provides: libc-pic, glibc-pic
+Depends: libc1 (= ${Source-Version})
+Description: GNU C Library: PIC archive library
+ Contains an archive library (ar file) composed of individual shared objects.
+ This is used for creating a library which is a smaller subset of the
+ standard libc shared library. The reduced library is used on the Debian
+ boot floppies. If you are not making your own set of Debian boot floppies
+ using the `boot-floppies' package, you probably don't need this package.
+
+Package: libc6-sparc64
+Architecture: sparc
+Section: base
+Priority: required
+Depends: libc6 (= ${Source-Version})
+Description: GNU C Library: 64bit Shared libraries for UltraSPARC
+ This package includes shared versions of the standard C library and the
+ standard math library, as well as many others. This is the 64bit version
+ of the library, meant for UltraSPARC systems.
+
+Package: libc6-dev-sparc64
+Architecture: sparc
+Section: devel
+Priority: standard
+Depends: libc6-sparc64 (= ${Source-Version}), libc6-dev (= ${Source-Version}), gcc-3.2 (>= 3.2.1-0pre1)
+Description: GNU C Library: 64bit Development Libraries for UltraSPARC
+ Contains the symlinks and object files needed to compile and link programs
+ which use the standard C library. This is the 64bit version of the
+ library, meant for UltraSPARC systems.
+
+Package: libc6-s390x
+Architecture: s390
+Section: base
+Priority: required
+Depends: libc6 (= ${Source-Version})
+Description: GNU C Library: 64bit Shared libraries for IBM zSeries
+ This package includes shared versions of the standard C library and the
+ standard math library, as well as many others. This is the 64bit version
+ of the library, meant for zSeries systems.
+
+Package: libc6-dev-s390x
+Architecture: s390
+Section: devel
+Priority: standard
+Depends: libc6-s390x (= ${Source-Version}), libc6-dev (= ${Source-Version}), gcc-3.2 (>= 3.2.1-0pre1)
+Description: GNU C Library: 64bit Development Libraries for IBM zSeries
+ Contains the symlinks and object files needed to compile and link programs
+ which use the standard C library. This is the 64bit version of the
+ library, meant for zSeries systems.
+
+Package: libc-udeb
+Architecture: any
+Section: debian-installer
+Priority: required
+Description: GNU C Library: Shared libraries and Timezone data - udeb
+ Contains the standard libraries that are used by nearly all programs on
+ the system. This package includes shared versions of the standard C library
+ and the standard math library, as well as many others.
+ Timezone data is also included.
+ .
+ This package contains a minimal set of libraries needed for the debian
+ installer.  Do not install it on a normal system.
+

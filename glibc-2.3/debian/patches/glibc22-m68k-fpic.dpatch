@@ -1,0 +1,28 @@
+#! /bin/sh -e
+
+# DP: Make sure libc_nonshared.a is compiled with -fPIC on m68k
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p1 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p1 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+diff -urN glibc-2.2.3.orig/sysdeps/m68k/Makefile glibc-2.2.3/sysdeps/m68k/Makefi
+--- glibc-2.2.3.orig/sysdeps/m68k/Makefile	Fri Sep  5 03:40:38 1997
++++ glibc-2.2.3/sysdeps/m68k/Makefile	Tue May 15 23:29:05 2001
+@@ -41,3 +41,7 @@
+ # Avoid a bug in gcc
+ CFLAGS-s_copysignl.c += -mnobitfield
+ endif
++
++# Build objects in libc_nonshared.a with -fPIC (instead of -fpic) to avoid
++# possible linkage problems.
++CFLAGS-.oS += -fPIC

@@ -1,0 +1,37 @@
+#! /bin/sh -e
+
+# All lines beginning with `# DP:' are a description of the patch.
+# DP: Description: Fix errno for secondary threads on Alpha
+# DP: Author: Daniel Jacobowitz <dan@debian.org>
+# DP: Upstream status: Pending
+# DP: Status Details: Submitted Jan 8, 2003
+# DP: Date: Jan 8, 2003
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p0 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p0 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+--- sysdeps/unix/alpha/sysdep.S	2002-12-23 10:47:40.000000000 -0500
++++ sysdeps/unix/alpha/sysdep.S	2003-01-07 23:04:21.000000000 -0500
+@@ -68,11 +68,7 @@
+ 	PROLOGUE
+ 
+ 	/* Find our per-thread errno address  */
+-#ifdef PIC
+-	bsr	ra, __errno_location	!samegp
+-#else
+ 	jsr	ra, __errno_location
+-#endif
+ 
+ 	/* Store the error value.  */
+ 	ldq	t0, 8(sp)

@@ -1,0 +1,341 @@
+#!/bin/bash
+set -e
+
+package_name()
+{
+    echo $(basename $0 .postinst)
+}
+
+zone_banner() {
+    TZBase=$(LC_ALL=C TZ=UTC0 date)
+    UTdate=$(TZ=UTC0 date -d "$TZBase")
+    TZdate=$(TZ="$timezone" date -d "$TZBase")
+    extra_info="
+Local time is now:      $TZdate.
+Universal Time is now:  $UTdate."
+    echo "Current default timezone: '$timezone'.$extra_info"
+    echo "Run 'tzconfig' if you wish to change it."
+}
+
+set_timezone() {
+    echo "Running 'tzconfig' to set this system's timezone."
+    /usr/sbin/tzconfig
+}
+
+# Borrowed from sysvinit's postinst.
+#	Function like update-rc.d but simpler & faster.
+#	Usage: updatercd basename start|stop NN runlevel .
+#
+#	Now we use the real update-rc.d, so now this function should
+#	be equivalent to /usr/sbin/update-rc.d.
+#
+updatercd() {
+
+	if [ ! -f /etc/init.d/$1 ]
+	then
+		return
+	fi
+
+	if [ -x /usr/sbin/update-rc.d ]
+	then
+		update-rc.d "$@" > /dev/null
+		return $?
+	fi
+
+	base=$1
+	shift
+	while [ "$1" != "" ]
+	do
+		if [ "$1" = stop ]
+		then
+			tlet=K
+		else
+			tlet=S
+		fi
+		lev=$2
+		shift 2
+		while [ "$1" != "." ]
+		do
+			cd /etc/rc$1.d
+			tmp="`echo $tlet??$base`"
+			case "$tmp" in
+				"$tlet??$base")
+					# Not present yet.
+					ln -s ../init.d/$base $tlet$lev$base
+					;;
+				*)
+					# Already present.
+					;;
+			esac
+			shift
+		done
+		shift
+	done
+}
+
+realpath()
+{
+    fname=${1%/} # strips trailing '/'
+    while [ -L "$fname" ]; do
+	oldfname="$fname"
+	fname="$(command ls -l $fname)"
+	fname="${fname#*\> }"
+	if [ "$fname" = . ] ; then
+	    fname="$(dirname $oldfname)"
+	elif echo $fname | grep -vq '^/' - ; then
+	    fname="$(dirname $oldfname)/$fname"
+	fi
+    done
+    pushd $(dirname $fname) > /dev/null
+    fname=$(pwd -P)/$(basename $fname)
+    popd > /dev/null
+    echo $fname
+}
+
+# element() is a helper function for file-rc:
+element() {
+    local element list IFS
+
+    element="$1"
+
+    [ "$2" = "in" ] && shift
+    list="$2"
+    [ "$list" = "-" ] && return 1
+    [ "$list" = "*" ] && return 0
+
+    IFS=","
+    set -- $list
+    case $element in
+	"$1"|"$2"|"$3"|"$4"|"$5"|"$6"|"$7"|"$8"|"$9")
+	    return 0
+    esac
+    return 1
+}
+
+# filerc (runlevel, service) returns /etc/init.d/service, if service is
+# running in $runlevel:
+filerc() {
+    local runlevel basename
+    runlevel=$1
+    basename=$2
+    while read LINE
+    do
+	case $LINE in
+	    \#*|"") continue
+	esac
+
+	set -- $LINE
+	SORT_NO="$1"; STOP="$2"; START="$3"; CMD="$4"
+	[ "$CMD" = "/etc/init.d/$basename" ] || continue
+
+	if element "$runlevel" in "$START" || element "S" in "$START"
+	then
+	    echo "/etc/init.d/$basename"
+	    return 0
+	fi
+    done < /etc/runlevel.conf
+    echo ""
+}
+
+
+if [ "$1" = "configure" ]
+then
+    # Handle upgrades for libdb.so.3. We do this before calling ldconfig,
+    # since it will create a symlink for us. Just move everything over. We
+    # use `cat' because I feel it is simpler and safer. Make sure that
+    # libdb.so.3 is either a symlink, or non-existent, just in case
+    # something weird happened and the new libdb2 is unpacked before we
+    # get here.
+    if [ -e /lib/libdb.so.3.old ]; then
+	if [ -L /lib/libdb.so.3 -o ! -e /lib/libdb.so.3 ]; then
+	    rm -f /lib/libdb.so.3
+	    cat /lib/libdb.so.3.old > /lib/libdb.so.3
+	fi
+	rm -f /lib/libdb.so.3.old
+    fi
+
+    ldconfig
+
+    if [ -f /etc/ld.so.nohwcap ]; then
+	grep -v glibc /etc/ld.so.nohwcap > /etc/ld.so.nohwcap.tmp || true
+	mv /etc/ld.so.nohwcap.tmp /etc/ld.so.nohwcap
+	test -s /etc/ld.so.nohwcap || rm -f /etc/ld.so.nohwcap
+    fi
+
+    if [ ! -z $2 ]; then
+	if [ ! -d /var/mail ] && [ ! -L /var/mail ]; then
+	    ln -sf spool/mail /var/mail
+	fi
+	if dpkg --compare-versions $2 lt 2.2.94-1; then
+	    echo -n "Checking for services that may need to be restarted..."
+
+	    check="nis smail sendmail exim ssh netbase apache apache2-common"
+	    check="$check proftpd proftpd-ldap proftpd-mysql proftpd-pgsql"
+	    check="$check ssh-nonfree postfix-tls wu-ftpd boa cron postfix"
+	    check="$check wu-ftpd-academ slapd openldapd wwwoffle"
+	    check="$check cupsys lprng lpr autofs snmpd ssh-krb5 samba"
+	    check="$check courier-authdaemon mysql-server spamassassin"
+	    # Only get the ones that are installed, and configured
+	    check=$(dpkg -s $check 2> /dev/null | awk 'BEGIN{RS="\n\n";FS="\n"}{if ( $2 ~ /Status: .* installed$/ ) { print $1 } }' | cut -f 2 -d ' ')
+	    # apache2 ships its init script in apache2-common, but the
+	    # script is apache2
+	    check=$(echo $check | sed 's/apache2-common/apache2/g')
+	    # The name of proftpd-{ldap,mysql,pgsql} init script is
+	    # same as "proftpd".
+	    check=$(echo $check | sed 's/proftpd-.*/proftpd/g')
+	    # We have to list inetd explicitly, because the package is a
+	    # different name from it's init script
+	    check="$check inetd"
+	    rl=$(runlevel | awk '{print $2}')
+	    for service in $check; do
+		if [ -f /usr/share/file-rc/rc -o -f /usr/lib/file-rc/rc ] && [ -f /etc/runlevel.conf ]; then
+		    idl=$(filerc $rl $service)
+		else
+		    idl=$(ls /etc/rc${rl}.d/S??${service} 2> /dev/null | head -1)
+		fi
+		if [ -n "$idl" ] && [ -x $idl ]; then
+		    services="$service $services"
+		fi
+	    done
+	    echo "done."
+	    if [ -n "$services" ]; then
+		echo
+		echo "Name Service Switch has changed in the C Library: post-installation question."
+		echo "Running programs may not be able to do NSS lookups until they are"
+		echo "restarted (for services such as ssh, this can affect your ability to"
+		echo "login)."
+		echo "Note: restarting sshd/telnetd should not affect any existing connections."
+		echo
+		echo "The services detected are: $services"
+		echo
+		echo "If other services begin to fail mysteriously after this upgrade,"
+		echo "it may be necessary to restart them too.  We strongly recommend"
+		echo "you to reboot your machine to avoid the NSS related trouble."
+		echo
+		frontend=`echo "$DEBIAN_FRONTEND" | tr '[:upper:]' '[:lower:]'`
+		if [ "$frontend" = noninteractive ]; then
+		    echo "Non-interactive mode, restarting services"
+		    answer=yes
+		else
+		    echo -n "Do you wish to Restart Services? [Y/n] "
+		    read answer
+		    case $answer in
+			Y*|y*) answer=yes ;;
+			N*|n*) answer=no ;;
+			*) answer=yes ;;
+		    esac
+		fi
+		echo
+		if [ "$answer" = yes ] && [ "$services" != "" ]; then
+		    echo "Restarting services possibly affected by the upgrade:"
+		    failed=""
+		    for service in $services; do
+			idl=$(ls /etc/rc${rl}.d/S??${service} 2> /dev/null | head -1)
+			echo -n "  $service: stopping..."
+			$idl stop > /dev/null 2>&1 || true
+			sleep 1
+			echo -n "starting..."
+			if $idl start > /dev/null 2>&1; then
+			    echo "done."
+			else
+			    echo "FAILED! ($?)"
+			    failed="$service $failed"
+			fi
+		    done
+		    echo
+		    if [ -n "$failed" ]; then
+			# Ruh roh, George
+			echo "The following services failed to start: $failed"
+			echo
+			echo "You will need to start these manually by running \`/etc/init.d/<service> start'"
+			echo "If the service still fails to start, you may need to file a bug on"
+			echo "$(package_name) or the service involved."
+			if [ "$DEBIAN_FRONTEND" != noninteractive ]; then
+			    echo
+			    echo -n "Press ENTER to continue: "
+			    read foo
+			fi
+		    else
+			echo "Services restarted successfully."
+		    fi
+		    echo
+		fi
+	    fi
+	fi # end upgrading and $2 lt 2.1.95-1
+    fi # Upgrading
+    if [ -f /etc/timezone.save ]; then
+	mv -fb /etc/timezone.save /etc/timezone
+    fi
+    if [ -f /etc/timezone ]; then
+	timezone=$(cat /etc/timezone)
+    else
+	timezone=Factory
+    fi
+    if [ "$timezone" = Factory ]; then
+	if [ -L /etc/localtime ]; then
+	    localtime_link=$(realpath /etc/localtime)
+	    if [ -f "$localtime_link" ]; then
+		link_not_dangling=true
+	    fi
+	    if [ "$link_not_dangling" = true ]; then
+		timezone=$(echo $localtime_link | sed 's%^/usr/share/zoneinfo/%%')
+	    fi
+	fi
+    fi
+    if [ -f /usr/share/zoneinfo/$timezone ] && [ "$timezone" != Factory ]
+    then
+#	zic -l $timezone
+	rm -f /etc/localtime && \
+	ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
+	zone_banner
+    # Handle problem caused by lame old tzconfig.
+    elif [ "$timezone" = "US/Pacific-New" ]
+    then
+	echo "US/Pacific" > /etc/timezone
+#	zic -l US/Pacific
+	rm -f /etc/localtime && \
+	ln -sf /usr/share/zoneinfo/US/Pacific /etc/localtime
+	zone_banner
+    else
+	set_timezone
+    fi
+    if [ "$(date +%Z)" = "/etc/localtime" ]; then
+	set_timezone
+    fi
+    # DO NOT FOLLOW THIS EXAMPLE IN OTHER PACKAGES
+    updatercd devpts.sh start 35 S .
+    /etc/init.d/devpts.sh 2>/dev/null || true
+fi
+
+if [ "`uname -s`" = Linux ]; then
+#
+#       Upgrade init if possible. There was a bug in all versions
+#       up to and including 2.75-4, which didn't affect i386 but
+#       did affect most other architectures.
+#
+sysvinitver="`dpkg -s sysvinit | grep ^Version: | sed -e 's/^Version: *//'`"
+case "`uname -m`" in
+        i?86)
+                badsysvinitver="2.[0-6]*|2.7[0-3]*"
+                ;;
+        *)
+                badsysvinitver="2.[0-6]*|2.7[0-4]*|2.75-*"
+                ;;
+esac
+# Black magic. If we are in a chroot, then /proc/1/exe will not resolve to
+# a file (will return EPERM). This keeps us from breaking things in
+# debootstrap, and the like.
+case "$sysvinitver" in
+        $badsysvinitver)
+                ;;
+        *)
+		if [ -x /sbin/init -a -x /bin/readlink ]; then
+			if [ "$(readlink /proc/1/exe 2>/dev/null)" = "/sbin/init" ]; then
+				(init u ; sleep 1)
+			fi
+		fi
+		;;
+esac
+fi
+
+exit 0

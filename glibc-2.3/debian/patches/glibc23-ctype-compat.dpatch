@@ -1,0 +1,117 @@
+#! /bin/sh -e
+
+# All lines beginning with `# DP:' are a description of the patch.
+# DP: Description: 
+# DP:	glibc 2.3.x changes some symbols (__ctype_b, __ctype_toupper, 
+# DP:	__ctype_tolower) as hidden attribute. These symbols that are
+# DP:	crashing the old 2.2.x dynamic linking code in static binaries
+# DP:	are now exported.
+# DP:	This patch is originally pulled from RedHat patch, I modified
+# DP:	it for current debian glibc.
+# DP: Original Author: RedHat glibc-2.2.93 cygnus-to-redhat patch
+# DP: Applying Author: GOTO Masanori <gotom@debian.org>
+# DP: Upstream status: Debian/Redhat Specific
+# DP: Status Details: We apply for a while (until sarge freeze?)
+# DP: Date: 2002-10-21
+# DP: Updated: 2002-12-02
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p1 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p1 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+--- glibc-2.3.1-cygnus/ctype/ctype-info.c	28 Sep 2002 20:36:35 -0000	1.1.1.9
++++ glibc-2.3.1-redhat/ctype/ctype-info.c	29 Sep 2002 11:38:50 -0000	1.4
+@@ -48,18 +48,32 @@ extern const char _nl_C_LC_CTYPE_class_a
+ 
+ #define b(t,x,o) (((const t *) _nl_C_LC_CTYPE_##x) + o)
+ 
++// const unsigned short int *__ctype_b = b (unsigned short int, class, 128);
++// const __uint32_t *__ctype32_b = b (__uint32_t, class32, 0);
++// const __int32_t *__ctype_tolower = b (__int32_t, tolower, 128);
++// const __int32_t *__ctype_toupper = b (__int32_t, toupper, 128);
++// const __uint32_t *__ctype32_tolower = b (__uint32_t, tolower, 128);
++// const __uint32_t *__ctype32_toupper = b (__uint32_t, toupper, 128);
++
++// compat_symbol (libc, __ctype_b, __ctype_b, GLIBC_2_0);
++// compat_symbol (libc, __ctype_tolower, __ctype_tolower, GLIBC_2_0);
++// compat_symbol (libc, __ctype_toupper, __ctype_toupper, GLIBC_2_0);
++// compat_symbol (libc, __ctype32_b, __ctype32_b, GLIBC_2_0);
++// compat_symbol (libc, __ctype32_tolower, __ctype32_tolower, GLIBC_2_2);
++// compat_symbol (libc, __ctype32_toupper, __ctype32_toupper, GLIBC_2_2);
++
++#endif
++
++/* Temporarily exported until all .a libraries are recompiled.  */
++#undef b
++#define b(t,x,o) (((const t *) _nl_C_LC_CTYPE_##x) + o)
++extern const char _nl_C_LC_CTYPE_class[] attribute_hidden;
++extern const char _nl_C_LC_CTYPE_class32[] attribute_hidden;
++extern const char _nl_C_LC_CTYPE_toupper[] attribute_hidden;
++extern const char _nl_C_LC_CTYPE_tolower[] attribute_hidden;
+ const unsigned short int *__ctype_b = b (unsigned short int, class, 128);
+ const __uint32_t *__ctype32_b = b (__uint32_t, class32, 0);
+ const __int32_t *__ctype_tolower = b (__int32_t, tolower, 128);
+ const __int32_t *__ctype_toupper = b (__int32_t, toupper, 128);
+ const __uint32_t *__ctype32_tolower = b (__uint32_t, tolower, 128);
+ const __uint32_t *__ctype32_toupper = b (__uint32_t, toupper, 128);
+-
+-compat_symbol (libc, __ctype_b, __ctype_b, GLIBC_2_0);
+-compat_symbol (libc, __ctype_tolower, __ctype_tolower, GLIBC_2_0);
+-compat_symbol (libc, __ctype_toupper, __ctype_toupper, GLIBC_2_0);
+-compat_symbol (libc, __ctype32_b, __ctype32_b, GLIBC_2_0);
+-compat_symbol (libc, __ctype32_tolower, __ctype32_tolower, GLIBC_2_2);
+-compat_symbol (libc, __ctype32_toupper, __ctype32_toupper, GLIBC_2_2);
+-
+-#endif
+--- glibc-2.3.1-cygnus/locale/lc-ctype.c	28 Sep 2002 20:37:14 -0000	1.1.1.8
++++ glibc-2.3.1-redhat/locale/lc-ctype.c	29 Sep 2002 11:38:51 -0000	1.5
+@@ -75,18 +75,32 @@ _nl_postload_ctype (void)
+      We need those relocations so that a versioned definition with a COPY
+      reloc in an executable will override the libc.so definition.  */
+ 
+-compat_symbol (libc, __ctype_b, __ctype_b, GLIBC_2_0);
+-compat_symbol (libc, __ctype_tolower, __ctype_tolower, GLIBC_2_0);
+-compat_symbol (libc, __ctype_toupper, __ctype_toupper, GLIBC_2_0);
+-compat_symbol (libc, __ctype32_b, __ctype32_b, GLIBC_2_0);
+-compat_symbol (libc, __ctype32_tolower, __ctype32_tolower, GLIBC_2_2);
+-compat_symbol (libc, __ctype32_toupper, __ctype32_toupper, GLIBC_2_2);
++// compat_symbol (libc, __ctype_b, __ctype_b, GLIBC_2_0);
++// compat_symbol (libc, __ctype_tolower, __ctype_tolower, GLIBC_2_0);
++// compat_symbol (libc, __ctype_toupper, __ctype_toupper, GLIBC_2_0);
++// compat_symbol (libc, __ctype32_b, __ctype32_b, GLIBC_2_0);
++// compat_symbol (libc, __ctype32_tolower, __ctype32_tolower, GLIBC_2_2);
++// compat_symbol (libc, __ctype32_toupper, __ctype32_toupper, GLIBC_2_2);
+ 
++//  __ctype_b = current (uint16_t, CLASS, 128);
++//  __ctype_toupper = current (uint32_t, TOUPPER, 128);
++//  __ctype_tolower = current (uint32_t, TOLOWER, 128);
++//  __ctype32_b = current (uint32_t, CLASS32, 0);
++//  __ctype32_toupper = current (uint32_t, TOUPPER32, 0);
++//  __ctype32_tolower = current (uint32_t, TOLOWER32, 0);
++#endif
++
++  /* Temporary.  */
++  extern __const unsigned short int *__ctype_b; /* Characteristics.  */
++  extern __const __int32_t *__ctype_tolower; /* Case conversions.  */
++  extern __const __int32_t *__ctype_toupper; /* Case conversions.  */
++  extern const uint32_t *__ctype32_b;
++  extern const uint32_t *__ctype32_toupper;
++  extern const uint32_t *__ctype32_tolower;
+   __ctype_b = current (uint16_t, CLASS, 128);
+   __ctype_toupper = current (uint32_t, TOUPPER, 128);
+   __ctype_tolower = current (uint32_t, TOLOWER, 128);
+   __ctype32_b = current (uint32_t, CLASS32, 0);
+   __ctype32_toupper = current (uint32_t, TOUPPER32, 0);
+   __ctype32_tolower = current (uint32_t, TOLOWER32, 0);
+-#endif
+ }

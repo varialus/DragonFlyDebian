@@ -1,0 +1,64 @@
+#! /bin/sh -e
+
+# All lines beginning with `# DP:' are a description of the patch.
+# DP: Description: lib64 support for s390, backported from CVS.
+# DP: Author: Jakub Jelinik
+# DP: Upstream status: In CVS
+# DP: Status Details:
+# DP: Date: 2002-10-09
+
+if [ $# -ne 2 ]; then
+  echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+  exit 1
+fi
+case "$1" in
+  -patch) patch -d "$2" -f --no-backup-if-mismatch -p1 < $0;;
+  -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p1 < $0;;
+  *)
+ echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+ exit 1
+esac
+exit 0
+
+--- glibc-2.3.1/sysdeps/unix/sysv/linux/configure.in.bak 2002-11-12 11:38:17.000000000 +0100
++++ glibc-2.3.1/sysdeps/unix/sysv/linux/configure.in 2002-11-12 11:39:31.000000000 +0100
+@@ -153,19 +152,22 @@
+ # files.  I.e., when the installation prefix is "/usr" we have to place
+ # shared library objects and the configuration files on the root partition
+ # in /lib and /etc.
+-if test "$prefix" = "/usr" -o "$prefix" = "/usr/"; then
+-  # 64bit libraries on sparc go to /lib64 and not /lib
+-  if test "$machine" = "sparc/sparc64" -o "$machine" = "x86_64" \
+-	  -o "$machine" = "powerpc/powerpc64"; then
++case "$prefix" in
++/usr | /usr/)
++  # 64-bit libraries on bi-arch platforms go in /lib64 instead of /lib
++  case $machine in
++  sparc/sparc64 | x86_64 | powerpc/powerpc64 | s390/s390-64 )
+     libc_cv_slibdir="/lib64"
+     if test "$libdir" = '${exec_prefix}/lib'; then
+       libdir='${exec_prefix}/lib64';
+       # Locale data can be shared between 32bit and 64bit libraries
+       libc_cv_localedir='${exec_prefix}/lib/locale'
+     fi
+-  else
++    ;;
++  *)
+     libc_cv_slibdir="/lib"
+-  fi
++    ;;
++  esac
+   # Allow the user to override the path with --sysconfdir
+   if test $sysconfdir = '${prefix}/etc'; then
+     libc_cv_sysconfdir=/etc
+@@ -173,7 +175,8 @@
+     libc_cv_sysconfdir=$sysconfdir
+    fi
+   libc_cv_rootsbindir="/sbin"
+-fi
++  ;;
++esac
+ 
+ # Under Linux the LinuxThreads or NPTL add-on should be available.
+ case $add_ons in
+ 

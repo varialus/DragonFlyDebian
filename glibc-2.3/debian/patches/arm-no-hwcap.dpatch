@@ -1,0 +1,28 @@
+#! /bin/sh -e
+
+# DP: No hardware caps for ARM
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p0 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p0 < $0;;
+    *)
+        echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+        exit 1
+esac
+exit 0
+
+--- sysdeps/unix/sysv/linux/arm/dl-procinfo.h	Mon Jul 23 12:57:23 2001
++++ sysdeps/unix/sysv/linux/arm/dl-procinfo.h	Sun Feb 10 06:37:00 2002
+@@ -67,7 +67,7 @@
+   HWCAP_ARM_VFP       = 1 << 6,
+   HWCAP_ARM_EDSP      = 1 << 7,
+ 
+-  HWCAP_IMPORTANT = (HWCAP_ARM_HALF | HWCAP_ARM_FAST_MULT)
++  HWCAP_IMPORTANT = 0
+ };
+ 
+ static inline int

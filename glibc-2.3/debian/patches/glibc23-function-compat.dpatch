@@ -1,0 +1,65 @@
+#! /bin/sh -e
+
+# All lines beginning with `# DP:' are a description of the patch.
+# DP: Description: 
+# DP:	Some internal symbols are changed in glibc 2.3.x. The result that
+# DP:	some ill-mannered applications does not run because they use glibc
+# DP:	internal only symbols which cannot be resolved now.
+# DP:	Such symbols are: __libc_wait, __libc_waitpid, __libc_fork, and so on.
+# DP:	We really dislike to keep such bad application binary compatibility
+# DP:	but we decide to adopt this change for condering user upgradablity
+# DP:	from woody to sarge. Thus, this patch should remove when sarge is
+# DP:	released.
+# DP:	This patch is originally pulled from RedHat patch.
+# DP: Original Author: RedHat glibc-2.2.93 cygnus-to-redhat patch
+# DP: Applying Author: GOTO Masanori <gotom@debian.org>
+# DP: Upstream status: Debian/Redhat-Specific
+# DP: Status Details: We apply for a while (until sarge is released)
+# DP: Date: 2002-12-19
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p1 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p1 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+--- glibc-2.3.1-cygnus/posix/Versions	2002-12-19 00:13:27.000000000 +0900
++++ glibc-2.3.1-redhat/posix/Versions	2002-12-19 00:14:34.000000000 +0900
+@@ -3,6 +3,9 @@
+     # functions with special/multiple interfaces
+     __bsd_getpgrp; __setpgid; __getpgid;
+ 
++    # This will be GLIBC_PRIVATE, just give Sun JDK some time to catch up
++    __libc_wait; __libc_waitpid;
++
+     # functions with required interface outside normal name space
+     _exit;
+ 
+@@ -83,6 +86,9 @@
+   GLIBC_2.1.2 {
+     # functions used in other libraries
+     __vfork;
++
++    # This will be GLIBC_PRIVATE, just give wine some time to catch up
++    __libc_fork; 
+   }
+   GLIBC_2.2 {
+     # p*
+@@ -121,7 +127,8 @@
+   GLIBC_PRIVATE {
+     # functions which have an additional interface since they are
+     # are cancelable.
+-    __libc_wait; __libc_waitpid; __libc_pause; __libc_nanosleep; __libc_fork;
++    # __libc_wait; __libc_waitpid;
++    __libc_pause; __libc_nanosleep; # __libc_fork;
+     __libc_pread; __libc_pread64; __libc_pwrite; __libc_pwrite64;
+     __waitid; __pselect;
+   }

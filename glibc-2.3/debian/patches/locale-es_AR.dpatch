@@ -1,0 +1,30 @@
+#! /bin/sh -e
+
+# DP: Carried over from glibc2.2, need to figure out why it's here.
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p0 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p0 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+--- localedata/locales/es_AR~ 	2000/10/26 23:22:55	1.10
++++ localedata/locales/es_AR 	2001/10/07 20:56:18
+@@ -80,8 +80,8 @@
+ 
+ LC_NUMERIC
+ decimal_point        "<U002C>"
+-thousands_sep        ""
+-grouping             0;0
++thousands_sep        "<U002E>"
++grouping             3;3
+ END LC_NUMERIC
+ 
+ LC_TIME

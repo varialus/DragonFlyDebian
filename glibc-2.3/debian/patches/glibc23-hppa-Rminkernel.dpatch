@@ -1,0 +1,62 @@
+#! /bin/sh -e
+
+# DP: Description: Relax glibc kernel version requirement.
+# DP: Author: Carlos O'Donell <carlos@baldric.uwo.ca>
+# DP: Upstream status: Debian-Specific
+# DP: Status Details: Overrides upstream requirement of 2.4.19
+# DP: Date: December 5th, 2002
+
+#
+# Comments from Carlos:
+#
+# Our users come first, and I've changed this back after seeing 
+# some people get burned by not having new kernels. We also
+# shouldn't be forcing people to use new kernels. Rather they should
+# be upgrading after seeing the quantifiable failures and choosing
+# to go for a new kernel :) It's an empowerment issue.
+#
+# If you complain of random segfaults in libc or other programs because
+# you have an old kernel without a fixed unaligned handler... the first
+# thing I'm going to ask is that you try upgrading to 2.4.19/20 :}
+#
+# When 2.4.19 on hppa becomes the defacto stable kernel, we can remove
+# the patch and let the upstream requirement be used. At which point
+# the preinst patch needs to be modified or removed.
+#
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p1 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p1 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+--- glibc-2.3.1/sysdeps/unix/sysv/linux/configure.in	2002-12-05 10:40:28.000000000 -0500
++++ glibc-2.3.1/sysdeps/unix/sysv/linux/configure.in	2002-12-05 10:40:49.000000000 -0500
+@@ -65,7 +65,7 @@
+     ;;
+   hppa*)
+     libc_cv_gcc_unwind_find_fde=yes  
+-    arch_minimum_kernel=2.4.19
++    arch_minimum_kernel=2.4.17
+     ;;
+   m68k*)
+     arch_minimum_kernel=2.0.10
+--- glibc-2.3.1/sysdeps/unix/sysv/linux/configure	2002-12-05 10:40:31.000000000 -0500
++++ glibc-2.3.1/sysdeps/unix/sysv/linux/configure	2002-12-05 10:41:08.000000000 -0500
+@@ -87,7 +87,7 @@
+     ;;
+   hppa*)
+     libc_cv_gcc_unwind_find_fde=yes  
+-    arch_minimum_kernel=2.4.19
++    arch_minimum_kernel=2.4.17
+     ;;
+   m68k*)
+     arch_minimum_kernel=2.0.10

@@ -1,0 +1,36 @@
+#! /bin/sh -e
+ 
+# DP: Description: Fix __ssize_t definition for s390
+# DP: Author: Gerhard Tonn <GerhardTonn@onlinehome.de>
+# DP: Upstream status: Not submitted
+# DP: Status Details: Different fix included upstream
+# DP: Date: 05 Nov 2002
+ 
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p0 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p0 < $0;;
+    *)
+        echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+        exit 1
+esac
+exit 0
+
+--- sysdeps/unix/sysv/linux/s390/bits/types.h.bak	2002-11-05 11:00:41.000000000 +0100
++++ sysdeps/unix/sysv/linux/s390/bits/types.h	2002-11-05 11:03:14.000000000 +0100
+@@ -79,7 +79,11 @@
+ typedef long int  __off_t;		/* Type of file sizes and offsets.  */
+ typedef __quad_t __loff_t;		/* Type of file sizes and offsets.  */
+ typedef int __pid_t;			/* Type of process identifications.  */
+-typedef long __ssize_t;			/* Type of a byte count, or error.  */
++#if __WORDSIZE == 64
++typedef long int __ssize_t;		/* Type of a byte count, or error.  */
++#else
++typedef int __ssize_t;			/* Type of a byte count, or error.  */
++#endif
+ typedef __u_long __rlim_t;		/* Type of resource counts.  */
+ typedef __u_quad_t __rlim64_t;		/* Type of resource counts (LFS).  */
+ typedef __u_int __id_t;			/* General type for ID.  */

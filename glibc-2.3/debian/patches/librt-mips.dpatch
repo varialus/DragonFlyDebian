@@ -1,0 +1,31 @@
+#! /bin/sh -e
+
+# DP: add clock_{get,set}time@@GLIBC_2.0 - programs in Woody need it
+# DP: although it should actually be @@GLIBC_2.2
+# DP: status: debian specific, until sarge will be released.
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p0 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p0 < $0;;
+    *)
+        echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+        exit 1
+esac
+exit 0
+
+--- sysdeps/unix/sysv/linux/mips/Versions.orig	Tue Sep 24 15:56:55 2002
++++ sysdeps/unix/sysv/linux/mips/Versions	Tue Sep 24 15:49:27 2002
+@@ -34,3 +34,9 @@
+     _sys_errlist; sys_errlist; _sys_nerr; sys_nerr;
+   }
+ }
++librt {
++  GLIBC_2.0 {
++    # c*
++    clock_gettime; clock_settime;
++  }
++}

@@ -1,0 +1,42 @@
+#! /bin/sh -e
+
+# DP: Check for $EDITOR existing
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p0 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p0 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+--- glibcbug.in.orig    Fri Jan 11 08:28:28 2002
++++ glibcbug.in Thu Jan 10 21:32:31 2002
+@@ -99,6 +99,8 @@
+ else
+   EDIT="$VISUAL"
+ fi
++# Ensure the editor exists
++command -v "$EDIT" > /dev/null 2>&1 || EDIT=sensible-editor
+
+ # Find out some information.
+ SYSTEM=`( [ -f /bin/uname ] && /bin/uname -a ) || \
+
+
+
+--- glibcbug.in	1999/05/13 10:22:38	1.17
++++ glibcbug.in	1999/06/02 12:00:43
+@@ -43,7 +43,7 @@
+ 
+ BUGADDR=${1-$BUGGLIBC}
+ 
+-: ${EDITOR=emacs}
++: ${EDITOR=sensible-editor}
+ 
+ : ${USER=${LOGNAME-`whoami`}}
+ 

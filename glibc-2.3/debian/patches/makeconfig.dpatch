@@ -1,0 +1,32 @@
+#! /bin/sh -e
+
+# DP: Carried over from glibc2.2, need to figure out why it's here.
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p0 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p0 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+--- Makeconfig~ 	2001/09/12 18:49:45	1.265
++++ Makeconfig 	2001/10/07 20:56:17
+@@ -532,10 +532,11 @@
+ $(subst $(empty) ,:,$(strip $(patsubst -Wl$(comma)-rpath-link=%, %,\
+ 				       $(filter -Wl$(comma)-rpath-link=%,\
+ 						$(sysdep-LDFLAGS)))))
++ld_envlib_path = $(shell test x$$LD_LIBRARY_PATH = x || echo -n :$$LD_LIBRARY_PATH)
+ run-program-prefix = $(if $(filter $(notdir $(built-program-file)),\
+ 				   $(tests-static)),, \
+ 			  $(elf-objpfx)$(rtld-installed-name) \
+-			  --library-path $(rpath-link)$(patsubst %,:%,$(sysdep-library-path)))
++			  --library-path $(rpath-link)$(patsubst %,:%,$(sysdep-library-path)))$(ld_envlib_path)
+ else
+ run-program-prefix =
+ endif

@@ -1,0 +1,47 @@
+#! /bin/sh -e
+
+# All lines beginning with `# DP:' are a description of the patch.
+# DP: Description: Add CMOV to hwcap, for VIA C3 which is i686 class processor,
+# DP:		but does not have 686 optional instruction CMOV.
+# DP: Author: GOTO Masanori <gotom@debian.org>
+# DP: Upstream status: Not submitted
+# DP: Status Details: Not submitted
+# DP: Date: 2003-02-21
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p1 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p1 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+--- libc/sysdeps/unix/sysv/linux/i386/dl-procinfo.h	2002-09-22 06:14:11.000000000 +0900
++++ libc/sysdeps/unix/sysv/linux/i386/dl-procinfo.h.new	2003-01-19 01:18:55.000000000 +0900
+@@ -92,7 +92,7 @@
+   HWCAP_I386_AMD3D = 1 << 31,
+ 
+   /* XXX Which others to add here?  */
+-  HWCAP_IMPORTANT = (HWCAP_I386_MMX)
++  HWCAP_IMPORTANT = (HWCAP_I386_MMX | HWCAP_I386_CMOV)
+ 
+ };
+ 
+--- libc/sysdeps/generic/dl-cache.c	2003-02-02 05:33:47.000000000 +0900
++++ libc/sysdeps/generic/dl-cache.c.new1	2003-02-21 09:18:19.000000000 +0900
+@@ -232,7 +232,8 @@
+ 	  && (lib->hwcap & _DL_HWCAP_PLATFORM) != platform)		      \
+ 	continue;							      \
+       if (hwcap								      \
+-	  && ((lib->hwcap & *hwcap & ~_DL_HWCAP_PLATFORM) > *hwcap))	      \
++	  && ((lib->hwcap & ~_DL_HWCAP_PLATFORM & *hwcap) <		      \
++	      (lib->hwcap & ~_DL_HWCAP_PLATFORM)))			      \
+ 	continue
+       SEARCH_CACHE (cache_new);
+     }

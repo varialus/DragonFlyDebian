@@ -1,0 +1,54 @@
+#! /bin/sh -e
+
+# DP: Description: Dummy out _dl_resolve_conflicts for mips
+# DP: Author: H.J. Lu  <hjl@gnu.org>
+# DP: Upstream status: Pending
+# DP: Status Details: Not accepted upstream.  The right thing is to
+# Support this correctly.
+# DP: Date: 2002-02-04
+
+
+echo $#
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p1 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p1 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+--- libc/elf/dl-conflict.c.mips	Mon Feb  4 13:44:57 2002
++++ libc/elf/dl-conflict.c	Mon Feb  4 15:10:31 2002
+@@ -33,6 +33,7 @@ void
+ _dl_resolve_conflicts (struct link_map *l, ElfW(Rela) *conflict,
+ 		       ElfW(Rela) *conflictend)
+ {
++#ifndef _DL_HAVE_NO_ELF_MACHINE_RELA
+   if (__builtin_expect (GL(dl_debug_mask) & DL_DEBUG_RELOC, 0))
+     _dl_printf ("\nconflict processing: %s\n",
+ 		l->l_name[0] ? l->l_name : _dl_argv[0]);
+@@ -63,4 +64,5 @@ _dl_resolve_conflicts (struct link_map *
+     for (; conflict < conflictend; ++conflict)
+       elf_machine_rela (l, conflict, NULL, NULL, (void *) conflict->r_offset);
+   }
++#endif
+ }
+--- libc/sysdeps/mips/dl-machine.h.mips	Mon Feb  4 13:45:18 2002
++++ libc/sysdeps/mips/dl-machine.h	Mon Feb  4 15:08:39 2002
+@@ -56,6 +56,9 @@
+ #define ELF_MACHINE_JMP_SLOT			R_MIPS_REL32
+ #define elf_machine_type_class(type)		ELF_RTYPE_CLASS_PLT
+ 
++/* MIPS doesn't support RELA.  */
++#define _DL_HAVE_NO_ELF_MACHINE_RELA
++
+ /* Translate a processor specific dynamic tag to the index
+    in l_info array.  */
+ #define DT_MIPS(x) (DT_MIPS_##x - DT_LOPROC + DT_NUM)
+
