@@ -106,7 +106,13 @@ $(stamp_install): $(stamp_build)
 	$(checkroot)
 	$(make_directory) $(install_root)
 	$(MAKE) -C $(objdir) install_root=$(install_root) install
-	for i in net/if.h netinet/ip.h netinet/in_systm.h sys/socketvar.h ; do \
+	for i in \
+		net/if.h \
+		netinet/ip.h \
+		netinet/in_systm.h \
+		sys/socketvar.h \
+		sys/param.h \
+	; do \
 		rm $(install_root)/usr/include/$$i ; \
 	done
 	touch $@
