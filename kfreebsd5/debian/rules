@@ -1,18 +1,80 @@
 #!/usr/bin/make -f
 
-DEB_AUTO_UPDATE_DEBIAN_CONTROL	= yes
-PWD = $(shell pwd)
-DEB_TAR_SRCDIR=src
-DEB_DH_SHLIBDEPS_ARGS=-X/boot
-DEB_STRIP_EXCLUDE=/boot
+full_version	:= $(shell dpkg-parsechangelog | grep ^Version | sed -e 's/^.*: //g')
+version		:= $(shell echo $(full_version) | sed -e 's/[+-].*//g')
+major		:= $(shell echo $(version) | sed -e 's/\..*//g')
+revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
+package		:= kfreebsd$(major)
 
-# dpkg-architecture
-include /usr/share/cdbs/1/rules/buildvars.mk
-
-include debian/mk/build.mk
-include debian/mk/mkdirs.mk
-include debian/mk/patches.mk
+DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
+DEB_TAR_SRCDIR			:= src
+DEB_PATCHDIRS			:= /usr/src/kfreebsd$(major)/patches
+DEB_PATCHDIRS_READONLY		:= yes
+DEB_DH_SHLIBDEPS_ARGS		:= -X/boot
+DEB_STRIP_EXCLUDE		:= /boot
 
 include /usr/share/cdbs/1/rules/tarball.mk
-include /usr/share/cdbs/1/rules/simple-patchsys.mk
+include debian/simple-patchsys.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
+
+KERNEL		:= GENERIC
+PATH		:= /usr/lib/freebsd:$(CURDIR)/bin:$(PATH)
+DESTDIR		:= $(CURDIR)/debian/$(package)
+MAKE		:= make DESTDIR=$(DESTDIR) WERROR=
+PWD		:= $(shell pwd)
+
+kfreebsd_cpu	:= $(DEB_HOST_GNU_CPU)
+ifeq ($(kfreebsd_cpu), x86_64)
+kfreebsd_cpu	:= amd64
+endif
+
+# this is for kfreebsd-rtc
+#export SRC_BASE=$(CURDIR)/$(DEB_SRCDIR)
+#export SYS=$(SRC_BASE)/sys
+#export SYSDIR=$(SYS)
+
+build/$(package):: debian/stamp-build
+debian/stamp-build: apply-patches
+	# make is stupid
+	set -e ; if ! test -e debian/stamp-build ; then \
+	mkdir -p bin ; \
+	ln -sf `which gcc-3.4` bin/cc ; \
+	ln -sf `which gcc-3.4` bin/gcc ; \
+	cd $(CURDIR)/$(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/conf \
+		&& config $(KERNEL) ; \
+	cd $(CURDIR)/$(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ \
+		&& $(MAKE) depend && $(MAKE) ; \
+	touch $(CURDIR)/debian/stamp-build ; \
+	fi
+
+install/$(package):: common-install-prehook-arch
+	# install device.hints
+	install -o root -g root -m 644 \
+		$(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/conf/GENERIC.hints \
+		$(DESTDIR)/boot/device.hints
+	install -o root -g root -m 644 \
+		$(DEB_SRCDIR)/sys/boot/forth/loader.conf \
+		$(DESTDIR)/boot/loader.conf
+	touch $(DESTDIR)/boot/loader.conf
+	install -o root -g root -m 644 \
+		$(DEB_SRCDIR)/sys/boot/forth/loader.conf \
+		 $(DESTDIR)/boot/defaults/loader.conf
+	# now install the kernel
+	cd $(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/compile/$(KERNEL) && \
+		$(MAKE) install
+	chmod 644 $(DESTDIR)/boot/kernel/kernel
+
+clean::
+	lsdiff -h $(DEB_PATCHDIRS)/*.diff \
+		| grep -q src/sys/$(kfreebsd_cpu)/conf/GENERIC
+
+	sed \
+		-e "s/@kfreebsd-gnu@/`type-handling any kfreebsd-gnu`/g" \
+		-e "s/@major@/$(major)/g" \
+		-e "s/@version@/$(version)/g" \
+	> debian/control.in < debian/control.in.in
+
+	ln -sf /usr/src/kfreebsd$(major)/src.tar* $(CURDIR)/
+
+	rm -rf bin
+	rm -f debian/stamp-build
