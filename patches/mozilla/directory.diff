@@ -1,0 +1,100 @@
+--- mozilla/directory/c-sdk/ldap/include/portable.h~	2003-09-17 05:18:10.000000000 +0200
++++ mozilla/directory/c-sdk/ldap/include/portable.h	2004-07-27 01:35:13.000000000 +0200
+@@ -320,7 +320,7 @@
+ #endif
+ #if defined(hpux9) || defined(LINUX1_2) || defined(SUNOS4) || defined(SNI) || \
+     defined(SCOOS) || defined(BSDI) || defined(NCR) || defined(VMS) || \
+-    defined(NEC) || defined(LINUX) || (defined(AIX) && !defined(USE_REENTRANT_LIBC))
++    defined(NEC) || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) || (defined(AIX) && !defined(USE_REENTRANT_LIBC))
+ #define STRTOK( s1, s2, l )		strtok( s1, s2 )
+ #else
+ #define HAVE_STRTOK_R
+--- mozilla/directory/c-sdk/ldap/include/portable.h~	2004-07-27 02:03:26.000000000 +0200
++++ mozilla/directory/c-sdk/ldap/include/portable.h	2004-07-27 02:22:33.000000000 +0200
+@@ -116,7 +116,7 @@
+  * some systems don't have the BSD re_comp and re_exec routines
+  */
+ #ifndef NEED_BSDREGEX
+-#if ( defined( SYSV ) || defined( NETBSD ) || defined( freebsd ) || defined( linux ) || defined( DARWIN )) && !defined(sgi)
++#if ( defined( SYSV ) || defined( NETBSD ) || defined( freebsd ) || defined( linux ) || defined(__GNU__) || defined(__GLIBC__) || defined( DARWIN )) && !defined(sgi)
+ #define NEED_BSDREGEX
+ #endif
+ #endif
+@@ -145,7 +145,7 @@
+  * Is snprintf() part of the standard C runtime library?
+  */
+ #if !defined(HAVE_SNPRINTF)
+-#if defined(SOLARIS) || defined(LINUX) || defined(HPUX)
++#if defined(SOLARIS) || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) || defined(HPUX)
+ #define HAVE_SNPRINTF
+ #endif
+ #endif
+@@ -165,7 +165,7 @@
+  * for select()
+  */
+ #if !defined(WINSOCK) && !defined(_WINDOWS) && !defined(macintosh) && !defined(XP_OS2)
+-#if defined(hpux) || defined(LINUX) || defined(SUNOS4) || defined(XP_BEOS)
++#if defined(hpux) || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) || defined(SUNOS4) || defined(XP_BEOS)
+ #include <sys/time.h>
+ #else
+ #include <sys/select.h>
+@@ -252,15 +252,14 @@
+ #define HAVE_GETGRNAM_R
+ #endif
+ 
+-#if defined(SNI) || defined(LINUX1_2)
++#if defined(SNI) || defined(LINUX1_2) || defined(__GNU__) || defined(__GLIBC__)
+ int strcasecmp(const char *, const char *);
+ #ifdef SNI
+ int strncasecmp(const char *, const char *, int);
+-#endif /* SNI */
+-#ifdef LINUX1_2
++#else /* SNI */
+ int strncasecmp(const char *, const char *, size_t);
+-#endif /* LINUX1_2 */
+-#endif /* SNI || LINUX1_2 */
++#endif
++#endif /* SNI || LINUX1_2 || __GNU__ || __GLIBC__ */
+ 
+ #if defined(_WINDOWS) || defined(macintosh) || defined(XP_OS2) || defined(DARWIN)
+ #define GETHOSTBYNAME( n, r, b, l, e )  gethostbyname( n )
+@@ -276,7 +275,7 @@
+     defined(UNIXWARE) || defined(SUNOS4) || defined(SNI) || defined(BSDI) || \
+     defined(NCR) || defined(OSF1) || defined(NEC) || defined(VMS) || \
+     ( defined(HPUX10) && !defined(_REENTRANT)) || defined(HPUX11) || \
+-    defined(UnixWare) || defined(LINUX) || defined(NETBSD) || \
++    defined(UnixWare) || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) || defined(NETBSD) || \
+     defined(FREEBSD) || defined(OPENBSD) || \
+     (defined(AIX) && !defined(USE_REENTRANT_LIBC))
+ #define GETHOSTBYNAME( n, r, b, l, e )  gethostbyname( n )
+@@ -300,7 +299,7 @@
+ #define GETHOSTBYNAME( n, r, b, l, e )  gethostbyname_r( n, r, b, l, e )
+ #endif
+ #if defined(HPUX9) || defined(LINUX1_2) || defined(LINUX2_0) || \
+-    defined(LINUX2_1) || defined(SUNOS4) || defined(SNI) || \
++    defined(LINUX2_1) || defined(__GNU__) || defined(__GLIBC__) || defined(SUNOS4) || defined(SNI) || \
+     defined(SCOOS) || defined(BSDI) || defined(NCR) || \
+     defined(NEC) || ( defined(HPUX10) && !defined(_REENTRANT)) || \
+     (defined(AIX) && !defined(USE_REENTRANT_LIBC))
+diff -ur mozilla/directory.old/c-sdk/ldap/libraries/libldap/Makefile.in mozilla/directory/c-sdk/ldap/libraries/libldap/Makefile.in
+--- mozilla/directory.old/c-sdk/ldap/libraries/libldap/Makefile.in	2004-03-10 19:47:25.000000000 +0100
++++ mozilla/directory/c-sdk/ldap/libraries/libldap/Makefile.in	2004-07-27 03:54:23.000000000 +0200
+@@ -168,7 +168,8 @@
+ EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME) $(OS_LIBS) -lc
+ endif
+ 
+-ifeq ($(OS_ARCH), Linux)
++
++ifneq (,$(findstring $(OS_ARCH),Linux GNU))
+ EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME)
+ endif
+ 
+@@ -286,7 +287,7 @@
+ ifdef SO_FILES_TO_REMOVE
+ 	-$(RM) $(SO_FILES_TO_REMOVE)
+ endif
+-ifneq (,$(filter AIX Linux HP-UX Darwin BeOS QNX NetBSD OSF1 OpenBSD, $(OS_ARCH)))
++ifneq (,$(findstring $(OS_ARCH),AIX Linux GNU HP-UX Darwin BeOS QNX NetBSD OSF1 OpenBSD))
+ 	$(LINK_LIB) ../liblber/$(OBJDIR_NAME)/*.a
+ else
+ ifeq ($(OS_ARCH),OS2)

@@ -1,0 +1,24 @@
+
+Status: in BTS.  Maintainer said he'd apply for libpcap0.8 also.
+
+diff -ur libpcap-0.7.2.old/configure.in libpcap-0.7.2/configure.in
+--- libpcap-0.7.2.old/configure.in	2003-02-26 07:45:30.000000000 +0100
++++ libpcap-0.7.2/configure.in	2004-08-19 17:27:28.000000000 +0200
+@@ -60,7 +60,7 @@
+ AC_MSG_CHECKING(packet capture type)
+ if test ! -z "$with_pcap" ; then
+ 	V_PCAP="$withval"
+-elif test -r /dev/bpf0 ; then
++elif test -r /usr/include/net/bpf.h ; then
+ 	V_PCAP=bpf
+ elif test -r /usr/include/net/pfilt.h ; then
+ 	V_PCAP=pf
+@@ -76,8 +76,6 @@
+ 	V_PCAP=dlpi
+ elif test -r /usr/include/linux/socket.h ; then
+ 	V_PCAP=linux
+-elif test -c /dev/bpf0 ; then		# check again in case not readable
+-	V_PCAP=bpf
+ elif test -c /dev/enet ; then		# check again in case not readable
+ 	V_PCAP=enet
+ elif test -c /dev/nit ; then		# check again in case not readable
