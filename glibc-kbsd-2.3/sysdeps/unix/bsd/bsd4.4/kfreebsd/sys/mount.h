@@ -97,18 +97,6 @@ enum
 #define MNT_NOSYMFOLLOW MNT_NOSYMFOLLOW
 };
 
-__BEGIN_DECLS
-
-/* Mount a filesystem.  */
-extern int mount (__const char *__type, __const char *__dir, int __flags,
-		  void *__data) __THROW;
-
-/* Unmount a filesystem.  */
-extern int unmount (__const char *__dir, int __flags) __THROW;
-
-__END_DECLS
-
-
 /* Retrieving the list of mounted filesystems.  */
 
 #include <bits/statfs.h>
