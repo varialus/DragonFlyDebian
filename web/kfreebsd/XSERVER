@@ -1,0 +1,24 @@
+
+The IRC log above describes how to setup an X server.  Obviously, I was too
+busy to document it properly.  Feel free to add decent notes to install.html.
+
+19:03 < tarzeau> i need to edit some x config file or update x?
+19:03 < tarzeau> X: user not authorized to run the X server, aborting.
+19:06 < tarzeau> i don't have /dev/psaux ?
+19:06 < tarzeau> should i dist-upgrade ?
+19:13 < nyu> X must be run as root, don't ask me why.  I have this hack to do
+             it as user:
+19:13 < nyu> #!/bin/bash -e
+19:13 < nyu> export DISPLAY=:0
+19:13 < nyu> sudo xinit /usr/bin/sudo -u `whoami` x-window-manager -- -nolisten
+             tcp
+19:14 < nyu> /dev/psaux is a linuxism
+19:14 < tarzeau> oki thanks
+19:14 < nyu> you should configure xserver-xfree86 with the default mouse config
+19:14 < nyu> and then edit manualy
+19:14 < nyu> you want something like:
+19:15 < nyu>         Option          "Device"                "/dev/sysmouse"
+19:15 < nyu>         Option          "Protocol"              "SysMouse"
+19:15 < nyu> ah, and apt-get install moused
+19:15 < nyu> and edit /etc/moused.conf
+19:15 < nyu> shouldn't all this be documented? :(
