@@ -1,0 +1,51 @@
+
+Status: unfinished, don't merge.
+
+--- fam-2.7.0.old/src/Listener.c++	2003-01-20 01:37:29.000000000 +0100
++++ fam-2.7.0/src/Listener.c++	2004-08-08 08:13:46.000000000 +0200
+@@ -209,11 +209,11 @@
+ #endif
+ 
+     char *tmpfile = tempnam("/tmp", ".fam");
++    sockaddr_un sun;
+ #ifdef HAVE_SOCKADDR_SUN_LEN
+-    sockaddr_un sun = { sizeof(sockaddr_un), AF_UNIX, "" };
+-#else
+-    sockaddr_un sun = { AF_UNIX, "" };
++    sun.sun_len = sizeof (sockaddr_un);
+ #endif
++    sun.sun_family = AF_UNIX;
+     if(strlen(tmpfile) >= (sizeof(sun.sun_path) - 1))
+     {
+         Log::error("tmpnam() too long for sun_path (%d >= %d)!",
+@@ -283,11 +283,11 @@
+ 
+     // Get the new socket.
+ 
++    struct sockaddr_un sun;
+ #ifdef HAVE_SOCKADDR_SUN_LEN
+-    struct sockaddr_un sun = { sizeof(sockaddr_un), AF_UNIX, "" };
+-#else
+-    struct sockaddr_un sun = { AF_UNIX, "" };
++    sun.sun_len = sizeof (sockaddr_un);
+ #endif
++    sun.sun_family = AF_UNIX;
+     socklen_t sunlen = sizeof(sun);
+     int client_fd = accept(ofd, (struct sockaddr *) &sun, &sunlen);
+     if (client_fd < 0)
+@@ -349,11 +349,12 @@
+ void
+ Listener::dirty_ugly_hack()
+ {
++    static sockaddr_un sun;
+ #ifdef HAVE_SOCKADDR_SUN_LEN
+-    static sockaddr_un sun = { sizeof (sockaddr_un), AF_UNIX, "/tmp/.fam_socket" };
+-#else
+-    static sockaddr_un sun = { AF_UNIX, "/tmp/.fam_socket" };
++    sun.sun_len = sizeof (sockaddr_un);
+ #endif
++    sun.sun_family = AF_UNIX;
++    strncpy (sun.sun_path, "/tmp/.fam_socket", sizeof (sun.sun_path));
+ 
+     int sock = socket(PF_UNIX, SOCK_STREAM, 0);
+     if (sock < 0)

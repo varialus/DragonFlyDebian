@@ -1,0 +1,61 @@
+
+Status: in BTS
+
+diff -Nur ruby1.8-1.8.1+1.8.2pre2.old/debian/patches/001_kbsd-gnu.patch ruby1.8-1.8.1+1.8.2pre2/debian/patches/001_kbsd-gnu.patch
+--- ruby1.8-1.8.1+1.8.2pre2.old/debian/patches/001_kbsd-gnu.patch	1970-01-01 01:00:00.000000000 +0100
++++ ruby1.8-1.8.1+1.8.2pre2/debian/patches/001_kbsd-gnu.patch	2004-08-08 08:19:48.000000000 +0200
+@@ -0,0 +1,54 @@
++--- ruby-1.8.2/configure.in~	2004-07-03 04:38:17.000000000 +0200
+++++ ruby-1.8.2/configure.in	2004-08-07 15:40:52.000000000 +0200
++@@ -776,7 +776,7 @@
++ fi
++ 
++ case "$target_os" in
++-linux*)
+++linux* | gnu* | k*bsd*-gnu)
++     if test "$rb_cv_binary_elf" = no; then
++ 	with_dln_a_out=yes
++     else
++@@ -856,16 +856,14 @@
++ 			rb_cv_dlopen=yes ;;
++ 	osf*) 		: ${LDSHARED="ld -shared -expect_unresolved \"*\""}
++ 			rb_cv_dlopen=yes ;;
++-	linux*) 	: ${LDSHARED="$CC -shared"}
+++	linux* | gnu* | k*bsd*-gnu)
+++		 	: ${LDSHARED="$CC -shared"}
++ 			rb_cv_dlopen=yes ;;
++ 	interix*) 	: ${LDSHARED="$CC -shared"}
++ 			XLDFLAGS="$XLDFLAGS -Wl,-E"
++ 			LIBPATHFLAG=" -L'%1\$-s'"
++ 			RPATHFLAG=" -Wl,-R'%1\$-s'"
++ 			rb_cv_dlopen=yes ;;
++-	gnu*)   	: ${LDSHARED="$CC -shared"}
++-			rb_cv_dlopen=yes
++-			LDFLAGS="$LDFLAGS -rdynamic" ;;
++ 	freebsd*|dragonfly*)       : ${LDSHARED="$CC -shared"}
++ 			if test "$rb_cv_binary_elf" = yes; then
++ 			    LDFLAGS="$LDFLAGS -rdynamic"
++@@ -1012,9 +1010,7 @@
++ fi
++ 
++ case "$target_os" in
++-  linux*)
++-	STRIP='strip -S -x';;
++-  gnu*)
+++  linux* | gnu* | k*bsd*-gnu)
++ 	STRIP='strip -S -x';;
++   nextstep*)
++ 	STRIP='strip -A -n';;
++@@ -1157,11 +1153,7 @@
++     sunos4*)
++ 	LIBRUBY_ALIASES='lib$(RUBY_SO_NAME).so.$(MAJOR).$(MINOR) lib$(RUBY_SO_NAME).so'
++ 	;;
++-    linux*)
++-	LIBRUBY_DLDFLAGS='-Wl,-soname,lib$(RUBY_SO_NAME).so.$(MAJOR).$(MINOR)'
++-	LIBRUBY_ALIASES='lib$(RUBY_SO_NAME).so.$(MAJOR).$(MINOR) lib$(RUBY_SO_NAME).so'
++-	;;
++-    gnu*)
+++    linux* | gnu* | k*bsd*-gnu)
++ 	LIBRUBY_DLDFLAGS='-Wl,-soname,lib$(RUBY_SO_NAME).so.$(MAJOR).$(MINOR)'
++ 	LIBRUBY_ALIASES='lib$(RUBY_SO_NAME).so.$(MAJOR).$(MINOR) lib$(RUBY_SO_NAME).so'
++ 	;;
