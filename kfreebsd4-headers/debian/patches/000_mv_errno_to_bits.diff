@@ -6,8 +6,8 @@ This patch is equivalent to:
 
 diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 --- src.old/sys/bits/errno.h	1970-01-01 01:00:00.000000000 +0100
-+++ src/sys/bits/errno.h	2004-08-03 02:04:35.000000000 +0200
-@@ -0,0 +1,204 @@
++++ src/sys/bits/errno.h	2004-09-28 00:46:05.000000000 +0200
+@@ -0,0 +1,190 @@
 +/*
 + * Copyright (c) 1982, 1986, 1989, 1993
 + *	The Regents of the University of California.  All rights reserved.
@@ -67,9 +67,7 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 +#define	ENOMEM		12		/* Cannot allocate memory */
 +#define	EACCES		13		/* Permission denied */
 +#define	EFAULT		14		/* Bad address */
-+#ifdef	__USE_BSD
 +#define	ENOTBLK		15		/* Block device required */
-+#endif
 +#define	EBUSY		16		/* Device busy */
 +#define	EEXIST		17		/* File exists */
 +#define	EXDEV		18		/* Cross-device link */
@@ -80,9 +78,7 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 +#define	ENFILE		23		/* Too many open files in system */
 +#define	EMFILE		24		/* Too many open files */
 +#define	ENOTTY		25		/* Inappropriate ioctl for device */
-+#ifdef	__USE_BSD
 +#define	ETXTBSY		26		/* Text file busy */
-+#endif
 +#define	EFBIG		27		/* File too large */
 +#define	ENOSPC		28		/* No space left on device */
 +#define	ESPIPE		29		/* Illegal seek */
@@ -105,7 +101,6 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 +
 +/* non-blocking and interrupt i/o */
 +#define	EAGAIN		35		/* Resource temporarily unavailable */
-+#ifdef	__USE_BSD
 +#define	EWOULDBLOCK	EAGAIN		/* Operation would block */
 +#define	EINPROGRESS	36		/* Operation now in progress */
 +#define	EALREADY	37		/* Operation already in progress */
@@ -140,18 +135,14 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 +#define	ECONNREFUSED	61		/* Connection refused */
 +
 +#define	ELOOP		62		/* Too many levels of symbolic links */
-+#endif /* __USE_BSD */
 +#define	ENAMETOOLONG	63		/* File name too long */
 +
 +/* should be rearranged */
-+#ifdef	__USE_BSD
 +#define	EHOSTDOWN	64		/* Host is down */
 +#define	EHOSTUNREACH	65		/* No route to host */
-+#endif /* __USE_BSD */
 +#define	ENOTEMPTY	66		/* Directory not empty */
 +
 +/* quotas & mush */
-+#ifdef	__USE_BSD
 +#define	EPROCLIM	67		/* Too many processes */
 +#define	EUSERS		68		/* Too many users */
 +#define	EDQUOT		69		/* Disc quota exceeded */
@@ -164,21 +155,18 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 +#define	EPROGUNAVAIL	74		/* RPC prog. not avail */
 +#define	EPROGMISMATCH	75		/* Program version wrong */
 +#define	EPROCUNAVAIL	76		/* Bad procedure for program */
-+#endif /* __USE_BSD */
 +
 +#define	ENOLCK		77		/* No locks available */
 +#define	ENOSYS		78		/* Function not implemented */
 +
 +#define	EFTYPE		79		/* Inappropriate file type or format */
 +
-+#ifdef	__USE_BSD
 +#define	EAUTH		80		/* Authentication error */
 +#define	ENEEDAUTH	81		/* Need authenticator */
 +#define	EIDRM		82		/* Identifier removed */
 +#define	ENOMSG		83		/* No message of desired type */
 +#define	EOVERFLOW	84		/* Value too large to be stored in data type */
 +#define	ECANCELED	85		/* Operation canceled */
-+#endif /* __USE_BSD */
 +
 +#endif /* <errno.h> included.  */
 +
@@ -188,9 +176,7 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 +
 +#ifdef _ERRNO_H
 +
-+#ifdef	__USE_BSD
 +#define	ELAST		86		/* Must be equal largest errno */
-+#endif /* __USE_BSD */
 +
 +
 +#ifndef __ASSEMBLER__
@@ -213,9 +199,9 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 +
 +#endif /* <errno.h> included.  */
 diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
---- src.old/sys/sys/errno.h	2004-08-03 02:04:35.000000000 +0200
+--- src.old/sys/sys/errno.h	2004-09-28 00:46:05.000000000 +0200
 +++ src/sys/sys/errno.h	1970-01-01 01:00:00.000000000 +0100
-@@ -1,204 +0,0 @@
+@@ -1,190 +0,0 @@
 -/*
 - * Copyright (c) 1982, 1986, 1989, 1993
 - *	The Regents of the University of California.  All rights reserved.
@@ -275,9 +261,7 @@ diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
 -#define	ENOMEM		12		/* Cannot allocate memory */
 -#define	EACCES		13		/* Permission denied */
 -#define	EFAULT		14		/* Bad address */
--#ifdef	__USE_BSD
 -#define	ENOTBLK		15		/* Block device required */
--#endif
 -#define	EBUSY		16		/* Device busy */
 -#define	EEXIST		17		/* File exists */
 -#define	EXDEV		18		/* Cross-device link */
@@ -288,9 +272,7 @@ diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
 -#define	ENFILE		23		/* Too many open files in system */
 -#define	EMFILE		24		/* Too many open files */
 -#define	ENOTTY		25		/* Inappropriate ioctl for device */
--#ifdef	__USE_BSD
 -#define	ETXTBSY		26		/* Text file busy */
--#endif
 -#define	EFBIG		27		/* File too large */
 -#define	ENOSPC		28		/* No space left on device */
 -#define	ESPIPE		29		/* Illegal seek */
@@ -313,7 +295,6 @@ diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
 -
 -/* non-blocking and interrupt i/o */
 -#define	EAGAIN		35		/* Resource temporarily unavailable */
--#ifdef	__USE_BSD
 -#define	EWOULDBLOCK	EAGAIN		/* Operation would block */
 -#define	EINPROGRESS	36		/* Operation now in progress */
 -#define	EALREADY	37		/* Operation already in progress */
@@ -348,18 +329,14 @@ diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
 -#define	ECONNREFUSED	61		/* Connection refused */
 -
 -#define	ELOOP		62		/* Too many levels of symbolic links */
--#endif /* __USE_BSD */
 -#define	ENAMETOOLONG	63		/* File name too long */
 -
 -/* should be rearranged */
--#ifdef	__USE_BSD
 -#define	EHOSTDOWN	64		/* Host is down */
 -#define	EHOSTUNREACH	65		/* No route to host */
--#endif /* __USE_BSD */
 -#define	ENOTEMPTY	66		/* Directory not empty */
 -
 -/* quotas & mush */
--#ifdef	__USE_BSD
 -#define	EPROCLIM	67		/* Too many processes */
 -#define	EUSERS		68		/* Too many users */
 -#define	EDQUOT		69		/* Disc quota exceeded */
@@ -372,21 +349,18 @@ diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
 -#define	EPROGUNAVAIL	74		/* RPC prog. not avail */
 -#define	EPROGMISMATCH	75		/* Program version wrong */
 -#define	EPROCUNAVAIL	76		/* Bad procedure for program */
--#endif /* __USE_BSD */
 -
 -#define	ENOLCK		77		/* No locks available */
 -#define	ENOSYS		78		/* Function not implemented */
 -
 -#define	EFTYPE		79		/* Inappropriate file type or format */
 -
--#ifdef	__USE_BSD
 -#define	EAUTH		80		/* Authentication error */
 -#define	ENEEDAUTH	81		/* Need authenticator */
 -#define	EIDRM		82		/* Identifier removed */
 -#define	ENOMSG		83		/* No message of desired type */
 -#define	EOVERFLOW	84		/* Value too large to be stored in data type */
 -#define	ECANCELED	85		/* Operation canceled */
--#endif /* __USE_BSD */
 -
 -#endif /* <errno.h> included.  */
 -
@@ -396,9 +370,7 @@ diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
 -
 -#ifdef _ERRNO_H
 -
--#ifdef	__USE_BSD
 -#define	ELAST		86		/* Must be equal largest errno */
--#endif /* __USE_BSD */
 -
 -
 -#ifndef __ASSEMBLER__
