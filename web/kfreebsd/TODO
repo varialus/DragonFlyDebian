@@ -27,14 +27,15 @@ if all tasks were fixed. We goalt neither of these though :P
 
  - Binutils
 	- Fixed in upstream. Push upstream fixes into Debian (#248182).
-	- The ld.so problem (see #246825) is not fixed in upstream. Guillem,
-	  can we forward the current patch? #246825 awaits your confirmation!
-	  [ Have to make sure the patch is enterely correct ]
+	- The ld.so problem (see #246825) is not fixed in upstream.  We have
+	  a patch in the bug that is acceptable for debian, but not for
+	  upstream.  Guillem rewrote the patch in a way that upstream likes,
+	  but his patch got obsoleted with an upstream update and no longer
+	  works.
 	- Pass "make check".
 
  - FreeBSD
-	- freebsd-buildutils is in official archive now. You can use it to
-	  build FreeBSD sources (which heavily depend on their make, awk, etc)
+	- Merge patches from freebsd-buildutils and kfreebsd6 into upstream.
 
 	- freebsd-utils. This is a hacked package built from staticaly-linked
 	  binaries. It'll eventualy be rewriten semi-portably and replaced
@@ -43,13 +44,15 @@ if all tasks were fixed. We goalt neither of these though :P
 	  their GNU/Linux sisters.
 
  - GDB
-	- Ported in upstream.
+	- Ported in upstream, but it doesn't work properly.  As a workaround,
+	we use freebsd-gdb package instead.
 
  - GRUB
 	- Fix userspace emulator to work on kFreeBSD-based systems.  This
 	  is supposedly fixed but I haven't tested it yet (rmh).
 	- Fix kfreebsd loader so we can boot directly the kernel and not need
-	  the FreeBSD loader.
+	  the FreeBSD loader.  (The debian package has a patch by Guillem
+	  which does this, but doesn't work reliably enough to merge it yet).
 
  - LiveCD
 	- Test current livecd.sh in SVN and make sure it generates working
@@ -58,3 +61,5 @@ if all tasks were fixed. We goalt neither of these though :P
 
  - Split out libuptimed
 	- See bug #259477 
+
+ - xterm is horribly fucked (I use rxvt instead)
