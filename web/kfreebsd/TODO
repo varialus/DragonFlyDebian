@@ -43,9 +43,12 @@ if all tasks were fixed. We goalt neither of these though :P
 	  I'm preparing a proper package with the same tools ported to Glibc
 	  and built from source on gnu environment.
 
- - GDB
-	- Ported in upstream, but it doesn't work properly.  As a workaround,
-	we use freebsd-gdb package instead.
+ - libkvm is ported badly.  It still has some dummy stubs that need replacing
+   with decent code.
+
+ - GDB is ported in upstream, but it doesn't work properly.  Maybe it will
+   work when we fix libkvm.  As a workaround, we use freebsd-gdb package
+   instead.
 
  - GRUB
 	- Fix userspace emulator to work on kFreeBSD-based systems.  This
@@ -56,9 +59,23 @@ if all tasks were fixed. We goalt neither of these though :P
 
  - d-i
 
- - Split out libuptimed
-	- See bug #259477 
-
  - xterm is horribly fucked (I use rxvt instead).
 
  - Package Glibc for the FreeBSD ports collection.
+
+
+     Big beasts
+     ~~~~~~~~~~
+
+These are presumably somewhere in the libc implementation and are the most
+hard to debug from this list.
+
+ - emacs21 segfaults during installation.
+ - GNUstep has a heisenbug segfault condition, see
+   http://lists.alioth.debian.org/pipermail/glibc-bsd-devel/2004-December/000344.html
+ - Some libgthread-based apps fail with pthread-related errors (e.g.
+   gnome-terminal or nautilus).
+ - konqueror hangs when user attempts to open an URL.  The same is reported to
+   happen with mozilla, although mozilla is not fully ported yet so we can't
+   check.
+ - KDE hangs during startup.
