@@ -1,0 +1,566 @@
+diff -Naur sysvinit-2.85/debian/changelog sysvinit-2.85-kbsd/debian/changelog
+--- sysvinit-2.85/debian/changelog	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/changelog	2003-10-04 20:16:37.000000000 +0200
+@@ -1,3 +1,15 @@
++sysvinit (2.85-7+kbsd) unstable; urgency=low
++
++  * Substituted mount(2) with system(2) calls.
++  * Generalized non portable arguments to low level utils.
++  * Fixed a wrong CPP define.
++  * Moved initctl from /dev to /var/run because in KFreeBSD it's
++    not writable.
++  * Fixed the inittab to use proper terminal devices.
++  * Added KFreeBSD reboot and halt magic defines.
++
++ -- Guillem Jover <guillem@debian.org>  Sat,  4 Oct 2003 20:16:06 +0200
++
+ sysvinit (2.85-7) unstable; urgency=low
+ 
+   * Fix devfs mtab fixup in checkroot.sh (closes: #202421)
+diff -Naur sysvinit-2.85/debian/initscripts/conffiles sysvinit-2.85-kbsd/debian/initscripts/conffiles
+--- sysvinit-2.85/debian/initscripts/conffiles	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/initscripts/conffiles	2003-10-04 18:50:53.000000000 +0200
+@@ -1,3 +1,4 @@
++/etc/init.d/rcArch
+ /etc/init.d/bootlogd
+ /etc/init.d/bootmisc.sh
+ /etc/init.d/checkfs.sh
+diff -Naur sysvinit-2.85/debian/initscripts/etc/init.d/bootmisc.sh sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/bootmisc.sh
+--- sysvinit-2.85/debian/initscripts/etc/init.d/bootmisc.sh	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/bootmisc.sh	2003-10-04 18:50:53.000000000 +0200
+@@ -5,6 +5,8 @@
+ #
+ 
+ . /etc/default/rcS
++. /etc/init.d/rcArch
++
+ #
+ #	Put a nologin file in /etc to prevent people from logging in
+ #	before system startup is complete.
+@@ -112,7 +114,7 @@
+ #
+ #	Save kernel messages in /var/log/dmesg
+ #
+-dmesg -s 65536 > /var/log/dmesg
++dmesg $dmesg_bufsize > /var/log/dmesg
+ 
+ : exit 0
+ 
+diff -Naur sysvinit-2.85/debian/initscripts/etc/init.d/checkfs.sh sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/checkfs.sh
+--- sysvinit-2.85/debian/initscripts/etc/init.d/checkfs.sh	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/checkfs.sh	2003-10-04 18:50:53.000000000 +0200
+@@ -5,6 +5,7 @@
+ #
+ 
+ . /etc/default/rcS
++. /etc/init.d/rcArch
+ 
+ #
+ # Check the rest of the file systems.
+@@ -21,15 +22,16 @@
+     then
+ 	fix="-y"
+     else
+-	fix="-a"
++	fix="$fsck_fix_all"
+     fi
+-    spinner="-C"
++    spinner="$fsck_spinner"
+     case "$TERM" in
+ 	dumb|network|unknown|"") spinner="" ;;
+     esac
+     [ `uname -m` = s390 ] && spinner="" # This should go away
++    fsckargs="$fsck_all_noroot"
+     echo "Checking all file systems..."
+-    fsck $spinner -R -A $fix $force
++    fsck $spinner $fsckargs $fix $force
+     if [ $? -gt 1 ]
+     then
+       echo
+diff -Naur sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/checkroot.sh
+--- sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/checkroot.sh	2003-10-04 19:58:27.000000000 +0200
+@@ -5,6 +5,7 @@
+ #
+ 
+ . /etc/default/rcS
++. /etc/init.d/rcArch
+ 
+ #
+ # Set SULOGIN in /etc/default/rcS to yes if you want a sulogin to be spawned
+@@ -78,7 +79,7 @@
+ 		doproc=no
+ 	fi
+ fi
+-[ "$doproc" = yes ] && mount -n /proc
++[ "$doproc" = yes ] && mount $mount_no_mtab /proc
+ 
+ #
+ # Activate the swap device(s) in /etc/fstab. This needs to be done
+@@ -115,7 +116,7 @@
+   #
+   # Ensure that root is quiescent and read-only before fsck'ing.
+   #
+-  mount -n -o remount,ro /
++  mount $mount_no_mtab $mount_remount,ro /
+   if [ $? = 0 ]
+   then
+     if [ -f /forcefsck ]
+@@ -128,15 +129,16 @@
+     then
+ 	fix="-y"
+     else
+-	fix="-a"
++	fix="$fsck_fix_all"
+     fi
+-    spinner="-C"
++    spinner="$fsck_spinner"
++
+     case "$TERM" in
+         dumb|network|unknown|"") spinner="" ;;
+     esac
+     [ `uname -m` = s390 ] && spinner="" # This should go away
+     echo "Checking root file system..."
+-    fsck $spinner $force $fix /
++    fsck $spinner $fsck_preen_mode $force $fix /
+     FSCKCODE=$?
+     #
+     # If there was a failure, drop into single-user mode.
+@@ -155,7 +157,7 @@
+       echo "that the root file system is currently mounted read-only.  To"
+       echo "remount it read-write:"
+       echo
+-      echo "   # mount -n -o remount,rw /"
++      echo "   # mount $mount_no_mtab $mount_remount,rw /"
+       echo
+       echo "CONTROL-D will exit from this shell and REBOOT the system."
+       echo
+@@ -181,13 +183,13 @@
+ #	is on a ro fs until the remount succeeded. Then clean up old mtabs
+ #	and finally write the new mtab.
+ #
+-mount -n -o remount,$rootmode /
++mount $mount_no_mtab $mount_remount,$rootmode /
+ if [ "$rootmode" = rw ]
+ then
+ 	[ ! -L /etc/mtab ] && [ -f /etc/mtab~ ] && rm -f /etc/mtab~
+ 	: > /etc/mtab
+-	mount -f -o remount /
+-	mount -f /proc
++	mount -f $mount_remount,$rootmode /
++	[ $SYSTEM = linux-compat ] && mount -f $mount_remount /proc
+ 	[ -n "$devfs" ] && mount -f $devfs
+ fi
+ 
+diff -Naur sysvinit-2.85/debian/initscripts/etc/init.d/halt sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/halt
+--- sysvinit-2.85/debian/initscripts/etc/init.d/halt	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/halt	2003-10-04 18:50:53.000000000 +0200
+@@ -7,6 +7,8 @@
+ 
+ PATH=/sbin:/bin:/usr/sbin:/usr/bin
+ 
++. /etc/init.d/rcArch
++
+ # See if we need to cut the power.
+ if [ -x /etc/init.d/ups-monitor ]
+ then
+@@ -20,6 +22,6 @@
+ 	hddown=""
+ fi
+ 
+-halt -d -f -i -p $hddown
++halt -d -f -p $halt_ifdown $hddown
+ 
+ : exit 0
+diff -Naur sysvinit-2.85/debian/initscripts/etc/init.d/mountall.sh sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/mountall.sh
+--- sysvinit-2.85/debian/initscripts/etc/init.d/mountall.sh	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/mountall.sh	2003-10-04 18:50:53.000000000 +0200
+@@ -3,7 +3,9 @@
+ #
+ # Version:	@(#)mountall.sh  2.85-4  08-May-2003  miquels@cistron.nl
+ #
++
+ . /etc/default/rcS
++. /etc/init.d/rcArch
+ 
+ #
+ # Mount local file systems in /etc/fstab. For some reason, people
+@@ -11,16 +13,18 @@
+ # about this. So we mount "proc" filesystems without -v.
+ #
+ [ "$VERBOSE" != no ] && echo "Mounting local filesystems..."
+-mount -at proc
+-mount -avt nonfs,nosmbfs,noncpfs,noproc
++mount -at $procfs
++mount -avt nonfs,nosmbfs,noncpfs,no$procfs
++
++INITCTL_PATH=/var/run/initctl
+ 
+ #
+ # We might have mounted something over /dev, see if /dev/initctl is there.
+ #
+-if [ ! -p /dev/initctl ]
++if [ ! -p $INITCTL_PATH ]
+ then
+-	rm -f /dev/initctl
+-	mknod -m 600 /dev/initctl p
++	rm -f $INITCTL_PATH
++	mkfifo -m 600 $INITCTL_PATH
+ fi
+ kill -USR1 1
+ 
+diff -Naur sysvinit-2.85/debian/initscripts/etc/init.d/rcArch sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/rcArch
+--- sysvinit-2.85/debian/initscripts/etc/init.d/rcArch	1970-01-01 01:00:00.000000000 +0100
++++ sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/rcArch	2003-10-04 18:50:53.000000000 +0200
+@@ -0,0 +1,44 @@
++# Arch specific options
++
++if [ `uname -s` = Linux -o `uname -s` = GNU ]; then
++  SYSTEM=linux-compat
++  umount_all="-a -r"
++  umount_try_ro="-r"
++  case "`uname -r`" in
++    [01].*|2.[01].*)
++      umount_force=""
++      umount_lazy=""
++      ;;
++    2.[23].*)
++      umount_force="-f"
++      umount_lazy=""
++      ;;
++    *)
++      umount_force="-f"
++      umount_lazy="-l"
++      ;;
++  esac
++  dmesg_bufsize="-s 65536"
++  fsck_all_noroot="-R -A"
++  fsck_fix_all="-a"
++  fsck_spinner="-C"
++  fsck_preen_mode=""
++  procfs="proc"
++  mount_no_mtab="-n"
++  mount_remount="-o remount"
++  halt_ifdown="-i"
++else
++  SYSTEM=bsd-compat
++  umount_all="-a"
++  umount_try_ro=""
++  umount_force="-f"
++  fsck_all_noroot="-B -p"
++  fsck_fix_all=""
++  fsck_spinner=""
++  fsck_preen_mode="-p"
++  procfs="procfs"
++  mount_no_mtab=""
++  mount_remount="-o update"
++  halt_ifdown=""
++fi
++
+diff -Naur sysvinit-2.85/debian/initscripts/etc/init.d/reboot sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/reboot
+--- sysvinit-2.85/debian/initscripts/etc/init.d/reboot	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/reboot	2003-10-04 18:50:53.000000000 +0200
+@@ -7,5 +7,7 @@
+ 
+ PATH=/sbin:/bin:/usr/sbin:/usr/bin
+ 
++. /etc/init.d/rcArch
++
+ echo -n "Rebooting... "
+-reboot -d -f -i
++reboot -d -f $halt_ifdown
+diff -Naur sysvinit-2.85/debian/initscripts/etc/init.d/single sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/single
+--- sysvinit-2.85/debian/initscripts/etc/init.d/single	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/single	2003-10-04 18:50:53.000000000 +0200
+@@ -19,11 +19,14 @@
+ # We start update here, since we just killed it.
+ if [ -x /sbin/update ]
+ then
+-	case `uname -r` in
+-		0.*|1.*|2.[0123].*)
+-			update
+-		;;
+-	esac
++  if [ `uname -s` = Linux ]
++  then
++    case `uname -r` in
++      0.*|1.*|2.[0123].*)
++        update
++        ;;
++    esac
++  fi
+ fi
+ 
+ echo "Entering single-user mode..."
+diff -Naur sysvinit-2.85/debian/initscripts/etc/init.d/umountfs sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/umountfs
+--- sysvinit-2.85/debian/initscripts/etc/init.d/umountfs	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/umountfs	2003-10-04 18:50:53.000000000 +0200
+@@ -7,10 +7,14 @@
+ 
+ PATH=/sbin:/bin:/usr/sbin:/usr/bin
+ 
+-echo -n "Deactivating swap... "
+-umount -ttmpfs -a -r
+-swapoff -a
+-echo "done."
++. /etc/init.d/rcArch
++
++if [ `uname -s` = Linux ]; then
++  echo -n "Deactivating swap... "
++  umount -ttmpfs -a -r
++  swapoff -a
++  echo "done."
++fi
+ 
+ #
+ #	Umount all procfs, usbfs, sysfs, devfs, and devpts
+@@ -25,7 +29,7 @@
+ 			;;
+ 	esac
+     	case $type in
+-		proc|devfs|sysfs)
++		$procfs|devfs|sysfs)
+ 			PROC_DEV="$PROC_DEV $dst"
+ 			;;
+ 		usbdevfs|usbfs|devpts)
+@@ -38,10 +42,10 @@
+ fi
+ 
+ # Now umount all other filesystems.
+-umount -tnoproc,nodevfs,nosysfs -a -r
++umount -tno$procfs,nodevfs,nosysfs $umount_all
+ echo "done."
+ 
+ # This is superfluous.
+-mount -n -o remount,ro /
++mount $mount_no_mtab $mount_remount,ro /
+ 
+ : exit 0
+diff -Naur sysvinit-2.85/debian/initscripts/etc/init.d/umountnfs.sh sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/umountnfs.sh
+--- sysvinit-2.85/debian/initscripts/etc/init.d/umountnfs.sh	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/initscripts/etc/init.d/umountnfs.sh	2003-10-04 18:50:53.000000000 +0200
+@@ -7,26 +7,13 @@
+ 
+ PATH=/sbin:/bin:/usr/sbin:/usr/bin
+ 
+-case "`uname -r`" in
+-  [01].*|2.[01].*)
+-	FORCE=""
+-	LAZY=""
+-	;;
+-  2.[23].*)
+-	FORCE="-f"
+-	LAZY=""
+-	;;
+-  *)
+-	FORCE="-f"
+-	LAZY="-l"
+-	;;
+-esac
++. /etc/init.d/rcArch
+ 
+ # Write a reboot record to /var/log/wtmp before unmounting
+ halt -w
+ 
+ echo -n "Unmounting remote filesystems... "
+-umount -tnfs,smbfs,ncpfs $FORCE $LAZY -a -r
++umount -tnfs,smbfs,ncpfs $umount_force $umount_lazy $umount_all $umount_try_ro
+ echo "done."
+ 
+ : exit 0
+diff -Naur sysvinit-2.85/debian/postinst sysvinit-2.85-kbsd/debian/postinst
+--- sysvinit-2.85/debian/postinst	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/debian/postinst	2003-10-04 20:14:18.000000000 +0200
+@@ -17,24 +17,31 @@
+ esac
+ umask 022
+ 
++INITCTL_PATH=/var/run/initctl
++
+ #
+-#	Check /dev/initctl
++#	Check initctl fifo
+ #
+-if [ ! -p /dev/initctl ]
++if [ ! -p $INITCTL_PATH ]
+ then
+-	echo "sysvinit: creating /dev/initctl"
+-	rm -f /dev/initctl
+-	mknod -m 600 /dev/initctl p
++	echo "sysvinit: creating $INITCTL_PATH"
++	rm -f $INITCTL_PATH
++	mkfifo -m 600 $INITCTL_PATH
+ fi
+ rm -f /etc/ioctl.save
+ 
+ if [ ! -f /etc/inittab ]
+ then
+-	# Prefer arch-specific inittab.
+-	arch=`dpkg --print-installation-architecture`
++	# Prefer kernel-arch-specific inittab.
++	system=`dpkg-architecture -qDEB_HOST_GNU_SYSTEM`
++	cpu=`dpkg-architecture -qDEB_HOST_GNU_CPU`
+ 	expl=/usr/share/sysvinit
+-	if [ -f $expl/inittab.$arch ]; then
+-		inittab=$expl/inittab.$arch
++	if [ -f $expl/inittab.$system ]; then
++		inittab=$expl/inittab.$system
++	elif [ -f $expl/inittab.$cpu ]; then
++		inittab=$expl/inittab.$cpu
++	elif [ -f $expl/inittab.$cpu-$system ]; then
++		inittab=$expl/inittab.$cpu-$system
+ 	else
+ 		inittab=$expl/inittab
+ 	fi
+diff -Naur sysvinit-2.85/debian/share/inittab.kfreebsd-gnu sysvinit-2.85-kbsd/debian/share/inittab.kfreebsd-gnu
+--- sysvinit-2.85/debian/share/inittab.kfreebsd-gnu	1970-01-01 01:00:00.000000000 +0100
++++ sysvinit-2.85-kbsd/debian/share/inittab.kfreebsd-gnu	2003-10-04 18:50:53.000000000 +0200
+@@ -0,0 +1,69 @@
++# /etc/inittab: init(8) configuration.
++# $Id: inittab,v 1.91 2002/01/25 13:35:21 miquels Exp $
++
++# The default runlevel.
++id:2:initdefault:
++
++# Boot-time system configuration/initialization script.
++# This is run first except when booting in emergency (-b) mode.
++si::sysinit:/etc/init.d/rcS
++
++# What to do in single-user mode.
++~~:S:wait:/sbin/sulogin
++
++# /etc/init.d executes the S and K scripts upon change
++# of runlevel.
++#
++# Runlevel 0 is halt.
++# Runlevel 1 is single-user.
++# Runlevels 2-5 are multi-user.
++# Runlevel 6 is reboot.
++
++l0:0:wait:/etc/init.d/rc 0
++l1:1:wait:/etc/init.d/rc 1
++l2:2:wait:/etc/init.d/rc 2
++l3:3:wait:/etc/init.d/rc 3
++l4:4:wait:/etc/init.d/rc 4
++l5:5:wait:/etc/init.d/rc 5
++l6:6:wait:/etc/init.d/rc 6
++# Normally not reached, but fallthrough in case of emergency.
++z6:6:respawn:/sbin/sulogin
++
++# What to do when CTRL-ALT-DEL is pressed.
++ca:12345:ctrlaltdel:/sbin/shutdown -t1 -a -r now
++
++# Action on special keypress (ALT-UpArrow).
++#kb::kbrequest:/bin/echo "Keyboard Request--edit /etc/inittab to let this work."
++
++# What to do when the power fails/returns.
++pf::powerwait:/etc/init.d/powerfail start
++pn::powerfailnow:/etc/init.d/powerfail now
++po::powerokwait:/etc/init.d/powerfail stop
++
++# /sbin/getty invocations for the runlevels.
++#
++# The "id" field MUST be the same as the last
++# characters of the device (after "tty").
++#
++# Format:
++#  <id>:<runlevels>:<action>:<process>
++#
++# Note that on most Debian systems tty7 is used by the X Window System,
++# so if you want to add more getty's go ahead but skip tty7 if you run X.
++#
++1:2345:respawn:/sbin/getty 38400 ttyv0
++2:23:respawn:/sbin/getty 38400 ttyv1
++3:23:respawn:/sbin/getty 38400 ttyv2
++4:23:respawn:/sbin/getty 38400 ttyv3
++5:23:respawn:/sbin/getty 38400 ttyv4
++6:23:respawn:/sbin/getty 38400 ttyv5
++
++# Example how to put a getty on a serial line (for a terminal)
++#
++#T0:23:respawn:/sbin/getty -L ttyS0 9600 vt100
++#T1:23:respawn:/sbin/getty -L ttyS1 9600 vt100
++
++# Example how to put a getty on a modem line.
++#
++#T3:23:respawn:/sbin/mgetty -x0 -s 57600 ttyS3
++
+diff -Naur sysvinit-2.85/src/bootlogd.c sysvinit-2.85-kbsd/src/bootlogd.c
+--- sysvinit-2.85/src/bootlogd.c	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/src/bootlogd.c	2003-10-04 18:50:53.000000000 +0200
+@@ -41,7 +41,6 @@
+ #include <fcntl.h>
+ #include <pty.h>
+ #include <ctype.h>
+-#include <sys/mount.h>
+ 
+ char *Version = "@(#) bootlogd 2.85 22-Jul-2003 miquels@cistron.nl";
+ 
+@@ -234,7 +233,7 @@
+ 		return -1;
+ 	}
+ 	if (st.st_dev == st2.st_dev) {
+-		if (mount("proc", "/proc", "proc", 0, NULL) < 0) {
++		if (system("mount -t proc proc /proc") != 0) {
+ 			perror("bootlogd: mount /proc");
+ 			return -1;
+ 		}
+@@ -253,7 +252,7 @@
+ 			perror("bootlogd: /proc/cmdline");
+ 		close(fd);
+ 	}
+-	if (didmount) umount("/proc");
++	if (didmount) system("umount /proc");
+ 
+ 	if (r < 0) return r;
+ 
+diff -Naur sysvinit-2.85/src/init.c sysvinit-2.85-kbsd/src/init.c
+--- sysvinit-2.85/src/init.c	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/src/init.c	2003-10-04 18:50:53.000000000 +0200
+@@ -76,7 +76,7 @@
+ #  define CBAUD		0
+ #endif
+ #ifndef CBAUDEX
+-#  defined CBAUDEX	0
++#  define CBAUDEX	0
+ #endif
+ 
+ /* Set a signal handler. */
+diff -Naur sysvinit-2.85/src/initreq.h sysvinit-2.85-kbsd/src/initreq.h
+--- sysvinit-2.85/src/initreq.h	2003-10-04 20:17:07.000000000 +0200
++++ sysvinit-2.85-kbsd/src/initreq.h	2003-10-04 18:50:53.000000000 +0200
+@@ -16,7 +16,11 @@
+ #include <sys/param.h>
+ 
+ #define INIT_MAGIC 0x03091969
++#if 0
+ #define INIT_FIFO  "/dev/initctl"
++#else
++#define INIT_FIFO  "/var/run/initctl"
++#endif
+ #define INIT_CMD_START	       0
+ #define INIT_CMD_RUNLVL        1
+ #define INIT_CMD_POWERFAIL     2
+diff -Naur sysvinit-2.85/src/reboot.h sysvinit-2.85-kbsd/src/reboot.h
+--- sysvinit-2.85/src/reboot.h	1997-09-24 10:55:52.000000000 +0200
++++ sysvinit-2.85-kbsd/src/reboot.h	2003-10-04 21:42:26.000000000 +0200
+@@ -10,11 +10,19 @@
+ #  include <sys/reboot.h>
+ #endif
+ 
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#define BMAGIC_HARD	BMAGIC_REBOOT
++#define BMAGIC_SOFT	BMAGIC_REBOOT
++#define BMAGIC_REBOOT	RB_AUTOBOOT
++#define BMAGIC_HALT	RB_HALT
++#define BMAGIC_POWEROFF RB_POWEROFF
++#else
+ #define BMAGIC_HARD	0x89ABCDEF
+ #define BMAGIC_SOFT	0
+ #define BMAGIC_REBOOT	0x01234567
+ #define BMAGIC_HALT	0xCDEF0123
+ #define BMAGIC_POWEROFF	0x4321FEDC
++#endif
+ 
+ #if defined(__GLIBC__)
+   #define init_reboot(magic) reboot(magic)

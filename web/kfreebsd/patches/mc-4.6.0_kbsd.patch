@@ -1,0 +1,27 @@
+diff -Naur mc-4.6.0/debian/changelog mc-4.6.0-kbsd/debian/changelog
+--- mc-4.6.0/debian/changelog	2003-10-05 07:39:44.000000000 +0200
++++ mc-4.6.0-kbsd/debian/changelog	2003-10-05 05:38:30.000000000 +0200
+@@ -1,3 +1,9 @@
++mc (1:4.6.0-5+kbsd) unstable; urgency=low
++
++  * Modified Build-Depends to not use libgpmg1-dev on freebsd-i386.
++
++ -- Guillem Jover <guillem@debian.org>  Sun,  5 Oct 2003 05:37:33 +0200
++
+ mc (1:4.6.0-5) unstable; urgency=low
+ 
+   * Fix segfault when TERM is unset (closes: #191867)
+diff -Naur mc-4.6.0/debian/control mc-4.6.0-kbsd/debian/control
+--- mc-4.6.0/debian/control	2003-10-05 07:39:44.000000000 +0200
++++ mc-4.6.0-kbsd/debian/control	2003-10-05 05:39:46.000000000 +0200
+@@ -2,8 +2,8 @@
+ Section: utils
+ Priority: optional
+ Maintainer: Adam Byrtek <alpha@debian.org>
+-Build-Depends: debhelper (>> 4.0.0), libglib2.0-dev, libgpmg1-dev [!hurd-i386],
+- gettext
++Build-Depends: debhelper (>> 4.0.0), libglib2.0-dev, gettext
++ libgpmg1-dev [!hurd-i386 !freebsd-i386]
+ Standards-Version: 3.5.8
+ 
+ Package: mc
