@@ -190,3 +190,214 @@ diff -ur src.old/sys/sys/fnv_hash.h src/sys/sys/fnv_hash.h
  #endif
  
  #ifdef _KERNEL			/* non standard */
+diff -ur src.old/sys/netinet6/in6.h src/sys/netinet6/in6.h
+--- src.old/sys/netinet6/in6.h	2004-08-16 01:52:54.000000000 +0200
++++ src/sys/netinet6/in6.h	2004-08-16 02:00:34.000000000 +0200
+@@ -116,7 +116,6 @@
+ #define	IPV6PORT_RESERVEDMIN	600
+ #define	IPV6PORT_RESERVEDMAX	(IPV6PORT_RESERVED-1)
+ 
+-#define s6_addr   __u6_addr.__u6_addr8
+ #ifdef _KERNEL	/* XXX nonstandard */
+ #define s6_addr8  __u6_addr.__u6_addr8
+ #define s6_addr16 __u6_addr.__u6_addr16
+diff -ur src.old/sys/net/if.h src/sys/net/if.h
+--- src.old/sys/net/if.h	2004-08-16 02:02:58.000000000 +0200
++++ src/sys/net/if.h	2004-08-16 02:58:23.000000000 +0200
+@@ -92,29 +92,29 @@
+  */
+ struct if_data {
+ 	/* generic interface information */
+-	u_char	ifi_type;		/* ethernet, tokenring, etc */
+-	u_char	ifi_physical;		/* e.g., AUI, Thinnet, 10base-T, etc */
+-	u_char	ifi_addrlen;		/* media address length */
+-	u_char	ifi_hdrlen;		/* media header length */
+-	u_char	ifi_recvquota;		/* polling quota for receive intrs */
+-	u_char	ifi_xmitquota;		/* polling quota for xmit intrs */
+-	u_long	ifi_mtu;		/* maximum transmission unit */
+-	u_long	ifi_metric;		/* routing metric (external only) */
+-	u_long	ifi_baudrate;		/* linespeed */
++	unsigned char	ifi_type;		/* ethernet, tokenring, etc */
++	unsigned char	ifi_physical;		/* e.g., AUI, Thinnet, 10base-T, etc */
++	unsigned char	ifi_addrlen;		/* media address length */
++	unsigned char	ifi_hdrlen;		/* media header length */
++	unsigned char	ifi_recvquota;		/* polling quota for receive intrs */
++	unsigned char	ifi_xmitquota;		/* polling quota for xmit intrs */
++	unsigned long	ifi_mtu;		/* maximum transmission unit */
++	unsigned long	ifi_metric;		/* routing metric (external only) */
++	unsigned long	ifi_baudrate;		/* linespeed */
+ 	/* volatile statistics */
+-	u_long	ifi_ipackets;		/* packets received on interface */
+-	u_long	ifi_ierrors;		/* input errors on interface */
+-	u_long	ifi_opackets;		/* packets sent on interface */
+-	u_long	ifi_oerrors;		/* output errors on interface */
+-	u_long	ifi_collisions;		/* collisions on csma interfaces */
+-	u_long	ifi_ibytes;		/* total number of octets received */
+-	u_long	ifi_obytes;		/* total number of octets sent */
+-	u_long	ifi_imcasts;		/* packets received via multicast */
+-	u_long	ifi_omcasts;		/* packets sent via multicast */
+-	u_long	ifi_iqdrops;		/* dropped on input, this interface */
+-	u_long	ifi_noproto;		/* destined for unsupported protocol */
+-	u_long	ifi_hwassist;		/* HW offload capabilities */
+-	u_long	ifi_unused;		/* XXX was ifi_xmittiming */
++	unsigned long	ifi_ipackets;		/* packets received on interface */
++	unsigned long	ifi_ierrors;		/* input errors on interface */
++	unsigned long	ifi_opackets;		/* packets sent on interface */
++	unsigned long	ifi_oerrors;		/* output errors on interface */
++	unsigned long	ifi_collisions;		/* collisions on csma interfaces */
++	unsigned long	ifi_ibytes;		/* total number of octets received */
++	unsigned long	ifi_obytes;		/* total number of octets sent */
++	unsigned long	ifi_imcasts;		/* packets received via multicast */
++	unsigned long	ifi_omcasts;		/* packets sent via multicast */
++	unsigned long	ifi_iqdrops;		/* dropped on input, this interface */
++	unsigned long	ifi_noproto;		/* destined for unsupported protocol */
++	unsigned long	ifi_hwassist;		/* HW offload capabilities */
++	unsigned long	ifi_unused;		/* XXX was ifi_xmittiming */
+ 	struct	__kernel_timeval ifi_lastchange;	/* time of last administrative change */
+ };
+ 
+@@ -165,12 +165,12 @@
+  * from getkerninfo and the routing socket
+  */
+ struct if_msghdr {
+-	u_short	ifm_msglen;	/* to skip over non-understood messages */
+-	u_char	ifm_version;	/* future binary compatability */
+-	u_char	ifm_type;	/* message type */
++	unsigned short	ifm_msglen;	/* to skip over non-understood messages */
++	unsigned char	ifm_version;	/* future binary compatability */
++	unsigned char	ifm_type;	/* message type */
+ 	int	ifm_addrs;	/* like rtm_addrs */
+ 	int	ifm_flags;	/* value of if_flags */
+-	u_short	ifm_index;	/* index for associated ifp */
++	unsigned short	ifm_index;	/* index for associated ifp */
+ 	struct	if_data ifm_data;/* statistics and other data about if */
+ };
+ 
+@@ -179,12 +179,12 @@
+  * from getkerninfo and the routing socket
+  */
+ struct ifa_msghdr {
+-	u_short	ifam_msglen;	/* to skip over non-understood messages */
+-	u_char	ifam_version;	/* future binary compatability */
+-	u_char	ifam_type;	/* message type */
++	unsigned short	ifam_msglen;	/* to skip over non-understood messages */
++	unsigned char	ifam_version;	/* future binary compatability */
++	unsigned char	ifam_type;	/* message type */
+ 	int	ifam_addrs;	/* like rtm_addrs */
+ 	int	ifam_flags;	/* value of ifa_flags */
+-	u_short	ifam_index;	/* index for associated ifp */
++	unsigned short	ifam_index;	/* index for associated ifp */
+ 	int	ifam_metric;	/* value of ifa_metric */
+ };
+ 
+@@ -193,24 +193,24 @@
+  * from the routing socket
+  */
+ struct ifma_msghdr {
+-	u_short	ifmam_msglen;	/* to skip over non-understood messages */
+-	u_char	ifmam_version;	/* future binary compatability */
+-	u_char	ifmam_type;	/* message type */
++	unsigned short	ifmam_msglen;	/* to skip over non-understood messages */
++	unsigned char	ifmam_version;	/* future binary compatability */
++	unsigned char	ifmam_type;	/* message type */
+ 	int	ifmam_addrs;	/* like rtm_addrs */
+ 	int	ifmam_flags;	/* value of ifa_flags */
+-	u_short	ifmam_index;	/* index for associated ifp */
++	unsigned short	ifmam_index;	/* index for associated ifp */
+ };
+ 
+ /*
+  * Message format announcing the arrival or departure of a network interface.
+  */
+ struct if_announcemsghdr {
+-	u_short	ifan_msglen;	/* to skip over non-understood messages */
+-	u_char	ifan_version;	/* future binary compatibility */
+-	u_char	ifan_type;	/* message type */
+-	u_short	ifan_index;	/* index for associated ifp */
++	unsigned short	ifan_msglen;	/* to skip over non-understood messages */
++	unsigned char	ifan_version;	/* future binary compatibility */
++	unsigned char	ifan_type;	/* message type */
++	unsigned short	ifan_index;	/* index for associated ifp */
+ 	char	ifan_name[IFNAMSIZ]; /* if name, e.g. "en0" */
+-	u_short	ifan_what;	/* what type of announcement */
++	unsigned short	ifan_what;	/* what type of announcement */
+ };
+ 
+ #define	IFAN_ARRIVAL	0	/* interface arrival */
+@@ -234,7 +234,7 @@
+ 		int	ifru_mtu;
+ 		int	ifru_phys;
+ 		int	ifru_media;
+-		caddr_t	ifru_data;
++		char	*ifru_data;
+ 		int	ifru_cap[2];
+ 	} ifr_ifru;
+ #define	ifr_addr	ifr_ifru.ifru_addr	/* address */
+@@ -296,7 +296,7 @@
+ struct	ifconf {
+ 	int	ifc_len;		/* size of associated buffer */
+ 	union {
+-		caddr_t	ifcu_buf;
++		char	*ifcu_buf;
+ 		struct	ifreq *ifcu_req;
+ 	} ifc_ifcu;
+ #define	ifc_buf	ifc_ifcu.ifcu_buf	/* buffer address */
+@@ -309,9 +309,9 @@
+  */
+ struct if_laddrreq {
+ 	char	iflr_name[IFNAMSIZ];
+-	u_int	flags;
++	unsigned int	flags;
+ #define	IFLR_PREFIX	0x8000  /* in: prefix given  out: kernel fills id */
+-	u_int	prefixlen;         /* in/out */
++	unsigned int	prefixlen;         /* in/out */
+ 	struct	sockaddr_storage addr;   /* in/out */
+ 	struct	sockaddr_storage dstaddr; /* out */
+ };
+@@ -325,13 +325,13 @@
+ 
+ #ifndef _KERNEL
+ struct if_nameindex {
+-	u_int	if_index;	/* 1, 2, ... */
++	unsigned int	if_index;	/* 1, 2, ... */
+ 	char	*if_name;	/* null terminated name: "le0", ... */
+ };
+ 
+ __BEGIN_DECLS
+-u_int	 if_nametoindex __P((const char *));
+-char	*if_indextoname __P((u_int, char *));
++unsigned int	 if_nametoindex __P((const char *));
++char	*if_indextoname __P((unsigned int, char *));
+ struct	 if_nameindex *if_nameindex __P((void));
+ void	 if_freenameindex __P((struct if_nameindex *));
+ __END_DECLS
+diff -ur src.old/sys/net/if_dl.h src/sys/net/if_dl.h
+--- src.old/sys/net/if_dl.h	2004-08-16 03:04:51.000000000 +0200
++++ src/sys/net/if_dl.h	2004-08-16 03:13:08.000000000 +0200
+@@ -63,17 +63,17 @@
+  * Structure of a Link-Level sockaddr:
+  */
+ struct sockaddr_dl {
+-	u_char	sdl_len;	/* Total length of sockaddr */
+-	u_char	sdl_family;	/* AF_LINK */
+-	u_short	sdl_index;	/* if != 0, system given index for interface */
+-	u_char	sdl_type;	/* interface type */
+-	u_char	sdl_nlen;	/* interface name length, no trailing 0 reqd. */
+-	u_char	sdl_alen;	/* link level address length */
+-	u_char	sdl_slen;	/* link layer selector length */
++	unsigned char	sdl_len;	/* Total length of sockaddr */
++	unsigned char	sdl_family;	/* AF_LINK */
++	unsigned short	sdl_index;	/* if != 0, system given index for interface */
++	unsigned char	sdl_type;	/* interface type */
++	unsigned char	sdl_nlen;	/* interface name length, no trailing 0 reqd. */
++	unsigned char	sdl_alen;	/* link level address length */
++	unsigned char	sdl_slen;	/* link layer selector length */
+ 	char	sdl_data[12];	/* minimum work area, can be larger;
+ 				   contains both if name and ll address */
+-	u_short	sdl_rcf;	/* source routing control */
+-	u_short	sdl_route[16];	/* source routing information */
++	unsigned short	sdl_rcf;	/* source routing control */
++	unsigned short	sdl_route[16];	/* source routing information */
+ };
+ 
+ #define LLADDR(s) ((caddr_t)((s)->sdl_data + (s)->sdl_nlen))
