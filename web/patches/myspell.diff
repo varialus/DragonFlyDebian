@@ -1,0 +1,14 @@
+
+Status: in debian BTS, requested maintainer to forward it upstream
+
+--- myspell-3.0+pre3.1.old/Makefile     2004-01-06 04:17:51.000000000 +0100
++++ myspell-3.0+pre3.1/Makefile 2005-02-28 16:44:14.000000000 +0100
+@@ -7,7 +7,7 @@
+ VERMINOR=1
+ VERSION=$(VERMAJOR).$(VERMINOR)
+ 
+-PLATFORM := $(shell uname -s)
++PLATFORM := $(shell uname -s | sed -e "s,GNU/.*,GNU,g" -e "s,GNU,Linux,g")
+ 
+ ifeq "$(PLATFORM)" "Linux"
+   CXX ?= g++

@@ -3,19 +3,20 @@ set -e
 
 # Status: in BTS.
 
+cp debian/control{,.in}
 patch -p1 < $0
 fakeroot debian/rules clean
 exit 0
 
-diff -ur gnupg-1.2.5.old/debian/control.in gnupg-1.2.5/debian/control.in
---- gnupg-1.2.5.old/debian/control.in	2005-01-21 12:13:58.000000000 +0100
-+++ gnupg-1.2.5/debian/control.in	2005-01-21 12:24:56.000000000 +0100
+diff -ur gnupg-1.4.0.old/debian/control.in gnupg-1.4.0/debian/control.in
+--- gnupg-1.4.0.old/debian/control.in	2005-02-24 08:16:57.000000000 +0100
++++ gnupg-1.4.0/debian/control.in	2005-02-24 08:18:04.000000000 +0100
 @@ -3,11 +3,11 @@
  Priority: standard
  Maintainer: James Troup <james@nocrew.org>
  Standards-Version: 3.6.1.1
--Build-Depends: gettext, libz-dev, libldap2-dev, file, libbz2-dev, libcap-dev, dpatch, mail-transport-agent
-+Build-Depends: gettext, libz-dev, libldap2-dev, file, libbz2-dev, libcap-dev [@linux-gnu@], dpatch, mail-transport-agent, type-handling (>= 0.2.1)
+-Build-Depends: libz-dev, libldap2-dev, libbz2-dev, libcap-dev, libusb-dev, libreadline5-dev, file, gettext, dpatch, mail-transport-agent
++Build-Depends: libz-dev, libldap2-dev, libbz2-dev, libcap-dev [@linux-gnu@], libusb-dev, libreadline5-dev, file, gettext, dpatch, mail-transport-agent
  
  Package: gnupg
  Architecture: any
@@ -24,11 +25,11 @@ diff -ur gnupg-1.2.5.old/debian/control.in gnupg-1.2.5/debian/control.in
  Suggests: gnupg-doc, xloadimage
  Conflicts: gpg-rsa, gpg-rsaref, suidmanager (<< 0.50), gpg-idea (<= 2.2)
  Replaces: gpg-rsa, gpg-rsaref
-diff -ur gnupg-1.2.5.old/debian/rules gnupg-1.2.5/debian/rules
---- gnupg-1.2.5.old/debian/rules	2005-01-21 12:09:30.000000000 +0100
-+++ gnupg-1.2.5/debian/rules	2005-01-21 12:14:45.000000000 +0100
-@@ -36,6 +36,8 @@
- 	-rm -rf debian/tmp debian/files* debian/substvars debian/patched
+diff -ur gnupg-1.4.0.old/debian/rules gnupg-1.4.0/debian/rules
+--- gnupg-1.4.0.old/debian/rules	2005-02-24 08:16:39.000000000 +0100
++++ gnupg-1.4.0/debian/rules	2005-02-24 08:17:05.000000000 +0100
+@@ -58,6 +58,8 @@
+ 	-rm -rf debian/tmp debian/gpgv-udeb debian/files* debian/*substvars debian/patched
  	-rm -f po/ca.gmo
  	find . -name \*~ | xargs rm -vf
 +	sed -e "s/@linux-gnu@/`type-handling any linux-gnu`/g" \
