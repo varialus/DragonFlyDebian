@@ -1,0 +1,91 @@
+
+Patch from wobin.
+
+diff -uNr apache-1.3.33.debian/debian/patches/000_gnukfreebsd_compile_fix_for_upstream apache-1.3.33/debian/patches/000_gnukfreebsd_compile_fix_for_upstream
+--- apache-1.3.33.debian/debian/patches/000_gnukfreebsd_compile_fix_for_upstream	1970-01-01 01:00:00.000000000 +0100
++++ apache-1.3.33/debian/patches/000_gnukfreebsd_compile_fix_for_upstream	2005-01-26 14:35:23.000000000 +0100
+@@ -0,0 +1,15 @@
++--- source/apache_1.3.33.upstream/src/Configure	2004-10-18 18:39:37.000000000 +0200
+++++ source/apache_1.3.33/src/Configure	2005-01-26 14:24:25.000000000 +0100
++@@ -411,6 +411,12 @@
++ 	CFLAGS="$CFLAGS -DLINUX=22"
++ 	LIBS="$LIBS -lm"
++ 	;;
+++    *-GNU/kFreeBSD*)
+++	DEF_WANTHSREGEX=yes
+++	OS='GNU/kFreeBSD'
+++	CFLAGS="$CFLAGS -DGNUKFREEBSD"
+++	LIBS="$LIBS -lm -lcrypt"
+++	;;
++     *-GNU*)
++ 	DEF_WANTHSREGEX=yes
++ 	OS='GNU/Hurd'
+diff -uNr apache-1.3.33.debian/debian/patches/001_gnukfreebsd_compile_fix_for_upstream apache-1.3.33/debian/patches/001_gnukfreebsd_compile_fix_for_upstream
+--- apache-1.3.33.debian/debian/patches/001_gnukfreebsd_compile_fix_for_upstream	1970-01-01 01:00:00.000000000 +0100
++++ apache-1.3.33/debian/patches/001_gnukfreebsd_compile_fix_for_upstream	2005-01-26 14:35:32.000000000 +0100
+@@ -0,0 +1,26 @@
++--- source/apache_1.3.33.upstream/src/include/ap_config.h	2004-09-16 01:45:17.000000000 +0200
+++++ source/apache_1.3.33/src/include/ap_config.h	2005-01-26 14:26:26.000000000 +0100
++@@ -487,6 +487,23 @@
++ #endif
++ #define AP_ENABLE_EXCEPTION_HOOK
++ 
+++#elif defined(GNUKFREEBSD)
+++#define NET_SIZE_T socklen_t
+++#define HAVE_SHMGET 1
+++#define USE_SHMGET_SCOREBOARD
+++#define HAVE_MMAP 1
+++#define USE_MMAP_FILES
+++#undef HAVE_GMTOFF
+++#undef NO_KILLPG
+++#undef NO_SETSID
+++#undef NEED_STRDUP
+++#define HAVE_FLOCK_SERIALIZED_ACCEPT
+++#define SINGLE_LISTEN_UNSERIALIZED_ACCEPT
+++#define HAVE_SYSLOG 1
+++#define SYS_SIGLIST sys_siglist
+++#define AP_ENABLE_EXCEPTION_HOOK
+++#include <sys/time.h>
+++
++ #elif defined(SCO)
++ #undef HAVE_GMTOFF
++ #undef NO_KILLPG
+diff -uNr apache-1.3.33.debian/debian/patches/002_gnukfreebsd_compile_fix_for_upstream apache-1.3.33/debian/patches/002_gnukfreebsd_compile_fix_for_upstream
+--- apache-1.3.33.debian/debian/patches/002_gnukfreebsd_compile_fix_for_upstream	1970-01-01 01:00:00.000000000 +0100
++++ apache-1.3.33/debian/patches/002_gnukfreebsd_compile_fix_for_upstream	2005-01-26 14:35:40.000000000 +0100
+@@ -0,0 +1,11 @@
++--- source/apache_1.3.33.upstream/src/modules/experimental/mod_backtrace.c	2004-02-20 12:41:05.000000000 +0100
+++++ source/apache_1.3.33/src/modules/experimental/mod_backtrace.c	2005-01-26 14:27:40.000000000 +0100
++@@ -13,7 +13,7 @@
++  * limitations under the License.
++  */
++ 
++-#if !defined(__linux__) && !defined(__FreeBSD__)
+++#if !defined(__linux__) && !defined(__FreeBSD__) && !defined(__FreeBSD_kernel__)
++ #error This module is currently only implemented for Linux and FreeBSD.
++ #endif
++ 
+diff -uNr apache-1.3.33.debian/debian/patches/011_find_dbm_libdb41_fix apache-1.3.33/debian/patches/011_find_dbm_libdb41_fix
+--- apache-1.3.33.debian/debian/patches/011_find_dbm_libdb41_fix	2005-01-26 14:14:13.000000000 +0100
++++ apache-1.3.33/debian/patches/011_find_dbm_libdb41_fix	2005-01-26 14:31:30.000000000 +0100
+@@ -2,7 +2,7 @@
+ --- build-tree/apache_1.3.33.ORIG/src/helpers/find-dbm-lib	2003-04-26 23:30:40.000000000 +0200
+ +++ build-tree/apache_1.3.33/src/helpers/find-dbm-lib	2003-04-26 23:42:30.000000000 +0200
+ @@ -13,7 +13,10 @@
+- 	    *-linux* | *-GNU/Hurd*)
++ 	    *-linux* | *-GNU/*)
+  		# many systems don't have -ldbm
+  		DBM_LIB=""
+ -		if ./helpers/TestCompile lib db __db_ndbm_open; then
+diff -uNr apache-1.3.33.debian/debian/patches/013_hurd_libdb_fix apache-1.3.33/debian/patches/013_hurd_libdb_fix
+--- apache-1.3.33.debian/debian/patches/013_hurd_libdb_fix	2005-01-26 14:14:13.000000000 +0100
++++ apache-1.3.33/debian/patches/013_hurd_libdb_fix	2005-01-26 14:31:37.000000000 +0100
+@@ -6,7 +6,7 @@
+  	found_dbm=0
+  	case "$PLAT" in
+ -	    *-linux*)
+-+	    *-linux* | *-GNU/Hurd*)
+++	    *-linux* | *-GNU/*)
+  		# many systems don't have -ldbm
+  		DBM_LIB=""
+  		if ./helpers/TestCompile lib db __db_ndbm_open; then

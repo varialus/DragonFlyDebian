@@ -1,82 +1,10 @@
 
-Status: sent to exim-dev@exim.org
+Status: sent to nutmeg (I'm banned in upstream ml)
 
-diff -ur exim-4.44.old/OS/os.c-Linux exim-4.44/OS/os.c-Linux
---- exim-4.44.old/OS/os.c-Linux	2005-01-11 13:54:54.000000000 +0100
-+++ exim-4.44/OS/os.c-Linux	2005-02-07 16:27:37.000000000 +0100
-@@ -10,65 +10,6 @@
- 
- 
- /*************************************************
--*              Load average computation          *
--*************************************************/
--
--/*Linux has an apparently unique way of getting the load average, so we provide
--a unique function here, and define OS_LOAD_AVERAGE to stop src/os.c trying to
--provide the function. However, when compiling os.c for utilities, we may not
--want this at all, so check that it isn't set first. */
--
--#ifndef OS_LOAD_AVERAGE
--#define OS_LOAD_AVERAGE
--
--/* Linux has 2 ways of returning load average:
--
--  (1) Do a read on /proc/loadavg
--  (2) Use the sysinfo library function and syscall
--
--The latter is simpler but in Linux 2.0 - 2.2 (and probably later releases) is
--exceptionally slow - 10-50ms per call is not unusual and about 100x slow the
--first method. This cripples high performance mail servers by increasing CPU
--utilisation by 3-5x.
--
--In Exim's very early days, it used the 1st method. Later, it switched to the
--2nd method. Now it tries the 1st method and falls back to the 2nd if /proc is
--unavailable. */
--
--#include <sys/sysinfo.h>
--
--static int
--linux_slow_getloadavg(void)
--{
--struct sysinfo s;
--double avg;
--if (sysinfo(&s) < 0) return -1;
--avg = (double) (s.loads[0]) / (1<<SI_LOAD_SHIFT);
--return (int)(avg * 1000.0);
--}
--
--int
--os_getloadavg(void)
--{
--char buffer[40];
--double avg;
--int count;
--int fd = open ("/proc/loadavg", O_RDONLY);
--if (fd == -1) return linux_slow_getloadavg();
--count = read (fd, buffer, sizeof(buffer));
--(void)close (fd);
--if (count <= 0) return linux_slow_getloadavg();
--count = sscanf (buffer, "%lf", &avg);
--if (count < 1) return linux_slow_getloadavg();
--return (int)(avg * 1000.0);
--}
--#endif  /* OS_LOAD_AVERAGE */
--
--
--
--
--
--/*************************************************
- *         Finding interface addresses            *
- *************************************************/
- 
-diff -ur exim-4.44.old/OS/os.h-Linux exim-4.44/OS/os.h-Linux
---- exim-4.44.old/OS/os.h-Linux	2005-01-11 21:05:08.000000000 +0100
-+++ exim-4.44/OS/os.h-Linux	2005-02-07 16:28:54.000000000 +0100
-@@ -1,13 +1,26 @@
--/* Exim: OS-specific C header file for Linux */
-+/* Exim: OS-specific C header file for GNU and variants */
- 
+diff -ur exim-snapshot.old/OS/os.h-Linux exim-snapshot/OS/os.h-Linux
+--- exim-snapshot.old/OS/os.h-Linux	2005-01-14 15:19:48.000000000 +0100
++++ exim-snapshot/OS/os.h-Linux	2005-02-07 21:45:22.000000000 +0100
+@@ -5,11 +5,24 @@
  #define CRYPT_H
  #define GLIBC_IP_OPTIONS
  #define HAVE_MMAP
@@ -92,7 +20,7 @@ diff -ur exim-4.44.old/OS/os.h-Linux exim-4.44/OS/os.h-Linux
 +#define os_strsignal strsignal
 +#define OS_STRSIGNAL
 +
-+#if defined(__linux__) || defined(__FreeBSD_kernel__) || defined(__NetBSD_kernel__)
++#if defined(__linux__) || defined(__FreeBSD_kernel__) || defined(__NetBSD_ker$
 +#define SIOCGIFCONF_GIVES_ADDR
 +#define HAVE_SYS_MOUNT_H
 +#endif
@@ -102,7 +30,7 @@ diff -ur exim-4.44.old/OS/os.h-Linux exim-4.44/OS/os.h-Linux
  /* Some versions of Linux need explicit sync-ing of directories as well as
  files. This setting requests that. If the directory is on NFS, it may not
  be possible to sync it - in that case, Exim now should ignore the error. But
-@@ -20,12 +33,6 @@
+@@ -22,12 +35,6 @@
  /* Other OS have "const" in here */
  #define ICONV_ARG2_TYPE char **
  
@@ -115,17 +43,17 @@ diff -ur exim-4.44.old/OS/os.h-Linux exim-4.44/OS/os.h-Linux
  #define os_find_running_interfaces os_find_running_interfaces_linux
  
  /* Need a prototype for the Linux-specific function. The structure hasn't
-@@ -34,4 +41,6 @@
+@@ -36,4 +43,6 @@
  struct ip_address_item;
  extern struct ip_address_item *os_find_running_interfaces_linux(void);
  
 +#endif /* __linux__ */
 +
  /* End */
-diff -ur exim-4.44.old/scripts/os-type exim-4.44/scripts/os-type
---- exim-4.44.old/scripts/os-type	2005-01-11 13:54:54.000000000 +0100
-+++ exim-4.44/scripts/os-type	2005-02-07 16:29:22.000000000 +0100
-@@ -20,6 +20,9 @@
+diff -ur exim-snapshot.old/scripts/os-type exim-snapshot/scripts/os-type
+--- exim-snapshot.old/scripts/os-type	2005-01-14 15:19:48.000000000 +0100
++++ exim-snapshot/scripts/os-type	2005-02-07 21:03:10.000000000 +0100
+@@ -21,6 +21,9 @@
  
  case "$os" in '') os=`uname -s`;; esac
  

@@ -1,0 +1,325 @@
+diff -ur kernel-package-8.119.old/kernel/rules kernel-package-8.119/kernel/rules
+--- kernel-package-8.119.old/kernel/rules	2004-12-08 10:46:11.000000000 +0100
++++ kernel-package-8.119/kernel/rules	2005-02-08 18:32:35.000000000 +0100
+@@ -91,13 +91,16 @@
+   architecture:=$(KPKG_ARCH)
+ else
+   #architecture:=$(shell CC=$(HOSTCC) dpkg --print-gnu-build-architecture)
+-  architecture:=$(DEB_HOST_ARCH)
++  architecture:=$(DEB_HOST_GNU_CPU)
++  ifeq ($(architecture), x86_64)
++    architecture:=amd64
++  endif
+ endif
+ 
+ ifndef CROSS_COMPILE
+   ifeq ($(strip $(MAKING_VIRTUAL_IMAGE)),)
+     ifneq ($(strip $(architecture)),$(strip $(DEB_BUILD_ARCH)))
+-      KERNEL_CROSS:=$(architecture)-$(strip $(DEB_HOST_GNU_SYSTEM))-
++      KERNEL_CROSS:=$(DEB_HOST_GNU_TYPE)
+     endif
+   endif
+ else
+@@ -119,7 +122,12 @@
+ space:= $(empty) $(empty)
+ localversion_files := $(wildcard localversion*)
+ 
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++PMAKE = PATH=/usr/lib/freebsd/:$(CURDIR)/bin:$(PATH) WERROR= MAKEFLAGS= \
++	freebsd-make
++endif
+ 
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+ VERSION =$(shell grep -E '^VERSION +=' Makefile 2>/dev/null | \
+  sed -e 's/[^0-9]*\([0-9]*\)/\1/')
+ PATCHLEVEL =$(shell grep -E '^PATCHLEVEL +=' Makefile 2>/dev/null | \
+@@ -130,6 +138,18 @@
+  sed -e 's/EXTRAVERSION *= *\([^ \t]*\)/\1/')
+ LOCALVERSION = $(subst $(space),, $(shell cat /dev/null $(localversion_files)) \
+                  $(CONFIG_LOCALVERSION))
++endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++VERSION	=$(shell grep '^REVISION=' conf/newvers.sh | \
++ sed -e 's/[^0-9]*\([0-9]\)\..*/\1/')
++PATCHLEVEL =$(shell grep '^REVISION=' conf/newvers.sh | \
++ sed -e 's/[^0-9]*[0-9]*\.\([0-9]*\)[^0-9]*/\1/')
++SUBLEVEL =0
++EXTRA_VERSION =$(shell grep '^RELEASE=' conf/newvers.sh | \
++ sed -e 's/[^0-9]*\([0-9]*\)[^0-9]*/\1/')
++LOCALVERSION = $(subst $(space),, $(shell cat /dev/null $(localversion_files)) \
++                 $(CONFIG_LOCALVERSION))
++endif
+ 
+ 
+ 
+@@ -481,6 +501,7 @@
+   ifeq (,$(findstring $(KPKG_SUBARCH),i386 i486 i586 i686))
+     KPKG_SUBARCH:=$(GUESS_SUBARCH)
+   endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+   kimage := bzImage
+   loaderdep=lilo (>= 19.1) | grub
+   loader=lilo
+@@ -488,9 +509,17 @@
+   target = $(kimage)
+   kimagesrc = $(strip arch/$(KERNEL_ARCH)/boot/$(kimage))
+   kimagedest = $(INT_IMAGE_DESTDIR)/vmlinuz-$(version)
+-  DEBCONFIG= $(CONFDIR)/config.$(KPKG_SUBARCH)
+   kelfimagesrc = vmlinux
+   kelfimagedest = $(INT_IMAGE_DESTDIR)/vmlinux-$(version)
++else
++  loaderdep=grub | grub2
++  loader=grub
++endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++  kimagesrc = $(strip $(KERNEL_ARCH)/compile/GENERIC/kernel)
++  kimagedest = $(INT_IMAGE_DESTDIR)/kfreebsd-$(version)
++endif
++  DEBCONFIG= $(CONFDIR)/config.$(KPKG_SUBARCH)
+ endif
+ 
+ ##### S/390
+@@ -810,10 +839,16 @@
+ version = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)$(iatv)$(INT_FLAV)$(LOCALVERSION)
+ 
+ # See if we are being run in the kernel directory
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+ IN_KERNEL_DIR := $(shell if test -d drivers && test -d kernel && test -d fs && test                \
+                                  -d include/linux ; then                            \
+                             echo YES;                                               \
+                          fi )
++endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++IN_KERNEL_DIR := $(shell if test -d dev && test -d kern && test -d fs && \
++		   test -d i386/include ; then echo YES; fi)
++endif
+ 
+ IN_KERNEL_HEADERS=$(shell if [ -f $(INT_STEM)-headers.revision ]; then                    \
+                                cat $(INT_STEM)-headers.revision;                          \
+@@ -1269,7 +1304,7 @@
+ # Deal with modules issues
+ 
+ # define MODULES_ENABLED if appropriate
+-ifneq ($(strip $(shell grep -E ^[^\#]*CONFIG_MODULES $(CONFIG_FILE))),)
++ifneq ($(filter kfreebsd-gnu, $(DEB_HOST_GNU_SYSTEM)):$(strip $(shell grep -E ^[^\#]*CONFIG_MODULES $(CONFIG_FILE))),:)
+ MODULES_ENABLED := YES
+ endif
+ 
+@@ -1582,13 +1617,18 @@
+ 	fi
+ endif
+ 	-test -f stamp-configure || $(deb_rule) configure
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+ 	$(MAKE) $(do_parallel) $(EXTRAV_ARG) $(FLAV_ARG) ARCH=$(KERNEL_ARCH) \
+ 	                    $(CROSS_ARG) $(target)
+ ifneq ($(strip $(shell grep -E ^[^\#]*CONFIG_MODULES $(CONFIG_FILE))),)
+ 	$(MAKE) $(do_parallel) $(EXTRAV_ARG) $(FLAV_ARG) ARCH=$(KERNEL_ARCH) \
+ 	                    $(CROSS_ARG) modules
+ endif
+-	COLUMNS=150 dpkg -l 'gcc*' perl dpkg 'libc6*' binutils ldso make dpkg-dev |\
++endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++	$(PMAKE) -C $(architecture)/compile/GENERIC
++endif
++	COLUMNS=150 dpkg -l 'gcc*' perl dpkg 'libc[0-9]*' binutils ldso make dpkg-dev |\
+          awk '$$1 ~ /[hi]i/ { printf("%s-%s\n", $$2, $$3) }'   > debian/buildinfo
+ 	@echo this was built on a machine with the kernel: >> debian/buildinfo
+ 	uname -a >> debian/buildinfo
+@@ -1667,7 +1707,7 @@
+ 	-test ! -f stamp-debian && \
+                ( test ! -f debian/official || test ! -f debian/control) && \
+ 	   sed -e 's/=V/$(version)/g'        -e 's/=D/$(debian)/g'       \
+-	       -e 's/=A/$(architecture)/g'   -e 's/=SA/$(INT_SUBARCH)/g' \
++	       -e 's/=A/$(DEB_HOST_ARCH)/g'   -e 's/=SA/$(INT_SUBARCH)/g' \
+                 -e 's/=L/$(int_loaderdep) /g' -e 's/=I/$(initrddep)/g'    \
+                 -e 's/=CV/$(VERSION).$(PATCHLEVEL)/g'                     \
+                 -e 's/=M/$(maintainer) <$(email)>/g'                      \
+@@ -1675,7 +1715,7 @@
+ 		         $(CONTROL)> debian/control
+ 	-test ! -f stamp-debian && test ! -f debian/official &&              \
+ 	   sed -e 's/=V/$(version)/g' -e 's/=D/$(debian)/g'                  \
+-	    -e 's/=A/$(architecture)/g' -e 's/=M/$(maintainer) <$(email)>/g' \
++	    -e 's/=A/$(DEB_HOST_ARCH)/g' -e 's/=M/$(maintainer) <$(email)>/g' \
+             -e 's/=ST/$(INT_STEM)/g'                                         \
+ 		$(DEBDIR)/changelog > debian/changelog
+ 	-test ! -f debian/rules &&                                       \
+@@ -1728,14 +1768,29 @@
+ 	@rm -f .mak
+ else
+ conf.vars: Makefile
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+ 	$(MAKE) -f debian/rules INCLUDE_KERNEL_MAKEFILE=yes conf_vars
++else
++	touch conf.vars
++endif
+ endif
+ 
+ dummy_do_dep:
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+ 	+$(MAKE) $(EXTRAV_ARG) $(FLAV_ARG) $(CROSS_ARG) \
+                                  ARCH=$(KERNEL_ARCH) $(fast_dep) dep
++endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++	$(PMAKE) -C $(architecture)/compile/GENERIC depend
++endif
+ 
+ stamp-kernel-configure: stamp-debian .config
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++	mkdir -p bin
++	ln -sf `which gcc-3.4` bin/cc
++	cd $(architecture)/conf && freebsd-config GENERIC
++endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+ 	$(MAKE) $(EXTRAV_ARG) $(FLAV_ARG) $(CROSS_ARG) \
+                                  ARCH=$(KERNEL_ARCH) $(config_target)
+ ifeq ($(shell if [ $(VERSION) -ge 2 ] && [ $(PATCHLEVEL) -ge 5 ]; then \
+@@ -1749,6 +1804,7 @@
+                                 ARCH=$(KERNEL_ARCH) prepare
+ endif
+ endif
++endif
+ 	echo done >  $@
+ 
+ configure: debian .config stamp-configure
+@@ -1786,10 +1842,20 @@
+ # only unpatch what we have applied? That would be changed, though saner,
+ # behaviour
+ real_stamp_clean:
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+ 	test ! -f .config || cp -pf .config config.precious
+ 	-test -f Makefile && \
+             $(MAKE) $(FLAV_ARG) $(EXTRAV_ARG) ARCH=$(KERNEL_ARCH) distclean
+ 	test ! -f config.precious || mv -f config.precious .config
++else
++	rm -f .config
++endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++	rm -rf bin
++	if test -e $(architecture)/compile/GENERIC ; then \
++		$(PMAKE) -C $(architecture)/compile/GENERIC clean ; \
++	fi
++endif
+ ifeq ($(strip $(patch_the_kernel)),YES)
+ 	$(deb_rule) unpatch_now
+ endif
+@@ -1899,7 +1965,7 @@
+            $(install_file) debian/README.Debian $(SOURCE_DOC)/README.Debian ; \
+ 	   gzip -9qf $(SOURCE_DOC)/README.Debian;\
+ 	else \
+-	    sed -e 's/=V/$(version)/g' -e 's/=A/$(architecture)/g' \
++	    sed -e 's/=V/$(version)/g' -e 's/=A/$(DEB_HOST_ARCH)/g' \
+              -e 's/=ST/$(INT_STEM)/g'                              \
+                  $(DEBDIR)/README.source >  $(SOURCE_SRC)/README.Debian ; \
+ 	fi
+@@ -1941,6 +2007,13 @@
+ 	$(deb_rule) real_stamp_headers
+ endif
+ 
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
++config = .config
++endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++config = $(architecture)/conf/GENERIC
++endif
++
+ real_stamp_headers:
+ ifneq ($(strip $(MAKING_VIRTUAL_IMAGE)),)
+ 	echo done >  stamp-headers
+@@ -1966,7 +2039,7 @@
+ 	gzip -9qf                                $(HEADER_DOC)/changelog.Debian
+ 	$(install_file) $(DEBDIR)/README.headers $(HEADER_DOC)/debian.README
+ 	gzip -9qf                                $(HEADER_DOC)/debian.README
+-	$(install_file) .config  	              $(HEADER_DOC)/config-$(version)
++	$(install_file) $(config)  	         $(HEADER_DOC)/config-$(version)
+ 	$(install_file) conf.vars  	     $(HEADER_DOC)/conf.vars
+ 	gzip -9qf                                $(HEADER_DOC)/config-$(version)
+ 	gzip -9qf                                $(HEADER_DOC)/conf.vars
+@@ -2009,7 +2082,7 @@
+ 	(cd $(HEADER_SRC);              \
+                test -x $(header_clean_hook) && $(header_clean_hook))
+ endif
+-	dpkg-gencontrol -DArchitecture=$(architecture) -isp \
++	dpkg-gencontrol -DArchitecture=$(DEB_HOST_ARCH) -isp \
+                         -p$(h_package) -P$(HEADER_TOP)/
+ 	chown -R root:root $(HEADER_TOP)
+ 	chmod -R og=rX $(HEADER_TOP)
+@@ -2180,8 +2253,10 @@
+ 	$(install_file) $(DEBDIR)/linux.1 $(MAN1DIR)/linux-$(version).1
+ 	gzip -9fq       $(MAN1DIR)/linux-$(version).1
+ endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+ 	$(install_file) Documentation/Changes $(IMAGE_DOC)/
+ 	gzip -9qf $(IMAGE_DOC)/Changes
++endif
+ 	$(install_file) debian/changelog        $(IMAGE_DOC)/changelog.Debian
+ 	gzip -9qf                               $(IMAGE_DOC)/changelog.Debian
+ ifdef loaderdoc
+@@ -2194,7 +2269,7 @@
+ 	echo "This was produced by kernel-package version $(kpkg_version)." > \
+ 	           $(IMAGE_DOC)/Buildinfo
+ 	chmod 0644 $(IMAGE_DOC)/Buildinfo
+-	$(install_file) .config          $(INT_IMAGE_DESTDIR)/config-$(version)
++	$(install_file) $(config)        $(INT_IMAGE_DESTDIR)/config-$(version)
+ 	$(install_file) conf.vars        $(IMAGE_DOC)/conf.vars
+ 	gzip -9qf                        $(IMAGE_DOC)/conf.vars
+ 	$(install_file) debian/buildinfo $(IMAGE_DOC)/buildinfo
+@@ -2214,11 +2289,12 @@
+ ifeq ($(strip $(HAVE_EXTRA_DOCS)),YES)
+ 	$(install_file) $(extra_docs) 	         $(IMAGE_DOC)/
+ endif
+-ifneq ($(strip $(shell grep -E ^[^\#]*CONFIG_MODULES $(CONFIG_FILE))),)
+-ifeq  ($(strip $(HAVE_NEW_MODLIB)),)
++ifneq ($(filter kfreebsd-gnu, $(DEB_HOST_GNU_SYSTEM)):$(strip $(shell grep -E ^[^\#]*CONFIG_MODULES $(CONFIG_FILE))),:)
++ifeq  ($(DEB_HOST_GNU_SYSTEM):$(strip $(HAVE_NEW_MODLIB)),linux:)
+ 	$(mod_inst_cmds)
+ else
+ # could have also said DEPMOD=/bin/true instead of moving files
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+ ifneq ($(strip $(KERNEL_CROSS)),)
+ 	mv System.map System.precious
+ endif
+@@ -2228,6 +2304,22 @@
+ 	mv System.precious System.map
+ endif
+ endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++	mkdir -p $(INSTALL_MOD_PATH)/boot/defaults
++	install -o root -g root -m 644 \
++		$(architecture)/conf/GENERIC.hints \
++		$(INSTALL_MOD_PATH)/boot/device.hints
++	install -o root -g root -m 644 \
++		boot/forth/loader.conf \
++		$(INSTALL_MOD_PATH)/boot/loader.conf 
++	touch $(INSTALL_MOD_PATH)/boot/loader.conf
++	install -o root -g root -m 644 \
++		boot/forth/loader.conf \
++		$(INSTALL_MOD_PATH)/boot/defaults/loader.conf
++	$(PMAKE) -C $(architecture)/compile/GENERIC install \
++		DESTDIR=$(INSTALL_MOD_PATH)
++endif
++endif
+ 	test ! -e $(IMAGE_TOP)/lib/modules/$(version)/source ||                        \
+ 	   mv $(IMAGE_TOP)/lib/modules/$(version)/source ./debian/source-link
+ 	test ! -e $(IMAGE_TOP)/lib/modules/$(version)/build ||                         \
+@@ -2298,7 +2390,7 @@
+ ifeq ($(strip $(delete_build_link)),YES)
+ 	rm -f $(IMAGE_TOP)/lib/modules/$(version)/build
+ endif
+-	dpkg-gencontrol -DArchitecture=$(architecture) -isp                   \
++	dpkg-gencontrol -DArchitecture=$(DEB_HOST_ARCH) -isp                   \
+                         -p$(i_package) -P$(IMAGE_TOP)/
+ 	chmod -R og=rX $(IMAGE_TOP)
+ 	chown -R root:root $(IMAGE_TOP)
+diff -ur kernel-package-8.119.old/make-kpkg kernel-package-8.119/make-kpkg
+--- kernel-package-8.119.old/make-kpkg	2004-11-17 17:33:32.000000000 +0100
++++ kernel-package-8.119/make-kpkg	2005-02-08 17:54:06.000000000 +0100
+@@ -743,7 +743,8 @@
+     exit 1;
+   }
+   # See if we are running in a linux kernel directory
+-  if (!(-d "drivers" && -d "kernel" && -d "fs" && -d "include/linux")){
++  if ((!(-d "drivers" && -d "kernel" && -d "fs" && -d "include/linux"))
++     && (!(-d "dev" && -d "kern" && -d "fs" && -d "i386/include"))){
+     my @other_targets = grep (! m/^modules/, @ARGV);
+     if ($#other_targets != -1 || ! -d "include/linux") {
+       print STDERR <<EOERR;
