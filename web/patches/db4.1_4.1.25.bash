@@ -1,3 +1,6 @@
+
+# Status: in BTS
+
 #!/bin/bash -e
 
 cp debian/control{,.in}
