@@ -161,3 +161,28 @@ diff -ur binutils-2.15.old/bfd/elfcode.h binutils-2.15/bfd/elfcode.h
    else if (i_ehdrp->e_type == ET_DYN)
      abfd->flags |= DYNAMIC;
  
+--- binutils-2.15.orig/ld/emultempl/elf32.em
++++ binutils-2.15/ld/emultempl/elf32.em
+@@ -463,11 +463,11 @@
+ 
+ EOF
+   case ${target} in
+-    *-*-linux-gnu*)
++    *-*-linux-gnu* | *-*-k*bsd*-gnu)
+       cat >>e${EMULATION_NAME}.c <<EOF
+ /* For a native linker, check the file /etc/ld.so.conf for directories
+    in which we may find shared libraries.  /etc/ld.so.conf is really
+-   only meaningful on Linux.  */
++   only meaningful on GNU/Linux or on GNU/*BSD. */
+ 
+ static bfd_boolean
+ gld${EMULATION_NAME}_check_ld_so_conf (const char *name, int force)
+@@ -738,7 +738,7 @@
+ EOF
+ if [ "x${USE_LIBPATH}" = xyes ] ; then
+   case ${target} in
+-    *-*-linux-gnu*)
++    *-*-linux-gnu* | *-*-k*bsd*-gnu)
+       cat >>e${EMULATION_NAME}.c <<EOF
+ 	  if (gld${EMULATION_NAME}_check_ld_so_conf (l->name, force))
+ 	    break;
