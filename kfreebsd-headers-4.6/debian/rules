@@ -1,12 +1,13 @@
 #!/usr/bin/make -f
 
 version := 4.6
-
 DEB_TAR_SRCDIR = kfreebsd-headers-$(version)
 
 build/kfreebsd-headers:: pre-build
-	cp -a debian/patches $(DEB_SRCDIR)/
-	cd $(DEB_SRCDIR) && patches/patchit
+	chmod +x debian/testheader
+#	set -e ; for i in \
+#		`find $(CURDIR)/$(DEB_SRCDIR)/import -type f -name \*.h` ; \
+#		do $(CURDIR)/debian/testheader $$i ; done
 
 binary/kfreebsd-headers:: common-install-prehook-arch
 	mkdir -p debian/kfreebsd-headers/usr/src/kfreebsd-headers
@@ -15,3 +16,4 @@ binary/kfreebsd-headers:: common-install-prehook-arch
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/tarball.mk
+include /usr/share/cdbs/1/rules/simple-patchsys.mk

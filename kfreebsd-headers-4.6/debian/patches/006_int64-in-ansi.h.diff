@@ -1,0 +1,50 @@
+
+Fix errors with re-definition of some types.
+
+--- kfreebsd-headers-4.6/import/i386/machine/ansi.h.old	2003-05-08 14:19:02.000000000 +0000
++++ kfreebsd-headers-4.6/import/i386/machine/ansi.h	2003-05-08 14:21:42.000000000 +0000
+@@ -106,44 +106,4 @@
+  */
+ #define __offsetof(type, field) ((size_t)(&((type *)0)->field))
+ 
+-/*
+- * XXX this paragraph is very out of date.
+- * Typedefs for especially magic types.  #define's wouldn't work in the
+- * __GNUC__ case, since __attribute__(()) only works in certain contexts.
+- * This is not in <machine/types.h>, since that has too much namespace
+- * pollution for inclusion in ANSI headers, yet we need __int64_t in at
+- * least <stdio.h>.
+- */
+-#ifdef __GNUC__
+-typedef	int __attribute__((__mode__(__DI__)))		 __int64_t;
+-typedef	unsigned int __attribute__((__mode__(__DI__)))	__uint64_t;
+-#else
+-/* LONGLONG */
+-typedef	long long					 __int64_t;
+-/* LONGLONG */
+-typedef	unsigned long long				__uint64_t;
+-#endif
+-/*
+- * Internal names for basic integral types.  Omit the typedef if
+- * not possible for a machine/compiler combination.
+- */
+-typedef	__signed char		   __int8_t;
+-typedef	unsigned char		  __uint8_t;
+-typedef	short			  __int16_t;
+-typedef	unsigned short		 __uint16_t;
+-typedef	int			  __int32_t;
+-typedef	unsigned int		 __uint32_t;
+-
+-typedef	int			 __intptr_t;
+-typedef	unsigned int		__uintptr_t;
+-
+-/*
+- * mbstate_t is an opaque object to keep conversion state, during multibyte
+- * stream conversions.  The content must not be referenced by user programs.
+- */
+-typedef union {
+-	char		__mbstate8[128];
+-	__int64_t	_mbstateL;		/* for alignment */
+-} __mbstate_t;
+-
+ #endif /* !_MACHINE_ANSI_H_ */
