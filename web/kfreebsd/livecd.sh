@@ -1,11 +1,12 @@
-#!/bin/bash -x
+#!/bin/bash
 #
-# Build-Depends: grub, wget, gnupg, mkisofs, crosshurd, fakeroot, binutils
+# Build-Depends: mkisofs, crosshurd, fakeroot
 #
 # Copyright 2004  Robert Millan <rmh@debian.org>
 # See /usr/share/common-licenses/GPL for license terms.
 
-version=8
+set -ex
+version=9
 
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
@@ -40,7 +41,7 @@ ln -s /usr/share/sysvinit/inittab etc/inittab
 
 # GRUB stuff
 mkdir -p boot/grub
-cp /lib/grub/${cpu}-*/stage2_eltorito boot/grub/
+cp lib/grub/${cpu}-*/stage2_eltorito boot/grub/
 cat > boot/grub/menu.lst << EOF
 timeout 30
 default 0
@@ -62,21 +63,18 @@ hw.ata.atapi_dma=0
 hw.ata.wc=0
 hw.eisa_slots=0
 EOF
-cat > etc/issue << EOF
-Debian ${uname} testing/unstable \n \l
-
-You may login as root, with no password.
-
-EOF
 cat > etc/fstab << EOF
 /dev/acd0 / cd9660 ro 1 1
 EOF
 # keep inetutils-syslogd from bitching
 cp bin/true usr/sbin/syslogd
 # password-less login
-cat > etc/passwd << EOF
-root::0:0:root:/root:/bin/bash
+cat > root/login << EOF
+#!/bin/sh
+login -f root
 EOF
+chmod +x root/login
+sed -i etc/inittab -e 's,/sbin/getty,& -nl /root/login,g'
 
 #########################
 #                    ignition!
