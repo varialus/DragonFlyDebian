@@ -1,0 +1,22 @@
+--- dpkg-1.10.22/utils/start-stop-daemon.c	2004-06-01 23:18:16.000000000 +0200
++++ dpkg-1.10.22+kbsd/utils/start-stop-daemon.c	2004-06-04 00:44:35.000000000 +0200
+@@ -36,6 +36,10 @@
+ #  define OSFreeBSD
+ #elif defined(__NetBSD__)
+ #  define OSNetBSD
++#elif defined(__GLIBC__) && defined(__FreeBSD_kernel__)
++#  define OSGNU_kFreeBSD
++#elif defined(__GLIBC__) && defined(__NetBSD_kernel__)
++#  define OSGNU_kNetBSD
+ #else
+ #  error Unknown architecture - cannot build start-stop-daemon
+ #endif
+@@ -725,7 +729,7 @@
+ /* WTA: this  needs to be an autoconf check for /proc/pid existance.
+  */
+ 
+-#if defined(OSLinux) || defined (OSsunos) || defined(OSfreebsd)
++#if defined(OSLinux) || defined (OSsunos) || defined(OSfreebsd) || defined(OSGNU_kFreeBSD) || defined(OSGNU_kNetBSD)
+ static void
+ do_procinit(void)
+ {
