@@ -1,15 +1,54 @@
-
-Status: dirty
-
+diff -Nur gcc-3.2-3.2.3ds9.old/debian/README.Debian gcc-3.2-3.2.3ds9/debian/README.Debian
+--- gcc-3.2-3.2.3ds9.old/debian/README.Debian	2004-09-17 10:59:19.000000000 +0200
++++ gcc-3.2-3.2.3ds9/debian/README.Debian	2004-09-17 13:46:19.000000000 +0200
+@@ -66,20 +66,17 @@
+   http://gcc.gnu.org/ml/gcc-cvs/2002-12/msg00157.html
+   http://gcc.gnu.org/ml/gcc-cvs/2002-12/msg00195.html
+ 
++deb-protoize:
++  build protoize/unprotoize by default
++
+ libobjc:
+   Find header file for Boehm garbage collector.
+ 
+ g77-names:
+   versioned g77 names
+ 
+-ada-gcc-name:
+-  use gcc-3.2 instead of gcc and gnatXXX-3.15 instead of gnatXXX
+-  as the command names.
+-
+-i386-typo:
+-  2003-05-10  Alexander Aganichev  <aaganichev@yandex.ru>
+-  
+-  	* config/i386/i386.h (MODES_TIEABLE_P): Fix typo. 
++kbsd-gnu:
++  GNU/k*BSD
+ 
+ reporting:
+   <compiler> --help gives hint to /usr/share/doc/debian/bug-reporting.txt
+diff -Nur gcc-3.2-3.2.3ds9.old/debian/changelog gcc-3.2-3.2.3ds9/debian/changelog
+--- gcc-3.2-3.2.3ds9.old/debian/changelog	2004-09-17 10:59:19.000000000 +0200
++++ gcc-3.2-3.2.3ds9/debian/changelog	2004-09-17 13:44:36.000000000 +0200
+@@ -1,3 +1,9 @@
++gcc-3.2 (1:3.2.3ds9-9+kbsd.2) unreleased; urgency=low
++
++  * foo
++
++ -- Robert Millan <rmh@debian.org>  Fri, 17 Sep 2004 12:18:25 +0200
++
+ gcc-3.2 (1:3.2.3ds9-9) unstable; urgency=low
+ 
+   * Recompile using recent glibc (closes: #205728).
 diff -Nur gcc-3.2-3.2.3ds9.old/debian/control gcc-3.2-3.2.3ds9/debian/control
---- gcc-3.2-3.2.3ds9.old/debian/control	2004-09-16 09:40:02.000000000 +0200
-+++ gcc-3.2-3.2.3ds9/debian/control	2004-09-16 09:40:18.000000000 +0200
+--- gcc-3.2-3.2.3ds9.old/debian/control	2004-09-17 10:59:19.000000000 +0200
++++ gcc-3.2-3.2.3ds9/debian/control	2004-09-17 13:46:18.000000000 +0200
 @@ -4,7 +4,7 @@
  Maintainer: Debian GCC maintainers <debian-gcc@lists.debian.org>
  Uploaders: Christopher C. Chimelis <chris@debian.org>, Matthias Klose <doko@debian.org>, Ryan Murray <rmurray@debian.org>
  Standards-Version: 3.5.6
 -Build-Depends: libc6.1-dev (>= 2.2.5-8) [alpha ia64] | libc0.3-dev [hurd-i386] | libc1-dev [freebsd-i386] | libc12-dev [netbsd-i386] | libc6-dev (>= 2.2.5-8), libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], m4, autoconf2.13, automake1.4 | automake (<< 1.5), libtool, autotools-dev, gawk, dejagnu (>= 1.4.3) [!hurd-i386 !mips !mipsel !freebsd-i386], expect (>= 5.38.0) [!hurd-i386 !mips !mipsel !freebsd-i386], bzip2, binutils (>= 2.14.90.0.4) | binutils (<< 2.14), binutils (>= 2.13.90.0.10) [!m68k] | binutils (>= 2.13.90.0.18-1.2) [m68k], debhelper (>= 3.0.25), gperf (>= 2.7-3), bison (>= 1:1.875a-1) | bison (<< 1:1.50), flex, gettext, texinfo, zlib1g-dev, libgc-dev [!avr !freebsd-i386], xlibs-dev, gnat-3.2 [!arm !hurd-i386 !m68k !freebsd-i386 !netbsd-i386] | gnat (>= 3.14p-3) [i386 powerpc sparc], libncurses5-dev [!arm !ia64 !m68k !powerpc !sparc], libgmp3-dev, tetex-bin [!arm !ia64 !m68k !powerpc !sparc], locales [!netbsd-i386 !hurd-i386 !mips !mipsel !freebsd-i386 !hurd-i386], gcc-2.95 [m68k], procps [!hurd-i386 !mips !mipsel !freebsd-i386], help2man [!arm !ia64 !m68k !powerpc !sparc]
-+Build-Depends: libc6.1-dev (>= 2.2.5-8) [alpha ia64] | libc0.3-dev | libc0.1-dev | libc1-dev | libc12-dev | libc6-dev (>= 2.2.5-8), libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], m4, autoconf2.13, automake1.4 | automake (<< 1.5), libtool, autotools-dev, gawk, dejagnu (>= 1.4.3) [!hurd-i386 !mips !mipsel !freebsd-i386 !netbsd-i386], expect (>= 5.38.0) [!hurd-i386 !mips !mipsel !freebsd-i386 !netbsd-i386], bzip2, binutils (>= 2.14.90.0.4) | binutils (<< 2.14), binutils (>= 2.13.90.0.10) [!m68k] | binutils (>= 2.13.90.0.18-1.2) [m68k], debhelper (>= 3.0.25), gperf (>= 2.7-3), bison (>= 1:1.875a-1) | bison (<< 1:1.50), flex-old, gettext, texinfo, zlib1g-dev, libgc-dev [!avr !freebsd-i386 !netbsd-i386], xlibs-dev, gnat-3.2 [!arm !hurd-i386 !m68k !freebsd-i386 !netbsd-i386] | gnat (>= 3.14p-3) [i386 powerpc sparc], libncurses5-dev [!arm !ia64 !m68k !powerpc !sparc], libgmp3-dev, tetex-bin [!arm !ia64 !m68k !powerpc !sparc], locales [!hurd-i386 !mips !mipsel !freebsd-i386 !netbsd-i386 !hurd-i386], gcc-2.95 [m68k], procps [!hurd-i386 !mips !mipsel !freebsd-i386 !netbsd-i386], help2man [!arm !ia64 !m68k !powerpc !sparc]
++Build-Depends: libc6.1-dev (>= 2.2.5-8) [alpha ia64] | libc0.3-dev | libc0.1-dev | libc1-dev | libc12-dev | libc6-dev (>= 2.2.5-8), libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], m4, autoconf2.13, automake1.4 | automake (<< 1.5), libtool, autotools-dev, gawk, dejagnu (>= 1.4.3) [!hurd-i386 !mips !mipsel !kfreebsd-i386 !knetbsd-i386], expect (>= 5.38.0) [!hurd-i386 !mips !mipsel !kfreebsd-i386 !knetbsd-i386], bzip2, binutils (>= 2.14.90.0.4) | binutils (<< 2.14), binutils (>= 2.13.90.0.10) [!m68k] | binutils (>= 2.13.90.0.18-1.2) [m68k], debhelper (>= 3.0.25), gperf (>= 2.7-3), bison (>= 1:1.875a-1) | bison (<< 1:1.50), flex-old, gettext, texinfo, zlib1g-dev, libgc-dev [!avr], xlibs-dev, gnat-3.2 [!arm !hurd-i386 !m68k !kfreebsd-i386 !knetbsd-i386] | gnat (>= 3.14p-3) [i386 powerpc sparc], libncurses5-dev [!arm !ia64 !m68k !powerpc !sparc], libgmp3-dev, tetex-bin [!arm !ia64 !m68k !powerpc !sparc], locales [!hurd-i386 !mips !mipsel !kfreebsd-i386 !knetbsd-i386 !hurd-i386], gcc-2.95 [m68k], help2man [!arm !ia64 !m68k !powerpc !sparc]
  Build-Depends-Indep: doxygen, sharutils
  
  Package: gcc-3.2-base
@@ -18,14 +57,14 @@ diff -Nur gcc-3.2-3.2.3ds9.old/debian/control gcc-3.2-3.2.3ds9/debian/control
  Section: devel
  Priority: optional
 -Depends: gcc-3.2-base, libgcc1 (>= 1:3.2.3-9), ${shlibs:Depends}, cpp-3.2 (>= 1:3.2.3-9), cpp-3.2 (<< 1:3.2.4), binutils (>= 2.13.90.0.10)
-+Depends: gcc-3.2-base, libgcc1 (>= 1:3.2.3-9+kbsd.1), ${shlibs:Depends}, cpp-3.2 (>= 1:3.2.3-9+kbsd.1), cpp-3.2 (<< 1:3.2.4), binutils (>= 2.13.90.0.10)
++Depends: gcc-3.2-base, libgcc1 (>= 1:3.2.3-9+kbsd.2), ${shlibs:Depends}, cpp-3.2 (>= 1:3.2.3-9+kbsd.2), cpp-3.2 (<< 1:3.2.4), binutils (>= 2.13.90.0.10)
  Conflicts: libc5-dev, gcc-3.1
  Replaces: gcc-3.1
  Provides: c-compiler
 -Recommends: libc6-dev (>= 2.2.5-8)
 -Suggests: gcc-3.2-doc (>= 1:3.2.3-9)
 +Recommends: libc0.1-dev
-+Suggests: gcc-3.2-doc (>= 1:3.2.3-9+kbsd.1)
++Suggests: gcc-3.2-doc (>= 1:3.2.3-9+kbsd.2)
  Description: The GNU C compiler
   This is the GNU C compiler, a fairly portable optimizing compiler for C.
  
@@ -33,7 +72,7 @@ diff -Nur gcc-3.2-3.2.3ds9.old/debian/control gcc-3.2-3.2.3ds9/debian/control
  Architecture: any
  Section: interpreters
 -Depends: gcc-3.2-base (>= 1:3.2.3-9), gcc-3.2-base (<< 1:3.2.4), ${shlibs:Depends}
-+Depends: gcc-3.2-base (>= 1:3.2.3-9+kbsd.1), gcc-3.2-base (<< 1:3.2.4), ${shlibs:Depends}
++Depends: gcc-3.2-base (>= 1:3.2.3-9+kbsd.2), gcc-3.2-base (<< 1:3.2.4), ${shlibs:Depends}
  Description: The GNU C preprocessor
   A macro processor that is used automatically by the GNU C compiler
   to transform programs before actual compilation.
@@ -42,10 +81,10 @@ diff -Nur gcc-3.2-3.2.3ds9.old/debian/control gcc-3.2-3.2.3ds9/debian/control
  Priority: optional
  Provides: c++-compiler
 -Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9), gcc-3.2 (<< 1:3.2.4), libstdc++5-dev (>= 1:3.2.3-9)
-+Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.1), gcc-3.2 (<< 1:3.2.4), libstdc++5-dev (>= 1:3.2.3-9+kbsd.1)
++Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.2), gcc-3.2 (<< 1:3.2.4), libstdc++5-dev (>= 1:3.2.3-9+kbsd.2)
  Replaces: gcc (<= 2.7.2.3-3)
 -Suggests: gcc-3.2-doc (>= 1:3.2.3-9)
-+Suggests: gcc-3.2-doc (>= 1:3.2.3-9+kbsd.1)
++Suggests: gcc-3.2-doc (>= 1:3.2.3-9+kbsd.2)
  Description: The GNU C++ compiler
   This is the GNU C++ compiler, a fairly portable optimizing compiler for C++.
  
@@ -53,104 +92,102 @@ diff -Nur gcc-3.2-3.2.3ds9.old/debian/control gcc-3.2-3.2.3ds9/debian/control
  Architecture: any
  Priority: optional
 -Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9), gcc-3.2 (<< 1:3.2.4)
-+Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.1), gcc-3.2 (<< 1:3.2.4)
++Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.2), gcc-3.2 (<< 1:3.2.4)
  Description: Create/remove ANSI prototypes from C code
   "protoize" can be used to add prototypes to a program, thus converting
   the program to ANSI C in one respect.  The companion program "unprotoize"
-@@ -83,10 +83,9 @@
+@@ -83,8 +83,8 @@
  Package: gobjc-3.2
  Architecture: any
  Priority: optional
 -Depends: gcc-3.2-base, ${shlibs:Depends}, libobjc1 (>= 1:3.2.3-9), gcc-3.2 (>= 1:3.2.3-9), gcc-3.2 (<< 1:3.2.4)
 -Suggests: gcc-3.2-doc (>= 1:3.2.3-9)
-+Depends: gcc-3.2-base, ${shlibs:Depends}, libobjc1 (>= 1:3.2.3-9+kbsd.1), gcc-3.2 (>= 1:3.2.3-9+kbsd.1), gcc-3.2 (<< 1:3.2.4)
-+Suggests: gcc-3.2-doc (>= 1:3.2.3-9+kbsd.1)
++Depends: gcc-3.2-base, ${shlibs:Depends}, libobjc1 (>= 1:3.2.3-9+kbsd.2), gcc-3.2 (>= 1:3.2.3-9+kbsd.2), gcc-3.2 (<< 1:3.2.4)
++Suggests: gcc-3.2-doc (>= 1:3.2.3-9+kbsd.2)
  Provides: objc-compiler
--Recommends: libgc-dev
+ Recommends: libgc-dev
  Description: The GNU Objective-C compiler
-  This is the GNU Objective-C compiler, which compiles
-  Objective-C on platforms supported by the gcc compiler. It uses the
-@@ -103,7 +102,7 @@
+@@ -103,7 +103,7 @@
  Package: g77-3.2
  Architecture: any
  Priority: optional
 -Depends: gcc-3.2-base, libg2c0, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9), gcc-3.2 (<< 1:3.2.4)
-+Depends: gcc-3.2-base, libg2c0, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.1), gcc-3.2 (<< 1:3.2.4)
++Depends: gcc-3.2-base, libg2c0, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.2), gcc-3.2 (<< 1:3.2.4)
  Provides: fortran77-compiler
  Suggests: g77-3.2-doc
  Description: The GNU Fortran 77 compiler
-@@ -152,7 +151,7 @@
+@@ -152,7 +152,7 @@
  Section: libdevel
  Architecture: any
  Priority: optional
 -Depends: gcc-3.2-base, libffi (>= 1:3.2.3-9), libc6-dev (>= 2.2.5-8)
-+Depends: gcc-3.2-base, libffi (>= 1:3.2.3-9+kbsd.1), libc0.1-dev
++Depends: gcc-3.2-base, libffi (>= 1:3.2.3-9+kbsd.2), libc0.1-dev
  Conflicts: libffi1-dev
  Description: Foreign Function Interface library development
   A foreign function interface is the popular name for the interface that
-@@ -176,7 +175,7 @@
+@@ -176,7 +176,7 @@
  Architecture: any
  Section: libdevel
  Priority: optional
 -Depends: gcc-3.2-base, libstdc++5 (>= 1:3.2.3-9), libc6-dev (>= 2.2.5-8), g++-3.2 (>= 1:3.2.3-9)
-+Depends: gcc-3.2-base, libstdc++5 (>= 1:3.2.3-9+kbsd.1), libc0.1-dev, g++-3.2 (>= 1:3.2.3-9+kbsd.1)
++Depends: gcc-3.2-base, libstdc++5 (>= 1:3.2.3-9+kbsd.2), libc0.1-dev, g++-3.2 (>= 1:3.2.3-9+kbsd.2)
  Conflicts: libg++27-dev, libg++272-dev (<< 2.7.2.8-1), libstdc++2.8-dev, libg++2.8-dev, libstdc++2.9-dev, libstdc++2.9-glibc2.1-dev, libstdc++2.10-dev (<< 1:2.95.3-2), libstdc++3.0-dev
  Suggests: libstdc++5-doc, stl-manual
  Provides: libstdc++-dev
-@@ -256,9 +255,9 @@
+@@ -256,9 +256,9 @@
  Package: gpc-2.1-3.2
  Architecture: any
  Priority: optional
 -Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9), gcc-3.2 (<< 1:3.2.4)
-+Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.1), gcc-3.2 (<< 1:3.2.4)
++Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.2), gcc-3.2 (<< 1:3.2.4)
  Recommends: libgmp3-dev, libncurses5-dev
 -Suggests: gpc-2.1-3.2-doc (>= 1:3.2.3.-9)
-+Suggests: gpc-2.1-3.2-doc (>= 1:3.2.3.-9+kbsd.1)
++Suggests: gpc-2.1-3.2-doc (>= 1:3.2.3.-9+kbsd.2)
  Provides: pascal-compiler
  Description: The GNU Pascal compiler
   This is the GNU Pascal compiler, which compiles Pascal on platforms supported
-@@ -283,7 +282,7 @@
+@@ -283,7 +283,7 @@
  Package: gcc-3.2-soft-float
  Architecture: arm
  Priority: optional
 -Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9), gcc-3.2 (<< 1:3.2.4)
-+Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.1), gcc-3.2 (<< 1:3.2.4)
++Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.2), gcc-3.2 (<< 1:3.2.4)
  Replaces: gcc-soft-float-ss (<< 1:3.2.4)
  Description: The soft-floating-point gcc libraries (arm)
   These are versions of basic static libraries such as libgcc.a compiled
-@@ -292,7 +291,7 @@
+@@ -292,7 +292,7 @@
  Package: fixincludes
  Architecture: any
  Priority: optional
 -Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9), gcc-3.2 (<< 1:3.2.4)
-+Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.1), gcc-3.2 (<< 1:3.2.4)
++Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.2), gcc-3.2 (<< 1:3.2.4)
  Description: Fix non-ANSI header files
   FixIncludes was created to fix non-ANSI system header files. Many
   system manufacturers supply proprietary headers that are not ANSI compliant.
-@@ -314,7 +313,7 @@
+@@ -314,7 +314,7 @@
  Package: gcc-3.2-nof
  Architecture: powerpc
  Priority: optional
 -Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9), gcc-3.2 (<< 1:3.2.4)
-+Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.1), gcc-3.2 (<< 1:3.2.4)
++Depends: gcc-3.2-base, ${shlibs:Depends}, gcc-3.2 (>= 1:3.2.3-9+kbsd.2), gcc-3.2 (<< 1:3.2.4)
  Description: The no-floating-point gcc libraries (powerpc)
   These are versions of basic static libraries such as libgcc.a compiled
   with the -msoft-float option, for CPUs without a floating-point unit.
 diff -Nur gcc-3.2-3.2.3ds9.old/debian/control.m4 gcc-3.2-3.2.3ds9/debian/control.m4
---- gcc-3.2-3.2.3ds9.old/debian/control.m4	2004-09-16 09:40:02.000000000 +0200
-+++ gcc-3.2-3.2.3ds9/debian/control.m4	2004-09-16 09:40:18.000000000 +0200
+--- gcc-3.2-3.2.3ds9.old/debian/control.m4	2004-09-17 10:59:19.000000000 +0200
++++ gcc-3.2-3.2.3ds9/debian/control.m4	2004-09-17 11:00:10.000000000 +0200
 @@ -33,7 +33,7 @@
  Maintainer: MAINTAINER
  Uploaders: Christopher C. Chimelis <chris@debian.org>, Matthias Klose <doko@debian.org>, Ryan Murray <rmurray@debian.org>
  Standards-Version: 3.5.6
 -Build-Depends: LIBC_BUILD_DEP, libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], m4, autoconf2.13, automake1.4 | automake (<< 1.5), libtool, autotools-dev, gawk, dejagnu (>= 1.4.3) [check_no_archs], expect (>= 5.38.0) [check_no_archs], bzip2, BINUTILS_BUILD_DEP, debhelper (>= 3.0.25), gperf (>= 2.7-3), bison (>= 1:1.875a-1) | bison (<< 1:1.50), flex, gettext, texinfo, zlib1g-dev, libgc-dev [libgc_no_archs], xlibs-dev, gnat-3.2 [ada_no_archs] | gnat (>= 3.14p-3) [i386 powerpc sparc], libncurses5-dev [gpc_no_archs], libgmp3-dev, tetex-bin [gpc_no_archs], locales [locale_no_archs !hurd-i386], gcc-2.95 [m68k], procps [check_no_archs], help2man [gpc_no_archs]
-+Build-Depends: LIBC_BUILD_DEP, libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], m4, autoconf2.13, automake1.4 | automake (<< 1.5), libtool, autotools-dev, gawk, dejagnu (>= 1.4.3) [check_no_archs], expect (>= 5.38.0) [check_no_archs], bzip2, BINUTILS_BUILD_DEP, debhelper (>= 3.0.25), gperf (>= 2.7-3), bison (>= 1:1.875a-1) | bison (<< 1:1.50), flex-old, gettext, texinfo, zlib1g-dev, libgc-dev [libgc_no_archs], xlibs-dev, gnat-3.2 [ada_no_archs] | gnat (>= 3.14p-3) [i386 powerpc sparc], libncurses5-dev [gpc_no_archs], libgmp3-dev, tetex-bin [gpc_no_archs], locales [locale_no_archs !hurd-i386], gcc-2.95 [m68k], procps [check_no_archs], help2man [gpc_no_archs]
++Build-Depends: LIBC_BUILD_DEP, libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], m4, autoconf2.13, automake1.4 | automake (<< 1.5), libtool, autotools-dev, gawk, dejagnu (>= 1.4.3) [check_no_archs], expect (>= 5.38.0) [check_no_archs], bzip2, BINUTILS_BUILD_DEP, debhelper (>= 3.0.25), gperf (>= 2.7-3), bison (>= 1:1.875a-1) | bison (<< 1:1.50), flex-old, gettext, texinfo, zlib1g-dev, libgc-dev [libgc_no_archs], xlibs-dev, gnat-3.2 [ada_no_archs] | gnat (>= 3.14p-3) [i386 powerpc sparc], libncurses5-dev [gpc_no_archs], libgmp3-dev, tetex-bin [gpc_no_archs], locales [locale_no_archs !hurd-i386], gcc-2.95 [m68k], help2man [gpc_no_archs]
  Build-Depends-Indep: doxygen, sharutils
  
  ifdef(`TARGET', `', `
 diff -Nur gcc-3.2-3.2.3ds9.old/debian/patches/autoreconf.dpatch gcc-3.2-3.2.3ds9/debian/patches/autoreconf.dpatch
---- gcc-3.2-3.2.3ds9.old/debian/patches/autoreconf.dpatch	2004-09-16 09:40:02.000000000 +0200
-+++ gcc-3.2-3.2.3ds9/debian/patches/autoreconf.dpatch	2004-09-16 09:40:18.000000000 +0200
+--- gcc-3.2-3.2.3ds9.old/debian/patches/autoreconf.dpatch	2004-09-17 10:59:19.000000000 +0200
++++ gcc-3.2-3.2.3ds9/debian/patches/autoreconf.dpatch	2004-09-17 10:59:37.000000000 +0200
 @@ -16,6 +16,9 @@
  	for i in libf2c libjava/libltdl libobjc libstdc++-v3 zlib; do
  		(cd ${dir}/${i} ; autoreconf --force)
@@ -313,938 +350,10 @@ diff -Nur gcc-3.2-3.2.3ds9.old/debian/patches/autoreconf.dpatch gcc-3.2-3.2.3ds9
 +     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
 +     hardcode_libdir_flag_spec='-R$libdir'
 +     hardcode_direct=yes
-diff -Nur gcc-3.2-3.2.3ds9.old/debian/patches/freebsd-gnu.dpatch gcc-3.2-3.2.3ds9/debian/patches/freebsd-gnu.dpatch
---- gcc-3.2-3.2.3ds9.old/debian/patches/freebsd-gnu.dpatch	2004-09-16 09:40:01.000000000 +0200
-+++ gcc-3.2-3.2.3ds9/debian/patches/freebsd-gnu.dpatch	1970-01-01 01:00:00.000000000 +0100
-@@ -1,924 +0,0 @@
--#! /bin/sh -e
--
--# All lines beginning with `# DPATCH:' are a description of the patch.
--# DP: GNU/FreeBSD support
--
--dir=
--if [ $# -eq 3 -a "$2" = '-d' ]; then
--    pdir="-d $3"
--    dir="$3/"
--elif [ $# -ne 1 ]; then
--    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
--    exit 1
--fi
--case "$1" in
--    -patch)
--        patch $pdir -f --no-backup-if-mismatch -p1 < $0
--        #cd ${dir}gcc && autoconf
--        ;;
--    -unpatch)
--        patch $pdir -f --no-backup-if-mismatch -R -p1 < $0
--        #rm ${dir}gcc/configure
--        ;;
--    *)
--        echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
--        exit 1
--esac
--exit 0
--
--# append the patch here and adjust the -p? flag in the patch calls.
--
--diff -Nur src.old/boehm-gc/configure src/boehm-gc/configure
----- src.old/boehm-gc/configure	2003-04-22 08:56:18.000000000 +0200
--+++ src/boehm-gc/configure	2003-05-29 01:49:26.000000000 +0200
--@@ -2698,6 +2698,16 @@
-- 
-- 	THREADLIBS="-lpthread -lrt"
-- 	;;
--+     *-*-freebsd*-gnu*)
--+	cat >> confdefs.h <<\EOF
--+#define GC_LINUX_THREADS 1
--+EOF
--+
--+	cat >> confdefs.h <<\EOF
--+#define _REENTRANT 1
--+EOF
--+
--+	;;
--      *-*-freebsd*)
-- 	echo "configure: warning: "FreeBSD does not yet fully support threads with Boehm GC."" 1>&2
-- 	cat >> confdefs.h <<\EOF
--diff -Nur src.old/boehm-gc/configure.in src/boehm-gc/configure.in
----- src.old/boehm-gc/configure.in	2003-01-28 02:44:36.000000000 +0100
--+++ src/boehm-gc/configure.in	2003-05-29 01:49:26.000000000 +0200
--@@ -95,6 +95,10 @@
-- 	AC_DEFINE(THREAD_LOCAL_ALLOC)
-- 	THREADLIBS="-lpthread -lrt"
-- 	;;
--+     *-*-freebsd*-gnu*)
--+	AC_DEFINE(GC_LINUX_THREADS)
--+	AC_DEFINE(_REENTRANT)
--+	;;
--      *-*-freebsd*)
-- 	AC_MSG_WARN("FreeBSD does not yet fully support threads with Boehm GC.")
-- 	AC_DEFINE(GC_FREEBSD_THREADS)
--diff -Nur src.old/boehm-gc/dbg_mlc.c src/boehm-gc/dbg_mlc.c
----- src.old/boehm-gc/dbg_mlc.c	2002-02-13 06:38:39.000000000 +0100
--+++ src/boehm-gc/dbg_mlc.c	2003-05-29 01:49:26.000000000 +0200
--@@ -60,7 +60,8 @@
-- # include <stdlib.h>
-- 
-- # if defined(LINUX) || defined(SUNOS4) || defined(SUNOS5) \
---     || defined(HPUX) || defined(IRIX) || defined(OSF1)
--+     || defined(HPUX) || defined(IRIX) || defined(OSF1) \
--+     || defined(GLIBC_FREEBSD)
-- #   define RANDOM() random()
-- # else
-- #   define RANDOM() (long)rand()
--@@ -819,7 +820,7 @@
-- void GC_check_heap_proc()
-- {
-- #   ifndef SMALL_CONFIG
---	if (sizeof(oh) & (2 * sizeof(word) - 1) != 0) {
--+	if ((sizeof(oh) & (2 * sizeof(word) - 1)) != 0) {
-- 	    ABORT("Alignment problem: object header has inappropriate size\n");
-- 	}
-- #   endif
--diff -Nur src.old/boehm-gc/dyn_load.c src/boehm-gc/dyn_load.c
----- src.old/boehm-gc/dyn_load.c	2002-04-09 02:03:24.000000000 +0200
--+++ src/boehm-gc/dyn_load.c	2003-05-29 01:49:26.000000000 +0200
--@@ -26,7 +26,7 @@
--  * None of this is safe with dlclose and incremental collection.
--  * But then not much of anything is safe in the presence of dlclose.
--  */
---#if defined(__linux__) && !defined(_GNU_SOURCE)
--+#if (defined(__linux__) || defined(__gnu_freebsd__)) && !defined(_GNU_SOURCE)
--     /* Can't test LINUX, since this must be define before other includes */
-- #   define _GNU_SOURCE
-- #endif
--@@ -446,7 +446,7 @@
-- /* For glibc 2.2.4+.  Unfortunately, it doesn't work for older	*/
-- /* versions.  Thanks to Jakub Jelinek for most of the code.	*/
-- 
---# if defined(LINUX) /* Are others OK here, too? */ \
--+# if (defined(LINUX) || defined(GLIBC_FREEBSD)) /* Are others OK here, too? */ \
--      && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2) \
--          || (__GLIBC__ == 2 && __GLIBC_MINOR__ == 2 && defined(DT_CONFIG))) 
-- 
--@@ -510,7 +510,7 @@
--   }
-- }
-- 
---# else /* !LINUX || version(glibc) < 2.2.4 */
--+# else /* !(LINUX || GLIBC_FREEBSD) || version(glibc) < 2.2.4 */
-- 
-- /* Dynamic loading code for Linux running ELF. Somewhat tested on
--  * Linux/x86, untested but hopefully should work on Linux/Alpha. 
--diff -Nur src.old/boehm-gc/include/private/gcconfig.h src/boehm-gc/include/private/gcconfig.h
----- src.old/boehm-gc/include/private/gcconfig.h	2002-04-22 08:05:04.000000000 +0200
--+++ src/boehm-gc/include/private/gcconfig.h	2003-05-29 01:49:26.000000000 +0200
--@@ -1051,25 +1051,40 @@
-- #   endif
-- #   ifdef FREEBSD
-- #	define OS_TYPE "FREEBSD"
---#	ifndef GC_FREEBSD_THREADS
---#	    define MPROTECT_VDB
---#	endif
---#	define SIG_SUSPEND SIGUSR1
---#	define SIG_THR_RESTART SIGUSR2
-- #	define FREEBSD_STACKBOTTOM
-- #	ifdef __ELF__
-- #	    define DYNAMIC_LOADING
-- #	endif
--+#	ifdef __gnu_freebsd__
--+	    /* FreeBSD with glibc.  Implies __ELF__.  */
--+#	    define GLIBC_FREEBSD
--+#	    if !defined(GC_LINUX_THREADS) || !defined(REDIRECT_MALLOC)
--+#		define MPROTECT_VDB
--+#	    endif
--+#	    define SIG_SUSPEND     57 /* arbitrary signal number <= 128 */
--+#	    define SIG_THR_RESTART 58 /* arbitrary signal number <= 128 */
--+#	    define LINUX_DATA_START
--+	    extern int _end[];
--+#	    define DATAEND (_end)
--+#	    define USE_MMAP	/* brk(0) doesn't return a meaningful value */
--+#	else
--+	    /* FreeBSD with BSD libc.  */
--+#	    ifndef GC_FREEBSD_THREADS
--+#		define MPROTECT_VDB
--+#	    endif
--+#	    define SIG_SUSPEND SIGUSR1
--+#	    define SIG_THR_RESTART SIGUSR2
-- /* Handle unmapped hole i386*-*-freebsd[45]* may put between etext and edata. */
---	extern char etext[];
---	extern char edata[];
---	extern char end[];
---#	define NEED_FIND_LIMIT
---#	define DATASTART ((ptr_t)(etext))
---#   	define MIN(x,y) ((x) < (y) ? (x) : (y))
---#	define DATAEND (MIN (GC_find_limit (DATASTART, TRUE), DATASTART2))
---#	define DATASTART2 ((ptr_t)(edata))
---#	define DATAEND2 ((ptr_t)(end))
--+	    extern char etext[];
--+	    extern char edata[];
--+	    extern char end[];
--+#	    define NEED_FIND_LIMIT
--+#	    define DATASTART ((ptr_t)(etext))
--+#   	    define MIN(x,y) ((x) < (y) ? (x) : (y))
--+#	    define DATAEND (MIN (GC_find_limit (DATASTART, TRUE), DATASTART2))
--+#	    define DATASTART2 ((ptr_t)(edata))
--+#	    define DATAEND2 ((ptr_t)(end))
--+#	endif
-- #   endif
-- #   ifdef NETBSD
-- #	define OS_TYPE "NETBSD"
--@@ -1764,7 +1779,7 @@
-- # if defined(GC_IRIX_THREADS) && !defined(IRIX5)
-- --> inconsistent configuration
-- # endif
---# if defined(GC_LINUX_THREADS) && !defined(LINUX)
--+# if defined(GC_LINUX_THREADS) && !(defined(LINUX) || defined(FREEBSD))
-- --> inconsistent configuration
-- # endif
-- # if defined(GC_SOLARIS_THREADS) && !defined(SUNOS5)
--@@ -1807,7 +1822,7 @@
-- /* build time, though we feel free to adjust it slightly.		*/
-- /* Define NEED_CALLINFO if we either save the call stack or 		*/
-- /* GC_ADD_CALLER is defined.						*/
---#ifdef LINUX
--+#if defined(LINUX) || defined(GLIBC_FREEBSD)
-- # include <features.h>
-- # if __GLIBC__ == 2 && __GLIBC_MINOR__ >= 1 || __GLIBC__ > 2
-- #   define HAVE_BUILTIN_BACKTRACE
--@@ -1818,7 +1833,7 @@
-- # define CAN_SAVE_CALL_STACKS
-- # define CAN_SAVE_CALL_ARGS
-- #endif
---#if defined(I386) && defined(LINUX)
--+#if defined(I386) && (defined(LINUX) || defined(GLIBC_FREEBSD))
--     /* SAVE_CALL_CHAIN is supported if the code is compiled to save	*/
--     /* frame pointers by default, i.e. no -fomit-frame-pointer flag.	*/
-- # define CAN_SAVE_CALL_STACKS
--diff -Nur src.old/boehm-gc/linux_threads.c src/boehm-gc/linux_threads.c
----- src.old/boehm-gc/linux_threads.c	2002-03-29 23:33:34.000000000 +0100
--+++ src/boehm-gc/linux_threads.c	2003-05-29 01:49:26.000000000 +0200
--@@ -992,6 +992,7 @@
-- 
-- #ifdef GC_LINUX_THREADS
-- /* Return the number of processors, or i<= 0 if it can't be determined.	*/
--+# ifdef LINUX
-- int GC_get_nprocs()
-- {
--     /* Should be "return sysconf(_SC_NPROCESSORS_ONLN);" but that	*/
--@@ -1027,6 +1028,21 @@
--     }
--     return result;
-- }
--+# endif /* LINUX */
--+# ifdef FREEBSD
--+#include <sys/sysctl.h>
--+int GC_get_nprocs()
--+{
--+    int request[] = { CTL_HW, HW_NCPU };
--+    int result;
--+    size_t result_len = sizeof (result);
--+
--+    if (sysctl(request, 2, &result, &result_len, NULL, 0) < 0)
--+	/* Dummy result.  */
--+	result = 1;
--+    return result;
--+}
--+# endif /* FREEBSD */
-- #endif /* GC_LINUX_THREADS */
-- 
-- /* We hold the allocation lock.	*/
--@@ -1193,7 +1209,7 @@
--     UNLOCK();
-- }
-- 
---GC_end_blocking(void) {
--+void GC_end_blocking(void) {
--     GC_thread me;
--     LOCK();   /* This will block if the world is stopped.	*/
--     me = GC_lookup_thread(pthread_self());
--diff -Nur src.old/boehm-gc/ltconfig src/boehm-gc/ltconfig
----- src.old/boehm-gc/ltconfig	2001-08-17 20:39:16.000000000 +0200
--+++ src/boehm-gc/ltconfig	2003-05-29 01:49:26.000000000 +0200
--@@ -1867,7 +1867,21 @@
-- freebsd1*)
--   dynamic_linker=no
--   ;;
---  
--+
--+freebsd*-gnu*)
--+  version_type=linux
--+  need_lib_prefix=no
--+  need_version=no
--+  library_names_spec='${libname}${release}.so$versuffix ${libname}${release}.so$major $libname.so'
--+  soname_spec='${libname}${release}.so$major'
--+  shlibpath_var=LD_LIBRARY_PATH
--+  shlibpath_overrides_runpath=no
--+  hardcode_into_libs=yes
--+  dynamic_linker='GNU ld.so'
--+  # Don't assume a particular installation location.
--+  sys_lib_search_path_spec=""
--+  ;;
--+
-- freebsd*)
--   objformat=`test -x /usr/bin/objformat && /usr/bin/objformat || echo aout`
--   version_type=freebsd-$objformat
--diff -Nur src.old/boehm-gc/os_dep.c src/boehm-gc/os_dep.c
----- src.old/boehm-gc/os_dep.c	2002-04-10 03:18:07.000000000 +0200
--+++ src/boehm-gc/os_dep.c	2003-05-29 01:49:26.000000000 +0200
--@@ -118,7 +118,8 @@
-- # include <fcntl.h>
-- #endif
-- 
---#if defined(SUNOS5SIGS) || defined (HURD) || defined(LINUX)
--+#if defined(SUNOS5SIGS) || defined (HURD) || defined(LINUX) \
--+    || defined(GLIBC_FREEBSD)
-- # ifdef SUNOS5SIGS
-- #  include <sys/siginfo.h>
-- # endif
--@@ -153,12 +154,12 @@
--   /* for recent Linux versions.  This seems to be the easiest way to	*/
--   /* cover all versions.						*/
-- 
---# ifdef LINUX
--+# if defined(LINUX) || defined(GLIBC_FREEBSD)
-- #   pragma weak __data_start
--     extern int __data_start[];
-- #   pragma weak data_start
--     extern int data_start[];
---# endif /* LINUX */
--+# endif /* LINUX || GLIBC_FREEBSD */
--   extern int _end[];
-- 
--   ptr_t GC_data_start;
--@@ -167,7 +168,7 @@
--   {
--     extern ptr_t GC_find_limit();
-- 
---#   ifdef LINUX
--+#   if defined(LINUX) || defined(GLIBC_FREEBSD)
--       /* Try the easy approaches first:	*/
--       if (__data_start != 0) {
-- 	  GC_data_start = (ptr_t)__data_start;
--@@ -177,7 +178,7 @@
-- 	  GC_data_start = (ptr_t)data_start;
-- 	  return;
--       }
---#   endif /* LINUX */
--+#   endif /* LINUX || GLIBC_FREEBSD */
--     GC_data_start = GC_find_limit((ptr_t)_end, FALSE);
--   }
-- #endif
--@@ -3060,7 +3061,8 @@
-- /* I suspect the following works for most X86 *nix variants, so 	*/
-- /* long as the frame pointer is explicitly stored.  In the case of gcc,	*/
-- /* compiler flags (e.g. -fomit-frame-pointer) determine whether it is.	*/
---#if defined(I386) && defined(LINUX) && defined(SAVE_CALL_CHAIN)
--+#if defined(I386) && (defined(LINUX) || defined(GLIBC_FREEBSD)) \
--+    && defined(SAVE_CALL_CHAIN)
-- #   include <features.h>
-- 
--     struct frame {
--@@ -3109,7 +3111,7 @@
-- /* Fill in the pc and argument information for up to NFRAMES of my	*/
-- /* callers.  Ignore my frame and my callers frame.			*/
-- 
---#ifdef LINUX
--+#if defined(LINUX) || defined(GLIBC_FREEBSD)
-- # include <features.h>
-- # if __GLIBC__ == 2 && __GLIBC_MINOR__ >= 1 || __GLIBC__ > 2
-- #   define HAVE_BUILTIN_BACKTRACE
--diff -Nur src.old/config.guess src/config.guess
----- src.old/config.guess	2003-01-30 23:32:36.000000000 +0100
--+++ src/config.guess	2003-05-29 01:49:26.000000000 +0200
--@@ -3,7 +3,7 @@
-- #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-- #   2000, 2001, 2002, 2003 Free Software Foundation, Inc.
-- 
---timestamp='2003-01-30'
--+timestamp='2003-02-22'
-- 
-- # This file is free software; you can redistribute it and/or modify it
-- # under the terms of the GNU General Public License as published by
--@@ -235,9 +235,6 @@
--     *:OpenBSD:*:*)
-- 	echo ${UNAME_MACHINE}-unknown-openbsd${UNAME_RELEASE}
-- 	exit 0 ;;
---    *:MicroBSD:*:*)
---	echo ${UNAME_MACHINE}-unknown-microbsd${UNAME_RELEASE}
---	exit 0 ;;
--     alpha:OSF1:*:*)
-- 	if test $UNAME_RELEASE = "V4.0"; then
-- 		UNAME_RELEASE=`/usr/sbin/sizer -v | awk '{print $3}'`
--@@ -747,7 +744,7 @@
--     *:BSD/OS:*:*)
-- 	echo ${UNAME_MACHINE}-unknown-bsdi${UNAME_RELEASE}
-- 	exit 0 ;;
---    *:FreeBSD:*:*)
--+    *:FreeBSD:*:*|*:GNU/FreeBSD:*:*)
-- 	# Determine whether the default compiler uses glibc.
-- 	eval $set_cc_for_build
-- 	sed 's/^	//' << EOF >$dummy.c
--diff -Nur src.old/config.sub src/config.sub
----- src.old/config.sub	2003-01-30 23:32:36.000000000 +0100
--+++ src/config.sub	2003-05-29 01:49:26.000000000 +0200
--@@ -3,7 +3,7 @@
-- #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-- #   2000, 2001, 2002, 2003 Free Software Foundation, Inc.
-- 
---timestamp='2003-01-28'
--+timestamp='2003-02-22'
-- 
-- # This file is (in principle) common to ALL GNU software.
-- # The presence of a machine in this file suggests that SOME GNU software
--@@ -296,7 +296,7 @@
-- 	| arm-*  | armbe-* | armle-* | armeb-* | armv*-* \
-- 	| avr-* \
-- 	| bs2000-* \
---	| c[123]* | c30-* | [cjt]90-* | c4x-* | c54x-* \
--+	| c[123]* | c30-* | [cjt]90-* | c4x-* | c54x-* | c55x-* | c6x-* \
-- 	| clipper-* | cydra-* \
-- 	| d10v-* | d30v-* | dlx-* \
-- 	| elxsi-* \
--@@ -333,7 +333,9 @@
-- 	| shle-* | sh[1234]le-* | sh3ele-* | sh64-* | sh64le-* \
-- 	| sparc-* | sparc64-* | sparc86x-* | sparclet-* | sparclite-* \
-- 	| sparcv9-* | sparcv9b-* | strongarm-* | sv1-* | sx?-* \
---	| tahoe-* | thumb-* | tic30-* | tic4x-* | tic54x-* | tic80-* | tron-* \
--+	| tahoe-* | thumb-* \
--+	| tic30-* | tic4x-* | tic54x-* | tic55x-* | tic6x-* | tic80-* \
--+	| tron-* \
-- 	| v850-* | v850e-* | vax-* \
-- 	| we32k-* \
-- 	| x86-* | x86_64-* | xps100-* | xscale-* | xstormy16-* \
--@@ -925,6 +927,14 @@
-- 		basic_machine=tic54x-unknown
-- 		os=-coff
-- 		;;
--+	tic55x | c55x*)
--+		basic_machine=tic55x-unknown
--+		os=-coff
--+		;;
--+	tic6x | c6x*)
--+		basic_machine=tic6x-unknown
--+		os=-coff
--+		;;
-- 	tx39)
-- 		basic_machine=mipstx39-unknown
-- 		;;
--@@ -1118,7 +1128,7 @@
-- 	      | -storm-chaos* | -tops10* | -tenex* | -tops20* | -its* \
-- 	      | -os2* | -vos* | -palmos* | -uclinux* | -nucleus* \
-- 	      | -morphos* | -superux* | -rtmk* | -rtmk-nova* | -windiss* \
---	      | -powermax* | -dnix* | -microbsd*)
--+	      | -powermax* | -dnix*)
-- 	# Remember, each alternative MUST END IN *, to match a version number.
-- 		;;
-- 	-qnx*)
--@@ -1230,6 +1240,9 @@
-- 	-aros*)
-- 		os=-aros
-- 		;;
--+	-kaos*)
--+		os=-kaos
--+		;;
-- 	-none)
-- 		;;
-- 	*)
--diff -Nur src.old/configure.in src/configure.in
----- src.old/configure.in	2003-05-29 01:43:27.000000000 +0200
--+++ src/configure.in	2003-05-29 01:49:26.000000000 +0200
--@@ -363,7 +363,7 @@
--   alpha*-*-*)
--     target_makefile_frag="${target_makefile_frag} config/mt-alphaieee"
--     ;;
---  *-*-linux*)
--+  *-*-linux* | *-*-freebsd*-gnu*)
--     target_makefile_frag="${target_makefile_frag} config/mt-linux"
--     ;;
--   *-*-aix4.[3456789]* | *-*-aix[56789].*)
--diff -Nur src.old/gcc/config/alpha/freebsdgnu.h src/gcc/config/alpha/freebsdgnu.h
----- src.old/gcc/config/alpha/freebsdgnu.h	1970-01-01 01:00:00.000000000 +0100
--+++ src/gcc/config/alpha/freebsdgnu.h	2003-05-29 01:49:26.000000000 +0200
--@@ -0,0 +1,39 @@
--+/* Definitions for Alpha running FreeBSD-based GNU systems with ELF format.
--+   Copyright (C) 2002 Free Software Foundation, Inc.
--+   Contributed by Bruno Haible.
--+
--+This file is part of GNU CC.
--+
--+GNU CC is free software; you can redistribute it and/or modify
--+it under the terms of the GNU General Public License as published by
--+the Free Software Foundation; either version 2, or (at your option)
--+any later version.
--+
--+GNU CC is distributed in the hope that it will be useful,
--+but WITHOUT ANY WARRANTY; without even the implied warranty of
--+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--+GNU General Public License for more details.
--+
--+You should have received a copy of the GNU General Public License
--+along with GNU CC; see the file COPYING.  If not, write to
--+the Free Software Foundation, 59 Temple Place - Suite 330,
--+Boston, MA 02111-1307, USA.  */
--+
--+#undef TARGET_VERSION
--+#define TARGET_VERSION fprintf (stderr, " (Alpha FreeBSD/ELF)");
--+
--+/* FIXME: Is a FreeBSD-specific fallback mechanism necessary?  */
--+#undef MD_FALLBACK_FRAME_STATE_FOR
--+
--+#undef ELF_DYNAMIC_LINKER
--+#define ELF_DYNAMIC_LINKER "/lib/ld.so.1"
--+
--+#undef LINK_SPEC
--+#define LINK_SPEC "-m elf64alpha_fbsd %{G*} %{relax:-relax}	\
--+  %{O*:-O3} %{!O*:-O1}						\
--+  %{shared:-shared}						\
--+  %{!shared:							\
--+    %{!static:							\
--+      %{rdynamic:-export-dynamic}				\
--+      %{!dynamic-linker:-dynamic-linker %(elf_dynamic_linker)}}	\
--+    %{static:-static}}"
--diff -Nur src.old/gcc/config/freebsdgnu.h src/gcc/config/freebsdgnu.h
----- src.old/gcc/config/freebsdgnu.h	1970-01-01 01:00:00.000000000 +0100
--+++ src/gcc/config/freebsdgnu.h	2003-05-29 01:50:29.000000000 +0200
--@@ -0,0 +1,26 @@
--+/* Definitions for FreeBSD-based GNU systems with ELF format.
--+   Copyright (C) 2002 Free Software Foundation, Inc.
--+   Contributed by Bruno Haible.
--+
--+This file is part of GNU CC.
--+
--+GNU CC is free software; you can redistribute it and/or modify
--+it under the terms of the GNU General Public License as published by
--+the Free Software Foundation; either version 2, or (at your option)
--+any later version.
--+
--+GNU CC is distributed in the hope that it will be useful,
--+but WITHOUT ANY WARRANTY; without even the implied warranty of
--+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--+GNU General Public License for more details.
--+
--+You should have received a copy of the GNU General Public License
--+along with GNU CC; see the file COPYING.  If not, write to
--+the Free Software Foundation, 59 Temple Place - Suite 330,
--+Boston, MA 02111-1307, USA.  */
--+
--+#undef WCHAR_TYPE
--+#define WCHAR_TYPE "int"
--+
--+#undef CPP_PREDEFINES
--+#define CPP_PREDEFINES "-D__GNU_FreeBSD__=4 -D__ELF__ -Dunix -D__gnu_freebsd__ -Asystem=posix"
--diff -Nur src.old/gcc/config/i386/freebsdgnu.h src/gcc/config/i386/freebsdgnu.h
----- src.old/gcc/config/i386/freebsdgnu.h	1970-01-01 01:00:00.000000000 +0100
--+++ src/gcc/config/i386/freebsdgnu.h	2003-05-29 01:49:26.000000000 +0200
--@@ -0,0 +1,35 @@
--+/* Definitions for Intel 386 running FreeBSD-based GNU systems with ELF format.
--+   Copyright (C) 2002 Free Software Foundation, Inc.
--+   Contributed by Bruno Haible.
--+
--+This file is part of GNU CC.
--+
--+GNU CC is free software; you can redistribute it and/or modify
--+it under the terms of the GNU General Public License as published by
--+the Free Software Foundation; either version 2, or (at your option)
--+any later version.
--+
--+GNU CC is distributed in the hope that it will be useful,
--+but WITHOUT ANY WARRANTY; without even the implied warranty of
--+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--+GNU General Public License for more details.
--+
--+You should have received a copy of the GNU General Public License
--+along with GNU CC; see the file COPYING.  If not, write to
--+the Free Software Foundation, 59 Temple Place - Suite 330,
--+Boston, MA 02111-1307, USA.  */
--+
--+#undef TARGET_VERSION
--+#define TARGET_VERSION fprintf (stderr, " (i386 FreeBSD/ELF)");
--+
--+/* FIXME: Is a FreeBSD-specific fallback mechanism necessary?  */
--+#undef MD_FALLBACK_FRAME_STATE_FOR
--+
--+#undef LINK_SPEC
--+#define LINK_SPEC "-m elf_i386_fbsd %{shared:-shared} \
--+  %{!shared: \
--+    %{!ibcs: \
--+      %{!static: \
--+	%{rdynamic:-export-dynamic} \
--+	%{!dynamic-linker:-dynamic-linker /lib/ld.so.1}} \
--+	%{static:-static}}}"
--diff -Nur src.old/gcc/config/t-freebsd-gnu src/gcc/config/t-freebsd-gnu
----- src.old/gcc/config/t-freebsd-gnu	1970-01-01 01:00:00.000000000 +0100
--+++ src/gcc/config/t-freebsd-gnu	2003-05-29 01:49:26.000000000 +0200
--@@ -0,0 +1,19 @@
--+# Don't run fixproto
--+STMP_FIXPROTO =
--+
--+# glibc provides a limits.h, which must be combined with gcc's limits.h.
--+LIMITS_H_TEST = true
--+
--+# Compile crtbeginS.o and crtendS.o with pic.
--+CRTSTUFF_T_CFLAGS_S = -fPIC
--+# Compile libgcc2.a with pic.
--+TARGET_LIBGCC2_CFLAGS = -fPIC
--+
--+# Override t-slibgcc-elf-ver to export some libgcc symbols with
--+# the symbol versions that glibc used.
--+SHLIB_MAPFILES += $(srcdir)/config/libgcc-glibc.ver
--+
--+# Use unwind-dw2-fde-glibc
--+LIB2ADDEH = $(srcdir)/unwind-dw2.c $(srcdir)/unwind-dw2-fde-glibc.c \
--+  $(srcdir)/unwind-sjlj.c
--+LIB2ADDEHDEP = unwind.inc unwind-dw2-fde.h unwind-dw2-fde.c
--diff -Nur src.old/gcc/config.gcc src/gcc/config.gcc
----- src.old/gcc/config.gcc	2003-02-28 19:38:19.000000000 +0100
--+++ src/gcc/config.gcc	2003-05-29 01:49:26.000000000 +0200
--@@ -361,7 +361,8 @@
-- 	;;
-- esac
-- 
---# Common parts for GNU/Linux, GNU/Hurd, OpenBSD, NetBSD, and FreeBSD systems.
--+# Common parts for GNU/Linux, GNU/Hurd, GNU/FreeBSD, OpenBSD, NetBSD, and
--+# FreeBSD systems.
-- case $machine in
-- *-*-linux*)
-- 	xm_defines=POSIX
--@@ -376,6 +377,14 @@
-- 		;;
-- 	esac
-- 	;;
--+*-*-freebsd*-gnu*)
--+	xm_defines=POSIX
--+	# GNU/FreeBSD uses ELF.
--+	elf=yes
--+	# GNU tools are the only tools.
--+	gnu_ld=yes
--+	gas=yes
--+	;;
-- *-*-gnu*)
-- 	# On the Hurd, the setup is just about the same on
-- 	# each different CPU.  The specific machines that we
--@@ -569,6 +578,16 @@
-- 	extra_parts="crtbegin.o crtend.o crtbeginS.o crtendS.o crtbeginT.o"
-- 	gas=yes gnu_ld=yes
-- 	;;
--+alpha*-*-freebsd*-gnu*)
--+	tm_file="${tm_file} alpha/elf.h alpha/linux.h alpha/linux-elf.h freebsdgnu.h alpha/freebsdgnu.h"
--+	target_cpu_default="MASK_GAS"
--+	tmake_file="t-slibgcc-elf-ver t-freebsd-gnu alpha/t-crtfm alpha/t-alpha alpha/t-ieee"
--+	extra_parts="crtbegin.o crtend.o crtbeginS.o crtendS.o crtbeginT.o"
--+	gas=yes gnu_ld=yes
--+	if test x$enable_threads = xyes; then
--+	  thread_file='posix'
--+	fi
--+	;;
-- alpha*-*-freebsd*)
-- 	tm_file="${tm_file} ${fbsd_tm_file} alpha/elf.h alpha/freebsd.h"
-- 	target_cpu_default="MASK_GAS"
--@@ -1239,6 +1258,15 @@
-- # Next line turned off because both 386BSD and BSD/386 use GNU ld.
-- #	use_collect2=yes
-- 	;;
--+i[34567]86-*-freebsd*-gnu*) # i386 running FreeBSD with ELF format using glibc2
--+	tm_file="${tm_file} i386/att.h dbxelf.h elfos.h svr4.h linux.h i386/linux.h freebsdgnu.h i386/freebsdgnu.h"
--+	tmake_file="t-slibgcc-elf-ver t-freebsd-gnu i386/t-crtstuff"
--+	extra_parts="crtbegin.o crtbeginS.o crtbeginT.o crtend.o crtendS.o"
--+	float_format=i386
--+	if test x$enable_threads = xyes; then
--+	  thread_file='posix'
--+	fi
--+	;;
-- i[34567]86-*-freebsd[12] | i[34567]86-*-freebsd[12].* | i[34567]86-*-freebsd*aout*)
-- 	tm_file=i386/freebsd-aout.h
-- 	tmake_file=t-freebsd
--diff -Nur src.old/gcc/cppfiles.c src/gcc/cppfiles.c
----- src.old/gcc/cppfiles.c	2002-08-15 21:46:35.000000000 +0200
--+++ src/gcc/cppfiles.c	2003-05-29 01:49:26.000000000 +0200
--@@ -193,11 +193,13 @@
--      cpp_reader *pfile;
--      const char *fname;
-- {
--+  int saved_errno;
--   splay_tree_node node;
--   struct include_file *file;
--   char *name = xstrdup (fname);
-- 
--   _cpp_simplify_pathname (name);
--+  saved_errno = errno;
--   node = splay_tree_lookup (pfile->all_include_files, (splay_tree_key) name);
--   if (node)
--     free (name);
--@@ -205,7 +207,7 @@
--     {
--       file = xcnew (struct include_file);
--       file->name = name;
---      file->err_no = errno;
--+      file->err_no = saved_errno;
--       node = splay_tree_insert (pfile->all_include_files,
-- 				(splay_tree_key) file->name,
-- 				(splay_tree_value) file);
--diff -Nur src.old/gcc/ginclude/stddef.h src/gcc/ginclude/stddef.h
----- src.old/gcc/ginclude/stddef.h	2003-01-28 13:41:52.000000000 +0100
--+++ src/gcc/ginclude/stddef.h	2003-05-29 01:49:26.000000000 +0200
--@@ -53,11 +53,11 @@
-- 
-- /* On 4.3bsd-net2, make sure ansi.h is included, so we have
--    one less case to deal with in the following.  */
---#if defined (__BSD_NET2__) || defined (____386BSD____) || (defined (__FreeBSD__) && (__FreeBSD__ < 5)) || defined(__NetBSD__)
--+#if defined (__BSD_NET2__) || defined (____386BSD____) || (defined (__FreeBSD__) && (__FreeBSD__ < 5) && !defined(__gnu_freebsd__)) || defined(__NetBSD__)
-- #include <machine/ansi.h>
-- #endif
-- /* On FreeBSD 5, machine/ansi.h does not exist anymore... */
---#if defined (__FreeBSD__) && (__FreeBSD__ >= 5)
--+#if defined (__FreeBSD__) && (__FreeBSD__ >= 5) && !defined (__gnu_freebsd__)
-- #include <sys/_types.h>
-- #endif
-- 
--diff -Nur src.old/libjava/configure src/libjava/configure
----- src.old/libjava/configure	2003-04-22 08:56:18.000000000 +0200
--+++ src/libjava/configure	2003-05-29 01:49:26.000000000 +0200
--@@ -3207,6 +3207,11 @@
--      *-*-cygwin*)
-- 	# Don't set THREADLIBS here.  Cygwin doesn't have -lpthread.
-- 	;;
--+     *-*-freebsd*-gnu*)
--+	# FreeBSD with glibc has -lpthread.
--+	THREADLIBS=-lpthread
--+	THREADSPEC=-lpthread
--+	;;
--    
--      *-*-freebsd[1234]*)
--    
--diff -Nur src.old/libjava/configure.in src/libjava/configure.in
----- src.old/libjava/configure.in	2003-01-28 02:44:39.000000000 +0100
--+++ src/libjava/configure.in	2003-05-29 01:49:26.000000000 +0200
--@@ -375,6 +375,11 @@
--      *-*-cygwin*)
-- 	# Don't set THREADLIBS here.  Cygwin doesn't have -lpthread.
-- 	;;
--+     *-*-freebsd*-gnu*)
--+	# FreeBSD with glibc has -lpthread.
--+	THREADLIBS=-lpthread
--+	THREADSPEC=-lpthread
--+	;;
-- changequote(<<,>>)   
--      *-*-freebsd[1234]*)
-- changequote([,])   
--diff -Nur src.old/libstdc++-v3/acinclude.m4 src/libstdc++-v3/acinclude.m4
----- src.old/libstdc++-v3/acinclude.m4	2003-01-27 18:30:41.000000000 +0100
--+++ src/libstdc++-v3/acinclude.m4	2003-05-29 01:49:26.000000000 +0200
--@@ -1164,7 +1164,7 @@
--   dnl Default to "generic"
--   if test x$enable_clocale_flag = xno; then
--     case x${target_os} in
---      xlinux* | xgnu*)
--+      xlinux* | xgnu* | xfreebsd*-gnu*)
-- 	AC_EGREP_CPP([_GLIBCPP_ok], [
--         #include <features.h>
--         #if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2) 
--@@ -1356,7 +1356,7 @@
--       # compile most of libio for linux systems.
--       if test x$has_libio = x"yes"; then
--         case "$target" in
---          *-*-linux*)
--+          *-*-linux* | *-*-freebsd*-gnu*)
--               AC_MSG_CHECKING([for glibc version >= 2.2])
--               AC_EGREP_CPP([ok], [
--             #include <features.h>
--diff -Nur src.old/libstdc++-v3/aclocal.m4 src/libstdc++-v3/aclocal.m4
----- src.old/libstdc++-v3/aclocal.m4	2003-05-29 01:43:31.000000000 +0200
--+++ src/libstdc++-v3/aclocal.m4	2003-05-29 01:49:26.000000000 +0200
--@@ -1176,7 +1176,7 @@
--   dnl Default to "generic"
--   if test x$enable_clocale_flag = xno; then
--     case x${target_os} in
---      xlinux* | xgnu*)
--+      xlinux* | xgnu* | xfreebsd*-gnu*)
-- 	AC_EGREP_CPP([_GLIBCPP_ok], [
--         #include <features.h>
--         #if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2) 
--@@ -1368,7 +1368,7 @@
--       # compile most of libio for linux systems.
--       if test x$has_libio = x"yes"; then
--         case "$target" in
---          *-*-linux*)
--+          *-*-linux* | *-*-freebsd*-gnu*)
--               AC_MSG_CHECKING([for glibc version >= 2.2])
--               AC_EGREP_CPP([ok], [
--             #include <features.h>
--diff -Nur src.old/libstdc++-v3/config/locale/gnu/c_locale.cc src/libstdc++-v3/config/locale/gnu/c_locale.cc
----- src.old/libstdc++-v3/config/locale/gnu/c_locale.cc	2002-10-17 04:04:14.000000000 +0200
--+++ src/libstdc++-v3/config/locale/gnu/c_locale.cc	2003-05-29 01:49:26.000000000 +0200
--@@ -40,6 +40,17 @@
-- 
-- namespace std 
-- {
--+  extern "C" __typeof (strtol_l) __strtol_l;
--+  extern "C" __typeof (strtoul_l) __strtoul_l;
--+  extern "C" __typeof (strtoll_l) __strtoll_l;
--+  extern "C" __typeof (strtoull_l) __strtoull_l;
--+  extern "C" __typeof (strtof_l) __strtof_l;
--+  extern "C" __typeof (strtod_l) __strtod_l;
--+  extern "C" __typeof (strtold_l) __strtold_l;
--+  extern "C" __typeof (newlocale) __newlocale;
--+  extern "C" __typeof (freelocale) __freelocale;
--+  extern "C" __typeof (duplocale) __duplocale;
--+
--   template<>
--     void
--     __convert_to_v(const char* __s, long& __v, ios_base::iostate& __err, 
--diff -Nur src.old/libstdc++-v3/config/locale/gnu/collate_members.cc src/libstdc++-v3/config/locale/gnu/collate_members.cc
----- src.old/libstdc++-v3/config/locale/gnu/collate_members.cc	2002-09-05 09:45:11.000000000 +0200
--+++ src/libstdc++-v3/config/locale/gnu/collate_members.cc	2003-05-29 01:49:26.000000000 +0200
--@@ -38,6 +38,11 @@
-- 
-- namespace std
-- {
--+  extern "C" __typeof (strcoll_l) __strcoll_l;
--+  extern "C" __typeof (strxfrm_l) __strxfrm_l;
--+  extern "C" __typeof (wcscoll_l) __wcscoll_l;
--+  extern "C" __typeof (wcsxfrm_l) __wcsxfrm_l;
--+
--   // These are basically extensions to char_traits, and perhaps should
--   // be put there instead of here.
--   template<>
--diff -Nur src.old/libstdc++-v3/config/locale/gnu/ctype_members.cc src/libstdc++-v3/config/locale/gnu/ctype_members.cc
----- src.old/libstdc++-v3/config/locale/gnu/ctype_members.cc	2002-10-17 04:04:14.000000000 +0200
--+++ src/libstdc++-v3/config/locale/gnu/ctype_members.cc	2003-05-29 01:49:26.000000000 +0200
--@@ -38,6 +38,11 @@
-- 
-- namespace std
-- {
--+  extern "C" __typeof (wctype_l) __wctype_l;
--+  extern "C" __typeof (towupper_l) __towupper_l;
--+  extern "C" __typeof (towlower_l) __towlower_l;
--+  extern "C" __typeof (iswctype_l) __iswctype_l;
--+
--   // NB: The other ctype<char> specializations are in src/locale.cc and
--   // various /config/os/* files.
--   template<>
--diff -Nur src.old/libstdc++-v3/config/locale/gnu/messages_members.cc src/libstdc++-v3/config/locale/gnu/messages_members.cc
----- src.old/libstdc++-v3/config/locale/gnu/messages_members.cc	2002-09-05 09:45:11.000000000 +0200
--+++ src/libstdc++-v3/config/locale/gnu/messages_members.cc	2003-05-29 01:49:26.000000000 +0200
--@@ -38,6 +38,7 @@
-- 
-- namespace std
-- {
--+  extern "C" __typeof (uselocale) __uselocale;
--   // Specializations.
--   template<>
--     string
--diff -Nur src.old/libstdc++-v3/config/locale/gnu/messages_members.h src/libstdc++-v3/config/locale/gnu/messages_members.h
----- src.old/libstdc++-v3/config/locale/gnu/messages_members.h	2003-01-07 04:43:59.000000000 +0100
--+++ src/libstdc++-v3/config/locale/gnu/messages_members.h	2003-05-29 01:49:26.000000000 +0200
--@@ -33,6 +33,8 @@
-- 
-- // Written by Benjamin Kosnik <bkoz@redhat.com>
-- 
--+  extern "C" __typeof (uselocale) __uselocale;
--+
--   // Non-virtual member functions.
--   template<typename _CharT>
--      messages<_CharT>::messages(size_t __refs)
--diff -Nur src.old/libstdc++-v3/config/locale/gnu/monetary_members.cc src/libstdc++-v3/config/locale/gnu/monetary_members.cc
----- src.old/libstdc++-v3/config/locale/gnu/monetary_members.cc	2002-10-17 04:04:14.000000000 +0200
--+++ src/libstdc++-v3/config/locale/gnu/monetary_members.cc	2003-05-29 01:49:26.000000000 +0200
--@@ -38,6 +38,8 @@
-- 
-- namespace std
-- {
--+  extern "C" __typeof (nl_langinfo_l) __nl_langinfo_l;
--+
--   // Construct and return valid pattern consisting of some combination of:
--   // space none symbol sign value
--   money_base::pattern
--diff -Nur src.old/libstdc++-v3/config/locale/gnu/numeric_members.cc src/libstdc++-v3/config/locale/gnu/numeric_members.cc
----- src.old/libstdc++-v3/config/locale/gnu/numeric_members.cc	2002-10-17 04:04:14.000000000 +0200
--+++ src/libstdc++-v3/config/locale/gnu/numeric_members.cc	2003-05-29 01:49:26.000000000 +0200
--@@ -38,6 +38,8 @@
-- 
-- namespace std
-- {
--+  extern "C" __typeof (nl_langinfo_l) __nl_langinfo_l;
--+
--   template<> 
--     void
--     numpunct<char>::_M_initialize_numpunct(__c_locale __cloc)
--diff -Nur src.old/libstdc++-v3/config/locale/gnu/time_members.cc src/libstdc++-v3/config/locale/gnu/time_members.cc
----- src.old/libstdc++-v3/config/locale/gnu/time_members.cc	2002-10-17 04:04:14.000000000 +0200
--+++ src/libstdc++-v3/config/locale/gnu/time_members.cc	2003-05-29 01:49:26.000000000 +0200
--@@ -39,6 +39,10 @@
-- 
-- namespace std
-- {
--+  extern "C" __typeof (strftime_l) __strftime_l;
--+  extern "C" __typeof (wcsftime_l) __wcsftime_l;
--+  extern "C" __typeof (nl_langinfo_l) __nl_langinfo_l;
--+
--   template<>
--     void
--     __timepunct<char>::
--diff -Nur src.old/libstdc++-v3/configure src/libstdc++-v3/configure
----- src.old/libstdc++-v3/configure	2003-05-29 01:43:32.000000000 +0200
--+++ src/libstdc++-v3/configure	2003-05-29 01:49:26.000000000 +0200
--@@ -2794,7 +2794,7 @@
--       # compile most of libio for linux systems.
--       if test x$has_libio = x"yes"; then
--         case "$target" in
---          *-*-linux*)
--+          *-*-linux* | *-*-freebsd*-gnu*)
--               echo $ac_n "checking for glibc version >= 2.2""... $ac_c" 1>&6
-- echo "configure:2800: checking for glibc version >= 2.2" >&5
--               cat > conftest.$ac_ext <<EOF
--@@ -2928,7 +2928,7 @@
-- 
--       if test x$enable_clocale_flag = xno; then
--     case x${target_os} in
---      xlinux* | xgnu*)
--+      xlinux* | xgnu* | xfreebsd*-gnu*)
-- 	cat > conftest.$ac_ext <<EOF
-- #line 2934 "configure"
-- #include "confdefs.h"
--diff -Nur src.old/libstdc++-v3/configure.target src/libstdc++-v3/configure.target
----- src.old/libstdc++-v3/configure.target	2002-09-06 20:32:08.000000000 +0200
--+++ src/libstdc++-v3/configure.target	2003-05-29 01:49:26.000000000 +0200
--@@ -80,6 +80,9 @@
--     os_include_dir="config/os/aix"
--     OPT_LDFLAGS="-Wl,-G"
--     ;;
--+  freebsd*-gnu*)
--+    os_include_dir="config/os/gnu-linux"
--+    ;;
--   bsd* | freebsd* )
--     os_include_dir="config/os/bsd/freebsd"
--     ;;
--diff -Nur src.old/ltconfig src/ltconfig
----- src.old/ltconfig	2001-09-01 02:47:19.000000000 +0200
--+++ src/ltconfig	2003-05-29 01:49:26.000000000 +0200
--@@ -1115,6 +1115,20 @@
--   dynamic_linker=no
--   ;;
-- 
--+freebsd*-gnu*)
--+  version_type=linux
--+  need_lib_prefix=no
--+  need_version=no
--+  library_names_spec='${libname}${release}.so$versuffix ${libname}${release}.so$major $libname.so'
--+  soname_spec='${libname}${release}.so$major'
--+  shlibpath_var=LD_LIBRARY_PATH
--+  shlibpath_overrides_runpath=no
--+  hardcode_into_libs=yes
--+  dynamic_linker='GNU ld.so'
--+  # Don't assume a particular installation location.
--+  sys_lib_search_path_spec=""
--+  ;;
--+
-- freebsd*)
--   objformat=`test -x /usr/bin/objformat && /usr/bin/objformat || echo aout`
--   version_type=freebsd-$objformat
 diff -Nur gcc-3.2-3.2.3ds9.old/debian/patches/kbsd-gnu.dpatch gcc-3.2-3.2.3ds9/debian/patches/kbsd-gnu.dpatch
 --- gcc-3.2-3.2.3ds9.old/debian/patches/kbsd-gnu.dpatch	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-3.2-3.2.3ds9/debian/patches/kbsd-gnu.dpatch	2004-09-16 09:40:18.000000000 +0200
-@@ -0,0 +1,341 @@
++++ gcc-3.2-3.2.3ds9/debian/patches/kbsd-gnu.dpatch	2004-09-17 12:21:00.000000000 +0200
+@@ -0,0 +1,362 @@
 +#! /bin/sh -e
 +
 +# All lines beginning with `# DPATCH:' are a description of the patch.
@@ -1586,9 +695,30 @@ diff -Nur gcc-3.2-3.2.3ds9.old/debian/patches/kbsd-gnu.dpatch gcc-3.2-3.2.3ds9/d
 +   template<>
 +     void
 +     __timepunct<char>::
++diff -ur gcc-3.2.3.old/gcc/ginclude/stddef.h gcc-3.2.3/gcc/ginclude/stddef.h
++--- gcc-3.2.3.old/gcc/ginclude/stddef.h	2003-01-28 13:41:52.000000000 +0100
+++++ gcc-3.2.3/gcc/ginclude/stddef.h	2004-09-16 08:01:38.000000000 +0200
++@@ -78,6 +78,8 @@
++ #define _WCHAR_T
++ #endif
++ #endif
+++#endif /* defined(_ANSI_H_) || defined(_MACHINE_ANSI_H_) */
+++
++ /* Undef _FOO_T_ if we are supposed to define foo_t.  */
++ #if defined (__need_ptrdiff_t) || defined (_STDDEF_H_)
++ #undef _PTRDIFF_T_
++@@ -91,7 +93,7 @@
++ #undef _WCHAR_T_
++ #undef _BSD_WCHAR_T_
++ #endif
++-#endif /* defined(_ANSI_H_) || defined(_MACHINE_ANSI_H_) */
+++
++ 
++ /* Sequent's header files use _PTRDIFF_T_ in some conflicting way.
++    Just ignore it.  */
 diff -Nur gcc-3.2-3.2.3ds9.old/debian/rules.conf gcc-3.2-3.2.3ds9/debian/rules.conf
---- gcc-3.2-3.2.3ds9.old/debian/rules.conf	2004-09-16 09:40:02.000000000 +0200
-+++ gcc-3.2-3.2.3ds9/debian/rules.conf	2004-09-16 09:40:18.000000000 +0200
+--- gcc-3.2-3.2.3ds9.old/debian/rules.conf	2004-09-17 10:59:19.000000000 +0200
++++ gcc-3.2-3.2.3ds9/debian/rules.conf	2004-09-17 10:59:37.000000000 +0200
 @@ -24,18 +24,18 @@
    ifeq ($(DEB_TARGET_GNU_SYSTEM),gnu)
      LIBC_DEP = libc0.3-dev
@@ -1614,8 +744,8 @@ diff -Nur gcc-3.2-3.2.3ds9.old/debian/rules.conf gcc-3.2-3.2.3ds9/debian/rules.c
  # The version number can be found in gcc/version.c e.g.
  # char *version_string = "2.95 19990710 (prerelease)";
 diff -Nur gcc-3.2-3.2.3ds9.old/debian/rules.defs gcc-3.2-3.2.3ds9/debian/rules.defs
---- gcc-3.2-3.2.3ds9.old/debian/rules.defs	2004-09-16 09:40:02.000000000 +0200
-+++ gcc-3.2-3.2.3ds9/debian/rules.defs	2004-09-16 09:40:18.000000000 +0200
+--- gcc-3.2-3.2.3ds9.old/debian/rules.defs	2004-09-17 10:59:19.000000000 +0200
++++ gcc-3.2-3.2.3ds9/debian/rules.defs	2004-09-17 11:00:59.000000000 +0200
 @@ -72,7 +72,7 @@
  # common things --------------------
  # build common packages, where package names don't differ in different
@@ -1643,21 +773,48 @@ diff -Nur gcc-3.2-3.2.3ds9.old/debian/rules.defs gcc-3.2-3.2.3ds9/debian/rules.d
  ifneq ($(DEB_TARGET_ARCH),i386)
    ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(no_cxa_archs)))
      with_cxa_atexit := disabled for architecture $(DEB_TARGET_ARCH)
+@@ -136,7 +136,7 @@
+ # Build all packages needed for Java development (gcj, libgcj-dev)
+ with_javadev := yes
+ 
+-no_java_archs := hppa hurd-i386 mips mipsel freebsd-i386 netbsd-i386
++no_java_archs := hppa hurd-i386 mips mipsel kfreebsd-i386 knetbsd-i386
+ ifneq ($(DEB_TARGET_ARCH),i386)
+   ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(no_java_archs)))
+     with_java := disabled for architecure $(DEB_TARGET_ARCH)
+@@ -167,7 +167,7 @@
+ # libffi -------------------
+ ifeq ($(with_common_libs),yes)
+   with_ffi := yes
+-  no_ffi_archs := hppa mips mipsel hurd-i386 freebsd-i386 netbsd-i386
++  no_ffi_archs := hppa mips mipsel hurd-i386 kfreebsd-i386 knetbsd-i386
+   ifneq ($(with_java),yes)
+     ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(no_ffi_archs)))
+       with_ffi := disabled for architecure $(DEB_TARGET_ARCH)
 @@ -248,7 +248,7 @@
  with_objcdev := yes
  
  # disable ObjC garbage collection library (needs libgc)
 -libgc_no_archs := avr freebsd-i386
-+libgc_no_archs := avr freebsd-i386 netbsd-i386
++libgc_no_archs := avr
  ifneq ($(DEB_TARGET_ARCH),i386)
    ifeq ($(DEB_TARGET_ARCH),$(findstring $(DEB_TARGET_ARCH),$(libgc_no_archs)))
      with_objc_gc := disabled for architecture $(DEB_TARGET_ARCH)
+@@ -271,7 +271,7 @@
+ # Ada --------------------
+ with_ada := yes
+ with_libgnat := no
+-ada_no_archs := arm hurd-i386 m68k freebsd-i386 netbsd-i386
++ada_no_archs := arm hurd-i386 m68k kfreebsd-i386 knetbsd-i386
+ ifneq ($(DEB_TARGET_ARCH),i386)
+   ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(ada_no_archs)))
+     with_ada := disabled for architecure $(DEB_TARGET_ARCH)
 @@ -292,7 +292,7 @@
  ifdef DEB_CROSS
    with_check := disabled for cross compiler package
  endif
 -check_no_archs := hurd-i386 mips mipsel freebsd-i386
-+check_no_archs := hurd-i386 mips mipsel freebsd-i386 netbsd-i386
++check_no_archs := hurd-i386 mips mipsel kfreebsd-i386 knetbsd-i386
  ifneq ($(DEB_TARGET_ARCH),i386)
    ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(check_no_archs)))
      with_check :=disabled for $(DEB_TARGET_ARCH)
@@ -1671,17 +828,17 @@ diff -Nur gcc-3.2-3.2.3ds9.old/debian/rules.defs gcc-3.2-3.2.3ds9/debian/rules.d
    ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(locale_no_archs)))
      force_gnu_locales := disabled for $(DEB_TARGET_ARCH)
 diff -Nur gcc-3.2-3.2.3ds9.old/debian/rules.parameters gcc-3.2-3.2.3ds9/debian/rules.parameters
---- gcc-3.2-3.2.3ds9.old/debian/rules.parameters	2004-09-16 09:40:02.000000000 +0200
-+++ gcc-3.2-3.2.3ds9/debian/rules.parameters	2004-09-16 09:40:18.000000000 +0200
+--- gcc-3.2-3.2.3ds9.old/debian/rules.parameters	2004-09-17 10:59:19.000000000 +0200
++++ gcc-3.2-3.2.3ds9/debian/rules.parameters	2004-09-17 13:46:18.000000000 +0200
 @@ -1,8 +1,8 @@
  # configuration parameters taken from upstream source files
  VER		:= 3.2.3
 -DPKGVER		:= 3.2.3-9
 -DEB_VERSION	:= 1:3.2.3-9
 -DEB_GPC_VERSION	:= 1:3.2.3.-9
-+DPKGVER		:= 3.2.3-9+kbsd.1
-+DEB_VERSION	:= 1:3.2.3-9+kbsd.1
-+DEB_GPC_VERSION	:= 1:3.2.3.-9+kbsd.1
++DPKGVER		:= 3.2.3-9+kbsd.2
++DEB_VERSION	:= 1:3.2.3-9+kbsd.2
++DEB_GPC_VERSION	:= 1:3.2.3.-9+kbsd.2
  DEB_SOVERSION	:= 1:3.2.3-0pre6
  GCC_SONAME	:= 1
  CXX_SONAME	:= 5
@@ -1692,8 +849,8 @@ diff -Nur gcc-3.2-3.2.3ds9.old/debian/rules.parameters gcc-3.2-3.2.3ds9/debian/r
 -LIBC_DEP		:= libc6-dev (>= 2.2.5-8)
 +LIBC_DEP		:= libc0.1-dev
 diff -Nur gcc-3.2-3.2.3ds9.old/debian/rules.patch gcc-3.2-3.2.3ds9/debian/rules.patch
---- gcc-3.2-3.2.3ds9.old/debian/rules.patch	2004-09-16 09:40:01.000000000 +0200
-+++ gcc-3.2-3.2.3ds9/debian/rules.patch	2004-09-16 09:40:18.000000000 +0200
+--- gcc-3.2-3.2.3ds9.old/debian/rules.patch	2004-09-17 10:59:19.000000000 +0200
++++ gcc-3.2-3.2.3ds9/debian/rules.patch	2004-09-17 10:59:37.000000000 +0200
 @@ -82,12 +82,11 @@
    endif
  endif
@@ -1712,8 +869,8 @@ diff -Nur gcc-3.2-3.2.3ds9.old/debian/rules.patch gcc-3.2-3.2.3ds9/debian/rules.
  
  debian_patches += reporting # applied after gcc-cvs-updates
 diff -Nur gcc-3.2-3.2.3ds9.old/debian/rules2 gcc-3.2-3.2.3ds9/debian/rules2
---- gcc-3.2-3.2.3ds9.old/debian/rules2	2004-09-16 09:40:02.000000000 +0200
-+++ gcc-3.2-3.2.3ds9/debian/rules2	2004-09-16 09:40:18.000000000 +0200
+--- gcc-3.2-3.2.3ds9.old/debian/rules2	2004-09-17 10:59:19.000000000 +0200
++++ gcc-3.2-3.2.3ds9/debian/rules2	2004-09-17 10:59:37.000000000 +0200
 @@ -72,9 +72,9 @@
  	--prefix=/$(PF) \
  	--mandir=/$(PF)/share/man \
