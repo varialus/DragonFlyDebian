@@ -1,0 +1,38 @@
+
+Status: it sucks. don't submit.
+
+--- cyrus-sasl2-2.1.18.old/debian/rules	2004-07-30 15:13:11.000000000 +0200
++++ cyrus-sasl2-2.1.18/debian/rules	2004-07-30 18:49:27.000000000 +0200
+@@ -18,6 +18,13 @@
+   include $(SCRIPT_DIR)/dpkg-arch.mk
+ endif
+ 
++ifeq ($(DEB_BUILD_GNU_SYSTEM),kfreebsd-gnu)
++DEB_BUILD_GNU_TYPE	= $(DEB_BUILD_GNU_CPU)-gnu
++endif
++ifeq ($(DEB_BUILD_GNU_SYSTEM),knetbsd-gnu)
++DEB_BUILD_GNU_TYPE	= $(DEB_BUILD_GNU_CPU)-gnu
++endif
++
+ 
+ AUTOTOOLS=rm -f acinclude.m4 aclocal.m4 config/config.sub \
+ 	config/config.guess config/ltmain.sh config/libtool.m4; \
+@@ -93,7 +100,7 @@
+ 	cd saslauthd; \
+ 	$(AUTOTOOLS); \
+ 	cd ..; \
+-	./configure --prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --with-saslauthd=/var/run/saslauthd --enable-login  --enable-auth-sasldb --with-ldap --enable-sql --enable-ntlm --enable-static --enable-alwaystrue --enable-krb4)
++	./configure --prefix=/usr --sysconfdir=/etc --mandir=/usr/share/man --with-saslauthd=/var/run/saslauthd --enable-login  --enable-auth-sasldb --with-ldap --enable-sql --enable-ntlm --enable-static --enable-alwaystrue --enable-krb4 $(DEB_BUILD_GNU_TYPE))
+ 
+ 	touch $@
+ 
+@@ -101,6 +108,9 @@
+ $(STAMP_DIR)/install-stamp: build
+ 	dh_testdir
+ 	cd $(BUILD_TREE) && $(MAKE) install DESTDIR=$(b)
++	# so this is ugly? really? don't tell me and send a f* patch
++	cd $(b) && set -x; for i in `find . -name $(DEB_BUILD_GNU_TYPE)-*` ; do \
++		mv $$i `echo $$i | sed "s/$(DEB_BUILD_GNU_TYPE)-//g"` ; done
+ 	cp $(BUILD_TREE)/lib/.libs/libsasl2.a $(b)/usr/lib/
+ 	cp $(BUILD_TREE)/saslauthd/testsaslauthd $(b)/usr/sbin/
+ 	cp $(BUILD_TREE)/utils/.libs/testsuite $(b)/usr/sbin/sasltestsuite
