@@ -3,42 +3,65 @@
 # $Id$
 #
 
-rm -f *~
+rm -f *~ src/*~
 rm -rf tmp out
 mkdir -p tmp out
 
 # pre-dependencies
-(cd src && gcc -Wall -static init.c -o ../tmp/init)
-if ! test -e boot.flp ; then
-  echo -n "boot.flp not found. You can get the upstream version from "
-  echo -n "ftp://ftp.freebsd.org/pub/FreeBSD/releases/"
-  echo -n "`uname -m`/`uname -r`/floppies/boot.flp"
+gcc -Wall -Isrc -c src/init.c -o tmp/init.o
+gcc -Wall -Isrc -c src/pmount.c -o tmp/pmount.o
+gcc -static tmp/init.o tmp/pmount.o -o tmp/init
+
+if ! test -e bin/boot.flp ; then
+  wget -c ftp://ftp.freebsd.org/pub/FreeBSD/releases/`uname -m`/`uname -r`/floppies/boot.flp \
+  -O bin/boot.flp
 fi
+cp bin/boot.flp tmp/
 
 # extract mfsroot
-mdconfig -a -t vnode -f boot.flp -u md0
+mdconfig -a -t vnode -f tmp/boot.flp -u md0
 mount /dev/md0 /mnt
 gunzip -c /mnt/mfsroot.gz > tmp/mfsroot
 umount /mnt
 mdconfig -d -u md0
 
-# insert init into mfsroot
+# mess with mfsroot
 mdconfig -a -t vnode -f tmp/mfsroot -u md0
 mount /dev/md0 /mnt
-rm -f /mnt/stand/sysinstall
+for i in /mnt/stand/etc/defaults/* ; do
+  dd if=/dev/zero of=$i bs=`stat -c%B $i` count=`stat -c%b $i`
+done
+rm -rf /mnt/stand/etc/defaults
+for i in /mnt/stand/etc/* /mnt/stand/help/* /mnt/modules/* ; do
+  dd if=/dev/zero of=$i bs=`stat -c%B $i` count=`stat -c%b $i`
+done
+rm -rf /mnt/stand/etc /mnt/stand/help /mnt/modules
+for i in /mnt/stand/* ; do
+  dd if=/dev/zero of=$i bs=`stat -c%B $i` count=`stat -c%b $i`
+done
+rm -rf /mnt/stand /mnt/modules
+
+mkdir /mnt/stand /mnt/boot/kernel
+cp bin/boot/kernel/cd9660.* /mnt/boot/kernel/
 install -m755 tmp/init /mnt/stand/sysinstall
+
 umount /mnt
 mdconfig -d -u md0
 
-# insert mfsroot
-mdconfig -a -t vnode -f boot.flp -u md0
+# mess with boot.flp
+mdconfig -a -t vnode -f tmp/boot.flp -u md0
 mount /dev/md0 /mnt
+for i in /mnt/mfsroot.gz /mnt/kernel.gz ; do
+  dd if=/dev/zero of=$i bs=`stat -c%B $i` count=`stat -c%b $i`
+done
 gzip -c9 tmp/mfsroot > /mnt/mfsroot.gz
-cp -a /mnt out/root
+gzip -c9 bin/boot/kernel/kernel > /mnt/kernel.gz
+cp -a /mnt tmp/root
 umount /mnt
 mdconfig -d -u md0
 
-cp boot.flp out/root/
-cp -a stand out/root/
+cp -a root/* tmp/root/
+cp tmp/boot.flp tmp/root/
 
-mkisofs -b boot.flp -c boot.catalog -o out/livecd.iso -r out/root
+mkisofs -b boot.flp -c boot.catalog -o tmp/livecd.iso -r tmp/root
+bzip2 -c9 tmp/livecd.iso > out/livecd.iso.bz2

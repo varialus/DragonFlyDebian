@@ -39,26 +39,26 @@
 #endif
 
 #include "uio.h"
-#include "mount.h"
-#include "/usr/src/kfreebsd-headers/isofs/cd9660/cd9660_mount.h"
+#include "mount.h" /* unmount */
 
 /* how about /dev/ttyv0 ? */
 #ifndef TTY
 #define TTY "/dev/console"
 #endif
 
-static char *device;
-static char *fstype;
-static char *init;
+extern int pmount (char *, char *, int, void *);
 
 int
-main ()
+main (int argc, char **argv)
 {
   size_t sz;
   int len;
-  struct iso_args iso;
   struct stat my_stat;
   struct iovec iov[4];
+
+  char *device;
+  char *fstype;
+  char *init;
 
   close (2); /* stderr */
   open (TTY, O_WRONLY);
@@ -127,19 +127,33 @@ main ()
 
   /* cd9660 mount */
   printf ("mount -t %s %s /mnt\n", fstype, device);
-  iso.fspec = device;
-  iso.flags = ISOFSMNT_EXTATT;
-  if (mount (fstype, "/mnt", MNT_RDONLY, &iso) == -1)
+  if (pmount (fstype, "/mnt", 0, (void *) device) != 0)
     {
-      fprintf (stderr, "mount failed: %s\n", strerror (errno));
+      fprintf (stderr, "pmount failed: %s\n", strerror (errno));
       goto init_abort;
     }
   free (device);
   free (fstype);
 
+  /* devfs mount */
+  iov[0].iov_base = "fstype";
+  iov[0].iov_len = sizeof("fstype");
+  iov[1].iov_base = "devfs";
+  iov[1].iov_len = strlen(iov[1].iov_base) + 1;;
+  iov[2].iov_base = "fspath";
+  iov[2].iov_len = sizeof("fspath");
+  iov[3].iov_base = "/mnt/dev";
+  iov[3].iov_len = sizeof("/mnt/dev");
+  printf ("mount -t devfs devfs /mnt/dev\n");
+  if (syscall (SYS_nmount, iov, 4, 0) == -1)
+    {
+      fprintf (stderr, "mount failed: %s\n", strerror (errno));
+      goto init_abort;
+    }
+
   /* chroot */
-  printf ("chroot /mnt/stand\n");
-  if (chroot ("/mnt/stand") == -1)
+  printf ("chroot /mnt/\n");
+  if (chroot ("/mnt/") == -1)
     {
       fprintf (stderr, "chroot() failed: %s\n", strerror (errno));
       goto init_abort;
@@ -151,24 +165,20 @@ main ()
       goto init_abort;
     }
 
-  /* devfs mount */
-  iov[0].iov_base = "fstype";
-  iov[0].iov_len = sizeof("fstype");
-  iov[1].iov_base = "devfs";
-  iov[1].iov_len = strlen(iov[1].iov_base) + 1;;
-  iov[2].iov_base = "fspath";
-  iov[2].iov_len = sizeof("fspath");
-  iov[3].iov_base = "/dev";
-  iov[3].iov_len = sizeof("/dev");
-  printf ("mount -t devfs devfs /dev\n");
-  if (syscall (SYS_nmount, iov, 4, 0) == -1)
-    {
-      fprintf (stderr, "mount failed: %s\n", strerror (errno));
-      goto init_abort;
-    }
+  /* fuck() off */
+  int pid = fork ();
 
-  printf ("executing %s\n", init);
-  execl (init, init, NULL);
+  if (pid > 0) while (1);
+
+  char *new_argv[2];
+  new_argv[0] = strdup (init);
+  new_argv[1] = NULL;
+
+  char *env[1];
+  env[0] = NULL;
+
+  printf ("process %d executing %s\n", getpid(), init);
+  syscall (SYS_execve, init, new_argv, env);
   fprintf (stderr, "execl() failed: %s\n", strerror (errno));
 
 init_abort:
