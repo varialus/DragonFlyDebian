@@ -1,18 +1,33 @@
-diff -ur arts-1.2.3.old/flow/bufferqueue.h arts-1.2.3/flow/bufferqueue.h
---- arts-1.2.3.old/flow/bufferqueue.h	2002-03-08 21:30:19.000000000 +0100
-+++ arts-1.2.3/flow/bufferqueue.h	2004-08-05 03:28:22.000000000 +0200
-@@ -10,6 +10,10 @@
+#!/bin/bash -e
+
+cp flow/bufferqueue.h{,.in}
+cp mcop/thread.h{,.in}
+cat $0 | patch -p1
+exit 0
+
+diff -ur arts-1.2.3.old/configure.in.in arts-1.2.3/configure.in.in
+--- arts-1.2.3.old/configure.in.in	2004-05-30 14:41:10.000000000 +0200
++++ arts-1.2.3/configure.in.in	2004-08-05 19:19:53.000000000 +0200
+@@ -740,4 +740,6 @@
+ dnl AC_OUTPUT(artsc/artsdsp)
+ dnl AC_OUTPUT(soundserver/artsversion-new.h)
+ dnl AC_OUTPUT(flow/gsl/gslconfig.h)
++dnl AC_OUTPUT(flow/bufferqueue.h)
++dnl AC_OUTPUT(mcop/thread.h)
+ 
+diff -ur arts-1.2.3.old/flow/bufferqueue.h.in arts-1.2.3/flow/bufferqueue.h.in
+--- arts-1.2.3.old/flow/bufferqueue.h.in	2004-08-05 19:18:09.000000000 +0200
++++ arts-1.2.3/flow/bufferqueue.h.in	2004-08-05 19:19:53.000000000 +0200
+@@ -10,6 +10,8 @@
  #ifndef _BUFFERQUEUE_H
  #define _BUFFERQUEUE_H
  
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++/* #undef HAVE_SEMAPHORE_H */
 +
  #include "thread.h"
  
  #define _DEFAULT_CHUNK_SIZE 4096
-@@ -67,27 +71,35 @@
+@@ -67,27 +69,35 @@
  	ByteBuffer bufs[_MAX_CHUNKS];
  	int rp;
  	int wp;
@@ -48,7 +63,7 @@ diff -ur arts-1.2.3.old/flow/bufferqueue.h arts-1.2.3/flow/bufferqueue.h
  	}
  
  	void write(void* data, int len);
-@@ -97,9 +109,30 @@
+@@ -97,9 +107,30 @@
  	ByteBuffer* waitProduced();
  	void consumed();
  
@@ -82,7 +97,7 @@ diff -ur arts-1.2.3.old/flow/bufferqueue.h arts-1.2.3/flow/bufferqueue.h
  	int maxChunks() const      { return _MAX_CHUNKS; }
  	int chunkSize() const      { return bufs[0].maxSize(); }
  	void clear()               { rp = wp = 0; semaReinit(); }
-@@ -113,34 +146,48 @@
+@@ -113,34 +144,48 @@
  
  inline void BufferQueue::write(void* data, int len)
  {
@@ -131,21 +146,19 @@ diff -ur arts-1.2.3.old/flow/bufferqueue.h arts-1.2.3/flow/bufferqueue.h
  }
  
  }
-diff -ur arts-1.2.3.old/mcop/thread.h arts-1.2.3/mcop/thread.h
---- arts-1.2.3.old/mcop/thread.h	2003-10-13 21:59:41.000000000 +0200
-+++ arts-1.2.3/mcop/thread.h	2004-08-05 03:28:22.000000000 +0200
-@@ -23,6 +23,10 @@
+diff -ur arts-1.2.3.old/mcop/thread.h.in arts-1.2.3/mcop/thread.h.in
+--- arts-1.2.3.old/mcop/thread.h.in	2004-08-05 19:17:59.000000000 +0200
++++ arts-1.2.3/mcop/thread.h.in	2004-08-05 19:19:53.000000000 +0200
+@@ -23,6 +23,8 @@
  #ifndef ARTS_MCOP_THREAD_H
  #define ARTS_MCOP_THREAD_H
  
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++/* #undef HAVE_SEMAPHORE_H */
 +
  /*
   * BC - Status (2002-03-08): SystemThreads, Thread, Mutex, ThreadCondition,
   * Semaphore
-@@ -78,7 +82,9 @@
+@@ -78,7 +80,9 @@
  	virtual Mutex_impl *createRecMutex_impl() = 0;
  	virtual Thread_impl *createThread_impl(Thread *thread) = 0;
  	virtual ThreadCondition_impl *createThreadCondition_impl() = 0;
@@ -155,7 +168,7 @@ diff -ur arts-1.2.3.old/mcop/thread.h arts-1.2.3/mcop/thread.h
  	virtual ~SystemThreads();
  
  	/**
-@@ -335,6 +341,7 @@
+@@ -335,6 +339,7 @@
  	}
  };
  
@@ -163,7 +176,7 @@ diff -ur arts-1.2.3.old/mcop/thread.h arts-1.2.3/mcop/thread.h
  class Semaphore {
  private:
  	Semaphore_impl *impl;
-@@ -367,6 +374,7 @@
+@@ -367,6 +372,7 @@
  		return impl->getValue();
  	}
  };
