@@ -1,0 +1,32 @@
+--- glibc-2.3/sysdeps/wordsize-32/divdi3.c.old	2003-05-08 15:06:04.000000000 +0000
++++ glibc-2.3/sysdeps/wordsize-32/divdi3.c	2003-05-08 15:06:52.000000000 +0000
+@@ -273,6 +273,7 @@
+   return ww.ll;
+ }
+ 
++#if 0
+ DWtype
+ __divdi3 (DWtype u, DWtype v)
+ {
+@@ -329,3 +330,4 @@
+   __udivmoddi4 (u, v, &w);
+   return w;
+ }
++#endif
+--- glibc-2.3/sysdeps/wordsize-32/lldiv.c.old	2003-05-08 15:13:29.000000000 +0000
++++ glibc-2.3/sysdeps/wordsize-32/lldiv.c	2003-05-08 15:13:13.000000000 +0000
+@@ -21,12 +21,14 @@
+ 
+ #include <inttypes.h>
+ 
++#if 0
+ #ifdef SHARED
+ /* This is an ugly trick.  We cause the C code generated for the code
+    in lldiv.c to use __divdi3_internal instead of __divdi3 by defining
+    an alias on the assembler level.  */
+ asm ("__divdi3 = __divdi3_internal");
+ #endif
++#endif
+ 
+ #include <sysdeps/generic/lldiv.c>
+ 

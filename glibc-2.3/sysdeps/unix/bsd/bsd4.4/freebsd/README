@@ -1,0 +1,144 @@
+This directory contains a port to FreeBSD.
+
+* What's the status of this port?
+* How to configure glibc for FreeBSD?
+* What are the changes between the include files of FreeBSD libc and glibc?
+* How to upgrade to a newer version of FreeBSD?
+
+
+                   What's the status of this port?
+                   ===============================
+
+See at http://www.haible.de/bruno/gnu-freebsd/
+
+
+                How to configure glibc for FreeBSD?
+                ===================================
+
+You need as prerequisites the binutils and gcc, with the patches found
+at http://www.haible.de/bruno/gnu-freebsd/
+
+Furthermore choose a kernel include file package that matches your kernel
+version, from http://www.haible.de/bruno/gnu-freebsd/kernel-include-x.y.tar.gz.
+Unpack it it glibc's directory, cd into it and run "./patchit". Then you
+specify this kernel include version through a configure option:
+   .../configure --enable-kernel-include=x.y
+
+Next, decide about the utmp implementation. There are two choices:
+  utmp-compat    Lets glibc use the same format for utmp and wtmp as FreeBSD
+                 libc. Recommended if you want to use glibc and FreeBSD libc
+                 on the same system.
+                 Configure option: --enable-compatible-utmp
+  utmp-utmpx     Lets glibc use the extended utmpx format for utmp and wtmp.
+                 This provides for better Linux source code compatibility.
+                 Configure option: --disable-compatible-utmp
+The default is --enable-compatible-utmp.
+
+
+    What are the changes between the include files of FreeBSD libc and glibc?
+    =========================================================================
+
+Note about <unistd.h>:
+This header file is cleaned up and more standard compliant than the original
+FreeBSD one.
+- async_daemon() doesn't even exist in FreeBSD libc.
+- des_cipher(), des_setkey(), setkey() are removed.
+- exect() is removed. Use execve() instead.
+- getgrouplist() declaration is moved to <grp.h>.
+- getmode(), setmode() are removed.
+- getresuid(), getresgid(), setresuid(), setresgid() are undeclared.
+- initgroups() declaration is moved to <grp.h>.
+- issetugid() is undeclared.
+- rcmd(), rresvport(), iruserok(), ruserok(), rcmd_af(), rresvport_af(),
+  iruserok_sa() declarations are moved to <netdb.h>.
+- mknod() declaration is moved to <sys/stat.h>.
+- mkstemps() is removed.
+- nfssvc() is removed.
+- rfork() declaration is moved to <sys/rfork.h>.
+- select() declaration is moved to <sys/select.h>.
+- setgroups() declaration is moved to <grp.h>.
+- setrgid(), setruid() are removed.
+- swapon() declaration is moved to <sys/swap.h>.
+- undelete() is undeclared.
+- unwhiteout() doesn't even exist in FreeBSD libc.
+- valloc() declaration is moved to <malloc.h>.
+
+Note about <dirent.h>:
+- opendir2() is removed.
+- getdents() is undeclared.
+
+Note about <grp.h>:
+- setgrent() return type changes from int to void.
+- setgrfile() doesn't even exist in FreeBSD libc.
+- setgroupent() is removed.
+
+sendfile() has been renamed to bsd_sendfile(), because it doesn't have
+the Linux sendfile() semantics.
+
+
+          How to upgrade to a newer version of FreeBSD?
+          =============================================
+
+For the most part, this consists in creating a new kernel-include-x.y
+package.
+
+The kernel-include directory has to be filled with a kernel version
+dependent add-on. This add-on consists of:
+  kernel-include/orig/      The original kernel include files, will be visible
+                            to programs compiled with -I/usr/include/kernel
+  kernel-include/patches/   Patches applying to these files
+  kernel-include/take       Copy /usr/src/sys into orig/
+  kernel-include/patchit    Apply the patches and create import/ and kernel/
+When applied, it generates the following directories
+  kernel-include/import/    The patched kernel includes that are visible to
+                            glibc and user programs
+
+Furthermore some files in glibc may need modifications:
+1)  sys/syscall.h
+    syscalls.list
+   by taking the differences of the old and new FreeBSD
+    /usr/src/sys/kern/syscalls.master
+    /usr/src/sys/kern/init_sysent.c
+    /usr/src/sys/sys/syscall.h
+    /usr/src/sys/sys/sysproto.h
+   and merging them into glibc. New system calls may require nontrivial
+   changes.
+2) Update glibc header              from new version of FreeBSD header
+    sys/ktrace.h                     /usr/src/sys/sys/ktrace.h
+    sys/mount.h                      /usr/src/sys/sys/mount.h
+    sys/mtio.h                       /usr/src/sys/sys/mtio.h
+    sys/ptrace.h                     /usr/src/sys/sys/ptrace.h
+    sys/rfork.h                      /usr/src/sys/sys/unistd.h
+    sys/ttydefaults.h                /usr/src/sys/sys/ttydefaults.h
+    sys/ucontext.h                   /usr/src/sys/sys/ucontext.h
+    bits/fcntl.h                     /usr/src/sys/sys/fcntl.h
+    bits/in.h                        /usr/src/sys/netinet/in.h
+    bits/ioctls.h                    /usr/src/sys/sys/ioctl.h
+                                     /usr/src/sys/sys/ioccom.h
+                                     /usr/src/sys/sys/ttycom.h
+                                     /usr/src/sys/sys/filio.h
+                                     /usr/src/sys/sys/sockio.h
+                                     /usr/src/sys/sys/ioctl_compat.h
+                                     /usr/src/sys/sys/ttydev.h
+    bits/mman.h                      /usr/src/sys/sys/mman.h
+    bits/poll.h                      /usr/src/sys/sys/poll.h
+    bits/resource.h                  /usr/src/sys/sys/resource.h
+    bits/sigaction.h                 /usr/src/sys/sys/signal.h
+    bits/siginfo.h                   /usr/src/sys/sys/signal.h
+    bits/socket.h                    /usr/src/sys/sys/socket.h
+    bits/stat.h                      /usr/src/sys/sys/stat.h
+    bits/stat16.h                    /usr/src/sys/sys/stat.h
+    bits/statfs.h                    /usr/src/sys/sys/mount.h
+    bits/termios.h                   /usr/src/sys/sys/termios.h
+    bits/uio.h                       /usr/src/sys/sys/uio.h
+    bits/waitflags.h                 /usr/src/sys/sys/wait.h
+    i386/sysarch.h                   /usr/src/sys/i386/include/sysarch.h
+    i386/sys/io.h                    /usr/src/sys/i386/include/sysarch.h
+    i386/sys/perm.h                  /usr/src/sys/i386/include/sysarch.h
+    i386/sys/vm86.h                  /usr/src/sys/i386/include/vm86.h
+    i386/bits/sigcontext.h           /usr/src/sys/i386/include/signal.h
+    i386/bits/mcontext.h             /usr/src/sys/i386/include/ucontext.h
+    i386/ucontext_i.h                /usr/src/sys/i386/include/ucontext.h
+    netinet/ip_icmp.h                /usr/src/sys/netinet/ip_icmp.h
+    netinet/ip_icmp.h                /usr/src/sys/netinet/ip_compat.h
+    netinet/tcp.h                    /usr/src/sys/netinet/tcp.h

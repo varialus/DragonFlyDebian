@@ -1,0 +1,81 @@
+diff -ur glibc-2.3/abi-tags glibc-2.3.new/abi-tags
+--- glibc-2.3/abi-tags	2002-09-21 02:28:19.000000000 +0200
++++ glibc-2.3.new/abi-tags	2003-07-22 23:36:55.000000000 +0200
+@@ -22,7 +22,7 @@
+ 
+ .*-sun-solaris2.*	2	2.0.0	# just an arbitrary value
+ 
+-.*-.*-freebsd.*-gnu.*	3	4.0.0	# earliest compatible kernel version
++.*-.*-kfreebsd.*-gnu	3	4.0.0	# earliest compatible kernel version
+ 
+ # There is no catch-all default here because every supported OS that uses
+ # ELF must have its own unique ABI tag.
+diff -ur glibc-2.3/configure glibc-2.3.new/configure
+--- glibc-2.3/configure	2003-07-22 23:36:14.000000000 +0200
++++ glibc-2.3.new/configure	2003-07-22 23:30:28.000000000 +0200
+@@ -942,7 +942,7 @@
+ host=`${CONFIG_SHELL-/bin/sh} $ac_config_sub $host_alias`
+ host_cpu=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
+ host_vendor=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
+-host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
++host_os=kfreebsd-gnu
+ echo "$ac_t""$host" 1>&6
+ 
+ 
+@@ -970,7 +970,7 @@
+ 
+ # Some configurations imply other options.
+ case "$host_os" in
+-gnu* | linux* | bsd4.4* | netbsd* | freebsd*)
++gnu* | linux* | bsd4.4* | netbsd* | freebsd* | k*bsd*-gnu)
+   # These systems always use GNU tools.
+   gnu_ld=yes gnu_as=yes ;;
+ esac
+@@ -978,7 +978,7 @@
+ # i586-linuxaout is mangled into i586-pc-linux-gnuaout
+ linux*ecoff* | linux*aout* | gnu*aout* | gnu*ecoff*)
+   ;;
+-gnu* | linux* | freebsd* | netbsd* | sysv4* | solaris2* | irix6*)
++gnu* | linux* | freebsd* | netbsd* | k*bsd*-gnu | sysv4* | solaris2* | irix6*)
+   # These systems (almost) always use the ELF format.
+   elf=yes
+   ;;
+@@ -1082,7 +1082,7 @@
+ case "$os" in
+ gnu*)
+   base_os=mach/hurd ;;
+-netbsd* | 386bsd* | freebsd* | bsdi*)
++netbsd* | 386bsd* | freebsd* | bsdi* | k*bsd*-gnu)
+   base_os=unix/bsd/bsd4.4 ;;
+ osf* | sunos* | ultrix* | newsos* | dynix* | *bsd*)
+   base_os=unix/bsd ;;
+diff -ur glibc-2.3/configure.in glibc-2.3.new/configure.in
+--- glibc-2.3/configure.in	2003-07-22 23:36:14.000000000 +0200
++++ glibc-2.3.new/configure.in	2003-07-22 23:01:28.000000000 +0200
+@@ -247,7 +247,7 @@
+ 
+ # Some configurations imply other options.
+ case "$host_os" in
+-gnu* | linux* | bsd4.4* | netbsd* | freebsd*)
++gnu* | linux* | bsd4.4* | netbsd* | freebsd* | k*bsd*-gnu)
+   # These systems always use GNU tools.
+   gnu_ld=yes gnu_as=yes ;;
+ esac
+@@ -255,7 +255,7 @@
+ # i586-linuxaout is mangled into i586-pc-linux-gnuaout
+ linux*ecoff* | linux*aout* | gnu*aout* | gnu*ecoff*)
+   ;;
+-gnu* | linux* | freebsd* | netbsd* | sysv4* | solaris2* | irix6*)
++gnu* | linux* | freebsd* | netbsd* | k*bsd*-gnu | sysv4* | solaris2* | irix6*)
+   # These systems (almost) always use the ELF format.
+   elf=yes
+   ;;
+@@ -360,7 +360,7 @@
+ case "$os" in
+ gnu*)
+   base_os=mach/hurd ;;
+-netbsd* | 386bsd* | freebsd* | bsdi*)
++netbsd* | 386bsd* | freebsd* | bsdi* | k*bsd*-gnu)
+   base_os=unix/bsd/bsd4.4 ;;
+ osf* | sunos* | ultrix* | newsos* | dynix* | *bsd*)
+   base_os=unix/bsd ;;

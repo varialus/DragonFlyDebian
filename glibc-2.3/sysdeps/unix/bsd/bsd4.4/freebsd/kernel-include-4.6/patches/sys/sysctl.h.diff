@@ -1,0 +1,475 @@
+*** orig/sys/sysctl.h	Sun Mar 17 12:08:38 2002
+--- import/sys/sysctl.h	Tue Sep  3 10:57:15 2002
+***************
+*** 1,3 ****
+--- 1,21 ----
++ /* Copyright (C) 1996, 1999, 2002 Free Software Foundation, Inc.
++    This file is part of the GNU C Library.
++ 
++    The GNU C Library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++ 
++    The GNU C Library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++ 
++    You should have received a copy of the GNU Lesser General Public
++    License along with the GNU C Library; if not, write to the Free
++    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++    02111-1307 USA.  */
++ 
+  /*
+   * Copyright (c) 1989, 1993
+   *	The Regents of the University of California.  All rights reserved.
+***************
+*** 34,47 ****
+   * SUCH DAMAGE.
+   *
+   *	@(#)sysctl.h	8.1 (Berkeley) 6/2/93
+-  * $FreeBSD: src/sys/sys/sysctl.h,v 1.81.2.8 2002/03/17 11:08:38 alfred Exp $
+   */
+  
+! #ifndef _SYS_SYSCTL_H_
+! #define	_SYS_SYSCTL_H_
+  
+! #include <sys/_posix.h>
+! #include <sys/queue.h>
+  
+  /*
+   * Definitions for sysctl call.  The sysctl call uses a hierarchical name
+--- 52,63 ----
+   * SUCH DAMAGE.
+   *
+   *	@(#)sysctl.h	8.1 (Berkeley) 6/2/93
+   */
+  
+! #ifndef	_SYS_SYSCTL_H
+  
+! #define	_SYS_SYSCTL_H	1
+! #include <features.h>
+  
+  /*
+   * Definitions for sysctl call.  The sysctl call uses a hierarchical name
+***************
+*** 95,271 ****
+   */ 
+  #define OID_AUTO	(-1)
+  
+- #ifdef _KERNEL
+- #define SYSCTL_HANDLER_ARGS struct sysctl_oid *oidp, void *arg1, int arg2, \
+- 	struct sysctl_req *req
+- 
+- /*
+-  * This describes the access space for a sysctl request.  This is needed
+-  * so that we can use the interface from the kernel or from user-space.
+-  */
+- struct sysctl_req {
+- 	struct proc	*p;
+- 	int		lock;
+- 	void		*oldptr;
+- 	size_t		oldlen;
+- 	size_t		oldidx;
+- 	int		(*oldfunc)(struct sysctl_req *, const void *, size_t);
+- 	void		*newptr;
+- 	size_t		newlen;
+- 	size_t		newidx;
+- 	int		(*newfunc)(struct sysctl_req *, void *, size_t);
+- };
+- 
+- SLIST_HEAD(sysctl_oid_list, sysctl_oid);
+- 
+- /*
+-  * This describes one "oid" in the MIB tree.  Potentially more nodes can
+-  * be hidden behind it, expanded by the handler.
+-  */
+- struct sysctl_oid {
+- 	struct sysctl_oid_list *oid_parent;
+- 	SLIST_ENTRY(sysctl_oid) oid_link;
+- 	int		oid_number;
+- 	int		oid_kind;
+- 	void		*oid_arg1;
+- 	int		oid_arg2;
+- 	const char	*oid_name;
+- 	int 		(*oid_handler)(SYSCTL_HANDLER_ARGS);
+- 	const char	*oid_fmt;
+- 	int		oid_refcnt;
+- };
+- 
+- #define SYSCTL_IN(r, p, l) (r->newfunc)(r, p, l)
+- #define SYSCTL_OUT(r, p, l) (r->oldfunc)(r, p, l)
+- 
+- int sysctl_handle_int(SYSCTL_HANDLER_ARGS);
+- int sysctl_handle_long(SYSCTL_HANDLER_ARGS);
+- int sysctl_handle_intptr(SYSCTL_HANDLER_ARGS);
+- int sysctl_handle_string(SYSCTL_HANDLER_ARGS);
+- int sysctl_handle_opaque(SYSCTL_HANDLER_ARGS);
+- 
+- /*
+-  * These functions are used to add/remove an oid from the mib.
+-  */
+- void sysctl_register_oid(struct sysctl_oid *oidp);
+- void sysctl_unregister_oid(struct sysctl_oid *oidp);
+- 
+- /* Declare a static oid to allow child oids to be added to it. */
+- #define SYSCTL_DECL(name)					\
+- 	extern struct sysctl_oid_list sysctl_##name##_children
+- 
+- /* Hide these in macros */
+- #define	SYSCTL_CHILDREN(oid_ptr) (struct sysctl_oid_list *) \
+- 	(oid_ptr)->oid_arg1
+- #define	SYSCTL_STATIC_CHILDREN(oid_name) \
+- 	(&sysctl_##oid_name##_children)
+- 
+- /* === Structs and macros related to context handling === */
+- 
+- /* All dynamically created sysctls can be tracked in a context list. */
+- struct sysctl_ctx_entry {
+- 	struct sysctl_oid *entry;
+- 	TAILQ_ENTRY(sysctl_ctx_entry) link;
+- };
+- 
+- TAILQ_HEAD(sysctl_ctx_list, sysctl_ctx_entry);
+- 
+- /* This constructs a "raw" MIB oid. */
+- #define SYSCTL_OID(parent, nbr, name, kind, a1, a2, handler, fmt, descr) \
+- 	static struct sysctl_oid sysctl__##parent##_##name = {		 \
+- 		&sysctl_##parent##_children, { 0 },			 \
+- 		nbr, kind, a1, a2, #name, handler, fmt, 0 };		 \
+- 	DATA_SET(sysctl_set, sysctl__##parent##_##name);
+- 
+- #define SYSCTL_ADD_OID(ctx, parent, nbr, name, kind, a1, a2, handler, fmt, descr) \
+- 	sysctl_add_oid(ctx, parent, nbr, name, kind, a1, a2, handler, fmt, descr);
+- 
+- /* This constructs a node from which other oids can hang. */
+- #define SYSCTL_NODE(parent, nbr, name, access, handler, descr)		    \
+- 	struct sysctl_oid_list sysctl_##parent##_##name##_children;	    \
+- 	SYSCTL_OID(parent, nbr, name, CTLTYPE_NODE|access,		    \
+- 		   (void*)&sysctl_##parent##_##name##_children, 0, handler, \
+- 		   "N", descr);
+- 
+- #define SYSCTL_ADD_NODE(ctx, parent, nbr, name, access, handler, descr)	    \
+- 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_NODE|access,	    \
+- 	0, 0, handler, "N", descr);
+- 
+- /* Oid for a string.  len can be 0 to indicate '\0' termination. */
+- #define SYSCTL_STRING(parent, nbr, name, access, arg, len, descr) \
+- 	SYSCTL_OID(parent, nbr, name, CTLTYPE_STRING|access, \
+- 		arg, len, sysctl_handle_string, "A", descr)
+- 
+- #define SYSCTL_ADD_STRING(ctx, parent, nbr, name, access, arg, len, descr)  \
+- 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_STRING|access,	    \
+- 	arg, len, sysctl_handle_string, "A", descr);
+- 
+- /* Oid for an int.  If ptr is NULL, val is returned. */
+- #define SYSCTL_INT(parent, nbr, name, access, ptr, val, descr) \
+- 	SYSCTL_OID(parent, nbr, name, CTLTYPE_INT|access, \
+- 		ptr, val, sysctl_handle_int, "I", descr)
+- 
+- #define SYSCTL_ADD_INT(ctx, parent, nbr, name, access, ptr, val, descr)	    \
+- 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_INT|access,	    \
+- 	ptr, val, sysctl_handle_int, "I", descr);
+- 
+- /* Oid for an unsigned int.  If ptr is NULL, val is returned. */
+- #define SYSCTL_UINT(parent, nbr, name, access, ptr, val, descr) \
+- 	SYSCTL_OID(parent, nbr, name, CTLTYPE_UINT|access, \
+- 		ptr, val, sysctl_handle_int, "IU", descr)
+- 
+- #define SYSCTL_ADD_UINT(ctx, parent, nbr, name, access, ptr, val, descr)    \
+- 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_UINT|access,	    \
+- 	ptr, val, sysctl_handle_int, "IU", descr);
+- 
+- /* Oid for a long.  The pointer must be non NULL. */
+- #define SYSCTL_LONG(parent, nbr, name, access, ptr, val, descr) \
+- 	SYSCTL_OID(parent, nbr, name, CTLTYPE_LONG|access, \
+- 		ptr, val, sysctl_handle_long, "L", descr)
+- 
+- #define SYSCTL_ADD_LONG(ctx, parent, nbr, name, access, ptr, descr)	    \
+- 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_LONG|access,	    \
+- 	ptr, 0, sysctl_handle_long, "L", descr);
+- 
+- /* Oid for a long.  The pointer must be non NULL. */
+- #define SYSCTL_ULONG(parent, nbr, name, access, ptr, val, descr) \
+- 	SYSCTL_OID(parent, nbr, name, CTLTYPE_ULONG|access, \
+- 		ptr, val, sysctl_handle_long, "LU", descr)
+- 
+- #define SYSCTL_ADD_ULONG(ctx, parent, nbr, name, access, ptr, descr)	    \
+- 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_ULONG|access,	    \
+- 	ptr, 0, sysctl_handle_long, "LU", descr);
+- 
+- /* Oid for an opaque object.  Specified by a pointer and a length. */
+- #define SYSCTL_OPAQUE(parent, nbr, name, access, ptr, len, fmt, descr) \
+- 	SYSCTL_OID(parent, nbr, name, CTLTYPE_OPAQUE|access, \
+- 		ptr, len, sysctl_handle_opaque, fmt, descr)
+- 
+- #define SYSCTL_ADD_OPAQUE(ctx, parent, nbr, name, access, ptr, len, fmt, descr)\
+- 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_OPAQUE|access,	    \
+- 	ptr, len, sysctl_handle_opaque, fmt, descr);
+- 
+- /* Oid for a struct.  Specified by a pointer and a type. */
+- #define SYSCTL_STRUCT(parent, nbr, name, access, ptr, type, descr) \
+- 	SYSCTL_OID(parent, nbr, name, CTLTYPE_OPAQUE|access, \
+- 		ptr, sizeof(struct type), sysctl_handle_opaque, \
+- 		"S," #type, descr)
+- 
+- #define SYSCTL_ADD_STRUCT(ctx, parent, nbr, name, access, ptr, type, descr) \
+- 	sysctl_add_oid(ctx, parent, nbr, name, CTLTYPE_OPAQUE|access,	    \
+- 	ptr, sizeof(struct type), sysctl_handle_opaque, "S," #type, descr);
+- 
+- /* Oid for a procedure.  Specified by a pointer and an arg. */
+- #define SYSCTL_PROC(parent, nbr, name, access, ptr, arg, handler, fmt, descr) \
+- 	SYSCTL_OID(parent, nbr, name, access, \
+- 		ptr, arg, handler, fmt, descr)
+- 
+- #define SYSCTL_ADD_PROC(ctx, parent, nbr, name, access, ptr, arg, handler, fmt, descr) \
+- 	sysctl_add_oid(ctx, parent, nbr, name, access,			    \
+- 	ptr, arg, handler, fmt, descr);
+- 
+- #endif /* _KERNEL */
+- 
+  /*
+   * Top-level identifiers
+   */
+--- 111,116 ----
+***************
+*** 308,314 ****
+  #define	KERN_SECURELVL	 	 9	/* int: system security level */
+  #define	KERN_HOSTNAME		10	/* string: hostname */
+  #define	KERN_HOSTID		11	/* int: host identifier */
+! #define	KERN_CLOCKRATE		12	/* struct: struct clockrate */
+  #define	KERN_VNODE		13	/* struct: vnode structures */
+  #define	KERN_PROC		14	/* struct: process entries */
+  #define	KERN_FILE		15	/* struct: file entries */
+--- 153,159 ----
+  #define	KERN_SECURELVL	 	 9	/* int: system security level */
+  #define	KERN_HOSTNAME		10	/* string: hostname */
+  #define	KERN_HOSTID		11	/* int: host identifier */
+! #define	KERN_CLOCKRATE		12	/* struct: struct clockinfo */
+  #define	KERN_VNODE		13	/* struct: vnode structures */
+  #define	KERN_PROC		14	/* struct: process entries */
+  #define	KERN_FILE		15	/* struct: file entries */
+***************
+*** 359,365 ****
+  	{ "nisdomainname", CTLTYPE_STRING }, \
+  	{ "update", CTLTYPE_INT }, \
+  	{ "osreldate", CTLTYPE_INT }, \
+! 	{ "ntp_pll", CTLTYPE_NODE }, \
+  	{ "bootfile", CTLTYPE_STRING }, \
+  	{ "maxfilesperproc", CTLTYPE_INT }, \
+  	{ "maxprocperuid", CTLTYPE_INT }, \
+--- 204,210 ----
+  	{ "nisdomainname", CTLTYPE_STRING }, \
+  	{ "update", CTLTYPE_INT }, \
+  	{ "osreldate", CTLTYPE_INT }, \
+!         { "ntp_pll", CTLTYPE_NODE }, \
+  	{ "bootfile", CTLTYPE_STRING }, \
+  	{ "maxfilesperproc", CTLTYPE_INT }, \
+  	{ "maxprocperuid", CTLTYPE_INT }, \
+***************
+*** 539,604 ****
+  	{ "timer_max", CTLTYPE_INT }, \
+  }
+  
+! #ifdef _KERNEL
+  
+  /*
+!  * Declare some common oids.
+   */
+! extern struct sysctl_oid_list sysctl__children;
+! SYSCTL_DECL(_kern);
+! SYSCTL_DECL(_sysctl);
+! SYSCTL_DECL(_vm);
+! SYSCTL_DECL(_vfs);
+! SYSCTL_DECL(_net);
+! SYSCTL_DECL(_debug);
+! SYSCTL_DECL(_hw);
+! SYSCTL_DECL(_machdep);
+! SYSCTL_DECL(_user);
+! SYSCTL_DECL(_compat);
+! 
+! extern char	machine[];
+! extern char	osrelease[];
+! extern char	ostype[];
+! 
+! struct linker_set;
+! 
+! /* Dynamic oid handling */
+! struct sysctl_oid *sysctl_add_oid(struct sysctl_ctx_list *clist,
+! 		struct sysctl_oid_list *parent, int nbr, const char *name,
+! 		int kind, void *arg1, int arg2,
+! 		int (*handler) (SYSCTL_HANDLER_ARGS),
+! 		const char *fmt, const char *descr);
+! int	sysctl_remove_oid(struct sysctl_oid *oidp, int del, int recurse);
+! int	sysctl_ctx_init(struct sysctl_ctx_list *clist);
+! int	sysctl_ctx_free(struct sysctl_ctx_list *clist);
+! struct	sysctl_ctx_entry *sysctl_ctx_entry_add(struct sysctl_ctx_list *clist,
+! 		struct sysctl_oid *oidp);
+! struct	sysctl_ctx_entry *sysctl_ctx_entry_find(struct sysctl_ctx_list *clist,
+! 		struct sysctl_oid *oidp);
+! int	sysctl_ctx_entry_del(struct sysctl_ctx_list *clist,
+! 		struct sysctl_oid *oidp);
+! 
+! /* Linker set based oid handling */
+! void	sysctl_register_set(struct linker_set *lsp);
+! void	sysctl_unregister_set(struct linker_set *lsp);
+! 
+! int	kernel_sysctl(struct proc *p, int *name, u_int namelen, void *old,
+! 		      size_t *oldlenp, void *new, size_t newlen,
+! 		      size_t *retval);
+! int	userland_sysctl(struct proc *p, int *name, u_int namelen, void *old,
+! 			size_t *oldlenp, int inkernel, void *new, size_t newlen,
+! 			size_t *retval);
+! int	sysctl_find_oid(int *name, u_int namelen, struct sysctl_oid **noid,
+! 			int *nindx, struct sysctl_req *req);
+  
+- #else	/* !_KERNEL */
+- #include <sys/cdefs.h>
+  
+  __BEGIN_DECLS
+! int	sysctl __P((int *, u_int, void *, size_t *, void *, size_t));
+! int	sysctlbyname __P((const char *, void *, size_t *, void *, size_t));
+! int	sysctlnametomib __P((const char *, int *, size_t *));
+  __END_DECLS
+- #endif	/* _KERNEL */
+  
+! #endif	/* !_SYS_SYSCTL_H_ */
+--- 384,520 ----
+  	{ "timer_max", CTLTYPE_INT }, \
+  }
+  
+! 
+! /* Other sysctl identifiers from <sys/mount.h>.  */
+! 
+! /*
+!  * Sysctl CTL_VFS definitions.
+!  *
+!  * Second level identifier specifies which filesystem. Second level
+!  * identifier VFS_VFSCONF returns information about all filesystems.
+!  * Second level identifier VFS_GENERIC is non-terminal.
+!  */
+! #define	VFS_VFSCONF		0	/* get configured filesystems */
+! #define	VFS_GENERIC		0	/* generic filesystem information */
+! /*
+!  * Third level identifiers for VFS_GENERIC are given below; third
+!  * level identifiers for specific filesystems are given in their
+!  * mount specific header files.
+!  */
+! #define VFS_MAXTYPENUM	1	/* int: highest defined filesystem type */
+! #define VFS_CONF	2	/* struct: vfsconf for filesystem given
+! 				   as next argument */
+! 
+! 
+! /* Other sysctl identifiers from <vm/vm_param.h>.  */
+  
+  /*
+!  * CTL_VM identifiers
+   */
+! #define	VM_METER		1	/* struct vmmeter */
+! #define	VM_LOADAVG	 	2	/* struct loadavg */
+! #define VM_V_FREE_MIN		3	/* cnt.v_free_min */
+! #define VM_V_FREE_TARGET	4	/* cnt.v_free_target */
+! #define VM_V_FREE_RESERVED	5	/* cnt.v_free_reserved */
+! #define VM_V_INACTIVE_TARGET	6	/* cnt.v_inactive_target */
+! #define VM_V_CACHE_MIN		7	/* cnt.v_cache_max */
+! #define VM_V_CACHE_MAX		8	/* cnt.v_cache_min */
+! #define VM_V_PAGEOUT_FREE_MIN	9	/* cnt.v_pageout_free_min */
+! #define	VM_PAGEOUT_ALGORITHM	10	/* pageout algorithm */
+! #define VM_SWAPPING_ENABLED	11	/* swapping enabled */
+! #define	VM_MAXID		12	/* number of valid vm ids */
+! 
+! #define CTL_VM_NAMES { \
+! 	{ 0, 0 }, \
+! 	{ "vmmeter", CTLTYPE_STRUCT }, \
+! 	{ "loadavg", CTLTYPE_STRUCT }, \
+! 	{ "v_free_min", CTLTYPE_INT }, \
+! 	{ "v_free_target", CTLTYPE_INT }, \
+! 	{ "v_free_reserved", CTLTYPE_INT }, \
+! 	{ "v_inactive_target", CTLTYPE_INT }, \
+! 	{ "v_cache_min", CTLTYPE_INT }, \
+! 	{ "v_cache_max", CTLTYPE_INT }, \
+! 	{ "v_pageout_free_min", CTLTYPE_INT}, \
+! 	{ "pageout_algorithm", CTLTYPE_INT}, \
+! 	{ "swapping_enabled", CTLTYPE_INT},\
+! }
+! 
+! 
+! /* Other sysctl identifiers from <sys/socket.h>.  */
+! 
+! #define CTL_NET_NAMES { \
+! 	{ 0, 0 }, \
+! 	{ "unix", CTLTYPE_NODE }, \
+! 	{ "inet", CTLTYPE_NODE }, \
+! 	{ "implink", CTLTYPE_NODE }, \
+! 	{ "pup", CTLTYPE_NODE }, \
+! 	{ "chaos", CTLTYPE_NODE }, \
+! 	{ "xerox_ns", CTLTYPE_NODE }, \
+! 	{ "iso", CTLTYPE_NODE }, \
+! 	{ "emca", CTLTYPE_NODE }, \
+! 	{ "datakit", CTLTYPE_NODE }, \
+! 	{ "ccitt", CTLTYPE_NODE }, \
+! 	{ "ibm_sna", CTLTYPE_NODE }, \
+! 	{ "decnet", CTLTYPE_NODE }, \
+! 	{ "dec_dli", CTLTYPE_NODE }, \
+! 	{ "lat", CTLTYPE_NODE }, \
+! 	{ "hylink", CTLTYPE_NODE }, \
+! 	{ "appletalk", CTLTYPE_NODE }, \
+! 	{ "route", CTLTYPE_NODE }, \
+! 	{ "link_layer", CTLTYPE_NODE }, \
+! 	{ "xtp", CTLTYPE_NODE }, \
+! 	{ "coip", CTLTYPE_NODE }, \
+! 	{ "cnt", CTLTYPE_NODE }, \
+! 	{ "rtip", CTLTYPE_NODE }, \
+! 	{ "ipx", CTLTYPE_NODE }, \
+! 	{ "sip", CTLTYPE_NODE }, \
+! 	{ "pip", CTLTYPE_NODE }, \
+! 	{ "isdn", CTLTYPE_NODE }, \
+! 	{ "key", CTLTYPE_NODE }, \
+! 	{ "inet6", CTLTYPE_NODE }, \
+! 	{ "natm", CTLTYPE_NODE }, \
+! 	{ "atm", CTLTYPE_NODE }, \
+! 	{ "hdrcomplete", CTLTYPE_NODE }, \
+! 	{ "netgraph", CTLTYPE_NODE }, \
+! }
+! 
+! /*
+!  * PF_ROUTE - Routing table
+!  *
+!  * Three additional levels are defined:
+!  *	Fourth: address family, 0 is wildcard
+!  *	Fifth: type of info, defined below
+!  *	Sixth: flag(s) to mask with for NET_RT_FLAGS
+!  */
+! #define NET_RT_DUMP	1		/* dump; may limit to a.f. */
+! #define NET_RT_FLAGS	2		/* by flags, e.g. RESOLVING */
+! #define NET_RT_IFLIST	3		/* survey interface list */
+! #define	NET_RT_MAXID	4
+! 
+! #define CTL_NET_RT_NAMES { \
+! 	{ 0, 0 }, \
+! 	{ "dump", CTLTYPE_STRUCT }, \
+! 	{ "flags", CTLTYPE_STRUCT }, \
+! 	{ "iflist", CTLTYPE_STRUCT }, \
+! }
+  
+  
+  __BEGIN_DECLS
+! 
+! #define __need_size_t
+! #include <stddef.h>
+! 
+! /* Read or write system parameters.  */
+! extern int sysctl (int *__name, int __nlen, void *__oldval, size_t *__oldlenp,
+! 		   void *__newval, size_t __newlen) __THROW;
+! extern int sysctlbyname (const char *__name, void *__oldval, size_t *__oldlenp,
+! 			 void *__newval, size_t __newlen) __THROW;
+! #ifdef _LIBC
+! extern int __sysctlbyname (const char *__name,
+! 			   void *__oldval, size_t *__oldlenp,
+! 			   void *__newval, size_t __newlen) __THROW;
+! #endif
+! 
+  __END_DECLS
+  
+! #endif	/* _SYS_SYSCTL_H */

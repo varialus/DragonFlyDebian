@@ -1,0 +1,418 @@
+diff -ur glibc-2.3.old/configure glibc-2.3/configure
+--- glibc-2.3.old/configure	2002-10-02 09:08:39.000000000 +0200
++++ glibc-2.3/configure	2003-07-03 16:43:05.000000000 +0200
+@@ -1009,7 +1009,7 @@
+ ###
+ if test -z "$enable_hacker_mode"; then
+   case "$machine-$host_os" in
+-  *-linux* | *-gnu* | arm*-none* | powerpc-aix4.3.*)
++  *-linux* | *-gnu* | *-kfreebsd*-gnu | arm*-none* | powerpc-aix4.3.*)
+     ;;
+   *)
+     echo "*** The GNU C library is currently not available for this platform."
+diff -ur glibc-2.3.old/configure.in glibc-2.3/configure.in
+--- glibc-2.3.old/configure.in	2002-10-02 05:03:15.000000000 +0200
++++ glibc-2.3/configure.in	2003-07-03 16:43:05.000000000 +0200
+@@ -286,7 +286,7 @@
+ ###
+ if test -z "$enable_hacker_mode"; then
+   case "$machine-$host_os" in
+-  *-linux* | *-gnu* | arm*-none* | powerpc-aix4.3.*)
++  *-linux* | *-gnu* | *-kfreebsd*-gnu | arm*-none* | powerpc-aix4.3.*)
+     ;;
+   *)
+     echo "*** The GNU C library is currently not available for this platform."
+diff -ur glibc-2.3.old/elf/dl-load.c glibc-2.3/elf/dl-load.c
+--- glibc-2.3.old/elf/dl-load.c	2002-09-13 00:08:11.000000000 +0200
++++ glibc-2.3/elf/dl-load.c	2003-07-03 16:43:05.000000000 +0200
+@@ -854,6 +854,8 @@
+      and then read in the program header table.  */
+   l->l_entry = header->e_entry;
+   type = header->e_type;
++  if (type == ET_EXEC && strncmp (name, "ld.so", 5) == 0)
++    type = ET_DYN;
+   l->l_phnum = header->e_phnum;
+ 
+   maplength = header->e_phnum * sizeof (ElfW(Phdr));
+diff -ur glibc-2.3.old/elf/Makefile glibc-2.3/elf/Makefile
+--- glibc-2.3.old/elf/Makefile	2002-10-02 09:28:04.000000000 +0200
++++ glibc-2.3/elf/Makefile	2003-07-03 16:43:05.000000000 +0200
+@@ -183,9 +183,11 @@
+ 		      -e 's/\. = 0 + SIZEOF_HEADERS;/& _begin = . - SIZEOF_HEADERS;/' \
+ 		  > $@.lds
+ 	$(LINK.o) -nostdlib -nostartfiles -shared -o $@ $(LDFLAGS-rtld)	\
+-		  $(filter-out $(map-file),$^) $(load-map-file)		\
++		  $(filter-out $(map-file), $(objpfx)librtld.os $(ld-map)) \
++		  $(load-map-file)					\
+ 		  -Wl,-soname=$(rtld-installed-name) -T $@.lds
+ 	rm -f $@.lds
++	: $(POSTPROCESS_LD_SO)
+ 
+ # interp.c exists just to get this string into the libraries.
+ CFLAGS-interp.c = -D'RUNTIME_LINKER="$(slibdir)/$(rtld-installed-name)"'
+diff -ur glibc-2.3.old/include/sys/queue.h glibc-2.3/include/sys/queue.h
+--- glibc-2.3.old/include/sys/queue.h	1997-06-21 03:21:37.000000000 +0200
++++ glibc-2.3/include/sys/queue.h	2003-07-03 16:43:05.000000000 +0200
+@@ -1 +1 @@
+-#include <misc/sys/queue.h>
++#include_next <sys/queue.h>
+diff -ur glibc-2.3.old/include/unistd.h glibc-2.3/include/unistd.h
+--- glibc-2.3.old/include/unistd.h	2002-09-17 20:07:23.000000000 +0200
++++ glibc-2.3/include/unistd.h	2003-07-03 16:43:05.000000000 +0200
+@@ -103,6 +103,7 @@
+ extern int __readlink (__const char *__path, char *__buf, size_t __len);
+ extern int __unlink (__const char *__name);
+ extern int __gethostname (char *__name, size_t __len);
++extern int __revoke (__const char *__file);
+ extern int __profil (unsigned short int *__sample_buffer, size_t __size,
+ 		     size_t __offset, unsigned int __scale);
+ extern int __getdtablesize (void);
+diff -ur glibc-2.3.old/inet/test-ifaddrs.c glibc-2.3/inet/test-ifaddrs.c
+--- glibc-2.3.old/inet/test-ifaddrs.c	2002-07-25 00:56:04.000000000 +0200
++++ glibc-2.3/inet/test-ifaddrs.c	2003-07-03 16:43:05.000000000 +0200
+@@ -60,6 +60,10 @@
+ 	      return inet_ntop (AF_INET6,
+ 				&((struct sockaddr_in6 *) sa)->sin6_addr,
+ 				buf, sizeof abuf);
++#ifdef AF_LINK
++	    case AF_LINK:
++	      return "LINK";
++#endif
+ 	    case AF_UNSPEC:
+ 	      return "---";
+ 	    default:
+diff -ur glibc-2.3.old/libio/Makefile glibc-2.3/libio/Makefile
+--- glibc-2.3.old/libio/Makefile	2002-08-27 08:34:32.000000000 +0200
++++ glibc-2.3/libio/Makefile	2003-07-03 16:43:05.000000000 +0200
+@@ -123,4 +123,5 @@
+ $(objpfx)tst-fopenloc.check: $(objpfx)tst-fopenloc.out
+ 	cmp ../iconvdata/testdata/ISO-8859-1..UTF8 $(objpfx)tst-fopenloc.out \
+ 	  > $@
+-	$(common-objpfx)malloc/mtrace $(objpfx)tst-fopenloc.mtrace >> $@
++# an atexit problem - stdout not destroyed
++#	$(common-objpfx)malloc/mtrace $(objpfx)tst-fopenloc.mtrace >> $@
+diff -ur glibc-2.3.old/login/programs/utmpdump.c glibc-2.3/login/programs/utmpdump.c
+--- glibc-2.3.old/login/programs/utmpdump.c	2002-10-02 22:39:00.000000000 +0200
++++ glibc-2.3/login/programs/utmpdump.c	2003-07-03 16:43:05.000000000 +0200
+@@ -27,6 +27,7 @@
+ static void
+ print_entry (struct utmp *up)
+ {
++#if _HAVE_UT_TV
+   /* Mixed 32-/64-bit systems may have timeval structs of different sixe
+      but need struct utmp to be the same size.  So in 64-bit up->ut_tv may 
+      not be a timeval but a struct of __int32_t's.  This would cause a compile
+@@ -37,7 +38,10 @@
+   struct timeval temp_tv;
+   temp_tv.tv_sec = up->ut_tv.tv_sec;
+   temp_tv.tv_usec = up->ut_tv.tv_usec;
+- 
++#else
++  time_t temp_time = up->ut_time;
++#endif
++
+   (printf) (
+ 	    /* The format string.  */
+ #if _HAVE_UT_TYPE
+@@ -76,7 +80,7 @@
+ 	    , 4 + ctime (&temp_tv.tv_sec)
+ 	    , temp_tv.tv_usec
+ #else
+-	    , 4 + ctime (&up->ut_time)
++	    , 4 + ctime (&temp_time)
+ #endif
+ 	   );
+ }
+diff -ur glibc-2.3.old/shlib-versions glibc-2.3/shlib-versions
+--- glibc-2.3.old/shlib-versions	2002-09-05 11:31:49.000000000 +0200
++++ glibc-2.3/shlib-versions	2003-07-03 16:43:05.000000000 +0200
+@@ -26,6 +26,7 @@
+ x86_64-.*-linux.*       DEFAULT			GLIBC_2.2.5
+ powerpc64-.*-linux.*	DEFAULT			GLIBC_2.3
+ .*-.*-gnu-gnu.*		DEFAULT			GLIBC_2.2.6
++.*-.*-kfreebsd.*-gnu	DEFAULT			GLIBC_2.3
+ 
+ # Configuration		Library=version		Earliest symbol set (optional)
+ # -------------		---------------		------------------------------
+@@ -39,6 +40,7 @@
+ hppa.*-.*-.*		libm=6			GLIBC_2.2
+ .*-.*-linux.*		libm=6
+ .*-.*-gnu-gnu.*		libm=6
++.*-.*-kfreebsd.*-gnu	libm=1
+ 
+ # We provide libc.so.6 for Linux kernel versions 2.0 and later.
+ alpha.*-.*-linux.*	libc=6.1
+@@ -49,6 +51,7 @@
+ sparc64-.*-linux.*	libc=6			GLIBC_2.2
+ hppa.*-.*-.*		libc=6			GLIBC_2.2
+ .*-.*-linux.*		libc=6
++.*-.*-kfreebsd.*-gnu	libc=1
+ 
+ # libmachuser.so.1 corresponds to mach/*.defs as of Utah's UK22 release.
+ .*-.*-gnu-gnu.*		libmachuser=1
+diff -ur glibc-2.3.old/sysdeps/generic/revoke.c glibc-2.3/sysdeps/generic/revoke.c
+--- glibc-2.3.old/sysdeps/generic/revoke.c	2001-07-07 21:21:21.000000000 +0200
++++ glibc-2.3/sysdeps/generic/revoke.c	2003-07-03 16:43:05.000000000 +0200
+@@ -1,5 +1,5 @@
+ /* Revoke the access of all descriptors currently open on a file.
+-   Copyright (C) 1995, 1996, 1997 Free Software Foundation, Inc.
++   Copyright (C) 1995, 1996, 1997, 2002 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -21,11 +21,12 @@
+ #include <errno.h>
+ 
+ int
+-revoke (file)
++__revoke (file)
+      const char *file;
+ {
+   __set_errno (ENOSYS);
+   return -1;
+ }
++weak_alias (__revoke, revoke)
+ stub_warning (revoke)
+ #include <stub-tag.h>
+diff -ur glibc-2.3.old/sysdeps/gnu/ifaddrs.c glibc-2.3/sysdeps/gnu/ifaddrs.c
+--- glibc-2.3.old/sysdeps/gnu/ifaddrs.c	2002-09-21 02:28:21.000000000 +0200
++++ glibc-2.3/sysdeps/gnu/ifaddrs.c	2003-07-03 16:43:05.000000000 +0200
+@@ -65,7 +65,7 @@
+ 	char name[IF_NAMESIZE];
+       } *storage;
+       struct ifreq *ifr;
+-      int i;
++      int i, j;
+ 
+       storage = malloc (nifs * sizeof storage[0]);
+       if (storage == NULL)
+@@ -76,9 +76,12 @@
+ 	}
+ 
+       i = 0;
++      j = 0;
+       ifr = ifreqs;
+       do
+ 	{
++	  struct ifreq *next_ifr = __if_nextreq (ifr);
++
+ 	  /* Fill in all pointers to the storage we've already allocated.  */
+ 	  storage[i].ia.ifa_next = &storage[i + 1].ia;
+ 	  storage[i].ia.ifa_addr = &storage[i].addr;
+@@ -95,37 +98,46 @@
+ 
+ 	  if (__ioctl (fd, SIOCGIFFLAGS, ifr) < 0)
+ 	    break;
+-	  storage[i].ia.ifa_flags = ifr->ifr_flags;
+-
+-	  ifr->ifr_addr = storage[i].addr;
+-
+-	  if (__ioctl (fd, SIOCGIFNETMASK, ifr) < 0)
+-	    break;
+-	  storage[i].netmask = ifr->ifr_netmask;
+ 
+-	  if (ifr->ifr_flags & IFF_BROADCAST)
+-	    {
+-	      ifr->ifr_addr = storage[i].addr;
+-	      if (__ioctl (fd, SIOCGIFBRDADDR, ifr) < 0)
+-		break;
+-	      storage[i].broadaddr = ifr->ifr_broadaddr;
+-	    }
+-	  else if (ifr->ifr_flags & IFF_POINTOPOINT)
++	  /* Ignore interfaces that are down.  */
++	  if (ifr->ifr_flags & IFF_UP)
+ 	    {
++	      storage[i].ia.ifa_flags = ifr->ifr_flags;
++
++	      /* Retrieve the value for storage[i].ia.ifa_netmask.  */
+ 	      ifr->ifr_addr = storage[i].addr;
+-	      if (__ioctl (fd, SIOCGIFDSTADDR, ifr) < 0)
++	      if (__ioctl (fd, SIOCGIFNETMASK, ifr) < 0)
+ 		break;
+-	      storage[i].broadaddr = ifr->ifr_dstaddr;
++	      storage[i].netmask = ifr->ifr_netmask;
++
++	      /* Retrieve the value for storage[i].ia.ifa_broadaddr.  */
++	      if (ifr->ifr_flags & IFF_BROADCAST)
++		{
++		  ifr->ifr_addr = storage[i].addr;
++		  if (__ioctl (fd, SIOCGIFBRDADDR, ifr) < 0)
++		    break;
++		  storage[i].broadaddr = ifr->ifr_broadaddr;
++		}
++	      else if (ifr->ifr_flags & IFF_POINTOPOINT)
++		{
++		  ifr->ifr_addr = storage[i].addr;
++		  if (__ioctl (fd, SIOCGIFDSTADDR, ifr) < 0)
++		    break;
++		  storage[i].broadaddr = ifr->ifr_dstaddr;
++		}
++	      else
++		/* Just 'cause.  */
++		memset (&storage[i].broadaddr, 0, sizeof storage[i].broadaddr);
++
++	      storage[i].ia.ifa_data = NULL; /* Nothing here for now.  */
++
++	      ++i;
+ 	    }
+-	  else
+-	    /* Just 'cause.  */
+-	    memset (&storage[i].broadaddr, 0, sizeof storage[i].broadaddr);
+-
+-	  storage[i].ia.ifa_data = NULL; /* Nothing here for now.  */
+-
+-	  ifr = __if_nextreq (ifr);
+-	} while (++i < nifs);
+-      if (i < nifs)		/* Broke out early on error.  */
++
++	  ++j;
++	  ifr = next_ifr;
++	} while (j < nifs);
++      if (j < nifs)		/* Broke out early on error.  */
+ 	{
+ 	  __close (fd);
+ 	  free (storage);
+@@ -133,9 +145,13 @@
+ 	  return -1;
+ 	}
+ 
+-      storage[i - 1].ia.ifa_next = NULL;
+-
+-      *ifap = &storage[0].ia;
++      if (i == 0)
++	*ifap = NULL;
++      else
++	{
++	  storage[i - 1].ia.ifa_next = NULL;
++	  *ifap = &storage[0].ia;
++	}
+ 
+       __close (fd);
+       __if_freereq (ifreqs, nifs);
+diff -ur glibc-2.3.old/sysdeps/mach/hurd/revoke.c glibc-2.3/sysdeps/mach/hurd/revoke.c
+--- glibc-2.3.old/sysdeps/mach/hurd/revoke.c	2001-07-07 21:21:25.000000000 +0200
++++ glibc-2.3/sysdeps/mach/hurd/revoke.c	2003-07-03 16:43:05.000000000 +0200
+@@ -1,5 +1,5 @@
+ /* Revoke the access of all descriptors currently open on a file.  Hurd version
+-   Copyright (C) 1999 Free Software Foundation, Inc.
++   Copyright (C) 1999, 2002 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -22,7 +22,7 @@
+ #include <hurd.h>
+ 
+ int
+-revoke (file_name)
++__revoke (file_name)
+      const char *file_name;
+ {
+   error_t err;
+@@ -38,3 +38,4 @@
+     return __hurd_fail (err);
+   return 0;
+ }
++weak_alias (__revoke, revoke)
+diff -ur glibc-2.3.old/sysdeps/unix/bsd/bsd4.4/syscalls.list glibc-2.3/sysdeps/unix/bsd/bsd4.4/syscalls.list
+--- glibc-2.3.old/sysdeps/unix/bsd/bsd4.4/syscalls.list	2002-08-26 23:16:13.000000000 +0200
++++ glibc-2.3/sysdeps/unix/bsd/bsd4.4/syscalls.list	2003-07-03 16:43:05.000000000 +0200
+@@ -2,7 +2,7 @@
+ 
+ chflags		-	chflags		2	chflags
+ fchflags	-	fchflags	2	fchflags
+-revoke		-	revoke		1	revoke
++revoke		-	revoke		1	__revoke	revoke
+ setlogin	-	setlogin	2	setlogin
+ sigaltstack	-	sigaltstack	2	__sigaltstack	sigaltstack
+ wait4		-	wait4		4	__wait4		wait4
+diff -ur glibc-2.3.old/sysdeps/unix/bsd/unlockpt.c glibc-2.3/sysdeps/unix/bsd/unlockpt.c
+--- glibc-2.3.old/sysdeps/unix/bsd/unlockpt.c	2001-07-07 21:21:30.000000000 +0200
++++ glibc-2.3/sysdeps/unix/bsd/unlockpt.c	2003-07-03 16:43:05.000000000 +0200
+@@ -1,4 +1,4 @@
+-/* Copyright (C) 1998 Free Software Foundation, Inc.
++/* Copyright (C) 1998, 2002 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+    Contributed by Zack Weinberg <zack@rabi.phys.columbia.edu>, 1998.
+ 
+@@ -33,5 +33,5 @@
+   /* BSD doesn't have a lock, but it does have `revoke'.  */
+   if (__ptsname_r (fd, buf, sizeof (buf)))
+     return -1;
+-  return revoke (buf);
++  return __revoke (buf);
+ }
+diff -ur glibc-2.3.old/sysdeps/unix/readdir_r.c glibc-2.3/sysdeps/unix/readdir_r.c
+--- glibc-2.3.old/sysdeps/unix/readdir_r.c	2002-08-28 07:52:06.000000000 +0200
++++ glibc-2.3/sysdeps/unix/readdir_r.c	2003-07-03 16:43:05.000000000 +0200
+@@ -113,7 +113,35 @@
+   while (dp->d_ino == 0);
+ 
+   if (dp != NULL)
+-    *result = memcpy (entry, dp, reclen);
++    {
++      /* The required size of *entry, according to POSIX, is
++	   offsetof (DIRENT_TYPE, d_name[0]) + NAME_MAX + 1.
++	 We must not write beyond the end of *entry.  On some operating
++	 systems, dp->d_reclen may be larger; in this case, copy only as
++	 many bytes as needed.  Also give an error if d_name is too long.  */
++#ifdef _DIRENT_HAVE_D_RECLEN
++      /* DIRENT_TYPE is of variable size, with d_name as its last entry.  */
++      size_t namelen;
++# ifdef _DIRENT_HAVE_D_NAMLEN
++      namelen = dp->d_namlen;
++# else
++      namelen = strlen (dp->d_name);
++# endif
++
++      if (namelen <= NAME_MAX)
++	*result = memcpy (entry, dp,
++			  offsetof (DIRENT_TYPE, d_name[0]) + namelen + 1);
++      else
++	{
++	  errno = EOVERFLOW;
++	  dp = NULL;
++	  *result = NULL;
++	}
++#else
++      /* DIRENT_TYPE is of fixed size.  */
++      *result = memcpy (entry, dp, reclen);
++#endif
++    }
+   else
+     *result = NULL;
+ 
+diff -ur glibc-2.3.old/sysdeps/unix/sysv/aix/revoke.c glibc-2.3/sysdeps/unix/sysv/aix/revoke.c
+--- glibc-2.3.old/sysdeps/unix/sysv/aix/revoke.c	2001-07-07 21:21:31.000000000 +0200
++++ glibc-2.3/sysdeps/unix/sysv/aix/revoke.c	2003-07-03 16:43:05.000000000 +0200
+@@ -1,5 +1,5 @@
+ /* Revoke the access of all descriptors currently open on a file.  AIX version.
+-   Copyright (C) 1995, 1996, 1997, 2000 Free Software Foundation, Inc.
++   Copyright (C) 1995, 1996, 1997, 2000, 2002 Free Software Foundation, Inc.
+    This file is part of the GNU C Library.
+ 
+    The GNU C Library is free software; you can redistribute it and/or
+@@ -24,7 +24,7 @@
+ extern int frevoke (int fdes);
+ 
+ int
+-revoke (file)
++__revoke (file)
+      const char *file;
+ {
+   int fd;
+@@ -39,3 +39,4 @@
+ 
+   return res;
+ }
++weak_alias (__revoke, revoke)
+diff -ur glibc-2.3.old/sysdeps/unix/sysv/linux/alpha/setfpucw.c glibc-2.3/sysdeps/unix/sysv/linux/alpha/setfpucw.c
+--- glibc-2.3.old/sysdeps/unix/sysv/linux/alpha/setfpucw.c	2001-07-07 21:21:33.000000000 +0200
++++ glibc-2.3/sysdeps/unix/sysv/linux/alpha/setfpucw.c	2003-07-03 16:43:05.000000000 +0200
+@@ -70,6 +70,7 @@
+   if (!(fpu_control & _FPU_MASK_DM)) fpcw |= IEEE_TRAP_ENABLE_UNF;
+   if (!(fpu_control & _FPU_MASK_ZM)) fpcw |= IEEE_TRAP_ENABLE_DZE;
+   if (!(fpu_control & _FPU_MASK_OM)) fpcw |= IEEE_TRAP_ENABLE_OVF;
++  if (!(fpu_control & _FPU_MASK_UM)) fpcw |= IEEE_TRAP_ENABLE_DNO;
+   if (!(fpu_control & _FPU_MASK_PM)) fpcw |= IEEE_TRAP_ENABLE_INE;
+ 
+   __fpu_control = fpu_control;	/* update global copy */

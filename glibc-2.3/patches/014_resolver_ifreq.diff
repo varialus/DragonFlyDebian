@@ -1,0 +1,28 @@
+--- glibc-2.3.old/sysdeps/generic/ifreq.h	2002-09-21 02:28:21.000000000 +0200
++++ glibc-2.3/sysdeps/generic/ifreq.h	2004-01-24 23:51:25.000000000 +0100
+@@ -44,10 +44,10 @@
+     }
+ 
+   ifc.ifc_buf = NULL;
+-  rq_len = RQ_IFS * sizeof (struct ifreq) / 2; /* Doubled in the loop.  */
+-  do
++  rq_len = RQ_IFS * sizeof (struct ifreq);
++  while (1)
+     {
+-      ifc.ifc_len = rq_len *= 2;
++      ifc.ifc_len = rq_len;
+       ifc.ifc_buf = realloc (ifc.ifc_buf, ifc.ifc_len);
+       if (ifc.ifc_buf == NULL || __ioctl (fd, SIOCGIFCONF, &ifc) < 0)
+ 	{
+@@ -60,8 +60,10 @@
+ 	  *ifreqs = NULL;
+ 	  return;
+ 	}
++      if (ifc.ifc_len + sizeof (struct ifreq) <= rq_len)
++	break;
++      rq_len *= 2;
+     }
+-  while (rq_len < sizeof (struct ifreq) + ifc.ifc_len);
+ 
+   nifs = ifc.ifc_len / sizeof (struct ifreq);
+ 

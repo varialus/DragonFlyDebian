@@ -1,0 +1,106 @@
+--- glibc-2.3/resolv/res_debug.h~	1999-12-04 09:07:16.000000000 +0100
++++ glibc-2.3/resolv/res_debug.h	2004-04-09 02:54:23.000000000 +0200
+@@ -19,6 +19,10 @@
+ #define _RES_DEBUG_H_
+ 
+ #ifndef DEBUG
++#define DEBUG
++#endif
++
++#ifndef DEBUG
+ #   define Dprint(cond, args) /*empty*/
+ #   define DprintQ(cond, args, query, size) /*empty*/
+ #   define Aerror(statp, file, string, error, address) /*empty*/
+--- glibc-2.3/resolv/res_send.c.old	2004-04-10 04:07:37.000000000 +0200
++++ glibc-2.3/resolv/res_send.c	2004-04-10 04:17:12.000000000 +0200
+@@ -199,7 +199,11 @@
+ 				int *, int *);
+ #ifdef DEBUG
+ static void		Aerror(const res_state, FILE *, const char *, int,
++#ifdef _LIBC
++			       struct sockaddr6_in);
++#else
+ 			       struct sockaddr_in);
++#endif
+ static void		Perror(const res_state, FILE *, const char *, int);
+ #endif
+ #ifdef _LIBC
+@@ -571,9 +575,15 @@
+ 			} while (!done);
+ 		}
+ 
++#ifdef _LIBC
++		Dprint(statp->options & RES_DEBUG,
++		       (stdout, ";; Querying server (# %d) address = %s\n",
++			ns + 1, inet_ntoa(nsap->sin6_addr)));
++#else
+ 		Dprint(statp->options & RES_DEBUG,
+ 		       (stdout, ";; Querying server (# %d) address = %s\n",
+ 			ns + 1, inet_ntoa(nsap->sin_addr)));
++#endif
+ 
+ 		if (v_circuit) {
+ 			/* Use VC; at most one attempt per server. */
+--- glibc-2.3/resolv/res_send.c.old	2004-04-12 01:49:33.000000000 +0200
++++ glibc-2.3/resolv/res_send.c	2004-04-12 15:33:45.000000000 +0200
+@@ -200,9 +200,9 @@
+ #ifdef DEBUG
+ static void		Aerror(const res_state, FILE *, const char *, int,
+ #ifdef _LIBC
+-			       struct sockaddr6_in);
++			       struct sockaddr6_in *);
+ #else
+-			       struct sockaddr_in);
++			       struct sockaddr_in *);
+ #endif
+ static void		Perror(const res_state, FILE *, const char *, int);
+ #endif
+@@ -576,9 +576,12 @@
+ 		}
+ 
+ #ifdef _LIBC
++		void *buf = malloc (256);
+ 		Dprint(statp->options & RES_DEBUG,
+ 		       (stdout, ";; Querying server (# %d) address = %s\n",
+-			ns + 1, inet_ntoa(nsap->sin6_addr)));
++			ns + 1, inet_ntop(AF_INET6, nsap->sin6_addr,
++			buf, sizeof (buf))));
++		free (buf);
+ #else
+ 		Dprint(statp->options & RES_DEBUG,
+ 		       (stdout, ";; Querying server (# %d) address = %s\n",
+@@ -1092,7 +1095,11 @@
+ #ifdef DEBUG
+ static void
+ Aerror(const res_state statp, FILE *file, const char *string, int error,
++#ifdef _LIBC
++       struct sockaddr6_in address)
++#else
+        struct sockaddr_in address)
++#endif
+ {
+ 	int save = errno;
+ 
+--- glibc-2.3/resolv/res_send.c.old	2004-04-12 15:37:32.000000000 +0200
++++ glibc-2.3/resolv/res_send.c	2004-04-12 17:11:23.000000000 +0200
+@@ -579,7 +579,7 @@
+ 		void *buf = malloc (256);
+ 		Dprint(statp->options & RES_DEBUG,
+ 		       (stdout, ";; Querying server (# %d) address = %s\n",
+-			ns + 1, inet_ntop(AF_INET6, nsap->sin6_addr,
++			ns + 1, inet_ntop(AF_INET6, &(nsap->sin6_addr),
+ 			buf, sizeof (buf))));
+ 		free (buf);
+ #else
+@@ -1096,9 +1096,9 @@
+ static void
+ Aerror(const res_state statp, FILE *file, const char *string, int error,
+ #ifdef _LIBC
+-       struct sockaddr6_in address)
++       struct sockaddr6_in *address)
+ #else
+-       struct sockaddr_in address)
++       struct sockaddr_in *address)
+ #endif
+ {
+ 	int save = errno;

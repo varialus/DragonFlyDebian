@@ -1,0 +1,126 @@
+--- glibc-2.3.1/sysdeps/unix/bsd/bsd4.4/kfreebsd/i386/brk.S~	2002-07-24 00:33:09.000000000 +0200
++++ glibc-2.3.1/sysdeps/unix/bsd/bsd4.4/kfreebsd/i386/brk.S	1970-01-01 01:00:00.000000000 +0100
+@@ -1,52 +0,0 @@
+-/* Copyright (C) 2002 Free Software Foundation, Inc.
+-   This file is part of the GNU C Library.
+-   Contributed by Bruno Haible <bruno@clisp.org>, 2002.
+-
+-   The GNU C Library is free software; you can redistribute it and/or
+-   modify it under the terms of the GNU Lesser General Public
+-   License as published by the Free Software Foundation; either
+-   version 2.1 of the License, or (at your option) any later version.
+-
+-   The GNU C Library is distributed in the hope that it will be useful,
+-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-   Lesser General Public License for more details.
+-
+-   You should have received a copy of the GNU Lesser General Public
+-   License along with the GNU C Library; if not, write to the Free
+-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+-   02111-1307 USA.  */
+-
+-#include <sysdep.h>
+-
+-.data
+-.globl C_SYMBOL_NAME(__curbrk)
+-#ifdef HAVE_ELF
+-	.type __curbrk,@object
+-	.size __curbrk,4
+-#endif
+-C_LABEL(__curbrk)
+-#ifdef	HAVE_GNU_LD
+-	.long C_SYMBOL_NAME(_end)
+-#else
+-	.long C_SYMBOL_NAME(end)
+-#endif
+-
+-.text
+-PSEUDO (__brk, obreak, 1)
+-	movl 4(%esp), %eax
+-#ifdef	PIC
+-	/* Standard PIC nonsense to store into `__curbrk' through the GOT.  */
+-	call L(here)
+-L(here): popl %ecx
+-	addl $_GLOBAL_OFFSET_TABLE_+[.-L(here)], %ecx
+-	movl C_SYMBOL_NAME(__curbrk@GOT)(%ecx), %ecx
+-	movl %eax, (%ecx)
+-#else
+-	movl %eax, C_SYMBOL_NAME(__curbrk)
+-#endif
+-	xorl %eax, %eax
+-	ret
+-PSEUDO_END (__brk)
+-
+-weak_alias (__brk, brk)
+--- glibc-2.3.1/sysdeps/unix/bsd/bsd4.4/kfreebsd/brk.c~	1970-01-01 01:00:00.000000000 +0100
++++ glibc-2.3.1/sysdeps/unix/bsd/bsd4.4/kfreebsd/brk.c	2004-02-18 12:43:01.000000000 +0100
+@@ -0,0 +1,57 @@
++/* Copyright (C) 1991, 1995, 1996, 1997, 2002 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++#include <errno.h>
++#include <unistd.h>
++#include <sys/syscall.h>
++
++#ifndef SYS_break
++#define SYS_break SYS_obreak
++#endif
++
++extern void _end;
++
++/* sbrk.c expects this.  */
++void *__curbrk = &_end;
++
++
++/* Set the end of the process's data space to ADDR.
++   Return 0 if successful, -1 if not.  */
++int
++__brk (addr)
++     void *addr;
++{
++
++
++
++  if (addr < &_end)
++    return 0;
++
++  if (syscall (SYS_break, addr) == -1)
++    {
++      __set_errno (ENOMEM);
++      return -1;
++    }
++
++  __curbrk = addr;
++  return 0;
++}
++stub_warning (brk)
++
++weak_alias (__brk, brk)
++#include <stub-tag.h>
+--- glibc-2.3.1/misc/Versions~	2002-10-09 00:17:34.000000000 +0200
++++ glibc-2.3.1/misc/Versions	2004-02-21 21:01:31.000000000 +0100
+@@ -1,7 +1,7 @@
+ libc {
+   GLIBC_2.0 {
+     # global variables
+-    ___brk_addr; __curbrk; __progname; __progname_full;
++    ___brk_addr; __curbrk; _end; __progname; __progname_full;
+ 
+     # interface of malloc functions
+     __sbrk; __getpagesize;

@@ -1,0 +1,84 @@
+
+  disable linuxthreads
+
+--- glibc-2.3/sysdeps/unix/bsd/bsd4.4/kfreebsd/i386/bits/types.h~	2002-09-15 22:00:52.000000000 +0200
++++ glibc-2.3/sysdeps/unix/bsd/bsd4.4/kfreebsd/i386/bits/types.h	2004-01-17 19:23:29.000000000 +0100
+@@ -138,7 +138,7 @@
+ 
+ /* Now add the thread types.  */
+ #if defined __USE_POSIX199506 || defined __USE_UNIX98
+-# include <bits/pthreadtypes.h>
++// include <bits/pthreadtypes.h>
+ #endif
+ 
+ #endif /* bits/types.h */
+--- glibc-2.3/sysdeps/generic/bits/libc-tsd.h~	2004-01-17 19:36:56.000000000 +0100
++++ glibc-2.3/sysdeps/generic/bits/libc-tsd.h	2004-01-17 19:38:58.000000000 +0100
+@@ -60,7 +60,7 @@
+ #else
+ # define __libc_tsd_define(CLASS, KEY)	CLASS void *__libc_tsd_##KEY##_data;
+ 
+-# define __libc_tsd_address(KEY)	(&__libc_tsd_##KEY)
++# define __libc_tsd_address(KEY)	(&__libc_tsd_##KEY##_data)
+ # define __libc_tsd_get(KEY)		(__libc_tsd_##KEY##_data)
+ # define __libc_tsd_set(KEY, VALUE)	(__libc_tsd_##KEY##_data = (VALUE))
+ #endif
+--- glibc-2.3/sysdeps/unix/bsd/bsd4.4/kfreebsd/configure~	2004-01-18 19:29:41.000000000 +0100
++++ glibc-2.3/sysdeps/unix/bsd/bsd4.4/kfreebsd/configure	2004-01-18 19:30:43.000000000 +0100
+@@ -66,19 +66,9 @@
+ esac
+ 
+ if test "$linuxthreads_missing"; then
+-  if test $enable_sanity = yes; then
+-    echo "\
+-*** On GNU/kFreeBSD systems it is normal to compile GNU libc with the
+-*** 'linuxthreads' add-on.  Without that, the library will be
+-*** incompatible with normal GNU/kFreeBSD systems.
+-*** If you really mean to not use this add-on, run configure again
+-*** using the extra parameter '--disable-sanity-checks'."
+-    exit 1
+-  else
+     echo "\
+ *** WARNING: Are you sure you do not want to use the 'linuxthreads'
+ *** add-on?"
+-  fi
+ fi
+ 
+ # On kFreeBSD we use ldconfig.
+--- glibc-2.3/sysdeps/unix/bsd/bsd4.4/kfreebsd/configure.in~	2004-01-18 19:29:41.000000000 +0100
++++ glibc-2.3/sysdeps/unix/bsd/bsd4.4/kfreebsd/configure.in	2004-01-18 19:30:32.000000000 +0100
+@@ -53,19 +53,9 @@
+ esac
+ 
+ if test "$linuxthreads_missing"; then
+-  if test $enable_sanity = yes; then
+-    echo "\
+-*** On GNU/kFreeBSD systems it is normal to compile GNU libc with the
+-*** 'linuxthreads' add-on.  Without that, the library will be
+-*** incompatible with normal GNU/kFreeBSD systems.
+-*** If you really mean to not use this add-on, run configure again
+-*** using the extra parameter '--disable-sanity-checks'."
+-    exit 1
+-  else
+     echo "\
+ *** WARNING: Are you sure you do not want to use the 'linuxthreads'
+ *** add-on?"
+-  fi
+ fi
+ 
+ # On kFreeBSD we use ldconfig.
+--- glibc-2.3/sysdeps/unix/bsd/bsd4.4/kfreebsd/Makefile~	2004-01-18 19:48:23.000000000 +0100
++++ glibc-2.3/sysdeps/unix/bsd/bsd4.4/kfreebsd/Makefile	2004-01-18 20:06:11.000000000 +0100
+@@ -90,12 +90,6 @@
+ sysdep_routines += ntp_adjtime ntp_gettime
+ endif
+ 
+-# Linuxthreads dependencies.
+-
+-ifeq ($(subdir),posix)
+-sysdep_headers += bits/pthreadtypes.h bits/initspin.h
+-endif
+-
+ # Don't compile the ctype glue code, since we have a much better <ctype.h>
+ # than the old non-GNU C library.
+ inhibit-glue = yes
