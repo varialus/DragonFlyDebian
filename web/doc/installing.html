@@ -21,6 +21,7 @@
 <hr align="center" width="70%">
 
 <table width="70%" border="0" cellpadding="0" cellspacing="0">
+
 <tr>
 <th colspan="3" align="left"><a name="pre"></a><font color="#990000"><h3>Pre-installation notes</h3></font></th>
 </tr>
@@ -28,7 +29,7 @@
 <tr>
 <td width="70%" align="left">
 <p><b>Important</b> - Make sure you've read <a href="sysreq.html#media">"Installation media"</a> before you continue. 
-It contains important partitioning related information.
+It contains important information.
 
 </p>
 </td>
@@ -36,7 +37,73 @@ It contains important partitioning related information.
 
 <tr>
 <th colspan="3" align="left">
-<a name="base"></a><font color="#990000"><h3>Installing the base system</h3></font></th>
+<a name="base-freebsd"></a><font color="#990000"><h3>Installing with a FreeBSD CD</h3></font></th>
+</tr>
+
+<tr>
+<td width="70%" align="left">
+<p>
+This method involves booting from the FreeBSD CD, inserting the GNU/kFreeBSD live CD and installing 
+a base system. The reason this is possible is because the FreeBSD installer recognizes the live CD as a 
+legacy FreeBSD disc (pre 2.1.5). So, you will need a copy of the FreeBSD CD and a copy of the live CD.
+
+<p>Insert the FreeBSD installation CD and boot your computer from it.</p>
+
+<p>Once the CD is finished booting, you should be presented with an installation menu.</p>
+
+<p>Select <font color="#461b7e"><b><i>"Standard - Begin a standard installation"</i></b></font>.</p>
+
+<p>You will now be asked to create your partitions.</p>
+<p>In the past, you could only install on to a single / slice. This no longer applies. 
+However, if you decide to use multiple slices for /usr, /home etc., they will not be added 
+to /etc/fstab automatically. You will have to add them manually.</p>
+
+<p>A simple / slice and swap is fine.</p>
+
+<p>For more information on partitioning with FreeBSD, see <a href="http://www.freebsd.org/handbook/install-steps.html">this</a>
+ page of the FreeBSD handbook.</p>
+
+
+<p>After you've finished creating the necessary partitions, you will be asked to install a boot manager.
+<br>Since you're going to be using GRUB as your boot loader,</p>
+
+<p>Select <font color="#461b7e"><b><i>"None - Leave the master boot record untouched"</i></b></font>.</p>
+
+<p>When you are at the <font color="#461b7e"><b><i>"Choose distributions"</i></b></font> 
+screen, select <font color="#461b7e"><b><i>"Minimal"</i></b></font>.
+<br>It is important that you select the minimal option. The live CD only contains a minimal installation, 
+and if you want to install more software you can use the Debian tools later to do so.</p>
+
+<p>The <font color="#461b7e"><b><i>"Choose installation media"</i></b></font> section is next.
+<br>Now it's time to switch CD's. Remove the FreeBSD CD from your computer and insert the GNU/kFreeBSD 
+live CD.</p>
+<p>Select <font color="#461b7e"><b><i>"CD/DVD - Install from a FreeBSD CD/DVD"</i></b></font>.</p>
+
+<p>The base system will now be installed. 
+<br>If you are presented with a warning about the current disc not being a FreeBSD CD, 
+just ignore it and answer <i>Yes</i>.</p>
+
+<p>Once the base system is extracted, you will be asked some questions related to the configuration of 
+your system. Answer <b>no</b> to all of these questions.</p>
+
+<p>When you're done installing the base system, you can reboot in to your new GNU/kFreeBSD system, 
+where you'll be in single user mode. See <a href="installing.html#grub">"Boot loader"</a> for 
+information on how to boot your new system with GRUB. Now all the base packages need to be installed and configured.</p>
+
+<p><font color="#461b7e" size=-1><b># /native-install</b></font></p>
+
+<p>This might take a while on slower machines.
+<br>Once native-install is finished, you'll need to reboot again. After that, you should have a 
+functioning Debian GNU/kFreeBSD system.
+</p>
+
+</p>
+</td>
+</tr>
+
+<tr>
+<th colspan="3" align="left">
+<a name="base-live"></a><font color="#990000"><h3>Installing with the live CD</h3></font></th>
 </tr>
 
 <tr>
@@ -54,7 +121,7 @@ It contains important partitioning related information.
 
 <p>Now extract the base tarball.</p>
 
-<p><font color="#461b7e" size=-1><b># tar -C /mnt --same-owner -xzpf /root/i386-kfreebsd-gnu.tar.gz</b></font></p>
+<p><font color="#461b7e" size=-1><b># tar -C /mnt --same-owner -xzpf /root/base.tgz</b></font></p>
 
 <p>Chroot in to the extracted system.</p>
 
