@@ -8,7 +8,7 @@ package		:= kfreebsd$(major)
 
 DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
 DEB_TAR_SRCDIR			:= src
-DEB_PATCHDIRS			:= /usr/src/kfreebsd$(major)/patches
+DEB_PATCHDIRS			:= /usr/src/kfreebsd$(major)/patches debian/patches
 DEB_PATCHDIRS_READONLY		:= yes
 DEB_DH_SHLIBDEPS_ARGS		:= -X/boot
 DEB_STRIP_EXCLUDE		:= /boot
@@ -65,7 +65,7 @@ install/$(package):: common-install-prehook-arch
 	chmod 644 $(DESTDIR)/boot/kernel/kernel
 
 clean::
-	lsdiff -h $(DEB_PATCHDIRS)/*.diff \
+	lsdiff -h `for i in $(DEB_PATCHDIRS) ; do echo $$i/*.diff ; done` \
 		| grep -q src/sys/$(kfreebsd_cpu)/conf/GENERIC
 
 	sed \
