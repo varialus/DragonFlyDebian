@@ -1,0 +1,121 @@
+#!/usr/bin/perl
+
+use File::Find;
+
+sub editfile {
+	my ($file,$rule)=@_;
+
+	open IN,"<$file";
+	open OUT,"| diff -u $file -";
+	while(<IN>) {
+		eval $rule;
+		print OUT $_;
+	}
+	close OUT;
+	close IN;
+}
+
+sub wanted {
+	push @recursefiles,"$File::Find::dir/$_" if -f $_;
+}
+
+sub dorule {
+	my ($file,$rule)=@_;
+	my $dir;
+
+	if(-d $file) {
+		undef @recursefiles;
+		find(\&wanted,$file);
+		map editfile($_,$rule), @recursefiles;
+	} else {
+		editfile($file,$rule);
+	}
+}
+
+
+$rules=shift @ARGV;
+
+open RULES,"<$rules";
+while(<RULES>) {
+	chomp;
+	$line=$_;
+
+	# check for inlining first
+	if($inlining) {
+		if(/\A$inlining\Z/) {
+			$inlining="";
+			next;
+		}
+		print "$_\n";
+		next;
+	}
+			
+	next if $line=~/^#/; # skip comment lines
+	while($line=~s/\\\s*$/ /) {
+		$line.=<RULES>;  # handle run on lines
+	}
+	# :append will append a diff file to the output
+	if($line=~/^:append\s+(\S+)\s*$/) {
+		push @append,$1;
+		next;
+	}
+	# :add will create a diff to add a file at some path in the tree
+	if($line=~/^:add\s+(\S+)\s+(\S+)\s*$/) {
+		my ($file,$path);
+		$file=$1; $path=$2;
+		$addfiles{$path}=$file;
+		next;
+	}
+	# :here works like "here documents" in shell or perl
+	if($line=~/^:here\s+(\S+)\s*$/) {
+		$inlining=$1;
+		next;
+	}
+	# :replace will create a diff to replace a file at some path
+	if($line=~/^:replace\s+(\S+)\s+(\S+)\s*$/) {
+		my ($file,$path);
+		$file=$1; $path=$2;
+		$replfiles{$path}=$file;
+		next;
+	}
+	# the pattern is: [file1] [file2] [fileN]: { perl expression }
+	if($line=~/^([^:]+):(.+)/) {
+		$filelist=$1; $rule=$2;
+		@filelist=split(/\s+/,$filelist);
+		map dorule($_,$rule), @filelist;
+	}
+}
+foreach (@append) {
+	open I,"<$_";
+	while(<I>) {
+		print;
+	}
+	close I;
+}
+
+foreach $path (keys %addfiles) {
+	$file=$addfiles{$path};
+	$time=scalar(localtime(time));
+	open I,"<$file";
+	@buf=<I>;
+
+	print "--- $path\t$time\n";
+	print "+++ $path\t$time\n";
+	print "\@\@ -0,0 +1,",$#buf+1," \@\@\n";
+	map { print "+$_" } @buf;
+	close I;
+}
+
+map {
+	$path=$_;
+	$file=$replfiles{$path};
+	open I,"<$file";
+	open O,"| diff -uN $path -";
+	while(<I>) {
+		print O;
+	}
+	close I;
+	close O;
+} (keys %replfiles);
+
+0;

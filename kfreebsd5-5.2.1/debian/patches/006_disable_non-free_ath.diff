@@ -1,0 +1,86 @@
+diff -ur src.old/sys/conf/files src/sys/conf/files
+--- src.old/sys/conf/files	2003-12-03 15:55:30.000000000 +0100
++++ src/sys/conf/files	2004-05-09 03:29:25.000000000 +0200
+@@ -191,7 +191,6 @@
+ contrib/dev/acpica/utmisc.c	 optional acpi
+ contrib/dev/acpica/utobject.c	 optional acpi
+ contrib/dev/acpica/utxface.c	 optional acpi
+-contrib/dev/ath/freebsd/ah_osdep.c	optional ath_hal
+ contrib/ipfilter/netinet/fil.c		optional ipfilter inet
+ contrib/ipfilter/netinet/ip_auth.c	optional ipfilter inet
+ contrib/ipfilter/netinet/ip_fil.c	optional ipfilter inet
+@@ -319,9 +318,6 @@
+ dev/ata/atapi-fd.c	optional atapifd
+ dev/ata/atapi-tape.c	optional atapist
+ dev/ata/atapi-cam.c	optional atapicam
+-dev/ath/if_ath.c	optional ath
+-dev/ath/if_ath_pci.c	optional ath pci
+-dev/ath/if_ath_pci.c	optional ath card
+ dev/awi/am79c930.c	optional awi
+ dev/awi/awi.c		optional awi
+ dev/awi/awi_wep.c	optional awi
+diff -ur src.old/sys/conf/files.i386 src/sys/conf/files.i386
+--- src.old/sys/conf/files.i386	2003-12-04 00:06:30.000000000 +0100
++++ src/sys/conf/files.i386	2004-05-09 03:30:05.000000000 +0200
+@@ -56,11 +56,6 @@
+ 	compile-with	"uudecode < $S/contrib/dev/oltr/i386-elf.trlld.o.uu"	\
+ 	no-implicit-rule
+ #
+-hal.o				optional	ath_hal			\
+-	dependency	"$S/contrib/dev/ath/freebsd/i386-elf.hal.o.uu"	\
+-	compile-with	"uudecode < $S/contrib/dev/ath/freebsd/i386-elf.hal.o.uu" \
+-	no-implicit-rule
+-#
+ #
+ compat/linux/linux_file.c	optional	compat_linux
+ compat/linux/linux_getcwd.c	optional	compat_linux
+diff -ur src.old/sys/conf/files.pc98 src/sys/conf/files.pc98
+--- src.old/sys/conf/files.pc98	2003-12-03 22:44:44.000000000 +0100
++++ src/sys/conf/files.pc98	2004-05-09 03:30:23.000000000 +0200
+@@ -43,11 +43,6 @@
+ 	compile-with	"uudecode < $S/contrib/dev/oltr/i386-elf.trlld.o.uu"	\
+ 	no-implicit-rule
+ #
+-hal.o				optional	ath_hal			\
+-	dependency	"$S/contrib/dev/ath/freebsd/i386-elf.hal.o.uu"	\
+-	compile-with	"uudecode < $S/contrib/dev/ath/freebsd/i386-elf.hal.o.uu" \
+-	no-implicit-rule
+-#
+ #
+ compat/linux/linux_file.c	optional	compat_linux
+ compat/linux/linux_getcwd.c	optional	compat_linux
+diff -ur src.old/sys/conf/kern.pre.mk src/sys/conf/kern.pre.mk
+--- src.old/sys/conf/kern.pre.mk	2003-11-05 13:20:16.000000000 +0100
++++ src/sys/conf/kern.pre.mk	2004-05-09 03:30:50.000000000 +0200
+@@ -29,9 +29,6 @@
+ # ... and the same for ipfilter
+ INCLUDES+= -I$S/contrib/ipfilter
+ 
+-# ... and the same for Atheros HAL
+-INCLUDES+= -I$S/contrib/dev/ath -I$S/contrib/dev/ath/freebsd
+-
+ # ... and the same for the NgATM stuff
+ INCLUDES+= -I$S/contrib/ngatm
+ 
+diff -ur src.old/sys/modules/Makefile src/sys/modules/Makefile
+--- src.old/sys/modules/Makefile	2003-12-03 22:13:06.000000000 +0100
++++ src/sys/modules/Makefile	2004-05-09 03:44:06.000000000 +0200
+@@ -189,7 +189,6 @@
+ 	apm \
+ 	ar \
+ 	arcnet \
+-	ath_hal \
+ 	awi \
+ 	bktr \
+ 	coff \
+diff -ur src.old/sys/modules/Makefile src/sys/modules/Makefile
+--- src.old/sys/modules/Makefile	2004-05-09 04:06:55.000000000 +0200
++++ src/sys/modules/Makefile	2004-05-09 04:12:37.000000000 +0200
+@@ -17,7 +17,6 @@
+ 	aio \
+ 	amr \
+ 	an \
+-	ath \
+ 	aue \
+ 	axe \
+ 	bfe \

@@ -1,0 +1,44 @@
+diff -ur src/sys/dev/isp.old/isp.c src/sys/dev/isp/isp.c
+--- src/sys/dev/isp.old/isp.c	2003-09-13 03:55:44.000000000 +0200
++++ src/sys/dev/isp/isp.c	2004-05-22 02:59:03.000000000 +0200
+@@ -39,10 +39,14 @@
+  * Include header file appropriate for platform we're building on.
+  */
+ 
++#ifdef __GLIBC__
++#define _BSD_SOURCE 1 /* u_int16_t */
++#endif
++
+ #ifdef	__NetBSD__
+ #include <dev/ic/isp_netbsd.h>
+ #endif
+-#ifdef	__FreeBSD__
++#ifdef	__FreeBSD_kernel__
+ #include <dev/isp/isp_freebsd.h>
+ #endif
+ #ifdef	__OpenBSD__
+Only in src/sys/dev/isp/: isp.c~
+diff -ur src/sys/dev/isp.old/ispvar.h src/sys/dev/isp/ispvar.h
+--- src/sys/dev/isp.old/ispvar.h	2003-09-13 03:59:14.000000000 +0200
++++ src/sys/dev/isp/ispvar.h	2004-05-22 03:00:10.000000000 +0200
+@@ -31,6 +31,10 @@
+ #ifndef	_ISPVAR_H
+ #define	_ISPVAR_H
+ 
++#ifdef __GLIBC__
++#define _BSD_SOURCE 1
++#endif
++
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <dev/ic/ispmbox.h>
+ #ifdef	ISP_TARGET_MODE
+@@ -38,7 +42,7 @@
+ #include <dev/ic/isp_tpublic.h>
+ #endif
+ #endif
+-#ifdef	__FreeBSD__
++#ifdef	__FreeBSD_kernel__
+ #include <dev/isp/ispmbox.h>
+ #ifdef	ISP_TARGET_MODE
+ #include <dev/isp/isp_target.h>
+Only in src/sys/dev/isp/: ispvar.h~

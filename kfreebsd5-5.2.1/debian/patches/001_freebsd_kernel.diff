@@ -1,0 +1,4935 @@
+diff -ur src.old/sys/cam/scsi/scsi_low.c src/sys/cam/scsi/scsi_low.c
+--- src.old/sys/cam/scsi/scsi_low.c	2003-06-15 00:17:38.000000000 +0200
++++ src/sys/cam/scsi/scsi_low.c	2004-05-22 01:01:27.000000000 +0200
+@@ -72,7 +72,7 @@
+ #include <sys/systm.h>
+ #include <sys/kernel.h>
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #if __FreeBSD_version >= 500001
+ #include <sys/bio.h>
+ #else
+@@ -105,7 +105,7 @@
+ #include <i386/Cbus/dev/scsi_low.h>
+ #endif	/* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <cam/cam.h>
+ #include <cam/cam_ccb.h>
+ #include <cam/cam_sim.h>
+diff -ur src.old/sys/compat/svr4/svr4_misc.c src/sys/compat/svr4/svr4_misc.c
+--- src.old/sys/compat/svr4/svr4_misc.c	2003-11-19 05:12:32.000000000 +0100
++++ src/sys/compat/svr4/svr4_misc.c	2004-05-22 01:01:30.000000000 +0200
+@@ -86,7 +86,7 @@
+ #include <vm/vm.h>
+ #include <vm/vm_param.h>
+ #include <vm/vm_map.h>
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <vm/uma.h>
+ #include <vm/vm_extern.h>
+ #endif
+@@ -1371,7 +1371,7 @@
+ #if defined(__NetBSD__)
+ 			pool_put(&proc_pool, q);
+ #endif
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 			mtx_destroy(&q->p_mtx);
+ #ifdef MAC
+                         mac_destroy_proc(q);
+diff -ur src.old/sys/contrib/dev/acpica/acenv.h src/sys/contrib/dev/acpica/acenv.h
+--- src.old/sys/contrib/dev/acpica/acenv.h	2003-05-01 22:40:03.000000000 +0200
++++ src/sys/contrib/dev/acpica/acenv.h	2004-05-22 01:05:15.000000000 +0200
+@@ -204,7 +204,7 @@
+ #elif defined(MSDOS)        /* Must appear after WIN32 and WIN64 check */
+ #include "acdos16.h"
+ 
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include "acfreebsd.h"
+ 
+ #elif defined(MODESTO)
+diff -ur src.old/sys/contrib/ipfilter/netinet/fil.c src/sys/contrib/ipfilter/netinet/fil.c
+--- src.old/sys/contrib/ipfilter/netinet/fil.c	2003-02-19 06:47:00.000000000 +0100
++++ src/sys/contrib/ipfilter/netinet/fil.c	2004-05-22 01:01:45.000000000 +0200
+@@ -818,7 +818,7 @@
+ 	int up;
+ 
+ #  if !SOLARIS && !defined(NETBSD_PF) && \
+-      ((defined(__FreeBSD__) && (__FreeBSD_version < 500011)) || \
++      ((defined(__FreeBSD_kernel__) && (__FreeBSD_version < 500011)) || \
+        defined(__OpenBSD__) || defined(_BSDI_VERSION))
+ 	if (fr_checkp != fr_check && fr_running > 0) {
+ 		static int counter = 0;
+@@ -942,7 +942,7 @@
+ # endif
+ #endif /* _KERNEL */
+ 	
+-#ifndef __FreeBSD__
++#ifndef __FreeBSD_kernel__
+ 	/*
+ 	 * Be careful here: ip_id is in network byte order when called
+ 	 * from ip_output()
+@@ -1193,7 +1193,7 @@
+ 	}
+ #endif /* IPFILTER_LOG */
+ 
+-#ifndef __FreeBSD__	
++#ifndef __FreeBSD_kernel__	
+ 	if ((out) && (v == 4))
+ 		ip->ip_id = htons(ip->ip_id);
+ #endif
+diff -ur src.old/sys/contrib/ipfilter/netinet/ip_auth.c src/sys/contrib/ipfilter/netinet/ip_auth.c
+--- src.old/sys/contrib/ipfilter/netinet/ip_auth.c	2003-03-05 00:19:55.000000000 +0100
++++ src/sys/contrib/ipfilter/netinet/ip_auth.c	2004-05-22 01:01:45.000000000 +0200
+@@ -91,7 +91,7 @@
+ #include "netinet/ip_auth.h"
+ #if !SOLARIS && !defined(linux)
+ # include <net/netisr.h>
+-# ifdef __FreeBSD__
++# ifdef __FreeBSD_kernel__
+ #  include <machine/cpufunc.h>
+ # endif
+ #endif
+@@ -283,7 +283,7 @@
+ 
+ 		bo = ip->ip_len;
+ 		ip->ip_len = htons(bo);
+-# if !SOLARIS && !defined(__NetBSD__) && !defined(__FreeBSD__)
++# if !SOLARIS && !defined(__NetBSD__) && !defined(__FreeBSD_kernel__)
+ 		/* 4.4BSD converts this ip_input.c, but I don't in solaris.c */
+ 		bo = ip->ip_id;
+ 		ip->ip_id = htons(bo);
+diff -ur src.old/sys/contrib/ipfilter/netinet/ip_compat.h src/sys/contrib/ipfilter/netinet/ip_compat.h
+--- src.old/sys/contrib/ipfilter/netinet/ip_compat.h	2003-10-31 19:31:56.000000000 +0100
++++ src/sys/contrib/ipfilter/netinet/ip_compat.h	2004-05-22 01:05:19.000000000 +0200
+@@ -214,7 +214,7 @@
+ #endif /* BSD > 199306 */
+ 
+ 
+-#if defined(__FreeBSD__) && (defined(KERNEL) || defined(_KERNEL))
++#if defined(__FreeBSD_kernel__) && (defined(KERNEL) || defined(_KERNEL))
+ # include <sys/param.h>
+ # ifndef __FreeBSD_version
+ #  ifdef IPFILTER_LKM
+@@ -245,7 +245,7 @@
+ /*
+  * These operating systems already take care of the problem for us.
+  */
+-#if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD__) || \
++#if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD_kernel__) || \
+     defined(__sgi)
+ typedef u_int32_t       u_32_t;
+ # if defined(_KERNEL) && !defined(IPFILTER_LKM)
+@@ -283,7 +283,7 @@
+ #endif /* __NetBSD__ || __OpenBSD__ || __FreeBSD__ || __sgi */
+ 
+ #ifdef	USE_INET6
+-# if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD__)
++# if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD_kernel__)
+ #  include <netinet/ip6.h>
+ #  ifdef	_KERNEL
+ #   include <netinet6/ip6_var.h>
+@@ -543,7 +543,7 @@
+ #   define	GETUNIT(n, v)	ifunit(n)
+ #   if (defined(NetBSD) && (NetBSD <= 1991011) && (NetBSD >= 199606)) || \
+         (defined(OpenBSD) && (OpenBSD >= 199603)) || \
+-	(defined(__FreeBSD__) && (__FreeBSD_version >= 501113))
++	(defined(__FreeBSD_kernel__) && (__FreeBSD_version >= 501113))
+ #    define	IFNAME(x)	((struct ifnet *)x)->if_xname
+ #   else
+ #    define	USE_GETIFNAME	1
+@@ -580,13 +580,13 @@
+ # ifndef	GET_MINOR
+ #  define	GET_MINOR(x)	minor(x)
+ # endif
+-# if (BSD >= 199306) || defined(__FreeBSD__)
++# if (BSD >= 199306) || defined(__FreeBSD_kernel__)
+ #  if (defined(__NetBSD_Version__) && (__NetBSD_Version__ < 105180000)) || \
+-       defined(__FreeBSD__) || (defined(OpenBSD) && (OpenBSD < 200206)) || \
++       defined(__FreeBSD_kernel__) || (defined(OpenBSD) && (OpenBSD < 200206)) || \
+        defined(_BSDI_VERSION)
+ #   include <vm/vm.h>
+ #  endif
+-#  if !defined(__FreeBSD__) || (defined (__FreeBSD_version) && \
++#  if !defined(__FreeBSD_kernel__) || (defined (__FreeBSD_version) && \
+       (__FreeBSD_version >= 300000))
+ #   if (defined(__NetBSD_Version__) && (__NetBSD_Version__ >= 105180000)) || \
+        (defined(OpenBSD) && (OpenBSD >= 200111))
+diff -ur src.old/sys/contrib/ipfilter/netinet/ip_fil.c src/sys/contrib/ipfilter/netinet/ip_fil.c
+--- src.old/sys/contrib/ipfilter/netinet/ip_fil.c	2003-10-31 19:31:56.000000000 +0100
++++ src/sys/contrib/ipfilter/netinet/ip_fil.c	2004-05-22 01:01:45.000000000 +0200
+@@ -20,7 +20,7 @@
+     defined(_KERNEL)  && !defined(_LKM)
+ # include "opt_ipfilter_log.h"
+ #endif
+-#if defined(__FreeBSD__) && !defined(__FreeBSD_version)
++#if defined(__FreeBSD_kernel__) && !defined(__FreeBSD_version)
+ # if !defined(_KERNEL) || defined(IPFILTER_LKM)
+ #  include <osreldate.h>
+ # endif
+@@ -1753,7 +1753,7 @@
+ 	 */
+ 	if (ip->ip_len <= ifp->if_mtu) {
+ # ifndef sparc
+-#  if (!defined(__FreeBSD__) && !(_BSDI_VERSION >= 199510)) && \
++#  if (!defined(__FreeBSD_kernel__) && !(_BSDI_VERSION >= 199510)) && \
+       !(__NetBSD_Version__ >= 105110000)
+ 		ip->ip_id = htons(ip->ip_id);
+ #  endif
+@@ -2076,7 +2076,7 @@
+ 
+ # if (defined(NetBSD) && (NetBSD <= 1991011) && (NetBSD >= 199606)) || \
+ 	(defined(OpenBSD) && (OpenBSD >= 199603)) || \
+-	(defined(__FreeBSD__) && (__FreeBSD_version >= 501113))
++	(defined(__FreeBSD_kernel__) && (__FreeBSD_version >= 501113))
+ 	sprintf(fname, "%s", ifp->if_xname);
+ # else
+ 	sprintf(fname, "%s%d", ifp->if_name, ifp->if_unit);
+@@ -2097,7 +2097,7 @@
+ {
+ # if (defined(NetBSD) && (NetBSD <= 1991011) && (NetBSD >= 199606)) || \
+      (defined(OpenBSD) && (OpenBSD >= 199603)) || \
+-     (defined(__FreeBSD__) && (__FreeBSD_version >= 501113))
++     (defined(__FreeBSD_kernel__) && (__FreeBSD_version >= 501113))
+ 	return ifp->if_xname;
+ # else
+ 	static char fullifname[LIFNAMSIZ];
+@@ -2117,7 +2117,7 @@
+ 	for (ifa = ifneta; ifa && (ifp = *ifa); ifa++) {
+ # if (defined(NetBSD) && (NetBSD <= 1991011) && (NetBSD >= 199606)) || \
+      (defined(OpenBSD) && (OpenBSD >= 199603)) || \
+-     (defined(__FreeBSD__) && (__FreeBSD_version >= 501113))
++     (defined(__FreeBSD_kernel__) && (__FreeBSD_version >= 501113))
+ 		if (!strncmp(ifname, ifp->if_xname, sizeof(ifp->if_xname)))
+ # else
+ 		char fullname[LIFNAMSIZ];
+@@ -2160,7 +2160,7 @@
+ 
+ # if (defined(NetBSD) && (NetBSD <= 1991011) && (NetBSD >= 199606)) || \
+      (defined(OpenBSD) && (OpenBSD >= 199603)) || \
+-     (defined(__FreeBSD__) && (__FreeBSD_version >= 501113))
++     (defined(__FreeBSD_kernel__) && (__FreeBSD_version >= 501113))
+ 	strncpy(ifp->if_xname, ifname, sizeof(ifp->if_xname));
+ # else
+ 	ifp->if_name = strdup(ifname);
+@@ -2188,7 +2188,7 @@
+ 
+ # if (defined(NetBSD) && (NetBSD <= 1991011) && (NetBSD >= 199606)) || \
+ 	(defined(OpenBSD) && (OpenBSD >= 199603)) || \
+-	(defined(__FreeBSD__) && (__FreeBSD_version >= 501113))
++	(defined(__FreeBSD_kernel__) && (__FreeBSD_version >= 501113))
+ 	for (ifa = ifneta; ifa && (ifp = *ifa); ifa++) {
+ 		ifp->if_output = write_output;
+ 		sprintf(fname, "/tmp/%s", ifp->if_xname);
+diff -ur src.old/sys/contrib/ipfilter/netinet/ip_log.c src/sys/contrib/ipfilter/netinet/ip_log.c
+--- src.old/sys/contrib/ipfilter/netinet/ip_log.c	2003-12-02 19:28:00.000000000 +0100
++++ src/sys/contrib/ipfilter/netinet/ip_log.c	2004-05-22 01:01:45.000000000 +0200
+@@ -254,7 +254,7 @@
+ # else
+ #  if (defined(NetBSD) && (NetBSD <= 1991011) && (NetBSD >= 199603)) || \
+ 	(defined(OpenBSD) && (OpenBSD >= 199603)) || \
+-	(defined(__FreeBSD__) && (__FreeBSD_version >= 501113))
++	(defined(__FreeBSD_kernel__) && (__FreeBSD_version >= 501113))
+ 	strncpy(ipfl.fl_ifname, ifp->if_xname, IFNAMSIZ);
+ #  else
+ 	ipfl.fl_unit = (u_char)ifp->if_unit;
+@@ -366,7 +366,7 @@
+ #  if SOLARIS || defined(sun)
+ 	uniqtime(&ipl->ipl_tv);
+ #  else
+-#   if BSD >= 199306 || defined(__FreeBSD__) || defined(__sgi)
++#   if BSD >= 199306 || defined(__FreeBSD_kernel__) || defined(__sgi)
+ 	microtime(&ipl->ipl_tv);
+ #   endif
+ #  endif
+@@ -452,7 +452,7 @@
+ # endif /* SOLARIS */
+ 	}
+ 
+-# if BSD >= 199306 || defined(__FreeBSD__)
++# if BSD >= 199306 || defined(__FreeBSD_kernel__)
+ 	uio->uio_rw = UIO_READ;
+ # endif
+ 
+diff -ur src.old/sys/contrib/ipfilter/netinet/ip_nat.c src/sys/contrib/ipfilter/netinet/ip_nat.c
+--- src.old/sys/contrib/ipfilter/netinet/ip_nat.c	2003-02-15 07:23:45.000000000 +0100
++++ src/sys/contrib/ipfilter/netinet/ip_nat.c	2004-05-22 01:01:45.000000000 +0200
+@@ -6,7 +6,7 @@
+  * Added redirect stuff and a LOT of bug fixes. (mcn@EnGarde.com)
+  */
+ 
+-#if defined(__FreeBSD__) && defined(KERNEL) && !defined(_KERNEL)
++#if defined(__FreeBSD_kernel__) && defined(KERNEL) && !defined(_KERNEL)
+ #define _KERNEL
+ #endif
+ 
+diff -ur src.old/sys/contrib/ipfilter/netinet/ip_proxy.c src/sys/contrib/ipfilter/netinet/ip_proxy.c
+--- src.old/sys/contrib/ipfilter/netinet/ip_proxy.c	2003-02-15 07:23:45.000000000 +0100
++++ src/sys/contrib/ipfilter/netinet/ip_proxy.c	2004-05-22 01:01:45.000000000 +0200
+@@ -4,7 +4,7 @@
+  * See the IPFILTER.LICENCE file for details on licencing.
+  */
+ 
+-#if defined(__FreeBSD__) && defined(KERNEL) && !defined(_KERNEL)
++#if defined(__FreeBSD_kernel__) && defined(KERNEL) && !defined(_KERNEL)
+ # define	_KERNEL
+ #endif
+ 
+diff -ur src.old/sys/contrib/ngatm/netnatm/saal/sscfu.h src/sys/contrib/ngatm/netnatm/saal/sscfu.h
+--- src.old/sys/contrib/ngatm/netnatm/saal/sscfu.h	2003-10-22 09:41:15.000000000 +0200
++++ src/sys/contrib/ngatm/netnatm/saal/sscfu.h	2004-05-22 01:05:20.000000000 +0200
+@@ -41,7 +41,7 @@
+  * Define how a buffer looks like.
+  */
+ #ifdef _KERNEL
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define SSCFU_MBUF_T mbuf
+ #endif
+ #else
+diff -ur src.old/sys/contrib/ngatm/netnatm/saal/sscfupriv.h src/sys/contrib/ngatm/netnatm/saal/sscfupriv.h
+--- src.old/sys/contrib/ngatm/netnatm/saal/sscfupriv.h	2003-10-22 09:41:15.000000000 +0200
++++ src/sys/contrib/ngatm/netnatm/saal/sscfupriv.h	2004-05-22 01:05:20.000000000 +0200
+@@ -31,7 +31,7 @@
+  * Private SSCF-UNI definitions.
+  */
+ #ifdef _KERNEL
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <netgraph/atm/sscfu/ng_sscfu_cust.h>
+ #endif
+ #else
+diff -ur src.old/sys/contrib/ngatm/netnatm/saal/sscop.h src/sys/contrib/ngatm/netnatm/saal/sscop.h
+--- src.old/sys/contrib/ngatm/netnatm/saal/sscop.h	2003-10-22 09:41:15.000000000 +0200
++++ src/sys/contrib/ngatm/netnatm/saal/sscop.h	2004-05-22 01:05:21.000000000 +0200
+@@ -39,7 +39,7 @@
+  * Define how a buffer looks like.
+  */
+ #ifdef _KERNEL
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define SSCOP_MBUF_T mbuf
+ #endif
+ #else
+diff -ur src.old/sys/contrib/ngatm/netnatm/saal/sscoppriv.h src/sys/contrib/ngatm/netnatm/saal/sscoppriv.h
+--- src.old/sys/contrib/ngatm/netnatm/saal/sscoppriv.h	2003-10-22 09:41:16.000000000 +0200
++++ src/sys/contrib/ngatm/netnatm/saal/sscoppriv.h	2004-05-22 01:05:21.000000000 +0200
+@@ -32,7 +32,7 @@
+  *
+  */
+ #ifdef _KERNEL
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <netgraph/atm/sscop/ng_sscop_cust.h>
+ #endif
+ #else	/* !_KERNEL */
+diff -ur src.old/sys/contrib/ngatm/netnatm/sig/unipriv.h src/sys/contrib/ngatm/netnatm/sig/unipriv.h
+--- src.old/sys/contrib/ngatm/netnatm/sig/unipriv.h	2003-11-07 09:46:20.000000000 +0100
++++ src/sys/contrib/ngatm/netnatm/sig/unipriv.h	2004-05-22 01:05:21.000000000 +0200
+@@ -34,7 +34,7 @@
+ #define unipriv_h
+ 
+ #ifdef _KERNEL
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <netgraph/atm/uni/ng_uni_cust.h>
+ #endif
+ #else
+diff -ur src.old/sys/contrib/ngatm/netnatm/unimsg.h src/sys/contrib/ngatm/netnatm/unimsg.h
+--- src.old/sys/contrib/ngatm/netnatm/unimsg.h	2003-10-22 09:41:15.000000000 +0200
++++ src/sys/contrib/ngatm/netnatm/unimsg.h	2004-05-22 01:05:19.000000000 +0200
+@@ -35,7 +35,7 @@
+ 
+ #include <sys/types.h>
+ #ifdef _KERNEL
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <sys/systm.h>
+ #endif
+ #else
+diff -ur src.old/sys/crypto/sha2/sha2.c src/sys/crypto/sha2/sha2.c
+--- src.old/sys/crypto/sha2/sha2.c	2003-09-08 20:32:33.000000000 +0200
++++ src/sys/crypto/sha2/sha2.c	2004-05-22 01:01:48.000000000 +0200
+@@ -67,7 +67,7 @@
+  *
+  */
+ 
+-#if defined(__bsdi__) || defined(__FreeBSD__)
++#if defined(__bsdi__) || defined(__FreeBSD_kernel__)
+ #define assert(x)
+ #endif
+ 
+diff -ur src.old/sys/dev/aic7xxx/aic79xx.c src/sys/dev/aic7xxx/aic79xx.c
+--- src.old/sys/dev/aic7xxx/aic79xx.c	2003-08-24 19:48:02.000000000 +0200
++++ src/sys/dev/aic7xxx/aic79xx.c	2004-05-22 01:01:55.000000000 +0200
+@@ -2166,7 +2166,7 @@
+ 			printerror = 0;
+ 		} else if (ahd_sent_msg(ahd, AHDMSG_1B,
+ 					MSG_BUS_DEV_RESET, TRUE)) {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 			/*
+ 			 * Don't mark the user's request for this BDR
+ 			 * as completing with CAM_BDR_SENT.  CAM3
+@@ -5332,7 +5332,7 @@
+ 		free(ahd->seep_config, M_DEVBUF);
+ 	if (ahd->saved_stack != NULL)
+ 		free(ahd->saved_stack, M_DEVBUF);
+-#ifndef __FreeBSD__
++#ifndef __FreeBSD_kernel__
+ 	free(ahd, M_DEVBUF);
+ #endif
+ 	return;
+diff -ur src.old/sys/dev/aic7xxx/aic7xxx.c src/sys/dev/aic7xxx/aic7xxx.c
+--- src.old/sys/dev/aic7xxx/aic7xxx.c	2003-08-24 19:48:03.000000000 +0200
++++ src/sys/dev/aic7xxx/aic7xxx.c	2004-05-22 01:01:56.000000000 +0200
+@@ -1259,7 +1259,7 @@
+ 				printerror = 0;
+ 			} else if (ahc_sent_msg(ahc, AHCMSG_1B,
+ 						MSG_BUS_DEV_RESET, TRUE)) {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 				/*
+ 				 * Don't mark the user's request for this BDR
+ 				 * as completing with CAM_BDR_SENT.  CAM3
+@@ -4033,7 +4033,7 @@
+ 		free(ahc->name, M_DEVBUF);
+ 	if (ahc->seep_config != NULL)
+ 		free(ahc->seep_config, M_DEVBUF);
+-#ifndef __FreeBSD__
++#ifndef __FreeBSD_kernel__
+ 	free(ahc, M_DEVBUF);
+ #endif
+ 	return;
+diff -ur src.old/sys/dev/asr/i2oadptr.h src/sys/dev/asr/i2oadptr.h
+--- src.old/sys/dev/asr/i2oadptr.h	2002-05-14 23:59:10.000000000 +0200
++++ src/sys/dev/asr/i2oadptr.h	2004-05-22 01:05:27.000000000 +0200
+@@ -83,7 +83,7 @@
+ #if !defined(I2O_ADPTR_HDR)
+ #define	I2O_ADPTR_HDR
+ 
+-#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD__))
++#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD_kernel__))
+ # if (KERN_VERSION < 3)
+ #  include "i386/pci/i2omsg.h"
+ # else
+diff -ur src.old/sys/dev/asr/i2obscsi.h src/sys/dev/asr/i2obscsi.h
+--- src.old/sys/dev/asr/i2obscsi.h	2002-05-14 23:59:10.000000000 +0200
++++ src/sys/dev/asr/i2obscsi.h	2004-05-22 01:05:27.000000000 +0200
+@@ -83,7 +83,7 @@
+ #if !defined(I2O_BASE_SCSI_HDR)
+ #define	I2O_BASE_SCSI_HDR
+ 
+-#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD__))
++#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD_kernel__))
+ # if (KERN_VERSION < 3)
+ #  include    "i386/pci/i2omsg.h"	   /* Include the Base Message file */
+ # else
+diff -ur src.old/sys/dev/asr/i2oexec.h src/sys/dev/asr/i2oexec.h
+--- src.old/sys/dev/asr/i2oexec.h	2002-05-14 23:59:10.000000000 +0200
++++ src/sys/dev/asr/i2oexec.h	2004-05-22 01:05:28.000000000 +0200
+@@ -92,7 +92,7 @@
+ 
+ #define	I2OEXEC_REV 1_5_4  /* I2OExec header file revision string */
+ 
+-#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD__))
++#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD_kernel__))
+ # if (!defined(KERN_VERSION))
+ #  include <sys/sysctl.h>
+ # endif
+diff -ur src.old/sys/dev/asr/i2omsg.h src/sys/dev/asr/i2omsg.h
+--- src.old/sys/dev/asr/i2omsg.h	2002-05-14 23:59:10.000000000 +0200
++++ src/sys/dev/asr/i2omsg.h	2004-05-22 01:05:28.000000000 +0200
+@@ -116,7 +116,7 @@
+ 
+ 
+ 
+-#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD__))
++#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD_kernel__))
+ # if (KERN_VERSION < 3)
+ #  include "i386/pci/i2otypes.h"
+ # else
+diff -ur src.old/sys/dev/asr/i2otypes.h src/sys/dev/asr/i2otypes.h
+--- src.old/sys/dev/asr/i2otypes.h	2002-05-14 23:59:10.000000000 +0200
++++ src/sys/dev/asr/i2otypes.h	2004-05-22 01:05:28.000000000 +0200
+@@ -87,7 +87,7 @@
+ 
+ /* include architecture/compiler dependencies */
+ 
+-#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD__))
++#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD_kernel__))
+ # if (KERN_VERSION < 3)
+ #  include "i386/pci/i2odep.h"
+ # else
+diff -ur src.old/sys/dev/asr/i2outil.h src/sys/dev/asr/i2outil.h
+--- src.old/sys/dev/asr/i2outil.h	2002-05-14 23:59:10.000000000 +0200
++++ src/sys/dev/asr/i2outil.h	2004-05-22 01:05:28.000000000 +0200
+@@ -92,7 +92,7 @@
+ 
+ #define	I2OUTIL_REV 1_5_4  /* I2OUtil header file revision string */
+ 
+-#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD__))
++#if ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD_kernel__))
+ # if (KERN_VERSION < 3)
+ #  include   "i386/pci/i2omsg.h"      /* Include the Base Message file */
+ # else
+diff -ur src.old/sys/dev/asr/osd_defs.h src/sys/dev/asr/osd_defs.h
+--- src.old/sys/dev/asr/osd_defs.h	2002-05-14 23:54:56.000000000 +0200
++++ src/sys/dev/asr/osd_defs.h	2004-05-22 01:05:28.000000000 +0200
+@@ -56,7 +56,7 @@
+ # define _DPT_LINUX
+ #elif (defined(__bsdi__))
+ # define _DPT_BSDI
+-#elif (defined(__FreeBSD__))
++#elif (defined(__FreeBSD_kernel__))
+ # undef _DPT_FREE_BSD
+ # define _DPT_FREE_BSD
+ #else
+diff -ur src.old/sys/dev/asr/osd_util.h src/sys/dev/asr/osd_util.h
+--- src.old/sys/dev/asr/osd_util.h	2003-01-01 19:48:49.000000000 +0100
++++ src/sys/dev/asr/osd_util.h	2004-05-22 01:05:28.000000000 +0200
+@@ -78,7 +78,7 @@
+ 
+ #if (defined(KERNEL) && defined(__bsdi__))
+ # include	 "i386/isa/dpt_osd_defs.h"
+-#elif ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD__))
++#elif ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD_kernel__))
+ # if (KERN_VERSION < 3)
+ #  include	  "i386/isa/dpt_osd_defs.h"
+ # else
+diff -ur src.old/sys/dev/asr/sys_info.h src/sys/dev/asr/sys_info.h
+--- src.old/sys/dev/asr/sys_info.h	2002-05-14 23:59:10.000000000 +0200
++++ src/sys/dev/asr/sys_info.h	2004-05-22 01:05:28.000000000 +0200
+@@ -53,7 +53,7 @@
+ 
+ #if (defined(KERNEL) && defined(__bsdi__))
+ # include	 "i386/isa/dpt_osd_util.h"
+-#elif ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD__))
++#elif ((defined(KERNEL) || defined(_KERNEL)) && defined(__FreeBSD_kernel__))
+ # if (KERN_VERSION < 3)
+ #  include	  "i386/isa/dpt_osd_util.h"
+ # else
+diff -ur src.old/sys/dev/awi/am79c930.c src/sys/dev/awi/am79c930.c
+--- src.old/sys/dev/awi/am79c930.c	2003-08-24 19:48:06.000000000 +0200
++++ src/sys/dev/awi/am79c930.c	2004-05-22 01:02:00.000000000 +0200
+@@ -64,12 +64,12 @@
+ 
+ #include <sys/param.h>
+ #include <sys/systm.h>
+-#ifndef __FreeBSD__
++#ifndef __FreeBSD_kernel__
+ #include <sys/device.h>
+ #endif
+ 
+ #include <machine/cpu.h>
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <machine/bus_pio.h>
+ #include <machine/bus_memio.h>
+ #endif
+@@ -82,7 +82,7 @@
+ #include <dev/ic/am79c930reg.h>
+ #include <dev/ic/am79c930var.h>
+ #endif
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <dev/awi/am79c930reg.h>
+ #include <dev/awi/am79c930var.h>
+ #endif
+diff -ur src.old/sys/dev/awi/awi.c src/sys/dev/awi/awi.c
+--- src.old/sys/dev/awi/awi.c	2003-08-24 19:48:06.000000000 +0200
++++ src/sys/dev/awi/awi.c	2004-05-22 01:02:00.000000000 +0200
+@@ -92,7 +92,7 @@
+ #include <sys/sockio.h>
+ #include <sys/errno.h>
+ #include <sys/syslog.h>
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 400000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 400000
+ #include <sys/bus.h>
+ #else
+ #include <sys/device.h>
+@@ -100,7 +100,7 @@
+ 
+ #include <net/if.h>
+ #include <net/if_dl.h>
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <net/ethernet.h>
+ #else
+ #include <net/if_ether.h>
+@@ -123,9 +123,9 @@
+ #include <net80211/ieee80211_var.h>
+ #include <net80211/ieee80211_ioctl.h>
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 400000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 400000
+ #define	NBPFILTER	1
+-#elif defined(__FreeBSD__) && __FreeBSD_version >= 300000
++#elif defined(__FreeBSD_kernel__) && __FreeBSD_version >= 300000
+ #include "bpf.h"
+ #define	NBPFILTER	NBPF
+ #else
+@@ -149,7 +149,7 @@
+ #include <dev/ic/awireg.h>
+ #include <dev/ic/awivar.h>
+ #endif
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <dev/awi/am79c930reg.h>
+ #include <dev/awi/am79c930var.h>
+ #include <dev/awi/awireg.h>
+@@ -212,7 +212,7 @@
+ #if NBPFILTER > 0
+ #define	AWI_BPF_NORM	0
+ #define	AWI_BPF_RAW	1
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define	AWI_BPF_MTAP(sc, m, raw) do {					\
+ 	if ((sc)->sc_rawbpf == (raw))					\
+ 		BPF_MTAP((sc)->sc_ifp, (m));				\
+@@ -231,7 +231,7 @@
+ #define llc_snap              llc_un.type_snap
+ #endif
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #if __FreeBSD_version >= 400000
+ devclass_t awi_devclass;
+ #endif
+@@ -302,7 +302,7 @@
+ #ifdef __NetBSD__
+ 	memcpy(ifp->if_xname, sc->sc_dev.dv_xname, IFNAMSIZ);
+ #endif
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	ifp->if_output = ether_output;
+ 	ifp->if_snd.ifq_maxlen = ifqmaxlen;
+ 	memcpy(sc->sc_ec.ac_enaddr, sc->sc_mib_addr.aMAC_Address,
+@@ -315,7 +315,7 @@
+ 	    sc->sc_tx_rate / 10, sc->sc_banner);
+ 	printf("%s: address %s\n",
+ 	    sc->sc_dev.dv_xname,  ether_sprintf(sc->sc_mib_addr.aMAC_Address));
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	ether_ifattach(ifp, sc->sc_mib_addr.aMAC_Address);
+ #else
+ 	if_attach(ifp);
+@@ -503,7 +503,7 @@
+ 
+ 	case SIOCADDMULTI:
+ 	case SIOCDELMULTI:
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 		error = ENETRESET;	/*XXX*/
+ #else
+ 		error = (cmd == SIOCADDMULTI) ?
+@@ -528,7 +528,7 @@
+ 		break;
+ #ifdef SIOCS80211NWID
+ 	case SIOCS80211NWID:
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 		error = suser(mythread);
+ 		if (error)
+ 			break;
+@@ -564,7 +564,7 @@
+ #endif
+ #ifdef SIOCS80211NWKEY
+ 	case SIOCS80211NWKEY:
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 		error = suser(mythread);
+ 		if (error)
+ 			break;
+@@ -581,7 +581,7 @@
+ 		error = ifmedia_ioctl(ifp, ifr, &sc->sc_media, cmd);
+ 		break;
+ #endif
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	case SIOCG80211:
+ 		switch(ireq->i_type) {
+ 		case IEEE80211_IOC_SSID:
+@@ -624,7 +624,7 @@
+ 			error = awi_wep_getkey(sc, ireq->i_val, tmpstr, &len);
+ 			if(error)
+ 				break;
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 			if (!suser(mythread))
+ 				bzero(tmpstr, len);
+ #endif
+@@ -949,7 +949,7 @@
+ 	int error, ostatus;
+ 	int n;
+ 	struct ifnet *ifp = sc->sc_ifp;
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct ifmultiaddr *ifma;
+ #else
+ 	struct ether_multi *enm;
+@@ -965,7 +965,7 @@
+ 		goto set_mib;
+ 	}
+ 	sc->sc_mib_mac.aPromiscuous_Enable = 0;
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	if (ifp->if_amcount != 0)
+ 		goto set_mib;
+ 	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
+@@ -1429,7 +1429,7 @@
+ 			break;
+ 		}
+ 		ifp->if_ipackets++;
+-#if !(defined(__FreeBSD__) && __FreeBSD_version >= 400000)
++#if !(defined(__FreeBSD_kernel__) && __FreeBSD_version >= 400000)
+ 		AWI_BPF_MTAP(sc, m, AWI_BPF_NORM);
+ #endif
+ 		(*ifp->if_input)(ifp, m);
+diff -ur src.old/sys/dev/awi/awi_wep.c src/sys/dev/awi/awi_wep.c
+--- src.old/sys/dev/awi/awi_wep.c	2003-09-05 13:09:26.000000000 +0200
++++ src/sys/dev/awi/awi_wep.c	2004-05-22 01:02:00.000000000 +0200
+@@ -60,7 +60,7 @@
+ #include <sys/socket.h>
+ #include <sys/errno.h>
+ #include <sys/sockio.h>
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 400000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 400000
+ #include <sys/bus.h>
+ #else
+ #include <sys/device.h>
+@@ -68,7 +68,7 @@
+ 
+ #include <net/if.h>
+ #include <net/if_dl.h>
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <net/ethernet.h>
+ #include <net/if_arp.h>
+ #else
+@@ -90,7 +90,7 @@
+ #include <crypto/arc4/arc4.h>
+ #endif
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <dev/awi/am79c930reg.h>
+ #include <dev/awi/am79c930var.h>
+ #include <dev/awi/awireg.h>
+@@ -188,7 +188,7 @@
+ 	nwkey->i_wepon = awi_wep_getalgo(sc);
+ 	nwkey->i_defkid = sc->sc_wep_defkid + 1;
+ 	/* do not show any keys to non-root user */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #if __FreeBSD_version < 500028
+ 	suerr = suser(curproc);
+ #else
+diff -ur src.old/sys/dev/awi/awi_wicfg.c src/sys/dev/awi/awi_wicfg.c
+--- src.old/sys/dev/awi/awi_wicfg.c	2003-08-24 19:48:06.000000000 +0200
++++ src/sys/dev/awi/awi_wicfg.c	2004-05-22 01:02:00.000000000 +0200
+@@ -51,7 +51,7 @@
+ #include <sys/socket.h>
+ #include <sys/errno.h>
+ #include <sys/sockio.h>
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 400000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 400000
+ #include <sys/bus.h>
+ #else
+ #include <sys/device.h>
+@@ -59,7 +59,7 @@
+ 
+ #include <net/if.h>
+ #include <net/if_dl.h>
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <net/ethernet.h>
+ #include <net/if_arp.h>
+ #else
+@@ -80,7 +80,7 @@
+ 
+ #include <dev/pcmcia/if_wi_ieee.h>	/* XXX */
+ #endif
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <dev/awi/am79c930reg.h>
+ #include <dev/awi/am79c930var.h>
+ 
+@@ -107,7 +107,7 @@
+ 		error = awi_cfgget(ifp, cmd, data);
+ 		break;
+ 	case SIOCSWAVELAN:
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #if __FreeBSD_version < 500028
+ 		error = suser(curproc);
+ #else
+@@ -275,7 +275,7 @@
+ 	case WI_RID_DEFLT_CRYPT_KEYS:
+ 		keys = (struct wi_ltv_keys *)&wreq;
+ 		/* do not show keys to non-root user */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #if __FreeBSD_version < 500028
+ 		error = suser(curproc);
+ #else
+diff -ur src.old/sys/dev/awi/awivar.h src/sys/dev/awi/awivar.h
+--- src.old/sys/dev/awi/awivar.h	2003-06-28 08:14:14.000000000 +0200
++++ src/sys/dev/awi/awivar.h	2004-05-22 01:05:29.000000000 +0200
+@@ -94,7 +94,7 @@
+ 	struct ethercom		sc_ec;
+ 	void			*sc_ih; /* interrupt handler */
+ #endif
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #if __FreeBSD_version >= 40000
+ 	struct {
+ 		char	dv_xname[64];	/*XXX*/
+diff -ur src.old/sys/dev/bktr/bktr_audio.c src/sys/dev/bktr/bktr_audio.c
+--- src.old/sys/dev/bktr/bktr_audio.c	2003-08-24 19:46:01.000000000 +0200
++++ src/sys/dev/bktr/bktr_audio.c	2004-05-22 01:02:01.000000000 +0200
+@@ -55,7 +55,7 @@
+ #include <sys/kernel.h>
+ #include <sys/vnode.h>
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 
+ #if (__FreeBSD_version < 500000)
+ #include <machine/clock.h>              /* for DELAY */
+diff -ur src.old/sys/dev/bktr/bktr_card.c src/sys/dev/bktr/bktr_card.c
+--- src.old/sys/dev/bktr/bktr_card.c	2003-08-24 19:46:01.000000000 +0200
++++ src/sys/dev/bktr/bktr_card.c	2004-05-22 01:02:01.000000000 +0200
+@@ -53,7 +53,7 @@
+ #include <sys/systm.h>
+ #include <sys/vnode.h>
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 
+ #if (__FreeBSD_version < 500000)
+ #include <machine/clock.h>              /* for DELAY */
+diff -ur src.old/sys/dev/bktr/bktr_core.c src/sys/dev/bktr/bktr_core.c
+--- src.old/sys/dev/bktr/bktr_core.c	2003-12-01 20:03:50.000000000 +0100
++++ src/sys/dev/bktr/bktr_core.c	2004-05-22 01:02:01.000000000 +0200
+@@ -92,7 +92,7 @@
+ #include "opt_bktr.h"		/* Include any kernel config options */
+ 
+ #if (                                                            \
+-       (defined(__FreeBSD__))                                    \
++       (defined(__FreeBSD_kernel__))                                    \
+     || (defined(__bsdi__))                                       \
+     || (defined(__OpenBSD__))                                    \
+     || (defined(__NetBSD__))                                     \
+@@ -102,7 +102,7 @@
+ /*******************/
+ /* *** FreeBSD *** */
+ /*******************/
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 
+ #include <sys/param.h>
+ #include <sys/systm.h>
+@@ -494,7 +494,7 @@
+                 buf = 0;
+ #endif
+ 
+-#if defined(__FreeBSD__) || defined(__bsdi__)
++#if defined(__FreeBSD_kernel__) || defined(__bsdi__)
+ 
+ /* If this is a module, check if there is any currently saved contiguous memory */
+ #if defined(BKTR_FREEBSD_MODULE)
+@@ -614,7 +614,7 @@
+         bktr->msp_source_selected = -1;
+ 	bktr->audio_mux_present = 1;
+ 
+-#if defined(__FreeBSD__) 
++#if defined(__FreeBSD_kernel__) 
+ #ifdef BKTR_NEW_MSP34XX_DRIVER
+ 	/* get hint on short programming of the msp34xx, so we know */
+ 	/* if the decision what thread to start should be overwritten */
+diff -ur src.old/sys/dev/bktr/bktr_os.c src/sys/dev/bktr/bktr_os.c
+--- src.old/sys/dev/bktr/bktr_os.c	2003-12-01 20:03:50.000000000 +0100
++++ src/sys/dev/bktr/bktr_os.c	2004-05-22 01:02:02.000000000 +0200
+@@ -55,7 +55,7 @@
+ /*******************/
+ /* *** FreeBSD *** */
+ /*******************/
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 
+ #include <sys/param.h>
+ #include <sys/systm.h>
+diff -ur src.old/sys/dev/bktr/bktr_os.h src/sys/dev/bktr/bktr_os.h
+--- src.old/sys/dev/bktr/bktr_os.h	2003-12-01 20:03:50.000000000 +0100
++++ src/sys/dev/bktr/bktr_os.h	2004-05-22 01:05:30.000000000 +0200
+@@ -47,7 +47,7 @@
+ /******************************/
+ /* *** Memory Allocation  *** */
+ /******************************/
+-#if (defined(__FreeBSD__) || defined(__bsdi__))
++#if (defined(__FreeBSD_kernel__) || defined(__bsdi__))
+ vm_offset_t     get_bktr_mem( int unit, unsigned size );
+ #endif
+ 
+@@ -59,7 +59,7 @@
+ /************************************/
+ /* *** Interrupt Enable/Disable *** */
+ /************************************/
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #if (__FreeBSD_version >=500000)
+ #define USE_VBIMUTEX
+ #define	DECLARE_INTR_MASK(s)	/* no need to declare 's' */
+diff -ur src.old/sys/dev/bktr/bktr_reg.h src/sys/dev/bktr/bktr_reg.h
+--- src.old/sys/dev/bktr/bktr_reg.h	2003-12-01 20:03:50.000000000 +0100
++++ src/sys/dev/bktr/bktr_reg.h	2004-05-22 01:05:30.000000000 +0200
+@@ -50,7 +50,7 @@
+  * Support the older kernel options on FreeBSD and OpenBSD.
+  *
+  */
+-#if defined(__FreeBSD__) || defined(__OpenBSD__)
++#if defined(__FreeBSD_kernel__) || defined(__OpenBSD__)
+ #if defined(BROOKTREE_ALLOC_PAGES)
+ #define BKTR_ALLOC_PAGES BROOKTREE_ALLOC_PAGES
+ #endif
+@@ -461,7 +461,7 @@
+  * memory mapped structure method only works on 32 bit processors
+  * with the right type of endianness.
+  */
+-#if defined(__NetBSD__) || ( defined(__FreeBSD__) && (__FreeBSD_version >=300000) )
++#if defined(__NetBSD__) || ( defined(__FreeBSD_kernel__) && (__FreeBSD_version >=300000) )
+ #define INB(bktr,offset)	bus_space_read_1((bktr)->memt,(bktr)->memh,(offset))
+ #define INW(bktr,offset)	bus_space_read_2((bktr)->memt,(bktr)->memh,(offset))
+ #define INL(bktr,offset)	bus_space_read_4((bktr)->memt,(bktr)->memh,(offset))
+@@ -524,7 +524,7 @@
+     vm_offset_t		phys_base;	/* Bt848 register physical address */
+ #endif
+ 
+-#if defined (__FreeBSD__)
++#if defined (__FreeBSD_kernel__)
+     #if (__FreeBSD_version < 400000)
+     vm_offset_t     phys_base;	/* 2.x Bt848 register physical address */
+     pcici_t         tag;	/* 2.x PCI tag, for doing PCI commands */
+@@ -729,7 +729,7 @@
+ typedef int ioctl_cmd_t;
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #if (__FreeBSD_version >= 300000)
+ typedef u_long ioctl_cmd_t;
+ #endif
+diff -ur src.old/sys/dev/bktr/bktr_tuner.c src/sys/dev/bktr/bktr_tuner.c
+--- src.old/sys/dev/bktr/bktr_tuner.c	2003-08-24 19:46:02.000000000 +0200
++++ src/sys/dev/bktr/bktr_tuner.c	2004-05-22 01:02:02.000000000 +0200
+@@ -51,7 +51,7 @@
+ #include <sys/proc.h>
+ #endif
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #if (__FreeBSD_version < 500000)
+ #include <machine/clock.h>              /* for DELAY */
+ #include <pci/pcivar.h>
+diff -ur src.old/sys/dev/cnw/if_cnw.c src/sys/dev/cnw/if_cnw.c
+--- src.old/sys/dev/cnw/if_cnw.c	2003-10-31 19:31:58.000000000 +0100
++++ src/sys/dev/cnw/if_cnw.c	2004-05-22 01:02:03.000000000 +0200
+@@ -115,7 +115,7 @@
+  * multicast. Volunteers are welcome, of course :-).
+  */
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ #include "opt_inet.h"
+ #include "bpfilter.h"
+ 
+@@ -342,11 +342,11 @@
+ DRIVER_MODULE(cnw, pccard, cnw_pccard_driver, cnw_pccard_devclass, 0, 0);
+ MODULE_DEPEND(cnw, ether, 1, 1, 1);
+ 
+-#endif /* !defined(__FreeBSD__) */
++#endif /* !defined(__FreeBSD_kernel__) */
+ 
+ void cnw_reset(struct cnw_softc *);
+ void cnw_init(struct cnw_softc *);
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ int cnw_enable(struct cnw_softc *sc);
+ void cnw_disable(struct cnw_softc *sc);
+ void cnw_config(struct cnw_softc *sc, u_int8_t *);
+@@ -355,7 +355,7 @@
+ void cnw_transmit(struct cnw_softc *, struct mbuf *);
+ struct mbuf *cnw_read(struct cnw_softc *);
+ void cnw_recv(struct cnw_softc *);
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ int cnw_intr(void *arg);
+ #else
+ void cnw_intr(void *arg);
+@@ -395,7 +395,7 @@
+ 		DELAY(100);
+ 	}
+ 	if (line > 0)
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		printf("%s: wedged at line %d\n", sc->sc_dev.dv_xname, line);
+ #else
+ 		device_printf(sc->dev, "wedged at line %d\n", line);
+@@ -438,7 +438,7 @@
+ 	int ptr = sc->sc_memoff + CNW_EREG_CB;
+ 
+ 	if (wait_WOC(sc, 0)) {
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		printf("%s: wedged when issuing cmd 0x%x\n",
+ 		    sc->sc_dev.dv_xname, cmd);
+ #else
+@@ -508,7 +508,7 @@
+ cnw_init(sc)
+ 	struct cnw_softc *sc;
+ {
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	struct ifnet *ifp = &sc->sc_ethercom.ec_if;
+ #else	/* FreeBSD */
+ 	struct ifnet *ifp = &sc->arpcom.ac_if;
+@@ -562,7 +562,7 @@
+ }
+ 
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ /*
+  * Enable and initialize the card.
+  */
+@@ -754,7 +754,7 @@
+ 		sc->sc_resource &= ~CNW_RES_PCIC;
+ 	}
+ }
+-#endif /* !defined(__FreeBSD__) */
++#endif /* !defined(__FreeBSD_kernel__) */
+ 
+ /*
+  * Start outputting on the interface.
+@@ -778,7 +778,7 @@
+ 		printf("%s: cnw_start reentered\n", ifp->if_xname);
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	if (sc->cnw_gone)
+ 		return;
+ #endif
+@@ -847,7 +847,7 @@
+ 		if (m0 == 0)
+ 			break;
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ #if NBPFILTER > 0
+ 		if (ifp->if_bpf)
+ 			bpf_mtap(ifp->if_bpf, m0);
+@@ -947,7 +947,7 @@
+ 	MGETHDR(m, M_DONTWAIT, MT_DATA);
+ 	if (m == 0)
+ 		return (0);
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	m->m_pkthdr.rcvif = &sc->sc_ethercom.ec_if;
+ #else	/* FreeBSD */
+ 	m->m_pkthdr.rcvif = &sc->arpcom.ac_if;
+@@ -1022,7 +1022,7 @@
+ 	struct cnw_softc *sc;
+ {
+ 	int rser;
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	struct ifnet *ifp = &sc->sc_ethercom.ec_if;
+ #else
+ 	struct ifnet *ifp = &sc->arpcom.ac_if;
+@@ -1049,7 +1049,7 @@
+ 		}
+ 		++ifp->if_ipackets;
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ #if NBPFILTER > 0
+ 		if (ifp->if_bpf)
+ 			bpf_mtap(ifp->if_bpf, m);
+@@ -1065,7 +1065,7 @@
+ /*
+  * Interrupt handler.
+  */
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ int
+ #else
+ void
+@@ -1074,7 +1074,7 @@
+ 	void *arg;
+ {
+ 	struct cnw_softc *sc = arg;
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	struct ifnet *ifp = &sc->sc_ethercom.ec_if;
+ #else
+ 	struct ifnet *ifp = &sc->arpcom.ac_if;
+@@ -1082,7 +1082,7 @@
+ 	int ret, status, rser, tser;
+ 
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	if ((sc->sc_ethercom.ec_if.if_flags & IFF_RUNNING) == 0 ||
+ 	    (sc->sc_dev.dv_flags & DVF_ACTIVE) == 0)
+ 		return (0);
+@@ -1103,7 +1103,7 @@
+ 		    sc->sc_memoff + CNW_IOM_OFF + CNW_REG_CCSR);
+ #endif
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		if (!(status & 0x02)) {
+ 			if (ret == 0)
+ 				printf("%s: spurious interrupt\n",
+@@ -1205,7 +1205,7 @@
+ 			ifp->if_flags &= ~IFF_OACTIVE;
+ 
+ 			/* Continue to send packets from the queue */
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 			cnw_start(&sc->sc_ethercom.ec_if);
+ #else
+ 			cnw_start(ifp);
+@@ -1226,7 +1226,7 @@
+ 	caddr_t data;
+ {
+ 	struct cnw_softc *sc = ifp->if_softc;
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	struct ifaddr *ifa = (struct ifaddr *)data;
+ #endif
+ 	struct ifreq *ifr = (struct ifreq *)data;
+@@ -1239,7 +1239,7 @@
+ 
+ 	s = splnet();
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	if (sc->cnw_gone) {
+ 		splx(s);
+ 		return(ENODEV);
+@@ -1249,7 +1249,7 @@
+ 	switch (cmd) {
+ 
+ 	case SIOCSIFADDR:
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		if (!(ifp->if_flags & IFF_RUNNING) &&
+ 		    (error = cnw_enable(sc)) != 0)
+ 			break;
+@@ -1271,7 +1271,7 @@
+ 		break;
+ 
+ 	case SIOCSIFFLAGS:
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		if ((ifp->if_flags & (IFF_UP | IFF_RUNNING)) == IFF_RUNNING) {
+ 			/*
+ 			 * The interface is marked down and it is running, so
+@@ -1304,7 +1304,7 @@
+ 
+ 	case SIOCADDMULTI:
+ 	case SIOCDELMULTI:
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		/* Update our multicast list. */
+ 		error = (cmd == SIOCADDMULTI) ?
+ 		    ether_addmulti(ifr, &sc->sc_ethercom) :
+@@ -1324,7 +1324,7 @@
+ 		break;
+ 
+ 	case SIOCSCNWDOMAIN:
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		error = suser(p->p_ucred, &p->p_acflag);
+ #else
+ 		error = suser(td);
+@@ -1335,7 +1335,7 @@
+ 		break;
+ 
+ 	case SIOCSCNWKEY:
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		error = suser(p->p_ucred, &p->p_acflag);
+ #else
+ 		error = suser(td);
+@@ -1346,7 +1346,7 @@
+ 		break;
+ 
+ 	case SIOCGCNWSTATUS:
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		error = suser(p->p_ucred, &p->p_acflag);
+ #else
+ 		error = suser(td);
+@@ -1387,7 +1387,7 @@
+ {
+ 	struct cnw_softc *sc = ifp->if_softc;
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	printf("%s: device timeout; card reset\n", sc->sc_dev.dv_xname);
+ 	++ifp->if_oerrors;
+ 	cnw_init(sc);
+@@ -1434,7 +1434,7 @@
+ 	return 0;
+ }
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ int
+ cnw_activate(self, act)
+ 	struct device *self;
+@@ -1494,7 +1494,7 @@
+ }
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ static void cnw_freebsd_init(xsc)
+ 	void	*xsc;
+ {
+diff -ur src.old/sys/dev/cnw/if_cnwioctl.h src/sys/dev/cnw/if_cnwioctl.h
+--- src.old/sys/dev/cnw/if_cnwioctl.h	2001-03-16 08:25:42.000000000 +0100
++++ src/sys/dev/cnw/if_cnwioctl.h	2004-05-22 01:05:32.000000000 +0200
+@@ -98,7 +98,7 @@
+ 	struct cnwtrail trail[128];
+ };
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ #define ifr_domain	ifr_ifru.ifru_flags     /* domain */
+ #define ifr_key		ifr_ifru.ifru_flags     /* scramble key */
+ #else
+diff -ur src.old/sys/dev/ct/bshw_machdep.c src/sys/dev/ct/bshw_machdep.c
+--- src.old/sys/dev/ct/bshw_machdep.c	2003-08-24 19:46:03.000000000 +0200
++++ src/sys/dev/ct/bshw_machdep.c	2004-05-22 01:02:04.000000000 +0200
+@@ -41,7 +41,7 @@
+ #include <sys/param.h>
+ #include <sys/systm.h>
+ #include <sys/kernel.h>
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500001
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500001
+ #include <sys/bio.h>
+ #endif	/* __ FreeBSD__ */
+ #include <sys/buf.h>
+@@ -73,7 +73,7 @@
+ #include <i386/Cbus/dev/ct/bshwvar.h>
+ #endif /* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <machine/bus.h>
+ #include <machine/clock.h>
+ #include <machine/md_var.h>
+diff -ur src.old/sys/dev/ct/ct.c src/sys/dev/ct/ct.c
+--- src.old/sys/dev/ct/ct.c	2003-08-24 19:46:03.000000000 +0200
++++ src/sys/dev/ct/ct.c	2004-05-22 01:02:04.000000000 +0200
+@@ -44,7 +44,7 @@
+ #include <sys/param.h>
+ #include <sys/systm.h>
+ #include <sys/kernel.h>
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500001
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500001
+ #include <sys/bio.h>
+ #endif	/* __ FreeBSD__ */
+ #include <sys/buf.h>
+@@ -73,7 +73,7 @@
+ #include <i386/Cbus/dev/ct/ct_machdep.h>
+ #endif /* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <machine/bus.h>
+ 
+ #include <machine/dvcfg.h>
+diff -ur src.old/sys/dev/ct/ct_isa.c src/sys/dev/ct/ct_isa.c
+--- src.old/sys/dev/ct/ct_isa.c	2003-08-24 19:46:03.000000000 +0200
++++ src/sys/dev/ct/ct_isa.c	2004-05-22 01:02:04.000000000 +0200
+@@ -71,7 +71,7 @@
+ #include <i386/Cbus/dev/ct/bshwvar.h>
+ #endif /* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <machine/bus.h>
+ #include <machine/resource.h>
+ #include <sys/bus.h>
+diff -ur src.old/sys/dev/cx/machdep.h src/sys/dev/cx/machdep.h
+--- src.old/sys/dev/cx/machdep.h	2003-12-03 08:29:38.000000000 +0100
++++ src/sys/dev/cx/machdep.h	2004-05-22 01:05:33.000000000 +0200
+@@ -68,7 +68,7 @@
+ /*
+  * FreeBSD and BSD/OS
+  */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #   include <sys/param.h>
+ #   include <machine/cpufunc.h>
+ #   include <sys/libkern.h>
+diff -ur src.old/sys/dev/drm/drm.h src/sys/dev/drm/drm.h
+--- src.old/sys/dev/drm/drm.h	2003-11-12 21:56:30.000000000 +0100
++++ src/sys/dev/drm/drm.h	2004-05-22 01:05:36.000000000 +0200
+@@ -48,8 +48,8 @@
+ #define DRM_IOC_WRITE		_IOC_WRITE
+ #define DRM_IOC_READWRITE	_IOC_READ|_IOC_WRITE
+ #define DRM_IOC(dir, group, nr, size) _IOC(dir, group, nr, size)
+-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+-#if defined(__FreeBSD__) && defined(IN_MODULE)
++#elif defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__)
++#if defined(__FreeBSD_kernel__) && defined(IN_MODULE)
+ /* Prevent name collision when including sys/ioccom.h */
+ #undef ioctl
+ #include <sys/ioccom.h>
+diff -ur src.old/sys/dev/drm/drmP.h src/sys/dev/drm/drmP.h
+--- src.old/sys/dev/drm/drmP.h	2003-11-12 21:56:30.000000000 +0100
++++ src/sys/dev/drm/drmP.h	2004-05-22 01:05:36.000000000 +0200
+@@ -62,7 +62,7 @@
+ 
+ /* There's undoubtably more of this file to go into these OS dependent ones. */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include "dev/drm/drm_os_freebsd.h"
+ #elif defined __NetBSD__
+ #include "dev/drm/drm_os_netbsd.h"
+@@ -315,7 +315,7 @@
+ 	const char	  *name;	/* Simple driver name		   */
+ 	char		  *unique;	/* Unique identifier: e.g., busid  */
+ 	int		  unique_len;	/* Length of unique field	   */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	device_t	  device;	/* Device instance from newbus     */
+ #endif
+ 	dev_t		  devnode;	/* Device number for mknod	   */
+@@ -324,7 +324,7 @@
+ 	int		  flags;	/* Flags to open(2)		   */
+ 
+ 				/* Locks */
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500000
+ #if __HAVE_DMA
+ 	struct mtx	  dma_lock;	/* protects dev->dma */
+ #endif
+@@ -360,7 +360,7 @@
+ 				/* Context support */
+ 	int		  irq;		/* Interrupt used by board	   */
+ 	int		  irq_enabled;	/* True if the irq handler is enabled */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	int		  irqrid;	/* Interrupt used by board */
+ 	struct resource   *irqr;	/* Resource for interrupt used by board	   */
+ #elif defined(__NetBSD__)
+@@ -384,7 +384,7 @@
+    	atomic_t          vbl_received;
+ #endif
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct sigio      *buf_sigio;	/* Processes waiting for SIGIO     */
+ #elif defined(__NetBSD__)
+ 	pid_t		  buf_pgid;
+diff -ur src.old/sys/dev/drm/drm_bufs.h src/sys/dev/drm/drm_bufs.h
+--- src.old/sys/dev/drm/drm_bufs.h	2003-11-12 21:56:30.000000000 +0100
++++ src/sys/dev/drm/drm_bufs.h	2004-05-22 01:05:36.000000000 +0200
+@@ -877,7 +877,7 @@
+ 	const int zero = 0;
+ 	vm_offset_t address;
+ 	struct vmspace *vms;
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	vm_ooffset_t foff;
+ 	vm_size_t size;
+ 	vm_offset_t vaddr;
+@@ -898,7 +898,7 @@
+ 		return 0;	/* FIXME: Shouldn't this be EINVAL or something? */
+ #endif /* __NetBSD__ */
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500000
+ 	vms = p->td_proc->p_vmspace;
+ #else
+ 	vms = p->p_vmspace;
+@@ -926,7 +926,7 @@
+ 		foff = 0;
+ 	}
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	vaddr = round_page((vm_offset_t)vms->vm_daddr + MAXDSIZ);
+ 	retcode = vm_mmap(&vms->vm_map, &vaddr, size, PROT_READ | PROT_WRITE,
+ 	    VM_PROT_ALL, MAP_SHARED, SLIST_FIRST(&kdev->si_hlist), foff );
+diff -ur src.old/sys/dev/drm/drm_drv.h src/sys/dev/drm/drm_drv.h
+--- src.old/sys/dev/drm/drm_drv.h	2003-11-12 21:56:30.000000000 +0100
++++ src/sys/dev/drm/drm_drv.h	2004-05-22 01:05:37.000000000 +0200
+@@ -117,7 +117,7 @@
+ static int DRM(init)(device_t nbdev);
+ static void DRM(cleanup)(drm_device_t *dev);
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define DRIVER_SOFTC(unit) \
+ 	((drm_device_t *) devclass_get_softc(DRM(devclass), unit))
+ 
+@@ -210,7 +210,7 @@
+ 
+ const char *DRM(find_description)(int vendor, int device);
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ static struct cdevsw DRM(cdevsw) = {
+ 	.d_open =	DRM( open ),
+ 	.d_close =	DRM( close ),
+@@ -487,7 +487,7 @@
+ 	dev->last_context = 0;
+ 	dev->if_version = 0;
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	dev->buf_sigio = NULL;
+ #elif defined(__NetBSD__)
+ 	dev->buf_pgid = 0;
+@@ -616,7 +616,7 @@
+ static int DRM(init)( device_t nbdev )
+ {
+ 	int unit;
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	drm_device_t *dev;
+ #elif defined(__NetBSD__)
+ 	drm_device_t *dev = nbdev;
+@@ -627,7 +627,7 @@
+ 	DRM_DEBUG( "\n" );
+ 	DRIVER_PREINIT();
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	unit = device_get_unit(nbdev);
+ 	dev = device_get_softc(nbdev);
+ 	memset( (void *)dev, 0, sizeof(*dev) );
+@@ -715,7 +715,7 @@
+ 	DRM_LOCK();
+ 	DRM(takedown)(dev);
+ 	DRM_UNLOCK();
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	destroy_dev(dev->devnode);
+ #if __FreeBSD_version >= 500000
+ 	mtx_destroy(&dev->dev_lock);
+@@ -735,7 +735,7 @@
+ 	DRM_DEBUG( "\n" );
+ 
+ 	DRM(sysctl_cleanup)( dev );
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	destroy_dev(dev->devnode);
+ #endif
+ #if __HAVE_CTX_BITMAP
+@@ -765,7 +765,7 @@
+ #endif
+ 	DRIVER_POSTCLEANUP();
+ 	DRM(mem_uninit)();
+-#if defined(__FreeBSD__) &&  __FreeBSD_version >= 500000
++#if defined(__FreeBSD_kernel__) &&  __FreeBSD_version >= 500000
+ 	mtx_destroy(&dev->dev_lock);
+ #endif
+ 	DRM(free)(dev->maplist, sizeof(*dev->maplist), DRM_MEM_MAPS);
+@@ -815,7 +815,7 @@
+ 	if ( !retcode ) {
+ 		atomic_inc( &dev->counts[_DRM_STAT_OPENS] );
+ 		DRM_LOCK();
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 		device_busy(dev->device);
+ #endif
+ 		if ( !dev->open_count++ )
+@@ -850,7 +850,7 @@
+ 	 * Begin inline drm_release
+ 	 */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	DRM_DEBUG( "pid = %d, device = 0x%lx, open_count = %d\n",
+ 		   DRM_CURRENTPID, (long)dev->device, dev->open_count );
+ #elif defined(__NetBSD__)
+@@ -892,7 +892,7 @@
+ 				break;	/* Got lock */
+ 			}
+ 				/* Contention */
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500000
+ 			retcode = msleep((void *)&dev->lock.lock_queue,
+ 			    dev->dev_lock, PZERO | PCATCH, "drmlk2", 0);
+ #else
+@@ -912,9 +912,9 @@
+ 	DRM(reclaim_buffers)( dev, (void *)priv->pid );
+ #endif
+ 
+-#if defined (__FreeBSD__) && (__FreeBSD_version >= 500000)
++#if defined (__FreeBSD_kernel__) && (__FreeBSD_version >= 500000)
+ 	funsetown(&dev->buf_sigio);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	funsetown(dev->buf_sigio);
+ #elif defined(__NetBSD__)
+ 	dev->buf_pgid = 0;
+@@ -930,7 +930,7 @@
+ 	 */
+ 
+ 	atomic_inc( &dev->counts[_DRM_STAT_CLOSES] );
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	device_unbusy(dev->device);
+ #endif
+ 	if (--dev->open_count == 0) {
+@@ -959,7 +959,7 @@
+ 	atomic_inc( &dev->counts[_DRM_STAT_IOCTLS] );
+ 	++priv->ioctl_count;
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	DRM_DEBUG( "pid=%d, cmd=0x%02lx, nr=0x%02x, dev 0x%lx, auth=%d\n",
+ 		 DRM_CURRENTPID, cmd, nr, (long)dev->device, priv->authenticated );
+ #elif defined(__NetBSD__)
+@@ -972,7 +972,7 @@
+ 	case FIOASYNC:
+ 		return 0;
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	case FIOSETOWN:
+ 		return fsetown(*(int *)data, &dev->buf_sigio);
+ 
+@@ -1047,7 +1047,7 @@
+ 		}
+ 
+ 		/* Contention */
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500000
+ 		ret = msleep((void *)&dev->lock.lock_queue, &dev->dev_lock,
+ 		    PZERO | PCATCH, "drmlk2", 0);
+ #else
+diff -ur src.old/sys/dev/drm/drm_fops.h src/sys/dev/drm/drm_fops.h
+--- src.old/sys/dev/drm/drm_fops.h	2003-11-12 21:56:30.000000000 +0100
++++ src/sys/dev/drm/drm_fops.h	2004-05-22 01:05:37.000000000 +0200
+@@ -96,7 +96,7 @@
+ 		TAILQ_INSERT_TAIL(&dev->files, priv, link);
+ 	}
+ 	DRM_UNLOCK();
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	kdev->si_drv1 = dev;
+ #endif
+ 	return 0;
+diff -ur src.old/sys/dev/drm/drm_irq.h src/sys/dev/drm/drm_irq.h
+--- src.old/sys/dev/drm/drm_irq.h	2003-11-12 21:56:30.000000000 +0100
++++ src/sys/dev/drm/drm_irq.h	2004-05-22 01:05:37.000000000 +0200
+@@ -52,7 +52,7 @@
+ 	return 0;
+ }
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500000
+ static irqreturn_t
+ DRM(irq_handler_wrap)(DRM_IRQ_ARGS)
+ {
+@@ -96,7 +96,7 @@
+ 	DRM(driver_irq_preinstall)( dev );
+ 
+ 				/* Install handler */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	dev->irqrid = 0;
+ 	dev->irqr = bus_alloc_resource(dev->device, SYS_RES_IRQ, &dev->irqrid,
+ 				      0, ~0, 1, RF_SHAREABLE);
+@@ -163,7 +163,7 @@
+ 
+ 	DRM(driver_irq_uninstall)( dev );
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	bus_teardown_intr(dev->device, dev->irqr, dev->irqh);
+ 	bus_release_resource(dev->device, SYS_RES_IRQ, irqrid, dev->irqr);
+ #elif defined(__NetBSD__)
+diff -ur src.old/sys/dev/drm/drm_memory.h src/sys/dev/drm/drm_memory.h
+--- src.old/sys/dev/drm/drm_memory.h	2003-10-24 03:48:16.000000000 +0200
++++ src/sys/dev/drm/drm_memory.h	2004-05-22 01:05:37.000000000 +0200
+@@ -33,7 +33,7 @@
+ 
+ #include "dev/drm/drmP.h"
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__)
++#if defined(__FreeBSD_kernel__) || defined(__NetBSD__)
+ #define malloctype DRM(M_DRM)
+ /* The macros conflicted in the MALLOC_DEFINE */
+ MALLOC_DEFINE(malloctype, "drm", "DRM Data Structures");
+@@ -85,7 +85,7 @@
+ 
+ void *DRM(ioremap)( drm_device_t *dev, drm_local_map_t *map )
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	return pmap_mapdev(map->offset, map->size);
+ #elif defined(__NetBSD__)
+ 	map->iot = dev->pa.pa_memt;
+@@ -98,7 +98,7 @@
+ 
+ void DRM(ioremapfree)(drm_local_map_t *map)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	pmap_unmapdev((vm_offset_t) map->handle, map->size);
+ #elif defined(__NetBSD__)
+ 	bus_space_unmap(map->iot, map->ioh, map->size);
+@@ -127,7 +127,7 @@
+ }
+ #endif /* __REALLY_HAVE_AGP */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ int
+ DRM(mtrr_add)(unsigned long offset, size_t size, int flags)
+ {
+diff -ur src.old/sys/dev/drm/drm_memory_debug.h src/sys/dev/drm/drm_memory_debug.h
+--- src.old/sys/dev/drm/drm_memory_debug.h	2003-10-24 03:48:16.000000000 +0200
++++ src/sys/dev/drm/drm_memory_debug.h	2004-05-22 01:05:38.000000000 +0200
+@@ -104,7 +104,7 @@
+ 	DRM_SPINUNINIT(DRM(mem_lock));
+ }
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ /* drm_mem_info is called whenever a process reads /dev/drm/mem. */
+ static int
+ DRM(_mem_info)(drm_mem_stats_t *stats, struct sysctl_oid *oidp, void *arg1, 
+@@ -226,7 +226,7 @@
+ 	map->iot = dev->pa.pa_memt;
+ #endif
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	if (!(pt = pmap_mapdev(map->offset, map->size))) {
+ #elif defined(__NetBSD__)
+ 	if (bus_space_map(map->iot, map->offset, map->size, 
+@@ -283,7 +283,7 @@
+ 		DRM_MEM_ERROR(DRM_MEM_MAPPINGS,
+ 			      "Attempt to free NULL pointer\n");
+ 	else
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 		pmap_unmapdev((vm_offset_t) map->handle, map->size);
+ #elif defined(__NetBSD__)
+ 		bus_space_unmap(map->iot, map->ioh, map->size);
+diff -ur src.old/sys/dev/drm/drm_os_freebsd.h src/sys/dev/drm/drm_os_freebsd.h
+--- src.old/sys/dev/drm/drm_os_freebsd.h	2003-11-12 21:56:30.000000000 +0100
++++ src/sys/dev/drm/drm_os_freebsd.h	2004-05-22 01:05:38.000000000 +0200
+@@ -227,7 +227,7 @@
+ 
+ #define DRM_HZ hz
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500000
+ #define DRM_WAIT_ON( ret, queue, timeout, condition )		\
+ for ( ret = 0 ; !ret && !(condition) ; ) {			\
+ 	mtx_lock(&dev->irq_lock);				\
+diff -ur src.old/sys/dev/drm/drm_sysctl.h src/sys/dev/drm/drm_sysctl.h
+--- src.old/sys/dev/drm/drm_sysctl.h	2003-10-24 23:45:21.000000000 +0200
++++ src/sys/dev/drm/drm_sysctl.h	2004-05-22 01:05:38.000000000 +0200
+@@ -24,7 +24,7 @@
+  * $FreeBSD: src/sys/dev/drm/drm_sysctl.h,v 1.6 2003/10/24 21:45:21 anholt Exp $
+  */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 
+ #include <sys/sysctl.h>
+ 
+diff -ur src.old/sys/dev/drm/drm_vm.h src/sys/dev/drm/drm_vm.h
+--- src.old/sys/dev/drm/drm_vm.h	2003-10-24 03:48:16.000000000 +0200
++++ src/sys/dev/drm/drm_vm.h	2004-05-22 01:05:38.000000000 +0200
+@@ -25,10 +25,10 @@
+  * $FreeBSD: src/sys/dev/drm/drm_vm.h,v 1.8 2003/10/24 01:48:16 anholt Exp $
+  */
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500102
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500102
+ static int DRM(dma_mmap)(dev_t kdev, vm_offset_t offset, vm_paddr_t *paddr, 
+     int prot)
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ static int DRM(dma_mmap)(dev_t kdev, vm_offset_t offset, int prot)
+ #elif defined(__NetBSD__)
+ static paddr_t DRM(dma_mmap)(dev_t kdev, vm_offset_t offset, int prot)
+@@ -46,7 +46,7 @@
+ 	physical = dma->pagelist[page];
+ 
+ 	DRM_DEBUG("0x%08lx (page %lu) => 0x%08lx\n", (long)offset, page, physical);
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500102
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500102
+ 	*paddr = physical;
+ 	return 0;
+ #else
+@@ -54,10 +54,10 @@
+ #endif
+ }
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500102
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500102
+ int DRM(mmap)(dev_t kdev, vm_offset_t offset, vm_paddr_t *paddr, 
+     int prot)
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ int DRM(mmap)(dev_t kdev, vm_offset_t offset, int prot)
+ #elif defined(__NetBSD__)
+ paddr_t DRM(mmap)(dev_t kdev, off_t offset, int prot)
+@@ -76,7 +76,7 @@
+ 	if (dev->dma
+ 	    && offset >= 0
+ 	    && offset < ptoa(dev->dma->page_count))
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500102
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500102
+ 		return DRM(dma_mmap)(kdev, offset, paddr, prot);
+ #else
+ 		return DRM(dma_mmap)(kdev, offset, prot);
+@@ -109,7 +109,7 @@
+ 	case _DRM_FRAME_BUFFER:
+ 	case _DRM_REGISTERS:
+ 	case _DRM_AGP:
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500102
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500102
+ 		*paddr = offset;
+ 		return 0;
+ #else
+@@ -117,7 +117,7 @@
+ #endif
+ 	case _DRM_SCATTER_GATHER:
+ 	case _DRM_SHM:
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500102
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500102
+ 		*paddr = vtophys(offset);
+ 		return 0;
+ #else
+diff -ur src.old/sys/dev/drm/mga_drv.c src/sys/dev/drm/mga_drv.c
+--- src.old/sys/dev/drm/mga_drv.c	2003-10-24 03:48:16.000000000 +0200
++++ src/sys/dev/drm/mga_drv.c	2004-05-22 01:02:05.000000000 +0200
+@@ -52,7 +52,7 @@
+ #include "dev/drm/drm_vm.h"
+ #include "dev/drm/drm_sysctl.h"
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ DRIVER_MODULE(mga, pci, mga_driver, mga_devclass, 0, 0);
+ #elif defined(__NetBSD__)
+ CFDRIVER_DECL(mga, DV_TTY, NULL);
+diff -ur src.old/sys/dev/drm/r128_drv.c src/sys/dev/drm/r128_drv.c
+--- src.old/sys/dev/drm/r128_drv.c	2003-10-24 03:48:16.000000000 +0200
++++ src/sys/dev/drm/r128_drv.c	2004-05-22 01:02:06.000000000 +0200
+@@ -59,7 +59,7 @@
+ #include "dev/drm/drm_scatter.h"
+ #endif
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ DRIVER_MODULE(r128, pci, r128_driver, r128_devclass, 0, 0);
+ #elif defined(__NetBSD__)
+ CFDRIVER_DECL(r128, DV_TTY, NULL);
+diff -ur src.old/sys/dev/drm/radeon_drv.c src/sys/dev/drm/radeon_drv.c
+--- src.old/sys/dev/drm/radeon_drv.c	2003-10-24 03:48:17.000000000 +0200
++++ src/sys/dev/drm/radeon_drv.c	2004-05-22 01:02:07.000000000 +0200
+@@ -57,7 +57,7 @@
+ #include "dev/drm/drm_scatter.h"
+ #endif
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ DRIVER_MODULE(DRIVER_NAME, pci, DRM(driver), DRM(devclass), 0, 0);
+ #elif defined(__NetBSD__)
+ CFDRIVER_DECL(radeon, DV_TTY, NULL);
+diff -ur src.old/sys/dev/drm/sis_drv.c src/sys/dev/drm/sis_drv.c
+--- src.old/sys/dev/drm/sis_drv.c	2003-10-24 03:48:17.000000000 +0200
++++ src/sys/dev/drm/sis_drv.c	2004-05-22 01:02:07.000000000 +0200
+@@ -45,7 +45,7 @@
+ #include "dev/drm/drm_vm.h"
+ #include "dev/drm/drm_sysctl.h"
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ /* Avoid clash with sis ethernet */
+ DRIVER_MODULE(sisdrm, pci, sis_driver, sis_devclass, 0, 0);
+ #elif defined(__NetBSD__)
+diff -ur src.old/sys/dev/drm/tdfx_drv.c src/sys/dev/drm/tdfx_drv.c
+--- src.old/sys/dev/drm/tdfx_drv.c	2003-10-24 03:48:17.000000000 +0200
++++ src/sys/dev/drm/tdfx_drv.c	2004-05-22 01:02:07.000000000 +0200
+@@ -48,7 +48,7 @@
+ #include "dev/drm/drm_vm.h"
+ #include "dev/drm/drm_sysctl.h"
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ DRIVER_MODULE(tdfx, pci, tdfx_driver, tdfx_devclass, 0, 0);
+ #elif defined(__NetBSD__)
+ CFDRIVER_DECL(tdfx, DV_TTY, NULL);
+diff -ur src.old/sys/dev/ncv/ncr53c500.c src/sys/dev/ncv/ncr53c500.c
+--- src.old/sys/dev/ncv/ncr53c500.c	2003-08-24 19:54:12.000000000 +0200
++++ src/sys/dev/ncv/ncr53c500.c	2004-05-22 01:02:25.000000000 +0200
+@@ -43,7 +43,7 @@
+ #include <sys/param.h>
+ #include <sys/systm.h>
+ #include <sys/kernel.h>
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500001
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500001
+ #include <sys/bio.h>
+ #endif	/* __FreeBSD__ */
+ #include <sys/buf.h>
+@@ -73,7 +73,7 @@
+ #include <i386/Cbus/dev/ncr53c500hwtab.h>
+ #endif /* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <machine/clock.h>
+ #include <machine/cpu.h>
+ #include <machine/bus_pio.h>
+diff -ur src.old/sys/dev/ncv/ncr53c500_pccard.c src/sys/dev/ncv/ncr53c500_pccard.c
+--- src.old/sys/dev/ncv/ncr53c500_pccard.c	2003-10-26 02:51:40.000000000 +0200
++++ src/sys/dev/ncv/ncr53c500_pccard.c	2004-05-22 01:02:25.000000000 +0200
+@@ -65,7 +65,7 @@
+ 
+ #include	<sys/kernel.h>
+ #include	<sys/module.h>
+-#if !defined(__FreeBSD__) || __FreeBSD_version < 500014
++#if !defined(__FreeBSD_kernel__) || __FreeBSD_version < 500014
+ #include	<sys/select.h>
+ #endif
+ #include	<pccard/cardinfo.h>
+diff -ur src.old/sys/dev/nsp/nsp.c src/sys/dev/nsp/nsp.c
+--- src.old/sys/dev/nsp/nsp.c	2003-08-24 19:54:13.000000000 +0200
++++ src/sys/dev/nsp/nsp.c	2004-05-22 01:02:26.000000000 +0200
+@@ -46,7 +46,7 @@
+ #include <sys/param.h>
+ #include <sys/systm.h>
+ #include <sys/kernel.h>
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500001
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500001
+ #include <sys/bio.h>
+ #endif	/* __ FreeBSD__ */
+ #include <sys/buf.h>
+@@ -72,7 +72,7 @@
+ #include <i386/Cbus/dev/nspvar.h>
+ #endif /* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <machine/clock.h>
+ #include <machine/cpu.h>
+ #include <machine/bus_pio.h>
+diff -ur src.old/sys/dev/nsp/nsp_pccard.c src/sys/dev/nsp/nsp_pccard.c
+--- src.old/sys/dev/nsp/nsp_pccard.c	2003-08-24 19:54:13.000000000 +0200
++++ src/sys/dev/nsp/nsp_pccard.c	2004-05-22 01:02:26.000000000 +0200
+@@ -62,7 +62,7 @@
+ 
+ #include	<sys/kernel.h>
+ #include	<sys/module.h>
+-#if !defined(__FreeBSD__) || __FreeBSD_version < 500014
++#if !defined(__FreeBSD_kernel__) || __FreeBSD_version < 500014
+ #include	<sys/select.h>
+ #endif
+ #include 	<pccard/cardinfo.h>
+diff -ur src.old/sys/dev/nsp/nspvar.h src/sys/dev/nsp/nspvar.h
+--- src.old/sys/dev/nsp/nspvar.h	2002-06-01 01:39:04.000000000 +0200
++++ src/sys/dev/nsp/nspvar.h	2004-05-22 01:06:33.000000000 +0200
+@@ -52,7 +52,7 @@
+ 	void *sc_ih;
+ #endif	/* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	bus_space_tag_t sc_iot;
+ 	bus_space_handle_t sc_ioh;
+ 	bus_space_tag_t sc_memt;
+diff -ur src.old/sys/dev/owi/if_wireg.h src/sys/dev/owi/if_wireg.h
+--- src.old/sys/dev/owi/if_wireg.h	2003-08-24 07:42:49.000000000 +0200
++++ src/sys/dev/owi/if_wireg.h	2004-05-22 01:06:34.000000000 +0200
+@@ -83,7 +83,7 @@
+ #ifdef __NetBSD__
+ #define OS_STRING_NAME	"NetBSD"
+ #endif
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define OS_STRING_NAME	"FreeBSD"
+ #endif
+ #ifdef __OpenBSD__
+diff -ur src.old/sys/dev/pdq/pdq.c src/sys/dev/pdq/pdq.c
+--- src.old/sys/dev/pdq/pdq.c	2003-08-24 19:54:16.000000000 +0200
++++ src/sys/dev/pdq/pdq.c	2004-05-22 01:02:31.000000000 +0200
+@@ -49,7 +49,7 @@
+ 
+ #define	PDQ_HWSUPPORT	/* for pdq.h */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ /*
+  * What a botch having to specific includes for FreeBSD!
+  */
+diff -ur src.old/sys/dev/pdq/pdq_ifsubr.c src/sys/dev/pdq/pdq_ifsubr.c
+--- src.old/sys/dev/pdq/pdq_ifsubr.c	2003-08-24 19:54:16.000000000 +0200
++++ src/sys/dev/pdq/pdq_ifsubr.c	2004-05-22 01:02:32.000000000 +0200
+@@ -436,14 +436,14 @@
+     ifp->if_snd.ifq_maxlen = IFQ_MAXLEN;
+     ifp->if_flags = IFF_BROADCAST|IFF_SIMPLEX|IFF_NOTRAILERS|IFF_MULTICAST;
+ 
+-#if (defined(__FreeBSD__) && BSD >= 199506) || defined(__NetBSD__)
++#if (defined(__FreeBSD_kernel__) && BSD >= 199506) || defined(__NetBSD__)
+     ifp->if_watchdog = pdq_ifwatchdog;
+ #else
+     ifp->if_watchdog = ifwatchdog;
+ #endif
+ 
+     ifp->if_ioctl = pdq_ifioctl;
+-#if !defined(__NetBSD__) && !defined(__FreeBSD__)
++#if !defined(__NetBSD__) && !defined(__FreeBSD_kernel__)
+     ifp->if_output = fddi_output;
+ #endif
+     ifp->if_start = pdq_ifstart;
+diff -ur src.old/sys/dev/pdq/pdqvar.h src/sys/dev/pdq/pdqvar.h
+--- src.old/sys/dev/pdq/pdqvar.h	2003-10-31 19:32:03.000000000 +0100
++++ src/sys/dev/pdq/pdqvar.h	2004-05-22 01:06:38.000000000 +0200
+@@ -61,7 +61,7 @@
+ 
+ #if defined(PDQTEST)
+ #include <pdq_os_test.h>
+-#elif defined(__FreeBSD__) || defined(__bsdi__) || defined(__NetBSD__)
++#elif defined(__FreeBSD_kernel__) || defined(__bsdi__) || defined(__NetBSD__)
+ 
+ #include <sys/param.h>
+ #include <sys/systm.h>
+@@ -73,14 +73,14 @@
+ #include <vm/vm_kern.h>
+ 
+ #define	PDQ_USE_MBUFS
+-#if defined(__NetBSD__) || defined(__FreeBSD__)
++#if defined(__NetBSD__) || defined(__FreeBSD_kernel__)
+ #define	PDQ_OS_PREFIX			"%s: "
+ #define	PDQ_OS_PREFIX_ARGS		pdq->pdq_os_name
+ #else
+ #define	PDQ_OS_PREFIX			"%s%d: "
+ #define	PDQ_OS_PREFIX_ARGS		pdq->pdq_os_name, pdq->pdq_unit
+ #endif
+-#if defined(__FreeBSD__) && BSD >= 199506
++#if defined(__FreeBSD_kernel__) && BSD >= 199506
+ #define	PDQ_OS_PAGESIZE			PAGE_SIZE
+ #else
+ #define	PDQ_OS_PAGESIZE			NBPG
+@@ -95,7 +95,7 @@
+ #endif
+ #define	PDQ_OS_MEMALLOC(n)		malloc(n, M_DEVBUF, M_NOWAIT)
+ #define	PDQ_OS_MEMFREE(p, n)		free((void *) p, M_DEVBUF)
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define	PDQ_OS_MEMALLOC_CONTIG(n)	vm_page_alloc_contig(n, 0, 0xffffffff, PAGE_SIZE)
+ #define	PDQ_OS_MEMFREE_CONTIG(p, n)	kmem_free(kernel_map, (vaddr_t) p, n)
+ #else
+@@ -105,7 +105,7 @@
+ #endif
+ #endif /* __FreeBSD__ */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <vm/pmap.h>
+ #include <vm/vm_extern.h>
+ #include <machine/cpufunc.h>
+@@ -309,7 +309,7 @@
+     struct ethercom sc_ec;
+     bus_dma_tag_t sc_dmatag;
+ #define	sc_if		sc_ec.ec_if
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+     struct kern_devconf *sc_kdc;	/* freebsd cruft */
+     struct arpcom sc_ac;
+ #define	sc_if		sc_ac.ac_if
+diff -ur src.old/sys/dev/raidframe/rf_acctrace.c src/sys/dev/raidframe/rf_acctrace.c
+--- src.old/sys/dev/raidframe/rf_acctrace.c	2003-08-24 19:54:17.000000000 +0200
++++ src/sys/dev/raidframe/rf_acctrace.c	2004-05-22 01:02:35.000000000 +0200
+@@ -35,7 +35,7 @@
+  *
+  *****************************************************************************/
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #endif
+diff -ur src.old/sys/dev/raidframe/rf_aselect.c src/sys/dev/raidframe/rf_aselect.c
+--- src.old/sys/dev/raidframe/rf_aselect.c	2003-08-24 19:54:17.000000000 +0200
++++ src/sys/dev/raidframe/rf_aselect.c	2004-05-22 01:02:35.000000000 +0200
+@@ -45,7 +45,7 @@
+ #include <dev/raidframe/rf_desc.h>
+ #include <dev/raidframe/rf_map.h>
+ 
+-#if defined(__NetBSD__) || defined(__FreeBSD__) && defined(_KERNEL)
++#if defined(__NetBSD__) || defined(__FreeBSD_kernel__) && defined(_KERNEL)
+ /* the function below is not used... so don't define it! */
+ #else
+ static void TransferDagMemory(RF_DagHeader_t *, RF_DagHeader_t *);
+@@ -85,7 +85,7 @@
+  * Transfer allocation list and mem chunks from one dag to another
+  *
+  *****************************************************************************/
+-#if defined(__NetBSD__) || defined(__FreeBSD__) && defined(_KERNEL)
++#if defined(__NetBSD__) || defined(__FreeBSD_kernel__) && defined(_KERNEL)
+ /* the function below is not used... so don't define it! */
+ #else
+ static void 
+diff -ur src.old/sys/dev/raidframe/rf_configure.h src/sys/dev/raidframe/rf_configure.h
+--- src.old/sys/dev/raidframe/rf_configure.h	2002-10-20 10:17:35.000000000 +0200
++++ src/sys/dev/raidframe/rf_configure.h	2004-05-22 01:06:41.000000000 +0200
+@@ -48,7 +48,7 @@
+ 
+ #if defined(__NetBSD__)
+ #include <sys/ioctl.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/ioccom.h>
+ #include <sys/filio.h>
+ #endif
+diff -ur src.old/sys/dev/raidframe/rf_copyback.c src/sys/dev/raidframe/rf_copyback.c
+--- src.old/sys/dev/raidframe/rf_copyback.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_copyback.c	2004-05-22 01:02:35.000000000 +0200
+@@ -42,7 +42,7 @@
+ 
+ #include <dev/raidframe/rf_types.h>
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <sys/types.h>
+ #include <sys/systm.h>
+ #if __FreeBSD_version > 500005
+@@ -90,7 +90,7 @@
+ #include <sys/proc.h>
+ #if defined(__NetBSD__)
+ #include <sys/ioctl.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/ioccom.h>
+ #include <sys/filio.h>
+ #endif
+diff -ur src.old/sys/dev/raidframe/rf_cvscan.c src/sys/dev/raidframe/rf_cvscan.c
+--- src.old/sys/dev/raidframe/rf_cvscan.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_cvscan.c	2004-05-22 01:02:35.000000000 +0200
+@@ -352,7 +352,7 @@
+ }
+ 
+ 
+-#if defined(__NetBSD__) || defined(__FreeBSD__) && defined(_KERNEL)
++#if defined(__NetBSD__) || defined(__FreeBSD_kernel__) && defined(_KERNEL)
+ /* PrintCvscanQueue is not used, so we ignore it... */
+ #else
+ static void 
+diff -ur src.old/sys/dev/raidframe/rf_dag.h src/sys/dev/raidframe/rf_dag.h
+--- src.old/sys/dev/raidframe/rf_dag.h	2002-10-20 10:17:35.000000000 +0200
++++ src/sys/dev/raidframe/rf_dag.h	2004-05-22 01:06:41.000000000 +0200
+@@ -49,7 +49,7 @@
+ #define RF_INTR_CONTEXT     1	/* we were invoked from interrupt context */
+ #define RF_MAX_ANTECEDENTS 20	/* max num of antecedents a node may posses */
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500005
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500005
+ #include <sys/bio.h>
+ #endif
+ #include <sys/buf.h>
+diff -ur src.old/sys/dev/raidframe/rf_dagfuncs.c src/sys/dev/raidframe/rf_dagfuncs.c
+--- src.old/sys/dev/raidframe/rf_dagfuncs.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_dagfuncs.c	2004-05-22 01:02:36.000000000 +0200
+@@ -53,7 +53,7 @@
+ #include <sys/param.h>
+ #if defined(__NetBSD__)
+ #include <sys/ioctl.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/ioccom.h>
+ #include <sys/filio.h>
+ #endif
+diff -ur src.old/sys/dev/raidframe/rf_debugMem.c src/sys/dev/raidframe/rf_debugMem.c
+--- src.old/sys/dev/raidframe/rf_debugMem.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_debugMem.c	2004-05-22 01:02:36.000000000 +0200
+@@ -46,7 +46,7 @@
+ #include <dev/raidframe/rf_debugMem.h>
+ #include <dev/raidframe/rf_general.h>
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <sys/kernel.h>
+ MALLOC_DEFINE(M_RAIDFRAME, "rfbuf", "Buffers for RAIDframe operation");
+ #endif
+diff -ur src.old/sys/dev/raidframe/rf_debugMem.h src/sys/dev/raidframe/rf_debugMem.h
+--- src.old/sys/dev/raidframe/rf_debugMem.h	2002-10-20 10:17:36.000000000 +0200
++++ src/sys/dev/raidframe/rf_debugMem.h	2004-05-22 01:06:43.000000000 +0200
+@@ -44,7 +44,7 @@
+ #include <sys/types.h>
+ #include <sys/malloc.h>
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ MALLOC_DECLARE(M_RAIDFRAME);
+ #endif
+ 
+diff -ur src.old/sys/dev/raidframe/rf_diskqueue.c src/sys/dev/raidframe/rf_diskqueue.c
+--- src.old/sys/dev/raidframe/rf_diskqueue.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_diskqueue.c	2004-05-22 01:02:36.000000000 +0200
+@@ -146,7 +146,7 @@
+ #define RF_DQD_INC       16
+ #define RF_DQD_INITIAL   64
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500005
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500005
+ #include <sys/bio.h>
+ #endif
+ 
+diff -ur src.old/sys/dev/raidframe/rf_disks.c src/sys/dev/raidframe/rf_disks.c
+--- src.old/sys/dev/raidframe/rf_disks.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_disks.c	2004-05-22 01:02:36.000000000 +0200
+@@ -85,7 +85,7 @@
+ #include <sys/proc.h>
+ #if defined(__NetBSD__)
+ #include <sys/ioctl.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/ioccom.h>
+ #include <sys/filio.h>
+ #endif
+@@ -571,7 +571,7 @@
+ 		if (ac->flag == 0) {
+ #if defined(__NetBSD__)
+ 			vn_lock(ac->vp, LK_EXCLUSIVE | LK_RETRY);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 			vn_lock(ac->vp, LK_EXCLUSIVE | LK_RETRY,
+ 				raidPtr->engine_thread);
+ #endif
+diff -ur src.old/sys/dev/raidframe/rf_driver.c src/sys/dev/raidframe/rf_driver.c
+--- src.old/sys/dev/raidframe/rf_driver.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_driver.c	2004-05-22 01:02:36.000000000 +0200
+@@ -80,7 +80,7 @@
+ #include <sys/systm.h>
+ #if defined(__NetBSD__)
+ #include <sys/ioctl.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/ioccom.h>
+ #include <sys/filio.h>
+ #endif
+@@ -123,7 +123,7 @@
+ #include <dev/raidframe/rf_shutdown.h>
+ #include <dev/raidframe/rf_kintf.h>
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500005
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500005
+ #include <sys/bio.h>
+ #endif
+ 
+@@ -157,7 +157,7 @@
+ 	RF_LTSLEEP(&((_raid_)->accesses_suspended), PRIBIO, \
+ 		"raidframe quiesce", 0, &((_raid_)->access_suspend_mutex))
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500005
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500005
+ #define IO_BUF_ERR(bp, err) { \
+ 	bp->bio_flags |= BIO_ERROR; \
+ 	bp->bio_resid = bp->bio_bcount; \
+diff -ur src.old/sys/dev/raidframe/rf_engine.c src/sys/dev/raidframe/rf_engine.c
+--- src.old/sys/dev/raidframe/rf_engine.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_engine.c	2004-05-22 01:02:37.000000000 +0200
+@@ -266,7 +266,7 @@
+ 			       (unsigned long) node, node->name);
+ 		}
+ 		if (node->flags & RF_DAGNODE_FLAG_YIELD) {
+-#if defined(__NetBSD__) || defined(__FreeBSD__) && defined(_KERNEL)
++#if defined(__NetBSD__) || defined(__FreeBSD_kernel__) && defined(_KERNEL)
+ 			/* thread_block(); */
+ 			/* printf("Need to block the thread here...\n");  */
+ 			/* XXX thread_block is actually mentioned in
+@@ -285,7 +285,7 @@
+ 			       (unsigned long) node, node->name);
+ 		}
+ 		if (node->flags & RF_DAGNODE_FLAG_YIELD)
+-#if defined(__NetBSD__) || defined(__FreeBSD__) && defined(_KERNEL)
++#if defined(__NetBSD__) || defined(__FreeBSD_kernel__) && defined(_KERNEL)
+ 			/* thread_block(); */
+ 			/* printf("Need to block the thread here...\n"); */
+ 			/* XXX thread_block is actually mentioned in
+diff -ur src.old/sys/dev/raidframe/rf_etimer.h src/sys/dev/raidframe/rf_etimer.h
+--- src.old/sys/dev/raidframe/rf_etimer.h	2002-10-20 10:17:36.000000000 +0200
++++ src/sys/dev/raidframe/rf_etimer.h	2004-05-22 01:06:44.000000000 +0200
+@@ -53,7 +53,7 @@
+                         (_t_).st = mono_time;                   \
+                         splx(s);                                \
+                 }
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #define RF_ETIMER_START(_t_)                                    \
+                 {                                               \
+                         int s;                                  \
+@@ -72,7 +72,7 @@
+                         (_t_).et = mono_time;                   \
+                         splx(s);                                \
+                 }
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #define RF_ETIMER_STOP(_t_)                                     \
+                 {                                               \
+                         int s;                                  \
+diff -ur src.old/sys/dev/raidframe/rf_general.h src/sys/dev/raidframe/rf_general.h
+--- src.old/sys/dev/raidframe/rf_general.h	2002-10-20 10:17:36.000000000 +0200
++++ src/sys/dev/raidframe/rf_general.h	2004-05-22 01:06:45.000000000 +0200
+@@ -89,7 +89,7 @@
+ #define RF_BZERO(_bp,_b,_l)  bzero(_b,_l)	/* XXX This is likely
+ 						 * incorrect. GO */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #define NBPG PAGE_SIZE
+ #endif
+ 
+diff -ur src.old/sys/dev/raidframe/rf_kintf.h src/sys/dev/raidframe/rf_kintf.h
+--- src.old/sys/dev/raidframe/rf_kintf.h	2002-10-20 10:17:36.000000000 +0200
++++ src/sys/dev/raidframe/rf_kintf.h	2004-05-22 01:06:45.000000000 +0200
+@@ -40,7 +40,7 @@
+ #if defined(__NetBSD__)
+ #define RF_LTSLEEP(cond, pri, text, time, mutex)	\
+ 		ltsleep(cond, pri, text, time, mutex)
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #if __FreeBSD_version > 500005
+ #define RF_LTSLEEP(cond, pri, text, time, mutex) \
+ 		msleep(cond, mutex, pri, text, time);
+diff -ur src.old/sys/dev/raidframe/rf_raid5.c src/sys/dev/raidframe/rf_raid5.c
+--- src.old/sys/dev/raidframe/rf_raid5.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_raid5.c	2004-05-22 01:02:41.000000000 +0200
+@@ -109,7 +109,7 @@
+ {
+ 	return (10);
+ }
+-#if !defined(__NetBSD__) && !defined(__FreeBSD__) && !defined(_KERNEL)
++#if !defined(__NetBSD__) && !defined(__FreeBSD_kernel__) && !defined(_KERNEL)
+ /* not currently used */
+ int 
+ rf_ShutdownRAID5(RF_Raid_t * raidPtr)
+diff -ur src.old/sys/dev/raidframe/rf_raidframe.h src/sys/dev/raidframe/rf_raidframe.h
+--- src.old/sys/dev/raidframe/rf_raidframe.h	2002-10-20 10:17:36.000000000 +0200
++++ src/sys/dev/raidframe/rf_raidframe.h	2004-05-22 01:06:50.000000000 +0200
+@@ -93,7 +93,7 @@
+ #define RAIDFRAME_CONFIGURE	_IOW ('r',  1, void *)	/* config an array */
+ #if defined(__NetBSD__)
+ #define RAIDFRAME_SHUTDOWN	_IO  ('r',  2)		/* shutdown the array */
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #define RAIDFRAME_SHUTDOWN	_IOW ('r',  2, int)	/* shutdown the array */
+ #endif
+ #define RAIDFRAME_TUR		_IOW ('r',  3, dev_t)	/* debug only: test
+diff -ur src.old/sys/dev/raidframe/rf_reconbuffer.c src/sys/dev/raidframe/rf_reconbuffer.c
+--- src.old/sys/dev/raidframe/rf_reconbuffer.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_reconbuffer.c	2004-05-22 01:02:41.000000000 +0200
+@@ -285,7 +285,7 @@
+ 	RF_ASSERT(numBufs > 0 && numBufs < RF_PS_MAX_BUFS);
+ #ifdef _KERNEL
+ #ifndef __NetBSD__
+-#ifndef __FreeBSD__
++#ifndef __FreeBSD_kernel__
+ 	thread_block();		/* yield the processor before doing a big XOR */
+ #endif
+ #endif
+diff -ur src.old/sys/dev/raidframe/rf_reconstruct.c src/sys/dev/raidframe/rf_reconstruct.c
+--- src.old/sys/dev/raidframe/rf_reconstruct.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_reconstruct.c	2004-05-22 01:02:42.000000000 +0200
+@@ -37,7 +37,7 @@
+ 
+ #include <dev/raidframe/rf_types.h>
+ #include <sys/time.h>
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <sys/systm.h>
+ #if __FreeBSD_version > 500005
+ #include <sys/bio.h>
+@@ -52,7 +52,7 @@
+ #include <sys/proc.h>
+ #if defined(__NetBSD__)
+ #include <sys/ioctl.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/ioccom.h>
+ #endif
+ #include <sys/fcntl.h>
+diff -ur src.old/sys/dev/raidframe/rf_stripelocks.h src/sys/dev/raidframe/rf_stripelocks.h
+--- src.old/sys/dev/raidframe/rf_stripelocks.h	2002-10-20 10:17:37.000000000 +0200
++++ src/sys/dev/raidframe/rf_stripelocks.h	2004-05-22 01:06:52.000000000 +0200
+@@ -45,7 +45,7 @@
+ #ifndef _RF__RF_STRIPELOCKS_H_
+ #define _RF__RF_STRIPELOCKS_H_
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <sys/types.h>
+ #if __FreeBSD_version > 500005
+ #include <sys/bio.h>
+diff -ur src.old/sys/dev/raidframe/rf_threadstuff.c src/sys/dev/raidframe/rf_threadstuff.c
+--- src.old/sys/dev/raidframe/rf_threadstuff.c	2003-08-24 19:54:18.000000000 +0200
++++ src/sys/dev/raidframe/rf_threadstuff.c	2004-05-22 01:02:43.000000000 +0200
+@@ -172,7 +172,7 @@
+ /*
+  * Kernel
+  */
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500005
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500005
+ int 
+ rf_mutex_init(m, s)
+ decl_simple_lock_data(, *m)
+diff -ur src.old/sys/dev/raidframe/rf_threadstuff.h src/sys/dev/raidframe/rf_threadstuff.h
+--- src.old/sys/dev/raidframe/rf_threadstuff.h	2003-03-20 22:17:39.000000000 +0100
++++ src/sys/dev/raidframe/rf_threadstuff.h	2004-05-22 01:06:52.000000000 +0200
+@@ -123,7 +123,7 @@
+ 	    (struct proc **)&(_handle_), _name_)
+ #define RF_THREAD_EXIT(ret)	\
+ 	kthread_exit(ret)
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #if __FreeBSD_version > 500005
+ #define RF_CREATE_THREAD(_handle_, _func_, _arg_, _name_) \
+ 	kthread_create((void (*)(void *))(_func_), (void *)(_arg_), \
+@@ -210,7 +210,7 @@
+ }
+ #endif
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500005
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500005
+ int     rf_mutex_init(struct mtx *, const char *);
+ int     rf_mutex_destroy(struct mtx *);
+ int	_rf_create_managed_mutex(RF_ShutdownList_t **, struct mtx *,
+diff -ur src.old/sys/dev/raidframe/rf_types.h src/sys/dev/raidframe/rf_types.h
+--- src.old/sys/dev/raidframe/rf_types.h	2003-04-29 15:36:00.000000000 +0200
++++ src/sys/dev/raidframe/rf_types.h	2004-05-22 01:06:52.000000000 +0200
+@@ -239,7 +239,7 @@
+ typedef union RF_GenericParam_u RF_DagParam_t;
+ typedef union RF_GenericParam_u RF_CBParam_t;
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version > 500005
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version > 500005
+ typedef struct bio	*RF_Buf_t;
+ #else
+ typedef struct buf	*RF_Buf_t;
+diff -ur src.old/sys/dev/snc/dp83932var.h src/sys/dev/snc/dp83932var.h
+--- src.old/sys/dev/snc/dp83932var.h	2003-02-10 14:31:49.000000000 +0100
++++ src/sys/dev/snc/dp83932var.h	2004-05-22 01:06:59.000000000 +0200
+@@ -37,7 +37,7 @@
+ #ifdef __NetBSD__
+ #define	splhardnet	splnet
+ #endif
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define	splhardnet	splimp
+ #ifndef NBPG
+ #define NBPG PAGE_SIZE
+diff -ur src.old/sys/dev/sound/usb/uaudio.c src/sys/dev/sound/usb/uaudio.c
+--- src.old/sys/dev/sound/usb/uaudio.c	2002-08-25 03:32:22.000000000 +0200
++++ src/sys/dev/sound/usb/uaudio.c	2004-05-22 01:02:54.000000000 +0200
+@@ -60,7 +60,7 @@
+ #include <sys/vnode.h>
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #include <sys/conf.h>
+@@ -73,7 +73,7 @@
+ #include <dev/audio_if.h>
+ #include <dev/mulaw.h>
+ #include <dev/auconv.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <dev/sound/pcm/sound.h>	/* XXXXX */
+ #include <dev/sound/chip.h>
+ #endif
+@@ -117,7 +117,7 @@
+ 	int		minval, maxval;
+ 	u_int		delta;
+ 	u_int		mul;
+-#if defined(__FreeBSD__) /* XXXXX */
++#if defined(__FreeBSD_kernel__) /* XXXXX */
+ 	unsigned	ctl;
+ #else
+ 	u_int8_t	class;
+@@ -171,7 +171,7 @@
+ 	} chanbufs[UAUDIO_NCHANBUFS];
+ 
+ 	struct uaudio_softc *sc; /* our softc */
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	u_int32_t format;
+ 	int	precision;
+ 	int	channels;
+@@ -358,7 +358,7 @@
+ 	"uaudio"
+ };
+ 
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ Static int	audio_attach_mi(device_t);
+ Static void	uaudio_init_params(struct uaudio_softc * sc, struct chan *ch);
+ 
+@@ -382,7 +382,7 @@
+ 
+ USB_DECLARE_DRIVER(uaudio);
+ 
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 
+ USB_DECLARE_DRIVER_INIT(uaudio,
+ 		DEVMETHOD(device_suspend, bus_generic_suspend),
+@@ -424,7 +424,7 @@
+ 	usbd_devinfo(uaa->device, 0, devinfo);
+ 	USB_ATTACH_SETUP;
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	printf(": %s\n", devinfo);
+ #endif
+ 
+@@ -486,7 +486,7 @@
+ 		printf("%s: %d mixer controls\n", USBDEVNAME(sc->sc_dev),
+ 		    sc->sc_nctls);
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	usbd_add_drv_event(USB_EVENT_DRIVER_ATTACH, sc->sc_udev,
+ 			   USBDEV(sc->sc_dev));
+ #endif
+@@ -496,7 +496,7 @@
+ 	audio_attach_mi(&uaudio_hw_if, sc, &sc->sc_dev);
+ #elif defined(__NetBSD__)
+ 	sc->sc_audiodev = audio_attach_mi(&uaudio_hw_if, sc, &sc->sc_dev);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	sc->sc_dying = 0;
+ 	if (audio_attach_mi(sc->sc_dev)) {
+ 		printf("audio_attach_mi failed\n");
+@@ -547,7 +547,7 @@
+ 
+ 	return (rv);
+ }
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 
+ USB_DETACH(uaudio)
+ {
+@@ -698,7 +698,7 @@
+ 		DPRINTF(("uaudio_mixer_add_ctl: wValue=%04x",mc->wValue[0]));
+ 		for (i = 1; i < mc->nchan; i++)
+ 			DPRINTF((",%04x", mc->wValue[i]));
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 		DPRINTF((" wIndex=%04x type=%d ctl='%d' "
+ 			 "min=%d max=%d\n",
+ 			 mc->wIndex, mc->type, mc->ctl,
+@@ -844,11 +844,11 @@
+ 
+ 	bm = d1->bmControls;
+ 	mix.wIndex = MAKE(d->bUnitId, sc->sc_ac_iface);
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	mix.class = -1;
+ #endif
+ 	mix.type = MIX_SIGNED_16;
+-#if !defined(__FreeBSD__)	/* XXXXX */
++#if !defined(__FreeBSD_kernel__)	/* XXXXX */
+ 	mix.ctlunit = AudioNvolume;
+ #endif
+ 
+@@ -875,7 +875,7 @@
+ 						mix.wValue[k++] = 
+ 							MAKE(p+c+1, o+1);
+ 				}
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 			sprintf(mix.ctlname, "mix%d-%s", d->bUnitId,
+ 				uaudio_id_name(sc, dps, d->baSourceId[i]));
+ #endif
+@@ -912,7 +912,7 @@
+ 	uByte *ctls = d->bmaControls;
+ 	int ctlsize = d->bControlSize;
+ 	int nchan = (d->bLength - 7) / ctlsize;
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	int srcId = d->bSourceId;
+ #endif
+ 	u_int fumask, mmask, cmask;
+@@ -930,7 +930,7 @@
+ 		cmask |= GET(chan);
+ 	}
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	DPRINTFN(1,("uaudio_add_feature: bUnitId=%d bSourceId=%d, "
+ 		    "%d channels, mmask=0x%04x, cmask=0x%04x\n", 
+ 		    d->bUnitId, srcId, nchan, mmask, cmask));
+@@ -960,13 +960,13 @@
+ 		}
+ #undef GET
+ 
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		mix.class = -1;	/* XXX */
+ #endif
+ 		switch (ctl) {
+ 		case MUTE_CONTROL:
+ 			mix.type = MIX_ON_OFF;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			mix.ctl = SOUND_MIXER_NRDEVICES;
+ #else
+ 			sprintf(mix.ctlname, "fea%d-%s-%s", unit,
+@@ -977,7 +977,7 @@
+ 			break;
+ 		case VOLUME_CONTROL:
+ 			mix.type = MIX_SIGNED_16;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			/* mix.ctl = SOUND_MIXER_VOLUME; */
+ 			mix.ctl = SOUND_MIXER_PCM;
+ #else
+@@ -989,7 +989,7 @@
+ 			break;
+ 		case BASS_CONTROL:
+ 			mix.type = MIX_SIGNED_8;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			mix.ctl = SOUND_MIXER_BASS;
+ #else
+ 			sprintf(mix.ctlname, "fea%d-%s-%s", unit,
+@@ -1000,7 +1000,7 @@
+ 			break;
+ 		case MID_CONTROL:
+ 			mix.type = MIX_SIGNED_8;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			mix.ctl = SOUND_MIXER_NRDEVICES;	/* XXXXX */
+ #else
+ 			sprintf(mix.ctlname, "fea%d-%s-%s", unit,
+@@ -1011,7 +1011,7 @@
+ 			break;
+ 		case TREBLE_CONTROL:
+ 			mix.type = MIX_SIGNED_8;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			mix.ctl = SOUND_MIXER_TREBLE;
+ #else
+ 			sprintf(mix.ctlname, "fea%d-%s-%s", unit,
+@@ -1025,7 +1025,7 @@
+ 			break;
+ 		case AGC_CONTROL:
+ 			mix.type = MIX_ON_OFF;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			mix.ctl = SOUND_MIXER_NRDEVICES;	/* XXXXX */
+ #else
+ 			sprintf(mix.ctlname, "fea%d-%s-%s", unit,
+@@ -1036,7 +1036,7 @@
+ 			break;
+ 		case DELAY_CONTROL:
+ 			mix.type = MIX_UNSIGNED_16;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			mix.ctl = SOUND_MIXER_NRDEVICES;	/* XXXXX */
+ #else
+ 			sprintf(mix.ctlname, "fea%d-%s-%s", unit,
+@@ -1047,7 +1047,7 @@
+ 			break;
+ 		case BASS_BOOST_CONTROL:
+ 			mix.type = MIX_ON_OFF;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			mix.ctl = SOUND_MIXER_NRDEVICES;	/* XXXXX */
+ #else
+ 			sprintf(mix.ctlname, "fea%d-%s-%s", unit,
+@@ -1058,7 +1058,7 @@
+ 			break;
+ 		case LOUDNESS_CONTROL:
+ 			mix.type = MIX_ON_OFF;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			mix.ctl = SOUND_MIXER_LOUD;	/* Is this correct ? */
+ #else
+ 			sprintf(mix.ctlname, "fea%d-%s-%s", unit,
+@@ -1097,11 +1097,11 @@
+ 	mix.wIndex = MAKE(d->bUnitId, sc->sc_ac_iface);
+ 	mix.nchan = 1;
+ 	mix.wValue[0] = MAKE(UD_MODE_SELECT_CONTROL, 0);
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	mix.class = -1;
+ #endif
+ 	mix.type = MIX_ON_OFF;	/* XXX */
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 	mix.ctlunit = "";
+ 	sprintf(mix.ctlname, "pro%d-mode", d->bUnitId);
+ #endif
+@@ -1132,11 +1132,11 @@
+ 		mix.wIndex = MAKE(d->bUnitId, sc->sc_ac_iface);
+ 		mix.nchan = 1;
+ 		mix.wValue[0] = MAKE(XX_ENABLE_CONTROL, 0);
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		mix.class = -1;
+ #endif
+ 		mix.type = MIX_ON_OFF;
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		mix.ctlunit = "";
+ 		sprintf(mix.ctlname, "pro%d.%d-enable", d->bUnitId, ptype);
+ #endif
+@@ -1181,11 +1181,11 @@
+ 		mix.wIndex = MAKE(d->bUnitId, sc->sc_ac_iface);
+ 		mix.nchan = 1;
+ 		mix.wValue[0] = MAKE(UA_EXT_ENABLE, 0);
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		mix.class = -1;
+ #endif
+ 		mix.type = MIX_ON_OFF;
+-#if !defined(__FreeBSD__)
++#if !defined(__FreeBSD_kernel__)
+ 		mix.ctlunit = "";
+ 		sprintf(mix.ctlname, "ext%d-enable", d->bUnitId);
+ #endif
+@@ -2201,7 +2201,7 @@
+ #endif
+ 
+ 	ch->transferred += cb->size;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	/* s = spltty(); */
+ 	s = splhigh();
+ 	chn_intr(ch->pcm_ch);
+@@ -2320,7 +2320,7 @@
+ 
+ 	/* Call back to upper layer */
+ 	ch->transferred += cb->size;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	s = spltty();
+ 	chn_intr(ch->pcm_ch);
+ 	splx(s);
+@@ -2547,7 +2547,7 @@
+ }
+ 
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ /************************************************************/
+ void
+ uaudio_init_params(struct uaudio_softc *sc, struct chan *ch)
+diff -ur src.old/sys/dev/stg/tmc18c30.c src/sys/dev/stg/tmc18c30.c
+--- src.old/sys/dev/stg/tmc18c30.c	2003-08-24 20:17:23.000000000 +0200
++++ src/sys/dev/stg/tmc18c30.c	2004-05-22 01:02:55.000000000 +0200
+@@ -45,7 +45,7 @@
+ #include <sys/param.h>
+ #include <sys/systm.h>
+ #include <sys/kernel.h>
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500001
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500001
+ #include <sys/bio.h>
+ #endif	/* __FreeBSD__ */
+ #include <sys/buf.h>
+@@ -71,7 +71,7 @@
+ #include <i386/Cbus/dev/tmc18c30var.h>
+ #endif /* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <machine/clock.h>
+ #include <machine/cpu.h>
+ #include <machine/bus_pio.h>
+diff -ur src.old/sys/dev/stg/tmc18c30_pccard.c src/sys/dev/stg/tmc18c30_pccard.c
+--- src.old/sys/dev/stg/tmc18c30_pccard.c	2003-08-24 20:17:23.000000000 +0200
++++ src/sys/dev/stg/tmc18c30_pccard.c	2004-05-22 01:02:55.000000000 +0200
+@@ -64,7 +64,7 @@
+ 
+ #include	<sys/kernel.h>
+ #include	<sys/module.h>
+-#if !defined(__FreeBSD__) || __FreeBSD_version < 500014
++#if !defined(__FreeBSD_kernel__) || __FreeBSD_version < 500014
+ #include	<sys/select.h>
+ #endif
+ #include	<pccard/cardinfo.h>
+diff -ur src.old/sys/dev/twe/twe_compat.h src/sys/dev/twe/twe_compat.h
+--- src.old/sys/dev/twe/twe_compat.h	2003-12-02 08:57:20.000000000 +0100
++++ src/sys/dev/twe/twe_compat.h	2004-05-22 01:07:17.000000000 +0200
+@@ -32,7 +32,7 @@
+  * Portability and compatibility interfaces.
+  */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ /******************************************************************************
+  * FreeBSD
+  */
+diff -ur src.old/sys/dev/usb/dsbr100io.h src/sys/dev/usb/dsbr100io.h
+--- src.old/sys/dev/usb/dsbr100io.h	2002-03-04 04:51:19.000000000 +0100
++++ src/sys/dev/usb/dsbr100io.h	2004-05-22 01:07:20.000000000 +0200
+@@ -30,11 +30,11 @@
+ 
+ /*  $FreeBSD: src/sys/dev/usb/dsbr100io.h,v 1.1 2002/03/04 03:51:19 alfred Exp $ */
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
++#if defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/ioccom.h>
+ #endif
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
++#if defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__)
+ #define FM_SET_FREQ	_IOWR('U', 200, int)
+ #define FM_GET_FREQ	_IOWR('U', 201, int)
+ #define FM_START	_IOWR('U', 202, int)
+diff -ur src.old/sys/dev/usb/ehci.c src/sys/dev/usb/ehci.c
+--- src.old/sys/dev/usb/ehci.c	2003-11-10 01:20:52.000000000 +0100
++++ src/sys/dev/usb/ehci.c	2004-05-22 01:03:01.000000000 +0200
+@@ -65,14 +65,14 @@
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+ #include <sys/select.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/endian.h>
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #include <machine/bus_pio.h>
+ #include <machine/bus_memio.h>
+ #include <sys/lockmgr.h>
+-#if defined(DIAGNOSTIC) && defined(__i386__) && defined(__FreeBSD__)
++#if defined(DIAGNOSTIC) && defined(__i386__) && defined(__FreeBSD_kernel__)
+ #include <machine/cpu.h>
+ #endif
+ #endif
+@@ -92,7 +92,7 @@
+ #include <dev/usb/ehcireg.h>
+ #include <dev/usb/ehcivar.h>
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <machine/clock.h>
+ 
+ #define delay(d)                DELAY(d)
+@@ -2139,7 +2139,7 @@
+ 		    EHCI_QTD_NBUFFERS * EHCI_PAGE_SIZE) {
+ 			/* we can handle it in this QTD */
+ 			curlen = len;
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 		/* XXX This is pretty broken: Because we do not allocate
+ 		 * a contiguous buffer (contiguous in physical pages) we
+ 		 * can only transfer one page in one go.
+@@ -2165,7 +2165,7 @@
+ 				curlen = len;
+ 			}
+ #endif
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 			/* See comment above (XXX) */
+ 			curlen = EHCI_PAGE_SIZE -
+ 				 EHCI_PAGE_MASK(dataphys);
+diff -ur src.old/sys/dev/usb/ehcireg.h src/sys/dev/usb/ehcireg.h
+--- src.old/sys/dev/usb/ehcireg.h	2003-04-14 16:04:07.000000000 +0200
++++ src/sys/dev/usb/ehcireg.h	2004-05-22 01:07:20.000000000 +0200
+@@ -174,7 +174,7 @@
+ #define EHCI_PAGE_SIZE 0x1000
+ #define EHCI_PAGE(x) ((x) &~ 0xfff)
+ #define EHCI_PAGE_OFFSET(x) ((x) & 0xfff)
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #define EHCI_PAGE_MASK(x) ((x) & 0xfff)
+ #endif
+ 
+diff -ur src.old/sys/dev/usb/ehcivar.h src/sys/dev/usb/ehcivar.h
+--- src.old/sys/dev/usb/ehcivar.h	2003-04-14 16:04:07.000000000 +0200
++++ src/sys/dev/usb/ehcivar.h	2004-05-22 01:07:21.000000000 +0200
+@@ -78,7 +78,7 @@
+ 	bus_space_tag_t iot;
+ 	bus_space_handle_t ioh;
+ 	bus_size_t sc_size;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	void *ih;
+ 
+ 	struct resource *io_res;
+diff -ur src.old/sys/dev/usb/if_auereg.h src/sys/dev/usb/if_auereg.h
+--- src.old/sys/dev/usb/if_auereg.h	2003-10-04 23:41:01.000000000 +0200
++++ src/sys/dev/usb/if_auereg.h	2004-05-22 01:07:21.000000000 +0200
+@@ -222,7 +222,7 @@
+ #define AUE_INC(x, y)		(x) = (x + 1) % y
+ 
+ struct aue_softc {
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #define GET_MII(sc) (device_get_softc((sc)->aue_miibus))
+ #elif defined(__NetBSD__)
+ #define GET_MII(sc) (&(sc)->aue_mii)
+diff -ur src.old/sys/dev/usb/if_axereg.h src/sys/dev/usb/if_axereg.h
+--- src.old/sys/dev/usb/if_axereg.h	2003-06-15 23:45:43.000000000 +0200
++++ src/sys/dev/usb/if_axereg.h	2004-05-22 01:07:21.000000000 +0200
+@@ -144,7 +144,7 @@
+ #define AXE_INC(x, y)		(x) = (x + 1) % y
+ 
+ struct axe_softc {
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #define GET_MII(sc) (device_get_softc((sc)->axe_miibus))
+ #elif defined(__NetBSD__)
+ #define GET_MII(sc) (&(sc)->axe_mii)
+diff -ur src.old/sys/dev/usb/if_ruereg.h src/sys/dev/usb/if_ruereg.h
+--- src.old/sys/dev/usb/if_ruereg.h	2003-10-04 23:41:01.000000000 +0200
++++ src/sys/dev/usb/if_ruereg.h	2004-05-22 01:07:22.000000000 +0200
+@@ -230,7 +230,7 @@
+ 	struct timeval		rue_rx_notice;
+ };
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #define GET_MII(sc)	(device_get_softc((sc)->rue_miibus))
+ #elif defined(__NetBSD__)
+ #define GET_MII(sc)	(&(sc)->rue_mii)
+diff -ur src.old/sys/dev/usb/ohci.c src/sys/dev/usb/ohci.c
+--- src.old/sys/dev/usb/ohci.c	2003-11-25 03:23:29.000000000 +0100
++++ src/sys/dev/usb/ohci.c	2004-05-22 01:03:02.000000000 +0200
+@@ -61,13 +61,13 @@
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+ #include <sys/select.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/endian.h>
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #include <machine/bus_pio.h>
+ #include <machine/bus_memio.h>
+-#if defined(DIAGNOSTIC) && defined(__i386__) && defined(__FreeBSD__)
++#if defined(DIAGNOSTIC) && defined(__i386__) && defined(__FreeBSD_kernel__)
+ #include <machine/cpu.h>
+ #endif
+ #endif
+@@ -87,7 +87,7 @@
+ #include <dev/usb/ohcireg.h>
+ #include <dev/usb/ohcivar.h>
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <machine/clock.h>
+ 
+ #define delay(d)                DELAY(d)
+diff -ur src.old/sys/dev/usb/ohcivar.h src/sys/dev/usb/ohcivar.h
+--- src.old/sys/dev/usb/ohcivar.h	2003-07-16 01:19:49.000000000 +0200
++++ src/sys/dev/usb/ohcivar.h	2004-05-22 01:07:22.000000000 +0200
+@@ -89,7 +89,7 @@
+ 	bus_space_handle_t ioh;
+ 	bus_size_t sc_size;
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	void *ih;
+ 
+ 	struct resource *io_res;
+diff -ur src.old/sys/dev/usb/rio500_usb.h src/sys/dev/usb/rio500_usb.h
+--- src.old/sys/dev/usb/rio500_usb.h	2000-04-08 19:02:13.000000000 +0200
++++ src/sys/dev/usb/rio500_usb.h	2004-05-22 01:07:22.000000000 +0200
+@@ -21,7 +21,7 @@
+ 
+ /*  $FreeBSD: src/sys/dev/usb/rio500_usb.h,v 1.1 2000/04/08 17:02:13 n_hibma Exp $ */
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
++#if defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/ioccom.h>
+ #ifndef USB_VENDOR_DIAMOND
+ #define USB_VENDOR_DIAMOND 0x841
+@@ -33,7 +33,7 @@
+ 
+ struct RioCommand
+ {
+-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
++#if defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__)
+   u_int16_t  length;
+ #else
+   short length;
+@@ -46,7 +46,7 @@
+   int  timeout;
+ };
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
++#if defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__)
+ #define RIO_SEND_COMMAND	_IOWR('U', 200, struct RioCommand)
+ #define RIO_RECV_COMMAND	_IOWR('U', 201, struct RioCommand)
+ #else
+diff -ur src.old/sys/dev/usb/ufm.c src/sys/dev/usb/ufm.c
+--- src.old/sys/dev/usb/ufm.c	2003-10-04 23:41:01.000000000 +0200
++++ src/sys/dev/usb/ufm.c	2004-05-22 01:03:02.000000000 +0200
+@@ -39,7 +39,7 @@
+ #if defined(__NetBSD__)
+ #include <sys/device.h>
+ #include <sys/ioctl.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #include <sys/ioccom.h>
+@@ -84,7 +84,7 @@
+ int ufmioctl(dev_t, u_long, caddr_t, int, usb_proc_ptr);
+ 
+ cdev_decl(ufm);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ d_open_t  ufmopen;
+ d_close_t ufmclose;
+ d_ioctl_t ufmioctl;
+@@ -105,7 +105,7 @@
+  	.d_bmaj =	-1
+ #endif
+ };
+-#endif  /*defined(__FreeBSD__)*/
++#endif  /*defined(__FreeBSD_kernel__)*/
+ 
+ #define FM_CMD0		0x00
+ #define FM_CMD_SET_FREQ	0x01
+@@ -170,7 +170,7 @@
+ 
+ 	sc->sc_udev = udev = uaa->device;
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+  	if ((!uaa->device) || (!uaa->iface)) {
+ 		ermsg = "device or iface";
+  		goto nobulk;
+@@ -209,7 +209,7 @@
+ 	}
+ 	sc->sc_epaddr = edesc->bEndpointAddress;
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	/* XXX no error trapping, no storing of dev_t */
+ 	(void) make_dev(&ufm_cdevsw, device_get_unit(self),
+ 			UID_ROOT, GID_OPERATOR,
+@@ -435,7 +435,7 @@
+ 	int maj, mn;
+ 
+ 	DPRINTF(("ufm_detach: sc=%p flags=%d\n", sc, flags));
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	DPRINTF(("ufm_detach: sc=%p\n", sc));
+ #endif
+ 
+@@ -457,7 +457,7 @@
+ 	/* Nuke the vnodes for any open instances (calls close). */
+ 	mn = self->dv_unit * USB_MAX_ENDPOINTS;
+ 	vdevgone(maj, mn, mn + USB_MAX_ENDPOINTS - 1, VCHR);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	/* XXX not implemented yet */
+ #endif
+ 
+@@ -468,7 +468,7 @@
+ }
+ #endif /* defined(__NetBSD__) || defined(__OpenBSD__) */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ Static int
+ ufm_detach(device_t self)
+ {
+diff -ur src.old/sys/dev/usb/ugen.c src/sys/dev/usb/ugen.c
+--- src.old/sys/dev/usb/ugen.c	2003-11-09 10:17:22.000000000 +0100
++++ src/sys/dev/usb/ugen.c	2004-05-22 01:03:02.000000000 +0200
+@@ -54,7 +54,7 @@
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+ #include <sys/ioctl.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #include <sys/ioccom.h>
+@@ -99,7 +99,7 @@
+ 
+ struct ugen_endpoint {
+ 	struct ugen_softc *sc;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	dev_t dev;
+ #endif
+ 	usb_endpoint_descriptor_t *edesc;
+@@ -126,7 +126,7 @@
+ struct ugen_softc {
+ 	USBBASEDEVICE sc_dev;		/* base device */
+ 	usbd_device_handle sc_udev;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	dev_t dev;
+ #endif
+ 
+@@ -141,7 +141,7 @@
+ 
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ cdev_decl(ugen);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ d_open_t  ugenopen;
+ d_close_t ugenclose;
+ d_read_t  ugenread;
+@@ -174,7 +174,7 @@
+ Static int ugen_do_write(struct ugen_softc *, int, struct uio *, int);
+ Static int ugen_do_ioctl(struct ugen_softc *, int, u_long,
+ 			 caddr_t, int, usb_proc_ptr);
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ Static void ugen_make_devnodes(struct ugen_softc *sc);
+ Static void ugen_destroy_devnodes(struct ugen_softc *sc);
+ #endif
+@@ -239,7 +239,7 @@
+ 		USB_ATTACH_ERROR_RETURN;
+ 	}
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	/* the main device, ctrl endpoint */
+ 	sc->dev = make_dev(&ugen_cdevsw, UGENMINOR(USBDEVUNIT(sc->sc_dev), 0),
+ 		UID_ROOT, GID_OPERATOR, 0644, "%s", USBDEVNAME(sc->sc_dev));
+@@ -248,7 +248,7 @@
+ 	USB_ATTACH_SUCCESS_RETURN;
+ }
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ Static void
+ ugen_make_devnodes(struct ugen_softc *sc)
+ {
+@@ -322,7 +322,7 @@
+ 	DPRINTFN(1,("ugen_set_config: %s to configno %d, sc=%p\n",
+ 		    USBDEVNAME(sc->sc_dev), configno, sc));
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	ugen_destroy_devnodes(sc);
+ #endif
+ 
+@@ -371,7 +371,7 @@
+ 		}
+ 	}
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	ugen_make_devnodes(sc);
+ #endif
+ 
+@@ -870,7 +870,7 @@
+ 
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ 	DPRINTF(("ugen_detach: sc=%p flags=%d\n", sc, flags));
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	DPRINTF(("ugen_detach: sc=%p\n", sc));
+ #endif
+ 
+@@ -903,7 +903,7 @@
+ 	/* Nuke the vnodes for any open instances (calls close). */
+ 	mn = self->dv_unit * USB_MAX_ENDPOINTS;
+ 	vdevgone(maj, mn, mn + USB_MAX_ENDPOINTS - 1, VCHR);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	/* destroy the device for the control endpoint */
+ 	destroy_dev(sc->dev);
+ 	ugen_destroy_devnodes(sc);
+@@ -1033,7 +1033,7 @@
+ 	if (err)
+ 		return (err);
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	/* destroy the existing devices, we remake the new ones in a moment */
+ 	ugen_destroy_devnodes(sc);
+ #endif
+@@ -1067,7 +1067,7 @@
+ 		sce->iface = iface;
+ 	}
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	/* make the new devices */
+ 	ugen_make_devnodes(sc);
+ #endif
+@@ -1466,6 +1466,6 @@
+ 	return (revents);
+ }
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ DRIVER_MODULE(ugen, uhub, ugen_driver, ugen_devclass, usbd_driver_load, 0);
+ #endif
+diff -ur src.old/sys/dev/usb/uhci.c src/sys/dev/usb/uhci.c
+--- src.old/sys/dev/usb/uhci.c	2003-11-10 01:08:41.000000000 +0100
++++ src/sys/dev/usb/uhci.c	2004-05-22 01:03:02.000000000 +0200
+@@ -65,7 +65,7 @@
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+ #include <sys/select.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/endian.h>
+ #include <sys/module.h>
+ #include <sys/bus.h>
+@@ -93,7 +93,7 @@
+ /* Use bandwidth reclamation for control transfers. Some devices choke on it. */
+ /*#define UHCI_CTL_LOOP */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <machine/clock.h>
+ 
+ #define delay(d)		DELAY(d)
+diff -ur src.old/sys/dev/usb/uhci_pci.c src/sys/dev/usb/uhci_pci.c
+--- src.old/sys/dev/usb/uhci_pci.c	2003-11-28 06:28:29.000000000 +0100
++++ src/sys/dev/usb/uhci_pci.c	2004-05-22 01:03:02.000000000 +0200
+@@ -56,7 +56,7 @@
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #include <sys/queue.h>
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <sys/bus.h>
+ 
+ #include <machine/bus.h>
+diff -ur src.old/sys/dev/usb/uhcivar.h src/sys/dev/usb/uhcivar.h
+--- src.old/sys/dev/usb/uhcivar.h	2003-07-16 01:19:49.000000000 +0200
++++ src/sys/dev/usb/uhcivar.h	2004-05-22 01:07:23.000000000 +0200
+@@ -136,7 +136,7 @@
+ 	bus_space_tag_t iot;
+ 	bus_space_handle_t ioh;
+ 	bus_size_t sc_size;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	void *ih;
+ 
+ 	struct resource *io_res;
+diff -ur src.old/sys/dev/usb/uhid.c src/sys/dev/usb/uhid.c
+--- src.old/sys/dev/usb/uhid.c	2003-11-09 10:17:22.000000000 +0100
++++ src/sys/dev/usb/uhid.c	2004-05-22 01:03:02.000000000 +0200
+@@ -61,7 +61,7 @@
+ #include <sys/device.h>
+ #include <sys/ioctl.h>
+ #include <sys/file.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/ioccom.h>
+ #include <sys/filio.h>
+ #include <sys/module.h>
+@@ -135,7 +135,7 @@
+ 	int sc_refcnt;
+ 	u_char sc_dying;
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	dev_t dev;
+ #endif
+ };
+@@ -146,7 +146,7 @@
+ 
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ cdev_decl(uhid);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ d_open_t	uhidopen;
+ d_close_t	uhidclose;
+ d_read_t	uhidread;
+@@ -273,7 +273,7 @@
+ 	sc->sc_repdesc = desc;
+ 	sc->sc_repdesc_size = size;
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	sc->dev = make_dev(&uhid_cdevsw, device_get_unit(self),
+ 			UID_ROOT, GID_OPERATOR,
+ 			0644, "uhid%d", device_get_unit(self));
+@@ -338,7 +338,7 @@
+ 	/* Nuke the vnodes for any open instances (calls close). */
+ 	mn = self->dv_unit;
+ 	vdevgone(maj, mn, mn, VCHR);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	destroy_dev(sc->dev);
+ #endif
+ 
+@@ -750,6 +750,6 @@
+ 	return (revents);
+ }
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ DRIVER_MODULE(uhid, uhub, uhid_driver, uhid_devclass, usbd_driver_load, 0);
+ #endif
+diff -ur src.old/sys/dev/usb/uhub.c src/sys/dev/usb/uhub.c
+--- src.old/sys/dev/usb/uhub.c	2003-08-24 19:55:55.000000000 +0200
++++ src/sys/dev/usb/uhub.c	2004-05-22 01:03:03.000000000 +0200
+@@ -51,7 +51,7 @@
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+ #include <sys/proc.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #include "bus_if.h"
+@@ -90,7 +90,7 @@
+ Static usbd_status uhub_explore(usbd_device_handle hub);
+ Static void uhub_intr(usbd_xfer_handle, usbd_private_handle,usbd_status);
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ Static bus_driver_added_t uhub_driver_added;
+ Static bus_child_detached_t uhub_child_detached;
+ #endif
+@@ -108,7 +108,7 @@
+ /* Create the driver instance for the hub connected to hub case */
+ CFATTACH_DECL(uhub_uhub, sizeof(struct uhub_softc),
+     uhub_match, uhub_attach, uhub_detach, uhub_activate);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ USB_DECLARE_DRIVER_INIT(uhub,
+ 			DEVMETHOD(bus_driver_added, uhub_driver_added),
+ 			DEVMETHOD(bus_child_detached, uhub_child_detached),
+@@ -548,7 +548,7 @@
+ 
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ 	DPRINTF(("uhub_detach: sc=%p flags=%d\n", sc, flags));
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	DPRINTF(("uhub_detach: sc=%port\n", sc));
+ #endif
+ 
+@@ -574,7 +574,7 @@
+ 	return (0);
+ }
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ /* Called when a device has been detached from it */
+ Static void
+ uhub_child_detached(device_t self, device_t child)
+@@ -637,7 +637,7 @@
+ 		usb_needs_explore(sc->sc_hub);
+ }
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ DRIVER_MODULE(uhub, usb, uhubroot_driver, uhubroot_devclass, 0, 0);
+ DRIVER_MODULE(uhub, uhub, uhub_driver, uhub_devclass, usbd_driver_load, 0);
+ #endif
+diff -ur src.old/sys/dev/usb/ulpt.c src/sys/dev/usb/ulpt.c
+--- src.old/sys/dev/usb/ulpt.c	2003-09-28 22:48:13.000000000 +0200
++++ src/sys/dev/usb/ulpt.c	2004-05-22 01:03:03.000000000 +0200
+@@ -51,7 +51,7 @@
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+ #include <sys/ioctl.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/ioccom.h>
+ #include <sys/module.h>
+ #include <sys/bus.h>
+@@ -121,7 +121,7 @@
+ 	int sc_refcnt;
+ 	u_char sc_dying;
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	dev_t dev;
+ 	dev_t dev_noprime;
+ #endif
+@@ -139,7 +139,7 @@
+ };
+ #elif defined(__OpenBSD__)
+ cdev_decl(ulpt);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ Static d_open_t ulptopen;
+ Static d_close_t ulptclose;
+ Static d_write_t ulptwrite;
+@@ -337,7 +337,7 @@
+ 	}
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	sc->dev = make_dev(&ulpt_cdevsw, device_get_unit(self),
+ 		UID_ROOT, GID_OPERATOR, 0644, "ulpt%d", device_get_unit(self));
+ 	sc->dev_noprime = make_dev(&ulpt_cdevsw,
+@@ -379,7 +379,7 @@
+ 
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ 	DPRINTF(("ulpt_detach: sc=%p flags=%d\n", sc, flags));
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	DPRINTF(("ulpt_detach: sc=%p\n", sc));
+ #endif
+ 
+@@ -410,7 +410,7 @@
+ 	/* Nuke the vnodes for any open instances (calls close). */
+ 	mn = self->dv_unit;
+ 	vdevgone(maj, mn, mn, VCHR);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	destroy_dev(sc->dev);
+ 	destroy_dev(sc->dev_noprime);
+ #endif
+@@ -509,7 +509,7 @@
+ 	sc->sc_flags = flags;
+ 	DPRINTF(("ulptopen: flags=0x%x\n", (unsigned)flags));
+ 
+-#if defined(USB_DEBUG) && defined(__FreeBSD__)
++#if defined(USB_DEBUG) && defined(__FreeBSD_kernel__)
+ 	/* Ignoring these flags might not be a good idea */
+ 	if ((flags & ~ULPT_NOPRIME) != 0)
+ 		printf("ulptopen: flags ignored: %b\n", flags,
+@@ -751,6 +751,6 @@
+ }
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ DRIVER_MODULE(ulpt, uhub, ulpt_driver, ulpt_devclass, usbd_driver_load, 0);
+ #endif
+diff -ur src.old/sys/dev/usb/umass.c src/sys/dev/usb/umass.c
+--- src.old/sys/dev/usb/umass.c	2003-09-20 10:18:16.000000000 +0200
++++ src/sys/dev/usb/umass.c	2004-05-22 01:03:03.000000000 +0200
+@@ -642,7 +642,7 @@
+ 				int buflen, int printlen);
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ MODULE_DEPEND(umass, cam, 1,1,1);
+ #endif
+ 
+diff -ur src.old/sys/dev/usb/ums.c src/sys/dev/usb/ums.c
+--- src.old/sys/dev/usb/ums.c	2003-11-09 10:17:22.000000000 +0100
++++ src/sys/dev/usb/ums.c	2004-05-22 01:03:03.000000000 +0200
+@@ -348,7 +348,7 @@
+ 	sc->status.button = sc->status.obutton = 0;
+ 	sc->status.dx = sc->status.dy = sc->status.dz = 0;
+ 
+-#ifndef __FreeBSD__
++#ifndef __FreeBSD_kernel__
+ 	sc->rsel.si_flags = 0;
+ 	sc->rsel.si_pid = 0;
+ #endif
+diff -ur src.old/sys/dev/usb/urio.c src/sys/dev/usb/urio.c
+--- src.old/sys/dev/usb/urio.c	2003-08-26 00:01:06.000000000 +0200
++++ src/sys/dev/usb/urio.c	2004-05-22 01:03:04.000000000 +0200
+@@ -51,7 +51,7 @@
+ #if defined(__NetBSD__)
+ #include <sys/device.h>
+ #include <sys/ioctl.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #include <sys/ioccom.h>
+@@ -108,7 +108,7 @@
+ #define RIO_UE_GET_DIR(p) ((UE_GET_DIR(p) == UE_DIR_IN) ? RIO_IN :\
+ 			  ((UE_GET_DIR(p) == UE_DIR_OUT) ? RIO_OUT :\
+ 							   RIO_NODIR))
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ d_open_t  urioopen;
+ d_close_t urioclose;
+ d_read_t  urioread;
+@@ -132,7 +132,7 @@
+ #define RIO_UE_GET_DIR(p) ((UE_GET_DIR(p) == UE_DIR_IN) ? RIO_IN :\
+ 		 	  ((UE_GET_DIR(p) == UE_DIR_OUT) ? RIO_OUT :\
+ 			    				   RIO_NODIR))
+-#endif  /*defined(__FreeBSD__)*/
++#endif  /*defined(__FreeBSD_kernel__)*/
+ 
+ #define	URIO_BBSIZE	1024
+ 
+@@ -147,9 +147,9 @@
+ 	int sc_epaddr[2];
+ 
+ 	int sc_refcnt;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	dev_t sc_dev_t;
+-#endif	/* defined(__FreeBSD__) */
++#endif	/* defined(__FreeBSD_kernel__) */
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ 	u_char sc_dying;
+ #endif
+@@ -204,7 +204,7 @@
+ 
+ 	sc->sc_udev = udev = uaa->device;
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+  	if ((!uaa->device) || (!uaa->iface)) {
+ 		ermsg = "device or iface";
+  		goto nobulk;
+@@ -261,7 +261,7 @@
+ 		goto nobulk;
+ 	}
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	/* XXX no error trapping, no storing of dev_t */
+ 	sc->sc_dev_t = make_dev(&urio_cdevsw, device_get_unit(self),
+ 			UID_ROOT, GID_OPERATOR,
+@@ -614,7 +614,7 @@
+ 	int maj, mn;
+ 
+ 	DPRINTF(("urio_detach: sc=%p flags=%d\n", sc, flags));
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	DPRINTF(("urio_detach: sc=%p\n", sc));
+ #endif
+ 
+@@ -671,7 +671,7 @@
+ }
+ #endif /* defined(__NetBSD__) || defined(__OpenBSD__) */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ Static int
+ urio_detach(device_t self)
+ {
+diff -ur src.old/sys/dev/usb/usb.c src/sys/dev/usb/usb.c
+--- src.old/sys/dev/usb/usb.c	2003-11-10 00:54:21.000000000 +0100
++++ src/sys/dev/usb/usb.c	2004-05-22 01:03:04.000000000 +0200
+@@ -62,7 +62,7 @@
+ #endif
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/unistd.h>
+ #include <sys/module.h>
+ #include <sys/bus.h>
+@@ -89,13 +89,13 @@
+ #define USBUNIT(d)	(minor(d))	/* usb_discover device nodes, kthread */
+ #define USB_DEV_MINOR	255		/* event queue device */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ MALLOC_DEFINE(M_USB, "USB", "USB");
+ MALLOC_DEFINE(M_USBDEV, "USBdev", "USB device");
+ MALLOC_DEFINE(M_USBHC, "USBHC", "USB host controller");
+ 
+ #include "usb_if.h"
+-#endif /* defined(__FreeBSD__) */
++#endif /* defined(__FreeBSD_kernel__) */
+ 
+ #include <machine/bus.h>
+ 
+@@ -138,7 +138,7 @@
+ 
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ cdev_decl(usb);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ d_open_t  usbopen;
+ d_close_t usbclose;
+ d_read_t usbread;
+@@ -188,7 +188,7 @@
+ 			DEVMETHOD(device_shutdown, bus_generic_shutdown)
+ 			);
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ MODULE_VERSION(usb, 1);
+ #endif
+ 
+@@ -202,7 +202,7 @@
+ {
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ 	struct usb_softc *sc = (struct usb_softc *)self;
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	struct usb_softc *sc = device_get_softc(self);
+ 	void *aux = device_get_ivars(self);
+ 	static int global_init_done = 0;
+@@ -222,7 +222,7 @@
+ 	sc->sc_bus->usbctl = sc;
+ 	sc->sc_port.power = USB_MAX_POWER;
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	printf("%s", USBDEVNAME(sc->sc_dev));
+ #endif
+ 	usbrev = sc->sc_bus->usbrev;
+@@ -281,7 +281,7 @@
+ 		 * until the USB event thread is running, which means that
+ 		 * the keyboard will not work until after cold boot.
+ 		 */
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 		if (cold)
+ #else
+ 		if (cold && (sc->sc_dev.dv_cfdata->cf_flags & 1))
+@@ -301,7 +301,7 @@
+ 	usb_kthread_create(usb_create_event_thread, sc);
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	usb_create_event_thread(sc);
+ 	/* The per controller devices (used for usb_discover) */
+ 	/* XXX This is redundant now, but old usbd's will want it */
+@@ -381,7 +381,7 @@
+ {
+ 	struct usb_softc *sc = arg;
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500000
+ 	mtx_lock(&Giant);
+ #endif
+ 
+@@ -431,7 +431,7 @@
+ 	struct usb_task *task;
+ 	int s;
+ 
+-#if defined(__FreeBSD__) && __FreeBSD_version >= 500000
++#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500000
+ 	mtx_lock(&Giant);
+ #endif
+ 
+@@ -570,7 +570,7 @@
+ 		return (EIO);
+ 
+ 	switch (cmd) {
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	/* This part should be deleted */
+   	case USB_DISCOVER:
+   		break;
+@@ -675,7 +675,7 @@
+ 
+ 		return (revents);
+ 	} else {
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 		return (0);	/* select/poll never wakes up - back compat */
+ #else
+ 		return (ENXIO);
+@@ -689,7 +689,7 @@
+ {
+ 	struct usb_softc *sc = v;
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	/* splxxx should be changed to mutexes for preemption safety some day */
+ 	int s;
+ #endif
+@@ -705,20 +705,20 @@
+ 	 * but this is guaranteed since this function is only called
+ 	 * from the event thread for the controller.
+ 	 */
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	s = splusb();
+ #endif
+ 	while (sc->sc_bus->needs_explore && !sc->sc_dying) {
+ 		sc->sc_bus->needs_explore = 0;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 		splx(s);
+ #endif
+ 		sc->sc_bus->root_hub->hub->explore(sc->sc_bus->root_hub);
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 		s = splusb();
+ #endif
+ 	}
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	splx(s);
+ #endif
+ }
+@@ -905,7 +905,7 @@
+ 
+ 	return (0);
+ }
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ int
+ usb_detach(device_t self)
+ {
+@@ -916,7 +916,7 @@
+ #endif
+ 
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ DRIVER_MODULE(usb, ohci, usb_driver, usb_devclass, 0, 0);
+ DRIVER_MODULE(usb, uhci, usb_driver, usb_devclass, 0, 0);
+ DRIVER_MODULE(usb, ehci, usb_driver, usb_devclass, 0, 0);
+diff -ur src.old/sys/dev/usb/usb.h src/sys/dev/usb/usb.h
+--- src.old/sys/dev/usb/usb.h	2002-11-06 22:37:21.000000000 +0100
++++ src/sys/dev/usb/usb.h	2004-05-22 01:07:23.000000000 +0200
+@@ -98,7 +98,7 @@
+ #define USETDW(w,v) (*(u_int32_t *)(w) = (v))
+ #endif
+ 
+-#if defined(__FreeBSD__) && (__FreeBSD_version <= 500014)
++#if defined(__FreeBSD_kernel__) && (__FreeBSD_version <= 500014)
+ #define UPACKED __attribute__ ((packed))
+ #else
+ #define UPACKED __packed
+diff -ur src.old/sys/dev/usb/usb_mem.c src/sys/dev/usb/usb_mem.c
+--- src.old/sys/dev/usb/usb_mem.c	2003-10-05 00:13:21.000000000 +0200
++++ src/sys/dev/usb/usb_mem.c	2004-05-22 01:03:04.000000000 +0200
+@@ -55,7 +55,7 @@
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>		/* for usbdivar.h */
+ #include <machine/bus.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/endian.h>
+ #include <sys/module.h>
+ #include <sys/bus.h>
+diff -ur src.old/sys/dev/usb/usb_mem.h src/sys/dev/usb/usb_mem.h
+--- src.old/sys/dev/usb/usb_mem.h	2003-09-01 03:07:24.000000000 +0200
++++ src/sys/dev/usb/usb_mem.h	2004-05-22 01:07:24.000000000 +0200
+@@ -41,7 +41,7 @@
+ typedef struct usb_dma_block {
+ 	bus_dma_tag_t tag;
+ 	bus_dmamap_t map;
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	void *kaddr;
+ #else
+         caddr_t kaddr;
+@@ -54,7 +54,7 @@
+ 	LIST_ENTRY(usb_dma_block) next;
+ } usb_dma_block_t;
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define DMAADDR(dma, o) ((dma)->block->segs[0].ds_addr + (dma)->offs + (o))
+ #else
+ #define DMAADDR(dma, o) (((char *)(dma)->block->map->dm_segs[0].ds_addr) + (dma)->offs + (o))
+diff -ur src.old/sys/dev/usb/usb_port.h src/sys/dev/usb/usb_port.h
+--- src.old/sys/dev/usb/usb_port.h	2003-11-10 00:54:21.000000000 +0100
++++ src/sys/dev/usb/usb_port.h	2004-05-22 01:07:24.000000000 +0200
+@@ -326,7 +326,7 @@
+ #define USB_DO_ATTACH(dev, bdev, parent, args, print, sub) \
+ 	(config_found_sm(parent, args, print, sub))
+ 
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ /*
+  * FreeBSD
+  */
+diff -ur src.old/sys/dev/usb/usb_subr.c src/sys/dev/usb/usb_subr.c
+--- src.old/sys/dev/usb/usb_subr.c	2003-09-01 09:47:42.000000000 +0200
++++ src/sys/dev/usb/usb_subr.c	2004-05-22 01:03:04.000000000 +0200
+@@ -52,7 +52,7 @@
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+ #include <sys/select.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #endif
+@@ -68,7 +68,7 @@
+ #include <dev/usb/usbdevs.h>
+ #include <dev/usb/usb_quirks.h>
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <machine/clock.h>
+ #define delay(d)         DELAY(d)
+ #endif
+@@ -810,7 +810,7 @@
+ 	device_ptr_t dv;
+ 	usbd_interface_handle ifaces[256]; /* 256 is the absolute max */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	/*
+ 	 * XXX uaa is a static var. Not a problem as it _should_ be used only
+ 	 * during probe and attach. Should be changed however.
+@@ -867,7 +867,7 @@
+ 			printf("%s: port %d, set config at addr %d failed\n",
+ 			       USBDEVPTRNAME(parent), port, addr);
+ #endif
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			device_delete_child(parent, bdev);
+ #endif
+ 
+@@ -881,7 +881,7 @@
+ 		uaa.nifaces = nifaces;
+ 		dev->subdevs = malloc((nifaces+1) * sizeof dv, M_USB,M_NOWAIT);
+ 		if (dev->subdevs == NULL) {
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			device_delete_child(parent, bdev);
+ #endif
+ 			return (USBD_NOMEM);
+@@ -900,7 +900,7 @@
+ 				dev->subdevs[found] = 0;
+ 				ifaces[i] = 0; /* consumed */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 				/* create another child for the next iface */
+ 				bdev = device_add_child(parent, NULL, -1);
+ 				if (!bdev) {
+@@ -914,7 +914,7 @@
+ 			}
+ 		}
+ 		if (found != 0) {
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 			/* remove the last created child again; it is unused */
+ 			device_delete_child(parent, bdev);
+ #endif
+@@ -951,7 +951,7 @@
+ 	 * fully operational and not harming anyone.
+ 	 */
+ 	DPRINTF(("usbd_probe_and_attach: generic attach failed\n"));
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	device_delete_child(parent, bdev);
+ #endif
+  	return (USBD_NORMAL_COMPLETION);
+diff -ur src.old/sys/dev/usb/usbdi.c src/sys/dev/usb/usbdi.c
+--- src.old/sys/dev/usb/usbdi.c	2003-11-10 00:56:19.000000000 +0100
++++ src/sys/dev/usb/usbdi.c	2004-05-22 01:03:05.000000000 +0200
+@@ -44,7 +44,7 @@
+ #include <sys/systm.h>
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #include "usb_if.h"
+@@ -63,7 +63,7 @@
+ #include <dev/usb/usbdivar.h>
+ #include <dev/usb/usb_mem.h>
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include "usb_if.h"
+ #include <machine/clock.h>
+ #define delay(d)	DELAY(d)
+@@ -944,7 +944,7 @@
+ 	usbd_status err;
+ 
+ #ifdef DIAGNOSTIC
+-#if defined(__i386__) && defined(__FreeBSD__)
++#if defined(__i386__) && defined(__FreeBSD_kernel__)
+ 	KASSERT(curthread->td_intr_nesting_level == 0,
+ 	       	("usbd_do_request: in interrupt context"));
+ #endif
+@@ -1143,7 +1143,7 @@
+ 	return (NULL);
+ }
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ int
+ usbd_driver_load(module_t mod, int what, void *arg)
+ {
+diff -ur src.old/sys/dev/usb/usbdi.h src/sys/dev/usb/usbdi.h
+--- src.old/sys/dev/usb/usbdi.h	2003-07-14 22:31:03.000000000 +0200
++++ src/sys/dev/usb/usbdi.h	2004-05-22 01:07:25.000000000 +0200
+@@ -88,7 +88,7 @@
+ #define USBD_NO_TIMEOUT 0
+ #define USBD_DEFAULT_TIMEOUT 5000 /* ms = 5 s */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #define USB_CDEV_MAJOR 108
+ #endif
+ 
+@@ -244,7 +244,7 @@
+ /* No match */
+ #define UMATCH_NONE					 0
+ 
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ /* FreeBSD needs values less than zero */
+ #define UMATCH_VENDOR_PRODUCT_REV			(-10)
+ #define UMATCH_VENDOR_PRODUCT				(-20)
+@@ -264,7 +264,7 @@
+ 
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ int usbd_driver_load(module_t mod, int what, void *arg);
+ #endif
+ 
+diff -ur src.old/sys/dev/usb/usbdi_util.c src/sys/dev/usb/usbdi_util.c
+--- src.old/sys/dev/usb/usbdi_util.c	2003-08-24 19:55:55.000000000 +0200
++++ src/sys/dev/usb/usbdi_util.c	2004-05-22 01:03:05.000000000 +0200
+@@ -47,7 +47,7 @@
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/proc.h>
+ #include <sys/device.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/bus.h>
+ #endif
+ 
+diff -ur src.old/sys/dev/usb/usbdivar.h src/sys/dev/usb/usbdivar.h
+--- src.old/sys/dev/usb/usbdivar.h	2003-07-16 00:42:37.000000000 +0200
++++ src/sys/dev/usb/usbdivar.h	2004-05-22 01:07:26.000000000 +0200
+@@ -276,7 +276,7 @@
+ 
+ #if defined(__NetBSD__)
+ #include "locators.h"
+-#elif defined(__FreeBSD__) || defined(__OpenBSD__)
++#elif defined(__FreeBSD_kernel__) || defined(__OpenBSD__)
+ /* XXX these values are used to statically bind some elements in the USB tree
+  * to specific driver instances. This should be somehow emulated in FreeBSD
+  * but can be done later on.
+diff -ur src.old/sys/dev/usb/uscanner.c src/sys/dev/usb/uscanner.c
+--- src.old/sys/dev/usb/uscanner.c	2003-10-01 15:53:51.000000000 +0200
++++ src/sys/dev/usb/uscanner.c	2004-05-22 01:03:05.000000000 +0200
+@@ -52,7 +52,7 @@
+ #include <sys/malloc.h>
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #include <sys/conf.h>
+@@ -223,7 +223,7 @@
+ 	USBBASEDEVICE		sc_dev;		/* base device */
+ 	usbd_device_handle	sc_udev;
+ 	usbd_interface_handle	sc_iface;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ 	dev_t			dev;
+ #endif
+ 
+@@ -252,7 +252,7 @@
+ 
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ cdev_decl(uscanner);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ d_open_t  uscanneropen;
+ d_close_t uscannerclose;
+ d_read_t  uscannerread;
+@@ -359,7 +359,7 @@
+ 	sc->sc_bulkin = ed_bulkin->bEndpointAddress;
+ 	sc->sc_bulkout = ed_bulkout->bEndpointAddress;
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	/* the main device, ctrl endpoint */
+ 	sc->dev = make_dev(&uscanner_cdevsw, USBDEVUNIT(sc->sc_dev),
+ 		UID_ROOT, GID_OPERATOR, 0644, "%s", USBDEVNAME(sc->sc_dev));
+@@ -625,7 +625,7 @@
+ 
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ 	DPRINTF(("uscanner_detach: sc=%p flags=%d\n", sc, flags));
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	DPRINTF(("uscanner_detach: sc=%p\n", sc));
+ #endif
+ 
+@@ -654,7 +654,7 @@
+ 	/* Nuke the vnodes for any open instances (calls close). */
+ 	mn = self->dv_unit * USB_MAX_ENDPOINTS;
+ 	vdevgone(maj, mn, mn + USB_MAX_ENDPOINTS - 1, VCHR);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	/* destroy the device for the control endpoint */
+ 	destroy_dev(sc->dev);
+ #endif
+@@ -687,6 +687,6 @@
+ 	return (revents);
+ }
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ DRIVER_MODULE(uscanner, uhub, uscanner_driver, uscanner_devclass, usbd_driver_load, 0);
+ #endif
+diff -ur src.old/sys/dev/usb/uvisor.c src/sys/dev/usb/uvisor.c
+--- src.old/sys/dev/usb/uvisor.c	2003-11-08 12:23:07.000000000 +0100
++++ src/sys/dev/usb/uvisor.c	2004-05-22 01:03:05.000000000 +0200
+@@ -60,7 +60,7 @@
+ #include <sys/kernel.h>
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ #include <sys/device.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #include <sys/bus.h>
+ #endif
+ #include <sys/conf.h>
+diff -ur src.old/sys/dev/usb/uvscom.c src/sys/dev/usb/uvscom.c
+--- src.old/sys/dev/usb/uvscom.c	2003-11-16 13:26:10.000000000 +0100
++++ src/sys/dev/usb/uvscom.c	2004-05-22 01:03:05.000000000 +0200
+@@ -46,7 +46,7 @@
+ #include <sys/conf.h>
+ #include <sys/tty.h>
+ #include <sys/file.h>
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ #include <sys/bus.h>
+ #include <sys/ioccom.h>
+ #if __FreeBSD_version >= 500014
+diff -ur src.old/sys/dev/wi/if_wireg.h src/sys/dev/wi/if_wireg.h
+--- src.old/sys/dev/wi/if_wireg.h	2003-09-06 00:29:30.000000000 +0200
++++ src/sys/dev/wi/if_wireg.h	2004-05-22 01:07:29.000000000 +0200
+@@ -83,7 +83,7 @@
+ #ifdef __NetBSD__
+ #define OS_STRING_NAME	"NetBSD"
+ #endif
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define OS_STRING_NAME	"FreeBSD"
+ #endif
+ #ifdef __OpenBSD__
+diff -ur src.old/sys/gnu/ext2fs/ext2_fs.h src/sys/gnu/ext2fs/ext2_fs.h
+--- src.old/sys/gnu/ext2fs/ext2_fs.h	2002-05-16 21:07:59.000000000 +0200
++++ src/sys/gnu/ext2fs/ext2_fs.h	2004-05-22 01:07:52.000000000 +0200
+@@ -108,7 +108,7 @@
+ #define EXT2_MIN_BLOCK_SIZE		1024
+ #define	EXT2_MAX_BLOCK_SIZE		4096
+ #define EXT2_MIN_BLOCK_LOG_SIZE		  10
+-#if defined(__KERNEL__) || (defined(__FreeBSD__) && defined(_KERNEL))
++#if defined(__KERNEL__) || (defined(__FreeBSD_kernel__) && defined(_KERNEL))
+ # define EXT2_BLOCK_SIZE(s)		((s)->s_blocksize)
+ #else
+ # define EXT2_BLOCK_SIZE(s)		(EXT2_MIN_BLOCK_SIZE << (s)->s_log_block_size)
+@@ -150,7 +150,7 @@
+ # define EXT2_FRAG_SIZE(s)		((s)->u.ext2_sb.s_frag_size)
+ # define EXT2_FRAGS_PER_BLOCK(s)	((s)->u.ext2_sb.s_frags_per_block)
+ #else
+-# if defined(_KERNEL) && defined(__FreeBSD__)
++# if defined(_KERNEL) && defined(__FreeBSD_kernel__)
+ # define EXT2_FRAG_SIZE(s)		((s)->s_frag_size)
+ # else
+ # define EXT2_FRAG_SIZE(s)		(EXT2_MIN_FRAG_SIZE << (s)->s_log_frag_size)
+diff -ur src.old/sys/i386/isa/bs/bsfunc.h src/sys/i386/isa/bs/bsfunc.h
+--- src.old/sys/i386/isa/bs/bsfunc.h	2002-03-20 08:39:49.000000000 +0100
++++ src/sys/i386/isa/bs/bsfunc.h	2004-05-22 01:08:58.000000000 +0200
+@@ -215,7 +215,7 @@
+ 	if ((bsc->sc_flags & BSSTARTTIMEOUT) == 0)
+ 	{
+ 		bsc->sc_flags |= BSSTARTTIMEOUT;
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 		bsc->timeout_ch =
+ #endif
+ 		timeout(bstimeout, bsc, BS_TIMEOUT_INTERVAL);
+@@ -229,7 +229,7 @@
+ 
+ 	if (bsc->sc_flags & BSSTARTTIMEOUT)
+ 	{
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 		untimeout(bstimeout, bsc,
+ 				  bsc->timeout_ch);
+ #else
+diff -ur src.old/sys/i386/isa/bs/bshw_dma.c src/sys/i386/isa/bs/bshw_dma.c
+--- src.old/sys/i386/isa/bs/bshw_dma.c	2003-08-25 10:13:07.000000000 +0200
++++ src/sys/i386/isa/bs/bshw_dma.c	2004-05-22 01:03:24.000000000 +0200
+@@ -201,7 +201,7 @@
+ 	 * byte mode channels.
+ 	 */
+ 	/* set dma channel mode, and reset address ff */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	if (need_pre_dma_flush)
+ 		wbinvd();
+ #else	/* NetBSD/pc98 */
+@@ -249,7 +249,7 @@
+ 	if (bsc->sc_hw->dma_stop)
+ 		(*bsc->sc_hw->dma_stop)(bsc);
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	if (need_post_dma_flush)
+ 		invd();
+ #else
+diff -ur src.old/sys/i386/isa/bs/bsif.c src/sys/i386/isa/bs/bsif.c
+--- src.old/sys/i386/isa/bs/bsif.c	2002-04-29 09:43:14.000000000 +0200
++++ src/sys/i386/isa/bs/bsif.c	2004-05-22 01:03:24.000000000 +0200
+@@ -37,7 +37,7 @@
+ #ifdef __NetBSD__
+ #include <i386/Cbus/dev/bs/bsif.h>
+ #endif	/* __NetBSD__ */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include "opt_bs.h"
+ #include "opt_pc98.h"
+ #include "bs.h"
+@@ -81,7 +81,7 @@
+ };
+ #endif	/* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ static int bsprobe(struct isa_device *);
+ static void bs_poll(struct cam_sim *sim);
+ static int bsattach(struct isa_device *);
+@@ -132,7 +132,7 @@
+ /*****************************************************************
+  * OS <=> BS INTERFACE
+  *****************************************************************/
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ static int
+ bsprobe(dev)
+ 	struct isa_device *dev;
+@@ -225,7 +225,7 @@
+ }
+ #endif
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ static void
+ bs_poll(struct cam_sim *sim)
+ {
+@@ -284,7 +284,7 @@
+ }
+ #endif	/* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ static void
+ bsintr(unit)
+ 	int unit;
+@@ -296,7 +296,7 @@
+ /*****************************************************************
+  * JULIAN SCSI <=> BS INTERFACE
+  *****************************************************************/
+-#ifndef __FreeBSD__
++#ifndef __FreeBSD_kernel__
+ static void
+ bs_scsi_minphys(bp)
+ 	struct buf *bp;
+@@ -385,7 +385,7 @@
+ }
+ #endif	/* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ static int bs_dmarangecheck(caddr_t va, unsigned length)
+ {
+ 	vm_offset_t phys, priorpage = 0, endva;
+diff -ur src.old/sys/i386/isa/bs/bsif.h src/sys/i386/isa/bs/bsif.h
+--- src.old/sys/i386/isa/bs/bsif.h	2003-11-03 23:37:28.000000000 +0100
++++ src/sys/i386/isa/bs/bsif.h	2004-05-22 01:09:01.000000000 +0200
+@@ -49,7 +49,7 @@
+ 	bus_dma_tag_t sc_dmat;		
+ 
+ #endif	/* __NetBSD__ */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define OS_DEPEND_DEVICE_HEADER			\
+ 	int unit;
+ 
+@@ -63,7 +63,7 @@
+ #if	defined(__NetBSD__)
+ #define BSHW_NBPG	NBPG
+ #endif
+-#if	defined(__FreeBSD__)
++#if	defined(__FreeBSD_kernel__)
+ #define BSHW_NBPG	PAGE_SIZE
+ #endif
+ 
+@@ -103,7 +103,7 @@
+ #include <scsi/scsi_disk.h>
+ #endif	/* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <sys/bus.h>
+ #include <sys/conf.h>
+ #include <sys/interrupt.h>
+@@ -177,7 +177,7 @@
+ #define	XSBS_SCSI_NOSLEEP	SCSI_NOSLEEP
+ #define XSBS_SCSI_POLL	SCSI_POLL
+ #endif	/* __NetBSD__ */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define XSBS_SCSI_POLL	SCSI_NOMASK
+ #endif	/* __FreeBSD__ */
+ 
+@@ -190,7 +190,7 @@
+ XSBS_INT32T bs_target_open(struct scsi_link *, struct cfdata *);
+ XSBS_INT32T bs_scsi_cmd(struct scsi_xfer *);
+ #endif
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ void bs_scsi_cmd(struct cam_sim *sim, union ccb *ccb);
+ #endif
+ extern int delaycount;
+@@ -201,7 +201,7 @@
+ int bsprint(void *, const char *);
+ #endif	/* __NetBSD__ */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ static BS_INLINE void memcopy(void *from, void *to, register size_t len);
+ u_int32_t bs_adapter_info(int);
+ #define delay(y) DELAY(y)
+diff -ur src.old/sys/i386/isa/bs/bsvar.h src/sys/i386/isa/bs/bsvar.h
+--- src.old/sys/i386/isa/bs/bsvar.h	2002-03-20 08:39:50.000000000 +0100
++++ src/sys/i386/isa/bs/bsvar.h	2004-05-22 01:09:03.000000000 +0200
+@@ -34,7 +34,7 @@
+  * Copyright (c) 1994, 1995, 1996 Naofumi HONDA.  All rights reserved.
+  */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define	BS_INLINE	__inline
+ #else
+ #define	BS_INLINE	inline
+diff -ur src.old/sys/i4b/include/i4b_global.h src/sys/i4b/include/i4b_global.h
+--- src.old/sys/i4b/include/i4b_global.h	2003-11-10 15:20:34.000000000 +0100
++++ src/sys/i4b/include/i4b_global.h	2004-05-22 01:09:13.000000000 +0200
+@@ -40,7 +40,7 @@
+  *	hiding OS differences in the kernel
+  *---------------------------------------------------------------------------*/ 
+ 
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 5
++#if defined(__FreeBSD_kernel__)
+ /*
+  * Deprecated LKM interface.
+  */
+diff -ur src.old/sys/i4b/layer1/ifpi/i4b_ifpi_pci.c src/sys/i4b/layer1/ifpi/i4b_ifpi_pci.c
+--- src.old/sys/i4b/layer1/ifpi/i4b_ifpi_pci.c	2003-09-02 19:30:39.000000000 +0200
++++ src/sys/i4b/layer1/ifpi/i4b_ifpi_pci.c	2004-05-22 01:03:29.000000000 +0200
+@@ -643,7 +643,7 @@
+ 	/* init the ISAC */
+ 	ifpi_isac_init(sc);
+ 
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4
+ 	/* Init the channel mutexes */
+ 	chan = &sc->sc_chan[HSCX_CH_A];
+ 	if(!mtx_initialized(&chan->rx_queue.ifq_mtx))
+@@ -683,7 +683,7 @@
+ 	sc->sc_obuf2 = NULL;
+ 	sc->sc_freeflag2 = 0;
+ 
+-#if defined(__FreeBSD__) && __FreeBSD__ >=3
++#if defined(__FreeBSD_kernel__)
+ 	callout_handle_init(&sc->sc_T3_callout);
+ 	callout_handle_init(&sc->sc_T4_callout);	
+ #endif
+@@ -873,7 +873,7 @@
+ 				
+ 					  /* move rx'd data to rx queue */
+ 
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4
+ 					  (void) IF_HANDOFF(&chan->rx_queue, chan->in_mbuf, NULL);
+ #else
+ 					  if(!(IF_QFULL(&chan->rx_queue)))
+@@ -1109,7 +1109,7 @@
+ static void
+ avma1pp_bchannel_setup(int unit, int h_chan, int bprot, int activate)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc = ifpi_scp[unit];
+ #else
+ 	struct l1_softc *sc = isic_find_sc(unit);
+@@ -1177,7 +1177,7 @@
+ static void
+ avma1pp_bchannel_start(int unit, int h_chan)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc = ifpi_scp[unit];
+ #else
+ 	struct l1_softc *sc = isic_find_sc(unit);
+@@ -1250,7 +1250,7 @@
+ static isdn_link_t *
+ avma1pp_ret_linktab(int unit, int channel)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc = ifpi_scp[unit];
+ #else
+ 	struct l1_softc *sc = isic_find_sc(unit);
+@@ -1266,7 +1266,7 @@
+ static void
+ avma1pp_set_linktab(int unit, int channel, drvr_link_t *dlt)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc = ifpi_scp[unit];
+ #else
+ 	struct l1_softc *sc = isic_find_sc(unit);
+@@ -1331,7 +1331,7 @@
+ static void
+ avma1pp_bchannel_stat(int unit, int h_chan, bchan_statistics_t *bsp)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc = ifpi_scp[unit];
+ #else
+ 	struct l1_softc *sc = isic_find_sc(unit);
+diff -ur src.old/sys/i4b/layer1/ifpi2/i4b_ifpi2_pci.c src/sys/i4b/layer1/ifpi2/i4b_ifpi2_pci.c
+--- src.old/sys/i4b/layer1/ifpi2/i4b_ifpi2_pci.c	2003-09-02 19:30:39.000000000 +0200
++++ src/sys/i4b/layer1/ifpi2/i4b_ifpi2_pci.c	2004-05-22 01:03:29.000000000 +0200
+@@ -572,7 +572,7 @@
+ 	/* init the ISAC */
+ 	ifpi2_isacsx_init(sc);
+ 
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4
+ 	/* Init the channel mutexes */
+ 	chan = &sc->sc_chan[HSCX_CH_A];
+ 	if(!mtx_initialized(&chan->rx_queue.ifq_mtx))
+@@ -612,7 +612,7 @@
+ 	sc->sc_obuf2 = NULL;
+ 	sc->sc_freeflag2 = 0;
+ 
+-#if defined(__FreeBSD__) && __FreeBSD__ >=3
++#if defined(__FreeBSD_kernel__)
+ 	callout_handle_init(&sc->sc_T3_callout);
+ 	callout_handle_init(&sc->sc_T4_callout);	
+ #endif
+@@ -802,7 +802,7 @@
+ 				
+ 					  /* move rx'd data to rx queue */
+ 
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4
+ 					  (void) IF_HANDOFF(&chan->rx_queue, chan->in_mbuf, NULL);
+ #else
+ 					  if(!(IF_QFULL(&chan->rx_queue)))
+@@ -1048,7 +1048,7 @@
+ static void
+ avma1pp2_bchannel_setup(int unit, int h_chan, int bprot, int activate)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc = ifpi2_scp[unit];
+ #else
+ 	struct l1_softc *sc = isic_find_sc(unit);
+@@ -1116,7 +1116,7 @@
+ static void
+ avma1pp2_bchannel_start(int unit, int h_chan)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc = ifpi2_scp[unit];
+ #else
+ 	struct l1_softc *sc = isic_find_sc(unit);
+@@ -1189,7 +1189,7 @@
+ static isdn_link_t *
+ avma1pp2_ret_linktab(int unit, int channel)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc = ifpi2_scp[unit];
+ #else
+ 	struct l1_softc *sc = isic_find_sc(unit);
+@@ -1205,7 +1205,7 @@
+ static void
+ avma1pp2_set_linktab(int unit, int channel, drvr_link_t *dlt)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc = ifpi2_scp[unit];
+ #else
+ 	struct l1_softc *sc = isic_find_sc(unit);
+@@ -1270,7 +1270,7 @@
+ static void
+ avma1pp2_bchannel_stat(int unit, int h_chan, bchan_statistics_t *bsp)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc = ifpi2_scp[unit];
+ #else
+ 	struct l1_softc *sc = isic_find_sc(unit);
+diff -ur src.old/sys/i4b/layer1/ifpnp/i4b_ifpnp_avm.c src/sys/i4b/layer1/ifpnp/i4b_ifpnp_avm.c
+--- src.old/sys/i4b/layer1/ifpnp/i4b_ifpnp_avm.c	2003-06-11 01:37:09.000000000 +0200
++++ src/sys/i4b/layer1/ifpnp/i4b_ifpnp_avm.c	2004-05-22 01:03:30.000000000 +0200
+@@ -792,7 +792,7 @@
+ 						 activity = ACT_RX;
+ 				
+ 					  /* move rx'd data to rx queue */
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4
+ 					  (void) IF_HANDOFF(&chan->rx_queue, chan->in_mbuf, NULL);
+ #else
+ 					  if(!(IF_QFULL(&chan->rx_queue)))
+@@ -1042,7 +1042,7 @@
+ 
+ 	chan->rx_queue.ifq_maxlen = IFQ_MAXLEN;
+ 
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4
+ 	if(!mtx_initialized(&chan->rx_queue.ifq_mtx))
+ 		mtx_init(&chan->rx_queue.ifq_mtx, "i4b_avm_pnp_rx", NULL, MTX_DEF);
+ #endif
+@@ -1061,7 +1061,7 @@
+ 
+ 	chan->tx_queue.ifq_maxlen = IFQ_MAXLEN;
+ 
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4
+ 	if(!mtx_initialized(&chan->tx_queue.ifq_mtx))
+ 		mtx_init(&chan->tx_queue.ifq_mtx, "i4b_avm_pnp_tx", NULL, MTX_DEF);
+ #endif
+diff -ur src.old/sys/i4b/layer1/ihfc/i4b_ihfc_drv.c src/sys/i4b/layer1/ihfc/i4b_ihfc_drv.c
+--- src.old/sys/i4b/layer1/ihfc/i4b_ihfc_drv.c	2003-06-11 01:39:45.000000000 +0200
++++ src/sys/i4b/layer1/ihfc/i4b_ihfc_drv.c	2004-05-22 01:03:30.000000000 +0200
+@@ -355,7 +355,7 @@
+ 
+ 			S_IFQUEUE.ifq_maxlen = IFQ_MAXLEN;
+ 
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4
+ 			if(!mtx_initialized(&S_IFQUEUE.ifq_mtx))
+ 				mtx_init(&S_IFQUEUE.ifq_mtx, "i4b_ihfc", NULL, MTX_DEF);
+ #endif
+@@ -381,7 +381,7 @@
+ 
+ 			S_IFQUEUE.ifq_maxlen = IFQ_MAXLEN;
+ 
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4
+ 			if(!mtx_initialized(&S_IFQUEUE.ifq_mtx))
+ 				mtx_init(&S_IFQUEUE.ifq_mtx, "i4b_ihfc", NULL, MTX_DEF);
+ #endif
+diff -ur src.old/sys/i4b/layer1/itjc/i4b_itjc_pci.c src/sys/i4b/layer1/itjc/i4b_itjc_pci.c
+--- src.old/sys/i4b/layer1/itjc/i4b_itjc_pci.c	2003-09-02 19:30:40.000000000 +0200
++++ src/sys/i4b/layer1/itjc/i4b_itjc_pci.c	2004-05-22 01:03:33.000000000 +0200
+@@ -1729,7 +1729,7 @@
+ 	sc->sc_obuf2 = NULL;
+ 	sc->sc_freeflag2 = 0;
+ 
+-#if defined(__FreeBSD__) && __FreeBSD__ >=3
++#if defined(__FreeBSD_kernel__)
+ 	callout_handle_init(&sc->sc_T3_callout);
+ 	callout_handle_init(&sc->sc_T4_callout);	
+ #endif
+@@ -1829,7 +1829,7 @@
+ static void
+ itjc_bchannel_setup(int unit, int h_chan, int bprot, int activate)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc		*sc	= itjc_scp[unit];
+ #else
+ 	struct l1_softc		*sc	= isic_find_sc(unit);
+@@ -1920,7 +1920,7 @@
+ 	 * But, don't despair. The impact of it is unnoticeable.
+ 	 */
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc  *sc	= itjc_scp[unit];
+ #else
+ 	struct l1_softc	 *sc	= isic_find_sc(unit);
+@@ -1980,7 +1980,7 @@
+ isdn_link_t *
+ itjc_ret_linktab(int unit, int channel)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc		*sc = itjc_scp[unit];
+ #else
+ 	struct l1_softc		*sc = isic_find_sc(unit);
+@@ -1996,7 +1996,7 @@
+ void
+ itjc_set_linktab(int unit, int channel, drvr_link_t *dlt)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc	= itjc_scp[unit];
+ #else
+ 	struct l1_softc *sc	= isic_find_sc(unit);
+@@ -2062,7 +2062,7 @@
+ static void
+ itjc_bchannel_stat(int unit, int h_chan, bchan_statistics_t *bsp)
+ {
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 	struct l1_softc *sc = itjc_scp[unit];
+ #else
+ 	struct l1_softc *sc = isic_find_sc(unit);
+diff -ur src.old/sys/i4b/layer1/iwic/i4b_iwic_bchan.c src/sys/i4b/layer1/iwic/i4b_iwic_bchan.c
+--- src.old/sys/i4b/layer1/iwic/i4b_iwic_bchan.c	2003-06-11 01:48:55.000000000 +0200
++++ src/sys/i4b/layer1/iwic/i4b_iwic_bchan.c	2004-05-22 01:03:33.000000000 +0200
+@@ -247,7 +247,7 @@
+ 				if(!(i4b_l1_bchan_tel_silence(chan->in_mbuf->m_data, chan->in_mbuf->m_len)))
+ 					activity = ACT_RX;
+ 
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4
+ 				(void) IF_HANDOFF(&chan->rx_queue, chan->in_mbuf, NULL);
+ #else
+ 				if(!(IF_QFULL(&chan->rx_queue)))
+@@ -429,7 +429,7 @@
+ 
+ 	chan->rx_queue.ifq_maxlen = IFQ_MAXLEN;
+ 
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4
+ 	if(!mtx_initialized(&chan->rx_queue.ifq_mtx))
+ 		mtx_init(&chan->rx_queue.ifq_mtx, "i4b_iwic_rx", NULL, MTX_DEF);
+ #endif
+@@ -448,7 +448,7 @@
+ 
+ 	chan->tx_queue.ifq_maxlen = IFQ_MAXLEN;
+ 
+-#if defined (__FreeBSD__) && __FreeBSD__ > 4	
++#if defined (__FreeBSD_kernel__) && __FreeBSD__ > 4	
+ 	if(!mtx_initialized(&chan->tx_queue.ifq_mtx))
+ 		mtx_init(&chan->tx_queue.ifq_mtx, "i4b_iwic_tx", NULL, MTX_DEF);
+ #endif
+diff -ur src.old/sys/net/if_atm.h src/sys/net/if_atm.h
+--- src.old/sys/net/if_atm.h	2003-08-06 16:53:26.000000000 +0200
++++ src/sys/net/if_atm.h	2004-05-22 01:09:42.000000000 +0200
+@@ -199,7 +199,7 @@
+ 
+ #if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__)
+ #define	RTALLOC1(A,B)		rtalloc1((A),(B))
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #define	RTALLOC1(A,B)		rtalloc1((A),(B),0UL)
+ #endif
+ 
+diff -ur src.old/sys/net/if_atmsubr.c src/sys/net/if_atmsubr.c
+--- src.old/sys/net/if_atmsubr.c	2003-10-31 19:32:08.000000000 +0100
++++ src/sys/net/if_atmsubr.c	2004-05-22 01:03:57.000000000 +0200
+@@ -181,11 +181,11 @@
+ 			break;
+ 			
+ 		default:
+-#if (defined(__FreeBSD__) && __FreeBSD_version >= 501113) || \
++#if (defined(__FreeBSD_kernel__) && __FreeBSD_version >= 501113) || \
+     defined(__NetBSD__) || defined(__OpenBSD__)
+ 			printf("%s: can't handle af%d\n", ifp->if_xname, 
+ 			    dst->sa_family);
+-#elif defined(__FreeBSD__) || defined(__bsdi__)
++#elif defined(__FreeBSD_kernel__) || defined(__bsdi__)
+ 			printf("%s%d: can't handle af%d\n", ifp->if_name, 
+ 			    ifp->if_unit, dst->sa_family);
+ #endif
+@@ -302,12 +302,12 @@
+ 				return; /* failed */
+ 			alc = mtod(m, struct atmllc *);
+ 			if (bcmp(alc, ATMLLC_HDR, 6)) {
+-#if (defined(__FreeBSD__) && __FreeBSD_version >= 501113) || \
++#if (defined(__FreeBSD_kernel__) && __FreeBSD_version >= 501113) || \
+     defined(__NetBSD__) || defined(__OpenBSD__)
+ 				printf("%s: recv'd invalid LLC/SNAP frame "
+ 				    "[vp=%d,vc=%d]\n", ifp->if_xname,
+ 				    ATM_PH_VPI(ah), ATM_PH_VCI(ah));
+-#elif defined(__FreeBSD__) || defined(__bsdi__)
++#elif defined(__FreeBSD_kernel__) || defined(__bsdi__)
+ 				printf("%s%d: recv'd invalid LLC/SNAP frame "
+ 				    "[vp=%d,vc=%d]\n", ifp->if_name,
+ 				    ifp->if_unit, ATM_PH_VPI(ah),
+@@ -370,10 +370,10 @@
+ 
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ 	TAILQ_FOREACH(ifa, &ifp->if_addrlist, ifa_list)
+-#elif defined(__FreeBSD__) && (__FreeBSD__ > 2)
++#elif defined(__FreeBSD_kernel__)
+ 	for (ifa = TAILQ_FIRST(&ifp->if_addrhead); ifa; 
+ 	    ifa = TAILQ_NEXT(ifa, ifa_link))
+-#elif defined(__FreeBSD__) || defined(__bsdi__)
++#elif defined(__FreeBSD_kernel__) || defined(__bsdi__)
+ 	for (ifa = ifp->if_addrlist; ifa; ifa = ifa->ifa_next) 
+ #endif
+ 		if ((sdl = (struct sockaddr_dl *)ifa->ifa_addr) &&
+diff -ur src.old/sys/net/if_spppsubr.c src/sys/net/if_spppsubr.c
+--- src.old/sys/net/if_spppsubr.c	2003-10-31 19:32:08.000000000 +0100
++++ src/sys/net/if_spppsubr.c	2004-05-22 01:03:59.000000000 +0200
+@@ -22,7 +22,7 @@
+ 
+ #include <sys/param.h>
+ 
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ #include "opt_inet.h"
+ #include "opt_inet6.h"
+ #include "opt_ipx.h"
+@@ -42,7 +42,7 @@
+ #include <sys/sockio.h>
+ #include <sys/socket.h>
+ #include <sys/syslog.h>
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ #include <sys/random.h>
+ #endif
+ #include <sys/malloc.h>
+@@ -78,7 +78,7 @@
+ #include <netinet/tcp.h>
+ #endif
+ 
+-#if defined (__FreeBSD__) || defined (__OpenBSD__)
++#if defined (__FreeBSD_kernel__) || defined (__OpenBSD__)
+ # include <netinet/if_ether.h>
+ #else
+ # include <net/ethertypes.h>
+@@ -91,7 +91,7 @@
+ 
+ #include <net/if_sppp.h>
+ 
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ # define UNTIMEOUT(fun, arg, handle) untimeout(fun, arg, handle)
+ # define TIMEOUT(fun, arg1, arg2, handle) handle = timeout(fun, arg1, arg2)
+ # define IOCTL_CMD_T	u_long
+@@ -260,11 +260,11 @@
+ };
+ 
+ static struct sppp *spppq;
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ static struct callout_handle keepalive_ch;
+ #endif
+ 
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3 && __FreeBSD_version < 501113
++#if defined(__FreeBSD_kernel__) && 0
+ #define	SPP_FMT		"%s%d: "
+ #define	SPP_ARGS(ifp)	(ifp)->if_name, (ifp)->if_unit
+ #else
+@@ -1276,7 +1276,7 @@
+ 			++sp->pp_loopcnt;
+ 
+ 			/* Generate new local sequence number */
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 			sp->pp_seq[IDX_LCP] = random();
+ #else
+ 			sp->pp_seq[IDX_LCP] ^= time.tv_sec ^ time.tv_usec;
+@@ -1308,13 +1308,13 @@
+ 	struct ppp_header *h;
+ 	struct cisco_packet *ch;
+ 	struct mbuf *m;
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	struct timeval tv;
+ #else
+ 	u_long t = (time.tv_sec - boottime.tv_sec) * 1000;
+ #endif
+ 
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	getmicrouptime(&tv);
+ #endif
+ 
+@@ -1335,7 +1335,7 @@
+ 	ch->par2 = htonl (par2);
+ 	ch->rel = -1;
+ 
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	ch->time0 = htons ((u_short) (tv.tv_sec >> 16));
+ 	ch->time1 = htons ((u_short) tv.tv_sec);
+ #else
+@@ -2086,7 +2086,7 @@
+ 	sp->lcp.max_terminate = 2;
+ 	sp->lcp.max_configure = 10;
+ 	sp->lcp.max_failure = 10;
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	callout_handle_init(&sp->ch[IDX_LCP]);
+ #endif
+ }
+@@ -2513,7 +2513,7 @@
+ 				if (magic == ~sp->lcp.magic) {
+ 					if (debug)
+ 						log(-1, "magic glitch ");
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 					sp->lcp.magic = random();
+ #else
+ 					sp->lcp.magic = time.tv_sec + time.tv_usec;
+@@ -2698,7 +2698,7 @@
+ 
+ 	if (sp->lcp.opts & (1 << LCP_OPT_MAGIC)) {
+ 		if (! sp->lcp.magic)
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 			sp->lcp.magic = random();
+ #else
+ 			sp->lcp.magic = time.tv_sec + time.tv_usec;
+@@ -2781,7 +2781,7 @@
+ 	sp->fail_counter[IDX_IPCP] = 0;
+ 	sp->pp_seq[IDX_IPCP] = 0;
+ 	sp->pp_rseq[IDX_IPCP] = 0;
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	callout_handle_init(&sp->ch[IDX_IPCP]);
+ #endif
+ }
+@@ -3269,7 +3269,7 @@
+ #if defined(__NetBSD__)
+ 	callout_init(&sp->ch[IDX_IPV6CP]);
+ #endif
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	callout_handle_init(&sp->ch[IDX_IPV6CP]);
+ #endif
+ }
+@@ -4068,7 +4068,7 @@
+ 	sp->fail_counter[IDX_CHAP] = 0;
+ 	sp->pp_seq[IDX_CHAP] = 0;
+ 	sp->pp_rseq[IDX_CHAP] = 0;
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	callout_handle_init(&sp->ch[IDX_CHAP]);
+ #endif
+ }
+@@ -4211,7 +4211,7 @@
+ 
+ 	/* Compute random challenge. */
+ 	ch = (u_long *)sp->myauth.challenge;
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	read_random(&seed, sizeof seed);
+ #else
+ 	{
+@@ -4401,7 +4401,7 @@
+ 	sp->fail_counter[IDX_PAP] = 0;
+ 	sp->pp_seq[IDX_PAP] = 0;
+ 	sp->pp_rseq[IDX_PAP] = 0;
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	callout_handle_init(&sp->ch[IDX_PAP]);
+ 	callout_handle_init(&sp->pap_my_to_ch);
+ #endif
+@@ -4712,7 +4712,7 @@
+ 	 * aliases don't make any sense on a p2p link anyway.
+ 	 */
+ 	si = 0;
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	TAILQ_FOREACH(ifa, &ifp->if_addrhead, ifa_link)
+ #elif defined(__NetBSD__) || defined (__OpenBSD__)
+ 	for (ifa = TAILQ_FIRST(&ifp->if_addrlist);
+@@ -4761,7 +4761,7 @@
+ 	 * aliases don't make any sense on a p2p link anyway.
+ 	 */
+ 	si = 0;
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	TAILQ_FOREACH(ifa, &ifp->if_addrhead, ifa_link)
+ #elif defined(__NetBSD__) || defined (__OpenBSD__)
+ 	for (ifa = TAILQ_FIRST(&ifp->if_addrlist);
+@@ -4840,7 +4840,7 @@
+ 	 * Pick the first link-local AF_INET6 address from the list,
+ 	 * aliases don't make any sense on a p2p link anyway.
+ 	 */
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	for (ifa = ifp->if_addrhead.tqh_first, si = 0;
+ 	     ifa;
+ 	     ifa = ifa->ifa_link.tqe_next)
+@@ -4905,7 +4905,7 @@
+ 	 */
+ 
+ 	sin6 = NULL;
+-#if defined(__FreeBSD__) && __FreeBSD__ >= 3
++#if defined(__FreeBSD_kernel__)
+ 	for (ifa = ifp->if_addrhead.tqh_first;
+ 	     ifa;
+ 	     ifa = ifa->ifa_link.tqe_next)
+diff -ur src.old/sys/net/net_osdep.h src/sys/net/net_osdep.h
+--- src.old/sys/net/net_osdep.h	2003-11-04 15:08:31.000000000 +0100
++++ src/sys/net/net_osdep.h	2004-05-22 01:09:46.000000000 +0200
+@@ -228,7 +228,7 @@
+  *	others: bpfilter.h, NBPFILTER
+  *	FreeBSD4: bpf.h, NBPF
+  *	solution:
+- *		#if defined(__FreeBSD__) && __FreeBSD__ >= 4
++ *		#if defined(__FreeBSD_kernel__)
+  *		#include "bpf.h"
+  *		#define NBPFILTER	NBPF
+  *		#else
+diff -ur src.old/sys/net/zlib.c src/sys/net/zlib.c
+--- src.old/sys/net/zlib.c	2003-02-02 14:52:24.000000000 +0100
++++ src/sys/net/zlib.c	2004-05-22 01:04:00.000000000 +0200
+@@ -24,7 +24,7 @@
+ #define NO_ZCFUNCS
+ #define MY_ZCALLOC
+ 
+-#if defined(__FreeBSD__) && defined(_KERNEL)
++#if defined(__FreeBSD_kernel__) && defined(_KERNEL)
+ #define inflate	inflate_ppp	/* FreeBSD already has an inflate :-( */
+ #endif
+ 
+diff -ur src.old/sys/net/zlib.h src/sys/net/zlib.h
+--- src.old/sys/net/zlib.h	2002-05-29 22:24:09.000000000 +0200
++++ src/sys/net/zlib.h	2004-05-22 01:09:50.000000000 +0200
+@@ -509,7 +509,7 @@
+    done by inflate().
+ */
+ 
+-#if defined(__FreeBSD__) && defined(_KERNEL)
++#if defined(__FreeBSD_kernel__) && defined(_KERNEL)
+ #define inflate       inflate_ppp     /* FreeBSD already has an inflate :-( */
+ #endif
+ 
+diff -ur src.old/sys/net80211/ieee80211_ioctl.h src/sys/net80211/ieee80211_ioctl.h
+--- src.old/sys/net80211/ieee80211_ioctl.h	2003-10-18 01:15:30.000000000 +0200
++++ src/sys/net80211/ieee80211_ioctl.h	2004-05-22 01:09:50.000000000 +0200
+@@ -82,7 +82,7 @@
+ 	u_int32_t	is_crypto_nomem;	/* no memory for crypto ctx */
+ };
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ /*
+  * FreeBSD-style ioctls.
+  */
+diff -ur src.old/sys/netipsec/ipsec_osdep.h src/sys/netipsec/ipsec_osdep.h
+--- src.old/sys/netipsec/ipsec_osdep.h	2003-09-30 00:47:45.000000000 +0200
++++ src/sys/netipsec/ipsec_osdep.h	2004-05-22 01:10:20.000000000 +0200
+@@ -60,7 +60,7 @@
+  *    NetBSD splnet equates to FreeBSD splimp.
+  * which is hidden by the macro IPSEC_SPLASSERT_SOFTNET(msg).
+  */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #if __FreeBSD_version < 500000
+ #define IPSEC_SPLASSERT(_x,_y) SPLASSERT(_x, _y)
+ #else
+@@ -81,7 +81,7 @@
+  * FreeBSD uses:
+  *    u_int read_random(void *outbuf, int nbytes).
+  */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #include <sys/random.h>
+ /* do nothing, use native random code. */
+ #endif /* __FreeBSD__ */
+@@ -159,7 +159,7 @@
+  * For now, we provide an emulation of IF_HANOOFF() which works
+  * for protocol input queues.
+  */
+-#ifdef __FreeBSD__ 
++#ifdef __FreeBSD_kernel__ 
+ /* nothing to do */
+ #endif /* __FreeBSD__ */
+ #ifdef __NetBSD__
+@@ -216,7 +216,7 @@
+  * This difference is wrapped inside  the IPSEC_PRIVILEGED_SO() macro.
+  *
+  */
+-#ifdef __FreeBSD__ 
++#ifdef __FreeBSD_kernel__ 
+ #define IPSEC_IS_PRIVILEGED_SO(_so) \
+ 	((_so)->so_cred && (_so)->so_cred->cr_uid == 0)
+ #endif	/* __FreeBSD__ */
+@@ -234,7 +234,7 @@
+  * This version of fast-ipsec source code  uses rawcb_list as the head,
+  *  and (to avoid namespace collisions) uses rcb_list as the "next" field.
+  */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ #define rcb_list list
+ #endif /* __FreeBSD__ */
+ #ifdef __NetBSD__
+@@ -250,7 +250,7 @@
+  * NB: Is it worth introducing iterator (find-first-list/find-next-list)
+  * functions or macros to encapsulate these?
+  */
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ /* nothing to do for raw interface list */
+ #endif	/* FreeBSD */
+ #ifdef __NetBSD__
+diff -ur src.old/sys/netnatm/natm.c src/sys/netnatm/natm.c
+--- src.old/sys/netnatm/natm.c	2003-11-18 01:39:05.000000000 +0100
++++ src/sys/netnatm/natm.c	2004-05-22 01:04:22.000000000 +0200
+@@ -403,7 +403,7 @@
+ 
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ int natm_usrreq(so, req, m, nam, control, p)
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ int natm_usrreq(so, req, m, nam, control)
+ #endif
+ 
+@@ -606,7 +606,7 @@
+       snatm->snatm_family = AF_NATM;
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+       bcopy(npcb->npcb_ifp->if_xname, snatm->snatm_if, sizeof(snatm->snatm_if));
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+       snprintf(snatm->snatm_if, sizeof(snatm->snatm_if),
+ 	"%s%d", npcb->npcb_ifp->if_name, npcb->npcb_ifp->if_unit);
+ #endif
+diff -ur src.old/sys/netnatm/natm.h src/sys/netnatm/natm.h
+--- src.old/sys/netnatm/natm.h	2003-08-06 16:34:38.000000000 +0200
++++ src/sys/netnatm/natm.h	2004-05-22 01:10:21.000000000 +0200
+@@ -55,7 +55,7 @@
+ 	u_int8_t	snatm_vpi;		/* vpi */
+ };
+ 
+-#if defined(__FreeBSD__) && defined(_KERNEL)
++#if defined(__FreeBSD_kernel__) && defined(_KERNEL)
+ 
+ #define	SPLSOFTNET() splnet()
+ 
+@@ -115,8 +115,8 @@
+ #if defined(__NetBSD__) || defined(__OpenBSD__)
+ int	natm_usrreq(struct socket *, int, struct mbuf *,
+ 	    struct mbuf *, struct mbuf *, struct proc *);
+-#elif defined(__FreeBSD__)
+-#if __FreeBSD__ > 2
++#elif defined(__FreeBSD_kernel__)
++#if 1
+ /*
+  * FreeBSD new usrreqs style appeared since 2.2.  compatibility to old style
+  * has gone since 3.0.
+diff -ur src.old/sys/netnatm/natm_proto.c src/sys/netnatm/natm_proto.c
+--- src.old/sys/netnatm/natm_proto.c	2003-11-08 23:28:40.000000000 +0100
++++ src/sys/netnatm/natm_proto.c	2004-05-22 01:04:22.000000000 +0200
+@@ -125,6 +125,6 @@
+ 	netisr_register(NETISR_NATM, natmintr, &natmintrq, 0);
+ }
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ DOMAIN_SET(natm);
+ #endif
+diff -ur src.old/sys/pci/if_de.c src/sys/pci/if_de.c
+--- src.old/sys/pci/if_de.c	2003-10-31 19:32:13.000000000 +0100
++++ src/sys/pci/if_de.c	2004-05-22 01:04:30.000000000 +0200
+@@ -3464,7 +3464,7 @@
+ #endif
+ #endif /* TULIP_BUS_DMA */
+ 
+-#ifndef __FreeBSD__
++#ifndef __FreeBSD_kernel__
+ 	    if (sc->tulip_if.if_bpf != NULL) {
+ 		if (me == ms)
+ 		    bpf_tap(&sc->tulip_if, mtod(ms, caddr_t), total_len);
+diff -ur src.old/sys/pci/ncr.c src/sys/pci/ncr.c
+--- src.old/sys/pci/ncr.c	2003-08-23 04:25:04.000000000 +0200
++++ src/sys/pci/ncr.c	2004-05-22 01:04:32.000000000 +0200
+@@ -49,7 +49,7 @@
+ 
+ #define NCR_GETCC_WITHMSG
+ 
+-#if defined (__FreeBSD__) && defined(_KERNEL)
++#if defined (__FreeBSD_kernel__) && defined(_KERNEL)
+ #include "opt_ncr.h"
+ #endif
+ 
+diff -ur src.old/sys/sys/device_port.h src/sys/sys/device_port.h
+--- src.old/sys/sys/device_port.h	2000-10-23 14:55:51.000000000 +0200
++++ src/sys/sys/device_port.h	2004-05-22 01:10:53.000000000 +0200
+@@ -29,7 +29,7 @@
+ 
+ #if defined(__NetBSD__)
+ # include <sys/device.h>
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ # if __FreeBSD_version >= 400001
+ #  include <sys/module.h>
+ #  include <sys/bus.h>
+@@ -47,7 +47,7 @@
+ # define DEVPORT_DEVNAME(dev)		(dev).dv_xname
+ # define DEVPORT_DEVUNIT(dev)		(dev).dv_unit
+ 
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ /*
+  * FreeBSD (compatibility for struct device)
+  */
+diff -ur src.old/sys/sys/mtio.h src/sys/sys/mtio.h
+--- src.old/sys/sys/mtio.h	2002-05-14 09:30:13.000000000 +0200
++++ src/sys/sys/mtio.h	2004-05-22 01:11:01.000000000 +0200
+@@ -64,7 +64,7 @@
+ #define MTCACHE		8	/* enable controller cache */
+ #define MTNOCACHE	9	/* disable controller cache */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD_kernel__)
+ /* Set block size for device. If device is a variable size dev		*/
+ /* a non zero parameter will change the device to a fixed block size	*/
+ /* device with block size set to that of the parameter passed in.	*/
+@@ -124,7 +124,7 @@
+ 	 * more accurate count.
+ 	 */
+ 	short	mt_resid;	/* residual count */
+-#if defined (__FreeBSD__)
++#if defined (__FreeBSD_kernel__)
+ 	int32_t mt_blksiz;	/* presently operating blocksize */
+ 	int32_t mt_density;	/* presently operating density */
+ 	u_int32_t mt_comp;	/* presently operating compression */
+diff -ur src.old/sys/sys/timex.h src/sys/sys/timex.h
+--- src.old/sys/sys/timex.h	2002-04-28 11:51:45.000000000 +0200
++++ src/sys/sys/timex.h	2004-05-22 01:11:08.000000000 +0200
+@@ -217,7 +217,7 @@
+ 	long	stbcnt;		/* stability limit exceeded (ro) */
+ };
+ 
+-#ifdef __FreeBSD__
++#ifdef __FreeBSD_kernel__
+ 
+ #ifdef _KERNEL
+ void	ntp_update_second(int64_t *adjustment, time_t *newsec);
+--- src/sys/cam/scsi/scsi_low.h~	2002-09-23 20:54:28.000000000 +0200
++++ src/sys/cam/scsi/scsi_low.h	2004-05-22 02:33:39.000000000 +0200
+@@ -64,7 +64,7 @@
+ #include <dev/isa/ccbque.h>
+ #endif	/* __NetBSD__ */
+ 
+-#ifdef	__FreeBSD__
++#ifdef	__FreeBSD_kernel__
+ #include <sys/device_port.h>
+ #include <cam/cam.h>
+ #include <cam/cam_ccb.h>
+@@ -84,7 +84,7 @@
+ #define	SCSI_LOW_BZERO(pt, size)	memset((pt), 0, (size))
+ #endif	/* __NetBSD__ */
+ 
+-#ifdef	__FreeBSD__
++#ifdef	__FreeBSD_kernel__
+ #undef	MSG_IDENTIFY
+ #define	SCSI_LOW_DEBUGGER(dev)	Debugger((dev))
+ #define	SCSI_LOW_DELAY(mu)	DELAY((mu))
+@@ -110,7 +110,7 @@
+ };
+ #endif	/* __NetBSD__ */
+ 
+-#ifdef	__FreeBSD__
++#ifdef	__FreeBSD_kernel__
+ typedef	struct scsi_sense_data scsi_low_osdep_sense_data_t;
+ 
+ struct scsi_low_osdep_interface {

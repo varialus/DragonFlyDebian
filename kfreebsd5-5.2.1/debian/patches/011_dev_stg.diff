@@ -1,0 +1,26 @@
+diff -ur src/sys/dev/stg.old/tmc18c30.c src/sys/dev/stg/tmc18c30.c
+--- src/sys/dev/stg.old/tmc18c30.c	2004-05-22 02:38:11.000000000 +0200
++++ src/sys/dev/stg/tmc18c30.c	2004-05-22 03:34:42.000000000 +0200
+@@ -45,7 +45,7 @@
+ #include <sys/param.h>
+ #include <sys/systm.h>
+ #include <sys/kernel.h>
+-#if defined(__FreeBSD_kernel__) && __FreeBSD_version >= 500001
++#if defined(__FreeBSD_kernel__)
+ #include <sys/bio.h>
+ #endif	/* __FreeBSD__ */
+ #include <sys/buf.h>
+Only in src/sys/dev/stg/: tmc18c30.c~
+diff -ur src/sys/dev/stg.old/tmc18c30var.h src/sys/dev/stg/tmc18c30var.h
+--- src/sys/dev/stg.old/tmc18c30var.h	2002-06-01 01:39:04.000000000 +0200
++++ src/sys/dev/stg/tmc18c30var.h	2004-05-22 03:35:43.000000000 +0200
+@@ -52,7 +52,7 @@
+ 	void *sc_ih;
+ #endif	/* __NetBSD__ */
+ 
+-#ifdef	__FreeBSD__
++#ifdef	__FreeBSD_kernel__
+ 	bus_space_tag_t sc_iot;
+ 	bus_space_tag_t sc_memt;
+ 	bus_space_handle_t sc_ioh;
+Only in src/sys/dev/stg/: tmc18c30var.h~

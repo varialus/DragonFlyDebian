@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+export DH_COMPAT=4
+
+VER := 5.2.1
+
+PWD := $(shell pwd)
+DEB_TAR_SRCDIR=src
+DEB_TARBALL=src.tar.bz2
+DEB_DH_SHLIBDEPS_ARGS=-X/boot
+
+include debian/mk/build.mk
+include debian/mk/mkdirs.mk
+include debian/mk/patches.mk
+
+include debian/tarball.mk
+include debian/simple-patchsys.mk
+include /usr/share/cdbs/1/rules/debhelper.mk
+
