@@ -6,35 +6,6 @@ cat $0 | patch -p1
 (cd src && ACLOCAL=true ./util/reconf --force)
 exit 0
 
-diff -ur krb5-1.3.3.old/src/aclocal.m4 krb5-1.3.3/src/aclocal.m4
---- krb5-1.3.3.old/src/aclocal.m4	2004-07-28 22:43:05.000000000 +0200
-+++ krb5-1.3.3/src/aclocal.m4	2004-07-29 16:42:02.000000000 +0200
-@@ -1230,10 +1230,21 @@
-     AC_CHECK_LIB(socket, socket, LIBS="-lsocket -lnsl $LIBS", , -lnsl)))
-   KRB5_AC_ENABLE_DNS
-   if test "$enable_dns" = yes ; then
--    AC_CHECK_FUNC(res_search, , AC_CHECK_LIB(resolv, res_search,
--	LIBS="$LIBS -lresolv" ; RESOLV_LIB=-lresolv,
--	AC_MSG_ERROR(Cannot find resolver support routine res_search in -lresolv.)
--    ))
-+	AC_MSG_CHECKING(for res_search)
-+	AC_TRY_LINK_FUNC(res_search, AC_MSG_RESULT(yes),
-+		AC_MSG_RESULT(no))
-+	saved_LIBS="$LIBS"
-+	LIBS="$LIBS -lresolv"
-+	AC_MSG_CHECKING(for res_search in -lresolv)
-+	AC_LINK_IFELSE([[
-+#include <resolv.h>
-+int main()
-+{
-+       res_search (0, 0, 0, 0, 0);
-+       return 0;
-+}]],
-+		LIBS="$LIBS -lresolv"; RESOLV_LIB=-lresolv; AC_MSG_RESULT(yes),
-+		LIBS="$saved_LIBS"; AC_MSG_RESULT(no))
-   fi
-   AC_SUBST(RESOLV_LIB)
-   ])
 diff -ur krb5-1.3.3.old/src/appl/gssftp/ftpd/ftpcmd.y krb5-1.3.3/src/appl/gssftp/ftpd/ftpcmd.y
 --- krb5-1.3.3.old/src/appl/gssftp/ftpd/ftpcmd.y	2002-10-23 17:00:23.000000000 +0200
 +++ krb5-1.3.3/src/appl/gssftp/ftpd/ftpcmd.y	2004-07-29 16:42:02.000000000 +0200
@@ -159,15 +130,3 @@ diff -ur krb5-1.3.3.old/src/appl/telnet/telnetd/termstat.c krb5-1.3.3/src/appl/t
  #include "telnetd.h"
  
  /*
-diff -ur krb5-1.3.3.old/src/config/shlib.conf krb5-1.3.3/src/config/shlib.conf
---- krb5-1.3.3.old/src/config/shlib.conf	2004-07-29 17:24:54.000000000 +0200
-+++ krb5-1.3.3/src/config/shlib.conf	2004-07-29 17:26:18.000000000 +0200
-@@ -277,7 +277,7 @@
- 	CC_LINK_STATIC='LD_LIBRARY_PATH=`echo $(PROG_LIBPATH) | sed -e "s/-L//g" -e "s/ /:/g` $(PURE) $(CC) $(CFLAGS) $(LDFLAGS)'
- 	RUN_ENV='LD_LIBRARY_PATH=`echo $(PROG_LIBPATH) | sed -e "s/-L//g" -e "s/ /:/g"`; export LD_LIBRARY_PATH;'
- 	;;
--*-*-linux*)
-+*-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
- 	PICFLAGS=-fPIC
- 	SHLIBVEXT='.so.$(LIBMAJOR).$(LIBMINOR)'
- 	SHLIBSEXT='.so.$(LIBMAJOR)'
