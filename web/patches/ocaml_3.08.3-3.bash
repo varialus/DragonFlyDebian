@@ -8,9 +8,9 @@ which type-handling
 fakeroot debian/rules clean
 exit 0
 
-diff -x control -Nur ocaml-3.08.0.old/debian/control.in ocaml-3.08.0/debian/control.in
---- ocaml-3.08.0.old/debian/control.in	2004-08-03 00:18:51.000000000 +0200
-+++ ocaml-3.08.0/debian/control.in	2004-08-03 00:24:52.000000000 +0200
+diff -x control -Nur ocaml-3.08.3.old/debian/control.in ocaml-3.08.3/debian/control.in
+--- ocaml-3.08.3.old/debian/control.in	2004-08-03 00:18:51.000000000 +0200
++++ ocaml-3.08.3/debian/control.in	2004-08-03 00:24:52.000000000 +0200
 @@ -2,7 +2,7 @@
  Section: devel
  Priority: optional
@@ -26,20 +26,20 @@ diff -x control -Nur ocaml-3.08.0.old/debian/control.in ocaml-3.08.0/debian/cont
  Package: ocaml-native-compilers
 -Architecture: alpha amd64 arm hppa i386 ia64 powerpc sparc
 +Architecture: @native-arches@
- Depends: ocaml-nox (= ${Source-Version}), ocaml-nox-3.08, ${shlibs:Depends}
+ Depends: ocaml-nox (= ${Source-Version}), ocaml-nox-3.08.3, ${shlibs:Depends}
  Provides: ocaml-best-compilers
  Description: Native code compilers of the ocaml suite (the .opt ones)
-diff -x control -Nur ocaml-3.08.0.old/debian/patches/00list ocaml-3.08.0/debian/patches/00list
---- ocaml-3.08.0.old/debian/patches/00list	2004-08-02 23:21:23.000000000 +0200
-+++ ocaml-3.08.0/debian/patches/00list	2004-08-03 00:23:40.000000000 +0200
+diff -x control -Nur ocaml-3.08.3.old/debian/patches/00list ocaml-3.08.3/debian/patches/00list
+--- ocaml-3.08.3.old/debian/patches/00list	2004-08-02 23:21:23.000000000 +0200
++++ ocaml-3.08.3/debian/patches/00list	2004-08-03 00:23:40.000000000 +0200
 @@ -1,3 +1,4 @@
  versioned_libdir
  objinfo
- camlp4-coq-fix
+ man-ocamlmklib
 +kbsd-gnu
-diff -x control -Nur ocaml-3.08.0.old/debian/patches/kbsd-gnu.dpatch ocaml-3.08.0/debian/patches/kbsd-gnu.dpatch
---- ocaml-3.08.0.old/debian/patches/kbsd-gnu.dpatch	1970-01-01 01:00:00.000000000 +0100
-+++ ocaml-3.08.0/debian/patches/kbsd-gnu.dpatch	2004-08-03 00:24:13.000000000 +0200
+diff -x control -Nur ocaml-3.08.3.old/debian/patches/kbsd-gnu.dpatch ocaml-3.08.3/debian/patches/kbsd-gnu.dpatch
+--- ocaml-3.08.3.old/debian/patches/kbsd-gnu.dpatch	1970-01-01 01:00:00.000000000 +0100
++++ ocaml-3.08.3/debian/patches/kbsd-gnu.dpatch	2004-08-03 00:24:13.000000000 +0200
 @@ -0,0 +1,157 @@
 +#! /bin/sh -e 
 +## kbsd-gnu.dpatch by Robert Millan <rmh@debian.org>
@@ -61,9 +61,9 @@ diff -x control -Nur ocaml-3.08.0.old/debian/patches/kbsd-gnu.dpatch ocaml-3.08.
 +
 +exit 0
 +@DPATCH@
-+diff -x control -ur ocaml-3.08.0.old/asmrun/signals.c ocaml-3.08.0/asmrun/signals.c
-+--- ocaml-3.08.0.old/asmrun/signals.c	2004-06-19 18:13:32.000000000 +0200
-++++ ocaml-3.08.0/asmrun/signals.c	2004-08-02 23:20:20.000000000 +0200
++diff -x control -ur ocaml-3.08.3.old/asmrun/signals.c ocaml-3.08.3/asmrun/signals.c
++--- ocaml-3.08.3.old/asmrun/signals.c	2004-06-19 18:13:32.000000000 +0200
+++++ ocaml-3.08.3/asmrun/signals.c	2004-08-02 23:20:20.000000000 +0200
 +@@ -555,21 +555,21 @@
 +   }
 + }
@@ -99,9 +99,9 @@ diff -x control -Nur ocaml-3.08.0.old/debian/patches/kbsd-gnu.dpatch ocaml-3.08.
 +     act.sa_handler = (void (*)(int)) segv_handler;
 +     act.sa_flags = SA_ONSTACK | SA_NODEFER;
 + #else
-+diff -x control -ur ocaml-3.08.0.old/config/auto-aux/stackov.c ocaml-3.08.0/config/auto-aux/stackov.c
-+--- ocaml-3.08.0.old/config/auto-aux/stackov.c	2003-07-23 09:57:17.000000000 +0200
-++++ ocaml-3.08.0/config/auto-aux/stackov.c	2004-08-02 23:19:51.000000000 +0200
++diff -x control -ur ocaml-3.08.3.old/config/auto-aux/stackov.c ocaml-3.08.3/config/auto-aux/stackov.c
++--- ocaml-3.08.3.old/config/auto-aux/stackov.c	2003-07-23 09:57:17.000000000 +0200
+++++ ocaml-3.08.3/config/auto-aux/stackov.c	2004-08-02 23:19:51.000000000 +0200
 +@@ -20,7 +20,7 @@
 + static char sig_alt_stack[SIGSTKSZ];
 + static char * system_stack_top;
@@ -120,9 +120,9 @@ diff -x control -Nur ocaml-3.08.0.old/debian/patches/kbsd-gnu.dpatch ocaml-3.08.
 +   act.sa_handler = (void (*)(int)) segv_handler;
 +   act.sa_flags = SA_ONSTACK | SA_NODEFER;
 + #else
-+diff -x control -ur ocaml-3.08.0.old/configure ocaml-3.08.0/configure
-+--- ocaml-3.08.0.old/configure	2004-07-09 17:08:51.000000000 +0200
-++++ ocaml-3.08.0/configure	2004-08-02 23:55:48.000000000 +0200
++diff -x control -ur ocaml-3.08.3.old/configure ocaml-3.08.3/configure
++--- ocaml-3.08.3.old/configure	2004-07-09 17:08:51.000000000 +0200
+++++ ocaml-3.08.3/configure	2004-08-02 23:55:48.000000000 +0200
 +@@ -268,7 +268,7 @@
 +     echo "#define ARCH_CODE32" >> m.h;;
 +   cc,alpha*-*-osf*)
@@ -198,9 +198,9 @@ diff -x control -Nur ocaml-3.08.0.old/debian/patches/kbsd-gnu.dpatch ocaml-3.08.
 +   x86_64-*-freebsd*)            arch=amd64; system=freebsd;;
 +   x86_64-*-openbsd*)            arch=amd64; system=openbsd;;
 + esac
-diff -x control -Nur ocaml-3.08.0.old/debian/rules ocaml-3.08.0/debian/rules
---- ocaml-3.08.0.old/debian/rules	2004-08-02 23:21:23.000000000 +0200
-+++ ocaml-3.08.0/debian/rules	2004-08-03 00:24:52.000000000 +0200
+diff -x control -Nur ocaml-3.08.3.old/debian/rules ocaml-3.08.3/debian/rules
+--- ocaml-3.08.3.old/debian/rules	2004-08-02 23:21:23.000000000 +0200
++++ ocaml-3.08.3/debian/rules	2004-08-03 00:24:52.000000000 +0200
 @@ -94,6 +94,11 @@
  ifneq "$(wildcard /usr/share/misc/config.guess)" ""
  	cp -f /usr/share/misc/config.guess config/gnu/config.guess
