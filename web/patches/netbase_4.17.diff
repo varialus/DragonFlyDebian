@@ -1,0 +1,42 @@
+diff -ur netbase-4.17/debian/netbase.init netbase-4.17+kbsd/debian/netbase.init
+--- netbase-4.17/debian/netbase.init	2004-02-13 12:35:29.000000000 +0100
++++ netbase-4.17+kbsd/debian/netbase.init	2004-06-30 00:25:16.000000000 +0200
+@@ -23,12 +23,15 @@
+ }
+ 
+ spoofprotect () {
+-    echo -n "Setting up IP spoofing protection: "
+-    if spoofprotect_rp_filter; then
+-        echo "rp_filter."
+-    else
+-        echo "FAILED."
+-    fi
++    case `uname -s` in Linux)
++        echo -n "Setting up IP spoofing protection: "
++        if spoofprotect_rp_filter; then
++            echo "rp_filter."
++        else
++            echo "FAILED."
++        fi
++    ;;
++    esac
+ }
+ 
+ ip_forward () {
+@@ -71,13 +74,13 @@
+ 	echo "done."
+ 	;;
+     stop)
+-        if sed -n 's/^[^ ]* \([^ ]*\) \([^ ]*\) .*$/\1 \2/p' /proc/mounts | 
++        if [ "`uname -s`" == "Linux" ] && sed -n 's/^[^ ]* \([^ ]*\) \([^ ]*\) .*$/\1 \2/p' /proc/mounts | 
+           grep -q "^/ nfs$"; then
+             echo "NOT deconfiguring network interfaces: / is an NFS mount"
+-        elif sed -n 's/^[^ ]* \([^ ]*\) \([^ ]*\) .*$/\1 \2/p' /proc/mounts |  
++        elif [ "`uname -s`" == "Linux" ] && sed -n 's/^[^ ]* \([^ ]*\) \([^ ]*\) .*$/\1 \2/p' /proc/mounts |  
+           grep -q "^/ smbfs$"; then
+             echo "NOT deconfiguring network interfaces: / is an SMB mount"
+-	elif sed -n 's/^[^ ]* \([^ ]*\) \([^ ]*\) .*$/\2/p' /proc/mounts | 
++	elif [ "`uname -s`" == "Linux" ] && sed -n 's/^[^ ]* \([^ ]*\) \([^ ]*\) .*$/\2/p' /proc/mounts | 
+           grep -qE '^(nfs|smbfs|ncp|coda)$'; then
+             echo "NOT deconfiguring network interfaces: network shares still mounted."
+         else
