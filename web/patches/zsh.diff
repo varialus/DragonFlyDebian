@@ -38,7 +38,7 @@ diff -uwrN /tmp/zsh-4.2.4/debian/rules zsh-4.2.4/debian/rules
    case "$host" in
      *-hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
 -    *-freebsd3-9*|*-linux*|gnu*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
-+    *-freebsd3-9*|*-linux*|gnu*|kfreebsd*gnu) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
++    *-freebsd3-9*|*-linux*|gnu*|k*bsd*gnu) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
      *openbsd*)
         if test $zsh_cv_sys_elf = yes; then
  	 EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}"
@@ -49,7 +49,7 @@ diff -uwrN /tmp/zsh-4.2.4/debian/rules zsh-4.2.4/debian/rules
    fi
    case "$host_os" in
 -    freebsd*|linux*|irix*|osf*|gnu*) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
-+    freebsd*|linux*|irix*|osf*|gnu*|kfreebsd*-gnu) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
++    freebsd*|linux*|irix*|osf*|gnu*|k*bsd*-gnu) DLLDFLAGS="${DLLDFLAGS=-shared}" ;;
      sunos*)       DLLDFLAGS="${DLLDFLAGS=-assert nodefinitions}" ;;
      sysv4*|esix*) DLLDFLAGS="${DLLDFLAGS=-G $ldflags}" ;;
      netbsd*)      DLLDFLAGS="${DLLDFLAGS=${DLLDARG}-x -shared --whole-archive}" ;;
@@ -58,7 +58,7 @@ diff -uwrN /tmp/zsh-4.2.4/debian/rules zsh-4.2.4/debian/rules
    case "$host" in
      *-hpux*)  EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}" ;;
 -    *-freebsd[3-9]*|*-linux*|gnu*) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
-+    *-freebsd[3-9]*|*-linux*|gnu*|kfreebsd*gnu) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
++    *-freebsd[3-9]*|*-linux*|gnu*|k*bsd*gnu) EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-rdynamic}" ;;
      *openbsd*)
         if test $zsh_cv_sys_elf = yes; then
  	 EXTRA_LDFLAGS="${EXTRA_LDFLAGS=-Wl,-E}"
