@@ -34,11 +34,10 @@ test ! -e $OLDROOT || { echo Directory $OLDROOT already exist; exit 1; }
 
 move_list=""
 for i in /* ; do
-  if ! test "$i" = "/dev" ; then
-    if ! test "$i" = "/boot" ; then
-      move_list="$move_list $i"
-    fi
-  fi
+  case i in
+    /dev|/boot|/lib/ld*) ;;
+    *) move_list="$move_list $i" ;;
+  esac
 done
 
 echo Going to move: $move_list
@@ -51,16 +50,18 @@ rm -rf $NEWROOT/boot
 # we want to know what happens here..
 set -x
 
+mkdir -p /lib
+cp /$NEWROOT/lib/ld.so.1 /lib/
+
 mkdir $OLDROOT
 echo "$move_list" | xargs -J % mv % $OLDROOT/
-LD_LIBRARY_PATH=$OLDROOT/usr/libexec:$OLDROOT/lib:$OLDROOT/usr/lib $OLDROOT/bin/mv $OLDROOT$NEWROOT/* /
+LD_LIBRARY_PATH=$OLDROOT/$NEWROOT/lib \
+  $OLDROOT/$NEWROOT/bin/mv $OLDROOT/$NEWROOT/lib/* /lib/
+$OLDROOT/$NEWROOT/bin/mv $OLDROOT/$NEWROOT/* /
 
 set +x
 
 # using native commands now
-
-#echo "Using old /etc/fstab"
-#cp -f $OLDROOT/etc/fstab /etc/
 
 #echo "Working around NFS support"
 #mkdir /var/db
@@ -69,9 +70,7 @@ set +x
 #echo "Setting up root passwd"
 #dpkg-reconfigure passwd
 
-echo "Moving $OLDROOT to $NEWROOT"
-rmdir $OLDROOT$NEWROOT
-mv $OLDROOT $NEWROOT
+rmdir $OLDROOT/$NEWROOT
 
 echo Seems it went ok
 
