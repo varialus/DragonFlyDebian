@@ -1,0 +1,43 @@
+
+Status: in BTS
+
+diff -Nur smpeg-0.4.5+cvs20030824.old/Makefile.am smpeg-0.4.5+cvs20030824/Makefile.am
+--- smpeg-0.4.5+cvs20030824.old/Makefile.am	2002-09-26 07:24:04.000000000 +0200
++++ smpeg-0.4.5+cvs20030824/Makefile.am	2004-08-31 18:03:46.000000000 +0200
+@@ -4,8 +4,6 @@
+ # These are the subdirectories that are always built
+ SUBDIRS = audio video
+ 
+-CXXLD = cc
+-
+ bin_SCRIPTS = smpeg-config
+ 
+ # The smpeg library target
+@@ -36,7 +34,7 @@
+ 
+ libsmpeg_la_LDFLAGS = 		\
+         -release $(LT_RELEASE)	\
+-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) -lstdc++
++	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+ 
+ libsmpeg_la_LIBADD =		\
+ 	audio/libaudio.la	\
+@@ -69,11 +67,11 @@
+ 
+ # Sources for plaympeg
+ man_MANS = plaympeg.1 gtv.1
+-plaympeg_SOURCES = plaympeg.c
++plaympeg_SOURCES = plaympeg.c empty.cc
+ plaympeg_LDADD = libsmpeg.la
+ 
+ # Sources for gtv
+-gtv_SOURCES = gtv.c gtv.h
++gtv_SOURCES = gtv.c gtv.h empty.cc
+ gtv_LDADD = @GTK_LIBS@ libsmpeg.la
+ 
+ # Sources for glmovie
+diff -Nur smpeg-0.4.5+cvs20030824.old/empty.cc smpeg-0.4.5+cvs20030824/empty.cc
+--- smpeg-0.4.5+cvs20030824.old/empty.cc	1970-01-01 01:00:00.000000000 +0100
++++ smpeg-0.4.5+cvs20030824/empty.cc	2004-08-31 18:26:37.000000000 +0200
+@@ -0,0 +1 @@
++/* Empty file used to hack automake into linking with g++ instead of gcc */
