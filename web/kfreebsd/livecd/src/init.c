@@ -33,7 +33,12 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <sys/syscall.h>
+#ifndef SYS_nmount
+#define SYS_nmount 378
+#endif
 
+#include "uio.h"
 #include "mount.h"
 #include "/usr/src/kfreebsd-headers/isofs/cd9660/cd9660_mount.h"
 
@@ -53,6 +58,7 @@ main ()
   int len;
   struct iso_args iso;
   struct stat my_stat;
+  struct iovec iov[4];
 
   close (2); /* stderr */
   open (TTY, O_WRONLY);
@@ -119,6 +125,7 @@ main ()
         }
     }
 
+  /* cd9660 mount */
   printf ("mount -t %s %s /mnt\n", fstype, device);
   iso.fspec = device;
   iso.flags = ISOFSMNT_EXTATT;
@@ -130,6 +137,7 @@ main ()
   free (device);
   free (fstype);
 
+  /* chroot */
   printf ("chroot /mnt/stand\n");
   if (chroot ("/mnt/stand") == -1)
     {
@@ -142,11 +150,32 @@ main ()
       fprintf (stderr, "chdir() failed: %s\n", strerror (errno));
       goto init_abort;
     }
-   printf ("executing %s\n", init);
+
+  /* devfs mount */
+  iov[0].iov_base = "fstype";
+  iov[0].iov_len = sizeof("fstype");
+  iov[1].iov_base = "devfs";
+  iov[1].iov_len = strlen(iov[1].iov_base) + 1;;
+  iov[2].iov_base = "fspath";
+  iov[2].iov_len = sizeof("fspath");
+  iov[3].iov_base = "/dev";
+  iov[3].iov_len = sizeof("/dev");
+  printf ("mount -t devfs devfs /dev\n");
+  if (syscall (SYS_nmount, iov, 4, 0) == -1)
+    {
+      fprintf (stderr, "mount failed: %s\n", strerror (errno));
+      goto init_abort;
+    }
+
+  printf ("executing %s\n", init);
   execl (init, init, NULL);
   fprintf (stderr, "execl() failed: %s\n", strerror (errno));
 
 init_abort:
+
+  printf ("umount /dev\n");
+  if (unmount ("/dev", 0) == -1)
+    fprintf (stderr, "unmount failed: %s\n", strerror (errno));
 
   printf ("umount /mnt\n");
   if (unmount ("/mnt", 0) == -1)

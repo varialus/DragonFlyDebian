@@ -8,7 +8,7 @@ rm -rf tmp out
 mkdir -p tmp out
 
 # pre-dependencies
-gcc -Wall -static init.c -o tmp/init
+(cd src && gcc -Wall -static init.c -o ../tmp/init)
 if ! test -e boot.flp ; then
   echo -n "boot.flp not found. You can get the upstream version from "
   echo -n "ftp://ftp.freebsd.org/pub/FreeBSD/releases/"
@@ -41,4 +41,4 @@ mdconfig -d -u md0
 cp boot.flp out/root/
 cp -a stand out/root/
 
-mkisofs -b boot.flp -c boot.catalog -o out/livecd.iso out/root
+mkisofs -b boot.flp -c boot.catalog -o out/livecd.iso -r out/root
