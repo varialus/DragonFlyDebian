@@ -6,7 +6,13 @@
 # See /usr/share/common-licenses/GPL for license terms.
 
 set -ex
-version=9
+
+for i in mkisofs crosshurd fakeroot ; do
+  if ! dpkg -s ${i} > /dev/null ; then
+    echo Install ${i} and try again
+    exit 1
+  fi
+done
 
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
@@ -14,6 +20,7 @@ if [ "$UID" != "0" ] ; then
   exit 0
 fi
 
+version=9
 cpu=`dpkg-architecture -qDEB_BUILD_GNU_CPU`
 system="kfreebsd-gnu"
 uname="GNU/kFreeBSD"
@@ -74,6 +81,22 @@ id:S:initdefault:
 ~~:S:wait:/sbin/sulogin -e
 ca:12345:ctrlaltdel:/sbin/shutdown -t1 -a -r now
 EOF
+
+# setup writable filesystems
+mkdir -p ramdisk
+cat > root/writable.sh << EOF
+#!/bin/sh
+set -e
+dirs="etc home mnt tmp var"
+mdconfig -a -t malloc -o compress -s 32m -u md0
+mkfs.ufs /dev/md0
+mount /dev/md0 /ramdisk
+for i in ${dirs} ; do
+  mv /${i} /ramdisk/${i}
+  ln -s /ramdisk/${i} /${i}
+done
+EOF
+chmod +x root/writable.sh
 
 #########################
 #                    ignition!
