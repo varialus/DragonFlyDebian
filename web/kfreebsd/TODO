@@ -11,15 +11,9 @@ if all tasks were fixed. We goalt neither of these though :P
 
  - Glibc
 	- resolver is broken.
-	- semctl () has some sort of undetermined breakness. Clint Adams found
-	  this when trying to fix fakeroot, but didn't give more details.
-	- mount () is broken (declaration doesn't match implementation, IIRC)
 	- pass "make check"
 	- sync with current CVS. (merge into upstream, etc).
 	- update kFreeBSD headers.
-
- - Xfree86
-	- Xfree86 no more.
 
  - Xorg / modular X
 	- Port whatever that is going to replace Xfree86 4.3 in Debian. AFAIK
@@ -27,10 +21,6 @@ if all tasks were fixed. We goalt neither of these though :P
 	  It'd help if someone could clarify wether the next leap will be to
 	  monolithic Xorg or to the modular experimental branch of Xorg.
 	  In case of monolithic Xorg, my Xfree86 4.3 patchset can be reused.
-
- - Buildd
-	- Needs nullmailer and an external smarthost.
-	- Wait for fixed libtool and config.guess to spread (see #)
 
  - Binutils
 	- Fixed in upstream. Push upstream fixes into Debian (#248182).
@@ -43,10 +33,6 @@ if all tasks were fixed. We goalt neither of these though :P
 	- freebsd-buildutils is in official archive now. You can use it to
 	  build FreeBSD sources (which heavily depend on their make, awk, etc)
 
-	- kfreebsd5. I'm preparing a package based on Nathan's. This time for
-	  kernel of FreeBSD 5.2.1, build with freebsd-buildutils and linking
-	  userland components with Glibc only.
-
 	- freebsd-utils. This is a hacked package built from staticaly-linked
 	  binaries. It'll eventualy be rewriten semi-portably and replaced
 	  (mount, ifconfig, etc). This is a long-term transition. For now,
@@ -54,21 +40,15 @@ if all tasks were fixed. We goalt neither of these though :P
 	  their GNU/Linux sisters.
 
  - GDB
-	- Ported in upstream. Too bad kfreebsd-headers has more bugs than a
-	  Florida swamp and GDB heavily depends on them. It won't build for
-	  now.
+	- Ported in upstream.
 
  - GRUB
-	- Fix userspace emulator to work on kFreeBSD-based systems. I fixed
-	  this in upstream. Me lazy bitch gotta propagate this to Debian.
+	- Fix userspace emulator to work on kFreeBSD-based systems.  This
+	  is supposedly fixed but I haven't tested it yet (rmh).
 	- Fix kfreebsd loader so we can boot directly the kernel and not need
 	  the FreeBSD loader.
 
  - LiveCD
-	- Now that GRUB supports iso9660. We could start checking if d-i
-	  supports GRUB as the _cdrom_ bootloader, and fixing it otherwise.
-	  Then porting d-i would earn us a LiveCD automagicaly I believe.
-	  Note: Even if GRUB supports iso9660, it can't build kfreebsd
-	  directly (yet) but through /boot/loader.gz. So we'll probably
-	  have to add real kfreebsd support to GRUB.
-
+	- Deprecate the .iso image in favour of a jidgo-like script (this
+	  requires merged support for kfreebsd in grub to work)
+	- Use the thing as a base for d-i.
