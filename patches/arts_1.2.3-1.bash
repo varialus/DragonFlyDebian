@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+# Status: in BTS
+
 cp debian/control{,.in}
 cat $0 | patch -p1
 which type-handling
@@ -76,47 +78,9 @@ diff -ur arts-1.2.3.old/debian/rules arts-1.2.3/debian/rules
  	dh_clean
  
  install: install-arch install-indep
-diff -ur arts-1.2.3.old/mcop/thread.cc arts-1.2.3/mcop/thread.cc
---- arts-1.2.3.old/mcop/thread.cc	2003-10-13 21:59:41.000000000 +0200
-+++ arts-1.2.3/mcop/thread.cc	2004-08-05 03:28:22.000000000 +0200
-@@ -20,6 +20,10 @@
- 
-     */
- 
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
- #include "thread.h"
- #include <string.h>
- 
-@@ -56,11 +60,13 @@
- {
- }
- 
-+#ifdef HAVE_SEMAPHORE_H
- // Semaphore
- Semaphore::~Semaphore()
- {
- 	delete impl;
- }
-+#endif
- 
- Semaphore_impl::~Semaphore_impl()
- {
 diff -ur arts-1.2.3.old/mcop_mt/threads_posix.cc arts-1.2.3/mcop_mt/threads_posix.cc
 --- arts-1.2.3.old/mcop_mt/threads_posix.cc	2004-03-22 12:29:28.000000000 +0100
 +++ arts-1.2.3/mcop_mt/threads_posix.cc	2004-08-05 03:28:22.000000000 +0200
-@@ -33,7 +33,9 @@
- #include <stddef.h>
- #include <stdarg.h>
- #include <pthread.h>
-+#ifdef HAVE_SEMAPHORE_H
- #include <semaphore.h>
-+#endif
- #include <debug.h>
- #include <string.h>
- 
 @@ -186,9 +188,12 @@
  	Thread_impl(Thread *thread) : thread(thread) {
  	}
@@ -130,31 +94,15 @@ diff -ur arts-1.2.3.old/mcop_mt/threads_posix.cc arts-1.2.3/mcop_mt/threads_posi
  			arts_debug("Thread::setPriority: sched_setscheduler failed");
  	}
  	static pthread_key_t privateDataKey;
-@@ -243,6 +248,7 @@
- 	}
- };
+diff -ur arts-1.2.3.old/configure.in.in arts-1.2.3/configure.in.in
+--- arts-1.2.3.old/configure.in.in	2004-05-30 14:41:10.000000000 +0200
++++ arts-1.2.3/configure.in.in	2004-08-10 02:58:56.000000000 +0200
+@@ -65,7 +65,7 @@
+ AC_BASE_PATH_KDE([don't test]) dnl arts is a special case
+ AC_CHECK_LIB(compat, main, [LIBCOMPAT="-lcompat"]) dnl for FreeBSD
+ AC_CHECK_LIB(util, main, [LIBUTIL="-lutil"]) dnl for FreeBSD
+-AC_CHECK_FUNC(sem_init, , AC_CHECK_LIB(rt, sem_init, [LIBSEM="-lrt"]))
++AC_CHECK_FUNC(sem_init, , AC_CHECK_LIB(rt, sem_init, [LIBSEM="-lrt"]) AC_CHECK_LIB(sem, sem_init, [LIBSEM="-lsem"]))
  
-+#ifdef HAVE_SEMAPHORE_H
- class Semaphore_impl : public Arts::Semaphore_impl
- {
- private:
-@@ -275,6 +281,7 @@
- 		return retval;
- 	}
- };
-+#endif /* HAVE_SEMAPHORE_H */
- 
- class PosixThreads : public SystemThreads {
- private:
-@@ -306,9 +313,11 @@
- 		else
- 			return 0; /* main thread */
- 	}
-+#ifdef HAVE_SEMAPHORE_H
- 	Arts::Semaphore_impl *createSemaphore_impl(int shared, int count) {
- 		return new Semaphore_impl(shared, count);
- 	}
-+#endif
- };
- 
- // set posix threads on startup
+ AM_CONDITIONAL(HAVE_LIBJPEG, test -n "$LIBJPEG" )
+ AM_CONDITIONAL(HAVE_LIBPNG, test -n "$LIBPNG" )

@@ -11,24 +11,113 @@ this first:
 
 
 Config scripts (config.guess and config.sub)
---------------
+--------------------------------------------
 
 You must have the latest config.guess and config.sub. Copy them from
 "/usr/share/misc/config.*".
 
 
-Autotools and Libtool
----------------------
+Add our system name to checks here and there
+--------------------------------------------
 
-If you need to update libtool via libtoolize, you will have to be sure
-you update the libtool.m4 file as well so that it is in sync with ltmain.sh
-otherwise you may get strange linking errors.
+When the check doesn't concern kernel, but userland stuff (notably, libc),
+we want to match the same checks that match Linux.  Make sure the definitions
+are not simply duplicated from Linux' because that will eventualy result in
+out-of-sync definitions that break for us.
+
+Example of triplet check:	linux*-gnu | gnu* | k*bsd*-gnu)
+Example of uname check:		Linux|GNU|GNU/*)
+Example of C macro check:	defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
+				[note: GNU/Hurd defines __GNU__, and GNU/k*BSD define __GLIBC__ as hardcoded macro]
+
+When the check concerns kernel, we obviously want to match with FreeBSD's or
+NetBSD's.
+
+Example of triplet check:	freebsd* | kfreebsd*-gnu)
+Example of uname check:		*FreeBSD)
+Example of C macro check:	defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+				[note: see below for more details on this one]
 
 
-Testing for "uname -s" output
+Libraries, your beloved enemy
 -----------------------------
 
-You'll have to the case for GNU/kFreeBSD or GNU/* when appropriate.
+Here are some guidelines for building and porting libraries. Many libraries
+need porting work because they have to detect the system in order to decide
+how their shared object support works.
+
+When building a library make sure it generates the shared object (.so.*)
+files.  Most of them will FTBFS if this fails, but a few will still build
+succesfuly, being the cause of horrible bugs in unrelated packages that are
+sometimes difficult to trace and can easily be avoided.
+
+First of all, check if your library uses libtool.  A quick and reliable check
+is:
+
+  grep 'Linux ELF' *
+
+If it reports matches in aclocal.m4 and configure, it means we're using
+libtool.  Now check wether the installed libtool supports us:
+
+  grep kfreebsd aclocal.m4
+
+If no match is found, we need to re-libtoolize. Generaly, this involves:
+
+  Check the 'configure' header for the version of autoconf that generated it.
+  If that version is 2.13, give up. Your attempt at relibtoolising failed.
+  (read the notes below for a method to work around the problem).
+
+  Run 'libtoolize -c -f'.  If everything is ok, this command should be a
+  no-op.  However, make sure it doesn't say you need to add the contents of
+  'libtool.m4' here or there.  If it does, it means the package is keeping an
+  old copy of libtool.m4 hidden somewhere (sigh).  Sometimes it's just renamed,
+  sometimes it's embedded in acinclude.m4.  In whichever case, _don't_ update
+  it manualy.  Instead, remove the libtool.m4 bits from whereever they are.
+
+  Check the 'aclocal.m4' header for the version of aclocal that generated it,
+  and use the same major version (aclocal-1.x) to regenerate it.  If the
+  package includes an 'm4' directory you might need to pass '-I m4' to aclocal.
+
+  Regenerate configure using autoconf 2.5x.  Now make sure everything went as
+  expected:
+
+    grep kfreebsd configure
+
+This should do it.  If you failed to update libtool due to broken autotools
+templates or some other weird reason, there's a workaround solution you can
+use.  Since the gnu system (GNU/Hurd) is already supported by old versions
+of libtool, and since the definitions are actualy not kernel-specific but
+specific to things like libc, ld.so, or binary format, we can cloak
+k*bsd-gnu as if it were gnu and this will work fine for us.
+
+  *PLEASE* make sure the package doesn't use any kernel-specific interfaces
+  that are supported by kfreebsd. If it does, the kfreebsd-gnu triplet needs
+  to be used to match with freebsd in the corresponding test, and using this
+  hack will break it.  Don't use this hack unless you know what you're doing.
+  Don't encourage package maintainers who are not aware of this porting issue
+  to use this hack without checking the package properly. If in doubt, ask.
+
+  I generaly do it like this.  In debian/rules:
+
+  DEB_BUILD_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+  DEB_BUILD_GNU_CPU	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
+  DEB_BUILD_GNU_SYSTEM	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_SYSTEM)
+
+  ifneq (, $(filter $(DEB_BUILD_GNU_SYSTEM), kfreebsd-gnu knetbsd-gnu))
+  DEB_BUILD_GNU_TYPE = $(DEB_BUILD_GNU_CPU)-gnu
+  endif
+
+  [...]
+  ./configure [...] $(DEB_BUILD_GNU_TYPE)
+
+When you submit the bug, please point the maintainer to bug #242950, it
+contains some useful info for maintainers.
+
+
+Finaly, if the library doesn't use libtool, expect a hardcoded check for
+Linux somewhere.  This is how badly-portable libraries generaly handle the
+shared object definitions.  Just find the check for Linux and add our triplet
+or uname output where it belongs.
 
 
 Non portable mount(2) calls
@@ -145,12 +234,16 @@ There are usage examples of all the above examples in [grub]/lib/device.c,
 so I suggest you have a look at it.
 
 
-Writing to devfs
-----------------
+Writing to devfs (kFreeBSD)
+---------------------------
 
 On kFreeBSD's devfs it's only possible to create block/char devices and
 symlinks. So if you need to create some thing in /dev, like a named pipe
 create it in another place, then symlink from /dev.
 
-[Perhaps we could work around this in Glibc? (by using symlinks) --rmh]
-
+Note that the symlink you put in /dev will be removed on next reboot, so
+make sure the proper init.d script restores it.
+ 
+Generaly, you should use /var/run for your named pipe.  The only exception
+is sysvinit, which can't assume /var is mounted and hence uses /etc. All
+other daemons can assume /var is mounted, so this shouldn't be an issue.

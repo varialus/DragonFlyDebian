@@ -1,0 +1,50 @@
+diff -ur libnasl-2.0.12.old/configure.in libnasl-2.0.12/configure.in
+--- libnasl-2.0.12.old/configure.in	2004-08-11 15:49:29.000000000 +0200
++++ libnasl-2.0.12/configure.in	2004-08-11 15:54:17.000000000 +0200
+@@ -198,7 +198,7 @@
+ 
+ dnl Check that the struct ip has member ip_csum
+ AC_MSG_CHECKING([struct ip contains ip_csum])
+-AC_TRY_COMPILE([#ifdef __linux__
++AC_TRY_COMPILE([#if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
+ #define __BSD_SOURCE
+ #define _BSD_SOURCE
+ #define __FAVOR_BSD
+@@ -257,7 +257,7 @@
+ [AC_MSG_RESULT(no)])
+ 
+ AC_MSG_CHECKING([BSD struct udphdr])
+-AC_TRY_COMPILE([#ifdef __linux__
++AC_TRY_COMPILE([#if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
+ #define __BSD_SOURCE
+ #define _BSD_SOURCE
+ #define __FAVOR_BSD
+@@ -284,7 +284,7 @@
+ 
+ AC_MSG_CHECKING([struct tcphdr has th_off])
+ AC_TRY_COMPILE([#include <sys/types.h>
+-#ifdef __linux__
++#if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
+ #define __FAVOR_BSD
+ #endif
+ #include <netinet/in.h>
+@@ -297,7 +297,7 @@
+ 
+ AC_MSG_CHECKING([struct tcphdr has th_x2_off])
+ AC_TRY_COMPILE([#include <sys/types.h>
+-#ifdef __linux__
++#if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
+ #define __FAVOR_BSD
+ #endif
+ #include <netinet/in.h>
+diff -ur libnasl-2.0.12.old/include/nasl_raw.h libnasl-2.0.12/include/nasl_raw.h
+--- libnasl-2.0.12.old/include/nasl_raw.h	1999-06-12 15:03:32.000000000 +0200
++++ libnasl-2.0.12/include/nasl_raw.h	2004-08-11 15:55:05.000000000 +0200
+@@ -1,6 +1,6 @@
+ #ifndef NESSUS_RAW_H
+ #define NESSUS_RAW_H
+-#ifdef __linux__
++#if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
+ #ifndef __BSD_SOURCE
+ #define __BSD_SOURCE
+ #endif

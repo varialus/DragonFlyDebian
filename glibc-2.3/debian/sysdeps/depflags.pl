@@ -39,10 +39,10 @@ if ($DEB_HOST_GNU_SYSTEM eq "linux") {
 		'ppp (<= 2.2.0f-24)', 'libgdbmg1-dev (<= 1.7.3-24)');
 }
 if ($DEB_HOST_GNU_SYSTEM eq "kfreebsd-gnu") {
-    push @{$libc_dev_c{'Depends'}}, ('libpthread-dev', 'kfreebsd-headers');
+    push @{$libc_dev_c{'Depends'}}, ('libpthread-dev', 'libsem-dev', 'kfreebsd-headers');
 }
 if ($DEB_HOST_GNU_SYSTEM eq "knetbsd-gnu") {
-    push @{$libc_dev_c{'Depends'}}, ('libpthread-dev', 'knetbsd-headers');
+    push @{$libc_dev_c{'Depends'}}, ('libpthread-dev', 'libsem-dev', 'knetbsd-headers');
 }
 
 # nss-db is now seperate
