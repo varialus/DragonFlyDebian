@@ -1,0 +1,55 @@
+Common practices and problems found when porting to GNU/k*BSD
+===============================================================
+
+Non Clean Builds
+----------------
+
+When you have to do *any* changes to the source that are needed to build
+it, please add a new changelog entry and append a "+kbsd", "+kfreebsd",
+"+knetbsd", "+hurd" or "+gnu" as apropriate to the version, so we can
+track what should be integrated to upstream or to the Debian maintainer.
+Also change the suite from "sid" to "unreleased".
+
+Config scripts (config.guess and config.sub)
+--------------
+
+You must have the latest config.guess and config.sub. Copy them from
+"/usr/share/misc/config.*". Then please add a "+cfg" to the version.
+Change the suite as well to "unreleased".
+
+Autotools and Libtool
+---------------------
+
+If you need to update libtool via libtoolize, you will have to be sure
+you update the libtool.m4 file as well so that it is in sync with ltmain.sh
+otherwise you may get strange linking errors. Then please add a "+libtool"
+to the version.
+
+If you autoreconf'ed the package without touching the source files then
+append an "+autotool" to the version.
+
+For other not listed autogeneration systems append "+autogen".
+
+Testing for "uname -s" output
+-----------------------------
+
+You'll have to the case for GNU/kFreeBSD or GNU/* when appropriate.
+
+Non portable mount(2) calls
+---------------------------
+
+Substitute by system(2) with the "-t<filesystem>" argument first.
+
+Preprocessor Variables
+----------------------
+
+For kFreeBSD specific code please test if __FreeBSD_kernel__ is defined.
+
+Writing to devfs
+----------------
+
+On kFreeBSD's devfs it's only possible to create block/char devices and
+symlinks. So if you need to create some thing in /dev, like a named pipe
+create it in another place, then symlink from /dev.
+
+

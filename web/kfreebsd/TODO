@@ -1,0 +1,50 @@
+TODO
+====
+
+This is the TODO list for GNU/kFreeBSD. If you want to work on any of this,
+_please_ send us a mail to ask about it first (glibc-bsd-devel).
+It's likely that work is already started and we can give you more details on
+the particular issue.
+
+Tasks are in no particular order. Subtasks are sorted by priority (or at least
+that's the intention).
+
+ - Glibc (http://www.nongnu.org/glibc-bsd/)
+   - DNS is broken.
+   - /lib/ld.so is an executable and should be a shared object. (run file
+     on it)
+   - semctl () has some sort of undetermined breakness. Clint Adams found
+     this when trying to fix fakeroot, but didn't give more details.
+   - pass "make check"
+   - sync with current CVS. (merge into upstream, etc).
+   - update KFreeBSD headers.
+ - Xfree86
+   - Merging patches into upstream
+ - Buildd
+   - Get an MTA working (Requires to fix DNS in Glibc first)
+   - Wait for libtool and config.guess to fix/release/spread.
+ - Binutils
+   - Fixed in upstream, but need to fix ld.so in Glibc for the latest version
+     to work (libbfd is just picky about that now).
+   - pass "make check"
+ - FreeBSD
+   - Nathan made some packages of FreeBSD components (see p.d.o/~utsl).
+   - We'd like to get some of these rewriten semi-portably and replaced
+     (mount, ifconfig, etc). This is a long-term transition. For now, it'd
+     be nice to have wrapper scripts that have the same I/O than their
+     GNU/Linux sisters.
+   - Update: They're in gnuab repo now. We have ifconfig (in inetutils) and
+     will have route/inetutils and mount/sysutils soon.
+ - GDB
+   - Doesn't load debugging symbols, so it's not much useful.
+   - Maybe when built with latest binutils it will work.
+   - Or when ld.so is fixed, or when ld.so and libc are built with latest
+     binutils, or when the day is rainy and mars and the moon are aligned.
+ - GRUB / PUPA
+   - Add UFS2 support (upstream is working on that, see #212340)
+   - Fix userspace emulator to work on kFreeBSD-based systems. See
+       http://mail.gnu.org/archive/html/bug-grub/2003-07/msg00067.html
+       http://mail.gnu.org/archive/html/bug-grub/2003-02/msg00060.html
+   - Add CDROM support (so we can build rescue/install images)
+   - Update: There's a patch around that adds CDROM support to GRUB 0.93
+

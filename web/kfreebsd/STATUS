@@ -1,0 +1,30 @@
+Current most Urgent things to solve
+===================================
+
+ - FIXME: ifupdown does not handle the gateway entry correctly, so do not
+   add it in your interfaces file, just add an up hook, that will do as a
+   gateway entry:
+
+   auto rl0
+   iface rl0 inet static
+	address 192.168.1.100
+	netmask 255.255.255.0
+	broadcast 192.168.1.255
+	up route add -net 0.0.0.0 192.168.1.1
+
+ - FIXME: DNS resolving is broken, make sure /etc/hosts has everything you
+   need. MX resolving won't work so MTA doesn't as well [working on it].
+ - FIXME: ps is broken. (Hector has wrote a very hackish temporal solution :)
+ - FIXME: df is broken.
+ - FIXME: inetutils, /var/log/news missing, no /dev/xconsole.
+ - FIXME: perl broken -> needed to get perl-modules from snapshot.debian.net
+ - FIXME: terminal broken, does not handle Ctrl-C nor Ctrl-Z.
+ - FIXME: glibc has DNS broken. thus no SMTP.
+ - FIXME: gdb: broken. strace works.
+
+ - FIXME: start-stop-daemon does not stop daemons. ??
+ - FIXME: ipv6 broken. from glibc. ??
+
+ - ?? /tmp bad perms no go+w ??
+
+

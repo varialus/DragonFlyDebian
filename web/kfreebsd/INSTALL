@@ -1,0 +1,38 @@
+Debian GNU/kFreeBSD installation instructions
+=============================================
+
+- Start with a fresh FreeBSD install
+  + Version 5.x
+  + With UFS1 (SoftUpdates recommended)
+  + In a single filesystem (otherwise the swap script won't work)
+  + With minimal options
+  + GRUB with UFS1, you do not need to install the FreeBSD bootloader since
+    GRUB may boot kFreeBSD (kernel of FreeBSD):
+       title Debian GNU/kFreeBSD
+       root (hdX,Y,a)
+       kernel /boot/loader
+  + GRUB with UFS2, you will have to install the FreeBSD bootloader and use
+    a chainloader:
+       title Debian GNU/kFreeBSD
+       rootnoverify (hdX,Y,a)
+       makeactive
+       chainloader +1
+- Create a base system system tarball with crosshurd (on a Debian system).
+  You will have to hack dpkg-architecture and s/freebsd/kfreebsd/.
+  And transfer it to the FreeBSD system.
+- Create a temporary directory (let's call it /gkf) and untar the base
+  system into it (don't untar it on / !!)
+- Swaping the sytems:
+  + Place the "swap" script somewhere except under /gkf.
+  + Use: "swap /gkf" to swap /gkf with /. Make sure nothing but / and /dev is
+    mounted when you run it !! Note this may well trash your existing
+    FreeBSD system, don't have important data on it!
+  + After you run it, your base system is GNU/kFreeBSD.
+- FIXME: You will need a proper /etc/fstab otherwise it will barf at start.
+- FIXME: There is no /etc/hosts.
+- Cross your fingers and reboot!! If all goes well you'll see some errors
+  with the init script, then init will spawn 8 getty's and you'll be able to
+  login your GNU/kFreeBSD system.
+
+See also the file STATUS, that lists know problems and some workarounds.
+

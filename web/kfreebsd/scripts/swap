@@ -1,0 +1,82 @@
+#!/bin/sh -e
+#
+# Script to swap from a FreeBSD system to a Debian GNU/kFreeBSD
+#
+# Originally written by Robert Millan <rmh@debian.org>
+# Modified by Guillem Jover <guillem@debian.org>
+#
+# $Id$
+#
+
+VERSION=0.1.1
+
+OLDROOT=/old
+NEWROOT=$1
+
+if ! test "$#" = "1" ; then
+  echo Swaps root filesystem contents with a given directory, use with care !!!
+  echo !!! This script may trash your system and destroy your data !!!
+  echo
+  echo Usage: `basename $0` directory
+  exit
+fi
+
+if ! test "`mount | grep -v ' on / ' | grep -v ' on /dev ' | wc -l | rev | cut -c 1`" = "0" ; then
+  echo There are mounted filesystems other than / and /dev, exiting
+  exit
+fi
+
+test -e /bin/mkdir || { echo Needed /bin/mkdir does not exist; exit 1; }
+test -e /bin/mv || { echo Needed /bin/mv does not exist; exit 1; }
+
+test -e $NEWROOT || { echo Directory $NEWROOT does not exist; exit 1; }
+test ! -e $OLDROOT || { echo Directory $OLDROOT already exist; exit 1; }
+
+move_list=""
+for i in /* ; do
+  if ! test "$i" = "/dev" ; then
+    if ! test "$i" = "/boot" ; then
+      move_list="$move_list $i"
+    fi
+  fi
+done
+
+echo Going to move: $move_list
+echo Verify it and press [Enter] to continue or [Ctrl-C] to cancel.
+read KEY
+
+rm -rf $NEWROOT/dev
+rm -rf $NEWROOT/boot
+
+# we want to know what happens here..
+set -x
+
+mkdir $OLDROOT
+echo "$move_list" | xargs -J % mv % $OLDROOT/
+LD_LIBRARY_PATH=$OLDROOT/usr/libexec:$OLDROOT/lib:$OLDROOT/usr/lib $OLDROOT/bin/mv $OLDROOT$NEWROOT/* /
+
+set +x
+
+# using native commands now
+
+#echo "Using old /etc/fstab"
+#cp -f $OLDROOT/etc/fstab /etc/
+
+#echo "Working around NFS support"
+#mkdir /var/db
+#cp -f $OLDROOT/etc/netconfig /etc/
+
+#echo "Setting up root passwd"
+#dpkg-reconfigure passwd
+
+echo "Moving $OLDROOT to $NEWROOT"
+rmdir $OLDROOT$NEWROOT
+mv $OLDROOT $NEWROOT
+
+echo Seems it went ok
+
+echo Now running native-install ... press [Enter]
+read KEY
+
+chroot / /native-install
+
