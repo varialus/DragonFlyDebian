@@ -14,7 +14,7 @@ echo $kfreebsd-headers > kfreebsd-headers
 AC_ARG_ENABLE(compatible-utmp, dnl
 [  --disable-compatible-utmp  use a struct utmp which is the same as struct
                           utmpx, as on Linux, but incompatible with FreeBSD],
-              enable_utmp_compat=$enableval, enable_utmp_compat=yes)
+              enable_utmp_compat=$enableval, enable_utmp_compat=no)
 if test "$enable_utmp_compat" = no; then
   utmp_subdir=utmp-utmpx
 else
@@ -39,22 +39,4 @@ inhibit_glue=yes
 # FIXME: Does not work yet.
 #libc_cv_gcc_unwind_find_fde=yes
 
-# Under FreeBSD the LinuxThreads add-on should be available.
-case $add_ons in
-  # It is available.  Good.
-  *linuxthreads*)
-    linuxthreads_missing=
-    ;;
-  *)
-    linuxthreads_missing=yes
-    ;;
-esac
-
-if test "$linuxthreads_missing"; then
-    echo "\
-*** WARNING: Are you sure you do not want to use the 'linuxthreads'
-*** add-on?"
-fi
-
-# On kFreeBSD we use ldconfig.
 use_ldconfig=yes
