@@ -5,6 +5,8 @@
 # Copyright 2004  Robert Millan <rmh@debian.org>
 # See /usr/share/common-licenses/GPL for license terms.
 
+version=7
+
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
   fakeroot $0 $@
@@ -17,7 +19,6 @@ uname="GNU/kFreeBSD"
 tmp1=`tempfile` && rm -f ${tmp1} && mkdir -p ${tmp1}
 tmp2=`tempfile`
 pwd=`pwd`
-version=6
 
 /usr/share/crosshurd/makehurddir.sh ${tmp1} ${cpu} ${system}
 
