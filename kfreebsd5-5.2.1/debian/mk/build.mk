@@ -4,6 +4,7 @@ DESTDIR=$(CURDIR)/debian/kfreebsd5
 #CFLAGS="-U__linux__ -U__FreeBSD_kernel__ -D__FreeBSD_kernel__=5 -D__FreeBSD_version=502010"
 MAKE=make DESTDIR=$(DESTDIR) WERROR=
 revision=`dpkg-parsechangelog | grep ^Version | cut -c 10- | cut -d '-' -f 2`
+kfreebsd_cpu = $(DEB_BUILD_GNU_CPU)
 
 build/kfreebsd5:: pre-build apply-patches
 	if ! test -e debian/stamp-build ; then \
@@ -42,12 +43,15 @@ binary/kfreebsd5:: common-install-prehook-arch
 	cp /bin/true $(DESTDIR)/sbin/fsck.cd9660
 
 clean::
+	grep -q src/sys/$(kfreebsd_cpu)/conf/GENERIC \
+		debian/patches/003_config.diff
+
 	cat debian/patches/004_version.diff.in \
-	| sed "s/@revision@/$(revision)/g" \
-	> debian/patches/004_version.diff
+		| sed "s/@revision@/$(revision)/g" \
+		> debian/patches/004_version.diff
 
 	cat debian/control.in \
-	| sed "s/@kfreebsd-gnu@/`type-handling any kfreebsd-gnu`/g" \
-	> debian/control
+		| sed "s/@kfreebsd-gnu@/`type-handling any kfreebsd-gnu`/g" \
+		> debian/control
 
 	rm -f debian/stamp-build
