@@ -1,0 +1,54 @@
+
+Author: rmh
+Status: sent to BTS
+
+diff -Nur apache2-2.0.53.old/debian/patches/007_debian_advertising apache2-2.0.53/debian/patches/007_debian_advertising
+--- apache2-2.0.53.old/debian/patches/007_debian_advertising	2005-03-25 21:16:46.000000000 +0100
++++ apache2-2.0.53/debian/patches/007_debian_advertising	1970-01-01 01:00:00.000000000 +0100
+@@ -1,11 +0,0 @@
+---- build-tree.orig/apache2/server/core.c	2003-04-05 11:07:54.000000000 +0200
+-+++ build-tree/apache2/server/core.c	2003-04-05 11:23:12.000000000 +0200
+-@@ -2384,7 +2384,7 @@
+-         ap_add_version_component(pconf, AP_SERVER_BASEPRODUCT "/" AP_SERVER_MAJORVERSION);
+-     }
+-     else {
+--        ap_add_version_component(pconf, AP_SERVER_BASEVERSION " (" PLATFORM ")");
+-+        ap_add_version_component(pconf, AP_SERVER_BASEVERSION " (Debian GNU/Linux)");
+-     }
+- 
+-     /*
+diff -Nur apache2-2.0.53.old/debian/patches.in/007_debian_advertising.in apache2-2.0.53/debian/patches.in/007_debian_advertising.in
+--- apache2-2.0.53.old/debian/patches.in/007_debian_advertising.in	1970-01-01 01:00:00.000000000 +0100
++++ apache2-2.0.53/debian/patches.in/007_debian_advertising.in	2005-03-25 18:39:34.000000000 +0100
+@@ -0,0 +1,11 @@
++--- build-tree.orig/apache2/os/unix/os.h~	2005-02-04 21:21:18.000000000 +0100
+++++ build-tree/apache2/os/unix/os.h	2005-03-25 17:26:27.000000000 +0100
++@@ -21,7 +21,7 @@
++ #include "ap_config.h"
++ 
++ #ifndef PLATFORM
++-#define PLATFORM "Unix"
+++#define PLATFORM "Debian GNU/@KERNEL@"
++ #endif
++ 
++ #endif	/* !APACHE_OS_H */
+diff -Nur apache2-2.0.53.old/debian/rules apache2-2.0.53/debian/rules
+--- apache2-2.0.53.old/debian/rules	2005-03-25 21:16:46.000000000 +0100
++++ apache2-2.0.53/debian/rules	2005-03-25 18:33:55.000000000 +0100
+@@ -81,6 +81,8 @@
+ 
+ source.make: $(STAMP_DIR)/source.make
+ $(STAMP_DIR)/source.make:
++	sed -e "s/@KERNEL@/`uname -s | sed -e s,GNU/,,g -e s,GNU,Hurd,g`/g" \
++	< debian/patches.in/007_debian_advertising.in > debian/patches/007_debian_advertising
+ 		$(MAKE) -f debian/sys-build.mk source.make
+ 
+ extract: source.make
+@@ -128,6 +130,7 @@
+ 	rm -f debian/apache2-mpm-prefork.prerm
+ 	rm -f debian/apache2-mpm-prefork.init.d
+ 	rm -f debian/apache2-common.init.d
++	rm -f debian/patches/007_debian_advertising
+ 	dh_clean
+ 
+ install: $(STAMP_DIR)/inst-mpms $(STAMP_DIR)/move 
