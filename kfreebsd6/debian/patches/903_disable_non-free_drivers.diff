@@ -1,0 +1,92 @@
+diff -ur src.old/sys/conf/files src/sys/conf/files
+--- src.old/sys/conf/files	2003-12-03 15:55:30.000000000 +0100
++++ src/sys/conf/files	2004-11-13 05:46:10.000000000 +0100
+@@ -191,7 +191,6 @@
+ contrib/dev/acpica/utmisc.c	 optional acpi
+ contrib/dev/acpica/utobject.c	 optional acpi
+ contrib/dev/acpica/utxface.c	 optional acpi
+-contrib/dev/ath/freebsd/ah_osdep.c	optional ath_hal
+ contrib/ipfilter/netinet/fil.c		optional ipfilter inet
+ contrib/ipfilter/netinet/ip_auth.c	optional ipfilter inet
+ contrib/ipfilter/netinet/ip_fil.c	optional ipfilter inet
+@@ -319,9 +318,6 @@
+ dev/ata/atapi-fd.c	optional atapifd
+ dev/ata/atapi-tape.c	optional atapist
+ dev/ata/atapi-cam.c	optional atapicam
+-dev/ath/if_ath.c	optional ath
+-dev/ath/if_ath_pci.c	optional ath pci
+-dev/ath/if_ath_pci.c	optional ath card
+ dev/awi/am79c930.c	optional awi
+ dev/awi/awi.c		optional awi
+ dev/awi/awi_wep.c	optional awi
+diff -ur src.old/sys/conf/files.i386 src/sys/conf/files.i386
+--- src.old/sys/conf/files.i386	2003-12-04 00:06:30.000000000 +0100
++++ src/sys/conf/files.i386	2004-11-13 05:46:10.000000000 +0100
+@@ -51,16 +51,6 @@
+ 	compile-with	"uudecode < $S/contrib/dev/fla/i386/msysosak.o.uu" \
+ 	no-implicit-rule
+ #
+-trlld.o				optional	oltr			\
+-	dependency	"$S/contrib/dev/oltr/i386-elf.trlld.o.uu"	\
+-	compile-with	"uudecode < $S/contrib/dev/oltr/i386-elf.trlld.o.uu"	\
+-	no-implicit-rule
+-#
+-hal.o				optional	ath_hal			\
+-	dependency	"$S/contrib/dev/ath/freebsd/i386-elf.hal.o.uu"	\
+-	compile-with	"uudecode < $S/contrib/dev/ath/freebsd/i386-elf.hal.o.uu" \
+-	no-implicit-rule
+-#
+ #
+ compat/linux/linux_file.c	optional	compat_linux
+ compat/linux/linux_getcwd.c	optional	compat_linux
+@@ -93,10 +83,6 @@
+ compat/svr4/svr4_termios.c		optional	compat_svr4
+ compat/svr4/svr4_ttold.c		optional	compat_svr4
+ contrib/dev/fla/fla.c		optional	fla
+-contrib/dev/oltr/if_oltr.c	optional	oltr
+-contrib/dev/oltr/trlldbm.c	optional	oltr
+-contrib/dev/oltr/trlldhm.c	optional	oltr
+-contrib/dev/oltr/trlldmac.c	optional	oltr
+ bf_enc.o			optional	ipsec ipsec_esp		\
+ 	dependency	"$S/crypto/blowfish/arch/i386/bf_enc.S $S/crypto/blowfish/arch/i386/bf_enc_586.S $S/crypto/blowfish/arch/i386/bf_enc_686.S"		\
+ 	compile-with	"${CC} -c -I$S/crypto/blowfish/arch/i386 ${ASM_CFLAGS} ${WERROR} ${.IMPSRC}"	\
+diff -ur src.old/sys/conf/kern.pre.mk src/sys/conf/kern.pre.mk
+--- src.old/sys/conf/kern.pre.mk	2003-11-05 13:20:16.000000000 +0100
++++ src/sys/conf/kern.pre.mk	2004-11-13 05:46:10.000000000 +0100
+@@ -29,9 +29,6 @@
+ # ... and the same for ipfilter
+ INCLUDES+= -I$S/contrib/ipfilter
+ 
+-# ... and the same for Atheros HAL
+-INCLUDES+= -I$S/contrib/dev/ath -I$S/contrib/dev/ath/freebsd
+-
+ # ... and the same for the NgATM stuff
+ INCLUDES+= -I$S/contrib/ngatm
+ 
+diff -ur src.old/sys/modules/Makefile src/sys/modules/Makefile
+--- src.old/sys/modules/Makefile	2003-12-03 22:13:06.000000000 +0100
++++ src/sys/modules/Makefile	2004-11-13 05:46:10.000000000 +0100
+@@ -17,7 +17,6 @@
+ 	aio \
+ 	amr \
+ 	an \
+-	ath \
+ 	aue \
+ 	axe \
+ 	bfe \
+@@ -189,7 +188,6 @@
+ 	apm \
+ 	ar \
+ 	arcnet \
+-	ath_hal \
+ 	awi \
+ 	bktr \
+ 	coff \
+@@ -212,7 +210,6 @@
+ 	netgraph \
+ 	nsp \
+ 	nwfs \
+-	oltr \
+ 	pccard \
+ 	pcfclock \
+ 	pecoff \
