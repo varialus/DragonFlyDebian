@@ -2,33 +2,6 @@
 Status: On hold, the ld hack needs some rework. The libtool bits are merged in 
 upstream CVS.
 
-diff -ur binutils-2.14.90.0.7.old/bfd/elf32-i386.c binutils-2.14.90.0.7/bfd/elf32-i386.c
---- binutils-2.14.90.0.7.old/bfd/elf32-i386.c	2003-08-21 17:28:47.000000000 +0200
-+++ binutils-2.14.90.0.7/bfd/elf32-i386.c	2004-07-20 01:31:51.000000000 +0200
-@@ -3297,8 +3297,23 @@
- #endif
- }
- 
-+static bfd_boolean
-+elf_i386_kfreebsd_object_p (bfd *abfd)
-+{
-+  if (strncmp (bfd_get_filename (abfd), "/lib/ld", 7) == 0
-+      && (abfd->flags & EXEC_P) != 0)
-+    {
-+      abfd->flags ^= EXEC_P;
-+      abfd->flags |= DYNAMIC;
-+    }
-+
-+  return elf_i386_object_p (abfd);
-+}
-+
- #undef	elf_backend_post_process_headers
- #define	elf_backend_post_process_headers	elf_i386_post_process_headers
-+#undef	elf_backend_object_p
-+#define	elf_backend_object_p			elf_i386_kfreebsd_object_p
- #undef	elf32_bed
- #define	elf32_bed				elf32_i386_fbsd_bed
- 
 diff -ur binutils-2.14.90.0.7.old/libtool.m4 binutils-2.14.90.0.7/libtool.m4
 --- binutils-2.14.90.0.7.old/libtool.m4	2003-05-05 23:46:46.000000000 +0200
 +++ binutils-2.14.90.0.7/libtool.m4	2004-07-20 01:31:51.000000000 +0200
@@ -161,3 +134,30 @@ diff -ur binutils-2.14.90.0.7.old/ltconfig binutils-2.14.90.0.7/ltconfig
  hpux9* | hpux10* | hpux11*)
    # Give a soname corresponding to the major version so that dld.sl refuses to
    # link against other versions.
+diff -ur binutils-2.15.old/bfd/elfcode.h binutils-2.15/bfd/elfcode.h
+--- binutils-2.15.old/bfd/elfcode.h	2004-05-17 21:36:02.000000000 +0200
++++ binutils-2.15/bfd/elfcode.h	2004-11-12 18:53:12.000000000 +0100
+@@ -591,8 +591,22 @@
+ 	}
+     }
+ 
++  /* Determine whether the file is an executable or a shared object.
++     It can even be both: The dynamic loader "ld.so*" is declared as an
++     executable (so the kernel can exec it) but at the same time we
++     treat it as a shared object (for symbol versioning purposes).  */
+   if (i_ehdrp->e_type == ET_EXEC)
+-    abfd->flags |= EXEC_P;
++    {
++      const char *file_name = abfd->filename;
++      const char *last_slash = strrchr (file_name, '/');
++      const char *base_name = (last_slash ? last_slash + 1 : file_name);
++      if (strncmp (base_name, "ld.so", 5) == 0)
++	/* The dynamic loader.  */
++	abfd->flags |= DYNAMIC;
++      else
++	/* Normal executable.  */
++	abfd->flags |= EXEC_P;
++    }
+   else if (i_ehdrp->e_type == ET_DYN)
+     abfd->flags |= DYNAMIC;
+ 
