@@ -2,6 +2,8 @@
 
 main ()
   {
-    gethostbyname ();
-    perror (NULL);
+    if (gethostbyname ("www.debian.org") == NULL)
+      perror ("gethostbyname");
+    else
+      printf ("Success\n");
   }
