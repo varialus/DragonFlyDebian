@@ -1,18 +1,31 @@
 #!/usr/bin/make -f
 
-DEB_AUTO_UPDATE_DEBIAN_CONTROL	= yes
-PWD = $(shell pwd)
-DEB_TAR_SRCDIR=src
-DEB_DH_SHLIBDEPS_ARGS=-X/boot
-DEB_STRIP_EXCLUDE=/boot
+DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
+DEB_TAR_SRCDIR			:= src
 
-# dpkg-architecture
-include /usr/share/cdbs/1/rules/buildvars.mk
-
-include debian/mk/build.mk
-include debian/mk/mkdirs.mk
-include debian/mk/patches.mk
-
-include /usr/share/cdbs/1/rules/tarball.mk
-include /usr/share/cdbs/1/rules/simple-patchsys.mk
+#include /usr/share/cdbs/1/rules/tarball.mk
+#include /usr/share/cdbs/1/rules/simple-patchsys.mk
 include /usr/share/cdbs/1/rules/debhelper.mk
+
+full_version	:= $(shell dpkg-parsechangelog | grep ^Version | sed -e 's/^.*: //g')
+version		:= $(shell echo $(full_version) | sed -e 's/[+-].*//g')
+major		:= $(shell echo $(version) | sed -e 's/\..*//g')
+revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
+
+package		:= kfreebsd$(major)-source
+
+clean::
+	sed \
+		-e "s/@version@/$(version)/g" \
+		-e "s/@revision@/$(revision)/g" \
+	> debian/patches/902_debian_version.diff \
+	< debian/patches/902_debian_version.diff.in
+	
+	sed \
+		-e "s/@major@/$(major)/g" \
+		-e "s/@version@/$(version)/g" \
+	> debian/control.in < debian/control.in.in
+
+	for i in install dirs ; do sed \
+		-e "s/@major@/$(major)/g" \
+	> debian/$$i < debian/$$i.in ; done
