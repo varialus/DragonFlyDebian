@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+tmp="`tempfile -s .c`"
+hdr="$1"
+case $hdr in
+  "") echo "Usage: `basename $0` <header>" ; exit 1 ;;
+  /*) ;;
+  *) hdr=`pwd`/$hdr ;;
+esac
+
+echo "#include \"$hdr\"" > $tmp
+gcc -w -c $tmp -o /dev/null
+rm -f $tmp
