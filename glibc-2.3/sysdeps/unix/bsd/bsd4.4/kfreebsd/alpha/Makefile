@@ -17,5 +17,5 @@ endif
 
 # Installation of kernel headers.
 
-kernelcpuheaderdir = sysdeps/unix/bsd/bsd4.4/freebsd/kernel-include/import/alpha
-kernelorigcpuheaderdir = sysdeps/unix/bsd/bsd4.4/freebsd/kernel-include/orig/alpha
+kernelcpuheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/kernel-include/import/alpha
+kernelorigcpuheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/kernel-include/orig/alpha

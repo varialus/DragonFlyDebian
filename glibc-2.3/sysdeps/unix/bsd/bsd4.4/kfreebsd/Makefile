@@ -106,7 +106,7 @@ ifeq ($(subdir),elf)
 sysdep-rtld-routines += dl-brk dl-sbrk
 
 # Make ld.so.1 executable.
-$(objpfx)mkexec: ../sysdeps/unix/bsd/bsd4.4/freebsd/mkexec.c
+$(objpfx)mkexec: ../sysdeps/unix/bsd/bsd4.4/kfreebsd/mkexec.c
 	gcc $< -o $@
 $(objpfx)ld.so: $(objpfx)mkexec
 POSTPROCESS_LD_SO = ; $(objpfx)mkexec $(objpfx)ld.so
@@ -115,7 +115,7 @@ endif
 
 # Installation of kernel headers.
 
-kernelheaderdir = sysdeps/unix/bsd/bsd4.4/freebsd/$(kernel_include_subdir)/import
+kernelheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/$(kernel_include_subdir)/import
 
 kernelheaders := \
   $(patsubst $(kernelheaderdir)/%, %, \
@@ -148,7 +148,7 @@ $(addprefix $(inst_includedir)/,$(kernelcpuheaders)): \
 # Currently commented out because of limited usefulness.
 ifdef install_kernel_include_orig
 
-kernelorigheaderdir = sysdeps/unix/bsd/bsd4.4/freebsd/$(kernel_include_subdir)/orig
+kernelorigheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/$(kernel_include_subdir)/orig
 
 kernelorigheaders := \
   $(patsubst $(kernelorigheaderdir)/%, %, \

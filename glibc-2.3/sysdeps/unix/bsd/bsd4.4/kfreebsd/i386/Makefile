@@ -18,5 +18,5 @@ endif
 
 # Installation of kernel headers.
 
-kernelcpuheaderdir = sysdeps/unix/bsd/bsd4.4/freebsd/kernel-include/import/i386
-kernelorigcpuheaderdir = sysdeps/unix/bsd/bsd4.4/freebsd/kernel-include/orig/i386
+kernelcpuheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/kernel-include/import/i386
+kernelorigcpuheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/kernel-include/orig/i386
