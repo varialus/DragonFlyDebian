@@ -5,7 +5,7 @@
 # Copyright 2004  Robert Millan <rmh@debian.org>
 # See /usr/share/common-licenses/GPL for license terms.
 
-version=7
+version=8
 
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
@@ -30,7 +30,9 @@ cd ${tmp1}
 tar --same-owner -cpf - ./* | gzip -c9 > ${tmp2}
 mv ${tmp2} ${tmp1}/root/${cpu}-${system}.tar.gz
 
-rm -f ${tmp1}/var/cache/apt/archives/*.deb
+if [ "${LIVECD_DEBUG}" != "yes" ] ; then
+  rm -f ${tmp1}/var/cache/apt/archives/*.deb
+fi
 
 # we can't run native-install (since we might be cross-building) so we
 # mimic the essentials here
@@ -63,6 +65,8 @@ EOF
 cat > etc/issue << EOF
 Debian ${uname} testing/unstable \n \l
 
+You may login as root, with no password.
+
 EOF
 cat > etc/fstab << EOF
 /dev/acd0 / cd9660 ro 1 1
@@ -70,9 +74,9 @@ EOF
 # keep inetutils-syslogd from bitching
 cp bin/true usr/sbin/syslogd
 # password-less login
-rm -f bin/login
-ln -s bash bin/login
-
+cat > etc/passwd << EOF
+root::0:0:root:/root:/bin/bash
+EOF
 
 #########################
 #                    ignition!
@@ -82,6 +86,9 @@ mkisofs -b boot/grub/stage2_eltorito \
   -o ${pwd}/livecd${version}.iso -r .
 
 cd ${pwd}/
-if [ "${LIVECD_DEBUG}" != "yes" ] ; then
+if [ "${LIVECD_DEBUG}" = "yes" ] ; then
+  echo tmp1 = ${tmp1}
+  echo tmp2 = ${tmp2}
+else
   rm -rf ${tmp1} ${tmp2}
 fi
