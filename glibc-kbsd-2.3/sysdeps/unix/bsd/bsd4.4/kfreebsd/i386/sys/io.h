@@ -1,4 +1,4 @@
-/* Copyright (C) 1996, 2000, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1996, 2000, 2002, 2004 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -27,9 +27,15 @@ __BEGIN_DECLS
    port numbers in the range [FROM,FROM+NUM-1].  Otherwise, turn I/O
    permission off for that range.  This call requires root privileges.
 
-   Portability note: not all FreeBSD platforms support this call.  */
+   Portability note: not all kFreeBSD platforms support this call.  Most
+   platforms based on the PC I/O architecture probably will, however. */
 extern int ioperm (unsigned int __from, unsigned int __num, int __turn_on)
      __THROW;
+
+/* Set the I/O privilege level to LEVEL.  If LEVEL>3, permission to
+   access any I/O port is granted.  This call requires root
+   privileges. */
+extern int iopl (int __level) __THROW;
 
 #if defined __GNUC__ && __GNUC__ >= 2
 
@@ -171,5 +177,4 @@ outsl (unsigned short int port, const void *addr, unsigned long int count)
 #endif	/* GNU C */
 
 __END_DECLS
-
 #endif /* _SYS_IO_H */
