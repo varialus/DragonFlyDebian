@@ -90,12 +90,6 @@ ifeq ($(subdir),time)
 sysdep_routines += ntp_adjtime ntp_gettime
 endif
 
-# Linuxthreads dependencies.
-
-ifeq ($(subdir),posix)
-sysdep_headers += bits/pthreadtypes.h bits/initspin.h
-endif
-
 # Don't compile the ctype glue code, since we have a much better <ctype.h>
 # than the old non-GNU C library.
 inhibit-glue = yes
