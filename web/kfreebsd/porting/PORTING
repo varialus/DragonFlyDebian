@@ -248,4 +248,36 @@ make sure the proper init.d script restores it.
 Generaly, you should use /var/run for your named pipe.  The only exception
 is sysvinit, which can't assume /var is mounted and hence uses /etc. All
 other daemons can assume /var is mounted, so this shouldn't be an issue.
+<<<<<<< .mine
 
+
+gcc attempting to link C programs with C++ libraries
+----------------------------------------------------
+
+If you see an error like this:
+
+gcc -o foo foo.o -lbar ...
+/usr/lib/libbar.so: undefined reference to `operator new[](unsigned)'
+/usr/lib/libbar.so: undefined reference to `vtable for __cxxabiv1::__si_class_type_info'
+/usr/lib/libbar.so: undefined reference to `operator delete(void*)'
+/usr/lib/libbar.so: undefined reference to `__gxx_personality_v0'
+/usr/lib/libbar.so: undefined reference to `__cxa_pure_virtual'
+
+It means you should be using g++ instead of gcc to link.  In some
+systems/situations, adding -lstdc++ works around the problem, but it might
+result in even more weird errors too.  In particular, if you see something
+really weird like this:
+
+/usr/bin/ld: foo: hidden symbol `__umoddi3' in /usr/lib/gcc-lib/[...]/libgcc.a(_umoddi3.oS) is referenced by DSO
+
+it most likely means upstream hardcoded -lstdc++ which only seems to break
+for us.
+
+Replacing gcc with g++ when linking non-c++ programs with autotools is a bit
+tricky:
+
+  - Make sure configure.ac has AC_PROG_CXX
+  - Create an empty empty.cc file and edit Makefile.am.  Make the foo_SOURCES
+    line look like "foo_SOURCES = foo.c empty.cc".  This will fool automake
+    into thinking foo is a C++ program.  If you know a better way to do this,
+    please let us know.
