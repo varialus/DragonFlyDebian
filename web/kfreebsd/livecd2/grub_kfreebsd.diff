@@ -1,0 +1,384 @@
+
+  Enable kFreeBSD support in GRUB, by Guillem Jover <guillem@debian.org>
+
+  The "build" script in this directory assumes your installed grub package
+  has been built with this patch applied.
+
+diff -ur grub-0.95+cvs20040624.old/docs/menu.lst grub-0.95+cvs20040624/docs/menu.lst
+--- grub-0.95+cvs20040624.old/docs/menu.lst	2004-06-26 03:40:01.000000000 +0200
++++ grub-0.95+cvs20040624/docs/menu.lst	2004-06-26 03:46:45.000000000 +0200
+@@ -27,7 +27,7 @@
+ # For booting GNU/kFreeBSD
+ title  GNU/kFreeBSD
+ root   (hd0,2,a)
+-kernel /boot/loader.gz
++kernel /boot/kernel/kernel.gz root=ufs:ad0s3a
+ 
+ # For booting GNU/kNetBSD
+ title  GNU/kNetBSD
+@@ -44,7 +44,7 @@
+ # For booting FreeBSD
+ title  FreeBSD
+ root   (hd0,2,a)
+-kernel /boot/loader
++kernel /boot/kernel/kernel root=ufs:ad0s3a
+ 
+ # For booting NetBSD
+ title  NetBSD
+Only in grub-0.95+cvs20040624/docs: menu.lst.orig
+diff -ur grub-0.95+cvs20040624.old/stage2/boot.c grub-0.95+cvs20040624/stage2/boot.c
+--- grub-0.95+cvs20040624.old/stage2/boot.c	2004-03-29 16:54:30.000000000 +0200
++++ grub-0.95+cvs20040624/stage2/boot.c	2004-06-26 03:46:45.000000000 +0200
+@@ -29,6 +29,8 @@
+ entry_func entry_addr;
+ static struct mod_list mll[99];
+ static int linux_mem_size;
++static int elf_kernel_addr;
++static int elf_kernel_size;
+ 
+ /*
+  *  The next two functions, 'load_image' and 'load_module', are the building
+@@ -594,6 +596,7 @@
+ 
+       /* reset this to zero for now */
+       cur_addr = 0;
++      elf_kernel_addr = ~0;
+ 
+       /* scan for program segments */
+       for (i = 0; i < pu.elf->e_phnum; i++)
+@@ -630,6 +633,8 @@
+ 	      /* mark memory as used */
+ 	      if (cur_addr < memaddr + memsiz)
+ 		cur_addr = memaddr + memsiz;
++	      if (elf_kernel_addr > cur_addr)
++		elf_kernel_addr = cur_addr;
+ 	      printf (", <0x%x:0x%x:0x%x>", memaddr, filesiz,
+ 		      memsiz - filesiz);
+ 	      /* increment number of segments */
+@@ -647,6 +652,8 @@
+ 	    }
+ 	}
+ 
++      elf_kernel_size = cur_addr - elf_kernel_addr;
++
+       if (! errnum)
+ 	{
+ 	  if (! loaded)
+@@ -864,6 +871,129 @@
+ }
+ #endif
+ 
++#define mem_align4k(p)	((p) + 0xFFF) & 0xFFFFF000
++
++static void
++kfreebsd_setenv (char *env, const char *var, const char *value)
++{
++  while (1)
++    {
++      if (env[0] == '\0' && env[1] == '\0')
++	{
++	  env++;
++	  break;
++	}
++      else
++        env++;
++    }
++
++  grub_sprintf (env, "%s=%s", var, value);
++  env[grub_strlen (env) + 1] = '\0';
++}
++
++static char *
++kfreebsd_read_hints (char *buf)
++{
++  char *buf_end = buf;
++
++  if (grub_open ("/boot/device.hints"))
++    {
++      char *line_start;
++      int line_len = 0;
++      char *envp;
++      int env_len;
++
++      env_len = grub_read (buf, -1);
++      if (env_len)
++	{
++	  buf_end += env_len;
++	  *(buf_end++) = '\0';
++	}
++      else
++	return buf_end;
++
++      grub_close ();
++
++      envp = line_start = buf;
++      while (*envp)
++	{
++	  char *envp_current = envp;
++	
++	  switch (*envp)
++	    {
++	      case ' ':
++		while (*envp == ' ')
++		  {
++		    envp++;
++		    env_len--;
++		  }
++		grub_memmove (envp_current, envp, env_len + 1);
++		envp = envp_current;
++		break;
++	      case '#':
++		while (*envp != '\n')
++		  {
++		    envp++;
++		    env_len--;
++		  }
++		if (!line_len)
++		  envp++;
++		grub_memmove (envp_current, envp, env_len + 1);
++		envp = envp_current;
++		break;
++	      case '\n':
++		if (!line_len)
++		  {
++		    env_len--;
++		    grub_memmove (line_start, envp, env_len + 1);
++		  }
++		*(envp++) = '\0';
++		line_len = 0;
++		line_start = envp;
++	      default:
++		envp++;
++		line_len++;
++		break;
++	    }
++	}
++
++      buf_end = buf + env_len;
++      *(buf_end++) = '\0';
++    }
++
++  return buf_end;
++}
++
++static u32_t *
++kfreebsd_set_module_string (u32_t type, u32_t *dst, char *src)
++{
++  int size;
++
++  *(dst++) = type;
++  *(dst++) = size = grub_strlen (src) + 1;
++  grub_strcpy ((void *) dst, src);
++
++  return dst + (size + sizeof(u32_t) - 1) / sizeof(u32_t);
++}
++
++static u32_t *
++kfreebsd_set_module_var (u32_t type, u32_t *dst, u32_t src)
++{
++  *(dst++) = type;
++  *(dst++) = sizeof(u32_t);
++  *(dst++) = src;
++
++  return dst;
++}
++
++static u32_t *
++kfreebsd_set_modules (u32_t *modulep)
++{
++  /* XXX: Need to copy the whole module structure.  */
++  /* XXX: How to pass the module name ?  */
++
++  return modulep;
++}
+ 
+ /*
+  *  All "*_boot" commands depend on the images being loaded into memory
+@@ -877,7 +1007,10 @@
+ bsd_boot (kernel_t type, int bootdev, char *arg)
+ {
+   char *str;
+-  int clval = 0, i;
++  char *kernelname;
++  char *bsd_root;
++  int clval = 0;
++  int i;
+   struct bootinfo bi;
+ 
+ #ifdef GRUB_UTIL
+@@ -886,8 +1019,21 @@
+   stop_floppy ();
+ #endif
+ 
++  while (*arg != '/')
++    arg++;
++  kernelname = arg;
++
+   while (*(++arg) && *arg != ' ');
++  *(arg++) = 0;
+   str = arg;
++
++  bsd_root = grub_strstr (str, "root=");
++  if (bsd_root)
++    {
++      bsd_root += 5;
++      /* XXX: should copy the str or terminate it.  */
++    }
++
+   while (*str)
+     {
+       if (*str == '-')
+@@ -910,6 +1056,8 @@
+ 		clval |= RB_GDB;
+ 	      if (*str == 'h')
+ 		clval |= RB_SERIAL;
++	      if (*str == 'p')
++		clval |= RB_PAUSE;
+ 	      if (*str == 'm')
+ 		clval |= RB_MUTE;
+ 	      if (*str == 'r')
+@@ -927,14 +1075,17 @@
+ 
+   if (type == KERNEL_TYPE_FREEBSD)
+     {
++      char *envp;
++      u32_t *modp;
++
+       clval |= RB_BOOTINFO;
+ 
+       bi.bi_version = BOOTINFO_VERSION;
+ 
+-      *arg = 0;
+-      while ((--arg) > (char *) MB_CMDLINE_BUF && *arg != '/');
+-      if (*arg == '/')
+-	bi.bi_kernelname = arg + 1;
++      bi.bi_pad[0] = bi.bi_pad[1] = 0;
++
++      if (*kernelname == '/')
++	bi.bi_kernelname = kernelname;
+       else
+ 	bi.bi_kernelname = 0;
+ 
+@@ -961,6 +1112,30 @@
+       bi.bi_basemem = mbi.mem_lower;
+       bi.bi_extmem = extended_memory;
+ 
++      /* Setup the environment.  */
++      bi.bi_envp = cur_addr = mem_align4k (cur_addr);
++      grub_memset ((void *) cur_addr, 0, 2);
++      cur_addr = (int) kfreebsd_read_hints ((void *) cur_addr);
++
++      envp = (char *) bi.bi_envp;
++      kfreebsd_setenv (envp, "kernelname", kernelname);
++      kfreebsd_setenv (envp, "vfs.root.mountfrom", bsd_root);
++
++      /* Setup the modules list.  */
++      bi.bi_modulep = cur_addr = mem_align4k (cur_addr);
++      modp = (u32_t *) bi.bi_modulep;
++      /* The first module is the kernel.  */
++      modp = kfreebsd_set_module_string (MODINFO_NAME, modp, kernelname);
++      modp = kfreebsd_set_module_string (MODINFO_TYPE, modp, "elf kernel");
++      modp = kfreebsd_set_module_string (MODINFO_ARGS, modp, arg);
++      modp = kfreebsd_set_module_var (MODINFO_ADDR, modp, elf_kernel_addr);
++      modp = kfreebsd_set_module_var (MODINFO_SIZE, modp, elf_kernel_size);
++      /* Now the real modules.  */
++      modp = kfreebsd_set_modules(modp);
++
++      /* Set the kernel end.  */
++      bi.bi_kernend = cur_addr = mem_align4k (((int) modp) + 1);
++
+       if (mbi.flags & MB_INFO_AOUT_SYMS)
+ 	{
+ 	  bi.bi_symtab = mbi.syms.a.addr;
+@@ -970,8 +1145,9 @@
+ #if 0
+       else if (mbi.flags & MB_INFO_ELF_SHDR)
+ 	{
+-	  /* FIXME: Should check if a symbol table exists and, if exists,
+-	     pass the table to BI.  */
++	  bi.bi_symtab = mbi.syms.e.addr;
++	  bi.bi_esymtab = mbi.syms.e.addr
++	    + mbi.syms.e.size * mbi.syms.e.num * mbi.syms.e.shndx;
+ 	}
+ #endif
+       else
+diff -ur grub-0.95+cvs20040624.old/stage2/freebsd.h grub-0.95+cvs20040624/stage2/freebsd.h
+--- grub-0.95+cvs20040624.old/stage2/freebsd.h	2002-11-30 18:33:06.000000000 +0100
++++ grub-0.95+cvs20040624/stage2/freebsd.h	2004-06-26 03:46:45.000000000 +0200
+@@ -1,7 +1,7 @@
+ 
+ /*
+  *  GRUB  --  GRand Unified Bootloader
+- *  Copyright (C) 2001  Free Software Foundation, Inc.
++ *  Copyright (C) 2001, 2004  Free Software Foundation, Inc.
+  *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+@@ -35,6 +35,10 @@
+ #define RB_CDROM        0x2000	/* use cdrom as root */
+ #define RB_GDB		0x8000	/* use GDB remote debugger instead of DDB */
+ #define RB_MUTE		0x10000	/* Come up with the console muted */
++#define RB_SELFTEST	0x20000 /* don't complete the boot; do selftest */
++#define RB_RESERVED1	0x40000 /* reserved for internal use of boot blocks */
++#define RB_RESERVED2	0x80000 /* reserved for internal use of boot blocks */
++#define RB_PAUSE	0x100000 /* pause after each output line during probe */
+ #define RB_MULTIPLE	0x20000000	/* Use multiple consoles */
+ 
+ #define RB_BOOTINFO     0x80000000	/* have `struct bootinfo *' arg */
+@@ -70,6 +74,9 @@
+ 
+ #define N_BIOS_GEOM             8
+ 
++typedef unsigned char u8_t;
++typedef unsigned int u32_t;
++
+ /*
+  * A zero bootinfo field often means that there is no info available.
+  * Flags are used to indicate the validity of fields where zero is a
+@@ -77,19 +84,33 @@
+  */
+ struct bootinfo
+   {
+-    unsigned int bi_version;
+-    unsigned char *bi_kernelname;
+-    struct nfs_diskless *bi_nfs_diskless;
++    u32_t bi_version;
++    u8_t *bi_kernelname;
++    u32_t bi_nfs_diskless;
+     /* End of fields that are always present. */
+ #define bi_endcommon            bi_n_bios_used
+-    unsigned int bi_n_bios_used;
+-    unsigned long bi_bios_geom[N_BIOS_GEOM];
+-    unsigned int bi_size;
+-    unsigned char bi_memsizes_valid;
+-    unsigned char bi_bios_dev;
+-    unsigned char bi_pad[2];
+-    unsigned long bi_basemem;
+-    unsigned long bi_extmem;
+-    unsigned long bi_symtab;
+-    unsigned long bi_esymtab;
++    u32_t bi_n_bios_used;
++    u32_t bi_bios_geom[N_BIOS_GEOM];
++    u32_t bi_size;
++    u8_t bi_memsizes_valid;
++    u8_t bi_bios_dev;
++    u8_t bi_pad[2];
++    u32_t bi_basemem;
++    u32_t bi_extmem;
++    u32_t bi_symtab;
++    u32_t bi_esymtab;
++    /* Items below only from advanced bootloader */
++    u32_t bi_kernend;
++    u32_t bi_envp;
++    u32_t bi_modulep;
+   };
++
++#define MODINFO_END		0x0000		/* End of list */
++#define MODINFO_NAME		0x0001		/* Name of module (string) */
++#define MODINFO_TYPE		0x0002		/* Type of module (string) */
++#define MODINFO_ADDR		0x0003		/* Loaded address */
++#define MODINFO_SIZE		0x0004		/* Size of module */
++#define MODINFO_EMPTY		0x0005		/* Has been deleted */
++#define MODINFO_ARGS		0x0006		/* Parameters string */
++#define MODINFO_METADATA	0x8000		/* Module-specfic */
++

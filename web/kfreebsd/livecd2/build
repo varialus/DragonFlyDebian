@@ -1,0 +1,27 @@
+#!/bin/bash -ex
+#
+# Build-Depends: grub, kfreebsd5, mkisofs
+
+rm -rf *~ tmp out
+mkdir -p tmp/root/boot/grub out
+
+cp /usr/lib/grub/i386-pc/{stage1,stage2} tmp/root/boot/grub/
+cp /usr/lib/grub/i386-pc/e2fs_stage1_5 tmp/root/boot/grub/
+#cp /usr/lib/grub/i386-pc/iso9660_stage1_5 tmp/root/boot/grub/
+cat > tmp/root/boot/grub/menu.lst << EOF
+timeout 10
+default 0
+title  GNU/kFreeBSD (cdrom 0)
+root (fd0)
+kernel /boot/kfreebsd.gz root=cd9660:acd0
+title  GNU/kFreeBSD (cdrom 1)
+root (fd0)
+kernel /boot/kfreebsd.gz root=cd9660:acd1
+EOF
+gzip -c9 /boot/kernel/kernel > tmp/root/boot/kfreebsd.gz
+#gzip -c9 /boot/kernel/cd9660.ko > tmp/root/boot/cd9660.ko.gz
+cp /boot/device.hints tmp/root/boot/
+tar -C tmp/root -cf tmp/tmp.tar boot
+mkbimage -t 2.88 -d tmp -s ext2 -f tmp/tmp.tar
+cp tmp/2.88.image stand/2.88.image
+mkisofs -b 2.88.image -c boot.catalog -o out/livecd2.iso -r stand
