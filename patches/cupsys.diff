@@ -1,80 +1,83 @@
- diff -ur cupsys-1.1.20final+rc1.old/config-scripts/cups-common.m4 cupsys-1.1.20final+rc1/config-scripts/cups-common.m4
- --- cupsys-1.1.20final+rc1.old/config-scripts/cups-common.m4    2004-02-26 17:52:00.000000000 +0100
- +++ cupsys-1.1.20final+rc1/config-scripts/cups-common.m4        2004-08-04 21:24:43.000000000 +0200
- @@ -156,9 +156,9 @@
-  AC_CHECK_FUNCS(vsyslog)
- 
-  dnl Checks for signal functions.
- -if test "$uname" != "Linux"; then
- -       AC_CHECK_FUNCS(sigset)
- -fi
- +case $uname in Linux|GNU|GNU/*)
- +       AC_CHECK_FUNCS(sigset) ;;
- +esac
- 
-  AC_CHECK_FUNCS(sigaction)
- 
- diff -ur cupsys-1.1.20final+rc1.old/config-scripts/cups-directories.m4 cupsys-1.1.20final+rc1/config-scripts/cups-directories.m4
- --- cupsys-1.1.20final+rc1.old/config-scripts/cups-directories.m4       2004-02-26 17:52:00.000000000 +0100
- +++ cupsys-1.1.20final+rc1/config-scripts/cups-directories.m4   2004-08-04 21:25:27.000000000 +0200
- @@ -115,7 +115,7 @@
-                         INITDDIR="/System/Library/StartupItems/PrintingServices"
+
+Status: in BTS
+
+diff -ur cupsys-1.1.20final+rc1.old/config-scripts/cups-common.m4 cupsys-1.1.20final+rc1/config-scripts/cups-common.m4
+--- cupsys-1.1.20final+rc1.old/config-scripts/cups-common.m4    2004-02-26 17:52:00.000000000 +0100
++++ cupsys-1.1.20final+rc1/config-scripts/cups-common.m4        2004-08-04 21:24:43.000000000 +0200
+@@ -156,9 +156,9 @@
+ AC_CHECK_FUNCS(vsyslog)
+
+ dnl Checks for signal functions.
+-if test "$uname" != "Linux"; then
+-       AC_CHECK_FUNCS(sigset)
+-fi
++case $uname in Linux|GNU|GNU/*)
++       AC_CHECK_FUNCS(sigset) ;;
++esac
+
+ AC_CHECK_FUNCS(sigaction)
+
+diff -ur cupsys-1.1.20final+rc1.old/config-scripts/cups-directories.m4 cupsys-1.1.20final+rc1/config-scripts/cups-directories.m4
+--- cupsys-1.1.20final+rc1.old/config-scripts/cups-directories.m4       2004-02-26 17:52:00.000000000 +0100
++++ cupsys-1.1.20final+rc1/config-scripts/cups-directories.m4   2004-08-04 21:25:27.000000000 +0200
+@@ -115,7 +115,7 @@
+                        INITDDIR="/System/Library/StartupItems/PrintingServices"
+                        ;;
+
+-               Linux*)
++               Linux*|GNU*|GNU/*)
+                        # Linux seems to choose an init.d directory at random...
+                        if test -d /sbin/init.d; then
+                                # SuSE
+@@ -173,6 +173,9 @@
+        AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$logdir")
+ fi
+
++dnl Prevent GNU/k*BSD from matching the *BSD rule below
++case "$uname" in GNU/*) uname=GNU ;; esac
++
+ dnl See what directory to put server executables...
+ case "$uname" in
+        *BSD* | Darwin*)
+@@ -197,7 +200,7 @@
+
+ dnl Set the CUPS_LOCALE directory...
+ case "$uname" in
+-       Linux* | *BSD* | Darwin*)
++       Linux* | GNU* | GNU/* | *BSD* | Darwin*)
+                CUPS_LOCALEDIR="$datadir/locale"
+                AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$datadir/locale")
+                ;;
+diff -ur cupsys-1.1.20final+rc1.old/config-scripts/cups-manpages.m4 cupsys-1.1.20final+rc1/config-scripts/cups-manpages.m4
+--- cupsys-1.1.20final+rc1.old/config-scripts/cups-manpages.m4  2004-02-26 17:52:00.000000000 +0100
++++ cupsys-1.1.20final+rc1/config-scripts/cups-manpages.m4      2004-08-04 21:25:53.000000000 +0200
+@@ -25,7 +25,7 @@
+ dnl Fix "mandir" variable...
+ if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
+        case "$uname" in
+-               Darwin* | Linux* | *BSD* | AIX*)
++               Darwin* | Linux* | GNU* | GNU/* | *BSD* | AIX*)
+                        # Darwin, MacOS X, Linux, *BSD, and AIX
+                        mandir="/usr/share/man"
+                        AMANDIR="/usr/share/man"
+diff -ur cupsys-1.1.20final+rc1.old/config-scripts/cups-sharedlibs.m4 cupsys-1.1.20final+rc1/config-scripts/cups-sharedlibs.m4
+--- cupsys-1.1.20final+rc1.old/config-scripts/cups-sharedlibs.m4        2004-02-26 17:52:00.000000000 +0100
++++ cupsys-1.1.20final+rc1/config-scripts/cups-sharedlibs.m4    2004-08-04 21:23:00.000000000 +0200
+@@ -47,7 +47,7 @@
+                        DSO="\$(CC)"
+                        DSOFLAGS="$DSOFLAGS -Wl,-rpath,\$(libdir),-set_version,sgi2.5,-soname,\$@ -shared \$(OPTIM)"
+                        ;;
+-               OSF1* | Linux* | *BSD*)
++               OSF1* | Linux* | *BSD* | GNU* | GNU/*)
+                        LIBCUPS="libcups.so.2"
+                        LIBCUPSIMAGE="libcupsimage.so.2"
+                        DSO="\$(CC)"
+@@ -135,7 +135,7 @@
+                         LDFLAGS="$LDFLAGS -Wl,-R$libdir"
+                         EXPORT_LDFLAGS="-Wl,-R$libdir"
                          ;;
- 
- -               Linux*)
- +               Linux*|GNU*|GNU/*)
-                         # Linux seems to choose an init.d directory at random...
-                         if test -d /sbin/init.d; then
-                                 # SuSE
- @@ -173,6 +173,9 @@
-         AC_DEFINE_UNQUOTED(CUPS_LOGDIR, "$logdir")
-  fi
- 
- +dnl Prevent GNU/k*BSD from matching the *BSD rule below
- +case "$uname" in GNU/*) uname=GNU ;; esac
- +
-  dnl See what directory to put server executables...
-  case "$uname" in
-         *BSD* | Darwin*)
- @@ -197,7 +200,7 @@
- 
-  dnl Set the CUPS_LOCALE directory...
-  case "$uname" in
- -       Linux* | *BSD* | Darwin*)
- +       Linux* | GNU* | GNU/* | *BSD* | Darwin*)
-                 CUPS_LOCALEDIR="$datadir/locale"
-                 AC_DEFINE_UNQUOTED(CUPS_LOCALEDIR, "$datadir/locale")
-                 ;;
- diff -ur cupsys-1.1.20final+rc1.old/config-scripts/cups-manpages.m4 cupsys-1.1.20final+rc1/config-scripts/cups-manpages.m4
- --- cupsys-1.1.20final+rc1.old/config-scripts/cups-manpages.m4  2004-02-26 17:52:00.000000000 +0100
- +++ cupsys-1.1.20final+rc1/config-scripts/cups-manpages.m4      2004-08-04 21:25:53.000000000 +0200
- @@ -25,7 +25,7 @@
-  dnl Fix "mandir" variable...
-  if test "$mandir" = "\${prefix}/man" -a "$prefix" = "/"; then
-         case "$uname" in
- -               Darwin* | Linux* | *BSD* | AIX*)
- +               Darwin* | Linux* | GNU* | GNU/* | *BSD* | AIX*)
-                         # Darwin, MacOS X, Linux, *BSD, and AIX
-                         mandir="/usr/share/man"
-                         AMANDIR="/usr/share/man"
- diff -ur cupsys-1.1.20final+rc1.old/config-scripts/cups-sharedlibs.m4 cupsys-1.1.20final+rc1/config-scripts/cups-sharedlibs.m4
- --- cupsys-1.1.20final+rc1.old/config-scripts/cups-sharedlibs.m4        2004-02-26 17:52:00.000000000 +0100
- +++ cupsys-1.1.20final+rc1/config-scripts/cups-sharedlibs.m4    2004-08-04 21:23:00.000000000 +0200
- @@ -47,7 +47,7 @@
-                         DSO="\$(CC)"
-                         DSOFLAGS="$DSOFLAGS -Wl,-rpath,\$(libdir),-set_version,sgi2.5,-soname,\$@ -shared \$(OPTIM)"
-                         ;;
- -               OSF1* | Linux* | *BSD*)
- +               OSF1* | Linux* | *BSD* | GNU* | GNU/*)
-                         LIBCUPS="libcups.so.2"
-                         LIBCUPSIMAGE="libcupsimage.so.2"
-                         DSO="\$(CC)"
- @@ -135,7 +135,7 @@
-                          LDFLAGS="$LDFLAGS -Wl,-R$libdir"
-                          EXPORT_LDFLAGS="-Wl,-R$libdir"
-                          ;;
- -                Linux*)
- +                Linux* | GNU* | GNU/*)
-                          # Linux
-                         DSOFLAGS="-Wl,-rpath,$libdir $DSOFLAGS"
-                          LDFLAGS="$LDFLAGS -Wl,-rpath,$libdir"
+-                Linux*)
++                Linux* | GNU* | GNU/*)
+                         # Linux
+                        DSOFLAGS="-Wl,-rpath,$libdir $DSOFLAGS"
+                         LDFLAGS="$LDFLAGS -Wl,-rpath,$libdir"
