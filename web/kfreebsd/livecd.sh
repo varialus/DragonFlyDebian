@@ -29,18 +29,19 @@ tmp1=`tempfile` && rm -f ${tmp1} && mkdir -p ${tmp1}
 tmp2=`tempfile`
 pwd=`pwd`
 
-/usr/share/crosshurd/makehurddir.sh ${tmp1} ${cpu} ${system}
+if ! test -e base.tgz ; then ./tarball.sh ; fi
+tar -C ${tmp1} --same-owner -xzpf base.tgz
+mkdir ${tmp1}/base
+cp base.tgz ${tmp1}/base/
 
 ##################
 #  add some trickery
 ###########################
 
 cd ${tmp1}
-tar --same-owner -cpf - ./* | gzip -c9 > ${tmp2}
-mv ${tmp2} ${tmp1}/root/${cpu}-${system}.tar.gz
 
 if [ "${LIVECD_DEBUG}" != "yes" ] ; then
-  rm -f ${tmp1}/var/cache/apt/archives/*.deb
+  rm -f var/cache/apt/archives/*.deb
 fi
 
 # GRUB stuff
@@ -109,6 +110,13 @@ done
 chroot /ramdisk
 EOF
 chmod +x root/writable.sh
+
+# hacks for being a FreeBSD compliant [tm] cdrom
+for i in 5 6 ; do for j in 0 1 2 3 4 5 6 7 8 9 ; do
+  ln -sf . $i.$j-RELEASE
+done ; done
+ln -s ../base/base.tgz root/
+
 
 #########################
 #                    ignition!
