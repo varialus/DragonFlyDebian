@@ -1,0 +1,259 @@
+diff -ur strace-4.4.old/configure strace-4.4/configure
+--- strace-4.4.old/configure	2001-10-01 06:23:03.000000000 +0200
++++ strace-4.4/configure	2004-05-30 22:03:07.000000000 +0200
+@@ -651,7 +651,7 @@
+ irix[56]*)
+ 	opsys=svr4
+ 	;;
+-freebsd*)
++freebsd*|kfreebsd*-gnu)
+ 	opsys=freebsd
+ 	;;
+ *)
+diff -ur strace-4.4.old/configure.in strace-4.4/configure.in
+--- strace-4.4.old/configure.in	2001-10-01 06:23:00.000000000 +0200
++++ strace-4.4/configure.in	2004-05-30 22:03:07.000000000 +0200
+@@ -22,7 +22,7 @@
+ irix[56]*)
+ 	opsys=svr4
+ 	;;
+-freebsd*)
++freebsd*|kfreebsd*-gnu)
+ 	opsys=freebsd
+ 	;;
+ *)
+diff -ur strace-4.4.old/debian/control strace-4.4/debian/control
+--- strace-4.4.old/debian/control	2001-09-21 23:52:53.000000000 +0200
++++ strace-4.4/debian/control	2004-05-30 22:03:24.000000000 +0200
+@@ -2,11 +2,10 @@
+ Section: devel
+ Priority: standard
+ Maintainer: Wichert Akkerman <wakkerma@debian.org>
+-Build-Depends: libc6-dev (>= 2.2.2-1) [!alpha !ia64], libc6.1-dev (>= 2.2.2-1) [alpha ia64]
+ Standards-Version: 3.5.2
+ 
+ Package: strace
+-Architecture: alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sh sparc
++Architecture: alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sh sparc kfreebsd-i386
+ Depends: ${shlibs:Depends}
+ Description: A system call tracer.
+  strace is a system call tracer, i.e. a debugging tool which prints out
+diff -ur strace-4.4.old/freebsd/i386/syscall.h strace-4.4/freebsd/i386/syscall.h
+--- strace-4.4.old/freebsd/i386/syscall.h	2001-03-13 00:29:09.000000000 +0100
++++ strace-4.4/freebsd/i386/syscall.h	2004-05-30 22:03:07.000000000 +0200
+@@ -197,7 +197,7 @@
+ #define sys_clock_getres printargs
+ #define sys_nanosleep printargs
+ #define sys_minherit printargs
+-#define sys_rfork printargs
++int sys_rfork();
+ #define sys_openbsd_poll printargs
+ #define sys_issetugid printargs
+ #define sys_lchown printargs
+diff -ur strace-4.4.old/freebsd/i386/syscallent.h strace-4.4/freebsd/i386/syscallent.h
+--- strace-4.4.old/freebsd/i386/syscallent.h	2001-03-13 00:29:09.000000000 +0100
++++ strace-4.4/freebsd/i386/syscallent.h	2004-05-30 22:03:07.000000000 +0200
+@@ -253,7 +253,7 @@
+   { -1,	0,	printargs,	"SYS_248"	}, /* 248 */
+   { -1,	0,	printargs,	"SYS_249"	}, /* 249 */
+   { 3,	0,	sys_minherit,	"minherit"	}, /* 250 */
+-  { 1,	0,	sys_rfork,	"rfork"	}, /* 251 */
++  { 1,	TP,	sys_rfork,	"rfork"	}, /* 251 */
+   { 3,	0,	sys_openbsd_poll,	"openbsd_poll"	}, /* 252 */
+   { 1,	0,	sys_issetugid,	"issetugid"	}, /* 253 */
+   { 3,	TF,	sys_lchown,	"lchown"	}, /* 254 */
+diff -ur strace-4.4.old/freebsd/syscalls.cat strace-4.4/freebsd/syscalls.cat
+--- strace-4.4.old/freebsd/syscalls.cat	2000-09-01 23:03:06.000000000 +0200
++++ strace-4.4/freebsd/syscalls.cat	2004-05-30 22:03:07.000000000 +0200
+@@ -134,6 +134,7 @@
+ fork1	TP
+ owait	TP
+ owait3	TP
++rfork	TP
+ vfork	TP
+ wait	TP
+ wait4	TP
+diff -ur strace-4.4.old/freebsd/syscalls.print strace-4.4/freebsd/syscalls.print
+--- strace-4.4.old/freebsd/syscalls.print	2001-03-13 00:29:09.000000000 +0100
++++ strace-4.4/freebsd/syscalls.print	2004-05-30 22:03:07.000000000 +0200
+@@ -127,6 +127,7 @@
+ recvfrom
+ recvmsg
+ rename
++rfork
+ rmdir
+ sbrk
+ select
+diff -ur strace-4.4.old/io.c strace-4.4/io.c
+--- strace-4.4.old/io.c	2001-07-14 00:07:45.000000000 +0200
++++ strace-4.4/io.c	2004-05-30 22:03:07.000000000 +0200
+@@ -203,9 +203,9 @@
+ 	} else {
+ 		off_t offset;
+ 
+-		if (!tcp->u_arg[5])
++//		if (!tcp->u_arg[5])
+ 			tprintf(", NULL");
+-		else {
++/*		else {
+ 			struct sf_hdtr hdtr;
+ 
+ 			if (umove(tcp, tcp->u_arg[5], &hdtr) < 0)
+@@ -217,7 +217,7 @@
+ 				tprint_iov(tcp, hdtr.trl_cnt, hdtr.trailers);
+ 				tprintf(", %u }", hdtr.hdr_cnt);
+ 			}
+-		}
++		}*/
+ 		if (!tcp->u_arg[6])
+ 			tprintf(", NULL");
+ 		else if (umove(tcp, tcp->u_arg[6], &offset) < 0)
+diff -ur strace-4.4.old/process.c strace-4.4/process.c
+--- strace-4.4.old/process.c	2001-09-21 23:50:35.000000000 +0200
++++ strace-4.4/process.c	2004-05-30 22:03:07.000000000 +0200
+@@ -366,7 +366,7 @@
+ 	return 0;
+ }
+ 
+-#if UNIXWARE > 2
++#if UNIXWARE > 2 || defined(FREEBSD)
+ 
+ int
+ sys_rfork(tcp)
+@@ -391,6 +391,7 @@
+ struct tcb *tcp;
+ {
+ 	struct tcb *tcpchild;
++	int pid;
+ 
+ 	if (exiting(tcp)) {
+ 		if (getrval2(tcp))
+@@ -406,12 +407,22 @@
+ 			tcp->flags |= TCB_FOLLOWFORK;
+ 		if (syserror(tcp))
+ 			return 0;
++		pid = tcp->u_rval;
+ 		if ((tcpchild = alloctcb(tcp->u_rval)) == NULL) {
+ 			fprintf(stderr, "sys_fork: tcb table full\n");
+ 			return 0;
+ 		}
+-		if (proc_open(tcpchild, 2) < 0)
+-		  	droptcb(tcpchild);
++		if (proc_open(tcpchild, 2) < 0) {
++			fprintf(stderr, "Too late?\n");
++			droptcb(tcpchild);
++			return 0;
++		}
++
++		tcpchild->flags |= TCB_ATTACHED;
++		newoutf(tcpchild);
++		tcp->nchildren++;
++		if (!qflag)
++			fprintf(stderr, "Process %d attached\n", pid);
+ 	}
+ 	return 0;
+ }
+diff -ur strace-4.4.old/strace.c strace-4.4/strace.c
+--- strace-4.4.old/strace.c	2001-08-03 13:43:35.000000000 +0200
++++ strace-4.4/strace.c	2004-05-30 22:03:07.000000000 +0200
+@@ -46,6 +46,9 @@
+ 
+ #ifdef USE_PROCFS
+ #include <poll.h>
++#ifndef INFTIM
++#define INFTIM (-1)
++#endif
+ #endif
+ 
+ #ifdef SVR4
+diff -ur strace-4.4.old/syscall.c strace-4.4/syscall.c
+--- strace-4.4.old/syscall.c	2001-09-21 23:50:35.000000000 +0200
++++ strace-4.4/syscall.c	2004-05-30 22:03:07.000000000 +0200
+@@ -446,6 +446,9 @@
+ 
+ const struct subcall subcalls_table[] = {
+   { SYS_shmsys, 5, { SYS_shmat, SYS_shmctl, SYS_shmdt, SYS_shmget, SYS_shmctl } },
++#ifndef SYS___semctl
++#define SYS___semctl SYS_semctl
++#endif
+ #ifdef SYS_semconfig
+   { SYS_semsys, 4, { SYS___semctl, SYS_semget, SYS_semop, SYS_semconfig } },
+ #else
+@@ -597,6 +600,9 @@
+ #ifdef SYS_forkall
+ 	case SYS_forkall:
+ #endif
++#ifdef SYS_rfork
++	case SYS_rfork:
++#endif
+ #ifdef SYS_rfork1
+ 	case SYS_rfork1:
+ #endif
+@@ -878,10 +884,14 @@
+                 return -1;
+         }
+ 	switch (regs.r_eax) {
++#ifdef SYS_syscall
+ 	case SYS_syscall:
++#endif
++#ifdef SYS___sycall
+ 	case SYS___syscall:
+     	        pread(tcp->pfd, &scno, sizeof(scno), regs.r_esp + sizeof(int));
+ 	        break;
++#endif
+ 	default:
+ 	        scno = regs.r_eax;
+ 	        break;
+@@ -1413,14 +1423,18 @@
+ 	if (tcp->u_nargs > MAX_ARGS)
+ 		tcp->u_nargs = MAX_ARGS;
+ 	switch(regs.r_eax) {
++#ifdef SYS___syscall
+ 	case SYS___syscall:
+ 		pread(tcp->pfd, &tcp->u_arg, tcp->u_nargs * sizeof(unsigned long),
+ 		      regs.r_esp + sizeof(int) + sizeof(quad_t));
+ 	  break;
++#endif
++#ifdef SYS_syscall
+         case SYS_syscall:
+ 		pread(tcp->pfd, &tcp->u_arg, tcp->u_nargs * sizeof(unsigned long),
+ 		      regs.r_esp + 2 * sizeof(int));
+ 	  break;
++#endif
+         default:
+ 		pread(tcp->pfd, &tcp->u_arg, tcp->u_nargs * sizeof(unsigned long),
+ 		      regs.r_esp + sizeof(int));
+@@ -1533,17 +1547,15 @@
+ #endif /* LINUX */
+ 			default:
+ 				tprintf("= -1 ");
+-				if (u_error < nerrnos && u_error < sys_nerr)
++				if (u_error < nerrnos)
+ 					tprintf("%s (%s)", errnoent[u_error],
+-						sys_errlist[u_error]);
++						strerror (u_error));
+ 				else if (u_error < nerrnos)
+ 					tprintf("%s (errno %ld)",
+ 						errnoent[u_error], u_error);
+-				else if (u_error < sys_nerr)
+-					tprintf("ERRNO_%ld (%s)", u_error,
+-						sys_errlist[u_error]);
+ 				else
+-					tprintf("E??? (errno %ld)", u_error);
++					tprintf("ERRNO_%ld (%s)", u_error,
++						strerror (u_error));
+ 				break;
+ 			}
+ 		}
+diff -ur strace-4.4.old/term.c strace-4.4/term.c
+--- strace-4.4.old/term.c	2000-09-04 02:07:38.000000000 +0200
++++ strace-4.4/term.c	2004-05-30 22:03:07.000000000 +0200
+@@ -39,6 +39,8 @@
+ #include <sys/filio.h>
+ #endif
+ 
++#include <sys/ttycom.h>
++
+ static struct xlat tcxonc_options[] = {
+ 	{ TCOOFF,	"TCOOFF"	},
+ 	{ TCOON,	"TCOON"		},
