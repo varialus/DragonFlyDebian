@@ -1,6 +1,6 @@
 diff -ur src.old/sys/alpha/include/alpha_cpu.h src/sys/alpha/include/alpha_cpu.h
 --- src.old/sys/alpha/include/alpha_cpu.h	2003-07-24 09:41:08.000000000 +0200
-+++ src/sys/alpha/include/alpha_cpu.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/alpha/include/alpha_cpu.h	2004-11-30 00:47:56.000000000 +0100
 @@ -49,6 +49,7 @@
   * and miscellaneous PALcode operations.
   */
@@ -10,9 +10,9 @@ diff -ur src.old/sys/alpha/include/alpha_cpu.h src/sys/alpha/include/alpha_cpu.h
  /*
   * Process Control Block definitions [OSF/1 PALcode Specific]
 diff -ur src.old/sys/alpha/include/param.h src/sys/alpha/include/param.h
---- src.old/sys/alpha/include/param.h	2003-07-31 03:31:31.000000000 +0200
-+++ src/sys/alpha/include/param.h	2004-11-27 18:08:36.000000000 +0100
-@@ -43,6 +43,9 @@
+--- src.old/sys/alpha/include/param.h	2004-09-10 02:04:16.000000000 +0200
++++ src/sys/alpha/include/param.h	2004-11-30 00:47:56.000000000 +0100
+@@ -39,6 +39,9 @@
   *	@(#)param.h	8.1 (Berkeley) 6/10/93
   */
  
@@ -22,7 +22,7 @@ diff -ur src.old/sys/alpha/include/param.h src/sys/alpha/include/param.h
  /*
   * Machine dependent constants for the Alpha.
   */
-@@ -139,4 +142,6 @@
+@@ -135,4 +138,6 @@
  #define pgtok(x)                ((x) * (PAGE_SIZE / 1024)) 
  
  #endif /* !_MACHINE_PARAM_H_ */
@@ -30,8 +30,8 @@ diff -ur src.old/sys/alpha/include/param.h src/sys/alpha/include/param.h
 +#endif /* !_MACHINE_PARAM_H_ */
  #endif /* !_NO_NAMESPACE_POLLUTION */
 diff -ur src.old/sys/alpha/include/pcb.h src/sys/alpha/include/pcb.h
---- src.old/sys/alpha/include/pcb.h	2003-08-17 08:42:07.000000000 +0200
-+++ src/sys/alpha/include/pcb.h	2004-11-27 18:08:36.000000000 +0100
+--- src.old/sys/alpha/include/pcb.h	2004-07-10 21:55:58.000000000 +0200
++++ src/sys/alpha/include/pcb.h	2004-11-30 00:47:56.000000000 +0100
 @@ -31,6 +31,8 @@
  #ifndef _MACHINE_PCB_H_
  #define _MACHINE_PCB_H_
@@ -42,9 +42,9 @@ diff -ur src.old/sys/alpha/include/pcb.h src/sys/alpha/include/pcb.h
  #include <machine/reg.h>
  #include <machine/alpha_cpu.h>
 diff -ur src.old/sys/alpha/include/pmap.h src/sys/alpha/include/pmap.h
---- src.old/sys/alpha/include/pmap.h	2003-10-06 03:47:11.000000000 +0200
-+++ src/sys/alpha/include/pmap.h	2004-11-27 18:08:36.000000000 +0100
-@@ -49,6 +49,13 @@
+--- src.old/sys/alpha/include/pmap.h	2004-07-19 20:12:04.000000000 +0200
++++ src/sys/alpha/include/pmap.h	2004-11-30 00:47:56.000000000 +0100
+@@ -45,6 +45,13 @@
  #ifndef _MACHINE_PMAP_H_
  #define	_MACHINE_PMAP_H_
  
@@ -60,7 +60,7 @@ diff -ur src.old/sys/alpha/include/pmap.h src/sys/alpha/include/pmap.h
   */
 diff -ur src.old/sys/alpha/include/proc.h src/sys/alpha/include/proc.h
 --- src.old/sys/alpha/include/proc.h	2003-04-17 23:57:16.000000000 +0200
-+++ src/sys/alpha/include/proc.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/alpha/include/proc.h	2004-11-30 00:47:56.000000000 +0100
 @@ -31,6 +31,9 @@
  #ifndef _MACHINE_PROC_H_
  #define	_MACHINE_PROC_H_
@@ -73,7 +73,7 @@ diff -ur src.old/sys/alpha/include/proc.h src/sys/alpha/include/proc.h
   */
 diff -ur src.old/sys/alpha/include/reg.h src/sys/alpha/include/reg.h
 --- src.old/sys/alpha/include/reg.h	2002-08-29 08:17:46.000000000 +0200
-+++ src/sys/alpha/include/reg.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/alpha/include/reg.h	2004-11-30 00:47:56.000000000 +0100
 @@ -31,6 +31,8 @@
  #ifndef _ALPHA_REG_H_
  #define	_ALPHA_REG_H_
@@ -84,9 +84,9 @@ diff -ur src.old/sys/alpha/include/reg.h src/sys/alpha/include/reg.h
   * XXX where did this info come from?
   */
 diff -ur src.old/sys/cam/cam_ccb.h src/sys/cam/cam_ccb.h
---- src.old/sys/cam/cam_ccb.h	2003-07-28 08:15:58.000000000 +0200
-+++ src/sys/cam/cam_ccb.h	2004-11-27 18:08:36.000000000 +0100
-@@ -307,7 +307,7 @@
+--- src.old/sys/cam/cam_ccb.h	2004-06-07 21:12:44.000000000 +0200
++++ src/sys/cam/cam_ccb.h	2004-11-30 00:47:56.000000000 +0100
+@@ -306,7 +306,7 @@
  				 * tagged operations
  				 */
  	int	mintags;
@@ -95,7 +95,7 @@ diff -ur src.old/sys/cam/cam_ccb.h src/sys/cam/cam_ccb.h
  };
  
  typedef enum {
-@@ -567,7 +567,7 @@
+@@ -566,7 +566,7 @@
  /* Path Statistics CCB */
  struct ccb_pathstats {
  	struct	ccb_hdr	ccb_h;
@@ -105,9 +105,9 @@ diff -ur src.old/sys/cam/cam_ccb.h src/sys/cam/cam_ccb.h
  
  typedef union {
 diff -ur src.old/sys/cam/cam_periph.h src/sys/cam/cam_periph.h
---- src.old/sys/cam/cam_periph.h	2003-03-08 09:01:26.000000000 +0100
-+++ src/sys/cam/cam_periph.h	2004-11-27 18:08:36.000000000 +0100
-@@ -167,7 +167,7 @@
+--- src.old/sys/cam/cam_periph.h	2004-07-15 10:25:59.000000000 +0200
++++ src/sys/cam/cam_periph.h	2004-11-30 00:47:56.000000000 +0100
+@@ -169,7 +169,7 @@
  void		cam_periph_bus_settle(struct cam_periph *periph,
  				      u_int bus_settle_ms);
  void		cam_periph_freeze_after_event(struct cam_periph *periph,
@@ -117,9 +117,9 @@ diff -ur src.old/sys/cam/cam_periph.h src/sys/cam/cam_periph.h
  int		cam_periph_error(union ccb *ccb, cam_flags camflags,
  				 u_int32_t sense_flags, union ccb *save_ccb);
 diff -ur src.old/sys/dev/aac/aacvar.h src/sys/dev/aac/aacvar.h
---- src.old/sys/dev/aac/aacvar.h	2004-02-18 07:20:50.000000000 +0100
-+++ src/sys/dev/aac/aacvar.h	2004-11-27 18:08:36.000000000 +0100
-@@ -172,7 +172,7 @@
+--- src.old/sys/dev/aac/aacvar.h	2004-08-13 03:44:09.000000000 +0200
++++ src/sys/dev/aac/aacvar.h	2004-11-30 00:47:56.000000000 +0100
+@@ -171,7 +171,7 @@
  
  	void			(* cm_complete)(struct aac_command *cm);
  	void			*cm_private;
@@ -129,8 +129,8 @@ diff -ur src.old/sys/dev/aac/aacvar.h src/sys/dev/aac/aacvar.h
  	int			cm_index;
  };
 diff -ur src.old/sys/dev/asr/sys_info.h src/sys/dev/asr/sys_info.h
---- src.old/sys/dev/asr/sys_info.h	2004-11-27 18:08:25.000000000 +0100
-+++ src/sys/dev/asr/sys_info.h	2004-11-27 18:08:36.000000000 +0100
+--- src.old/sys/dev/asr/sys_info.h	2004-11-30 00:47:32.000000000 +0100
++++ src/sys/dev/asr/sys_info.h	2004-11-30 00:47:56.000000000 +0100
 @@ -458,10 +458,10 @@
  	u_int32_t	write_by_size_count[10];
  	u_int32_t	read_by_size_min_time[10];
@@ -154,20 +154,20 @@ diff -ur src.old/sys/dev/asr/sys_info.h src/sys/dev/asr/sys_info.h
  #endif
  
 diff -ur src.old/sys/dev/ata/atapi-cd.h src/sys/dev/ata/atapi-cd.h
---- src.old/sys/dev/ata/atapi-cd.h	2003-11-01 10:44:33.000000000 +0100
-+++ src/sys/dev/ata/atapi-cd.h	2004-11-27 18:08:36.000000000 +0100
+--- src.old/sys/dev/ata/atapi-cd.h	2004-04-30 18:21:34.000000000 +0200
++++ src/sys/dev/ata/atapi-cd.h	2004-11-30 00:48:39.000000000 +0100
 @@ -311,7 +311,7 @@
      struct changer		*changer_info;	/* changer info */
      struct acd_softc		**driver;	/* softc's of changer slots */
      int				slot;		/* this instance slot number */
 -    time_t			timestamp;	/* this instance timestamp */
-+    __kernel_time_t			timestamp;	/* this instance timestamp */
-     u_int			disk_size;	/* size of current media */
-     u_int			block_size;	/* blocksize currently used */
-     struct g_geom		*gp;		/* geom instance */
++    __kernel_time_t		timestamp;	/* this instance timestamp */
+     u_int32_t			disk_size;	/* size of current media */
+     u_int32_t			block_size;	/* blocksize currently used */
+     u_int32_t			iomax;		/* Max I/O request (bytes) */
 diff -ur src.old/sys/dev/dec/mcclockvar.h src/sys/dev/dec/mcclockvar.h
 --- src.old/sys/dev/dec/mcclockvar.h	2000-05-01 21:54:24.000000000 +0200
-+++ src/sys/dev/dec/mcclockvar.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/dev/dec/mcclockvar.h	2004-11-30 00:47:56.000000000 +0100
 @@ -32,6 +32,6 @@
  
  void	mcclock_attach(device_t dev);
@@ -177,9 +177,9 @@ diff -ur src.old/sys/dev/dec/mcclockvar.h src/sys/dev/dec/mcclockvar.h
  void	mcclock_set(device_t, struct clocktime *);
  int	mcclock_getsecs(device_t dev, int *secp);
 diff -ur src.old/sys/dev/dpt/dpt.h src/sys/dev/dpt/dpt.h
---- src.old/sys/dev/dpt/dpt.h	2003-03-29 09:30:45.000000000 +0100
-+++ src/sys/dev/dpt/dpt.h	2004-11-27 18:08:36.000000000 +0100
-@@ -896,8 +896,8 @@
+--- src.old/sys/dev/dpt/dpt.h	2004-02-21 20:42:50.000000000 +0100
++++ src/sys/dev/dpt/dpt.h	2004-11-30 00:47:56.000000000 +0100
+@@ -895,8 +895,8 @@
  
  #ifdef DPT_MEASURE_PERFORMANCE
  	u_int32_t	 submitted_time;
@@ -190,7 +190,7 @@ diff -ur src.old/sys/dev/dpt/dpt.h src/sys/dev/dpt/dpt.h
  #endif
  } dpt_ccb_t;
  
-@@ -1003,7 +1003,7 @@
+@@ -1002,7 +1002,7 @@
  #define SIZE_BIGGER	8
  #define SIZE_OTHER	9
  
@@ -199,7 +199,7 @@ diff -ur src.old/sys/dev/dpt/dpt.h src/sys/dev/dpt/dpt.h
  
  	u_int32_t warm_starts;
  	u_int32_t cold_boots;
-@@ -1158,7 +1158,7 @@
+@@ -1157,7 +1157,7 @@
  #endif
  
  #ifdef DPT_RESET_HBA
@@ -208,7 +208,7 @@ diff -ur src.old/sys/dev/dpt/dpt.h src/sys/dev/dpt/dpt.h
  #endif
  } dpt_softc_t;
  
-@@ -1235,10 +1235,10 @@
+@@ -1234,10 +1234,10 @@
   */
  #ifdef _KERNEL
  /* This function gets the current hi-res time and returns it to the caller */
@@ -221,7 +221,7 @@ diff -ur src.old/sys/dev/dpt/dpt.h src/sys/dev/dpt/dpt.h
  
  	microtime(&now);
  	return(now);
-@@ -1264,8 +1264,8 @@
+@@ -1263,8 +1263,8 @@
   * If times are sensless, ~0 is returned.
   */
  static __inline u_int32_t
@@ -233,21 +233,21 @@ diff -ur src.old/sys/dev/dpt/dpt.h src/sys/dev/dpt/dpt.h
      if (start.tv_sec > end.tv_sec)
  	return(~0);
 diff -ur src.old/sys/dev/hfa/fore_var.h src/sys/dev/hfa/fore_var.h
---- src.old/sys/dev/hfa/fore_var.h	2003-07-31 16:52:44.000000000 +0200
-+++ src/sys/dev/hfa/fore_var.h	2004-11-27 18:08:36.000000000 +0100
+--- src.old/sys/dev/hfa/fore_var.h	2004-02-21 20:08:23.000000000 +0100
++++ src/sys/dev/hfa/fore_var.h	2004-11-30 00:49:06.000000000 +0100
 @@ -222,7 +222,7 @@
  
  	Fore_stats	*fu_stats;	/* Device statistics buffer */
- 	Fore_stats	*fu_statsd;	/* Device statistics buffer (DMA) */
+ 	vm_paddr_t	fu_statsd;	/* Device statistics buffer (DMA) */
 -	time_t		fu_stats_time;	/* Last stats request timestamp */
-+	__kernel_time_t		fu_stats_time;	/* Last stats request timestamp */
++	__kernel_time_t	fu_stats_time;	/* Last stats request timestamp */
  	int		fu_stats_ret;	/* Stats request return code */
  	Fore_prom	*fu_prom;	/* Device PROM buffer */
- 	Fore_prom	*fu_promd;	/* Device PROM buffer (DMA) */
+ 	vm_paddr_t	fu_promd;	/* Device PROM buffer (DMA) */
 diff -ur src.old/sys/dev/isp/isp_freebsd.h src/sys/dev/isp/isp_freebsd.h
---- src.old/sys/dev/isp/isp_freebsd.h	2003-10-21 23:52:23.000000000 +0200
-+++ src/sys/dev/isp/isp_freebsd.h	2004-11-27 18:08:36.000000000 +0100
-@@ -201,7 +201,7 @@
+--- src.old/sys/dev/isp/isp_freebsd.h	2004-10-12 01:59:03.000000000 +0200
++++ src/sys/dev/isp/isp_freebsd.h	2004-11-30 00:47:56.000000000 +0100
+@@ -197,7 +197,7 @@
  	if (isp->isp_osinfo.intsok)	\
  		ISP_LOCK(isp)
  
@@ -256,7 +256,7 @@ diff -ur src.old/sys/dev/isp/isp_freebsd.h src/sys/dev/isp/isp_freebsd.h
  #define	GET_NANOTIME		nanotime
  #define	GET_NANOSEC(x)		((x)->tv_sec * 1000000000 + (x)->tv_nsec)
  #define	NANOTIME_SUB		nanotime_sub
-@@ -458,12 +458,12 @@
+@@ -454,12 +454,12 @@
  	}
  }
  
@@ -273,8 +273,8 @@ diff -ur src.old/sys/dev/isp/isp_freebsd.h src/sys/dev/isp/isp_freebsd.h
  	elapsed = GET_NANOSEC(&x);
  	if (elapsed == 0)
 diff -ur src.old/sys/dev/mlx/mlxvar.h src/sys/dev/mlx/mlxvar.h
---- src.old/sys/dev/mlx/mlxvar.h	2003-09-02 10:30:31.000000000 +0200
-+++ src/sys/dev/mlx/mlxvar.h	2004-11-27 18:08:36.000000000 +0100
+--- src.old/sys/dev/mlx/mlxvar.h	2004-06-16 11:46:50.000000000 +0200
++++ src/sys/dev/mlx/mlxvar.h	2004-11-30 00:47:56.000000000 +0100
 @@ -82,7 +82,7 @@
      struct mlx_softc		*mc_sc;		/* controller that owns us */
      u_int8_t			mc_slot;	/* command slot we occupy */
@@ -295,7 +295,7 @@ diff -ur src.old/sys/dev/mlx/mlxvar.h src/sys/dev/mlx/mlxvar.h
      int			mlx_background;	/* if != 0 rebuild or check is in progress */
 diff -ur src.old/sys/dev/ray/if_raymib.h src/sys/dev/ray/if_raymib.h
 --- src.old/sys/dev/ray/if_raymib.h	2002-09-23 08:25:07.000000000 +0200
-+++ src/sys/dev/ray/if_raymib.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/dev/ray/if_raymib.h	2004-11-30 00:47:56.000000000 +0100
 @@ -1179,5 +1179,5 @@
  	u_int8_t	rsl_host[ETHER_ADDR_LEN]; /* MAC address */
  	u_int8_t	rsl_siglevs[RAY_NSIGLEV]; /* levels, newest in [0] */
@@ -304,8 +304,8 @@ diff -ur src.old/sys/dev/ray/if_raymib.h src/sys/dev/ray/if_raymib.h
 +	struct __kernel_timeval	rsl_time; 		  /* time of last packet */
  };
 diff -ur src.old/sys/dev/usb/usb.h src/sys/dev/usb/usb.h
---- src.old/sys/dev/usb/usb.h	2004-11-27 18:08:25.000000000 +0100
-+++ src/sys/dev/usb/usb.h	2004-11-27 18:08:36.000000000 +0100
+--- src.old/sys/dev/usb/usb.h	2004-11-30 00:47:32.000000000 +0100
++++ src/sys/dev/usb/usb.h	2004-11-30 00:47:56.000000000 +0100
 @@ -642,7 +642,7 @@
  #define USB_EVENT_DRIVER_DETACH 6
  #define USB_EVENT_IS_ATTACH(n) ((n) == USB_EVENT_CTRLR_ATTACH || (n) == USB_EVENT_DEVICE_ATTACH || (n) == USB_EVENT_DRIVER_ATTACH)
@@ -317,7 +317,7 @@ diff -ur src.old/sys/dev/usb/usb.h src/sys/dev/usb/usb.h
  			int			ue_bus;
 diff -ur src.old/sys/dev/vinum/request.h src/sys/dev/vinum/request.h
 --- src.old/sys/dev/vinum/request.h	2003-05-01 15:06:00.000000000 +0200
-+++ src/sys/dev/vinum/request.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/dev/vinum/request.h	2004-11-30 00:47:56.000000000 +0100
 @@ -210,7 +210,7 @@
  
  struct rqinfo {
@@ -328,9 +328,9 @@ diff -ur src.old/sys/dev/vinum/request.h src/sys/dev/vinum/request.h
      int devmajor;					    /* major and minor device info */
      int devminor;
 diff -ur src.old/sys/dev/vinum/vinumvar.h src/sys/dev/vinum/vinumvar.h
---- src.old/sys/dev/vinum/vinumvar.h	2003-09-29 10:19:06.000000000 +0200
-+++ src/sys/dev/vinum/vinumvar.h	2004-11-27 18:08:36.000000000 +0100
-@@ -207,8 +207,8 @@
+--- src.old/sys/dev/vinum/vinumvar.h	2004-03-19 11:28:34.000000000 +0100
++++ src/sys/dev/vinum/vinumvar.h	2004-11-30 00:47:56.000000000 +0100
+@@ -195,8 +195,8 @@
  struct vinum_label {
      char sysname[VINUMHOSTNAMELEN];			    /* system name at time of creation */
      char name[MAXDRIVENAME];				    /* our name of the drive */
@@ -341,7 +341,7 @@ diff -ur src.old/sys/dev/vinum/vinumvar.h src/sys/dev/vinum/vinumvar.h
      /*
       * total size in bytes of the drive.  This value
       * includes the headers.
-@@ -311,7 +311,7 @@
+@@ -299,7 +299,7 @@
  
  #define MCFILENAMELEN	16
  struct mc {
@@ -351,8 +351,8 @@ diff -ur src.old/sys/dev/vinum/vinumvar.h src/sys/dev/vinum/vinumvar.h
      int size;
      short line;
 diff -ur src.old/sys/fs/msdosfs/direntry.h src/sys/fs/msdosfs/direntry.h
---- src.old/sys/fs/msdosfs/direntry.h	2003-09-27 03:18:27.000000000 +0200
-+++ src/sys/fs/msdosfs/direntry.h	2004-11-27 18:08:36.000000000 +0100
+--- src.old/sys/fs/msdosfs/direntry.h	2004-02-19 10:56:58.000000000 +0100
++++ src/sys/fs/msdosfs/direntry.h	2004-11-30 00:47:56.000000000 +0100
 @@ -139,9 +139,9 @@
  char	*mbnambuf_flush(struct dirent *dp);
  void	mbnambuf_init(void);
@@ -364,10 +364,10 @@ diff -ur src.old/sys/fs/msdosfs/direntry.h src/sys/fs/msdosfs/direntry.h
 +void	dos2unixtime(u_int dd, u_int dt, u_int dh, struct __kernel_timespec *tsp);
  int	dos2unixfn(u_char dn[11], u_char *un, int lower,
  	    struct msdosfsmount *pmp);
- int	unix2dosfn(const u_char *un, u_char dn[12], int unlen, u_int gen,
+ int	unix2dosfn(const u_char *un, u_char dn[12], size_t unlen, u_int gen,
 diff -ur src.old/sys/fs/ntfs/ntfs_subr.h src/sys/fs/ntfs/ntfs_subr.h
 --- src.old/sys/fs/ntfs/ntfs_subr.h	2003-09-26 22:26:23.000000000 +0200
-+++ src/sys/fs/ntfs/ntfs_subr.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/fs/ntfs/ntfs_subr.h	2004-11-30 00:47:56.000000000 +0100
 @@ -82,7 +82,7 @@
  int ntfs_readattr( struct ntfsmount *, struct ntnode *, u_int32_t, char *, off_t, size_t, void *, struct uio *);
  int ntfs_filesize( struct ntfsmount *, struct fnode *, u_int64_t *, u_int64_t *);
@@ -379,7 +379,7 @@ diff -ur src.old/sys/fs/ntfs/ntfs_subr.h src/sys/fs/ntfs/ntfs_subr.h
  int ntfs_attrtontvattr( struct ntfsmount *, struct ntvattr **, struct attr * );
 diff -ur src.old/sys/fs/nwfs/nwfs_node.h src/sys/fs/nwfs/nwfs_node.h
 --- src.old/sys/fs/nwfs/nwfs_node.h	2001-09-12 10:37:19.000000000 +0200
-+++ src/sys/fs/nwfs/nwfs_node.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/fs/nwfs/nwfs_node.h	2004-11-30 00:47:56.000000000 +0100
 @@ -49,9 +49,9 @@
  	struct vnode 		*n_vnode;
  	struct vattr		n_vattr;
@@ -395,7 +395,7 @@ diff -ur src.old/sys/fs/nwfs/nwfs_node.h src/sys/fs/nwfs/nwfs_node.h
  	ncpfid			n_fid;
 diff -ur src.old/sys/fs/nwfs/nwfs_subr.h src/sys/fs/nwfs/nwfs_subr.h
 --- src.old/sys/fs/nwfs/nwfs_subr.h	2001-09-12 10:37:19.000000000 +0200
-+++ src/sys/fs/nwfs/nwfs_subr.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/fs/nwfs/nwfs_subr.h	2004-11-30 00:47:56.000000000 +0100
 @@ -47,7 +47,7 @@
  struct nw_search_info;
  struct nwmount;
@@ -418,7 +418,7 @@ diff -ur src.old/sys/fs/nwfs/nwfs_subr.h src/sys/fs/nwfs/nwfs_subr.h
  #endif /* !_NWFS_SUBR_H_ */
 diff -ur src.old/sys/i386/include/i4b_trace.h src/sys/i386/include/i4b_trace.h
 --- src.old/sys/i386/include/i4b_trace.h	2002-03-17 10:33:13.000000000 +0100
-+++ src/sys/i386/include/i4b_trace.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/i386/include/i4b_trace.h	2004-11-30 00:47:56.000000000 +0100
 @@ -52,7 +52,7 @@
  #define FROM_NT 1			/* network -> user		*/
  	int trunc;		/* # of truncated bytes (frame > MCLBYTES) */
@@ -429,9 +429,9 @@ diff -ur src.old/sys/i386/include/i4b_trace.h src/sys/i386/include/i4b_trace.h
  
  #define INFO0		0	/* layer 1 */
 diff -ur src.old/sys/i386/include/npx.h src/sys/i386/include/npx.h
---- src.old/sys/i386/include/npx.h	2002-09-23 07:55:10.000000000 +0200
-+++ src/sys/i386/include/npx.h	2004-11-27 18:08:36.000000000 +0100
-@@ -45,6 +45,8 @@
+--- src.old/sys/i386/include/npx.h	2004-04-07 22:46:05.000000000 +0200
++++ src/sys/i386/include/npx.h	2004-11-30 00:47:56.000000000 +0100
+@@ -41,6 +41,8 @@
  #ifndef _MACHINE_NPX_H_
  #define	_MACHINE_NPX_H_
  
@@ -441,9 +441,9 @@ diff -ur src.old/sys/i386/include/npx.h src/sys/i386/include/npx.h
  struct env87 {
  	long	en_cw;		/* control word (16bits) */
 diff -ur src.old/sys/i386/include/pcb.h src/sys/i386/include/pcb.h
---- src.old/sys/i386/include/pcb.h	2003-09-30 10:11:36.000000000 +0200
-+++ src/sys/i386/include/pcb.h	2004-11-27 18:08:36.000000000 +0100
-@@ -43,6 +43,7 @@
+--- src.old/sys/i386/include/pcb.h	2004-07-10 21:55:59.000000000 +0200
++++ src/sys/i386/include/pcb.h	2004-11-30 00:47:56.000000000 +0100
+@@ -39,6 +39,7 @@
  /*
   * Intel 386 process control block
   */
@@ -452,9 +452,9 @@ diff -ur src.old/sys/i386/include/pcb.h src/sys/i386/include/pcb.h
  
  struct pcb {
 diff -ur src.old/sys/i386/include/pmap.h src/sys/i386/include/pmap.h
---- src.old/sys/i386/include/pmap.h	2003-11-08 04:01:26.000000000 +0100
-+++ src/sys/i386/include/pmap.h	2004-11-27 18:08:36.000000000 +0100
-@@ -48,6 +48,13 @@
+--- src.old/sys/i386/include/pmap.h	2004-10-10 21:08:00.000000000 +0200
++++ src/sys/i386/include/pmap.h	2004-11-30 00:47:56.000000000 +0100
+@@ -44,6 +44,13 @@
  #ifndef _MACHINE_PMAP_H_
  #define	_MACHINE_PMAP_H_
  
@@ -469,9 +469,9 @@ diff -ur src.old/sys/i386/include/pmap.h src/sys/i386/include/pmap.h
   * Page-directory and page-table entires follow this format, with a few
   * of the fields not present here and there, depending on a lot of things.
 diff -ur src.old/sys/isofs/cd9660/cd9660_node.h src/sys/isofs/cd9660/cd9660_node.h
---- src.old/sys/isofs/cd9660/cd9660_node.h	2003-06-25 00:11:20.000000000 +0200
-+++ src/sys/isofs/cd9660/cd9660_node.h	2004-11-27 18:08:36.000000000 +0100
-@@ -49,9 +49,9 @@
+--- src.old/sys/isofs/cd9660/cd9660_node.h	2004-06-17 19:16:48.000000000 +0200
++++ src/sys/isofs/cd9660/cd9660_node.h	2004-11-30 00:47:56.000000000 +0100
+@@ -45,9 +45,9 @@
  #define doff_t	long
  
  typedef	struct	{
@@ -484,9 +484,9 @@ diff -ur src.old/sys/isofs/cd9660/cd9660_node.h src/sys/isofs/cd9660/cd9660_node
  	u_short		iso_mode;	/* files access mode and type */
  	uid_t		iso_uid;	/* owner user id */
  	gid_t		iso_gid;	/* owner group id */
-@@ -119,7 +119,7 @@
+@@ -115,7 +115,7 @@
  			struct iso_node *, struct buf *, enum ISO_FTYPE);
- int cd9660_ihashget(dev_t, ino_t, int, struct vnode **);
+ int cd9660_ihashget(struct cdev *, ino_t, int, struct vnode **);
  void cd9660_ihashins(struct iso_node *);
 -int cd9660_tstamp_conv7(u_char *, struct timespec *, enum ISO_FTYPE);
 -int cd9660_tstamp_conv17(u_char *, struct timespec *);
@@ -495,9 +495,9 @@ diff -ur src.old/sys/isofs/cd9660/cd9660_node.h src/sys/isofs/cd9660/cd9660_node
  
  #endif /* _KERNEL */
 diff -ur src.old/sys/net/bpf.h src/sys/net/bpf.h
---- src.old/sys/net/bpf.h	2003-11-28 19:48:59.000000000 +0100
-+++ src/sys/net/bpf.h	2004-11-27 18:08:36.000000000 +0100
-@@ -104,8 +104,8 @@
+--- src.old/sys/net/bpf.h	2004-05-30 19:03:48.000000000 +0200
++++ src/sys/net/bpf.h	2004-11-30 00:47:56.000000000 +0100
+@@ -100,8 +100,8 @@
  #define	BIOCGDLT	_IOR('B',106, u_int)
  #define BIOCGETIF	_IOR('B',107, struct ifreq)
  #define BIOCSETIF	_IOW('B',108, struct ifreq)
@@ -508,7 +508,7 @@ diff -ur src.old/sys/net/bpf.h src/sys/net/bpf.h
  #define BIOCGSTATS	_IOR('B',111, struct bpf_stat)
  #define BIOCIMMEDIATE	_IOW('B',112, u_int)
  #define BIOCVERSION	_IOR('B',113, struct bpf_version)
-@@ -122,7 +122,7 @@
+@@ -118,7 +118,7 @@
   * Structure prepended to each packet.
   */
  struct bpf_hdr {
@@ -518,8 +518,8 @@ diff -ur src.old/sys/net/bpf.h src/sys/net/bpf.h
  	bpf_u_int32	bh_datalen;	/* original length of packet */
  	u_short		bh_hdrlen;	/* length of bpf header (this struct
 diff -ur src.old/sys/net/ethernet.h src/sys/net/ethernet.h
---- src.old/sys/net/ethernet.h	2002-11-15 00:28:47.000000000 +0100
-+++ src/sys/net/ethernet.h	2004-11-27 18:08:36.000000000 +0100
+--- src.old/sys/net/ethernet.h	2004-06-02 23:34:14.000000000 +0200
++++ src/sys/net/ethernet.h	2004-11-30 00:47:56.000000000 +0100
 @@ -8,6 +8,9 @@
  #ifndef _NET_ETHERNET_H_
  #define _NET_ETHERNET_H_
@@ -538,7 +538,7 @@ diff -ur src.old/sys/net/ethernet.h src/sys/net/ethernet.h
  
  /*
   * Structure of a 48-bit Ethernet address.
-@@ -361,19 +365,8 @@
+@@ -363,19 +367,8 @@
  
  #else /* _KERNEL */
  
@@ -561,9 +561,9 @@ diff -ur src.old/sys/net/ethernet.h src/sys/net/ethernet.h
  
  #endif /* !_NET_ETHERNET_H_ */
 diff -ur src.old/sys/net/if.h src/sys/net/if.h
---- src.old/sys/net/if.h	2003-10-31 19:32:08.000000000 +0100
-+++ src/sys/net/if.h	2004-11-27 18:08:36.000000000 +0100
-@@ -43,10 +43,15 @@
+--- src.old/sys/net/if.h	2004-09-13 07:11:40.000000000 +0200
++++ src/sys/net/if.h	2004-11-30 00:49:28.000000000 +0100
+@@ -39,10 +39,15 @@
  #include <sys/queue.h>
  #endif
  
@@ -580,16 +580,16 @@ diff -ur src.old/sys/net/if.h src/sys/net/if.h
   */
  #ifndef _KERNEL
  #include <sys/time.h>
-@@ -127,7 +132,7 @@
- 	u_long	ifi_noproto;		/* destined for unsupported protocol */
- 	u_long	ifi_hwassist;		/* HW offload capabilities */
- 	u_long	ifi_unused;		/* XXX was ifi_xmittiming */
+@@ -106,7 +111,7 @@
+ #ifdef __alpha__
+ 	u_int	ifi_timepad;		/* time_t is int, not long on alpha */
+ #endif
 -	struct	timeval ifi_lastchange;	/* time of last administrative change */
 +	struct	__kernel_timeval ifi_lastchange;	/* time of last administrative change */
  };
  
  #define	IFF_UP		0x1		/* interface is up */
-@@ -247,6 +252,7 @@
+@@ -235,6 +240,7 @@
  		struct	sockaddr ifru_addr;
  		struct	sockaddr ifru_dstaddr;
  		struct	sockaddr ifru_broadaddr;
@@ -597,7 +597,7 @@ diff -ur src.old/sys/net/if.h src/sys/net/if.h
  		short	ifru_flags[2];
  		short	ifru_index;
  		int	ifru_metric;
-@@ -259,6 +265,7 @@
+@@ -247,6 +253,7 @@
  #define	ifr_addr	ifr_ifru.ifru_addr	/* address */
  #define	ifr_dstaddr	ifr_ifru.ifru_dstaddr	/* other end of p-to-p link */
  #define	ifr_broadaddr	ifr_ifru.ifru_broadaddr	/* broadcast address */
@@ -606,9 +606,9 @@ diff -ur src.old/sys/net/if.h src/sys/net/if.h
  #define	ifr_flagshigh	ifr_ifru.ifru_flags[1]	/* flags (high 16 bits) */
  #define	ifr_metric	ifr_ifru.ifru_metric	/* metric */
 diff -ur src.old/sys/net/if_arp.h src/sys/net/if_arp.h
---- src.old/sys/net/if_arp.h	2003-03-21 18:53:15.000000000 +0100
-+++ src/sys/net/if_arp.h	2004-11-27 18:08:36.000000000 +0100
-@@ -37,6 +37,11 @@
+--- src.old/sys/net/if_arp.h	2004-06-13 12:54:35.000000000 +0200
++++ src/sys/net/if_arp.h	2004-11-30 00:47:56.000000000 +0100
+@@ -33,6 +33,11 @@
  #ifndef _NET_IF_ARP_H_
  #define	_NET_IF_ARP_H_
  
@@ -620,7 +620,7 @@ diff -ur src.old/sys/net/if_arp.h src/sys/net/if_arp.h
  /*
   * Address Resolution Protocol.
   *
-@@ -84,6 +89,15 @@
+@@ -81,6 +86,15 @@
  	(sizeof(struct arphdr) + 2*(ar_hln) + 2*(ar_pln))
  #define arphdr_len(ap)	(arphdr_len2((ap)->ar_hln, (ap)->ar_pln))
  
@@ -637,9 +637,9 @@ diff -ur src.old/sys/net/if_arp.h src/sys/net/if_arp.h
   * ARP ioctl request
   */
 diff -ur src.old/sys/net/if_dl.h src/sys/net/if_dl.h
---- src.old/sys/net/if_dl.h	2002-05-08 00:14:06.000000000 +0200
-+++ src/sys/net/if_dl.h	2004-11-27 18:08:36.000000000 +0100
-@@ -37,6 +37,10 @@
+--- src.old/sys/net/if_dl.h	2004-04-07 22:46:11.000000000 +0200
++++ src/sys/net/if_dl.h	2004-11-30 00:47:56.000000000 +0100
+@@ -33,6 +33,10 @@
  #ifndef _NET_IF_DL_H_
  #define _NET_IF_DL_H_
  
@@ -650,7 +650,7 @@ diff -ur src.old/sys/net/if_dl.h src/sys/net/if_dl.h
  /*
   * A Link-Level Sockaddr may specify the interface in one of two
   * ways: either by means of a system-provided index number (computed
-@@ -72,15 +76,9 @@
+@@ -68,15 +72,9 @@
  
  #define LLADDR(s) ((caddr_t)((s)->sdl_data + (s)->sdl_nlen))
  
@@ -670,7 +670,7 @@ diff -ur src.old/sys/net/if_dl.h src/sys/net/if_dl.h
  #endif
 diff -ur src.old/sys/net/if_pppvar.h src/sys/net/if_pppvar.h
 --- src.old/sys/net/if_pppvar.h	2002-08-09 17:30:46.000000000 +0200
-+++ src/sys/net/if_pppvar.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/net/if_pppvar.h	2004-11-30 00:47:56.000000000 +0100
 @@ -74,8 +74,8 @@
  	void	*sc_xc_state;		/* transmit compressor state */
  	struct	compressor *sc_rcomp;	/* receive decompressor */
@@ -684,7 +684,7 @@ diff -ur src.old/sys/net/if_pppvar.h src/sys/net/if_pppvar.h
  	struct	bpf_program sc_active_filt; /* filter for "non-idle" packets */
 diff -ur src.old/sys/net/if_sppp.h src/sys/net/if_sppp.h
 --- src.old/sys/net/if_sppp.h	2001-12-30 21:42:29.000000000 +0100
-+++ src/sys/net/if_sppp.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/net/if_sppp.h	2004-11-30 00:47:56.000000000 +0100
 @@ -154,8 +154,8 @@
  	int	confflags;	/* administrative configuration flags */
  #define CONF_ENABLE_VJ    0x01	/* VJ header compression enabled */
@@ -698,7 +698,7 @@ diff -ur src.old/sys/net/if_sppp.h src/sys/net/if_sppp.h
  	struct slcp lcp;		/* LCP params */
 diff -ur src.old/sys/net/ppp_defs.h src/sys/net/ppp_defs.h
 --- src.old/sys/net/ppp_defs.h	2001-06-11 14:38:58.000000000 +0200
-+++ src/sys/net/ppp_defs.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/net/ppp_defs.h	2004-11-30 00:47:56.000000000 +0100
 @@ -142,8 +142,8 @@
   * the last NP packet was sent or received.
   */
@@ -711,8 +711,8 @@ diff -ur src.old/sys/net/ppp_defs.h src/sys/net/ppp_defs.h
  
  #ifndef __P
 diff -ur src.old/sys/netatm/atm_ioctl.h src/sys/netatm/atm_ioctl.h
---- src.old/sys/netatm/atm_ioctl.h	2003-07-29 15:32:10.000000000 +0200
-+++ src/sys/netatm/atm_ioctl.h	2004-11-27 18:08:36.000000000 +0100
+--- src.old/sys/netatm/atm_ioctl.h	2004-06-08 15:46:31.000000000 +0200
++++ src/sys/netatm/atm_ioctl.h	2004-11-30 00:47:56.000000000 +0100
 @@ -347,7 +347,7 @@
  	u_long		avp_obytes;		/* Bytes sent to VCC */
  	u_long		avp_ierrors;		/* Errors receiving from VCC */
@@ -724,7 +724,7 @@ diff -ur src.old/sys/netatm/atm_ioctl.h src/sys/netatm/atm_ioctl.h
  /*
 diff -ur src.old/sys/netatm/atm_sys.h src/sys/netatm/atm_sys.h
 --- src.old/sys/netatm/atm_sys.h	2002-06-14 21:31:07.000000000 +0200
-+++ src/sys/netatm/atm_sys.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/netatm/atm_sys.h	2004-11-30 00:47:56.000000000 +0100
 @@ -177,7 +177,7 @@
   */
  #ifdef DIAGNOSTIC
@@ -736,7 +736,7 @@ diff -ur src.old/sys/netatm/atm_sys.h src/sys/netatm/atm_sys.h
  	delta.tv_usec = now.tv_usec - atm_debugtime.tv_usec;		\
 diff -ur src.old/sys/netatm/atm_var.h src/sys/netatm/atm_var.h
 --- src.old/sys/netatm/atm_var.h	2003-10-31 19:32:10.000000000 +0100
-+++ src/sys/netatm/atm_var.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/netatm/atm_var.h	2004-11-30 00:47:56.000000000 +0100
 @@ -63,7 +63,7 @@
  extern int		atm_init;
  extern int		atm_version;
@@ -747,9 +747,9 @@ diff -ur src.old/sys/netatm/atm_var.h src/sys/netatm/atm_var.h
  extern int		atm_print_data;
  extern uma_zone_t	atm_attributes_zone;
 diff -ur src.old/sys/netinet/if_ether.h src/sys/netinet/if_ether.h
---- src.old/sys/netinet/if_ether.h	2003-03-05 00:19:52.000000000 +0100
-+++ src/sys/netinet/if_ether.h	2004-11-27 18:08:36.000000000 +0100
-@@ -37,6 +37,9 @@
+--- src.old/sys/netinet/if_ether.h	2004-04-07 22:46:13.000000000 +0200
++++ src/sys/netinet/if_ether.h	2004-11-30 00:47:56.000000000 +0100
+@@ -33,6 +33,9 @@
  #ifndef _NETINET_IF_ETHER_H_
  #define _NETINET_IF_ETHER_H_
  
@@ -760,9 +760,9 @@ diff -ur src.old/sys/netinet/if_ether.h src/sys/netinet/if_ether.h
  #include <net/if_arp.h>
  
 diff -ur src.old/sys/netinet/ip_mroute.h src/sys/netinet/ip_mroute.h
---- src.old/sys/netinet/ip_mroute.h	2003-08-07 20:16:59.000000000 +0200
-+++ src/sys/netinet/ip_mroute.h	2004-11-27 18:08:36.000000000 +0100
-@@ -185,7 +185,7 @@
+--- src.old/sys/netinet/ip_mroute.h	2004-08-16 20:32:07.000000000 +0200
++++ src/sys/netinet/ip_mroute.h	2004-11-30 00:49:54.000000000 +0100
+@@ -181,7 +181,7 @@
   */
  
  struct bw_data {
@@ -771,7 +771,7 @@ diff -ur src.old/sys/netinet/ip_mroute.h src/sys/netinet/ip_mroute.h
  	uint64_t	b_packets;
  	uint64_t	b_bytes;
  };
-@@ -285,7 +285,7 @@
+@@ -281,7 +281,7 @@
  	u_long		mfc_byte_cnt;		/* byte count for src-grp    */
  	u_long		mfc_wrong_if;		/* wrong if for src-grp	     */
  	int		mfc_expire;		/* time to clean entry up    */
@@ -780,16 +780,16 @@ diff -ur src.old/sys/netinet/ip_mroute.h src/sys/netinet/ip_mroute.h
  	struct rtdetq	*mfc_stall;		/* q of packets awaiting mfc */
  	struct mfc	*mfc_next;		/* next mfc entry            */
  	uint8_t		mfc_flags[MAXVIFS];	/* the MRT_MFC_FLAGS_* flags */
-@@ -341,7 +341,7 @@
+@@ -337,7 +337,7 @@
   */
  struct tbf
  {
--    struct timeval tbf_last_pkt_t; /* arr. time of last pkt 	*/
-+    struct __kernel_timeval tbf_last_pkt_t; /* arr. time of last pkt 	*/
-     u_long tbf_n_tok;      	/* no of tokens in bucket 	*/
-     u_long tbf_q_len;    	/* length of queue at this vif	*/
+-    struct timeval tbf_last_pkt_t; /* arr. time of last pkt	*/
++    struct __kernel_timeval tbf_last_pkt_t; /* arr. time of last pkt	*/
+     u_long tbf_n_tok;		/* no of tokens in bucket	*/
+     u_long tbf_q_len;		/* length of queue at this vif	*/
      u_long tbf_max_q_len;	/* max. queue length		*/
-@@ -372,7 +372,7 @@
+@@ -368,7 +368,7 @@
  
  	struct bw_data	bm_threshold;		/* the upcall threshold	     */
  	struct bw_data	bm_measured;		/* the measured bw	     */
@@ -798,24 +798,10 @@ diff -ur src.old/sys/netinet/ip_mroute.h src/sys/netinet/ip_mroute.h
  };
  
  #ifdef _KERNEL
-diff -ur src.old/sys/netinet6/in6_prefix.h src/sys/netinet6/in6_prefix.h
---- src.old/sys/netinet6/in6_prefix.h	2001-06-11 14:39:05.000000000 +0200
-+++ src/sys/netinet6/in6_prefix.h	2004-11-27 18:08:36.000000000 +0100
-@@ -39,8 +39,8 @@
- 	struct sockaddr_in6 rp_prefix;	/* prefix */
- 	u_int32_t rp_vltime;	/* advertised valid lifetime */
- 	u_int32_t rp_pltime;	/* advertised preferred lifetime */
--	time_t rp_expire;	/* expiration time of the prefix */
--	time_t rp_preferred;	/* preferred time of the prefix */
-+	__kernel_time_t rp_expire;	/* expiration time of the prefix */
-+	__kernel_time_t rp_preferred;	/* preferred time of the prefix */
- 	struct in6_prflags rp_flags;
- 	u_char	rp_origin; /* from where this prefix info is obtained */
- 	struct	rp_stateflags {
 diff -ur src.old/sys/netinet6/in6_var.h src/sys/netinet6/in6_var.h
---- src.old/sys/netinet6/in6_var.h	2003-10-30 16:29:17.000000000 +0100
-+++ src/sys/netinet6/in6_var.h	2004-11-27 18:08:36.000000000 +0100
-@@ -84,8 +84,8 @@
+--- src.old/sys/netinet6/in6_var.h	2004-04-07 22:46:15.000000000 +0200
++++ src/sys/netinet6/in6_var.h	2004-11-30 00:48:03.000000000 +0100
+@@ -80,8 +80,8 @@
   *	in kernel: modify preferred/expire only
   */
  struct in6_addrlifetime {
@@ -828,7 +814,7 @@ diff -ur src.old/sys/netinet6/in6_var.h src/sys/netinet6/in6_var.h
  };
 diff -ur src.old/sys/netinet6/ip6_mroute.h src/sys/netinet6/ip6_mroute.h
 --- src.old/sys/netinet6/ip6_mroute.h	2002-04-19 06:46:23.000000000 +0200
-+++ src/sys/netinet6/ip6_mroute.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/netinet6/ip6_mroute.h	2004-11-30 00:48:03.000000000 +0100
 @@ -238,7 +238,7 @@
  	u_quad_t    	mf6c_byte_cnt;		/* byte count for src-grp    */
  	u_quad_t    	mf6c_wrong_if;		/* wrong if for src-grp	     */
@@ -848,9 +834,9 @@ diff -ur src.old/sys/netinet6/ip6_mroute.h src/sys/netinet6/ip6_mroute.h
      struct rtdetq	*next;
  };
 diff -ur src.old/sys/netinet6/ip6_var.h src/sys/netinet6/ip6_var.h
---- src.old/sys/netinet6/ip6_var.h	2003-11-04 21:22:33.000000000 +0100
-+++ src/sys/netinet6/ip6_var.h	2004-11-27 18:08:36.000000000 +0100
-@@ -309,7 +309,7 @@
+--- src.old/sys/netinet6/ip6_var.h	2004-09-22 21:23:39.000000000 +0200
++++ src/sys/netinet6/ip6_var.h	2004-11-30 00:48:03.000000000 +0100
+@@ -302,7 +302,7 @@
  extern int	ip6_accept_rtadv;	/* Acts as a host not a router */
  extern int	ip6_keepfaith;		/* Firewall Aided Internet Translator */
  extern int	ip6_log_interval;
@@ -861,7 +847,7 @@ diff -ur src.old/sys/netinet6/ip6_var.h src/sys/netinet6/ip6_var.h
  
 diff -ur src.old/sys/netinet6/nd6.h src/sys/netinet6/nd6.h
 --- src.old/sys/netinet6/nd6.h	2003-10-31 17:06:04.000000000 +0100
-+++ src/sys/netinet6/nd6.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/netinet6/nd6.h	2004-11-30 00:48:03.000000000 +0100
 @@ -156,7 +156,7 @@
  		u_char	origin;
  		u_int32_t vltime;
@@ -884,7 +870,7 @@ diff -ur src.old/sys/netinet6/nd6.h src/sys/netinet6/nd6.h
  	/* list of routers that advertise the prefix: */
 diff -ur src.old/sys/netncp/ncp_lib.h src/sys/netncp/ncp_lib.h
 --- src.old/sys/netncp/ncp_lib.h	2002-07-28 01:16:49.000000000 +0200
-+++ src/sys/netncp/ncp_lib.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/netncp/ncp_lib.h	2004-11-30 00:48:03.000000000 +0100
 @@ -158,9 +158,9 @@
  void NWUnpackDateTime(nuint32, NW_DATE *, NW_TIME *);
  void NWUnpackDate(nuint16, NW_DATE *);
@@ -909,7 +895,7 @@ diff -ur src.old/sys/netncp/ncp_lib.h src/sys/netncp/ncp_lib.h
  NWCCODE NWGetObjectConnectionNumbers(NWCONN_HANDLE, pnstr8, nuint16,
 diff -ur src.old/sys/netncp/ncp_sock.h src/sys/netncp/ncp_sock.h
 --- src.old/sys/netncp/ncp_sock.h	2003-02-26 22:25:55.000000000 +0100
-+++ src/sys/netncp/ncp_sock.h	2004-11-27 18:08:36.000000000 +0100
++++ src/sys/netncp/ncp_sock.h	2004-11-30 00:48:03.000000000 +0100
 @@ -39,14 +39,14 @@
  struct ncp_rq;
  struct proc;
@@ -928,9 +914,9 @@ diff -ur src.old/sys/netncp/ncp_sock.h src/sys/netncp/ncp_sock.h
  int  ncp_sock_checksum(struct ncp_conn *conn, int enable);
  
 diff -ur src.old/sys/nfsclient/nfs.h src/sys/nfsclient/nfs.h
---- src.old/sys/nfsclient/nfs.h	2003-11-22 03:21:48.000000000 +0100
-+++ src/sys/nfsclient/nfs.h	2004-11-27 18:08:36.000000000 +0100
-@@ -40,6 +40,11 @@
+--- src.old/sys/nfsclient/nfs.h	2004-07-06 11:12:02.000000000 +0200
++++ src/sys/nfsclient/nfs.h	2004-11-30 00:48:03.000000000 +0100
+@@ -36,6 +36,11 @@
  #ifndef _NFSCLIENT_NFS_H_
  #define _NFSCLIENT_NFS_H_
  
@@ -943,9 +929,9 @@ diff -ur src.old/sys/nfsclient/nfs.h src/sys/nfsclient/nfs.h
  #include "opt_nfs.h"
  #endif
 diff -ur src.old/sys/nfsclient/nfsnode.h src/sys/nfsclient/nfsnode.h
---- src.old/sys/nfsclient/nfsnode.h	2003-11-22 03:21:49.000000000 +0100
-+++ src/sys/nfsclient/nfsnode.h	2004-11-27 18:08:36.000000000 +0100
-@@ -97,25 +97,25 @@
+--- src.old/sys/nfsclient/nfsnode.h	2004-04-15 01:23:55.000000000 +0200
++++ src/sys/nfsclient/nfsnode.h	2004-11-30 00:48:03.000000000 +0100
+@@ -93,25 +93,25 @@
  	u_quad_t		n_brev;		/* Modify rev when cached */
  	u_quad_t		n_lrev;		/* Modify rev for lease */
  	struct vattr		n_vattr;	/* Vnode attribute cache */
@@ -979,9 +965,9 @@ diff -ur src.old/sys/nfsclient/nfsnode.h src/sys/nfsclient/nfsnode.h
  	} n_un2;
  	union {
 diff -ur src.old/sys/nfsserver/nfs.h src/sys/nfsserver/nfs.h
---- src.old/sys/nfsserver/nfs.h	2003-05-25 08:17:33.000000000 +0200
-+++ src/sys/nfsserver/nfs.h	2004-11-27 18:08:37.000000000 +0100
-@@ -252,7 +252,7 @@
+--- src.old/sys/nfsserver/nfs.h	2004-05-24 06:06:14.000000000 +0200
++++ src/sys/nfsserver/nfs.h	2004-11-30 00:48:03.000000000 +0100
+@@ -256,7 +256,7 @@
  	int			nd_len;		/* Length of this write */
  	int			nd_repstat;	/* Reply status */
  	u_int32_t		nd_retxid;	/* Reply xid */
@@ -992,7 +978,7 @@ diff -ur src.old/sys/nfsserver/nfs.h src/sys/nfsserver/nfs.h
  };
 diff -ur src.old/sys/posix4/posix4.h src/sys/posix4/posix4.h
 --- src.old/sys/posix4/posix4.h	2003-02-19 06:47:42.000000000 +0100
-+++ src/sys/posix4/posix4.h	2004-11-27 18:08:37.000000000 +0100
++++ src/sys/posix4/posix4.h	2004-11-30 00:48:03.000000000 +0100
 @@ -109,7 +109,7 @@
  int ksched_get_priority_min(register_t *, struct ksched *, int);
  
@@ -1004,7 +990,7 @@ diff -ur src.old/sys/posix4/posix4.h src/sys/posix4/posix4.h
  
 diff -ur src.old/sys/posix4/sched.h src/sys/posix4/sched.h
 --- src.old/sys/posix4/sched.h	2002-10-03 08:27:50.000000000 +0200
-+++ src/sys/posix4/sched.h	2004-11-27 18:08:37.000000000 +0100
++++ src/sys/posix4/sched.h	2004-11-30 00:48:03.000000000 +0100
 @@ -59,14 +59,14 @@
  #ifndef _KERNEL
  #include <sys/cdefs.h>
@@ -1023,9 +1009,9 @@ diff -ur src.old/sys/posix4/sched.h src/sys/posix4/sched.h
  int	sched_setscheduler(pid_t, int, const struct sched_param *);
  int	sched_yield(void);
 diff -ur src.old/sys/sys/acct.h src/sys/sys/acct.h
---- src.old/sys/sys/acct.h	2003-03-28 16:27:30.000000000 +0100
-+++ src/sys/sys/acct.h	2004-11-27 18:08:37.000000000 +0100
-@@ -55,7 +55,7 @@
+--- src.old/sys/sys/acct.h	2004-06-17 19:16:52.000000000 +0200
++++ src/sys/sys/acct.h	2004-11-30 00:48:03.000000000 +0100
+@@ -51,7 +51,7 @@
  	comp_t	  ac_utime;		/* user time */
  	comp_t	  ac_stime;		/* system time */
  	comp_t	  ac_etime;		/* elapsed time */
@@ -1035,11 +1021,11 @@ diff -ur src.old/sys/sys/acct.h src/sys/sys/acct.h
  	gid_t	  ac_gid;		/* group id */
  	u_int16_t ac_mem;		/* average memory usage */
 diff -ur src.old/sys/sys/acl.h src/sys/sys/acl.h
---- src.old/sys/sys/acl.h	2003-08-04 04:13:04.000000000 +0200
-+++ src/sys/sys/acl.h	2004-11-27 18:08:37.000000000 +0100
+--- src.old/sys/sys/acl.h	2004-05-10 20:38:07.000000000 +0200
++++ src/sys/sys/acl.h	2004-11-30 00:48:03.000000000 +0100
 @@ -35,6 +35,9 @@
- #ifndef _SYS_ACL_H
- #define	_SYS_ACL_H
+ #ifndef _SYS_ACL_H_
+ #define	_SYS_ACL_H_
  
 +#include <features.h>
 +#include <sys/types.h>
@@ -1180,7 +1166,7 @@ diff -ur src.old/sys/sys/acl.h src/sys/sys/acl.h
  #endif /* !_KERNEL */
 diff -ur src.old/sys/sys/aio.h src/sys/sys/aio.h
 --- src.old/sys/sys/aio.h	2002-01-06 22:03:39.000000000 +0100
-+++ src/sys/sys/aio.h	2004-11-27 18:08:37.000000000 +0100
++++ src/sys/sys/aio.h	2004-11-30 00:48:03.000000000 +0100
 @@ -116,9 +116,9 @@
  /*
   * Suspend until all specified I/O or timeout is complete.
@@ -1194,9 +1180,9 @@ diff -ur src.old/sys/sys/aio.h src/sys/sys/aio.h
  __END_DECLS
  
 diff -ur src.old/sys/sys/callout.h src/sys/sys/callout.h
---- src.old/sys/sys/callout.h	2002-03-19 21:18:36.000000000 +0100
-+++ src/sys/sys/callout.h	2004-11-27 18:08:37.000000000 +0100
-@@ -42,6 +42,8 @@
+--- src.old/sys/sys/callout.h	2004-04-20 17:49:31.000000000 +0200
++++ src/sys/sys/callout.h	2004-11-30 00:48:03.000000000 +0100
+@@ -38,6 +38,8 @@
  #ifndef _SYS_CALLOUT_H_
  #define _SYS_CALLOUT_H_
  
@@ -1207,7 +1193,7 @@ diff -ur src.old/sys/sys/callout.h src/sys/sys/callout.h
  SLIST_HEAD(callout_list, callout);
 diff -ur src.old/sys/sys/dvdio.h src/sys/sys/dvdio.h
 --- src.old/sys/sys/dvdio.h	2002-03-04 22:08:35.000000000 +0100
-+++ src/sys/sys/dvdio.h	2004-11-27 18:08:37.000000000 +0100
++++ src/sys/sys/dvdio.h	2004-11-30 00:48:03.000000000 +0100
 @@ -31,6 +31,8 @@
  #ifndef _SYS_DVDIO_H_
  #define _SYS_DVDIO_H_
@@ -1218,10 +1204,10 @@ diff -ur src.old/sys/sys/dvdio.h src/sys/sys/dvdio.h
  	u_int8_t book_type	:4;
  	u_int8_t book_version	:4;
 diff -ur src.old/sys/sys/errno.h src/sys/sys/errno.h
---- src.old/sys/sys/errno.h	2002-10-07 08:25:23.000000000 +0200
-+++ src/sys/sys/errno.h	2004-11-27 18:10:59.000000000 +0100
-@@ -39,16 +39,8 @@
-  * $FreeBSD: src/sys/sys/errno.h,v 1.25 2002/10/07 06:25:23 phk Exp $
+--- src.old/sys/sys/errno.h	2004-04-07 06:19:49.000000000 +0200
++++ src/sys/sys/errno.h	2004-11-30 00:48:03.000000000 +0100
+@@ -35,16 +35,8 @@
+  * $FreeBSD: src/sys/sys/errno.h,v 1.26 2004/04/07 04:19:49 imp Exp $
   */
  
 -#ifndef _SYS_ERRNO_H_
@@ -1239,7 +1225,7 @@ diff -ur src.old/sys/sys/errno.h src/sys/sys/errno.h
  
  #define	EPERM		1		/* Operation not permitted */
  #define	ENOENT		2		/* No such file or directory */
-@@ -65,9 +57,7 @@
+@@ -61,9 +53,7 @@
  #define	ENOMEM		12		/* Cannot allocate memory */
  #define	EACCES		13		/* Permission denied */
  #define	EFAULT		14		/* Bad address */
@@ -1249,7 +1235,7 @@ diff -ur src.old/sys/sys/errno.h src/sys/sys/errno.h
  #define	EBUSY		16		/* Device busy */
  #define	EEXIST		17		/* File exists */
  #define	EXDEV		18		/* Cross-device link */
-@@ -78,9 +68,7 @@
+@@ -74,9 +64,7 @@
  #define	ENFILE		23		/* Too many open files in system */
  #define	EMFILE		24		/* Too many open files */
  #define	ENOTTY		25		/* Inappropriate ioctl for device */
@@ -1259,7 +1245,7 @@ diff -ur src.old/sys/sys/errno.h src/sys/sys/errno.h
  #define	EFBIG		27		/* File too large */
  #define	ENOSPC		28		/* No space left on device */
  #define	ESPIPE		29		/* Illegal seek */
-@@ -88,13 +76,21 @@
+@@ -84,13 +72,21 @@
  #define	EMLINK		31		/* Too many links */
  #define	EPIPE		32		/* Broken pipe */
  
@@ -1282,7 +1268,7 @@ diff -ur src.old/sys/sys/errno.h src/sys/sys/errno.h
  #define	EWOULDBLOCK	EAGAIN		/* Operation would block */
  #define	EINPROGRESS	36		/* Operation now in progress */
  #define	EALREADY	37		/* Operation already in progress */
-@@ -129,18 +125,14 @@
+@@ -125,18 +121,14 @@
  #define	ECONNREFUSED	61		/* Connection refused */
  
  #define	ELOOP		62		/* Too many levels of symbolic links */
@@ -1301,7 +1287,7 @@ diff -ur src.old/sys/sys/errno.h src/sys/sys/errno.h
  #define	EPROCLIM	67		/* Too many processes */
  #define	EUSERS		68		/* Too many users */
  #define	EDQUOT		69		/* Disc quota exceeded */
-@@ -153,28 +145,32 @@
+@@ -149,28 +141,32 @@
  #define	EPROGUNAVAIL	74		/* RPC prog. not avail */
  #define	EPROGMISMATCH	75		/* Program version wrong */
  #define	EPROCUNAVAIL	76		/* Bad procedure for program */
@@ -1339,7 +1325,7 @@ diff -ur src.old/sys/sys/errno.h src/sys/sys/errno.h
  #ifdef _KERNEL
  /* pseudo-errors returned inside kernel to modify return to process */
  #define	ERESTART	(-1)		/* restart syscall */
-@@ -183,4 +179,22 @@
+@@ -179,4 +175,22 @@
  #define	EDIRIOCTL	(-4)		/* do direct ioctl in GEOM */
  #endif
  
@@ -1364,9 +1350,9 @@ diff -ur src.old/sys/sys/errno.h src/sys/sys/errno.h
 +
 +#endif /* <errno.h> included.  */
 diff -ur src.old/sys/sys/event.h src/sys/sys/event.h
---- src.old/sys/sys/event.h	2003-02-02 20:39:51.000000000 +0100
-+++ src/sys/sys/event.h	2004-11-27 18:08:37.000000000 +0100
-@@ -184,13 +184,13 @@
+--- src.old/sys/sys/event.h	2004-08-15 17:36:18.000000000 +0200
++++ src/sys/sys/event.h	2004-11-30 00:48:03.000000000 +0100
+@@ -217,13 +217,13 @@
  #else 	/* !_KERNEL */
  
  #include <sys/cdefs.h>
@@ -1384,7 +1370,7 @@ diff -ur src.old/sys/sys/event.h src/sys/sys/event.h
  #endif /* !_KERNEL */
 diff -ur src.old/sys/sys/extattr.h src/sys/sys/extattr.h
 --- src.old/sys/sys/extattr.h	2003-06-04 06:04:24.000000000 +0200
-+++ src/sys/sys/extattr.h	2004-11-27 18:08:37.000000000 +0100
++++ src/sys/sys/extattr.h	2004-11-30 00:48:03.000000000 +0100
 @@ -50,36 +50,36 @@
  	    struct ucred *cred, struct thread *td, int access);
  
@@ -1449,19 +1435,19 @@ diff -ur src.old/sys/sys/extattr.h src/sys/sys/extattr.h
  
  #endif /* !_KERNEL */
 diff -ur src.old/sys/sys/filedesc.h src/sys/sys/filedesc.h
---- src.old/sys/sys/filedesc.h	2003-11-11 23:07:29.000000000 +0100
-+++ src/sys/sys/filedesc.h	2004-11-27 18:08:37.000000000 +0100
-@@ -39,6 +39,7 @@
+--- src.old/sys/sys/filedesc.h	2004-08-15 08:24:42.000000000 +0200
++++ src/sys/sys/filedesc.h	2004-11-30 00:50:23.000000000 +0100
+@@ -33,6 +33,7 @@
+ #ifndef _SYS_FILEDESC_H_
+ #define	_SYS_FILEDESC_H_
  
- #include <sys/_lock.h>
- #include <sys/_mutex.h>
 +#include <sys/types.h>
  #include <sys/queue.h>
- 
- /*
+ #include <sys/event.h>
+ #include <sys/_lock.h>
 diff -ur src.old/sys/sys/jail.h src/sys/sys/jail.h
---- src.old/sys/sys/jail.h	2003-04-09 04:55:18.000000000 +0200
-+++ src/sys/sys/jail.h	2004-11-27 18:08:37.000000000 +0100
+--- src.old/sys/sys/jail.h	2004-04-26 21:46:52.000000000 +0200
++++ src/sys/sys/jail.h	2004-11-30 00:48:03.000000000 +0100
 @@ -13,6 +13,10 @@
  #ifndef _SYS_JAIL_H_
  #define _SYS_JAIL_H_
@@ -1486,21 +1472,9 @@ diff -ur src.old/sys/sys/jail.h src/sys/sys/jail.h
  
  #else /* _KERNEL */
  
-diff -ur src.old/sys/sys/kernel.h src/sys/sys/kernel.h
---- src.old/sys/sys/kernel.h	2003-10-17 17:46:31.000000000 +0200
-+++ src/sys/sys/kernel.h	2004-11-27 18:08:37.000000000 +0100
-@@ -66,7 +66,7 @@
- extern char kernelname[MAXPATHLEN];
- 
- /* 1.2 */
--extern struct timeval boottime;
-+extern struct __kernel_timeval boottime;
- 
- extern int tick;			/* usec per tick (1000000 / hz) */
- extern int hz;				/* system clock's frequency */
 diff -ur src.old/sys/sys/linker.h src/sys/sys/linker.h
---- src.old/sys/sys/linker.h	2003-05-01 05:31:17.000000000 +0200
-+++ src/sys/sys/linker.h	2004-11-27 18:08:37.000000000 +0100
+--- src.old/sys/sys/linker.h	2004-09-03 20:32:24.000000000 +0200
++++ src/sys/sys/linker.h	2004-11-30 00:54:29.000000000 +0100
 @@ -172,6 +172,13 @@
  int linker_ddb_symbol_values(c_linker_sym_t _sym, linker_symval_t *_symval);
  
@@ -1515,7 +1489,7 @@ diff -ur src.old/sys/sys/linker.h src/sys/sys/linker.h
  #endif	/* _KERNEL */
  
  /*
-@@ -266,26 +273,45 @@
+@@ -268,13 +275,19 @@
      size_t	size;		/* size in bytes */
  };
  
@@ -1534,46 +1508,33 @@ diff -ur src.old/sys/sys/linker.h src/sys/sys/linker.h
  };
 -#define KLDSYM_LOOKUP	1
  
- #ifndef _KERNEL
+ /*
+  * Flags for kldunloadf() and linker_file_unload()
+@@ -287,14 +300,13 @@
+ #include <sys/cdefs.h>
  
--#include <sys/cdefs.h>
--
  __BEGIN_DECLS
 -int	kldload(const char* _file);
 -int	kldunload(int _fileid);
+-int	kldunloadf(int _fileid, int flags);
 -int	kldfind(const char* _file);
 -int	kldnext(int _fileid);
 -int	kldstat(int _fileid, struct kld_file_stat* _stat);
 -int	kldfirstmod(int _fileid);
 -int	kldsym(int _fileid, int _cmd, void *_data);
-+
-+/* Load a KLD kernel module into the kernel.  */
 +extern int kldload (__const char *__file) __THROW;
-+
-+/* Unload a KLD kernel module from the kernel.  */
 +extern int kldunload (int __fileid) __THROW;
-+
-+/* Return the fileid of loaded KLD kernel module.  */
 +extern int kldfind (__const char *__file) __THROW;
-+
-+/* Return the fileid of the next loaded KLD kernel module after FILEID.  */
 +extern int kldnext (int __fileid) __THROW;
-+
-+/* Return info about the loaded KLD kernel module FILEID in *STATP.  */
 +extern int kldstat (int __fileid, struct kld_file_stat *__statp) __THROW;
-+
-+/* Return the moduleid of the first module referenced by FILEID.  */
 +extern int kldfirstmod (int __fileid) __THROW;
-+
-+/* Perform an operation related to kernel module symbols.  */
 +extern int kldsym (int __fileid, int __cmd, void*__data) __THROW;
-+
  __END_DECLS
  
  #endif
 diff -ur src.old/sys/sys/lock.h src/sys/sys/lock.h
---- src.old/sys/sys/lock.h	2003-09-20 00:01:56.000000000 +0200
-+++ src/sys/sys/lock.h	2004-11-27 18:08:37.000000000 +0100
+--- src.old/sys/sys/lock.h	2004-01-28 21:39:57.000000000 +0100
++++ src/sys/sys/lock.h	2004-11-30 00:48:03.000000000 +0100
 @@ -32,6 +32,7 @@
  #ifndef _SYS_LOCK_H_
  #define _SYS_LOCK_H_
@@ -1583,10 +1544,10 @@ diff -ur src.old/sys/sys/lock.h src/sys/sys/lock.h
  #include <sys/_lock.h>
  
 diff -ur src.old/sys/sys/memrange.h src/sys/sys/memrange.h
---- src.old/sys/sys/memrange.h	2002-09-15 17:07:50.000000000 +0200
-+++ src/sys/sys/memrange.h	2004-11-27 18:08:37.000000000 +0100
+--- src.old/sys/sys/memrange.h	2004-08-04 20:30:31.000000000 +0200
++++ src/sys/sys/memrange.h	2004-11-30 00:48:03.000000000 +0100
 @@ -4,6 +4,11 @@
-  * $FreeBSD: src/sys/sys/memrange.h,v 1.6 2002/09/15 15:07:50 dwmalone Exp $
+  * $FreeBSD: src/sys/sys/memrange.h,v 1.7 2004/08/04 18:30:31 markm Exp $
   */
  
 +#ifndef _SYS_MEMRANGE_H_
@@ -1598,14 +1559,14 @@ diff -ur src.old/sys/sys/memrange.h src/sys/sys/memrange.h
  #define MDF_UNCACHEABLE		(1<<0)	/* region not cached */
  #define MDF_WRITECOMBINE	(1<<1)	/* region supports "write combine" action */
 @@ -69,3 +74,4 @@
- extern void mem_range_AP_init(void);
+ 
  #endif
  
 +#endif /* _SYS_MEMRANGE_H_ */
 diff -ur src.old/sys/sys/param.h src/sys/sys/param.h
---- src.old/sys/sys/param.h	2004-02-23 06:34:20.000000000 +0100
-+++ src/sys/sys/param.h	2004-11-27 18:08:37.000000000 +0100
-@@ -42,7 +42,9 @@
+--- src.old/sys/sys/param.h	2004-10-03 19:04:41.000000000 +0200
++++ src/sys/sys/param.h	2004-11-30 00:48:03.000000000 +0100
+@@ -38,7 +38,9 @@
  #ifndef _SYS_PARAM_H_
  #define _SYS_PARAM_H_
  
@@ -1616,9 +1577,9 @@ diff -ur src.old/sys/sys/param.h src/sys/sys/param.h
  
  #define	BSD	199506		/* System version (year & month). */
  #define BSD4_3	1
-@@ -61,9 +63,8 @@
+@@ -57,9 +59,8 @@
  #undef __FreeBSD_version
- #define __FreeBSD_version 502010	/* Master, propagated to newvers */
+ #define __FreeBSD_version 503001	/* Master, propagated to newvers */
  
 -#ifndef LOCORE
 +/* Some inet code expects that this file defines the 'u_int32_t' type.  */
@@ -1627,7 +1588,7 @@ diff -ur src.old/sys/sys/param.h src/sys/sys/param.h
  
  /*
   * Machine-independent constants (some used in following include files).
-@@ -73,6 +74,7 @@
+@@ -69,6 +70,7 @@
   * MAXLOGNAME should be == UT_NAMESIZE+1 (see <utmp.h>)
   */
  #include <sys/syslimits.h>
@@ -1635,7 +1596,7 @@ diff -ur src.old/sys/sys/param.h src/sys/sys/param.h
  
  #define	MAXCOMLEN	19		/* max command name remembered */
  #define	MAXINTERP	32		/* max interpreter file name length */
-@@ -183,8 +185,6 @@
+@@ -179,8 +181,6 @@
  #define	PCATCH	0x100		/* OR'd with pri for tsleep to check signals */
  #define	PDROP	0x200	/* OR'd with pri to stop re-entry of interlock mutex */
  
@@ -1644,7 +1605,7 @@ diff -ur src.old/sys/sys/param.h src/sys/sys/param.h
  #define	NBBY	8		/* number of bits in a byte */
  #define	NBPW	sizeof(int)	/* number of bytes per word (integer) */
  
-@@ -285,28 +285,6 @@
+@@ -278,28 +278,6 @@
  #endif /* _KERNEL */
  
  /*
@@ -1675,7 +1636,7 @@ diff -ur src.old/sys/sys/param.h src/sys/sys/param.h
   * The number of CPU `tick's that map to a unique `%age' can be expressed
 diff -ur src.old/sys/sys/pciio.h src/sys/sys/pciio.h
 --- src.old/sys/sys/pciio.h	2001-09-05 03:22:14.000000000 +0200
-+++ src/sys/sys/pciio.h	2004-11-27 18:08:37.000000000 +0100
++++ src/sys/sys/pciio.h	2004-11-30 00:48:03.000000000 +0100
 @@ -31,6 +31,7 @@
  #ifndef _SYS_PCIIO_H_
  #define	_SYS_PCIIO_H_
@@ -1685,18 +1646,9 @@ diff -ur src.old/sys/sys/pciio.h src/sys/sys/pciio.h
  
  #define PCI_MAXNAMELEN	16
 diff -ur src.old/sys/sys/pipe.h src/sys/sys/pipe.h
---- src.old/sys/sys/pipe.h	2003-11-12 04:14:31.000000000 +0100
-+++ src/sys/sys/pipe.h	2004-11-27 18:08:37.000000000 +0100
-@@ -25,7 +25,7 @@
- #define _SYS_PIPE_H_
- 
- #ifndef _KERNEL
--#include <sys/time.h>			/* for struct timespec */
-+#include <sys/time.h>			/* for struct __kernel_timespec */
- #include <sys/selinfo.h>		/* for struct selinfo */
- #include <vm/vm.h>			/* for vm_page_t */
- #include <machine/param.h>		/* for PAGE_SIZE */
-@@ -108,9 +108,9 @@
+--- src.old/sys/sys/pipe.h	2004-07-21 05:11:41.000000000 +0200
++++ src/sys/sys/pipe.h	2004-11-30 00:48:03.000000000 +0100
+@@ -103,9 +103,9 @@
  	struct	pipebuf pipe_buffer;	/* data storage */
  	struct	pipemapping pipe_map;	/* pipe mapping for direct I/O */
  	struct	selinfo pipe_sel;	/* for compat with select */
@@ -1708,11 +1660,11 @@ diff -ur src.old/sys/sys/pipe.h src/sys/sys/pipe.h
 +	struct	__kernel_timespec pipe_ctime;	/* time of status change */
  	struct	sigio *pipe_sigio;	/* information for async I/O */
  	struct	pipe *pipe_peer;	/* link with other direction */
- 	u_int	pipe_state;		/* pipe status info */
+ 	struct	pipepair *pipe_pair;	/* container structure pointer */
 diff -ur src.old/sys/sys/proc.h src/sys/sys/proc.h
---- src.old/sys/sys/proc.h	2003-11-16 00:57:19.000000000 +0100
-+++ src/sys/sys/proc.h	2004-11-27 18:08:37.000000000 +0100
-@@ -56,12 +56,13 @@
+--- src.old/sys/sys/proc.h	2004-10-22 21:13:07.000000000 +0200
++++ src/sys/sys/proc.h	2004-11-30 00:48:03.000000000 +0100
+@@ -52,12 +52,13 @@
  #include <sys/sigio.h>
  #include <sys/signal.h>
  #ifndef _KERNEL
@@ -1727,7 +1679,7 @@ diff -ur src.old/sys/sys/proc.h src/sys/sys/proc.h
  #include <machine/proc.h>		/* Machine-dependent proc substruct. */
  
  /*
-@@ -560,7 +561,7 @@
+@@ -528,7 +529,7 @@
  	pid_t		p_oppid;	/* (c + e) Save ppid in ptrace. XXX */
  	struct vmspace	*p_vmspace;	/* (b) Address space. */
  	u_int		p_swtime;	/* (j) Time swapped in or out. */
@@ -1737,37 +1689,21 @@ diff -ur src.old/sys/sys/proc.h src/sys/sys/proc.h
  	u_int64_t	p_uu;		/* (j) Previous user time in usec. */
  	u_int64_t	p_su;		/* (j) Previous system time in usec. */
 diff -ur src.old/sys/sys/procfs.h src/sys/sys/procfs.h
---- src.old/sys/sys/procfs.h	2001-08-16 10:35:51.000000000 +0200
-+++ src/sys/sys/procfs.h	2004-11-27 18:08:37.000000000 +0100
-@@ -65,8 +65,6 @@
-     gregset_t	pr_reg;		/* General purpose registers (1) */
- } prstatus_t;
+--- src.old/sys/sys/procfs.h	2004-07-15 05:52:17.000000000 +0200
++++ src/sys/sys/procfs.h	2004-11-30 01:01:31.000000000 +0100
+@@ -82,4 +82,8 @@
  
--typedef fpregset_t prfpregset_t;
--
- #define PRFNAMESZ	16	/* Maximum command length saved */
- #define PRARGSZ		80	/* Maximum argument bytes saved */
+ typedef void *psaddr_t;		/* An address in the target process. */
  
-@@ -79,4 +77,15 @@
-     char	pr_psargs[PRARGSZ+1];	/* Arguments, null terminated (1) */
- } prpsinfo_t;
- 
-+/* Addresses.  */
-+typedef void *psaddr_t;
-+
-+/* Register sets.  */
-+typedef gregset_t prgregset_t;
-+typedef fpregset_t prfpregset_t;
-+
 +/* We don't have any differences between processes and threads,
 +   therefore have only one PID type.  */
 +typedef __pid_t lwpid_t;
 +
  #endif /* _SYS_PROCFS_H_ */
 diff -ur src.old/sys/sys/reboot.h src/sys/sys/reboot.h
---- src.old/sys/sys/reboot.h	2003-11-15 11:04:05.000000000 +0100
-+++ src/sys/sys/reboot.h	2004-11-27 18:08:37.000000000 +0100
-@@ -37,6 +37,8 @@
+--- src.old/sys/sys/reboot.h	2004-04-07 06:19:49.000000000 +0200
++++ src/sys/sys/reboot.h	2004-11-30 00:48:07.000000000 +0100
+@@ -33,6 +33,8 @@
  #ifndef _SYS_REBOOT_H_
  #define	_SYS_REBOOT_H_
  
@@ -1776,7 +1712,7 @@ diff -ur src.old/sys/sys/reboot.h src/sys/sys/reboot.h
  /*
   * Arguments to reboot system call.  These are passed to
   * the boot program and on to init.
-@@ -68,4 +70,11 @@
+@@ -64,4 +66,11 @@
  
  #define	RB_BOOTINFO	0x80000000	/* have `struct bootinfo *' arg */
  
@@ -1789,9 +1725,9 @@ diff -ur src.old/sys/sys/reboot.h src/sys/sys/reboot.h
 +
  #endif
 diff -ur src.old/sys/sys/resourcevar.h src/sys/sys/resourcevar.h
---- src.old/sys/sys/resourcevar.h	2003-10-28 21:46:23.000000000 +0100
-+++ src/sys/sys/resourcevar.h	2004-11-27 18:08:37.000000000 +0100
-@@ -39,6 +39,8 @@
+--- src.old/sys/sys/resourcevar.h	2004-08-04 20:14:19.000000000 +0200
++++ src/sys/sys/resourcevar.h	2004-11-30 01:02:47.000000000 +0100
+@@ -35,6 +35,8 @@
  
  #include <sys/resource.h>
  #include <sys/queue.h>
@@ -1800,25 +1736,25 @@ diff -ur src.old/sys/sys/resourcevar.h src/sys/sys/resourcevar.h
  #ifdef _KERNEL
  #include <sys/_lock.h>
  #include <sys/_mutex.h>
-@@ -52,7 +54,7 @@
+@@ -54,7 +56,7 @@
  #define	pstat_startzero	p_ru
- 	struct	rusage p_ru;		/* stats for this proc */
- 	struct	rusage p_cru;		/* sum of stats for reaped children */
--	struct	itimerval p_timer[3];	/* virtual-time timers */
-+	struct	__kernel_itimerval p_timer[3];	/* virtual-time timers */
+ 	struct	rusage p_ru;		/* Stats for this process. */
+ 	struct	rusage p_cru;		/* Stats for reaped children. */
+-	struct	itimerval p_timer[3];	/* (j) Virtual-time timers. */
++	struct	__kernel_itimerval p_timer[3];	/* (j) Virtual-time timers. */
  #define	pstat_endzero	pstat_startcopy
  
  #define	pstat_startcopy	p_prof
 @@ -65,7 +67,7 @@
- 		u_int	pr_ticks;	/* temp storage for ticks until AST */
+ 		u_long	pr_scale;	/* (c + j) PC scaling. */
  	} p_prof;
  #define	pstat_endcopy	p_start
--	struct	timeval p_start;	/* starting time */
-+	struct	__kernel_timeval p_start;	/* starting time */
+-	struct	timeval p_start;	/* (b) Starting time. */
++	struct	__kernel_timeval p_start;	/* (b) Starting time. */
  };
  
- /*
-@@ -101,8 +103,8 @@
+ #ifdef _KERNEL
+@@ -110,8 +112,8 @@
  
  void	 addupc_intr(struct thread *td, uintptr_t pc, u_int ticks);
  void	 addupc_task(struct thread *td, uintptr_t pc, u_int ticks);
@@ -1826,12 +1762,12 @@ diff -ur src.old/sys/sys/resourcevar.h src/sys/sys/resourcevar.h
 -	    struct timeval *ip);
 +void	 calcru(struct proc *p, struct __kernel_timeval *up, struct __kernel_timeval *sp,
 +	    struct __kernel_timeval *ip);
- int	 chgproccnt(struct uidinfo *uip, int diff, int max);
+ int	 chgproccnt(struct uidinfo *uip, int diff, int maxval);
  int	 chgsbsize(struct uidinfo *uip, u_int *hiwat, u_int to,
- 	    rlim_t max);
+ 	    rlim_t maxval);
 diff -ur src.old/sys/sys/rtprio.h src/sys/sys/rtprio.h
 --- src.old/sys/sys/rtprio.h	2002-03-19 21:18:41.000000000 +0100
-+++ src/sys/sys/rtprio.h	2004-11-27 18:08:37.000000000 +0100
++++ src/sys/sys/rtprio.h	2004-11-30 00:48:07.000000000 +0100
 @@ -36,6 +36,10 @@
  
  #include <sys/priority.h>
@@ -1870,9 +1806,9 @@ diff -ur src.old/sys/sys/rtprio.h src/sys/sys/rtprio.h
  #endif	/* !_KERNEL */
  #endif	/* !_SYS_RTPRIO_H_ */
 diff -ur src.old/sys/sys/signalvar.h src/sys/sys/signalvar.h
---- src.old/sys/sys/signalvar.h	2003-11-10 04:11:08.000000000 +0100
-+++ src/sys/sys/signalvar.h	2004-11-27 18:08:37.000000000 +0100
-@@ -47,6 +47,9 @@
+--- src.old/sys/sys/signalvar.h	2004-07-13 09:20:09.000000000 +0200
++++ src/sys/sys/signalvar.h	2004-11-30 00:48:07.000000000 +0100
+@@ -43,6 +43,9 @@
   * not exported to user programs.
   */
  
@@ -1882,7 +1818,7 @@ diff -ur src.old/sys/sys/signalvar.h src/sys/sys/signalvar.h
  /*
   * Logical process signal actions and state, needed only within the process
   * The mapping between sigacts and proc structures is 1:1 except for rfork()
-@@ -99,10 +102,14 @@
+@@ -95,10 +98,14 @@
  typedef void __osiginfohandler_t(int, osiginfo_t *, void *);
  #endif /* _KERNEL && COMPAT_43 */
  
@@ -1897,7 +1833,7 @@ diff -ur src.old/sys/sys/signalvar.h src/sys/sys/signalvar.h
  /*
   * get signal action for process and signal; currently only for current process
   */
-@@ -185,7 +192,7 @@
+@@ -181,7 +188,7 @@
  	int i;
  
  	for (i = 0; i < _SIG_WORDS; i++) {
@@ -1906,7 +1842,7 @@ diff -ur src.old/sys/sys/signalvar.h src/sys/sys/signalvar.h
  			return (0);
  	}
  	return (1);
-@@ -197,7 +204,7 @@
+@@ -193,7 +200,7 @@
  	int i;
  
  	for (i = 0; i < _SIG_WORDS; i++) {
@@ -1916,9 +1852,9 @@ diff -ur src.old/sys/sys/signalvar.h src/sys/sys/signalvar.h
  	}
  	return (1);
 diff -ur src.old/sys/sys/sysctl.h src/sys/sys/sysctl.h
---- src.old/sys/sys/sysctl.h	2003-11-14 22:37:35.000000000 +0100
-+++ src/sys/sys/sysctl.h	2004-11-27 18:08:37.000000000 +0100
-@@ -40,7 +40,103 @@
+--- src.old/sys/sys/sysctl.h	2004-07-28 09:08:39.000000000 +0200
++++ src/sys/sys/sysctl.h	2004-11-30 00:48:07.000000000 +0100
+@@ -36,7 +36,103 @@
  #ifndef _SYS_SYSCTL_H_
  #define	_SYS_SYSCTL_H_
  
@@ -2023,7 +1959,7 @@ diff -ur src.old/sys/sys/sysctl.h src/sys/sys/sysctl.h
  
  struct thread;
  /*
-@@ -337,7 +433,7 @@
+@@ -336,7 +432,7 @@
  #define	KERN_SECURELVL	 	 9	/* int: system security level */
  #define	KERN_HOSTNAME		10	/* string: hostname */
  #define	KERN_HOSTID		11	/* int: host identifier */
@@ -2032,8 +1968,8 @@ diff -ur src.old/sys/sys/sysctl.h src/sys/sys/sysctl.h
  #define	KERN_VNODE		13	/* struct: vnode structures */
  #define	KERN_PROC		14	/* struct: process entries */
  #define	KERN_FILE		15	/* struct: file entries */
-@@ -622,13 +718,19 @@
- void	sysctl_wire_old_buffer(struct sysctl_req *req, size_t len);
+@@ -629,13 +725,19 @@
+ int	sysctl_wire_old_buffer(struct sysctl_req *req, size_t len);
  
  #else	/* !_KERNEL */
 -#include <sys/cdefs.h>
@@ -2057,9 +1993,9 @@ diff -ur src.old/sys/sys/sysctl.h src/sys/sys/sysctl.h
  
  #endif	/* !_SYS_SYSCTL_H_ */
 diff -ur src.old/sys/sys/syslimits.h src/sys/sys/syslimits.h
---- src.old/sys/sys/syslimits.h	2003-09-10 21:08:16.000000000 +0200
-+++ src/sys/sys/syslimits.h	2004-11-27 18:08:37.000000000 +0100
-@@ -55,7 +55,9 @@
+--- src.old/sys/sys/syslimits.h	2004-04-07 06:19:49.000000000 +0200
++++ src/sys/sys/syslimits.h	2004-11-30 00:48:07.000000000 +0100
+@@ -51,7 +51,9 @@
  #define	MAX_CANON		  255	/* max bytes in term canon input line */
  #define	MAX_INPUT		  255	/* max bytes in terminal input */
  #define	NAME_MAX		  255	/* max bytes in a file name */
@@ -2070,8 +2006,8 @@ diff -ur src.old/sys/sys/syslimits.h src/sys/sys/syslimits.h
  #define	OPEN_MAX		   64	/* max open files per process */
  #endif
 diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
---- src.old/sys/sys/sysproto.h	2003-11-14 04:49:41.000000000 +0100
-+++ src/sys/sys/sysproto.h	2004-11-27 18:08:37.000000000 +0100
+--- src.old/sys/sys/sysproto.h	2004-10-09 17:25:41.000000000 +0200
++++ src/sys/sys/sysproto.h	2004-11-30 00:48:07.000000000 +0100
 @@ -306,8 +306,8 @@
  };
  struct setitimer_args {
@@ -2134,7 +2070,7 @@ diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
  };
  struct ogethostid_args {
  	register_t dummy;
-@@ -637,7 +637,7 @@
+@@ -641,7 +641,7 @@
  };
  struct futimes_args {
  	char fd_l_[PADL_(int)]; int fd; char fd_r_[PADR_(int)];
@@ -2143,7 +2079,7 @@ diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
  };
  struct getpgid_args {
  	char pid_l_[PADL_(pid_t)]; pid_t pid; char pid_r_[PADR_(pid_t)];
-@@ -705,19 +705,19 @@
+@@ -709,19 +709,19 @@
  };
  struct clock_gettime_args {
  	char clock_id_l_[PADL_(clockid_t)]; clockid_t clock_id; char clock_id_r_[PADR_(clockid_t)];
@@ -2168,7 +2104,7 @@ diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
  };
  struct minherit_args {
  	char addr_l_[PADL_(void *)]; void * addr; char addr_r_[PADR_(void *)];
-@@ -751,7 +751,7 @@
+@@ -755,7 +755,7 @@
  };
  struct lutimes_args {
  	char path_l_[PADL_(char *)]; char * path; char path_r_[PADR_(char *)];
@@ -2177,7 +2113,7 @@ diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
  };
  struct nstat_args {
  	char path_l_[PADL_(char *)]; char * path; char path_r_[PADR_(char *)];
-@@ -824,7 +824,7 @@
+@@ -828,7 +828,7 @@
  struct aio_suspend_args {
  	char aiocbp_l_[PADL_(struct aiocb *const *)]; struct aiocb *const * aiocbp; char aiocbp_r_[PADR_(struct aiocb *const *)];
  	char nent_l_[PADL_(int)]; int nent; char nent_r_[PADR_(int)];
@@ -2186,7 +2122,7 @@ diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
  };
  struct aio_cancel_args {
  	char fd_l_[PADL_(int)]; int fd; char fd_r_[PADR_(int)];
-@@ -885,7 +885,7 @@
+@@ -889,7 +889,7 @@
  };
  struct sched_rr_get_interval_args {
  	char pid_l_[PADL_(pid_t)]; pid_t pid; char pid_r_[PADR_(pid_t)];
@@ -2195,7 +2131,7 @@ diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
  };
  struct utrace_args {
  	char addr_l_[PADL_(const void *)]; const void * addr; char addr_r_[PADR_(const void *)];
-@@ -913,7 +913,7 @@
+@@ -917,7 +917,7 @@
  struct sigtimedwait_args {
  	char set_l_[PADL_(const sigset_t *)]; const sigset_t * set; char set_r_[PADR_(const sigset_t *)];
  	char info_l_[PADL_(siginfo_t *)]; siginfo_t * info; char info_r_[PADR_(siginfo_t *)];
@@ -2204,7 +2140,7 @@ diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
  };
  struct sigwaitinfo_args {
  	char set_l_[PADL_(const sigset_t *)]; const sigset_t * set; char set_r_[PADR_(const sigset_t *)];
-@@ -985,7 +985,7 @@
+@@ -989,7 +989,7 @@
  };
  struct aio_waitcomplete_args {
  	char aiocbp_l_[PADL_(struct aiocb **)]; struct aiocb ** aiocbp; char aiocbp_r_[PADR_(struct aiocb **)];
@@ -2213,7 +2149,7 @@ diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
  };
  struct getresuid_args {
  	char ruid_l_[PADL_(uid_t *)]; uid_t * ruid; char ruid_r_[PADR_(uid_t *)];
-@@ -1006,7 +1006,7 @@
+@@ -1010,7 +1010,7 @@
  	char nchanges_l_[PADL_(int)]; int nchanges; char nchanges_r_[PADR_(int)];
  	char eventlist_l_[PADL_(struct kevent *)]; struct kevent * eventlist; char eventlist_r_[PADR_(struct kevent *)];
  	char nevents_l_[PADL_(int)]; int nevents; char nevents_r_[PADR_(int)];
@@ -2222,7 +2158,7 @@ diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
  };
  struct extattr_set_fd_args {
  	char fd_l_[PADL_(int)]; int fd; char fd_r_[PADR_(int)];
-@@ -1059,7 +1059,7 @@
+@@ -1063,7 +1063,7 @@
  	char data_l_[PADL_(long)]; long data; char data_r_[PADR_(long)];
  };
  struct kse_release_args {
@@ -2232,9 +2168,9 @@ diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
  struct __mac_get_proc_args {
  	char mac_p_l_[PADL_(struct mac *)]; struct mac * mac_p; char mac_p_r_[PADR_(struct mac *)];
 diff -ur src.old/sys/sys/systm.h src/sys/sys/systm.h
---- src.old/sys/sys/systm.h	2003-09-30 22:54:12.000000000 +0200
-+++ src/sys/sys/systm.h	2004-11-27 18:08:37.000000000 +0100
-@@ -229,8 +229,8 @@
+--- src.old/sys/sys/systm.h	2004-08-05 09:15:35.000000000 +0200
++++ src/sys/sys/systm.h	2004-11-30 00:48:07.000000000 +0100
+@@ -232,8 +232,8 @@
  int	testenv(const char *name);
  
  #ifdef APM_FIXUP_CALLTODO 
@@ -2245,7 +2181,7 @@ diff -ur src.old/sys/sys/systm.h src/sys/sys/systm.h
  #endif /* APM_FIXUP_CALLTODO */ 
  
  #include <sys/libkern.h>
-@@ -246,7 +246,7 @@
+@@ -249,7 +249,7 @@
  /*
   * Kernel to clock driver interface.
   */
@@ -2256,7 +2192,7 @@ diff -ur src.old/sys/sys/systm.h src/sys/sys/systm.h
  
 diff -ur src.old/sys/sys/timepps.h src/sys/sys/timepps.h
 --- src.old/sys/sys/timepps.h	2003-11-23 19:52:23.000000000 +0100
-+++ src/sys/sys/timepps.h	2004-11-27 18:08:37.000000000 +0100
++++ src/sys/sys/timepps.h	2004-11-30 00:48:07.000000000 +0100
 @@ -15,6 +15,8 @@
  #ifndef _SYS_TIMEPPS_H_
  #define _SYS_TIMEPPS_H_
@@ -2303,8 +2239,8 @@ diff -ur src.old/sys/sys/timepps.h src/sys/sys/timepps.h
  	int error;
  	struct pps_fetch_args arg;
 diff -ur src.old/sys/sys/timex.h src/sys/sys/timex.h
---- src.old/sys/sys/timex.h	2004-11-27 18:08:25.000000000 +0100
-+++ src/sys/sys/timex.h	2004-11-27 18:09:33.000000000 +0100
+--- src.old/sys/sys/timex.h	2004-11-30 00:47:32.000000000 +0100
++++ src/sys/sys/timex.h	2004-11-30 00:48:07.000000000 +0100
 @@ -69,7 +69,7 @@
   *	int ntp_gettime(struct ntptimeval *ntv);
   *
@@ -2361,24 +2297,21 @@ diff -ur src.old/sys/sys/timex.h src/sys/sys/timex.h
  #endif /* _KERNEL */
  
 diff -ur src.old/sys/sys/ttycom.h src/sys/sys/ttycom.h
---- src.old/sys/sys/ttycom.h	2000-01-29 17:47:35.000000000 +0100
-+++ src/sys/sys/ttycom.h	2004-11-27 18:08:37.000000000 +0100
-@@ -124,9 +124,9 @@
- #define	TIOCDRAIN	 _IO('t', 94)		/* wait till output drained */
+--- src.old/sys/sys/ttycom.h	2004-06-25 23:54:49.000000000 +0200
++++ src/sys/sys/ttycom.h	2004-11-30 01:03:17.000000000 +0100
+@@ -129,7 +129,7 @@
  #define	TIOCMSDTRWAIT	_IOW('t', 91, int)	/* modem: set wait on close */
  #define	TIOCMGDTRWAIT	_IOR('t', 90, int)	/* modem: get wait on close */
+ 						/* 90-70 ppp; many conflicts */
 -#define	TIOCTIMESTAMP	_IOR('t', 89, struct timeval)	/* enable/get timestamp
 +#define	TIOCTIMESTAMP	_IOR('t', 89, struct __kernel_timeval)	/* enable/get timestamp
  						 * of last input event */
--#define	TIOCDCDTIMESTAMP _IOR('t', 88, struct timeval)	/* enable/get timestamp
-+#define	TIOCDCDTIMESTAMP _IOR('t', 88, struct __kernel_timeval)	/* enable/get timestamp
- 						 * of last DCd rise */
+ 						/* 88 slip, ppp; conflicts */
  #define	TIOCSDRAINWAIT	_IOW('t', 87, int)	/* set ttywait timeout */
- #define	TIOCGDRAINWAIT	_IOR('t', 86, int)	/* get ttywait timeout */
 diff -ur src.old/sys/sys/ucred.h src/sys/sys/ucred.h
---- src.old/sys/sys/ucred.h	2003-11-12 16:07:18.000000000 +0100
-+++ src/sys/sys/ucred.h	2004-11-27 18:08:37.000000000 +0100
-@@ -37,6 +37,9 @@
+--- src.old/sys/sys/ucred.h	2004-09-03 08:11:59.000000000 +0200
++++ src/sys/sys/ucred.h	2004-11-30 00:48:07.000000000 +0100
+@@ -33,6 +33,9 @@
  #ifndef _SYS_UCRED_H_
  #define	_SYS_UCRED_H_
  
@@ -2388,21 +2321,9 @@ diff -ur src.old/sys/sys/ucred.h src/sys/sys/ucred.h
  /*
   * Credentials.
   *
-diff -ur src.old/sys/sys/user.h src/sys/sys/user.h
---- src.old/sys/sys/user.h	2003-05-13 22:36:02.000000000 +0200
-+++ src/sys/sys/user.h	2004-11-27 18:08:37.000000000 +0100
-@@ -112,7 +112,7 @@
- 	pid_t	ki_sid;			/* Process session ID */
- 	pid_t	ki_tsid;		/* Terminal session ID */
- 	short	ki_jobc;		/* job control counter */
--	udev_t	ki_tdev;		/* controlling tty dev */
-+	dev_t	ki_tdev;		/* controlling tty dev */
- 	sigset_t ki_siglist;		/* Signals arrived but not delivered */
- 	sigset_t ki_sigmask;		/* Current signal mask */
- 	sigset_t ki_sigignore;		/* Signals being ignored */
 diff -ur src.old/sys/sys/vnode.h src/sys/sys/vnode.h
---- src.old/sys/sys/vnode.h	2003-11-12 04:14:31.000000000 +0100
-+++ src/sys/sys/vnode.h	2004-11-27 18:08:37.000000000 +0100
+--- src.old/sys/sys/vnode.h	2004-08-15 08:24:42.000000000 +0200
++++ src/sys/sys/vnode.h	2004-11-30 00:48:07.000000000 +0100
 @@ -255,10 +255,10 @@
  	long		va_fileid;	/* file id */
  	u_quad_t	va_size;	/* file size in bytes */
@@ -2417,8 +2338,8 @@ diff -ur src.old/sys/sys/vnode.h src/sys/sys/vnode.h
 +	struct __kernel_timespec	va_birthtime;	/* time file created */
  	u_long		va_gen;		/* generation number of file */
  	u_long		va_flags;	/* flags defined for file */
- 	udev_t		va_rdev;	/* device the special file represents */
-@@ -678,7 +678,7 @@
+ 	dev_t		va_rdev;	/* device the special file represents */
+@@ -685,7 +685,7 @@
  int	vfs_cache_lookup(struct vop_lookup_args *ap);
  int	vfs_object_create(struct vnode *vp, struct thread *td,
  	    struct ucred *cred);
@@ -2429,7 +2350,7 @@ diff -ur src.old/sys/sys/vnode.h src/sys/sys/vnode.h
  int	vop_stdbmap(struct vop_bmap_args *);
 diff -ur src.old/sys/sys/xrpuio.h src/sys/sys/xrpuio.h
 --- src.old/sys/sys/xrpuio.h	1999-08-28 02:52:12.000000000 +0200
-+++ src/sys/sys/xrpuio.h	2004-11-27 18:08:37.000000000 +0100
++++ src/sys/sys/xrpuio.h	2004-11-30 00:48:07.000000000 +0100
 @@ -13,6 +13,7 @@
  #ifndef _SYS_XRPUIO_H_
  #define _SYS_XRPUIO_H_
@@ -2439,9 +2360,9 @@ diff -ur src.old/sys/sys/xrpuio.h src/sys/sys/xrpuio.h
  
  #define XRPU_MAX_PPS	16
 diff -ur src.old/sys/ufs/ufs/ufsmount.h src/sys/ufs/ufs/ufsmount.h
---- src.old/sys/ufs/ufs/ufsmount.h	2003-01-07 19:23:50.000000000 +0100
-+++ src/sys/ufs/ufs/ufsmount.h	2004-11-27 18:08:37.000000000 +0100
-@@ -54,7 +54,7 @@
+--- src.old/sys/ufs/ufs/ufsmount.h	2004-06-16 11:47:25.000000000 +0200
++++ src/sys/ufs/ufs/ufsmount.h	2004-11-30 00:48:07.000000000 +0100
+@@ -50,7 +50,7 @@
  struct buf;
  struct inode;
  struct nameidata;
@@ -2450,7 +2371,7 @@ diff -ur src.old/sys/ufs/ufs/ufsmount.h src/sys/ufs/ufs/ufsmount.h
  struct ucred;
  struct uio;
  struct vnode;
-@@ -74,8 +74,8 @@
+@@ -70,8 +70,8 @@
  	u_long	um_bptrtodb;			/* indir ptr to disk block */
  	u_long	um_seqinc;			/* inc between seq blocks */
  	long	um_numindirdeps;		/* indirdeps for this filesys */
@@ -2462,9 +2383,9 @@ diff -ur src.old/sys/ufs/ufs/ufsmount.h src/sys/ufs/ufs/ufsmount.h
  	int64_t	um_savedmaxfilesize;		/* XXX - limit maxfilesize */
  	int	(*um_balloc)(struct vnode *, off_t, int, struct ucred *, int, struct buf **);
 diff -ur src.old/sys/vm/vm.h src/sys/vm/vm.h
---- src.old/sys/vm/vm.h	2002-12-16 20:24:43.000000000 +0100
-+++ src/sys/vm/vm.h	2004-11-27 18:08:37.000000000 +0100
-@@ -65,6 +65,8 @@
+--- src.old/sys/vm/vm.h	2004-08-16 08:16:12.000000000 +0200
++++ src/sys/vm/vm.h	2004-11-30 00:48:07.000000000 +0100
+@@ -61,6 +61,8 @@
  #ifndef VM_H
  #define VM_H
  
@@ -2474,10 +2395,10 @@ diff -ur src.old/sys/vm/vm.h src/sys/vm/vm.h
  
  #define	VM_INHERIT_SHARE	((vm_inherit_t) 0)
 diff -ur src.old/sys/vm/vm_map.h src/sys/vm/vm_map.h
---- src.old/sys/vm/vm_map.h	2003-11-09 06:25:35.000000000 +0100
-+++ src/sys/vm/vm_map.h	2004-11-27 18:08:37.000000000 +0100
-@@ -74,6 +74,12 @@
- #include <sys/lockmgr.h>
+--- src.old/sys/vm/vm_map.h	2004-08-13 10:06:34.000000000 +0200
++++ src/sys/vm/vm_map.h	2004-11-30 00:48:07.000000000 +0100
+@@ -70,6 +70,12 @@
+ #include <sys/sx.h>
  #include <sys/_mutex.h>
  
 +#include <sys/types.h>

@@ -1,64 +1,26 @@
---- src/sys/sys/syslimits.h~	2004-11-27 20:07:36.000000000 +0100
-+++ src/sys/sys/syslimits.h	2004-11-27 20:07:54.000000000 +0100
-@@ -37,12 +37,6 @@
- #ifndef _SYS_SYSLIMITS_H_
- #define _SYS_SYSLIMITS_H_
+diff -ur src.old/sys/net/if.h src/sys/net/if.h
+--- src.old/sys/net/if.h	2004-11-30 01:22:43.000000000 +0100
++++ src/sys/net/if.h	2004-11-30 01:22:54.000000000 +0100
+@@ -44,7 +44,6 @@
+ #include <sys/types.h>
+ #include <sys/socket.h>
  
--#if !defined(_KERNEL) && !defined(_LIMITS_H_) && !defined(_SYS_PARAM_H_)
--#if __GNUC__
--#warning "No user-serviceable parts inside."
--#endif
--#endif
--
+-#if __BSD_VISIBLE
  /*
-  * Do not add any new variables here.  (See the comment at the end of
-  * the file for why.)
---- src/sys/sys/limits.h.old	2003-05-19 22:29:07.000000000 +0200
-+++ src/sys/sys/limits.h	2004-11-27 20:13:14.000000000 +0100
-@@ -38,39 +38,8 @@
+  * <net/if.h> does not depend on <sys/time.h> on most other systems.  This
+  * helps userland compatibility.  (struct __kernel_timeval ifi_lastchange)
+@@ -54,7 +53,6 @@
+ #endif
  
- #include <sys/cdefs.h>
- #include <machine/_limits.h>
-+#include <limits.h>
- 
--#define	CHAR_BIT	__CHAR_BIT	/* number of bits in a char */
--
--#define	SCHAR_MAX	__SCHAR_MAX	/* max value for a signed char */
--#define	SCHAR_MIN	__SCHAR_MIN	/* min value for a signed char */
--
--#define	UCHAR_MAX	__UCHAR_MAX	/* max value for an unsigned char */
--
--#ifdef __CHAR_UNSIGNED__
--#define	CHAR_MAX	UCHAR_MAX	/* max value for a char */
--#define	CHAR_MIN	0		/* min value for a char */
--#else
--#define	CHAR_MAX	SCHAR_MAX
--#define	CHAR_MIN	SCHAR_MIN
--#endif
--
--#define	USHRT_MAX	__USHRT_MAX	/* max value for an unsigned short */
--#define	SHRT_MAX	__SHRT_MAX	/* max value for a short */
--#define	SHRT_MIN	__SHRT_MIN	/* min value for a short */
--
--#define	UINT_MAX	__UINT_MAX	/* max value for an unsigned int */
--#define	INT_MAX		__INT_MAX	/* max value for an int */
--#define	INT_MIN		__INT_MIN	/* min value for an int */
--
--#define	ULONG_MAX	__ULONG_MAX	/* max for an unsigned long */
--#define	LONG_MAX	__LONG_MAX	/* max for a long */
--#define	LONG_MIN	__LONG_MIN	/* min for a long */
--
--#ifdef __LONG_LONG_SUPPORTED
--#define	ULLONG_MAX	__ULLONG_MAX	/* max for an unsigned long long */
--#define	LLONG_MAX	__LLONG_MAX	/* max for a long long */
--#define	LLONG_MIN	__LLONG_MIN	/* min for a long long */
+ struct ifnet;
 -#endif
  
- #if __POSIX_VISIBLE || __XSI_VISIBLE
- #define	SSIZE_MAX	__SSIZE_MAX	/* max value for an ssize_t */
---- src/sys/netinet6/in6.h.old	2004-11-27 20:07:37.000000000 +0100
-+++ src/sys/netinet6/in6.h	2004-11-27 20:21:15.000000000 +0100
-@@ -72,7 +72,14 @@
+ /*
+  * Length of interface external name, including terminating '\0'.
+diff -ur src.old/sys/netinet6/in6.h src/sys/netinet6/in6.h
+--- src.old/sys/netinet6/in6.h	2004-11-30 01:19:35.000000000 +0100
++++ src/sys/netinet6/in6.h	2004-11-30 01:22:54.000000000 +0100
+@@ -68,7 +68,14 @@
  #ifndef _NETINET6_IN6_H_
  #define _NETINET6_IN6_H_
  
@@ -74,7 +36,7 @@
  
  /*
   * Identification of the network protocol stack
-@@ -117,17 +124,6 @@
+@@ -113,17 +120,6 @@
  #define	IPV6PORT_RESERVEDMAX	(IPV6PORT_RESERVED-1)
  #endif
  
@@ -92,7 +54,7 @@
  #ifdef _KERNEL	/* XXX nonstandard */
  #define s6_addr8  __u6_addr.__u6_addr8
  #define s6_addr16 __u6_addr.__u6_addr16
-@@ -141,22 +137,6 @@
+@@ -137,22 +133,6 @@
   */
  
  /*
@@ -115,7 +77,7 @@
   * Local definition for masks
   */
  #ifdef _KERNEL	/* XXX nonstandard */
-@@ -423,22 +403,6 @@
+@@ -419,22 +399,6 @@
  #define IPV6_DEFAULT_MULTICAST_LOOP 1	/* normally hear sends if a member */
  
  /*
@@ -138,7 +100,7 @@
   * Control structure for IPV6_RECVPATHMTU socket option.
   */
  struct ip6_mtuinfo {
-@@ -547,16 +511,6 @@
+@@ -543,16 +507,6 @@
  extern int	(*faithprefix_p)(struct in6_addr *);
  #endif /* _KERNEL */
  
@@ -155,20 +117,11 @@
  #if __BSD_VISIBLE
  
  __BEGIN_DECLS
---- src/sys/sys/mount.h~	2004-11-27 20:22:12.000000000 +0100
-+++ src/sys/sys/mount.h	2004-11-27 20:49:20.000000000 +0100
-@@ -45,8 +45,6 @@
- #include <sys/_mutex.h>
- #endif
- 
--typedef struct fsid { int32_t val[2]; } fsid_t;	/* filesystem id type */
--
- /*
-  * File identifier.
-  * These are unique per filesystem on a single machine.
---- src/sys/sys/cdefs.h~	2003-10-31 06:42:53.000000000 +0100
-+++ src/sys/sys/cdefs.h	2004-11-27 21:36:54.000000000 +0100
-@@ -346,109 +346,6 @@
+Only in src.old/sys/netinet6: in6.h.orig
+diff -ur src.old/sys/sys/cdefs.h src/sys/sys/cdefs.h
+--- src.old/sys/sys/cdefs.h	2004-08-13 02:53:40.000000000 +0200
++++ src/sys/sys/cdefs.h	2004-11-30 01:22:54.000000000 +0100
+@@ -362,109 +362,6 @@
  #define	__DEQUALIFY(type, var)	((type)(uintptr_t)(const volatile void *)(var))
  #endif
  
@@ -279,34 +232,77 @@
 +#include <features.h>
  
  #endif /* !_SYS_CDEFS_H_ */
---- src/sys/net/if.h~	2004-11-27 20:49:57.000000000 +0100
-+++ src/sys/net/if.h	2004-11-27 21:45:52.000000000 +0100
-@@ -48,7 +48,6 @@
- #include <sys/types.h>
- #include <sys/socket.h>
+Only in src.old/sys/sys: ioctl_compat.h.orig
+diff -ur src.old/sys/sys/limits.h src/sys/sys/limits.h
+--- src.old/sys/sys/limits.h	2004-04-07 06:19:49.000000000 +0200
++++ src/sys/sys/limits.h	2004-11-30 01:22:54.000000000 +0100
+@@ -34,39 +34,8 @@
  
--#if __BSD_VISIBLE
- /*
-  * <net/if.h> does not depend on <sys/time.h> on most other systems.  This
-  * helps userland compatibility.  (struct __kernel_timeval ifi_lastchange)
-@@ -58,7 +57,6 @@
+ #include <sys/cdefs.h>
+ #include <machine/_limits.h>
++#include <limits.h>
+ 
+-#define	CHAR_BIT	__CHAR_BIT	/* number of bits in a char */
+-
+-#define	SCHAR_MAX	__SCHAR_MAX	/* max value for a signed char */
+-#define	SCHAR_MIN	__SCHAR_MIN	/* min value for a signed char */
+-
+-#define	UCHAR_MAX	__UCHAR_MAX	/* max value for an unsigned char */
+-
+-#ifdef __CHAR_UNSIGNED__
+-#define	CHAR_MAX	UCHAR_MAX	/* max value for a char */
+-#define	CHAR_MIN	0		/* min value for a char */
+-#else
+-#define	CHAR_MAX	SCHAR_MAX
+-#define	CHAR_MIN	SCHAR_MIN
+-#endif
+-
+-#define	USHRT_MAX	__USHRT_MAX	/* max value for an unsigned short */
+-#define	SHRT_MAX	__SHRT_MAX	/* max value for a short */
+-#define	SHRT_MIN	__SHRT_MIN	/* min value for a short */
+-
+-#define	UINT_MAX	__UINT_MAX	/* max value for an unsigned int */
+-#define	INT_MAX		__INT_MAX	/* max value for an int */
+-#define	INT_MIN		__INT_MIN	/* min value for an int */
+-
+-#define	ULONG_MAX	__ULONG_MAX	/* max for an unsigned long */
+-#define	LONG_MAX	__LONG_MAX	/* max for a long */
+-#define	LONG_MIN	__LONG_MIN	/* min for a long */
+-
+-#ifdef __LONG_LONG_SUPPORTED
+-#define	ULLONG_MAX	__ULLONG_MAX	/* max for an unsigned long long */
+-#define	LLONG_MAX	__LLONG_MAX	/* max for a long long */
+-#define	LLONG_MIN	__LLONG_MIN	/* min for a long long */
+-#endif
+ 
+ #if __POSIX_VISIBLE || __XSI_VISIBLE
+ #define	SSIZE_MAX	__SSIZE_MAX	/* max value for an ssize_t */
+diff -ur src.old/sys/sys/mount.h src/sys/sys/mount.h
+--- src.old/sys/sys/mount.h	2004-11-30 01:22:43.000000000 +0100
++++ src/sys/sys/mount.h	2004-11-30 01:22:54.000000000 +0100
+@@ -41,8 +41,6 @@
+ #include <sys/_mutex.h>
  #endif
  
- struct ifnet;
--#endif
- 
+-typedef struct fsid { int32_t val[2]; } fsid_t;	/* filesystem id type */
+-
  /*
-  * Length of interface external name, including terminating '\0'.
---- src/sys/net/if.h~	2004-11-27 21:50:16.000000000 +0100
-+++ src/sys/net/if.h	2004-11-27 22:02:16.000000000 +0100
-@@ -63,10 +63,8 @@
-  * Note: this is the same size as a generic device's external name.
-  */
- #define		IF_NAMESIZE	16
--#if __BSD_VISIBLE
- #define		IFNAMSIZ	IF_NAMESIZE
- #define		IF_MAXUNIT	0x7fff	/* historical value */
--#endif
+  * File identifier.
+  * These are unique per filesystem on a single machine.
+diff -ur src.old/sys/sys/syslimits.h src/sys/sys/syslimits.h
+--- src.old/sys/sys/syslimits.h	2004-11-30 01:05:19.000000000 +0100
++++ src/sys/sys/syslimits.h	2004-11-30 01:23:49.000000000 +0100
+@@ -33,12 +33,6 @@
+ #ifndef _SYS_SYSLIMITS_H_
+ #define _SYS_SYSLIMITS_H_
  
- #ifdef _KERNEL
+-#if !defined(_KERNEL) && !defined(_LIMITS_H_) && !defined(_SYS_PARAM_H_)
+-#if defined(__GNUC__) || defined(__INTEL_COMPILER)
+-#warning "No user-serviceable parts inside."
+-#endif
+-#endif
+-
  /*
+  * Do not add any new variables here.  (See the comment at the end of
+  * the file for why.)
+Only in src.old/sys/vm: vm_param.h.orig

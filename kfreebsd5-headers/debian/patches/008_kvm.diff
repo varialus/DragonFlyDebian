@@ -1,6 +1,6 @@
 diff -ur src.old/sys/sys/blist.h src/sys/sys/blist.h
---- src.old/sys/sys/blist.h	2003-08-13 01:24:05.000000000 +0200
-+++ src/sys/sys/blist.h	2004-08-07 01:36:17.000000000 +0200
+--- src.old/sys/sys/blist.h	2004-06-04 06:03:25.000000000 +0200
++++ src/sys/sys/blist.h	2004-11-30 01:15:18.000000000 +0100
 @@ -53,6 +53,8 @@
  #ifndef _SYS_BLIST_H_
  #define _SYS_BLIST_H_
@@ -10,10 +10,11 @@ diff -ur src.old/sys/sys/blist.h src/sys/sys/blist.h
  typedef	u_int32_t	u_daddr_t;	/* unsigned disk address */
  
  /*
+Only in src.old/sys/sys: ioctl_compat.h.orig
 diff -ur src.old/sys/sys/user.h src/sys/sys/user.h
---- src.old/sys/sys/user.h	2004-08-07 01:35:52.000000000 +0200
-+++ src/sys/sys/user.h	2004-08-07 01:41:57.000000000 +0200
-@@ -46,8 +46,6 @@
+--- src.old/sys/sys/user.h	2004-07-12 06:53:33.000000000 +0200
++++ src/sys/sys/user.h	2004-11-30 01:15:18.000000000 +0100
+@@ -42,8 +42,6 @@
  #include <sys/ucred.h>
  #include <sys/uio.h>
  #include <sys/queue.h>
@@ -22,23 +23,11 @@ diff -ur src.old/sys/sys/user.h src/sys/sys/user.h
  #include <sys/proc.h>
  #include <vm/vm.h>		/* XXX */
  #include <vm/vm_param.h>	/* XXX */
-@@ -156,7 +154,6 @@
- 	char	ki_sparestrings[85];	/* spare string space */
+@@ -178,7 +176,6 @@
+ 	char	ki_sparestrings[68];	/* spare string space */
  	struct	rusage ki_rusage;	/* process rusage statistics */
  	long	ki_sflag;		/* PS_* flags */
 -	struct	priority ki_pri;	/* process priority */
  	long	ki_tdflags;		/* XXXKSE kthread flag */
  	struct	pcb *ki_pcb;		/* kernel virtual addr of pcb */
  	void	*ki_kstack;		/* kernel virtual addr of stack */
-diff -ur src.old/sys/vm/vm_param.h src/sys/vm/vm_param.h
---- src.old/sys/vm/vm_param.h	2003-01-18 22:14:02.000000000 +0100
-+++ src/sys/vm/vm_param.h	2004-08-07 01:36:17.000000000 +0200
-@@ -111,7 +111,7 @@
- #define XSWDEV_VERSION	1
- struct xswdev {
- 	u_int	xsw_version;
--	udev_t	xsw_dev;
-+	dev_t	xsw_dev;
- 	int	xsw_flags;
- 	int	xsw_nblks;
- 	int     xsw_used;
