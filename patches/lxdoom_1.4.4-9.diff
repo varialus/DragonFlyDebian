@@ -1,0 +1,69 @@
+
+Status: in BTS
+
+diff -ur lxdoom-1.4.4.old/configure.in lxdoom-1.4.4/configure.in
+--- lxdoom-1.4.4.old/configure.in	2000-03-27 12:33:22.000000000 +0200
++++ lxdoom-1.4.4/configure.in	2004-09-04 10:56:49.000000000 +0200
+@@ -12,9 +12,8 @@
+ AM_CONDITIONAL(I386_ASM, test "$is_i386" = yes)
+ 
+ case "$target" in
+-*-linux) AC_DEFINE(LINUX) AC_DEFINE(SECURE_UID) ;;
+-*-linux-*) AC_DEFINE(LINUX) AC_DEFINE(SECURE_UID) ;;
+-*-freebsd) AC_DEFINE(FREEBSD) ;;
++*-linux*) AC_DEFINE(LINUX) AC_DEFINE(SECURE_UID) ;;
++*-freebsd | *-kfreebsd*-gnu) AC_DEFINE(FREEBSD) ;;
+ esac
+ 
+ dnl --- some defaults for CFLAGS : josh
+diff -ur lxdoom-1.4.4.old/debian/control lxdoom-1.4.4/debian/control
+--- lxdoom-1.4.4.old/debian/control	2004-09-04 10:55:00.000000000 +0200
++++ lxdoom-1.4.4/debian/control	2004-09-04 10:57:29.000000000 +0200
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Joe Drew <drew@debian.org>
+ Standards-Version: 3.6.1
+-Build-Depends: svgalibg1-dev [i386], debhelper (>= 3.0.0), xlibs-dev
++Build-Depends: svgalibg1-dev [i386], debhelper (>= 3.0.0), xlibs-dev, autotools-dev
+ 
+ Package: lxdoom
+ Architecture: any
+diff -ur lxdoom-1.4.4.old/debian/rules lxdoom-1.4.4/debian/rules
+--- lxdoom-1.4.4.old/debian/rules	2004-09-04 10:55:00.000000000 +0200
++++ lxdoom-1.4.4/debian/rules	2004-09-04 11:04:40.000000000 +0200
+@@ -1,19 +1,19 @@
+ #!/usr/bin/make -f
+ # Debhelper-using rules file for lxdoom
+ 
+-DEB_BUILD_GNU_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
+-DEB_BUILD_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_SYSTEM)
++DEB_HOST_GNU_CPU ?= $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
++DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+ 
+-SVGA_ARCHS=i386
+-SVGA_KERNS=linux
+-ifneq ($(findstring $(DEB_BUILD_GNU_CPU),$(SVGA_ARCHS)),)
+-ifneq ($(findstring $(DEB_BUILD_GNU_SYSTEM),$(SVGA_KERNS)),)
++SVGA_CPUS=i386
++SVGA_SYSTEMS=linux
++ifneq (, $(filter $(DEB_HOST_GNU_CPU),$(SVGA_CPUS)))
++ifneq (, $(filter $(DEB_HOST_GNU_SYSTEM),$(SVGA_SYSTEMS)))
+ DO_SVGA=1
+ endif
+ endif
+ 
+-SOUND_KERNS=linux
+-ifneq ($(findstring $(DEB_BUILD_GNU_SYSTEM),$(SOUND_KERNS)),)
++SOUND_SYSTEMS=linux kfreebsd-gnu
++ifneq ($(findstring $(DEB_HOST_GNU_SYSTEM),$(SOUND_SYSTEMS)),)
+ DO_SOUND=1
+ endif
+ 
+@@ -42,6 +42,7 @@
+ build-stamp:
+ 	dh_testdir
+ 
++	cp /usr/share/misc/config.* ./
+ 	CFLAGS="$(CFLAGS)" ./configure --prefix=/usr --mandir=/usr/share/man --disable-cpu-opt
+ 	# Add here commands to compile the package.
+ 	$(MAKE)
