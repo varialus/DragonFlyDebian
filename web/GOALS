@@ -1,0 +1,62 @@
+
+Base system as installed by debootstrap:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+at			- ftbfs
+console-common		- not for us
+console-data		- not for us
+console-tools		- not for us
+dhcp-client		- can of worms (broken due to incompatible ifconfig)
+dpkg			- fixed in experimental
+exim4			- patch sent upstream ML
+fdutils			- not for us?
+ifupdown		- not fully working due to incompatible route
+initscripts		- hacked to work with incompatible utils
+ipchains		- not for us (pf)
+iptables		- not for us (pf)
+iputils-ping		- not for us (inetutils-ping)
+klogd			- not for us (inetutils-syslogd)
+libacl1			- not for us?
+libattr1		- not for us?
+libcap1			- not for us
+libgdbm3		- ftbfs. libtool?
+libpcap0.7		- ftbfs. patch in BTS and upstream BTS
+libssl0.9.7		- ftbfs. patch sent upstream
+libtextwrap1		- config.guess
+logrotate		- problem with inetutils-inetd, see #294833
+makedev			- not for us (we have devfs)
+man-db			- config.guess
+manpages		- many Linux-isms.  needs package split (post-sarge)
+modutils		- not for us (kld*)
+ncurses			- ftbfs
+net-tools		- not for us (inetutils-tools)
+netbase			- see #256919 (and take a cluebat)
+netkit-inetd		- not for us (inetutils-inetd)
+nvi			- config.guess
+pciutils		- patch in BTS but not upstream AFAIK (#292324)
+ppp			- not for us? could be ported but using FreeBSD version seems easier
+pppconfig		- just a frontend, would need some work
+pppoe			- no idea
+pppoeconf		- no idea
+procps			- patch in BTS and applied for next upstream release
+sysklogd		- not for us (inetutils-syslogd)
+util-linux		- needs work in upstream (Guillem is working on it)
+
+
+Build-essential:
+~~~~~~~~~~~~~~~~
+
+binutils		- upstream rejected ld.so hack
+gcc			- fixed in gcc-4.0
+glibc			- no comment
+
+
+Other very important stuff we can't live without
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+parted			- either this, or a working fdisk
+grub			- or grub2.  whatever that fully works.
+kfreebsd-headers	- no comment
+freebsd-utils		- no comment
+cdebootstrap		- hangs in infin loop.  also, see #285785
+debian-installer	- we need a bunch or dependencies first
