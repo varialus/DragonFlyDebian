@@ -1,0 +1,60 @@
+#! /bin/sh -e
+
+# All lines beginning with `# DP:' are a description of the patch.
+# DP: Description: Fix insecure temporary file creation in catchsegv.sh
+# DP:		   (CAN-2004-0968)
+# DP: Related bugs: #278278
+# DP: Dpatch author: GOTO Masanori <gotom@debian.org>
+# DP: Patch author: 
+# DP: Upstream status: In CVS
+# DP: Status Details: 
+# DP: Date: 2004-11-25
+
+PATCHLEVEL=0
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p$PATCHLEVEL < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p$PATCHLEVEL < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+diff -u -r1.16 -r1.17
+--- debug/catchsegv.sh	17 May 2004 18:37:11 -0000	1.16
++++ debug/catchsegv.sh	19 Oct 2004 10:34:20 -0000	1.17
+@@ -50,9 +50,7 @@
+   esac
+ fi
+ 
+-segv_output=`basename "$prog"`.segv.$$
+-# Make sure this output file does not exist.
+-rm -f "$segv_output"
++segv_output=`mktemp ${TMPDIR:-/tmp}/segv_output.XXXXXX` || exit
+ 
+ # Redirect stderr to avoid termination message from shell.
+ (exec 3>&2 2>/dev/null
+@@ -65,7 +63,7 @@
+ # Check for output.  Even if the program terminated correctly it might
+ # be that a minor process (clone) failed.  Therefore we do not check the
+ # exit code.
+-if test -f "$segv_output"; then
++if test -s "$segv_output"; then
+   # The program caught a signal.  The output is in the file with the
+   # name we have in SEGFAULT_OUTPUT_NAME.  In the output the names of
+   # functions in shared objects are available, but names in the static
+@@ -102,7 +100,7 @@
+ 	    ;;
+      esac
+    done)
+-   rm -f "$segv_output"
+ fi
++rm -f "$segv_output"
+ 
+ exit $exval
