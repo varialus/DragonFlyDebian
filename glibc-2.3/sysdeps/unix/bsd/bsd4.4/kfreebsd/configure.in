@@ -5,13 +5,11 @@ GLIBC_PROVIDES dnl See aclocal.m4 in the top level source directory.
 # Process this file with "autoconf-2.13 -l ../../../../..".
 #
 
-AC_ARG_ENABLE(kernel-include, dnl
-[  --enable-kernel-include=x.y  use the kernel include files corresponding to
-                          the FreeBSD kernel version x.y],
-              kernel_include_version=$enableval, kernel_include_version=4.0)
-kernel_include_subdir=kernel-include-$kernel_include_version
+AC_ARG_ENABLE(kfreebsd-headers, dnl
+[  --enable-kfreebsd-headers=path location of kFreeBSD headers],
+              kfreebsd-headers=$enableval, kfreebsd-headers=/usr/src/kfreebsd-headers)
 mkdir -p sysdeps/unix/bsd/bsd4.4/kfreebsd
-echo $kernel_include_subdir > kernel-include
+echo $kfreebsd-headers > kfreebsd-headers
 
 AC_ARG_ENABLE(compatible-utmp, dnl
 [  --disable-compatible-utmp  use a struct utmp which is the same as struct

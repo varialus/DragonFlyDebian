@@ -3,8 +3,8 @@
 # in localedata/tst-fmon.sh correctly.
 SHELL = bash
 
-# Use the kernel-include-x.y subdirectory chosen at configuration time.
-kernel_include_subdir := $(shell cat $(common-objpfx)kernel-include)
+# Use the kfreebsd-headers directory chosen at configuration time.
+kfreebsd-headers := $(shell cat $(common-objpfx)kfreebsd-headers)
 
 # Additional header files to be installed in $prefix/include:
 
@@ -109,7 +109,7 @@ endif
 
 # Installation of kernel headers.
 
-kernelheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/$(kernel_include_subdir)/import
+kernelheaderdir = $(kfreebsd-headers)
 
 kernelheaders := \
   $(patsubst $(kernelheaderdir)/%, %, \
@@ -138,37 +138,3 @@ $(addprefix $(inst_includedir)/,$(kernelcpuheaders)): \
     $(inst_includedir)/%: $(kernelcpuheaderdir)/% $(+force)
 	$(do-install)
 
-# Installation of original kernel headers.
-# Currently commented out because of limited usefulness.
-ifdef install_kernel_include_orig
-
-kernelorigheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/$(kernel_include_subdir)/orig
-
-kernelorigheaders := \
-  $(patsubst $(kernelorigheaderdir)/%, %, \
-    $(filter-out \
-      $(kernelorigheaderdir)/alpha/% \
-      $(kernelorigheaderdir)/i386/%, \
-      $(wildcard $(kernelorigheaderdir)/*.h) \
-      $(wildcard $(kernelorigheaderdir)/*/*.h) \
-      $(wildcard $(kernelorigheaderdir)/*/*/*.h) \
-      $(wildcard $(kernelorigheaderdir)/*/*/*/*.h)))
-
-kernelorigcpuheaders := \
-  $(patsubst $(kernelorigcpuheaderdir)/%, %, \
-    $(wildcard $(kernelorigcpuheaderdir)/*.h) \
-    $(wildcard $(kernelorigcpuheaderdir)/*/*.h) \
-    $(wildcard $(kernelorigcpuheaderdir)/*/*/*.h))
-
-install-headers-nosubdir: \
-    $(addprefix $(inst_includedir)/kernel/, $(kernelorigheaders) $(kernelorigcpuheaders))
-
-$(addprefix $(inst_includedir)/kernel/,$(kernelorigheaders)): \
-    $(inst_includedir)/kernel/%: $(kernelorigheaderdir)/% $(+force)
-	$(do-install)
-
-$(addprefix $(inst_includedir)/kernel/,$(kernelorigcpuheaders)): \
-    $(inst_includedir)/kernel/%: $(kernelorigcpuheaderdir)/% $(+force)
-	$(do-install)
-
-endif
