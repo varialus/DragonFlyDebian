@@ -1,28 +1,28 @@
 diff -ur src.old/sys/conf/kern.mk src/sys/conf/kern.mk
---- src.old/sys/conf/kern.mk	2003-11-05 00:29:17.000000000 +0100
-+++ src/sys/conf/kern.mk	2004-05-20 00:32:02.000000000 +0200
-@@ -8,7 +8,7 @@
- # also pop up, but are easier to fix.
+--- src.old/sys/conf/kern.mk	2004-05-14 15:35:46.000000000 +0200
++++ src/sys/conf/kern.mk	2004-11-16 18:16:45.000000000 +0100
+@@ -12,7 +12,7 @@
+ .else
  CWARNFLAGS?=	-Wall -Wredundant-decls -Wnested-externs -Wstrict-prototypes \
  		-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual \
 -		-fformat-extensions -std=c99
 +		-std=c99
+ .endif
  #
  # The following flags are next up for working on:
- #	-W
-@@ -23,7 +23,7 @@
+@@ -28,7 +28,7 @@
  # cache tag lines)
  #
- .if ${MACHINE_ARCH} == "i386"
+ .if ${MACHINE_ARCH} == "i386" && ${CC} != "icc"
 -CFLAGS+=	-mno-align-long-strings -mpreferred-stack-boundary=2
 +CFLAGS+=	-mpreferred-stack-boundary=2
- INLINE_LIMIT?=	15000
+ INLINE_LIMIT?=	8000
  .endif
  
 diff -ur src.old/sys/conf/kern.post.mk src/sys/conf/kern.post.mk
---- src.old/sys/conf/kern.post.mk	2003-11-25 05:12:43.000000000 +0100
-+++ src/sys/conf/kern.post.mk	2004-05-20 00:32:55.000000000 +0200
-@@ -178,11 +178,9 @@
+--- src.old/sys/conf/kern.post.mk	2004-09-20 19:39:02.000000000 +0200
++++ src/sys/conf/kern.post.mk	2004-11-16 18:16:08.000000000 +0100
+@@ -185,11 +185,9 @@
  .if exists(${DESTDIR}${KODIR})
  	-thiskernel=`sysctl -n kern.bootfile` ; \
  	if [ "`dirname "$$thiskernel"`" != ${DESTDIR}${KODIR} ] ; then \
@@ -34,7 +34,7 @@ diff -ur src.old/sys/conf/kern.post.mk src/sys/conf/kern.post.mk
  			rm -rf ${DESTDIR}${KODIR}.old ; \
  		fi ; \
  		mv ${DESTDIR}${KODIR} ${DESTDIR}${KODIR}.old ; \
-@@ -191,17 +189,17 @@
+@@ -198,17 +196,17 @@
  .endif
  	mkdir -p ${DESTDIR}${KODIR}
  .if defined(DEBUG) && defined(INSTALL_DEBUG)

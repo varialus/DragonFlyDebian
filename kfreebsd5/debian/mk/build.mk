@@ -1,5 +1,5 @@
 KERNEL		:= GENERIC
-PATH		:= /usr/lib/freebsd:$(PATH)
+PATH		:= /usr/lib/freebsd:$(CURDIR)/bin:$(PATH)
 DESTDIR		:= $(CURDIR)/debian/kfreebsd$(major)
 MAKE		:= make DESTDIR=$(DESTDIR) WERROR=
 revision	:= `dpkg-parsechangelog | grep ^Version | cut -c 10- | cut -d '-' -f 2`
@@ -10,12 +10,17 @@ endif
 
 build/kfreebsd$(major):: debian/stamp-build
 debian/stamp-build: apply-patches
-	cd $(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/conf \
-		&& config $(KERNEL)
-	cd $(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ \
-		&& $(MAKE) depend && $(MAKE)
-
-	touch debian/stamp-build
+	# make is stupid
+	if ! test -e debian/stamp-build ; then \
+	mkdir -p bin ; \
+	ln -sf `which gcc-3.4` bin/cc ; \
+	ln -sf `which gcc-3.4` bin/gcc ; \
+	cd $(CURDIR)/$(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/conf \
+		&& config $(KERNEL) ; \
+	cd $(CURDIR)/$(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ \
+		&& $(MAKE) depend && $(MAKE) ; \
+	touch $(CURDIR)/debian/stamp-build ; \
+	fi
 
 binary/kfreebsd$(major):: common-install-prehook-arch
 	# setup directories to install into first
@@ -41,20 +46,23 @@ binary/kfreebsd$(major):: common-install-prehook-arch
 
 	# prevent init barfs when / is cd9660
 	mkdir -p $(DESTDIR)/sbin
-	cp `which true` $(DESTDIR)/sbin/fsck.cd9660
+	ln -s `which true` $(DESTDIR)/sbin/fsck.cd9660
 
 clean::
 	grep -q src/sys/$(kfreebsd_cpu)/conf/GENERIC \
 		debian/patches/*.diff
 
-	cat debian/patches/902_debian_version.diff.in \
-		| sed "s/@revision@/$(revision)/g" \
-		> debian/patches/902_debian_version.diff
-
+	sed \
+		-e "s/@version@/$(version)/g" \
+		-e "s/@revision@/$(revision)/g" \
+	> debian/patches/902_debian_version.diff \
+	< debian/patches/902_debian_version.diff.in
+	
 	sed \
 		-e "s/@kfreebsd-gnu@/`type-handling any kfreebsd-gnu`/g" \
 		-e "s/@major@/$(major)/g" \
 		-e "s/@version@/$(version)/g" \
 	> debian/control.in < debian/control.in.in
 
+	rm -rf bin
 	rm -f debian/stamp-build

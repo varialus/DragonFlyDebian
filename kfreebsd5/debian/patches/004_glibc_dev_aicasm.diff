@@ -1,27 +1,27 @@
 diff -Nur src.old/sys/dev/aic7xxx/aicasm/Makefile src/sys/dev/aic7xxx/aicasm/Makefile
---- src.old/sys/dev/aic7xxx/aicasm/Makefile	2004-05-21 22:51:50.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/Makefile	2004-05-21 22:52:23.000000000 +0200
-@@ -13,7 +13,7 @@
+--- src.old/sys/dev/aic7xxx/aicasm/Makefile	2004-11-26 00:15:27.000000000 +0100
++++ src/sys/dev/aic7xxx/aicasm/Makefile	2004-11-26 00:17:03.000000000 +0100
+@@ -14,7 +14,7 @@
  SRCS=	${GENHDRS} ${CSRCS} ${YSRCS} ${LSRCS}
  CLEANFILES+= ${GENHDRS} ${YSRCS:R:C/(.*)/\1.output/g}
- DPADD+=	${LIBL}
--LDADD+=	-ll
-+LDADD+=	-ll -ldb
+ DPADD=	${LIBL}
+-LDADD=	-ll
++LDADD=	-ll -ldb
  
  # Correct path for kernel builds
  # Don't rely on the kernel's .depend file
-@@ -22,7 +22,7 @@
- DEPENDFILE=
+@@ -29,7 +29,7 @@
+ .else
+ NOSTDINC=	-nostdinc
  .endif
- 
--CFLAGS+= -nostdinc -I/usr/include -I.
+-CFLAGS+= ${NOSTDINC} -I/usr/include -I.
 +CFLAGS+= -I.
  .ifdef MAKESRCPATH
  CFLAGS+= -I${MAKESRCPATH}
  .endif
 diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm.c src/sys/dev/aic7xxx/aicasm/aicasm.c
---- src.old/sys/dev/aic7xxx/aicasm/aicasm.c	2004-05-21 22:51:50.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/aicasm.c	2004-05-21 22:52:23.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aicasm/aicasm.c	2004-11-26 00:15:27.000000000 +0100
++++ src/sys/dev/aic7xxx/aicasm/aicasm.c	2004-11-26 00:17:03.000000000 +0100
 @@ -53,10 +53,10 @@
  #include <sysexits.h>
  #include <unistd.h>
@@ -37,8 +37,8 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm.c src/sys/dev/aic7xxx/aicasm/aic
  
  #include "aicasm.h"
 diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm.h src/sys/dev/aic7xxx/aicasm/aicasm.h
---- src.old/sys/dev/aic7xxx/aicasm/aicasm.h	2004-05-21 22:51:50.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/aicasm.h	2004-05-21 22:52:23.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aicasm/aicasm.h	2004-11-26 00:15:27.000000000 +0100
++++ src/sys/dev/aic7xxx/aicasm/aicasm.h	2004-11-26 00:17:03.000000000 +0100
 @@ -42,10 +42,10 @@
   * $FreeBSD: src/sys/dev/aic7xxx/aicasm/aicasm.h,v 1.16 2002/08/31 06:39:40 gibbs Exp $
   */
@@ -54,8 +54,8 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm.h src/sys/dev/aic7xxx/aicasm/aic
  
  #ifndef TRUE
 diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_gram.y src/sys/dev/aic7xxx/aicasm/aicasm_gram.y
---- src.old/sys/dev/aic7xxx/aicasm/aicasm_gram.y	2004-05-21 22:51:50.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/aicasm_gram.y	2004-05-21 22:52:23.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aicasm/aicasm_gram.y	2004-11-26 00:15:27.000000000 +0100
++++ src/sys/dev/aic7xxx/aicasm/aicasm_gram.y	2004-11-26 00:17:03.000000000 +0100
 @@ -52,10 +52,10 @@
  #include <string.h>
  #include <sysexits.h>
@@ -71,8 +71,8 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_gram.y src/sys/dev/aic7xxx/aicas
  
  #include "aicasm.h"
 diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y src/sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y
---- src.old/sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y	2004-05-21 22:51:50.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y	2004-05-21 22:52:23.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y	2004-11-26 00:15:27.000000000 +0100
++++ src/sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y	2004-11-26 00:17:03.000000000 +0100
 @@ -52,10 +52,10 @@
  #include <string.h>
  #include <sysexits.h>
@@ -88,8 +88,8 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y src/sys/dev/aic7xxx
  
  #include "aicasm.h"
 diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l src/sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l
---- src.old/sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l	2004-05-21 22:51:50.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l	2004-05-21 22:52:23.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l	2004-11-26 00:15:27.000000000 +0100
++++ src/sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l	2004-11-26 00:17:03.000000000 +0100
 @@ -51,10 +51,10 @@
  #include <stdio.h>
  #include <string.h>
@@ -105,8 +105,8 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l src/sys/dev/aic7xxx
  
  #include "aicasm.h"
 diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_scan.l src/sys/dev/aic7xxx/aicasm/aicasm_scan.l
---- src.old/sys/dev/aic7xxx/aicasm/aicasm_scan.l	2004-05-21 22:51:50.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/aicasm_scan.l	2004-05-21 22:52:23.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aicasm/aicasm_scan.l	2004-11-26 00:15:27.000000000 +0100
++++ src/sys/dev/aic7xxx/aicasm/aicasm_scan.l	2004-11-26 00:17:03.000000000 +0100
 @@ -51,10 +51,10 @@
  #include <stdio.h>
  #include <string.h>
@@ -122,8 +122,8 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_scan.l src/sys/dev/aic7xxx/aicas
  
  #include "aicasm.h"
 diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.c src/sys/dev/aic7xxx/aicasm/aicasm_symbol.c
---- src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.c	2004-05-21 22:51:50.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/aicasm_symbol.c	2004-05-21 22:52:23.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.c	2004-11-26 00:15:27.000000000 +0100
++++ src/sys/dev/aic7xxx/aicasm/aicasm_symbol.c	2004-11-26 00:17:03.000000000 +0100
 @@ -44,10 +44,10 @@
  
  #include <sys/types.h>
@@ -139,8 +139,8 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.c src/sys/dev/aic7xxx/aic
  #include <fcntl.h>
  #include <inttypes.h>
 diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.h src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h
---- src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.h	2004-05-21 22:51:50.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h	2004-05-21 22:52:23.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.h	2004-11-26 00:15:27.000000000 +0100
++++ src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h	2004-11-26 00:17:03.000000000 +0100
 @@ -42,10 +42,10 @@
   * $FreeBSD: src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h,v 1.16 2002/08/31 06:39:41 gibbs Exp $
   */
@@ -157,8 +157,8 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.h src/sys/dev/aic7xxx/aic
  typedef enum {
 diff -Nur src.old/sys/dev/aic7xxx/aicasm/queue.h src/sys/dev/aic7xxx/aicasm/queue.h
 --- src.old/sys/dev/aic7xxx/aicasm/queue.h	1970-01-01 01:00:00.000000000 +0100
-+++ src/sys/dev/aic7xxx/aicasm/queue.h	2004-05-21 22:52:40.000000000 +0200
-@@ -0,0 +1,557 @@
++++ src/sys/dev/aic7xxx/aicasm/queue.h	2004-11-26 00:16:50.000000000 +0100
+@@ -0,0 +1,553 @@
 +/*
 + * Copyright (c) 1991, 1993
 + *	The Regents of the University of California.  All rights reserved.
@@ -171,10 +171,6 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/queue.h src/sys/dev/aic7xxx/aicasm/queu
 + * 2. Redistributions in binary form must reproduce the above copyright
 + *    notice, this list of conditions and the following disclaimer in the
 + *    documentation and/or other materials provided with the distribution.
-+ * 3. All advertising materials mentioning features or use of this software
-+ *    must display the following acknowledgement:
-+ *	This product includes software developed by the University of
-+ *	California, Berkeley and its contributors.
 + * 4. Neither the name of the University nor the names of its contributors
 + *    may be used to endorse or promote products derived from this software
 + *    without specific prior written permission.
@@ -192,7 +188,7 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/queue.h src/sys/dev/aic7xxx/aicasm/queu
 + * SUCH DAMAGE.
 + *
 + *	@(#)queue.h	8.5 (Berkeley) 8/20/94
-+ * $FreeBSD: src/sys/sys/queue.h,v 1.56 2003/08/14 14:49:26 kan Exp $
++ * $FreeBSD: src/sys/sys/queue.h,v 1.58 2004/04/07 04:19:49 imp Exp $
 + */
 +
 +#ifndef _SYS_QUEUE_H_
@@ -682,7 +678,7 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/queue.h src/sys/dev/aic7xxx/aicasm/queu
 +	struct quehead *qh_rlink;
 +};
 +
-+#ifdef	__GNUC__
++#if defined(__GNUC__) || defined(__INTEL_COMPILER)
 +
 +static __inline void
 +insque(void *a, void *b)
@@ -706,12 +702,12 @@ diff -Nur src.old/sys/dev/aic7xxx/aicasm/queue.h src/sys/dev/aic7xxx/aicasm/queu
 +	element->qh_rlink = 0;
 +}
 +
-+#else /* !__GNUC__ */
++#else /* !(__GNUC__ || __INTEL_COMPILER) */
 +
 +void	insque(void *a, void *b);
 +void	remque(void *a);
 +
-+#endif /* __GNUC__ */
++#endif /* __GNUC__ || __INTEL_COMPILER */
 +
 +#endif /* _KERNEL */
 +

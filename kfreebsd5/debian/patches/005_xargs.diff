@@ -1,7 +1,7 @@
 diff -ur src.old/sys/conf/kmod.mk src/sys/conf/kmod.mk
---- src.old/sys/conf/kmod.mk	2003-11-19 06:08:26.000000000 +0100
-+++ src/sys/conf/kmod.mk	2004-05-22 03:57:42.000000000 +0200
-@@ -146,7 +146,7 @@
+--- src.old/sys/conf/kmod.mk	2004-08-15 01:53:04.000000000 +0200
++++ src/sys/conf/kmod.mk	2004-11-16 18:22:07.000000000 +0100
+@@ -171,7 +171,7 @@
  .endif
  	awk -f ${SYSDIR}/conf/kmod_syms.awk ${.TARGET} \
  		${.OBJDIR}/export_syms | \
@@ -9,16 +9,23 @@ diff -ur src.old/sys/conf/kmod.mk src/sys/conf/kmod.mk
 +	xargs -i% ${OBJCOPY} % ${.TARGET}
  .endif
  .endif
- 
+ .if !defined(DEBUG_FLAGS) && ${MACHINE_ARCH} == amd64
 diff -ur src.old/sys/contrib/dev/acpica/acpica_prep.sh src/sys/contrib/dev/acpica/acpica_prep.sh
---- src.old/sys/contrib/dev/acpica/acpica_prep.sh	2003-04-29 20:48:17.000000000 +0200
-+++ src/sys/contrib/dev/acpica/acpica_prep.sh	2004-05-22 03:58:14.000000000 +0200
-@@ -48,7 +48,7 @@
+--- src.old/sys/contrib/dev/acpica/acpica_prep.sh	2004-04-14 04:03:33.000000000 +0200
++++ src/sys/contrib/dev/acpica/acpica_prep.sh	2004-11-16 18:22:34.000000000 +0100
+@@ -52,12 +52,12 @@
+ 
+ echo copying full dirs
+ for i in ${fulldirs}; do
+-    find ${wrk} -name ${i} -type d | xargs -J % mv % ${dst}
++    find ${wrk} -name ${i} -type d | xargs -i % mv % ${dst}
+ done
  
  # move files to destination
- echo copy
+ echo copying flat dirs
 -find ${wrk} -type f | xargs -J % mv % ${dst}
 +find ${wrk} -type f | xargs -i % mv % ${dst}
  mv CHANGES.txt ${dst}
  
  # update src/headers for appropriate paths
+Only in src/sys/dev/aic7xxx/aicasm: queue.h
