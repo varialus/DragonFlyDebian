@@ -1,21 +1,9 @@
 
-Status: Won't send. We need to sort out the pthread linker problem first.
+Status: in BTS
 
-diff -ur openldap2-2.1.30.old/clients/tools/Makefile.in openldap2-2.1.30/clients/tools/Makefile.in
---- openldap2-2.1.30.old/clients/tools/Makefile.in	2003-03-29 16:45:43.000000000 +0100
-+++ openldap2-2.1.30/clients/tools/Makefile.in	2004-07-30 16:31:21.000000000 +0200
-@@ -13,7 +13,7 @@
- MKVOPTS = -s
- 
- XLIBS =  $(LDAP_LIBLDIF_A) $(LDAP_L)
--XXLIBS	= $(SECURITY_LIBS) $(LDIF_LIBS) $(LUTIL_LIBS)
-+XXLIBS	= $(SECURITY_LIBS) $(LDIF_LIBS) $(LUTIL_LIBS) $(LTHREAD_LIBS)
- 
- XSRCS	= ldsversion.c ldmversion.c lddversion.c ldrversion.c \
- 	ldpversion.c ldwversion.c ldcversion.c
 diff -ur openldap2-2.1.30.old/debian/rules openldap2-2.1.30/debian/rules
---- openldap2-2.1.30.old/debian/rules	2004-07-30 15:04:37.000000000 +0200
-+++ openldap2-2.1.30/debian/rules	2004-07-30 15:33:04.000000000 +0200
+--- openldap2-2.1.30.old/debian/rules	2004-08-18 19:54:14.000000000 +0200
++++ openldap2-2.1.30/debian/rules	2004-08-18 18:44:52.000000000 +0200
 @@ -18,7 +18,18 @@
  INSTALL_PROGRAM += -s
  endif
@@ -37,26 +25,14 @@ diff -ur openldap2-2.1.30.old/debian/rules openldap2-2.1.30/debian/rules
  rootdir		:= $(shell pwd)
  installdir	:= $(rootdir)/debian/install
 diff -ur openldap2-2.1.30.old/libraries/libldap/Makefile.in openldap2-2.1.30/libraries/libldap/Makefile.in
---- openldap2-2.1.30.old/libraries/libldap/Makefile.in	2004-07-30 15:04:38.000000000 +0200
-+++ openldap2-2.1.30/libraries/libldap/Makefile.in	2004-07-30 16:07:56.000000000 +0200
-@@ -35,7 +35,7 @@
- LIB_DEFS = -DLDAP_LIBRARY
- 
+--- openldap2-2.1.30.old/libraries/libldap/Makefile.in	2004-08-18 19:54:14.000000000 +0200
++++ openldap2-2.1.30/libraries/libldap/Makefile.in	2004-08-18 19:25:25.000000000 +0200
+@@ -37,7 +37,7 @@
  XLIBS = $(LIBRARY) $(LDAP_LIBLBER_LA) $(LDAP_LIBLUTIL_A)
--XXLIBS = $(SECURITY_LIBS) $(LUTIL_LIBS)
-+XXLIBS = $(SECURITY_LIBS) $(LUTIL_LIBS) $(LTHREAD_LIBS)
+ XXLIBS = $(SECURITY_LIBS) $(LUTIL_LIBS)
  NT_LINK_LIBS = $(LDAP_LIBLBER_LA) $(AC_LIBS) $(SECURITY_LIBS)
- UNIX_LINK_LIBS = $(LDAP_LIBLBER_LA) $(AC_LIBS) $(SECURITY_LIBS)
+-UNIX_LINK_LIBS = $(LDAP_LIBLBER_LA) $(AC_LIBS) $(SECURITY_LIBS)
++UNIX_LINK_LIBS = $(LDAP_LIBLBER_LA) $(AC_LIBS) $(SECURITY_LIBS) $(LTHREAD_LIBS)
  
-diff -ur openldap2-2.1.30.old/tests/progs/Makefile.in openldap2-2.1.30/tests/progs/Makefile.in
---- openldap2-2.1.30.old/tests/progs/Makefile.in	2003-02-24 17:16:54.000000000 +0100
-+++ openldap2-2.1.30/tests/progs/Makefile.in	2004-07-30 17:08:50.000000000 +0200
-@@ -13,7 +13,7 @@
- LDAP_LIBDIR= ../../libraries
- 
- XLIBS    = $(LDAP_LIBLDAP_LA) $(LDAP_LIBLBER_LA) $(LDAP_LIBLUTIL_A)
--XXLIBS	= $(SECURITY_LIBS) $(LUTIL_LIBS)
-+XXLIBS	= $(SECURITY_LIBS) $(LUTIL_LIBS) $(LTHREAD_LIBS)
- 
- # build-tools: FORCE
- # $(MAKE) $(MFLAGS) load-tools
+ apitest:	$(XLIBS) apitest.o
+ 	$(LTLINK) -o $@ apitest.o $(LIBS)

@@ -1,0 +1,345 @@
+
+Status: in BTS
+
+diff -Nur tcsh-6.13.01.old/debian/control tcsh-6.13.01/debian/control
+--- tcsh-6.13.01.old/debian/control	2004-08-18 16:23:20.000000000 +0200
++++ tcsh-6.13.01/debian/control	2004-08-18 16:24:50.000000000 +0200
+@@ -3,7 +3,7 @@
+ Priority: standard
+ Maintainer: Martin A. Godisch <godisch@debian.org>
+ Uploaders: Matej Vela <vela@debian.org>
+-Build-Depends: autotools-dev, libncurses5-dev, patch
++Build-Depends: autotools-dev, libncurses5-dev, patch, autoconf
+ Standards-Version: 3.6.1
+ 
+ Package: tcsh
+diff -Nur tcsh-6.13.01.old/debian/patches/01_build.diff tcsh-6.13.01/debian/patches/01_build.diff
+--- tcsh-6.13.01.old/debian/patches/01_build.diff	2004-08-18 16:23:19.000000000 +0200
++++ tcsh-6.13.01/debian/patches/01_build.diff	2004-08-18 16:23:33.000000000 +0200
+@@ -15,9 +15,9 @@
+  # define _PATH_TCSHELL		"/local/bin/tcsh"	/* use ram disk */
+  #endif /* _MINIX && !_PATH_TCSHELL */
+  
+-+#if defined(linux) && !defined(_PATH_TCSHELL)
+++#ifndef _PATH_TCSHELL
+ +# define _PATH_TCSHELL		"/bin/tcsh"		/* Debian */
+-+#endif /* linux && !_PATH_TCSHELL */
+++#endif /* !_PATH_TCSHELL */
+ +
+  #if defined(__EMX__) && !defined(_PATH_DEVNULL)
+  # define _PATH_DEVNULL		"nul"
+diff -Nur tcsh-6.13.01.old/debian/patches/12_gnu-kbsd.diff tcsh-6.13.01/debian/patches/12_gnu-kbsd.diff
+--- tcsh-6.13.01.old/debian/patches/12_gnu-kbsd.diff	1970-01-01 01:00:00.000000000 +0100
++++ tcsh-6.13.01/debian/patches/12_gnu-kbsd.diff	2004-08-18 16:23:45.000000000 +0200
+@@ -0,0 +1,284 @@
++diff -ur tcsh-6.13.01.old/Imakefile tcsh-6.13.01/Imakefile
++--- tcsh-6.13.01.old/Imakefile	2003-02-08 21:03:25.000000000 +0100
+++++ tcsh-6.13.01/Imakefile	2004-08-18 15:58:21.000000000 +0200
++@@ -41,12 +41,12 @@
++ #  define ConfigH sysv4
++ # endif
++ 
++-# ifdef LinuxArchitecture
+++# if defined(LinuxArchitecture) || defined(GNUArchitecture)
++ #  define ConfigH linux
++ # endif
++ 
++ # ifdef AlphaArchitecture
++-#  ifndef LinuxArchitecture
+++#  if !defined(LinuxArchitecture) && !defined(GNUArchitecture)
++ #    define ConfigH decosf1
++ #  endif
++ #  if !HasGcc
++diff -ur tcsh-6.13.01.old/configure.in tcsh-6.13.01/configure.in
++--- tcsh-6.13.01.old/configure.in	2004-07-24 23:52:48.000000000 +0200
+++++ tcsh-6.13.01/configure.in	2004-08-18 15:53:27.000000000 +0200
++@@ -78,7 +78,7 @@
++   ;;
++ 
++   ## Linux
++-  *-*-linux* )
+++  *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
++     tcsh_config_file=linux
++   ;;
++ 
++diff -ur tcsh-6.13.01.old/ed.term.h tcsh-6.13.01/ed.term.h
++--- tcsh-6.13.01.old/ed.term.h	2002-07-07 00:28:13.000000000 +0200
+++++ tcsh-6.13.01/ed.term.h	2004-08-18 16:00:56.000000000 +0200
++@@ -453,7 +453,7 @@
++  * Also for RH6.2 on the alpha, defined TIOCGLTC, but does not have
++  * struct ltchars
++  */
++-#if (defined(hpux) && defined(VSUSP) && defined(VDSUSP) && defined(VWERASE) && defined(VLNEXT)) || defined(__linux__)
+++#if (defined(hpux) && defined(VSUSP) && defined(VDSUSP) && defined(VWERASE) && defined(VLNEXT)) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
++ # undef TIOCGLTC       /* not really needed */
++ # undef TIOCSLTC
++ #endif
++diff -ur tcsh-6.13.01.old/host.defs tcsh-6.13.01/host.defs
++--- tcsh-6.13.01.old/host.defs	2004-08-18 16:21:25.000000000 +0200
+++++ tcsh-6.13.01/host.defs	2004-08-18 16:01:18.000000000 +0200
++@@ -435,7 +435,7 @@
++ enddef	:
++ 
++ 
++-newdef	: defined(linux)
+++newdef	: defined(linux) || defined(__GNU__) || defined(__GLIBC__)
++ comment	: Linus Torvalds's linux
++ vendor	: defined(M_intel)				: "intel"
++ hosttype: defined(M_i686) 				: "i386-linux"
++diff -ur tcsh-6.13.01.old/sh.func.c tcsh-6.13.01/sh.func.c
++--- tcsh-6.13.01.old/sh.func.c	2004-08-18 16:21:26.000000000 +0200
+++++ tcsh-6.13.01/sh.func.c	2004-08-18 16:02:23.000000000 +0200
++@@ -1757,7 +1757,7 @@
++ #   define toset(a) ((a) + 1)
++ #  endif /* aiws */
++ # else /* BSDLIMIT */
++-#  if (defined(BSD4_4) || defined(__linux__) || (HPUXVERSION >= 1100)) && !defined(__386BSD__)
+++#  if (defined(BSD4_4) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__) || (HPUXVERSION >= 1100)) && !defined(__386BSD__)
++     typedef rlim_t RLIM_TYPE;
++ #  else
++ #   if defined(SOLARIS2) || (defined(sgi) && SYSVREL > 3)
++@@ -1809,7 +1809,7 @@
++ #  endif
++ # endif /* SYSVREL > 3 && BSDLIMIT */
++ 
++-# if defined(__linux__) && defined(RLIMIT_AS) && !defined(RLIMIT_VMEM)
+++# if (defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) && defined(RLIMIT_AS) && !defined(RLIMIT_VMEM)
++ #  define RLIMIT_VMEM	RLIMIT_AS
++ # endif
++ 
++diff -ur tcsh-6.13.01.old/sh.h tcsh-6.13.01/sh.h
++--- tcsh-6.13.01.old/sh.h	2004-07-24 23:52:48.000000000 +0200
+++++ tcsh-6.13.01/sh.h	2004-08-18 16:06:08.000000000 +0200
++@@ -291,10 +291,10 @@
++  * redefines malloc(), so we define the following
++  * to avoid it.
++  */
++-# if defined(SYSMALLOC) || defined(linux) || defined(sgi) || defined(_OSD_POSIX)
+++# if defined(SYSMALLOC) || defined(linux) || defined(__GNU__) || defined(__GLIBC__) || defined(sgi) || defined(_OSD_POSIX)
++ #  define NO_FIX_MALLOC
++ #  include <stdlib.h>
++-# else /* linux */
+++# else /* glibc */
++ #  define _GNU_STDLIB_H
++ #  define malloc __malloc
++ #  define free __free
++@@ -305,11 +305,11 @@
++ #  undef free
++ #  undef calloc
++ #  undef realloc
++-# endif /* linux || sgi */
+++# endif /* glibc || sgi */
++ # include <limits.h>
++ #endif /* POSIX && !WINNT_NATIVE */
++ 
++-#if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX) || defined(linux)
+++#if SYSVREL > 0 || defined(_IBMR2) || defined(_MINIX) || defined(linux) || defined(__GNU__) || defined(__GLIBC__)
++ # if !defined(pyr) && !defined(stellar)
++ #  include <time.h>
++ #  ifdef _MINIX
++@@ -623,7 +623,7 @@
++ extern bool    dolzero;		/* if $?0 should return true... */
++ 
++ extern char *seterr;		/* Error message from scanner/parser */
++-#if !defined(BSD4_4) && !defined(__linux__)
+++#ifndef errno
++ extern int errno;		/* Error from C library routines */
++ #endif
++ extern int exitset;
++@@ -1203,23 +1203,9 @@
++ 
++ #include "tc.h"
++ 
++-/*
++- * To print system call errors...
++- */
++-#ifdef BSD4_4
++-# include <errno.h>
++-#else
++-# ifndef linux
++-#  ifdef NEEDstrerror
++-extern char *sys_errlist[];
++-#  endif
++-extern int errno, sys_nerr;
++-# endif /* !linux */
++-#endif
++-
++ #ifndef WINNT_NATIVE
++ # ifdef NLS_CATALOGS
++-#  ifdef linux
+++#  if defined(linux) || defined(__GNU__) || defined(__GLIBC__)
++ #   include <locale.h>
++ #   ifdef notdef
++ #    include <localeinfo.h>	/* Has this changed ? */
++diff -ur tcsh-6.13.01.old/sh.proc.c tcsh-6.13.01/sh.proc.c
++--- tcsh-6.13.01.old/sh.proc.c	2003-11-09 04:02:46.000000000 +0100
+++++ tcsh-6.13.01/sh.proc.c	2004-08-18 16:06:50.000000000 +0200
++@@ -47,9 +47,9 @@
++ # define HZ 16
++ #endif /* aiws */
++ 
++-#if defined(_BSD) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(linux)
+++#if defined(_BSD) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(linux) || defined(__GNU__) || defined(__GLIBC__)
++ # define BSDWAIT
++-#endif /* _BSD || (IRIS4D && __STDC__) || __lucid || linux */
+++#endif /* _BSD || (IRIS4D && __STDC__) || __lucid || glibc */
++ #ifndef WTERMSIG
++ # define WTERMSIG(w)	(((union wait *) &(w))->w_termsig)
++ # ifndef BSDWAIT
++@@ -216,7 +216,7 @@
++         (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
++ #   else
++     /* both a wait3 and rusage */
++-#    if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || defined(linux) || (defined(IRIS4D) && (__STDC__ || defined(FUNCPROTO)) && SYSVREL <= 3) || defined(__lucid) || defined(__osf__)
+++#    if !defined(BSDWAIT) || defined(NeXT) || defined(MACH) || defined(linux) || defined(__GNU__) || defined(__GLIBC__) || (defined(IRIS4D) && (__STDC__ || defined(FUNCPROTO)) && SYSVREL <= 3) || defined(__lucid) || defined(__osf__)
++     pid = wait3(&w,
++        (setintr && (intty || insource) ? WNOHANG | WUNTRACED : WNOHANG), &ru);
++ #    else /* BSDWAIT */
++diff -ur tcsh-6.13.01.old/sh.sem.c tcsh-6.13.01/sh.sem.c
++--- tcsh-6.13.01.old/sh.sem.c	2004-05-19 20:51:02.000000000 +0200
+++++ tcsh-6.13.01/sh.sem.c	2004-08-18 16:07:22.000000000 +0200
++@@ -50,9 +50,9 @@
++ #endif /* CLOSE_ON_EXEC */
++ 
++ #if defined(__sparc__) || defined(sparc)
++-# if !defined(MACH) && SYSVREL == 0 && !defined(Lynx) && !defined(BSD4_4) && !defined(linux)
+++# if !defined(MACH) && SYSVREL == 0 && !defined(Lynx) && !defined(BSD4_4) && !defined(linux) && !defined(__GNU__) && !defined(__GLIBC__)
++ #  include <vfork.h>
++-# endif /* !MACH && SYSVREL == 0 && !Lynx && !BSD4_4 && !linux */
+++# endif /* !MACH && SYSVREL == 0 && !Lynx && !BSD4_4 && !glibc */
++ #endif /* __sparc__ || sparc */
++ 
++ #ifdef VFORK
++diff -ur tcsh-6.13.01.old/tc.const.c tcsh-6.13.01/tc.const.c
++--- tcsh-6.13.01.old/tc.const.c	2004-07-24 23:59:27.000000000 +0200
+++++ tcsh-6.13.01/tc.const.c	2004-08-18 16:07:46.000000000 +0200
++@@ -158,7 +158,7 @@
++ 			    '\0' };
++ Char STRLANGEUCZH[]	= { '\0' };
++ Char STRLANGEUCZHB[]	= { '\0' };
++-#  elif defined(linux)
+++#  elif defined(linux) || defined(__GNU__) || defined(__GLIBC__)
++ Char STRLANGEUCJP[]	= { 'j', 'a', '_', 'J', 'P', '.', 'E', 'U', 'C', '-',
++ 			    'J', 'P', '\0' };
++ Char STRLANGEUCKR[]	= { 'k', 'o', '_', 'K', 'R', '.', 'E', 'U', 'C', '\0' };
++diff -ur tcsh-6.13.01.old/tc.os.h tcsh-6.13.01/tc.os.h
++--- tcsh-6.13.01.old/tc.os.h	2004-01-23 17:21:10.000000000 +0100
+++++ tcsh-6.13.01/tc.os.h	2004-08-18 16:13:02.000000000 +0200
++@@ -86,9 +86,9 @@
++ # define NOFILE 256
++ #endif /* NOFILE */
++ 
++-#if defined(linux) || defined(__NetBSD__) || defined(__FreeBSD__) || SYSVREL >= 4  || defined(_MINIX_VMD)
+++#if defined(linux) || defined(__GNU__) || defined(__GLIBC__) || defined(__NetBSD__) || defined(__FreeBSD__) || SYSVREL >= 4  || defined(_MINIX_VMD)
++ # undef NEEDstrerror
++-#endif /* linux || __NetBSD__ || __FreeBSD__ || SYSVREL >= 4 || _MINIX_VMD */
+++#endif /* glibc || __NetBSD__ || __FreeBSD__ || SYSVREL >= 4 || _MINIX_VMD */
++ 
++ #if !defined(pyr) && !defined(sinix)
++ /* Pyramid's cpp complains about the next line */
++@@ -197,10 +197,10 @@
++  * #if (SYSVREL > 0) && defined(TIOCGWINSZ)
++  * If that breaks on your machine, let me know.
++  *
++- * It would break on linux, where all this is
+++ * It would break on glibc, where all this is
++  * defined in <termios.h>. Wrapper added.
++  */
++-#if !defined(linux) && !defined(_VMS_POSIX)
+++#if !defined(linux) && !defined(__GNU__) && !defined(__GLIBC__) && !defined(_VMS_POSIX)
++ # if defined(INTEL) || defined(u3b2) || defined (u3b5) || defined(ub15) || defined(u3b20d) || defined(ISC) || defined(SCO) || defined(tower32)
++ #  ifdef TIOCGWINSZ
++ /*
++@@ -213,7 +213,7 @@
++ #   define NEEDgethostname
++ #  endif /* ODT */
++ # endif /* INTEL || u3b2 || u3b5 || ub15 || u3b20d || ISC || SCO || tower32 */
++-#endif /* !linux && !_VMS_POSIX */
+++#endif /* !glibc && !_VMS_POSIX */
++ 
++ #if defined(UNIXPC) || defined(COHERENT)
++ # define NEEDgethostname
++@@ -510,9 +510,9 @@
++ 
++ 
++ #if !defined(SOLARIS2) && !defined(sinix) && !defined(BSD4_4) && !defined(WINNT_NATIVE)
++-# if (SYSVREL > 0 && !defined(OREO) && !defined(sgi) && !defined(linux) && !defined(sinix) && !defined(_AIX) &&!defined(_UWIN)) || defined(NeXT)
+++# if (SYSVREL > 0 && !defined(OREO) && !defined(sgi) && !defined(linux) && !defined(__GNU__) && !defined(__GLIBC__) && !defined(sinix) && !defined(_AIX) &&!defined(_UWIN)) || defined(NeXT)
++ #  define NEEDgetcwd
++-# endif /* (SYSVREL > 0 && !OREO && !sgi && !linux && !sinix && !_AIX && !_UWIN) || NeXT */
+++# endif /* (SYSVREL > 0 && !OREO && !sgi && !glibc && !sinix && !_AIX && !_UWIN) || NeXT */
++ #endif
++ 
++ #ifndef S_IFLNK
++@@ -534,12 +534,12 @@
++ # define free tcsh_free
++ #endif /* NeXT */
++ 
++-#if !defined(BSD4_4) && !defined(__linux__) && !defined(__hpux) && \
+++#if !defined(BSD4_4) && !defined(__linux__) && !defined(__GNU__) && !defined(__GLIBC__) && !defined(__hpux) && \
++     !defined(sgi) && !defined(_AIX) && !defined(__CYGWIN__)
++ #ifndef NEEDgethostname
++ extern int gethostname __P((char *, int));
++ #endif /* NEEDgethostname */
++-#endif /* !BDS4_4 && !__linux__ && !__hpux && !sgi */
+++#endif /* !BDS4_4 && !glibc && !__hpux && !sgi */
++ 
++ #if !defined(POSIX) || defined(SUNOS4) || defined(UTekV) || defined(sysV88)
++ extern time_t time();
++diff -ur tcsh-6.13.01.old/tc.wait.h tcsh-6.13.01/tc.wait.h
++--- tcsh-6.13.01.old/tc.wait.h	2002-05-30 17:22:09.000000000 +0200
+++++ tcsh-6.13.01/tc.wait.h	2004-08-18 16:11:15.000000000 +0200
++@@ -39,7 +39,7 @@
++  * We try to use the system's wait.h when we can...
++  */
++ 
++-#if SYSVREL > 0 && !defined(linux)
+++#if SYSVREL > 0 && !defined(linux) && !defined(__GNU__) && !defined(__GLIBC__)
++ # ifdef hpux
++ #  ifndef __hpux
++ #   define NEEDwait
++@@ -59,7 +59,7 @@
++ #   define NEEDwait
++ #  endif /* OREO || IRIS4D || POSIX */
++ # endif	/* hpux */
++-#else /* SYSVREL == 0 || linux */
+++#else /* SYSVREL == 0 || glibc */
++ # ifdef _MINIX
++ #  undef NEEDwait
++ #  include "mi.wait.h"
++@@ -68,7 +68,7 @@
++ #   include <sys/wait.h>
++ #  endif /* WINNT_NATIVE */
++ # endif /* _MINIX */
++-#endif /* SYSVREL == 0 || linux */
+++#endif /* SYSVREL == 0 || glibc */
++ 
++ #ifdef NEEDwait
++ /*
+diff -Nur tcsh-6.13.01.old/debian/rules tcsh-6.13.01/debian/rules
+--- tcsh-6.13.01.old/debian/rules	2004-08-18 16:23:20.000000000 +0200
++++ tcsh-6.13.01/debian/rules	2004-08-18 16:25:44.000000000 +0200
+@@ -3,6 +3,9 @@
+ testdir  = test -f tc.h && test -f debian/rules
+ testroot = test x`whoami` = xroot
+ 
++DEB_HOST_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
++DEB_BUILD_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
++
+ # FOR AUTOCONF 2.52 AND NEWER ONLY
+ ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+ 	CONFFLAGS += --build $(DEB_HOST_GNU_TYPE)
+@@ -27,11 +30,13 @@
+ 	rm -rf debian/tcsh debian/tcsh-kanji
+ 	rm -f debian/files debian/rejected debian/substvars.*
+ 	rm -f config.guess config.sub config_f.h tcsh-nokanji tcsh-kanji
++	rm -rf autom4te.cache
+ 
+ configure-stamp: configure
+ 	$(testdir)
+ 	cp -f /usr/share/misc/config.guess /usr/share/misc/config.sub .
+ 	-cat debian/patches/*.diff | patch -Ntp1 -r debian/rejected --no-backup-if-mismatch
++	`which autoconf2.50 || which autoconf`
+ 	./configure $(CONFFLAGS) --prefix=
+ 	touch configure-stamp
+ 
