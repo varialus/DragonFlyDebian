@@ -3,6 +3,7 @@ PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/kfreebsd5
 #CFLAGS="-U__linux__ -U__FreeBSD_kernel__ -D__FreeBSD_kernel__=5 -D__FreeBSD_version=502010"
 MAKE=make DESTDIR=$(DESTDIR) WERROR=
+revision=`dpkg-parsechangelog | grep ^Version | cut -c 10- | cut -d '-' -f 2`
 
 build/kfreebsd5:: pre-build apply-patches
 	if ! test -e debian/stamp-build ; then \
@@ -19,9 +20,6 @@ binary/kfreebsd5:: common-install-prehook-arch
 	for i in $(kfreebsd5_MKDIR); do \
 		install -d -m 755 -o root -g root $(DESTDIR)/$$i; \
 	done
-	# first install loader
-#	cd $(CURDIR)/build-tree/src/sys/boot && \
-#		$(MAKE) install
 	# install device.hints
 	install -o root -g root -m 644 \
 		build-tree/src/sys/i386/conf/GENERIC.hints \
@@ -44,4 +42,7 @@ binary/kfreebsd5:: common-install-prehook-arch
 	cp /bin/true $(DESTDIR)/sbin/fsck.cd9660
 
 clean::
+	cat debian/patches/004_version.diff.in | \
+		sed s/@revision@/$(revision)/g > \
+		debian/patches/004_version.diff
 	rm -f debian/stamp-build
