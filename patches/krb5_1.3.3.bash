@@ -6,18 +6,6 @@ cat $0 | patch -p1
 (cd src && ACLOCAL=true ./util/reconf --force)
 exit 0
 
-diff -ur krb5-1.3.3.old/src/appl/gssftp/ftpd/ftpcmd.y krb5-1.3.3/src/appl/gssftp/ftpd/ftpcmd.y
---- krb5-1.3.3.old/src/appl/gssftp/ftpd/ftpcmd.y	2002-10-23 17:00:23.000000000 +0200
-+++ krb5-1.3.3/src/appl/gssftp/ftpd/ftpcmd.y	2004-07-29 16:42:02.000000000 +0200
-@@ -96,7 +96,7 @@
- #endif
- 
- #ifndef NBBY
--#ifdef linux
-+#ifdef unix
- #define NBBY 8
- #endif
- #ifdef __pyrsoft
 diff -ur krb5-1.3.3.old/src/appl/telnet/telnet/sys_bsd.c krb5-1.3.3/src/appl/telnet/telnet/sys_bsd.c
 --- krb5-1.3.3.old/src/appl/telnet/telnet/sys_bsd.c	2002-11-15 21:21:35.000000000 +0100
 +++ krb5-1.3.3/src/appl/telnet/telnet/sys_bsd.c	2004-07-29 16:48:53.000000000 +0200
