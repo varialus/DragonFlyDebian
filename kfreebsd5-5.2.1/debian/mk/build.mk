@@ -36,6 +36,12 @@ binary/kfreebsd5:: common-install-prehook-arch
 	cd build-tree/src/sys/i386/compile/$(KERNEL) && \
 		$(MAKE) install
 	chmod 644 $(DESTDIR)/boot/kernel/kernel
+	gzip -c9 $(DESTDIR)/boot/kernel/kernel > \
+		$(DESTDIR)/boot/kfreebsd.gz
+
+	# prevent init barfs when / is cd9660
+	mkdir -p $(DESTDIR)/sbin
+	cp /bin/true $(DESTDIR)/sbin/fsck.cd9660
 
 clean::
 	rm -f debian/stamp-build
