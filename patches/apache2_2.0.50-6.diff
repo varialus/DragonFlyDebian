@@ -1,0 +1,22 @@
+--- old/apache2-2.0.50/debian/rules	2004-08-03 01:51:58.000000000 +0200
++++ apache2-2.0.50/debian/rules	2004-08-03 00:14:20.000000000 +0200
+@@ -85,6 +85,10 @@
+ 
+ configure: $(STAMP_DIR)/configure
+ $(STAMP_DIR)/configure: $(STAMP_DIR)/source.make 
++	for i in build srclib/pcre srclib/apr/build srclib/apr-util/build \
++		srclib/apr-util/xml/expat/conftools ; do \
++		cp /usr/share/misc/config.* $(B)/$$i ; \
++	done
+ 	cd $(B) && ./buildconf
+ 	touch $@ 
+ 
+@@ -115,7 +119,7 @@
+ 	for i in $(FIRSTMPM) $(OTHERMPMS); do \
+ 		rm -f debian/apache2-mpm-$$i.postinst ;\
+ 		rm -f debian/apache2-mpm-$$i.init.d ;\
+-    done
++	done
+ 	rm -f debian/apache2-mpm-prefork.init.d
+ 	dh_clean
+ 
