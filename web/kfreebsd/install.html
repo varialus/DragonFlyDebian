@@ -14,8 +14,7 @@
 <p><b>Introduction</b>
 <p><a href="http://www.debian.org/ports/kfreebsd-gnu">Debian GNU/kFreeBSD</a> is a port of the Debian packaging system 
 (dpkg, apt etc.) with the GNU C library and GNU userland, built on top of the <a href="http://www.freebsd.org">FreeBSD</a> kernel. 
-<br>There is also a port using FreeBSD's native C library <a href="http://www.debian.org/ports/freebsd/bsd-libc-based">here</a>, 
-but most of the project's focus is on the Glibc port. Oh. And there's the <a href="http://www.debian.org/ports/netbsd/">NetBSD</a> port too.
+<br>Oh. And there's the <a href="http://www.debian.org/ports/netbsd/">NetBSD</a> port too.
 
 <p><b>Requirements</b>
 
@@ -97,15 +96,11 @@ Which software you use to do this isn't a huge deal, as long as it's capable of 
 <br>See <a href="http://glibc-bsd.alioth.debian.org/kfreebsd/porting/PORTING">PORTING</a> for more information.
 
 <p>Stopping and starting daemons is done the Debian way with /etc/init.d/foo start|stop.
-<br>This isn't completely bug-free on GNU/kFreeBSD though. Sometimes stopping or starting a daemon just doesn't work.
+<br>This isn't completely bug-free on GNU/kFreeBSD though. Stopping a daemon just doesn't work.
 <br>This means you may need to manually kill a process to stop a daemon or remove its' pid file before one will start. This is a known bug.
 
 <p>DNS resolving is broken due to a Glibc bug, so you'll have to make sure /etc/hosts contains hostnames and corresponding ip addresses for any servers you want to access.
 <br>MX resolving also doesn't work, so MTA's (postfix, sendmail etc.) are borked too.
-
-
-<p>There have been reports of problems with /usr/share/info/dir. One workaround is to copy the file from a Linux system 
-and remove all of the contents except for the stuff at the top of the file.
 
 <p>That's it! Start installing packages. Don't expect everything to be perfect and non-broken though.
 <br>Have fun. :)
