@@ -2,12 +2,12 @@
 #
 # Build-Depends: mkisofs, crosshurd, fakeroot
 #
-# Copyright 2004  Robert Millan <rmh@debian.org>
+# Copyright 2004, 2005 Robert Millan <rmh@debian.org>
 # See /usr/share/common-licenses/GPL for license terms.
 
 set -ex
 
-version=10
+version=11
 
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
@@ -110,6 +110,9 @@ done
 chroot /ramdisk
 EOF
 chmod +x root/writable.sh
+
+# mimic kfreebsd5's postinst
+gzip -c9 boot/kernel/kernel > boot/kfreebsd.gz
 
 # hacks for being a FreeBSD compliant [tm] cdrom
 for i in 5 6 ; do for j in 0 1 2 3 4 5 6 7 8 9 ; do
