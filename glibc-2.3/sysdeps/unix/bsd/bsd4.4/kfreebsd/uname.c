@@ -23,7 +23,7 @@
 #include <string.h>
 
 /* Dummy values used as a fallback.  */
-#define UNAME_SYSNAME	"FreeBSD"
+#define UNAME_SYSNAME	"GNU/kFreeBSD"
 #define UNAME_RELEASE	"4.0"
 #define UNAME_VERSION	"GENERIC"
 #define UNAME_MACHINE	"mmix"
@@ -50,18 +50,7 @@ __uname (struct utsname *name)
 
   /* Fill sysname: "uname -s".  Fetch sysctl "kern.ostype".  */
   {
-    int request[2] = { CTL_KERN, KERN_OSTYPE };
-    size_t len = sizeof (name->sysname);
-    if (__sysctl (request, 2, name->sysname, &len, NULL, 0) >= 0)
-      {
-	if (len < sizeof (name->sysname))
-	  name->sysname[len] = '\0';
-      }
-    else
-      {
-	if (errno != ENOMEM)
-	  strncpy (name->sysname, UNAME_SYSNAME, sizeof (name->sysname));
-      }
+    strncpy (name->sysname, UNAME_SYSNAME, sizeof (name->sysname));
   }
 
   /* Fill release: "uname -r".  Fetch sysctl "kern.osrelease".  */
