@@ -1,18 +1,27 @@
 #!/usr/bin/make -f
 
 #version := 5.2.1
-DEB_TAR_SRCDIR = src
+DEB_TAR_SRCDIR			:= src
+DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
 
-#build/kfreebsd5-headers:: apply-patches
-#	chmod +x debian/testheader
-#	set -e ; for i in \
-#		`find $(CURDIR)/$(DEB_SRCDIR)/import -type f -name \*.h` ; \
-#		do $(CURDIR)/debian/testheader $$i ; done
+# for dpkg-architecture
+include /usr/share/cdbs/1/rules/buildvars.mk
+
+kfreebsd_cpu	:= $(DEB_HOST_GNU_CPU)
+ifeq ($(kfreebsd_cpu), x86_64)
+kfreebsd_cpu	:= amd64
+endif
 
 binary/kfreebsd5-headers:: common-install-prehook-arch
+	ln -sf $(kfreebsd_cpu)/include $(DEB_SRCDIR)/sys/machine
 	mkdir -p debian/kfreebsd5-headers/usr/src/kfreebsd5-headers
 	cp -a $(DEB_SRCDIR)/sys/* \
 		debian/kfreebsd5-headers/usr/src/kfreebsd5-headers/
+
+clean::
+	sed \
+		-e "s/@arches@/`type-handling alpha,arm,i386,ia64,powerpc,sparc64,x86_64 kfreebsd-gnu`/g" \
+	< debian/control.in.in > debian/control.in
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/tarball.mk

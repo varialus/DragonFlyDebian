@@ -1,0 +1,140 @@
+diff -ur src.old/sys/netinet6/in6.h src/sys/netinet6/in6.h
+--- src.old/sys/netinet6/in6.h	2004-11-27 18:23:16.000000000 +0100
++++ src/sys/netinet6/in6.h	2004-11-27 18:27:41.000000000 +0100
+@@ -210,12 +210,6 @@
+  * Definition of some useful macros to handle IP6 addresses
+  */
+ #if __BSD_VISIBLE
+-#define IN6ADDR_ANY_INIT \
+-	{{{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+-	    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }}}
+-#define IN6ADDR_LOOPBACK_INIT \
+-	{{{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+-	    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }}}
+ #define IN6ADDR_NODELOCAL_ALLNODES_INIT \
+ 	{{{ 0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+ 	    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }}}
+@@ -258,42 +252,6 @@
+ #endif
+ 
+ /*
+- * Unspecified
+- */
+-#define IN6_IS_ADDR_UNSPECIFIED(a)	\
+-	((*(const u_int32_t *)(const void *)(&(a)->s6_addr[0]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[4]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[8]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[12]) == 0))
+-
+-/*
+- * Loopback
+- */
+-#define IN6_IS_ADDR_LOOPBACK(a)		\
+-	((*(const u_int32_t *)(const void *)(&(a)->s6_addr[0]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[4]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[8]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[12]) == ntohl(1)))
+-
+-/*
+- * IPv4 compatible
+- */
+-#define IN6_IS_ADDR_V4COMPAT(a)		\
+-	((*(const u_int32_t *)(const void *)(&(a)->s6_addr[0]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[4]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[8]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[12]) != 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[12]) != ntohl(1)))
+-
+-/*
+- * Mapped
+- */
+-#define IN6_IS_ADDR_V4MAPPED(a)		      \
+-	((*(const u_int32_t *)(const void *)(&(a)->s6_addr[0]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[4]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[8]) == ntohl(0x0000ffff)))
+-
+-/*
+  * KAME Scope Values
+  */
+ 
+@@ -313,20 +271,6 @@
+ #define __IPV6_ADDR_SCOPE_GLOBAL	0x0e
+ #endif
+ 
+-/*
+- * Unicast Scope
+- * Note that we must check topmost 10 bits only, not 16 bits (see RFC2373).
+- */
+-#define IN6_IS_ADDR_LINKLOCAL(a)	\
+-	(((a)->s6_addr[0] == 0xfe) && (((a)->s6_addr[1] & 0xc0) == 0x80))
+-#define IN6_IS_ADDR_SITELOCAL(a)	\
+-	(((a)->s6_addr[0] == 0xfe) && (((a)->s6_addr[1] & 0xc0) == 0xc0))
+-
+-/*
+- * Multicast
+- */
+-#define IN6_IS_ADDR_MULTICAST(a)	((a)->s6_addr[0] == 0xff)
+-
+ #ifdef _KERNEL	/* XXX nonstandard */
+ #define IPV6_ADDR_MC_SCOPE(a)		((a)->s6_addr[1] & 0x0f)
+ #else
+@@ -355,22 +299,6 @@
+ #define IN6_IS_ADDR_MC_GLOBAL(a)	\
+ 	(IN6_IS_ADDR_MULTICAST(a) &&	\
+ 	 (IPV6_ADDR_MC_SCOPE(a) == IPV6_ADDR_SCOPE_GLOBAL))
+-#else
+-#define IN6_IS_ADDR_MC_NODELOCAL(a)	\
+-	(IN6_IS_ADDR_MULTICAST(a) &&	\
+-	 (__IPV6_ADDR_MC_SCOPE(a) == __IPV6_ADDR_SCOPE_NODELOCAL))
+-#define IN6_IS_ADDR_MC_LINKLOCAL(a)	\
+-	(IN6_IS_ADDR_MULTICAST(a) &&	\
+-	 (__IPV6_ADDR_MC_SCOPE(a) == __IPV6_ADDR_SCOPE_LINKLOCAL))
+-#define IN6_IS_ADDR_MC_SITELOCAL(a)	\
+-	(IN6_IS_ADDR_MULTICAST(a) && 	\
+-	 (__IPV6_ADDR_MC_SCOPE(a) == __IPV6_ADDR_SCOPE_SITELOCAL))
+-#define IN6_IS_ADDR_MC_ORGLOCAL(a)	\
+-	(IN6_IS_ADDR_MULTICAST(a) &&	\
+-	 (__IPV6_ADDR_MC_SCOPE(a) == __IPV6_ADDR_SCOPE_ORGLOCAL))
+-#define IN6_IS_ADDR_MC_GLOBAL(a)	\
+-	(IN6_IS_ADDR_MULTICAST(a) &&	\
+-	 (__IPV6_ADDR_MC_SCOPE(a) == __IPV6_ADDR_SCOPE_GLOBAL))
+ #endif
+ 
+ #ifdef _KERNEL	/* nonstandard */
+@@ -412,12 +340,6 @@
+ #define IPV6_RETOPTS		8  /* ip6_opts; set/get IP6 options */
+ #endif
+ #define IPV6_SOCKOPT_RESERVED1	3  /* reserved for future use */
+-#define IPV6_UNICAST_HOPS	4  /* int; IP6 hops */
+-#define IPV6_MULTICAST_IF	9  /* u_int; set/get IP6 multicast i/f  */
+-#define IPV6_MULTICAST_HOPS	10 /* int; set/get IP6 multicast hops */
+-#define IPV6_MULTICAST_LOOP	11 /* u_int; set/get IP6 multicast loopback */
+-#define IPV6_JOIN_GROUP		12 /* ip6_mreq; join a group membership */
+-#define IPV6_LEAVE_GROUP	13 /* ip6_mreq; leave a group membership */
+ #define IPV6_PORTRANGE		14 /* int; range to choose for unspec port */
+ #define ICMP6_FILTER		18 /* icmp6_filter; icmp6 filter */
+ /* RFC2292 options */
+@@ -431,7 +353,6 @@
+ #define IPV6_2292PKTOPTIONS	25 /* buf/cmsghdr; set/get IPv6 options */
+ #endif
+ 
+-#define IPV6_CHECKSUM		26 /* int; checksum offset for raw socket */
+ #define IPV6_V6ONLY		27 /* bool; make AF_INET6 sockets v6 only */
+ #ifndef _KERNEL
+ #define IPV6_BINDV6ONLY		IPV6_V6ONLY
+@@ -474,15 +395,9 @@
+ 
+ /* more new socket options introduced in RFC2292bis */
+ #define IPV6_PKTINFO		46 /* in6_pktinfo; send if, src addr */
+-#define IPV6_HOPLIMIT		47 /* int; send hop limit */
+ #define IPV6_NEXTHOP		48 /* sockaddr; next hop addr */
+ #define IPV6_HOPOPTS		49 /* ip6_hbh; send hop-by-hop option */
+ #define IPV6_DSTOPTS		50 /* ip6_dest; send dst option befor rthdr */
+-#define IPV6_RTHDR		51 /* ip6_rthdr; send routing header */
+-#if 0
+-#define IPV6_PKTOPTIONS		52 /* buf/cmsghdr; set/get IPv6 options */
+-				   /* obsoleted by 2292bis */
+-#endif
+ 
+ #define IPV6_RECVTCLASS		57 /* bool; recv traffic class values */
+ 

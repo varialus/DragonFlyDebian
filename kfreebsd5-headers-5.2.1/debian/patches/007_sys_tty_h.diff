@@ -1,6 +1,6 @@
 diff -ur src.old/sys/sys/tty.h src/sys/sys/tty.h
---- src.old/sys/sys/tty.h	2004-08-03 08:37:35.000000000 +0200
-+++ src/sys/sys/tty.h	2004-08-03 08:53:33.000000000 +0200
+--- src.old/sys/sys/tty.h	2004-11-27 23:36:31.000000000 +0100
++++ src/sys/sys/tty.h	2004-11-27 23:37:02.000000000 +0100
 @@ -51,8 +51,15 @@
  #define	_SYS_TTY_H_
  
@@ -19,6 +19,15 @@ diff -ur src.old/sys/sys/tty.h src/sys/sys/tty.h
  
  /*
   * Clists are character lists, which is a variable length linked list
+@@ -84,7 +91,7 @@
+ 	int	t_line;			/* Interface to device drivers. */
+ 	union {
+ 		dev_t	t_kdev;		/* Device. */
+-		udev_t	t_udev;		/* Userland (sysctl) instance. */
++		dev_t	t_udev;		/* Userland (sysctl) instance. */
+ 		void	*t_devp;	/* Keep user/kernel size in sync. */
+ 	} ttyu;
+ 	int	t_state;		/* Device and driver (TS*) state. */
 @@ -93,8 +100,6 @@
  	struct	pgrp *t_pgrp;		/* Foreground process group. */
  	struct	session *t_session;	/* Enclosing session. */
@@ -28,3 +37,12 @@ diff -ur src.old/sys/sys/tty.h src/sys/sys/tty.h
  	struct	termios t_termios;	/* Termios state. */
  	struct	winsize t_winsize;	/* Window size. */
  					/* Start output. */
+@@ -140,7 +145,7 @@
+ 	long	xt_cancc;		/* Canonical queue statistics. */
+ 	long	xt_outcc;		/* Output queue statistics. */
+ 	int	xt_line;		/* Interface to device drivers. */
+-	udev_t	xt_dev;			/* Userland (sysctl) instance. */
++	dev_t	xt_dev;			/* Userland (sysctl) instance. */
+ 	int	xt_state;		/* Device and driver (TS*) state. */
+ 	int	xt_flags;		/* Tty flags. */
+ 	int     xt_timeout;		/* Timeout for ttywait(). */
