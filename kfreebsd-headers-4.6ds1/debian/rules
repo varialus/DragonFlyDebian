@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 version := 4.6
-DEB_TAR_SRCDIR = kfreebsd-headers-$(version)
+DEB_TAR_SRCDIR = src
 
 build/kfreebsd-headers:: pre-build
 	chmod +x debian/testheader
@@ -11,7 +11,7 @@ build/kfreebsd-headers:: pre-build
 
 binary/kfreebsd-headers:: common-install-prehook-arch
 	mkdir -p debian/kfreebsd-headers/usr/src/kfreebsd-headers
-	cp -a $(DEB_SRCDIR)/import/* \
+	cp -a $(DEB_SRCDIR)/sys/* \
 		debian/kfreebsd-headers/usr/src/kfreebsd-headers/
 
 include /usr/share/cdbs/1/rules/debhelper.mk
