@@ -42,7 +42,12 @@ binary/kfreebsd5:: common-install-prehook-arch
 	cp /bin/true $(DESTDIR)/sbin/fsck.cd9660
 
 clean::
-	cat debian/patches/004_version.diff.in | \
-		sed s/@revision@/$(revision)/g > \
-		debian/patches/004_version.diff
+	cat debian/patches/004_version.diff.in \
+	| sed "s/@revision@/$(revision)/g" \
+	> debian/patches/004_version.diff
+
+	cat debian/control.in \
+	| sed "s/@kfreebsd-gnu@/`type-handling any kfreebsd-gnu`/g" \
+	> debian/control
+
 	rm -f debian/stamp-build
