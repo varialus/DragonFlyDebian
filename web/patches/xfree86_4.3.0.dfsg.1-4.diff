@@ -1,7 +1,7 @@
-diff -Nur xfree86-4.3.0.old/debian/MANIFEST.kfreebsd-i386 xfree86-4.3.0/debian/MANIFEST.kfreebsd-i386
---- xfree86-4.3.0.old/debian/MANIFEST.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/MANIFEST.kfreebsd-i386	2004-05-30 20:53:46.000000000 +0200
-@@ -0,0 +1,7647 @@
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/MANIFEST.kfreebsd-i386 xfree86-4.3.0.dfsg.1/debian/MANIFEST.kfreebsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/MANIFEST.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/MANIFEST.kfreebsd-i386	2004-06-08 21:35:22.000000000 +0200
+@@ -0,0 +1,7652 @@
 +etc/X11/Xresources/xbase-clients
 +etc/X11/Xresources/xfree86-common
 +etc/X11/Xsession
@@ -64,7 +64,6 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.kfreebsd-i386 xfree86-4.3.0/debian/M
 +etc/X11/rstart/contexts/@List
 +etc/X11/rstart/contexts/default
 +etc/X11/rstart/contexts/x11r6
-+etc/X11/rstart/rstartd.real
 +etc/X11/twm/system.twmrc
 +etc/X11/twm/system.twmrc-menu
 +etc/X11/xdm/GiveConsole
@@ -254,6 +253,7 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.kfreebsd-i386 xfree86-4.3.0/debian/M
 +etc/X11/xkb/symbols/gur
 +etc/X11/xkb/symbols/hp/us
 +etc/X11/xkb/symbols/hr
++etc/X11/xkb/symbols/hr_US
 +etc/X11/xkb/symbols/hu
 +etc/X11/xkb/symbols/hu_US
 +etc/X11/xkb/symbols/hu_qwerty
@@ -365,6 +365,8 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.kfreebsd-i386 xfree86-4.3.0/debian/M
 +etc/X11/xkb/symbols/pc/syr_phonetic
 +etc/X11/xkb/symbols/pc/tel
 +etc/X11/xkb/symbols/pc/th
++etc/X11/xkb/symbols/pc/th_pat
++etc/X11/xkb/symbols/pc/th_tis
 +etc/X11/xkb/symbols/pc/tj
 +etc/X11/xkb/symbols/pc/tml
 +etc/X11/xkb/symbols/pc/tr
@@ -397,6 +399,8 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.kfreebsd-i386 xfree86-4.3.0/debian/M
 +etc/X11/xkb/symbols/syr_phonetic
 +etc/X11/xkb/symbols/tel
 +etc/X11/xkb/symbols/th
++etc/X11/xkb/symbols/th_pat
++etc/X11/xkb/symbols/th_tis
 +etc/X11/xkb/symbols/tj
 +etc/X11/xkb/symbols/tml
 +etc/X11/xkb/symbols/tr
@@ -479,6 +483,7 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.kfreebsd-i386 xfree86-4.3.0/debian/M
 +usr/X11R6/bin/revpath
 +usr/X11R6/bin/rstart
 +usr/X11R6/bin/rstartd
++usr/X11R6/bin/rstartd.real
 +usr/X11R6/bin/sessreg
 +usr/X11R6/bin/setxkbmap
 +usr/X11R6/bin/showfont
@@ -5906,6 +5911,7 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.kfreebsd-i386 xfree86-4.3.0/debian/M
 +usr/X11R6/lib/modules/drivers/tseng_drv.o
 +usr/X11R6/lib/modules/drivers/vesa_drv.o
 +usr/X11R6/lib/modules/drivers/vga_drv.o
++usr/X11R6/lib/modules/drivers/via_drv.o
 +usr/X11R6/lib/modules/drivers/vmware_drv.o
 +usr/X11R6/lib/modules/extensions/libGLcore.a
 +usr/X11R6/lib/modules/extensions/libdbe.a
@@ -5964,8 +5970,6 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.kfreebsd-i386 xfree86-4.3.0/debian/M
 +usr/X11R6/lib/modules/libxf4bpp.a
 +usr/X11R6/lib/modules/libxf8_16bpp.a
 +usr/X11R6/lib/modules/libxf8_32bpp.a
-+usr/X11R6/lib/modules/v10002d.uc
-+usr/X11R6/lib/modules/v20002d.uc
 +usr/X11R6/lib/pkgconfig/xcursor.pc
 +usr/X11R6/man/man1/XFree86.1x
 +usr/X11R6/man/man1/Xmark.1x
@@ -7615,6 +7619,7 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.kfreebsd-i386 xfree86-4.3.0/debian/M
 +usr/X11R6/man/man4/tseng.4x
 +usr/X11R6/man/man4/vesa.4x
 +usr/X11R6/man/man4/vga.4x
++usr/X11R6/man/man4/via.4x
 +usr/X11R6/man/man4/vmware.4x
 +usr/X11R6/man/man4/void.4x
 +usr/X11R6/man/man4/wacom.4x
@@ -7649,10 +7654,10 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.kfreebsd-i386 xfree86-4.3.0/debian/M
 +usr/share/man/man8/update-fonts-dir.8
 +usr/share/man/man8/update-fonts-scale.8
 +var/lib/xkb/README
-diff -Nur xfree86-4.3.0.old/debian/MANIFEST.netbsd-i386 xfree86-4.3.0/debian/MANIFEST.netbsd-i386
---- xfree86-4.3.0.old/debian/MANIFEST.netbsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/MANIFEST.netbsd-i386	2004-05-30 20:53:48.000000000 +0200
-@@ -0,0 +1,7647 @@
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/MANIFEST.knetbsd-i386 xfree86-4.3.0.dfsg.1/debian/MANIFEST.knetbsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/MANIFEST.knetbsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/MANIFEST.knetbsd-i386	2004-06-08 22:04:15.000000000 +0200
+@@ -0,0 +1,7652 @@
 +etc/X11/Xresources/xbase-clients
 +etc/X11/Xresources/xfree86-common
 +etc/X11/Xsession
@@ -7715,7 +7720,6 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.netbsd-i386 xfree86-4.3.0/debian/MAN
 +etc/X11/rstart/contexts/@List
 +etc/X11/rstart/contexts/default
 +etc/X11/rstart/contexts/x11r6
-+etc/X11/rstart/rstartd.real
 +etc/X11/twm/system.twmrc
 +etc/X11/twm/system.twmrc-menu
 +etc/X11/xdm/GiveConsole
@@ -7905,6 +7909,7 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.netbsd-i386 xfree86-4.3.0/debian/MAN
 +etc/X11/xkb/symbols/gur
 +etc/X11/xkb/symbols/hp/us
 +etc/X11/xkb/symbols/hr
++etc/X11/xkb/symbols/hr_US
 +etc/X11/xkb/symbols/hu
 +etc/X11/xkb/symbols/hu_US
 +etc/X11/xkb/symbols/hu_qwerty
@@ -8016,6 +8021,8 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.netbsd-i386 xfree86-4.3.0/debian/MAN
 +etc/X11/xkb/symbols/pc/syr_phonetic
 +etc/X11/xkb/symbols/pc/tel
 +etc/X11/xkb/symbols/pc/th
++etc/X11/xkb/symbols/pc/th_pat
++etc/X11/xkb/symbols/pc/th_tis
 +etc/X11/xkb/symbols/pc/tj
 +etc/X11/xkb/symbols/pc/tml
 +etc/X11/xkb/symbols/pc/tr
@@ -8048,6 +8055,8 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.netbsd-i386 xfree86-4.3.0/debian/MAN
 +etc/X11/xkb/symbols/syr_phonetic
 +etc/X11/xkb/symbols/tel
 +etc/X11/xkb/symbols/th
++etc/X11/xkb/symbols/th_pat
++etc/X11/xkb/symbols/th_tis
 +etc/X11/xkb/symbols/tj
 +etc/X11/xkb/symbols/tml
 +etc/X11/xkb/symbols/tr
@@ -8130,6 +8139,7 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.netbsd-i386 xfree86-4.3.0/debian/MAN
 +usr/X11R6/bin/revpath
 +usr/X11R6/bin/rstart
 +usr/X11R6/bin/rstartd
++usr/X11R6/bin/rstartd.real
 +usr/X11R6/bin/sessreg
 +usr/X11R6/bin/setxkbmap
 +usr/X11R6/bin/showfont
@@ -13557,6 +13567,7 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.netbsd-i386 xfree86-4.3.0/debian/MAN
 +usr/X11R6/lib/modules/drivers/tseng_drv.o
 +usr/X11R6/lib/modules/drivers/vesa_drv.o
 +usr/X11R6/lib/modules/drivers/vga_drv.o
++usr/X11R6/lib/modules/drivers/via_drv.o
 +usr/X11R6/lib/modules/drivers/vmware_drv.o
 +usr/X11R6/lib/modules/extensions/libGLcore.a
 +usr/X11R6/lib/modules/extensions/libdbe.a
@@ -13615,8 +13626,6 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.netbsd-i386 xfree86-4.3.0/debian/MAN
 +usr/X11R6/lib/modules/libxf4bpp.a
 +usr/X11R6/lib/modules/libxf8_16bpp.a
 +usr/X11R6/lib/modules/libxf8_32bpp.a
-+usr/X11R6/lib/modules/v10002d.uc
-+usr/X11R6/lib/modules/v20002d.uc
 +usr/X11R6/lib/pkgconfig/xcursor.pc
 +usr/X11R6/man/man1/XFree86.1x
 +usr/X11R6/man/man1/Xmark.1x
@@ -15266,6 +15275,7 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.netbsd-i386 xfree86-4.3.0/debian/MAN
 +usr/X11R6/man/man4/tseng.4x
 +usr/X11R6/man/man4/vesa.4x
 +usr/X11R6/man/man4/vga.4x
++usr/X11R6/man/man4/via.4x
 +usr/X11R6/man/man4/vmware.4x
 +usr/X11R6/man/man4/void.4x
 +usr/X11R6/man/man4/wacom.4x
@@ -15300,88 +15310,18 @@ diff -Nur xfree86-4.3.0.old/debian/MANIFEST.netbsd-i386 xfree86-4.3.0/debian/MAN
 +usr/share/man/man8/update-fonts-dir.8
 +usr/share/man/man8/update-fonts-scale.8
 +var/lib/xkb/README
-diff -Nur xfree86-4.3.0.old/debian/TODO xfree86-4.3.0/debian/TODO
---- xfree86-4.3.0.old/debian/TODO	2004-05-30 20:53:27.000000000 +0200
-+++ xfree86-4.3.0/debian/TODO	2004-05-30 20:53:46.000000000 +0200
-@@ -47,9 +47,9 @@
- 000_stolen_from_HEAD_xlib.diff						check for stuff stolen from HEAD after xf-4_3_0 was tagged
- 000_stolen_from_HEAD_xman.diff						check for stuff stolen from HEAD after xf-4_3_0 was tagged
- 000_stolen_from_HEAD_xtt.diff						check for stuff stolen from HEAD after xf-4_3_0 was tagged
--001_linux_cf.diff
--001a_damn_cpp_3.3_to_hell.diff
--001b_m68k_haslinuxinput_too.diff
-+001_linux_cf.diff					merged		003_linux.cf_and_xfree86.cf.diff
-+001a_damn_cpp_3.3_to_hell.diff				merged		003a_damn_cpp_3.3_to_hell.diff
-+001b_m68k_haslinuxinput_too.diff			merged		003_linux.cf_and_xfree86.cf.diff
- 002_xdm_fixes.diff					merged
- 003_xfs-fixes.diff
- 004_xfree86_cf.diff
-diff -Nur xfree86-4.3.0.old/debian/changelog xfree86-4.3.0/debian/changelog
---- xfree86-4.3.0.old/debian/changelog	2004-05-30 20:53:27.000000000 +0200
-+++ xfree86-4.3.0/debian/changelog	2004-05-30 20:53:47.000000000 +0200
-@@ -1,3 +1,9 @@
-+xfree86 (4.3.0-0pre1v5+rmh.1) unreleased; urgency=low
-+
-+  * Misc fixes for GNU and GNU/k*BSD.
-+
-+ -- Robert Millan <rmh@debian.org>  Sat, 27 Dec 2003 16:34:52 +0100
-+
- xfree86 (4.3.0-0pre1v5) experimental; urgency=low
- 
-   * Grab fixes to upstream CVS xf-4_3-branch since last pull.
-@@ -280,7 +286,12 @@
-     architecture it is compiled for (thanks to F:Xlibmesa-gl-Depends).
-     - debian/control
- 
-- -- Branden Robinson <branden@debian.org>  Fri,  5 Dec 2003 17:48:40 -0500
-+  * Fix encoding of Catalan translations file to not use a codepoint that is
-+    undefined in ISO 8859-15, which prevents the file from being transcoded
-+    from UTF-8 to ISO 8859-15 (thanks, Denis Barbier).  (Closes: #223024)
-+    - debian/po/ca.po
-+
-+ -- Branden Robinson <branden@debian.org>  Fri,  5 Dec 2003 21:18:07 -0500
- 
- xfree86 (4.3.0-0pre1v4) experimental; urgency=low
- 
-@@ -5118,6 +5129,6 @@
-   See /usr/share/doc/xfree86-common/changelog.Debian.old.gz in the
-   xfree86-common package for the remainder of this changelog.
- 
--  $Id: changelog 822 2003-12-06 00:49:11Z branden $
-+  $Id: changelog 824 2003-12-06 02:20:23Z branden $
- 
-   vim:set ai et sts=2 sw=2 tw=78:
-diff -Nur xfree86-4.3.0.old/debian/control xfree86-4.3.0/debian/control
---- xfree86-4.3.0.old/debian/control	2004-05-30 20:53:28.000000000 +0200
-+++ xfree86-4.3.0/debian/control	2004-05-30 20:53:47.000000000 +0200
-@@ -4,7 +4,7 @@
- Maintainer: Debian X Strike Force <debian-x@lists.debian.org>
- Uploaders: Branden Robinson <branden@debian.org>
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/control xfree86-4.3.0.dfsg.1/debian/control
+--- xfree86-4.3.0.dfsg.1/debian.old/control	2004-06-08 02:17:26.000000000 +0200
++++ xfree86-4.3.0.dfsg.1/debian/control	2004-06-08 02:20:39.000000000 +0200
+@@ -5,7 +5,6 @@
+ Uploaders: Branden Robinson <branden@debian.org>, Fabio M. Di Nitto <fabbione@fabbione.net>
  Standards-Version: 3.6.1
--Build-Depends: dpkg (>= 1.7.0), cpp-3.2, flex, bison, bsdmainutils, groff, zlib1g-dev | libz-dev, libncurses5-dev | libncurses-dev, libpam0g-dev | libpam-dev, libfreetype6-dev, libpaperg, libstdc++5-dev | libstdc++-dev, tetex-bin, po-debconf, debhelper (>= 4.1.16), html2text, libglide2-dev (>> 2001.01.26) [i386], libglide3-dev (>= 2002.04.10-3) [i386 alpha], kernel-headers-2.4 [alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sh sparc], libpng12-0-dev | libpng-dev (>= 1.2.1), libexpat1-dev, libfontconfig1-dev, fontconfig, bzip2, libxft2-dev, libxrender-dev, libxcursor-dev, dbs, m4
-+Build-Depends: dpkg (>= 1.7.0), flex, bison, bsdmainutils, groff, zlib1g-dev | libz-dev, libncurses5-dev | libncurses-dev, libpam0g-dev | libpam-dev, libfreetype6-dev, libpaperg, libstdc++5-dev | libstdc++-dev, tetex-bin, po-debconf, debhelper (>= 4.1.16), html2text, libglide2-dev (>> 2001.01.26) [i386], libglide3-dev (>= 2002.04.10-3) [i386 alpha], kernel-headers-2.4 [alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sh sparc], libpng12-0-dev | libpng-dev (>= 1.2.1), libexpat1-dev, libfontconfig1-dev, fontconfig, bzip2, libxft2-dev, libxrender-dev, libxcursor-dev, dbs, m4
- Build-Conflicts: gcc-3.3 (<< 1:3.3.2-0pre1)
+ Build-Depends: dpkg (>= 1.7.0), flex, bison, bsdmainutils, groff, zlib1g-dev | libz-dev, libncurses5-dev | libncurses-dev, libpam0g-dev | libpam-dev, libfreetype6-dev, libpaperg, libstdc++5-dev | libstdc++-dev, tetex-bin, po-debconf, debhelper (>= 4.1.16), html2text, libglide2-dev (>> 2001.01.26) [i386], libglide3-dev (>= 2002.04.10-3) [alpha i386], linux-kernel-headers [alpha amd64 arm hppa i386 ia64 m68k mips mipsel powerpc s390 sh], linux-kernel-headers (>= 2.5.999-test7-bk-15) [sparc], libpng12-dev | libpng-dev, libexpat1-dev, libfontconfig1-dev, fontconfig, bzip2, libxft-dev (>= 2.1.2), libxrender-dev (>= 0.8.3), libxcursor-dev, dbs, m4
+-Build-Conflicts: cpp-3.3 (<< 1:3.3.3-0pre1)
  
  Package: lbxproxy
-@@ -877,7 +877,7 @@
- 
- Package: xbase-clients
  Architecture: any
--Depends: cpp-3.2, xlibs-data, ${shlibs:Depends}, ${misc:Depends}
-+Depends: cpp, xlibs-data, ${shlibs:Depends}, ${misc:Depends}
- Conflicts: xbase (<< 3.3.2.3a-2), xserver-common (<< 3.3.2.3a-9), xmodmap, xaw-wrappers (<< 0.90), xfonts-100dpi (<< 3.3.3.1-3), xfonts-75dpi (<< 3.3.3.1-3), xfonts-base (<< 3.3.3.1-3), xfonts-cyrillic (<< 3.3.3.1-3), xfonts-scalable (<< 3.3.3.1-3), xfnt100 (<= 3.3.2.3a-1), xfnt75 (<= 3.3.2.3a-1), xfntbase (<= 3.3.2.3a-1), xfntcyr (<= 3.3.2.3a-1), xfntscl (<= 3.3.2.3a-1), xdm (<< 4.0), xsm, xcontrib, xpm4g-dev, xpm-bin, xlibs (<< 4.3.0)
- Replaces: xbase (<< 3.3.2.3a-2), xf86setup (<< 3.3.2.3a-9), xserver-common (<< 4.0), xmodmap, xcontrib, xpm4g-dev, xpm-bin, xsm
- Provides: xmodmap, xcontrib, xpm-bin, xsm
-@@ -974,7 +974,7 @@
- 
- Package: xdm
- Architecture: any
--Depends: debconf (>= 1.2.9), xbase-clients, cpp-3.2, ${shlibs:Depends}, ${misc:Depends}
-+Depends: debconf (>= 1.2.9), xbase-clients, cpp, ${shlibs:Depends}, ${misc:Depends}
- Suggests: xutils
- Replaces: xbase (<< 3.3.2.3a-2), xbase-clients (<< 4.0)
- Provides: x-display-manager
-@@ -1315,57 +1315,6 @@
+@@ -1326,57 +1325,6 @@
   .
   See the xlibmesa-gl package for further information.
  
@@ -15438,26 +15378,26 @@ diff -Nur xfree86-4.3.0.old/debian/control xfree86-4.3.0/debian/control
 -
  Package: xlibosmesa4
  Section: libs
- Architecture: alpha i386 ia64 powerpc sparc
-@@ -1578,7 +1527,7 @@
+ Architecture: alpha amd64 i386 ia64 powerpc sparc
+@@ -1589,7 +1537,7 @@
   xfonts-base, xfonts-100dpi or xfonts-75dpi, and xfonts-scalable packages.
  
  Package: xserver-xfree86
--Architecture: alpha arm hppa hurd-i386 i386 ia64 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
-+Architecture: alpha arm hppa hurd-i386 i386 kfreebsd-i386 ia64 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
+-Architecture: alpha amd64 arm hppa hurd-i386 i386 ia64 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
++Architecture: alpha amd64 arm hppa hurd-i386 i386 ia64 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc kfreebsd-i386 knetbsd-i386
  Depends: xserver-common (>= 4.2.1-10), ${shlibs:Depends}, ${misc:Depends}
  Suggests: discover, mdetect, read-edid, libglide2 (>> 2001.01.26)
  Conflicts: libxfont-xtt
-@@ -1612,7 +1561,7 @@
+@@ -1623,7 +1571,7 @@
  
  Package: xserver-xfree86-dbg
  Priority: extra
--Architecture: alpha arm hppa hurd-i386 i386 ia64 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
-+Architecture: alpha arm hppa hurd-i386 i386 kfreebsd-i386 ia64 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
+-Architecture: alpha amd64 arm hppa hurd-i386 i386 ia64 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
++Architecture: alpha amd64 arm hppa hurd-i386 i386 ia64 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc kfreebsd-i386 knetbsd-i386
  Depends: xserver-common (>= 4.2.1-10), ${shlibs:Depends}, ${misc:Depends}
  Recommends: xserver-xfree86
  Suggests: discover, mdetect, read-edid
-@@ -1629,71 +1578,6 @@
+@@ -1640,71 +1588,6 @@
   of the XFree86 X server, but is not mandatory.  See the package description
   of xserver-xfree86 for further information.
  
@@ -15529,16 +15469,7 @@ diff -Nur xfree86-4.3.0.old/debian/control xfree86-4.3.0/debian/control
  Package: xterm
  Architecture: any
  Depends: xlibs-data, ${shlibs:Depends}, ${misc:Depends}
-@@ -1717,7 +1601,7 @@
- 
- Package: xutils
- Architecture: any
--Depends: xfree86-common (>> 4.3), cpp-3.2, ${shlibs:Depends}, ${misc:Depends}
-+Depends: xfree86-common (>> 4.3), cpp, ${shlibs:Depends}, ${misc:Depends}
- Suggests: ssh | rsh-server, ssh | rsh-client, xlibs-data
- Conflicts: rstart, rstartd, xbase-clients (<< 4.0), xserver-common (<< 4.0), xbase (<< 3.3.2.3a-2)
- Replaces: rstart, rstartd, xbase-clients (<= 4.0.1-8), xserver-common (<< 4.0), xbase (<< 3.3.2.3a-2), xlibs-dev (<< 4.1.0-12), xlib6g-dev, dpsclient, xcontrib
-@@ -1801,7 +1685,7 @@
+@@ -1815,7 +1698,7 @@
  
  Package: x-window-system-core
  Architecture: any
@@ -15547,10 +15478,10 @@ diff -Nur xfree86-4.3.0.old/debian/control xfree86-4.3.0/debian/control
  Description: X Window System core components
   This metapackage provides the essential components for a standalone
   workstation running the X Window System.  It provides the X libraries, an X
-diff -Nur xfree86-4.3.0.old/debian/patches/002_xdm_fixes.diff xfree86-4.3.0/debian/patches/002_xdm_fixes.diff
---- xfree86-4.3.0.old/debian/patches/002_xdm_fixes.diff	2004-05-30 20:53:27.000000000 +0200
-+++ xfree86-4.3.0/debian/patches/002_xdm_fixes.diff	2004-05-30 20:53:47.000000000 +0200
-@@ -3128,18 +3128,6 @@
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/002_xdm_fixes.diff xfree86-4.3.0.dfsg.1/debian/patches/002_xdm_fixes.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/002_xdm_fixes.diff	2004-06-08 02:17:24.000000000 +0200
++++ xfree86-4.3.0.dfsg.1/debian/patches/002_xdm_fixes.diff	2004-06-08 02:19:08.000000000 +0200
+@@ -3126,18 +3126,6 @@
       if (chooserFd == -1)
       {
   	LogError ("chooser stream creation failed\n");
@@ -15569,21 +15500,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/002_xdm_fixes.diff xfree86-4.3.0/debi
  diff -urN xc/programs/xdm~/xdm.man xc/programs/xdm/xdm.man
  --- xc/programs/xdm~/xdm.man	2003-09-21 15:39:23.000000000 -0500
  +++ xc/programs/xdm/xdm.man	2003-09-21 15:41:15.000000000 -0500
-diff -Nur xfree86-4.3.0.old/debian/patches/003a_damn_cpp_3.3_to_hell.diff xfree86-4.3.0/debian/patches/003a_damn_cpp_3.3_to_hell.diff
---- xfree86-4.3.0.old/debian/patches/003a_damn_cpp_3.3_to_hell.diff	2004-05-30 20:53:27.000000000 +0200
-+++ xfree86-4.3.0/debian/patches/003a_damn_cpp_3.3_to_hell.diff	2004-05-30 20:53:47.000000000 +0200
-@@ -16,7 +16,7 @@
- -#ifndef
- -#define CppCmd			/lib/cpp
- -#endif
--+#define CppCmd			cpp-3.2
-++#define CppCmd			cpp
-  #define YaccCmd			bison -y
-  #define LexCmd			flex -l
-  #define HasFlex			YES
-diff -Nur xfree86-4.3.0.old/debian/patches/099c_FreeType_2.1.7_build_fix_again.diff xfree86-4.3.0/debian/patches/099c_FreeType_2.1.7_build_fix_again.diff
---- xfree86-4.3.0.old/debian/patches/099c_FreeType_2.1.7_build_fix_again.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/099c_FreeType_2.1.7_build_fix_again.diff	2004-05-30 20:53:47.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/099c_FreeType_2.1.7_build_fix_again.diff xfree86-4.3.0.dfsg.1/debian/patches/099c_FreeType_2.1.7_build_fix_again.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/099c_FreeType_2.1.7_build_fix_again.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/099c_FreeType_2.1.7_build_fix_again.diff	2004-06-08 02:19:10.000000000 +0200
 @@ -0,0 +1,33 @@
 +diff -ur xc-xserver-xfree86-dbg/lib/font.old/FreeType/ftenc.c xc-xserver-xfree86-dbg/lib/font/FreeType/ftenc.c
 +--- xc-xserver-xfree86-dbg/lib/font.old/FreeType/ftenc.c	2002-10-01 02:02:10.000000000 +0200
@@ -15618,12 +15537,13 @@ diff -Nur xfree86-4.3.0.old/debian/patches/099c_FreeType_2.1.7_build_fix_again.d
 + #include "freetype/freetype.h"
 + #include "freetype/ftsnames.h"
 + #include "freetype/ttnameid.h"
-diff -Nur xfree86-4.3.0.old/debian/patches/800a_gnu_config_more.diff xfree86-4.3.0/debian/patches/800a_gnu_config_more.diff
---- xfree86-4.3.0.old/debian/patches/800a_gnu_config_more.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/800a_gnu_config_more.diff	2004-05-30 20:53:47.000000000 +0200
-@@ -0,0 +1,42 @@
-+--- xc/config/cf/gnu.cf.old	2003-12-03 16:23:58.000000000 +0100
-++++ xc/config/cf/gnu.cf	2003-12-03 16:27:19.000000000 +0100
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/800a_gnu_config_more.diff xfree86-4.3.0.dfsg.1/debian/patches/800a_gnu_config_more.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/800a_gnu_config_more.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/800a_gnu_config_more.diff	2004-06-08 04:40:56.000000000 +0200
+@@ -0,0 +1,43 @@
++diff -ur xc.old/config/cf/gnu.cf xc/config/cf/gnu.cf
++--- xc.old/config/cf/gnu.cf	2004-06-08 02:35:32.000000000 +0200
+++++ xc/config/cf/gnu.cf	2004-06-08 04:39:54.000000000 +0200
 +@@ -43,9 +43,6 @@
 + #define BuildAllSpecsDocs	YES
 + #define HasLatex		YES
@@ -15638,11 +15558,11 @@ diff -Nur xfree86-4.3.0.old/debian/patches/800a_gnu_config_more.diff xfree86-4.3
 + #define UseFontconfig                        YES
 + #define FontconfigIncDir             /usr/include/fontconfig
 + #define BuildXftLibrary              NO
-++#define HasXftLibrary			YES
-+ #define BuildXft1Library             YES
+++#define HasXftLibrary                 YES
 + #define XAppLoadDir		EtcX11Directory/app-defaults
 + #define XFileSearchPathDefault	Concat4(EtcX11Directory/%L/%T/%N%C,%S:EtcX11Directory/%l/%T/%N%C,%S:EtcX11Directory/%T/%N%C,%S:EtcX11Directory/%L/%T/%N%S:EtcX11Directory/%l/%T/%N%S:EtcX11Directory/%T/%N%S):Concat4($(LIBDIR)/%L/%T/%N%C,%S:$(LIBDIR)/%l/%T/%N%C,%S:$(LIBDIR)/%T/%N%C,%S:$(LIBDIR)/%L/%T/%N%S:$(LIBDIR)/%l/%T/%N%S:$(LIBDIR)/%T/%N%S)
-+@@ -84,6 +82,21 @@
++ /* the relative symlink created by this rule causes problems for us */
++@@ -83,6 +81,21 @@
 + #define ProjectManSuffix             x
 + #define IconDir		Concat(ProjectRoot,/lib/X11/icons)
 + 
@@ -15664,14 +15584,14 @@ diff -Nur xfree86-4.3.0.old/debian/patches/800a_gnu_config_more.diff xfree86-4.3
 + /* The TT/Meltho fonts are all under non-free licenses. */
 + #  define BuildTrueTypeFonts           NO
 + #  define BuildBethMarduthoFonts       NO
-diff -Nur xfree86-4.3.0.old/debian/patches/800b_gnu_config_even_more.diff xfree86-4.3.0/debian/patches/800b_gnu_config_even_more.diff
---- xfree86-4.3.0.old/debian/patches/800b_gnu_config_even_more.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/800b_gnu_config_even_more.diff	2004-05-30 20:53:47.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/800b_gnu_config_even_more.diff xfree86-4.3.0.dfsg.1/debian/patches/800b_gnu_config_even_more.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/800b_gnu_config_even_more.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/800b_gnu_config_even_more.diff	2004-06-08 04:42:59.000000000 +0200
 @@ -0,0 +1,39 @@
-+diff -Nur xc/config/cf.old/gnu.cf xc/config/cf/gnu.cf
-+--- xc/config/cf.old/gnu.cf	2004-03-15 23:24:05.000000000 +0100
-++++ xc/config/cf/gnu.cf	2004-03-15 23:25:45.000000000 +0100
-+@@ -240,6 +240,13 @@
++diff -Nur xc.old/config/cf/gnu.cf xc/config/cf/gnu.cf
++--- xc.old/config/cf/gnu.cf	2004-06-08 04:41:13.000000000 +0200
+++++ xc/config/cf/gnu.cf	2004-06-08 04:41:42.000000000 +0200
++@@ -241,6 +241,13 @@
 + 
 + #define XserverNeedsSetUID	YES
 + 
@@ -15685,9 +15605,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/800b_gnu_config_even_more.diff xfree8
 + #include <gnuLib.rules>
 + 
 + XCOMM XXX Might need this if they are not careful with slashes.
-+diff -Nur xc/config/cf.old/kFreeBSD.cf xc/config/cf/kFreeBSD.cf
-+--- xc/config/cf.old/kFreeBSD.cf	1970-01-01 01:00:00.000000000 +0100
-++++ xc/config/cf/kFreeBSD.cf	2004-03-15 23:24:58.000000000 +0100
++diff -Nur xc.old/config/cf/kFreeBSD.cf xc/config/cf/kFreeBSD.cf
++--- xc.old/config/cf/kFreeBSD.cf	1970-01-01 01:00:00.000000000 +0100
+++++ xc/config/cf/kFreeBSD.cf	2004-06-08 04:41:42.000000000 +0200
 +@@ -0,0 +1,7 @@
 ++
 ++#ifdef i386Architecture
@@ -15696,9 +15616,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/800b_gnu_config_even_more.diff xfree8
 ++# endif
 ++#endif
 ++
-+diff -Nur xc/config/cf.old/kNetBSD.cf xc/config/cf/kNetBSD.cf
-+--- xc/config/cf.old/kNetBSD.cf	1970-01-01 01:00:00.000000000 +0100
-++++ xc/config/cf/kNetBSD.cf	2004-03-15 23:25:08.000000000 +0100
++diff -Nur xc.old/config/cf/kNetBSD.cf xc/config/cf/kNetBSD.cf
++--- xc.old/config/cf/kNetBSD.cf	1970-01-01 01:00:00.000000000 +0100
+++++ xc/config/cf/kNetBSD.cf	2004-06-08 04:41:42.000000000 +0200
 +@@ -0,0 +1,7 @@
 ++
 ++#ifdef i386Architecture
@@ -15707,9 +15627,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/800b_gnu_config_even_more.diff xfree8
 ++# endif
 ++#endif
 ++
-diff -Nur xfree86-4.3.0.old/debian/patches/800c_gnu_config_osname.diff xfree86-4.3.0/debian/patches/800c_gnu_config_osname.diff
---- xfree86-4.3.0.old/debian/patches/800c_gnu_config_osname.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/800c_gnu_config_osname.diff	2004-05-30 20:53:46.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/800c_gnu_config_osname.diff xfree86-4.3.0.dfsg.1/debian/patches/800c_gnu_config_osname.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/800c_gnu_config_osname.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/800c_gnu_config_osname.diff	2004-06-08 02:19:10.000000000 +0200
 @@ -0,0 +1,13 @@
 +--- xc/config/cf/gnu.cf~	2004-03-15 22:22:17.000000000 +0100
 ++++ xc/config/cf/gnu.cf	2004-03-15 22:24:06.000000000 +0100
@@ -15724,11 +15644,28 @@ diff -Nur xfree86-4.3.0.old/debian/patches/800c_gnu_config_osname.diff xfree86-4
 + #ifndef OSVendor
 + #define OSVendor		/**/
 + #endif
-diff -Nur xfree86-4.3.0.old/debian/patches/801_gnu_os-support_Imake.diff xfree86-4.3.0/debian/patches/801_gnu_os-support_Imake.diff
---- xfree86-4.3.0.old/debian/patches/801_gnu_os-support_Imake.diff	2004-05-30 20:53:27.000000000 +0200
-+++ xfree86-4.3.0/debian/patches/801_gnu_os-support_Imake.diff	1970-01-01 01:00:00.000000000 +0100
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/800d_gnu_config_cppcmd.diff xfree86-4.3.0.dfsg.1/debian/patches/800d_gnu_config_cppcmd.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/800d_gnu_config_cppcmd.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/800d_gnu_config_cppcmd.diff	2004-06-08 06:00:21.000000000 +0200
+@@ -0,0 +1,13 @@
++--- xc/config/cf.old/gnu.cf	2004-06-08 05:59:12.000000000 +0200
+++++ xc/config/cf/gnu.cf	2004-06-08 05:59:34.000000000 +0200
++@@ -194,8 +194,8 @@
++ #ifndef DoLoadableServer
++ #define DoLoadableServer	YES
++ #endif
++-#ifndef
++-#define CppCmd			/lib/cpp
+++#ifndef CppCmd
+++#define CppCmd			cpp
++ #endif
++ #define YaccCmd			bison -y
++ #define LexCmd			flex -l
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/801_gnu_os-support_Imake.diff xfree86-4.3.0.dfsg.1/debian/patches/801_gnu_os-support_Imake.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/801_gnu_os-support_Imake.diff	2004-06-08 02:17:23.000000000 +0200
++++ xfree86-4.3.0.dfsg.1/debian/patches/801_gnu_os-support_Imake.diff	1970-01-01 01:00:00.000000000 +0100
 @@ -1,13 +0,0 @@
--$Id: 801_gnu_os-support_Imake.diff 535 2003-09-16 18:28:31Z branden $
+-$Id: 801_gnu_os-support_Imake.diff 1044 2004-02-16 17:40:33Z branden $
 -
 ---- xc/programs/Xserver/hw/xfree86/os-support/Imakefile.orig	Fri Nov  9 11:44:26 2001
 -+++ xc/programs/Xserver/hw/xfree86/os-support/Imakefile	Fri Nov  9 11:44:55 2001
@@ -15741,9 +15678,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/801_gnu_os-support_Imake.diff xfree86
 - BUS_SUBDIR = bus
 - #endif
 - 
-diff -Nur xfree86-4.3.0.old/debian/patches/801_gnu_xserver.diff xfree86-4.3.0/debian/patches/801_gnu_xserver.diff
---- xfree86-4.3.0.old/debian/patches/801_gnu_xserver.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/801_gnu_xserver.diff	2004-05-30 20:53:46.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/801_gnu_xserver.diff xfree86-4.3.0.dfsg.1/debian/patches/801_gnu_xserver.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/801_gnu_xserver.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/801_gnu_xserver.diff	2004-06-08 02:19:11.000000000 +0200
 @@ -0,0 +1,51 @@
 +
 +all merged except the second hunk in Imakefile
@@ -15796,11 +15733,11 @@ diff -Nur xfree86-4.3.0.old/debian/patches/801_gnu_xserver.diff xfree86-4.3.0/de
 + OS_SUBDIR = bsd
 + #endif
 + 
-diff -Nur xfree86-4.3.0.old/debian/patches/802_gnu_disable_vt_switching.diff xfree86-4.3.0/debian/patches/802_gnu_disable_vt_switching.diff
---- xfree86-4.3.0.old/debian/patches/802_gnu_disable_vt_switching.diff	2004-05-30 20:53:27.000000000 +0200
-+++ xfree86-4.3.0/debian/patches/802_gnu_disable_vt_switching.diff	1970-01-01 01:00:00.000000000 +0100
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/802_gnu_disable_vt_switching.diff xfree86-4.3.0.dfsg.1/debian/patches/802_gnu_disable_vt_switching.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/802_gnu_disable_vt_switching.diff	2004-06-08 02:17:25.000000000 +0200
++++ xfree86-4.3.0.dfsg.1/debian/patches/802_gnu_disable_vt_switching.diff	1970-01-01 01:00:00.000000000 +0100
 @@ -1,24 +0,0 @@
--$Id: 802_gnu_disable_vt_switching.diff 535 2003-09-16 18:28:31Z branden $
+-$Id: 802_gnu_disable_vt_switching.diff 1044 2004-02-16 17:40:33Z branden $
 -
 -This patch from Robert Millan.
 -
@@ -15824,9 +15761,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/802_gnu_disable_vt_switching.diff xfr
 - #endif
 -     default:
 - 	break;
-diff -Nur xfree86-4.3.0.old/debian/patches/802_gnu_xdm.diff xfree86-4.3.0/debian/patches/802_gnu_xdm.diff
---- xfree86-4.3.0.old/debian/patches/802_gnu_xdm.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/802_gnu_xdm.diff	2004-05-30 20:53:47.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/802_gnu_xdm.diff xfree86-4.3.0.dfsg.1/debian/patches/802_gnu_xdm.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/802_gnu_xdm.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/802_gnu_xdm.diff	2004-06-08 02:19:11.000000000 +0200
 @@ -0,0 +1,104 @@
 +
 +  merged upstream (4.4)
@@ -15932,9 +15869,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/802_gnu_xdm.diff xfree86-4.3.0/debian
 + #define setpgrp setpgid
 + #endif
 + 
-diff -Nur xfree86-4.3.0.old/debian/patches/803_gnu_xterm_openpty.diff xfree86-4.3.0/debian/patches/803_gnu_xterm_openpty.diff
---- xfree86-4.3.0.old/debian/patches/803_gnu_xterm_openpty.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/803_gnu_xterm_openpty.diff	2004-05-30 20:53:46.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/803_gnu_xterm_openpty.diff xfree86-4.3.0.dfsg.1/debian/patches/803_gnu_xterm_openpty.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/803_gnu_xterm_openpty.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/803_gnu_xterm_openpty.diff	2004-06-08 02:19:11.000000000 +0200
 @@ -0,0 +1,13 @@
 +
 +  on Glibc-based systems, openpty needs -lutil
@@ -15949,12 +15886,11 @@ diff -Nur xfree86-4.3.0.old/debian/patches/803_gnu_xterm_openpty.diff xfree86-4.
 +     (defined(LinuxArchitecture) && \
 +      (LinuxCLibMajorVersion == 6) && (LinuxCLibMinorVersion < 1))
 +          PTYLIB = -lutil
-diff -Nur xfree86-4.3.0.old/debian/patches/820_gnu-freebsd_config.diff xfree86-4.3.0/debian/patches/820_gnu-freebsd_config.diff
---- xfree86-4.3.0.old/debian/patches/820_gnu-freebsd_config.diff	2004-05-30 20:53:27.000000000 +0200
-+++ xfree86-4.3.0/debian/patches/820_gnu-freebsd_config.diff	1970-01-01 01:00:00.000000000 +0100
-@@ -1,488 +0,0 @@
--$Id: 820_gnu-freebsd_config.diff 535 2003-09-16 18:28:31Z branden $
--
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/820_gnu-freebsd_config.diff xfree86-4.3.0.dfsg.1/debian/patches/820_gnu-freebsd_config.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/820_gnu-freebsd_config.diff	2004-06-08 02:17:23.000000000 +0200
++++ xfree86-4.3.0.dfsg.1/debian/patches/820_gnu-freebsd_config.diff	1970-01-01 01:00:00.000000000 +0100
+@@ -1,486 +0,0 @@
+-$Id: 820_gnu-freebsd_config.diff 1161 2004-03-18 15:40:35Z branden $
 -
 -  adds GNU/FreeBSD build defines to xc/config/cf. they're basicaly
 -  copied and adapted from the defines for GNU OS.
@@ -16204,7 +16140,7 @@ diff -Nur xfree86-4.3.0.old/debian/patches/820_gnu-freebsd_config.diff xfree86-4
 -diff -Nur xc/config/cf.old/gnu-freebsd.cf xc/config/cf/gnu-freebsd.cf
 ---- xc/config/cf.old/gnu-freebsd.cf	1970-01-01 01:00:00.000000000 +0100
 -+++ xc/config/cf/gnu-freebsd.cf	2003-05-31 15:01:56.000000000 +0200
--@@ -0,0 +1,236 @@
+-@@ -0,0 +1,235 @@
 -+XCOMM platform:  $XFree86: xc/config/cf/gnu.cf,v 1.11 2001/02/28 18:58:49 dawes Exp $
 -+
 -+#ifndef OSName
@@ -16261,7 +16197,6 @@ diff -Nur xfree86-4.3.0.old/debian/patches/820_gnu-freebsd_config.diff xfree86-4
 -+#define UseFontconfig                        YES
 -+#define FontconfigIncDir             /usr/include/fontconfig
 -+#define BuildXftLibrary              NO
--+#define BuildXft1Library             YES
 -+#define XAppLoadDir		EtcX11Directory/app-defaults
 -+#define XFileSearchPathDefault	Concat4(EtcX11Directory/%L/%T/%N%C,%S:EtcX11Directory/%l/%T/%N%C,%S:EtcX11Directory/%T/%N%C,%S:EtcX11Directory/%L/%T/%N%S:EtcX11Directory/%l/%T/%N%S:EtcX11Directory/%T/%N%S):Concat4($(LIBDIR)/%L/%T/%N%C,%S:$(LIBDIR)/%l/%T/%N%C,%S:$(LIBDIR)/%T/%N%C,%S:$(LIBDIR)/%L/%T/%N%S:$(LIBDIR)/%l/%T/%N%S:$(LIBDIR)/%T/%N%S)
 -+/* the relative symlink created by this rule causes problems for us */
@@ -16441,22 +16376,18 @@ diff -Nur xfree86-4.3.0.old/debian/patches/820_gnu-freebsd_config.diff xfree86-4
 -+
 -+#include <xfree86.cf>
 -+
-diff -Nur xfree86-4.3.0.old/debian/patches/820_gnu-kbsd_config.diff xfree86-4.3.0/debian/patches/820_gnu-kbsd_config.diff
---- xfree86-4.3.0.old/debian/patches/820_gnu-kbsd_config.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/820_gnu-kbsd_config.diff	2004-05-30 20:53:46.000000000 +0200
-@@ -0,0 +1,103 @@
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/820_gnu-kbsd_config.diff xfree86-4.3.0.dfsg.1/debian/patches/820_gnu-kbsd_config.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/820_gnu-kbsd_config.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/820_gnu-kbsd_config.diff	2004-06-08 04:46:06.000000000 +0200
+@@ -0,0 +1,95 @@
 +
 +  merged upstream (4.4)
 +
-+===================================================================
-+RCS file: /xf86/anoncvs/cvs/xc/config/cf/Imake.cf,v
-+retrieving revision 3.85
-+retrieving revision 3.86
-+diff -u -p -r3.85 -r3.86
-+--- xc/config/cf/Imake.cf	2003/11/07 23:57:43	3.85
-++++ xc/config/cf/Imake.cf	2003/11/24 02:02:26	3.86
-+@@ -177,6 +177,11 @@ XCOMM $XFree86: xc/config/cf/Imake.cf,v 
-+ # endif /* __hppa__ */
++diff -ur xc.old/config/cf/Imake.cf xc/config/cf/Imake.cf
++--- xc.old/config/cf/Imake.cf	2003-02-27 07:34:03.000000000 +0100
+++++ xc/config/cf/Imake.cf	2004-06-08 04:45:03.000000000 +0200
++@@ -166,6 +166,11 @@
++ # endif
 + #endif /* OpenBSD */
 + 
 ++/* Systems based on kernel of OpenBSD */
@@ -16467,7 +16398,7 @@ diff -Nur xfree86-4.3.0.old/debian/patches/820_gnu-kbsd_config.diff xfree86-4.3.
 + #ifdef __NetBSD__
 + # define MacroIncludeFile <NetBSD.cf>
 + # define MacroFile NetBSD.cf
-+@@ -224,6 +229,11 @@ XCOMM $XFree86: xc/config/cf/Imake.cf,v 
++@@ -213,6 +218,11 @@
 + # endif
 + #endif /* NetBSD */
 + 
@@ -16479,7 +16410,7 @@ diff -Nur xfree86-4.3.0.old/debian/patches/820_gnu-kbsd_config.diff xfree86-4.3.
 + #ifdef __FreeBSD__
 + # define MacroIncludeFile <FreeBSD.cf>
 + # define MacroFile FreeBSD.cf
-+@@ -254,6 +264,11 @@ XCOMM $XFree86: xc/config/cf/Imake.cf,v 
++@@ -234,6 +244,11 @@
 + # endif
 + #endif /* __FreeBSD__ */
 + 
@@ -16491,7 +16422,7 @@ diff -Nur xfree86-4.3.0.old/debian/patches/820_gnu-kbsd_config.diff xfree86-4.3.
 + #ifdef AMOEBA
 +  /* Should be before the 'sun' entry because we may be cross-compiling */
 + # define MacroIncludeFile <Amoeba.cf>
-+@@ -962,10 +977,20 @@ XCOMM Keep cpp from replacing path eleme
++@@ -921,10 +936,20 @@
 + #define i386Architecture
 + #endif /* minix */
 + 
@@ -16514,14 +16445,10 @@ diff -Nur xfree86-4.3.0.old/debian/patches/820_gnu-kbsd_config.diff xfree86-4.3.
 + #define GNUMachArchitecture
 + #else
 + #define MacroIncludeFile <mach.cf>
-+===================================================================
-+RCS file: /xf86/anoncvs/cvs/xc/config/cf/gnu.cf,v
-+retrieving revision 1.11
-+retrieving revision 1.12
-+diff -u -p -r1.11 -r1.12
-+--- xc/config/cf/gnu.cf	2001/02/28 18:58:49	1.11
-++++ xc/config/cf/gnu.cf	2003/11/24 02:02:26	1.12
-+@@ -26,12 +26,11 @@ XCOMM XXXMB: What about _GNU_SOURCE, see
++diff -ur xc.old/config/cf/gnu.cf xc/config/cf/gnu.cf
++--- xc.old/config/cf/gnu.cf	2004-06-08 04:43:51.000000000 +0200
+++++ xc/config/cf/gnu.cf	2004-06-08 04:45:03.000000000 +0200
++@@ -112,12 +112,11 @@
 + 
 + #define XawI18nDefines        -DHAS_WCHAR_H -DHAS_WCTYPE_H -DNO_WIDEC_H
 + 
@@ -16537,9 +16464,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/820_gnu-kbsd_config.diff xfree86-4.3.
 ++#define ThreadsLibraries        -lpthread
 ++#define SystemMTDefines         -D_REENTRANT
 + 
-+ #ifndef HasLibCrypt
-+ #define HasLibCrypt             YES
-+@@ -134,7 +133,7 @@ XCOMM i386Architecture
++ #define HasDevRandom		YES
++ #define PollDevRandom		YES
++@@ -223,7 +222,7 @@
 + #define VendorHasX11R6_3libXext	YES
 + 
 + #ifndef StandardDefines
@@ -16548,16 +16475,17 @@ diff -Nur xfree86-4.3.0.old/debian/patches/820_gnu-kbsd_config.diff xfree86-4.3.
 + #endif
 + 
 + #define DlLibrary		-rdynamic -ldl
-diff -Nur xfree86-4.3.0.old/debian/patches/821_gnu-kbsd_config_gccopt.diff xfree86-4.3.0/debian/patches/821_gnu-kbsd_config_gccopt.diff
---- xfree86-4.3.0.old/debian/patches/821_gnu-kbsd_config_gccopt.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/821_gnu-kbsd_config_gccopt.diff	2004-05-30 20:53:47.000000000 +0200
-@@ -0,0 +1,15 @@
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/821_gnu-kbsd_config_gccopt.diff xfree86-4.3.0.dfsg.1/debian/patches/821_gnu-kbsd_config_gccopt.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/821_gnu-kbsd_config_gccopt.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/821_gnu-kbsd_config_gccopt.diff	2004-06-08 04:47:41.000000000 +0200
+@@ -0,0 +1,17 @@
 +
 +  workaround for a build error that happens on gnu/k*bsd, but not on gnu/hurd.
 +
-+--- xc/config/cf/gnu.cf.old	2003-12-02 18:01:06.000000000 +0100
-++++ xc/config/cf/gnu.cf	2003-12-02 18:03:07.000000000 +0100
-+@@ -196,6 +196,9 @@
++diff -ur xc.old/config/cf/gnu.cf xc/config/cf/gnu.cf
++--- xc.old/config/cf/gnu.cf	2004-06-08 04:46:29.000000000 +0200
+++++ xc/config/cf/gnu.cf	2004-06-08 04:46:34.000000000 +0200
++@@ -214,6 +214,9 @@
 + #define VarDbDirectory		$(VARDIR)/lib
 + 
 + XCOMM i386Architecture
@@ -16567,11 +16495,12 @@ diff -Nur xfree86-4.3.0.old/debian/patches/821_gnu-kbsd_config_gccopt.diff xfree
 + #define OptimizedCDebugFlags	DefaultGcc2i386Opt
 + #define GNUMachineDefines	-D__i386__
 + #define ServerOSDefines		XFree86ServerOSDefines -DDDXTIME -DPART_NET
-diff -Nur xfree86-4.3.0.old/debian/patches/822_gnu-freebsd_xload.diff xfree86-4.3.0/debian/patches/822_gnu-freebsd_xload.diff
---- xfree86-4.3.0.old/debian/patches/822_gnu-freebsd_xload.diff	2004-05-30 20:53:27.000000000 +0200
-+++ xfree86-4.3.0/debian/patches/822_gnu-freebsd_xload.diff	1970-01-01 01:00:00.000000000 +0100
++Only in xc/config/cf/: gnu.cf.orig
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/822_gnu-freebsd_xload.diff xfree86-4.3.0.dfsg.1/debian/patches/822_gnu-freebsd_xload.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/822_gnu-freebsd_xload.diff	2004-06-08 02:17:24.000000000 +0200
++++ xfree86-4.3.0.dfsg.1/debian/patches/822_gnu-freebsd_xload.diff	1970-01-01 01:00:00.000000000 +0100
 @@ -1,27 +0,0 @@
--$Id: 822_gnu-freebsd_xload.diff 535 2003-09-16 18:28:31Z branden $
+-$Id: 822_gnu-freebsd_xload.diff 1044 2004-02-16 17:40:33Z branden $
 -
 -
 -  the second hunk is a dirty hack. we should adapt it to
@@ -16598,9 +16527,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/822_gnu-freebsd_xload.diff xfree86-4.
 - 
 - void InitLoadPoint()
 - {
-diff -Nur xfree86-4.3.0.old/debian/patches/822_gnu-kbsd_xload.diff xfree86-4.3.0/debian/patches/822_gnu-kbsd_xload.diff
---- xfree86-4.3.0.old/debian/patches/822_gnu-kbsd_xload.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/822_gnu-kbsd_xload.diff	2004-05-30 20:53:47.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/822_gnu-kbsd_xload.diff xfree86-4.3.0.dfsg.1/debian/patches/822_gnu-kbsd_xload.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/822_gnu-kbsd_xload.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/822_gnu-kbsd_xload.diff	2004-06-08 02:19:13.000000000 +0200
 @@ -0,0 +1,19 @@
 +
 +  merged upstream (4.4)
@@ -16621,9 +16550,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/822_gnu-kbsd_xload.diff xfree86-4.3.0
 + #include <nlist.h>
 + #endif /* !linux && ... */
 + #endif /* LOADSTUB */
-diff -Nur xfree86-4.3.0.old/debian/patches/822a_gnu-kbsd_xload_dirty_hack.diff xfree86-4.3.0/debian/patches/822a_gnu-kbsd_xload_dirty_hack.diff
---- xfree86-4.3.0.old/debian/patches/822a_gnu-kbsd_xload_dirty_hack.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/822a_gnu-kbsd_xload_dirty_hack.diff	2004-05-30 20:53:47.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/822a_gnu-kbsd_xload_dirty_hack.diff xfree86-4.3.0.dfsg.1/debian/patches/822a_gnu-kbsd_xload_dirty_hack.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/822a_gnu-kbsd_xload_dirty_hack.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/822a_gnu-kbsd_xload_dirty_hack.diff	2004-06-08 02:19:13.000000000 +0200
 @@ -0,0 +1,12 @@
 +diff -Nur xc/programs/xload.old/get_load.c xc/programs/xload/get_load.c
 +--- xc/programs/xload.old/get_load.c	2003-05-31 15:05:58.000000000 +0200
@@ -16637,29 +16566,21 @@ diff -Nur xfree86-4.3.0.old/debian/patches/822a_gnu-kbsd_xload_dirty_hack.diff x
 + 
 + void InitLoadPoint()
 + {
-diff -Nur xfree86-4.3.0.old/debian/patches/823_gnu-freebsd_xterm.diff xfree86-4.3.0/debian/patches/823_gnu-freebsd_xterm.diff
---- xfree86-4.3.0.old/debian/patches/823_gnu-freebsd_xterm.diff	2004-05-30 20:53:27.000000000 +0200
-+++ xfree86-4.3.0/debian/patches/823_gnu-freebsd_xterm.diff	1970-01-01 01:00:00.000000000 +0100
-@@ -1,26 +0,0 @@
--$Id: 823_gnu-freebsd_xterm.diff 535 2003-09-16 18:28:31Z branden $
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/823_gnu-freebsd_xterm.diff xfree86-4.3.0.dfsg.1/debian/patches/823_gnu-freebsd_xterm.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/823_gnu-freebsd_xterm.diff	2004-06-08 02:17:24.000000000 +0200
++++ xfree86-4.3.0.dfsg.1/debian/patches/823_gnu-freebsd_xterm.diff	1970-01-01 01:00:00.000000000 +0100
+@@ -1,18 +0,0 @@
+-$Id: 823_gnu-freebsd_xterm.diff 1437 2004-05-23 03:18:32Z branden $
 -
+-GNU/FreeBSD needs the termios.h header included to know what "B38400" is.
 -
--  the setpgrp issue applies to this one too. see the xdm patch for
--  reference. --Robert Millan <rmh@debian.org>
+-This patch by Robert Millan.
 -
--diff -Nur xc/programs/xterm.old/main.c xc/programs/xterm/main.c
----- xc/programs/xterm.old/main.c	2003-05-31 14:55:24.000000000 +0200
--+++ xc/programs/xterm/main.c	2003-05-31 15:06:53.000000000 +0200
--@@ -176,7 +176,7 @@
-- #define _SVID3
-- #endif
-- 
---#ifdef __GNU__
--+#if defined(__GNU__) || defined(__GLIBC__)
-- #define USE_SYSV_PGRP
-- #define WTMP
-- #define HAS_BSD_GROUPS
--@@ -471,6 +471,7 @@
+-Not submitted upstream to XFree86 or Thomas Dickey.
+-
+---- xc/programs/xterm/main.c~	2004-05-12 02:25:06.000000000 -0500
+-+++ xc/programs/xterm/main.c	2004-05-12 02:29:08.000000000 -0500
+-@@ -481,6 +481,7 @@
 - /* choose a nice default value for speed - if we make it too low, users who
 -  * mistakenly use $TERM set to vt100 will get padding delays
 -  */
@@ -16667,58 +16588,14 @@ diff -Nur xfree86-4.3.0.old/debian/patches/823_gnu-freebsd_xterm.diff xfree86-4.
 - #ifdef B38400			/* everyone should define this */
 - #define VAL_LINE_SPEED B38400
 - #else /* ...but xterm's used this for a long time */
-diff -Nur xfree86-4.3.0.old/debian/patches/823_gnu-kbsd_xterm.diff xfree86-4.3.0/debian/patches/823_gnu-kbsd_xterm.diff
---- xfree86-4.3.0.old/debian/patches/823_gnu-kbsd_xterm.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/823_gnu-kbsd_xterm.diff	2004-05-30 20:53:46.000000000 +0200
-@@ -0,0 +1,40 @@
-+
-+  merged upstream (4.4)
-+
-+===================================================================
-+RCS file: /xf86/anoncvs/cvs/xc/programs/xterm/main.c,v
-+retrieving revision 3.172
-+retrieving revision 3.173
-+diff -u -p -r3.172 -r3.173
-+--- xc/programs/xterm/main.c	2003/11/13 01:16:38	3.172
-++++ xc/programs/xterm/main.c	2003/11/25 01:54:43	3.173
-+@@ -183,7 +183,7 @@ static Bool IsPts = False;
-+ #define _SVID3
-+ #endif
-+ 
-+-#ifdef __GNU__
-++#if defined(__GLIBC__) && !defined(linux)
-+ #define USE_SYSV_PGRP
-+ #define WTMP
-+ #define HAS_BSD_GROUPS
-+===================================================================
-+RCS file: /xf86/anoncvs/cvs/xc/programs/xterm/xterm_io.h,v
-+retrieving revision 1.10
-+retrieving revision 1.11
-+diff -u -p -r1.10 -r1.11
-+--- xc/programs/xterm/xterm_io.h	2003/03/23 02:01:41	1.10
-++++ xc/programs/xterm/xterm_io.h	2003/11/23 23:53:15	1.11
-+@@ -73,8 +73,12 @@
-+ #endif
-+ 
-+ #ifdef macII
-+-#undef SYSV				/* pretend to be bsd (sgtty.h) */
-++#undef SYSV			/* pretend to be bsd (sgtty.h) */
-+ #endif /* macII */
-++
-++#if defined(__GLIBC__) && !defined(linux)
-++#define USE_POSIX_TERMIOS	/* GNU/Hurd, GNU/KFreeBSD and GNU/KNetBSD */
-++#endif
-+ 
-+ #ifdef __MVS__
-+ #define SVR4
-diff -Nur xfree86-4.3.0.old/debian/patches/823a_gnu-kbsd_xterm.diff xfree86-4.3.0/debian/patches/823a_gnu-kbsd_xterm.diff
---- xfree86-4.3.0.old/debian/patches/823a_gnu-kbsd_xterm.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/823a_gnu-kbsd_xterm.diff	2004-05-30 20:53:47.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/823_gnu-kbsd_xterm.diff xfree86-4.3.0.dfsg.1/debian/patches/823_gnu-kbsd_xterm.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/823_gnu-kbsd_xterm.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/823_gnu-kbsd_xterm.diff	2004-06-08 04:52:29.000000000 +0200
 @@ -0,0 +1,25 @@
-+diff -ur xc/programs/xterm.old/main.c xc/programs/xterm/main.c
-+--- xc/programs/xterm.old/main.c	2003-12-03 17:41:10.000000000 +0100
-++++ xc/programs/xterm/main.c	2003-12-03 21:41:13.000000000 +0100
-+@@ -471,6 +471,9 @@
++diff -ur xc.old/programs/xterm/main.c xc/programs/xterm/main.c
++--- xc.old/programs/xterm/main.c	2004-06-08 02:26:03.000000000 +0200
+++++ xc/programs/xterm/main.c	2004-06-08 04:51:34.000000000 +0200
++@@ -481,6 +481,9 @@
 + /* choose a nice default value for speed - if we make it too low, users who
 +  * mistakenly use $TERM set to vt100 will get padding delays
 +  */
@@ -16728,10 +16605,10 @@ diff -Nur xfree86-4.3.0.old/debian/patches/823a_gnu-kbsd_xterm.diff xfree86-4.3.
 + #ifdef B38400			/* everyone should define this */
 + #define VAL_LINE_SPEED B38400
 + #else /* ...but xterm's used this for a long time */
-+diff -ur xc/programs/xterm.old/xterm_io.h xc/programs/xterm/xterm_io.h
-+--- xc/programs/xterm.old/xterm_io.h	2003-12-03 17:41:10.000000000 +0100
-++++ xc/programs/xterm/xterm_io.h	2003-12-03 21:40:38.000000000 +0100
-+@@ -77,7 +77,7 @@
++diff -ur xc.old/programs/xterm/xterm_io.h xc/programs/xterm/xterm_io.h
++--- xc.old/programs/xterm/xterm_io.h	2004-06-08 02:26:05.000000000 +0200
+++++ xc/programs/xterm/xterm_io.h	2004-06-08 04:51:34.000000000 +0200
++@@ -82,7 +82,7 @@
 + #endif /* macII */
 + 
 + #if defined(__GLIBC__) && !defined(linux)
@@ -16740,16 +16617,44 @@ diff -Nur xfree86-4.3.0.old/debian/patches/823a_gnu-kbsd_xterm.diff xfree86-4.3.
 + #endif
 + 
 + #ifdef __MVS__
-diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3.0/debian/patches/824_gnu-kbsd_xserver.diff
---- xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/824_gnu-kbsd_xserver.diff	2004-05-30 20:53:47.000000000 +0200
-@@ -0,0 +1,1024 @@
-+
-+  not merged upstream. needs serious cleanup.
-+
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/common/compiler.h xc/programs/Xserver/hw/xfree86/common/compiler.h
-+--- xc/programs/Xserver/hw/xfree86.old/common/compiler.h	2003-12-03 02:25:31.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/common/compiler.h	2003-12-03 01:31:54.000000000 +0100
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/824_gnu-kbsd_xserver.diff xfree86-4.3.0.dfsg.1/debian/patches/824_gnu-kbsd_xserver.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/824_gnu-kbsd_xserver.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/824_gnu-kbsd_xserver.diff	2004-06-08 19:03:28.000000000 +0200
+@@ -0,0 +1,1286 @@
++diff -Nur xc.old/programs/Xserver/hw/xfree86/Imakefile xc/programs/Xserver/hw/xfree86/Imakefile
++--- xc.old/programs/Xserver/hw/xfree86/Imakefile	2003-02-17 18:06:40.000000000 +0100
+++++ xc/programs/Xserver/hw/xfree86/Imakefile	2004-06-08 18:56:10.000000000 +0200
++@@ -124,13 +124,13 @@
++ DPI75USFONTPATH=\"$(LIBDIR)/fonts/75dpi/:unscaled\"
++ DPI100USFONTPATH=\"$(LIBDIR)/fonts/100dpi/:unscaled\"
++ 
++-#ifdef FreeBSDArchitecture
+++#ifdef KFreeBSDArchitecture
++   FREEBSDMOUSEDEV="    Option	\"Device\"	\"/dev/mse0\""
++ #else
++   FREEBSDMOUSEDEV="XCOMM    Option	\"Device\"	\"/dev/mse0\""
++ #endif
++ 
++-#if defined(i386BsdArchitecture)&&defined(NetBSDArchitecture)
+++#if defined(i386BsdArchitecture)&&defined(KNetBSDArchitecture)
++ #  if (OSMajorVersion >= 1) && (OSMinorVersion >= 1)
++   NETBSDOLDMOUSEDEV="XCOMM    Option	\"Device\"	\"/dev/mms0\""
++   NETBSDNEWMOUSEDEV="    Option	\"Device\"	\"/dev/lms0\""
++diff -Nur xc.old/programs/Xserver/hw/xfree86/common/Imakefile xc/programs/Xserver/hw/xfree86/common/Imakefile
++--- xc.old/programs/Xserver/hw/xfree86/common/Imakefile	2004-06-08 18:31:22.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/common/Imakefile	2004-06-08 18:56:10.000000000 +0200
++@@ -18,7 +18,7 @@
++ #endif /* GNUMachArchitecture */
++ #else
++ # if defined(i386BsdArchitecture) || defined(AlphaBsdArchitecture) \
++-	|| defined(OpenBSDArchitecture) || defined(NetBSDArchitecture)
+++	|| defined(KOpenBSDArchitecture) || defined(KNetBSDArchitecture)
++         KBD = xf86KbdBSD
++ # else
++ #  ifdef LinuxArchitecture
++diff -Nur xc.old/programs/Xserver/hw/xfree86/common/compiler.h xc/programs/Xserver/hw/xfree86/common/compiler.h
++--- xc.old/programs/Xserver/hw/xfree86/common/compiler.h	2004-06-08 18:31:34.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/common/compiler.h	2004-06-08 18:56:10.000000000 +0200
 +@@ -30,6 +30,7 @@
 + # endif
 + 
@@ -16770,26 +16675,32 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + 
 + /*
 +  * inline functions to do unaligned accesses
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/common/kbsd.h xc/programs/Xserver/hw/xfree86/common/kbsd.h
-+--- xc/programs/Xserver/hw/xfree86.old/common/kbsd.h	1970-01-01 01:00:00.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/common/kbsd.h	2003-12-03 01:07:05.000000000 +0100
-+@@ -0,0 +1,13 @@
-++/* Compatibility with non-BSD systems based on BSD kernel (e.g, GNU/K*BSD) */
++diff -Nur xc.old/programs/Xserver/hw/xfree86/common/kbsd.h xc/programs/Xserver/hw/xfree86/common/kbsd.h
++--- xc.old/programs/Xserver/hw/xfree86/common/kbsd.h	1970-01-01 01:00:00.000000000 +0100
+++++ xc/programs/Xserver/hw/xfree86/common/kbsd.h	2004-06-08 18:56:10.000000000 +0200
++@@ -0,0 +1,19 @@
+++/* Compatibility with k*BSD-based non-BSD systems (e.g. GNU/k*BSD) */
 ++
 ++#if defined(__FreeBSD__) && !defined(__FreeBSD_kernel__)
-++#define __FreeBSD_kernel__ __FreeBSD__
+++# define __FreeBSD_kernel__ __FreeBSD__
+++#endif
+++#ifdef __FreeBSD_kernel__
+++# include <osreldate.h>
+++# ifndef __FreeBSD_kernel_version
+++#  define __FreeBSD_kernel_version __FreeBSD_version
+++# endif
 ++#endif
 ++
 ++#if defined(__NetBSD__) && !defined(__NetBSD_kernel__)
-++#define __NetBSD_kernel__ __NetBSD__
+++# define __NetBSD_kernel__ __NetBSD__
 ++#endif
 ++
 ++#if defined(__OpenBSD__) && !defined(__OpenBSD_kernel__)
-++#define __OpenBSD_kernel__ __OpenBSD__
+++# define __OpenBSD_kernel__ __OpenBSD__
 ++#endif
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/common/xf86Config.c xc/programs/Xserver/hw/xfree86/common/xf86Config.c
-+--- xc/programs/Xserver/hw/xfree86.old/common/xf86Config.c	2003-02-20 05:36:07.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/common/xf86Config.c	2003-12-03 01:37:53.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/common/xf86Config.c xc/programs/Xserver/hw/xfree86/common/xf86Config.c
++--- xc.old/programs/Xserver/hw/xfree86/common/xf86Config.c	2004-06-08 18:31:32.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/common/xf86Config.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -27,6 +27,7 @@
 + #include "xf86_OSlib.h"
 + 
@@ -16807,9 +16718,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 +      (defined(SVR4) && !defined(sun)) || defined(__GNU__))
 + #define SUPPORT_PC98
 + #endif
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/common/xf86Configure.c xc/programs/Xserver/hw/xfree86/common/xf86Configure.c
-+--- xc/programs/Xserver/hw/xfree86.old/common/xf86Configure.c	2003-01-18 08:27:13.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/common/xf86Configure.c	2003-12-03 01:38:19.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/common/xf86Configure.c xc/programs/Xserver/hw/xfree86/common/xf86Configure.c
++--- xc.old/programs/Xserver/hw/xfree86/common/xf86Configure.c	2003-01-18 08:27:13.000000000 +0100
+++++ xc/programs/Xserver/hw/xfree86/common/xf86Configure.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -51,6 +51,7 @@
 + #include "xf86Sbus.h"
 + #endif
@@ -16827,9 +16738,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + static char *DFLT_MOUSE_DEV = "/dev/sysmouse";
 + static char *DFLT_MOUSE_PROTO = "auto";
 + #else
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/common/xf86Globals.c xc/programs/Xserver/hw/xfree86/common/xf86Globals.c
-+--- xc/programs/Xserver/hw/xfree86.old/common/xf86Globals.c	2003-02-20 05:05:14.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/common/xf86Globals.c	2003-12-03 01:38:37.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/common/xf86Globals.c xc/programs/Xserver/hw/xfree86/common/xf86Globals.c
++--- xc.old/programs/Xserver/hw/xfree86/common/xf86Globals.c	2004-06-08 18:31:32.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/common/xf86Globals.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -17,6 +17,7 @@
 + #include "xf86Parser.h"
 + #include "xf86Xinput.h"
@@ -16847,9 +16758,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + 	0,		/* wskbdType */
 + #endif
 + 	NULL,		/* pMouse */
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/common/xf86KbdBSD.c xc/programs/Xserver/hw/xfree86/common/xf86KbdBSD.c
-+--- xc/programs/Xserver/hw/xfree86.old/common/xf86KbdBSD.c	2002-05-22 23:38:27.000000000 +0200
-++++ xc/programs/Xserver/hw/xfree86/common/xf86KbdBSD.c	2003-12-03 01:38:54.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/common/xf86KbdBSD.c xc/programs/Xserver/hw/xfree86/common/xf86KbdBSD.c
++--- xc.old/programs/Xserver/hw/xfree86/common/xf86KbdBSD.c	2002-05-22 23:38:27.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/common/xf86KbdBSD.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -36,6 +36,7 @@
 + #include "xf86_OSlib.h"
 + #include "atKeynames.h"
@@ -16885,9 +16796,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 +   break;
 + #endif
 + 
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/common/xf86Privstr.h xc/programs/Xserver/hw/xfree86/common/xf86Privstr.h
-+--- xc/programs/Xserver/hw/xfree86.old/common/xf86Privstr.h	2003-02-20 05:05:14.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/common/xf86Privstr.h	2003-12-03 01:45:08.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/common/xf86Privstr.h xc/programs/Xserver/hw/xfree86/common/xf86Privstr.h
++--- xc.old/programs/Xserver/hw/xfree86/common/xf86Privstr.h	2003-02-20 05:05:14.000000000 +0100
+++++ xc/programs/Xserver/hw/xfree86/common/xf86Privstr.h	2004-06-08 18:56:10.000000000 +0200
 +@@ -14,6 +14,7 @@
 + 
 + #include "xf86Pci.h"
@@ -16925,9 +16836,155 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + #define PCCONS		   0
 + #define CODRV011	   1
 + #define CODRV01X	   2
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/bsd/alpha_video.c xc/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/bsd/alpha_video.c	2003-12-03 02:25:16.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c	2003-12-03 01:15:42.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/drivers/i810/i830_driver.c xc/programs/Xserver/hw/xfree86/drivers/i810/i830_driver.c
++--- xc.old/programs/Xserver/hw/xfree86/drivers/i810/i830_driver.c	2004-06-08 18:31:11.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/drivers/i810/i830_driver.c	2004-06-08 18:56:10.000000000 +0200
++@@ -3374,8 +3374,10 @@
++    RestoreHWState(pScrn);
++    RestoreBIOSMemSize(pScrn);
++    I830UnbindGARTMemory(pScrn);
+++#ifdef XF86DRI
++    if (pI830->AccelInfoRec)
++       pI830->AccelInfoRec->NeedToSync = FALSE;
+++#endif
++ }
++ 
++ /*
++diff -Nur xc.old/programs/Xserver/hw/xfree86/etc/Imakefile xc/programs/Xserver/hw/xfree86/etc/Imakefile
++--- xc.old/programs/Xserver/hw/xfree86/etc/Imakefile	2004-06-08 18:31:13.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/etc/Imakefile	2004-06-08 18:56:10.000000000 +0200
++@@ -80,8 +80,8 @@
++        SRCS2 = scanpci.c
++ 
++ #if defined(i386Architecture) && \
++-    (defined(OpenBSDArchitecture) || \
++-	(defined(NetBSDArchitecture) && \
+++    (defined(KOpenBSDArchitecture) || \
+++	(defined(KNetBSDArchitecture) && \
++ 	 ((OSMajorVersion == 1 && OSMinorVersion >= 1) || \
++ 	  OSMajorVersion >= 2)))
++ DEFINES = -DUSE_I386_IOPL
++@@ -113,7 +113,7 @@
++ #if 0 /*BuildMatchagp*/
++        SRCS5 = matchagp.c
++ 
++-# if defined(OpenBSDArchitecture) || defined(NetBSDArchitecture) \
+++# if defined(KOpenBSDArchitecture) || defined(KNetBSDArchitecture) \
++     && ((OSMajorVersion == 1 && OSMinorVersion >= 1) || OSMajorVersion >= 2)
++ DEFINES = -DUSE_I386_IOPL
++ SYS_LIBRARIES = -li386
++diff -Nur xc.old/programs/Xserver/hw/xfree86/input/joystick/Imakefile xc/programs/Xserver/hw/xfree86/input/joystick/Imakefile
++--- xc.old/programs/Xserver/hw/xfree86/input/joystick/Imakefile	2000-11-06 20:24:07.000000000 +0100
+++++ xc/programs/Xserver/hw/xfree86/input/joystick/Imakefile	2004-06-08 18:56:10.000000000 +0200
++@@ -15,7 +15,7 @@
++         ARCH_JSTK = ../os-support/linux/lnx_jstk.o
++ #endif
++ 
++-#if defined(FreeBSDArchitecture) || defined(NetBSDArchitecture) || defined(OpenBSDArchitecture)
+++#if defined(KFreeBSDArchitecture) || defined(KNetBSDArchitecture) || defined(KOpenBSDArchitecture)
++         ARCH_JSTK = ../os-support/bsd/bsd_jstk.o
++ #endif
++ 
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile xc/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile	2003-02-17 17:37:19.000000000 +0100
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile	2004-06-08 18:56:10.000000000 +0200
++@@ -8,7 +8,7 @@
++ 
++ #include <Server.tmpl>
++ 
++-#if defined(FreeBSDArchitecture) || defined(NetBSDArchitecture) || defined(OpenBSDArchitecture)
+++#if defined(KFreeBSDArchitecture) || defined(KNetBSDArchitecture) || defined(KOpenBSDArchitecture)
++ #if BuildXInputExt
++ # if JoystickSupport
++  JOYSTICK_SRC = bsd_jstk.c
++@@ -23,7 +23,7 @@
++ #endif
++ #endif
++ 
++-#if defined(NetBSDArchitecture) \
+++#if defined(KNetBSDArchitecture) \
++     && ((OSMajorVersion == 1 && OSMinorVersion >= 1) || OSMajorVersion >= 2)
++ # if defined(AlphaArchitecture)
++   IOPERMDEFINES = -DUSE_ALPHA_PIO
++@@ -38,14 +38,14 @@
++ # else
++   IOPERMDEFINES = -DUSE_I386_IOPL
++ # endif
++-#elif defined(OpenBSDArchitecture) 
+++#elif defined(KOpenBSDArchitecture) 
++ # if defined(i386Architecture) 
++   IOPERMDEFINES = -DUSE_I386_IOPL
++ # elif defined(PpcArchitecture) || defined(Sparc64Architecture) 
++   IOPERM_SRC = ioperm_noop.c
++   IOPERM_OBJ = ioperm_noop.o
++ # endif
++-#elif defined(FreeBSDArchitecture) && !defined(AlphaBsdArchitecture)
+++#elif defined(KFreeBSDArchitecture) && !defined(AlphaBsdArchitecture)
++   IOPERMDEFINES = -DUSE_DEV_IO
++ #else
++ # if defined(AlphaBsdArchitecture)
++@@ -71,11 +71,11 @@
++ MTRRDEFINES = -DHAS_MTRR_SUPPORT
++ #endif
++ 
++-#if defined(NetBSDArchitecture) && defined(HasMTRRBuiltin)
+++#if defined(KNetBSDArchitecture) && defined(HasMTRRBuiltin)
++ MTRRDEFINES = -DHAS_MTRR_BUILTIN
++ #endif
++ 
++-#if defined(FreeBSDArchitecture)
+++#if defined(KFreeBSDArchitecture)
++ SYSVIPCDEFINES = -DHAVE_SYSV_IPC
++ #endif
++ 
++@@ -93,7 +93,7 @@
++ #endif
++ USBMOUSEDEFINES = $(USBMOUSEDEFINES1) $(USBMOUSEDEFINES2)
++ 
++-#if (defined(OpenBSDArchitecture) || defined(NetBSDArchitecture)) && defined(i386Architecture)
+++#if (defined(KOpenBSDArchitecture) || defined(KNetBSDArchitecture)) && defined(i386Architecture)
++ # if !defined(HasApmKqueue) || !HasApmKqueue
++ APMSRC = bsd_apm.c
++ APMOBJ = bsd_apm.o
++@@ -106,7 +106,7 @@
++ APMOBJ = pm_noop.o
++ #endif
++ 
++-#if defined(FreeBSDArchitecture) && (OSMajorVersion > 2)
+++#if defined(KFreeBSDArchitecture) && (OSMajorVersion > 2)
++ KMODSRC = bsd_kmod.c
++ KMODOBJ = bsd_kmod.o
++ #else
++@@ -127,7 +127,7 @@
++ AXP_OBJ=bsd_ev56.o xf86Axp.o bsd_axp.o
++ #endif
++ 
++-#if (defined(FreeBSDArchitecture) || defined(NetBSDArchitecture)) && HasAgpGart
+++#if (defined(KFreeBSDArchitecture) || defined(KNetBSDArchitecture)) && HasAgpGart
++ AGP_SRC=lnx_agp.c
++ AGP_OBJ=lnx_agp.o
++ #else
++@@ -204,7 +204,7 @@
++ # endif
++ #endif
++ 
++-#if !defined(NetBSDArchitecture) && !defined(OpenBSDArchitecture) || \
+++#if !defined(KNetBSDArchitecture) && !defined(KOpenBSDArchitecture) || \
++ 	!defined(i386Architecture)
++ LinkSourceFile(pm_noop.c,../shared)
++ #endif
++@@ -218,7 +218,7 @@
++ LinkSourceFile(vidmem.c,../shared)
++ LinkSourceFile(sigio.c,../shared)
++ LinkSourceFile(kmod_noop.c,../shared)
++-#if (defined(FreeBSDArchitecture) || defined(NetBSDArchitecture)) && HasAgpGart
+++#if (defined(KFreeBSDArchitecture) || defined(KNetBSDArchitecture)) && HasAgpGart
++ LinkSourceFile(lnx_agp.c,../linux)
++ #else
++ LinkSourceFile(agp_noop.c,../shared)
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c xc/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c	2004-06-08 18:31:03.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -29,11 +29,12 @@
 + #include "X.h"
 + #include "xf86.h"
@@ -17069,9 +17126,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + 	return -1;
 + #endif
 + }
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/bsd/arm_video.c xc/programs/Xserver/hw/xfree86/os-support/bsd/arm_video.c
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/bsd/arm_video.c	2003-12-03 02:25:16.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/arm_video.c	2003-12-03 01:16:00.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/arm_video.c xc/programs/Xserver/hw/xfree86/os-support/bsd/arm_video.c
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/arm_video.c	2004-06-08 18:31:11.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/arm_video.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -64,6 +64,7 @@
 + #include "xf86Priv.h"
 + #include "xf86_OSlib.h"
@@ -17089,9 +17146,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + #define MAP_FLAGS MAP_SHARED
 + #else
 + #define MAP_FLAGS (MAP_FILE | MAP_SHARED)
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_KbdMap.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_KbdMap.c
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_KbdMap.c	2002-10-11 03:40:34.000000000 +0200
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_KbdMap.c	2003-12-03 01:16:15.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_KbdMap.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_KbdMap.c
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_KbdMap.c	2002-10-11 03:40:34.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_KbdMap.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -23,6 +23,7 @@
 + #include "atKeynames.h"
 + #include "xf86Keymap.h"
@@ -17127,9 +17184,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 +   break;
 + #endif
 + 
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_axp.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_axp.c
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_axp.c	2002-10-30 00:19:13.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_axp.c	2003-12-03 01:16:31.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_axp.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_axp.c
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_axp.c	2002-10-30 00:19:13.000000000 +0100
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_axp.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -9,6 +9,7 @@
 + #include "xf86_OSlib.h"
 + #include <stdio.h>
@@ -17147,9 +17204,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + 	int mib[3];
 + 	int error;
 + 
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_init.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_init.c	2002-05-05 20:54:02.000000000 +0200
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c	2003-12-03 01:23:03.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c	2002-05-05 20:54:02.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -32,9 +32,12 @@
 + #include "xf86.h"
 + #include "xf86Priv.h"
@@ -17198,6 +17255,22 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + #define CHECK_DRIVER_MSG \
 +   "Check your kernel's console driver configuration and /dev entries"
 + 
++@@ -233,11 +240,11 @@
++ 	     * switching anymore. Here we check for FreeBSD 3.1 and up.
++ 	     * Add cases for other *BSD that behave the same.
++ 	    */
+++#if defined(__FreeBSD_kernel__)
++ 	    uname (&uts);
++-	    if (strcmp(uts.sysname, "FreeBSD") == 0) {
++-		i = atof(uts.release) * 100;
++-		if (i >= 310) goto acquire_vt;
++-	    }
+++	    i = atof(uts.release) * 100;
+++	    if (i >= 310) goto acquire_vt;
+++#endif
++ 	    /* otherwise fall through */
++ 	case PCVT:
++ 	    /*
 +@@ -441,7 +448,7 @@
 + 	    }
 + 
@@ -17228,9 +17301,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + 	sprintf(ttyname, "/dev/ttyC%d", i);
 + #endif
 + 	if ((fd = open(ttyname, 2)) != -1)
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_io.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_io.c	2002-10-21 22:38:04.000000000 +0200
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c	2003-12-03 01:45:57.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c	2002-10-21 22:38:04.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -34,6 +34,10 @@
 + #include "xf86Priv.h"
 + #include "xf86_OSlib.h"
@@ -17242,9 +17315,18 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + #ifdef WSCONS_SUPPORT
 + #define KBD_FD(i) ((i).kbdFd != -1 ? (i).kbdFd : (i).consoleFd)
 + #endif
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_kbd.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_kbd.c	2003-02-17 16:11:56.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c	2003-12-03 02:21:56.000000000 +0100
++@@ -144,7 +148,7 @@
++ }
++ 
++ #if defined(SYSCONS_SUPPORT) || defined(PCCONS_SUPPORT) || defined(PCVT_SUPPORT) || defined(WSCONS_SUPPORT)
++-static struct termio kbdtty;
+++static struct termios kbdtty;
++ #endif
++ 
++ void
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c	2003-02-17 16:11:56.000000000 +0100
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -23,6 +23,10 @@
 + #include "atKeynames.h"
 + #include "bsd_kbd.h"
@@ -17325,9 +17407,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 +          }
 +       }
 +     }
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_mouse.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/bsd/bsd_mouse.c	2003-02-15 06:37:59.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c	2003-12-03 01:17:04.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c	2003-02-15 06:37:59.000000000 +0100
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -12,6 +12,7 @@
 + #include "xf86OSmouse.h"
 + #include "xisb.h"
@@ -17392,9 +17474,9 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 +     p->SetupAuto = SetupAuto;
 +     p->SetPS2Res = SetSysMouseRes;
 +     p->SetBMRes = SetSysMouseRes;
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/bsd/i386_video.c xc/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/bsd/i386_video.c	2003-12-03 02:25:16.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c	2003-12-03 01:44:11.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c xc/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c	2004-06-08 18:31:11.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -29,9 +29,13 @@
 + #include "X.h"
 + #include "xf86.h"
@@ -17509,26 +17591,32 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + static pointer
 + NetBSDsetWC(int screenNum, unsigned long base, unsigned long size, Bool enable,
 + 	    MessageType from)
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/bsd/kbsd.h xc/programs/Xserver/hw/xfree86/os-support/bsd/kbsd.h
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/bsd/kbsd.h	1970-01-01 01:00:00.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/kbsd.h	2003-12-03 01:29:50.000000000 +0100
-+@@ -0,0 +1,13 @@
-++/* Compatibility with non-BSD systems based on BSD kernel (e.g, GNU/K*BSD) */
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/kbsd.h xc/programs/Xserver/hw/xfree86/os-support/bsd/kbsd.h
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/kbsd.h	1970-01-01 01:00:00.000000000 +0100
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/kbsd.h	2004-06-08 18:56:10.000000000 +0200
++@@ -0,0 +1,19 @@
+++/* Compatibility with k*BSD-based non-BSD systems (e.g. GNU/k*BSD) */
 ++
 ++#if defined(__FreeBSD__) && !defined(__FreeBSD_kernel__)
-++#define __FreeBSD_kernel__ __FreeBSD__
+++# define __FreeBSD_kernel__ __FreeBSD__
+++#endif
+++#ifdef __FreeBSD_kernel__
+++# include <osreldate.h>
+++# ifndef __FreeBSD_kernel_version
+++#  define __FreeBSD_kernel_version __FreeBSD_version
+++# endif
 ++#endif
 ++
 ++#if defined(__NetBSD__) && !defined(__NetBSD_kernel__)
-++#define __NetBSD_kernel__ __NetBSD__
+++# define __NetBSD_kernel__ __NetBSD__
 ++#endif
 ++
 ++#if defined(__OpenBSD__) && !defined(__OpenBSD_kernel__)
-++#define __OpenBSD_kernel__ __OpenBSD__
+++# define __OpenBSD_kernel__ __OpenBSD__
 ++#endif
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/bsd/ppc_video.c xc/programs/Xserver/hw/xfree86/os-support/bsd/ppc_video.c
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/bsd/ppc_video.c	2003-12-03 02:25:16.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/ppc_video.c	2003-12-03 01:17:32.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/ppc_video.c xc/programs/Xserver/hw/xfree86/os-support/bsd/ppc_video.c
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/ppc_video.c	2004-06-08 18:31:11.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/ppc_video.c	2004-06-08 18:56:10.000000000 +0200
 +@@ -32,6 +32,7 @@
 + 
 + #include "xf86_OSlib.h"
@@ -17546,9 +17634,48 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + #define DEV_MEM "/dev/mem"
 + #else
 + #define DEV_MEM "/dev/xf86"
-+diff -Nur xc/programs/Xserver/hw/xfree86.old/os-support/xf86_OSlib.h xc/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h
-+--- xc/programs/Xserver/hw/xfree86.old/os-support/xf86_OSlib.h	2002-05-31 20:46:00.000000000 +0200
-++++ xc/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h	2003-12-03 02:09:58.000000000 +0100
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/bus/Imakefile xc/programs/Xserver/hw/xfree86/os-support/bus/Imakefile
++--- xc.old/programs/Xserver/hw/xfree86/os-support/bus/Imakefile	2004-06-08 18:31:33.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/os-support/bus/Imakefile	2004-06-08 18:56:10.000000000 +0200
++@@ -48,7 +48,7 @@
++ PCIDRVRSRC = linuxPci.c
++ PCIDRVROBJ = linuxPci.o
++ 
++-#elif defined(OpenBSDArchitecture) && \
+++#elif defined(KOpenBSDArchitecture) && \
++ 	(defined(PpcArchitecture) || \
++ 	defined(AlphaArchitecture) || \
++ 	defined(Sparc64Architecture))
++@@ -58,7 +58,7 @@
++ PCIDRVRSRC = freebsdPci.c
++ PCIDRVROBJ = freebsdPci.o
++ 
++-#elif defined(NetBSDArchitecture) && defined(PpcArchitecture)
+++#elif defined(KNetBSDArchitecture) && defined(PpcArchitecture)
++ 
++ XCOMM NetBSD/powerpc
++ 
++@@ -80,7 +80,7 @@
++ PCIDRVRSRC = ix86Pci.c linuxPci.c
++ PCIDRVROBJ = ix86Pci.o linuxPci.o
++ 
++-#elif defined(FreeBSDArchitecture) && defined(AlphaArchitecture)
+++#elif defined(KFreeBSDArchitecture) && defined(AlphaArchitecture)
++ 
++ 
++ XCOMM generic FreeBSD PCI driver (using /dev/pci)
++@@ -88,7 +88,7 @@
++ PCIDRVRSRC = freebsdPci.c
++ PCIDRVROBJ = freebsdPci.o
++ 
++-#elif defined(NetBSDArchitecture) && defined(AlphaArchitecture)
+++#elif defined(KNetBSDArchitecture) && defined(AlphaArchitecture)
++ 
++ XCOMM Alpha (NetBSD) PCI driver
++ 
++diff -Nur xc.old/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h xc/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h
++--- xc.old/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h	2002-05-31 20:46:00.000000000 +0200
+++++ xc/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h	2004-06-08 19:00:39.000000000 +0200
 +@@ -98,6 +98,8 @@
 + #endif
 + #endif
@@ -17653,7 +17780,7 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + #     ifdef PCCONS_SUPPORT
 + #       include <machine/pccons.h>
 + #       undef CONSOLE_X_MODE_ON
-+@@ -442,10 +476,10 @@
++@@ -442,12 +476,11 @@
 + #   endif
 + #   ifdef SYSCONS_SUPPORT
 + #    define COMPAT_SYSCONS
@@ -17662,11 +17789,14 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + #     include <machine/console.h>
 + #    else
 +-#     if defined(__FreeBSD__)
++-#        include <osreldate.h>
++-#        if __FreeBSD_version >= 410000
 ++#     if defined(__FreeBSD_kernel__)
-+ #        include <osreldate.h>
-+ #        if __FreeBSD_version >= 410000
+++#        if (__FreeBSD_kernel_version >= 410000)
 + #          include <sys/consio.h>
-+@@ -461,17 +495,17 @@
++ #          include <sys/kbio.h>
++ #        else
++@@ -461,17 +494,17 @@
 + #   if defined(PCVT_SUPPORT)
 + #    if !defined(SYSCONS_SUPPORT)
 +       /* no syscons, so include pcvt specific header file */
@@ -17688,16 +17818,19 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + #    else /* pcvt and syscons: hard-code the ID magic */
 + #     define VGAPCVTID _IOWR('V',113, struct pcvtid)
 +       struct pcvtid {
-+@@ -484,7 +518,7 @@
++@@ -484,9 +517,8 @@
 + #    include <dev/wscons/wsconsio.h>
 + #    include <dev/wscons/wsdisplay_usl_io.h>
 + #   endif /* WSCONS_SUPPORT */
 +-#   if defined(__FreeBSD__)
++-#    include <osreldate.h>
++-#    if __FreeBSD_version >= 500013
 ++#   if defined(__FreeBSD_kernel__)
-+ #    include <osreldate.h>
-+ #    if __FreeBSD_version >= 500013
+++#    if (__FreeBSD_kernel_version >= 500013)
 + #     include <sys/mouse.h>
-+@@ -525,17 +559,6 @@
++ #    else
++ #     undef MOUSE_GETINFO
++@@ -525,17 +557,6 @@
 + #  endif /* __bsdi__ */
 + # endif /* !LINKKIT */
 + 
@@ -17715,7 +17848,7 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + #ifdef USE_I386_IOPL
 + #include <machine/sysarch.h>
 + #endif
-+@@ -546,7 +569,8 @@
++@@ -546,7 +567,8 @@
 + #  define USE_VT_SYSREQ
 + # endif
 + 
@@ -17725,7 +17858,7 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + 
 + /**************************************************************************/
 + /* OS/2                                                                   */
-+@@ -656,25 +680,6 @@
++@@ -656,25 +678,6 @@
 + #endif
 + 
 + /**************************************************************************/
@@ -17751,50 +17884,40 @@ diff -Nur xfree86-4.3.0.old/debian/patches/824_gnu-kbsd_xserver.diff xfree86-4.3
 + /* Generic                                                                */
 + /**************************************************************************/
 + 
-+diff -Nur xc/programs/Xserver/include.old/kbsd.h xc/programs/Xserver/include/kbsd.h
-+--- xc/programs/Xserver/include.old/kbsd.h	1970-01-01 01:00:00.000000000 +0100
-++++ xc/programs/Xserver/include/kbsd.h	2003-12-03 03:16:42.000000000 +0100
-+@@ -0,0 +1,13 @@
-++/* Compatibility with non-BSD systems based on BSD kernel (e.g, GNU/K*BSD) */
++diff -Nur xc.old/programs/Xserver/include/kbsd.h xc/programs/Xserver/include/kbsd.h
++--- xc.old/programs/Xserver/include/kbsd.h	1970-01-01 01:00:00.000000000 +0100
+++++ xc/programs/Xserver/include/kbsd.h	2004-06-08 18:56:10.000000000 +0200
++@@ -0,0 +1,19 @@
+++/* Compatibility with k*BSD-based non-BSD systems (e.g. GNU/k*BSD) */
 ++
 ++#if defined(__FreeBSD__) && !defined(__FreeBSD_kernel__)
-++#define __FreeBSD_kernel__ __FreeBSD__
+++# define __FreeBSD_kernel__ __FreeBSD__
+++#endif
+++#ifdef __FreeBSD_kernel__
+++# include <osreldate.h>
+++# ifndef __FreeBSD_kernel_version
+++#  define __FreeBSD_kernel_version __FreeBSD_version
+++# endif
 ++#endif
 ++
 ++#if defined(__NetBSD__) && !defined(__NetBSD_kernel__)
-++#define __NetBSD_kernel__ __NetBSD__
+++# define __NetBSD_kernel__ __NetBSD__
 ++#endif
 ++
 ++#if defined(__OpenBSD__) && !defined(__OpenBSD_kernel__)
-++#define __OpenBSD_kernel__ __OpenBSD__
+++# define __OpenBSD_kernel__ __OpenBSD__
 ++#endif
-diff -Nur xfree86-4.3.0.old/debian/patches/824a_gnu-kbsd_xserver_more.diff xfree86-4.3.0/debian/patches/824a_gnu-kbsd_xserver_more.diff
---- xfree86-4.3.0.old/debian/patches/824a_gnu-kbsd_xserver_more.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/824a_gnu-kbsd_xserver_more.diff	2004-05-30 20:53:47.000000000 +0200
-@@ -0,0 +1,12 @@
-+diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c
-+--- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c	2003-12-14 01:00:40.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c	2003-12-14 00:56:14.000000000 +0100
-+@@ -148,7 +148,7 @@
-+ }
-+ 
-+ #if defined(SYSCONS_SUPPORT) || defined(PCCONS_SUPPORT) || defined(PCVT_SUPPORT) || defined(WSCONS_SUPPORT)
-+-static struct termio kbdtty;
-++static struct termios kbdtty;
-+ #endif
-+ 
-+ void
-diff -Nur xfree86-4.3.0.old/debian/patches/825_gnu-kbsd_nothreads.diff xfree86-4.3.0/debian/patches/825_gnu-kbsd_nothreads.diff
---- xfree86-4.3.0.old/debian/patches/825_gnu-kbsd_nothreads.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/825_gnu-kbsd_nothreads.diff	2004-05-30 20:53:47.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/patches/825_gnu-kbsd_nothreads.diff xfree86-4.3.0.dfsg.1/debian/patches/825_gnu-kbsd_nothreads.diff
+--- xfree86-4.3.0.dfsg.1/debian.old/patches/825_gnu-kbsd_nothreads.diff	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/patches/825_gnu-kbsd_nothreads.diff	2004-06-08 04:56:27.000000000 +0200
 @@ -0,0 +1,19 @@
 +
 +  on gnu/knetbsd, libX11 doesn't pass -lpthread for some reason, so
 +  i just disable it temporarily.
 +
-+--- xc/config/cf/gnu.cf.old	2003-12-03 03:34:35.000000000 +0100
-++++ xc/config/cf/gnu.cf	2003-12-03 03:34:48.000000000 +0100
-+@@ -96,12 +96,6 @@
++--- xc.old/config/cf/gnu.cf	2004-06-08 04:47:59.000000000 +0200
+++++ xc/config/cf/gnu.cf	2004-06-08 04:54:46.000000000 +0200
++@@ -112,12 +112,6 @@
 + 
 + #define XawI18nDefines        -DHAS_WCHAR_H -DHAS_WCTYPE_H -DNO_WIDEC_H
 + 
@@ -17807,387 +17930,27 @@ diff -Nur xfree86-4.3.0.old/debian/patches/825_gnu-kbsd_nothreads.diff xfree86-4
 + #define HasDevRandom		YES
 + #define PollDevRandom		YES
 + 
-diff -Nur xfree86-4.3.0.old/debian/patches/827_gnu-kbsd_xserver_more.diff xfree86-4.3.0/debian/patches/827_gnu-kbsd_xserver_more.diff
---- xfree86-4.3.0.old/debian/patches/827_gnu-kbsd_xserver_more.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/827_gnu-kbsd_xserver_more.diff	2004-05-30 20:53:47.000000000 +0200
-@@ -0,0 +1,202 @@
-+diff -ur xc/programs/Xserver.old/hw/xfree86/Imakefile xc/programs/Xserver/hw/xfree86/Imakefile
-+--- xc/programs/Xserver.old/hw/xfree86/Imakefile	2003-02-17 18:06:40.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/Imakefile	2003-12-03 12:37:47.000000000 +0100
-+@@ -124,13 +124,13 @@
-+ DPI75USFONTPATH=\"$(LIBDIR)/fonts/75dpi/:unscaled\"
-+ DPI100USFONTPATH=\"$(LIBDIR)/fonts/100dpi/:unscaled\"
-+ 
-+-#ifdef FreeBSDArchitecture
-++#ifdef KFreeBSDArchitecture
-+   FREEBSDMOUSEDEV="    Option	\"Device\"	\"/dev/mse0\""
-+ #else
-+   FREEBSDMOUSEDEV="XCOMM    Option	\"Device\"	\"/dev/mse0\""
-+ #endif
-+ 
-+-#if defined(i386BsdArchitecture)&&defined(NetBSDArchitecture)
-++#if defined(i386BsdArchitecture)&&defined(KNetBSDArchitecture)
-+ #  if (OSMajorVersion >= 1) && (OSMinorVersion >= 1)
-+   NETBSDOLDMOUSEDEV="XCOMM    Option	\"Device\"	\"/dev/mms0\""
-+   NETBSDNEWMOUSEDEV="    Option	\"Device\"	\"/dev/lms0\""
-+diff -ur xc/programs/Xserver.old/hw/xfree86/common/Imakefile xc/programs/Xserver/hw/xfree86/common/Imakefile
-+--- xc/programs/Xserver.old/hw/xfree86/common/Imakefile	2003-12-03 12:27:56.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/common/Imakefile	2003-12-03 12:38:27.000000000 +0100
-+@@ -18,7 +18,7 @@
-+ #endif /* GNUMachArchitecture */
-+ #else
-+ # if defined(i386BsdArchitecture) || defined(AlphaBsdArchitecture) \
-+-	|| defined(OpenBSDArchitecture) || defined(NetBSDArchitecture)
-++	|| defined(KOpenBSDArchitecture) || defined(KNetBSDArchitecture)
-+         KBD = xf86KbdBSD
-+ # else
-+ #  ifdef LinuxArchitecture
-+diff -ur xc/programs/Xserver.old/hw/xfree86/etc/Imakefile xc/programs/Xserver/hw/xfree86/etc/Imakefile
-+--- xc/programs/Xserver.old/hw/xfree86/etc/Imakefile	2003-12-03 12:28:09.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/etc/Imakefile	2003-12-03 12:40:34.000000000 +0100
-+@@ -80,8 +80,8 @@
-+        SRCS2 = scanpci.c
-+ 
-+ #if defined(i386Architecture) && \
-+-    (defined(OpenBSDArchitecture) || \
-+-	(defined(NetBSDArchitecture) && \
-++    (defined(KOpenBSDArchitecture) || \
-++	(defined(KNetBSDArchitecture) && \
-+ 	 ((OSMajorVersion == 1 && OSMinorVersion >= 1) || \
-+ 	  OSMajorVersion >= 2)))
-+ DEFINES = -DUSE_I386_IOPL
-+@@ -113,7 +113,7 @@
-+ #if 0 /*BuildMatchagp*/
-+        SRCS5 = matchagp.c
-+ 
-+-# if defined(OpenBSDArchitecture) || defined(NetBSDArchitecture) \
-++# if defined(KOpenBSDArchitecture) || defined(KNetBSDArchitecture) \
-+     && ((OSMajorVersion == 1 && OSMinorVersion >= 1) || OSMajorVersion >= 2)
-+ DEFINES = -DUSE_I386_IOPL
-+ SYS_LIBRARIES = -li386
-+diff -ur xc/programs/Xserver.old/hw/xfree86/input/joystick/Imakefile xc/programs/Xserver/hw/xfree86/input/joystick/Imakefile
-+--- xc/programs/Xserver.old/hw/xfree86/input/joystick/Imakefile	2000-11-06 20:24:07.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/input/joystick/Imakefile	2003-12-03 12:33:10.000000000 +0100
-+@@ -15,7 +15,7 @@
-+         ARCH_JSTK = ../os-support/linux/lnx_jstk.o
-+ #endif
-+ 
-+-#if defined(FreeBSDArchitecture) || defined(NetBSDArchitecture) || defined(OpenBSDArchitecture)
-++#if defined(KFreeBSDArchitecture) || defined(KNetBSDArchitecture) || defined(KOpenBSDArchitecture)
-+         ARCH_JSTK = ../os-support/bsd/bsd_jstk.o
-+ #endif
-+ 
-+diff -ur xc/programs/Xserver.old/hw/xfree86/os-support/bsd/Imakefile xc/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile
-+--- xc/programs/Xserver.old/hw/xfree86/os-support/bsd/Imakefile	2003-02-17 17:37:19.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile	2003-12-03 12:42:17.000000000 +0100
-+@@ -8,7 +8,7 @@
-+ 
-+ #include <Server.tmpl>
-+ 
-+-#if defined(FreeBSDArchitecture) || defined(NetBSDArchitecture) || defined(OpenBSDArchitecture)
-++#if defined(KFreeBSDArchitecture) || defined(KNetBSDArchitecture) || defined(KOpenBSDArchitecture)
-+ #if BuildXInputExt
-+ # if JoystickSupport
-+  JOYSTICK_SRC = bsd_jstk.c
-+@@ -23,7 +23,7 @@
-+ #endif
-+ #endif
-+ 
-+-#if defined(NetBSDArchitecture) \
-++#if defined(KNetBSDArchitecture) \
-+     && ((OSMajorVersion == 1 && OSMinorVersion >= 1) || OSMajorVersion >= 2)
-+ # if defined(AlphaArchitecture)
-+   IOPERMDEFINES = -DUSE_ALPHA_PIO
-+@@ -38,14 +38,14 @@
-+ # else
-+   IOPERMDEFINES = -DUSE_I386_IOPL
-+ # endif
-+-#elif defined(OpenBSDArchitecture) 
-++#elif defined(KOpenBSDArchitecture) 
-+ # if defined(i386Architecture) 
-+   IOPERMDEFINES = -DUSE_I386_IOPL
-+ # elif defined(PpcArchitecture) || defined(Sparc64Architecture) 
-+   IOPERM_SRC = ioperm_noop.c
-+   IOPERM_OBJ = ioperm_noop.o
-+ # endif
-+-#elif defined(FreeBSDArchitecture) && !defined(AlphaBsdArchitecture)
-++#elif defined(KFreeBSDArchitecture) && !defined(AlphaBsdArchitecture)
-+   IOPERMDEFINES = -DUSE_DEV_IO
-+ #else
-+ # if defined(AlphaBsdArchitecture)
-+@@ -71,11 +71,11 @@
-+ MTRRDEFINES = -DHAS_MTRR_SUPPORT
-+ #endif
-+ 
-+-#if defined(NetBSDArchitecture) && defined(HasMTRRBuiltin)
-++#if defined(KNetBSDArchitecture) && defined(HasMTRRBuiltin)
-+ MTRRDEFINES = -DHAS_MTRR_BUILTIN
-+ #endif
-+ 
-+-#if defined(FreeBSDArchitecture)
-++#if defined(KFreeBSDArchitecture)
-+ SYSVIPCDEFINES = -DHAVE_SYSV_IPC
-+ #endif
-+ 
-+@@ -93,7 +93,7 @@
-+ #endif
-+ USBMOUSEDEFINES = $(USBMOUSEDEFINES1) $(USBMOUSEDEFINES2)
-+ 
-+-#if (defined(OpenBSDArchitecture) || defined(NetBSDArchitecture)) && defined(i386Architecture)
-++#if (defined(KOpenBSDArchitecture) || defined(KNetBSDArchitecture)) && defined(i386Architecture)
-+ # if !defined(HasApmKqueue) || !HasApmKqueue
-+ APMSRC = bsd_apm.c
-+ APMOBJ = bsd_apm.o
-+@@ -106,7 +106,7 @@
-+ APMOBJ = pm_noop.o
-+ #endif
-+ 
-+-#if defined(FreeBSDArchitecture) && (OSMajorVersion > 2)
-++#if defined(KFreeBSDArchitecture) && (OSMajorVersion > 2)
-+ KMODSRC = bsd_kmod.c
-+ KMODOBJ = bsd_kmod.o
-+ #else
-+@@ -127,7 +127,7 @@
-+ AXP_OBJ=bsd_ev56.o xf86Axp.o bsd_axp.o
-+ #endif
-+ 
-+-#if (defined(FreeBSDArchitecture) || defined(NetBSDArchitecture)) && HasAgpGart
-++#if (defined(KFreeBSDArchitecture) || defined(KNetBSDArchitecture)) && HasAgpGart
-+ AGP_SRC=lnx_agp.c
-+ AGP_OBJ=lnx_agp.o
-+ #else
-+@@ -204,7 +204,7 @@
-+ # endif
-+ #endif
-+ 
-+-#if !defined(NetBSDArchitecture) && !defined(OpenBSDArchitecture) || \
-++#if !defined(KNetBSDArchitecture) && !defined(KOpenBSDArchitecture) || \
-+ 	!defined(i386Architecture)
-+ LinkSourceFile(pm_noop.c,../shared)
-+ #endif
-+@@ -218,7 +218,7 @@
-+ LinkSourceFile(vidmem.c,../shared)
-+ LinkSourceFile(sigio.c,../shared)
-+ LinkSourceFile(kmod_noop.c,../shared)
-+-#if (defined(FreeBSDArchitecture) || defined(NetBSDArchitecture)) && HasAgpGart
-++#if (defined(KFreeBSDArchitecture) || defined(KNetBSDArchitecture)) && HasAgpGart
-+ LinkSourceFile(lnx_agp.c,../linux)
-+ #else
-+ LinkSourceFile(agp_noop.c,../shared)
-+diff -ur xc/programs/Xserver.old/hw/xfree86/os-support/bus/Imakefile xc/programs/Xserver/hw/xfree86/os-support/bus/Imakefile
-+--- xc/programs/Xserver.old/hw/xfree86/os-support/bus/Imakefile	2003-12-03 12:28:07.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bus/Imakefile	2003-12-03 12:42:55.000000000 +0100
-+@@ -48,7 +48,7 @@
-+ PCIDRVRSRC = linuxPci.c
-+ PCIDRVROBJ = linuxPci.o
-+ 
-+-#elif defined(OpenBSDArchitecture) && \
-++#elif defined(KOpenBSDArchitecture) && \
-+ 	(defined(PpcArchitecture) || \
-+ 	defined(AlphaArchitecture) || \
-+ 	defined(Sparc64Architecture))
-+@@ -58,7 +58,7 @@
-+ PCIDRVRSRC = freebsdPci.c
-+ PCIDRVROBJ = freebsdPci.o
-+ 
-+-#elif defined(NetBSDArchitecture) && defined(PpcArchitecture)
-++#elif defined(KNetBSDArchitecture) && defined(PpcArchitecture)
-+ 
-+ XCOMM NetBSD/powerpc
-+ 
-+@@ -80,7 +80,7 @@
-+ PCIDRVRSRC = ix86Pci.c linuxPci.c
-+ PCIDRVROBJ = ix86Pci.o linuxPci.o
-+ 
-+-#elif defined(FreeBSDArchitecture) && defined(AlphaArchitecture)
-++#elif defined(KFreeBSDArchitecture) && defined(AlphaArchitecture)
-+ 
-+ 
-+ XCOMM generic FreeBSD PCI driver (using /dev/pci)
-+@@ -88,7 +88,7 @@
-+ PCIDRVRSRC = freebsdPci.c
-+ PCIDRVROBJ = freebsdPci.o
-+ 
-+-#elif defined(NetBSDArchitecture) && defined(AlphaArchitecture)
-++#elif defined(KNetBSDArchitecture) && defined(AlphaArchitecture)
-+ 
-+ XCOMM Alpha (NetBSD) PCI driver
-+ 
-diff -Nur xfree86-4.3.0.old/debian/patches/828_xserver_i830.diff xfree86-4.3.0/debian/patches/828_xserver_i830.diff
---- xfree86-4.3.0.old/debian/patches/828_xserver_i830.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/828_xserver_i830.diff	2004-05-30 20:53:47.000000000 +0200
-@@ -0,0 +1,13 @@
-+--- xc/programs/Xserver/hw/xfree86/drivers/i810/i830_driver.c~	2003-12-03 12:47:43.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/drivers/i810/i830_driver.c	2003-12-03 13:49:02.000000000 +0100
-+@@ -3341,8 +3341,10 @@
-+    RestoreHWState(pScrn);
-+    RestoreBIOSMemSize(pScrn);
-+    I830UnbindGARTMemory(pScrn);
-++#ifdef XF86DRI
-+    if (pI830->AccelInfoRec)
-+       pI830->AccelInfoRec->NeedToSync = FALSE;
-++#endif
-+ }
-+ 
-+ /*
-diff -Nur xfree86-4.3.0.old/debian/patches/829_xserver_kfreebsd.diff xfree86-4.3.0/debian/patches/829_xserver_kfreebsd.diff
---- xfree86-4.3.0.old/debian/patches/829_xserver_kfreebsd.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/patches/829_xserver_kfreebsd.diff	2004-05-30 20:53:46.000000000 +0200
-@@ -0,0 +1,61 @@
-+diff -ur xc/programs/Xserver.old/hw/xfree86/os-support/xf86_OSlib.h xc/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h
-+--- xc/programs/Xserver.old/hw/xfree86/os-support/xf86_OSlib.h	2004-03-15 14:33:17.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h	2004-03-15 15:24:18.000000000 +0100
-+@@ -479,13 +479,15 @@
-+ #    if defined(__NetBSD_kernel__) || defined(__OpenBSD_kernel__)
-+ #     include <machine/console.h>
-+ #    else
-++#     if defined(__FreeBSD__)
-++#      include <osreldate.h>
-++#     endif
-+ #     if defined(__FreeBSD_kernel__)
-+-#        include <osreldate.h>
-+-#        if __FreeBSD_version >= 410000
-++#        if defined(__FreeBSD_version) && (__FreeBSD_version < 410000)
-++#          include <machine/console.h>
-++#        else
-+ #          include <sys/consio.h>
-+ #          include <sys/kbio.h>
-+-#        else
-+-#          include <machine/console.h>
-+ #        endif /* FreeBSD 4.1 RELEASE or lator */
-+ #     else
-+ #      include <sys/console.h>
-+@@ -518,13 +520,15 @@
-+ #    include <dev/wscons/wsconsio.h>
-+ #    include <dev/wscons/wsdisplay_usl_io.h>
-+ #   endif /* WSCONS_SUPPORT */
-+-#   if defined(__FreeBSD_kernel__)
-++#   if defined(__FreeBSD__)
-+ #    include <osreldate.h>
-+-#    if __FreeBSD_version >= 500013
-+-#     include <sys/mouse.h>
-+-#    else
-++#   endif
-++#   if defined(__FreeBSD_kernel__)
-++#    if defined(__FreeBSD_version) && (__FreeBSD_version < 500013)
-+ #     undef MOUSE_GETINFO
-+ #     include <machine/mouse.h>
-++#    else
-++#     include <sys/mouse.h>
-+ #    endif
-+ #   endif
-+     /* Include these definitions in case ioctl_pc.h didn't get included */
-+--- xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c~	2004-03-16 13:02:53.000000000 +0100
-++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c	2004-03-16 13:09:05.000000000 +0100
-+@@ -240,11 +240,11 @@
-+ 	     * switching anymore. Here we check for FreeBSD 3.1 and up.
-+ 	     * Add cases for other *BSD that behave the same.
-+ 	    */
-++#if defined(__FreeBSD_kernel__)
-+ 	    uname (&uts);
-+-	    if (strcmp(uts.sysname, "FreeBSD") == 0) {
-+-		i = atof(uts.release) * 100;
-+-		if (i >= 310) goto acquire_vt;
-+-	    }
-++	    i = atof(uts.release) * 100;
-++	    if (i >= 310) goto acquire_vt;
-++#endif
-+ 	    /* otherwise fall through */
-+ 	case PCVT:
-+ 	    /*
-diff -Nur xfree86-4.3.0.old/debian/po/ca.po xfree86-4.3.0/debian/po/ca.po
---- xfree86-4.3.0.old/debian/po/ca.po	2004-05-30 20:53:26.000000000 +0200
-+++ xfree86-4.3.0/debian/po/ca.po	2004-05-30 20:53:46.000000000 +0200
-@@ -45,7 +45,7 @@
- "run by default."
- msgstr ""
- "Només un gestor de pantalla pot gestionar un servidor X determinat, però "
--"teniu instaŀlats diversos paquets de gestor de pantalla.  Per favor, "
-+"teniu instal·lats diversos paquets de gestor de pantalla.  Per favor, "
- "escolliu quin gestor de pantalla s'executarà per defecte."
- 
- #. Type: select
-@@ -287,7 +287,7 @@
- "information in discover's hardware database, or it could be that your video "
- "hardware is simply not supported by any available X servers."
- msgstr ""
--"O bé no teniu cap maquinari de vídeo instaŀlat en aquesta màquina (teniu "
-+"O bé no teniu cap maquinari de vídeo instal·lat en aquesta màquina (teniu "
- "només una consola sèrie?), o bé el programa «discover» no ha pogut "
- "determinar quin servidor X és l'apropiat per al vostre maquinari de vídeo.  "
- "Açò pot ser degut a una informació incompleta en la base de dades de "
-@@ -416,7 +416,7 @@
- "Els mòduls «GLCore» i «glx» habiliten la representació d'OpenGL via "
- "programari.  El mòdul «dri» habilita en el servidor X el suport de la "
- "Infraestructura de Representació Directa (DRI).  Tingueu en compte que el "
--"nucli, la targeta de vídeo i la versió instaŀlada de les biblioteques Mesa "
-+"nucli, la targeta de vídeo i la versió instal·lada de les biblioteques Mesa "
- "també han de suportar DRI per tal que funcionen les operacions 3D "
- "accelerades per maquinari amb DRI.  En cas contrari el servidor recorrerà a "
- "la representació via programari."
-@@ -786,8 +786,8 @@
- "been unpacked, see the /etc/X11/xkb/rules directory for available rule sets."
- msgstr ""
- "Les usuàries i usuaris avançats poden usar qualsevol joc definit de regles "
--"d'XKB.  Si heu instaŀlat el paquet «xlibs», vegeu el directori «/etc/X11/xkb/"
--"rules» per trobar els jocs disponibles de regles."
-+"d'XKB.  Si heu instal·lat el paquet «xlibs», vegeu el directori «/etc/X11/"
-+"xkb/rules» per trobar els jocs disponibles de regles."
- 
- #. Type: string
- #. Description
-@@ -899,7 +899,7 @@
- "for available rule sets."
- msgstr ""
- "Les usuàries i usuaris avançats poden usar qualsevol model definit pel joc "
--"de regles d'XKB escollit.  Si heu instaŀlat el paquet «xlibs», vegeu el "
-+"de regles d'XKB escollit.  Si heu instal·lat el paquet «xlibs», vegeu el "
- "directori «/etc/X11/xkb/rules» per trobar els jocs disponibles de regles."
- 
- #. Type: string
-@@ -938,9 +938,9 @@
- "available layouts."
- msgstr ""
- "Les usuàries i usuaris avançats poden usar qualsevol disposició suportada "
--"pel joc de regles d'XKB escollit.  Si heu instaŀlat el paquet «xlibs», vegeu "
--"el directori «/etc/X11/xkb/rules» per trobar els jocs disponibles de regles, "
--"i el directori «/etc/X11/xkb/symbols» per trobar les disposicions "
-+"pel joc de regles d'XKB escollit.  Si heu instal·lat el paquet «xlibs», "
-+"vegeu el directori «/etc/X11/xkb/rules» per trobar els jocs disponibles de "
-+"regles, i el directori «/etc/X11/xkb/symbols» per trobar les disposicions "
- "escollibles."
- 
- #. Type: string
-@@ -996,7 +996,7 @@
- "for the file corresponding to your selected layout for available variants."
- msgstr ""
- "Les usuàries i usuaris avançats poden usar qualsevol variant suportada per "
--"la disposició d'XKB escollida.  Si heu instaŀlat el paquet «xlibs», cerqueu "
-+"la disposició d'XKB escollida.  Si heu instal·lat el paquet «xlibs», cerqueu "
- "en el directori «/etc/X11/xkb/symbols» el fitxer corresponent a la "
- "disposició que heu escollit, per trobar-hi les variants disponibles."
- 
-@@ -1083,7 +1083,7 @@
- msgstr ""
- "Les usuàries i usuaris avançats poden usar qualssevol disposicions "
- "suportades pel model, disposició i variant d'XKB escollits.  Si heu "
--"instaŀlat el paquet «xlibs», vegeu els fitxers d'opcions disponibles en el "
-+"instal·lat el paquet «xlibs», vegeu els fitxers d'opcions disponibles en el "
- "directori «/etc/X11/xkb/symbols», que defineixen traduccions només parcials "
- "de teclat. (Per exemple, «/etc/X11/xkb/symbols/ctrl».)"
- 
-diff -Nur xfree86-4.3.0.old/debian/scripts/vars.kfreebsd-i386 xfree86-4.3.0/debian/scripts/vars.kfreebsd-i386
---- xfree86-4.3.0.old/debian/scripts/vars.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/scripts/vars.kfreebsd-i386	2004-05-30 20:53:46.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/scripts/vars.kfreebsd-i386 xfree86-4.3.0.dfsg.1/debian/scripts/vars.kfreebsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/scripts/vars.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/scripts/vars.kfreebsd-i386	2004-06-08 02:19:15.000000000 +0200
 @@ -0,0 +1,5 @@
 +# This file is NOT a shell script.
 +#
 +# This file gets included by both debian/rules (make) AND the scripts in
 +# debian/scripts (Bourne shell).
 +XWSC_SPECIAL_DEPENDS="xserver-xfree86, "
-diff -Nur xfree86-4.3.0.old/debian/xbase-clients.install.kfreebsd-i386 xfree86-4.3.0/debian/xbase-clients.install.kfreebsd-i386
---- xfree86-4.3.0.old/debian/xbase-clients.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xbase-clients.install.kfreebsd-i386	2004-05-30 20:53:46.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/scripts/vars.knetbsd-i386 xfree86-4.3.0.dfsg.1/debian/scripts/vars.knetbsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/scripts/vars.knetbsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/scripts/vars.knetbsd-i386	2004-06-08 22:04:15.000000000 +0200
+@@ -0,0 +1,5 @@
++# This file is NOT a shell script.
++#
++# This file gets included by both debian/rules (make) AND the scripts in
++# debian/scripts (Bourne shell).
++XWSC_SPECIAL_DEPENDS="xserver-xfree86, "
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xbase-clients.install.kfreebsd-i386 xfree86-4.3.0.dfsg.1/debian/xbase-clients.install.kfreebsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xbase-clients.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xbase-clients.install.kfreebsd-i386	2004-06-08 02:19:15.000000000 +0200
 @@ -0,0 +1,225 @@
 +etc/X11/Xresources/xbase-clients
 +etc/X11/app-defaults/Beforelight
@@ -18414,9 +18177,9 @@ diff -Nur xfree86-4.3.0.old/debian/xbase-clients.install.kfreebsd-i386 xfree86-4
 +usr/X11R6/man/man1/xwd.1x
 +usr/X11R6/man/man1/xwininfo.1x
 +usr/X11R6/man/man1/xwud.1x
-diff -Nur xfree86-4.3.0.old/debian/xbase-clients.install.netbsd-i386 xfree86-4.3.0/debian/xbase-clients.install.netbsd-i386
---- xfree86-4.3.0.old/debian/xbase-clients.install.netbsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xbase-clients.install.netbsd-i386	2004-05-30 20:53:48.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xbase-clients.install.knetbsd-i386 xfree86-4.3.0.dfsg.1/debian/xbase-clients.install.knetbsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xbase-clients.install.knetbsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xbase-clients.install.knetbsd-i386	2004-06-08 22:04:15.000000000 +0200
 @@ -0,0 +1,225 @@
 +etc/X11/Xresources/xbase-clients
 +etc/X11/app-defaults/Beforelight
@@ -18643,9 +18406,9 @@ diff -Nur xfree86-4.3.0.old/debian/xbase-clients.install.netbsd-i386 xfree86-4.3
 +usr/X11R6/man/man1/xwd.1x
 +usr/X11R6/man/man1/xwininfo.1x
 +usr/X11R6/man/man1/xwud.1x
-diff -Nur xfree86-4.3.0.old/debian/xlibs-data.install.kfreebsd-i386 xfree86-4.3.0/debian/xlibs-data.install.kfreebsd-i386
---- xfree86-4.3.0.old/debian/xlibs-data.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xlibs-data.install.kfreebsd-i386	2004-05-30 20:53:46.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xlibs-data.install.kfreebsd-i386 xfree86-4.3.0.dfsg.1/debian/xlibs-data.install.kfreebsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xlibs-data.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xlibs-data.install.kfreebsd-i386	2004-06-08 02:19:15.000000000 +0200
 @@ -0,0 +1,248 @@
 +etc/X11/cursors/core.theme
 +etc/X11/cursors/handhelds.theme
@@ -18895,9 +18658,9 @@ diff -Nur xfree86-4.3.0.old/debian/xlibs-data.install.kfreebsd-i386 xfree86-4.3.
 +usr/X11R6/lib/X11/locale/zh_TW/Compose
 +usr/X11R6/lib/X11/locale/zh_TW/XI18N_OBJS
 +usr/X11R6/lib/X11/locale/zh_TW/XLC_LOCALE
-diff -Nur xfree86-4.3.0.old/debian/xlibs-data.install.netbsd-i386 xfree86-4.3.0/debian/xlibs-data.install.netbsd-i386
---- xfree86-4.3.0.old/debian/xlibs-data.install.netbsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xlibs-data.install.netbsd-i386	2004-05-30 20:53:48.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xlibs-data.install.knetbsd-i386 xfree86-4.3.0.dfsg.1/debian/xlibs-data.install.knetbsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xlibs-data.install.knetbsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xlibs-data.install.knetbsd-i386	2004-06-08 22:04:16.000000000 +0200
 @@ -0,0 +1,248 @@
 +etc/X11/cursors/core.theme
 +etc/X11/cursors/handhelds.theme
@@ -19147,9 +18910,9 @@ diff -Nur xfree86-4.3.0.old/debian/xlibs-data.install.netbsd-i386 xfree86-4.3.0/
 +usr/X11R6/lib/X11/locale/zh_TW/Compose
 +usr/X11R6/lib/X11/locale/zh_TW/XI18N_OBJS
 +usr/X11R6/lib/X11/locale/zh_TW/XLC_LOCALE
-diff -Nur xfree86-4.3.0.old/debian/xlibs-static-dev.install.kfreebsd-i386 xfree86-4.3.0/debian/xlibs-static-dev.install.kfreebsd-i386
---- xfree86-4.3.0.old/debian/xlibs-static-dev.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xlibs-static-dev.install.kfreebsd-i386	2004-05-30 20:53:46.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xlibs-static-dev.install.kfreebsd-i386 xfree86-4.3.0.dfsg.1/debian/xlibs-static-dev.install.kfreebsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xlibs-static-dev.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xlibs-static-dev.install.kfreebsd-i386	2004-06-08 02:19:15.000000000 +0200
 @@ -0,0 +1,105 @@
 +usr/X11R6/include/X11/X10.h
 +usr/X11R6/include/X11/Xauth.h
@@ -19256,9 +19019,9 @@ diff -Nur xfree86-4.3.0.old/debian/xlibs-static-dev.install.kfreebsd-i386 xfree8
 +usr/X11R6/man/man3/XauReadAuth.3x
 +usr/X11R6/man/man3/XauUnlockAuth.3x
 +usr/X11R6/man/man3/XauWriteAuth.3x
-diff -Nur xfree86-4.3.0.old/debian/xlibs-static-dev.install.netbsd-i386 xfree86-4.3.0/debian/xlibs-static-dev.install.netbsd-i386
---- xfree86-4.3.0.old/debian/xlibs-static-dev.install.netbsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xlibs-static-dev.install.netbsd-i386	2004-05-30 20:53:48.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xlibs-static-dev.install.knetbsd-i386 xfree86-4.3.0.dfsg.1/debian/xlibs-static-dev.install.knetbsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xlibs-static-dev.install.knetbsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xlibs-static-dev.install.knetbsd-i386	2004-06-08 22:04:16.000000000 +0200
 @@ -0,0 +1,105 @@
 +usr/X11R6/include/X11/X10.h
 +usr/X11R6/include/X11/Xauth.h
@@ -19365,9 +19128,9 @@ diff -Nur xfree86-4.3.0.old/debian/xlibs-static-dev.install.netbsd-i386 xfree86-
 +usr/X11R6/man/man3/XauReadAuth.3x
 +usr/X11R6/man/man3/XauUnlockAuth.3x
 +usr/X11R6/man/man3/XauWriteAuth.3x
-diff -Nur xfree86-4.3.0.old/debian/xlibs-static-pic.install.kfreebsd-i386 xfree86-4.3.0/debian/xlibs-static-pic.install.kfreebsd-i386
---- xfree86-4.3.0.old/debian/xlibs-static-pic.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xlibs-static-pic.install.kfreebsd-i386	2004-05-30 20:53:46.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xlibs-static-pic.install.kfreebsd-i386 xfree86-4.3.0.dfsg.1/debian/xlibs-static-pic.install.kfreebsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xlibs-static-pic.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xlibs-static-pic.install.kfreebsd-i386	2004-06-08 02:19:15.000000000 +0200
 @@ -0,0 +1,18 @@
 +usr/X11R6/lib/libFS_pic.a
 +usr/X11R6/lib/libGLw_pic.a
@@ -19387,30 +19150,43 @@ diff -Nur xfree86-4.3.0.old/debian/xlibs-static-pic.install.kfreebsd-i386 xfree8
 +usr/X11R6/lib/libxf86config_pic.a
 +usr/X11R6/lib/libxkbfile_pic.a
 +usr/X11R6/lib/libxkbui_pic.a
-diff -Nur xfree86-4.3.0.old/debian/xlibs-static-pic.install.netbsd-i386 xfree86-4.3.0/debian/xlibs-static-pic.install.netbsd-i386
---- xfree86-4.3.0.old/debian/xlibs-static-pic.install.netbsd-i386	2004-05-30 20:53:26.000000000 +0200
-+++ xfree86-4.3.0/debian/xlibs-static-pic.install.netbsd-i386	2004-05-30 20:53:46.000000000 +0200
-@@ -1,4 +1,5 @@
- usr/X11R6/lib/libFS_pic.a
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xlibs-static-pic.install.knetbsd-i386 xfree86-4.3.0.dfsg.1/debian/xlibs-static-pic.install.knetbsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xlibs-static-pic.install.knetbsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xlibs-static-pic.install.knetbsd-i386	2004-06-08 22:04:16.000000000 +0200
+@@ -0,0 +1,18 @@
++usr/X11R6/lib/libFS_pic.a
 +usr/X11R6/lib/libGLw_pic.a
- usr/X11R6/lib/libXRes_pic.a
- usr/X11R6/lib/libXau_pic.a
- usr/X11R6/lib/libXdmcp_pic.a
-diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.config.in xfree86-4.3.0/debian/xserver-xfree86.config.in
---- xfree86-4.3.0.old/debian/xserver-xfree86.config.in	2004-05-30 20:53:27.000000000 +0200
-+++ xfree86-4.3.0/debian/xserver-xfree86.config.in	2004-05-30 20:53:46.000000000 +0200
-@@ -565,7 +565,7 @@
-     arm)
-       DRIVER_LIST="ati, chips, fbdev, glint, imstt, mga, s3virge, savage, tdfx, trident, vga"
-       ;;
--    i386|hurd-i386)
-+    i386|*-i386)
-       DRIVER_LIST="apm, ark, ati, chips, cirrus, cyrix, fbdev, glide, glint, i128, i740, i810, imstt, mga, neomagic, nv, rendition, s3, s3virge, savage, siliconmotion, sis, tdfx, tga, trident, tseng, vesa, vga, vmware"
-       ;;
-     ia64)
-diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.docs.kfreebsd-i386 xfree86-4.3.0/debian/xserver-xfree86.docs.kfreebsd-i386
---- xfree86-4.3.0.old/debian/xserver-xfree86.docs.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xserver-xfree86.docs.kfreebsd-i386	2004-05-30 20:53:46.000000000 +0200
++usr/X11R6/lib/libXRes_pic.a
++usr/X11R6/lib/libXau_pic.a
++usr/X11R6/lib/libXdmcp_pic.a
++usr/X11R6/lib/libXfontcache_pic.a
++usr/X11R6/lib/libXinerama_pic.a
++usr/X11R6/lib/libXss_pic.a
++usr/X11R6/lib/libXvMC_pic.a
++usr/X11R6/lib/libXxf86dga_pic.a
++usr/X11R6/lib/libXxf86misc_pic.a
++usr/X11R6/lib/libXxf86rush_pic.a
++usr/X11R6/lib/libXxf86vm_pic.a
++usr/X11R6/lib/libfontenc_pic.a
++usr/X11R6/lib/liboldX_pic.a
++usr/X11R6/lib/libxf86config_pic.a
++usr/X11R6/lib/libxkbfile_pic.a
++usr/X11R6/lib/libxkbui_pic.a
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xserver-xfree86.config.in xfree86-4.3.0.dfsg.1/debian/xserver-xfree86.config.in
+--- xfree86-4.3.0.dfsg.1/debian.old/xserver-xfree86.config.in	2004-06-08 02:17:23.000000000 +0200
++++ xfree86-4.3.0.dfsg.1/debian/xserver-xfree86.config.in	2004-06-08 02:21:04.000000000 +0200
+@@ -578,7 +578,7 @@
+     DRIVER_LIST=${DRIVER_LIST:=ati, chips, fbdev, glint, mga, nv, s3, s3virge, savage, sis, tdfx, trident, vga}
+     DEFAULT_DRIVER=fbdev
+     ;;
+-  hurd-i386)
++  *-i386)
+     DRIVER_LIST=${DRIVER_LIST:=apm, ark, ati, chips, cirrus, cyrix, fbdev, glint, i128, i740, i810, imstt, mga, neomagic, newport, nsc, nv, rendition, s3, s3virge, savage, siliconmotion, sis, tdfx, tga, trident, tseng, vesa, vga, vmware}
+     DEFAULT_DRIVER=vesa
+     ;;
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xserver-xfree86.docs.kfreebsd-i386 xfree86-4.3.0.dfsg.1/debian/xserver-xfree86.docs.kfreebsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xserver-xfree86.docs.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xserver-xfree86.docs.kfreebsd-i386	2004-06-08 02:19:15.000000000 +0200
 @@ -0,0 +1,19 @@
 +debian/tmp/usr/X11R6/lib/X11/doc/DESIGN
 +debian/tmp/usr/X11R6/lib/X11/doc/README.DGA
@@ -19431,9 +19207,9 @@ diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.docs.kfreebsd-i386 xfree86-4.
 +debian/tmp/usr/X11R6/lib/X11/doc/README.rendition
 +debian/tmp/usr/X11R6/lib/X11/doc/README.s3virge
 +debian/tmp/usr/X11R6/lib/X11/doc/Status
-diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.docs.netbsd-i386 xfree86-4.3.0/debian/xserver-xfree86.docs.netbsd-i386
---- xfree86-4.3.0.old/debian/xserver-xfree86.docs.netbsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xserver-xfree86.docs.netbsd-i386	2004-05-30 20:53:48.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xserver-xfree86.docs.knetbsd-i386 xfree86-4.3.0.dfsg.1/debian/xserver-xfree86.docs.knetbsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xserver-xfree86.docs.knetbsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xserver-xfree86.docs.knetbsd-i386	2004-06-08 22:04:16.000000000 +0200
 @@ -0,0 +1,19 @@
 +debian/tmp/usr/X11R6/lib/X11/doc/DESIGN
 +debian/tmp/usr/X11R6/lib/X11/doc/README.DGA
@@ -19454,9 +19230,9 @@ diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.docs.netbsd-i386 xfree86-4.3.
 +debian/tmp/usr/X11R6/lib/X11/doc/README.rendition
 +debian/tmp/usr/X11R6/lib/X11/doc/README.s3virge
 +debian/tmp/usr/X11R6/lib/X11/doc/Status
-diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.install.kfreebsd-i386 xfree86-4.3.0/debian/xserver-xfree86.install.kfreebsd-i386
---- xfree86-4.3.0.old/debian/xserver-xfree86.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xserver-xfree86.install.kfreebsd-i386	2004-05-30 20:53:46.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xserver-xfree86.install.kfreebsd-i386 xfree86-4.3.0.dfsg.1/debian/xserver-xfree86.install.kfreebsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xserver-xfree86.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xserver-xfree86.install.kfreebsd-i386	2004-06-08 21:53:51.000000000 +0200
 @@ -0,0 +1,180 @@
 +usr/X11R6/bin/XFree86
 +usr/X11R6/bin/gtf
@@ -19530,6 +19306,7 @@ diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.install.kfreebsd-i386 xfree86
 +usr/X11R6/lib/modules/drivers/tseng_drv.o
 +usr/X11R6/lib/modules/drivers/vesa_drv.o
 +usr/X11R6/lib/modules/drivers/vga_drv.o
++usr/X11R6/lib/modules/drivers/via_drv.o
 +usr/X11R6/lib/modules/drivers/vmware_drv.o
 +usr/X11R6/lib/modules/extensions/libGLcore.a
 +usr/X11R6/lib/modules/extensions/libdbe.a
@@ -19588,8 +19365,6 @@ diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.install.kfreebsd-i386 xfree86
 +usr/X11R6/lib/modules/libxf4bpp.a
 +usr/X11R6/lib/modules/libxf8_16bpp.a
 +usr/X11R6/lib/modules/libxf8_32bpp.a
-+usr/X11R6/lib/modules/v10002d.uc
-+usr/X11R6/lib/modules/v20002d.uc
 +usr/X11R6/man/man1/XFree86.1x
 +usr/X11R6/man/man1/gtf.1x
 +usr/X11R6/man/man4/apm.4x
@@ -19634,13 +19409,14 @@ diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.install.kfreebsd-i386 xfree86
 +usr/X11R6/man/man4/tseng.4x
 +usr/X11R6/man/man4/vesa.4x
 +usr/X11R6/man/man4/vga.4x
++usr/X11R6/man/man4/via.4x
 +usr/X11R6/man/man4/vmware.4x
 +usr/X11R6/man/man4/void.4x
 +usr/X11R6/man/man4/wacom.4x
 +usr/X11R6/man/man5/XF86Config-4.5x
-diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.install.netbsd-i386 xfree86-4.3.0/debian/xserver-xfree86.install.netbsd-i386
---- xfree86-4.3.0.old/debian/xserver-xfree86.install.netbsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xserver-xfree86.install.netbsd-i386	2004-05-30 20:53:48.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xserver-xfree86.install.knetbsd-i386 xfree86-4.3.0.dfsg.1/debian/xserver-xfree86.install.knetbsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xserver-xfree86.install.knetbsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xserver-xfree86.install.knetbsd-i386	2004-06-08 22:04:16.000000000 +0200
 @@ -0,0 +1,180 @@
 +usr/X11R6/bin/XFree86
 +usr/X11R6/bin/gtf
@@ -19714,6 +19490,7 @@ diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.install.netbsd-i386 xfree86-4
 +usr/X11R6/lib/modules/drivers/tseng_drv.o
 +usr/X11R6/lib/modules/drivers/vesa_drv.o
 +usr/X11R6/lib/modules/drivers/vga_drv.o
++usr/X11R6/lib/modules/drivers/via_drv.o
 +usr/X11R6/lib/modules/drivers/vmware_drv.o
 +usr/X11R6/lib/modules/extensions/libGLcore.a
 +usr/X11R6/lib/modules/extensions/libdbe.a
@@ -19772,8 +19549,6 @@ diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.install.netbsd-i386 xfree86-4
 +usr/X11R6/lib/modules/libxf4bpp.a
 +usr/X11R6/lib/modules/libxf8_16bpp.a
 +usr/X11R6/lib/modules/libxf8_32bpp.a
-+usr/X11R6/lib/modules/v10002d.uc
-+usr/X11R6/lib/modules/v20002d.uc
 +usr/X11R6/man/man1/XFree86.1x
 +usr/X11R6/man/man1/gtf.1x
 +usr/X11R6/man/man4/apm.4x
@@ -19818,13 +19593,14 @@ diff -Nur xfree86-4.3.0.old/debian/xserver-xfree86.install.netbsd-i386 xfree86-4
 +usr/X11R6/man/man4/tseng.4x
 +usr/X11R6/man/man4/vesa.4x
 +usr/X11R6/man/man4/vga.4x
++usr/X11R6/man/man4/via.4x
 +usr/X11R6/man/man4/vmware.4x
 +usr/X11R6/man/man4/void.4x
 +usr/X11R6/man/man4/wacom.4x
 +usr/X11R6/man/man5/XF86Config-4.5x
-diff -Nur xfree86-4.3.0.old/debian/xutils.install.kfreebsd-i386 xfree86-4.3.0/debian/xutils.install.kfreebsd-i386
---- xfree86-4.3.0.old/debian/xutils.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xutils.install.kfreebsd-i386	2004-05-30 20:53:46.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xutils.install.kfreebsd-i386 xfree86-4.3.0.dfsg.1/debian/xutils.install.kfreebsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xutils.install.kfreebsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xutils.install.kfreebsd-i386	2004-06-08 21:55:01.000000000 +0200
 @@ -0,0 +1,186 @@
 +etc/X11/rstart/commands/@List
 +etc/X11/rstart/commands/ListContexts
@@ -19836,7 +19612,6 @@ diff -Nur xfree86-4.3.0.old/debian/xutils.install.kfreebsd-i386 xfree86-4.3.0/de
 +etc/X11/rstart/contexts/@List
 +etc/X11/rstart/contexts/default
 +etc/X11/rstart/contexts/x11r6
-+etc/X11/rstart/rstartd.real
 +usr/X11R6/bin/atobm
 +usr/X11R6/bin/bdftopcf
 +usr/X11R6/bin/bdftruncate
@@ -19862,6 +19637,7 @@ diff -Nur xfree86-4.3.0.old/debian/xutils.install.kfreebsd-i386 xfree86-4.3.0/de
 +usr/X11R6/bin/revpath
 +usr/X11R6/bin/rstart
 +usr/X11R6/bin/rstartd
++usr/X11R6/bin/rstartd.real
 +usr/X11R6/bin/sessreg
 +usr/X11R6/bin/showfont
 +usr/X11R6/bin/showrgb
@@ -20012,9 +19788,9 @@ diff -Nur xfree86-4.3.0.old/debian/xutils.install.kfreebsd-i386 xfree86-4.3.0/de
 +usr/share/man/man8/update-fonts-alias.8
 +usr/share/man/man8/update-fonts-dir.8
 +usr/share/man/man8/update-fonts-scale.8
-diff -Nur xfree86-4.3.0.old/debian/xutils.install.netbsd-i386 xfree86-4.3.0/debian/xutils.install.netbsd-i386
---- xfree86-4.3.0.old/debian/xutils.install.netbsd-i386	1970-01-01 01:00:00.000000000 +0100
-+++ xfree86-4.3.0/debian/xutils.install.netbsd-i386	2004-05-30 20:53:48.000000000 +0200
+diff -Nur xfree86-4.3.0.dfsg.1/debian.old/xutils.install.knetbsd-i386 xfree86-4.3.0.dfsg.1/debian/xutils.install.knetbsd-i386
+--- xfree86-4.3.0.dfsg.1/debian.old/xutils.install.knetbsd-i386	1970-01-01 01:00:00.000000000 +0100
++++ xfree86-4.3.0.dfsg.1/debian/xutils.install.knetbsd-i386	2004-06-08 22:04:16.000000000 +0200
 @@ -0,0 +1,186 @@
 +etc/X11/rstart/commands/@List
 +etc/X11/rstart/commands/ListContexts
@@ -20026,7 +19802,6 @@ diff -Nur xfree86-4.3.0.old/debian/xutils.install.netbsd-i386 xfree86-4.3.0/debi
 +etc/X11/rstart/contexts/@List
 +etc/X11/rstart/contexts/default
 +etc/X11/rstart/contexts/x11r6
-+etc/X11/rstart/rstartd.real
 +usr/X11R6/bin/atobm
 +usr/X11R6/bin/bdftopcf
 +usr/X11R6/bin/bdftruncate
@@ -20052,6 +19827,7 @@ diff -Nur xfree86-4.3.0.old/debian/xutils.install.netbsd-i386 xfree86-4.3.0/debi
 +usr/X11R6/bin/revpath
 +usr/X11R6/bin/rstart
 +usr/X11R6/bin/rstartd
++usr/X11R6/bin/rstartd.real
 +usr/X11R6/bin/sessreg
 +usr/X11R6/bin/showfont
 +usr/X11R6/bin/showrgb
