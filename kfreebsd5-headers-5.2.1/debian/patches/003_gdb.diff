@@ -1,6 +1,6 @@
 diff -ur src.old/sys/sys/callout.h src/sys/sys/callout.h
---- src.old/sys/sys/callout.h	2004-08-03 02:14:03.000000000 +0200
-+++ src/sys/sys/callout.h	2004-08-03 02:20:50.000000000 +0200
+--- src.old/sys/sys/callout.h	2004-08-03 08:59:32.000000000 +0200
++++ src/sys/sys/callout.h	2004-08-07 00:24:00.000000000 +0200
 @@ -44,7 +44,7 @@
  
  #include <features.h>
@@ -11,8 +11,8 @@ diff -ur src.old/sys/sys/callout.h src/sys/sys/callout.h
  SLIST_HEAD(callout_list, callout);
  TAILQ_HEAD(callout_tailq, callout);
 diff -ur src.old/sys/sys/event.h src/sys/sys/event.h
---- src.old/sys/sys/event.h	2004-08-03 02:14:03.000000000 +0200
-+++ src/sys/sys/event.h	2004-08-03 02:20:50.000000000 +0200
+--- src.old/sys/sys/event.h	2004-08-03 10:17:59.000000000 +0200
++++ src/sys/sys/event.h	2004-08-07 00:24:00.000000000 +0200
 @@ -29,6 +29,8 @@
  #ifndef _SYS_EVENT_H_
  #define _SYS_EVENT_H_
@@ -23,14 +23,17 @@ diff -ur src.old/sys/sys/event.h src/sys/sys/event.h
  #define EVFILT_WRITE		(-2)
  #define EVFILT_AIO		(-3)	/* attached to aio requests */
 diff -ur src.old/sys/sys/filedesc.h src/sys/sys/filedesc.h
---- src.old/sys/sys/filedesc.h	2004-08-03 02:14:03.000000000 +0200
-+++ src/sys/sys/filedesc.h	2004-08-03 02:20:50.000000000 +0200
-@@ -38,7 +38,7 @@
- #define _SYS_FILEDESC_H_
- 
+--- src.old/sys/sys/filedesc.h	2004-08-03 10:20:40.000000000 +0200
++++ src/sys/sys/filedesc.h	2004-08-07 00:25:22.000000000 +0200
+@@ -40,7 +40,11 @@
+ #include <sys/_lock.h>
+ #include <sys/_mutex.h>
  #include <sys/types.h>
--#include <sys/queue.h>
-+#include "/usr/src/kfreebsd-headers/sys/queue.h"
++#ifdef _KERNEL
+ #include <sys/queue.h>
++#else
++#include "/usr/src/kfreebsd5-headers/sys/queue.h"
++#endif
  
  /*
   * This structure is used for the management of descriptors.  It may be

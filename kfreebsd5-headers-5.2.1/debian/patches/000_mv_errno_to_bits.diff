@@ -1,13 +1,7 @@
-
-This patch is equivalent to:
-
-  mkdir src/sys/bits
-  mv src/sys/{sys,bits}/errno.h
-
 diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 --- src.old/sys/bits/errno.h	1970-01-01 01:00:00.000000000 +0100
-+++ src/sys/bits/errno.h	2004-08-03 02:04:35.000000000 +0200
-@@ -0,0 +1,204 @@
++++ src/sys/bits/errno.h	2004-08-03 10:17:10.000000000 +0200
+@@ -0,0 +1,214 @@
 +/*
 + * Copyright (c) 1982, 1986, 1989, 1993
 + *	The Regents of the University of California.  All rights reserved.
@@ -46,7 +40,7 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 + * SUCH DAMAGE.
 + *
 + *	@(#)errno.h	8.5 (Berkeley) 1/21/94
-+ * $FreeBSD: src/sys/sys/errno.h,v 1.14.2.2 2002/01/22 10:46:56 keramida Exp $
++ * $FreeBSD: src/sys/sys/errno.h,v 1.25 2002/10/07 06:25:23 phk Exp $
 + */
 +
 +#ifndef _ERRNO_H_
@@ -86,7 +80,7 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 +#define	EFBIG		27		/* File too large */
 +#define	ENOSPC		28		/* No space left on device */
 +#define	ESPIPE		29		/* Illegal seek */
-+#define	EROFS		30		/* Read-only file system */
++#define	EROFS		30		/* Read-only filesystem */
 +#define	EMLINK		31		/* Too many links */
 +#define	EPIPE		32		/* Broken pipe */
 +
@@ -168,10 +162,9 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 +
 +#define	ENOLCK		77		/* No locks available */
 +#define	ENOSYS		78		/* Function not implemented */
-+
 +#define	EFTYPE		79		/* Inappropriate file type or format */
 +
-+#ifdef	__USE_BSD
++#ifdef __USE_BSD
 +#define	EAUTH		80		/* Authentication error */
 +#define	ENEEDAUTH	81		/* Need authenticator */
 +#define	EIDRM		82		/* Identifier removed */
@@ -188,10 +181,21 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 +
 +#ifdef _ERRNO_H
 +
-+#ifdef	__USE_BSD
-+#define	ELAST		86		/* Must be equal largest errno */
++#ifdef __USE_BSD
++#define	ENOATTR		87		/* Attribute not found */
++
++#define EDOOFUS		88		/* Programming error */
++
++#define	ELAST		88		/* Must be equal largest errno */
 +#endif /* __USE_BSD */
 +
++#ifdef _KERNEL
++/* pseudo-errors returned inside kernel to modify return to process */
++#define	ERESTART	(-1)		/* restart syscall */
++#define	EJUSTRETURN	(-2)		/* don't modify regs, just return */
++#define	ENOIOCTL	(-3)		/* ioctl not handled by this layer */
++#define	EDIRIOCTL	(-4)		/* do direct ioctl in GEOM */
++#endif
 +
 +#ifndef __ASSEMBLER__
 +/* We now need a declaration of the `errno' variable.  */
@@ -213,9 +217,9 @@ diff -Nur src.old/sys/bits/errno.h src/sys/bits/errno.h
 +
 +#endif /* <errno.h> included.  */
 diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
---- src.old/sys/sys/errno.h	2004-08-03 02:04:35.000000000 +0200
+--- src.old/sys/sys/errno.h	2004-08-03 10:17:10.000000000 +0200
 +++ src/sys/sys/errno.h	1970-01-01 01:00:00.000000000 +0100
-@@ -1,204 +0,0 @@
+@@ -1,214 +0,0 @@
 -/*
 - * Copyright (c) 1982, 1986, 1989, 1993
 - *	The Regents of the University of California.  All rights reserved.
@@ -254,7 +258,7 @@ diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
 - * SUCH DAMAGE.
 - *
 - *	@(#)errno.h	8.5 (Berkeley) 1/21/94
-- * $FreeBSD: src/sys/sys/errno.h,v 1.14.2.2 2002/01/22 10:46:56 keramida Exp $
+- * $FreeBSD: src/sys/sys/errno.h,v 1.25 2002/10/07 06:25:23 phk Exp $
 - */
 -
 -#ifndef _ERRNO_H_
@@ -294,7 +298,7 @@ diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
 -#define	EFBIG		27		/* File too large */
 -#define	ENOSPC		28		/* No space left on device */
 -#define	ESPIPE		29		/* Illegal seek */
--#define	EROFS		30		/* Read-only file system */
+-#define	EROFS		30		/* Read-only filesystem */
 -#define	EMLINK		31		/* Too many links */
 -#define	EPIPE		32		/* Broken pipe */
 -
@@ -376,10 +380,9 @@ diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
 -
 -#define	ENOLCK		77		/* No locks available */
 -#define	ENOSYS		78		/* Function not implemented */
--
 -#define	EFTYPE		79		/* Inappropriate file type or format */
 -
--#ifdef	__USE_BSD
+-#ifdef __USE_BSD
 -#define	EAUTH		80		/* Authentication error */
 -#define	ENEEDAUTH	81		/* Need authenticator */
 -#define	EIDRM		82		/* Identifier removed */
@@ -396,10 +399,21 @@ diff -Nur src.old/sys/sys/errno.h src/sys/sys/errno.h
 -
 -#ifdef _ERRNO_H
 -
--#ifdef	__USE_BSD
--#define	ELAST		86		/* Must be equal largest errno */
+-#ifdef __USE_BSD
+-#define	ENOATTR		87		/* Attribute not found */
+-
+-#define EDOOFUS		88		/* Programming error */
+-
+-#define	ELAST		88		/* Must be equal largest errno */
 -#endif /* __USE_BSD */
 -
+-#ifdef _KERNEL
+-/* pseudo-errors returned inside kernel to modify return to process */
+-#define	ERESTART	(-1)		/* restart syscall */
+-#define	EJUSTRETURN	(-2)		/* don't modify regs, just return */
+-#define	ENOIOCTL	(-3)		/* ioctl not handled by this layer */
+-#define	EDIRIOCTL	(-4)		/* do direct ioctl in GEOM */
+-#endif
 -
 -#ifndef __ASSEMBLER__
 -/* We now need a declaration of the `errno' variable.  */
