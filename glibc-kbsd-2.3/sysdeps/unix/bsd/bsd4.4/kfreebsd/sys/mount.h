@@ -28,7 +28,7 @@
 
 /* Mounting and unmounting filesystems.  */
 
-#include_next <sys/mount.h>
+#include "/usr/src/kfreebsd5-headers/sys/mount.h"
 
 __BEGIN_DECLS
 
