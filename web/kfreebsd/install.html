@@ -1,0 +1,141 @@
+<html>
+<head>
+<title>Installing Debian GNU/kFreeBSD</title>
+</head>
+<body text="#000000" bgcolor="#ffffff" link="#0000ff" alink="#0000ff" vlink="#880088">
+
+<table border=0 width=100% cellpadding=4>
+<tr>
+<td>
+
+<font face="verdana, arial, helvetica" size=-1>
+<b>Installing Debian GNU/kFreeBSD</b>
+
+<p><b>Introduction</b>
+<p><a href="http://www.debian.org/ports/freebsd/gnu-libc-based">GNU/kFreeBSD</a> is a port of the Debian packaging system 
+(dpkg, apt etc.) with the GNU C library and GNU userland, built on top of the <a href="http://www.freebsd.org">FreeBSD</a> kernel. 
+<br>There is also a port using FreeBSD's native C library <a href="http://www.debian.org/ports/freebsd/bsd-libc-based">here</a>, 
+but most of the project's focus is on the Glibc port. Oh. And there's the <a href="http://www.debian.org/ports/netbsd/">NetBSD</a> port too.
+
+<p><b>Requirements</b>
+
+<p><font color="red">Note:</font> Debian GNU/kFreeBSD isn't exactly a stable, polished system. The whole thing is still very alpha/beta (depending on how you look at it).
+<br>If you want to take on the task of installing it, you should have a good knowledge of FreeBSD (5.x in particular) and Debian GNU/Linux (preferably the unstable branch). 
+<br>The most important non-computer related requirement is probably time and patience. Set aside a day/night to get everything set up.
+
+
+<p>To install GNU/kFreeBSD you'll need some spare disk space (or a spare machine with disk space). Around 1Gb should be enough room.
+Add more space if you plan on building packages etc.
+<br>On the hardware side, any system that FreeBSD i386 supports will be fine.
+When it comes to turning a FreeBSD system into GNU/kFreeBSD, you'll need to use crosshurd to build your own base tarball from the latest packages.
+To get crosshurd simply apt-get install crosshurd. Before you start installing FreeBSD you have to generate your own kFreeBSD tarball with crosshurd. 
+
+<p><font color="red">Note:</font> Before you make your tarball you'll need to edit /usr/bin/dpkg-architecture and change 'freebsd-i386' to 'kfreebsd-i386' in the archtable list of system types.
+<br>When you run crosshurd you will be asked to specify a target directory. This is where the contents of the soon-to-be downloaded 
+kFreeBSD system will be stored. This directory can be anywhere, as long as you have enough disk space. Target system is 
+kfreebsd-gnu. Crosshurd will now download the packages needed to build a minimal base system. Once crosshurd is finished you should 
+have everything you need in your target directory to create a base tarball.
+
+<p><i># tar -jcpf gnu-kfreebsd.tar.bz2 /your/target/directory/</i>
+
+<p>The j tar option is for creating an archive compressed in bzip2 format. You can use z for a gzip archive.
+
+<p><b>Getting started</b>
+<p>As the name suggests, you'll need an existing FreeBSD system. So, stick a FreeBSD CD/floppy in and get started.
+<br>If you've never installled FreeBSD maybe this isn't for you. But, if you <i>really</i> think you can handle it, 
+start with the almighty <a href="http://www.freebsd.org/handbook/">FreeBSD handbook</a>. 
+<br>When you install FreeBSD, only go with the very basics. eg. no XFree86 or any other FreeBSD packages or ports stuff, 
+since you'll be wanting to install all that sort of stuff from the proper Debian packages through apt.
+Version wise, you should be ok with any 5.x release. FreeBSD 4.x is also known to work.
+
+<p>When installing make sure you create one big fat slice mounted as /, and leave room for swap of course.
+<br>If you use multiple mount points for /usr, /home etc. the script used to convert your system to GNU/kFreeBSD won't work.
+
+<!-- <p><i>title Debian GNU/kFreeBSD
+<br>root (foo)
+<br>kernel /boot/loader
+</i> -->
+
+<p><b>Converting to GNU/kFreeBSD</b>
+<p>You'll need the <a href="http://glibc-bsd.alioth.debian.org/kfreebsd/scripts/swap">swap</a> script and your kfreebsd tarball.
+<br>Place them anywhere on your FreeBSD system and create a temporary directory to extract the base system into.
+<br>Now extract the tarball.
+
+<p><i># mkdir /gkf
+<br># mv /tarball_location/gnu-kfreebsd.tar.bz2 /gkf
+<br># cd /gkf
+<br># tar --same-owner -jxvpf gnu-kfreebsd.tar.bz2
+</i>
+<p><b>Don't</b> extract it in / !
+
+<p>Now mount devfs:
+
+<p><i># mount_devfs /dev /gkf/dev</i>
+
+<p>Now chroot into the extracted kFreeBSD system and run the native-install script to configure the soon-to-be new system:
+
+<p><i># chroot /gkf
+<br># /native-install
+</i>
+
+<p>Exit the chroot and unmount /gkf/dev.
+
+<p>Now it's time to convert. 
+<br><font color="red">Note:</font> There's always a chance that this might destroy your installation, 
+so don't do it to a system that contains important data or runs crucial services.
+
+<p>The swap script is used to switch the normal FreeBSD / contents with the GNU/kFreeBSD system contents of /gkf.
+<br>Make sure the script is executable.
+
+<p><i># chmod u+x swap</i>
+
+<p>Run the script and specify the tarball contents location. Make sure the only filesystems mounted are / and /dev before you run the script.
+
+<p><i># ./swap /gkf</i>
+
+<p>Once you've done this, you've got a GNU/kFreeBSD system.
+
+<p>Before you reboot make sure your /etc/fstab actually matches your system's configuration.
+<br>You might also want to check /etc/network/interfaces is configured properly, especially if ethernet is your only method of accessing the machine.
+<br><font color="red">Note:</font> For GRUB users, the latest version now supports UFS2. You can use the following configuration.
+
+<p><i>title Debian GNU/kFreeBSD
+<br>root (foo)
+<br>kernel /boot/loader
+</i>
+
+<p>Now reboot and hope everything goes fine. You'll see a lot of daemon-related errors and other things, so don't freak out.
+
+<p><b>Post installation notes</b>
+<p>Once you've got the base system running, you'll need to do and know a few things.
+
+<p>Stopping and starting daemons is done the Debian way with /etc/init.d/foo start|stop.
+<br>This isn't completely bug-free on GNU/kFreeBSD though. Sometimes stopping or starting a daemon just doesn't work.
+<br>This means you may need to manually kill a process to stop a daemon or remove its' pid file before one will start. This is a known bug.
+
+<p>DNS resolving is broken due to Glibc issues, so you'll have to make sure /etc/hosts contains hostnames and corresponding ip addresses for any servers you want to access.
+<br>MX resolving also doesn't work, so MTA's (postfix, sendmail etc.) are borked too.
+
+<p>If you find some things like ps are broken (due to version mismatches etc.), remember you have a complete backup of your original FreeBSD system in /old.
+<br>The /old directory can be very helpful when it comes to breakage solutions. Try copying or symlinking to the original FreeBSD counterparts and their required libraries.
+
+<p>There have been reports of problems with /usr/share/info/dir. One workaround is to copy the file from a Linux system 
+and remove all of the contents except for the stuff at the top of the file.
+
+<p>That's it! Start installing packages. Don't expect everything to be perfect and non-broken though.
+<br>Have fun :)
+
+<p><br>Any comments or complaints about this guide can be directed to jrac at tsn dot cc or on Jabber at penix@jabber.org.
+<br>For further help with GNU/kFreeBSD related matters, try the <a href="http://lists.alioth.debian.org/mailman/listinfo/glibc-bsd-devel">glibc-bsd-devel</a>
+mailing list for Glibc-based port discussion or the <a href="http://lists.debian.org/debian-bsd">debian-bsd</a> list for general Debian GNU/*BSD related matters.
+<br>Make sure you search the archives before you post!
+
+<p><br><font size=-2>Last modified: Mon, May 24 2:05 AEST 2004</font>
+
+</td>
+</tr>
+</table>
+
+</body>
+</html>
+
