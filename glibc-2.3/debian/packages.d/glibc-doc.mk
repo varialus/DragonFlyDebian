@@ -8,17 +8,21 @@ $(glibc)-doc:	$(stamp_install) debian/control $(mkdir)/sysdeps.mk
 	-gzip -9f $(tmpdir)/$@$(infodir)/*
 
 	$(make_directory) $(tmpdir)/$@$(mandir)/man3
+ifeq ($(threads),yes)
 	$(INSTALL_DATA) $(srcdir)/linuxthreads/man/*.man \
 		$(tmpdir)/$@$(mandir)/man3/.
 	for manfile in $(tmpdir)/$@$(mandir)/man3/*; do \
 		mv $$manfile `echo $$manfile | sed 's/\.man/\.3/'`; \
 	done
+endif
 	-gzip -9f $(tmpdir)/$@$(mandir)/man?/*
+ifeq ($(threads),yes)
 	for manfile in pthread_getspecific.3.gz pthread_key_delete.3.gz \
 			 pthread_setspecific.3.gz; do \
 		ln -sf pthread_key_create.3.gz \
 			$(tmpdir)/$@$(mandir)/man3/$$manfile ;	\
 	done
+endif
 
 	$(make_directory) $(tmpdir)/$@$(docdir)/$@
 	$(MAKE) -C $(objdir) subdirs=manual info
@@ -34,7 +38,9 @@ $(glibc)-doc:	$(stamp_install) debian/control $(mkdir)/sysdeps.mk
 	$(INSTALL_DATA) $(srcdir)/ChangeLog* $(tmpdir)/$@$(docdir)/$@/.
 	-gzip -f9 $(tmpdir)/$@$(docdir)/$@/ChangeLog*
 	ln -sf ChangeLog.gz $(tmpdir)/$@$(docdir)/$@/changelog.gz
+ifeq ($(threads),yes)
 	$(INSTALL_DATA) $(srcdir)/linuxthreads/FAQ.html $(tmpdir)/$@$(docdir)/$@/FAQ.threads.html
+endif
 	$(INSTALL_DATA) debian/changelog $(tmpdir)/$@$(docdir)/$@/changelog.Debian
 	-gzip -f9 $(tmpdir)/$@$(docdir)/$@/changelog.Debian
 	$(INSTALL_DATA) debian/copyright $(tmpdir)/$@$(docdir)/$@/.
