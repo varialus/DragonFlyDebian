@@ -1,16 +1,6 @@
---- mozilla/directory/c-sdk/ldap/include/portable.h~	2003-09-17 05:18:10.000000000 +0200
-+++ mozilla/directory/c-sdk/ldap/include/portable.h	2004-07-27 01:35:13.000000000 +0200
-@@ -320,7 +320,7 @@
- #endif
- #if defined(hpux9) || defined(LINUX1_2) || defined(SUNOS4) || defined(SNI) || \
-     defined(SCOOS) || defined(BSDI) || defined(NCR) || defined(VMS) || \
--    defined(NEC) || defined(LINUX) || (defined(AIX) && !defined(USE_REENTRANT_LIBC))
-+    defined(NEC) || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) || (defined(AIX) && !defined(USE_REENTRANT_LIBC))
- #define STRTOK( s1, s2, l )		strtok( s1, s2 )
- #else
- #define HAVE_STRTOK_R
---- mozilla/directory/c-sdk/ldap/include/portable.h~	2004-07-27 02:03:26.000000000 +0200
-+++ mozilla/directory/c-sdk/ldap/include/portable.h	2004-07-27 02:22:33.000000000 +0200
+diff -ur mozilla.old/directory/c-sdk/ldap/include/portable.h mozilla/directory/c-sdk/ldap/include/portable.h
+--- mozilla.old/directory/c-sdk/ldap/include/portable.h	2003-09-17 05:18:10.000000000 +0200
++++ mozilla/directory/c-sdk/ldap/include/portable.h	2004-12-10 17:47:24.000000000 +0100
 @@ -116,7 +116,7 @@
   * some systems don't have the BSD re_comp and re_exec routines
   */
@@ -76,20 +66,28 @@
      defined(SCOOS) || defined(BSDI) || defined(NCR) || \
      defined(NEC) || ( defined(HPUX10) && !defined(_REENTRANT)) || \
      (defined(AIX) && !defined(USE_REENTRANT_LIBC))
-diff -ur mozilla/directory.old/c-sdk/ldap/libraries/libldap/Makefile.in mozilla/directory/c-sdk/ldap/libraries/libldap/Makefile.in
---- mozilla/directory.old/c-sdk/ldap/libraries/libldap/Makefile.in	2004-03-10 19:47:25.000000000 +0100
-+++ mozilla/directory/c-sdk/ldap/libraries/libldap/Makefile.in	2004-07-27 03:54:23.000000000 +0200
-@@ -168,7 +168,8 @@
+@@ -320,7 +319,7 @@
+ #endif
+ #if defined(hpux9) || defined(LINUX1_2) || defined(SUNOS4) || defined(SNI) || \
+     defined(SCOOS) || defined(BSDI) || defined(NCR) || defined(VMS) || \
+-    defined(NEC) || defined(LINUX) || (defined(AIX) && !defined(USE_REENTRANT_LIBC))
++    defined(NEC) || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) || (defined(AIX) && !defined(USE_REENTRANT_LIBC))
+ #define STRTOK( s1, s2, l )		strtok( s1, s2 )
+ #else
+ #define HAVE_STRTOK_R
+diff -ur mozilla.old/directory/c-sdk/ldap/libraries/libldap/Makefile.in mozilla/directory/c-sdk/ldap/libraries/libldap/Makefile.in
+--- mozilla.old/directory/c-sdk/ldap/libraries/libldap/Makefile.in	2004-12-10 17:43:58.000000000 +0100
++++ mozilla/directory/c-sdk/ldap/libraries/libldap/Makefile.in	2004-12-10 17:48:19.000000000 +0100
+@@ -168,7 +168,7 @@
  EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME) $(OS_LIBS) -lc
  endif
  
 -ifeq ($(OS_ARCH), Linux)
-+
 +ifneq (,$(findstring $(OS_ARCH),Linux GNU))
- EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME)
+ EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME) -lpthread
  endif
  
-@@ -286,7 +287,7 @@
+@@ -286,7 +286,7 @@
  ifdef SO_FILES_TO_REMOVE
  	-$(RM) $(SO_FILES_TO_REMOVE)
  endif
