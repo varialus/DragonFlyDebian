@@ -11,6 +11,18 @@ diff -Nur sysvinit-2.85.old/debian/changelog sysvinit-2.85/debian/changelog
  sysvinit (2.85-16) unstable; urgency=high
  
    * Remove /etc/init.d/{mountkernfs,devpts.sh) that glibc installed
+diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/bootmisc.sh sysvinit-2.85/debian/initscripts/etc/init.d/bootmisc.sh
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/bootmisc.sh	2004-06-04 00:31:30.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/bootmisc.sh	2004-06-04 00:46:41.000000000 +0200
+@@ -55,7 +55,7 @@
+ #
+ #	Save kernel messages in /var/log/dmesg
+ #
+-if [ -x /bin/dmesg ]
++if [ -x `which dmesg` ]
+ then
+ 	dmesg -s 524288 > /var/log/dmesg
+ elif [ -c /dev/klog ]
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh
 --- sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh	2004-06-04 00:31:30.000000000 +0200
 +++ sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh	2004-06-04 00:26:00.000000000 +0200
