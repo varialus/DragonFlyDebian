@@ -1,0 +1,27 @@
+
+Status: in BTS.
+
+diff -ur pdfkit.framework-0.8.old/GNUmakefile pdfkit.framework-0.8/GNUmakefile
+--- pdfkit.framework-0.8.old/GNUmakefile	2004-10-11 19:24:33.000000000 +0200
++++ pdfkit.framework-0.8/GNUmakefile	2004-12-20 05:13:09.000000000 +0100
+@@ -53,7 +53,7 @@
+ 
+ ADDITIONAL_INCLUDE_DIRS = -Ixpdf/bridge
+ ADDITIONAL_OBJCFLAGS = -Wall
+-ADDITIONAL_LDFLAGS = $(XPDF_OBJ_FILES) -lfreetype -lm
++ADDITIONAL_LDFLAGS = $(XPDF_OBJ_FILES) -lfreetype -lm -lpaper
+ 
+ ifdef LIB_FREETYPE_LIBS
+    ADDITIONAL_LDFLAGS += -L$(LIB_FREETYPE_LIBS)
+diff -ur pdfkit.framework-0.8.old/debian/control pdfkit.framework-0.8/debian/control
+--- pdfkit.framework-0.8.old/debian/control	2004-12-20 05:17:04.000000000 +0100
++++ pdfkit.framework-0.8/debian/control	2004-12-20 05:18:20.000000000 +0100
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Brent A. Fulgham <bfulgham@debian.org>
+ Uploaders: Eric Heintzmann <eric@gnustep.fr.st>
+-Build-Depends: debhelper (>= 4.0.0), libfreetype6-dev, libgnustep-gui0.9-dev (>= 0.9.4)
++Build-Depends: debhelper (>= 4.0.0), libfreetype6-dev, libgnustep-gui0.9-dev (>= 0.9.4), libpaper-dev
+ Standards-Version: 3.6.1.1
+ 
+ 
