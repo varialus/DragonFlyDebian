@@ -50,8 +50,10 @@ clean::
 		| sed "s/@revision@/$(revision)/g" \
 		> debian/patches/902_debian_version.diff
 
-	cat debian/control.in.in \
-		| sed "s/@kfreebsd-gnu@/`type-handling any kfreebsd-gnu`/g" \
-		> debian/control.in
+	sed \
+		-e "s/@kfreebsd-gnu@/`type-handling any kfreebsd-gnu`/g" \
+		-e "s/@major@/$(major)/g" \
+		-e "s/@version@/$(version)/g" \
+	> debian/control.in < debian/control.in.in
 
 	rm -f debian/stamp-build
