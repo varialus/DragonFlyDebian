@@ -1,26 +1,24 @@
 #!/usr/bin/make -f
 
+major = 5
+package = kfreebsd$(major)-headers
+
 DEB_TAR_SRCDIR			:= src
 DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
+DEB_PATCHDIRS			:= /usr/src/kfreebsd$(major)/patches \
+	debian/patches
+DEB_PATCHDIRS_READONLY		:= yes
 
-# for dpkg-architecture
-include /usr/share/cdbs/1/rules/buildvars.mk
-
-kfreebsd_cpu	:= $(DEB_HOST_GNU_CPU)
-ifeq ($(kfreebsd_cpu), x86_64)
-kfreebsd_cpu	:= amd64
-endif
-
-binary/kfreebsd5-headers:: common-install-prehook-arch
-	ln -sf $(kfreebsd_cpu)/include $(DEB_SRCDIR)/sys/machine
-	mkdir -p debian/kfreebsd5-headers/usr/src/kfreebsd5-headers
-	cp -a $(DEB_SRCDIR)/sys/* \
-		debian/kfreebsd5-headers/usr/src/kfreebsd5-headers/
+binary/$(package):: common-install-prehook-arch
+	for i in `cd $(DEB_SRCDIR)/sys ; find . -type f -name "*.h"` ; do \
+		mkdir -p debian/$(package)/usr/src/$(package)/$$i ; \
+		rmdir debian/$(package)/usr/src/$(package)/$$i ; \
+		cp $(DEB_SRCDIR)/sys/$$i \
+		debian/$(package)/usr/src/$(package)/$$i ; \
+	done
 
 clean::
-	sed \
-		-e "s/@arches@/`type-handling any kfreebsd-gnu`/g" \
-	< debian/control.in.in > debian/control.in
+	ln -sf /usr/src/kfreebsd$(major)/src.tar* $(CURDIR)/
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/tarball.mk

@@ -1,0 +1,185 @@
+diff -ur src.old/sys/dev/usb/usb.h src/sys/dev/usb/usb.h
+--- src.old/sys/dev/usb/usb.h	2005-03-02 21:21:45.000000000 +0100
++++ src/sys/dev/usb/usb.h	2005-03-02 21:26:56.000000000 +0100
+@@ -101,7 +101,7 @@
+ #if defined(__FreeBSD_kernel__) && (__FreeBSD_version <= 500014)
+ #define UPACKED __attribute__ ((packed))
+ #else
+-#define UPACKED __packed
++#define UPACKED
+ #endif
+ 
+ typedef struct {
+diff -ur src.old/sys/i386/include/cpufunc.h src/sys/i386/include/cpufunc.h
+--- src.old/sys/i386/include/cpufunc.h	2004-04-07 22:46:05.000000000 +0200
++++ src/sys/i386/include/cpufunc.h	2005-03-02 21:28:56.000000000 +0100
+@@ -193,57 +193,12 @@
+ 	return (data);
+ }
+ 
+-static __inline u_int
+-inl(u_int port)
+-{
+-	u_int	data;
+-
+-	__asm __volatile("inl %%dx,%0" : "=a" (data) : "d" (port));
+-	return (data);
+-}
+-
+-static __inline void
+-insb(u_int port, void *addr, size_t cnt)
+-{
+-	__asm __volatile("cld; rep; insb"
+-			 : "+D" (addr), "+c" (cnt)
+-			 : "d" (port)
+-			 : "memory");
+-}
+-
+-static __inline void
+-insw(u_int port, void *addr, size_t cnt)
+-{
+-	__asm __volatile("cld; rep; insw"
+-			 : "+D" (addr), "+c" (cnt)
+-			 : "d" (port)
+-			 : "memory");
+-}
+-
+-static __inline void
+-insl(u_int port, void *addr, size_t cnt)
+-{
+-	__asm __volatile("cld; rep; insl"
+-			 : "+D" (addr), "+c" (cnt)
+-			 : "d" (port)
+-			 : "memory");
+-}
+-
+ static __inline void
+ invd(void)
+ {
+ 	__asm __volatile("invd");
+ }
+ 
+-static __inline u_short
+-inw(u_int port)
+-{
+-	u_short	data;
+-
+-	__asm __volatile("inw %%dx,%0" : "=a" (data) : "d" (port));
+-	return (data);
+-}
+-
+ static __inline void
+ outbv(u_int port, u_char data)
+ {
+@@ -259,47 +214,6 @@
+ }
+ 
+ static __inline void
+-outl(u_int port, u_int data)
+-{
+-	/*
+-	 * outl() and outw() aren't used much so we haven't looked at
+-	 * possible micro-optimizations such as the unnecessary
+-	 * assignment for them.
+-	 */
+-	__asm __volatile("outl %0,%%dx" : : "a" (data), "d" (port));
+-}
+-
+-static __inline void
+-outsb(u_int port, const void *addr, size_t cnt)
+-{
+-	__asm __volatile("cld; rep; outsb"
+-			 : "+S" (addr), "+c" (cnt)
+-			 : "d" (port));
+-}
+-
+-static __inline void
+-outsw(u_int port, const void *addr, size_t cnt)
+-{
+-	__asm __volatile("cld; rep; outsw"
+-			 : "+S" (addr), "+c" (cnt)
+-			 : "d" (port));
+-}
+-
+-static __inline void
+-outsl(u_int port, const void *addr, size_t cnt)
+-{
+-	__asm __volatile("cld; rep; outsl"
+-			 : "+S" (addr), "+c" (cnt)
+-			 : "d" (port));
+-}
+-
+-static __inline void
+-outw(u_int port, u_short data)
+-{
+-	__asm __volatile("outw %0,%%dx" : : "a" (data), "d" (port));
+-}
+-
+-static __inline void
+ ia32_pause(void)
+ {
+ 	__asm __volatile("pause");
+@@ -629,16 +543,11 @@
+ void	halt(void);
+ void	ia32_pause(void);
+ u_char	inb(u_int port);
+-u_int	inl(u_int port);
+-void	insb(u_int port, void *addr, size_t cnt);
+-void	insl(u_int port, void *addr, size_t cnt);
+-void	insw(u_int port, void *addr, size_t cnt);
+ register_t	intr_disable(void);
+ void	intr_restore(register_t ef);
+ void	invd(void);
+ void	invlpg(u_int addr);
+ void	invltlb(void);
+-u_short	inw(u_int port);
+ void	lidt(struct region_descriptor *addr);
+ void	lldt(u_short sel);
+ void	load_cr0(u_int cr0);
+@@ -656,11 +565,6 @@
+ void	load_gs(u_int sel);
+ void	ltr(u_short sel);
+ void	outb(u_int port, u_char data);
+-void	outl(u_int port, u_int data);
+-void	outsb(u_int port, const void *addr, size_t cnt);
+-void	outsl(u_int port, const void *addr, size_t cnt);
+-void	outsw(u_int port, const void *addr, size_t cnt);
+-void	outw(u_int port, u_short data);
+ u_int	rcr0(void);
+ u_int	rcr2(void);
+ u_int	rcr3(void);
+diff -ur src.old/sys/sys/_types.h src/sys/sys/_types.h
+--- src.old/sys/sys/_types.h	2004-06-19 19:58:32.000000000 +0200
++++ src/sys/sys/_types.h	2005-03-02 21:27:37.000000000 +0100
+@@ -31,16 +31,14 @@
+ 
+ #include <sys/cdefs.h>
+ #include <machine/_types.h>
++#include <sys/types.h>
+ 
+ /*
+  * Standard type definitions.
+  */
+ typedef	__int32_t	__clockid_t;	/* clock_gettime()... */
+ typedef	__uint32_t	__fflags_t;	/* file flags */
+-typedef	__uint64_t	__fsblkcnt_t;
+-typedef	__uint64_t	__fsfilcnt_t;
+ typedef	__uint32_t	__gid_t;
+-typedef	__int64_t	__id_t;		/* can hold a gid_t, pid_t, or uid_t */
+ typedef	__uint32_t	__ino_t;	/* inode number */
+ typedef	long		__key_t;	/* IPC key (for Sys V IPC) */
+ typedef	__int32_t	__lwpid_t;	/* Thread ID (a.k.a. LWP) */
+@@ -84,13 +82,4 @@
+ 
+ typedef	__uint32_t	__fixpt_t;	/* fixed point number */
+ 
+-/*
+- * mbstate_t is an opaque object to keep conversion state during multibyte
+- * stream conversions.
+- */
+-typedef union {
+-	char		__mbstate8[128];
+-	__int64_t	_mbstateL;	/* for alignment */
+-} __mbstate_t;
+-
+ #endif /* !_SYS__TYPES_H_ */
