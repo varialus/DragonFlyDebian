@@ -1,0 +1,81 @@
+diff -ur openssl-0.9.7e.old/Configure openssl-0.9.7e/Configure
+--- openssl-0.9.7e.old/Configure	2004-12-05 17:55:48.000000000 +0100
++++ openssl-0.9.7e/Configure	2004-12-05 17:53:48.000000000 +0100
+@@ -595,8 +595,11 @@
+ ##### Sony NEWS-OS 4.x
+ "newsos4-gcc","gcc:-O -DB_ENDIAN::(unknown):NEWS4:-lmld -liberty:BN_LLONG RC4_CHAR RC4_CHUNK DES_PTR DES_RISC1 DES_UNROLL BF_PTR::::",
+ 
+-##### GNU Hurd
+-"hurd-x86",  "gcc:-DL_ENDIAN -DTERMIOS -O3 -fomit-frame-pointer -m486 -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC",
++##### GNUish (Glibc-based) systems
++"i386-gnuish","gcc:-DL_ENDIAN -DTERMIOS -O3 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}::::::::::dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
++"i486-gnuish","gcc:-DL_ENDIAN -DTERMIOS -O3 -march=i486 -mcpu=i486 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
++"i586-gnuish","gcc:-DL_ENDIAN -DTERMIOS -O3 -march=i586 -mcpu=i586 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
++"i686-gnuish","gcc:-DL_ENDIAN -DTERMIOS -O3 -march=i686 -mcpu=i686 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
+ 
+ ##### OS/2 EMX
+ "OS2-EMX", "gcc::::::::",
+diff -ur openssl-0.9.7e.old/debian/rules openssl-0.9.7e/debian/rules
+--- openssl-0.9.7e.old/debian/rules	2004-12-05 17:55:49.000000000 +0100
++++ openssl-0.9.7e/debian/rules	2004-12-05 17:54:59.000000000 +0100
+@@ -17,6 +17,7 @@
+ export VERSION=$(shell dpkg-parsechangelog | grep '^Version:' | sed -e 's/^.*://' -e 's/-.*//')
+ 
+ # The binary architeture
++DEB_HOST_GNU_SYSTEM = $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+ DEB_HOST_ARCH = $(shell dpkg-architecture -qDEB_HOST_ARCH)
+ 
+ CONFARGS  = --prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5
+@@ -27,12 +28,18 @@
+ OPTS      = $($(ARCHOPTS))
+ WANTED_LIBC_VERSION = 2.3.1-10
+ 
++ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
++HOST_ARCH = debian-$(DEB_HOST_ARCH)
++else
++HOST_ARCH = $(shell ./config -t | grep '^Operating system: ' | cut -d ' ' -f 3)
++endif
++
+ build:
+ 	dh_testdir
+ 	perl util/perlpath.pl /usr/bin
+ #	perl util/ssldir.pl /usr/lib/ssl
+ #	chmod +x debian/libtool
+-	./Configure no-shared $(CONFARGS) debian-$(DEB_HOST_ARCH)
++	./Configure no-shared $(CONFARGS) $(HOST_ARCH)
+ 	make -f Makefile DIRS="crypto ssl" all
+ 	mv libcrypto.a libcrypto.static
+ 	mv libssl.a libssl.static
+@@ -40,20 +47,20 @@
+ 	test -z "$(OPTS)" || for opt in $(OPTS); \
+ 	do \
+ 		set -xe; \
+-		./Configure shared $(CONFARGS) debian-$(DEB_HOST_ARCH)-$$opt; \
++		./Configure shared $(CONFARGS) $(HOST_ARCH)-$$opt; \
+ 		make -f Makefile DIRS="crypto ssl" all; \
+ 		mkdir -p $$opt; \
+ 		mv libcrypto.so* libssl.so* $$opt/; \
+ 		make -f Makefile DIRS="crypto ssl" clean; \
+ 	done
+-	./Configure shared $(CONFARGS) debian-$(DEB_HOST_ARCH)
++	./Configure shared $(CONFARGS) $(HOST_ARCH)
+ 	#make -f Makefile depend
+ 	ln -sf apps/openssl.pod crypto/crypto.pod ssl/ssl.pod doc/
+ #	make -f Makefile linux-shared
+ 	make -f Makefile all
+ #	strip apps/openssl
+ #	make -f Makefile clean DIRS="crypto ssl"
+-#	./Configure --prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5 debian-$(DEB_HOST_ARCH)
++#	./Configure --prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5 $(HOST_ARCH)
+ #	make -f Makefile all DIRS="crypto ssl"
+ 	touch build
+ 
+@@ -62,7 +69,7 @@
+ 	dh_testroot
+ 	-rm -f build
+ 	perl util/perlpath.pl /usr/bin
+-	./Configure $(CONFARGS) debian-$(DEB_HOST_ARCH)
++	./Configure $(CONFARGS) $(HOST_ARCH)
+ 	-make -f Makefile  clean clean-shared
+ 	#-make -f Makefile  dclean
+ 	perl util/perlpath.pl /usr/local/bin
