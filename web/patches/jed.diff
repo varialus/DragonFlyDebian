@@ -1,0 +1,30 @@
+ asac: jed in console has some emacs and fried like weird_segfault
+  behaviour like emacs-nox ... segfaults on ctrl-space. Nevertheless, 
+  xjed appears to work fine with this patch. Currently disabled architecture 
+  check for XRENDERFONTLIBS by 'if [true]' => ATM I can't imagine a debian
+  architecture that has no xft; but maybe I am wrong!
+
+diff -uwr /tmp/jed-0.99.16/debian/control jed-0.99.16/debian/control
+--- /tmp/jed-0.99.16/debian/control	2005-03-18 23:43:50.000000000 +0100
++++ jed-0.99.16/debian/control	2005-03-18 01:03:45.000000000 +0100
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Debian JED Group <pkg-jed-devel@lists.alioth.debian.org>
+ Standards-Version: 3.6.1
+-Build-Depends: debhelper (>= 4), hevea, libgpmg1-dev (>= 1.17.8-18) [!hurd-i386], perl (>= 5.004.05-1.1), perl-base (>= 5.004.05-1.1), slang1-dev (>= 1.3.11), xlibs-dev (>= 4.0.1-10), libfreetype6-dev (>= 2.0.1-1), libxft-dev, dpatch
++Build-Depends: debhelper (>= 4), hevea, libgpmg1-dev (>= 1.17.8-18) [!hurd-i386,kfreebsd-i386], perl (>= 5.004.05-1.1), perl-base (>= 5.004.05-1.1), slang1-dev (>= 1.3.11), xlibs-dev (>= 4.0.1-10), libfreetype6-dev (>= 2.0.1-1), libxft-dev, dpatch
+ 
+ Package: jed
+ Architecture: any
+diff -uwr /tmp/jed-0.99.16/debian/rules jed-0.99.16/debian/rules
+--- /tmp/jed-0.99.16/debian/rules	2005-03-18 23:43:50.000000000 +0100
++++ jed-0.99.16/debian/rules	2005-03-18 01:39:18.000000000 +0100
+@@ -30,7 +30,7 @@
+ 	@echo
+ 	@echo "--- activate xrenderfont support patch for Linux ---"
+ 	@echo
+-	if [ "`uname -s`" = "Linux" ]; then \
++	if [ true ]; then \
+ 		perl -w -i -p \
+ 			-e 's/#XRENDERFONTLIBS/XRENDERFONTLIBS/;' \
+ 			src/Makefile; \
