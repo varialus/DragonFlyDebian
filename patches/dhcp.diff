@@ -1,0 +1,76 @@
+
+Status: dirty
+
+diff -ur dhcp-2.0pl5.old/common/dispatch.c dhcp-2.0pl5/common/dispatch.c
+--- dhcp-2.0pl5.old/common/dispatch.c	1999-07-13 14:51:55.000000000 +0200
++++ dhcp-2.0pl5/common/dispatch.c	2004-10-04 22:41:52.000000000 +0200
+@@ -167,7 +167,7 @@
+ 
+ 		/* If we have the capability, extract link information
+ 		   and record it in a linked list. */
+-#ifdef HAVE_AF_LINK
++#if defined(HAVE_AF_LINK) && defined(__linux__)
+ 		if (ifp -> ifr_addr.sa_family == AF_LINK) {
+ 			struct sockaddr_dl *foo = ((struct sockaddr_dl *)
+ 						   (&ifp -> ifr_addr));
+diff -ur dhcp-2.0pl5.old/configure dhcp-2.0pl5/configure
+--- dhcp-2.0pl5.old/configure	1999-07-13 20:38:55.000000000 +0200
++++ dhcp-2.0pl5/configure	2004-10-04 21:39:40.000000000 +0200
+@@ -19,19 +19,16 @@
+       if [ $machine = 'alpha' ]; then
+         sysname=alphaosf
+       fi;;
+-    Linux)
++    Linux|GNU|GNU/*)
+       release=`uname -r`
+       minor=`echo $release |sed -e 's/[0-9]*\.\([0-9][0-9]*\)\(\..*\)*$/\1/'`
+       major=`echo $release |sed -e 's/\([0-9][0-9]*\)\..*$/\1/'`
+       
+-      case $major in
++      case $major.$minor in
+ 	1) sysname=linux-1 ;;
+-	2) case $minor in
+-	     0) sysname=linux-2.0 ;;
+-	     1) sysname=linux-2.1 ;;
+-	     2) sysname=linux-2.2 ;;
+-	     *) sysname=linux-2.2 ;;
+-	   esac;;
++	2.0) sysname=linux-2.0 ;;
++	2.1) sysname=linux-2.1 ;;
++	*)   sysname=linux-2.2 ;;
+       esac;;
+     SunOS)
+       case `uname -r` in
+diff -ur dhcp-2.0pl5.old/includes/cf/linux.h dhcp-2.0pl5/includes/cf/linux.h
+--- dhcp-2.0pl5.old/includes/cf/linux.h	1999-05-27 19:44:53.000000000 +0200
++++ dhcp-2.0pl5/includes/cf/linux.h	2004-10-04 22:41:51.000000000 +0200
+@@ -67,7 +67,7 @@
+ #include <net/if.h>
+ #include <net/route.h>
+ 
+-#if LINUX_MAJOR == 1
++#if defined(__linux__) && (LINUX_MAJOR == 1)
+ # include <linux/if_arp.h>
+ # include <linux/time.h>		/* also necessary */
+ #else
+@@ -111,7 +111,7 @@
+ #define TIME time_t
+ #define GET_TIME(x)	time ((x))
+ 
+-#if (LINUX_MAJOR >= 2)
++#if defined(__linux__) && (LINUX_MAJOR >= 2)
+ # if (LINUX_MINOR >= 1)
+ #  if defined (USE_DEFAULT_NETWORK)
+ #   define USE_LPF
+diff -ur dhcp-2.0pl5.old/includes/osdep.h dhcp-2.0pl5/includes/osdep.h
+--- dhcp-2.0pl5.old/includes/osdep.h	1999-10-25 17:40:32.000000000 +0200
++++ dhcp-2.0pl5/includes/osdep.h	2004-10-04 22:41:51.000000000 +0200
+@@ -99,7 +99,7 @@
+ #  include "cf/ultrix.h"
+ #endif
+ 
+-#ifdef linux
++#if defined(linux) || defined(__GNU__) || defined(__GLIBC__)
+ #  include "cf/linux.h"
+ #endif
+ 
