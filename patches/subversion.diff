@@ -1,0 +1,131 @@
+
+Description: Disable swig b-d for building subversion
+Status: Won't merge. Port swig!
+
+diff -ur subversion-1.1.1.old/debian/control subversion-1.1.1/debian/control
+--- subversion-1.1.1.old/debian/control	2004-12-28 00:15:05.000000000 +0100
++++ subversion-1.1.1/debian/control	2004-12-28 00:19:46.000000000 +0100
+@@ -2,7 +2,7 @@
+ Section: devel
+ Priority: optional
+ Maintainer: David Kimdon <dwhedon@debian.org>
+-Build-Depends: m4, debhelper (>=4.1.25), libneon24-dev (>=0.24.7), apache2-threaded-dev (>=2.0.50-11), libapr0-dev (>=2.0.50-11), libdb4.2-dev, libtool (>=1.4), libexpat1-dev, zlib1g-dev, bison, patch, python, time, python2.3-dev, autotools-dev, autoconf (>=2.53), swig (>=1.3.22-2), libsasl2-dev, docbook-xsl, xsltproc, perl (>= 5.6.0-16), cdbs, quilt (>=0.30-4), libperl-dev, libkrb5-dev 
++Build-Depends: m4, debhelper (>=4.1.25), libneon24-dev (>=0.24.7), apache2-threaded-dev (>=2.0.50-11), libapr0-dev (>=2.0.50-11), libdb4.2-dev, libtool (>=1.4), libexpat1-dev, zlib1g-dev, bison, patch, python, time, python2.3-dev, autotools-dev, autoconf (>=2.53), libsasl2-dev, docbook-xsl, xsltproc, perl (>= 5.6.0-16), cdbs, quilt (>=0.30-4), libperl-dev, libkrb5-dev 
+ Build-Conflicts: libtool (=1.5-6)
+ Standards-Version: 3.6.1
+ 
+diff -ur subversion-1.1.1.old/debian/control.m4 subversion-1.1.1/debian/control.m4
+--- subversion-1.1.1.old/debian/control.m4	2004-12-28 00:15:05.000000000 +0100
++++ subversion-1.1.1/debian/control.m4	2004-12-28 00:19:40.000000000 +0100
+@@ -2,7 +2,7 @@
+ Section: devel
+ Priority: optional
+ Maintainer: David Kimdon <dwhedon@debian.org>
+-Build-Depends: m4, debhelper (>=4.1.25), libneon24-dev (>=0.24.7), apache2-threaded-dev (>=2.0.50-11), libapr0-dev (>=2.0.50-11), libdb4.2-dev, libtool (>=1.4), libexpat1-dev, zlib1g-dev, bison, patch, python, time, python`'PYTHON_VER`'-dev, autotools-dev, autoconf (>=2.53), swig (>=1.3.22-2), libsasl2-dev, docbook-xsl, xsltproc, perl (>= 5.6.0-16), cdbs, quilt (>=0.30-4), libperl-dev, libkrb5-dev ifelse(ENABLE_JAVAHL,yes,`, kaffe, kaffe-dev')
++Build-Depends: m4, debhelper (>=4.1.25), libneon24-dev (>=0.24.7), apache2-threaded-dev (>=2.0.50-11), libapr0-dev (>=2.0.50-11), libdb4.2-dev, libtool (>=1.4), libexpat1-dev, zlib1g-dev, bison, patch, python, time, python`'PYTHON_VER`'-dev, autotools-dev, autoconf (>=2.53), libsasl2-dev, docbook-xsl, xsltproc, perl (>= 5.6.0-16), cdbs, quilt (>=0.30-4), libperl-dev, libkrb5-dev ifelse(ENABLE_JAVAHL,yes,`, kaffe, kaffe-dev')
+ Build-Conflicts: libtool (=1.5-6)
+ Standards-Version: 3.6.1
+ 
+diff -ur subversion-1.1.1.old/debian/rules subversion-1.1.1/debian/rules
+--- subversion-1.1.1.old/debian/rules	2004-12-28 00:15:05.000000000 +0100
++++ subversion-1.1.1/debian/rules	2004-12-28 02:35:38.000000000 +0100
+@@ -30,7 +30,7 @@
+ 		--with-editor=/usr/bin/editor \
+ 		--with-apxs=/usr/bin/apxs2 \
+ 		--disable-mod-activation \
+-		--with-swig=/usr
++		--without-swig
+ 
+ ifeq ($(ENABLE_JAVAHL), yes)
+   # jikes 1.22 cannot compile javahl.
+@@ -49,7 +49,7 @@
+ TESTARCHS+=arm 
+ TESTARCHS+=hppa 
+ TESTARCHS+=hurd-i386 
+-TESTARCHS+=i386 
++#TESTARCHS+=i386 
+ TESTARCHS+=ia64 
+ TESTARCHS+=m68k 
+ TESTARCHS+=mips 
+@@ -127,7 +127,7 @@
+ 	ln -s /usr/share/misc/config.guess \
+ 		$(DEB_BUILDDIR)/ac-helpers/config.guess
+ 
+-	cd $(DEB_BUILDDIR) && ./configure \
++	cd $(DEB_BUILDDIR) && autoconf2.50 && ./configure \
+ 		$(confflags) CFLAGS="-g -Wall" \
+ 
+ 	touch $@
+@@ -136,7 +136,8 @@
+ debian/stamp-build: debian/stamp-configure
+ 	dh_testdir
+ 
+-	$(MAKE) -C $(DEB_BUILDDIR) all swig-py \
++	$(MAKE) -C $(DEB_BUILDDIR) all
++ifneq (,)
+ 		swig_pydir=/usr/lib/python$(PYTHON_VER)/site-packages/libsvn \
+ 		swig_pydir_extra=/usr/lib/python$(PYTHON_VER)/site-packages/svn
+ 
+@@ -155,6 +156,7 @@
+ 	$(MAKE) subversion/bindings/swig/$(LIBSVN_SWIG_PY) \
+ 		EXTRA_LDFLAGS="-lpython$(PYTHON_VER) -lswigpy-$(SWIG_VER)" \
+ 		-C $(DEB_BUILDDIR)
++endif
+ 
+ 	touch $@
+ 
+@@ -171,7 +173,7 @@
+ 	dh_clean -k
+ 	dh_installdirs
+ 
+-	$(MAKE) local-install install-swig-py \
++	$(MAKE) local-install \
+ 		INSTALL_MOD_SHARED=echo \
+ 		DESTDIR=$(PWD)/debian/tmp \
+ 		swig_pydir=/usr/lib/python$(PYTHON_VER)/site-packages/libsvn \
+@@ -197,7 +199,7 @@
+ 	       revision-install \
+ 	       -C $(DEB_BUILDDIR)
+ 
+-ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
++ifneq (,)
+ 	# If we aren't cross-compiling we might run the testsuite
+ 
+ 	# Since the testsuite takes a while to run it is only enabled on
+@@ -233,8 +235,8 @@
+ 	fi
+ endif
+ 
+-	$(MAKE) -C $(DEB_BUILDDIR) swig-pl check-swig-pl
+ 
++ifneq (,)
+ 	cd $(DEB_BUILDDIR)/$(PERL_BINDINGDIR) && \
+ 		env APR_CONFIG=/usr/bin/apr-config perl Makefile.PL \
+ 			INSTALLDIRS=vendor
+@@ -252,10 +254,9 @@
+ 		make all test OTHERLDFLAGS="-L $(INSTALL_PREFIX)/lib" \
+ 			OPTIMIZE="-O2 -g -Wall"
+ 
+-	$(MAKE) -C $(DEB_BUILDDIR) install-swig-pl-lib \
+-		DESTDIR=$(PWD)/debian/tmp 
+ 	$(MAKE) -C $(DEB_BUILDDIR)/$(PERL_BINDINGDIR) install \
+ 		MAN3EXT=3perl DESTDIR=$(PWD)/debian/tmp 
++endif
+ 
+ ifeq ($(ENABLE_JAVAHL), yes)
+ 	dh_movefiles --package=libsvn-javahl \
+@@ -268,14 +269,6 @@
+ 		usr/include/svn-javahl
+ endif
+ 
+-	# Install files for 'libsvn-core-perl' package.
+-	dh_movefiles --package=libsvn-core-perl \
+-		usr/lib/perl5/ \
+-		usr/share/man/man3 \
+-
+-	# Install files for 'python$(PYTHON_VER)-subversion' package.
+-	dh_movefiles --package=$(PYTHON_PKG) \
+-		usr/lib/python$(PYTHON_VER)/
+ 
+ 	install -d debian/$(PYTHON_PKG)/usr/share/doc/$(PYTHON_PKG)
+ 	install -m 0644 debian/pythonX.Y-subversion.README.Debian \
