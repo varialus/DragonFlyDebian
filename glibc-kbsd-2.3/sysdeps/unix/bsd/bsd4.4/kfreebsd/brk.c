@@ -30,16 +30,12 @@ extern void _end;
 /* sbrk.c expects this.  */
 void *__curbrk = &_end;
 
-
 /* Set the end of the process's data space to ADDR.
    Return 0 if successful, -1 if not.  */
 int
 __brk (addr)
      void *addr;
 {
-
-
-
   if (addr < &_end)
     return 0;
 
