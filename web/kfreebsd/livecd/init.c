@@ -52,13 +52,13 @@ int
 main ()
 {
   size_t sz;
-  int len, pid, err;
+  int len, pid, ret;
   struct iso_args iso;
   struct stat my_stat;
 
   close (0); close (1); close (2);
 
-  int tty = open (TTY, O_RDWR);
+  open (TTY, O_RDWR);
   dup (0); dup (0);
 
   stdin = fdopen (0, "r");
@@ -84,19 +84,15 @@ main ()
   else
     device[len - 1] = '\0';
 
-/*
   printf ("Fstype [cd9660]: ");
   fstype = NULL; sz = 0;
   len = getline (&fstype, &sz, stdin);
   if (len == 1)
-*/
     fstype = strdup ("cd9660");
-/*
   else
     fstype[len - 1] = '\0';
-*/
 
-  printf ("Init [/sbin/init]: ");
+  printf ("Init [/bin/bash]: ");
   init = NULL; sz = 0;
   len = getline (&init, &sz, stdin);
   if (len == 1)
@@ -110,77 +106,49 @@ main ()
       if (mkdir ("/mnt", 0755) == -1)
         {
           fprintf (stderr, "mkdir failed: %s\n", strerror (errno));
-          init_abort ();
+          goto init_abort;
         }
     }
 
   printf ("mount -t %s %s /mnt\n", fstype, device);
   iso.fspec = device;
   iso.flags = ISOFSMNT_EXTATT;
-  err = mount (fstype, "/mnt", MNT_RDONLY, &iso);
-  if (err == -1)
+  if (mount (fstype, "/mnt", MNT_RDONLY, &iso) == -1)
     {
       fprintf (stderr, "mount failed: %s\n", strerror (errno));
-      init_abort ();
+      goto init_abort;
     }
-
-/*
-  printf ("mount -t devfs devfs /mnt/dev\n");
-  err = mount ("devfs", "/mnt/dev", 0, "devfs");
-  if (err == -1)
-    {
-      fprintf (stderr, "mount failed: %s\n", strerror (errno));
-      init_abort ();
-    }
-*/
 
   pid = fork ();
   switch (pid)
     {
       case -1:
         fprintf (stderr, "fork() failed: %s\n", strerror (errno));
-        break;
+        goto init_abort;
       case 0:
         printf ("chroot /mnt\n");
         if (chroot ("/mnt") == -1)
           {
             fprintf (stderr, "chroot() failed: %s\n", strerror (errno));
-            init_abort ();
+            exit (1);
           }
         printf ("chdir /\n");
         if (chdir ("/") == -1)
           {
             fprintf (stderr, "chdir() failed: %s\n", strerror (errno));
-            init_abort ();
+            exit (1);
           }
         printf ("executing %s -i\n", init);
         execl (init, init, "-i", NULL);
         fprintf (stderr, "execl() failed: %s\n", strerror (errno));
         exit (1);
       default:
-        waitpid (pid, NULL, 0);
+        waitpid (pid, &ret, 0);
+        if (ret != 0)
+          fprintf (stderr, "warning, child exited with %d status.\n", ret);
     }
 
-  init_abort ();
-
-  /* should never reach this point, but we want gcc happy */
-  return 0;
-}
-
-int
-init_abort ()
-{
-  int pid;
-  int err;
-
-/*
-  printf ("umount /mnt/dev\n");
-  err = unmount ("/mnt/dev", 0);
-  if (err == -1)
-    {
-      fprintf (stderr, "unmount failed: %s\n", strerror (errno));
-    }
-*/
+:init_abort
 
   printf ("umount /mnt\n");
   err = unmount ("/mnt", 0);
@@ -189,16 +157,14 @@ init_abort ()
       fprintf (stderr, "unmount failed: %s\n", strerror (errno));
     }
 
-
   free (device);
   free (fstype);
   free (init);
   fprintf (stderr, "init: Aborted.\n");
 
   /* loop forever, so that user can read errors */
-  while (1) {};
+  while (1);
 
   /* should never reach this point, but we want gcc happy */
   return 0;
 }
-
