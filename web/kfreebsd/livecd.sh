@@ -1,32 +1,30 @@
 #!/bin/bash -ex
 #
-# Build-Depends: grub, kfreebsd5, mkisofs and maybe something else..
+# Build-Depends: wget, gnupg, mkisofs, crosshurd
 
 [ "$UID" == "0" ]
 
-rm -rf *~ tmp out
-mkdir -p tmp/root/boot/grub out
+version=5
+
+rm -rf *~ out
+mkdir -p stand/boot/grub out
 
 # GRUB stuff
-cp /usr/lib/grub/i386-pc/{stage1,stage2} tmp/root/boot/grub/
-cp /usr/lib/grub/i386-pc/e2fs_stage1_5 tmp/root/boot/grub/
-	#cp /usr/lib/grub/i386-pc/iso9660_stage1_5 tmp/root/boot/grub/
-cat > tmp/root/boot/grub/menu.lst << EOF
+cp /lib/grub/i386-pc/stage2_eltorito stand/boot/grub/
+cat > stand/boot/grub/menu.lst << EOF
 timeout 30
 default 0
 title  GNU/kFreeBSD (cdrom 0)
-root (fd0)
+root (cd)
 kernel /boot/kfreebsd.gz root=cd9660:acd0
 title  GNU/kFreeBSD (cdrom 1)
-root (fd0)
+root (cd)
 kernel /boot/kfreebsd.gz root=cd9660:acd1
 EOF
 
-# kernel of FreeBSD stuff
-cp /boot/kfreebsd.gz tmp/root/boot/
-cp /boot/device.hints tmp/root/boot/
 # add this to make it safe
-cat >> tmp/root/boot/device.hints << EOF
+cp /boot/device.hints stand/boot/
+cat >> stand/boot/device.hints << EOF
 hint.acpi.0.disabled=1
 loader.acpi_disabled_by_user=1
 hint.apic.0.disabled=1
@@ -35,19 +33,21 @@ hw.ata.atapi_dma=0
 hw.ata.wc=0
 hw.eisa_slots=0
 EOF
-tar -C tmp/root -cf tmp/tmp.tar boot
-mkbimage -t 2.88 -d tmp -s ext2 -f tmp/tmp.tar
 
 # prepare the base system
-cp tmp/2.88.image stand/2.88.image
 cat > stand/etc/issue << EOF
 Debian GNU/kFreeBSD testing/unstable \n \l
 
 You may login as root, with no password.
 
 EOF
+cat > stand/etc/fstab << EOF
+/dev/acd0 / cd9660 ro 1 1
+EOF
 # keep inetutils-syslogd from bitching
 cp stand/{bin/true,usr/sbin/syslogd}
 
 # ignition!
-mkisofs -b 2.88.image -c boot.catalog -o out/livecd.iso -r stand
+mkisofs -b boot/grub/stage2_eltorito \
+  -no-emul-boot -boot-load-size 4 -boot-info-table \
+  -o out/livecd${version}.iso -r stand
