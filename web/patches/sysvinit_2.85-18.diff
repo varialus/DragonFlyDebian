@@ -1,0 +1,185 @@
+diff -Nur sysvinit-2.85.old/debian/changelog sysvinit-2.85/debian/changelog
+--- sysvinit-2.85.old/debian/changelog	2004-06-06 04:16:44.000000000 +0200
++++ sysvinit-2.85/debian/changelog	2004-06-06 03:52:28.000000000 +0200
+@@ -1,3 +1,9 @@
++sysvinit (2.85-18+kbsd) unreleased; urgency=low
++
++  * foo
++
++ -- Robert Millan <rmh@debian.org>  Sun,  6 Jun 2004 03:52:12 +0200
++
+ sysvinit (2.85-18) unstable; urgency=medium
+ 
+   * Fix typo in /etc/init.d/single (closes: #252611)
+diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh	2004-06-06 04:16:45.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh	2004-06-06 03:52:03.000000000 +0200
+@@ -7,6 +7,7 @@
+ SULOGIN=no
+ VERBOSE=yes
+ [ -f /etc/default/rcS ] && . /etc/default/rcS
++. /etc/init.d/rcArch
+ 
+ PATH=/lib/init:/bin:/sbin
+ 
+@@ -180,7 +181,7 @@
+ 	#
+ 	# Ensure that root is quiescent and read-only before fsck'ing.
+ 	#
+-	if ! mount -n -o remount,ro /
++	if ! mount $mount_no_mtab $mount_remount,ro /
+ 	then
+     		echo -n "*** ERROR!  Cannot fsck root fs because it is "
+ 		echo    "not mounted read-only!"
+@@ -241,7 +242,7 @@
+ 	echo "that the root file system is currently mounted read-only.  To"
+ 	echo "remount it read-write:"
+ 	echo
+-	echo "   # mount -n -o remount,rw /"
++	echo "   # mount $mount_no_mtab $mount_remount,rw /"
+ 	echo
+ 	echo "CONTROL-D will exit from this shell and REBOOT the system."
+ 	echo
+@@ -263,7 +264,7 @@
+ #
+ #	Remount root to final mode (rw or ro).
+ #	
+-mount -n -o remount,$rootmode /
++mount $mount_no_mtab $mount_remount,$rootmode /
+ 
+ #
+ #	We only create/modify /etc/mtab if the location where it is
+@@ -290,9 +291,9 @@
+ 
+ if [ "$init_mtab"  = yes ]
+ then
+-	[ "$roottype" != none ] && mount -f -o remount /
+-	[ -n "$devfs" ] && mount -f $devfs
+-	. /etc/init.d/mountvirtfs
++	[ "$roottype" != none ] && mount -f $mount_remount,$rootmode /
++	[ $SYSTEM = linux-compat ] && [ -n "$devfs" ] && mount -f $devfs
++	[ $SYSTEM = linux-compat ] && . /etc/init.d/mountvirtfs
+ fi
+ 
+ #
+diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/halt sysvinit-2.85/debian/initscripts/etc/init.d/halt
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/halt	2004-06-06 04:16:45.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/halt	2004-06-06 03:52:03.000000000 +0200
+@@ -25,6 +25,8 @@
+ 	esac
+ fi
+ 
++. /etc/init.d/rcArch
++
+ # See if we need to cut the power.
+ if [ "$INIT_HALT" = "POWEROFF" -a -x /etc/init.d/ups-monitor ]
+ then
+@@ -45,6 +47,6 @@
+ 	poweroff=""
+ fi
+ 
+-halt -d -f -i $poweroff $hddown
++halt -d -f $poweroff $halt_ifdown $hddown
+ 
+ : exit 0
+diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/rcArch sysvinit-2.85/debian/initscripts/etc/init.d/rcArch
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/rcArch	1970-01-01 01:00:00.000000000 +0100
++++ sysvinit-2.85/debian/initscripts/etc/init.d/rcArch	2004-06-06 03:52:03.000000000 +0200
+@@ -0,0 +1,36 @@
++# Arch specific options
++
++if [ `uname -s` = Linux -o `uname -s` = GNU ]; then
++  SYSTEM=linux-compat
++  umount_all="-a -r"
++  umount_try_ro="-r"
++  case "`uname -s`:`uname -r`" in
++    GNU:*|Linux:2.[01].*)
++      umount_force=""
++      umount_lazy=""
++      ;;
++    Linux:2.[23].*)
++      umount_force="-f"
++      umount_lazy=""
++      ;;
++    *)
++      umount_force="-f"
++      umount_lazy="-l"
++      ;;
++  esac
++  dmesg_bufsize="-s 65536"
++  procfs="proc"
++  mount_no_mtab="-n"
++  mount_remount="-o remount"
++  halt_ifdown="-i"
++else
++  SYSTEM=bsd-compat
++  umount_all="-a"
++  umount_try_ro=""
++  umount_force="-f"
++  procfs="procfs"
++  mount_no_mtab=""
++  mount_remount="-o update"
++  halt_ifdown=""
++fi
++
+diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/reboot sysvinit-2.85/debian/initscripts/etc/init.d/reboot
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/reboot	2004-06-06 04:16:45.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/reboot	2004-06-06 03:52:03.000000000 +0200
+@@ -7,5 +7,7 @@
+ 
+ PATH=/sbin:/bin:/usr/sbin:/usr/bin
+ 
++. /etc/init.d/rcArch
++
+ echo -n "Rebooting... "
+-reboot -d -f -i
++reboot -d -f $halt_ifdown
+diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/umountfs sysvinit-2.85/debian/initscripts/etc/init.d/umountfs
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/umountfs	2004-06-06 04:16:45.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/umountfs	2004-06-06 03:52:03.000000000 +0200
+@@ -7,19 +7,23 @@
+ 
+ PATH=/sbin:/bin:/usr/sbin:/usr/bin
+ 
+-echo -n "Deactivating swap..."
+-umount -ttmpfs -a -r
+-swapoff -a
+-echo "done."
++. /etc/init.d/rcArch
++
++if [ `uname -s` = Linux ] ; then
++  echo -n "Deactivating swap..."
++  umount -ttmpfs -a -r
++  swapoff -a
++  echo "done."
++fi
+ 
+ #
+ #	Umount all filesystems except the virtual ones.
+ #
+ echo -n "Unmounting local filesystems..."
+-umount -tnoproc,noprocfs,nodevfs,nosysfs,nousbfs,nousbdevfs,nodevpts -d -a -r
++umount -tnoproc,noprocfs,nodevfs,nosysfs,nousbfs,nousbdevfs,nodevpts -d $umount_all
+ echo "done."
+ 
+ # This is superfluous.
+-mount -n -o remount,ro /
++mount $mount_no_mtab $mount_remount,ro /
+ 
+ : exit 0
+diff -Nur sysvinit-2.85.old/debian/rules sysvinit-2.85/debian/rules
+--- sysvinit-2.85.old/debian/rules	2004-06-06 04:16:44.000000000 +0200
++++ sysvinit-2.85/debian/rules	2004-06-06 04:14:00.000000000 +0200
+@@ -39,10 +39,12 @@
+ 	#
+ 	-rm -rf $(tmp)
+ 	install -d -g root -m 755 -o root $(tmp)
++ifeq ($(DEB_BUILD_GNU_SYSTEM),linux)
+ 	install -d -g root -m 755 -o root $(tmp)/dev
+ 	install -d -g root -m 755 -o root $(tmp)/dev/pts
+ 	install -d -g root -m 755 -o root $(tmp)/dev/shm
+ 	install -d -g root -m 755 -o root $(tmp)/sys
++endif
+ 	install -d -g root -m 755 -o root $(tmp)/{DEBIAN,etc,usr}
+ 	install -d -g root -m 755 -o root $(tmp)/usr/share
+ 	install -d -g root -m 755 -o root $(tmp)/usr/share/sysvinit
