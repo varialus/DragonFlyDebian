@@ -1,0 +1,111 @@
+diff -ur tun-module.old/debian/control.in tun-module/debian/control.in
+--- tun-module.old/debian/control.in	2005-02-10 14:30:59.000000000 +0100
++++ tun-module/debian/control.in	2005-02-10 14:32:03.000000000 +0100
+@@ -2,6 +2,8 @@
+ Section: net
+ Priority: optional
+ Maintainer: Alexander Zangerl <az@debian.org>
++Build-Depends: autotools-dev, type-handling (>= 0.2.1),
++ kfreebsd5-source [@kfreebsd-gnu@], freebsd5-buildutils [@kfreebsd-gnu@]
+ Standards-Version: 3.5.6.1
+ 
+ Package: tun-source
+diff -ur tun-module.old/debian/rules tun-module/debian/rules
+--- tun-module.old/debian/rules	2002-12-25 05:09:14.000000000 +0100
++++ tun-module/debian/rules	2005-02-10 14:18:34.000000000 +0100
+@@ -2,10 +2,17 @@
+ # rules for building both the tun-source package as well as the 
+ # tun-module package
+ 
++DEB_HOST_GNU_SYSTEM	?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
++
+ clean:
+ 	test -f debian/rules
++	sed -e "s/@kfreebsd-gnu@/`type-handling any kfreebsd-gnu`/g" \
++	< debian/control.in > debian/control
+ 	-$(MAKE) distclean
+ 	-rm -rf debian/tmp debian/files* debian/substvars kdist_configure debian/control.real debian/changelog.real
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++	rm -rf $(KSRC_BASE)
++endif
+ 
+ # building the tun-source package
+ binary-indep:
+@@ -59,19 +66,35 @@
+ 
+ # These are used for cross-compiling and for saving the configure script
+ # from having to guess our platform (since we know it already)
++DEB_HOST_GNU_SYSTEM	?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+ DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+ 
+ # those will be passed by make-kpkg 
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
++kernel = linux
+ KSRC?=/usr/src/linux
++endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++kernel = freebsd
++KSRC_BASE := $(CURDIR)/kfreebsd-source
++KSRC := $(KSRC_BASE)/src/sys
++endif
++
+ KDREV?="custom.1.0"
+ 
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+ KVERSION :=$(shell egrep '^VERSION +=' $(KSRC)/Makefile 2>/dev/null | \
+                  sed -e 's/[^0-9]*\([0-9]*\)/\1/')
+ KPLEVEL  :=$(shell egrep '^PATCHLEVEL +=' $(KSRC)/Makefile 2>/dev/null | \
+                     sed -e 's/[^0-9]*\([0-9]*\)/\1/')
+ KSUBLEVEL:=$(shell egrep '^SUBLEVEL +=' $(KSRC)/Makefile 2>/dev/null | \
+                   sed -e 's/[^0-9]*\([0-9]*\)/\1/')
++else
++KVERSION	:= 0
++KPLEVEL		:= 0
++KSUBLEVEL	:= 0
++endif
+ 
+ # the sed regexps to insert the kernel version and revision
+ # into control and changelog
+@@ -80,12 +103,20 @@
+ 
+ kdist_configure: kdist_clean
+ 	test -f debian/rules
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux)
+ 	# make sure it builds only for 2.2.x
+ 	if [ "$(KPLEVEL).$(KVERSION)" != "2.2" ]; then \
+ 	echo -e "\n\n*** You were trying to build this package for kernel $(KVERSION).$(KPLEVEL).$(KSUBLEVEL), but";\
+ 	echo "*** the package is supported only for the 2.2 kernel series.";\
+ 	echo -e "*** For kernels 2.4.x the tun/tap driver comes with the main kernel.\n";\
+ 	exit 1; fi
++endif
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++	mkdir -p $(KSRC_BASE)
++	tar -C $(KSRC_BASE) -xjpf /usr/src/kfreebsd5/src.tar.bz2
++	cd $(KSRC_BASE) && cat /usr/src/kfreebsd5/patches/*.diff | patch -p0
++endif
++	cp /usr/share/misc/config.* ./
+ 	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
+ 	 --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --with-kernel=$(KSRC)
+ 	touch kdist_configure
+@@ -96,14 +127,18 @@
+ kdist_image: kdist_configure
+ 	# clean up temp area
+ 	-rm -rf debian/tmp/
+-	# build the module in linux/tun.o
++	# build the module in $(kernel)/tun.o
++ifeq ($(DEB_HOST_GNU_SYSTEM), kfreebsd-gnu)
++	freebsd-make -C freebsd
++else
+ 	$(MAKE)
++endif
+ 	# setup temp area for module, docs and control info
+ 	install -d debian/tmp/DEBIAN debian/tmp/etc/modutils
+ 	install -d debian/tmp/usr/share/doc/tun-module-$(KVERS)
+ 	install -d debian/tmp/lib/modules/$(KVERS)/misc
+ 	# the module goes into misc...
+-	install linux/tun.o debian/tmp/lib/modules/$(KVERS)/misc
++	install $(kernel)/tun.o debian/tmp/lib/modules/$(KVERS)/misc
+ 	# the config file into /etc/modutils
+ 	install -m 644 debian/tun.modutuils debian/tmp/etc/modutils/tun-$(KVERS)
+ 	# do the necessary magic wrt. packagename and version:

@@ -1,0 +1,44 @@
+diff -uNr pciutils-2.1.11.debian/lib/configure pciutils-2.1.11/lib/configure
+--- pciutils-2.1.11.debian/lib/configure	2005-01-26 13:40:17.000000000 +0100
++++ pciutils-2.1.11/lib/configure	2005-01-26 13:20:27.000000000 +0100
+@@ -12,7 +12,7 @@
+ echo_n "Configuring libpci for your system..."
+ sharedir=${1:-/usr/share}
+ version=${2:-0.0}
+-sys=`uname -s`
++sys=`uname -s | tr -d 'GNU/k'`
+ rel=`uname -r`
+ if [ "$sys" = "AIX" -a -x /usr/bin/oslevel -a -x /usr/sbin/lsattr ]
+ then
+diff -uNr pciutils-2.1.11.debian/lib/fbsd-device.c pciutils-2.1.11/lib/fbsd-device.c
+--- pciutils-2.1.11.debian/lib/fbsd-device.c	1999-07-20 16:01:31.000000000 +0200
++++ pciutils-2.1.11/lib/fbsd-device.c	2005-01-26 13:36:50.000000000 +0100
+@@ -14,9 +14,26 @@
+ #include <fcntl.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <osreldate.h>
++#include <stdint.h>
+ 
+-#include <pci/pcivar.h>
+-#include <pci/pci_ioctl.h>
++#ifdef __FreeBSD_kernel_version
++#  ifndef __FreeBSD_version
++#    define __FreeBSD_version __FreeBSD_kernel_version
++#  endif
++#endif
++
++#if __FreeBSD_version < 500000
++#  include <pci/pcivar.h>
++#else
++#  include <dev/pci/pcivar.h>
++#endif
++
++#if __FreeBSD_version < 430000
++#  include <pci/pci_ioctl.h>
++#else
++#  include <sys/pciio.h>
++#endif
+ 
+ #include "internal.h"
+ 

@@ -1,0 +1,27 @@
+
+Status: first hunk is pending (#274677), second merged in RCS
+
+diff -ur dpkg-1.10.27.old/scripts/dpkg-gencontrol.pl dpkg-1.10.27/scripts/dpkg-gencontrol.pl
+--- dpkg-1.10.27.old/scripts/dpkg-gencontrol.pl	2005-02-10 16:24:18.000000000 +0100
++++ dpkg-1.10.27/scripts/dpkg-gencontrol.pl	2005-02-11 14:21:33.000000000 +0100
+@@ -242,7 +242,7 @@
+     binmode(X);
+     while (<X>) {
+         chomp;
+-        next if m/^([-+0-9a-z.]+)_[^_]+_(\w+)\.deb /
++        next if m/^([-+0-9a-z.]+)_[^_]+_([-\w]+)\.deb /
+                 && ($1 eq $oppackage) && ($2 eq $arch || $2 eq 'all');
+         print(Y "$_\n") || &syserr("copy old entry to new files list file");
+     }
+diff -ur dpkg-1.10.27.old/utils/start-stop-daemon.c dpkg-1.10.27/utils/start-stop-daemon.c
+--- dpkg-1.10.27.old/utils/start-stop-daemon.c	2005-02-10 16:24:18.000000000 +0100
++++ dpkg-1.10.27/utils/start-stop-daemon.c	2005-02-11 14:22:36.000000000 +0100
+@@ -22,7 +22,7 @@
+ 
+ #include "config.h"
+ 
+-#if defined(linux)
++#if defined(linux) || (defined(__FreeBSD_kernel__) && defined(__GLIBC__))
+ #  define OSLinux
+ #elif defined(__GNU__)
+ #  define OSHURD
