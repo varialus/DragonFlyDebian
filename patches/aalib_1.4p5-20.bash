@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+# Status: in BTS.
+
 cp debian/control{,.in}
 cat $0 | patch -p1
 which type-handling
