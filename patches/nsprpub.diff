@@ -1,0 +1,307 @@
+diff -ur nsprpub.old/config/nsinstall.c nsprpub/config/nsinstall.c
+--- nsprpub.old/config/nsinstall.c	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/config/nsinstall.c	2004-09-25 17:18:08.000000000 +0200
+@@ -98,7 +98,7 @@
+ }
+ #endif /* NEXTSTEP */
+ 
+-#ifdef LINUX
++#if defined(LINUX) || defined(GLIBC)
+ #include <getopt.h>
+ #endif
+ 
+diff -ur nsprpub.old/configure.in nsprpub/configure.in
+--- nsprpub.old/configure.in	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/configure.in	2004-09-25 17:33:43.000000000 +0200
+@@ -923,6 +923,7 @@
+     fi
+     AC_DEFINE(XP_UNIX)
+     AC_DEFINE(FREEBSD)
++    AC_DEFINE(__FreeBSD_kernel__)
+     AC_DEFINE(HAVE_BSD_FLOCK)
+     AC_DEFINE(HAVE_SOCKLEN_T)
+     CFLAGS="$CFLAGS $(DSO_CFLAGS) -ansi -Wall"
+@@ -1178,7 +1179,7 @@
+ 	esac
+     ;;
+ 
+-*-linux*)
++*-linux* | *-gnu* | *-k*bsd*-gnu)
+     if test -z "$USE_NSPR_THREADS"; then
+         USE_PTHREADS=1
+         IMPL_STRATEGY=_PTH
+@@ -1189,7 +1190,10 @@
+     AC_DEFINE(_SVID_SOURCE)
+     AC_DEFINE(_LARGEFILE64_SOURCE)
+     AC_DEFINE(HAVE_FCNTL_FILE_LOCKING)
+-    AC_DEFINE(LINUX)
++    case "$target_os" in
++      linux*) AC_DEFINE(LINUX) ;;
++      gnu* | k*bsd*-gnu) AC_DEFINE(GLIBC) ;;
++    esac
+     CFLAGS="$CFLAGS -ansi -Wall"
+     CXXFLAGS="$CXXFLAGS -ansi -Wall"
+     MDCPUCFG_H=_linux.cfg
+@@ -1422,6 +1426,7 @@
+ *-netbsd*)
+     AC_DEFINE(XP_UNIX)
+     AC_DEFINE(NETBSD)
++    AC_DEFINE(__NetBSD_kernel__)
+     AC_DEFINE(HAVE_BSD_FLOCK)
+     USE_NSPR_THREADS=1
+     MDCPUCFG_H=_netbsd.cfg
+@@ -2222,7 +2227,7 @@
+             _PTHREAD_LDFLAGS=-pthread
+         fi
+         ;;
+-    *-linux*)
++    *-linux* | *-gnu* | *-k*bsd*-gnu)
+         AC_DEFINE(_REENTRANT)
+         ;;
+     esac
+@@ -2306,7 +2311,7 @@
+         fi
+     fi
+     ;;
+-*-linux*)
++*-linux* | *-gnu* | *-k*bsd*-gnu)
+     if test -n "$USE_NSPR_THREADS"; then
+         AC_DEFINE(_PR_LOCAL_THREADS_ONLY)
+     fi
+diff -ur nsprpub.old/pr/include/md/_linux.cfg nsprpub/pr/include/md/_linux.cfg
+--- nsprpub.old/pr/include/md/_linux.cfg	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/pr/include/md/_linux.cfg	2004-09-25 13:43:44.000000000 +0200
+@@ -42,10 +42,14 @@
+ #define XP_UNIX
+ #endif
+ 
+-#ifndef LINUX
++#if !defined(LINUX) && defined(__linux__)
+ #define LINUX
+ #endif
+ 
++#if !defined(GLIBC) && (defined(__GNU__) || defined(__GLIBC__))
++#define GLIBC
++#endif
++
+ #define PR_AF_INET6 10  /* same as AF_INET6 */
+ 
+ #ifdef __powerpc__
+diff -ur nsprpub.old/pr/include/md/_pth.h nsprpub/pr/include/md/_pth.h
+--- nsprpub.old/pr/include/md/_pth.h	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/pr/include/md/_pth.h	2004-09-25 17:44:15.000000000 +0200
+@@ -139,10 +139,14 @@
+ 	(!memcmp(&(t), &pt_zero_tid, sizeof(pthread_t)))
+ #define _PT_PTHREAD_COPY_THR_HANDLE(st, dt)   (dt) = (st)
+ #elif defined(IRIX) || defined(OSF1) || defined(AIX) || defined(SOLARIS) \
+-	|| defined(HPUX) || defined(LINUX) || defined(FREEBSD) \
++	|| defined(HPUX) || defined(LINUX) || defined(GLIBC) || defined(FREEBSD) \
+ 	|| defined(NETBSD) || defined(OPENBSD) || defined(BSDI) \
+ 	|| defined(VMS) || defined(NTO) || defined(DARWIN) \
+ 	|| defined(UNIXWARE)
++#ifdef __GNU__
++# error Using Hurd pthreads?
++/* Hurd pthreads don't have an invalid value for pthread_t. -- rmh */
++#endif
+ #define _PT_PTHREAD_INVALIDATE_THR_HANDLE(t)  (t) = 0
+ #define _PT_PTHREAD_THR_HANDLE_IS_INVALID(t)  (t) == 0
+ #define _PT_PTHREAD_COPY_THR_HANDLE(st, dt)   (dt) = (st)
+@@ -231,7 +235,7 @@
+ #define PT_PRIO_MAX            sched_get_priority_max(SCHED_OTHER)
+ #endif /* defined(_PR_DCETHREADS) */
+ 
+-#elif defined(LINUX) || defined(FREEBSD)
++#elif defined(LINUX) || defined(GLIBC) || defined(FREEBSD)
+ #define PT_PRIO_MIN            sched_get_priority_min(SCHED_OTHER)
+ #define PT_PRIO_MAX            sched_get_priority_max(SCHED_OTHER)
+ #elif defined(NTO)
+@@ -286,7 +290,7 @@
+ 		onemillisec.tv_nsec = 1000000L;			\
+         nanosleep(&onemillisec,NULL);			\
+     PR_END_MACRO
+-#elif defined(HPUX) || defined(LINUX) || defined(SOLARIS) \
++#elif defined(HPUX) || defined(LINUX) || defined(GLIBC) || defined(SOLARIS) \
+ 	|| defined(FREEBSD) || defined(NETBSD) || defined(OPENBSD) \
+ 	|| defined(BSDI) || defined(NTO) || defined(DARWIN) \
+ 	|| defined(UNIXWARE)
+diff -ur nsprpub.old/pr/include/md/_unixos.h nsprpub/pr/include/md/_unixos.h
+--- nsprpub.old/pr/include/md/_unixos.h	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/pr/include/md/_unixos.h	2004-09-25 13:42:52.000000000 +0200
+@@ -46,7 +46,7 @@
+  * Linux: FD_SETSIZE is defined in /usr/include/sys/select.h and should
+  * not be redefined.
+  */
+-#if !defined(LINUX) && !defined(DARWIN) && !defined(NEXTSTEP)
++#if !defined(LINUX) && !defined(GLIBC) && !defined(DARWIN) && !defined(NEXTSTEP)
+ #ifndef FD_SETSIZE
+ #define FD_SETSIZE  4096
+ #endif
+diff -ur nsprpub.old/pr/include/md/prosdep.h nsprpub/pr/include/md/prosdep.h
+--- nsprpub.old/pr/include/md/prosdep.h	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/pr/include/md/prosdep.h	2004-09-25 17:18:43.000000000 +0200
+@@ -90,7 +90,7 @@
+ #elif defined(IRIX)
+ #include "md/_irix.h"
+ 
+-#elif defined(LINUX)
++#elif defined(LINUX) || defined(GLIBC)
+ #include "md/_linux.h"
+ 
+ #elif defined(OSF1)
+diff -ur nsprpub.old/pr/src/md/prosdep.c nsprpub/pr/src/md/prosdep.c
+--- nsprpub.old/pr/src/md/prosdep.c	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/pr/src/md/prosdep.c	2004-09-25 17:19:09.000000000 +0200
+@@ -63,7 +63,7 @@
+ 
+     /* Get page size */
+ #ifdef XP_UNIX
+-#if defined SUNOS4 || defined LINUX || defined BSDI || defined AIX \
++#if defined SUNOS4 || defined LINUX || defined GLIBC || defined BSDI || defined AIX \
+         || defined FREEBSD || defined NETBSD || defined OPENBSD \
+         || defined DARWIN || defined NEXTSTEP
+     _pr_pageSize = getpagesize();
+diff -ur nsprpub.old/pr/src/md/unix/unix.c nsprpub/pr/src/md/unix/unix.c
+--- nsprpub.old/pr/src/md/unix/unix.c	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/pr/src/md/unix/unix.c	2004-09-24 20:24:02.000000000 +0200
+@@ -65,7 +65,7 @@
+  * PRInt32* pointer to a _PRSockLen_t* pointer.
+  */
+ #if defined(HAVE_SOCKLEN_T) \
+-    || (defined(LINUX) && defined(__GLIBC__) && __GLIBC__ >= 2)
++    || (defined(__GLIBC__) && __GLIBC__ >= 2)
+ #define _PRSockLen_t socklen_t
+ #elif defined(IRIX) || defined(HPUX) || defined(OSF1) || defined(SOLARIS) \
+     || defined(AIX4_1) || defined(LINUX) || defined(SONY) \
+diff -ur nsprpub.old/pr/src/md/unix/uxproces.c nsprpub/pr/src/md/unix/uxproces.c
+--- nsprpub.old/pr/src/md/unix/uxproces.c	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/pr/src/md/unix/uxproces.c	2004-09-25 17:22:02.000000000 +0200
+@@ -92,7 +92,7 @@
+  * that can share the virtual address space and file descriptors.
+  */
+ #if (defined(IRIX) && !defined(_PR_PTHREADS)) \
+-        || (defined(LINUX) && defined(_PR_PTHREADS))
++        || ((defined(LINUX) || defined(GLIBC)) && defined(_PR_PTHREADS))
+ #define _PR_SHARE_CLONES
+ #endif
+ 
+@@ -106,7 +106,7 @@
+  */
+ 
+ #if defined(_PR_GLOBAL_THREADS_ONLY) \
+-	|| (defined(_PR_PTHREADS) && !defined(LINUX))
++	|| (defined(_PR_PTHREADS) && !defined(LINUX) && !defined(GLIBC))
+ #define _PR_NATIVE_THREADS
+ #endif
+ 
+diff -ur nsprpub.old/pr/src/md/unix/uxrng.c nsprpub/pr/src/md/unix/uxrng.c
+--- nsprpub.old/pr/src/md/unix/uxrng.c	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/pr/src/md/unix/uxrng.c	2004-09-25 17:34:05.000000000 +0200
+@@ -138,7 +138,7 @@
+     return 0;
+ }
+ 
+-#elif (defined(LINUX) || defined(FREEBSD) || defined(NETBSD) || defined(OPENBSD))
++#elif (defined(LINUX) || defined(__FreeBSD_kernel__) || defined(__NetBSD_kernel__) || defined(OPENBSD))
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+diff -ur nsprpub.old/pr/src/misc/prnetdb.c nsprpub/pr/src/misc/prnetdb.c
+--- nsprpub.old/pr/src/misc/prnetdb.c	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/pr/src/misc/prnetdb.c	2004-09-24 20:24:02.000000000 +0200
+@@ -108,7 +108,7 @@
+ #define _PR_HAVE_GETPROTO_R_INT
+ #endif
+ 
+-#if (defined(LINUX) && defined(__GLIBC__) && __GLIBC__ >= 2)
++#if (defined(__GLIBC__) && __GLIBC__ >= 2)
+ #define _PR_HAVE_GETPROTO_R
+ #define _PR_HAVE_5_ARG_GETPROTO_R
+ #endif
+diff -ur nsprpub.old/pr/src/pthreads/ptio.c nsprpub/pr/src/pthreads/ptio.c
+--- nsprpub.old/pr/src/pthreads/ptio.c	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/pr/src/pthreads/ptio.c	2004-09-25 17:24:00.000000000 +0200
+@@ -206,7 +206,7 @@
+ #if defined(SOLARIS)
+ #define _PRSockOptVal_t char *
+ #elif defined(IRIX) || defined(OSF1) || defined(AIX) || defined(HPUX) \
+-    || defined(LINUX) || defined(FREEBSD) || defined(BSDI) || defined(VMS) \
++    || defined(LINUX) || defined(GLIBC) || defined(FREEBSD) || defined(BSDI) || defined(VMS) \
+     || defined(NTO) || defined(OPENBSD) || defined(DARWIN) \
+     || defined(UNIXWARE) || defined(NETBSD)
+ #define _PRSockOptVal_t void *
+@@ -220,7 +220,7 @@
+ #define _PRSelectFdSetArg_t void *
+ #elif defined(IRIX) || (defined(AIX) && !defined(AIX4_1)) \
+     || defined(OSF1) || defined(SOLARIS) \
+-    || defined(HPUX10_30) || defined(HPUX11) || defined(LINUX) \
++    || defined(HPUX10_30) || defined(HPUX11) || defined(LINUX) || defined(GLIBC) \
+     || defined(FREEBSD) || defined(NETBSD) || defined(OPENBSD) \
+     || defined(BSDI) || defined(VMS) || defined(NTO) || defined(DARWIN) \
+     || defined(UNIXWARE)
+@@ -304,7 +304,7 @@
+  * most current systems.
+  */
+ #if defined(HAVE_SOCKLEN_T) \
+-    || (defined(LINUX) && defined(__GLIBC__) && __GLIBC__ >= 2)
++    || (defined(__GLIBC__) && __GLIBC__ >= 2)
+ typedef socklen_t pt_SockLen;
+ #elif (defined(AIX) && !defined(AIX4_1)) \
+     || defined(VMS)
+@@ -360,14 +360,14 @@
+     int nbytes_to_send;                     /* size of header and file */
+ #endif  /* SOLARIS */
+ 
+-#ifdef LINUX
++#if defined(LINUX) || defined(GLIBC)
+     /*
+      * For sendfile()
+      */
+     int in_fd;                              /* descriptor of file to send */
+     off_t offset;
+     size_t count;
+-#endif  /* LINUX */
++#endif  /* LINUX || GLIBC */
+  
+     PRIntervalTime timeout;                 /* client (relative) timeout */
+ 
+@@ -3258,7 +3258,7 @@
+ };
+ 
+ #if defined(HPUX) || defined(OSF1) || defined(SOLARIS) || defined (IRIX) \
+-    || defined(AIX) || defined(LINUX) || defined(FREEBSD) || defined(NETBSD) \
++    || defined(AIX) || defined(LINUX) || defined(GLIBC) || defined(FREEBSD) || defined(NETBSD) \
+     || defined(OPENBSD) || defined(BSDI) || defined(VMS) || defined(NTO) \
+     || defined(DARWIN) || defined(UNIXWARE)
+ #define _PR_FCNTL_FLAGS O_NONBLOCK
+@@ -4750,7 +4750,7 @@
+ 
+ #include <sys/types.h>
+ #include <sys/time.h>
+-#if !defined(SUNOS4) && !defined(HPUX) && !defined(LINUX)
++#if !defined(SUNOS4) && !defined(HPUX) && !defined(LINUX) && !defined(GLIBC)
+ #include <sys/select.h>
+ #endif
+ 
+diff -ur nsprpub.old/pr/tests/Makefile.in nsprpub/pr/tests/Makefile.in
+--- nsprpub.old/pr/tests/Makefile.in	2004-09-24 20:29:02.000000000 +0200
++++ nsprpub/pr/tests/Makefile.in	2004-09-24 20:24:02.000000000 +0200
+@@ -376,8 +376,8 @@
+     EXTRA_LIBS = -lsocket -lnsl -lgen -lresolv
+ endif
+ 
+-ifeq ($(OS_ARCH), Linux)
+-    ifeq ($(OS_RELEASE), 1.2)
++ifneq (,$(findstring $(OS_ARCH),Linux GNU))
++    ifeq ($(OS_ARCH)-$(OS_RELEASE), Linux-1.2)
+         EXTRA_LIBS = -ldl
+     else
+         LDOPTS += -Xlinker -rpath $(ABSOLUTE_LIB_DIR)
+@@ -548,7 +548,7 @@
+ endif
+ endif
+ 
+-ifeq ($(OS_TARGET),Linux)
++ifneq (,$(findstring $(OS_TARGET),Linux GNU))
+ ECHO = /bin/echo
+ endif
+ 
