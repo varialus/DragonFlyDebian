@@ -35,10 +35,6 @@ if [ "${LIVECD_DEBUG}" != "yes" ] ; then
   rm -f ${tmp1}/var/cache/apt/archives/*.deb
 fi
 
-# we can't run native-install (since we might be cross-building) so we
-# mimic the essentials here
-ln -s /usr/share/sysvinit/inittab etc/inittab
-
 # GRUB stuff
 mkdir -p boot/grub
 cp lib/grub/${cpu}-*/stage2_eltorito boot/grub/
@@ -68,13 +64,16 @@ cat > etc/fstab << EOF
 EOF
 # keep inetutils-syslogd from bitching
 cp bin/true usr/sbin/syslogd
+
 # password-less login
-cat > root/login << EOF
-#!/bin/sh
-login -f root
+cat > etc/passwd << EOF
+root::0:0:root:/root:/bin/bash
 EOF
-chmod +x root/login
-sed -i etc/inittab -e 's,/sbin/getty,& -nl /root/login,g'
+cat > etc/inittab << EOF
+id:S:initdefault:
+~~:S:wait:/sbin/sulogin -e
+ca:12345:ctrlaltdel:/sbin/shutdown -t1 -a -r now
+EOF
 
 #########################
 #                    ignition!
