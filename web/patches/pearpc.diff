@@ -1,0 +1,54 @@
+
+Status: in BTS and upstream BTS
+
+--- pearpc-0.3.1.old/configure.in	2004-09-05 18:24:36.000000000 +0200
++++ pearpc-0.3.1/configure.in	2005-02-05 05:02:14.000000000 +0100
+@@ -61,7 +61,7 @@
+ NASM_OPTS="-f elf"
+ 
+ case "$target_os" in
+-linux*) 
++linux* | gnu* | k*bsd*-gnu)
+ 	OSAPI_DIR=posix
+ 	if test "x$enable_ui" = "xno"; then
+ 		enable_ui="x11"
+@@ -69,7 +69,7 @@
+ 	AC_MSG_RESULT([*** LINUX, building POSIX version. we need pthread.])
+ 	PPC_LDADD="$PPC_LDADD -lpthread -lrt"
+ ;;
+-*freebsd*) 
++freebsd*) 
+ 	OSAPI_DIR=posix
+ 	if test "x$enable_ui" = "xno"; then
+ 		enable_ui="x11"
+diff -ur pearpc-0.3.1.old/debian/control.in pearpc-0.3.1/debian/control.in
+--- pearpc-0.3.1.old/debian/control.in	2005-02-05 04:36:25.000000000 +0100
++++ pearpc-0.3.1/debian/control.in	2005-02-05 04:59:27.000000000 +0100
+@@ -2,12 +2,13 @@
+ Section: otherosfs
+ Priority: optional
+ Maintainer: Leo Costela <costela@debian.org>
+-Build-Depends: nasm, debhelper (>= 4.1.0), cdbs, aalib1, libgpmg1, libsdl1.2debian-all, libsvga1, libncurses5-dev, libxext6, libasound2, slang1, libsdl1.2-dev, libx11-6
++Build-Depends: @cdbs@, nasm [cpu: i386], aalib1-dev, libsdl1.2-dev, libncurses5-dev, libxext-dev, slang1-dev, libx11-dev, libsvga1-dev [i386], libgpmg1-dev [system: linux], libasound2-dev [system: linux]
+ Standards-Version: 3.6.1.0
+ 
+ Package: pearpc
+-Architecture: i386
+-Depends: ${shlibs:Depends}
++Cpu: i386
++System: any
++Depends: ${shlibs:Depends}
+ Description: Architecture-independent PowerPC platform emulator
+  PearPC is an architecture-independent PowerPC platform emulator capable of 
+  running most PowerPC operating systems.
+diff -ur pearpc-0.3.1.old/debian/rules pearpc-0.3.1/debian/rules
+--- pearpc-0.3.1.old/debian/rules	2005-02-05 04:33:50.000000000 +0100
++++ pearpc-0.3.1/debian/rules	2005-02-05 04:43:12.000000000 +0100
+@@ -2,6 +2,7 @@
+ 
+ PACKAGE = pearpc
+ INSTALL = install -D
++DEB_AUTO_UPDATE_DEBIAN_CONTROL = yes
+ 
+ include /usr/share/cdbs/1/class/autotools.mk
+ include /usr/share/cdbs/1/class/makefile.mk

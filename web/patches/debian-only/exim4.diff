@@ -1,0 +1,521 @@
+diff -Nur exim4-4.44.old/OS/Makefile-GNU exim4-4.44/OS/Makefile-GNU
+--- exim4-4.44.old/OS/Makefile-GNU	2005-01-11 13:54:54.000000000 +0100
++++ exim4-4.44/OS/Makefile-GNU	1970-01-01 01:00:00.000000000 +0100
+@@ -1,22 +0,0 @@
+-# Exim: OS-specific make file for GNU/Hurd.
+-
+-BASENAME_COMMAND=look_for_it
+-
+-DBMLIB = -ldb
+-USE_DB = yes
+-
+-LIBS = -lnsl -lcrypt
+-LIBRESOLV = -lresolv
+-
+-CFLAGS = -O2 -g -Wall
+-
+-X11=/usr/X11R6
+-XINCLUDE=-I$(X11)/include
+-XLFLAGS=-L$(X11)/lib
+-X11_LD_LIB=$(X11)/lib
+-
+-EXIWHAT_PS_ARG=ax
+-EXIWHAT_EGREP_ARG='/exim( |$$)'
+-EXIWHAT_KILL_SIGNAL=-USR1
+-
+-# End
+diff -Nur exim4-4.44.old/OS/os.c-GNU exim4-4.44/OS/os.c-GNU
+--- exim4-4.44.old/OS/os.c-GNU	2005-01-11 13:54:54.000000000 +0100
++++ exim4-4.44/OS/os.c-GNU	1970-01-01 01:00:00.000000000 +0100
+@@ -1,55 +0,0 @@
+-/*************************************************
+-*     Exim - an Internet mail transport agent    *
+-*************************************************/
+-
+-/* See the file NOTICE for conditions of use and distribution. */
+-
+-/* GNU-specific code. This is concatenated onto the generic src/os.c file.
+-GNU/Hurd has approximately the same way to determine the load average as NeXT,
+-so a variant of this could also be in the generic os.c file. See the GNU EMacs
+-getloadavg.c file, from which this snippet was derived. getloadavg.c from Emacs
+-is copyrighted by the FSF under the terms of the GPLv2 or any later version.
+-Changes are hereby placed under the same license, as requested by the GPL. */
+-
+-#ifndef OS_LOAD_AVERAGE
+-#define OS_LOAD_AVERAGE
+-
+-#include <mach.h>
+-
+-static processor_set_t default_set;
+-static int getloadavg_initialized;
+-
+-int
+-os_getloadavg (void)
+-{
+-host_t host;
+-struct processor_set_basic_info info;
+-unsigned info_count;
+-
+-if (!getloadavg_initialized)
+-  {
+-  if (processor_set_default (mach_host_self(), &default_set) == KERN_SUCCESS)
+-    getloadavg_initialized = 1;
+-  }
+-
+-if (getloadavg_initialized)
+-  {
+-  info_count = PROCESSOR_SET_BASIC_INFO_COUNT;
+-  if (processor_set_info(default_set, PROCESSOR_SET_BASIC_INFO, &host,
+-       (processor_set_info_t)&info, &info_count) != KERN_SUCCESS)
+-    getloadavg_initialized = 0;
+-  else
+-    {
+-    #if LOAD_SCALE == 1000
+-    return info.load_average;
+-    #else
+-    return (int) (((double) info.load_average * 1000) / LOAD_SCALE));
+-    #endif
+-    }
+-  }
+-
+-return -1;
+-}
+-#endif  /* OS_LOAD_AVERAGE */
+-
+-/* End of os.c-GNU */
+diff -Nur exim4-4.44.old/OS/os.c-Linux exim4-4.44/OS/os.c-Linux
+--- exim4-4.44.old/OS/os.c-Linux	2005-01-11 13:54:54.000000000 +0100
++++ exim4-4.44/OS/os.c-Linux	2005-02-07 15:23:53.000000000 +0100
+@@ -10,65 +10,6 @@
+ 
+ 
+ /*************************************************
+-*              Load average computation          *
+-*************************************************/
+-
+-/*Linux has an apparently unique way of getting the load average, so we provide
+-a unique function here, and define OS_LOAD_AVERAGE to stop src/os.c trying to
+-provide the function. However, when compiling os.c for utilities, we may not
+-want this at all, so check that it isn't set first. */
+-
+-#ifndef OS_LOAD_AVERAGE
+-#define OS_LOAD_AVERAGE
+-
+-/* Linux has 2 ways of returning load average:
+-
+-  (1) Do a read on /proc/loadavg
+-  (2) Use the sysinfo library function and syscall
+-
+-The latter is simpler but in Linux 2.0 - 2.2 (and probably later releases) is
+-exceptionally slow - 10-50ms per call is not unusual and about 100x slow the
+-first method. This cripples high performance mail servers by increasing CPU
+-utilisation by 3-5x.
+-
+-In Exim's very early days, it used the 1st method. Later, it switched to the
+-2nd method. Now it tries the 1st method and falls back to the 2nd if /proc is
+-unavailable. */
+-
+-#include <sys/sysinfo.h>
+-
+-static int
+-linux_slow_getloadavg(void)
+-{
+-struct sysinfo s;
+-double avg;
+-if (sysinfo(&s) < 0) return -1;
+-avg = (double) (s.loads[0]) / (1<<SI_LOAD_SHIFT);
+-return (int)(avg * 1000.0);
+-}
+-
+-int
+-os_getloadavg(void)
+-{
+-char buffer[40];
+-double avg;
+-int count;
+-int fd = open ("/proc/loadavg", O_RDONLY);
+-if (fd == -1) return linux_slow_getloadavg();
+-count = read (fd, buffer, sizeof(buffer));
+-(void)close (fd);
+-if (count <= 0) return linux_slow_getloadavg();
+-count = sscanf (buffer, "%lf", &avg);
+-if (count < 1) return linux_slow_getloadavg();
+-return (int)(avg * 1000.0);
+-}
+-#endif  /* OS_LOAD_AVERAGE */
+-
+-
+-
+-
+-
+-/*************************************************
+ *         Finding interface addresses            *
+ *************************************************/
+ 
+diff -Nur exim4-4.44.old/OS/os.h-GNU exim4-4.44/OS/os.h-GNU
+--- exim4-4.44.old/OS/os.h-GNU	2005-01-11 13:54:54.000000000 +0100
++++ exim4-4.44/OS/os.h-GNU	1970-01-01 01:00:00.000000000 +0100
+@@ -1,18 +0,0 @@
+-/* Exim: OS-specific C header file for GNU/Hurd */
+-
+-#define CRYPT_H
+-#define HAVE_MMAP
+-#define HAVE_SYS_VFS_H
+-#define NO_IP_VAR_H
+-#define NO_NET_IF_H
+-#define NO_FIND_INTERFACES
+-#define SETRLIMIT_NOT_SUPPORTED
+-#define GLIBC_IP_OPTIONS
+-
+-#define F_FREESP     O_TRUNC
+-typedef struct flock flock_t;
+-
+-#define os_strsignal strsignal
+-#define OS_STRSIGNAL
+-
+-/* End */
+diff -Nur exim4-4.44.old/OS/os.h-Linux exim4-4.44/OS/os.h-Linux
+--- exim4-4.44.old/OS/os.h-Linux	2005-01-11 21:05:08.000000000 +0100
++++ exim4-4.44/OS/os.h-Linux	2005-02-07 15:23:53.000000000 +0100
+@@ -1,13 +1,26 @@
+-/* Exim: OS-specific C header file for Linux */
++/* Exim: OS-specific C header file for GNU and variants */
+ 
+ #define CRYPT_H
+ #define GLIBC_IP_OPTIONS
+ #define HAVE_MMAP
++#define HAVE_BSD_GETLOADAVG
+ #define HAVE_SYS_STATVFS_H
+ #define NO_IP_VAR_H
+-#define SIOCGIFCONF_GIVES_ADDR
+ #define SIG_IGN_WORKS
+ 
++#define F_FREESP     O_TRUNC
++typedef struct flock flock_t;
++
++#define os_strsignal strsignal
++#define OS_STRSIGNAL
++
++#if defined(__linux__) || defined(__FreeBSD_kernel__) || defined(__NetBSD_kernel__)
++#define SIOCGIFCONF_GIVES_ADDR
++#define HAVE_SYS_MOUNT_H
++#endif
++
++#if defined(__linux__)
++
+ /* Some versions of Linux need explicit sync-ing of directories as well as
+ files. This setting requests that. If the directory is on NFS, it may not
+ be possible to sync it - in that case, Exim now should ignore the error. But
+@@ -20,12 +33,6 @@
+ /* Other OS have "const" in here */
+ #define ICONV_ARG2_TYPE char **
+ 
+-#define F_FREESP     O_TRUNC
+-typedef struct flock flock_t;
+-
+-#define os_strsignal strsignal
+-#define OS_STRSIGNAL
+-
+ #define os_find_running_interfaces os_find_running_interfaces_linux
+ 
+ /* Need a prototype for the Linux-specific function. The structure hasn't
+@@ -34,4 +41,11 @@
+ struct ip_address_item;
+ extern struct ip_address_item *os_find_running_interfaces_linux(void);
+ 
++/* Fudge added because this Linux doesn't appear to have a definition
++for ip_options in /usr/include/linux/ip.h. */
++
++#define ip_options options
++
++#endif /* __linux__ */
++
+ /* End */
+diff -Nur exim4-4.44.old/debian/patches/37_kbsd-gnu.dpatch exim4-4.44/debian/patches/37_kbsd-gnu.dpatch
+--- exim4-4.44.old/debian/patches/37_kbsd-gnu.dpatch	2005-02-06 17:52:09.000000000 +0100
++++ exim4-4.44/debian/patches/37_kbsd-gnu.dpatch	1970-01-01 01:00:00.000000000 +0100
+@@ -1,249 +0,0 @@
+-#! /bin/sh -e
+-## 37_kbsd-gnu.dpatch by Robert Millan <rmh@debian.org>
+-##
+-## All lines beginning with `## DP:' are a description of the patch.
+-## DP: GNU and GNU/k*BSD porting fixes.
+-
+-if [ $# -ne 1 ]; then
+-    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+-    exit 1
+-fi
+-case "$1" in
+-	-patch) patch -f --no-backup-if-mismatch -p1 < $0;;
+-	-unpatch) patch -f --no-backup-if-mismatch -R -p1 < $0;;
+-	*)
+-		echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+-		exit 1;;
+-esac
+-
+-exit 0
+-				    
+-@DPATCH@
+-diff -Nur exim4-4.34.old/OS/Makefile-GNU exim4-4.34/OS/Makefile-GNU
+---- exim4-4.34.old/OS/Makefile-GNU	2004-08-01 04:16:31.000000000 +0200
+-+++ exim4-4.34/OS/Makefile-GNU	2004-08-01 04:19:06.000000000 +0200
+-@@ -1,6 +1,12 @@
+--# Exim: OS-specific make file for GNU/Hurd.
+-+# Exim: OS-specific make file for GNU and variants.
+-+
+-+HAVE_ICONV=yes
+- 
+- BASENAME_COMMAND=look_for_it
+-+CHOWN_COMMAND=look_for_it
+-+CHGRP_COMMAND=look_for_it
+-+
+-+CFLAGS ?= -O -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+- 
+- DBMLIB = -ldb
+- USE_DB = yes
+-@@ -8,8 +14,6 @@
+- LIBS = -lnsl -lcrypt
+- LIBRESOLV = -lresolv
+- 
+--CFLAGS = -O2 -g -Wall
+--
+- X11=/usr/X11R6
+- XINCLUDE=-I$(X11)/include
+- XLFLAGS=-L$(X11)/lib
+-@@ -17,6 +21,8 @@
+- 
+- EXIWHAT_PS_ARG=ax
+- EXIWHAT_EGREP_ARG='/exim( |$$)'
+-+EXIWHAT_MULTIKILL_CMD=killall
+-+EXIWHAT_MULTIKILL_ARG=exim4
+- EXIWHAT_KILL_SIGNAL=-USR1
+- 
+- # End
+-diff -Nur exim4-4.34.old/OS/Makefile-GNUkFreeBSD exim4-4.34/OS/Makefile-GNUkFreeBSD
+---- exim4-4.34.old/OS/Makefile-GNUkFreeBSD	1970-01-01 01:00:00.000000000 +0100
+-+++ exim4-4.34/OS/Makefile-GNUkFreeBSD	2004-08-01 04:19:16.000000000 +0200
+-@@ -0,0 +1,28 @@
+-+# Exim: OS-specific make file for GNU and variants.
+-+
+-+HAVE_ICONV=yes
+-+
+-+BASENAME_COMMAND=look_for_it
+-+CHOWN_COMMAND=look_for_it
+-+CHGRP_COMMAND=look_for_it
+-+
+-+CFLAGS ?= -O -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+-+
+-+DBMLIB = -ldb
+-+USE_DB = yes
+-+
+-+LIBS = -lnsl -lcrypt
+-+LIBRESOLV = -lresolv
+-+
+-+X11=/usr/X11R6
+-+XINCLUDE=-I$(X11)/include
+-+XLFLAGS=-L$(X11)/lib
+-+X11_LD_LIB=$(X11)/lib
+-+
+-+EXIWHAT_PS_ARG=ax
+-+EXIWHAT_EGREP_ARG='/exim( |$$)'
+-+EXIWHAT_MULTIKILL_CMD=killall
+-+EXIWHAT_MULTIKILL_ARG=exim4
+-+EXIWHAT_KILL_SIGNAL=-USR1
+-+
+-+# End
+-diff -Nur exim4-4.34.old/OS/Makefile-GNUkNetBSD exim4-4.34/OS/Makefile-GNUkNetBSD
+---- exim4-4.34.old/OS/Makefile-GNUkNetBSD	1970-01-01 01:00:00.000000000 +0100
+-+++ exim4-4.34/OS/Makefile-GNUkNetBSD	2004-08-01 04:19:19.000000000 +0200
+-@@ -0,0 +1,28 @@
+-+# Exim: OS-specific make file for GNU and variants.
+-+
+-+HAVE_ICONV=yes
+-+
+-+BASENAME_COMMAND=look_for_it
+-+CHOWN_COMMAND=look_for_it
+-+CHGRP_COMMAND=look_for_it
+-+
+-+CFLAGS ?= -O -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+-+
+-+DBMLIB = -ldb
+-+USE_DB = yes
+-+
+-+LIBS = -lnsl -lcrypt
+-+LIBRESOLV = -lresolv
+-+
+-+X11=/usr/X11R6
+-+XINCLUDE=-I$(X11)/include
+-+XLFLAGS=-L$(X11)/lib
+-+X11_LD_LIB=$(X11)/lib
+-+
+-+EXIWHAT_PS_ARG=ax
+-+EXIWHAT_EGREP_ARG='/exim( |$$)'
+-+EXIWHAT_MULTIKILL_CMD=killall
+-+EXIWHAT_MULTIKILL_ARG=exim4
+-+EXIWHAT_KILL_SIGNAL=-USR1
+-+
+-+# End
+-diff -Nur exim4-4.34.old/OS/os.h-GNU exim4-4.34/OS/os.h-GNU
+---- exim4-4.34.old/OS/os.h-GNU	2004-08-01 04:16:31.000000000 +0200
+-+++ exim4-4.34/OS/os.h-GNU	2004-08-01 04:21:29.000000000 +0200
+-@@ -1,13 +1,12 @@
+- /* Exim: OS-specific C header file for GNU/Hurd */
+- 
+- #define CRYPT_H
+-+#define GLIBC_IP_OPTIONS
+- #define HAVE_MMAP
+-+#define HAVE_BSD_GETLOADAVG
+- #define HAVE_SYS_VFS_H
+- #define NO_IP_VAR_H
+--#define NO_NET_IF_H
+--#define NO_FIND_INTERFACES
+--#define SETRLIMIT_NOT_SUPPORTED
+--#define GLIBC_IP_OPTIONS
+-+#define SIG_IGN_WORKS
+- 
+- #define F_FREESP     O_TRUNC
+- typedef struct flock flock_t;
+-@@ -15,4 +14,6 @@
+- #define os_strsignal strsignal
+- #define OS_STRSIGNAL
+- 
+-+/* Hurd-specific bits below */
+-+
+- /* End */
+-diff -Nur exim4-4.34.old/OS/os.h-GNUkFreeBSD exim4-4.34/OS/os.h-GNUkFreeBSD
+---- exim4-4.34.old/OS/os.h-GNUkFreeBSD	1970-01-01 01:00:00.000000000 +0100
+-+++ exim4-4.34/OS/os.h-GNUkFreeBSD	2004-08-01 04:20:31.000000000 +0200
+-@@ -0,0 +1,22 @@
+-+/* Exim: OS-specific C header file for GNU/kFreeBSD */
+-+
+-+#define CRYPT_H
+-+#define GLIBC_IP_OPTIONS
+-+#define HAVE_MMAP
+-+#define HAVE_BSD_GETLOADAVG
+-+#define HAVE_SYS_VFS_H
+-+#define NO_IP_VAR_H
+-+#define SIG_IGN_WORKS
+-+
+-+#define F_FREESP     O_TRUNC
+-+typedef struct flock flock_t;
+-+
+-+#define os_strsignal strsignal
+-+#define OS_STRSIGNAL
+-+
+-+/* kFreeBSD-specific bits below */
+-+
+-+#define HAVE_SYS_MOUNT_H
+-+#define SIOCGIFCONF_GIVES_ADDR
+-+
+-+/* End */
+-diff -Nur exim4-4.34.old/OS/os.h-GNUkNetBSD exim4-4.34/OS/os.h-GNUkNetBSD
+---- exim4-4.34.old/OS/os.h-GNUkNetBSD	1970-01-01 01:00:00.000000000 +0100
+-+++ exim4-4.34/OS/os.h-GNUkNetBSD	2004-08-01 04:20:31.000000000 +0200
+-@@ -0,0 +1,22 @@
+-+/* Exim: OS-specific C header file for GNU/kNetBSD */
+-+
+-+#define CRYPT_H
+-+#define GLIBC_IP_OPTIONS
+-+#define HAVE_MMAP
+-+#define HAVE_BSD_GETLOADAVG
+-+#define HAVE_SYS_VFS_H
+-+#define NO_IP_VAR_H
+-+#define SIG_IGN_WORKS
+-+
+-+#define F_FREESP     O_TRUNC
+-+typedef struct flock flock_t;
+-+
+-+#define os_strsignal strsignal
+-+#define OS_STRSIGNAL
+-+
+-+/* kNetBSD-specific bits below */
+-+
+-+#define HAVE_SYS_MOUNT_H
+-+#define SIOCGIFCONF_GIVES_ADDR
+-+
+-+/* End */
+-diff -Nur exim4-4.34.old/OS/os.h-Linux exim4-4.34/OS/os.h-Linux
+---- exim4-4.34.old/OS/os.h-Linux	2004-08-01 04:16:31.000000000 +0200
+-+++ exim4-4.34/OS/os.h-Linux	2004-08-01 04:20:31.000000000 +0200
+-@@ -3,11 +3,22 @@
+- #define CRYPT_H
+- #define GLIBC_IP_OPTIONS
+- #define HAVE_MMAP
+-+#define HAVE_BSD_GETLOADAVG
+- #define HAVE_SYS_VFS_H
+- #define NO_IP_VAR_H
+--#define SIOCGIFCONF_GIVES_ADDR
+- #define SIG_IGN_WORKS
+- 
+-+#define F_FREESP     O_TRUNC
+-+typedef struct flock flock_t;
+-+
+-+#define os_strsignal strsignal
+-+#define OS_STRSIGNAL
+-+
+-+/* Linux-specific bits below */
+-+
+-+#define SIOCGIFCONF_GIVES_ADDR
+-+#define HAVE_SYS_MOUNT_H
+-+
+- /* Some versions of Linux need explicit sync-ing of directories as well as
+- files. This setting requests that. If the directory is on NFS, it may not
+- be possible to sync it - in that case, Exim now should ignore the error. But
+-@@ -20,12 +31,6 @@
+- /* Other OS have "const" in here */
+- #define ICONV_ARG2_TYPE char **
+- 
+--#define F_FREESP     O_TRUNC
+--typedef struct flock flock_t;
+--
+--#define os_strsignal strsignal
+--#define OS_STRSIGNAL
+--
+- #define os_find_running_interfaces os_find_running_interfaces_linux
+- 
+- /* Need a prototype for the Linux-specific function. The structure hasn't
+-@@ -34,4 +39,9 @@
+- struct ip_address_item;
+- extern struct ip_address_item *os_find_running_interfaces_linux(void);
+- 
+-+/* Fudge added because this Linux doesn't appear to have a definition
+-+for ip_options in /usr/include/linux/ip.h. */
+-+
+-+#define ip_options options
+-+
+- /* End */
+diff -Nur exim4-4.44.old/debian/patches/exiscan.patch exim4-4.44/debian/patches/exiscan.patch
+--- exim4-4.44.old/debian/patches/exiscan.patch	2005-02-06 17:52:09.000000000 +0100
++++ exim4-4.44/debian/patches/exiscan.patch	2005-02-07 15:23:54.000000000 +0100
+@@ -71,18 +71,6 @@
+  tod.o:           $(HDRS) tod.c
+  transport.o:     $(HDRS) transport.c
+  tree.o:          $(HDRS) tree.c
+-diff -urN exim-4.44-orig/OS/os.h-Linux exim-4.44/OS/os.h-Linux
+---- exim-4.44-orig/OS/os.h-Linux	Tue Jan 11 21:05:08 2005
+-+++ exim-4.44/OS/os.h-Linux	Fri Jan 14 20:35:02 2005
+-@@ -35,3 +35,8 @@
+- extern struct ip_address_item *os_find_running_interfaces_linux(void);
+- 
+- /* End */
+-+
+-+/* Fudge added because this Linux doesn't appear to have a definition
+-+for ip_options in /usr/include/linux/ip.h. */
+-+
+-+#define ip_options options
+ diff -urN exim-4.44-orig/README.EXISCAN exim-4.44/README.EXISCAN
+ --- exim-4.44-orig/README.EXISCAN	Thu Jan  1 01:00:00 1970
+ +++ exim-4.44/README.EXISCAN	Fri Jan 14 20:35:02 2005
+diff -Nur exim4-4.44.old/scripts/os-type exim4-4.44/scripts/os-type
+--- exim4-4.44.old/scripts/os-type	2005-01-11 13:54:54.000000000 +0100
++++ exim4-4.44/scripts/os-type	2005-02-07 15:23:54.000000000 +0100
+@@ -20,6 +20,9 @@
+ 
+ case "$os" in '') os=`uname -s`;; esac
+ 
++# Glibc systems have different names..
++case "$os" in GNU|GNU/*|Linux) os=Linux;; esac
++
+ # It is believed that all systems respond to uname -s, but just in case
+ # there is one that doesn't, use the shell's $OSTYPE variable. It is known
+ # to be unhelpful for some systems (under IRIX is it "irix" and under BSDI
