@@ -1,15 +1,8 @@
 #!/usr/bin/make -f
 
-version := 4.6
-DEB_TAR_SRCDIR = src
-
-#  Attempting this is out of sanity.. come back lator.
-#
-#build/kfreebsd4-headers:: apply-patches
-#	chmod +x debian/testheader
-#	set -e ; for i in \
-#		`find $(CURDIR)/$(DEB_SRCDIR) -type f -name \*.h` ; \
-#		do $(CURDIR)/debian/testheader $$i ; done
+version				:= 4.6
+DEB_TAR_SRCDIR			:= src
+DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
 
 binary/kfreebsd4-headers:: common-install-prehook-arch
 	mkdir -p debian/kfreebsd4-headers/usr/src/kfreebsd4-headers
