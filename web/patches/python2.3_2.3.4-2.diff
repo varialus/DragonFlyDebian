@@ -1,35 +1,5 @@
-
-All except the --without-threads hunk is in BTS.
-
 --- python2.3-2.3.4.old/debian/rules	2004-06-10 20:00:05.000000000 +0200
 +++ python2.3-2.3.4/debian/rules	2004-06-10 18:59:06.000000000 +0200
-@@ -9,7 +9,8 @@
- # This is the debhelper compatibility version to use.
- export DH_COMPAT=3
- 
--DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
-+DEB_BUILD_GNU_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
-+DEB_BUILD_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_SYSTEM)
- 
- export VER=2.3
- export NVER=2.4
-@@ -39,14 +40,14 @@
- CC = gcc
- 
- # on alpha, use -O2 only, use -mieee
--ifeq ($(DEB_HOST_ARCH),alpha)
-+ifeq ($(DEB_BUILD_GNU_CPU),alpha)
-     OPTSETTINGS = OPT="-DNDEBUG -g -O2 -mieee -Wall -Wstrict-prototypes"
- endif
- #OPTSETTINGS = OPT="-DNDEBUG -g -O0 -Wall -Wstrict-prototypes"
- 
- # on arm, use gcc-3.2
- #GCCBDEP = , gcc-3.2 [arm]
--#ifeq ($(DEB_HOST_ARCH),arm)
-+#ifeq ($(DEB_BUILD_GNU_CPU),arm)
- #    CC = gcc-3.2
- #    GCCDEP = , gcc-3.2
- #endif
 @@ -109,6 +110,13 @@
  		--enable-unicode=ucs4 \
  		--without-cxx
@@ -44,12 +14,3 @@ All except the --without-threads hunk is in BTS.
  stamp-configure-shared: patch-stamp
  	mkdir -p $(buildd_shared)
  	cd $(buildd_shared) && \
-@@ -543,7 +551,7 @@
- #	cvs-updates \
- #	patchlevel \
- 
--ifeq ($(DEB_HOST_ARCH),hurd-i386)
-+ifeq ($(DEB_BUILD_GNU_SYSTEM),gnu)
-   debian_patches += \
- 	no-large-file-support \
- 	hurd-reclimit \
