@@ -1,6 +1,6 @@
-/* Copyright (C) 2002 Free Software Foundation, Inc.
+/* Copyright (C) 2004 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-   Contributed by Bruno Haible <bruno@clisp.org>, 2002.
+   Contributed by Robert Millan <robertmh@gnu.org>
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -17,36 +17,42 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <sysdep.h>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/syscall.h>
 
-.data
-.globl C_SYMBOL_NAME(__curbrk)
-#ifdef HAVE_ELF
-	.type __curbrk,@object
-	.size __curbrk,4
-#endif
-C_LABEL(__curbrk)
-#ifdef	HAVE_GNU_LD
-	.long C_SYMBOL_NAME(_end)
-#else
-	.long C_SYMBOL_NAME(end)
+#ifndef SYS_break
+#define SYS_break SYS_obreak
 #endif
 
-.text
-PSEUDO (__brk, obreak, 1)
-	movl 4(%esp), %eax
-#ifdef	PIC
-	/* Standard PIC nonsense to store into `__curbrk' through the GOT.  */
-	call L(here)
-L(here): popl %ecx
-	addl $_GLOBAL_OFFSET_TABLE_+[.-L(here)], %ecx
-	movl C_SYMBOL_NAME(__curbrk@GOT)(%ecx), %ecx
-	movl %eax, (%ecx)
-#else
-	movl %eax, C_SYMBOL_NAME(__curbrk)
-#endif
-	xorl %eax, %eax
-	ret
-PSEUDO_END (__brk)
+extern void _end;
+
+/* sbrk.c expects this.  */
+void *__curbrk = &_end;
+
+
+/* Set the end of the process's data space to ADDR.
+   Return 0 if successful, -1 if not.  */
+int
+__brk (addr)
+     void *addr;
+{
+
+
+
+  if (addr < &_end)
+    return 0;
+
+  if (syscall (SYS_break, addr) == -1)
+    {
+      __set_errno (ENOMEM);
+      return -1;
+    }
+
+  __curbrk = addr;
+  return 0;
+}
+stub_warning (brk)
 
 weak_alias (__brk, brk)
+#include <stub-tag.h>
