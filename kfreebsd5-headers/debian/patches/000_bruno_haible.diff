@@ -1,6 +1,6 @@
 diff -ur src.old/sys/alpha/include/alpha_cpu.h src/sys/alpha/include/alpha_cpu.h
---- src.old/sys/alpha/include/alpha_cpu.h	2003-07-24 09:41:08.000000000 +0200
-+++ src/sys/alpha/include/alpha_cpu.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/alpha/include/alpha_cpu.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/alpha/include/alpha_cpu.h	2004-12-07 23:48:24.000000000 +0100
 @@ -49,6 +49,7 @@
   * and miscellaneous PALcode operations.
   */
@@ -10,8 +10,8 @@ diff -ur src.old/sys/alpha/include/alpha_cpu.h src/sys/alpha/include/alpha_cpu.h
  /*
   * Process Control Block definitions [OSF/1 PALcode Specific]
 diff -ur src.old/sys/alpha/include/param.h src/sys/alpha/include/param.h
---- src.old/sys/alpha/include/param.h	2004-09-10 02:04:16.000000000 +0200
-+++ src/sys/alpha/include/param.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/alpha/include/param.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/alpha/include/param.h	2004-12-07 23:48:24.000000000 +0100
 @@ -39,6 +39,9 @@
   *	@(#)param.h	8.1 (Berkeley) 6/10/93
   */
@@ -30,8 +30,8 @@ diff -ur src.old/sys/alpha/include/param.h src/sys/alpha/include/param.h
 +#endif /* !_MACHINE_PARAM_H_ */
  #endif /* !_NO_NAMESPACE_POLLUTION */
 diff -ur src.old/sys/alpha/include/pcb.h src/sys/alpha/include/pcb.h
---- src.old/sys/alpha/include/pcb.h	2004-07-10 21:55:58.000000000 +0200
-+++ src/sys/alpha/include/pcb.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/alpha/include/pcb.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/alpha/include/pcb.h	2004-12-07 23:48:24.000000000 +0100
 @@ -31,6 +31,8 @@
  #ifndef _MACHINE_PCB_H_
  #define _MACHINE_PCB_H_
@@ -42,8 +42,8 @@ diff -ur src.old/sys/alpha/include/pcb.h src/sys/alpha/include/pcb.h
  #include <machine/reg.h>
  #include <machine/alpha_cpu.h>
 diff -ur src.old/sys/alpha/include/pmap.h src/sys/alpha/include/pmap.h
---- src.old/sys/alpha/include/pmap.h	2004-07-19 20:12:04.000000000 +0200
-+++ src/sys/alpha/include/pmap.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/alpha/include/pmap.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/alpha/include/pmap.h	2004-12-07 23:48:24.000000000 +0100
 @@ -45,6 +45,13 @@
  #ifndef _MACHINE_PMAP_H_
  #define	_MACHINE_PMAP_H_
@@ -59,8 +59,8 @@ diff -ur src.old/sys/alpha/include/pmap.h src/sys/alpha/include/pmap.h
   * Define meanings for a few software bits in the pte
   */
 diff -ur src.old/sys/alpha/include/proc.h src/sys/alpha/include/proc.h
---- src.old/sys/alpha/include/proc.h	2003-04-17 23:57:16.000000000 +0200
-+++ src/sys/alpha/include/proc.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/alpha/include/proc.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/alpha/include/proc.h	2004-12-07 23:48:24.000000000 +0100
 @@ -31,6 +31,9 @@
  #ifndef _MACHINE_PROC_H_
  #define	_MACHINE_PROC_H_
@@ -72,8 +72,8 @@ diff -ur src.old/sys/alpha/include/proc.h src/sys/alpha/include/proc.h
   * Machine-dependent part of the proc struct for the Alpha.
   */
 diff -ur src.old/sys/alpha/include/reg.h src/sys/alpha/include/reg.h
---- src.old/sys/alpha/include/reg.h	2002-08-29 08:17:46.000000000 +0200
-+++ src/sys/alpha/include/reg.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/alpha/include/reg.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/alpha/include/reg.h	2004-12-07 23:48:24.000000000 +0100
 @@ -31,6 +31,8 @@
  #ifndef _ALPHA_REG_H_
  #define	_ALPHA_REG_H_
@@ -83,354 +83,33 @@ diff -ur src.old/sys/alpha/include/reg.h src/sys/alpha/include/reg.h
  /*
   * XXX where did this info come from?
   */
-diff -ur src.old/sys/cam/cam_ccb.h src/sys/cam/cam_ccb.h
---- src.old/sys/cam/cam_ccb.h	2004-06-07 21:12:44.000000000 +0200
-+++ src/sys/cam/cam_ccb.h	2004-11-30 00:47:56.000000000 +0100
-@@ -306,7 +306,7 @@
- 				 * tagged operations
- 				 */
- 	int	mintags;
--	struct	timeval last_reset;	/* Time of last bus reset/loop init */
-+	struct	__kernel_timeval last_reset;	/* Time of last bus reset/loop init */
- };
- 
- typedef enum {
-@@ -566,7 +566,7 @@
- /* Path Statistics CCB */
- struct ccb_pathstats {
- 	struct	ccb_hdr	ccb_h;
--	struct	timeval last_reset;	/* Time of last bus reset/loop init */
-+	struct	__kernel_timeval last_reset;	/* Time of last bus reset/loop init */
- };
- 
- typedef union {
-diff -ur src.old/sys/cam/cam_periph.h src/sys/cam/cam_periph.h
---- src.old/sys/cam/cam_periph.h	2004-07-15 10:25:59.000000000 +0200
-+++ src/sys/cam/cam_periph.h	2004-11-30 00:47:56.000000000 +0100
-@@ -169,7 +169,7 @@
- void		cam_periph_bus_settle(struct cam_periph *periph,
- 				      u_int bus_settle_ms);
- void		cam_periph_freeze_after_event(struct cam_periph *periph,
--					      struct timeval* event_time,
-+					      struct __kernel_timeval* event_time,
- 					      u_int duration_ms);
- int		cam_periph_error(union ccb *ccb, cam_flags camflags,
- 				 u_int32_t sense_flags, union ccb *save_ccb);
-diff -ur src.old/sys/dev/aac/aacvar.h src/sys/dev/aac/aacvar.h
---- src.old/sys/dev/aac/aacvar.h	2004-08-13 03:44:09.000000000 +0200
-+++ src/sys/dev/aac/aacvar.h	2004-11-30 00:47:56.000000000 +0100
-@@ -171,7 +171,7 @@
- 
- 	void			(* cm_complete)(struct aac_command *cm);
- 	void			*cm_private;
--	time_t			cm_timestamp;	/* command creation time */
-+	__kernel_time_t			cm_timestamp;	/* command creation time */
- 	int			cm_queue;
- 	int			cm_index;
- };
-diff -ur src.old/sys/dev/asr/sys_info.h src/sys/dev/asr/sys_info.h
---- src.old/sys/dev/asr/sys_info.h	2004-11-30 00:47:32.000000000 +0100
-+++ src/sys/dev/asr/sys_info.h	2004-11-30 00:47:56.000000000 +0100
-@@ -458,10 +458,10 @@
- 	u_int32_t	write_by_size_count[10];
- 	u_int32_t	read_by_size_min_time[10];
- 	u_int32_t	read_by_size_max_time[10];
--	struct timeval	read_by_size_total_time[10];
-+	struct __kernel_timeval	read_by_size_total_time[10];
- 	u_int32_t	write_by_size_min_time[10];
- 	u_int32_t	write_by_size_max_time[10];
--	struct timeval	write_by_size_total_time[10];
-+	struct __kernel_timeval	write_by_size_total_time[10];
- 
- #define	SIZE_512	0
- #define	SIZE_1K		1
-@@ -474,7 +474,7 @@
- #define	SIZE_BIGGER	8
- #define	SIZE_OTHER	9
- 
--	struct timeval	intr_started;
-+	struct __kernel_timeval	intr_started;
- } dpt_perf_t;
- #endif
- 
 diff -ur src.old/sys/dev/ata/atapi-cd.h src/sys/dev/ata/atapi-cd.h
---- src.old/sys/dev/ata/atapi-cd.h	2004-04-30 18:21:34.000000000 +0200
-+++ src/sys/dev/ata/atapi-cd.h	2004-11-30 00:48:39.000000000 +0100
+--- src.old/sys/dev/ata/atapi-cd.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/dev/ata/atapi-cd.h	2004-12-07 23:48:27.000000000 +0100
 @@ -311,7 +311,7 @@
      struct changer		*changer_info;	/* changer info */
      struct acd_softc		**driver;	/* softc's of changer slots */
      int				slot;		/* this instance slot number */
 -    time_t			timestamp;	/* this instance timestamp */
-+    __kernel_time_t		timestamp;	/* this instance timestamp */
++    time_t		timestamp;	/* this instance timestamp */
      u_int32_t			disk_size;	/* size of current media */
      u_int32_t			block_size;	/* blocksize currently used */
      u_int32_t			iomax;		/* Max I/O request (bytes) */
-diff -ur src.old/sys/dev/dec/mcclockvar.h src/sys/dev/dec/mcclockvar.h
---- src.old/sys/dev/dec/mcclockvar.h	2000-05-01 21:54:24.000000000 +0200
-+++ src/sys/dev/dec/mcclockvar.h	2004-11-30 00:47:56.000000000 +0100
-@@ -32,6 +32,6 @@
- 
- void	mcclock_attach(device_t dev);
- void	mcclock_init(device_t);
--void	mcclock_get(device_t, time_t, struct clocktime *);
-+void	mcclock_get(device_t, __kernel_time_t, struct clocktime *);
- void	mcclock_set(device_t, struct clocktime *);
- int	mcclock_getsecs(device_t dev, int *secp);
-diff -ur src.old/sys/dev/dpt/dpt.h src/sys/dev/dpt/dpt.h
---- src.old/sys/dev/dpt/dpt.h	2004-02-21 20:42:50.000000000 +0100
-+++ src/sys/dev/dpt/dpt.h	2004-11-30 00:47:56.000000000 +0100
-@@ -895,8 +895,8 @@
- 
- #ifdef DPT_MEASURE_PERFORMANCE
- 	u_int32_t	 submitted_time;
--	struct		 timeval command_started;
--	struct		 timeval command_ended;
-+	struct		 __kernel_timeval command_started;
-+	struct		 __kernel_timeval command_ended;
- #endif
- } dpt_ccb_t;
- 
-@@ -1002,7 +1002,7 @@
- #define SIZE_BIGGER	8
- #define SIZE_OTHER	9
- 
--	struct	  timeval intr_started;
-+	struct	  __kernel_timeval intr_started;
- 
- 	u_int32_t warm_starts;
- 	u_int32_t cold_boots;
-@@ -1157,7 +1157,7 @@
- #endif
- 
- #ifdef DPT_RESET_HBA
--	struct timeval last_contact;
-+	struct __kernel_timeval last_contact;
- #endif
- } dpt_softc_t;
- 
-@@ -1234,10 +1234,10 @@
-  */
- #ifdef _KERNEL
- /* This function gets the current hi-res time and returns it to the caller */
--static __inline struct timeval
-+static __inline struct __kernel_timeval
- dpt_time_now(void)
- {
--	struct timeval now;
-+	struct __kernel_timeval now;
- 
- 	microtime(&now);
- 	return(now);
-@@ -1263,8 +1263,8 @@
-  * If times are sensless, ~0 is returned.
-  */
- static __inline u_int32_t
--dpt_time_delta(struct timeval start,
--	       struct timeval end)
-+dpt_time_delta(struct __kernel_timeval start,
-+	       struct __kernel_timeval end)
- {
-     if (start.tv_sec > end.tv_sec)
- 	return(~0);
 diff -ur src.old/sys/dev/hfa/fore_var.h src/sys/dev/hfa/fore_var.h
---- src.old/sys/dev/hfa/fore_var.h	2004-02-21 20:08:23.000000000 +0100
-+++ src/sys/dev/hfa/fore_var.h	2004-11-30 00:49:06.000000000 +0100
+--- src.old/sys/dev/hfa/fore_var.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/dev/hfa/fore_var.h	2004-12-07 23:48:29.000000000 +0100
 @@ -222,7 +222,7 @@
  
  	Fore_stats	*fu_stats;	/* Device statistics buffer */
  	vm_paddr_t	fu_statsd;	/* Device statistics buffer (DMA) */
 -	time_t		fu_stats_time;	/* Last stats request timestamp */
-+	__kernel_time_t	fu_stats_time;	/* Last stats request timestamp */
++	time_t	fu_stats_time;	/* Last stats request timestamp */
  	int		fu_stats_ret;	/* Stats request return code */
  	Fore_prom	*fu_prom;	/* Device PROM buffer */
  	vm_paddr_t	fu_promd;	/* Device PROM buffer (DMA) */
-diff -ur src.old/sys/dev/isp/isp_freebsd.h src/sys/dev/isp/isp_freebsd.h
---- src.old/sys/dev/isp/isp_freebsd.h	2004-10-12 01:59:03.000000000 +0200
-+++ src/sys/dev/isp/isp_freebsd.h	2004-11-30 00:47:56.000000000 +0100
-@@ -197,7 +197,7 @@
- 	if (isp->isp_osinfo.intsok)	\
- 		ISP_LOCK(isp)
- 
--#define	NANOTIME_T		struct timespec
-+#define	NANOTIME_T		struct __kernel_timespec
- #define	GET_NANOTIME		nanotime
- #define	GET_NANOSEC(x)		((x)->tv_sec * 1000000000 + (x)->tv_nsec)
- #define	NANOTIME_SUB		nanotime_sub
-@@ -454,12 +454,12 @@
- 	}
- }
- 
--static INLINE u_int64_t nanotime_sub(struct timespec *, struct timespec *);
-+static INLINE u_int64_t nanotime_sub(struct __kernel_timespec *, struct __kernel_timespec *);
- static INLINE u_int64_t
--nanotime_sub(struct timespec *b, struct timespec *a)
-+nanotime_sub(struct __kernel_timespec *b, struct __kernel_timespec *a)
- {
- 	u_int64_t elapsed;
--	struct timespec x = *b;
-+	struct __kernel_timespec x = *b;
- 	timespecsub(&x, a);
- 	elapsed = GET_NANOSEC(&x);
- 	if (elapsed == 0)
-diff -ur src.old/sys/dev/mlx/mlxvar.h src/sys/dev/mlx/mlxvar.h
---- src.old/sys/dev/mlx/mlxvar.h	2004-06-16 11:46:50.000000000 +0200
-+++ src/sys/dev/mlx/mlxvar.h	2004-11-30 00:47:56.000000000 +0100
-@@ -82,7 +82,7 @@
-     struct mlx_softc		*mc_sc;		/* controller that owns us */
-     u_int8_t			mc_slot;	/* command slot we occupy */
-     u_int16_t			mc_status;	/* command completion status */
--    time_t			mc_timeout;	/* when this command expires */
-+    __kernel_time_t			mc_timeout;	/* when this command expires */
-     u_int8_t			mc_mailbox[16];	/* command mailbox */
-     u_int32_t			mc_sgphys;	/* physical address of s/g array in controller space */
-     int				mc_nsgent;	/* number of entries in s/g map */
-@@ -149,7 +149,7 @@
- #define MLX_STATE_OPEN		(1<<2)	/* control device is open */
- #define MLX_STATE_SUSPEND	(1<<3)	/* controller is suspended */
-     struct callout_handle mlx_timeout;	/* periodic status monitor */
--    time_t		mlx_lastpoll;	/* last time_second we polled for status */
-+    __kernel_time_t		mlx_lastpoll;	/* last time_second we polled for status */
-     u_int16_t		mlx_lastevent;	/* sequence number of the last event we recorded */
-     int			mlx_currevent;	/* sequence number last time we looked */
-     int			mlx_background;	/* if != 0 rebuild or check is in progress */
-diff -ur src.old/sys/dev/ray/if_raymib.h src/sys/dev/ray/if_raymib.h
---- src.old/sys/dev/ray/if_raymib.h	2002-09-23 08:25:07.000000000 +0200
-+++ src/sys/dev/ray/if_raymib.h	2004-11-30 00:47:56.000000000 +0100
-@@ -1179,5 +1179,5 @@
- 	u_int8_t	rsl_host[ETHER_ADDR_LEN]; /* MAC address */
- 	u_int8_t	rsl_siglevs[RAY_NSIGLEV]; /* levels, newest in [0] */
- 	u_int8_t	rsl_antennas[RAY_NANTENNA]; /* best antenna */
--	struct timeval	rsl_time; 		  /* time of last packet */
-+	struct __kernel_timeval	rsl_time; 		  /* time of last packet */
- };
-diff -ur src.old/sys/dev/usb/usb.h src/sys/dev/usb/usb.h
---- src.old/sys/dev/usb/usb.h	2004-11-30 00:47:32.000000000 +0100
-+++ src/sys/dev/usb/usb.h	2004-11-30 00:47:56.000000000 +0100
-@@ -642,7 +642,7 @@
- #define USB_EVENT_DRIVER_DETACH 6
- #define USB_EVENT_IS_ATTACH(n) ((n) == USB_EVENT_CTRLR_ATTACH || (n) == USB_EVENT_DEVICE_ATTACH || (n) == USB_EVENT_DRIVER_ATTACH)
- #define USB_EVENT_IS_DETACH(n) ((n) == USB_EVENT_CTRLR_DETACH || (n) == USB_EVENT_DEVICE_DETACH || (n) == USB_EVENT_DRIVER_DETACH)
--	struct timespec		ue_time;
-+	struct __kernel_timespec		ue_time;
- 	union {
- 		struct {
- 			int			ue_bus;
-diff -ur src.old/sys/dev/vinum/request.h src/sys/dev/vinum/request.h
---- src.old/sys/dev/vinum/request.h	2003-05-01 15:06:00.000000000 +0200
-+++ src/sys/dev/vinum/request.h	2004-11-30 00:47:56.000000000 +0100
-@@ -210,7 +210,7 @@
- 
- struct rqinfo {
-     enum rqinfo_type type;				    /* kind of event */
--    struct timeval timestamp;				    /* time it happened */
-+    struct __kernel_timeval timestamp;				    /* time it happened */
-     struct buf *bp;					    /* point to user buffer */
-     int devmajor;					    /* major and minor device info */
-     int devminor;
-diff -ur src.old/sys/dev/vinum/vinumvar.h src/sys/dev/vinum/vinumvar.h
---- src.old/sys/dev/vinum/vinumvar.h	2004-03-19 11:28:34.000000000 +0100
-+++ src/sys/dev/vinum/vinumvar.h	2004-11-30 00:47:56.000000000 +0100
-@@ -195,8 +195,8 @@
- struct vinum_label {
-     char sysname[VINUMHOSTNAMELEN];			    /* system name at time of creation */
-     char name[MAXDRIVENAME];				    /* our name of the drive */
--    struct timeval date_of_birth;			    /* the time it was created */
--    struct timeval last_update;				    /* and the time of last update */
-+    struct __kernel_timeval date_of_birth;			    /* the time it was created */
-+    struct __kernel_timeval last_update;				    /* and the time of last update */
-     /*
-      * total size in bytes of the drive.  This value
-      * includes the headers.
-@@ -299,7 +299,7 @@
- 
- #define MCFILENAMELEN	16
- struct mc {
--    struct timeval time;
-+    struct __kernel_timeval time;
-     int seq;
-     int size;
-     short line;
-diff -ur src.old/sys/fs/msdosfs/direntry.h src/sys/fs/msdosfs/direntry.h
---- src.old/sys/fs/msdosfs/direntry.h	2004-02-19 10:56:58.000000000 +0100
-+++ src/sys/fs/msdosfs/direntry.h	2004-11-30 00:47:56.000000000 +0100
-@@ -139,9 +139,9 @@
- char	*mbnambuf_flush(struct dirent *dp);
- void	mbnambuf_init(void);
- void	mbnambuf_write(char *name, int id);
--void	unix2dostime(struct timespec *tsp, u_int16_t *ddp, 
-+void	unix2dostime(struct __kernel_timespec *tsp, u_int16_t *ddp, 
- 	    u_int16_t *dtp, u_int8_t *dhp);
--void	dos2unixtime(u_int dd, u_int dt, u_int dh, struct timespec *tsp);
-+void	dos2unixtime(u_int dd, u_int dt, u_int dh, struct __kernel_timespec *tsp);
- int	dos2unixfn(u_char dn[11], u_char *un, int lower,
- 	    struct msdosfsmount *pmp);
- int	unix2dosfn(const u_char *un, u_char dn[12], size_t unlen, u_int gen,
-diff -ur src.old/sys/fs/ntfs/ntfs_subr.h src/sys/fs/ntfs/ntfs_subr.h
---- src.old/sys/fs/ntfs/ntfs_subr.h	2003-09-26 22:26:23.000000000 +0200
-+++ src/sys/fs/ntfs/ntfs_subr.h	2004-11-30 00:47:56.000000000 +0100
-@@ -82,7 +82,7 @@
- int ntfs_readattr( struct ntfsmount *, struct ntnode *, u_int32_t, char *, off_t, size_t, void *, struct uio *);
- int ntfs_filesize( struct ntfsmount *, struct fnode *, u_int64_t *, u_int64_t *);
- int ntfs_times( struct ntfsmount *, struct ntnode *, ntfs_times_t *);
--struct timespec	ntfs_nttimetounix( u_int64_t );
-+struct __kernel_timespec	ntfs_nttimetounix( u_int64_t );
- int ntfs_ntreaddir( struct ntfsmount *, struct fnode *, u_int32_t, struct attr_indexentry **);
- int ntfs_runtovrun( cn_t **, cn_t **, u_long *, u_int8_t *);
- int ntfs_attrtontvattr( struct ntfsmount *, struct ntvattr **, struct attr * );
-diff -ur src.old/sys/fs/nwfs/nwfs_node.h src/sys/fs/nwfs/nwfs_node.h
---- src.old/sys/fs/nwfs/nwfs_node.h	2001-09-12 10:37:19.000000000 +0200
-+++ src/sys/fs/nwfs/nwfs_node.h	2004-11-30 00:47:56.000000000 +0100
-@@ -49,9 +49,9 @@
- 	struct vnode 		*n_vnode;
- 	struct vattr		n_vattr;
- 	struct nwmount		*n_mount;
--	time_t			n_atime;	/* attributes cache time*/
--	time_t			n_ctime;
--	time_t			n_mtime;
-+	__kernel_time_t			n_atime;	/* attributes cache time*/
-+	__kernel_time_t			n_ctime;
-+	__kernel_time_t			n_mtime;
- 	int			n_flag;
- 	ncpfid			n_parent;
- 	ncpfid			n_fid;
-diff -ur src.old/sys/fs/nwfs/nwfs_subr.h src/sys/fs/nwfs/nwfs_subr.h
---- src.old/sys/fs/nwfs/nwfs_subr.h	2001-09-12 10:37:19.000000000 +0200
-+++ src/sys/fs/nwfs/nwfs_subr.h	2004-11-30 00:47:56.000000000 +0100
-@@ -47,7 +47,7 @@
- struct nw_search_info;
- struct nwmount;
- struct thread;
--struct timespec;
-+struct __kernel_timespec;
- struct ucred;
- struct vattr;
- struct vnode;
-@@ -89,8 +89,8 @@
- 		int n, struct ncp_volume_info *target,
- 		struct thread *td, struct ucred *cred);
- 
--void ncp_unix2dostime (struct timespec *tsp, int tz, u_int16_t *ddp, 
-+void ncp_unix2dostime (struct __kernel_timespec *tsp, int tz, u_int16_t *ddp, 
- 	     u_int16_t *dtp, u_int8_t *dhp);
--void ncp_dos2unixtime (u_int dd, u_int dt, u_int dh, int tz, struct timespec *tsp);
-+void ncp_dos2unixtime (u_int dd, u_int dt, u_int dh, int tz, struct __kernel_timespec *tsp);
- 
- #endif /* !_NWFS_SUBR_H_ */
-diff -ur src.old/sys/i386/include/i4b_trace.h src/sys/i386/include/i4b_trace.h
---- src.old/sys/i386/include/i4b_trace.h	2002-03-17 10:33:13.000000000 +0100
-+++ src/sys/i386/include/i4b_trace.h	2004-11-30 00:47:56.000000000 +0100
-@@ -52,7 +52,7 @@
- #define FROM_NT 1			/* network -> user		*/
- 	int trunc;		/* # of truncated bytes (frame > MCLBYTES) */
- 	unsigned int count;	/* frame count for this unit/type	*/
--	struct timeval time;	/* timestamp for this frame		*/
-+	struct __kernel_timeval time;	/* timestamp for this frame		*/
- } i4b_trace_hdr_t;
- 
- #define INFO0		0	/* layer 1 */
 diff -ur src.old/sys/i386/include/npx.h src/sys/i386/include/npx.h
---- src.old/sys/i386/include/npx.h	2004-04-07 22:46:05.000000000 +0200
-+++ src/sys/i386/include/npx.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/i386/include/npx.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/i386/include/npx.h	2004-12-07 23:48:32.000000000 +0100
 @@ -41,6 +41,8 @@
  #ifndef _MACHINE_NPX_H_
  #define	_MACHINE_NPX_H_
@@ -441,8 +120,8 @@ diff -ur src.old/sys/i386/include/npx.h src/sys/i386/include/npx.h
  struct env87 {
  	long	en_cw;		/* control word (16bits) */
 diff -ur src.old/sys/i386/include/pcb.h src/sys/i386/include/pcb.h
---- src.old/sys/i386/include/pcb.h	2004-07-10 21:55:59.000000000 +0200
-+++ src/sys/i386/include/pcb.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/i386/include/pcb.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/i386/include/pcb.h	2004-12-07 23:48:32.000000000 +0100
 @@ -39,6 +39,7 @@
  /*
   * Intel 386 process control block
@@ -452,8 +131,8 @@ diff -ur src.old/sys/i386/include/pcb.h src/sys/i386/include/pcb.h
  
  struct pcb {
 diff -ur src.old/sys/i386/include/pmap.h src/sys/i386/include/pmap.h
---- src.old/sys/i386/include/pmap.h	2004-10-10 21:08:00.000000000 +0200
-+++ src/sys/i386/include/pmap.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/i386/include/pmap.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/i386/include/pmap.h	2004-12-07 23:48:32.000000000 +0100
 @@ -44,6 +44,13 @@
  #ifndef _MACHINE_PMAP_H_
  #define	_MACHINE_PMAP_H_
@@ -468,58 +147,9 @@ diff -ur src.old/sys/i386/include/pmap.h src/sys/i386/include/pmap.h
  /*
   * Page-directory and page-table entires follow this format, with a few
   * of the fields not present here and there, depending on a lot of things.
-diff -ur src.old/sys/isofs/cd9660/cd9660_node.h src/sys/isofs/cd9660/cd9660_node.h
---- src.old/sys/isofs/cd9660/cd9660_node.h	2004-06-17 19:16:48.000000000 +0200
-+++ src/sys/isofs/cd9660/cd9660_node.h	2004-11-30 00:47:56.000000000 +0100
-@@ -45,9 +45,9 @@
- #define doff_t	long
- 
- typedef	struct	{
--	struct timespec	iso_atime;	/* time of last access */
--	struct timespec	iso_mtime;	/* time of last modification */
--	struct timespec	iso_ctime;	/* time file changed */
-+	struct __kernel_timespec	iso_atime;	/* time of last access */
-+	struct __kernel_timespec	iso_mtime;	/* time of last modification */
-+	struct __kernel_timespec	iso_ctime;	/* time file changed */
- 	u_short		iso_mode;	/* files access mode and type */
- 	uid_t		iso_uid;	/* owner user id */
- 	gid_t		iso_gid;	/* owner group id */
-@@ -115,7 +115,7 @@
- 			struct iso_node *, struct buf *, enum ISO_FTYPE);
- int cd9660_ihashget(struct cdev *, ino_t, int, struct vnode **);
- void cd9660_ihashins(struct iso_node *);
--int cd9660_tstamp_conv7(u_char *, struct timespec *, enum ISO_FTYPE);
--int cd9660_tstamp_conv17(u_char *, struct timespec *);
-+int cd9660_tstamp_conv7(u_char *, struct __kernel_timespec *, enum ISO_FTYPE);
-+int cd9660_tstamp_conv17(u_char *, struct __kernel_timespec *);
- 
- #endif /* _KERNEL */
-diff -ur src.old/sys/net/bpf.h src/sys/net/bpf.h
---- src.old/sys/net/bpf.h	2004-05-30 19:03:48.000000000 +0200
-+++ src/sys/net/bpf.h	2004-11-30 00:47:56.000000000 +0100
-@@ -100,8 +100,8 @@
- #define	BIOCGDLT	_IOR('B',106, u_int)
- #define BIOCGETIF	_IOR('B',107, struct ifreq)
- #define BIOCSETIF	_IOW('B',108, struct ifreq)
--#define BIOCSRTIMEOUT	_IOW('B',109, struct timeval)
--#define BIOCGRTIMEOUT	_IOR('B',110, struct timeval)
-+#define BIOCSRTIMEOUT	_IOW('B',109, struct __kernel_timeval)
-+#define BIOCGRTIMEOUT	_IOR('B',110, struct __kernel_timeval)
- #define BIOCGSTATS	_IOR('B',111, struct bpf_stat)
- #define BIOCIMMEDIATE	_IOW('B',112, u_int)
- #define BIOCVERSION	_IOR('B',113, struct bpf_version)
-@@ -118,7 +118,7 @@
-  * Structure prepended to each packet.
-  */
- struct bpf_hdr {
--	struct timeval	bh_tstamp;	/* time stamp */
-+	struct __kernel_timeval	bh_tstamp;	/* time stamp */
- 	bpf_u_int32	bh_caplen;	/* length of captured portion */
- 	bpf_u_int32	bh_datalen;	/* original length of packet */
- 	u_short		bh_hdrlen;	/* length of bpf header (this struct
 diff -ur src.old/sys/net/ethernet.h src/sys/net/ethernet.h
---- src.old/sys/net/ethernet.h	2004-06-02 23:34:14.000000000 +0200
-+++ src/sys/net/ethernet.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/net/ethernet.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/net/ethernet.h	2004-12-07 23:48:33.000000000 +0100
 @@ -8,6 +8,9 @@
  #ifndef _NET_ETHERNET_H_
  #define _NET_ETHERNET_H_
@@ -561,9 +191,9 @@ diff -ur src.old/sys/net/ethernet.h src/sys/net/ethernet.h
  
  #endif /* !_NET_ETHERNET_H_ */
 diff -ur src.old/sys/net/if.h src/sys/net/if.h
---- src.old/sys/net/if.h	2004-09-13 07:11:40.000000000 +0200
-+++ src/sys/net/if.h	2004-11-30 00:49:28.000000000 +0100
-@@ -39,10 +39,15 @@
+--- src.old/sys/net/if.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/net/if.h	2004-12-07 23:48:33.000000000 +0100
+@@ -39,6 +39,11 @@
  #include <sys/queue.h>
  #endif
  
@@ -575,20 +205,6 @@ diff -ur src.old/sys/net/if.h src/sys/net/if.h
  #if __BSD_VISIBLE
  /*
   * <net/if.h> does not depend on <sys/time.h> on most other systems.  This
-- * helps userland compatibility.  (struct timeval ifi_lastchange)
-+ * helps userland compatibility.  (struct __kernel_timeval ifi_lastchange)
-  */
- #ifndef _KERNEL
- #include <sys/time.h>
-@@ -106,7 +111,7 @@
- #ifdef __alpha__
- 	u_int	ifi_timepad;		/* time_t is int, not long on alpha */
- #endif
--	struct	timeval ifi_lastchange;	/* time of last administrative change */
-+	struct	__kernel_timeval ifi_lastchange;	/* time of last administrative change */
- };
- 
- #define	IFF_UP		0x1		/* interface is up */
 @@ -235,6 +240,7 @@
  		struct	sockaddr ifru_addr;
  		struct	sockaddr ifru_dstaddr;
@@ -606,8 +222,8 @@ diff -ur src.old/sys/net/if.h src/sys/net/if.h
  #define	ifr_flagshigh	ifr_ifru.ifru_flags[1]	/* flags (high 16 bits) */
  #define	ifr_metric	ifr_ifru.ifru_metric	/* metric */
 diff -ur src.old/sys/net/if_arp.h src/sys/net/if_arp.h
---- src.old/sys/net/if_arp.h	2004-06-13 12:54:35.000000000 +0200
-+++ src/sys/net/if_arp.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/net/if_arp.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/net/if_arp.h	2004-12-07 23:48:33.000000000 +0100
 @@ -33,6 +33,11 @@
  #ifndef _NET_IF_ARP_H_
  #define	_NET_IF_ARP_H_
@@ -637,8 +253,8 @@ diff -ur src.old/sys/net/if_arp.h src/sys/net/if_arp.h
   * ARP ioctl request
   */
 diff -ur src.old/sys/net/if_dl.h src/sys/net/if_dl.h
---- src.old/sys/net/if_dl.h	2004-04-07 22:46:11.000000000 +0200
-+++ src/sys/net/if_dl.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/net/if_dl.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/net/if_dl.h	2004-12-07 23:48:33.000000000 +0100
 @@ -33,6 +33,10 @@
  #ifndef _NET_IF_DL_H_
  #define _NET_IF_DL_H_
@@ -668,87 +284,9 @@ diff -ur src.old/sys/net/if_dl.h src/sys/net/if_dl.h
 -#endif /* !_KERNEL */
 -
  #endif
-diff -ur src.old/sys/net/if_pppvar.h src/sys/net/if_pppvar.h
---- src.old/sys/net/if_pppvar.h	2002-08-09 17:30:46.000000000 +0200
-+++ src/sys/net/if_pppvar.h	2004-11-30 00:47:56.000000000 +0100
-@@ -74,8 +74,8 @@
- 	void	*sc_xc_state;		/* transmit compressor state */
- 	struct	compressor *sc_rcomp;	/* receive decompressor */
- 	void	*sc_rc_state;		/* receive decompressor state */
--	time_t	sc_last_sent;		/* time (secs) last NP pkt sent */
--	time_t	sc_last_recv;		/* time (secs) last NP pkt rcvd */
-+	__kernel_time_t	sc_last_sent;		/* time (secs) last NP pkt sent */
-+	__kernel_time_t	sc_last_recv;		/* time (secs) last NP pkt rcvd */
- #ifdef PPP_FILTER
- 	struct	bpf_program sc_pass_filt;   /* filter for packets to pass */
- 	struct	bpf_program sc_active_filt; /* filter for "non-idle" packets */
-diff -ur src.old/sys/net/if_sppp.h src/sys/net/if_sppp.h
---- src.old/sys/net/if_sppp.h	2001-12-30 21:42:29.000000000 +0100
-+++ src/sys/net/if_sppp.h	2004-11-30 00:47:56.000000000 +0100
-@@ -154,8 +154,8 @@
- 	int	confflags;	/* administrative configuration flags */
- #define CONF_ENABLE_VJ    0x01	/* VJ header compression enabled */
- #define CONF_ENABLE_IPV6  0x02	/* IPv6 administratively enabled */
--	time_t	pp_last_recv;	/* time last packet has been received */
--	time_t	pp_last_sent;	/* time last packet has been sent */
-+	__kernel_time_t	pp_last_recv;	/* time last packet has been received */
-+	__kernel_time_t	pp_last_sent;	/* time last packet has been sent */
- 	struct callout_handle ch[IDX_COUNT]; /* per-proto and if callouts */
- 	struct callout_handle pap_my_to_ch; /* PAP needs one more... */
- 	struct slcp lcp;		/* LCP params */
-diff -ur src.old/sys/net/ppp_defs.h src/sys/net/ppp_defs.h
---- src.old/sys/net/ppp_defs.h	2001-06-11 14:38:58.000000000 +0200
-+++ src/sys/net/ppp_defs.h	2004-11-30 00:47:56.000000000 +0100
-@@ -142,8 +142,8 @@
-  * the last NP packet was sent or received.
-  */
- struct ppp_idle {
--    time_t xmit_idle;		/* time since last NP packet sent */
--    time_t recv_idle;		/* time since last NP packet received */
-+    __kernel_time_t xmit_idle;		/* time since last NP packet sent */
-+    __kernel_time_t recv_idle;		/* time since last NP packet received */
- };
- 
- #ifndef __P
-diff -ur src.old/sys/netatm/atm_ioctl.h src/sys/netatm/atm_ioctl.h
---- src.old/sys/netatm/atm_ioctl.h	2004-06-08 15:46:31.000000000 +0200
-+++ src/sys/netatm/atm_ioctl.h	2004-11-30 00:47:56.000000000 +0100
-@@ -347,7 +347,7 @@
- 	u_long		avp_obytes;		/* Bytes sent to VCC */
- 	u_long		avp_ierrors;		/* Errors receiving from VCC */
- 	u_long		avp_oerrors;		/* Errors sending to VCC */
--	time_t		avp_tstamp;		/* State transition timestamp */
-+	__kernel_time_t		avp_tstamp;		/* State transition timestamp */
- };
- 
- /*
-diff -ur src.old/sys/netatm/atm_sys.h src/sys/netatm/atm_sys.h
---- src.old/sys/netatm/atm_sys.h	2002-06-14 21:31:07.000000000 +0200
-+++ src/sys/netatm/atm_sys.h	2004-11-30 00:47:56.000000000 +0100
-@@ -177,7 +177,7 @@
-  */
- #ifdef DIAGNOSTIC
- #define ATM_TIME							\
--	struct timeval now, delta;					\
-+	struct __kernel_timeval now, delta;					\
- 	KT_TIME(now);							\
- 	delta.tv_sec = now.tv_sec - atm_debugtime.tv_sec;		\
- 	delta.tv_usec = now.tv_usec - atm_debugtime.tv_usec;		\
-diff -ur src.old/sys/netatm/atm_var.h src/sys/netatm/atm_var.h
---- src.old/sys/netatm/atm_var.h	2003-10-31 19:32:10.000000000 +0100
-+++ src/sys/netatm/atm_var.h	2004-11-30 00:47:56.000000000 +0100
-@@ -63,7 +63,7 @@
- extern int		atm_init;
- extern int		atm_version;
- extern int		atm_debug;
--extern struct timeval	atm_debugtime;
-+extern struct __kernel_timeval	atm_debugtime;
- extern int		atm_dev_print;
- extern int		atm_print_data;
- extern uma_zone_t	atm_attributes_zone;
 diff -ur src.old/sys/netinet/if_ether.h src/sys/netinet/if_ether.h
---- src.old/sys/netinet/if_ether.h	2004-04-07 22:46:13.000000000 +0200
-+++ src/sys/netinet/if_ether.h	2004-11-30 00:47:56.000000000 +0100
+--- src.old/sys/netinet/if_ether.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/netinet/if_ether.h	2004-12-07 23:48:35.000000000 +0100
 @@ -33,6 +33,9 @@
  #ifndef _NETINET_IF_ETHER_H_
  #define _NETINET_IF_ETHER_H_
@@ -759,163 +297,9 @@ diff -ur src.old/sys/netinet/if_ether.h src/sys/netinet/if_ether.h
  #include <net/ethernet.h>
  #include <net/if_arp.h>
  
-diff -ur src.old/sys/netinet/ip_mroute.h src/sys/netinet/ip_mroute.h
---- src.old/sys/netinet/ip_mroute.h	2004-08-16 20:32:07.000000000 +0200
-+++ src/sys/netinet/ip_mroute.h	2004-11-30 00:49:54.000000000 +0100
-@@ -181,7 +181,7 @@
-  */
- 
- struct bw_data {
--	struct timeval	b_time;
-+	struct __kernel_timeval	b_time;
- 	uint64_t	b_packets;
- 	uint64_t	b_bytes;
- };
-@@ -281,7 +281,7 @@
- 	u_long		mfc_byte_cnt;		/* byte count for src-grp    */
- 	u_long		mfc_wrong_if;		/* wrong if for src-grp	     */
- 	int		mfc_expire;		/* time to clean entry up    */
--	struct timeval	mfc_last_assert;	/* last time I sent an assert*/
-+	struct __kernel_timeval	mfc_last_assert;	/* last time I sent an assert*/
- 	struct rtdetq	*mfc_stall;		/* q of packets awaiting mfc */
- 	struct mfc	*mfc_next;		/* next mfc entry            */
- 	uint8_t		mfc_flags[MAXVIFS];	/* the MRT_MFC_FLAGS_* flags */
-@@ -337,7 +337,7 @@
-  */
- struct tbf
- {
--    struct timeval tbf_last_pkt_t; /* arr. time of last pkt	*/
-+    struct __kernel_timeval tbf_last_pkt_t; /* arr. time of last pkt	*/
-     u_long tbf_n_tok;		/* no of tokens in bucket	*/
-     u_long tbf_q_len;		/* length of queue at this vif	*/
-     u_long tbf_max_q_len;	/* max. queue length		*/
-@@ -368,7 +368,7 @@
- 
- 	struct bw_data	bm_threshold;		/* the upcall threshold	     */
- 	struct bw_data	bm_measured;		/* the measured bw	     */
--	struct timeval	bm_start_time;		/* abs. time		     */
-+	struct __kernel_timeval	bm_start_time;		/* abs. time		     */
- };
- 
- #ifdef _KERNEL
-diff -ur src.old/sys/netinet6/in6_var.h src/sys/netinet6/in6_var.h
---- src.old/sys/netinet6/in6_var.h	2004-04-07 22:46:15.000000000 +0200
-+++ src/sys/netinet6/in6_var.h	2004-11-30 00:48:03.000000000 +0100
-@@ -80,8 +80,8 @@
-  *	in kernel: modify preferred/expire only
-  */
- struct in6_addrlifetime {
--	time_t ia6t_expire;	/* valid lifetime expiration time */
--	time_t ia6t_preferred;	/* preferred lifetime expiration time */
-+	__kernel_time_t ia6t_expire;	/* valid lifetime expiration time */
-+	__kernel_time_t ia6t_preferred;	/* preferred lifetime expiration time */
- 	u_int32_t ia6t_vltime;	/* valid lifetime */
- 	u_int32_t ia6t_pltime;	/* prefix lifetime */
- };
-diff -ur src.old/sys/netinet6/ip6_mroute.h src/sys/netinet6/ip6_mroute.h
---- src.old/sys/netinet6/ip6_mroute.h	2002-04-19 06:46:23.000000000 +0200
-+++ src/sys/netinet6/ip6_mroute.h	2004-11-30 00:48:03.000000000 +0100
-@@ -238,7 +238,7 @@
- 	u_quad_t    	mf6c_byte_cnt;		/* byte count for src-grp    */
- 	u_quad_t    	mf6c_wrong_if;		/* wrong if for src-grp	     */
- 	int	    	mf6c_expire;		/* time to clean entry up    */
--	struct timeval  mf6c_last_assert;	/* last time I sent an assert*/
-+	struct __kernel_timeval  mf6c_last_assert;	/* last time I sent an assert*/
- 	struct rtdetq  *mf6c_stall;		/* pkts waiting for route */
- 	struct mf6c    *mf6c_next;		/* hash table linkage */
- };
-@@ -253,7 +253,7 @@
-     struct mbuf 	*m;		/* A copy of the packet	    	    */
-     struct ifnet	*ifp;		/* Interface pkt came in on 	    */
- #ifdef UPCALL_TIMING
--    struct timeval	t;		/* Timestamp */
-+    struct __kernel_timeval	t;		/* Timestamp */
- #endif /* UPCALL_TIMING */
-     struct rtdetq	*next;
- };
-diff -ur src.old/sys/netinet6/ip6_var.h src/sys/netinet6/ip6_var.h
---- src.old/sys/netinet6/ip6_var.h	2004-09-22 21:23:39.000000000 +0200
-+++ src/sys/netinet6/ip6_var.h	2004-11-30 00:48:03.000000000 +0100
-@@ -302,7 +302,7 @@
- extern int	ip6_accept_rtadv;	/* Acts as a host not a router */
- extern int	ip6_keepfaith;		/* Firewall Aided Internet Translator */
- extern int	ip6_log_interval;
--extern time_t	ip6_log_time;
-+extern __kernel_time_t	ip6_log_time;
- extern int	ip6_hdrnestlimit; /* upper limit of # of extension headers */
- extern int	ip6_dad_count;		/* DupAddrDetectionTransmits */
- 
-diff -ur src.old/sys/netinet6/nd6.h src/sys/netinet6/nd6.h
---- src.old/sys/netinet6/nd6.h	2003-10-31 17:06:04.000000000 +0100
-+++ src/sys/netinet6/nd6.h	2004-11-30 00:48:03.000000000 +0100
-@@ -156,7 +156,7 @@
- 		u_char	origin;
- 		u_int32_t vltime;
- 		u_int32_t pltime;
--		time_t expire;
-+		__kernel_time_t expire;
- 		u_short if_index;
- 		u_short advrtrs; /* number of advertisement routers */
- 		struct	in6_addr advrtr[DRLSTSIZ]; /* XXX: explicit limit */
-@@ -249,8 +249,8 @@
- 	struct in6_addr ndpr_addr; /* address that is derived from the prefix */
- 	u_int32_t ndpr_vltime;	/* advertised valid lifetime */
- 	u_int32_t ndpr_pltime;	/* advertised preferred lifetime */
--	time_t ndpr_expire;	/* expiration time of the prefix */
--	time_t ndpr_preferred;	/* preferred time of the prefix */
-+	__kernel_time_t ndpr_expire;	/* expiration time of the prefix */
-+	__kernel_time_t ndpr_preferred;	/* preferred time of the prefix */
- 	struct prf_ra ndpr_flags;
- 	u_int32_t ndpr_stateflags; /* actual state flags */
- 	/* list of routers that advertise the prefix: */
-diff -ur src.old/sys/netncp/ncp_lib.h src/sys/netncp/ncp_lib.h
---- src.old/sys/netncp/ncp_lib.h	2002-07-28 01:16:49.000000000 +0200
-+++ src/sys/netncp/ncp_lib.h	2004-11-30 00:48:03.000000000 +0100
-@@ -158,9 +158,9 @@
- void NWUnpackDateTime(nuint32, NW_DATE *, NW_TIME *);
- void NWUnpackDate(nuint16, NW_DATE *);
- void NWUnpackTime(nuint16, NW_TIME *);
--time_t ncp_UnpackDateTime(nuint32);
--int  ncp_GetFileServerDateAndTime(NWCONN_HANDLE, time_t *);
--int  ncp_SetFileServerDateAndTime(NWCONN_HANDLE, time_t *);
-+__kernel_time_t ncp_UnpackDateTime(nuint32);
-+int  ncp_GetFileServerDateAndTime(NWCONN_HANDLE, __kernel_time_t *);
-+int  ncp_SetFileServerDateAndTime(NWCONN_HANDLE, __kernel_time_t *);
- NWCCODE NWDownFileServer(NWCONN_HANDLE, int);
- NWCCODE NWCloseBindery(NWCONN_HANDLE);
- NWCCODE NWOpenBindery(NWCONN_HANDLE);
-@@ -217,7 +217,7 @@
- /* misc ncp calls */
- int  ncp_get_file_server_information(NWCONN_HANDLE, struct ncp_file_server_info *);
- int  ncp_get_stations_logged_info(NWCONN_HANDLE, u_int32_t,
--		struct ncp_bindery_object *, time_t *);
-+		struct ncp_bindery_object *, __kernel_time_t *);
- int  ncp_get_internet_address(NWCONN_HANDLE, u_int32_t, struct ipx_addr *,
- 		u_int8_t *);
- NWCCODE NWGetObjectConnectionNumbers(NWCONN_HANDLE, pnstr8, nuint16,
-diff -ur src.old/sys/netncp/ncp_sock.h src/sys/netncp/ncp_sock.h
---- src.old/sys/netncp/ncp_sock.h	2003-02-26 22:25:55.000000000 +0100
-+++ src/sys/netncp/ncp_sock.h	2004-11-30 00:48:03.000000000 +0100
-@@ -39,14 +39,14 @@
- struct ncp_rq;
- struct proc;
- struct socket;
--struct timeval;
-+struct __kernel_timeval;
- 
- int  ncp_sock_connect(struct ncp_conn *ncp);
- int  ncp_sock_recv(struct socket *so, struct mbuf **mp, int *rlen);
- int  ncp_sock_send(struct socket *so, struct mbuf *data, struct ncp_rq *rqp);
- int  ncp_sock_disconnect(struct ncp_conn *conn);
- int  ncp_poll(struct socket *so, int events);
--int  ncp_sock_rselect(struct socket *so, struct thread *td, struct timeval *tv,
-+int  ncp_sock_rselect(struct socket *so, struct thread *td, struct __kernel_timeval *tv,
- 		      int events);
- int  ncp_sock_checksum(struct ncp_conn *conn, int enable);
- 
 diff -ur src.old/sys/nfsclient/nfs.h src/sys/nfsclient/nfs.h
---- src.old/sys/nfsclient/nfs.h	2004-07-06 11:12:02.000000000 +0200
-+++ src/sys/nfsclient/nfs.h	2004-11-30 00:48:03.000000000 +0100
+--- src.old/sys/nfsclient/nfs.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/nfsclient/nfs.h	2004-12-07 23:48:35.000000000 +0100
 @@ -36,6 +36,11 @@
  #ifndef _NFSCLIENT_NFS_H_
  #define _NFSCLIENT_NFS_H_
@@ -928,101 +312,9 @@ diff -ur src.old/sys/nfsclient/nfs.h src/sys/nfsclient/nfs.h
  #ifdef _KERNEL
  #include "opt_nfs.h"
  #endif
-diff -ur src.old/sys/nfsclient/nfsnode.h src/sys/nfsclient/nfsnode.h
---- src.old/sys/nfsclient/nfsnode.h	2004-04-15 01:23:55.000000000 +0200
-+++ src/sys/nfsclient/nfsnode.h	2004-11-30 00:48:03.000000000 +0100
-@@ -93,25 +93,25 @@
- 	u_quad_t		n_brev;		/* Modify rev when cached */
- 	u_quad_t		n_lrev;		/* Modify rev for lease */
- 	struct vattr		n_vattr;	/* Vnode attribute cache */
--	time_t			n_attrstamp;	/* Attr. cache timestamp */
-+	__kernel_time_t			n_attrstamp;	/* Attr. cache timestamp */
- 	u_int32_t		n_mode;		/* ACCESS mode cache */
- 	uid_t			n_modeuid;	/* credentials having mode */
--	time_t			n_modestamp;	/* mode cache timestamp */
--	time_t			n_mtime;	/* Prev modify time. */
--	time_t			n_ctime;	/* Prev create time. */
--	time_t			n_expiry;	/* Lease expiry time */
-+	__kernel_time_t			n_modestamp;	/* mode cache timestamp */
-+	__kernel_time_t			n_mtime;	/* Prev modify time. */
-+	__kernel_time_t			n_ctime;	/* Prev create time. */
-+	__kernel_time_t			n_expiry;	/* Lease expiry time */
- 	nfsfh_t			*n_fhp;		/* NFS File Handle */
- 	struct vnode		*n_vnode;	/* associated vnode */
- 	struct vnode		*n_dvp;		/* parent vnode */
- 	struct lockf		*n_lockf;	/* Locking record of file */
- 	int			n_error;	/* Save write error value */
- 	union {
--		struct timespec	nf_atim;	/* Special file times */
-+		struct __kernel_timespec	nf_atim;	/* Special file times */
- 		nfsuint64	nd_cookieverf;	/* Cookie verifier (dir only) */
- 		u_char		nd4_cookieverf[NFSX_V4VERF];
- 	} n_un1;
- 	union {
--		struct timespec	nf_mtim;
-+		struct __kernel_timespec	nf_mtim;
- 		off_t		nd_direof;	/* Dir. EOF offset cache */
- 	} n_un2;
- 	union {
-diff -ur src.old/sys/nfsserver/nfs.h src/sys/nfsserver/nfs.h
---- src.old/sys/nfsserver/nfs.h	2004-05-24 06:06:14.000000000 +0200
-+++ src/sys/nfsserver/nfs.h	2004-11-30 00:48:03.000000000 +0100
-@@ -256,7 +256,7 @@
- 	int			nd_len;		/* Length of this write */
- 	int			nd_repstat;	/* Reply status */
- 	u_int32_t		nd_retxid;	/* Reply xid */
--	struct timeval		nd_starttime;	/* Time RPC initiated */
-+	struct __kernel_timeval		nd_starttime;	/* Time RPC initiated */
- 	fhandle_t		nd_fh;		/* File handle */
- 	struct ucred		nd_cr;		/* Credentials */
- };
-diff -ur src.old/sys/posix4/posix4.h src/sys/posix4/posix4.h
---- src.old/sys/posix4/posix4.h	2003-02-19 06:47:42.000000000 +0100
-+++ src/sys/posix4/posix4.h	2004-11-30 00:48:03.000000000 +0100
-@@ -109,7 +109,7 @@
- int ksched_get_priority_min(register_t *, struct ksched *, int);
- 
- int ksched_rr_get_interval(register_t *, struct ksched *,
--	struct thread *, struct timespec *);
-+	struct thread *, struct __kernel_timespec *);
- 
- #endif /* _KPOSIX_PRIORITY_SCHEDULING */
- 
-diff -ur src.old/sys/posix4/sched.h src/sys/posix4/sched.h
---- src.old/sys/posix4/sched.h	2002-10-03 08:27:50.000000000 +0200
-+++ src/sys/posix4/sched.h	2004-11-30 00:48:03.000000000 +0100
-@@ -59,14 +59,14 @@
- #ifndef _KERNEL
- #include <sys/cdefs.h>
- 
--struct timespec;
-+struct __kernel_timespec;
- 
- __BEGIN_DECLS
- int	sched_get_priority_max(int);
- int	sched_get_priority_min(int);
- int	sched_getparam(pid_t, struct sched_param *);
- int	sched_getscheduler(pid_t);
--int	sched_rr_get_interval(pid_t, struct timespec *);
-+int	sched_rr_get_interval(pid_t, struct __kernel_timespec *);
- int	sched_setparam(pid_t, const struct sched_param *);
- int	sched_setscheduler(pid_t, int, const struct sched_param *);
- int	sched_yield(void);
-diff -ur src.old/sys/sys/acct.h src/sys/sys/acct.h
---- src.old/sys/sys/acct.h	2004-06-17 19:16:52.000000000 +0200
-+++ src/sys/sys/acct.h	2004-11-30 00:48:03.000000000 +0100
-@@ -51,7 +51,7 @@
- 	comp_t	  ac_utime;		/* user time */
- 	comp_t	  ac_stime;		/* system time */
- 	comp_t	  ac_etime;		/* elapsed time */
--	time_t	  ac_btime;		/* starting time */
-+	__kernel_time_t	  ac_btime;		/* starting time */
- 	uid_t	  ac_uid;		/* user id */
- 	gid_t	  ac_gid;		/* group id */
- 	u_int16_t ac_mem;		/* average memory usage */
 diff -ur src.old/sys/sys/acl.h src/sys/sys/acl.h
---- src.old/sys/sys/acl.h	2004-05-10 20:38:07.000000000 +0200
-+++ src/sys/sys/acl.h	2004-11-30 00:48:03.000000000 +0100
+--- src.old/sys/sys/acl.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/acl.h	2004-12-07 23:48:37.000000000 +0100
 @@ -35,6 +35,9 @@
  #ifndef _SYS_ACL_H_
  #define	_SYS_ACL_H_
@@ -1164,24 +456,9 @@ diff -ur src.old/sys/sys/acl.h src/sys/sys/acl.h
  __END_DECLS
  
  #endif /* !_KERNEL */
-diff -ur src.old/sys/sys/aio.h src/sys/sys/aio.h
---- src.old/sys/sys/aio.h	2002-01-06 22:03:39.000000000 +0100
-+++ src/sys/sys/aio.h	2004-11-30 00:48:03.000000000 +0100
-@@ -116,9 +116,9 @@
- /*
-  * Suspend until all specified I/O or timeout is complete.
-  */
--int	aio_suspend(const struct aiocb * const[], int, const struct timespec *);
-+int	aio_suspend(const struct aiocb * const[], int, const struct __kernel_timespec *);
- 
--int	aio_waitcomplete(struct aiocb **, struct timespec *);
-+int	aio_waitcomplete(struct aiocb **, struct __kernel_timespec *);
- 
- __END_DECLS
- 
 diff -ur src.old/sys/sys/callout.h src/sys/sys/callout.h
---- src.old/sys/sys/callout.h	2004-04-20 17:49:31.000000000 +0200
-+++ src/sys/sys/callout.h	2004-11-30 00:48:03.000000000 +0100
+--- src.old/sys/sys/callout.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/callout.h	2004-12-07 23:48:37.000000000 +0100
 @@ -38,6 +38,8 @@
  #ifndef _SYS_CALLOUT_H_
  #define _SYS_CALLOUT_H_
@@ -1192,8 +469,8 @@ diff -ur src.old/sys/sys/callout.h src/sys/sys/callout.h
  
  SLIST_HEAD(callout_list, callout);
 diff -ur src.old/sys/sys/dvdio.h src/sys/sys/dvdio.h
---- src.old/sys/sys/dvdio.h	2002-03-04 22:08:35.000000000 +0100
-+++ src/sys/sys/dvdio.h	2004-11-30 00:48:03.000000000 +0100
+--- src.old/sys/sys/dvdio.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/dvdio.h	2004-12-07 23:48:37.000000000 +0100
 @@ -31,6 +31,8 @@
  #ifndef _SYS_DVDIO_H_
  #define _SYS_DVDIO_H_
@@ -1204,8 +481,8 @@ diff -ur src.old/sys/sys/dvdio.h src/sys/sys/dvdio.h
  	u_int8_t book_type	:4;
  	u_int8_t book_version	:4;
 diff -ur src.old/sys/sys/errno.h src/sys/sys/errno.h
---- src.old/sys/sys/errno.h	2004-04-07 06:19:49.000000000 +0200
-+++ src/sys/sys/errno.h	2004-11-30 00:48:03.000000000 +0100
+--- src.old/sys/sys/errno.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/errno.h	2004-12-07 23:48:37.000000000 +0100
 @@ -35,16 +35,8 @@
   * $FreeBSD: src/sys/sys/errno.h,v 1.26 2004/04/07 04:19:49 imp Exp $
   */
@@ -1349,28 +626,9 @@ diff -ur src.old/sys/sys/errno.h src/sys/sys/errno.h
 +#endif /* !__ASSEMBLER__ */
 +
 +#endif /* <errno.h> included.  */
-diff -ur src.old/sys/sys/event.h src/sys/sys/event.h
---- src.old/sys/sys/event.h	2004-08-15 17:36:18.000000000 +0200
-+++ src/sys/sys/event.h	2004-11-30 00:48:03.000000000 +0100
-@@ -217,13 +217,13 @@
- #else 	/* !_KERNEL */
- 
- #include <sys/cdefs.h>
--struct timespec;
-+struct __kernel_timespec;
- 
- __BEGIN_DECLS
- int     kqueue(void);
- int     kevent(int kq, const struct kevent *changelist, int nchanges,
- 	    struct kevent *eventlist, int nevents,
--	    const struct timespec *timeout);
-+	    const struct __kernel_timespec *timeout);
- __END_DECLS
- 
- #endif /* !_KERNEL */
 diff -ur src.old/sys/sys/extattr.h src/sys/sys/extattr.h
---- src.old/sys/sys/extattr.h	2003-06-04 06:04:24.000000000 +0200
-+++ src/sys/sys/extattr.h	2004-11-30 00:48:03.000000000 +0100
+--- src.old/sys/sys/extattr.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/extattr.h	2004-12-07 23:48:37.000000000 +0100
 @@ -50,36 +50,36 @@
  	    struct ucred *cred, struct thread *td, int access);
  
@@ -1435,8 +693,8 @@ diff -ur src.old/sys/sys/extattr.h src/sys/sys/extattr.h
  
  #endif /* !_KERNEL */
 diff -ur src.old/sys/sys/filedesc.h src/sys/sys/filedesc.h
---- src.old/sys/sys/filedesc.h	2004-08-15 08:24:42.000000000 +0200
-+++ src/sys/sys/filedesc.h	2004-11-30 00:50:23.000000000 +0100
+--- src.old/sys/sys/filedesc.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/filedesc.h	2004-12-07 23:48:37.000000000 +0100
 @@ -33,6 +33,7 @@
  #ifndef _SYS_FILEDESC_H_
  #define	_SYS_FILEDESC_H_
@@ -1446,8 +704,8 @@ diff -ur src.old/sys/sys/filedesc.h src/sys/sys/filedesc.h
  #include <sys/event.h>
  #include <sys/_lock.h>
 diff -ur src.old/sys/sys/jail.h src/sys/sys/jail.h
---- src.old/sys/sys/jail.h	2004-04-26 21:46:52.000000000 +0200
-+++ src/sys/sys/jail.h	2004-11-30 00:48:03.000000000 +0100
+--- src.old/sys/sys/jail.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/jail.h	2004-12-07 23:48:37.000000000 +0100
 @@ -13,6 +13,10 @@
  #ifndef _SYS_JAIL_H_
  #define _SYS_JAIL_H_
@@ -1473,8 +731,8 @@ diff -ur src.old/sys/sys/jail.h src/sys/sys/jail.h
  #else /* _KERNEL */
  
 diff -ur src.old/sys/sys/linker.h src/sys/sys/linker.h
---- src.old/sys/sys/linker.h	2004-09-03 20:32:24.000000000 +0200
-+++ src/sys/sys/linker.h	2004-11-30 00:54:29.000000000 +0100
+--- src.old/sys/sys/linker.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/linker.h	2004-12-07 23:48:37.000000000 +0100
 @@ -172,6 +172,13 @@
  int linker_ddb_symbol_values(c_linker_sym_t _sym, linker_symval_t *_symval);
  
@@ -1533,8 +791,8 @@ diff -ur src.old/sys/sys/linker.h src/sys/sys/linker.h
  
  #endif
 diff -ur src.old/sys/sys/lock.h src/sys/sys/lock.h
---- src.old/sys/sys/lock.h	2004-01-28 21:39:57.000000000 +0100
-+++ src/sys/sys/lock.h	2004-11-30 00:48:03.000000000 +0100
+--- src.old/sys/sys/lock.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/lock.h	2004-12-07 23:48:37.000000000 +0100
 @@ -32,6 +32,7 @@
  #ifndef _SYS_LOCK_H_
  #define _SYS_LOCK_H_
@@ -1544,8 +802,8 @@ diff -ur src.old/sys/sys/lock.h src/sys/sys/lock.h
  #include <sys/_lock.h>
  
 diff -ur src.old/sys/sys/memrange.h src/sys/sys/memrange.h
---- src.old/sys/sys/memrange.h	2004-08-04 20:30:31.000000000 +0200
-+++ src/sys/sys/memrange.h	2004-11-30 00:48:03.000000000 +0100
+--- src.old/sys/sys/memrange.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/memrange.h	2004-12-07 23:48:37.000000000 +0100
 @@ -4,6 +4,11 @@
   * $FreeBSD: src/sys/sys/memrange.h,v 1.7 2004/08/04 18:30:31 markm Exp $
   */
@@ -1564,8 +822,8 @@ diff -ur src.old/sys/sys/memrange.h src/sys/sys/memrange.h
  
 +#endif /* _SYS_MEMRANGE_H_ */
 diff -ur src.old/sys/sys/param.h src/sys/sys/param.h
---- src.old/sys/sys/param.h	2004-10-03 19:04:41.000000000 +0200
-+++ src/sys/sys/param.h	2004-11-30 00:48:03.000000000 +0100
+--- src.old/sys/sys/param.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/param.h	2004-12-07 23:48:37.000000000 +0100
 @@ -38,7 +38,9 @@
  #ifndef _SYS_PARAM_H_
  #define _SYS_PARAM_H_
@@ -1635,8 +893,8 @@ diff -ur src.old/sys/sys/param.h src/sys/sys/param.h
   *
   * The number of CPU `tick's that map to a unique `%age' can be expressed
 diff -ur src.old/sys/sys/pciio.h src/sys/sys/pciio.h
---- src.old/sys/sys/pciio.h	2001-09-05 03:22:14.000000000 +0200
-+++ src/sys/sys/pciio.h	2004-11-30 00:48:03.000000000 +0100
+--- src.old/sys/sys/pciio.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/pciio.h	2004-12-07 23:48:37.000000000 +0100
 @@ -31,6 +31,7 @@
  #ifndef _SYS_PCIIO_H_
  #define	_SYS_PCIIO_H_
@@ -1645,33 +903,10 @@ diff -ur src.old/sys/sys/pciio.h src/sys/sys/pciio.h
  #include <sys/ioccom.h>
  
  #define PCI_MAXNAMELEN	16
-diff -ur src.old/sys/sys/pipe.h src/sys/sys/pipe.h
---- src.old/sys/sys/pipe.h	2004-07-21 05:11:41.000000000 +0200
-+++ src/sys/sys/pipe.h	2004-11-30 00:48:03.000000000 +0100
-@@ -103,9 +103,9 @@
- 	struct	pipebuf pipe_buffer;	/* data storage */
- 	struct	pipemapping pipe_map;	/* pipe mapping for direct I/O */
- 	struct	selinfo pipe_sel;	/* for compat with select */
--	struct	timespec pipe_atime;	/* time of last access */
--	struct	timespec pipe_mtime;	/* time of last modify */
--	struct	timespec pipe_ctime;	/* time of status change */
-+	struct	__kernel_timespec pipe_atime;	/* time of last access */
-+	struct	__kernel_timespec pipe_mtime;	/* time of last modify */
-+	struct	__kernel_timespec pipe_ctime;	/* time of status change */
- 	struct	sigio *pipe_sigio;	/* information for async I/O */
- 	struct	pipe *pipe_peer;	/* link with other direction */
- 	struct	pipepair *pipe_pair;	/* container structure pointer */
 diff -ur src.old/sys/sys/proc.h src/sys/sys/proc.h
---- src.old/sys/sys/proc.h	2004-10-22 21:13:07.000000000 +0200
-+++ src/sys/sys/proc.h	2004-11-30 00:48:03.000000000 +0100
-@@ -52,12 +52,13 @@
- #include <sys/sigio.h>
- #include <sys/signal.h>
- #ifndef _KERNEL
--#include <sys/time.h>			/* For structs itimerval, timeval. */
-+#include <sys/time.h>			/* For structs __kernel_itimerval, __kernel_timeval. */
- #else
- #include <sys/pcpu.h>
+--- src.old/sys/sys/proc.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/proc.h	2004-12-07 23:48:37.000000000 +0100
+@@ -58,6 +58,7 @@
  #endif
  #include <sys/ucontext.h>
  #include <sys/ucred.h>
@@ -1679,18 +914,9 @@ diff -ur src.old/sys/sys/proc.h src/sys/sys/proc.h
  #include <machine/proc.h>		/* Machine-dependent proc substruct. */
  
  /*
-@@ -528,7 +529,7 @@
- 	pid_t		p_oppid;	/* (c + e) Save ppid in ptrace. XXX */
- 	struct vmspace	*p_vmspace;	/* (b) Address space. */
- 	u_int		p_swtime;	/* (j) Time swapped in or out. */
--	struct itimerval p_realtimer;	/* (c) Alarm timer. */
-+	struct __kernel_itimerval p_realtimer;	/* (c) Alarm timer. */
- 	struct bintime	p_runtime;	/* (j) Real time. */
- 	u_int64_t	p_uu;		/* (j) Previous user time in usec. */
- 	u_int64_t	p_su;		/* (j) Previous system time in usec. */
 diff -ur src.old/sys/sys/procfs.h src/sys/sys/procfs.h
---- src.old/sys/sys/procfs.h	2004-07-15 05:52:17.000000000 +0200
-+++ src/sys/sys/procfs.h	2004-11-30 01:01:31.000000000 +0100
+--- src.old/sys/sys/procfs.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/procfs.h	2004-12-07 23:48:37.000000000 +0100
 @@ -82,4 +82,8 @@
  
  typedef void *psaddr_t;		/* An address in the target process. */
@@ -1701,8 +927,8 @@ diff -ur src.old/sys/sys/procfs.h src/sys/sys/procfs.h
 +
  #endif /* _SYS_PROCFS_H_ */
 diff -ur src.old/sys/sys/reboot.h src/sys/sys/reboot.h
---- src.old/sys/sys/reboot.h	2004-04-07 06:19:49.000000000 +0200
-+++ src/sys/sys/reboot.h	2004-11-30 00:48:07.000000000 +0100
+--- src.old/sys/sys/reboot.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/reboot.h	2004-12-07 23:48:38.000000000 +0100
 @@ -33,6 +33,8 @@
  #ifndef _SYS_REBOOT_H_
  #define	_SYS_REBOOT_H_
@@ -1725,8 +951,8 @@ diff -ur src.old/sys/sys/reboot.h src/sys/sys/reboot.h
 +
  #endif
 diff -ur src.old/sys/sys/resourcevar.h src/sys/sys/resourcevar.h
---- src.old/sys/sys/resourcevar.h	2004-08-04 20:14:19.000000000 +0200
-+++ src/sys/sys/resourcevar.h	2004-11-30 01:02:47.000000000 +0100
+--- src.old/sys/sys/resourcevar.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/resourcevar.h	2004-12-07 23:48:38.000000000 +0100
 @@ -35,6 +35,8 @@
  
  #include <sys/resource.h>
@@ -1736,38 +962,9 @@ diff -ur src.old/sys/sys/resourcevar.h src/sys/sys/resourcevar.h
  #ifdef _KERNEL
  #include <sys/_lock.h>
  #include <sys/_mutex.h>
-@@ -54,7 +56,7 @@
- #define	pstat_startzero	p_ru
- 	struct	rusage p_ru;		/* Stats for this process. */
- 	struct	rusage p_cru;		/* Stats for reaped children. */
--	struct	itimerval p_timer[3];	/* (j) Virtual-time timers. */
-+	struct	__kernel_itimerval p_timer[3];	/* (j) Virtual-time timers. */
- #define	pstat_endzero	pstat_startcopy
- 
- #define	pstat_startcopy	p_prof
-@@ -65,7 +67,7 @@
- 		u_long	pr_scale;	/* (c + j) PC scaling. */
- 	} p_prof;
- #define	pstat_endcopy	p_start
--	struct	timeval p_start;	/* (b) Starting time. */
-+	struct	__kernel_timeval p_start;	/* (b) Starting time. */
- };
- 
- #ifdef _KERNEL
-@@ -110,8 +112,8 @@
- 
- void	 addupc_intr(struct thread *td, uintptr_t pc, u_int ticks);
- void	 addupc_task(struct thread *td, uintptr_t pc, u_int ticks);
--void	 calcru(struct proc *p, struct timeval *up, struct timeval *sp,
--	    struct timeval *ip);
-+void	 calcru(struct proc *p, struct __kernel_timeval *up, struct __kernel_timeval *sp,
-+	    struct __kernel_timeval *ip);
- int	 chgproccnt(struct uidinfo *uip, int diff, int maxval);
- int	 chgsbsize(struct uidinfo *uip, u_int *hiwat, u_int to,
- 	    rlim_t maxval);
 diff -ur src.old/sys/sys/rtprio.h src/sys/sys/rtprio.h
---- src.old/sys/sys/rtprio.h	2002-03-19 21:18:41.000000000 +0100
-+++ src/sys/sys/rtprio.h	2004-11-30 00:48:07.000000000 +0100
+--- src.old/sys/sys/rtprio.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/rtprio.h	2004-12-07 23:48:38.000000000 +0100
 @@ -36,6 +36,10 @@
  
  #include <sys/priority.h>
@@ -1806,8 +1003,8 @@ diff -ur src.old/sys/sys/rtprio.h src/sys/sys/rtprio.h
  #endif	/* !_KERNEL */
  #endif	/* !_SYS_RTPRIO_H_ */
 diff -ur src.old/sys/sys/signalvar.h src/sys/sys/signalvar.h
---- src.old/sys/sys/signalvar.h	2004-07-13 09:20:09.000000000 +0200
-+++ src/sys/sys/signalvar.h	2004-11-30 00:48:07.000000000 +0100
+--- src.old/sys/sys/signalvar.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/signalvar.h	2004-12-07 23:48:38.000000000 +0100
 @@ -43,6 +43,9 @@
   * not exported to user programs.
   */
@@ -1852,8 +1049,8 @@ diff -ur src.old/sys/sys/signalvar.h src/sys/sys/signalvar.h
  	}
  	return (1);
 diff -ur src.old/sys/sys/sysctl.h src/sys/sys/sysctl.h
---- src.old/sys/sys/sysctl.h	2004-07-28 09:08:39.000000000 +0200
-+++ src/sys/sys/sysctl.h	2004-11-30 00:48:07.000000000 +0100
+--- src.old/sys/sys/sysctl.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/sysctl.h	2004-12-07 23:48:38.000000000 +0100
 @@ -36,7 +36,103 @@
  #ifndef _SYS_SYSCTL_H_
  #define	_SYS_SYSCTL_H_
@@ -1993,8 +1190,8 @@ diff -ur src.old/sys/sys/sysctl.h src/sys/sys/sysctl.h
  
  #endif	/* !_SYS_SYSCTL_H_ */
 diff -ur src.old/sys/sys/syslimits.h src/sys/sys/syslimits.h
---- src.old/sys/sys/syslimits.h	2004-04-07 06:19:49.000000000 +0200
-+++ src/sys/sys/syslimits.h	2004-11-30 00:48:07.000000000 +0100
+--- src.old/sys/sys/syslimits.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/syslimits.h	2004-12-07 23:48:38.000000000 +0100
 @@ -51,7 +51,9 @@
  #define	MAX_CANON		  255	/* max bytes in term canon input line */
  #define	MAX_INPUT		  255	/* max bytes in terminal input */
@@ -2005,194 +1202,9 @@ diff -ur src.old/sys/sys/syslimits.h src/sys/sys/syslimits.h
  #ifndef OPEN_MAX
  #define	OPEN_MAX		   64	/* max open files per process */
  #endif
-diff -ur src.old/sys/sys/sysproto.h src/sys/sys/sysproto.h
---- src.old/sys/sys/sysproto.h	2004-10-09 17:25:41.000000000 +0200
-+++ src/sys/sys/sysproto.h	2004-11-30 00:48:07.000000000 +0100
-@@ -306,8 +306,8 @@
- };
- struct setitimer_args {
- 	char which_l_[PADL_(u_int)]; u_int which; char which_r_[PADR_(u_int)];
--	char itv_l_[PADL_(struct itimerval *)]; struct itimerval * itv; char itv_r_[PADR_(struct itimerval *)];
--	char oitv_l_[PADL_(struct itimerval *)]; struct itimerval * oitv; char oitv_r_[PADR_(struct itimerval *)];
-+	char itv_l_[PADL_(struct __kernel_itimerval *)]; struct __kernel_itimerval * itv; char itv_r_[PADR_(struct __kernel_itimerval *)];
-+	char oitv_l_[PADL_(struct __kernel_itimerval *)]; struct __kernel_itimerval * oitv; char oitv_r_[PADR_(struct __kernel_itimerval *)];
- };
- struct owait_args {
- 	register_t dummy;
-@@ -317,7 +317,7 @@
- };
- struct getitimer_args {
- 	char which_l_[PADL_(u_int)]; u_int which; char which_r_[PADR_(u_int)];
--	char itv_l_[PADL_(struct itimerval *)]; struct itimerval * itv; char itv_r_[PADR_(struct itimerval *)];
-+	char itv_l_[PADL_(struct __kernel_itimerval *)]; struct __kernel_itimerval * itv; char itv_r_[PADR_(struct __kernel_itimerval *)];
- };
- struct getdtablesize_args {
- 	register_t dummy;
-@@ -336,7 +336,7 @@
- 	char in_l_[PADL_(fd_set *)]; fd_set * in; char in_r_[PADR_(fd_set *)];
- 	char ou_l_[PADL_(fd_set *)]; fd_set * ou; char ou_r_[PADR_(fd_set *)];
- 	char ex_l_[PADL_(fd_set *)]; fd_set * ex; char ex_r_[PADR_(fd_set *)];
--	char tv_l_[PADL_(struct timeval *)]; struct timeval * tv; char tv_r_[PADR_(struct timeval *)];
-+	char tv_l_[PADL_(struct __kernel_timeval *)]; struct __kernel_timeval * tv; char tv_r_[PADR_(struct __kernel_timeval *)];
- };
- struct fsync_args {
- 	char fd_l_[PADL_(int)]; int fd; char fd_r_[PADR_(int)];
-@@ -377,7 +377,7 @@
- 	char backlog_l_[PADL_(int)]; int backlog; char backlog_r_[PADR_(int)];
- };
- struct gettimeofday_args {
--	char tp_l_[PADL_(struct timeval *)]; struct timeval * tp; char tp_r_[PADR_(struct timeval *)];
-+	char tp_l_[PADL_(struct __kernel_timeval *)]; struct __kernel_timeval * tp; char tp_r_[PADR_(struct __kernel_timeval *)];
- 	char tzp_l_[PADL_(struct timezone *)]; struct timezone * tzp; char tzp_r_[PADR_(struct timezone *)];
- };
- struct getrusage_args {
-@@ -402,7 +402,7 @@
- 	char iovcnt_l_[PADL_(u_int)]; u_int iovcnt; char iovcnt_r_[PADR_(u_int)];
- };
- struct settimeofday_args {
--	char tv_l_[PADL_(struct timeval *)]; struct timeval * tv; char tv_r_[PADR_(struct timeval *)];
-+	char tv_l_[PADL_(struct __kernel_timeval *)]; struct __kernel_timeval * tv; char tv_r_[PADR_(struct __kernel_timeval *)];
- 	char tzp_l_[PADL_(struct timezone *)]; struct timezone * tzp; char tzp_r_[PADR_(struct timezone *)];
- };
- struct fchown_args {
-@@ -461,11 +461,11 @@
- };
- struct utimes_args {
- 	char path_l_[PADL_(char *)]; char * path; char path_r_[PADR_(char *)];
--	char tptr_l_[PADL_(struct timeval *)]; struct timeval * tptr; char tptr_r_[PADR_(struct timeval *)];
-+	char tptr_l_[PADL_(struct __kernel_timeval *)]; struct __kernel_timeval * tptr; char tptr_r_[PADR_(struct __kernel_timeval *)];
- };
- struct adjtime_args {
--	char delta_l_[PADL_(struct timeval *)]; struct timeval * delta; char delta_r_[PADR_(struct timeval *)];
--	char olddelta_l_[PADL_(struct timeval *)]; struct timeval * olddelta; char olddelta_r_[PADR_(struct timeval *)];
-+	char delta_l_[PADL_(struct __kernel_timeval *)]; struct __kernel_timeval * delta; char delta_r_[PADR_(struct __kernel_timeval *)];
-+	char olddelta_l_[PADL_(struct __kernel_timeval *)]; struct __kernel_timeval * olddelta; char olddelta_r_[PADR_(struct __kernel_timeval *)];
- };
- struct ogethostid_args {
- 	register_t dummy;
-@@ -641,7 +641,7 @@
- };
- struct futimes_args {
- 	char fd_l_[PADL_(int)]; int fd; char fd_r_[PADR_(int)];
--	char tptr_l_[PADL_(struct timeval *)]; struct timeval * tptr; char tptr_r_[PADR_(struct timeval *)];
-+	char tptr_l_[PADL_(struct __kernel_timeval *)]; struct __kernel_timeval * tptr; char tptr_r_[PADR_(struct __kernel_timeval *)];
- };
- struct getpgid_args {
- 	char pid_l_[PADL_(pid_t)]; pid_t pid; char pid_r_[PADR_(pid_t)];
-@@ -709,19 +709,19 @@
- };
- struct clock_gettime_args {
- 	char clock_id_l_[PADL_(clockid_t)]; clockid_t clock_id; char clock_id_r_[PADR_(clockid_t)];
--	char tp_l_[PADL_(struct timespec *)]; struct timespec * tp; char tp_r_[PADR_(struct timespec *)];
-+	char tp_l_[PADL_(struct __kernel_timespec *)]; struct __kernel_timespec * tp; char tp_r_[PADR_(struct __kernel_timespec *)];
- };
- struct clock_settime_args {
- 	char clock_id_l_[PADL_(clockid_t)]; clockid_t clock_id; char clock_id_r_[PADR_(clockid_t)];
--	char tp_l_[PADL_(const struct timespec *)]; const struct timespec * tp; char tp_r_[PADR_(const struct timespec *)];
-+	char tp_l_[PADL_(const struct __kernel_timespec *)]; const struct __kernel_timespec * tp; char tp_r_[PADR_(const struct __kernel_timespec *)];
- };
- struct clock_getres_args {
- 	char clock_id_l_[PADL_(clockid_t)]; clockid_t clock_id; char clock_id_r_[PADR_(clockid_t)];
--	char tp_l_[PADL_(struct timespec *)]; struct timespec * tp; char tp_r_[PADR_(struct timespec *)];
-+	char tp_l_[PADL_(struct __kernel_timespec *)]; struct __kernel_timespec * tp; char tp_r_[PADR_(struct __kernel_timespec *)];
- };
- struct nanosleep_args {
--	char rqtp_l_[PADL_(const struct timespec *)]; const struct timespec * rqtp; char rqtp_r_[PADR_(const struct timespec *)];
--	char rmtp_l_[PADL_(struct timespec *)]; struct timespec * rmtp; char rmtp_r_[PADR_(struct timespec *)];
-+	char rqtp_l_[PADL_(const struct __kernel_timespec *)]; const struct __kernel_timespec * rqtp; char rqtp_r_[PADR_(const struct __kernel_timespec *)];
-+	char rmtp_l_[PADL_(struct __kernel_timespec *)]; struct __kernel_timespec * rmtp; char rmtp_r_[PADR_(struct __kernel_timespec *)];
- };
- struct minherit_args {
- 	char addr_l_[PADL_(void *)]; void * addr; char addr_r_[PADR_(void *)];
-@@ -755,7 +755,7 @@
- };
- struct lutimes_args {
- 	char path_l_[PADL_(char *)]; char * path; char path_r_[PADR_(char *)];
--	char tptr_l_[PADL_(struct timeval *)]; struct timeval * tptr; char tptr_r_[PADR_(struct timeval *)];
-+	char tptr_l_[PADL_(struct __kernel_timeval *)]; struct __kernel_timeval * tptr; char tptr_r_[PADR_(struct __kernel_timeval *)];
- };
- struct nstat_args {
- 	char path_l_[PADL_(char *)]; char * path; char path_r_[PADR_(char *)];
-@@ -828,7 +828,7 @@
- struct aio_suspend_args {
- 	char aiocbp_l_[PADL_(struct aiocb *const *)]; struct aiocb *const * aiocbp; char aiocbp_r_[PADR_(struct aiocb *const *)];
- 	char nent_l_[PADL_(int)]; int nent; char nent_r_[PADR_(int)];
--	char timeout_l_[PADL_(const struct timespec *)]; const struct timespec * timeout; char timeout_r_[PADR_(const struct timespec *)];
-+	char timeout_l_[PADL_(const struct __kernel_timespec *)]; const struct __kernel_timespec * timeout; char timeout_r_[PADR_(const struct __kernel_timespec *)];
- };
- struct aio_cancel_args {
- 	char fd_l_[PADL_(int)]; int fd; char fd_r_[PADR_(int)];
-@@ -889,7 +889,7 @@
- };
- struct sched_rr_get_interval_args {
- 	char pid_l_[PADL_(pid_t)]; pid_t pid; char pid_r_[PADR_(pid_t)];
--	char interval_l_[PADL_(struct timespec *)]; struct timespec * interval; char interval_r_[PADR_(struct timespec *)];
-+	char interval_l_[PADL_(struct __kernel_timespec *)]; struct __kernel_timespec * interval; char interval_r_[PADR_(struct __kernel_timespec *)];
- };
- struct utrace_args {
- 	char addr_l_[PADL_(const void *)]; const void * addr; char addr_r_[PADR_(const void *)];
-@@ -917,7 +917,7 @@
- struct sigtimedwait_args {
- 	char set_l_[PADL_(const sigset_t *)]; const sigset_t * set; char set_r_[PADR_(const sigset_t *)];
- 	char info_l_[PADL_(siginfo_t *)]; siginfo_t * info; char info_r_[PADR_(siginfo_t *)];
--	char timeout_l_[PADL_(const struct timespec *)]; const struct timespec * timeout; char timeout_r_[PADR_(const struct timespec *)];
-+	char timeout_l_[PADL_(const struct __kernel_timespec *)]; const struct __kernel_timespec * timeout; char timeout_r_[PADR_(const struct __kernel_timespec *)];
- };
- struct sigwaitinfo_args {
- 	char set_l_[PADL_(const sigset_t *)]; const sigset_t * set; char set_r_[PADR_(const sigset_t *)];
-@@ -989,7 +989,7 @@
- };
- struct aio_waitcomplete_args {
- 	char aiocbp_l_[PADL_(struct aiocb **)]; struct aiocb ** aiocbp; char aiocbp_r_[PADR_(struct aiocb **)];
--	char timeout_l_[PADL_(struct timespec *)]; struct timespec * timeout; char timeout_r_[PADR_(struct timespec *)];
-+	char timeout_l_[PADL_(struct __kernel_timespec *)]; struct __kernel_timespec * timeout; char timeout_r_[PADR_(struct __kernel_timespec *)];
- };
- struct getresuid_args {
- 	char ruid_l_[PADL_(uid_t *)]; uid_t * ruid; char ruid_r_[PADR_(uid_t *)];
-@@ -1010,7 +1010,7 @@
- 	char nchanges_l_[PADL_(int)]; int nchanges; char nchanges_r_[PADR_(int)];
- 	char eventlist_l_[PADL_(struct kevent *)]; struct kevent * eventlist; char eventlist_r_[PADR_(struct kevent *)];
- 	char nevents_l_[PADL_(int)]; int nevents; char nevents_r_[PADR_(int)];
--	char timeout_l_[PADL_(const struct timespec *)]; const struct timespec * timeout; char timeout_r_[PADR_(const struct timespec *)];
-+	char timeout_l_[PADL_(const struct __kernel_timespec *)]; const struct __kernel_timespec * timeout; char timeout_r_[PADR_(const struct __kernel_timespec *)];
- };
- struct extattr_set_fd_args {
- 	char fd_l_[PADL_(int)]; int fd; char fd_r_[PADR_(int)];
-@@ -1063,7 +1063,7 @@
- 	char data_l_[PADL_(long)]; long data; char data_r_[PADR_(long)];
- };
- struct kse_release_args {
--	char timeout_l_[PADL_(struct timespec *)]; struct timespec * timeout; char timeout_r_[PADR_(struct timespec *)];
-+	char timeout_l_[PADL_(struct __kernel_timespec *)]; struct __kernel_timespec * timeout; char timeout_r_[PADR_(struct __kernel_timespec *)];
- };
- struct __mac_get_proc_args {
- 	char mac_p_l_[PADL_(struct mac *)]; struct mac * mac_p; char mac_p_r_[PADR_(struct mac *)];
-diff -ur src.old/sys/sys/systm.h src/sys/sys/systm.h
---- src.old/sys/sys/systm.h	2004-08-05 09:15:35.000000000 +0200
-+++ src/sys/sys/systm.h	2004-11-30 00:48:07.000000000 +0100
-@@ -232,8 +232,8 @@
- int	testenv(const char *name);
- 
- #ifdef APM_FIXUP_CALLTODO 
--struct timeval;
--void	adjust_timeout_calltodo(struct timeval *time_change); 
-+struct __kernel_timeval;
-+void	adjust_timeout_calltodo(struct __kernel_timeval *time_change); 
- #endif /* APM_FIXUP_CALLTODO */ 
- 
- #include <sys/libkern.h>
-@@ -249,7 +249,7 @@
- /*
-  * Kernel to clock driver interface.
-  */
--void	inittodr(time_t base);
-+void	inittodr(__kernel_time_t base);
- void	resettodr(void);
- void	startrtclock(void);
- 
 diff -ur src.old/sys/sys/timepps.h src/sys/sys/timepps.h
---- src.old/sys/sys/timepps.h	2003-11-23 19:52:23.000000000 +0100
-+++ src/sys/sys/timepps.h	2004-11-30 00:48:07.000000000 +0100
+--- src.old/sys/sys/timepps.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/timepps.h	2004-12-07 23:48:38.000000000 +0100
 @@ -15,6 +15,8 @@
  #ifndef _SYS_TIMEPPS_H_
  #define _SYS_TIMEPPS_H_
@@ -2202,54 +1214,9 @@ diff -ur src.old/sys/sys/timepps.h src/sys/sys/timepps.h
  #include <sys/ioccom.h>
  #include <sys/time.h>
  
-@@ -30,7 +32,7 @@
- } ntp_fp_t;
- 
- typedef union pps_timeu {
--	struct timespec	tspec;
-+	struct __kernel_timespec	tspec;
- 	ntp_fp_t	ntpfp;
- 	unsigned long	longpad[3];
- } pps_timeu_t;
-@@ -86,7 +88,7 @@
- struct pps_fetch_args {
- 	int tsformat;
- 	pps_info_t	pps_info_buf;
--	struct timespec	timeout;
-+	struct __kernel_timespec	timeout;
- };
- 
- struct pps_kcbind_args {
-@@ -124,7 +126,7 @@
- void pps_event(struct pps_state *pps, int event);
- void pps_init(struct pps_state *pps);
- int pps_ioctl(unsigned long cmd, caddr_t data, struct pps_state *pps);
--void hardpps(struct timespec *tsp, long nsec);
-+void hardpps(struct __kernel_timespec *tsp, long nsec);
- 
- #else /* !_KERNEL */
- 
-@@ -167,7 +169,7 @@
- 
- static __inline int
- time_pps_fetch(pps_handle_t handle, const int tsformat,
--	pps_info_t *ppsinfobuf, const struct timespec *timeout)
-+	pps_info_t *ppsinfobuf, const struct __kernel_timespec *timeout)
- {
- 	int error;
- 	struct pps_fetch_args arg;
 diff -ur src.old/sys/sys/timex.h src/sys/sys/timex.h
---- src.old/sys/sys/timex.h	2004-11-30 00:47:32.000000000 +0100
-+++ src/sys/sys/timex.h	2004-11-30 00:48:07.000000000 +0100
-@@ -69,7 +69,7 @@
-  *	int ntp_gettime(struct ntptimeval *ntv);
-  *
-  * DESCRIPTION
-- *	The time returned by ntp_gettime() is in a timespec structure,
-+ *	The time returned by ntp_gettime() is in a __kernel_timespec structure,
-  *	but may be in either microsecond (seconds and microseconds) or
-  *	nanosecond (seconds and nanoseconds) format. The particular
-  *	format in use is determined by the STA_NANO bit of the status
+--- src.old/sys/sys/timex.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/timex.h	2004-12-07 23:48:38.000000000 +0100
 @@ -94,11 +94,9 @@
   */
  #ifndef _SYS_TIMEX_H_
@@ -2264,23 +1231,21 @@ diff -ur src.old/sys/sys/timex.h src/sys/sys/timex.h
  
  /*
   * The following defines establish the performance envelope of the
-@@ -175,8 +173,14 @@
+@@ -175,7 +173,13 @@
   * Note: The time member is in microseconds if STA_NANO is zero and
   * nanoseconds if not.
   */
 -struct ntptimeval {
--	struct timespec time;	/* current time (ns) (ro) */
 +struct ntptimeval3 {
-+	struct __kernel_timespec time;	/* current time (ns) (ro) */
++	struct timespec time;	/* current time (ns) (ro) */
 +	long maxerror;		/* maximum error (us) (ro) */
 +	long esterror;		/* estimated error (us) (ro) */
 +	int time_state;		/* time status */
 +};
 +struct ntptimeval4 {
-+	struct __kernel_timespec time;	/* current time (ns) (ro) */
+ 	struct timespec time;	/* current time (ns) (ro) */
  	long maxerror;		/* maximum error (us) (ro) */
  	long esterror;		/* estimated error (us) (ro) */
- 	long tai;		/* TAI offset */
 @@ -224,9 +228,12 @@
  #else /* !_KERNEL */
  #include <sys/cdefs.h>
@@ -2296,21 +1261,9 @@ diff -ur src.old/sys/sys/timex.h src/sys/sys/timex.h
  __END_DECLS
  #endif /* _KERNEL */
  
-diff -ur src.old/sys/sys/ttycom.h src/sys/sys/ttycom.h
---- src.old/sys/sys/ttycom.h	2004-06-25 23:54:49.000000000 +0200
-+++ src/sys/sys/ttycom.h	2004-11-30 01:03:17.000000000 +0100
-@@ -129,7 +129,7 @@
- #define	TIOCMSDTRWAIT	_IOW('t', 91, int)	/* modem: set wait on close */
- #define	TIOCMGDTRWAIT	_IOR('t', 90, int)	/* modem: get wait on close */
- 						/* 90-70 ppp; many conflicts */
--#define	TIOCTIMESTAMP	_IOR('t', 89, struct timeval)	/* enable/get timestamp
-+#define	TIOCTIMESTAMP	_IOR('t', 89, struct __kernel_timeval)	/* enable/get timestamp
- 						 * of last input event */
- 						/* 88 slip, ppp; conflicts */
- #define	TIOCSDRAINWAIT	_IOW('t', 87, int)	/* set ttywait timeout */
 diff -ur src.old/sys/sys/ucred.h src/sys/sys/ucred.h
---- src.old/sys/sys/ucred.h	2004-09-03 08:11:59.000000000 +0200
-+++ src/sys/sys/ucred.h	2004-11-30 00:48:07.000000000 +0100
+--- src.old/sys/sys/ucred.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/ucred.h	2004-12-07 23:48:38.000000000 +0100
 @@ -33,6 +33,9 @@
  #ifndef _SYS_UCRED_H_
  #define	_SYS_UCRED_H_
@@ -2321,36 +1274,9 @@ diff -ur src.old/sys/sys/ucred.h src/sys/sys/ucred.h
  /*
   * Credentials.
   *
-diff -ur src.old/sys/sys/vnode.h src/sys/sys/vnode.h
---- src.old/sys/sys/vnode.h	2004-08-15 08:24:42.000000000 +0200
-+++ src/sys/sys/vnode.h	2004-11-30 00:48:07.000000000 +0100
-@@ -255,10 +255,10 @@
- 	long		va_fileid;	/* file id */
- 	u_quad_t	va_size;	/* file size in bytes */
- 	long		va_blocksize;	/* blocksize preferred for i/o */
--	struct timespec	va_atime;	/* time of last access */
--	struct timespec	va_mtime;	/* time of last modification */
--	struct timespec	va_ctime;	/* time file changed */
--	struct timespec	va_birthtime;	/* time file created */
-+	struct __kernel_timespec	va_atime;	/* time of last access */
-+	struct __kernel_timespec	va_mtime;	/* time of last modification */
-+	struct __kernel_timespec	va_ctime;	/* time file changed */
-+	struct __kernel_timespec	va_birthtime;	/* time file created */
- 	u_long		va_gen;		/* generation number of file */
- 	u_long		va_flags;	/* flags defined for file */
- 	dev_t		va_rdev;	/* device the special file represents */
-@@ -685,7 +685,7 @@
- int	vfs_cache_lookup(struct vop_lookup_args *ap);
- int	vfs_object_create(struct vnode *vp, struct thread *td,
- 	    struct ucred *cred);
--void	vfs_timestamp(struct timespec *);
-+void	vfs_timestamp(struct __kernel_timespec *);
- void	vfs_write_resume(struct mount *mp);
- int	vfs_write_suspend(struct mount *mp);
- int	vop_stdbmap(struct vop_bmap_args *);
 diff -ur src.old/sys/sys/xrpuio.h src/sys/sys/xrpuio.h
---- src.old/sys/sys/xrpuio.h	1999-08-28 02:52:12.000000000 +0200
-+++ src/sys/sys/xrpuio.h	2004-11-30 00:48:07.000000000 +0100
+--- src.old/sys/sys/xrpuio.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/sys/xrpuio.h	2004-12-07 23:48:38.000000000 +0100
 @@ -13,6 +13,7 @@
  #ifndef _SYS_XRPUIO_H_
  #define _SYS_XRPUIO_H_
@@ -2359,32 +1285,9 @@ diff -ur src.old/sys/sys/xrpuio.h src/sys/sys/xrpuio.h
  #include <sys/ioccom.h>
  
  #define XRPU_MAX_PPS	16
-diff -ur src.old/sys/ufs/ufs/ufsmount.h src/sys/ufs/ufs/ufsmount.h
---- src.old/sys/ufs/ufs/ufsmount.h	2004-06-16 11:47:25.000000000 +0200
-+++ src/sys/ufs/ufs/ufsmount.h	2004-11-30 00:48:07.000000000 +0100
-@@ -50,7 +50,7 @@
- struct buf;
- struct inode;
- struct nameidata;
--struct timeval;
-+struct __kernel_timeval;
- struct ucred;
- struct uio;
- struct vnode;
-@@ -70,8 +70,8 @@
- 	u_long	um_bptrtodb;			/* indir ptr to disk block */
- 	u_long	um_seqinc;			/* inc between seq blocks */
- 	long	um_numindirdeps;		/* indirdeps for this filesys */
--	time_t	um_btime[MAXQUOTAS];		/* block quota time limit */
--	time_t	um_itime[MAXQUOTAS];		/* inode quota time limit */
-+	__kernel_time_t	um_btime[MAXQUOTAS];		/* block quota time limit */
-+	__kernel_time_t	um_itime[MAXQUOTAS];		/* inode quota time limit */
- 	char	um_qflags[MAXQUOTAS];		/* quota specific flags */
- 	int64_t	um_savedmaxfilesize;		/* XXX - limit maxfilesize */
- 	int	(*um_balloc)(struct vnode *, off_t, int, struct ucred *, int, struct buf **);
 diff -ur src.old/sys/vm/vm.h src/sys/vm/vm.h
---- src.old/sys/vm/vm.h	2004-08-16 08:16:12.000000000 +0200
-+++ src/sys/vm/vm.h	2004-11-30 00:48:07.000000000 +0100
+--- src.old/sys/vm/vm.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/vm/vm.h	2004-12-07 23:48:38.000000000 +0100
 @@ -61,6 +61,8 @@
  #ifndef VM_H
  #define VM_H
@@ -2395,8 +1298,8 @@ diff -ur src.old/sys/vm/vm.h src/sys/vm/vm.h
  
  #define	VM_INHERIT_SHARE	((vm_inherit_t) 0)
 diff -ur src.old/sys/vm/vm_map.h src/sys/vm/vm_map.h
---- src.old/sys/vm/vm_map.h	2004-08-13 10:06:34.000000000 +0200
-+++ src/sys/vm/vm_map.h	2004-11-30 00:48:07.000000000 +0100
+--- src.old/sys/vm/vm_map.h	2004-12-07 23:50:18.000000000 +0100
++++ src/sys/vm/vm_map.h	2004-12-07 23:48:38.000000000 +0100
 @@ -70,6 +70,12 @@
  #include <sys/sx.h>
  #include <sys/_mutex.h>

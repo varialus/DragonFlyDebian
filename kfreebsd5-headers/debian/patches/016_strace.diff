@@ -9,3 +9,58 @@
  
  union	savefpu {
  	struct	save87	sv_87;
+--- src/sys/sys/proc.h~	2004-12-07 23:53:09.000000000 +0100
++++ src/sys/sys/proc.h	2004-12-08 02:03:24.000000000 +0100
+@@ -61,6 +61,12 @@
+ 
+ #include <machine/proc.h>		/* Machine-dependent proc substruct. */
+ 
++#ifdef __FreeBSD__
++#include <sys/types.h>			/* vm_offset_t */
++#else
++#include <machine/_types.h>		/* __vm_offset_t */
++#endif
++
+ /*
+  * One structure allocated per session.
+  *
+@@ -315,10 +321,10 @@
+ 	struct callout	td_slpcallout;	/* (h) Callout for sleep. */
+ 	struct trapframe *td_frame;	/* (k) */
+ 	struct vm_object *td_kstack_obj;/* (a) Kstack object. */
+-	vm_offset_t	td_kstack;	/* (a) Kernel VA of kstack. */
++	__vm_offset_t	td_kstack;	/* (a) Kernel VA of kstack. */
+ 	int		td_kstack_pages; /* (a) Size of the kstack. */
+ 	struct vm_object *td_altkstack_obj;/* (a) Alternate kstack object. */
+-	vm_offset_t	td_altkstack;	/* (a) Kernel VA of alternate kstack. */
++	__vm_offset_t	td_altkstack;	/* (a) Kernel VA of alternate kstack. */
+ 	int		td_altkstack_pages; /* (a) Size of alternate kstack. */
+ 	u_int		td_critnest;	/* (k) Critical section nest level. */
+ 	struct mdthread td_md;		/* (k) Any machine-dependent fields. */
+--- src/sys/i386/include/_types.h~	2004-03-20 21:41:40.000000000 +0100
++++ src/sys/i386/include/_types.h	2004-12-08 02:22:34.000000000 +0100
+@@ -39,6 +39,8 @@
+ #ifndef _MACHINE__TYPES_H_
+ #define	_MACHINE__TYPES_H_
+ 
++#include <sys/types.h>
++
+ /*
+  * Basic types upon which most other types are built.
+  */
+@@ -67,7 +69,6 @@
+ /*
+  * Standard type definitions.
+  */
+-typedef	unsigned long	__clock_t;		/* clock()... */
+ typedef	unsigned int	__cpumask_t;
+ typedef	__int32_t	__critical_t;
+ typedef	double		__double_t;
+@@ -88,7 +89,6 @@
+ typedef	__int32_t	__segsz_t;		/* segment size (in pages) */
+ typedef	__uint32_t	__size_t;		/* sizeof() */
+ typedef	__int32_t	__ssize_t;		/* byte count or error */
+-typedef	__int32_t	__time_t;		/* time()... */
+ typedef	__uint32_t	__uintfptr_t;
+ typedef	__uint64_t	__uintmax_t;
+ typedef	__uint32_t	__uintptr_t;
