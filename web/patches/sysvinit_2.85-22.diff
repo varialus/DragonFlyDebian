@@ -1,8 +1,8 @@
 diff -Nur sysvinit-2.85.old/debian/changelog sysvinit-2.85/debian/changelog
---- sysvinit-2.85.old/debian/changelog	2004-06-20 15:24:11.000000000 +0200
-+++ sysvinit-2.85/debian/changelog	2004-06-20 15:32:27.000000000 +0200
+--- sysvinit-2.85.old/debian/changelog	2004-07-05 02:09:46.000000000 +0200
++++ sysvinit-2.85/debian/changelog	2004-07-05 02:11:20.000000000 +0200
 @@ -1,3 +1,9 @@
-+sysvinit (2.85-22+kbsd) unreleased; urgency=low
++sysvinit (2.85-22+kbsd.1) unreleased; urgency=low
 +
 +  * foo
 +
@@ -11,9 +11,29 @@ diff -Nur sysvinit-2.85.old/debian/changelog sysvinit-2.85/debian/changelog
  sysvinit (2.85-22) unstable; urgency=medium
  
    * Fix typo in /etc/init.d/halt (closes: #255133)
+diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/bootmisc.sh sysvinit-2.85/debian/initscripts/etc/init.d/bootmisc.sh
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/bootmisc.sh	2004-07-05 02:09:46.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/bootmisc.sh	2004-07-05 02:13:40.000000000 +0200
+@@ -8,6 +8,7 @@
+ VERBOSE=yes
+ EDITMOTD=yes
+ [ -f /etc/default/rcS ] && . /etc/default/rcS
++. /etc/init.d/rcArch
+ 
+ #
+ #	Put a nologin file in /etc to prevent people from logging in
+@@ -57,7 +58,7 @@
+ #
+ if [ -x /bin/dmesg ] || [ -x /sbin/dmesg ]
+ then
+-	dmesg -s 524288 > /var/log/dmesg
++	dmesg $dmesg_size > /var/log/dmesg
+ elif [ -c /dev/klog ]
+ then
+ 	dd if=/dev/klog of=/var/log/dmesg &
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh
---- sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh	2004-06-20 15:24:11.000000000 +0200
-+++ sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh	2004-06-20 15:32:05.000000000 +0200
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh	2004-07-05 02:09:46.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh	2004-07-05 02:11:20.000000000 +0200
 @@ -7,6 +7,7 @@
  SULOGIN=no
  VERBOSE=yes
@@ -63,8 +83,8 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh sysvinit-
  
  #
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/halt sysvinit-2.85/debian/initscripts/etc/init.d/halt
---- sysvinit-2.85.old/debian/initscripts/etc/init.d/halt	2004-06-20 15:24:11.000000000 +0200
-+++ sysvinit-2.85/debian/initscripts/etc/init.d/halt	2004-06-20 15:26:08.000000000 +0200
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/halt	2004-07-05 02:09:46.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/halt	2004-07-05 02:11:20.000000000 +0200
 @@ -25,6 +25,8 @@
  	esac
  fi
@@ -84,8 +104,8 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/halt sysvinit-2.85/deb
  : exit 0
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/rcArch sysvinit-2.85/debian/initscripts/etc/init.d/rcArch
 --- sysvinit-2.85.old/debian/initscripts/etc/init.d/rcArch	1970-01-01 01:00:00.000000000 +0100
-+++ sysvinit-2.85/debian/initscripts/etc/init.d/rcArch	2004-06-20 15:26:08.000000000 +0200
-@@ -0,0 +1,36 @@
++++ sysvinit-2.85/debian/initscripts/etc/init.d/rcArch	2004-07-05 02:12:44.000000000 +0200
+@@ -0,0 +1,37 @@
 +# Arch specific options
 +
 +if [ `uname -s` = Linux -o `uname -s` = GNU ]; then
@@ -106,7 +126,7 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/rcArch sysvinit-2.85/d
 +      umount_lazy="-l"
 +      ;;
 +  esac
-+  dmesg_bufsize="-s 65536"
++  dmesg_bufsize="-s 524288"
 +  procfs="proc"
 +  mount_no_mtab="-n"
 +  mount_remount="-o remount"
@@ -116,6 +136,7 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/rcArch sysvinit-2.85/d
 +  umount_all="-a"
 +  umount_try_ro=""
 +  umount_force="-f"
++  dmesg_bufsize=""
 +  procfs="procfs"
 +  mount_no_mtab=""
 +  mount_remount="-o update"
@@ -123,8 +144,8 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/rcArch sysvinit-2.85/d
 +fi
 +
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/reboot sysvinit-2.85/debian/initscripts/etc/init.d/reboot
---- sysvinit-2.85.old/debian/initscripts/etc/init.d/reboot	2004-06-20 15:24:11.000000000 +0200
-+++ sysvinit-2.85/debian/initscripts/etc/init.d/reboot	2004-06-20 15:26:08.000000000 +0200
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/reboot	2004-07-05 02:09:46.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/reboot	2004-07-05 02:11:20.000000000 +0200
 @@ -7,5 +7,7 @@
  
  PATH=/sbin:/bin:/usr/sbin:/usr/bin
@@ -135,8 +156,8 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/reboot sysvinit-2.85/d
 -reboot -d -f -i
 +reboot -d -f $halt_ifdown
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/umountfs sysvinit-2.85/debian/initscripts/etc/init.d/umountfs
---- sysvinit-2.85.old/debian/initscripts/etc/init.d/umountfs	2004-06-20 15:24:11.000000000 +0200
-+++ sysvinit-2.85/debian/initscripts/etc/init.d/umountfs	2004-06-20 15:26:08.000000000 +0200
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/umountfs	2004-07-05 02:09:46.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/umountfs	2004-07-05 02:11:20.000000000 +0200
 @@ -7,19 +7,23 @@
  
  PATH=/sbin:/bin:/usr/sbin:/usr/bin

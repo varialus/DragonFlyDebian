@@ -1,0 +1,893 @@
+diff -Nur gcc-3.3-3.3.4.old/debian/changelog gcc-3.3-3.3.4/debian/changelog
+--- gcc-3.3-3.3.4.old/debian/changelog	2004-07-06 14:51:02.000000000 +0200
++++ gcc-3.3-3.3.4/debian/changelog	2004-07-06 15:51:29.000000000 +0200
+@@ -1,3 +1,9 @@
++gcc-3.3 (1:3.3.4-2+kbsd) unreleased; urgency=low
++
++  * foo
++
++ -- Robert Millan <rmh@debian.org>  Tue,  6 Jul 2004 15:51:19 +0200
++
+ gcc-3.3 (1:3.3.4-2) unstable; urgency=low
+ 
+   * debian/patches/pr14782.dpatch:
+diff -Nur gcc-3.3-3.3.4.old/debian/control gcc-3.3-3.3.4/debian/control
+--- gcc-3.3-3.3.4.old/debian/control	2004-07-06 14:51:02.000000000 +0200
++++ gcc-3.3-3.3.4/debian/control	2004-07-06 16:16:59.000000000 +0200
+@@ -4,7 +4,7 @@
+ Maintainer: Debian GCC maintainers <debian-gcc@lists.debian.org>
+ Uploaders: Matthias Klose <doko@debian.org>, Gerhard Tonn <gt@debian.org>
+ Standards-Version: 3.6.1
+-Build-Depends: libc6.1-dev (>= 2.3.1) [alpha ia64] | libc0.3-dev [hurd-i386] | libc1-dev [freebsd-i386] | libc12-dev [netbsd-i386] | libc6-dev (>= 2.3.2.ds1-12) [hppa] | libc6-dev (>= 2.3.1) [!hppa], libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], m4, autoconf2.13, automake1.4 | automake (<< 1.5), libtool, autotools-dev, gawk, dejagnu (>= 1.4.3) [!hurd-i386], expect (>= 5.38.0) [!hurd-i386], bzip2, binutils (>= 2.14.90.0.4) | binutils (<< 2.14), binutils (>= 2.13.90.0.10) [!m68k !sparc] | binutils (>= 2.13.90.0.18-1.3) [m68k] | binutils (>= 2.13.90.0.18-1.4) [sparc], binutils-hppa64 [hppa], debhelper (>= 3.0.25), gperf (>= 2.7-3), bison (>= 1:1.875a-1) | bison (<< 1:1.50), flex-old | flex (<< 2.5.31), gettext, texinfo (>= 4.3), zlib1g-dev, libgc-dev [!avr !freebsd-i386], xlibs-dev, gnat-3.3 [!arm !hurd-i386 !m68k !freebsd-i386 !netbsd-i386] | gnat-3.2 [!arm !hurd-i386 !m68k !freebsd-i386 !netbsd-i386] | gnat [i386 powerpc sparc], libncurses5-dev [!netbsd-i386], libgmp3-dev, tetex-bin [!netbsd-i386], locales [!netbsd-i386 !hurd-i386 !hurd-i386], procps [!hurd-i386], help2man, sharutils
++Build-Depends: libc-dev, libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], m4, autoconf2.13, automake1.4 | automake (<< 1.5), libtool, autotools-dev, gawk, dejagnu (>= 1.4.3) [!hurd-i386 !kfreebsd-i386 !knetbsd-i386], expect (>= 5.38.0) [!hurd-i386 !kfreebsd-i386 !knetbsd-i386], bzip2, binutils (>= 2.14.90.0.4) | binutils (<< 2.14), binutils (>= 2.13.90.0.10) [!m68k !sparc] | binutils (>= 2.13.90.0.18-1.3) [m68k] | binutils (>= 2.13.90.0.18-1.4) [sparc], binutils-hppa64 [hppa], debhelper (>= 3.0.25), gperf (>= 2.7-3), bison (>= 1:1.875a-1) | bison (<< 1:1.50), flex-old | flex (<< 2.5.31), gettext, texinfo (>= 4.3), zlib1g-dev, libgc-dev [!avr !kfreebsd-i386 !knetbsd-i386], xlibs-dev, gnat-3.3 [!arm !hurd-i386 !m68k !kfreebsd-i386 !knetbsd-i386] | gnat-3.2 [!arm !hurd-i386 !m68k !kfreebsd-i386 !knetbsd-i386] | gnat [i386 powerpc sparc], libncurses5-dev [!kfreebsd-i386 !knetbsd-i386], libgmp3-dev, tetex-bin [!kfreebsd-i386 !knetbsd-i386], locales [!hurd-i386 !kfreebsd-i386 !knetbsd-i386 !hurd-i386], procps [!hurd-i386 !kfreebsd-i386 !knetbsd-i386], help2man, sharutils
+ Build-Depends-Indep: doxygen (>= 1.3.6.20040222)
+ 
+ Package: gcc-3.3-base
+@@ -40,10 +40,10 @@
+ Architecture: any
+ Section: devel
+ Priority: standard
+-Depends: gcc-3.3-base, libgcc1 (>= 1:3.3.4-2), ${shlibs:Depends}, cpp-3.3 (>= 1:3.3.4-2), cpp-3.3 (<< 1:3.3.5), binutils (>= 2.13.90.0.10)
+-Recommends: libc6-dev (>= 2.3.1)
++Depends: gcc-3.3-base, libgcc1 (>= 1:3.3.4-2+kbsd), ${shlibs:Depends}, cpp-3.3 (>= 1:3.3.4-2+kbsd), cpp-3.3 (<< 1:3.3.5), binutils (>= 2.13.90.0.10)
++Recommends: libc0.1-dev
+ Conflicts: gcc-3.2 (<= 1:3.2.3-0pre8)
+-Suggests: gcc-3.3-doc (>= 1:3.3.4-2)
++Suggests: gcc-3.3-doc (>= 1:3.3.4-2+kbsd)
+ Provides: c-compiler
+ Description: The GNU C compiler
+  This is the GNU C compiler, a fairly portable optimizing compiler for C.
+@@ -51,14 +51,14 @@
+ Package: gcc-3.3-hppa64
+ Architecture: hppa
+ Section: devel
+-Depends: gcc-3.3-base (>= 1:3.3.4-2), gcc-3.3-base (<< 1:3.3.5), libc6-dev (>= 2.3.2.ds1-12), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.4-2+kbsd), gcc-3.3-base (<< 1:3.3.5), libc6-dev (>= 2.3.2.ds1-12), ${shlibs:Depends}
+ Description: The GNU C compiler (cross compiler for hppa64)
+  This is the GNU C compiler, a fairly portable optimizing compiler for C.
+ 
+ Package: cpp-3.3
+ Architecture: any
+ Section: interpreters
+-Depends: gcc-3.3-base (>= 1:3.3.4-2), gcc-3.3-base (<< 1:3.3.5), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.4-2+kbsd), gcc-3.3-base (<< 1:3.3.5), ${shlibs:Depends}
+ Description: The GNU C preprocessor
+  A macro processor that is used automatically by the GNU C compiler
+  to transform programs before actual compilation.
+@@ -79,17 +79,17 @@
+ Architecture: any
+ Section: devel
+ Priority: standard
+-Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2), gcc-3.3 (<< 1:3.3.5), libstdc++5-3.3-dev (>= 1:3.3.4-2)
++Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2+kbsd), gcc-3.3 (<< 1:3.3.5), libstdc++5-3.3-dev (>= 1:3.3.4-2+kbsd)
+ Replaces: gcc (<= 2.7.2.3-3)
+ Provides: c++-compiler
+-Suggests: gcc-3.3-doc (>= 1:3.3.4-2)
++Suggests: gcc-3.3-doc (>= 1:3.3.4-2+kbsd)
+ Description: The GNU C++ compiler
+  This is the GNU C++ compiler, a fairly portable optimizing compiler for C++.
+ 
+ Package: protoize
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2), gcc-3.3 (<< 1:3.3.5)
++Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2+kbsd), gcc-3.3 (<< 1:3.3.5)
+ Description: Create/remove ANSI prototypes from C code
+  "protoize" can be used to add prototypes to a program, thus converting
+  the program to ANSI C in one respect.  The companion program "unprotoize"
+@@ -99,10 +99,9 @@
+ Package: gobjc-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base, ${shlibs:Depends}, libobjc1 (>= 1:3.3.4-2), gcc-3.3 (>= 1:3.3.4-2), gcc-3.3 (<< 1:3.3.5)
+-Suggests: gcc-3.3-doc (>= 1:3.3.4-2)
++Depends: gcc-3.3-base, ${shlibs:Depends}, libobjc1 (>= 1:3.3.4-2+kbsd), gcc-3.3 (>= 1:3.3.4-2+kbsd), gcc-3.3 (<< 1:3.3.5)
++Suggests: gcc-3.3-doc (>= 1:3.3.4-2+kbsd)
+ Provides: objc-compiler
+-Recommends: libgc-dev
+ Description: The GNU Objective-C compiler
+  This is the GNU Objective-C compiler, which compiles
+  Objective-C on platforms supported by the gcc compiler. It uses the
+@@ -127,7 +126,7 @@
+ Package: g77-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base, libg2c0, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2), gcc-3.3 (<< 1:3.3.5)
++Depends: gcc-3.3-base, libg2c0, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2+kbsd), gcc-3.3 (<< 1:3.3.5)
+ Provides: fortran77-compiler
+ Suggests: g77-3.3-doc
+ Conflicts: g77-2.95, g77-3.0, g77-3.2
+@@ -158,7 +157,7 @@
+ Section: libdevel
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base, libg2c0 (>= 1:3.3.4-2), ${shlibs:Depends}
++Depends: gcc-3.3-base, libg2c0 (>= 1:3.3.4-2+kbsd), ${shlibs:Depends}
+ Conflicts: g77-2.95 (<= 1:2.95.4-19), g77-3.0 (<= 1:3.0.4-16), g77-3.2 (<= 1:3.2.3-9), g77-3.3 (<= 1:3.3.3-0pre3)
+ Description: GNU Fortran 77 library development
+  Headers and static libraries for g2c.
+@@ -175,8 +174,8 @@
+ Package: gcj-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base, ${shlibs:Depends}, java-common, g++-3.3 (>= 1:3.3.4-2), g++-3.3 (<< 1:3.3.5)
+-Recommends: fastjar, gij-3.3 (>= 1:3.3.4-2), libgcj4-dev (>= 1:3.3.4-2)
++Depends: gcc-3.3-base, ${shlibs:Depends}, java-common, g++-3.3 (>= 1:3.3.4-2+kbsd), g++-3.3 (<< 1:3.3.5)
++Recommends: fastjar, gij-3.3 (>= 1:3.3.4-2+kbsd), libgcj4-dev (>= 1:3.3.4-2+kbsd)
+ Provides: java-compiler
+ Description: The GNU compiler for Java(TM)
+  GCJ is a front end to the GCC compiler which can natively compile both
+@@ -187,7 +186,7 @@
+ Priority: optional
+ Architecture: any
+ Depends: gcc-3.3-base, ${shlibs:Depends}
+-Suggests: fastjar, gcj-3.3 (>= 1:3.3.4-2)
++Suggests: fastjar, gcj-3.3 (>= 1:3.3.4-2+kbsd)
+ Conflicts: libgcj2 (<= 1:3.0.3-1)
+ Replaces: libgcj2 (<= 1:3.0.3-1)
+ Provides: java-virtual-machine, java1-runtime
+@@ -230,7 +229,7 @@
+ Section: libdevel
+ Architecture: any
+ Priority: optional
+-Depends: gcj-3.3 (>= 1:3.3.4-2), libgcj4 (>= 1:3.3.4-2), libc6-dev (>= 2.3.1), zlib1g-dev, ${shlibs:Depends}
++Depends: gcj-3.3 (>= 1:3.3.4-2+kbsd), libgcj4 (>= 1:3.3.4-2+kbsd), libc0.1-dev, zlib1g-dev, ${shlibs:Depends}
+ Conflicts: libgcj2-dev, libgcj3-dev
+ Provides: libgcj-dev
+ Description: Java development headers and static library for use with gcj
+@@ -248,7 +247,7 @@
+  Replacement for Suns .jar creation program.  It is written in C
+  instead of java and is tons faster.  It is currently not complete.
+ 
+-Package: libffi2
++Package: libffi
+ Section: libs
+ Architecture: any
+ Priority: optional
+@@ -258,7 +257,7 @@
+  allows code written in one language to call code written in another
+  language.
+ 
+-Package: lib64ffi2
++Package: lib64ffi
+ Section: libs
+ Architecture: any
+ Priority: optional
+@@ -268,11 +267,11 @@
+  allows code written in one language to call code written in another
+  language.
+ 
+-Package: libffi2-dev
++Package: libffi-dev
+ Section: libdevel
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base, libffi2 (>= 1:3.3.4-2), libc6-dev (>= 2.3.1)
++Depends: gcc-3.3-base, libffi (>= 1:3.3.4-2+kbsd), libc0.1-dev
+ Conflicts: libffi1-dev
+ Description: Foreign Function Interface library (development files)
+  This package contains the headers and static library files necessary for
+@@ -313,7 +312,7 @@
+ Architecture: any
+ Section: libdevel
+ Priority: standard
+-Depends: gcc-3.3-base, libstdc++5 (>= 1:3.3.4-2), libc6-dev (>= 2.3.1), g++-3.3 (>= 1:3.3.4-2)
++Depends: gcc-3.3-base, libstdc++5 (>= 1:3.3.4-2+kbsd), libc0.1-dev, g++-3.3 (>= 1:3.3.4-2+kbsd)
+ Conflicts: libg++27-dev, libg++272-dev (<< 2.7.2.8-1), libstdc++2.8-dev, libg++2.8-dev, libstdc++2.9-dev, libstdc++2.9-glibc2.1-dev, libstdc++2.10-dev (<< 1:2.95.3-2), libstdc++3.0-dev, libstdc++5-dev (<= 1:3.2.3-0pre3)
+ Suggests: libstdc++5-3.3-doc, stl-manual
+ Provides: libstdc++-dev
+@@ -364,7 +363,7 @@
+ Package: gnat-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2), gcc-3.3 (<< 1:3.3.5)
++Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2+kbsd), gcc-3.3 (<< 1:3.3.5)
+ Suggests: gnat-3.3-doc, ada-reference-manual
+ Provides: ada-compiler
+ Conflicts: gnat, gnat-3.1, gnat-3.2
+@@ -401,9 +400,9 @@
+ Package: gpc-2.1-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2), gcc-3.3 (<< 1:3.3.5)
++Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2+kbsd), gcc-3.3 (<< 1:3.3.5)
+ Recommends: libgmp3-dev, libncurses5-dev
+-Suggests: gpc-2.1-3.3-doc (>= 2:3.3.4.-2)
++Suggests: gpc-2.1-3.3-doc (>= 2:3.3.4.-2+kbsd)
+ Provides: pascal-compiler
+ Description: The GNU Pascal compiler
+  This is the GNU Pascal compiler, which compiles Pascal on platforms supported
+@@ -428,7 +427,7 @@
+ Package: treelang-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2), gcc-3.3 (<< 1:3.3.5)
++Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2+kbsd), gcc-3.3 (<< 1:3.3.5)
+ Description: The GNU Treelang compiler
+  Treelang is a sample language, useful only to help people understand how
+  to implement a new language front end to GCC. It is not a useful
+@@ -439,7 +438,7 @@
+ Package: gcc-3.3-soft-float
+ Architecture: arm
+ Priority: optional
+-Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2), gcc-3.3 (<< 1:3.3.5)
++Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2+kbsd), gcc-3.3 (<< 1:3.3.5)
+ Replaces: gcc-soft-float-ss (<< 1:3.3.5)
+ Description: The soft-floating-point gcc libraries (arm)
+  These are versions of basic static libraries such as libgcc.a compiled
+@@ -448,7 +447,7 @@
+ Package: fixincludes
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2), gcc-3.3 (<< 1:3.3.5)
++Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2+kbsd), gcc-3.3 (<< 1:3.3.5)
+ Description: Fix non-ANSI header files
+  FixIncludes was created to fix non-ANSI system header files. Many
+  system manufacturers supply proprietary headers that are not ANSI compliant.
+@@ -470,7 +469,7 @@
+ Package: gcc-3.3-nof
+ Architecture: powerpc
+ Priority: optional
+-Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2), gcc-3.3 (<< 1:3.3.5)
++Depends: gcc-3.3-base, ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.4-2+kbsd), gcc-3.3 (<< 1:3.3.5)
+ Conflicts: gcc-3.2-nof
+ Description: The no-floating-point gcc libraries (powerpc)
+  These are versions of basic static libraries such as libgcc.a compiled
+diff -Nur gcc-3.3-3.3.4.old/debian/patches/autoreconf.dpatch gcc-3.3-3.3.4/debian/patches/autoreconf.dpatch
+--- gcc-3.3-3.3.4.old/debian/patches/autoreconf.dpatch	2004-07-06 14:51:02.000000000 +0200
++++ gcc-3.3-3.3.4/debian/patches/autoreconf.dpatch	2004-07-06 15:36:45.000000000 +0200
+@@ -16,6 +16,9 @@
+ 	for i in libf2c libjava/libltdl libobjc libstdc++-v3 zlib; do
+ 		(cd ${dir}/${i} ; autoreconf --force)
+ 	done
++	for i in . boehm-gc ; do
++		cp -f /usr/share/misc/config.* ${dir}/${i}/
++	done
+         ;;
+     -unpatch)
+         patch $pdir -f --no-backup-if-mismatch -R -p0 < $0
+@@ -38,3 +41,129 @@
+      lt_cv_deplibs_check_method=pass_all ;;
+    *)
+      # glibc up to 2.1.1 does not perform some relocations on ARM
++@@ -687,7 +687,7 @@
++   lt_cv_file_magic_test_file=`echo /lib/libc.so* /lib/libc-*.so`
++   ;;
++ 
++-netbsd*)
+++netbsd* | knetbsd*-gnu)
++   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
++     [lt_cv_deplibs_check_method='match_pattern /lib[^/\.]+\.so\.[0-9]+\.[0-9]+$']
++   else
++diff -ur ../src.old/ltcf-c.sh ./ltcf-c.sh
++--- ../src.old/ltcf-c.sh	2002-08-14 04:39:52.000000000 +0200
+++++ ./ltcf-c.sh	2003-12-18 21:30:48.000000000 +0100
++@@ -185,7 +185,7 @@
++     whole_archive_flag_spec='-all_load $convenience'
++     ;;
++ 
++-  netbsd*)
+++  netbsd* | knetbsd*-gnu)
++     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
++       archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
++       wlarc=
++@@ -456,7 +456,7 @@
++     link_all_deplibs=yes
++     ;;
++ 
++-  netbsd*)
+++  netbsd* | knetbsd*-gnu)
++     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
++       archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
++     else
++diff -ur ../src.old/ltcf-cxx.sh ./ltcf-cxx.sh
++--- ../src.old/ltcf-cxx.sh	2003-02-20 02:12:47.000000000 +0100
+++++ ./ltcf-cxx.sh	2003-12-18 21:31:18.000000000 +0100
++@@ -404,7 +404,7 @@
++         ;;
++     esac
++     ;;
++-  netbsd*)
+++  netbsd* | knetbsd*-gnu)
++     # NetBSD uses g++ - do we need to do anything?
++     ;;
++   osf3*)
++diff -ur ../src.old/ltcf-gcj.sh ./ltcf-gcj.sh
++--- ../src.old/ltcf-gcj.sh	2003-02-20 01:36:49.000000000 +0100
+++++ ./ltcf-gcj.sh	2003-12-18 21:31:47.000000000 +0100
++@@ -178,7 +178,7 @@
++       $CC $output_objdir/$soname-exp '$lt_cv_cc_dll_switch' -Wl,-e,'$dll_entry' -o $output_objdir/$soname '$ltdll_obj'$libobjs $deplibs $compiler_flags'
++     ;;
++ 
++-  netbsd*)
+++  netbsd* | knetbsd*-gnu)
++     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
++       archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
++       wlarc=
++@@ -433,7 +433,7 @@
++     link_all_deplibs=yes
++     ;;
++ 
++-  netbsd*)
+++  netbsd* | knetbsd*-gnu)
++     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
++       archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
++     else
++diff -ur ../src.old/ltconfig ./ltconfig
++--- ../src.old/ltconfig	2003-02-20 03:10:02.000000000 +0100
+++++ ./ltconfig	2003-12-18 21:33:54.000000000 +0100
++@@ -1152,6 +1152,17 @@
++   hardcode_into_libs=yes
++   ;;
++ 
+++k*bsd*-gnu)
+++  version_type=linux
+++  need_lib_prefix=no
+++  need_version=no
+++  library_names_spec='${libname}${release}.so$versuffix ${libname}${release}.so${major} ${libname}.so'
+++  soname_spec='${libname}${release}.so$major'
+++  shlibpath_var=LD_LIBRARY_PATH
+++  shlibpath_overrides_runpath=yes
+++  hardcode_into_libs=yes
+++  ;;
+++
++ hpux9* | hpux10* | hpux11*)
++   # Give a soname corresponding to the major version so that dld.sl refuses to
++   # link against other versions.
++--- ltcf-c.sh~	2004-01-13 05:20:39.000000000 +0100
+++++ ltcf-c.sh	2004-01-13 05:28:22.000000000 +0100
++@@ -409,7 +409,7 @@
++     ;;
++ 
++   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
++-  freebsd*)
+++  freebsd* | kfreebsd*-gnu)
++     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
++     hardcode_libdir_flag_spec='-R$libdir'
++     hardcode_direct=yes
++--- ltcf-cxx.sh~	2004-01-13 05:20:39.000000000 +0100
+++++ ltcf-cxx.sh	2004-01-13 05:29:15.000000000 +0100
++@@ -241,7 +241,7 @@
++     # C++ shared libraries reported to be fairly broken before switch to ELF
++     ld_shlibs=no
++     ;;
++-  freebsd*)
+++  freebsd* | kfreebsd*-gnu)
++     # FreeBSD 3 and later use GNU C++ and GNU ld with standard ELF
++     # conventions
++     ld_shlibs=yes
++@@ -743,7 +743,7 @@
++           ;;
++       esac
++       ;;
++-    freebsd*)
+++    freebsd* | kfreebsd*-gnu)
++       # FreeBSD uses GNU C++
++       ;;
++     gnu*)
++--- ltcf-gcj.sh~	2004-01-13 05:20:39.000000000 +0100
+++++ ltcf-gcj.sh	2004-01-13 05:29:34.000000000 +0100
++@@ -402,7 +402,7 @@
++     ;;
++ 
++   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
++-  freebsd*)
+++  freebsd* | kfreebsd*-gnu)
++     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
++     hardcode_libdir_flag_spec='-R$libdir'
++     hardcode_direct=yes
+diff -Nur gcc-3.3-3.3.4.old/debian/patches/kbsd-gnu.dpatch gcc-3.3-3.3.4/debian/patches/kbsd-gnu.dpatch
+--- gcc-3.3-3.3.4.old/debian/patches/kbsd-gnu.dpatch	1970-01-01 01:00:00.000000000 +0100
++++ gcc-3.3-3.3.4/debian/patches/kbsd-gnu.dpatch	2004-07-06 15:36:45.000000000 +0200
+@@ -0,0 +1,369 @@
++#! /bin/sh -e
++
++# All lines beginning with `# DPATCH:' are a description of the patch.
++# DP: GNU/k*BSD
++
++dir=
++if [ $# -eq 3 -a "$2" = '-d' ]; then
++    pdir="-d $3"
++    dir="$3/"
++elif [ $# -ne 1 ]; then
++    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
++    exit 1
++fi
++case "$1" in
++    -patch)
++        patch $pdir -f --no-backup-if-mismatch -p1 < $0
++        #cd ${dir}gcc && autoconf
++        ;;
++    -unpatch)
++        patch $pdir -f --no-backup-if-mismatch -R -p1 < $0
++        #rm ${dir}gcc/configure
++        ;;
++    *)
++        echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
++        exit 1
++esac
++exit 0
++
++# append the patch here and adjust the -p? flag in the patch calls.
++
++diff -Nur gcc-20031206.old/gcc/config/i386/linux.h gcc-20031206/gcc/config/i386/linux.h
++--- gcc-20031206.old/gcc/config/i386/linux.h	2003-11-14 08:02:41.000000000 +0100
+++++ gcc-20031206/gcc/config/i386/linux.h	2004-01-11 09:13:21.000000000 +0100
++@@ -267,28 +267,28 @@
++     else								\
++       break;								\
++ 									\
++-    new_cfa_ = sc_->esp;						\
+++    new_cfa_ = sc_->sc_esp;						\
++     (FS)->cfa_how = CFA_REG_OFFSET;					\
++     (FS)->cfa_reg = 4;							\
++     (FS)->cfa_offset = new_cfa_ - (long) (CONTEXT)->cfa;		\
++ 									\
++     /* The SVR4 register numbering macros aren't usable in libgcc.  */	\
++     (FS)->regs.reg[0].how = REG_SAVED_OFFSET;				\
++-    (FS)->regs.reg[0].loc.offset = (long)&sc_->eax - new_cfa_;		\
+++    (FS)->regs.reg[0].loc.offset = (long)&sc_->sc_eax - new_cfa_;		\
++     (FS)->regs.reg[3].how = REG_SAVED_OFFSET;				\
++-    (FS)->regs.reg[3].loc.offset = (long)&sc_->ebx - new_cfa_;		\
+++    (FS)->regs.reg[3].loc.offset = (long)&sc_->sc_ebx - new_cfa_;		\
++     (FS)->regs.reg[1].how = REG_SAVED_OFFSET;				\
++-    (FS)->regs.reg[1].loc.offset = (long)&sc_->ecx - new_cfa_;		\
+++    (FS)->regs.reg[1].loc.offset = (long)&sc_->sc_ecx - new_cfa_;		\
++     (FS)->regs.reg[2].how = REG_SAVED_OFFSET;				\
++-    (FS)->regs.reg[2].loc.offset = (long)&sc_->edx - new_cfa_;		\
+++    (FS)->regs.reg[2].loc.offset = (long)&sc_->sc_edx - new_cfa_;		\
++     (FS)->regs.reg[6].how = REG_SAVED_OFFSET;				\
++-    (FS)->regs.reg[6].loc.offset = (long)&sc_->esi - new_cfa_;		\
+++    (FS)->regs.reg[6].loc.offset = (long)&sc_->sc_esi - new_cfa_;		\
++     (FS)->regs.reg[7].how = REG_SAVED_OFFSET;				\
++-    (FS)->regs.reg[7].loc.offset = (long)&sc_->edi - new_cfa_;		\
+++    (FS)->regs.reg[7].loc.offset = (long)&sc_->sc_edi - new_cfa_;		\
++     (FS)->regs.reg[5].how = REG_SAVED_OFFSET;				\
++-    (FS)->regs.reg[5].loc.offset = (long)&sc_->ebp - new_cfa_;		\
+++    (FS)->regs.reg[5].loc.offset = (long)&sc_->sc_ebp - new_cfa_;		\
++     (FS)->regs.reg[8].how = REG_SAVED_OFFSET;				\
++-    (FS)->regs.reg[8].loc.offset = (long)&sc_->eip - new_cfa_;		\
+++    (FS)->regs.reg[8].loc.offset = (long)&sc_->sc_eip - new_cfa_;		\
++     (FS)->retaddr_column = 8;						\
++     goto SUCCESS;							\
++   } while (0)
++diff -Nur gcc-20031206.old/gcc/config/kfreebsd-gnu.h gcc-20031206/gcc/config/kfreebsd-gnu.h
++--- gcc-20031206.old/gcc/config/kfreebsd-gnu.h	1970-01-01 01:00:00.000000000 +0100
+++++ gcc-20031206/gcc/config/kfreebsd-gnu.h	2004-01-11 09:14:21.000000000 +0100
++@@ -0,0 +1,26 @@
+++
+++#undef TARGET_OS_CPP_BUILTINS    
+++#define TARGET_OS_CPP_BUILTINS()		\
+++  do						\
+++    {						\
+++	builtin_define ("__GLIBC__");		\
+++	builtin_define ("__FreeBSD_kernel__");	\
+++	builtin_define_std ("unix");		\
+++	builtin_define ("__ELF__");		\
+++	builtin_assert ("system=posix");	\
+++	if (flag_pic)				\
+++	  {					\
+++	    builtin_define ("__PIC__");		\
+++	    builtin_define ("__pic__");		\
+++	  }					\
+++    }						\
+++  while (0)
+++
+++#undef LINK_SPEC
+++#define LINK_SPEC "-m elf_i386_fbsd %{shared:-shared} \
+++  %{!shared: \
+++    %{!ibcs: \
+++      %{!static: \
+++	%{rdynamic:-export-dynamic} \
+++	%{!dynamic-linker:-dynamic-linker /lib/ld.so.1}} \
+++	%{static:-static}}}"
++diff -Nur gcc-20031206.old/gcc/config/knetbsd-gnu.h gcc-20031206/gcc/config/knetbsd-gnu.h
++--- gcc-20031206.old/gcc/config/knetbsd-gnu.h	1970-01-01 01:00:00.000000000 +0100
+++++ gcc-20031206/gcc/config/knetbsd-gnu.h	2004-01-11 09:14:10.000000000 +0100
++@@ -0,0 +1,26 @@
+++
+++#undef TARGET_OS_CPP_BUILTINS    
+++#define TARGET_OS_CPP_BUILTINS()		\
+++  do						\
+++    {						\
+++	builtin_define ("__GLIBC__");		\
+++	builtin_define ("__NetBSD_kernel__");	\
+++	builtin_define_std ("unix");		\
+++	builtin_define ("__ELF__");		\
+++	builtin_assert ("system=posix");	\
+++	if (flag_pic)				\
+++	  {					\
+++	    builtin_define ("__PIC__");		\
+++	    builtin_define ("__pic__");		\
+++	  }					\
+++    }						\
+++  while (0)
+++
+++#undef LINK_SPEC
+++#define LINK_SPEC "-m elf_i386 %{shared:-shared} \
+++  %{!shared: \
+++    %{!ibcs: \
+++      %{!static: \
+++	%{rdynamic:-export-dynamic} \
+++	%{!dynamic-linker:-dynamic-linker /lib/ld.so.1}} \
+++	%{static:-static}}}"
++diff -Nur gcc-20031206.old/gcc/config.gcc gcc-20031206/gcc/config.gcc
++--- gcc-20031206.old/gcc/config.gcc	2003-12-02 23:34:29.000000000 +0100
+++++ gcc-20031206/gcc/config.gcc	2004-01-11 09:12:39.000000000 +0100
++@@ -362,7 +362,7 @@
++ 
++ # Common parts for GNU/Linux, GNU/Hurd, OpenBSD, NetBSD, and FreeBSD systems.
++ case $machine in
++-*-*-linux*)
+++*-*-linux* | *-*-k*bsd*-gnu)
++ 	xm_defines=POSIX
++ 	case $machine in
++ 	*-*-linux*ecoff* | *-*-linux*libc1* | *-*-linux*oldld* | *-*-linux*aout*)
++@@ -1173,10 +1173,15 @@
++ 		thread_file='single'
++ 	fi
++ 	;;
++-i[34567]86-*-linux*)	# Intel 80386's running GNU/Linux
+++i[34567]86-*-linux* | i[34567]86-*-k*bsd*-gnu)
+++			# Intel 80386's running GNU/Linux
++ 			# with ELF format using glibc 2
++ 			# aka GNU/Linux C library 6
++ 	tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h svr4.h linux.h i386/linux.h"
+++	case $machine in
+++	i[34567]86-*-knetbsd*-gnu) tm_file="${tm_file} knetbsd-gnu.h" ;;
+++	i[34567]86-*-kfreebsd*-gnu) tm_file="${tm_file} kfreebsd-gnu.h" ;;
+++	esac
++ 	tmake_file="t-slibgcc-elf-ver t-linux i386/t-crtstuff"
++ 	;;
++ x86_64-*-linux*)
++diff -Nur gcc-20031206.old/libstdc++-v3/acinclude.m4 gcc-20031206/libstdc++-v3/acinclude.m4
++--- gcc-20031206.old/libstdc++-v3/acinclude.m4	2003-09-12 03:29:13.000000000 +0200
+++++ gcc-20031206/libstdc++-v3/acinclude.m4	2004-01-11 09:12:39.000000000 +0100
++@@ -1204,7 +1204,7 @@
++   dnl Default to "generic"
++   if test x$enable_clocale_flag = xno; then
++     case x${target_os} in
++-      xlinux* | xgnu*)
+++      xlinux* | xgnu* | xk*bsd*-gnu)
++ 	AC_EGREP_CPP([_GLIBCPP_ok], [
++         #include <features.h>
++         #if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2) 
++@@ -1392,7 +1392,7 @@
++       # compile most of libio for linux systems.
++       if test x$has_libio = x"yes"; then
++         case "$target" in
++-          *-*-linux*)
+++          *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
++               AC_MSG_CHECKING([for glibc version >= 2.2])
++               AC_EGREP_CPP([ok], [
++             #include <features.h>
++diff -Nur gcc-20031206.old/libstdc++-v3/aclocal.m4 gcc-20031206/libstdc++-v3/aclocal.m4
++--- gcc-20031206.old/libstdc++-v3/aclocal.m4	2003-09-12 03:29:13.000000000 +0200
+++++ gcc-20031206/libstdc++-v3/aclocal.m4	2004-01-11 09:12:39.000000000 +0100
++@@ -1216,7 +1216,7 @@
++   dnl Default to "generic"
++   if test x$enable_clocale_flag = xno; then
++     case x${target_os} in
++-      xlinux* | xgnu*)
+++      xlinux* | xgnu* | xk*bsd*-gnu)
++ 	AC_EGREP_CPP([_GLIBCPP_ok], [
++         #include <features.h>
++         #if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2) 
++@@ -1404,7 +1404,7 @@
++       # compile most of libio for linux systems.
++       if test x$has_libio = x"yes"; then
++         case "$target" in
++-          *-*-linux*)
+++          *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
++               AC_MSG_CHECKING([for glibc version >= 2.2])
++               AC_EGREP_CPP([ok], [
++             #include <features.h>
++diff -Nur gcc-20031206.old/libstdc++-v3/configure gcc-20031206/libstdc++-v3/configure
++--- gcc-20031206.old/libstdc++-v3/configure	2003-09-12 03:29:26.000000000 +0200
+++++ gcc-20031206/libstdc++-v3/configure	2004-01-11 09:12:39.000000000 +0100
++@@ -2863,7 +2863,7 @@
++       # compile most of libio for linux systems.
++       if test x$has_libio = x"yes"; then
++         case "$target" in
++-          *-*-linux*)
+++          *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu)
++               echo $ac_n "checking for glibc version >= 2.2""... $ac_c" 1>&6
++ echo "configure:2869: checking for glibc version >= 2.2" >&5
++               cat > conftest.$ac_ext <<EOF
++@@ -2997,7 +2997,7 @@
++ 
++       if test x$enable_clocale_flag = xno; then
++     case x${target_os} in
++-      xlinux* | xgnu*)
+++      xlinux* | xgnu* | xk*bsd*-gnu)
++ 	cat > conftest.$ac_ext <<EOF
++ #line 3003 "configure"
++ #include "confdefs.h"
++@@ -4213,7 +4213,7 @@
++   # GLIBCPP_CHECK_MATH_SUPPORT
++ 
++   case "$target" in
++-    *-linux*)
+++    *-linux* | *-k*bsd*-gnu | *-gnu*)
++       os_include_dir="os/gnu-linux"
++       for ac_hdr in nan.h ieeefp.h endian.h sys/isa_defs.h \
++         machine/endian.h machine/param.h sys/machine.h sys/types.h \
++diff -Nur gcc-20031206.old/libstdc++-v3/configure.in gcc-20031206/libstdc++-v3/configure.in
++--- gcc-20031206.old/libstdc++-v3/configure.in	2003-07-18 00:22:24.000000000 +0200
+++++ gcc-20031206/libstdc++-v3/configure.in	2004-01-11 09:12:39.000000000 +0100
++@@ -117,7 +117,7 @@
++   # GLIBCPP_CHECK_MATH_SUPPORT
++ 
++   case "$target" in
++-    *-linux*)
+++    *-linux* | *-k*bsd*-gnu | *-gnu*)
++       os_include_dir="os/gnu-linux"
++       AC_CHECK_HEADERS([nan.h ieeefp.h endian.h sys/isa_defs.h \
++         machine/endian.h machine/param.h sys/machine.h sys/types.h \
++diff -Nur gcc-20031206.old/libstdc++-v3/configure.target gcc-20031206/libstdc++-v3/configure.target
++--- gcc-20031206.old/libstdc++-v3/configure.target	2003-10-01 22:36:21.000000000 +0200
+++++ gcc-20031206/libstdc++-v3/configure.target	2004-01-11 09:12:39.000000000 +0100
++@@ -151,6 +151,9 @@
++   mingw32*)
++     os_include_dir="os/mingw32"
++     ;;
+++  k*bsd*-gnu)
+++    os_include_dir="os/gnu-linux"
+++    ;;
++   netbsd*)
++     os_include_dir="os/bsd/netbsd"
++     ;;
++diff -ur src/libstdc++-v3.old/config/locale/gnu/c_locale.cc src/libstdc++-v3/config/locale/gnu/c_locale.cc
++--- src/libstdc++-v3.old/config/locale/gnu/c_locale.cc	2003-02-28 07:38:09.000000000 +0100
+++++ src/libstdc++-v3/config/locale/gnu/c_locale.cc	2004-01-23 17:49:28.000000000 +0100
++@@ -40,6 +40,17 @@
++ 
++ namespace std 
++ {
+++  extern "C" __typeof (strtol_l) __strtol_l;
+++  extern "C" __typeof (strtoul_l) __strtoul_l;
+++  extern "C" __typeof (strtoll_l) __strtoll_l;
+++  extern "C" __typeof (strtoull_l) __strtoull_l;
+++  extern "C" __typeof (strtof_l) __strtof_l;
+++  extern "C" __typeof (strtod_l) __strtod_l;
+++  extern "C" __typeof (strtold_l) __strtold_l;
+++  extern "C" __typeof (newlocale) __newlocale;
+++  extern "C" __typeof (freelocale) __freelocale;
+++  extern "C" __typeof (duplocale) __duplocale;
+++
++   template<>
++     void
++     __convert_to_v(const char* __s, long& __v, ios_base::iostate& __err, 
++diff -ur src/libstdc++-v3.old/config/locale/gnu/collate_members.cc src/libstdc++-v3/config/locale/gnu/collate_members.cc
++--- src/libstdc++-v3.old/config/locale/gnu/collate_members.cc	2003-02-28 07:38:09.000000000 +0100
+++++ src/libstdc++-v3/config/locale/gnu/collate_members.cc	2004-01-23 17:49:28.000000000 +0100
++@@ -38,6 +38,11 @@
++ 
++ namespace std
++ {
+++  extern "C" __typeof (strcoll_l) __strcoll_l;
+++  extern "C" __typeof (strxfrm_l) __strxfrm_l;
+++  extern "C" __typeof (wcscoll_l) __wcscoll_l;
+++  extern "C" __typeof (wcsxfrm_l) __wcsxfrm_l;
+++
++   // These are basically extensions to char_traits, and perhaps should
++   // be put there instead of here.
++   template<>
++diff -ur src/libstdc++-v3.old/config/locale/gnu/ctype_members.cc src/libstdc++-v3/config/locale/gnu/ctype_members.cc
++--- src/libstdc++-v3.old/config/locale/gnu/ctype_members.cc	2003-10-07 21:21:14.000000000 +0200
+++++ src/libstdc++-v3/config/locale/gnu/ctype_members.cc	2004-01-23 17:49:28.000000000 +0100
++@@ -38,6 +38,11 @@
++ 
++ namespace std
++ {
+++  extern "C" __typeof (wctype_l) __wctype_l;
+++  extern "C" __typeof (towupper_l) __towupper_l;
+++  extern "C" __typeof (towlower_l) __towlower_l;
+++  extern "C" __typeof (iswctype_l) __iswctype_l;
+++
++   // NB: The other ctype<char> specializations are in src/locale.cc and
++   // various /config/os/* files.
++   template<>
++diff -ur src/libstdc++-v3.old/config/locale/gnu/messages_members.cc src/libstdc++-v3/config/locale/gnu/messages_members.cc
++--- src/libstdc++-v3.old/config/locale/gnu/messages_members.cc	2003-02-28 07:38:09.000000000 +0100
+++++ src/libstdc++-v3/config/locale/gnu/messages_members.cc	2004-01-23 17:49:28.000000000 +0100
++@@ -38,6 +38,7 @@
++ 
++ namespace std
++ {
+++  extern "C" __typeof (uselocale) __uselocale;
++   // Specializations.
++   template<>
++     string
++diff -ur src/libstdc++-v3.old/config/locale/gnu/messages_members.h src/libstdc++-v3/config/locale/gnu/messages_members.h
++--- src/libstdc++-v3.old/config/locale/gnu/messages_members.h	2003-01-07 01:12:41.000000000 +0100
+++++ src/libstdc++-v3/config/locale/gnu/messages_members.h	2004-01-23 17:49:28.000000000 +0100
++@@ -33,6 +33,8 @@
++ 
++ // Written by Benjamin Kosnik <bkoz@redhat.com>
++ 
+++  extern "C" __typeof (uselocale) __uselocale;
+++
++   // Non-virtual member functions.
++   template<typename _CharT>
++      messages<_CharT>::messages(size_t __refs)
++diff -ur src/libstdc++-v3.old/config/locale/gnu/monetary_members.cc src/libstdc++-v3/config/locale/gnu/monetary_members.cc
++--- src/libstdc++-v3.old/config/locale/gnu/monetary_members.cc	2003-02-28 07:38:09.000000000 +0100
+++++ src/libstdc++-v3/config/locale/gnu/monetary_members.cc	2004-01-23 17:49:28.000000000 +0100
++@@ -38,6 +38,8 @@
++ 
++ namespace std
++ {
+++  extern "C" __typeof (nl_langinfo_l) __nl_langinfo_l;
+++
++   // Construct and return valid pattern consisting of some combination of:
++   // space none symbol sign value
++   money_base::pattern
++diff -ur src/libstdc++-v3.old/config/locale/gnu/numeric_members.cc src/libstdc++-v3/config/locale/gnu/numeric_members.cc
++--- src/libstdc++-v3.old/config/locale/gnu/numeric_members.cc	2003-02-28 07:38:09.000000000 +0100
+++++ src/libstdc++-v3/config/locale/gnu/numeric_members.cc	2004-01-23 17:49:28.000000000 +0100
++@@ -38,6 +38,8 @@
++ 
++ namespace std
++ {
+++  extern "C" __typeof (nl_langinfo_l) __nl_langinfo_l;
+++
++   template<> 
++     void
++     numpunct<char>::_M_initialize_numpunct(__c_locale __cloc)
++diff -ur src/libstdc++-v3.old/config/locale/gnu/time_members.cc src/libstdc++-v3/config/locale/gnu/time_members.cc
++--- src/libstdc++-v3.old/config/locale/gnu/time_members.cc	2003-02-28 07:38:09.000000000 +0100
+++++ src/libstdc++-v3/config/locale/gnu/time_members.cc	2004-01-23 17:49:28.000000000 +0100
++@@ -39,6 +39,10 @@
++ 
++ namespace std
++ {
+++  extern "C" __typeof (strftime_l) __strftime_l;
+++  extern "C" __typeof (wcsftime_l) __wcsftime_l;
+++  extern "C" __typeof (nl_langinfo_l) __nl_langinfo_l;
+++
++   template<>
++     void
++     __timepunct<char>::
+diff -Nur gcc-3.3-3.3.4.old/debian/rules.conf gcc-3.3-3.3.4/debian/rules.conf
+--- gcc-3.3-3.3.4.old/debian/rules.conf	2004-07-06 14:51:02.000000000 +0200
++++ gcc-3.3-3.3.4/debian/rules.conf	2004-07-06 15:48:08.000000000 +0200
+@@ -31,18 +31,18 @@
+   ifeq ($(DEB_TARGET_GNU_SYSTEM),gnu)
+     LIBC_DEP = libc0.3-dev
+   else
+-    ifeq ($(DEB_TARGET_GNU_SYSTEM),freebsd)
+-      LIBC_DEP = libc1-dev
++    ifeq ($(DEB_TARGET_GNU_SYSTEM),kfreebsd-gnu)
++      LIBC_DEP = libc0.1-dev
+     else
+-      ifeq ($(DEB_TARGET_ARCH),netbsd-i386)
+-        LIBC_DEP = libc12-dev
++      ifeq ($(DEB_TARGET_GNU_SYSTEM),knetbsd-gnu)
++        LIBC_DEP = libc0.1-dev
+       else
+         LIBC_DEP = libc6-dev (>= $(libc_ver))
+       endif
+     endif
+   endif
+ endif
+-LIBC_BUILD_DEP = libc6.1-dev (>= $(libc_ver)) [alpha ia64] | libc0.3-dev [hurd-i386] | libc1-dev [freebsd-i386] | libc12-dev [netbsd-i386] | libc6-dev (>= 2.3.2.ds1-12) [hppa] | libc6-dev (>= $(libc_ver)) [!hppa]
++LIBC_BUILD_DEP = libc-dev
+ 
+ SOURCE_VERSION := $(shell dpkg-parsechangelog | awk '/^Version:/ {print $$NF}')
+ DEB_VERSION := $(shell echo $(SOURCE_VERSION) | sed 's/ds[0-9]*//')
+diff -Nur gcc-3.3-3.3.4.old/debian/rules.defs gcc-3.3-3.3.4/debian/rules.defs
+--- gcc-3.3-3.3.4.old/debian/rules.defs	2004-07-06 14:51:02.000000000 +0200
++++ gcc-3.3-3.3.4/debian/rules.defs	2004-07-06 15:50:17.000000000 +0200
+@@ -69,8 +69,11 @@
+   ifeq ($(TARGET_ALIAS),i386-gnu)
+     TARGET_ALIAS := i586-gnu
+   endif
+-  ifeq ($(TARGET_ALIAS),i386-freebsd-gnu)
+-    TARGET_ALIAS := i486-freebsd-gnu
++  ifeq ($(TARGET_ALIAS),i386-kfreebsd-gnu)
++    TARGET_ALIAS := i486-kfreebsd-gnu
++  endif
++  ifeq ($(TARGET_ALIAS),i386-knetbsd-gnu)
++    TARGET_ALIAS := i486-knetbsd-gnu
+   endif
+   ifeq ($(TARGET_ALIAS)-$(hammer_branch),powerpc-linux-yes)
+     TARGET_ALIAS := powerpc64-linux
+@@ -170,7 +173,7 @@
+ # The __cxa_atexit API does not exist in some libc version (NetBSD)
+ with_cxa_atexit := yes
+ 
+-no_cxa_archs := netbsd-i386
++no_cxa_archs := 
+ ifneq ($(DEB_TARGET_ARCH),i386)
+   ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(no_cxa_archs)))
+     with_cxa_atexit := disabled for architecture $(DEB_TARGET_ARCH)
+@@ -185,7 +188,7 @@
+   with_java := yes
+ endif
+ 
+-java_no_archs := hurd-i386 mips mipsel freebsd-i386 netbsd-i386
++java_no_archs := hurd-i386 mips mipsel kfreebsd-i386 knetbsd-i386
+ ifneq ($(DEB_TARGET_ARCH),i386)
+   ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(java_no_archs)))
+     with_java := disabled for architecure $(DEB_TARGET_ARCH)
+@@ -231,7 +234,7 @@
+ # libffi -------------------
+ ifeq ($(with_common_libs),yes)
+   with_libffi := yes
+-  no_ffi_archs := mips mipsel hurd-i386 freebsd-i386 netbsd-i386
++  no_ffi_archs := mips mipsel hurd-i386 kfreebsd-i386 knetbsd-i386
+   ifneq ($(with_java),yes)
+     ifneq ($(DEB_TARGET_ARCH),i386)
+     ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(no_ffi_archs)))
+@@ -307,7 +310,7 @@
+   with_pascal := no
+ endif
+ 
+-pascal_no_archs := netbsd-i386
++pascal_no_archs := kfreebsd-i386 knetbsd-i386
+ #pascal_no_archs := netbsd-i386 arm
+ ifneq ($(DEB_TARGET_ARCH),i386)
+   ifeq ($(DEB_TARGET_ARCH),$(findstring $(DEB_TARGET_ARCH),$(pascal_no_archs)))
+@@ -339,7 +342,7 @@
+ with_objc_gc := yes
+ 
+ # disable ObjC garbage collection library (needs libgc)
+-libgc_no_archs := avr freebsd-i386
++libgc_no_archs := avr kfreebsd-i386 knetbsd-i386
+ ifneq ($(DEB_TARGET_ARCH),i386)
+   ifeq ($(DEB_TARGET_ARCH),$(findstring $(DEB_TARGET_ARCH),$(libgc_no_archs)))
+     with_objc_gc := disabled for architecture $(DEB_TARGET_ARCH)
+@@ -379,7 +382,7 @@
+ endif
+ 
+ with_libgnat := yes
+-ada_no_archs := arm hurd-i386 m68k freebsd-i386 netbsd-i386
++ada_no_archs := arm hurd-i386 m68k kfreebsd-i386 knetbsd-i386
+ ifneq ($(DEB_TARGET_ARCH),i386)
+   ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(ada_no_archs)))
+     with_ada := disabled for architecure $(DEB_TARGET_ARCH)
+@@ -455,7 +458,7 @@
+ ifdef DEB_CROSS
+   with_check := disabled for cross compiler package
+ endif
+-check_no_archs := hurd-i386
++check_no_archs := hurd-i386 kfreebsd-i386 knetbsd-i386
+ ifneq ($(DEB_TARGET_ARCH),i386)
+   ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(check_no_archs)))
+     with_check :=disabled for $(DEB_TARGET_ARCH)
+@@ -514,7 +517,7 @@
+ 
+ # GNU locales
+ force_gnu_locales := yes
+-locale_no_archs := netbsd-i386
++locale_no_archs := 
+ ifneq ($(DEB_TARGET_ARCH),i386)
+   ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(locale_no_archs)))
+     force_gnu_locales := disabled for $(DEB_TARGET_ARCH)
+diff -Nur gcc-3.3-3.3.4.old/debian/rules.patch gcc-3.3-3.3.4/debian/rules.patch
+--- gcc-3.3-3.3.4.old/debian/rules.patch	2004-07-06 14:51:02.000000000 +0200
++++ gcc-3.3-3.3.4/debian/rules.patch	2004-07-06 15:36:45.000000000 +0200
+@@ -102,15 +102,18 @@
+   endif
+ endif
+ 
+-ifeq ($(DEB_TARGET_ARCH),freebsd-i386)
++ifeq ($(DEB_TARGET_GNU_SYSTEM),knetbsd-gnu)
+   debian_patches += cpu-default-i486
+ endif
+-ifeq ($(DEB_TARGET_ARCH),freebsd-i386-gnu)
++ifeq ($(DEB_TARGET_GNU_SYSTEM),kfreebsd-gnu)
+   debian_patches += cpu-default-i486
+ endif
+ 
+-ifeq ($(DEB_TARGET_ARCH),netbsd-i386)
+-  debian_patches += netbsd-all-gcc netbsd-archs-gcc
++ifeq ($(DEB_TARGET_GNU_SYSTEM),knetbsd-gnu)
++  debian_patches += kbsd-gnu
++endif
++ifeq ($(DEB_TARGET_GNU_SYSTEM),kfreebsd-gnu)
++  debian_patches += kbsd-gnu
+ endif
+ 
+ debian_patches += reporting # applied after gcc-cvs-updates
