@@ -56,14 +56,15 @@ EOF
 cat > etc/issue << EOF
 Debian ${uname} testing/unstable \n \l
 
-You may login as root, with no password.
-
 EOF
 cat > etc/fstab << EOF
 /dev/acd0 / cd9660 ro 1 1
 EOF
 # keep inetutils-syslogd from bitching
 cp bin/true usr/sbin/syslogd
+# password-less login
+rm -f bin/login
+ln -s bash bin/login
 
 
 #########################
