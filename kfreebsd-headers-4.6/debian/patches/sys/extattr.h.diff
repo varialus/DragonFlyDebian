@@ -1,0 +1,77 @@
+*** orig/sys/extattr.h	Wed Jan 19 07:07:34 2000
+--- import/sys/extattr.h	Fri Sep  6 01:13:41 2002
+***************
+*** 1,3 ****
+--- 1,22 ----
++ /* Header file for Extended File Attributes.  FreeBSD version.
++    Copyright (C) 2002 Free Software Foundation, Inc.
++    This file is part of the GNU C Library.
++ 
++    The GNU C Library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++ 
++    The GNU C Library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++ 
++    You should have received a copy of the GNU Lesser General Public
++    License along with the GNU C Library; if not, write to the Free
++    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++    02111-1307 USA.  */
++ 
+  /*-
+   * Copyright (c) 1999 Robert N. M. Watson
+   * All rights reserved.
+***************
+*** 41,63 ****
+  
+  #ifndef _SYS_EXTATTR_H_
+  #define	_SYS_EXTATTR_H_
+- #ifdef _KERNEL
+- 
+- #define	EXTATTR_MAXNAMELEN	NAME_MAX
+  
+! #else
+! #include <sys/cdefs.h>
+  
+  struct iovec;
+  
+  __BEGIN_DECLS
+! int	extattrctl(const char *path, int cmd, const char *attrname, char *arg);
+! int	extattr_delete_file(const char *path, const char *attrname);
+! int	extattr_get_file(const char *path, const char *attrname,
+! 	    struct iovec *iovp, unsigned iovcnt);
+! int	extattr_set_file(const char *path, const char *attrname,
+! 	    struct iovec *iovp, unsigned iovcnt);
+  __END_DECLS
+  
+- #endif /* !_KERNEL */
+  #endif /* !_SYS_EXTATTR_H_ */
+--- 60,83 ----
+  
+  #ifndef _SYS_EXTATTR_H_
+  #define	_SYS_EXTATTR_H_
+  
+! #include <features.h>
+  
+  struct iovec;
+  
+  __BEGIN_DECLS
+! 
+! extern int extattrctl (__const char *__path, int __cmd, const char *__attrname,
+! 		       char *__arg) __THROW;
+! extern int extattr_delete_file (__const char *__path, __const char *__attrname)
+!      __THROW;
+! extern int extattr_get_file (__const char *__path, __const char *__attrname,
+! 			     struct iovec *__iovp, unsigned int __iovcnt)
+!      __THROW;
+! extern int extattr_set_file (__const char *__path, __const char *__attrname,
+! 			     struct iovec *__iovp, unsigned int __iovcnt)
+!      __THROW;
+! 
+  __END_DECLS
+  
+  #endif /* !_SYS_EXTATTR_H_ */

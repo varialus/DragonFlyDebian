@@ -1,0 +1,94 @@
+*** orig/sys/signalvar.h	Tue May 16 08:58:05 2000
+--- import/sys/signalvar.h	Fri Sep  6 01:13:46 2002
+***************
+*** 1,3 ****
+--- 1,21 ----
++ /* Copyright (C) 2002 Free Software Foundation, Inc.
++    This file is part of the GNU C Library.
++ 
++    The GNU C Library is free software; you can redistribute it and/or
++    modify it under the terms of the GNU Lesser General Public
++    License as published by the Free Software Foundation; either
++    version 2.1 of the License, or (at your option) any later version.
++ 
++    The GNU C Library is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++    Lesser General Public License for more details.
++ 
++    You should have received a copy of the GNU Lesser General Public
++    License along with the GNU C Library; if not, write to the Free
++    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++    02111-1307 USA.  */
++ 
+  /*
+   * Copyright (c) 1991, 1993
+   *	The Regents of the University of California.  All rights reserved.
+***************
+*** 46,51 ****
+--- 64,72 ----
+   * not exported to user programs.
+   */
+  
++ #define	_SIG_WORDS	4
++ #define	_SIG_MAXSIG	128
++ 
+  /*
+   * Process signal actions and state, needed only within the process
+   * (not necessarily resident).
+***************
+*** 62,67 ****
+--- 83,90 ----
+  	sigset_t ps_usertramp;		/* SunOS compat; libc sigtramp XXX */
+  };
+  
++ #if 0
++ 
+  /*
+   * Compatibility.
+   */
+***************
+*** 83,88 ****
+--- 106,113 ----
+  
+  typedef void __osiginfohandler_t __P((int, osiginfo_t *, void *));
+  
++ #endif
++ 
+  /* additional signal action values, used only temporarily/internally */
+  #define	SIG_CATCH	((__sighandler_t *)2)
+  #define SIG_HOLD        ((__sighandler_t *)3)
+***************
+*** 169,175 ****
+  	int i;
+  
+  	for (i = 0; i < _SIG_WORDS; i++) {
+! 		if (set->__bits[i])
+  			return (0);
+  	}
+  	return (1);
+--- 194,200 ----
+  	int i;
+  
+  	for (i = 0; i < _SIG_WORDS; i++) {
+! 		if (set->__sigbits[i])
+  			return (0);
+  	}
+  	return (1);
+***************
+*** 181,187 ****
+  	int i;
+  
+  	for (i = 0; i < _SIG_WORDS; i++) {
+! 		if (set1->__bits[i] != set2->__bits[i])
+  			return (0);
+  	}
+  	return (1);
+--- 206,212 ----
+  	int i;
+  
+  	for (i = 0; i < _SIG_WORDS; i++) {
+! 		if (set1->__sigbits[i] != set2->__sigbits[i])
+  			return (0);
+  	}
+  	return (1);
