@@ -1,49 +1,151 @@
 Common practices and problems found when porting to GNU/k*BSD
 ===============================================================
 
-Non Clean Builds
-----------------
+GNUAB archive upload policy
+---------------------------
 
-When you have to do *any* changes to the source that are needed to build
-it, please add a new changelog entry and append a "+kbsd", "+kfreebsd",
-"+knetbsd", "+hurd" or "+gnu" as apropriate to the version, so we can
-track what should be integrated to upstream or to the Debian maintainer.
-Also change the suite from "sid" to "unreleased".
+When you're going to upload your fixes to the GNUAB repository, check
+this first:
+
+http://lists.alioth.debian.org/pipermail/glibc-bsd-devel/2004-April/000182.html
+
 
 Config scripts (config.guess and config.sub)
 --------------
 
 You must have the latest config.guess and config.sub. Copy them from
-"/usr/share/misc/config.*". Then please add a "+cfg" to the version.
-Change the suite as well to "unreleased".
+"/usr/share/misc/config.*".
+
 
 Autotools and Libtool
 ---------------------
 
 If you need to update libtool via libtoolize, you will have to be sure
 you update the libtool.m4 file as well so that it is in sync with ltmain.sh
-otherwise you may get strange linking errors. Then please add a "+libtool"
-to the version.
+otherwise you may get strange linking errors.
 
-If you autoreconf'ed the package without touching the source files then
-append an "+autotool" to the version.
-
-For other not listed autogeneration systems append "+autogen".
 
 Testing for "uname -s" output
 -----------------------------
 
 You'll have to the case for GNU/kFreeBSD or GNU/* when appropriate.
 
+
 Non portable mount(2) calls
 ---------------------------
 
 Substitute by system(2) with the "-t<filesystem>" argument first.
 
+[We're supposed to have a portable mount() in Glibc, but it's broken.
+See TODO file]
+
+
 Preprocessor Variables
 ----------------------
 
-For kFreeBSD specific code please test if __FreeBSD_kernel__ is defined.
+How to check for system based on kernel of FreeBSD (i.e. either FreeBSD or
+GNU/kFreeBSD), the Right Way [tm].
+
+#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+[...]
+#endif
+
+Alternatively, when there are lots of checks, this might be prefered:
+
+#if defined(__FreeBSD__) && ! defined(__FreeBSD_kernel__)
+# define __FreeBSD_kernel__ __FreeBSD__
+#endif
+[...]
+#ifdef __FreeBSD_kernel__
+[...]
+#endif
+
+Some notes on version checking stuff. You _may_ assume __FreeBSD__ contains
+major version information, but you must _not_ assume the same for
+__FreeBSD_kernel__. On GNU/kFreeBSD, __FreeBSD_kernel__ will only contain
+major version number after including <osreldate.h>. E.g:
+
+#if defined(__FreeBSD__) && ! defined(__FreeBSD_kernel__)
+# define __FreeBSD_kernel__ __FreeBSD__
+#endif
+#ifdef __FreeBSD_kernel__
+# include <osreldate.h>
+#endif
+[...]
+#if __FreeBSD_kernel__ >= 5
+[...]
+#else
+[...]
+#endif
+
+There are also __FreeBSD_version and __FreeBSD_kernel_version, which work
+similarly:
+
+#if defined(__FreeBSD__) && ! defined(__FreeBSD_kernel__)
+# define __FreeBSD_kernel__ __FreeBSD__
+#endif
+#ifdef __FreeBSD_kernel__
+# include <osreldate.h>
+# ifndef __FreeBSD_kernel_version
+# define __FreeBSD_kernel_version __FreeBSD_version
+# endif
+#endif
+[...]
+#if __FreeBSD_kernel_version >= 502010
+[...]
+#else
+[...]
+#endif
+
+For possible values of __FreeBSD_*version variables, see:
+
+  http://www.freebsd.org/doc/en_US.ISO8859-1/books/porters-handbook/freebsd-versions.html
+
+
+Important note on __FreeBSD_*version. Unlike FreeBSD, we ship packages that
+are not part of base _always_ providing binaries. Sometimes it's not important
+for a FreeBSD porter to maintain compatibility with different kernel ABIs
+in runtime, and per might opt for doing it in build time. However, we are
+going to ship two major kernel versions (4.x and 5.x) and our binaries should
+run on both. This is why we need to implement runtime detection whenever
+possible. An example, based on the previous one:
+
+#if defined(__FreeBSD__) && ! defined(__FreeBSD_kernel__)
+# define __FreeBSD_kernel__ __FreeBSD__
+#endif
+#ifdef __FreeBSD_kernel__
+# include <osreldate.h>
+# ifndef __FreeBSD_kernel_version
+# define __FreeBSD_kernel_version __FreeBSD_version
+# endif
+int
+get_kfreebsd_version ()
+  {
+[...]
+  }
+#endif
+[...]
+#if __FreeBSD_kernel_version >= 502010
+  if (get_kfreebsd_version () >= 502010)
+    {
+[...]
+    }
+  else
+#else
+  {
+[...]
+  }
+#endif
+
+get_kfreebsd_version () returns the latest version of kFreeBSD that uname ()
+can garantee us, and converts it in a 6-digit format compatible with
+__FreeBSD_*version. I have put get_kfreebsd_version () in
+get_kfreebsd_version.c in this directory. You can copy and use it whereever
+you like.
+
+There are usage examples of all the above examples in [grub]/lib/device.c,
+so I suggest you have a look at it.
+
 
 Writing to devfs
 ----------------
@@ -52,4 +154,4 @@ On kFreeBSD's devfs it's only possible to create block/char devices and
 symlinks. So if you need to create some thing in /dev, like a named pipe
 create it in another place, then symlink from /dev.
 
-
+[Perhaps we could work around this in Glibc? (by using symlinks) --rmh]
