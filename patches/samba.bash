@@ -1,3 +1,11 @@
+#!/bin/bash
+set -e
+cp debian/control{,.in}
+cat $0 | patch -p1
+which type-handling
+fakeroot debian/rules clean
+exit 0
+
 diff -ur samba-3.0.9.old/debian/control.in samba-3.0.9/debian/control.in
 --- samba-3.0.9.old/debian/control.in	2004-12-09 17:22:38.000000000 +0100
 +++ samba-3.0.9/debian/control.in	2004-12-11 01:23:02.000000000 +0100
