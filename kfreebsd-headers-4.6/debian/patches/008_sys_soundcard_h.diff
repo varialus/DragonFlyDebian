@@ -1,0 +1,31 @@
+--- kfreebsd-headers-4.6.old/import/sys/soundcard.h	2004-05-31 03:27:35.000000000 +0200
++++ kfreebsd-headers-4.6/import/sys/soundcard.h	2004-08-01 21:06:15.000000000 +0200
+@@ -89,12 +89,13 @@
+ #define SNDCARD_CS4232_MPU     22
+ #define SNDCARD_MAUI           23
+ #define SNDCARD_PSEUDO_MSS     24
+-#define SNDCARD_AWE32           25
++#define SNDCARD_AWE32          25
+ #define SNDCARD_NSS            26
+ #define SNDCARD_UART16550      27
+ #define SNDCARD_OPL            28
+ 
+ #include <sys/types.h>
++#include <machine/endian.h>
+ #ifndef _IOWR
+ #include <sys/ioccom.h>
+ #endif  /* !_IOWR */
+@@ -161,6 +162,13 @@
+ #define AFMT_U16_BE	0x00000100	/* Big endian unsigned 16-bit */
+ #define AFMT_MPEG	0x00000200	/* MPEG MP2/MP3 audio */
+ #define AFMT_AC3	0x00000400	/* Dolby Digital AC3 */
++
++#if _BYTE_ORDER == _LITTLE_ENDIAN
++#define AFMT_S16_NE	AFMT_S16_LE	/* native endian signed 16 */
++#else
++#define AFMT_S16_NE	AFMT_S16_BE
++#endif
++
+ /*
+  * 32-bit formats below used for 24-bit audio data where the data is stored
+  * in the 24 most significant bits and the least significant bits are not used
