@@ -5,13 +5,13 @@ Debian GNU/kFreeBSD installation instructions
 - Partition your drive from a working system (bsd disklabel with rootfs and
   swap slices in it)
 - Boot into the LiveCD system. (http://people.debian.org/~rmh/livecd/)
-- newfs -U /dev/adXsYa (where X and Y could be 0 and 1)
+- mkfs.ufs -O 2 -U /dev/adXsYa (X is for disk and Y is for partition.
+  Warning: this will destroy any existant data in that slice)
 - mount /dev/adXsYa /mnt.
 - tar -C /mnt --same-owner -xzpf /root/i386-kfreebsd-gnu.tar.gz
 - chroot /mnt
 - /native-install
-- Edit /etc/fstab
-- Exit, Sync, Umount, Reboot...
-
-See also the file STATUS, that lists known problems and some workarounds.
-
+- exit
+- TERM=cons25 nano /mnt/etc/fstab
+- umount /mnt/dev ; umount /mnt
+- reboot
