@@ -3,20 +3,14 @@ Debian GNU/kFreeBSD installation instructions
 
 - Start with a fresh FreeBSD install
   + Version 5.x
-  + With UFS1 (SoftUpdates recommended)
+  + With UFS1 or UFS2 (SoftUpdates recommended)
   + In a single filesystem (otherwise the swap script won't work)
   + With minimal options
-  + GRUB with UFS1, you do not need to install the FreeBSD bootloader since
-    GRUB may boot kFreeBSD (kernel of FreeBSD):
+  + You do not need to install the FreeBSD bootloader since GRUB may boot
+    kFreeBSD (kernel of FreeBSD) on a USF1 or USF2 filesystem:
        title Debian GNU/kFreeBSD
        root (hdX,Y,a)
        kernel /boot/loader
-  + GRUB with UFS2, you will have to install the FreeBSD bootloader and use
-    a chainloader:
-       title Debian GNU/kFreeBSD
-       rootnoverify (hdX,Y,a)
-       makeactive
-       chainloader +1
 - Create a base system system tarball with crosshurd (on a Debian system).
   You will have to hack dpkg-architecture and s/freebsd/kfreebsd/.
   And transfer the tarball to the FreeBSD system.
