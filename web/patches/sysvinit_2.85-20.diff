@@ -1,16 +1,3 @@
-diff -Nur sysvinit-2.85.old/debian/changelog sysvinit-2.85/debian/changelog
---- sysvinit-2.85.old/debian/changelog	2004-06-06 04:16:44.000000000 +0200
-+++ sysvinit-2.85/debian/changelog	2004-06-06 03:52:28.000000000 +0200
-@@ -1,3 +1,9 @@
-+sysvinit (2.85-18+kbsd) unreleased; urgency=low
-+
-+  * foo
-+
-+ -- Robert Millan <rmh@debian.org>  Sun,  6 Jun 2004 03:52:12 +0200
-+
- sysvinit (2.85-18) unstable; urgency=medium
- 
-   * Fix typo in /etc/init.d/single (closes: #252611)
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh
 --- sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh	2004-06-06 04:16:45.000000000 +0200
 +++ sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh	2004-06-06 03:52:03.000000000 +0200
@@ -167,19 +154,3 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/umountfs sysvinit-2.85
 +mount $mount_no_mtab $mount_remount,ro /
  
  : exit 0
-diff -Nur sysvinit-2.85.old/debian/rules sysvinit-2.85/debian/rules
---- sysvinit-2.85.old/debian/rules	2004-06-06 04:16:44.000000000 +0200
-+++ sysvinit-2.85/debian/rules	2004-06-06 04:14:00.000000000 +0200
-@@ -39,10 +39,12 @@
- 	#
- 	-rm -rf $(tmp)
- 	install -d -g root -m 755 -o root $(tmp)
-+ifeq ($(DEB_BUILD_GNU_SYSTEM),linux)
- 	install -d -g root -m 755 -o root $(tmp)/dev
- 	install -d -g root -m 755 -o root $(tmp)/dev/pts
- 	install -d -g root -m 755 -o root $(tmp)/dev/shm
- 	install -d -g root -m 755 -o root $(tmp)/sys
-+endif
- 	install -d -g root -m 755 -o root $(tmp)/{DEBIAN,etc,usr}
- 	install -d -g root -m 755 -o root $(tmp)/usr/share
- 	install -d -g root -m 755 -o root $(tmp)/usr/share/sysvinit
