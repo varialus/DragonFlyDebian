@@ -12,18 +12,24 @@ if [ "$UID" != "0" ] ; then
 fi
 
 cpu=`dpkg-architecture -qDEB_BUILD_GNU_CPU`
+system="kfreebsd-gnu"
 uname="GNU/kFreeBSD"
-tmp=`tempfile` && rm -f ${tmp} && mkdir -p ${tmp}
+tmp1=`tempfile` && rm -f ${tmp1} && mkdir -p ${tmp1}
+tmp2=`tempfile`
 pwd=`pwd`
 version=6
 
-/usr/share/crosshurd/makehurddir.sh ${tmp} ${cpu} kfreebsd-gnu
+/usr/share/crosshurd/makehurddir.sh ${tmp1} ${cpu} ${system}
 
 ##################
 #  add some trickery
 ###########################
 
-cd ${tmp}
+cd ${tmp1}
+tar --same-owner -cpf - ./* | gzip -c9 > ${tmp2}
+mv ${tmp2} ${tmp1}/root/${cpu}-${system}.tar.gz
+
+rm -f ${tmp1}/var/cache/apt/archives/*.deb
 
 # we can't run native-install (since we might be cross-building) so we
 # mimic the essentials here
@@ -76,5 +82,5 @@ mkisofs -b boot/grub/stage2_eltorito \
 
 cd ${pwd}/
 if [ "${LIVECD_DEBUG}" != "yes" ] ; then
-  rm -rf ${tmp}
+  rm -rf ${tmp1} ${tmp2}
 fi
