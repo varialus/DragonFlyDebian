@@ -1,3 +1,9 @@
+
+nsprpub contacts:
+
+Wan-Teh Chang <wtchang@redhat.com>
+Darin Fisher <darin@meer.net>
+
 diff -Nur mozilla-1.7.5.old/debian/patches/zzz_libffi.diff mozilla-1.7.5/debian/patches/zzz_libffi.diff
 --- mozilla-1.7.5.old/debian/patches/zzz_libffi.diff	1970-01-01 01:00:00.000000000 +0100
 +++ mozilla-1.7.5/debian/patches/zzz_libffi.diff	2005-01-16 06:28:44.000000000 +0100
@@ -250,7 +256,7 @@ diff -Nur mozilla-1.7.5.old/debian/patches/zzz_mozilla.diff mozilla-1.7.5/debian
 + endif
 + 
 +-ifeq ($(OS_ARCH), Linux)
-++ifneq (,$(findstring $(OS_ARCH),Linux GNU GNU_kFreeBSD GNU_kNetBSD))
+++ifneq (,$(filter $(OS_ARCH),Linux GNU GNU_kFreeBSD GNU_kNetBSD))
 + EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME) -lpthread
 + endif
 + 
@@ -259,7 +265,7 @@ diff -Nur mozilla-1.7.5.old/debian/patches/zzz_mozilla.diff mozilla-1.7.5/debian
 + 	-$(RM) $(SO_FILES_TO_REMOVE)
 + endif
 +-ifneq (,$(filter AIX Linux HP-UX Darwin BeOS QNX NetBSD OSF1 OpenBSD, $(OS_ARCH)))
-++ifneq (,$(findstring $(OS_ARCH),AIX Linux GNU HP-UX Darwin BeOS QNX NetBSD OSF1 OpenBSD))
+++ifneq (,$(filter $(OS_ARCH),AIX Linux GNU GNU_kFreeBSD GNU_kNetBSD HP-UX Darwin BeOS QNX NetBSD OSF1 OpenBSD))
 + 	$(LINK_LIB) ../liblber/$(OBJDIR_NAME)/*.a
 + else
 + ifeq ($(OS_ARCH),OS2)
@@ -296,7 +302,7 @@ diff -Nur mozilla-1.7.5.old/debian/patches/zzz_mozilla.diff mozilla-1.7.5/debian
 + endif # USE_DLL_EXPORTS_FILE
 + 
 +-ifeq ($(OS_ARCH), Linux)
-++ifneq (,$(findstring $(OS_ARCH),Linux GNU GNU_kFreeBSD GNU_kNetBSD))
+++ifneq (,$(filter $(OS_ARCH),Linux GNU GNU_kFreeBSD GNU_kNetBSD))
 + EXTRA_LIBS = -L$(dist_libdir) -l$(LDAP_LIBNAME)
 + EXTRA_LIBS += -L$(dist_libdir) $(DYNAMICNSPR)
 + endif

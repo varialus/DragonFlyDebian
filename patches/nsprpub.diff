@@ -294,7 +294,7 @@ diff -ur nsprpub.old/pr/tests/Makefile.in nsprpub/pr/tests/Makefile.in
  
 -ifeq ($(OS_ARCH), Linux)
 -    ifeq ($(OS_RELEASE), 1.2)
-+ifneq (,$(findstring $(OS_ARCH),Linux GNU))
++ifneq (,$(filter $(OS_ARCH),Linux GNU GNU_kFreeBSD GNU_kNetBSD))
 +    ifeq ($(OS_ARCH)-$(OS_RELEASE), Linux-1.2)
          EXTRA_LIBS = -ldl
      else
@@ -304,7 +304,7 @@ diff -ur nsprpub.old/pr/tests/Makefile.in nsprpub/pr/tests/Makefile.in
  endif
  
 -ifeq ($(OS_TARGET),Linux)
-+ifneq (,$(findstring $(OS_TARGET),Linux GNU))
++ifneq (,$(filter $(OS_TARGET),Linux GNU GNU_kFreeBSD GNU_kNetBSD))
  ECHO = /bin/echo
  endif
  

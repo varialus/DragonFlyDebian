@@ -1,0 +1,301 @@
+diff -Nur gcc-20040724.old/boehm-gc/include/private/gcconfig.h gcc-20040724/boehm-gc/include/private/gcconfig.h
+--- gcc-20040724.old/boehm-gc/include/private/gcconfig.h	2004-04-06 20:05:05.000000000 +0200
++++ gcc-20040724/boehm-gc/include/private/gcconfig.h	2004-08-06 01:53:05.000000000 +0200
+@@ -44,6 +44,14 @@
+ #  endif
+ # endif
+ 
++/* And one for Glibc: */
++#if defined(LINUX) || defined(__GNU__) || defined(__GLIBC__)
++# include <features.h>
++#endif
++#ifdef __GLIBC__
++# define GLIBC
++#endif
++
+ /* And one for NetBSD: */
+ # if defined(__NetBSD__)
+ #    define NETBSD
+@@ -58,6 +66,9 @@
+ # if defined(__FreeBSD__)
+ #    define FREEBSD
+ # endif
++# if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#    define KFREEBSD
++# endif
+ 
+ /* Determine the machine type: */
+ # if defined(__arm__) || defined(__thumb__)
+@@ -299,7 +310,7 @@
+ #   define OPENBSD
+ #   define mach_type_known
+ # endif
+-# if defined(FREEBSD) && (defined(i386) || defined(__i386__))
++# if defined(KFREEBSD) && (defined(i386) || defined(__i386__))
+ #   define I386
+ #   define mach_type_known
+ # endif
+@@ -1162,13 +1173,25 @@
+ #	endif
+ #	define SIG_SUSPEND SIGUSR1
+ #	define SIG_THR_RESTART SIGUSR2
++	extern char etext[];
++	extern char * GC_FreeBSDGetDataStart();
++#	define DATASTART GC_FreeBSDGetDataStart(0x1000, &etext)
++#   endif
++#   if defined(GLIBC) && defined(KFREEBSD)
++#	define OS_TYPE "GNU/kFreeBSD"
++#	if !defined(GC_LINUX_THREADS) && !defined(REDIRECT_MALLOC)
++#	    define MPROTECT_VDB
++#	endif
++#	define SIG_SUSPEND 57 /* arbitrary signal number <= 128 */
++#	define SIG_THR_RESTART 58 /* arbitrary signal number <= 128 */
++#	define SEARCH_FOR_DATA_START
++#	define DATAEND (sbrk (0))
++#   endif
++#   ifdef KFREEBSD
+ #	define FREEBSD_STACKBOTTOM
+ #	ifdef __ELF__
+ #	    define DYNAMIC_LOADING
+ #	endif
+-	extern char etext[];
+-	extern char * GC_FreeBSDGetDataStart();
+-#	define DATASTART GC_FreeBSDGetDataStart(0x1000, &etext)
+ #   endif
+ #   ifdef NETBSD
+ #	define OS_TYPE "NETBSD"
+diff -Nur gcc-20040724.old/boehm-gc/configure gcc-20040724/boehm-gc/configure
+--- gcc-20040724.old/boehm-gc/configure	2004-06-17 21:32:41.000000000 +0200
++++ gcc-20040724/boehm-gc/configure	2004-08-06 01:53:05.000000000 +0200
+@@ -5337,6 +5337,12 @@
+ _ACEOF
+ 
+ 	;;
++     *-*-gnu* | *-*-k*bsd*-gnu)
++	cat >>confdefs.h <<\_ACEOF
++#define _REENTRANT 1
++_ACEOF
++
++	;;
+      *-*-aix*)
+ 	cat >>confdefs.h <<\_ACEOF
+ #define GC_AIX_THREADS 1
+diff -Nur gcc-20040724.old/boehm-gc/configure.ac gcc-20040724/boehm-gc/configure.ac
+--- gcc-20040724.old/boehm-gc/configure.ac	2004-06-16 09:34:42.000000000 +0200
++++ gcc-20040724/boehm-gc/configure.ac	2004-08-06 01:53:05.000000000 +0200
+@@ -138,6 +138,9 @@
+ 	AC_DEFINE(GC_LINUX_THREADS)
+ 	AC_DEFINE(_REENTRANT)
+ 	;;
++     *-*-gnu* | *-*-k*bsd*-gnu)
++	AC_DEFINE(_REENTRANT)
++	;;
+      *-*-aix*)
+ 	AC_DEFINE(GC_AIX_THREADS)
+ 	AC_DEFINE(_REENTRANT)
+diff -Nur gcc-20040724.old/boehm-gc/dbg_mlc.c gcc-20040724/boehm-gc/dbg_mlc.c
+--- gcc-20040724.old/boehm-gc/dbg_mlc.c	2003-07-28 06:18:20.000000000 +0200
++++ gcc-20040724/boehm-gc/dbg_mlc.c	2004-08-06 01:53:05.000000000 +0200
+@@ -59,7 +59,7 @@
+ 
+ # include <stdlib.h>
+ 
+-# if defined(LINUX) || defined(SUNOS4) || defined(SUNOS5) \
++# if defined(LINUX) || defined(GLIBC) || defined(SUNOS4) || defined(SUNOS5) \
+      || defined(HPUX) || defined(IRIX5) || defined(OSF1)
+ #   define RANDOM() random()
+ # else
+diff -Nur gcc-20040724.old/boehm-gc/dyn_load.c gcc-20040724/boehm-gc/dyn_load.c
+--- gcc-20040724.old/boehm-gc/dyn_load.c	2003-07-30 19:42:28.000000000 +0200
++++ gcc-20040724/boehm-gc/dyn_load.c	2004-08-06 01:53:05.000000000 +0200
+@@ -26,7 +26,8 @@
+  * None of this is safe with dlclose and incremental collection.
+  * But then not much of anything is safe in the presence of dlclose.
+  */
+-#if defined(__linux__) && !defined(_GNU_SOURCE)
++#if (defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) \
++  && !defined(_GNU_SOURCE)
+     /* Can't test LINUX, since this must be define before other includes */
+ #   define _GNU_SOURCE
+ #endif
+@@ -56,7 +57,7 @@
+     !(defined(ALPHA) && defined(OSF1)) && \
+     !defined(HPUX) && !(defined(LINUX) && defined(__ELF__)) && \
+     !defined(RS6000) && !defined(SCO_ELF) && !defined(DGUX) && \
+-    !(defined(FREEBSD) && defined(__ELF__)) && \
++    !(defined(KFREEBSD) && defined(__ELF__)) && \
+     !(defined(NETBSD) && defined(__ELF__)) && !defined(HURD) && \
+     !defined(DARWIN)
+  --> We only know how to find data segments of dynamic libraries for the
+@@ -81,7 +82,7 @@
+ #endif
+ 
+ #if defined(LINUX) && defined(__ELF__) || defined(SCO_ELF) || \
+-    (defined(FREEBSD) && defined(__ELF__)) || defined(DGUX) || \
++    (defined(KFREEBSD) && defined(__ELF__)) || defined(DGUX) || \
+     (defined(NETBSD) && defined(__ELF__)) || defined(HURD)
+ #   include <stddef.h>
+ #   include <elf.h>
+@@ -265,7 +266,7 @@
+ # endif /* SUNOS */
+ 
+ #if defined(LINUX) && defined(__ELF__) || defined(SCO_ELF) || \
+-    (defined(FREEBSD) && defined(__ELF__)) || defined(DGUX) || \
++    (defined(KFREEBSD) && defined(__ELF__)) || defined(DGUX) || \
+     (defined(NETBSD) && defined(__ELF__)) || defined(HURD)
+ 
+ 
+@@ -360,7 +361,7 @@
+ /* For glibc 2.2.4+.  Unfortunately, it doesn't work for older	*/
+ /* versions.  Thanks to Jakub Jelinek for most of the code.	*/
+ 
+-# if defined(LINUX) /* Are others OK here, too? */ \
++# if defined(GLIBC) \
+      && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2) \
+          || (__GLIBC__ == 2 && __GLIBC_MINOR__ == 2 && defined(DT_CONFIG))) 
+ 
+@@ -434,7 +435,7 @@
+ 
+ #define HAVE_REGISTER_MAIN_STATIC_DATA
+ 
+-# else /* !LINUX || version(glibc) < 2.2.4 */
++# else /* !GLIBC || version(glibc) < 2.2.4 */
+ 
+ /* Dynamic loading code for Linux running ELF. Somewhat tested on
+  * Linux/x86, untested but hopefully should work on Linux/Alpha. 
+diff -Nur gcc-20040724.old/boehm-gc/include/gc.h gcc-20040724/boehm-gc/include/gc.h
+--- gcc-20040724.old/boehm-gc/include/gc.h	2003-07-31 06:52:36.000000000 +0200
++++ gcc-20040724/boehm-gc/include/gc.h	2004-08-06 01:53:05.000000000 +0200
+@@ -466,7 +466,7 @@
+ #   define GC_RETURN_ADDR (GC_word)__return_address
+ #endif
+ 
+-#ifdef __linux__
++#if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
+ # include <features.h>
+ # if (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 1 || __GLIBC__ > 2) \
+      && !defined(__ia64__)
+@@ -490,7 +490,8 @@
+ /* This may also be desirable if it is possible but expensive to	*/
+ /* retrieve the call chain.						*/
+ #if (defined(__linux__) || defined(__NetBSD__) || defined(__OpenBSD__) \
+-     || defined(__FreeBSD__)) & !defined(GC_CAN_SAVE_CALL_STACKS)
++     || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) \
++     ) & !defined(GC_CAN_SAVE_CALL_STACKS)
+ # define GC_ADD_CALLER
+ # if __GNUC__ >= 3 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95) 
+     /* gcc knows how to retrieve return address, but we don't know */
+diff -Nur gcc-20040724.old/boehm-gc/os_dep.c gcc-20040724/boehm-gc/os_dep.c
+--- gcc-20040724.old/boehm-gc/os_dep.c	2004-07-07 06:31:15.000000000 +0200
++++ gcc-20040724/boehm-gc/os_dep.c	2004-08-06 01:53:05.000000000 +0200
+@@ -80,7 +80,7 @@
+ #   define NEED_FIND_LIMIT
+ # endif
+ 
+-#if defined(FREEBSD) && defined(I386)
++#if defined(KFREEBSD) && defined(I386)
+ #  include <machine/trap.h>
+ #  if !defined(PCR)
+ #    define NEED_FIND_LIMIT
+@@ -121,7 +121,7 @@
+ # include <fcntl.h>
+ #endif
+ 
+-#if defined(SUNOS5SIGS) || defined (HURD) || defined(LINUX)
++#if defined(SUNOS5SIGS) || defined(LINUX) || defined(GLIBC)
+ # ifdef SUNOS5SIGS
+ #  include <sys/siginfo.h>
+ # endif
+@@ -311,7 +311,7 @@
+   /* for recent Linux versions.  This seems to be the easiest way to	*/
+   /* cover all versions.						*/
+ 
+-# ifdef LINUX
++# if defined(LINUX) || defined(GLIBC)
+     /* Some Linux distributions arrange to define __data_start.  Some	*/
+     /* define data_start as a weak symbol.  The latter is technically	*/
+     /* broken, since the user program may define data_start, in which	*/
+@@ -321,7 +321,7 @@
+     extern int __data_start[];
+ #   pragma weak data_start
+     extern int data_start[];
+-# endif /* LINUX */
++# endif /* LINUX || GLIBC */
+   extern int _end[];
+ 
+   ptr_t GC_data_start;
+@@ -330,7 +330,7 @@
+   {
+     extern ptr_t GC_find_limit();
+ 
+-#   ifdef LINUX
++#   if defined(LINUX) || defined(GLIBC)
+       /* Try the easy approaches first:	*/
+       if ((ptr_t)__data_start != 0) {
+ 	  GC_data_start = (ptr_t)(__data_start);
+@@ -340,7 +340,7 @@
+ 	  GC_data_start = (ptr_t)(data_start);
+ 	  return;
+       }
+-#   endif /* LINUX */
++#   endif /* LINUX || GLIBC */
+     GC_data_start = GC_find_limit((ptr_t)(_end), FALSE);
+   }
+ #endif
+@@ -2175,13 +2175,13 @@
+ #endif /* SUNOS4 || FREEBSD */
+ 
+ #if defined(SUNOS5SIGS) || defined(OSF1) || defined(LINUX) \
+-    || defined(HURD)
++    || defined(GLIBC)
+ # ifdef __STDC__
+     typedef void (* SIG_PF)(int);
+ # else
+     typedef void (* SIG_PF)();
+ # endif
+-#endif /* SUNOS5SIGS || OSF1 || LINUX || HURD */
++#endif /* SUNOS5SIGS || OSF1 || LINUX || GLIBC */
+ 
+ #if defined(MSWIN32)
+     typedef LPTOP_LEVEL_EXCEPTION_FILTER SIG_PF;
+@@ -2301,7 +2301,7 @@
+ 
+ /*ARGSUSED*/
+ #if !defined(DARWIN)
+-# if defined (SUNOS4) || defined(FREEBSD)
++# if defined (SUNOS4) || defined(KFREEBSD)
+     void GC_write_fault_handler(sig, code, scp, addr)
+     int sig, code;
+     struct sigcontext *scp;
+@@ -2312,11 +2312,11 @@
+               	    || (FC_CODE(code) == FC_OBJERR \
+               	       && FC_ERRNO(code) == FC_PROT))
+ #   endif
+-#   ifdef FREEBSD
++#   ifdef KFREEBSD
+ #     define SIG_OK (sig == SIGBUS)
+ #     define CODE_OK (code == BUS_PAGE_FAULT)
+ #   endif
+-# endif /* SUNOS4 || FREEBSD */
++# endif /* SUNOS4 || KFREEBSD */
+ 
+ # if defined(IRIX5) || defined(OSF1) || defined(HURD)
+ #   include <errno.h>
+@@ -3831,7 +3831,7 @@
+ /* I suspect the following works for most X86 *nix variants, so 	*/
+ /* long as the frame pointer is explicitly stored.  In the case of gcc,	*/
+ /* compiler flags (e.g. -fomit-frame-pointer) determine whether it is.	*/
+-#if defined(I386) && defined(LINUX) && defined(SAVE_CALL_CHAIN)
++#if defined(I386) && (defined(LINUX) || defined(GLIBC)) && defined(SAVE_CALL_CHAIN)
+ #   include <features.h>
+ 
+     struct frame {
+@@ -3842,7 +3842,7 @@
+ #endif
+ 
+ #if defined(SPARC)
+-#  if defined(LINUX)
++#  if defined(LINUX) || defined(GLIBC)
+ #    include <features.h>
+ 
+      struct frame {
