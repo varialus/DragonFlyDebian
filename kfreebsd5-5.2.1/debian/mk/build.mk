@@ -4,7 +4,7 @@ DESTDIR=$(CURDIR)/debian/kfreebsd5
 #CFLAGS="-U__linux__ -U__FreeBSD_kernel__ -D__FreeBSD_kernel__=5 -D__FreeBSD_version=502010"
 MAKE=make DESTDIR=$(DESTDIR) WERROR=
 revision=`dpkg-parsechangelog | grep ^Version | cut -c 10- | cut -d '-' -f 2`
-kfreebsd_cpu = $(DEB_BUILD_GNU_CPU)
+kfreebsd_cpu = $(DEB_HOST_GNU_CPU)
 
 build/kfreebsd5:: pre-build apply-patches
 	if ! test -e debian/stamp-build ; then \

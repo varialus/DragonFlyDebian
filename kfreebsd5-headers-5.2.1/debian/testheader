@@ -9,5 +9,9 @@ case $hdr in
 esac
 
 echo "#include \"$hdr\"" > $tmp
-gcc -w -c $tmp -o /dev/null
+set +e
+if ! gcc -w -c $tmp -o /dev/null ; then
+  rm -f $tmp
+  exit 1
+fi
 rm -f $tmp
