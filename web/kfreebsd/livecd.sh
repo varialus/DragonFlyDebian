@@ -7,6 +7,8 @@
 
 set -ex
 
+version=10
+
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
   fakeroot $0 $@
@@ -20,7 +22,6 @@ for i in mkisofs crosshurd ; do
   fi
 done
 
-version=9
 cpu="i386"
 system="kfreebsd-gnu"
 uname="GNU/kFreeBSD"
