@@ -1,0 +1,44 @@
+#!/bin/sh -ex
+#
+# $Id$
+#
+
+rm -f *~
+rm -rf tmp out
+mkdir -p tmp out
+
+# pre-dependencies
+gcc -Wall -static init.c -o tmp/init
+if ! test -e boot.flp ; then
+  echo -n "boot.flp not found. You can get the upstream version from "
+  echo -n "ftp://ftp.freebsd.org/pub/FreeBSD/releases/"
+  echo -n "`uname -m`/`uname -r`/floppies/boot.flp"
+fi
+
+# extract mfsroot
+mdconfig -a -t vnode -f boot.flp -u md0
+mount /dev/md0 /mnt
+gunzip -c /mnt/mfsroot.gz > tmp/mfsroot
+umount /mnt
+mdconfig -d -u md0
+
+# insert init into mfsroot
+mdconfig -a -t vnode -f tmp/mfsroot -u md0
+mount /dev/md0 /mnt
+rm -f /mnt/stand/sysinstall
+install -m755 tmp/init /mnt/stand/sysinstall
+umount /mnt
+mdconfig -d -u md0
+
+# insert mfsroot
+mdconfig -a -t vnode -f boot.flp -u md0
+mount /dev/md0 /mnt
+gzip -c9 tmp/mfsroot > /mnt/mfsroot.gz
+cp -a /mnt out/root
+umount /mnt
+mdconfig -d -u md0
+
+cp boot.flp out/root/
+cp -a stand out/root/
+
+mkisofs -b boot.flp -c boot.catalog -o out/livecd.iso out/root

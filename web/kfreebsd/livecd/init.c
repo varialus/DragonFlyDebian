@@ -21,17 +21,21 @@
  *
  */
 
+#define _GNU_SOURCE 1 /* getline */
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <sys/stat.h>
+#include <string.h>
 
-/* kFreeBSD stuff */
 #include <sys/param.h>
-#include <sys/mount.h>
-#include <isofs/cd9660/cd9660_mount.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+
+#include "mount.h"
+#include "/usr/src/kfreebsd-headers/isofs/cd9660/cd9660_mount.h"
 
 /* how about /dev/ttyv0 ? */
 #ifndef TTY
@@ -42,39 +46,44 @@ static char *device;
 static char *fstype;
 static char *init;
 
-int init_abort ();
-#ifndef __GLIBC__
-int getline (char **lineptr, size_t *n, FILE *stream)
-{ return 1; }
-#endif
-
 int
 main ()
 {
   size_t sz;
-  int len, pid, ret;
+  int len;
   struct iso_args iso;
   struct stat my_stat;
 
-  close (0); close (1); close (2);
-
-  open (TTY, O_RDWR);
-  dup (0); dup (0);
-
-  stdin = fdopen (0, "r");
-  if (stdin == NULL)
-    exit (errno);
-  stdout = fdopen (1, "w");
-  if (stdout == NULL)
-    exit (errno);
+  close (2); /* stderr */
+  open (TTY, O_WRONLY);
   stderr = fdopen (2, "w");
   if (stderr == NULL)
-    exit (errno);
-
-  if (fprintf (stdout, "stdout works\n") < 0)
-    exit (errno);
+    exit (1);
   if (fprintf (stderr, "stderr works\n") < 0)
-    exit (errno);
+    exit (2);
+
+  close (1); /* stdout */
+  dup (2);
+  stdout = fdopen (1, "w");
+  if (stdout == NULL)
+    {
+      fprintf (stderr, "fdopen: failed for stdout\n");
+      while (1);
+    }
+  if (fprintf (stdout, "stdout works\n") < 0)
+    {
+      fprintf (stderr, "fprintf: failed for stdout\n");
+      while (1);
+    }
+
+  close (0); /* stdin */
+  open (TTY, O_RDONLY);
+  stdin = fdopen (0, "r");
+  if (stdin == NULL)
+    {
+      fprintf (stderr, "fdopen: failed for stdin\n");
+      while (1);
+    }
 
   printf ("\nDevice [/dev/acd0]: ");
   device = NULL; sz = 0;
@@ -102,7 +111,7 @@ main ()
 
   if ((stat ("/mnt", &my_stat) == -1) && (errno = ENOENT))
     {
-      fprintf (stderr, "/mnt does not exist, creating\n");
+      fprintf (stderr, "warning: creating /mnt\n");
       if (mkdir ("/mnt", 0755) == -1)
         {
           fprintf (stderr, "mkdir failed: %s\n", strerror (errno));
@@ -118,44 +127,30 @@ main ()
       fprintf (stderr, "mount failed: %s\n", strerror (errno));
       goto init_abort;
     }
+  free (device);
+  free (fstype);
 
-  pid = fork ();
-  switch (pid)
+  printf ("chroot /mnt/stand\n");
+  if (chroot ("/mnt/stand") == -1)
     {
-      case -1:
-        fprintf (stderr, "fork() failed: %s\n", strerror (errno));
-        goto init_abort;
-      case 0:
-        printf ("chroot /mnt\n");
-        if (chroot ("/mnt") == -1)
-          {
-            fprintf (stderr, "chroot() failed: %s\n", strerror (errno));
-            exit (1);
-          }
-        printf ("chdir /\n");
-        if (chdir ("/") == -1)
-          {
-            fprintf (stderr, "chdir() failed: %s\n", strerror (errno));
-            exit (1);
-          }
-        printf ("executing %s -i\n", init);
-        execl (init, init, "-i", NULL);
-        fprintf (stderr, "execl() failed: %s\n", strerror (errno));
-        exit (1);
-      default:
-        waitpid (pid, &ret, 0);
-        if (ret != 0)
-          fprintf (stderr, "warning, child exited with %d status.\n", ret);
+      fprintf (stderr, "chroot() failed: %s\n", strerror (errno));
+      goto init_abort;
     }
+  printf ("chdir /\n");
+  if (chdir ("/") == -1)
+    {
+      fprintf (stderr, "chdir() failed: %s\n", strerror (errno));
+      goto init_abort;
+    }
+   printf ("executing %s\n", init);
+  execl (init, init, NULL);
+  fprintf (stderr, "execl() failed: %s\n", strerror (errno));
 
-:init_abort
+init_abort:
 
   printf ("umount /mnt\n");
-  err = unmount ("/mnt", 0);
-  if (err == -1)
-    {
-      fprintf (stderr, "unmount failed: %s\n", strerror (errno));
-    }
+  if (unmount ("/mnt", 0) == -1)
+    fprintf (stderr, "unmount failed: %s\n", strerror (errno));
 
   free (device);
   free (fstype);
