@@ -1,0 +1,28 @@
+diff -u cvs-1.12.9/debian/control cvs-1.12.9/debian/control
+--- cvs-1.12.9/debian/control
++++ cvs-1.12.9/debian/control
+@@ -2,7 +2,7 @@
+ Section: devel
+ Priority: optional
+ Maintainer: Steve McIntyre <93sam@debian.org>
+-Build-Depends: debhelper (>= 4.1.16), zlib1g-dev, texi2html, groff, texinfo, bison, dbs, automake1.7, libpam0g-dev
++Build-Depends: debhelper (>= 4.1.16), zlib1g-dev, texi2html, groff, texinfo, bison, dbs, automake1.7, libpam0g-dev, autotools-dev
+ Build-Conflicts: heimdal-dev, kerberos4kth-dev, libkrb5-dev
+ Standards-Version: 3.6.1.0
+ 
+diff -u cvs-1.12.9/debian/rules cvs-1.12.9/debian/rules
+--- cvs-1.12.9/debian/rules
++++ cvs-1.12.9/debian/rules
+@@ -37,6 +37,11 @@
+ configure: $(STAMP_DIR)/stamp-configure
+ $(STAMP_DIR)/stamp-configure: $(patched)
+ 	dh_testdir
++	
++	-test -r /usr/share/misc/config.sub && \
++	cp -f /usr/share/misc/config.sub $(BUILD_TREE)/config.sub
++	-test -r /usr/share/misc/config.guess && \
++	cp -f /usr/share/misc/config.guess $(BUILD_TREE)/config.guess
+ 
+ 	cd $(BUILD_TREE) && CSH=/bin/csh ./configure --prefix=/usr \
+ 		--sysconfdir=/etc \
+
