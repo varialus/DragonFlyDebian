@@ -1,0 +1,159 @@
+diff -ur binutils-2.14.90.0.7.old/bfd/elf32-i386.c binutils-2.14.90.0.7/bfd/elf32-i386.c
+--- binutils-2.14.90.0.7.old/bfd/elf32-i386.c	2003-08-21 17:28:47.000000000 +0200
++++ binutils-2.14.90.0.7/bfd/elf32-i386.c	2004-07-20 01:31:51.000000000 +0200
+@@ -3297,8 +3297,23 @@
+ #endif
+ }
+ 
++static bfd_boolean
++elf_i386_kfreebsd_object_p (bfd *abfd)
++{
++  if (strncmp (bfd_get_filename (abfd), "/lib/ld", 7) == 0
++      && (abfd->flags & EXEC_P) != 0)
++    {
++      abfd->flags ^= EXEC_P;
++      abfd->flags |= DYNAMIC;
++    }
++
++  return elf_i386_object_p (abfd);
++}
++
+ #undef	elf_backend_post_process_headers
+ #define	elf_backend_post_process_headers	elf_i386_post_process_headers
++#undef	elf_backend_object_p
++#define	elf_backend_object_p			elf_i386_kfreebsd_object_p
+ #undef	elf32_bed
+ #define	elf32_bed				elf32_i386_fbsd_bed
+ 
+diff -ur binutils-2.14.90.0.7.old/libtool.m4 binutils-2.14.90.0.7/libtool.m4
+--- binutils-2.14.90.0.7.old/libtool.m4	2003-05-05 23:46:46.000000000 +0200
++++ binutils-2.14.90.0.7/libtool.m4	2004-07-20 01:31:51.000000000 +0200
+@@ -577,7 +577,7 @@
+   esac
+   ;;
+ 
+-freebsd* )
++freebsd* | kfreebsd*-gnu)
+   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
+     case $host_cpu in
+     i*86 )
+@@ -645,7 +645,7 @@
+   lt_cv_file_magic_test_file=`echo /lib/libc.so* /lib/libc-*.so`
+   ;;
+ 
+-netbsd*)
++netbsd* | knetbsd*-gnu)
+   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
+     [lt_cv_deplibs_check_method='match_pattern /lib[^/\.]+\.so\.[0-9]+\.[0-9]+$']
+   else
+diff -ur binutils-2.14.90.0.7.old/ltcf-c.sh binutils-2.14.90.0.7/ltcf-c.sh
+--- binutils-2.14.90.0.7.old/ltcf-c.sh	2002-12-16 21:22:51.000000000 +0100
++++ binutils-2.14.90.0.7/ltcf-c.sh	2004-07-20 01:31:51.000000000 +0200
+@@ -185,7 +185,7 @@
+     whole_archive_flag_spec='-all_load $convenience'
+     ;;
+ 
+-  netbsd*)
++  netbsd* | knetbsd*-gnu)
+     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
+       archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
+       wlarc=
+@@ -409,7 +409,7 @@
+     ;;
+ 
+   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
+-  freebsd*)
++  freebsd* | kfreebsd*-gnu)
+     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
+     hardcode_libdir_flag_spec='-R$libdir'
+     hardcode_direct=yes
+@@ -456,7 +456,7 @@
+     link_all_deplibs=yes
+     ;;
+ 
+-  netbsd*)
++  netbsd* | knetbsd*-gnu)
+     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
+       archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
+     else
+diff -ur binutils-2.14.90.0.7.old/ltcf-cxx.sh binutils-2.14.90.0.7/ltcf-cxx.sh
+--- binutils-2.14.90.0.7.old/ltcf-cxx.sh	2003-03-19 18:19:13.000000000 +0100
++++ binutils-2.14.90.0.7/ltcf-cxx.sh	2004-07-20 01:31:51.000000000 +0200
+@@ -244,7 +244,7 @@
+     # C++ shared libraries reported to be fairly broken before switch to ELF
+     ld_shlibs=no
+     ;;
+-  freebsd*)
++  freebsd* | kfreebsd*-gnu)
+     # FreeBSD 3 and later use GNU C++ and GNU ld with standard ELF
+     # conventions
+     ld_shlibs=yes
+@@ -404,7 +404,7 @@
+         ;;
+     esac
+     ;;
+-  netbsd*)
++  netbsd* | knetbsd*-gnu)
+     # NetBSD uses g++ - do we need to do anything?
+     ;;
+   osf3*)
+@@ -759,7 +759,7 @@
+           ;;
+       esac
+       ;;
+-    freebsd*)
++    freebsd* | kfreebsd*-gnu)
+       # FreeBSD uses GNU C++
+       ;;
+     gnu*)
+diff -ur binutils-2.14.90.0.7.old/ltcf-gcj.sh binutils-2.14.90.0.7/ltcf-gcj.sh
+--- binutils-2.14.90.0.7.old/ltcf-gcj.sh	2003-03-19 18:19:13.000000000 +0100
++++ binutils-2.14.90.0.7/ltcf-gcj.sh	2004-07-20 01:31:51.000000000 +0200
+@@ -178,7 +178,7 @@
+       $CC $output_objdir/$soname-exp '$lt_cv_cc_dll_switch' -Wl,-e,'$dll_entry' -o $output_objdir/$soname '$ltdll_obj'$libobjs $deplibs $compiler_flags'
+     ;;
+ 
+-  netbsd*)
++  netbsd* | knetbsd*-gnu)
+     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
+       archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
+       wlarc=
+@@ -402,7 +402,7 @@
+     ;;
+ 
+   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
+-  freebsd*)
++  freebsd* | kfreebsd*-gnu)
+     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
+     hardcode_libdir_flag_spec='-R$libdir'
+     hardcode_direct=yes
+@@ -433,7 +433,7 @@
+     link_all_deplibs=yes
+     ;;
+ 
+-  netbsd*)
++  netbsd* | knetbsd*-gnu)
+     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
+       archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
+     else
+diff -ur binutils-2.14.90.0.7.old/ltconfig binutils-2.14.90.0.7/ltconfig
+--- binutils-2.14.90.0.7.old/ltconfig	2003-10-29 18:37:47.000000000 +0100
++++ binutils-2.14.90.0.7/ltconfig	2004-07-20 01:31:51.000000000 +0200
+@@ -1164,6 +1164,17 @@
+   hardcode_into_libs=yes
+   ;;
+ 
++kfreebsd*-gnu | knetbsd*-gnu)
++  version_type=linux
++  need_lib_prefix=no
++  need_version=no
++  library_names_spec='${libname}${release}.so$versuffix ${libname}${release}.so${major} ${libname}.so'
++  soname_spec='${libname}${release}.so$major'
++  shlibpath_var=LD_LIBRARY_PATH
++  shlibpath_overrides_runpath=yes
++  hardcode_into_libs=yes
++  ;;
++
+ hpux9* | hpux10* | hpux11*)
+   # Give a soname corresponding to the major version so that dld.sl refuses to
+   # link against other versions.
