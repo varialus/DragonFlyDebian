@@ -1,42 +1,15 @@
 
-Status: in BTS.  need also upstream fixes (in gcc_upstream.diff)
+Status: in BTS.  need also upstream fixes (merged in cvs)
 
-diff -ur gcc-4.0-4.0.old/debian/rules.defs gcc-4.0-4.0/debian/rules.defs
---- gcc-4.0-4.0.old/debian/rules.defs	2004-09-23 13:10:05.000000000 +0200
-+++ gcc-4.0-4.0/debian/rules.defs	2004-09-23 13:17:00.000000000 +0200
-@@ -193,7 +193,7 @@
-   with_java := yes
+diff -ur gcc-4.0-4.0ds0.old/debian/rules.defs gcc-4.0-4.0ds0/debian/rules.defs
+--- gcc-4.0-4.0ds0.old/debian/rules.defs	2004-11-29 18:54:45.000000000 +0100
++++ gcc-4.0-4.0ds0/debian/rules.defs	2004-11-29 18:58:58.000000000 +0100
+@@ -198,7 +198,7 @@
  endif
  
+ java_no_cpus := mips mipsel
 -java_no_systems := hurd-i386 kfreebsd-gnu knetbsd-gnu netbsd-elf-gnu
 +java_no_systems := hurd-i386 knetbsd-gnu netbsdelf-gnu
- ifneq (, $(filter $(DEB_TARGET_GNU_SYSTEM),$(java_no_systems)))
-   with_java := disabled for $(DEB_TARGET_GNU_SYSTEM)
- endif
-@@ -245,7 +245,7 @@
- ifeq ($(with_common_libs),yes)
-   with_libffi := yes
-   no_ffi_cpus :=
--  no_ffi_systems := hurd-i386 kfreebsd-gnu knetbsd-gnu netbsd-elf-gnu
-+  no_ffi_systems := hurd-i386 netbsdelf-gnu
-   ifneq ($(with_java),yes)
-     ifneq (, $(filter $(DEB_TARGET_GNU_CPU),$(no_ffi_cpus)))
-       with_libffi := disabled for architecure $(DEB_TARGET_GNU_CPU)
-@@ -433,7 +433,7 @@
- 
- with_libgnat := yes
- ada_no_cpus := arm m68k
--ada_no_systems := hurd-i386 kfreebsd-gnu knetbsd-gnu netbsd-elf-gnu
-+ada_no_systems := hurd-i386 kfreebsd-gnu knetbsd-gnu netbsdelf-gnu
- ifneq (, $(filter $(DEB_TARGET_GNU_CPU),$(ada_no_cpus)))
-   with_ada := disabled for architecure $(DEB_TARGET_GNU_CPU)
- endif
-@@ -516,7 +516,7 @@
- ifdef DEB_CROSS
-   with_check := disabled for cross compiler package
- endif
--check_no_systems := hurd-i386 kfreebsd-gnu knetbsd-gnu
-+check_no_systems := hurd-i386
- ifneq (, $(filter $(DEB_TARGET_GNU_SYSTEM),$(check_no_systems)))
-   with_check := disabled for $(DEB_TARGET_GNU_SYSTEM)
+ ifneq (, $(filter $(DEB_TARGET_GNU_CPU),$(java_no_cpus)))
+   with_java := disabled for architecture $(DEB_TARGET_GNU_CPU)
  endif
