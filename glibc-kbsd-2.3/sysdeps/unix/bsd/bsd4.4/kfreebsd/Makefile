@@ -3,9 +3,6 @@
 # in localedata/tst-fmon.sh correctly.
 SHELL = bash
 
-# Use the kfreebsd-headers directory chosen at configuration time.
-kfreebsd-headers := $(shell cat $(common-objpfx)kfreebsd-headers)
-
 # Additional header files to be installed in $prefix/include:
 
 ifeq ($(subdir),misc)
@@ -106,35 +103,3 @@ $(objpfx)ld.so: $(objpfx)mkexec
 POSTPROCESS_LD_SO = ; $(objpfx)mkexec $(objpfx)ld.so
 
 endif
-
-# Installation of kernel headers.
-
-kernelheaderdir = $(kfreebsd-headers)
-
-kernelheaders := \
-  $(patsubst $(kernelheaderdir)/%, %, \
-    $(filter-out \
-      $(kernelheaderdir)/alpha/% \
-      $(kernelheaderdir)/i386/%, \
-      $(wildcard $(kernelheaderdir)/*.h) \
-      $(wildcard $(kernelheaderdir)/*/*.h) \
-      $(wildcard $(kernelheaderdir)/*/*/*.h) \
-      $(wildcard $(kernelheaderdir)/*/*/*/*.h)))
-
-kernelcpuheaders := \
-  $(patsubst $(kernelcpuheaderdir)/%, %, \
-    $(wildcard $(kernelcpuheaderdir)/*.h) \
-    $(wildcard $(kernelcpuheaderdir)/*/*.h) \
-    $(wildcard $(kernelcpuheaderdir)/*/*/*.h))
-
-install-headers-nosubdir: \
-    $(addprefix $(inst_includedir)/, $(kernelheaders) $(kernelcpuheaders))
-
-$(addprefix $(inst_includedir)/,$(kernelheaders)): \
-    $(inst_includedir)/%: $(kernelheaderdir)/% $(+force)
-	$(do-install)
-
-$(addprefix $(inst_includedir)/,$(kernelcpuheaders)): \
-    $(inst_includedir)/%: $(kernelcpuheaderdir)/% $(+force)
-	$(do-install)
-

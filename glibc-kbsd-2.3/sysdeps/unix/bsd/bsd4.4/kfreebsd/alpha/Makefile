@@ -14,8 +14,3 @@ endif
 ifeq ($(subdir),math)
 sysdep_routines += ieee_get_fp_control ieee_set_fp_control
 endif
-
-# Installation of kernel headers.
-
-kernelcpuheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/kernel-include/import/alpha
-kernelorigcpuheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/kernel-include/orig/alpha

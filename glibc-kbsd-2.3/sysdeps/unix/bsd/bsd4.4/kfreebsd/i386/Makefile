@@ -15,8 +15,3 @@ sysdep_routines += i386_get_ioperm i386_set_ioperm
 # For <sys/vm86.h>.
 sysdep_routines += i386_vm86
 endif
-
-# Installation of kernel headers.
-
-kernelcpuheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/kernel-include/import/i386
-kernelorigcpuheaderdir = sysdeps/unix/bsd/bsd4.4/kfreebsd/kernel-include/orig/i386
