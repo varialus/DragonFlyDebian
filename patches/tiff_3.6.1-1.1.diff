@@ -1,0 +1,36 @@
+diff -ur tiff-3.6.1.old/configure tiff-3.6.1/configure
+--- tiff-3.6.1.old/configure	2004-08-01 23:06:08.000000000 +0200
++++ tiff-3.6.1/configure	2004-08-01 23:16:38.000000000 +0200
+@@ -1223,7 +1223,7 @@
+         DSOOPTS='-dynamiclib -undefined error'
+         DSO=DARWIN
+         ;;
+-    *-linux*|*-gnu*)
++    *-linux*|*-gnu*|*-k*bsd*-gnu)
+ 	DSOSUF=so.${DIST_MAJOR}
+ 	DSOSUF_VERSION=${DSOSUF}.${DIST_MINOR}.${DIST_POINT}
+ 
+@@ -1411,7 +1411,8 @@
+     case $TARGET in
+     *-bsdi*|*-netbsd*)		MANSCHEME=bsd-nroff-gzip-0.gz;;
+     *-freebsd*)			MANSCHEME=bsd-source-cat;;
+-    *-linux*)			MANSCHEME=bsd-source-cat;;
++    *-linux*|*-gnu*|*-k*bsd*-gnu)
++				MANSCHEME=bsd-source-cat;;
+     *-ultrix*)			MANSCHEME=bsd-source-cat;;
+     *-sunos*)			MANSCHEME=bsd-source-cat-strip;;
+     *-sysv[234]*)		MANSCHEME=sysv-source-cat-strip;;
+diff -ur tiff-3.6.1.old/debian/rules tiff-3.6.1/debian/rules
+--- tiff-3.6.1.old/debian/rules	2004-08-01 23:06:08.000000000 +0200
++++ tiff-3.6.1/debian/rules	2004-08-01 23:16:50.000000000 +0200
+@@ -19,10 +19,6 @@
+ DEB_BUILD_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_SYSTEM)
+ DEB_BUILD_GNU_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
+ 
+-ifneq "$(findstring netbsd,$(DEB_BUILD_GNU_SYSTEM))" ""
+-TARGET_ARCH := "--target=$(DEB_BUILD_GNU_CPU)-fake-gnu"
+-endif
+-
+ build: build-stamp
+ build-stamp: configure
+ 	dh_testdir
