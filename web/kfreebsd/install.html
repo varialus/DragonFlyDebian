@@ -35,7 +35,7 @@ Add more space if you plan on building packages etc.
 <br>This means installing FreeBSD first is no longer required, but, for now you will need a working Linux or BSD system to partition your disk.
 
 <p>Currently, the live CD does not have support for partitioning, so you'll need to setup your partitions from a working system before installing.
-<br>You can do this from an existing FreeBSD installation, or with <a href="http://www.gnu.org/software/parted/parted.html">GNU Parted</a> from within Linux. 
+<br>You can do this from a FreeBSD CD or existing installation, or with <a href="http://www.gnu.org/software/parted/parted.html">GNU Parted</a> from within Linux. 
 Which software you use to do this isn't a huge deal, as long as it's capable of creating the required root and swap partitions etc.
 
 <p><b>Installing</b>
@@ -62,7 +62,7 @@ Which software you use to do this isn't a huge deal, as long as it's capable of 
 
 <p>This might take a while on some machines, so be patient.
 
-<p>Exit the chroot and edit /mnt/etc/fstab with nano to match your system's configuration. Set TERM to cons25 before you use nano.
+<p>Exit the chroot and edit /mnt/etc/fstab with nano to match your system's configuration.
 
 <p>Now unmount everything and reboot. 
 
@@ -77,11 +77,9 @@ Which software you use to do this isn't a huge deal, as long as it's capable of 
 <br>root (device)
 <br>kernel /boot/loader</i>
 
+<a name="post"></a>
 <p><b>Post installation notes and bugs</b>
 <p>Once you've got the base system running, you'll need to do and know a few things.
-
-<p>The terminal is slightly broken. Ctrl-C and Ctrl-Z don't work and the TERM variable is not set. It should be set to "cons25".
-<br>A workaround for the Ctrl problem is to use screen. You won't have any trouble if you're ssh'ing to the GNU/kFreeBSD system.
 
 <p>If you intend on building packages make sure you have the latest autotools-dev package installed. Many packages have outdated config.* files. 
 <br>See <a href="http://glibc-bsd.alioth.debian.org/kfreebsd/porting/PORTING">PORTING</a> for more information.
