@@ -1,0 +1,121 @@
+<html>
+<head>
+<title>Installing Debian GNU/kFreeBSD - Installing</title>
+</head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000ff" alink="#0000ff" vlink="#880088">
+<center>
+<table width="70%" border=0 cellpadding="0" cellspacing="0">
+<tr>
+<th colspan="3" align="center"><h4>Installing Debian GNU/kFreeBSD</h4></th>
+</tr>
+
+<tr>
+<td width="10%" align="left" valign="bottom"><a href="sysreq.html">Prev</a></td>
+
+<td width="80%" align="center" valign="bottom">Installing</td>
+
+<td width="10%" align="right" valign="bottom"><a href="post.html">Next</a></td>
+</tr>
+</table>
+
+<hr align="center" width="70%">
+
+<table width="70%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<th colspan="3" align="left"><a name="pre"></a><font color="#990000"><h3>Pre-installation notes</h3></font></th>
+</tr>
+
+<tr>
+<td width="70%" align="left">
+<p><b>Important</b> - Make sure you've read <a href="sysreq.html#media">"Installation media"</a> before you continue. 
+It contains important partitioning related information.
+
+</p>
+</td>
+</tr>
+
+<tr>
+<th colspan="3" align="left">
+<a name="base"></a><font color="#990000"><h3>Installing the base system</h3></font></th>
+</tr>
+
+<tr>
+<td width="70%" align="left">
+<p>Once you've finished setting up your partitions, boot the Debian GNU/kFreeBSD live CD.</p>
+
+<p>When the live CD is finished booting, you should be presented with a root shell.
+<br>Now we can create our filesystem and mount it.
+</p>
+
+<p><font color="#461b7e" size=-1><b># mkfs.ufs -O 2 -U /dev/adXsYa</b></font></p>
+<p><font color="#461b7e" size=-1><b># mount /dev/adXsYa /mnt</b></font></p>
+
+<p>X is disk, Y is partition. Example: /dev/ad0s1a. This would be the first partition on the system's first disk. 0 is the disk, 1 is the slice and a is the partition.</p>
+
+<p>Now extract the base tarball.</p>
+
+<p><font color="#461b7e" size=-1><b># tar -C /mnt --same-owner -xzpf /root/i386-kfreebsd-gnu.tar.gz</b></font></p>
+
+<p>Chroot in to the extracted system.</p>
+
+<p><font color="#461b7e" size=-1><b># chroot /mnt</b></font></p>
+
+<p>Now all the base packages need to be installed and configured.</p>
+
+<p><font color="#461b7e" size=-1><b># /native-install</b></font></p>
+
+<p>This might take a while on slower machines.</p>
+
+<p>Exit the chroot and edit /mnt/etc/fstab with nano to match your system's configuration.</p>
+
+<p>Now unmount everything and reboot.</p>
+
+<p><font color="#461b7e" size=-1><b># umount /mnt/dev</b></font></p>
+
+<p><font color="#461b7e" size=-1><b># umount /mnt</b></font></p>
+
+<p><font color="#461b7e" size=-1><b># reboot</b></font></p>
+
+</td>
+</tr>
+
+<tr>
+<th colspan="3" align="left">
+<a name="grub"></a><font color="#990000"><h3>Boot loader</h3></font>
+</th>
+</tr>
+
+<tr>
+<td width="70%" align="left">
+<p>If you use GRUB as your bootloader, the following configuration can be used to boot Debian GNU/kFreeBSD.
+
+<p>
+<font color="#461b7e" size=-1><b>
+<br>title Debian GNU/kFreeBSD
+<br>root (device)
+<br>kernel /boot/loader</b></font>
+
+</p>
+
+
+</p>
+
+</td>
+</tr>
+
+</table>
+
+<p></p><br>
+
+<hr align="center" width="70%">
+<table width="70%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td width="10%" align="left" valign="top"><a href="sysreq.html">Prev</a></td>
+<td width="80%" align="center" valign="top"><a href="index.html">Home</a></td>
+<td width="10%" align="right" valign="top"><a href="post.html">Next</a></td>
+</tr>
+
+</table>
+
+</body>
+</html>
