@@ -1,6 +1,19 @@
+diff -Nur sysvinit-2.85.old/debian/changelog sysvinit-2.85/debian/changelog
+--- sysvinit-2.85.old/debian/changelog	2004-06-20 15:24:11.000000000 +0200
++++ sysvinit-2.85/debian/changelog	2004-06-20 15:32:27.000000000 +0200
+@@ -1,3 +1,9 @@
++sysvinit (2.85-22+kbsd) unreleased; urgency=low
++
++  * foo
++
++ -- Robert Millan <rmh@debian.org>  Sun, 20 Jun 2004 15:32:14 +0200
++
+ sysvinit (2.85-22) unstable; urgency=medium
+ 
+   * Fix typo in /etc/init.d/halt (closes: #255133)
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh
---- sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh	2004-06-06 04:16:45.000000000 +0200
-+++ sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh	2004-06-06 03:52:03.000000000 +0200
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh	2004-06-20 15:24:11.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/checkroot.sh	2004-06-20 15:32:05.000000000 +0200
 @@ -7,6 +7,7 @@
  SULOGIN=no
  VERBOSE=yes
@@ -9,16 +22,16 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh sysvinit-
  
  PATH=/lib/init:/bin:/sbin
  
-@@ -180,7 +181,7 @@
+@@ -184,7 +185,7 @@
  	#
  	# Ensure that root is quiescent and read-only before fsck'ing.
  	#
--	if ! mount -n -o remount,ro /
-+	if ! mount $mount_no_mtab $mount_remount,ro /
+-	if ! mount -n -o remount,ro $rootdev /
++	if ! mount $mount_no_mtab $mount_remount,ro $rootdev /
  	then
      		echo -n "*** ERROR!  Cannot fsck root fs because it is "
  		echo    "not mounted read-only!"
-@@ -241,7 +242,7 @@
+@@ -245,7 +246,7 @@
  	echo "that the root file system is currently mounted read-only.  To"
  	echo "remount it read-write:"
  	echo
@@ -27,31 +40,31 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/checkroot.sh sysvinit-
  	echo
  	echo "CONTROL-D will exit from this shell and REBOOT the system."
  	echo
-@@ -263,7 +264,7 @@
+@@ -267,7 +268,7 @@
  #
  #	Remount root to final mode (rw or ro).
  #	
--mount -n -o remount,$rootmode /
-+mount $mount_no_mtab $mount_remount,$rootmode /
+-mount -n -o remount,$rootopts,$rootmode $fstabroot /
++mount $mount_no_mtab $mount_remount,$rootopts,$rootmode $fstabroot /
  
  #
  #	We only create/modify /etc/mtab if the location where it is
-@@ -290,9 +291,9 @@
+@@ -294,9 +295,9 @@
  
  if [ "$init_mtab"  = yes ]
  then
--	[ "$roottype" != none ] && mount -f -o remount /
+-	[ "$roottype" != none ] && mount -f -o $rootopts $fstabroot /
 -	[ -n "$devfs" ] && mount -f $devfs
 -	. /etc/init.d/mountvirtfs
-+	[ "$roottype" != none ] && mount -f $mount_remount,$rootmode /
++	[ "$roottype" != none ] && mount -f $mount_remount,$rootopts,$rootmode $fstabroot /
 +	[ $SYSTEM = linux-compat ] && [ -n "$devfs" ] && mount -f $devfs
 +	[ $SYSTEM = linux-compat ] && . /etc/init.d/mountvirtfs
  fi
  
  #
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/halt sysvinit-2.85/debian/initscripts/etc/init.d/halt
---- sysvinit-2.85.old/debian/initscripts/etc/init.d/halt	2004-06-06 04:16:45.000000000 +0200
-+++ sysvinit-2.85/debian/initscripts/etc/init.d/halt	2004-06-06 03:52:03.000000000 +0200
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/halt	2004-06-20 15:24:11.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/halt	2004-06-20 15:26:08.000000000 +0200
 @@ -25,6 +25,8 @@
  	esac
  fi
@@ -59,7 +72,7 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/halt sysvinit-2.85/deb
 +. /etc/init.d/rcArch
 +
  # See if we need to cut the power.
- if [ "$INIT_HALT" = "POWEROFF" -a -x /etc/init.d/ups-monitor ]
+ if [ "$INIT_HALT" = "POWEROFF" ] && [ -x /etc/init.d/ups-monitor ]
  then
 @@ -45,6 +47,6 @@
  	poweroff=""
@@ -71,7 +84,7 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/halt sysvinit-2.85/deb
  : exit 0
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/rcArch sysvinit-2.85/debian/initscripts/etc/init.d/rcArch
 --- sysvinit-2.85.old/debian/initscripts/etc/init.d/rcArch	1970-01-01 01:00:00.000000000 +0100
-+++ sysvinit-2.85/debian/initscripts/etc/init.d/rcArch	2004-06-06 03:52:03.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/rcArch	2004-06-20 15:26:08.000000000 +0200
 @@ -0,0 +1,36 @@
 +# Arch specific options
 +
@@ -110,8 +123,8 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/rcArch sysvinit-2.85/d
 +fi
 +
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/reboot sysvinit-2.85/debian/initscripts/etc/init.d/reboot
---- sysvinit-2.85.old/debian/initscripts/etc/init.d/reboot	2004-06-06 04:16:45.000000000 +0200
-+++ sysvinit-2.85/debian/initscripts/etc/init.d/reboot	2004-06-06 03:52:03.000000000 +0200
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/reboot	2004-06-20 15:24:11.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/reboot	2004-06-20 15:26:08.000000000 +0200
 @@ -7,5 +7,7 @@
  
  PATH=/sbin:/bin:/usr/sbin:/usr/bin
@@ -122,8 +135,8 @@ diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/reboot sysvinit-2.85/d
 -reboot -d -f -i
 +reboot -d -f $halt_ifdown
 diff -Nur sysvinit-2.85.old/debian/initscripts/etc/init.d/umountfs sysvinit-2.85/debian/initscripts/etc/init.d/umountfs
---- sysvinit-2.85.old/debian/initscripts/etc/init.d/umountfs	2004-06-06 04:16:45.000000000 +0200
-+++ sysvinit-2.85/debian/initscripts/etc/init.d/umountfs	2004-06-06 03:52:03.000000000 +0200
+--- sysvinit-2.85.old/debian/initscripts/etc/init.d/umountfs	2004-06-20 15:24:11.000000000 +0200
++++ sysvinit-2.85/debian/initscripts/etc/init.d/umountfs	2004-06-20 15:26:08.000000000 +0200
 @@ -7,19 +7,23 @@
  
  PATH=/sbin:/bin:/usr/sbin:/usr/bin
