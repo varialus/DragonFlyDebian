@@ -7,21 +7,21 @@
 
 set -ex
 
-for i in mkisofs crosshurd fakeroot ; do
-  if ! dpkg -s ${i} > /dev/null ; then
-    echo Install ${i} and try again
-    exit 1
-  fi
-done
-
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
   fakeroot $0 $@
   exit 0
 fi
 
+for i in mkisofs crosshurd ; do
+  if ! dpkg -s ${i} > /dev/null ; then
+    echo Install ${i} and try again
+    exit 1
+  fi
+done
+
 version=9
-cpu=`dpkg-architecture -qDEB_BUILD_GNU_CPU`
+cpu="i386"
 system="kfreebsd-gnu"
 uname="GNU/kFreeBSD"
 tmp1=`tempfile` && rm -f ${tmp1} && mkdir -p ${tmp1}
@@ -87,14 +87,25 @@ mkdir -p ramdisk
 cat > root/writable.sh << EOF
 #!/bin/sh
 set -e
-dirs="etc home mnt tmp var"
 mdconfig -a -t malloc -o compress -s 32m -u md0
 mkfs.ufs /dev/md0
 mount /dev/md0 /ramdisk
-for i in ${dirs} ; do
-  mv /${i} /ramdisk/${i}
-  ln -s /ramdisk/${i} /${i}
+for i in /* ; do
+  case ${i} in
+    /bin|/usr|/boot|/lib|/sbin|/root)
+      mkdir -p /ramdisk/${i}
+      mount -t nullfs /${i} /ramdisk/${i}
+    ;;
+    /dev)
+      mkdir -p /ramdisk/dev
+      mkdir -t devfs devfs /ramdisk/dev
+    ;;
+    /*)
+      cp -a /${i} /ramdisk/${i}
+    ;;
+  esac
 done
+chroot /ramdisk
 EOF
 chmod +x root/writable.sh
 
