@@ -102,5 +102,6 @@ finish() {
 
 # Glibc
 unpack glibc-${TARBALL_VERSION}.tar.bz2 in . creating glibc-${TARBALL_VERSION}
+cp -a /usr/src/glibc-kbsd/sysdeps on glibc-${TARBALL_VERSION}/
 finish glibc-${TARBALL_VERSION} ./glibc-${VERSION}
 cp -f /usr/share/misc/config.* ./glibc-${VERSION}/scripts/
