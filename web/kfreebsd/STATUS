@@ -14,16 +14,22 @@ Current most Urgent things to solve
 
  - FIXME: DNS resolving is broken, make sure /etc/hosts has everything you
    need. MX resolving won't work so MTA doesn't as well [working on it].
- - FIXME: ps is broken.
-   (Workaround: Just copy the /bin/ps from the FreeBSD chroot)
- - FIXME: df is broken when not specifying any mount point)
+ - FIXME: df is broken when not specifying any mount point). We'll fix this
+   by implementing a portable mount that handles mtab. I [rmh] have some
+   preliminar work on this already.
    (Workaround: Just copy the /bin/df from the FreeBSD chroot)
  - FIXME: inetutils, /var/log/news missing, no /dev/xconsole.
    [ Fixes on alioth cvs repo ]
+ - FIXME: TERM variable not set. It should be "cons25" but we don't know
+   where is the correct place to set it yet (init? getty? login?)
  - FIXME: terminal broken, does not handle Ctrl-C nor Ctrl-Z.
    [ It may be a bad tty initialized by init ]
+   (Workaround: it seems to work fine through screen)
  - FIXME: gdb: semi-broken. strace works.
+ - FIXME: start-stop-daemon does not stop daemons. ?? We definitely need
+   a portable libps implementation.
+ - FIXME: ipv6 broken. from glibc. ?? This could be related to the DNS bug.
 
- - FIXME: start-stop-daemon does not stop daemons. ??
- - FIXME: ipv6 broken. from glibc. ??
-
+ - When you setup a build environment don't forget to install autotools-dev.
+   Many packages have outdated config.* and only auto-update when those are
+   available (some never auto-update).
