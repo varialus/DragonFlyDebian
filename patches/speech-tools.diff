@@ -1,0 +1,181 @@
+
+Status: in BTS.
+
+diff -ur speech-tools-1.2.3.old/config/compilers/gcc27emx.mak speech-tools-1.2.3/config/compilers/gcc27emx.mak
+--- speech-tools-1.2.3.old/config/compilers/gcc27emx.mak	2001-04-04 13:55:32.000000000 +0200
++++ speech-tools-1.2.3/config/compilers/gcc27emx.mak	2004-09-20 10:39:51.000000000 +0200
+@@ -45,7 +45,7 @@
+ COMPILER_DESC=FSF gcc2.7 EMX
+ 
+ CC = gcc
+-CXX = gcc
++CXX = g++
+ 
+ COMPILERLIBS = $(COMPILER_LIBS_DIR:%=-L%) -lstdcpp
+ 
+diff -ur speech-tools-1.2.3.old/config/compilers/gcc28.mak speech-tools-1.2.3/config/compilers/gcc28.mak
+--- speech-tools-1.2.3.old/config/compilers/gcc28.mak	2001-04-04 13:55:32.000000000 +0200
++++ speech-tools-1.2.3/config/compilers/gcc28.mak	2004-09-20 10:38:38.000000000 +0200
+@@ -45,7 +45,7 @@
+ endif
+ 
+ CC= $(GCC28)
+-CXX = $(GCC28)
++CXX = g++
+ 
+ COMPILER_DESC=FSF gcc2.8
+ 
+@@ -56,7 +56,7 @@
+ # gcc-2.8.1 has problems in optimizing some files
+ HONOUR_NOOPT=1
+ 
+-COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lstdc++
++COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%)
+ 
+ 
+ 
+diff -ur speech-tools-1.2.3.old/config/compilers/gcc295.mak speech-tools-1.2.3/config/compilers/gcc295.mak
+--- speech-tools-1.2.3.old/config/compilers/gcc295.mak	2004-09-20 09:25:03.000000000 +0200
++++ speech-tools-1.2.3/config/compilers/gcc295.mak	2004-09-20 10:38:03.000000000 +0200
+@@ -47,7 +47,7 @@
+ endif
+ 
+ CC= $(GCC295)
+-CXX = $(GCC295)
++CXX = g++
+ 
+ # We do not actually need -fguiding-decls, because the code is in fact
+ # correct despite the bogus in-class declarations of templated ostream
+@@ -67,7 +67,7 @@
+ 
+ STATIC_LINKFLAGS = -Dstatic
+ 
+-COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lstdc++
++COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%)
+ 
+ ifndef GCC295_MAKE_SHARED_LIB
+     MAKE_SHARED_LIB = gcc -shared -fno-shared-data -o XXX -Wl,-soname -Wl,YYY
+diff -ur speech-tools-1.2.3.old/config/compilers/gcc296.mak speech-tools-1.2.3/config/compilers/gcc296.mak
+--- speech-tools-1.2.3.old/config/compilers/gcc296.mak	2001-04-04 15:11:27.000000000 +0200
++++ speech-tools-1.2.3/config/compilers/gcc296.mak	2004-09-20 10:38:20.000000000 +0200
+@@ -47,13 +47,13 @@
+ endif
+ 
+ CC= $(GCC296)
+-CXX = $(GCC296)
++CXX = g++
+ 
+ WARN_CXXFLAGS  +=  -Wno-non-template-friend
+ 
+ STATIC_LINKFLAGS = -Dstatic
+ 
+-COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lstdc++
++COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%)
+ 
+ 
+ 
+diff -ur speech-tools-1.2.3.old/config/compilers/gcc30.mak speech-tools-1.2.3/config/compilers/gcc30.mak
+--- speech-tools-1.2.3.old/config/compilers/gcc30.mak	2001-06-18 19:42:17.000000000 +0200
++++ speech-tools-1.2.3/config/compilers/gcc30.mak	2004-09-20 10:38:52.000000000 +0200
+@@ -47,13 +47,13 @@
+ endif
+ 
+ CC= $(GCC30)
+-CXX = $(GCC30)
++CXX = g++
+ 
+ WARN_CXXFLAGS  +=  -Wno-non-template-friend
+ 
+ STATIC_LINKFLAGS = -Dstatic
+ 
+-COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lstdc++
++COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%)
+ 
+ 
+ 
+diff -ur speech-tools-1.2.3.old/config/compilers/gcc31.mak speech-tools-1.2.3/config/compilers/gcc31.mak
+--- speech-tools-1.2.3.old/config/compilers/gcc31.mak	2002-08-26 00:07:45.000000000 +0200
++++ speech-tools-1.2.3/config/compilers/gcc31.mak	2004-09-20 10:39:07.000000000 +0200
+@@ -47,13 +47,13 @@
+ endif
+ 
+ CC= $(GCC31)
+-CXX = $(GCC31)
++CXX = g++
+ 
+ WARN_CXXFLAGS  +=  -Wno-non-template-friend
+ 
+ STATIC_LINKFLAGS = -Dstatic
+ 
+-COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lstdc++
++COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%)
+ 
+ 
+ 
+diff -ur speech-tools-1.2.3.old/config/compilers/gcc32.mak speech-tools-1.2.3/config/compilers/gcc32.mak
+--- speech-tools-1.2.3.old/config/compilers/gcc32.mak	2002-12-26 23:16:26.000000000 +0100
++++ speech-tools-1.2.3/config/compilers/gcc32.mak	2004-09-20 10:18:22.000000000 +0200
+@@ -55,7 +55,7 @@
+ 
+ MAKE_DEPEND = $(CC) -MM $(INCLUDES) $(WARN_CXXFLAGS) $(TEMPLATES) $(TEMPLATE_SPECIFIC)
+ 
+-COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lstdc++
++COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%)
+ 
+ 
+ 
+diff -ur speech-tools-1.2.3.old/config/compilers/gcc_defaults.mak speech-tools-1.2.3/config/compilers/gcc_defaults.mak
+--- speech-tools-1.2.3.old/config/compilers/gcc_defaults.mak	2004-09-20 09:25:03.000000000 +0200
++++ speech-tools-1.2.3/config/compilers/gcc_defaults.mak	2004-09-20 09:47:39.000000000 +0200
+@@ -39,7 +39,7 @@
+  ###########################################################################
+ 
+ CC=gcc
+-CXX =gcc
++CXX=g++
+ 
+ COMPILER_DESC=FSF gcc
+ COMPILER_VERSION_COMMAND=$(CXX) -v 2>&1 | tail -1 | sed -e 's/^....//'
+@@ -96,7 +96,7 @@
+ ## The -lgcc here is redundant - gcc does this anyway - but it
+ ## helps java know what needs to be loaded.
+ 
+-COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lstdc++ -lgcc
++COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lgcc
+ 
+ ## special ways of doing things, blank means default
+ 
+diff -ur speech-tools-1.2.3.old/config/system.sh speech-tools-1.2.3/config/system.sh
+--- speech-tools-1.2.3.old/config/system.sh	2002-12-27 19:39:26.000000000 +0100
++++ speech-tools-1.2.3/config/system.sh	2004-09-20 09:36:47.000000000 +0200
+@@ -60,8 +60,7 @@
+ 	sed -e 's/^\([^.]*\)\(\.[^-. ]*\).*/\1\2/'`
+ 
+ # Sort out various flavours of Linux
+-if [ "$OSTYPE" = Linux ]
+-    then
++case "$OSTYPE" in Linux|GNU|GNU/*)
+     if [ -f "/etc/redhat-release" ]
+ 	then
+ 	OSTYPE=RedHatLinux
+@@ -74,7 +73,8 @@
+ 	# Generic unknown GNU/Linux system.
+ 	OSTYPE=Linux
+     fi
+-fi
++;;
++esac
+ 
+ # Make sure we actually have a .mak file for it, otherwise fall back
+ # to sensible defaults (for example, kernel version and architecture
+diff -ur speech-tools-1.2.3.old/configure.in speech-tools-1.2.3/configure.in
+--- speech-tools-1.2.3.old/configure.in	2002-12-28 12:57:31.000000000 +0100
++++ speech-tools-1.2.3/configure.in	2004-09-20 09:43:23.000000000 +0200
+@@ -34,6 +34,7 @@
+ 
+ AC_CANONICAL_SYSTEM
+ AC_PROG_CC
++AC_PROG_CXX
+ if test "x$GCC" = "xyes"; then
+ 	CFLAGS="$CFLAGS -Wall"
+ fi

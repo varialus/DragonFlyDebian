@@ -1,0 +1,48 @@
+
+Status: dirty
+
+diff -ur -x changelog swfdec-0.2.2.old/debian/control swfdec-0.2.2/debian/control
+--- swfdec-0.2.2.old/debian/control	2004-09-20 14:29:28.000000000 +0200
++++ swfdec-0.2.2/debian/control	2004-09-20 14:23:36.000000000 +0200
+@@ -1,7 +1,7 @@
+ Source: swfdec
+ Priority: optional
+ Maintainer: David Schleef <ds@schleef.org>
+-Build-Depends: debhelper (>> 3.0.0), libgtk2.0-dev (>> 2.1.2), mozilla-dev, libart-2.0-dev, zlib1g-dev, libmad0-dev, libsdl1.2-dev
++Build-Depends: debhelper (>> 3.0.0), libgtk2.0-dev (>> 2.1.2), libart-2.0-dev, zlib1g-dev, libmad0-dev, libsdl1.2-dev
+ Standards-Version: 3.5.6
+ 
+ Package: libswfdec-dev
+diff -ur -x changelog swfdec-0.2.2.old/debian/rules swfdec-0.2.2/debian/rules
+--- swfdec-0.2.2.old/debian/rules	2004-09-20 14:29:28.000000000 +0200
++++ swfdec-0.2.2/debian/rules	2004-09-20 14:24:45.000000000 +0200
+@@ -69,18 +69,6 @@
+ 	# Add here commands to install the package into debian/tmp
+ 	$(MAKE) install prefix=$(CURDIR)/debian/tmp/usr
+ 
+-	mkdir -p debian/tmp/usr/lib/mozilla-snapshot/plugins
+-	cd debian/tmp/usr/lib/mozilla-snapshot/plugins && ln -s ../../mozilla/plugins/libmozswfdec.so .
+-	mkdir -p debian/tmp/usr/lib/mozilla-firefox/plugins
+-	cd debian/tmp/usr/lib/mozilla-firefox/plugins && ln -s ../../mozilla/plugins/libmozswfdec.so .
+-
+-	mkdir -p debian/tmp/usr/lib/debug/
+-	cd debian/tmp/usr/lib && \
+-		objcopy --only-keep-debug libswfdec.so.0.0.0 \
+-			debug/libswfdec.so.0.0.0.dbg && \
+-		objcopy --add-gnu-debuglink=debug/libswfdec.so.0.0.0.dbg \
+-			libswfdec.so.0.0.0
+-
+ # Build architecture-independent files here.
+ binary-indep: build install
+ # We have nothing to do by default.
+diff -ur -x changelog swfdec-0.2.2.old/debian/swf-player.files swfdec-0.2.2/debian/swf-player.files
+--- swfdec-0.2.2.old/debian/swf-player.files	2004-09-20 14:29:28.000000000 +0200
++++ swfdec-0.2.2/debian/swf-player.files	2004-09-20 14:24:57.000000000 +0200
+@@ -1,7 +1,4 @@
+ usr/bin/*
+ usr/share/man/*
+-usr/lib/mozilla/plugins/*.so
+ usr/lib/gtk-2.0/*/loaders/*.so
+ usr/lib/gtk-2.0/*/loaders/*.la
+-usr/lib/mozilla-snapshot/plugins/*.so
+-usr/lib/mozilla-firefox/plugins/*.so
