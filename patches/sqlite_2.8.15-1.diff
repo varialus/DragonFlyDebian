@@ -1,0 +1,23 @@
+diff -ur sqlite-2.8.15.old/Makefile.in sqlite-2.8.15/Makefile.in
+--- sqlite-2.8.15.old/Makefile.in	2004-03-27 00:16:32.000000000 +0100
++++ sqlite-2.8.15/Makefile.in	2004-08-08 00:38:01.000000000 +0200
+@@ -38,7 +38,7 @@
+ 
+ # libtool compile/link/install
+ LTCOMPILE = $(LIBTOOL) --mode=compile $(TCC)
+-LTLINK = $(LIBTOOL) --mode=link $(TCC)
++LTLINK = $(LIBTOOL) --mode=link $(TCC) @TARGET_LIBS@
+ LTINSTALL = $(LIBTOOL) --mode=install $(INSTALL)
+ 
+ # Compiler options needed for programs that use the TCL library.
+diff -ur sqlite-2.8.15.old/debian/rules sqlite-2.8.15/debian/rules
+--- sqlite-2.8.15.old/debian/rules	2004-08-08 00:27:31.000000000 +0200
++++ sqlite-2.8.15/debian/rules	2004-08-08 00:38:01.000000000 +0200
+@@ -24,6 +24,7 @@
+ 
+ DEB_CONFIGURE_EXTRA_FLAGS = config_TARGET_TCL_INC="-I/usr/include/tcl8.4" \
+ 			    config_BUILD_CFLAGS="$(CFLAGS) -DTHREADSAFE=1" \
++			    config_TARGET_LIBS="-lpthread" \
+ 			    --enable-utf8
+ 
+ DEB_BUILD_MAKE_TARGET = all libtclsqlite.la doc

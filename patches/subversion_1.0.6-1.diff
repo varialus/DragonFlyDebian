@@ -1,0 +1,197 @@
+
+Description: Disable swig b-d for building subversion
+Status: Won't merge. Port swig!
+
+diff -x control -Nur subversion-1.0.6.old/debian/control.in subversion-1.0.6/debian/control.in
+--- subversion-1.0.6.old/debian/control.in	2004-08-08 06:22:16.000000000 +0200
++++ subversion-1.0.6/debian/control.in	2004-08-07 16:07:50.000000000 +0200
+@@ -2,7 +2,7 @@
+ Section: devel
+ Priority: optional
+ Maintainer: David Kimdon <dwhedon@debian.org>
+-Build-Depends: debhelper (>=3.0.18), libneon24-dev (>=0.24.7), apache2-threaded-dev (>=2.0.50-5), libapr0-dev (>=2.0.50-5), libdb4.2-dev, libtool (>=1.4), libexpat1-dev, zlib1g-dev, bison, patch, python, time, python@PYTHON_VER@-dev, autotools-dev, autoconf (>=2.53), swig (>=1.3.21-2), libsasl2-dev, docbook-xsl, xsltproc, perl (>= 5.6.0-16), cdbs, quilt (>=0.30-4), libperl-dev, libkrb5-dev
++Build-Depends: debhelper (>=3.0.18), libneon24-dev (>=0.24.7), apache2-threaded-dev (>=2.0.50-5), libapr0-dev (>=2.0.50-5), libdb4.2-dev, libtool (>=1.4), libexpat1-dev, zlib1g-dev, bison, patch, python, time, python@PYTHON_VER@-dev, autotools-dev, autoconf (>=2.53), libsasl2-dev, docbook-xsl, xsltproc, perl (>= 5.6.0-16), cdbs, quilt (>=0.30-4), libperl-dev, libkrb5-dev
+ Build-Conflicts: libtool (=1.5-6)
+ Standards-Version: 3.6.1
+ 
+diff -x control -Nur subversion-1.0.6.old/debian/patches/disable_swig.patch subversion-1.0.6/debian/patches/disable_swig.patch
+--- subversion-1.0.6.old/debian/patches/disable_swig.patch	1970-01-01 01:00:00.000000000 +0100
++++ subversion-1.0.6/debian/patches/disable_swig.patch	2004-08-07 19:24:58.000000000 +0200
+@@ -0,0 +1,19 @@
++--- subversion-1.0.6/configure.in~	2003-11-24 16:56:52.000000000 +0100
+++++ subversion-1.0.6/configure.in	2004-08-07 19:24:27.000000000 +0200
++@@ -59,7 +59,6 @@
++ sinclude(build/ac-macros/find_apu.m4)
++ sinclude(build/ac-macros/aprutil.m4)
++ sinclude(build/ac-macros/java.m4)
++-sinclude(build/ac-macros/swig.m4)
++ 
++ 
++ dnl Grab the libtool macros
++@@ -453,8 +452,6 @@
++ 
++ AC_PATH_PROG(PERL, perl, none)
++ 
++-SVN_CHECK_SWIG
++-
++ dnl try to find the "makeinfo" program
++ AC_PATH_PROG(MAKEINFO, makeinfo, [echo cannot run makeinfo])
++ if test "$MAKEINFO" = "echo cannot run makeinfo"; then
+diff -x control -Nur subversion-1.0.6.old/debian/rules subversion-1.0.6/debian/rules
+--- subversion-1.0.6.old/debian/rules	2004-08-08 06:22:16.000000000 +0200
++++ subversion-1.0.6/debian/rules	2004-08-08 00:58:55.000000000 +0200
+@@ -8,9 +8,9 @@
+ include /usr/share/cdbs/1/rules/tarball.mk
+ include /usr/share/cdbs/1/rules/patchsys-quilt.mk
+ 
+-export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+-export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+-export DEB_HOST_ARCH      ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
++export DEB_HOST_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
++export DEB_BUILD_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
++export DEB_HOST_GNU_CPU		?= $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
+ 
+ confflags=  \
+ 		--mandir=\$${prefix}/share/man \
+@@ -23,7 +23,7 @@
+ 		--with-editor=/usr/bin/editor \
+ 		--with-apxs=/usr/bin/apxs2 \
+ 		--disable-mod-activation \
+-		--with-swig=/usr
++		--without-swig
+ 
+ # FOR AUTOCONF 2.52 AND NEWER ONLY
+ ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+@@ -32,20 +32,19 @@
+   confflags += --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+ endif
+ 
+-TESTARCHS=
+-TESTARCHS+=alpha
+-TESTARCHS+=arm 
+-TESTARCHS+=hppa 
+-TESTARCHS+=hurd-i386 
+-TESTARCHS+=i386 
+-TESTARCHS+=ia64 
+-TESTARCHS+=m68k 
+-TESTARCHS+=mips 
+-TESTARCHS+=mipsel 
+-#TESTARCHS+=powerpc 
+-TESTARCHS+=s390 
+-TESTARCHS+=sh 
+-TESTARCHS+=sparc
++TESTCPUS=
++TESTCPUS+=alpha
++TESTCPUS+=arm 
++TESTCPUS+=hppa 
++#TESTCPUS+=i386 
++TESTCPUS+=ia64 
++TESTCPUS+=m68k 
++TESTCPUS+=mips 
++TESTCPUS+=mipsel 
++#TESTCPUS+=powerpc 
++TESTCPUS+=s390 
++TESTCPUS+=sh 
++TESTCPUS+=sparc
+ 
+ # This logic allows subversion to be more easily on woody.
+ # Some versions of libtool and fakeroot give us build failures
+@@ -113,7 +112,7 @@
+ 	ln -s /usr/share/misc/config.guess \
+ 		$(DEB_BUILDDIR)/ac-helpers/config.guess
+ 
+-	cd $(DEB_BUILDDIR) && ./configure \
++	cd $(DEB_BUILDDIR) && autoconf2.50 && ./configure \
+ 		$(confflags) CFLAGS="-g -Wall" \
+ 
+ 	touch $@
+@@ -122,18 +121,7 @@
+ debian/stamp-build: debian/stamp-configure
+ 	dh_testdir
+ 
+-	$(MAKE) -C $(DEB_BUILDDIR) all swig-py \
+-		swig_pydir=/usr/lib/python$(PYTHON_VER)/site-packages/libsvn \
+-		swig_pydir_extra=/usr/lib/python$(PYTHON_VER)/site-packages/svn
+-
+-	# In Bug #220107 it was pointed out that libsvn_swig_py isn't
+-	# linked in a pre-link friendly way.  The ideal would be to find 
+-	# a clean patch to the upstream build system but this will have to 
+-	# do for now.
+-	rm $(DEB_BUILDDIR)/subversion/bindings/swig/libsvn_swig_py-1.la
+-	$(MAKE) subversion/bindings/swig/libsvn_swig_py-1.la \
+-		EXTRA_LDFLAGS="-lpython$(PYTHON_VER) -lswigpy-1.3.21" \
+-		-C $(DEB_BUILDDIR)
++	$(MAKE) -C $(DEB_BUILDDIR) all
+ 
+ 	touch $@
+ 
+@@ -150,11 +138,9 @@
+ 	dh_clean -k
+ 	dh_installdirs
+ 
+-	$(MAKE) local-install install-swig-py \
++	$(MAKE) local-install \
+ 		INSTALL_MOD_SHARED=echo \
+ 		DESTDIR=$(PWD)/debian/tmp \
+-		swig_pydir=/usr/lib/python$(PYTHON_VER)/site-packages/libsvn \
+-		swig_pydir_extra=/usr/lib/python$(PYTHON_VER)/site-packages/svn \
+ 		-C $(DEB_BUILDDIR)
+ 
+ 	# Create our default configuration files to be installed in
+@@ -179,8 +165,8 @@
+ 	# available all archs have the testsuite enabled.  Any arch that
+ 	# passes the testsuite then has the testsuite disabled for future
+ 	# Debian versions of that upstream version.
+-	@if echo " $(TESTARCHS) " | \
+-	    grep -q "[[:space:]]$(DEB_HOST_ARCH)[[:space:]]" ; then \
++	@if echo " $(TESTCPUS) " | \
++	    grep -q "[[:space:]]$(DEB_HOST_GNU_CPU)[[:space:]]" ; then \
+ 	  echo "################################################";  \
+ 	  echo "Running Testsuite, this may take a while, "      ;  \
+ 	  echo "edit debian/rules to disable"                    ;  \
+@@ -207,45 +193,6 @@
+ 	fi
+ endif
+ 
+-	$(MAKE) swig-pl-lib \
+-		EXTRA_LDFLAGS="-L$(PWD)/$(DEB_BUILDDIR)/subversion/libsvn_delta -L$(PWD)/$(DEB_BUILDDIR)/subversion/libsvn_subr -lperl -lswigpl -lsvn_subr-1 -lsvn_delta-1" \
+-		-C $(DEB_BUILDDIR)
+-
+-	cd $(DEB_BUILDDIR)/subversion/bindings/swig/perl && \
+-		env APR_CONFIG=/usr/bin/apr-config perl Makefile.PL \
+-			INSTALLDIRS=vendor
+-
+-	for file in Makefile Makefile.client Makefile.delta Makefile.fs \
+-	  Makefile.ra Makefile.repos Makefile.wc ; do \
+-	    sed -e 's/^LD_RUN_PATH/\#LD_RUN_PATH/' < \
+-	      $(DEB_BUILDDIR)/subversion/bindings/swig/perl/$$file \
+-	      > $(DEB_BUILDDIR)/subversion/bindings/swig/perl/$$file.tmp;\
+-	    cp $(DEB_BUILDDIR)/subversion/bindings/swig/perl/$$file.tmp\
+-	      $(DEB_BUILDDIR)/subversion/bindings/swig/perl/$$file;\
+-	done
+-
+-	cd $(DEB_BUILDDIR)/subversion/bindings/swig/perl && \
+-		make all test OTHERLDFLAGS="-L $(INSTALL_PREFIX)/lib" \
+-			OPTIMIZE="-O2 -g -Wall"
+-
+-	$(MAKE) -C $(DEB_BUILDDIR) install-swig-pl-lib \
+-		DESTDIR=$(PWD)/debian/tmp 
+-	$(MAKE) -C $(DEB_BUILDDIR)/subversion/bindings/swig/perl install \
+-		MAN3EXT=3perl DESTDIR=$(PWD)/debian/tmp 
+-
+-	# Install files for 'libsvn-core-perl' package
+-	dh_movefiles --package=libsvn-core-perl \
+-		usr/lib/perl5/ \
+-		usr/share/man/man3 \
+-
+-	# Install files for 'python$(PYTHON_VER)-subversion' package
+-	dh_movefiles --package=$(PYTHON_PKG) \
+-		usr/lib/python$(PYTHON_VER)/
+-
+-	install -d debian/$(PYTHON_PKG)/usr/share/doc/$(PYTHON_PKG)
+-	install -m 0644 debian/pythonX.Y-subversion.README.Debian \
+-		debian/$(PYTHON_PKG)/usr/share/doc/$(PYTHON_PKG)/README.Debian
+-
+ 	# install files for 'subversion' package
+ 	dh_movefiles --package=subversion \
+ 		usr/bin \
