@@ -1,6 +1,6 @@
 diff -ur src.old/sys/cam/cam.h src/sys/cam/cam.h
---- src.old/sys/cam/cam.h	2000-03-17 23:36:21.000000000 +0100
-+++ src/sys/cam/cam.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/cam/cam.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/cam/cam.h	2004-09-16 15:11:07.000000000 +0200
 @@ -36,6 +36,7 @@
  #endif
  
@@ -10,14 +10,14 @@ diff -ur src.old/sys/cam/cam.h src/sys/cam/cam.h
  typedef u_int path_id_t;
  typedef u_int target_id_t;
 diff -ur src.old/sys/cam/cam_ccb.h src/sys/cam/cam_ccb.h
---- src.old/sys/cam/cam_ccb.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/cam/cam_ccb.h	2004-09-11 10:54:12.000000000 +0200
+--- src.old/sys/cam/cam_ccb.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/cam/cam_ccb.h	2004-09-16 15:11:07.000000000 +0200
 @@ -31,7 +31,7 @@
  #ifndef _CAM_CAM_CCB_H
  #define _CAM_CAM_CCB_H 1
  
 -#include <sys/queue.h>
-+#include <bsd/queue.h>
++#include "/usr/src/kfreebsd4-headers/sys/queue.h"
  #include <sys/cdefs.h>
  #include <sys/time.h>
  #ifndef _KERNEL
@@ -30,8 +30,8 @@ diff -ur src.old/sys/cam/cam_ccb.h src/sys/cam/cam_ccb.h
  
  /* General allocation length definitions for CCB structures */
 diff -ur src.old/sys/cam/scsi/scsi_low.h src/sys/cam/scsi/scsi_low.h
---- src.old/sys/cam/scsi/scsi_low.h	2004-08-19 23:05:48.000000000 +0200
-+++ src/sys/cam/scsi/scsi_low.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/cam/scsi/scsi_low.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/cam/scsi/scsi_low.h	2004-09-16 15:11:07.000000000 +0200
 @@ -44,6 +44,11 @@
  #ifndef	_SCSI_LOW_H_
  #define	_SCSI_LOW_H_
@@ -63,8 +63,8 @@ diff -ur src.old/sys/cam/scsi/scsi_low.h src/sys/cam/scsi/scsi_low.h
  #ifdef	__NetBSD__
  typedef	struct scsipi_sense_data scsi_low_osdep_sense_data_t;
 diff -ur src.old/sys/cam/scsi/scsi_pt.h src/sys/cam/scsi/scsi_pt.h
---- src.old/sys/cam/scsi/scsi_pt.h	2001-01-12 03:50:39.000000000 +0100
-+++ src/sys/cam/scsi/scsi_pt.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/cam/scsi/scsi_pt.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/cam/scsi/scsi_pt.h	2004-09-16 15:11:07.000000000 +0200
 @@ -31,6 +31,8 @@
  #ifndef	_SCSI_SCSI_PT_H
  #define _SCSI_SCSI_PT_H 1
@@ -75,8 +75,8 @@ diff -ur src.old/sys/cam/scsi/scsi_pt.h src/sys/cam/scsi/scsi_pt.h
  {
  	u_int8_t opcode;
 diff -ur src.old/sys/cam/scsi/scsi_sa.h src/sys/cam/scsi/scsi_sa.h
---- src.old/sys/cam/scsi/scsi_sa.h	2001-01-12 03:50:39.000000000 +0100
-+++ src/sys/cam/scsi/scsi_sa.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/cam/scsi/scsi_sa.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/cam/scsi/scsi_sa.h	2004-09-16 15:11:07.000000000 +0200
 @@ -33,6 +33,7 @@
  #define _SCSI_SCSI_SA_H 1
  
@@ -86,8 +86,8 @@ diff -ur src.old/sys/cam/scsi/scsi_sa.h src/sys/cam/scsi/scsi_sa.h
  struct scsi_read_block_limits
  {
 diff -ur src.old/sys/dev/aac/aac_compat.h src/sys/dev/aac/aac_compat.h
---- src.old/sys/dev/aac/aac_compat.h	2001-09-19 21:09:11.000000000 +0200
-+++ src/sys/dev/aac/aac_compat.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/aac/aac_compat.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aac/aac_compat.h	2004-09-16 15:11:07.000000000 +0200
 @@ -34,7 +34,7 @@
   * Handle the new/old bio/buf changeover
   */
@@ -98,8 +98,8 @@ diff -ur src.old/sys/dev/aac/aac_compat.h src/sys/dev/aac/aac_compat.h
  #define FREEBSD_4
  #define bio					buf
 diff -ur src.old/sys/dev/aac/aac_ioctl.h src/sys/dev/aac/aac_ioctl.h
---- src.old/sys/dev/aac/aac_ioctl.h	2001-09-19 21:09:11.000000000 +0200
-+++ src/sys/dev/aac/aac_ioctl.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/aac/aac_ioctl.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aac/aac_ioctl.h	2004-09-16 15:11:07.000000000 +0200
 @@ -28,6 +28,9 @@
   *	$FreeBSD: src/sys/dev/aac/aac_ioctl.h,v 1.2.2.2 2001/09/19 19:09:11 scottl Exp $
   */
@@ -111,8 +111,8 @@ diff -ur src.old/sys/dev/aac/aac_ioctl.h src/sys/dev/aac/aac_ioctl.h
   * Command queue statistics
   */
 diff -ur src.old/sys/dev/aac/aac_tables.h src/sys/dev/aac/aac_tables.h
---- src.old/sys/dev/aac/aac_tables.h	2001-12-04 03:38:04.000000000 +0100
-+++ src/sys/dev/aac/aac_tables.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/aac/aac_tables.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aac/aac_tables.h	2004-09-16 15:11:07.000000000 +0200
 @@ -27,6 +27,8 @@
   *	$FreeBSD: src/sys/dev/aac/aac_tables.h,v 1.1.2.3 2001/12/04 02:38:04 scottl Exp $
   */
@@ -123,8 +123,8 @@ diff -ur src.old/sys/dev/aac/aac_tables.h src/sys/dev/aac/aac_tables.h
   * Status codes for block read/write commands, etc.
   *
 diff -ur src.old/sys/dev/aac/aacreg.h src/sys/dev/aac/aacreg.h
---- src.old/sys/dev/aac/aacreg.h	2002-05-01 00:58:38.000000000 +0200
-+++ src/sys/dev/aac/aacreg.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/aac/aacreg.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aac/aacreg.h	2004-09-16 15:11:07.000000000 +0200
 @@ -29,6 +29,11 @@
   *	$FreeBSD: src/sys/dev/aac/aacreg.h,v 1.4.2.5 2002/04/30 22:58:38 scottl Exp $
   */
@@ -144,8 +144,8 @@ diff -ur src.old/sys/dev/aac/aacreg.h src/sys/dev/aac/aacreg.h
 +
 +#endif		/* _DEV_AAC_AACREG_H */
 diff -ur src.old/sys/dev/aac/aacvar.h src/sys/dev/aac/aacvar.h
---- src.old/sys/dev/aac/aacvar.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/dev/aac/aacvar.h	2004-08-23 07:11:58.000000000 +0200
+--- src.old/sys/dev/aac/aacvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aac/aacvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -29,6 +29,21 @@
   *	$FreeBSD: src/sys/dev/aac/aacvar.h,v 1.4.2.6 2002/04/30 22:58:38 scottl Exp $
   */
@@ -217,8 +217,8 @@ diff -ur src.old/sys/dev/aac/aacvar.h src/sys/dev/aac/aacvar.h
  							 * task */
  #endif
 diff -ur src.old/sys/dev/advansys/advansys.h src/sys/dev/advansys/advansys.h
---- src.old/sys/dev/advansys/advansys.h	2000-04-14 15:32:48.000000000 +0200
-+++ src/sys/dev/advansys/advansys.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/advansys/advansys.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/advansys/advansys.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,7 @@
  #define _ADVANSYS_H_
  
@@ -228,8 +228,8 @@ diff -ur src.old/sys/dev/advansys/advansys.h src/sys/dev/advansys/advansys.h
  struct adv_softc *	adv_alloc(device_t dev, bus_space_tag_t tag,
  				  bus_space_handle_t bsh);
 diff -ur src.old/sys/dev/advansys/advlib.h src/sys/dev/advansys/advlib.h
---- src.old/sys/dev/advansys/advlib.h	2000-04-14 15:32:50.000000000 +0200
-+++ src/sys/dev/advansys/advlib.h	2004-08-23 07:13:04.000000000 +0200
+--- src.old/sys/dev/advansys/advlib.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/advansys/advlib.h	2004-09-16 15:11:07.000000000 +0200
 @@ -48,6 +48,21 @@
  #define _ADVLIB_H_
  
@@ -253,8 +253,8 @@ diff -ur src.old/sys/dev/advansys/advlib.h src/sys/dev/advansys/advlib.h
  struct cam_path;
  union ccb;
 diff -ur src.old/sys/dev/advansys/advmcode.h src/sys/dev/advansys/advmcode.h
---- src.old/sys/dev/advansys/advmcode.h	2000-01-14 04:33:38.000000000 +0100
-+++ src/sys/dev/advansys/advmcode.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/advansys/advmcode.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/advansys/advmcode.h	2004-09-16 15:11:07.000000000 +0200
 @@ -14,6 +14,8 @@
   * modification.
   */
@@ -265,8 +265,8 @@ diff -ur src.old/sys/dev/advansys/advmcode.h src/sys/dev/advansys/advmcode.h
  extern u_int16_t adv_mcode_size;
  extern u_int32_t adv_mcode_chksum;
 diff -ur src.old/sys/dev/advansys/adwlib.h src/sys/dev/advansys/adwlib.h
---- src.old/sys/dev/advansys/adwlib.h	2000-03-02 01:08:35.000000000 +0100
-+++ src/sys/dev/advansys/adwlib.h	2004-08-23 07:17:01.000000000 +0200
+--- src.old/sys/dev/advansys/adwlib.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/advansys/adwlib.h	2004-09-16 15:11:07.000000000 +0200
 @@ -47,11 +47,26 @@
  #ifndef _ADWLIB_H_
  #define _ADWLIB_H_
@@ -297,8 +297,8 @@ diff -ur src.old/sys/dev/advansys/adwlib.h src/sys/dev/advansys/adwlib.h
  #define ADW_DEF_MAX_HOST_QNG	253
  #define ADW_DEF_MIN_HOST_QNG	16
 diff -ur src.old/sys/dev/advansys/adwmcode.h src/sys/dev/advansys/adwmcode.h
---- src.old/sys/dev/advansys/adwmcode.h	2000-02-03 17:34:57.000000000 +0100
-+++ src/sys/dev/advansys/adwmcode.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/advansys/adwmcode.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/advansys/adwmcode.h	2004-09-16 15:11:07.000000000 +0200
 @@ -17,6 +17,8 @@
  #ifndef _ADMCODE_H_
  #define _ADMCODE_H_
@@ -309,8 +309,8 @@ diff -ur src.old/sys/dev/advansys/adwmcode.h src/sys/dev/advansys/adwmcode.h
  {
  	const u_int8_t*	mcode_buf;
 diff -ur src.old/sys/dev/advansys/adwvar.h src/sys/dev/advansys/adwvar.h
---- src.old/sys/dev/advansys/adwvar.h	2000-08-09 01:50:48.000000000 +0200
-+++ src/sys/dev/advansys/adwvar.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/advansys/adwvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/advansys/adwvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,7 @@
  #define _ADWVAR_H_
  
@@ -320,8 +320,8 @@ diff -ur src.old/sys/dev/advansys/adwvar.h src/sys/dev/advansys/adwvar.h
  struct adw_softc *	adw_alloc(device_t dev, struct resource *regs,
  				  int regs_type, int regs_id);
 diff -ur src.old/sys/dev/aha/ahareg.h src/sys/dev/aha/ahareg.h
---- src.old/sys/dev/aha/ahareg.h	2000-08-03 00:24:40.000000000 +0200
-+++ src/sys/dev/aha/ahareg.h	2004-08-23 07:19:12.000000000 +0200
+--- src.old/sys/dev/aha/ahareg.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aha/ahareg.h	2004-09-16 15:11:07.000000000 +0200
 @@ -36,10 +36,21 @@
  #ifndef _AHAREG_H_
  #define _AHAREG_H_
@@ -347,8 +347,8 @@ diff -ur src.old/sys/dev/aha/ahareg.h src/sys/dev/aha/ahareg.h
  #define AHA_MAXTRANSFER_SIZE	 0xffffff	/* limited by 24bit counter */
  #define AHA_NSEG		17	/* The number of dma segments 
 diff -ur src.old/sys/dev/ahb/ahbreg.h src/sys/dev/ahb/ahbreg.h
---- src.old/sys/dev/ahb/ahbreg.h	1999-08-28 02:43:37.000000000 +0200
-+++ src/sys/dev/ahb/ahbreg.h	2004-08-23 07:22:39.000000000 +0200
+--- src.old/sys/dev/ahb/ahbreg.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/ahb/ahbreg.h	2004-09-16 15:11:07.000000000 +0200
 @@ -28,6 +28,23 @@
   * $FreeBSD: src/sys/dev/ahb/ahbreg.h,v 1.2 1999/08/28 00:43:37 peter Exp $
   */
@@ -374,8 +374,8 @@ diff -ur src.old/sys/dev/ahb/ahbreg.h src/sys/dev/ahb/ahbreg.h
  #define	AHB_NECB	64
  #define AHB_NSEG	32
 diff -ur src.old/sys/dev/aic/aicvar.h src/sys/dev/aic/aicvar.h
---- src.old/sys/dev/aic/aicvar.h	2000-08-09 01:51:23.000000000 +0200
-+++ src/sys/dev/aic/aicvar.h	2004-08-23 07:26:05.000000000 +0200
+--- src.old/sys/dev/aic/aicvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aic/aicvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -26,6 +26,18 @@
   * $FreeBSD: src/sys/dev/aic/aicvar.h,v 1.2.2.1 2000/08/08 23:51:23 peter Exp $
   */
@@ -396,8 +396,8 @@ diff -ur src.old/sys/dev/aic/aicvar.h src/sys/dev/aic/aicvar.h
  	u_int8_t period;
  	u_int8_t offset;
 diff -ur src.old/sys/dev/aic7xxx/aic7xxx.h src/sys/dev/aic7xxx/aic7xxx.h
---- src.old/sys/dev/aic7xxx/aic7xxx.h	2002-04-29 21:36:29.000000000 +0200
-+++ src/sys/dev/aic7xxx/aic7xxx.h	2004-08-23 07:42:58.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aic7xxx.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aic7xxx/aic7xxx.h	2004-09-16 15:11:07.000000000 +0200
 @@ -45,8 +45,11 @@
  #ifndef _AIC7XXX_H_
  #define _AIC7XXX_H_
@@ -565,8 +565,8 @@ diff -ur src.old/sys/dev/aic7xxx/aic7xxx.h src/sys/dev/aic7xxx/aic7xxx.h
  
  /*
 diff -ur src.old/sys/dev/aic7xxx/aic7xxx_osm.h src/sys/dev/aic7xxx/aic7xxx_osm.h
---- src.old/sys/dev/aic7xxx/aic7xxx_osm.h	2002-04-29 21:36:31.000000000 +0200
-+++ src/sys/dev/aic7xxx/aic7xxx_osm.h	2004-08-23 07:44:01.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aic7xxx_osm.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aic7xxx/aic7xxx_osm.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,11 +37,6 @@
  #ifndef _AIC7XXX_FREEBSD_H_
  #define _AIC7XXX_FREEBSD_H_
@@ -580,8 +580,8 @@ diff -ur src.old/sys/dev/aic7xxx/aic7xxx_osm.h src/sys/dev/aic7xxx/aic7xxx_osm.h
  #include <sys/systm.h>
  #include <sys/bus.h>		/* For device_t */
 diff -ur src.old/sys/dev/aic7xxx/aicasm/aicasm.h src/sys/dev/aic7xxx/aicasm/aicasm.h
---- src.old/sys/dev/aic7xxx/aicasm/aicasm.h	2002-04-29 21:36:36.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/aicasm.h	2004-08-23 07:32:43.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aicasm/aicasm.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aic7xxx/aicasm/aicasm.h	2004-09-16 15:11:07.000000000 +0200
 @@ -45,7 +45,7 @@
  #ifdef __linux__
  #include "../queue.h"
@@ -592,8 +592,8 @@ diff -ur src.old/sys/dev/aic7xxx/aicasm/aicasm.h src/sys/dev/aic7xxx/aicasm/aica
  
  #ifndef TRUE
 diff -ur src.old/sys/dev/aic7xxx/aicasm/aicasm_insformat.h src/sys/dev/aic7xxx/aicasm/aicasm_insformat.h
---- src.old/sys/dev/aic7xxx/aicasm/aicasm_insformat.h	2002-04-29 21:36:36.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/aicasm_insformat.h	2004-08-23 07:33:50.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aicasm/aicasm_insformat.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aic7xxx/aicasm/aicasm_insformat.h	2004-09-16 15:11:07.000000000 +0200
 @@ -42,16 +42,19 @@
   * $FreeBSD: src/sys/dev/aic7xxx/aicasm/aicasm_insformat.h,v 1.3.2.3 2002/04/29 19:36:36 gibbs Exp $
   */
@@ -661,8 +661,8 @@ diff -ur src.old/sys/dev/aic7xxx/aicasm/aicasm_insformat.h src/sys/dev/aic7xxx/a
  struct instruction {
  	union	ins_formats format;
 diff -ur src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.h src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h
---- src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.h	2002-04-29 21:36:36.000000000 +0200
-+++ src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h	2004-08-23 07:37:19.000000000 +0200
+--- src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h	2004-09-16 15:11:07.000000000 +0200
 @@ -44,8 +44,11 @@
  #ifdef __linux__
  #include "../queue.h"
@@ -677,8 +677,8 @@ diff -ur src.old/sys/dev/aic7xxx/aicasm/aicasm_symbol.h src/sys/dev/aic7xxx/aica
  typedef enum {
  	UNINITIALIZED,
 diff -ur src.old/sys/dev/amr/amr_compat.h src/sys/dev/amr/amr_compat.h
---- src.old/sys/dev/amr/amr_compat.h	2000-11-28 20:25:28.000000000 +0100
-+++ src/sys/dev/amr/amr_compat.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/amr/amr_compat.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/amr/amr_compat.h	2004-09-16 15:11:07.000000000 +0200
 @@ -30,7 +30,7 @@
   * Backwards compatibility support.
   */
@@ -689,8 +689,8 @@ diff -ur src.old/sys/dev/amr/amr_compat.h src/sys/dev/amr/amr_compat.h
  # include <machine/clock.h>
  
 diff -ur src.old/sys/dev/amr/amrvar.h src/sys/dev/amr/amrvar.h
---- src.old/sys/dev/amr/amrvar.h	2000-10-28 12:16:59.000000000 +0200
-+++ src/sys/dev/amr/amrvar.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/amr/amrvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/amr/amrvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -27,7 +27,7 @@
   *      $FreeBSD: src/sys/dev/amr/amrvar.h,v 1.2.2.2 2000/10/28 10:16:59 msmith Exp $
   */
@@ -710,8 +710,8 @@ diff -ur src.old/sys/dev/amr/amrvar.h src/sys/dev/amr/amrvar.h
  #endif
  };
 diff -ur src.old/sys/dev/bktr/bktr_reg.h src/sys/dev/bktr/bktr_reg.h
---- src.old/sys/dev/bktr/bktr_reg.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/dev/bktr/bktr_reg.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/bktr/bktr_reg.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/bktr/bktr_reg.h	2004-09-16 15:11:07.000000000 +0200
 @@ -35,7 +35,7 @@
   */
  
@@ -763,8 +763,8 @@ diff -ur src.old/sys/dev/bktr/bktr_reg.h src/sys/dev/bktr/bktr_reg.h
  #endif
  #endif
 diff -ur src.old/sys/dev/ciss/cissvar.h src/sys/dev/ciss/cissvar.h
---- src.old/sys/dev/ciss/cissvar.h	2001-12-12 07:38:16.000000000 +0100
-+++ src/sys/dev/ciss/cissvar.h	2004-08-23 06:58:33.000000000 +0200
+--- src.old/sys/dev/ciss/cissvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/ciss/cissvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -74,7 +74,7 @@
  /************************************************************************
   * Compatibility with older versions of FreeBSD
@@ -775,8 +775,8 @@ diff -ur src.old/sys/dev/ciss/cissvar.h src/sys/dev/ciss/cissvar.h
  typedef struct proc	d_thread_t;
  #endif
 diff -ur src.old/sys/dev/fxp/if_fxpvar.h src/sys/dev/fxp/if_fxpvar.h
---- src.old/sys/dev/fxp/if_fxpvar.h	2002-02-10 00:02:39.000000000 +0100
-+++ src/sys/dev/fxp/if_fxpvar.h	2004-08-23 06:58:34.000000000 +0200
+--- src.old/sys/dev/fxp/if_fxpvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/fxp/if_fxpvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -88,7 +88,7 @@
   */
  #define TUNABLE_BUNDLE_MAX 6
@@ -787,8 +787,8 @@ diff -ur src.old/sys/dev/fxp/if_fxpvar.h src/sys/dev/fxp/if_fxpvar.h
  #define	FXP_UNLOCK(_sc)
  #define mtx_init(a, b, c)
 diff -ur src.old/sys/dev/gx/if_gxvar.h src/sys/dev/gx/if_gxvar.h
---- src.old/sys/dev/gx/if_gxvar.h	2001-11-15 04:09:23.000000000 +0100
-+++ src/sys/dev/gx/if_gxvar.h	2004-08-23 06:58:34.000000000 +0200
+--- src.old/sys/dev/gx/if_gxvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/gx/if_gxvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -29,7 +29,7 @@
   *	$FreeBSD: src/sys/dev/gx/if_gxvar.h,v 1.1.2.1 2001/11/15 03:09:23 jlemon Exp $
   */
@@ -799,8 +799,8 @@ diff -ur src.old/sys/dev/gx/if_gxvar.h src/sys/dev/gx/if_gxvar.h
  #define GX_UNLOCK(gx)		
  #define mtx_init(a, b, c)
 diff -ur src.old/sys/dev/mlx/mlx_compat.h src/sys/dev/mlx/mlx_compat.h
---- src.old/sys/dev/mlx/mlx_compat.h	2001-06-25 06:37:51.000000000 +0200
-+++ src/sys/dev/mlx/mlx_compat.h	2004-08-23 06:58:34.000000000 +0200
+--- src.old/sys/dev/mlx/mlx_compat.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/mlx/mlx_compat.h	2004-09-16 15:11:07.000000000 +0200
 @@ -30,7 +30,7 @@
   * Portability and compatibility interfaces.
   */
@@ -811,8 +811,8 @@ diff -ur src.old/sys/dev/mlx/mlx_compat.h src/sys/dev/mlx/mlx_compat.h
  # define INTR_ENTROPY			0
  
 diff -ur src.old/sys/dev/mly/mlyvar.h src/sys/dev/mly/mlyvar.h
---- src.old/sys/dev/mly/mlyvar.h	2001-03-05 21:17:24.000000000 +0100
-+++ src/sys/dev/mly/mlyvar.h	2004-08-23 06:58:34.000000000 +0200
+--- src.old/sys/dev/mly/mlyvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/mly/mlyvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -52,11 +52,11 @@
   ********************************************************************************
   ********************************************************************************/
@@ -837,8 +837,8 @@ diff -ur src.old/sys/dev/mly/mlyvar.h src/sys/dev/mly/mlyvar.h
      struct task		mly_task_complete;	/* deferred-completion task */
  #endif
 diff -ur src.old/sys/dev/sound/pcm/sound.h src/sys/dev/sound/pcm/sound.h
---- src.old/sys/dev/sound/pcm/sound.h	2002-04-22 17:49:36.000000000 +0200
-+++ src/sys/dev/sound/pcm/sound.h	2004-08-23 06:58:35.000000000 +0200
+--- src.old/sys/dev/sound/pcm/sound.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/sound/pcm/sound.h	2004-09-16 15:11:07.000000000 +0200
 @@ -52,7 +52,7 @@
  #include <sys/errno.h>
  #include <sys/malloc.h>
@@ -858,8 +858,8 @@ diff -ur src.old/sys/dev/sound/pcm/sound.h src/sys/dev/sound/pcm/sound.h
  #define USING_DEVFS
  #endif
 diff -ur src.old/sys/dev/twe/twe_compat.h src/sys/dev/twe/twe_compat.h
---- src.old/sys/dev/twe/twe_compat.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/dev/twe/twe_compat.h	2004-08-23 06:58:35.000000000 +0200
+--- src.old/sys/dev/twe/twe_compat.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/twe/twe_compat.h	2004-09-16 15:11:07.000000000 +0200
 @@ -130,7 +130,7 @@
  #define twe_printf(sc, fmt, args...)	device_printf(sc->twe_dev, fmt , ##args)
  #define twed_printf(twed, fmt, args...)	device_printf(twed->twed_dev, fmt , ##args)
@@ -870,8 +870,8 @@ diff -ur src.old/sys/dev/twe/twe_compat.h src/sys/dev/twe/twe_compat.h
  # define INTR_ENTROPY			0
  
 diff -ur src.old/sys/dev/wi/if_wivar.h src/sys/dev/wi/if_wivar.h
---- src.old/sys/dev/wi/if_wivar.h	2002-04-28 22:20:32.000000000 +0200
-+++ src/sys/dev/wi/if_wivar.h	2004-08-23 06:58:35.000000000 +0200
+--- src.old/sys/dev/wi/if_wivar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/dev/wi/if_wivar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -160,7 +160,7 @@
  	u_int32_t		wi_icv;
  	int			wi_icv_flag;
@@ -891,8 +891,8 @@ diff -ur src.old/sys/dev/wi/if_wivar.h src/sys/dev/wi/if_wivar.h
   * Various compat hacks/kludges
   */
 diff -ur src.old/sys/i386/machine/ansi.h src/sys/i386/machine/ansi.h
---- src.old/sys/i386/machine/ansi.h	2004-08-19 23:05:48.000000000 +0200
-+++ src/sys/i386/machine/ansi.h	2004-08-23 07:31:43.000000000 +0200
+--- src.old/sys/i386/machine/ansi.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/ansi.h	2004-09-16 15:11:07.000000000 +0200
 @@ -34,8 +34,10 @@
   * $FreeBSD: src/sys/i386/include/ansi.h,v 1.18.2.4 2001/06/03 17:15:54 obrien Exp $
   */
@@ -913,8 +913,8 @@ diff -ur src.old/sys/i386/machine/ansi.h src/sys/i386/machine/ansi.h
 -#endif /* !_MACHINE_ANSI_H_ */
 +#endif /* !_MACHINE_ANSI_H_SAFE */
 diff -ur src.old/sys/i386/machine/atomic.h src/sys/i386/machine/atomic.h
---- src.old/sys/i386/machine/atomic.h	2000-07-07 02:38:47.000000000 +0200
-+++ src/sys/i386/machine/atomic.h	2004-08-23 23:18:59.000000000 +0200
+--- src.old/sys/i386/machine/atomic.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/atomic.h	2004-09-16 15:11:07.000000000 +0200
 @@ -28,6 +28,8 @@
  #ifndef _MACHINE_ATOMIC_H_
  #define _MACHINE_ATOMIC_H_
@@ -925,8 +925,8 @@ diff -ur src.old/sys/i386/machine/atomic.h src/sys/i386/machine/atomic.h
   * Various simple arithmetic on memory which is atomic in the presence
   * of interrupts and multiple processors.
 diff -ur src.old/sys/i386/machine/bootinfo.h src/sys/i386/machine/bootinfo.h
---- src.old/sys/i386/machine/bootinfo.h	1999-12-29 05:32:57.000000000 +0100
-+++ src/sys/i386/machine/bootinfo.h	2004-08-23 23:21:32.000000000 +0200
+--- src.old/sys/i386/machine/bootinfo.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/bootinfo.h	2004-09-16 15:11:07.000000000 +0200
 @@ -35,6 +35,8 @@
  #ifndef	_MACHINE_BOOTINFO_H_
  #define	_MACHINE_BOOTINFO_H_
@@ -937,8 +937,8 @@ diff -ur src.old/sys/i386/machine/bootinfo.h src/sys/i386/machine/bootinfo.h
  #define	BOOTINFO_VERSION	1
  
 diff -ur src.old/sys/i386/machine/bus_at386.h src/sys/i386/machine/bus_at386.h
---- src.old/sys/i386/machine/bus_at386.h	2002-03-03 06:42:50.000000000 +0100
-+++ src/sys/i386/machine/bus_at386.h	2004-08-23 06:58:35.000000000 +0200
+--- src.old/sys/i386/machine/bus_at386.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/bus_at386.h	2004-09-16 15:11:07.000000000 +0200
 @@ -73,6 +73,8 @@
  #define _I386_BUS_AT386_H_
  
@@ -949,8 +949,8 @@ diff -ur src.old/sys/i386/machine/bus_at386.h src/sys/i386/machine/bus_at386.h
  /*
   * To remain compatible with NetBSD's interface, default to both memio and
 diff -ur src.old/sys/i386/machine/bus_dma.h src/sys/i386/machine/bus_dma.h
---- src.old/sys/i386/machine/bus_dma.h	2002-03-03 06:42:50.000000000 +0100
-+++ src/sys/i386/machine/bus_dma.h	2004-08-23 06:58:35.000000000 +0200
+--- src.old/sys/i386/machine/bus_dma.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/bus_dma.h	2004-09-16 15:11:07.000000000 +0200
 @@ -72,6 +72,8 @@
  #ifndef _I386_BUS_DMA_H_
  #define _I386_BUS_DMA_H_
@@ -961,8 +961,8 @@ diff -ur src.old/sys/i386/machine/bus_dma.h src/sys/i386/machine/bus_dma.h
   * Flags used in various bus DMA methods.
   */
 diff -ur src.old/sys/i386/machine/cpufunc.h src/sys/i386/machine/cpufunc.h
---- src.old/sys/i386/machine/cpufunc.h	2002-04-29 00:50:54.000000000 +0200
-+++ src/sys/i386/machine/cpufunc.h	2004-08-23 06:58:35.000000000 +0200
+--- src.old/sys/i386/machine/cpufunc.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/cpufunc.h	2004-09-16 15:11:07.000000000 +0200
 @@ -41,6 +41,8 @@
  #define	_MACHINE_CPUFUNC_H_
  
@@ -1124,8 +1124,8 @@ diff -ur src.old/sys/i386/machine/cpufunc.h src/sys/i386/machine/cpufunc.h
  rcr2(void)
  {
 diff -ur src.old/sys/i386/machine/db_machdep.h src/sys/i386/machine/db_machdep.h
---- src.old/sys/i386/machine/db_machdep.h	1999-10-04 15:55:35.000000000 +0200
-+++ src/sys/i386/machine/db_machdep.h	2004-08-23 23:40:23.000000000 +0200
+--- src.old/sys/i386/machine/db_machdep.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/db_machdep.h	2004-09-16 15:11:07.000000000 +0200
 @@ -32,6 +32,7 @@
  #include <machine/frame.h>
  #include <machine/psl.h>
@@ -1135,8 +1135,8 @@ diff -ur src.old/sys/i386/machine/db_machdep.h src/sys/i386/machine/db_machdep.h
  #define i386_saved_state trapframe
  
 diff -ur src.old/sys/i386/machine/dvcfg.h src/sys/i386/machine/dvcfg.h
---- src.old/sys/i386/machine/dvcfg.h	2000-08-03 03:01:19.000000000 +0200
-+++ src/sys/i386/machine/dvcfg.h	2004-08-23 23:44:44.000000000 +0200
+--- src.old/sys/i386/machine/dvcfg.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/dvcfg.h	2004-09-16 15:11:07.000000000 +0200
 @@ -35,6 +35,9 @@
  #ifndef _I386_DVCFG_H_
  #define _I386_DVCFG_H_
@@ -1148,8 +1148,8 @@ diff -ur src.old/sys/i386/machine/dvcfg.h src/sys/i386/machine/dvcfg.h
  
  struct dvcfg_hwsel {
 diff -ur src.old/sys/i386/machine/frame.h src/sys/i386/machine/frame.h
---- src.old/sys/i386/machine/frame.h	1999-09-29 17:06:22.000000000 +0200
-+++ src/sys/i386/machine/frame.h	2004-08-23 23:33:20.000000000 +0200
+--- src.old/sys/i386/machine/frame.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/frame.h	2004-09-16 15:11:07.000000000 +0200
 @@ -40,6 +40,8 @@
  #ifndef _MACHINE_FRAME_H_
  #define _MACHINE_FRAME_H_ 1
@@ -1160,8 +1160,8 @@ diff -ur src.old/sys/i386/machine/frame.h src/sys/i386/machine/frame.h
   * System stack frames.
   */
 diff -ur src.old/sys/i386/machine/globaldata.h src/sys/i386/machine/globaldata.h
---- src.old/sys/i386/machine/globaldata.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/i386/machine/globaldata.h	2004-08-24 02:05:41.000000000 +0200
+--- src.old/sys/i386/machine/globaldata.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/globaldata.h	2004-09-16 15:11:07.000000000 +0200
 @@ -26,6 +26,10 @@
   * $FreeBSD: src/sys/i386/include/globaldata.h,v 1.11.2.1 2000/05/16 06:58:10 dillon Exp $
   */
@@ -1174,8 +1174,8 @@ diff -ur src.old/sys/i386/machine/globaldata.h src/sys/i386/machine/globaldata.h
   * This structure maps out the global data that needs to be kept on a
   * per-cpu basis.  genassym uses this to generate offsets for the assembler
 diff -ur src.old/sys/i386/machine/i4b_debug.h src/sys/i386/machine/i4b_debug.h
---- src.old/sys/i386/machine/i4b_debug.h	2001-08-01 19:45:01.000000000 +0200
-+++ src/sys/i386/machine/i4b_debug.h	2004-08-24 02:06:18.000000000 +0200
+--- src.old/sys/i386/machine/i4b_debug.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/i4b_debug.h	2004-09-16 15:11:07.000000000 +0200
 @@ -33,6 +33,8 @@
   *
   *---------------------------------------------------------------------------*/
@@ -1186,8 +1186,8 @@ diff -ur src.old/sys/i386/machine/i4b_debug.h src/sys/i386/machine/i4b_debug.h
  # define DO_I4B_DEBUG 1		/* default = include debugging code */
  #elif DO_I4B_DEBUG != 0
 diff -ur src.old/sys/i386/machine/i4b_ioctl.h src/sys/i386/machine/i4b_ioctl.h
---- src.old/sys/i386/machine/i4b_ioctl.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/i386/machine/i4b_ioctl.h	2004-08-24 02:06:55.000000000 +0200
+--- src.old/sys/i386/machine/i4b_ioctl.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/i4b_ioctl.h	2004-09-16 15:11:07.000000000 +0200
 @@ -36,7 +36,9 @@
  #ifndef _I4B_IOCTL_H_
  #define _I4B_IOCTL_H_
@@ -1200,8 +1200,8 @@ diff -ur src.old/sys/i386/machine/i4b_ioctl.h src/sys/i386/machine/i4b_ioctl.h
  #include <machine/types.h>
  #endif /* _MACHINE_TYPES_H_ */
 diff -ur src.old/sys/i386/machine/i4b_isppp.h src/sys/i386/machine/i4b_isppp.h
---- src.old/sys/i386/machine/i4b_isppp.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/i386/machine/i4b_isppp.h	2004-08-25 01:36:52.000000000 +0200
+--- src.old/sys/i386/machine/i4b_isppp.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/i4b_isppp.h	2004-09-16 15:11:07.000000000 +0200
 @@ -26,6 +26,9 @@
  #ifndef _I4B_ISPPP_H_
  #define _I4B_ISPPP_H_
@@ -1240,8 +1240,8 @@ diff -ur src.old/sys/i386/machine/i4b_isppp.h src/sys/i386/machine/i4b_isppp.h
  #else
  #ifdef __FreeBSD_kernel__
 diff -ur src.old/sys/i386/machine/i4b_rbch_ioctl.h src/sys/i386/machine/i4b_rbch_ioctl.h
---- src.old/sys/i386/machine/i4b_rbch_ioctl.h	2001-08-01 19:45:01.000000000 +0200
-+++ src/sys/i386/machine/i4b_rbch_ioctl.h	2004-08-25 01:38:05.000000000 +0200
+--- src.old/sys/i386/machine/i4b_rbch_ioctl.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/i4b_rbch_ioctl.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,8 @@
  #ifndef _I4B_RBCH_IOCTL_H_
  #define _I4B_RBCH_IOCTL_H_
@@ -1252,8 +1252,8 @@ diff -ur src.old/sys/i386/machine/i4b_rbch_ioctl.h src/sys/i386/machine/i4b_rbch
   *	instruct the rbch device to dial the given number
   *---------------------------------------------------------------------------*/
 diff -ur src.old/sys/i386/machine/i4b_trace.h src/sys/i386/machine/i4b_trace.h
---- src.old/sys/i386/machine/i4b_trace.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/i386/machine/i4b_trace.h	2004-08-25 01:49:53.000000000 +0200
+--- src.old/sys/i386/machine/i4b_trace.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/i4b_trace.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,8 @@
  #ifndef _I4B_TRACE_H_
  #define _I4B_TRACE_H_
@@ -1264,8 +1264,8 @@ diff -ur src.old/sys/i386/machine/i4b_trace.h src/sys/i386/machine/i4b_trace.h
   *	structure of the header at the beginning of every trace mbuf
   *---------------------------------------------------------------------------*/
 diff -ur src.old/sys/i386/machine/iic.h src/sys/i386/machine/iic.h
---- src.old/sys/i386/machine/iic.h	1999-08-28 02:44:16.000000000 +0200
-+++ src/sys/i386/machine/iic.h	2004-08-25 02:07:51.000000000 +0200
+--- src.old/sys/i386/machine/iic.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/iic.h	2004-09-16 15:11:07.000000000 +0200
 @@ -30,6 +30,7 @@
  #define __IIC_H
  
@@ -1275,8 +1275,8 @@ diff -ur src.old/sys/i386/machine/iic.h src/sys/i386/machine/iic.h
  struct iiccmd {
  	u_char slave;
 diff -ur src.old/sys/i386/machine/in_cksum.h src/sys/i386/machine/in_cksum.h
---- src.old/sys/i386/machine/in_cksum.h	2000-05-05 15:37:00.000000000 +0200
-+++ src/sys/i386/machine/in_cksum.h	2004-08-25 02:09:49.000000000 +0200
+--- src.old/sys/i386/machine/in_cksum.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/in_cksum.h	2004-09-16 15:11:07.000000000 +0200
 @@ -40,6 +40,8 @@
  #define	_MACHINE_IN_CKSUM_H_	1
  
@@ -1287,8 +1287,8 @@ diff -ur src.old/sys/i386/machine/in_cksum.h src/sys/i386/machine/in_cksum.h
  /*
   * It it useful to have an Internet checksum routine which is inlineable
 diff -ur src.old/sys/i386/machine/ioctl_bt848.h src/sys/i386/machine/ioctl_bt848.h
---- src.old/sys/i386/machine/ioctl_bt848.h	2000-10-31 15:31:27.000000000 +0100
-+++ src/sys/i386/machine/ioctl_bt848.h	2004-08-25 02:10:18.000000000 +0200
+--- src.old/sys/i386/machine/ioctl_bt848.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/ioctl_bt848.h	2004-09-16 15:11:07.000000000 +0200
 @@ -7,6 +7,8 @@
  #ifndef  _MACHINE_IOCTL_BT848_H_
  #define  _MACHINE_IOCTL_BT848_H_
@@ -1299,8 +1299,8 @@ diff -ur src.old/sys/i386/machine/ioctl_bt848.h src/sys/i386/machine/ioctl_bt848
   * frequency sets
   */
 diff -ur src.old/sys/i386/machine/ipl.h src/sys/i386/machine/ipl.h
---- src.old/sys/i386/machine/ipl.h	2000-07-18 23:12:41.000000000 +0200
-+++ src/sys/i386/machine/ipl.h	2004-08-25 02:10:55.000000000 +0200
+--- src.old/sys/i386/machine/ipl.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/ipl.h	2004-09-16 15:11:07.000000000 +0200
 @@ -36,12 +36,6 @@
  #ifndef _MACHINE_IPL_H_
  #define	_MACHINE_IPL_H_
@@ -1315,8 +1315,8 @@ diff -ur src.old/sys/i386/machine/ipl.h src/sys/i386/machine/ipl.h
   * Software interrupt bit numbers in priority order.  The priority only
   * determines which swi will be dispatched next; a higher priority swi
 diff -ur src.old/sys/i386/machine/md_var.h src/sys/i386/machine/md_var.h
---- src.old/sys/i386/machine/md_var.h	2001-08-15 03:23:52.000000000 +0200
-+++ src/sys/i386/machine/md_var.h	2004-08-25 02:13:00.000000000 +0200
+--- src.old/sys/i386/machine/md_var.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/md_var.h	2004-09-16 15:11:07.000000000 +0200
 @@ -32,6 +32,10 @@
  #ifndef _MACHINE_MD_VAR_H_
  #define	_MACHINE_MD_VAR_H_
@@ -1329,8 +1329,8 @@ diff -ur src.old/sys/i386/machine/md_var.h src/sys/i386/machine/md_var.h
   * Miscellaneous machine-dependent declarations.
   */
 diff -ur src.old/sys/i386/machine/mpapic.h src/sys/i386/machine/mpapic.h
---- src.old/sys/i386/machine/mpapic.h	2000-09-30 04:49:34.000000000 +0200
-+++ src/sys/i386/machine/mpapic.h	2004-08-25 02:22:10.000000000 +0200
+--- src.old/sys/i386/machine/mpapic.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/mpapic.h	2004-09-16 15:11:07.000000000 +0200
 @@ -30,7 +30,10 @@
  
  #include <machine/apic.h>
@@ -1344,8 +1344,8 @@ diff -ur src.old/sys/i386/machine/mpapic.h src/sys/i386/machine/mpapic.h
  /*
   * Size of APIC ID list.
 diff -ur src.old/sys/i386/machine/pc/bios.h src/sys/i386/machine/pc/bios.h
---- src.old/sys/i386/machine/pc/bios.h	2001-10-21 05:16:56.000000000 +0200
-+++ src/sys/i386/machine/pc/bios.h	2004-08-23 23:05:09.000000000 +0200
+--- src.old/sys/i386/machine/pc/bios.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/pc/bios.h	2004-09-16 15:11:07.000000000 +0200
 @@ -27,6 +27,9 @@
   * $FreeBSD: src/sys/i386/include/pc/bios.h,v 1.7.2.3 2001/10/21 03:16:56 yokota Exp $
   */
@@ -1357,8 +1357,8 @@ diff -ur src.old/sys/i386/machine/pc/bios.h src/sys/i386/machine/pc/bios.h
   * Signature structure for the BIOS32 Service Directory header 
   */
 diff -ur src.old/sys/i386/machine/pc/vesa.h src/sys/i386/machine/pc/vesa.h
---- src.old/sys/i386/machine/pc/vesa.h	1999-12-29 05:33:12.000000000 +0100
-+++ src/sys/i386/machine/pc/vesa.h	2004-08-23 23:05:38.000000000 +0200
+--- src.old/sys/i386/machine/pc/vesa.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/pc/vesa.h	2004-09-16 15:11:07.000000000 +0200
 @@ -29,6 +29,8 @@
  #ifndef _MACHINE_PC_VESA_H
  #define _MACHINE_PC_VESA_H
@@ -1369,8 +1369,8 @@ diff -ur src.old/sys/i386/machine/pc/vesa.h src/sys/i386/machine/pc/vesa.h
  {
      /* mandatory fields */
 diff -ur src.old/sys/i386/machine/pci_cfgreg.h src/sys/i386/machine/pci_cfgreg.h
---- src.old/sys/i386/machine/pci_cfgreg.h	2001-07-28 07:55:07.000000000 +0200
-+++ src/sys/i386/machine/pci_cfgreg.h	2004-08-25 02:27:41.000000000 +0200
+--- src.old/sys/i386/machine/pci_cfgreg.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/pci_cfgreg.h	2004-09-16 15:11:07.000000000 +0200
 @@ -27,6 +27,8 @@
   *
   */
@@ -1381,14 +1381,14 @@ diff -ur src.old/sys/i386/machine/pci_cfgreg.h src/sys/i386/machine/pci_cfgreg.h
  #define CONF1_DATA_PORT    0x0cfc
  
 diff -ur src.old/sys/i386/machine/physio_proc.h src/sys/i386/machine/physio_proc.h
---- src.old/sys/i386/machine/physio_proc.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/i386/machine/physio_proc.h	2004-08-25 02:34:20.000000000 +0200
+--- src.old/sys/i386/machine/physio_proc.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/physio_proc.h	2004-09-16 15:11:07.000000000 +0200
 @@ -33,7 +33,8 @@
  #ifndef _I386_PHYSIO_PROC_H_
  #define _I386_PHYSIO_PROC_H_
  #include <sys/buf.h>
 -#include <sys/queue.h>
-+#include <bsd/queue.h>
++#include "/usr/src/kfreebsd4-headers/sys/queue.h"
 +#include <stdio.h>		/* NULL */
  
  struct physio_proc;
@@ -1403,8 +1403,8 @@ diff -ur src.old/sys/i386/machine/physio_proc.h src/sys/i386/machine/physio_proc
  #endif
  	TAILQ_INSERT_TAIL(&physio_proc_busyt, pp, pp_chain);
 diff -ur src.old/sys/i386/machine/profile.h src/sys/i386/machine/profile.h
---- src.old/sys/i386/machine/profile.h	1999-12-29 05:33:05.000000000 +0100
-+++ src/sys/i386/machine/profile.h	2004-08-25 02:37:23.000000000 +0200
+--- src.old/sys/i386/machine/profile.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/profile.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,8 @@
  #ifndef _MACHINE_PROFILE_H_
  #define	_MACHINE_PROFILE_H_
@@ -1415,8 +1415,8 @@ diff -ur src.old/sys/i386/machine/profile.h src/sys/i386/machine/profile.h
  
  /*
 diff -ur src.old/sys/i386/machine/sigframe.h src/sys/i386/machine/sigframe.h
---- src.old/sys/i386/machine/sigframe.h	1999-12-04 11:40:24.000000000 +0100
-+++ src/sys/i386/machine/sigframe.h	2004-08-26 02:30:27.000000000 +0200
+--- src.old/sys/i386/machine/sigframe.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/sigframe.h	2004-09-16 15:11:07.000000000 +0200
 @@ -31,6 +31,9 @@
  #ifndef _MACHINE_SIGFRAME_H_
  #define	_MACHINE_SIGFRAME_H_
@@ -1472,8 +1472,8 @@ diff -ur src.old/sys/i386/machine/sigframe.h src/sys/i386/machine/sigframe.h
  
  #endif /* !_MACHINE_SIGFRAME_H_ */
 diff -ur src.old/sys/i386/machine/signal.h src/sys/i386/machine/signal.h
---- src.old/sys/i386/machine/signal.h	1999-11-12 14:52:11.000000000 +0100
-+++ src/sys/i386/machine/signal.h	2004-08-26 02:12:05.000000000 +0200
+--- src.old/sys/i386/machine/signal.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/signal.h	2004-09-16 15:11:07.000000000 +0200
 @@ -80,46 +80,7 @@
  	int	sc_err;
  };
@@ -1523,8 +1523,8 @@ diff -ur src.old/sys/i386/machine/signal.h src/sys/i386/machine/signal.h
  #endif /* !_ANSI_SOURCE && !_POSIX_SOURCE */
  
 diff -ur src.old/sys/i386/machine/smb.h src/sys/i386/machine/smb.h
---- src.old/sys/i386/machine/smb.h	1999-08-28 02:44:24.000000000 +0200
-+++ src/sys/i386/machine/smb.h	2004-08-26 02:31:31.000000000 +0200
+--- src.old/sys/i386/machine/smb.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/smb.h	2004-09-16 15:11:07.000000000 +0200
 @@ -30,6 +30,7 @@
  #define __SMB_H
  
@@ -1534,8 +1534,8 @@ diff -ur src.old/sys/i386/machine/smb.h src/sys/i386/machine/smb.h
  struct smbcmd {
  	char cmd;
 diff -ur src.old/sys/i386/machine/specialreg.h src/sys/i386/machine/specialreg.h
---- src.old/sys/i386/machine/specialreg.h	2001-08-15 03:23:52.000000000 +0200
-+++ src/sys/i386/machine/specialreg.h	2004-08-26 02:32:51.000000000 +0200
+--- src.old/sys/i386/machine/specialreg.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/specialreg.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,8 @@
  #ifndef _MACHINE_SPECIALREG_H_
  #define	_MACHINE_SPECIALREG_H_
@@ -1546,8 +1546,8 @@ diff -ur src.old/sys/i386/machine/specialreg.h src/sys/i386/machine/specialreg.h
   * Bits in 386 special registers:
   */
 diff -ur src.old/sys/i386/machine/uc_device.h src/sys/i386/machine/uc_device.h
---- src.old/sys/i386/machine/uc_device.h	2000-07-14 12:21:34.000000000 +0200
-+++ src/sys/i386/machine/uc_device.h	2004-08-26 02:33:27.000000000 +0200
+--- src.old/sys/i386/machine/uc_device.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/uc_device.h	2004-09-16 15:11:07.000000000 +0200
 @@ -52,6 +52,8 @@
  #ifndef _I386_MACHINE_UC_DEVICE_H
  #define _I386_MACHINE_UC_DEVICE_H
@@ -1558,8 +1558,8 @@ diff -ur src.old/sys/i386/machine/uc_device.h src/sys/i386/machine/uc_device.h
   * Per device structure.  This just happens to resemble the old isa_device
   * but that is by accident.  It is NOT the same.
 diff -ur src.old/sys/i386/machine/vm86.h src/sys/i386/machine/vm86.h
---- src.old/sys/i386/machine/vm86.h	1999-09-02 22:59:50.000000000 +0200
-+++ src/sys/i386/machine/vm86.h	2004-08-25 02:26:56.000000000 +0200
+--- src.old/sys/i386/machine/vm86.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/i386/machine/vm86.h	2004-09-16 15:11:07.000000000 +0200
 @@ -32,6 +32,9 @@
  #ifndef _MACHINE_VM86_H_
  #define _MACHINE_VM86_H_ 1
@@ -1571,8 +1571,8 @@ diff -ur src.old/sys/i386/machine/vm86.h src/sys/i386/machine/vm86.h
  typedef union {
  	u_int	r_ex;
 diff -ur src.old/sys/isofs/cd9660/cd9660_mount.h src/sys/isofs/cd9660/cd9660_mount.h
---- src.old/sys/isofs/cd9660/cd9660_mount.h	2001-03-14 13:03:50.000000000 +0100
-+++ src/sys/isofs/cd9660/cd9660_mount.h	2004-08-26 02:34:11.000000000 +0200
+--- src.old/sys/isofs/cd9660/cd9660_mount.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/isofs/cd9660/cd9660_mount.h	2004-09-16 15:11:07.000000000 +0200
 @@ -39,6 +39,8 @@
   * $FreeBSD: src/sys/isofs/cd9660/cd9660_mount.h,v 1.3.2.2 2001/03/14 12:03:50 bp Exp $
   */
@@ -1583,8 +1583,8 @@ diff -ur src.old/sys/isofs/cd9660/cd9660_mount.h src/sys/isofs/cd9660/cd9660_mou
   * Arguments to mount ISO 9660 filesystems.
   */
 diff -ur src.old/sys/isofs/cd9660/cd9660_node.h src/sys/isofs/cd9660/cd9660_node.h
---- src.old/sys/isofs/cd9660/cd9660_node.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/isofs/cd9660/cd9660_node.h	2004-08-26 03:07:02.000000000 +0200
+--- src.old/sys/isofs/cd9660/cd9660_node.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/isofs/cd9660/cd9660_node.h	2004-09-16 15:11:07.000000000 +0200
 @@ -39,6 +39,10 @@
   * $FreeBSD: src/sys/isofs/cd9660/cd9660_node.h,v 1.20 1999/12/29 04:54:37 peter Exp $
   */
@@ -1606,8 +1606,8 @@ diff -ur src.old/sys/isofs/cd9660/cd9660_node.h src/sys/isofs/cd9660/cd9660_node
  
  
 diff -ur src.old/sys/isofs/cd9660/cd9660_rrip.h src/sys/isofs/cd9660/cd9660_rrip.h
---- src.old/sys/isofs/cd9660/cd9660_rrip.h	1999-08-28 02:46:06.000000000 +0200
-+++ src/sys/isofs/cd9660/cd9660_rrip.h	2004-08-26 03:09:09.000000000 +0200
+--- src.old/sys/isofs/cd9660/cd9660_rrip.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/isofs/cd9660/cd9660_rrip.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,7 +38,10 @@
   *	@(#)cd9660_rrip.h	8.2 (Berkeley) 12/5/94
   * $FreeBSD: src/sys/isofs/cd9660/cd9660_rrip.h,v 1.6 1999/08/28 00:46:06 peter Exp $
@@ -1621,8 +1621,8 @@ diff -ur src.old/sys/isofs/cd9660/cd9660_rrip.h src/sys/isofs/cd9660/cd9660_rrip
  	char   type			[ISODCL (  0,    1)];
  	u_char length			[ISODCL (  2,    2)]; /* 711 */
 diff -ur src.old/sys/isofs/cd9660/iso.h src/sys/isofs/cd9660/iso.h
---- src.old/sys/isofs/cd9660/iso.h	2000-07-08 16:35:56.000000000 +0200
-+++ src/sys/isofs/cd9660/iso.h	2004-08-26 03:09:35.000000000 +0200
+--- src.old/sys/isofs/cd9660/iso.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/isofs/cd9660/iso.h	2004-09-16 15:11:07.000000000 +0200
 @@ -39,6 +39,8 @@
   * $FreeBSD: src/sys/isofs/cd9660/iso.h,v 1.19.2.1 2000/07/08 14:35:56 bp Exp $
   */
@@ -1633,8 +1633,8 @@ diff -ur src.old/sys/isofs/cd9660/iso.h src/sys/isofs/cd9660/iso.h
  
  struct iso_volume_descriptor {
 diff -ur src.old/sys/isofs/cd9660/iso_rrip.h src/sys/isofs/cd9660/iso_rrip.h
---- src.old/sys/isofs/cd9660/iso_rrip.h	1999-08-28 02:46:07.000000000 +0200
-+++ src/sys/isofs/cd9660/iso_rrip.h	2004-08-26 03:10:30.000000000 +0200
+--- src.old/sys/isofs/cd9660/iso_rrip.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/isofs/cd9660/iso_rrip.h	2004-09-16 15:11:07.000000000 +0200
 @@ -39,6 +39,7 @@
   * $FreeBSD: src/sys/isofs/cd9660/iso_rrip.h,v 1.6 1999/08/28 00:46:07 peter Exp $
   */
@@ -1644,8 +1644,8 @@ diff -ur src.old/sys/isofs/cd9660/iso_rrip.h src/sys/isofs/cd9660/iso_rrip.h
  /*
   *	Analyze function flag (similar to RR field bits)
 diff -ur src.old/sys/msdosfs/bootsect.h src/sys/msdosfs/bootsect.h
---- src.old/sys/msdosfs/bootsect.h	1999-08-28 02:48:06.000000000 +0200
-+++ src/sys/msdosfs/bootsect.h	2004-08-26 03:11:03.000000000 +0200
+--- src.old/sys/msdosfs/bootsect.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/msdosfs/bootsect.h	2004-09-16 15:11:07.000000000 +0200
 @@ -17,6 +17,8 @@
   * October 1992
   */
@@ -1656,8 +1656,8 @@ diff -ur src.old/sys/msdosfs/bootsect.h src/sys/msdosfs/bootsect.h
   * Format of a boot sector.  This is the first sector on a DOS floppy disk
   * or the fist sector of a partition on a hard disk.  But, it is not the
 diff -ur src.old/sys/msdosfs/bpb.h src/sys/msdosfs/bpb.h
---- src.old/sys/msdosfs/bpb.h	2000-10-27 11:45:07.000000000 +0200
-+++ src/sys/msdosfs/bpb.h	2004-08-26 03:11:38.000000000 +0200
+--- src.old/sys/msdosfs/bpb.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/msdosfs/bpb.h	2004-09-16 15:11:07.000000000 +0200
 @@ -17,6 +17,8 @@
   * October 1992
   */
@@ -1668,8 +1668,8 @@ diff -ur src.old/sys/msdosfs/bpb.h src/sys/msdosfs/bpb.h
   * BIOS Parameter Block (BPB) for DOS 3.3
   */
 diff -ur src.old/sys/msdosfs/denode.h src/sys/msdosfs/denode.h
---- src.old/sys/msdosfs/denode.h	1999-12-29 05:54:52.000000000 +0100
-+++ src/sys/msdosfs/denode.h	2004-08-26 03:12:39.000000000 +0200
+--- src.old/sys/msdosfs/denode.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/msdosfs/denode.h	2004-09-16 15:11:07.000000000 +0200
 @@ -91,6 +91,9 @@
   *   things.
   */
@@ -1681,8 +1681,8 @@ diff -ur src.old/sys/msdosfs/denode.h src/sys/msdosfs/denode.h
   * Internal pseudo-offset for (nonexistent) directory entry for the root
   * dir in the root dir
 diff -ur src.old/sys/msdosfs/direntry.h src/sys/msdosfs/direntry.h
---- src.old/sys/msdosfs/direntry.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/msdosfs/direntry.h	2004-08-26 03:13:13.000000000 +0200
+--- src.old/sys/msdosfs/direntry.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/msdosfs/direntry.h	2004-09-16 15:11:07.000000000 +0200
 @@ -48,6 +48,8 @@
   * October 1992
   */
@@ -1693,8 +1693,8 @@ diff -ur src.old/sys/msdosfs/direntry.h src/sys/msdosfs/direntry.h
   * Structure of a dos directory entry.
   */
 diff -ur src.old/sys/msdosfs/msdosfsmount.h src/sys/msdosfs/msdosfsmount.h
---- src.old/sys/msdosfs/msdosfsmount.h	2000-10-27 11:45:07.000000000 +0200
-+++ src/sys/msdosfs/msdosfsmount.h	2004-08-26 03:13:54.000000000 +0200
+--- src.old/sys/msdosfs/msdosfsmount.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/msdosfs/msdosfsmount.h	2004-09-16 15:11:07.000000000 +0200
 @@ -51,6 +51,8 @@
  #ifndef _MSDOSFS_MSDOSFSMOUNT_H_
  #define	_MSDOSFS_MSDOSFSMOUNT_H_
@@ -1705,8 +1705,8 @@ diff -ur src.old/sys/msdosfs/msdosfsmount.h src/sys/msdosfs/msdosfsmount.h
  
  #ifdef MALLOC_DECLARE
 diff -ur src.old/sys/net/bpf.h src/sys/net/bpf.h
---- src.old/sys/net/bpf.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/net/bpf.h	2004-08-26 03:14:31.000000000 +0200
+--- src.old/sys/net/bpf.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/bpf.h	2004-09-16 15:11:07.000000000 +0200
 @@ -44,6 +44,8 @@
  #ifndef _NET_BPF_H_
  #define _NET_BPF_H_
@@ -1717,8 +1717,8 @@ diff -ur src.old/sys/net/bpf.h src/sys/net/bpf.h
  #define	BPF_RELEASE 199606
  
 diff -ur src.old/sys/net/bpfdesc.h src/sys/net/bpfdesc.h
---- src.old/sys/net/bpfdesc.h	2001-12-17 20:32:33.000000000 +0100
-+++ src/sys/net/bpfdesc.h	2004-08-26 03:15:15.000000000 +0200
+--- src.old/sys/net/bpfdesc.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/bpfdesc.h	2004-09-16 15:11:07.000000000 +0200
 @@ -43,6 +43,8 @@
  #ifndef _NET_BPFDESC_H_
  #define _NET_BPFDESC_H_
@@ -1729,8 +1729,8 @@ diff -ur src.old/sys/net/bpfdesc.h src/sys/net/bpfdesc.h
  #include <sys/select.h>
  
 diff -ur src.old/sys/net/bridge.h src/sys/net/bridge.h
---- src.old/sys/net/bridge.h	2002-02-15 06:13:58.000000000 +0100
-+++ src/sys/net/bridge.h	2004-08-26 03:16:09.000000000 +0200
+--- src.old/sys/net/bridge.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/bridge.h	2004-09-16 15:11:07.000000000 +0200
 @@ -27,6 +27,8 @@
   * $FreeBSD: src/sys/net/bridge.h,v 1.4.2.5 2002/02/15 05:13:58 luigi Exp $
   */
@@ -1741,8 +1741,8 @@ diff -ur src.old/sys/net/bridge.h src/sys/net/bridge.h
  
  /*
 diff -ur src.old/sys/net/hostcache.h src/sys/net/hostcache.h
---- src.old/sys/net/hostcache.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/net/hostcache.h	2004-08-26 03:17:01.000000000 +0200
+--- src.old/sys/net/hostcache.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/hostcache.h	2004-09-16 15:11:07.000000000 +0200
 @@ -32,6 +32,9 @@
  #ifndef _NET_HOSTCACHE_H
  #define	_NET_HOSTCACHE_H	1
@@ -1754,8 +1754,8 @@ diff -ur src.old/sys/net/hostcache.h src/sys/net/hostcache.h
   * This file defines the interface between network protocols and
   * the cache of host-specific information maintained by the kernel.
 diff -ur src.old/sys/net/if_arc.h src/sys/net/if_arc.h
---- src.old/sys/net/if_arc.h	2002-02-21 00:34:09.000000000 +0100
-+++ src/sys/net/if_arc.h	2004-08-26 03:19:22.000000000 +0200
+--- src.old/sys/net/if_arc.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_arc.h	2004-09-16 15:11:07.000000000 +0200
 @@ -40,6 +40,9 @@
  #ifndef _NET_IF_ARC_H_
  #define _NET_IF_ARC_H_
@@ -1767,8 +1767,8 @@ diff -ur src.old/sys/net/if_arc.h src/sys/net/if_arc.h
   * Arcnet address - 1 octets
   * don't know who uses this.
 diff -ur src.old/sys/net/if_arp.h src/sys/net/if_arp.h
---- src.old/sys/net/if_arp.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/net/if_arp.h	2004-09-02 08:12:50.000000000 +0200
+--- src.old/sys/net/if_arp.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_arp.h	2004-09-16 15:11:07.000000000 +0200
 @@ -41,6 +41,7 @@
  #include <sys/types.h>
  /* Define 'struct sockaddr'.  */
@@ -1794,8 +1794,8 @@ diff -ur src.old/sys/net/if_arp.h src/sys/net/if_arp.h
  extern u_char	arcbroadcastaddr;
  #endif
 diff -ur src.old/sys/net/if_atm.h src/sys/net/if_atm.h
---- src.old/sys/net/if_atm.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/net/if_atm.h	2004-08-26 03:19:58.000000000 +0200
+--- src.old/sys/net/if_atm.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_atm.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,8 @@
   * net/if_atm.h
   */
@@ -1806,22 +1806,22 @@ diff -ur src.old/sys/net/if_atm.h src/sys/net/if_atm.h
  #define RTALLOC1(A,B)		rtalloc1((A),(B))
  #elif defined(__FreeBSD_kernel__)
 diff -ur src.old/sys/net/if_gif.h src/sys/net/if_gif.h
---- src.old/sys/net/if_gif.h	2001-07-24 21:10:18.000000000 +0200
-+++ src/sys/net/if_gif.h	2004-08-26 03:29:41.000000000 +0200
+--- src.old/sys/net/if_gif.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_gif.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,10 @@
  #ifndef _NET_IF_GIF_H_
  #define _NET_IF_GIF_H_
  
 +#include <net/if_var.h>			/* ifnet */
-+#include <bsd/queue.h>
++#include "/usr/src/kfreebsd4-headers/sys/queue.h"
 +#include <sys/types.h>
 +#include <net/route.h>			/* route */
  
  #if defined(_KERNEL) && !defined(_LKM)
  #include "opt_inet.h"
 diff -ur src.old/sys/net/if_ieee80211.h src/sys/net/if_ieee80211.h
---- src.old/sys/net/if_ieee80211.h	2002-04-24 17:20:19.000000000 +0200
-+++ src/sys/net/if_ieee80211.h	2004-08-26 03:31:35.000000000 +0200
+--- src.old/sys/net/if_ieee80211.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_ieee80211.h	2004-09-16 15:11:07.000000000 +0200
 @@ -4,6 +4,10 @@
  #ifndef _NET_IF_IEEE80211_H_
  #define _NET_IF_IEEE80211_H_
@@ -1834,8 +1834,8 @@ diff -ur src.old/sys/net/if_ieee80211.h src/sys/net/if_ieee80211.h
   * generic definitions for IEEE 802.11 frames
   */
 diff -ur src.old/sys/net/if_llc.h src/sys/net/if_llc.h
---- src.old/sys/net/if_llc.h	1999-08-28 02:48:18.000000000 +0200
-+++ src/sys/net/if_llc.h	2004-08-26 03:31:58.000000000 +0200
+--- src.old/sys/net/if_llc.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_llc.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,8 @@
  #ifndef _NET_IF_LLC_H_
  #define _NET_IF_LLC_H_
@@ -1846,8 +1846,8 @@ diff -ur src.old/sys/net/if_llc.h src/sys/net/if_llc.h
   * IEEE 802.2 Link Level Control headers, for use in conjunction with
   * 802.{3,4,5} media access control methods.
 diff -ur src.old/sys/net/if_mib.h src/sys/net/if_mib.h
---- src.old/sys/net/if_mib.h	1999-08-28 02:48:19.000000000 +0200
-+++ src/sys/net/if_mib.h	2004-08-26 03:33:10.000000000 +0200
+--- src.old/sys/net/if_mib.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_mib.h	2004-09-16 15:11:07.000000000 +0200
 @@ -32,6 +32,8 @@
  #ifndef _NET_IF_MIB_H
  #define	_NET_IF_MIB_H	1
@@ -1858,8 +1858,8 @@ diff -ur src.old/sys/net/if_mib.h src/sys/net/if_mib.h
  	char	ifmd_name[IFNAMSIZ]; /* name of interface */
  	int	ifmd_pcount;	/* number of promiscuous listeners */
 diff -ur src.old/sys/net/if_pppvar.h src/sys/net/if_pppvar.h
---- src.old/sys/net/if_pppvar.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/net/if_pppvar.h	2004-08-26 03:39:22.000000000 +0200
+--- src.old/sys/net/if_pppvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_pppvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -42,6 +42,11 @@
   * $FreeBSD: src/sys/net/if_pppvar.h,v 1.15 2000/01/29 16:56:23 peter Exp $
   */
@@ -1873,8 +1873,8 @@ diff -ur src.old/sys/net/if_pppvar.h src/sys/net/if_pppvar.h
   * Supported network protocols.  These values are used for
   * indexing sc_npmode.
 diff -ur src.old/sys/net/if_slvar.h src/sys/net/if_slvar.h
---- src.old/sys/net/if_slvar.h	1999-08-28 02:48:21.000000000 +0200
-+++ src/sys/net/if_slvar.h	2004-08-26 03:49:06.000000000 +0200
+--- src.old/sys/net/if_slvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_slvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -39,6 +39,8 @@
  #define _NET_IF_SLVAR_H_
  
@@ -1885,8 +1885,8 @@ diff -ur src.old/sys/net/if_slvar.h src/sys/net/if_slvar.h
  /*
   * Definitions for SLIP interface data structures
 diff -ur src.old/sys/net/if_sppp.h src/sys/net/if_sppp.h
---- src.old/sys/net/if_sppp.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/net/if_sppp.h	2004-09-02 08:02:34.000000000 +0200
+--- src.old/sys/net/if_sppp.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_sppp.h	2004-09-16 15:11:07.000000000 +0200
 @@ -22,6 +22,8 @@
  #ifndef _NET_IF_SPPP_H_
  #define _NET_IF_SPPP_H_ 1
@@ -1897,8 +1897,8 @@ diff -ur src.old/sys/net/if_sppp.h src/sys/net/if_sppp.h
  
  struct slcp {
 diff -ur src.old/sys/net/if_stf.h src/sys/net/if_stf.h
---- src.old/sys/net/if_stf.h	2002-04-28 07:40:25.000000000 +0200
-+++ src/sys/net/if_stf.h	2004-09-02 08:05:45.000000000 +0200
+--- src.old/sys/net/if_stf.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_stf.h	2004-09-16 15:11:07.000000000 +0200
 @@ -33,6 +33,8 @@
  #ifndef _NET_IF_STF_H_
  #define _NET_IF_STF_H_
@@ -1909,8 +1909,8 @@ diff -ur src.old/sys/net/if_stf.h src/sys/net/if_stf.h
  
  #endif /* _NET_IF_STF_H_ */
 diff -ur src.old/sys/net/if_tap.h src/sys/net/if_tap.h
---- src.old/sys/net/if_tap.h	2000-07-27 15:57:05.000000000 +0200
-+++ src/sys/net/if_tap.h	2004-09-02 08:05:59.000000000 +0200
+--- src.old/sys/net/if_tap.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_tap.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,8 @@
  #ifndef _NET_IF_TAP_H_
  #define _NET_IF_TAP_H_
@@ -1921,8 +1921,8 @@ diff -ur src.old/sys/net/if_tap.h src/sys/net/if_tap.h
  
  /* maximum receive packet size (hard limit) */
 diff -ur src.old/sys/net/if_tapvar.h src/sys/net/if_tapvar.h
---- src.old/sys/net/if_tapvar.h	2000-07-27 15:57:05.000000000 +0200
-+++ src/sys/net/if_tapvar.h	2004-09-02 08:16:53.000000000 +0200
+--- src.old/sys/net/if_tapvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_tapvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -41,6 +41,11 @@
  #ifndef _NET_IF_TAPVAR_H_
  #define _NET_IF_TAPVAR_H_
@@ -1936,8 +1936,8 @@ diff -ur src.old/sys/net/if_tapvar.h src/sys/net/if_tapvar.h
  	struct arpcom	arpcom;			/* ethernet common data      */
  #define tap_if		arpcom.ac_if
 diff -ur src.old/sys/net/if_tun.h src/sys/net/if_tun.h
---- src.old/sys/net/if_tun.h	2000-01-23 02:47:12.000000000 +0100
-+++ src/sys/net/if_tun.h	2004-09-02 08:17:06.000000000 +0200
+--- src.old/sys/net/if_tun.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_tun.h	2004-09-16 15:11:07.000000000 +0200
 @@ -19,6 +19,8 @@
  #ifndef _NET_IF_TUN_H_
  #define _NET_IF_TUN_H_
@@ -1948,8 +1948,8 @@ diff -ur src.old/sys/net/if_tun.h src/sys/net/if_tun.h
  
  /* Maximum transmit packet size (default) */
 diff -ur src.old/sys/net/if_tunvar.h src/sys/net/if_tunvar.h
---- src.old/sys/net/if_tunvar.h	2000-01-23 02:47:12.000000000 +0100
-+++ src/sys/net/if_tunvar.h	2004-09-02 08:18:35.000000000 +0200
+--- src.old/sys/net/if_tunvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_tunvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -29,6 +29,10 @@
  #ifndef _NET_IF_TUNVAR_H_
  #define _NET_IF_TUNVAR_H_
@@ -1962,8 +1962,8 @@ diff -ur src.old/sys/net/if_tunvar.h src/sys/net/if_tunvar.h
  	u_short	tun_flags;		/* misc flags */
  #define	TUN_OPEN	0x0001
 diff -ur src.old/sys/net/if_vlan_var.h src/sys/net/if_vlan_var.h
---- src.old/sys/net/if_vlan_var.h	2001-12-04 21:01:54.000000000 +0100
-+++ src/sys/net/if_vlan_var.h	2004-09-02 08:19:53.000000000 +0200
+--- src.old/sys/net/if_vlan_var.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/if_vlan_var.h	2004-09-16 15:11:07.000000000 +0200
 @@ -32,6 +32,10 @@
  #ifndef _NET_IF_VLAN_VAR_H_
  #define	_NET_IF_VLAN_VAR_H_	1
@@ -1976,8 +1976,8 @@ diff -ur src.old/sys/net/if_vlan_var.h src/sys/net/if_vlan_var.h
  struct vlan_mc_entry {
  	struct ether_addr		mc_addr;
 diff -ur src.old/sys/net/iso88025.h src/sys/net/iso88025.h
---- src.old/sys/net/iso88025.h	2002-06-18 02:15:31.000000000 +0200
-+++ src/sys/net/iso88025.h	2004-09-02 08:20:04.000000000 +0200
+--- src.old/sys/net/iso88025.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/iso88025.h	2004-09-16 15:11:07.000000000 +0200
 @@ -43,6 +43,8 @@
  #ifndef _NET_ISO88025_H_
  #define _NET_ISO88025_H_
@@ -1988,8 +1988,8 @@ diff -ur src.old/sys/net/iso88025.h src/sys/net/iso88025.h
   * General ISO 802.5 definitions
   */
 diff -ur src.old/sys/net/pfkeyv2.h src/sys/net/pfkeyv2.h
---- src.old/sys/net/pfkeyv2.h	2001-10-24 21:49:13.000000000 +0200
-+++ src/sys/net/pfkeyv2.h	2004-09-02 08:20:14.000000000 +0200
+--- src.old/sys/net/pfkeyv2.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/pfkeyv2.h	2004-09-16 15:11:07.000000000 +0200
 @@ -39,6 +39,8 @@
  #ifndef _NET_PFKEYV2_H_
  #define _NET_PFKEYV2_H_
@@ -2000,8 +2000,8 @@ diff -ur src.old/sys/net/pfkeyv2.h src/sys/net/pfkeyv2.h
  This file defines structures and symbols for the PF_KEY Version 2
  key management interface. It was written at the U.S. Naval Research
 diff -ur src.old/sys/net/ppp_defs.h src/sys/net/ppp_defs.h
---- src.old/sys/net/ppp_defs.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/net/ppp_defs.h	2004-08-26 03:34:08.000000000 +0200
+--- src.old/sys/net/ppp_defs.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/ppp_defs.h	2004-09-16 15:11:07.000000000 +0200
 @@ -30,6 +30,8 @@
  #ifndef _PPP_DEFS_H_
  #define _PPP_DEFS_H_
@@ -2012,8 +2012,8 @@ diff -ur src.old/sys/net/ppp_defs.h src/sys/net/ppp_defs.h
   * The basic PPP frame.
   */
 diff -ur src.old/sys/net/radix.h src/sys/net/radix.h
---- src.old/sys/net/radix.h	2000-05-03 21:17:11.000000000 +0200
-+++ src/sys/net/radix.h	2004-09-02 08:20:38.000000000 +0200
+--- src.old/sys/net/radix.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/radix.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,8 @@
  #ifndef _RADIX_H_
  #define	_RADIX_H_
@@ -2024,8 +2024,8 @@ diff -ur src.old/sys/net/radix.h src/sys/net/radix.h
  MALLOC_DECLARE(M_RTABLE);
  #endif
 diff -ur src.old/sys/net/raw_cb.h src/sys/net/raw_cb.h
---- src.old/sys/net/raw_cb.h	1999-12-29 05:38:37.000000000 +0100
-+++ src/sys/net/raw_cb.h	2004-09-02 08:24:26.000000000 +0200
+--- src.old/sys/net/raw_cb.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/raw_cb.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,7 @@
  #define _NET_RAW_CB_H_
  
@@ -2035,8 +2035,8 @@ diff -ur src.old/sys/net/raw_cb.h src/sys/net/raw_cb.h
  /*
   * Raw protocol interface control block.  Used
 diff -ur src.old/sys/net/route.h src/sys/net/route.h
---- src.old/sys/net/route.h	2002-02-01 12:48:01.000000000 +0100
-+++ src/sys/net/route.h	2004-09-02 08:27:33.000000000 +0200
+--- src.old/sys/net/route.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/route.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,9 @@
  #ifndef _NET_ROUTE_H_
  #define _NET_ROUTE_H_
@@ -2048,8 +2048,8 @@ diff -ur src.old/sys/net/route.h src/sys/net/route.h
   * Kernel resident routing tables.
   *
 diff -ur src.old/sys/net/slcompress.h src/sys/net/slcompress.h
---- src.old/sys/net/slcompress.h	2000-05-05 15:37:06.000000000 +0200
-+++ src/sys/net/slcompress.h	2004-08-26 03:50:50.000000000 +0200
+--- src.old/sys/net/slcompress.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/net/slcompress.h	2004-09-16 15:11:07.000000000 +0200
 @@ -40,6 +40,8 @@
  #ifndef _NET_SLCOMPRESS_H_
  #define _NET_SLCOMPRESS_H_
@@ -2060,8 +2060,8 @@ diff -ur src.old/sys/net/slcompress.h src/sys/net/slcompress.h
  #define MAX_HDR 128
  
 diff -ur src.old/sys/netatalk/aarp.h src/sys/netatalk/aarp.h
---- src.old/sys/netatalk/aarp.h	1999-12-29 05:45:57.000000000 +0100
-+++ src/sys/netatalk/aarp.h	2004-09-02 08:29:47.000000000 +0200
+--- src.old/sys/netatalk/aarp.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatalk/aarp.h	2004-09-16 15:11:07.000000000 +0200
 @@ -6,6 +6,11 @@
   */
  
@@ -2075,8 +2075,8 @@ diff -ur src.old/sys/netatalk/aarp.h src/sys/netatalk/aarp.h
   * This structure is used for both phase 1 and 2. Under phase 1
   * the net is not filled in. It is in phase 2. In both cases, the
 diff -ur src.old/sys/netatalk/at.h src/sys/netatalk/at.h
---- src.old/sys/netatalk/at.h	1998-02-03 22:56:42.000000000 +0100
-+++ src/sys/netatalk/at.h	2004-09-02 08:29:58.000000000 +0200
+--- src.old/sys/netatalk/at.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatalk/at.h	2004-09-16 15:11:07.000000000 +0200
 @@ -23,6 +23,9 @@
  
  #ifndef __AT_HEADER__
@@ -2088,8 +2088,8 @@ diff -ur src.old/sys/netatalk/at.h src/sys/netatalk/at.h
   * Supported protocols
   */
 diff -ur src.old/sys/netatalk/at_extern.h src/sys/netatalk/at_extern.h
---- src.old/sys/netatalk/at_extern.h	1998-06-07 19:12:10.000000000 +0200
-+++ src/sys/netatalk/at_extern.h	2004-09-02 08:30:39.000000000 +0200
+--- src.old/sys/netatalk/at_extern.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatalk/at_extern.h	2004-09-16 15:11:07.000000000 +0200
 @@ -1,3 +1,6 @@
 +#include <sys/cdefs.h>			/* __P */
 +#include <sys/types.h>
@@ -2098,8 +2098,8 @@ diff -ur src.old/sys/netatalk/at_extern.h src/sys/netatalk/at_extern.h
  struct sockaddr_at;
  
 diff -ur src.old/sys/netatalk/at_var.h src/sys/netatalk/at_var.h
---- src.old/sys/netatalk/at_var.h	1999-12-29 05:45:57.000000000 +0100
-+++ src/sys/netatalk/at_var.h	2004-09-02 08:40:35.000000000 +0200
+--- src.old/sys/netatalk/at_var.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatalk/at_var.h	2004-09-16 15:11:07.000000000 +0200
 @@ -25,6 +25,11 @@
  
  #ifndef _NETATALK_AT_VAR_H_
@@ -2113,8 +2113,8 @@ diff -ur src.old/sys/netatalk/at_var.h src/sys/netatalk/at_var.h
   * For phase2, we need to keep not only our address on an interface,
   * but also the legal networks on the interface.
 diff -ur src.old/sys/netatalk/ddp.h src/sys/netatalk/ddp.h
---- src.old/sys/netatalk/ddp.h	1996-05-24 03:35:34.000000000 +0200
-+++ src/sys/netatalk/ddp.h	2004-09-02 08:40:55.000000000 +0200
+--- src.old/sys/netatalk/ddp.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatalk/ddp.h	2004-09-16 15:11:07.000000000 +0200
 @@ -23,6 +23,8 @@
  #ifndef _NETATALK_DDP_H_
  #define _NETATALK_DDP_H_ 1
@@ -2125,8 +2125,8 @@ diff -ur src.old/sys/netatalk/ddp.h src/sys/netatalk/ddp.h
   * <-1byte(8bits) ->
   * +---------------+
 diff -ur src.old/sys/netatalk/ddp_var.h src/sys/netatalk/ddp_var.h
---- src.old/sys/netatalk/ddp_var.h	1999-12-29 05:45:58.000000000 +0100
-+++ src/sys/netatalk/ddp_var.h	2004-09-02 08:41:52.000000000 +0200
+--- src.old/sys/netatalk/ddp_var.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatalk/ddp_var.h	2004-09-16 15:11:07.000000000 +0200
 @@ -7,6 +7,10 @@
  
  #ifndef _NETATALK_DDP_VAR_H_
@@ -2139,8 +2139,8 @@ diff -ur src.old/sys/netatalk/ddp_var.h src/sys/netatalk/ddp_var.h
      struct sockaddr_at	ddp_fsat, ddp_lsat;
      struct route	ddp_route;
 diff -ur src.old/sys/netatm/atm.h src/sys/netatm/atm.h
---- src.old/sys/netatm/atm.h	1999-08-28 02:48:34.000000000 +0200
-+++ src/sys/netatm/atm.h	2004-09-02 08:50:10.000000000 +0200
+--- src.old/sys/netatm/atm.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatm/atm.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,7 @@
  #ifndef _NETATM_ATM_H
  #define _NETATM_ATM_H
@@ -2150,8 +2150,8 @@ diff -ur src.old/sys/netatm/atm.h src/sys/netatm/atm.h
  /*
   * The definitions in this file are intended to conform to the 
 diff -ur src.old/sys/netatm/atm_cm.h src/sys/netatm/atm_cm.h
---- src.old/sys/netatm/atm_cm.h	1999-08-28 02:48:35.000000000 +0200
-+++ src/sys/netatm/atm_cm.h	2004-09-02 09:12:34.000000000 +0200
+--- src.old/sys/netatm/atm_cm.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatm/atm_cm.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,13 @@
  #ifndef _NETATM_ATM_CM_H
  #define _NETATM_ATM_CM_H
@@ -2199,8 +2199,8 @@ diff -ur src.old/sys/netatm/atm_cm.h src/sys/netatm/atm_cm.h
   * Connection Flags
   */
 diff -ur src.old/sys/netatm/atm_if.h src/sys/netatm/atm_if.h
---- src.old/sys/netatm/atm_if.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/netatm/atm_if.h	2004-09-02 08:59:30.000000000 +0200
+--- src.old/sys/netatm/atm_if.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatm/atm_if.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,8 @@
  #ifndef _NETATM_ATM_IF_H
  #define _NETATM_ATM_IF_H
@@ -2211,8 +2211,8 @@ diff -ur src.old/sys/netatm/atm_if.h src/sys/netatm/atm_if.h
   * Handy constants
   */
 diff -ur src.old/sys/netatm/atm_ioctl.h src/sys/netatm/atm_ioctl.h
---- src.old/sys/netatm/atm_ioctl.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/netatm/atm_ioctl.h	2004-09-02 09:03:29.000000000 +0200
+--- src.old/sys/netatm/atm_ioctl.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatm/atm_ioctl.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,13 @@
  #ifndef _NETATM_ATM_IOCTL_H
  #define _NETATM_ATM_IOCTL_H
@@ -2228,8 +2228,8 @@ diff -ur src.old/sys/netatm/atm_ioctl.h src/sys/netatm/atm_ioctl.h
  /*
   * Structure for PF_ATM configure (AIOCCFG) socket ioctls
 diff -ur src.old/sys/netatm/atm_sap.h src/sys/netatm/atm_sap.h
---- src.old/sys/netatm/atm_sap.h	1999-08-28 02:48:37.000000000 +0200
-+++ src/sys/netatm/atm_sap.h	2004-09-02 09:04:13.000000000 +0200
+--- src.old/sys/netatm/atm_sap.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatm/atm_sap.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,8 @@
  #ifndef _NETATM_ATM_SAP_H
  #define _NETATM_ATM_SAP_H
@@ -2240,8 +2240,8 @@ diff -ur src.old/sys/netatm/atm_sap.h src/sys/netatm/atm_sap.h
   * Service Access Point (SAP)
   *
 diff -ur src.old/sys/netatm/atm_sys.h src/sys/netatm/atm_sys.h
---- src.old/sys/netatm/atm_sys.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/netatm/atm_sys.h	2004-09-02 09:13:18.000000000 +0200
+--- src.old/sys/netatm/atm_sys.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatm/atm_sys.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,8 @@
  #ifndef _NETATM_ATM_SYS_H
  #define _NETATM_ATM_SYS_H
@@ -2268,8 +2268,8 @@ diff -ur src.old/sys/netatm/atm_sys.h src/sys/netatm/atm_sys.h
   * Timer Flags
   */
 diff -ur src.old/sys/netatm/ipatm/ipatm_serv.h src/sys/netatm/ipatm/ipatm_serv.h
---- src.old/sys/netatm/ipatm/ipatm_serv.h	1999-08-28 02:48:45.000000000 +0200
-+++ src/sys/netatm/ipatm/ipatm_serv.h	2004-09-02 08:57:42.000000000 +0200
+--- src.old/sys/netatm/ipatm/ipatm_serv.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatm/ipatm/ipatm_serv.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,12 @@
  #ifndef _IPATM_IPATM_SERV_H
  #define _IPATM_IPATM_SERV_H
@@ -2284,8 +2284,8 @@ diff -ur src.old/sys/netatm/ipatm/ipatm_serv.h src/sys/netatm/ipatm/ipatm_serv.h
  /*
   * Structures specifying VCC parameters and pointers to all of the IP 
 diff -ur src.old/sys/netatm/port.h src/sys/netatm/port.h
---- src.old/sys/netatm/port.h	2002-02-13 01:43:11.000000000 +0100
-+++ src/sys/netatm/port.h	2004-09-02 08:56:02.000000000 +0200
+--- src.old/sys/netatm/port.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatm/port.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,14 @@
  #ifndef _NETATM_PORT_H
  #define	_NETATM_PORT_H
@@ -2302,8 +2302,8 @@ diff -ur src.old/sys/netatm/port.h src/sys/netatm/port.h
   * Try to ensure that this system is supported
   */
 diff -ur src.old/sys/netatm/spans/spans_cls.h src/sys/netatm/spans/spans_cls.h
---- src.old/sys/netatm/spans/spans_cls.h	1999-08-28 02:48:49.000000000 +0200
-+++ src/sys/netatm/spans/spans_cls.h	2004-09-02 12:58:07.000000000 +0200
+--- src.old/sys/netatm/spans/spans_cls.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatm/spans/spans_cls.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,11 @@
  #ifndef _SPANS_SPANSCLS_H
  #define _SPANS_SPANSCLS_H
@@ -2317,8 +2317,8 @@ diff -ur src.old/sys/netatm/spans/spans_cls.h src/sys/netatm/spans/spans_cls.h
   * Protocol constants
   */
 diff -ur src.old/sys/netatm/spans/spans_var.h src/sys/netatm/spans/spans_var.h
---- src.old/sys/netatm/spans/spans_var.h	1999-08-28 02:48:52.000000000 +0200
-+++ src/sys/netatm/spans/spans_var.h	2004-09-02 13:15:58.000000000 +0200
+--- src.old/sys/netatm/spans/spans_var.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netatm/spans/spans_var.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,6 +38,10 @@
  #ifndef _SPANS_SPANS_VAR_H
  #define _SPANS_SPANS_VAR_H
@@ -2341,8 +2341,8 @@ diff -ur src.old/sys/netatm/spans/spans_var.h src/sys/netatm/spans/spans_var.h
  
  #define	sv_type		vcp_hdr.vc_type
 diff -ur src.old/sys/netinet/in_systm.h src/sys/netinet/in_systm.h
---- src.old/sys/netinet/in_systm.h	1999-12-29 05:41:00.000000000 +0100
-+++ src/sys/netinet/in_systm.h	2004-08-24 02:07:33.000000000 +0200
+--- src.old/sys/netinet/in_systm.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/netinet/in_systm.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,8 @@
  #ifndef _NETINET_IN_SYSTM_H_
  #define _NETINET_IN_SYSTM_H_
@@ -2353,8 +2353,8 @@ diff -ur src.old/sys/netinet/in_systm.h src/sys/netinet/in_systm.h
   * Miscellaneous internetwork
   * definitions for kernel.
 diff -ur src.old/sys/pccard/pcicvar.h src/sys/pccard/pcicvar.h
---- src.old/sys/pccard/pcicvar.h	2001-09-13 19:54:50.000000000 +0200
-+++ src/sys/pccard/pcicvar.h	2004-08-23 06:58:37.000000000 +0200
+--- src.old/sys/pccard/pcicvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/pccard/pcicvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -111,7 +111,7 @@
  void pcic_putb_io(struct pcic_slot *sp, int reg, unsigned char val);
  int pcic_set_memory_offset(device_t bus, device_t child, int rid,
@@ -2365,8 +2365,8 @@ diff -ur src.old/sys/pccard/pcicvar.h src/sys/pccard/pcicvar.h
  #endif
      );
 diff -ur src.old/sys/pccard/slot.h src/sys/pccard/slot.h
---- src.old/sys/pccard/slot.h	2001-07-30 02:11:29.000000000 +0200
-+++ src/sys/pccard/slot.h	2004-08-23 06:58:37.000000000 +0200
+--- src.old/sys/pccard/slot.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/pccard/slot.h	2004-09-16 15:11:07.000000000 +0200
 @@ -47,7 +47,7 @@
  #include <machine/bus.h>
  #include <sys/rman.h>
@@ -2377,8 +2377,8 @@ diff -ur src.old/sys/pccard/slot.h src/sys/pccard/slot.h
  #else
  #include <sys/select.h>
 diff -ur src.old/sys/sys/buf.h src/sys/sys/buf.h
---- src.old/sys/sys/buf.h	2001-12-25 02:44:44.000000000 +0100
-+++ src/sys/sys/buf.h	2004-08-23 06:58:37.000000000 +0200
+--- src.old/sys/sys/buf.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/buf.h	2004-09-16 15:11:07.000000000 +0200
 @@ -44,6 +44,7 @@
  
  #include <sys/queue.h>
@@ -2388,8 +2388,8 @@ diff -ur src.old/sys/sys/buf.h src/sys/sys/buf.h
  struct buf;
  struct mount;
 diff -ur src.old/sys/sys/callout.h src/sys/sys/callout.h
---- src.old/sys/sys/callout.h	2004-08-19 23:05:48.000000000 +0200
-+++ src/sys/sys/callout.h	2004-08-23 06:59:59.000000000 +0200
+--- src.old/sys/sys/callout.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/callout.h	2004-09-16 15:11:07.000000000 +0200
 @@ -44,7 +44,13 @@
  
  #include <features.h>
@@ -2406,8 +2406,8 @@ diff -ur src.old/sys/sys/callout.h src/sys/sys/callout.h
  SLIST_HEAD(callout_list, callout);
  TAILQ_HEAD(callout_tailq, callout);
 diff -ur src.old/sys/sys/device_port.h src/sys/sys/device_port.h
---- src.old/sys/sys/device_port.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/sys/device_port.h	2004-08-23 06:58:37.000000000 +0200
+--- src.old/sys/sys/device_port.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/device_port.h	2004-09-16 15:11:07.000000000 +0200
 @@ -30,12 +30,8 @@
  #if defined(__NetBSD__)
  # include <sys/device.h>
@@ -2440,8 +2440,8 @@ diff -ur src.old/sys/sys/device_port.h src/sys/sys/device_port.h
  # define DEVPORT_PDEVUNIT(pdev)		device_get_unit(pdev)
  # define DEVPORT_PDEVFLAGS(pdev)	device_get_flags(pdev)
 diff -ur src.old/sys/sys/devicestat.h src/sys/sys/devicestat.h
---- src.old/sys/sys/devicestat.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/sys/devicestat.h	2004-08-23 07:01:02.000000000 +0200
+--- src.old/sys/sys/devicestat.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/devicestat.h	2004-09-16 15:11:07.000000000 +0200
 @@ -32,6 +32,10 @@
  #define _DEVICESTAT_H
  
@@ -2454,8 +2454,8 @@ diff -ur src.old/sys/sys/devicestat.h src/sys/sys/devicestat.h
  
  #define DEVSTAT_NAME_LEN  16
 diff -ur src.old/sys/sys/elf_common.h src/sys/sys/elf_common.h
---- src.old/sys/sys/elf_common.h	2001-02-28 03:30:46.000000000 +0100
-+++ src/sys/sys/elf_common.h	2004-08-23 23:46:24.000000000 +0200
+--- src.old/sys/sys/elf_common.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/elf_common.h	2004-09-16 15:11:07.000000000 +0200
 @@ -29,6 +29,8 @@
  #ifndef _SYS_ELF_COMMON_H_
  #define _SYS_ELF_COMMON_H_ 1
@@ -2466,8 +2466,8 @@ diff -ur src.old/sys/sys/elf_common.h src/sys/sys/elf_common.h
   * ELF definitions that are independent of architecture or word size.
   */
 diff -ur src.old/sys/sys/elf_generic.h src/sys/sys/elf_generic.h
---- src.old/sys/sys/elf_generic.h	1999-08-28 02:51:42.000000000 +0200
-+++ src/sys/sys/elf_generic.h	2004-08-24 01:47:42.000000000 +0200
+--- src.old/sys/sys/elf_generic.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/elf_generic.h	2004-09-16 15:11:07.000000000 +0200
 @@ -30,13 +30,24 @@
  #define _SYS_ELF_GENERIC_H_ 1
  
@@ -2495,8 +2495,8 @@ diff -ur src.old/sys/sys/elf_generic.h src/sys/sys/elf_generic.h
  #endif
  
 diff -ur src.old/sys/sys/event.h src/sys/sys/event.h
---- src.old/sys/sys/event.h	2004-08-19 23:05:48.000000000 +0200
-+++ src/sys/sys/event.h	2004-08-23 07:09:24.000000000 +0200
+--- src.old/sys/sys/event.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/event.h	2004-09-16 15:11:07.000000000 +0200
 @@ -111,6 +111,25 @@
   * programs which pull in <sys/proc.h> or <sys/select.h>.
   */
@@ -2524,8 +2524,8 @@ diff -ur src.old/sys/sys/event.h src/sys/sys/event.h
  SLIST_HEAD(klist, knote);
  
 diff -ur src.old/sys/sys/fbio.h src/sys/sys/fbio.h
---- src.old/sys/sys/fbio.h	2000-05-05 11:16:16.000000000 +0200
-+++ src/sys/sys/fbio.h	2004-08-23 23:29:29.000000000 +0200
+--- src.old/sys/sys/fbio.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/fbio.h	2004-09-16 15:11:07.000000000 +0200
 @@ -46,6 +46,7 @@
  #include <sys/types.h>
  #endif
@@ -2535,8 +2535,8 @@ diff -ur src.old/sys/sys/fbio.h src/sys/sys/fbio.h
  /*
   * Frame buffer ioctls (from Sprite, trimmed to essentials for X11).
 diff -ur src.old/sys/sys/filedesc.h src/sys/sys/filedesc.h
---- src.old/sys/sys/filedesc.h	2004-08-19 23:05:48.000000000 +0200
-+++ src/sys/sys/filedesc.h	2004-08-24 13:47:24.000000000 +0200
+--- src.old/sys/sys/filedesc.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/filedesc.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,7 +38,19 @@
  #define _SYS_FILEDESC_H_
  
@@ -2559,8 +2559,8 @@ diff -ur src.old/sys/sys/filedesc.h src/sys/sys/filedesc.h
  /*
   * This structure is used for the management of descriptors.  It may be
 diff -ur src.old/sys/sys/inttypes.h src/sys/sys/inttypes.h
---- src.old/sys/sys/inttypes.h	1999-08-28 02:51:47.000000000 +0200
-+++ src/sys/sys/inttypes.h	2004-08-25 00:01:19.000000000 +0200
+--- src.old/sys/sys/inttypes.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/inttypes.h	2004-09-16 15:11:07.000000000 +0200
 @@ -1,24 +1 @@
 -/*
 - * This file is in the public domain.
@@ -2588,8 +2588,8 @@ diff -ur src.old/sys/sys/inttypes.h src/sys/sys/inttypes.h
 -#endif /* !_SYS_INTTYPES_H_ */
 +#include <inttypes.h>
 diff -ur src.old/sys/sys/mbuf.h src/sys/sys/mbuf.h
---- src.old/sys/sys/mbuf.h	2002-06-27 23:27:23.000000000 +0200
-+++ src/sys/sys/mbuf.h	2004-09-02 08:56:46.000000000 +0200
+--- src.old/sys/sys/mbuf.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/mbuf.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,8 @@
  #ifndef _SYS_MBUF_H_
  #define	_SYS_MBUF_H_
@@ -2600,8 +2600,8 @@ diff -ur src.old/sys/sys/mbuf.h src/sys/sys/mbuf.h
   * Mbufs are of a single size, MSIZE (machine/param.h), which
   * includes overhead.  An mbuf may add a single "mbuf cluster" of size
 diff -ur src.old/sys/sys/module.h src/sys/sys/module.h
---- src.old/sys/sys/module.h	2002-03-17 12:07:45.000000000 +0100
-+++ src/sys/sys/module.h	2004-08-23 06:58:37.000000000 +0200
+--- src.old/sys/sys/module.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/module.h	2004-09-16 15:11:07.000000000 +0200
 @@ -29,6 +29,8 @@
  #ifndef _SYS_MODULE_H_
  #define _SYS_MODULE_H_
@@ -2612,14 +2612,14 @@ diff -ur src.old/sys/sys/module.h src/sys/sys/module.h
      MOD_LOAD,
      MOD_UNLOAD,
 diff -ur src.old/sys/sys/mount.h src/sys/sys/mount.h
---- src.old/sys/sys/mount.h	2002-04-26 02:46:00.000000000 +0200
-+++ src/sys/sys/mount.h	2004-08-26 02:58:57.000000000 +0200
+--- src.old/sys/sys/mount.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/mount.h	2004-09-16 15:11:21.000000000 +0200
 @@ -45,12 +45,12 @@
  #endif /* !_POSIX_C_SOURCE */
  #endif /* !_KERNEL */
  
 -#include <sys/queue.h>
-+#include <bsd/queue.h>
++#include "/usr/src/kfreebsd4-headers/sys/queue.h"
  #ifdef _KERNEL
  #include <sys/lock.h>
  #endif
@@ -2698,8 +2698,8 @@ diff -ur src.old/sys/sys/mount.h src/sys/sys/mount.h
  /* C library stuff */
  void	endvfsent __P((void));
 diff -ur src.old/sys/sys/sbuf.h src/sys/sys/sbuf.h
---- src.old/sys/sys/sbuf.h	2002-03-12 02:00:28.000000000 +0100
-+++ src/sys/sys/sbuf.h	2004-08-23 07:13:46.000000000 +0200
+--- src.old/sys/sys/sbuf.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/sbuf.h	2004-09-16 15:11:07.000000000 +0200
 @@ -62,8 +62,8 @@
  int		 sbuf_bcpy(struct sbuf *, const char *, size_t);
  int		 sbuf_cat(struct sbuf *, const char *);
@@ -2712,8 +2712,8 @@ diff -ur src.old/sys/sys/sbuf.h src/sys/sys/sbuf.h
  int		 sbuf_trim(struct sbuf *);
  int		 sbuf_overflowed(struct sbuf *);
 diff -ur src.old/sys/sys/signalvar.h src/sys/sys/signalvar.h
---- src.old/sys/sys/signalvar.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/sys/signalvar.h	2004-08-26 02:19:38.000000000 +0200
+--- src.old/sys/sys/signalvar.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/signalvar.h	2004-09-16 15:11:07.000000000 +0200
 @@ -40,6 +40,7 @@
  #include <sys/signal.h>
  #include <sys/proc.h>
@@ -2733,8 +2733,8 @@ diff -ur src.old/sys/sys/signalvar.h src/sys/sys/signalvar.h
   * Compatibility.
   */
 diff -ur src.old/sys/sys/socket.h src/sys/sys/socket.h
---- src.old/sys/sys/socket.h	2001-07-03 13:02:01.000000000 +0200
-+++ src/sys/sys/socket.h	2004-09-02 08:27:59.000000000 +0200
+--- src.old/sys/sys/socket.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/socket.h	2004-09-16 15:11:07.000000000 +0200
 @@ -37,6 +37,8 @@
  #ifndef _SYS_SOCKET_H_
  #define	_SYS_SOCKET_H_
@@ -2745,8 +2745,8 @@ diff -ur src.old/sys/sys/socket.h src/sys/sys/socket.h
  #define _NO_NAMESPACE_POLLUTION
  #include <machine/param.h>
 diff -ur src.old/sys/sys/systm.h src/sys/sys/systm.h
---- src.old/sys/sys/systm.h	2004-08-19 23:05:47.000000000 +0200
-+++ src/sys/sys/systm.h	2004-08-23 07:14:27.000000000 +0200
+--- src.old/sys/sys/systm.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/systm.h	2004-09-16 15:11:07.000000000 +0200
 @@ -45,6 +45,10 @@
  #include <machine/atomic.h>
  #include <machine/cpufunc.h>
@@ -2809,8 +2809,8 @@ diff -ur src.old/sys/sys/systm.h src/sys/sys/systm.h
 +dev_t makeudev(int x, int y);
  #endif /* !_SYS_SYSTM_H_ */
 diff -ur src.old/sys/sys/time.h src/sys/sys/time.h
---- src.old/sys/sys/time.h	1999-12-29 05:24:48.000000000 +0100
-+++ src/sys/sys/time.h	2004-08-25 02:07:04.000000000 +0200
+--- src.old/sys/sys/time.h	2004-09-16 15:11:01.000000000 +0200
++++ src/sys/sys/time.h	2004-09-16 15:11:07.000000000 +0200
 @@ -38,22 +38,10 @@
  #define _SYS_TIME_H_
  
