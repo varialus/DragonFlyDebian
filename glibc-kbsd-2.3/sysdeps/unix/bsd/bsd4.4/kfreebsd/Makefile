@@ -60,7 +60,7 @@ sysdep_routines += kldfind kldfirstmod kldload kldnext kldstat kldsym kldunload
 # For <sys/mman.h>.
 sysdep_routines += minherit sys_mmap
 # For <sys/mount.h>.
-sysdep_routines += fhopen sys_fhstat fhstat fhstat64 fhstatfs fhstatfs64 getfh getfsstat getfsstat64 getmntinfo getmntinfo64 mount unmount
+sysdep_routines += fhopen sys_fhstat fhstat fhstat64 fhstatfs fhstatfs64 getfh getfsstat getfsstat64 getmntinfo getmntinfo64
 # For <sys/ptrace.h>.
 sysdep_routines += sys_ptrace
 # For <sys/rfork.h>.
@@ -85,6 +85,12 @@ endif
 ifeq ($(subdir),time)
 # For <sys/timex.h>.
 sysdep_routines += ntp_adjtime ntp_gettime
+endif
+
+# Linuxthreads dependencies.
+
+ifeq ($(subdir),posix)
+sysdep_headers += bits/pthreadtypes.h bits/initspin.h
 endif
 
 # Don't compile the ctype glue code, since we have a much better <ctype.h>

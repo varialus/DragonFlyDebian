@@ -21,13 +21,14 @@
 #define _SYS_MOUNT_H	1
 
 #include <features.h>
-#include "/usr/src/kfreebsd4-headers/sys/mount.h"
-
-/* Mounting and unmounting filesystems.  */
 
 /* Retrieving the list of mounted filesystems.  */
 
 #include <bits/statfs.h>
+
+/* Mounting and unmounting filesystems.  */
+
+#include "/usr/src/kfreebsd4-headers/sys/mount.h"
 
 __BEGIN_DECLS
 
