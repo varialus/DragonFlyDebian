@@ -1,0 +1,86 @@
+#! /bin/sh
+# reportbug_libtool - report a bug against a package, asking to update libtool
+#
+# Copyright (C) 2005 Aurelien Jarno
+# Licensed under the GNU GPL v2.
+
+if [ -z "$1" ] ; then
+  echo "Usage: $0 sourcepackage"
+  exit 1;
+fi
+
+PACKAGE=$1
+VERSION=$(apt-cache showsrc $PACKAGE | grep ^Version: | head -n 1 | sed -e "s/^Version: //g" -e "s/\+libtool//g")
+
+if [ -z "$VERSION" ] ; then
+  echo "Package $PACKAGE not found"
+  exit 1;
+fi
+
+echo "Reporting bug against $PACKAGE version $VERSION".
+
+if [ -z "$DEBEMAIL" ] ; then
+  DEBEMAIL="$USER@$(hostname)"
+  echo "Warning: DEBMAIL not set. Using $DEBEMAIL."
+fi
+
+if [ -n "$DEBUSER" ] ; then
+  MAIL="$DEBEMAIL"
+else
+  MAIL="$DEBUSER <$DEBEMAIL>"
+fi
+
+CHARMAP="$(locale charmap)"
+LC_CTYPE="$(locale | grep LC_CTYPE | sed -e "s/LC_CTYPE=\"\(.*\)\"/\1/g")"
+LANG="$(locale | grep LANG | sed -e "s/LANG=\(.*\)/\1/g")"
+
+cat << EOF | /usr/sbin/sendmail -bm submit@bugs.debian.org,$DEBEMAIL
+From: $MAIL
+To: Debian Bug Tracking System <submit@bugs.debian.org>
+Subject: ${PACKAGE}_${VERSION}(GNU/k*BSD): FTBFS: out of date libtool scripts
+Date: $(date -R)
+
+Package: $PACKAGE
+Version: $VERSION
+Severity: wishlist
+
+Hello,
+
+
+The current version of $PACKAGE ($VERSION) fails to build on 
+GNU/kFreeBSD, because of outdated libtool.
+
+The version of config.guess and config.sub in $PACKAGE is too 
+old to correctly support Debian GNU/k*BSD.  libtool 1.5.2-1 or 
+later is need. 
+
+Here is how to update the libtool in your package (Make sure you
+are using libtool 1.5.2-1 or later:
+  libtoolize -c -f
+  aclocal (-Im4 might be needed if there's an "m4" template dir)
+  autoconf
+
+If your package uses a tar-in-tar system you'll have to run these
+ommands on build time by other means.  Particularly, if you use 
+CDBS the DEB_AUTO_UPDATE_{LIBTOOL,AUTOMAKE,AUTOCONF} variables can 
+help you.
+
+It would also be nice if you cans ask upstream to update 
+libtool in their next release.
+
+
+Thanks for your cooperation.
+
+
+-- System Information:
+Debian Release: $(cat /etc/debian_version)
+  APT prefers unstable
+  APT policy: (500, 'unstable')
+Architecture: $(dpkg-architecture -qDEB_BUILD_ARCH) ($(uname -m))
+Kernel: $(uname -s -r)
+Locale: LANG=$LANG, LC_CTYPE=$LC_CTYPE (charmap=$CHARMAP)
+
+EOF
+
+echo "Done."		
+
