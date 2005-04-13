@@ -6,53 +6,47 @@
 
 if [ -z "$1" ] ; then
   echo "Usage: $0 sourcepackage"
-  exit 1;
+  exit 1
 fi
 
-PACKAGE=$1
-VERSION=$(apt-cache showsrc $PACKAGE | grep ^Version: | head -n 1 | sed -e "s/^Version: //g" -e "s/\+libtool//g")
-
-if [ -z "$VERSION" ] ; then
-  echo "Package $PACKAGE not found"
-  exit 1;
+if [ ! -x "/usr/bin/reportbug" ] ; then
+  echo "reportbug not found. Please install if"
+  exit 1
 fi
 
-echo "Reporting bug against $PACKAGE version $VERSION".
+BODY="$(mktemp -t reportbug_libtool.XXXXXX)" || exit 1
 
-if [ -z "$DEBEMAIL" ] ; then
-  DEBEMAIL="$USER@$(hostname)"
-  echo "Warning: DEBMAIL not set. Using $DEBEMAIL."
-fi
-
-if [ -n "$DEBUSER" ] ; then
-  MAIL="$DEBEMAIL"
-else
-  MAIL="$DEBUSER <$DEBEMAIL>"
-fi
-
-CHARMAP="$(locale charmap)"
-LC_CTYPE="$(locale | grep LC_CTYPE | sed -e "s/LC_CTYPE=\"\(.*\)\"/\1/g")"
-LANG="$(locale | grep LANG | sed -e "s/LANG=\(.*\)/\1/g")"
-
-cat << EOF | /usr/sbin/sendmail -bm submit@bugs.debian.org,$DEBEMAIL
-From: $MAIL
-To: Debian Bug Tracking System <submit@bugs.debian.org>
-Subject: ${PACKAGE}_${VERSION}(GNU/k*BSD): FTBFS: out of date libtool scripts
-Date: $(date -R)
-
-Package: $PACKAGE
-Version: $VERSION
-Severity: wishlist
-
+if apt-cache showsrc $1 | grep -q "^Build-Depends:.*kdelibs.*-dev.*" ; then
+  cat << EOF > $BODY
 Hello,
 
 
-The current version of $PACKAGE ($VERSION) fails to build on 
+The current version of $1 fails to build on
 GNU/kFreeBSD, because of outdated libtool.
 
-The version of config.guess and config.sub in $PACKAGE is too 
-old to correctly support Debian GNU/k*BSD.  libtool 1.5.2-1 or 
-later is need. 
+The version of libtool in $1 is too old to correctly 
+support Debian GNU/k*BSD.
+
+Here is how to update the libtool in your package:
+  update the admin/ directory from the latest CVS
+  make -f admin/Makefile.common
+
+It would also be nice if you can ask upstream to update libtool
+in their next release.
+
+
+Thanks for your cooperation.
+EOF
+else
+  cat << EOF > $BODY
+Hello,
+
+
+The current version of $1 fails to build on
+GNU/kFreeBSD, because of outdated libtool.
+
+The version of libtool in $1 is too old to correctly 
+support Debian GNU/k*BSD.  libtool 1.5.2-1 or later is need.
 
 Here is how to update the libtool in your package (Make sure you
 are using libtool 1.5.2-1 or later:
@@ -60,27 +54,22 @@ are using libtool 1.5.2-1 or later:
   aclocal (-Im4 might be needed if there's an "m4" template dir)
   autoconf
 
-If your package uses a tar-in-tar system you'll have to run these
-ommands on build time by other means.  Particularly, if you use 
-CDBS the DEB_AUTO_UPDATE_{LIBTOOL,AUTOMAKE,AUTOCONF} variables can 
-help you.
-
-It would also be nice if you cans ask upstream to update 
-libtool in their next release.
+It would also be nice if you can ask upstream to update libtool 
+in their next release.
 
 
 Thanks for your cooperation.
-
-
--- System Information:
-Debian Release: $(cat /etc/debian_version)
-  APT prefers unstable
-  APT policy: (500, 'unstable')
-Architecture: $(dpkg-architecture -qDEB_BUILD_ARCH) ($(uname -m))
-Kernel: $(uname -s -r)
-Locale: LANG=$LANG, LC_CTYPE=$LC_CTYPE (charmap=$CHARMAP)
-
 EOF
+fi
 
-echo "Done."		
+/usr/bin/reportbug \
+	--no-config-files \
+	--no-check-available \
+	--no-check-installed \
+	--subject="$1(GNU/k*BSD): FTBFS: out of date libtool scripts" \
+	--package-version="N/A" \
+	--severity=wishlist \
+        --body-file=$BODY \
+	$1
 
+rm -f $BODY
