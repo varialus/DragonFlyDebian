@@ -1,0 +1,65 @@
+diff -u ruby1.6-1.6.8/debian/control ruby1.6-1.6.8/debian/control
+--- ruby1.6-1.6.8/debian/control
++++ ruby1.6-1.6.8/debian/control
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: akira yamada <akira@debian.org>
+ Uploaders: Fumitoshi UKAI <ukai@debian.or.jp>, Akira TAGOH <tagoh@debian.org>
+-Build-Depends: autoconf, m4, bison, debhelper (>= 3.0), dbs, patch, libgdbm-dev, libncurses5-dev, libreadline4-dev, tcl8.4-dev, tk8.4-dev
++Build-Depends: autoconf, autotools-dev, m4, bison, debhelper (>= 3.0), dbs, patch, libgdbm-dev, libncurses5-dev, libreadline4-dev, tcl8.4-dev, tk8.4-dev
+ Standards-Version: 3.5.8
+ 
+ Package: ruby1.6
+diff -u ruby1.6-1.6.8/debian/rules ruby1.6-1.6.8/debian/rules
+--- ruby1.6-1.6.8/debian/rules
++++ ruby1.6-1.6.8/debian/rules
+@@ -50,6 +50,13 @@
+ configure: configure-stamp
+ configure-stamp: $(patched)
+ 	dh_testdir
++	
++	# update config.guess and config.sub
++	-test -r /usr/share/misc/config.sub && \
++	cp -f /usr/share/misc/config.sub $(BUILD_TREE)/config.sub
++	-test -r /usr/share/misc/config.guess && \
++	cp -f /usr/share/misc/config.guess $(BUILD_TREE)/config.guess
++	
+ 	# Add here commands to configure the package.
+ 	cd $(BUILD_TREE) && autoconf
+ 	cd $(BUILD_TREE) && \
+only in patch2:
+unchanged:
+--- ruby1.6-1.6.8.orig/debian/patches/812_configure.in-kfreebsd.patch
++++ ruby1.6-1.6.8/debian/patches/812_configure.in-kfreebsd.patch
+@@ -0,0 +1,31 @@
++--- ruby-1.6.8/configure.in	2005-04-10 01:26:21.000000000 +0200
+++++ ruby-1.6.8/configure.in	2005-04-10 02:15:42.000000000 +0200
++@@ -664,6 +664,8 @@
++ 			  test "$GCC" = yes && test "$rb_cv_prog_gnu_ld" = yes || LDSHARED="ld -Bshareable"
++ 			fi
++ 			rb_cv_dlopen=yes ;;
+++	k*bsd*-gnu)	LDSHARED="$CC -shared"
+++			rb_cv_dlopen=yes ;;
++ 	netbsd*)	LDSHARED='${CC} -shared'
++ 			if test "$rb_cv_binary_elf" = yes; then
++ 			    LDFLAGS="-Wl,-export-dynamic"
++@@ -790,6 +792,8 @@
++ 	STRIP='strip -S -x';;
++   gnu*)
++ 	STRIP='strip -S -x';;
+++  k*bsd*-gnu)
+++  	STRIP='strip -S -x';;
++   nextstep*)
++ 	STRIP='strip -A -n';;
++   openstep*)
++@@ -943,6 +947,10 @@
++ 	    LIBRUBY_ALIASES=''
++ 	fi
++ 	;;
+++    k*bsd*-gnu)
+++    	LIBRUBY_DLDFLAGS='-Wl,-soname,lib$(RUBY_INSTALL_NAME).so.$(MAJOR).$(MINOR)'
+++	LIBRUBY_ALIASES='lib$(RUBY_INSTALL_NAME).so.$(MAJOR).$(MINOR) lib$(RUBY_INSTALL_NAME).so'
+++ 	;;
++     netbsd*)
++ 	SOLIBS='$(LIBS)'
++ 	LIBRUBY_SO='lib$(RUBY_INSTALL_NAME).so.$(MAJOR)$(MINOR).$(TEENY)'
