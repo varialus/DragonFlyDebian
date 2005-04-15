@@ -1,0 +1,26 @@
+diff -u ecos-2.0/debian/control ecos-2.0/debian/control
+--- ecos-2.0/debian/control
++++ ecos-2.0/debian/control
+@@ -2,7 +2,7 @@
+ Section: devel
+ Priority: optional
+ Maintainer: Masato Taruishi <taru@debian.org>
+-Build-Depends: debhelper (>> 3.0.0), dbs, cpio, tcl8.3-dev, tk8.3-dev, bzip2, docbook-to-man, libgtk1.2-dev, libwxgtk2.4-dev
++Build-Depends: debhelper (>> 3.0.0), dbs, cpio, tcl8.3-dev, tk8.3-dev, bzip2, docbook-to-man, libgtk1.2-dev, libwxgtk2.4-dev, autotools-dev
+ Standards-Version: 3.5.6
+ 
+ Package: ecos
+diff -u ecos-2.0/debian/rules ecos-2.0/debian/rules
+--- ecos-2.0/debian/rules
++++ ecos-2.0/debian/rules
+@@ -40,6 +40,10 @@
+ 
+ 	debian/rules setup
+ 
++	cp -f /usr/share/misc/config.{guess,sub} $(BUILD_TREE)/ecos-2.0/packages/services/gfx/mw/v2_0/src/jpeg-6b/
++	cp -f /usr/share/misc/config.{guess,sub} $(BUILD_TREE)/ecos-2.0/acsupport/
++	cp -f /usr/share/misc/config.{guess,sub} $(BUILD_TREE)/ecos-2.0/tools/acsupport/
++
+ 	install -d build
+ 	cd build; sh ../$(BUILD_TREE)/ecos-2.0/configure --with-tcl-libdir=/usr/lib/tcl8.3 --with-tcl-incdir=/usr/include/tcl8.3 --with-tcl-version=8.3 --prefix=/usr
+ 	touch configure-stamp
