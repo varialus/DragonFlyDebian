@@ -51,6 +51,10 @@ __sched_getparam (pid_t pid, struct sched_param *param)
 	}
     }
 
+  /* workaround upstream PR kern/76485 --rmh */
+  if (ret < 0)
+    ret = 0;
+
   return ret;
 }
 
