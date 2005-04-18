@@ -44,7 +44,7 @@ endif
 
 ifeq ($(subdir),misc)
 # For <sched.h>.
-sysdep_routines += clone sys_sched_getp sys_sched_gets start_thread
+sysdep_routines += clone start_thread
 # For <unistd.h>.
 sysdep_routines += sys_ftruncate sys_truncate
 # For <sys/acl.h>.

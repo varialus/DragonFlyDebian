@@ -22,40 +22,24 @@
 #include <errno.h>
 #include <sys/rtprio.h>
 
-extern int __syscall_sched_getparam (pid_t pid, struct sched_param *param);
-
 /* Retrieve scheduling parameters for a particular process.  */
 int
 __sched_getparam (pid_t pid, struct sched_param *param)
 {
-  int ret;
-
-  ret = __syscall_sched_getparam (pid, param);
-
-  /* FreeBSD (at least versions 4.0 and 4.6) always returns error EPERM, but
+  /* kFreeBSD return bogus values for SYS_sched_param (see PR kern/76485);
      fortunately the same information can be retrieved through the rtprio()
      system call.  */
-  if (ret < 0 && errno == EPERM)
+  struct rtprio rtp;
+
+  if (__rtprio (RTP_LOOKUP, pid, &rtp) >= 0)
     {
-      struct rtprio rtp;
-
-      ret = __rtprio (RTP_LOOKUP, pid, &rtp);
-      if (ret >= 0)
-	{
-	  if (RTP_PRIO_IS_REALTIME (rtp.type))
-	    param->sched_priority = RTP_PRIO_MAX - rtp.prio;
-	  else
-	    param->sched_priority = 0;
-
-	  ret = 0;
-	}
+      if (RTP_PRIO_IS_REALTIME (rtp.type))
+        param->sched_priority = RTP_PRIO_MAX - rtp.prio;
+      else
+        param->sched_priority = 0;
     }
 
-  /* workaround upstream PR kern/76485 --rmh */
-  if (ret < 0)
-    ret = 0;
-
-  return ret;
+  return 0;
 }
 
 weak_alias (__sched_getparam, sched_getparam)

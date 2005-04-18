@@ -4,6 +4,7 @@ setup: patch
 
 patch: $(stamp_patch)
 $(stamp_patch): $(stamp_unpack)
+	./patches/genpatch.sh
 	if [ ! -d patched ]; then mkdir patched; fi
 	@echo "Patches applied in the Debian version of the GNU C Library:" > $@T
 	@while read patch; do \
@@ -32,6 +33,7 @@ $(stamp_patch): $(stamp_unpack)
 	mv -f $@T $@
 
 unpatch:
+	./patches/genpatch.sh
 	@tac $(top_srcdir)debian/patches/0list | \
 	while read patch; do \
 		case $$patch in \#*) continue;; esac; \
