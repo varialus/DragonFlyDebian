@@ -1,0 +1,46 @@
+diff -ur ufsutils-0.0+2004.06.26.old/debian/patches/02_fsck.ufs.patch ufsutils-0.0+2004.06.26/debian/patches/02_fsck.ufs.patch
+--- ufsutils-0.0+2004.06.26.old/debian/patches/02_fsck.ufs.patch	2005-04-18 01:33:37.000000000 +0200
++++ ufsutils-0.0+2004.06.26/debian/patches/02_fsck.ufs.patch	2005-04-18 01:38:43.000000000 +0200
+@@ -572,8 +572,8 @@
+  	if (bkgrdflag == 0 && mntp != NULL && (mntp->f_flags & MNT_RDONLY) == 0)
+  		resolved = 0;
+ +#else
+-+	if (bkgrdflag == 0 && mntp != NULL && (mntp->f_flag & ST_RDONLY) == 0)
+-+		resolved = 0;
+++
+++
+ +#endif
+  	ckfini(resolved);
+  
+diff -ur ufsutils-0.0+2004.06.26.old/mkfs.ufs/mkfs.c ufsutils-0.0+2004.06.26/mkfs.ufs/mkfs.c
+--- ufsutils-0.0+2004.06.26.old/mkfs.ufs/mkfs.c	2004-04-09 21:58:33.000000000 +0200
++++ ufsutils-0.0+2004.06.26/mkfs.ufs/mkfs.c	2005-04-18 01:40:16.000000000 +0200
+@@ -733,10 +733,18 @@
+ {
+ 	union dinode node;
+ 	struct group *grp;
++#if defined(__FreeBSD__)
++#define OPERATOR_GID 5
++#else
++#define OPERATOR_GID 37
++#endif
++	gid_t operator_gid = OPERATOR_GID;
+ 
+ 	memset(&node, 0, sizeof node);
+ 	if ((grp = getgrnam("operator")) == NULL)
+-		errx(35, "Cannot retrieve operator gid");
++		fprintf (stderr, "warning: Cannot retrieve operator gid, assuming %d\n", OPERATOR_GID);
++	else
++		operator_gid = grp->gr_gid;
+ 	if (sblock.fs_magic == FS_UFS1_MAGIC) {
+ 		/*
+ 		 * initialize the node
+@@ -760,7 +768,7 @@
+ 		 * create the .snap directory
+ 		 */
+ 		node.dp1.di_mode |= 020;
+-		node.dp1.di_gid = grp->gr_gid;
++		node.dp1.di_gid = operator_gid;
+ 		node.dp1.di_nlink = SNAPLINKCNT;
+ 		node.dp1.di_size = makedir(snap_dir, SNAPLINKCNT);
+ 		node.dp1.di_db[0] = alloc(sblock.fs_fsize, node.dp1.di_mode);
