@@ -8,6 +8,7 @@ for i in `find src -type f` ; do
     -e 's/#\( \|\t\)*ifdef\( \|\t\)*__FreeBSD__/#ifdef __FreeBSD_kernel__/g' \
     -e 's/#\( \|\t\)*ifndef\( \|\t\)*__FreeBSD__/#ifndef __FreeBSD_kernel__/g' \
     -e 's/__FreeBSD__/5/g' \
+    -e 's/__packed/__attribute__ ((packed))/g' \
     -e 's,#\( \|\t\)*include\( \|\t\)*<sys/device.h>,,g' \
     -e 's,#\( \|\t\)*include\( \|\t\)*<dev/rndvar.h>,,g' \
     -e 's,#\( \|\t\)*include\( \|\t\)*<sys/pool.h>,,g' \
