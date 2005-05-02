@@ -1,15 +1,389 @@
-
-Status:  dirty, will never merge (gcc-4.0 includes proper fixes)
-
+diff -Nur gcc-3.3-3.3.5.old/debian/control gcc-3.3-3.3.5/debian/control
+--- gcc-3.3-3.3.5.old/debian/control	2005-05-02 13:24:28.000000000 +0200
++++ gcc-3.3-3.3.5/debian/control	2005-05-02 14:03:35.000000000 +0200
+@@ -4,7 +4,7 @@
+ Maintainer: Debian GCC maintainers <debian-gcc@lists.debian.org>
+ Uploaders: Matthias Klose <doko@debian.org>, Gerhard Tonn <gt@debian.org>
+ Standards-Version: 3.6.1
+-Build-Depends: libc6.1-dev (>= 2.3.2.ds1-16) [alpha ia64] | libc0.3-dev [hurd-i386] | libc1-dev [freebsd-i386] | libc12-dev (>= 2.0.ds1-1) [netbsd-i386] | libc6-dev (>= 2.3.2.ds1-16), libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], libunwind7-dev (>= 0.98.3-3) [ia64], libatomic-ops-dev [ia64], m4, autoconf2.13, automake1.4 | automake (<< 1.5), libtool, autotools-dev, gawk, dejagnu (>= 1.4.3) [!hurd-i386], expect (>= 5.38.0) [!hurd-i386], bzip2, binutils (>= 2.15-5) | binutils-multiarch (>= 2.15-5), binutils-hppa64 [hppa], debhelper (>= 3.0.25), gperf (>= 2.7-3), bison (>= 1:1.875a-1) | bison (<< 1:1.50), flex-old | flex (<< 2.5.31), gettext, texinfo (>= 4.3), zlib1g-dev, libgc-dev [!avr !freebsd-i386], xlibs-dev, gnat-3.3 [!arm !hurd-i386 !m68k !freebsd-i386 !netbsd-i386] | gnat-3.2 [!arm !hurd-i386 !m68k !freebsd-i386 !netbsd-i386] | gnat [i386 powerpc sparc], libncurses5-dev, libgmp3-dev, tetex-bin, locales [!netbsd-i386 !hurd-i386 !hurd-i386], procps [!hurd-i386], help2man, sharutils, realpath (>= 1.9.12)
++Build-Depends: libc-dev, libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], libunwind7-dev (>= 0.98.3-3) [ia64], libatomic-ops-dev [ia64], m4, autoconf2.13, automake1.4 | automake (<< 1.5), libtool, autotools-dev, gawk, dejagnu (>= 1.4.3) [!hurd-i386 !kfreebsd-i386 !knetbsd-i386], expect (>= 5.38.0) [!hurd-i386 !kfreebsd-i386 !knetbsd-i386], bzip2, binutils (>= 2.15-5) | binutils-multiarch (>= 2.15-5), binutils-hppa64 [hppa], debhelper (>= 3.0.25), gperf (>= 2.7-3), bison (>= 1:1.875a-1) | bison (<< 1:1.50), flex-old | flex (<< 2.5.31), gettext, texinfo (>= 4.3), zlib1g-dev, libgc-dev [!avr], xlibs-dev, gnat-3.3 [!arm !hurd-i386 !m68k !kfreebsd-i386 !knetbsd-i386] | gnat-3.2 [!arm !hurd-i386 !m68k !kfreebsd-i386 !knetbsd-i386] | gnat [i386 powerpc sparc], libncurses5-dev, libgmp3-dev, tetex-bin, locales [!netbsd-i386 !hurd-i386 !kfreebsd-i386 !knetbsd-i386 !hurd-i386], procps [!hurd-i386 !kfreebsd-i386 !knetbsd-i386], help2man, sharutils, realpath (>= 1.9.12)
+ Build-Depends-Indep: doxygen (>= 1.3.7), graphviz (>= 2.0)
+ 
+ Package: gcc-3.3-base
+@@ -40,10 +40,10 @@
+ Architecture: any
+ Section: devel
+ Priority: standard
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), libgcc1 (>= 1:3.3.4-3), ${shlibs:Depends}, cpp-3.3 (>= 1:3.3.5-12), cpp-3.3 (<< 1:3.3.6), binutils (>= 2.15-5)
+-Recommends: libc6-dev (>= 2.3.2.ds1-16)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), libgcc1 (>= 1:3.3.4-3), ${shlibs:Depends}, cpp-3.3 (>= 1:3.3.5-12+kbsd), cpp-3.3 (<< 1:3.3.6), binutils (>= 2.15-5)
++Recommends: libc-dev
+ Conflicts: gcc-3.2 (<= 1:3.2.3-0pre8)
+-Suggests: gcc-3.3-doc (>= 1:3.3.5-12)
++Suggests: gcc-3.3-doc (>= 1:3.3.5-12+kbsd)
+ Provides: c-compiler
+ Description: The GNU C compiler
+  This is the GNU C compiler, a fairly portable optimizing compiler for C.
+@@ -52,7 +52,7 @@
+ Architecture: hppa
+ Section: devel
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), gcc-3.3-base (<< 1:3.3.6), libc6-dev (>= 2.3.2.ds1-12), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), gcc-3.3-base (<< 1:3.3.6), libc6-dev (>= 2.3.2.ds1-12), ${shlibs:Depends}
+ Conflicts: gcc-3.4-hppa64 (<= 3.4.1-3), gcc-3.5-hppa64 (<= 3.5-0pre1)
+ Description: The GNU C compiler (cross compiler for hppa64)
+  This is the GNU C compiler, a fairly portable optimizing compiler for C.
+@@ -61,7 +61,7 @@
+ Architecture: any
+ Section: interpreters
+ Priority: standard
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), gcc-3.3-base (<< 1:3.3.6), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), gcc-3.3-base (<< 1:3.3.6), ${shlibs:Depends}
+ Description: The GNU C preprocessor
+  A macro processor that is used automatically by the GNU C compiler
+  to transform programs before actual compilation.
+@@ -73,7 +73,7 @@
+ Architecture: all
+ Section: doc
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd)
+ Replaces: cpp (<= 1:2.93.12)
+ Description: Documentation for the GNU C preprocessor (cpp)
+  Documentation for the GNU C preprocessor in info format.
+@@ -82,17 +82,17 @@
+ Architecture: any
+ Section: devel
+ Priority: standard
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12), gcc-3.3 (<< 1:3.3.6), libstdc++5-3.3-dev (>= 1:3.3.5-12)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12+kbsd), gcc-3.3 (<< 1:3.3.6), libstdc++5-3.3-dev (>= 1:3.3.5-12+kbsd)
+ Replaces: gcc (<= 2.7.2.3-3)
+ Provides: c++-compiler
+-Suggests: gcc-3.3-doc (>= 1:3.3.5-12)
++Suggests: gcc-3.3-doc (>= 1:3.3.5-12+kbsd)
+ Description: The GNU C++ compiler
+  This is the GNU C++ compiler, a fairly portable optimizing compiler for C++.
+ 
+ Package: protoize
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12), gcc-3.3 (<< 1:3.3.6)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12+kbsd), gcc-3.3 (<< 1:3.3.6)
+ Description: Create/remove ANSI prototypes from C code
+  "protoize" can be used to add prototypes to a program, thus converting
+  the program to ANSI C in one respect.  The companion program "unprotoize"
+@@ -102,8 +102,8 @@
+ Package: gobjc-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}, libobjc1 (>= 1:3.3.5-12), gcc-3.3 (>= 1:3.3.5-12), gcc-3.3 (<< 1:3.3.6)
+-Suggests: gcc-3.3-doc (>= 1:3.3.5-12)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}, libobjc1 (>= 1:3.3.5-12+kbsd), gcc-3.3 (>= 1:3.3.5-12+kbsd), gcc-3.3 (<< 1:3.3.6)
++Suggests: gcc-3.3-doc (>= 1:3.3.5-12+kbsd)
+ Provides: objc-compiler
+ Recommends: libgc-dev
+ Description: The GNU Objective-C compiler
+@@ -115,7 +115,7 @@
+ Section: libs
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}
+ Description: Runtime library for GNU Objective-C applications
+  Library needed for GNU ObjC applications linked against the shared library.
+ 
+@@ -123,14 +123,14 @@
+ Section: libs
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}
+ Description: Runtime library for GNU Objective-C applications (64bit)
+  Library needed for GNU ObjC applications linked against the shared library.
+ 
+ Package: g77-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), libg2c0-dev (>= 1:3.3.5-12), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12), gcc-3.3 (<< 1:3.3.6)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), libg2c0-dev (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12+kbsd), gcc-3.3 (<< 1:3.3.6)
+ Provides: fortran77-compiler
+ Suggests: g77-3.3-doc
+ Description: The GNU Fortran 77 compiler
+@@ -142,7 +142,7 @@
+ Architecture: all
+ Section: doc
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd)
+ Replaces: g77 (<= 1:2.91.58-3)
+ Description: Documentation for the GNU Fortran compiler (g77)
+  Documentation for the GNU Fortran 77 compiler in info format.
+@@ -151,7 +151,7 @@
+ Section: libs
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}
+ Description: Runtime library for GNU Fortran 77 applications
+  Library needed for GNU Fortran 77 applications linked against the
+  shared library.
+@@ -160,7 +160,7 @@
+ Section: libdevel
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), libg2c0 (>= 1:3.3.5-12), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), libg2c0 (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}
+ Conflicts: g77-2.95 (<= 1:2.95.4-19), g77-3.0 (<= 1:3.0.4-16), g77-3.2 (<= 1:3.2.3-9), g77-3.3 (<= 1:3.3.4-3)
+ Description: GNU Fortran 77 library development
+  Headers and static libraries for g2c.
+@@ -169,7 +169,7 @@
+ Section: libs
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}
+ Description: Runtime library for GNU Fortran 77 applications (64bit)
+  Library needed for GNU Fortran 77 applications linked against the
+  shared library.
+@@ -177,9 +177,9 @@
+ Package: gcj-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}, libgcj4-common (>= 1:3.3.5-12), java-common, g++-3.3 (>= 1:3.3.5-12), g++-3.3 (<< 1:3.3.6)
+-Recommends: fastjar, gij-3.3 (>= 1:3.3.5-12), libgcj4-dev (>= 1:3.3.5-12)
+-Suggests: libgcj4-awt (>= 1:3.3.5-12)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}, libgcj4-common (>= 1:3.3.5-12+kbsd), java-common, g++-3.3 (>= 1:3.3.5-12+kbsd), g++-3.3 (<< 1:3.3.6)
++Recommends: fastjar, gij-3.3 (>= 1:3.3.5-12+kbsd), libgcj4-dev (>= 1:3.3.5-12+kbsd)
++Suggests: libgcj4-awt (>= 1:3.3.5-12+kbsd)
+ Provides: java-compiler
+ Description: The GNU compiler for Java(TM)
+  GCJ is a front end to the GCC compiler which can natively compile both
+@@ -189,8 +189,8 @@
+ Package: gij-3.3
+ Priority: optional
+ Architecture: any
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}
+-Suggests: fastjar, gcj-3.3 (>= 1:3.3.5-12), libgcj4-awt (>= 1:3.3.5-12)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}
++Suggests: fastjar, gcj-3.3 (>= 1:3.3.5-12+kbsd), libgcj4-awt (>= 1:3.3.5-12+kbsd)
+ Conflicts: libgcj2 (<= 1:3.0.3-1)
+ Replaces: libgcj2 (<= 1:3.0.3-1)
+ Provides: java-virtual-machine, java1-runtime
+@@ -233,7 +233,7 @@
+ Section: libs
+ Architecture: any
+ Priority: optional
+-Depends: libgcj4 (>= 1:3.3.5-12), ${shlibs:Depends}
++Depends: libgcj4 (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}
+ Conflicts: libgcj4 (<< 3.3.4-5)
+ Replaces: libgcj4 (<< 3.3.4-5)
+ Description: AWT peer runtime libraries for use with gcj
+@@ -254,7 +254,7 @@
+ Section: libdevel
+ Architecture: any
+ Priority: optional
+-Depends: gcj-3.3 (>= 1:3.3.5-12), libgcj4 (>= 1:3.3.5-12), libgcj4-common (>= 1:3.3.5-12), libgcj4-awt (>= 1:3.3.5-12), libc6-dev (>= 2.3.2.ds1-16), zlib1g-dev, ${shlibs:Depends}
++Depends: gcj-3.3 (>= 1:3.3.5-12+kbsd), libgcj4 (>= 1:3.3.5-12+kbsd), libgcj4-common (>= 1:3.3.5-12+kbsd), libgcj4-awt (>= 1:3.3.5-12+kbsd), libc-dev, zlib1g-dev, ${shlibs:Depends}
+ Conflicts: libgcj2-dev, libgcj3-dev, libgcj0-dev, libgcj0
+ Provides: libgcj-dev
+ Description: Java development headers and static library for use with gcj
+@@ -272,7 +272,7 @@
+  Replacement for Suns .jar creation program.  It is written in C
+  instead of java and is tons faster.  It is currently not complete.
+ 
+-Package: libffi2
++Package: libffi
+ Section: libs
+ Architecture: any
+ Priority: optional
+@@ -282,7 +282,7 @@
+  allows code written in one language to call code written in another
+  language.
+ 
+-Package: lib64ffi2
++Package: lib64ffi
+ Section: libs
+ Architecture: any
+ Priority: optional
+@@ -292,11 +292,11 @@
+  allows code written in one language to call code written in another
+  language.
+ 
+-Package: libffi2-dev
++Package: libffi-dev
+ Section: libdevel
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base, libffi2 (>= 1:3.3.5-12), libc6-dev (>= 2.3.2.ds1-16)
++Depends: gcc-3.3-base, libffi (>= 1:3.3.5-12+kbsd), libc-dev
+ Conflicts: libffi1-dev
+ Description: Foreign Function Interface library (development files)
+  This package contains the headers and static library files necessary for
+@@ -310,7 +310,7 @@
+ Architecture: any
+ Section: base
+ Priority: required
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}
+ Description: The GNU Standard C++ Library v3
+  This package contains an additional runtime library for C++ programs
+  built with the GNU compiler.
+@@ -323,7 +323,7 @@
+ Architecture: any
+ Section: base
+ Priority: important
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}
+ Conflicts: libstdc++5 (<= 1:3.3-0pre9)
+ Description: The GNU Standard C++ Library v3 (64bit)
+  This package contains an additional runtime library for C++ programs
+@@ -337,7 +337,7 @@
+ Architecture: any
+ Section: libdevel
+ Priority: standard
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), libstdc++5 (>= 1:3.3.5-12), libc6-dev (>= 2.3.2.ds1-16), g++-3.3 (>= 1:3.3.5-12)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), libstdc++5 (>= 1:3.3.5-12+kbsd), libc-dev, g++-3.3 (>= 1:3.3.5-12+kbsd)
+ Conflicts: libg++27-dev, libg++272-dev (<< 2.7.2.8-1), libstdc++2.8-dev, libg++2.8-dev, libstdc++2.9-dev, libstdc++2.9-glibc2.1-dev, libstdc++2.10-dev (<< 1:2.95.3-2), libstdc++3.0-dev, libstdc++5-dev (<= 1:3.2.3-0pre3)
+ Suggests: libstdc++5-3.3-doc, stl-manual
+ Provides: libstdc++-dev
+@@ -354,7 +354,7 @@
+ Architecture: any
+ Section: libdevel
+ Priority: extra
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), libstdc++5, libstdc++5-3.3-dev
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), libstdc++5, libstdc++5-3.3-dev
+ Description: The GNU Standard C++ Library v3 (shared library subset kit)
+  This is used to develop subsets of the libstdc++ shared libraries for
+  use on custom installation floppies and in embedded systems.
+@@ -365,7 +365,7 @@
+ Architecture: any
+ Section: libdevel
+ Priority: extra
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), libstdc++5, libstdc++5-3.3-dev
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), libstdc++5, libstdc++5-3.3-dev
+ Conflicts: libstdc++5-dbg
+ Description: The GNU Standard C++ Library v3 (debugging files)
+  This package contains the shared library of libstdc++ compiled with
+@@ -375,7 +375,7 @@
+ Architecture: all
+ Section: doc
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd)
+ Replaces: libstdc++3.0-doc
+ Description: The GNU Standard C++ Library v3 (documentation files)
+  This package contains documentation files for the GNU stdc++ library.
+@@ -388,7 +388,7 @@
+ Package: gnat-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12), gcc-3.3 (<< 1:3.3.6)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12+kbsd), gcc-3.3 (<< 1:3.3.6)
+ Suggests: gnat-3.3-doc, ada-reference-manual
+ Provides: ada-compiler
+ Conflicts: gnat, gnat-3.1, gnat-3.2
+@@ -401,7 +401,7 @@
+ Section: libs
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}
+ Description: Runtime library for GNU Ada applications
+  Library needed for GNU Ada applications linked against the shared library.
+ 
+@@ -409,7 +409,7 @@
+ Section: libs
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}
+ Description: Runtime library for GNU Ada applications
+  Library needed for GNU Ada applications linked against the shared library.
+ 
+@@ -417,7 +417,7 @@
+ Architecture: all
+ Section: doc
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd)
+ Suggests: gnat-3.3
+ Description: Documentation for the GNU Ada compiler (gnat)
+  Documentation for the GNU Ada compiler in info format.
+@@ -425,9 +425,9 @@
+ Package: gpc-2.1-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12), gcc-3.3 (<< 1:3.3.6)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12+kbsd), gcc-3.3 (<< 1:3.3.6)
+ Recommends: libgmp3-dev, libncurses5-dev
+-Suggests: gpc-2.1-3.3-doc (>= 2:3.3.5.20040516-12)
++Suggests: gpc-2.1-3.3-doc (>= 2:3.3.5.-12+kbsd)
+ Provides: pascal-compiler
+ Description: The GNU Pascal compiler
+  This is the GNU Pascal compiler, which compiles Pascal on platforms supported
+@@ -440,7 +440,7 @@
+ Architecture: all
+ Section: doc
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd)
+ Replaces: gpc (<= 2.91.58-3)
+ Suggests: gpc-2.1-3.3
+ Description: Documentation for the GNU Pascal compiler (gpc)
+@@ -452,7 +452,7 @@
+ Package: treelang-3.3
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12), gcc-3.3 (<< 1:3.3.6)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12+kbsd), gcc-3.3 (<< 1:3.3.6)
+ Description: The GNU Treelang compiler
+  Treelang is a sample language, useful only to help people understand how
+  to implement a new language front end to GCC. It is not a useful
+@@ -463,7 +463,7 @@
+ Package: gcc-3.3-soft-float
+ Architecture: arm
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12), gcc-3.3 (<< 1:3.3.6)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12+kbsd), gcc-3.3 (<< 1:3.3.6)
+ Replaces: gcc-soft-float-ss (<< 1:3.3.6)
+ Description: The soft-floating-point gcc libraries (arm)
+  These are versions of basic static libraries such as libgcc.a compiled
+@@ -472,7 +472,7 @@
+ Package: fixincludes
+ Architecture: any
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12), gcc-3.3 (<< 1:3.3.6)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12+kbsd), gcc-3.3 (<< 1:3.3.6)
+ Description: Fix non-ANSI header files
+  FixIncludes was created to fix non-ANSI system header files. Many
+  system manufacturers supply proprietary headers that are not ANSI compliant.
+@@ -485,7 +485,7 @@
+ Architecture: all
+ Section: doc
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd)
+ Conflicts: gcc-docs (<< 2.95.2)
+ Replaces: gcc (<=2.7.2.3-4.3), gcc-docs (<< 2.95.2)
+ Description: Documentation for the GNU compilers (gcc, gobjc, g++)
+@@ -494,7 +494,7 @@
+ Package: gcc-3.3-nof
+ Architecture: powerpc
+ Priority: optional
+-Depends: gcc-3.3-base (>= 1:3.3.5-12), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12), gcc-3.3 (<< 1:3.3.6)
++Depends: gcc-3.3-base (>= 1:3.3.5-12+kbsd), ${shlibs:Depends}, gcc-3.3 (>= 1:3.3.5-12+kbsd), gcc-3.3 (<< 1:3.3.6)
+ Conflicts: gcc-3.2-nof
+ Description: The no-floating-point gcc libraries (powerpc)
+  These are versions of basic static libraries such as libgcc.a compiled
 diff -Nur gcc-3.3-3.3.5.old/debian/patches/autoreconf.dpatch gcc-3.3-3.3.5/debian/patches/autoreconf.dpatch
---- gcc-3.3-3.3.5.old/debian/patches/autoreconf.dpatch	2004-12-21 13:31:43.000000000 +0100
-+++ gcc-3.3-3.3.5/debian/patches/autoreconf.dpatch	2004-12-21 02:45:16.000000000 +0100
+--- gcc-3.3-3.3.5.old/debian/patches/autoreconf.dpatch	2005-05-02 13:24:27.000000000 +0200
++++ gcc-3.3-3.3.5/debian/patches/autoreconf.dpatch	2005-05-02 14:02:23.000000000 +0200
 @@ -14,7 +14,10 @@
      -patch)
          patch $pdir -f --no-backup-if-mismatch -p0 < $0
  	for i in libf2c libjava/libltdl libobjc libstdc++-v3 zlib; do
 -		(cd ${dir}/${i} ; autoreconf --force)
-+		(cd ${dir}/${i} ; autoreconf2.13 --force)
++		(cd ${dir}/${i} ; `which autoreconf2.50 || which autoreconf` --force)
 +	done
 +	for i in . boehm-gc ; do
 +		cp -f /usr/share/misc/config.* ${dir}/${i}/
@@ -148,7 +522,7 @@ diff -Nur gcc-3.3-3.3.5.old/debian/patches/autoreconf.dpatch gcc-3.3-3.3.5/debia
 +     hardcode_direct=yes
 diff -Nur gcc-3.3-3.3.5.old/debian/patches/kbsd-gnu.dpatch gcc-3.3-3.3.5/debian/patches/kbsd-gnu.dpatch
 --- gcc-3.3-3.3.5.old/debian/patches/kbsd-gnu.dpatch	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-3.3-3.3.5/debian/patches/kbsd-gnu.dpatch	2004-12-21 02:45:16.000000000 +0100
++++ gcc-3.3-3.3.5/debian/patches/kbsd-gnu.dpatch	2005-05-02 13:25:12.000000000 +0200
 @@ -0,0 +1,408 @@
 +#! /bin/sh -e
 +
@@ -559,24 +933,43 @@ diff -Nur gcc-3.3-3.3.5.old/debian/patches/kbsd-gnu.dpatch gcc-3.3-3.3.5/debian/
 +     os_include_dir="os/bsd/netbsd"
 +     ;;
 diff -Nur gcc-3.3-3.3.5.old/debian/rules.conf gcc-3.3-3.3.5/debian/rules.conf
---- gcc-3.3-3.3.5.old/debian/rules.conf	2004-12-21 13:31:43.000000000 +0100
-+++ gcc-3.3-3.3.5/debian/rules.conf	2004-12-21 02:47:02.000000000 +0100
-@@ -36,9 +36,9 @@
-     endif
-   endif
+--- gcc-3.3-3.3.5.old/debian/rules.conf	2005-05-02 13:24:28.000000000 +0200
++++ gcc-3.3-3.3.5/debian/rules.conf	2005-05-02 13:25:48.000000000 +0200
+@@ -18,27 +18,11 @@
  endif
--
+ 
+ # libc-dev dependencies
+-libc_ver := 2.3.2.ds1-16
+-ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),alpha ia64))
+-  LIBC_DEP = libc6.1-dev$(LS) (>= $(libc_ver))
+-else
+-  ifeq ($(DEB_TARGET_GNU_SYSTEM),gnu)
+-    LIBC_DEP = libc0.3-dev$(LS)
+-  else
+-    ifeq ($(DEB_TARGET_GNU_SYSTEM),freebsd)
+-      LIBC_DEP = libc1-dev$(LS)
+-    else
+-      ifeq ($(DEB_TARGET_ARCH),netbsd-i386)
+-        LIBC_DEP = libc12-dev$(LS)
+-      else
+-        LIBC_DEP = libc6-dev$(LS) (>= $(libc_ver))
+-      endif
+-    endif
+-  endif
+-endif
++libc_ver := 2.3
 +LIBC_DEP = libc-dev
+ 
  ifndef DEB_CROSS
--LIBC_BUILD_DEP = libc6.1-dev (>= $(libc_ver)) [alpha ia64] | libc0.3-dev [hurd-i386] | libc1-dev [freebsd-i386] | libc12-dev [netbsd-i386] | libc6-dev (>= $(libc_ver))
-+LIBC_BUILD_DEP = libc6.1-dev (>= $(libc_ver)) [alpha ia64] | libc0.3-dev [hurd-i386] | libc1-dev [freebsd-i386] | libc12-dev [netbsd-i386] | libc6-dev (>= $(libc_ver)) | libc-dev
+-LIBC_BUILD_DEP = libc6.1-dev (>= $(libc_ver)) [alpha ia64] | libc0.3-dev [hurd-i386] | libc1-dev [freebsd-i386] | libc12-dev (>= 2.0.ds1-1) [netbsd-i386] | libc6-dev (>= $(libc_ver))
++LIBC_BUILD_DEP = libc-dev
  else
  # When building a cross compiler, the libc-dev build dependancy must be
  # sensitive to the target architecture; the host architecture is irrelevant.
 diff -Nur gcc-3.3-3.3.5.old/debian/rules.defs gcc-3.3-3.3.5/debian/rules.defs
---- gcc-3.3-3.3.5.old/debian/rules.defs	2004-12-21 13:31:43.000000000 +0100
-+++ gcc-3.3-3.3.5/debian/rules.defs	2004-12-21 03:28:02.000000000 +0100
-@@ -67,8 +67,11 @@
+--- gcc-3.3-3.3.5.old/debian/rules.defs	2005-05-02 13:24:28.000000000 +0200
++++ gcc-3.3-3.3.5/debian/rules.defs	2005-05-02 13:26:30.000000000 +0200
+@@ -76,8 +76,11 @@
    ifeq ($(TARGET_ALIAS),i386-gnu)
      TARGET_ALIAS := i586-gnu
    endif
@@ -590,34 +983,34 @@ diff -Nur gcc-3.3-3.3.5.old/debian/rules.defs gcc-3.3-3.3.5/debian/rules.defs
    endif
    ifeq ($(TARGET_ALIAS)-$(hammer_branch),powerpc-linux-yes)
      TARGET_ALIAS := powerpc64-linux
-@@ -186,7 +189,7 @@
+@@ -183,7 +186,7 @@
    with_java := yes
  endif
  
--java_no_archs := hurd-i386 mips mipsel freebsd-i386 netbsd-i386
+-java_no_archs := hurd-i386 mips mipsel freebsd-i386
 +java_no_archs := hurd-i386 mips mipsel kfreebsd-i386 knetbsd-i386
  ifneq ($(DEB_TARGET_ARCH),i386)
    ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(java_no_archs)))
      with_java := disabled for architecure $(DEB_TARGET_ARCH)
-@@ -234,7 +237,7 @@
+@@ -231,7 +234,7 @@
  # libffi -------------------
  ifeq ($(with_common_libs),yes)
    with_libffi := yes
--  no_ffi_archs := hurd-i386 freebsd-i386 netbsd-i386
+-  no_ffi_archs := hurd-i386 freebsd-i386
 +  no_ffi_archs := hurd-i386 kfreebsd-i386 knetbsd-i386
    ifneq ($(with_java),yes)
      ifneq ($(DEB_TARGET_ARCH),i386)
      ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(no_ffi_archs)))
-@@ -311,7 +314,7 @@
+@@ -308,7 +311,7 @@
    with_pascal := no
  endif
  
--pascal_no_archs := netbsd-i386
+-pascal_no_archs := 
 +pascal_no_archs := kfreebsd-i386 knetbsd-i386
  #pascal_no_archs := netbsd-i386 arm
  ifneq ($(DEB_TARGET_ARCH),i386)
    ifeq ($(DEB_TARGET_ARCH),$(findstring $(DEB_TARGET_ARCH),$(pascal_no_archs)))
-@@ -343,7 +346,7 @@
+@@ -340,7 +343,7 @@
  with_objc_gc := yes
  
  # disable ObjC garbage collection library (needs libgc)
@@ -626,7 +1019,7 @@ diff -Nur gcc-3.3-3.3.5.old/debian/rules.defs gcc-3.3-3.3.5/debian/rules.defs
  ifneq ($(DEB_TARGET_ARCH),i386)
    ifeq ($(DEB_TARGET_ARCH),$(findstring $(DEB_TARGET_ARCH),$(libgc_no_archs)))
      with_objc_gc := disabled for architecture $(DEB_TARGET_ARCH)
-@@ -383,7 +386,7 @@
+@@ -380,7 +383,7 @@
  endif
  
  with_libgnat := yes
@@ -635,7 +1028,7 @@ diff -Nur gcc-3.3-3.3.5.old/debian/rules.defs gcc-3.3-3.3.5/debian/rules.defs
  ifneq ($(DEB_TARGET_ARCH),i386)
    ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(ada_no_archs)))
      with_ada := disabled for architecure $(DEB_TARGET_ARCH)
-@@ -463,7 +466,7 @@
+@@ -465,7 +468,7 @@
  ifdef DEB_CROSS
    with_check := disabled for cross compiler package
  endif
@@ -644,10 +1037,35 @@ diff -Nur gcc-3.3-3.3.5.old/debian/rules.defs gcc-3.3-3.3.5/debian/rules.defs
  ifneq ($(DEB_TARGET_ARCH),i386)
    ifeq ($(DEB_TARGET_ARCH), $(findstring $(DEB_TARGET_ARCH),$(check_no_archs)))
      with_check :=disabled for $(DEB_TARGET_ARCH)
+diff -Nur gcc-3.3-3.3.5.old/debian/rules.parameters gcc-3.3-3.3.5/debian/rules.parameters
+--- gcc-3.3-3.3.5.old/debian/rules.parameters	2005-05-02 13:24:28.000000000 +0200
++++ gcc-3.3-3.3.5/debian/rules.parameters	2005-05-02 14:03:35.000000000 +0200
+@@ -1,10 +1,10 @@
+ # configuration parameters taken from upstream source files
+ VER		:= 3.3.5
+ BASE_VERSION	:= 3.3
+-SOURCE_VERSION	:= 1:3.3.5-12
+-DEB_VERSION	:= 1:3.3.5-12
++SOURCE_VERSION	:= 1:3.3.5-12+kbsd
++DEB_VERSION	:= 1:3.3.5-12+kbsd
+ GPC_BASE_VERSION	:= 2.1
+-DEB_GPC_VERSION	:= 2:3.3.5.20040516-12
++DEB_GPC_VERSION	:= 2:3.3.5.-12+kbsd
+ DEB_SOVERSION	:= 1:3.3.4-1
+ DEB_FFI_SOVERSION	:= 1:3.3.4-1
+ DEB_GCC_SOVERSION	:= 1:3.3.4-3
+@@ -17,5 +17,5 @@
+ GCJ_SONAME	:= 4
+ GNAT_VERSION	:= 3.3
+ GNAT_SONAME	:= 3.15
+-FFI_SONAME	:= 2
+-LIBC_DEP		:= libc6-dev (>= 2.3.2.ds1-16)
++FFI_SONAME	:= 
++LIBC_DEP		:= libc-dev
 diff -Nur gcc-3.3-3.3.5.old/debian/rules.patch gcc-3.3-3.3.5/debian/rules.patch
---- gcc-3.3-3.3.5.old/debian/rules.patch	2004-12-21 13:31:43.000000000 +0100
-+++ gcc-3.3-3.3.5/debian/rules.patch	2004-12-21 02:49:25.000000000 +0100
-@@ -121,15 +121,18 @@
+--- gcc-3.3-3.3.5.old/debian/rules.patch	2005-05-02 13:24:28.000000000 +0200
++++ gcc-3.3-3.3.5/debian/rules.patch	2005-05-02 13:25:12.000000000 +0200
+@@ -122,15 +122,18 @@
    endif
  endif
  
