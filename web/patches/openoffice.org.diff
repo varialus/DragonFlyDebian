@@ -1,0 +1,235 @@
+
+Status: dirty and unfinished
+
+diff -ur openoffice.org-1.1.3.old/config_office/configure.in openoffice.org-1.1.3/config_office/configure.in
+--- openoffice.org-1.1.3.old/config_office/configure.in	2004-08-27 12:03:41.000000000 +0200
++++ openoffice.org-1.1.3/config_office/configure.in	2005-05-07 17:25:04.000000000 +0200
+@@ -334,7 +334,7 @@
+ 		test_x=yes
+ 		test_gtk=yes
+ 		;;
+-	"Linux")
++	Linux|GNU/*)
+ 		test_x=yes
+ 		test_gtk=yes
+ 		;;
+diff -ur openoffice.org-1.1.3.old/config_office/set_soenv.in openoffice.org-1.1.3/config_office/set_soenv.in
+--- openoffice.org-1.1.3.old/config_office/set_soenv.in	2004-08-27 12:03:54.000000000 +0200
++++ openoffice.org-1.1.3/config_office/set_soenv.in	2005-05-07 17:25:04.000000000 +0200
+@@ -156,7 +156,7 @@
+ #
+ # A. Checking the platform first.
+ #
+-$platform = `uname`;       # probing the platform
++$platform = `uname | sed -e "s,GNU/.*,Linux,g"`;       # probing the platform
+ if ( $platform =~ m/CYGWIN/g )
+ {   $platform = $Winnt;
+     $cygwinver = `uname -r`;
+diff -ur openoffice.org-1.1.3.old/debian/control openoffice.org-1.1.3/debian/control
+--- openoffice.org-1.1.3.old/debian/control	2005-05-07 17:35:22.000000000 +0200
++++ openoffice.org-1.1.3/debian/control	2005-05-07 17:29:26.000000000 +0200
+@@ -42,7 +42,7 @@
+  at http://openoffice.debian.net or join us on IRC #debian-oo.
+ 
+ Package: openoffice.org-bin
+-Architecture: i386 powerpc s390 sparc arm
++Architecture: any
+ Depends: ${shlibs:Depends}, libfontconfig1, ${debconf-depends}, openoffice.org (>> 1.1.2+1.1.3)
+ Conflicts: openoffice.org1.1-bin
+ Replaces: openoffice.org1.1-bin, openoffice.org-gnome
+@@ -93,7 +93,7 @@
+  bullets (needed for bullets in OOo) and non-latin characters.
+ 
+ Package: openoffice.org-kde
+-Architecture: i386 powerpc sparc s390 arm
++Architecture: any
+ Depends: ${shlibs:Depends}, openoffice.org-bin (>= 1.1.2+1.1.3)
+ Suggests: oooqs-kde
+ Section: kde
+@@ -106,7 +106,7 @@
+  KDE/Qt and a KDEish File Picker when running under KDE.
+ 
+ Package: openoffice.org-gtk-gnome
+-Architecture: i386 powerpc sparc s390 arm
++Architecture: any
+ Depends: ${shlibs:Depends}, openoffice.org-bin (>= 1.1.2+1.1.3)
+ Suggests: ooqstart-gnome
+ Section: gnome
+@@ -119,7 +119,7 @@
+  Gtk+ and a Gtk/GNOMEish File Picker when running under GNOME.
+ 
+ Package: openoffice.org-dev
+-Architecture: i386 powerpc sparc s390 arm
++Architecture: any
+ Section: devel
+ Depends: ${shlibs:Depends}, openoffice.org-bin (= ${Source-Version}), ${dev-stl-depends}, openoffice.org-debian-files (>> 1.1.2-1.1.3)
+ Recommends: dmake
+@@ -134,7 +134,7 @@
+  OpenOffice.org (includes, IDL files, needed build tools...).
+ 
+ Package: openoffice.org-java
+-Architecture: i386 powerpc s390 sparc
++Architecture: any
+ Enhances: openoffice.org
+ Depends: ${shlibs:Depends}, openoffice.org (>> 1.1.2+1.1.3)${java-additional-depends}
+ Conflicts: openoffice.org (>> 1.1.3+1.1.4)
+@@ -157,7 +157,7 @@
+  /usr/lib/openoffice/program/jvmconfig after installation.
+ 
+ Package: openoffice.org-evolution
+-Architecture: i386 powerpc s390 sparc arm
++Architecture: any
+ Section: gnome
+ Depends: ${shlibs:Depends}, openoffice.org (>> 1.1.2+1.1.3)
+ Recommends: evolution (>> 2.0)
+diff -ur openoffice.org-1.1.3.old/debian/control.in openoffice.org-1.1.3/debian/control.in
+--- openoffice.org-1.1.3.old/debian/control.in	2005-05-07 17:35:22.000000000 +0200
++++ openoffice.org-1.1.3/debian/control.in	2005-05-06 21:34:42.000000000 +0200
+@@ -42,7 +42,7 @@
+  at http://openoffice.debian.net or join us on IRC #debian-oo.
+ 
+ Package: openoffice.org-bin
+-Architecture: i386 powerpc s390 sparc arm
++Architecture: any
+ Depends: ${shlibs:Depends}, libfontconfig1, ${debconf-depends}, openoffice.org (>> 1.1.2+1.1.3)
+ Conflicts: openoffice.org1.1-bin
+ Replaces: openoffice.org1.1-bin, openoffice.org-gnome
+@@ -93,7 +93,7 @@
+  bullets (needed for bullets in OOo) and non-latin characters.
+ 
+ Package: openoffice.org-kde
+-Architecture: i386 powerpc sparc s390 arm
++Architecture: any
+ Depends: ${shlibs:Depends}, openoffice.org-bin (>= 1.1.2+1.1.3)
+ Suggests: oooqs-kde
+ Section: kde
+@@ -106,7 +106,7 @@
+  KDE/Qt and a KDEish File Picker when running under KDE.
+ 
+ Package: openoffice.org-gtk-gnome
+-Architecture: i386 powerpc sparc s390 arm
++Architecture: any
+ Depends: ${shlibs:Depends}, openoffice.org-bin (>= 1.1.2+1.1.3)
+ Suggests: ooqstart-gnome
+ Section: gnome
+@@ -119,7 +119,7 @@
+  Gtk+ and a Gtk/GNOMEish File Picker when running under GNOME.
+ 
+ Package: openoffice.org-dev
+-Architecture: i386 powerpc sparc s390 arm
++Architecture: any
+ Section: devel
+ Depends: ${shlibs:Depends}, openoffice.org-bin (= ${Source-Version}), ${dev-stl-depends}, openoffice.org-debian-files (>> 1.1.2-1.1.3)
+ Recommends: dmake
+@@ -134,7 +134,7 @@
+  OpenOffice.org (includes, IDL files, needed build tools...).
+ 
+ Package: openoffice.org-java
+-Architecture: i386 powerpc s390 sparc
++Architecture: any
+ Enhances: openoffice.org
+ Depends: ${shlibs:Depends}, openoffice.org (>> 1.1.2+1.1.3)${java-additional-depends}
+ Conflicts: openoffice.org (>> 1.1.3+1.1.4)
+@@ -157,7 +157,7 @@
+  /usr/lib/openoffice/program/jvmconfig after installation.
+ 
+ Package: openoffice.org-evolution
+-Architecture: i386 powerpc s390 sparc arm
++Architecture: any
+ Section: gnome
+ Depends: ${shlibs:Depends}, openoffice.org (>> 1.1.2+1.1.3)
+ Recommends: evolution (>> 2.0)
+diff -ur openoffice.org-1.1.3.old/debian/rules openoffice.org-1.1.3/debian/rules
+--- openoffice.org-1.1.3.old/debian/rules	2005-05-07 17:35:22.000000000 +0200
++++ openoffice.org-1.1.3/debian/rules	2005-05-06 17:24:26.000000000 +0200
+@@ -583,7 +583,7 @@
+ 
+ 	$(MAKE) -f debian/rules control
+ 
+-ifneq "$(ARCH)" "i386"
++ifneq "i386" "i386"
+ ifneq "$(MOZILLA)" "n"
+ 	# Workaround for mozilla zips on ! i386
+ 	cp -rvf ../mozlibs/* $(SOURCE_TREE)/moz/zipped/
+diff -ur openoffice.org-1.1.3.old/dmake/configure.in openoffice.org-1.1.3/dmake/configure.in
+--- openoffice.org-1.1.3.old/dmake/configure.in	2004-01-09 17:59:00.000000000 +0100
++++ openoffice.org-1.1.3/dmake/configure.in	2005-05-06 18:02:22.000000000 +0200
+@@ -76,7 +76,7 @@
+ 	"SunOS")
+ 	  OS_VERSION=solaris  
+ 	  ;;
+-	"Linux")
++	GNU|GNU/*|Linux)
+ 	  OS_VERSION=linux
+ 	  ;;
+ 	"CYGWIN")
+@@ -108,9 +108,6 @@
+ 	"IRIX64")
+ 	  OS_VERSION=sysvr4
+ 	  ;;
+-	"GNU")
+-	  OS_VERSION=linux
+-	  ;;
+    *)
+       AC_MSG_ERROR([$_os operating system is not suitable to build dmake!])
+       ;;
+diff -ur openoffice.org-1.1.3.old/sal/osl/unx/conditn.c openoffice.org-1.1.3/sal/osl/unx/conditn.c
+--- openoffice.org-1.1.3.old/sal/osl/unx/conditn.c	2001-03-16 14:14:43.000000000 +0100
++++ openoffice.org-1.1.3/sal/osl/unx/conditn.c	2005-05-07 18:01:47.000000000 +0200
+@@ -297,6 +297,9 @@
+                 ret = pthread_cond_timedwait(&pCond->m_Condition, &pCond->m_Lock, &to);
+ 				if ( ret != 0 )
+ 				{
++#ifndef ETIME
++#define ETIME -1
++#endif
+ 					if ( ret == ETIME || ret == ETIMEDOUT )
+ 					{
+ 						Result = osl_cond_result_timeout;
+diff -ur openoffice.org-1.1.3.old/sal/osl/unx/file.c openoffice.org-1.1.3/sal/osl/unx/file.c
+--- openoffice.org-1.1.3.old/sal/osl/unx/file.c	2004-01-09 19:31:46.000000000 +0100
++++ openoffice.org-1.1.3/sal/osl/unx/file.c	2005-05-07 17:24:14.000000000 +0200
+@@ -136,7 +134,7 @@
+ #include <sys/fs/ufs_quota.h>
+ static const sal_Char* MOUNTTAB="/etc/mnttab";
+ 
+-#elif defined(LINUX)
++#elif defined(__linux__)
+ #include <mntent.h>
+ #include <sys/vfs.h>
+ #define  HAVE_STATFS_H
+@@ -144,7 +142,7 @@
+ #include <ctype.h>
+ static const sal_Char* MOUNTTAB="/etc/mtab";
+ 
+-#elif defined(NETBSD) || defined(FREEBSD)
++#elif defined(NETBSD) || defined(FREEBSD) || defined(__FreeBSD_kernel__)
+ #include <sys/param.h>
+ #include <sys/ucred.h>
+ #include <sys/mount.h>
+@@ -152,8 +150,11 @@
+ #include <ctype.h>
+ #define  HAVE_STATFS_H
+ /* No mounting table on *BSD
+- * This information is stored only in the kernel. */
+-/* static const sal_Char* MOUNTTAB="/etc/mtab"; */
++ * This information is stored only in the kernel.
++ * However, systems with GNU userland tend to provide this file. */
++#ifdef __GLIBC__
++static const sal_Char* MOUNTTAB="/etc/mtab";
++#endif
+ 
+ #elif defined(IRIX)
+ #include <mntent.h>
+diff -ur openoffice.org-1.1.3.old/sal/osl/unx/system.h openoffice.org-1.1.3/sal/osl/unx/system.h
+--- openoffice.org-1.1.3.old/sal/osl/unx/system.h	2003-08-15 13:38:50.000000000 +0200
++++ openoffice.org-1.1.3/sal/osl/unx/system.h	2005-05-06 20:47:47.000000000 +0200
+@@ -111,7 +111,7 @@
+ #if GLIBC >= 2
+ #   include <shadow.h>
+ #   if !defined(SPARC)
+-#       include <asm/sigcontext.h>
++#       include <signal.h>
+ #   endif
+ #   include <pthread.h>
+ #   include <sys/file.h>
