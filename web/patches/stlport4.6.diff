@@ -1,0 +1,108 @@
+diff -ur stlport4.6-4.6.2.old/src/time_facets.cpp stlport4.6-4.6.2/src/time_facets.cpp
+--- stlport4.6-4.6.2.old/src/time_facets.cpp	2003-11-02 09:58:50.000000000 +0100
++++ stlport4.6-4.6.2/src/time_facets.cpp	2005-05-06 15:46:38.000000000 +0200
+@@ -268,7 +268,7 @@
+ #ifdef __GNUC__
+ 
+       // fbp : at least on SUN 
+-# if defined ( _STLP_UNIX ) && ! defined (__linux__)
++# if defined ( _STLP_UNIX ) && ! defined (__linux__) && !defined(__GLIBC__)
+ #  define __USE_BSD 1
+ # endif
+  
+diff -ur stlport4.6-4.6.2.old/stlport/config/stl_como.h stlport4.6-4.6.2/stlport/config/stl_como.h
+--- stlport4.6-4.6.2.old/stlport/config/stl_como.h	2003-11-02 09:59:11.000000000 +0100
++++ stlport4.6-4.6.2/stlport/config/stl_como.h	2005-05-06 13:30:25.000000000 +0200
+@@ -63,7 +63,7 @@
+ //
+ 
+ 
+-#ifdef __linux__
++#if defined(__linux__) || defined(__GLIBC__)
+ 
+ #   define _STLP_NO_NATIVE_MBSTATE_T      1
+ #   define _STLP_NO_NATIVE_WIDE_FUNCTIONS 1
+diff -ur stlport4.6-4.6.2.old/stlport/config/stl_gcc.h stlport4.6-4.6.2/stlport/config/stl_gcc.h
+--- stlport4.6-4.6.2.old/stlport/config/stl_gcc.h	2005-05-06 16:22:47.000000000 +0200
++++ stlport4.6-4.6.2/stlport/config/stl_gcc.h	2005-05-06 13:31:21.000000000 +0200
+@@ -3,7 +3,7 @@
+  */
+ 
+ /* Systems having GLIBC installed have different traits */
+-#if ! defined (_STLP_USE_GLIBC) && ( defined (__linux__) || defined (__CYGWIN__) )
++#if ! defined (_STLP_USE_GLIBC) && ( defined (__linux__) || defined(__GLIBC__) || defined (__CYGWIN__) )
+ # define _STLP_USE_GLIBC
+ #endif
+ 
+@@ -87,7 +87,7 @@
+ #endif
+ #   define _STLP_NO_NATIVE_WIDE_FUNCTIONS 1
+ #   define _STLP_NO_NATIVE_WIDE_STREAMS   1
+-# elif defined(__linux__)
++# elif defined(__linux__) || defined(__GLIBC__)
+ #   define _STLP_NO_NATIVE_WIDE_FUNCTIONS 1
+ #   define _STLP_NO_NATIVE_WIDE_STREAMS   1
+ # elif defined (__sun)
+diff -ur stlport4.6-4.6.2.old/stlport/config/stl_kai.h stlport4.6-4.6.2/stlport/config/stl_kai.h
+--- stlport4.6-4.6.2.old/stlport/config/stl_kai.h	2003-11-02 09:59:11.000000000 +0100
++++ stlport4.6-4.6.2/stlport/config/stl_kai.h	2005-05-06 15:48:16.000000000 +0200
+@@ -41,7 +41,7 @@
+ 
+ // this is multiplatform compiler, so here should go system-dependant section
+ // This really should be in platform-specific files, like stl_solaris.h
+-# ifdef __linux__
++# if defined(__linux__) || defined(__GLIBC__)
+ #  define _STLP_NO_NATIVE_WIDE_STREAMS 1
+ #  define _STLP_NO_NATIVE_WIDE_FUNCTIONS 1
+ # elif defined (__sun) || defined (sun)
+diff -ur stlport4.6-4.6.2.old/stlport/stl/_config.h stlport4.6-4.6.2/stlport/stl/_config.h
+--- stlport4.6-4.6.2.old/stlport/stl/_config.h	2004-02-05 00:29:55.000000000 +0100
++++ stlport4.6-4.6.2/stlport/stl/_config.h	2005-05-06 13:27:58.000000000 +0200
+@@ -166,9 +166,9 @@
+ # endif
+ 
+ /* Operating system recognition (basic) */
+-# if defined (__unix) || defined (__linux__) || defined (__QNX__) || defined (_AIX)  || defined (__NetBSD__) || defined (__Lynx__)
++# if defined (__unix) || defined (__linux__) || defined(__GLIBC__) || defined (__QNX__) || defined (_AIX)  || defined (__NetBSD__) || defined (__Lynx__)
+ #  define _STLP_UNIX 1
+-#  if defined (__linux__) && ! defined (_STLP_USE_GLIBC)
++#  if (defined (__linux__) || defined(__GLIBC__)) && ! defined (_STLP_USE_GLIBC)
+ #   define _STLP_USE_GLIBC 1
+ #  endif
+ # elif defined(macintosh) || defined (_MAC)
+@@ -262,7 +262,7 @@
+ #    define _STLP_DEC_THREADS
+ #   elif defined (_STLP_WIN32) && ! defined (_STLP_PTHREADS)
+ #    define _STLP_WIN32THREADS 1
+-#   elif ((defined (__sun) && !defined (__linux__)) \
++#   elif ((defined (__sun) && !defined (__linux__) && !defined(__GLIBC__)) \
+      || defined(_UITHREADS) ) && !defined(_STLP_PTHREADS)
+ #     define _STLP_UITHREADS
+ #   elif defined (__OS2__)
+@@ -280,12 +280,12 @@
+ #  endif /* _REENTRANT */
+ 
+ // warning : pthread_spinlock code was reported not to work on RedHat 3
+-# if defined(__linux__) && defined(_STLP_USE_PTHREAD_SPINLOCK)
++# if (defined(__linux__) || defined(__GLIBC__)) && defined(_STLP_USE_PTHREAD_SPINLOCK)
+ #  include <features.h>
+ #  ifndef __USE_XOPEN2K
+ #   undef _STLP_USE_PTHREAD_SPINLOCK
+ #  endif /* __USE_XOPEN2K */
+-# endif /* __linux__ && _STLP_PTHREADS */
++# endif /* (__linux__ || __GLIBC__) && _STLP_PTHREADS */
+ 
+ # ifndef _STLP_STATIC_MUTEX
+ #  define _STLP_STATIC_MUTEX _STLP_mutex_base
+diff -ur stlport4.6-4.6.2.old/stlport/stl/c_locale.h stlport4.6-4.6.2/stlport/stl/c_locale.h
+--- stlport4.6-4.6.2.old/stlport/stl/c_locale.h	2003-11-02 09:59:03.000000000 +0100
++++ stlport4.6-4.6.2/stlport/stl/c_locale.h	2005-05-06 15:47:36.000000000 +0200
+@@ -226,7 +226,7 @@
+ #  define _Locale_PRINT _PRINT
+ #  define _Locale_ALPHA (_UPPER|_LOWER)
+ 
+-# elif defined(_STLP_USE_GLIBC) /* linux, using the gnu compiler */
++# elif defined(_STLP_USE_GLIBC) /* glibc, using the gnu compiler */
+ 
+ /* This section uses macros defined in the gnu libc ctype.h header */
+ 
