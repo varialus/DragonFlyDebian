@@ -7,7 +7,7 @@
 
 set -ex
 
-version=11
+version=12
 
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
