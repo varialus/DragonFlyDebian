@@ -1,0 +1,69 @@
+diff -ur src.old/sys/dev/null/null.c src/sys/dev/null/null.c
+--- src.old/sys/dev/null/null.c	2004-08-02 21:59:41.000000000 +0200
++++ src/sys/dev/null/null.c	2004-11-09 01:50:39.000000000 +0100
+@@ -42,14 +42,17 @@
+ 
+ /* For use with destroy_dev(9). */
+ static struct cdev *null_dev;
++static struct cdev *full_dev;
+ static struct cdev *zero_dev;
+ 
+ static d_write_t null_write;
++static d_write_t full_write;
+ static d_ioctl_t null_ioctl;
+ static d_read_t zero_read;
+ 
+ #define CDEV_MAJOR	2
+ #define NULL_MINOR	2
++#define FULL_MINOR	3
+ #define ZERO_MINOR	12
+ 
+ static struct cdevsw null_cdevsw = {
+@@ -61,6 +64,15 @@
+ 	.d_maj =	CDEV_MAJOR,
+ };
+ 
++static struct cdevsw full_cdevsw = {
++	.d_version =	D_VERSION,
++	.d_read =	(d_read_t *)nullop,
++	.d_write =	full_write,
++	.d_ioctl =	null_ioctl,
++	.d_name =	"full",
++	.d_maj =	CDEV_MAJOR,
++};
++
+ static struct cdevsw zero_cdevsw = {
+ 	.d_version =	D_VERSION,
+ 	.d_read =	zero_read,
+@@ -83,6 +95,15 @@
+ 
+ /* ARGSUSED */
+ static int
++full_write(struct cdev *dev __unused, struct uio *uio, int flags __unused)
++{
++	uio->uio_resid = 0;
++
++	return (ENOSPC);
++}
++
++/* ARGSUSED */
++static int
+ null_ioctl(struct cdev *dev __unused, u_long cmd, caddr_t data __unused,
+     int flags __unused, struct thread *td)
+ {
+@@ -119,12 +140,15 @@
+ 		zbuf = (void *)malloc(PAGE_SIZE, M_TEMP, M_WAITOK | M_ZERO);
+ 		null_dev = make_dev(&null_cdevsw, NULL_MINOR, UID_ROOT,
+ 			GID_WHEEL, 0666, "null");
++		full_dev = make_dev(&full_cdevsw, FULL_MINOR, UID_ROOT,
++			GID_WHEEL, 0666, "full");
+ 		zero_dev = make_dev(&zero_cdevsw, ZERO_MINOR, UID_ROOT,
+ 			GID_WHEEL, 0666, "zero");
+ 		break;
+ 
+ 	case MOD_UNLOAD:
+ 		destroy_dev(null_dev);
++		destroy_dev(full_dev);
+ 		destroy_dev(zero_dev);
+ 		free(zbuf, M_TEMP);
+ 		break;
