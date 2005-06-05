@@ -1,0 +1,82 @@
+                  GNU/kFreeBSD IRC meeting, June 5, 2005
+                  ======================================
+
+Minutes
+-------
+
+People mentioned:
+  aurel32: 	Aurelien Jarno
+  braindmg:	Guillem Jover
+  nyu:		Robert Millan
+  sanvila:	Santiago Vila
+
+
+1) The GNU/kFreeBSD LiveCD has been moved from the SVN repository to the
+   FTP space on alioth.debian.org as suggested by braindmg.
+
+2) gnuab (the machine hosting the kfreebsd archive) has been giving a 
+   lot of problems in the past months. braindmg tell us they have been 
+   partly solved but there is still some problem such as power outage.
+   It would be nice, but not urgent to have a new machine/hosting 
+   place. We could also live with it and try to get soon in the official
+   archive.
+
+3) We have to adopt all kbsd related packages that nyu maintains. 
+   braindmg proposed to put them as team maintained. nyu is fine with
+   that.
+
+4) type-handling looks like a bit insane. Scott James Remnant is 
+   implementing sane kernel and cpu split from dpkg. So we decided to
+   continue to maintain type-handling as a deprecated technology until
+   the new dpkg comes.
+
+5) libpthread2 is causing a lot of packages to fail working because they
+   have objects that depend on libpthread2.so, but they don't depend on 
+   libpthread2.
+   nyu explains this package comes from libpth. Initialy, he enabled 
+   posix emulation in it to work as the standard pthreads for kfreebsd.
+   But it turned out that libpth is not usable for providing pthreads, 
+   so we switched back to linuxthreads.
+   We need to rebuild all packages that depends on libpthread2, as well 
+   as all package that have objects that depends on libpthread2.so
+
+6) Colin Watson has started working on porting d-i to the Hurd. We need 
+   to contact him so we can benefit from the changes to de-linuxize d-i.
+
+7) nyu mentioned that kfreebsd5-headers is built from kfreebsd5-source, 
+   so when the kernel is updated, there's a chance that glibc breaks.
+
+8) The post-sarge released will use gcc-4.0 and glibc-2.3.5. So we need
+   to start to port them to be ready for the change.
+
+9) nyu explained why there is no java in the current gcc-3.3. It is 
+   because the boehm-gc was not ported to gcc-3.3. The gcc-3.2 boehm-gc
+   had important issues: it didn't fix gc to split glibc checks out of 
+   "linux" checks and kfreebsd checks out of freebsd checks instead it 
+   created a GLIBC_FREEBSD macro or something and used it altogether.
+   So it is better to backport the boehm-gc from gcc-3.4 to gcc-3.3.
+
+10) aurel32 noticed his machine is not enough powerfull to follow the 
+    sid development. braindmg explained that sanvila will set up a 
+    buildd.
+
+11) We need to do something to increase the visibility of the port. 
+    braindmg suggest to send periodic reports on debian-devel or dwn.
+
+12) It has been decicided to do regular IRC meetings every other Sunday
+    at 19:00 UTC. We can change that later if it's not convenient.
+
+
+
+Action points
+-------------
+
+* braindmg:		talk with Colin Watson about d-i
+* aurel32:		rebuild all packages that are still using lipthread2
+* braindmg:		work on util-linux
+* aurel32:		get the out-of-date packages down to 220 by 20050611
+* aurel32:		update gcc to 3.3.6 and add java support
+* aurel32 & braindmg:	adopt packages from nyu
+* braindmg:		send a status of the port to debian-devel
+
+
