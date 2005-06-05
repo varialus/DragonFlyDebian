@@ -52,11 +52,20 @@ if all tasks were fixed. We goalt neither of these though :P
 	  the FreeBSD loader.  (The debian package has a patch by Guillem
 	  which does this, but doesn't work reliably enough to merge it yet).
 
- - d-i
+ - d-i. Note that Colin Watson has started working on porting d-i to the Hurd
 
  - xterm is horribly fucked (I use rxvt instead).
 
  - Package Glibc for the FreeBSD ports collection.
+
+ - type-handling is a way to convert System and CPU combinations into the 
+   architecture variable names that dpkg can understand. This system is a bit
+   complicated and could be replaced by a sane kernel and cpu split from dpkg.
+   Scott James Remnant is working on that.
+
+ - lipthread2 is still used by a lot of packages. They should be rebuilt on a system
+   without libpthread2. Note note that we have packages that didn't depend on 
+   libpthread2 but still had objects that depended on libpthread2.so.
 
 
      Big beasts
