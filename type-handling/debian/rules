@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+# This file is PUBLIC DOMAIN. 
+
+DEB_AUTO_UPDATE_DEBIAN_CONTROL	= yes
+
+DEB_BUILD_GNU_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
+DEB_BUILD_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_SYSTEM)
+ifeq ($(DEB_BUILD_GNU_SYSTEM),linux)
+DEB_BUILD_GNU_SYSTEM = linux-gnu
+endif
+DEB_BUILD_GNU_TYPE = $(DEB_BUILD_GNU_CPU)-$(DEB_BUILD_GNU_SYSTEM)
+
+types := $(shell dpkg-architecture --help 2>&1 | grep "^Known GNU" | cut -d " " -f 6- | sed "s/, / /g")
+
+cpus := $(shell echo $(types) | tr " " "\n" | cut -d "-" -f 1 | sort | uniq)
+systems := $(shell echo $(types) | tr " " "\n" | cut -d "-" -f 2-  | sort | uniq)
+systems := $(shell echo $(systems) linux-gnu | tr " " "\n" | grep -vx linux | sort | uniq)
+
+not_cpus := $(shell echo $(cpus) | tr " " "\n" | grep -vx $(DEB_BUILD_GNU_CPU))
+not_systems := $(shell echo $(systems) | tr " " "\n" | grep -vx $(DEB_BUILD_GNU_SYSTEM))
+
+not_cpus := $(shell for cpu in $(not_cpus) ; do echo -n , not+$$cpu ; done)
+not_systems := $(shell for system in $(not_systems) ; do echo -n , not+$$system ; done)
+
+provides = $(DEB_BUILD_GNU_CPU), $(DEB_BUILD_GNU_SYSTEM), \
+$(DEB_BUILD_GNU_TYPE)$(not_cpus)$(not_systems)
+
+clean::
+	sed -e "s%@provides@%$(provides)%g" \
+	< debian/control.in.in > debian/control.in
+
+binary/type-handling:: common-install-prehook-arch
+	TYPE_HANDLING_BOOTSTRAP=yes ./type-handling any linux	> "any:linux"
+	TYPE_HANDLING_BOOTSTRAP=yes ./type-handling i386 any	> "i386:any"
+
+clean::
+	rm -f "any:linux" "i386:any"
+
+include /usr/share/cdbs/1/rules/debhelper.mk

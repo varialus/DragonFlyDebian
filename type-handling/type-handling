@@ -1,0 +1,92 @@
+#!/bin/sh -e
+
+all_types=`dpkg-architecture --help 2>&1 | grep "^Known GNU" | \
+  cut -d " " -f 6- | sed "s/, / /g"`
+
+all_cpus=`echo ${all_types} | tr " " "\n" | cut -d "-" -f 1 | sort | uniq`
+all_systems=`echo ${all_types} | tr " " "\n" | cut -d "-" -f 2-  | sort | uniq`
+
+if [ "$#" = "0" ] ; then
+  echo "Known cpus: `for i in ${all_cpus} ; do echo -n $i\  ; done`"
+  echo "Known systems: `for i in ${all_systems} ; do echo -n $i\  ; done`"
+  exit
+fi
+
+negated="0"
+reverted="0"
+cpus=""
+systems=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    "-n"|"--negated")	negated="1" ;;
+    "-r"|"--reverted")  reverted="1" ;;
+    *)
+      if [ "${cpus}" = "" ] ; then
+        cpus="$1"
+      else
+        systems="$1"
+      fi
+    ;;
+  esac
+  shift
+done
+
+# linux-gnu is an alias for linux, normalise it first of all.
+systems="`echo ${systems} | sed "s/linux-gnu/linux/g"`"
+
+# check if we have a cached result for this
+if test -e "/usr/share/type-handling/${cpus}:${systems}" \
+  && [ ":${TYPE_HANDLING_BOOTSTRAP}" = ":" ] \
+  && [ "${negated}:${reverted}" = ":" ] ; then
+  cat "/usr/share/type-handling/${cpus}:${systems}"
+  exit
+fi
+
+# "all" / "any" wildcards
+case "${cpus}:${systems}" in
+  all:*)		echo all ; exit ;;
+  any:any|any:all)	echo any ; exit ;;
+  any:*)		cpus=`for i in ${all_cpus}; do echo -n $i, ; done` ;;
+  *:any|*:all)		systems=`for i in ${all_systems}; do echo -n $i, ; done` ;;
+esac
+
+# replace commas with spaces
+cpus="`echo ${cpus} | sed "s/,/ /g"`"
+systems="`echo ${systems} | sed "s/,/ /g"`"
+
+# match:negated:reverted logic table
+#
+# 000	- ""
+# 001	- "!arch"
+# 010	- "arch"
+# 011	- ""
+# 100	- "arch"
+# 101	- ""
+# 110	- ""
+# 111	- "!arch"
+
+# for each concievable type..
+(for cpu in ${all_cpus} ; do for system in ${all_systems} ; do
+  # if it's in our list..
+  if echo " ${cpus} " | grep -q " ${cpu} " && echo " ${systems} " | grep -q " ${system} " ; then
+    match="1"
+  else
+    match="0"
+  fi
+  case "${match}${negated}${reverted}" in
+    010|100)
+      # make sure it exists..
+      if arch=`dpkg-architecture -f -t${cpu}-${system} -qDEB_HOST_ARCH 2>/dev/null` ; then
+        echo -n " ${arch}"
+      fi
+    ;;
+    001|111)
+      # make sure it exists..
+      if arch=`dpkg-architecture -f -t${cpu}-${system} -qDEB_HOST_ARCH 2>/dev/null` ; then
+        echo -n " !${arch}"
+      fi
+    ;;
+  esac
+done ; done) | cut -c 2-
+echo

@@ -1,0 +1,106 @@
+type-handling (0.2.11) unstable; urgency=low
+
+  * Changed to a team maintained package. 
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon,  6 Jun 2005 01:52:22 +0200
+
+type-handling (0.2.10) unstable; urgency=low
+
+  * Actualy not use fucking itself when fucking building the damn thing.
+    (Fucking closes: #297269)
+
+ -- Robert Millan <rmh@debian.org>  Sun, 17 Apr 2005 22:21:04 +0200
+
+type-handling (0.2.9) unstable; urgency=low
+
+  * control.in.in: Hardcode build-depend on cdbs (>= 0.4.27-4).  (Closes: #297269)
+
+ -- Robert Millan <rmh@debian.org>  Thu, 14 Apr 2005 19:15:54 +0200
+
+type-handling (0.2.8) unstable; urgency=high
+
+  * Bring back the "Provides:" since some package broke without it.
+
+ -- Robert Millan <rmh@debian.org>  Sun,  3 Apr 2005 14:08:06 +0200
+
+type-handling (0.2.7) unstable; urgency=low
+
+  * Don't use caching when --negated or --reverted were passed.
+
+ -- Robert Millan <rmh@debian.org>  Thu, 17 Mar 2005 11:46:53 +0100
+
+type-handling (0.2.6) unstable; urgency=low
+
+  * Add caching hack to optimise for most common requests (i386:any and
+    any:linux).
+  * Replace Architecture with Cpu/System in control.in.
+
+ -- Robert Millan <rmh@debian.org>  Mon,  7 Feb 2005 16:47:16 +0100
+
+type-handling (0.2.5) unstable; urgency=low
+
+  * Improvements to "all" / "any" handling:
+    - Understand "all" as valid for both cpu and system parameters.  The logic
+      is:  If cpu input is "all", output is always "all" regardless of system.
+      If system input is "all", do as if system input was "any".
+    - When both cpu input and system input are "any", output is just "any", not
+      the expansion of all the cpu/system combinations.
+    - Optimise "all" / "any" wildcard logic using a case/esac statement.
+  * Remove old "Provides:" functionality, which has been deprecated for several
+    versions now.  Set Architecture: all in debian/control.in.
+  * Use cdbs DEB_AUTO_UPDATE_DEBIAN_CONTROL feature.
+
+ -- Robert Millan <rmh@debian.org>  Tue,  1 Feb 2005 12:17:25 +0100
+
+type-handling (0.2.4) unstable; urgency=low
+
+  * Rewrite iterative boolean logic.
+  * Add -r|--reverted option to shorten output strings in some situations
+    (only when the maintainer sees fit!).  See README.Debian for details.
+
+ -- Robert Millan <rmh@debian.org>  Wed, 22 Sep 2004 12:44:08 +0200
+
+type-handling (0.2.3) unstable; urgency=low
+
+  * Officialy deprecating the old option.  Rewrite documentation in package
+    description and in debian/README.
+
+ -- Robert Millan <rmh@debian.org>  Wed, 18 Aug 2004 16:44:51 +0200
+
+type-handling (0.2.2) unstable; urgency=low
+
+  * Negated generation now works through inclussion instead of exclussion.
+    I.e., instead of "!foo !..." it generates an equivalent "bar ...". As a
+    consequence, we can use negated lists to generate an Architecture field.
+
+  * Nuke list of negated types (${not_types}) in Provides.  Noone is really
+    using it, and this area of functionality is deprecated anyway.
+
+ -- Robert Millan <rmh@debian.org>  Tue, 10 Aug 2004 03:26:22 +0200
+
+type-handling (0.2.1) unstable; urgency=low
+
+  * Pass -f to dpkg-architecture to override environment when converting
+    from type to arch.
+
+ -- Robert Millan <rmh@debian.org>  Fri, 30 Jul 2004 19:43:34 +0200
+
+type-handling (0.2.0) unstable; urgency=low
+
+  * Add 'type-handling' script, for generating dpkg internal architecture
+    names from cpu-system combinations.
+
+ -- Robert Millan <rmh@debian.org>  Mon, 26 Jul 2004 16:39:44 +0200
+
+type-handling (0.1.0) unstable; urgency=low
+
+  * Implement negated cpus, systems and types (not+*).
+
+ -- Robert Millan <rmh@debian.org>  Mon, 29 Dec 2003 12:55:13 +0100
+
+type-handling (0.0.0) unstable; urgency=low
+
+  * Initial Release. (Closes: #221075)
+
+ -- Robert Millan <rmh@debian.org>  Tue, 18 Nov 2003 15:39:25 +0100
+
