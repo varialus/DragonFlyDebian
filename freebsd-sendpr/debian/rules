@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+
+DEB_TAR_SRCDIR			:= src
+DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
+
+package				:= freebsd-sendpr
+DESTDIR				:= $(CURDIR)/debian/$(package)
+PMAKE				:= freebsd-make DESTDIR=$(DESTDIR) BINDIR=/usr/bin
+
+build/$(package):: apply-patches
+	cd $(DEB_SRCDIR)/gnu/usr.bin/send-pr/ && $(PMAKE)
+
+binary/$(package):: common-install-prehook-arch
+	mkdir -p $(DESTDIR)/usr/share/man/man1
+	cd $(DEB_SRCDIR)/gnu/usr.bin/send-pr/ && \
+		$(PMAKE) install etc-gnats-freefall
+	for i in $(DESTDIR)/usr/share/man/man1/*.gz ; do \
+		[ -L $$i ] || gunzip $$i ; \
+	done
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/tarball.mk
+include /usr/share/cdbs/1/rules/simple-patchsys.mk

@@ -1,0 +1,78 @@
+diff -ur src.old/gnu/usr.bin/send-pr/send-pr.sh src/gnu/usr.bin/send-pr/send-pr.sh
+--- src.old/gnu/usr.bin/send-pr/send-pr.sh	2004-12-18 01:40:07.000000000 +0100
++++ src/gnu/usr.bin/send-pr/send-pr.sh	2004-12-18 01:42:40.000000000 +0100
+@@ -88,10 +88,12 @@
+ # Find out the name of the originator of this PR.
+ if [ -n "$NAME" ]; then
+   ORIGINATOR="$NAME"
++elif [ -n "$DEBFULLNAME" ]; then
++  ORIGINATOR="$DEBFULLNAME"
+ elif [ -f $HOME/.fullname ]; then
+   ORIGINATOR="`sed -e '1q' $HOME/.fullname`"
+-else
+-  PTEMP=`mktemp -t p` || exit 1
++elif test -e $PW ; then
++  PTEMP=`mktemp -t p.XXXXXX` || exit 1
+   # Must use temp file due to incompatibilities in quoting behavior
+   # and to protect shell metacharacters in the expansion of $LOGNAME
+   $PW usershow $LOGNAME | awk -F: '{ print $8 }' | sed -e 's/,.*//' > $PTEMP
+@@ -99,8 +101,17 @@
+   rm -f $PTEMP
+ fi
+ 
+-FROM="$ORIGINATOR <$LOGNAME>"
+-REPLY_TO="$ORIGINATOR <${REPLY_TO:-${REPLYTO:-$LOGNAME}}>"
++# Ditto for email address
++if [ -n "$EMAIL" ]; then
++  ORIGINATOR_EMAIL="$EMAIL"
++elif [ -n "$DEBEMAIL" ]; then
++  ORIGINATOR_EMAIL="$DEBEMAIL"
++else
++  ORIGINATOR_EMAIL="`whoami || echo $LOGNAME`@`hostname`"
++fi
++
++FROM="$ORIGINATOR <$ORIGINATOR_EMAIL>"
++REPLY_TO="$ORIGINATOR <${REPLY_TO:-${REPLYTO:-$ORIGINATOR_EMAIL}}>"
+ 
+ if [ -n "$ORGANIZATION" ]; then
+   if [ -f "$ORGANIZATION" ]; then
+@@ -111,6 +122,10 @@
+     ORGANIZATION="$DEFAULT_ORGANIZATION"
+   elif [ -f $HOME/.organization ]; then
+     ORGANIZATION="`cat $HOME/.organization`"
++  else
++    case "$ORIGINATOR_EMAIL" in *@debian.org)
++      ORGANIZATION="Debian" ;;
++    esac
+   fi
+ fi
+ 
+@@ -257,8 +272,8 @@
+ FIX_C='<how to correct or work around the problem, if known (multiple lines)>'
+ 
+ # Create temporary files, safely
+-REF=`mktemp -t pf` || exit 1
+-TEMP=`mktemp -t pf` || exit 1
++REF=`mktemp -t pf.XXXXXX` || exit 1
++TEMP=`mktemp -t pf.XXXXXX` || exit 1
+ # Catch some signals. ($xs kludge needed by Sun /bin/sh)
+ xs=0
+ trap 'rm -f $REF $TEMP; exit $xs' 0
+@@ -492,7 +507,7 @@
+     case "$input" in
+       a*)
+ 	if [ -z "$BATCH" ]; then
+-	  BAD=`mktemp -t pbad`
++	  BAD=`mktemp -t pbad.XXXXXX`
+ 	  echo "$COMMAND: the problem report remains in $BAD and is not sent."
+ 	  mv $TEMP $BAD
+         else
+@@ -574,7 +589,7 @@
+ else
+   echo "$COMMAND: mysterious mail failure."
+   if [ -z "$BATCH" ]; then
+-    BAD=`mktemp -t pbad`
++    BAD=`mktemp -t pbad.XXXXXX`
+     echo "$COMMAND: the problem report remains in $BAD and is not sent."
+     mv $REF $BAD
+   else
