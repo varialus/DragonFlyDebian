@@ -1,0 +1,34 @@
+diff -u gdm-2.6.0.8/debian/control gdm-2.6.0.8/debian/control
+--- gdm-2.6.0.8/debian/control
++++ gdm-2.6.0.8/debian/control
+@@ -2,7 +2,7 @@
+ Section: gnome
+ Priority: optional
+ Maintainer: Ryan Murray <rmurray@debian.org>
+-Build-Depends: libpam0g-dev, libgnomeui-dev (>= 1.96.0), librsvg2-dev, libglade2-dev, libwrap0-dev, debhelper, gettext, intltool, scrollkeeper, libselinux1-dev, libattr1-dev, xlibs-static-dev, libxt-dev
++Build-Depends: libpam0g-dev, libgnomeui-dev (>= 1.96.0), librsvg2-dev, libglade2-dev, libwrap0-dev, debhelper, gettext, intltool, scrollkeeper, libselinux1-dev [!kfreebsd-i386 !hurd-i386], libattr1-dev [!kfreebsd-i386 !hurd-i386], xlibs-static-dev, libxt-dev
+ Standards-Version: 3.6.1
+ 
+ Package: gdm
+diff -u gdm-2.6.0.8/debian/rules gdm-2.6.0.8/debian/rules
+--- gdm-2.6.0.8/debian/rules
++++ gdm-2.6.0.8/debian/rules
+@@ -8,10 +8,17 @@
+ # This is the debhelper compatability version to use.
+ export DH_COMPAT=4
+ 
++DEB_HOST_GNU_SYSTEM	?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
++
++conf_args = --disable-dependency-tracking --with-tags= --prefix=/usr --libexecdir=\$${prefix}/lib --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --sysconfdir=/etc --libexecdir=\$${prefix}/lib/gdm --localstatedir=/var/lib
++ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
++conf_args += --with-selinux
++endif
++
+ configure: configure-stamp
+ configure-stamp:
+ 	dh_testdir
+-	./configure --disable-dependency-tracking --with-tags= --prefix=/usr --libexecdir=\$${prefix}/lib --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --sysconfdir=/etc --libexecdir=\$${prefix}/lib/gdm --localstatedir=/var/lib --with-selinux
++	./configure $(conf_args)
+ 
+ 	touch configure-stamp
+ 
