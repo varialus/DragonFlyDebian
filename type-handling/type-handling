@@ -1,10 +1,7 @@
 #!/bin/sh -e
 
-all_types=`dpkg-architecture --help 2>&1 | grep "^Known GNU" | \
-  cut -d " " -f 6- | sed "s/, / /g"`
-
-all_cpus=`echo ${all_types} | tr " " "\n" | cut -d "-" -f 1 | sort | uniq`
-all_systems=`echo ${all_types} | tr " " "\n" | cut -d "-" -f 2-  | sort | uniq`
+all_cpus=`grep -v ^# /usr/share/dpkg/cputable | (while read debian gnu regex ; do echo ${gnu} ; done)`
+all_systems=`grep -v ^# /usr/share/dpkg/ostable | (while read debian gnu regex ; do echo ${gnu} ; done)`
 
 if [ "$#" = "0" ] ; then
   echo "Known cpus: `for i in ${all_cpus} ; do echo -n $i\  ; done`"
@@ -31,9 +28,6 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
-
-# linux-gnu is an alias for linux, normalise it first of all.
-systems="`echo ${systems} | sed "s/linux-gnu/linux/g"`"
 
 # check if we have a cached result for this
 if test -e "/usr/share/type-handling/${cpus}:${systems}" \
