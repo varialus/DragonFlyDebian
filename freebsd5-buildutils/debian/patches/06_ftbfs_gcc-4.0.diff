@@ -1,0 +1,34 @@
+Package: freebsd5-buildutils
+Severity: normal
+Tags: patch
+
+When building 'freebsd5-buildutils' on amd64 with gcc-4.0,
+I get the following error:
+
+cc -O -I/freebsd5-buildutils-5.3/build-tree/src/usr.bin/make -DMAKE_VERSION=\"5200408120\" -DDEFSHELL=1 -O2 -g -Wall -DMACHINE_ARCH='"x86_64"'   -c job.c
+job.c:231: error: static declaration of 'maxJobs' follows non-static declaration
+job.h:229: error: previous declaration of 'maxJobs' was here
+*** Error code 1
+
+Stop.
+pmake: stopped in /freebsd5-buildutils-5.3/build-tree/src/usr.bin/make
+make: *** [build/freebsd5-buildutils] Error 1
+
+With the attached patch 'freebsd5-buildutils' can be compiled
+on amd64 using gcc-4.0.
+
+Regards
+Andreas Jochens
+
+diff -urN tmp/usr.bin/make/job.c src/usr.bin/make/job.c
+--- tmp/usr.bin/make/job.c	2004-12-16 17:06:50.255866000 +0100
++++ src/usr.bin/make/job.c	2004-12-16 17:08:49.266774208 +0100
+@@ -228,7 +228,7 @@
+                	*shellName = NULL;		  /* last component of shell */
+ 
+ 
+-static int  	maxJobs;    	/* The most children we can run at once */
++int  	maxJobs;    	/* The most children we can run at once */
+ static int  	maxLocal;    	/* The most local ones we can have */
+ STATIC int     	nJobs;	    	/* The number of children currently running */
+ STATIC int	nLocal;    	/* The number of local children */

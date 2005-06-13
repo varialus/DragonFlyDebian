@@ -1,0 +1,83 @@
+--- ports.old/Mk/bsd.port.mk	2005-02-04 08:40:35.000000000 +0800
++++ ports/Mk/bsd.port.mk	2005-04-24 21:16:26.205492960 +0800
+@@ -1726,7 +1726,7 @@
+ .endif
+ 
+ .if ${PATCH} == "patch"
+-PATCH_ARGS+=	-b .orig
++PATCH_ARGS+=	-b# .orig
+ PATCH_DIST_ARGS+=	-b .orig
+ .endif
+ 
+@@ -2815,7 +2815,7 @@
+ .if !defined(DISABLE_VULNERABILITIES) && !defined(PACKAGE_BUILDING)
+ 	@if [ -f "${AUDITFILE}" ]; then \
+ 		audit_created=`${_EXTRACT_AUDITFILE} | \
+-			${SED} -nEe "1s/^#CREATED: *([0-9]{4})-?([0-9]{2})-?([0-9]{2}).*$$/\1\2\3/p"`; \
++			${SED} -ne "1s/^#CREATED: *([0-9]{4})-?([0-9]{2})-?([0-9]{2}).*$$/\1\2\3/p"`; \
+ 		audit_expiry=`date -u -v-14d "+%Y%m%d"`; \
+ 		if [ "$$audit_created" -lt "$$audit_expiry" ]; then \
+ 			${ECHO_MSG} "===>  WARNING: Vulnerability database out of date, checking anyway"; \
+@@ -2847,7 +2847,7 @@
+ 	@(cd ${_DISTDIR}; \
+ 	 ${_MASTER_SITES_ENV} ; \
+ 	 for _file in ${DISTFILES}; do \
+-		file=`${ECHO_CMD} $$_file | ${SED} -E -e 's/:[^:]+$$//'` ; \
++		file=`${ECHO_CMD} $$_file | ${SED} -e 's/:[^:]+$$//'` ; \
+ 		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
+ 		force_fetch=false; \
+ 		filebasename=`${BASENAME} $$file`; \
+@@ -2914,7 +2914,7 @@
+ 	@(cd ${_DISTDIR}; \
+ 	 ${_PATCH_SITES_ENV} ; \
+ 	 for _file in ${PATCHFILES}; do \
+-		file=`${ECHO_CMD} $$_file | ${SED} -E -e 's/:[^:]+$$//'` ; \
++		file=`${ECHO_CMD} $$_file | ${SED} -e 's/:[^:]+$$//'` ; \
+ 		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
+ 		force_fetch=false; \
+ 		filebasename=`${BASENAME} $$file`; \
+@@ -3816,7 +3816,7 @@
+ 	@(cd ${_DISTDIR}; \
+ 	 ${_MASTER_SITES_ENV} ; \
+ 	 for _file in ${DISTFILES}; do \
+-		file=`${ECHO_CMD} $$_file | ${SED} -E -e 's/:[^:]+$$//'` ; \
++		file=`${ECHO_CMD} $$_file | ${SED} -e 's/:[^:]+$$//'` ; \
+ 		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
+ 		if [ ! -f $$file -a ! -f `${BASENAME} $$file` ]; then \
+ 			if [ ! -z "$$select" ] ; then \
+@@ -3848,7 +3848,7 @@
+ 	@(cd ${_DISTDIR}; \
+ 	 ${_PATCH_SITES_ENV} ; \
+ 	 for _file in ${PATCHFILES}; do \
+-		file=`${ECHO_CMD} $$_file | ${SED} -E -e 's/:[^:]+$$//'` ; \
++		file=`${ECHO_CMD} $$_file | ${SED} -e 's/:[^:]+$$//'` ; \
+ 		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
+ 		if [ ! -f $$file -a ! -f `${BASENAME} $$file` ]; then \
+ 			if [ ! -z "$$select" ] ; then \
+@@ -3918,7 +3918,7 @@
+ 		(cd ${DISTDIR}; OK=""; \
+ 		  for file in ${_CKSUMFILES}; do \
+ 			pattern="`${ECHO_CMD} $$file | ${SED} -e 's/\./\\\\./g'`"; \
+-			CKSUM=`${MD5} < $$file`; \
++			CKSUM=`${MD5} < $$file | awk '{print $$1}'`; \
+ 			CKSUM2=`${GREP} "^MD5 ($$pattern)" ${MD5_FILE} | ${AWK} '{print $$4}'`; \
+ 			if [ -z "$$CKSUM2" ]; then \
+ 				${ECHO_MSG} ">> No checksum recorded for $$file."; \
+@@ -4552,7 +4552,7 @@
+ 	done
+ 	@${ECHO_CMD} '@cwd ${PREFIX}' >> ${TMPPLIST}
+ .endif
+-	@for i in $$(${ECHO_CMD} ${__MANPAGES} ${_TMLINKS:M${_PREFIX}*:S|^${_PREFIX}/||} ' ' | ${SED} -E -e 's|man([1-9ln])/([^/ ]+) |cat\1/\2 |g'); do \
++	@for i in $$(${ECHO_CMD} ${__MANPAGES} ${_TMLINKS:M${_PREFIX}*:S|^${_PREFIX}/||} ' ' | ${SED} -e 's|man([1-9ln])/([^/ ]+) |cat\1/\2 |g'); do \
+ 		${ECHO_CMD} "@unexec rm -f %D/$${i%.gz} %D/$${i%.gz}.gz" >> ${TMPPLIST}; \
+ 	done
+ .if ${XFREE86_HTML_MAN:L} == "yes"
+@@ -4601,7 +4601,7 @@
+ add-plist-docs:
+ .if defined(PORTDOCS)
+ 	@if ${EGREP} -qe '^@cw?d' ${TMPPLIST} && \
+-		[ "`${SED} -En -e '/^@cw?d[ 	]*/s,,,p' ${TMPPLIST} | ${TAIL} -n 1`" != "${PREFIX}" ]; then \
++		[ "`${SED} -n -e '/^@cw?d[ 	]*/s,,,p' ${TMPPLIST} | ${TAIL} -n 1`" != "${PREFIX}" ]; then \
+ 		${ECHO_CMD} "@cwd ${PREFIX}" >> ${TMPPLIST}; \
+ 	fi
+ 	@${FIND} -P ${PORTDOCS:S/^/${DOCSDIR}\//} ! -type d 2>/dev/null | \

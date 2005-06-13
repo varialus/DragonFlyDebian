@@ -1,0 +1,1306 @@
+diff -Nur src.old/usr.bin/make/main.c src/usr.bin/make/main.c
+--- src.old/usr.bin/make/main.c	2004-10-28 22:44:09.000000000 +0200
++++ src/usr.bin/make/main.c	2004-10-28 22:50:06.000000000 +0200
+@@ -65,7 +65,7 @@
+ #if defined(__FreeBSD__) && defined(__i386__)
+ #include <sys/sysctl.h>
+ #endif
+-#include <sys/time.h>
++#include <time.h>
+ #include <sys/resource.h>
+ #ifndef MACHINE
+ #include <sys/utsname.h>
+diff -ur src.old/usr.sbin/btxld/btx.h src/usr.sbin/btxld/btx.h
+--- src.old/usr.sbin/btxld/btx.h	1999-08-28 03:15:41.000000000 +0200
++++ src/usr.sbin/btxld/btx.h	2004-10-28 22:41:30.000000000 +0200
+@@ -30,6 +30,7 @@
+ #define _BTX_H_
+ 
+ #include <sys/types.h>
++#include <stdint.h>
+ 
+ #define BTX_PGSIZE	0x1000		/* Page size */
+ #define BTX_PGBASE	0x5000		/* Start of page tables */
+diff -ur src.old/usr.sbin/btxld/elfh.c src/usr.sbin/btxld/elfh.c
+--- src.old/usr.sbin/btxld/elfh.c	2004-06-22 19:05:37.000000000 +0200
++++ src/usr.sbin/btxld/elfh.c	2004-10-28 22:41:30.000000000 +0200
+@@ -30,6 +30,7 @@
+ #include <sys/endian.h>
+ 
+ #include <stddef.h>
++#include <stdint.h>
+ #include "elfh.h"
+ 
+ #define SET_ME	0xeeeeeeee    /* filled in by btxld */
+diff -Nur src.old/usr.sbin/btxld/elf32.h src/usr.sbin/btxld/elf32.h
+--- src.old/usr.sbin/btxld/elf32.h	1970-01-01 01:00:00.000000000 +0100
++++ src/usr.sbin/btxld/elf32.h	2004-10-28 22:50:06.000000000 +0200
+@@ -0,0 +1,156 @@
++/*-
++ * Copyright (c) 1996-1998 John D. Polstra.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ * $FreeBSD: src/sys/sys/elf32.h,v 1.8 2002/05/30 08:32:18 dfr Exp $
++ */
++
++#ifndef _SYS_ELF32_H_
++#define _SYS_ELF32_H_ 1
++
++#include "elf_common.h"
++
++/*
++ * ELF definitions common to all 32-bit architectures.
++ */
++
++typedef u_int32_t	Elf32_Addr;
++typedef u_int16_t	Elf32_Half;
++typedef u_int32_t	Elf32_Off;
++typedef int32_t		Elf32_Sword;
++typedef u_int32_t	Elf32_Word;
++typedef u_int32_t	Elf32_Size;
++typedef Elf32_Off	Elf32_Hashelt;
++
++/*
++ * ELF header.
++ */
++
++typedef struct {
++	unsigned char	e_ident[EI_NIDENT];	/* File identification. */
++	Elf32_Half	e_type;		/* File type. */
++	Elf32_Half	e_machine;	/* Machine architecture. */
++	Elf32_Word	e_version;	/* ELF format version. */
++	Elf32_Addr	e_entry;	/* Entry point. */
++	Elf32_Off	e_phoff;	/* Program header file offset. */
++	Elf32_Off	e_shoff;	/* Section header file offset. */
++	Elf32_Word	e_flags;	/* Architecture-specific flags. */
++	Elf32_Half	e_ehsize;	/* Size of ELF header in bytes. */
++	Elf32_Half	e_phentsize;	/* Size of program header entry. */
++	Elf32_Half	e_phnum;	/* Number of program header entries. */
++	Elf32_Half	e_shentsize;	/* Size of section header entry. */
++	Elf32_Half	e_shnum;	/* Number of section header entries. */
++	Elf32_Half	e_shstrndx;	/* Section name strings section. */
++} Elf32_Ehdr;
++
++/*
++ * Section header.
++ */
++
++typedef struct {
++	Elf32_Word	sh_name;	/* Section name (index into the
++					   section header string table). */
++	Elf32_Word	sh_type;	/* Section type. */
++	Elf32_Word	sh_flags;	/* Section flags. */
++	Elf32_Addr	sh_addr;	/* Address in memory image. */
++	Elf32_Off	sh_offset;	/* Offset in file. */
++	Elf32_Size	sh_size;	/* Size in bytes. */
++	Elf32_Word	sh_link;	/* Index of a related section. */
++	Elf32_Word	sh_info;	/* Depends on section type. */
++	Elf32_Size	sh_addralign;	/* Alignment in bytes. */
++	Elf32_Size	sh_entsize;	/* Size of each entry in section. */
++} Elf32_Shdr;
++
++/*
++ * Program header.
++ */
++
++typedef struct {
++	Elf32_Word	p_type;		/* Entry type. */
++	Elf32_Off	p_offset;	/* File offset of contents. */
++	Elf32_Addr	p_vaddr;	/* Virtual address in memory image. */
++	Elf32_Addr	p_paddr;	/* Physical address (not used). */
++	Elf32_Size	p_filesz;	/* Size of contents in file. */
++	Elf32_Size	p_memsz;	/* Size of contents in memory. */
++	Elf32_Word	p_flags;	/* Access permission flags. */
++	Elf32_Size	p_align;	/* Alignment in memory and file. */
++} Elf32_Phdr;
++
++/*
++ * Dynamic structure.  The ".dynamic" section contains an array of them.
++ */
++
++typedef struct {
++	Elf32_Sword	d_tag;		/* Entry type. */
++	union {
++		Elf32_Size	d_val;	/* Integer value. */
++		Elf32_Addr	d_ptr;	/* Address value. */
++	} d_un;
++} Elf32_Dyn;
++
++/*
++ * Relocation entries.
++ */
++
++/* Relocations that don't need an addend field. */
++typedef struct {
++	Elf32_Addr	r_offset;	/* Location to be relocated. */
++	Elf32_Word	r_info;		/* Relocation type and symbol index. */
++} Elf32_Rel;
++
++/* Relocations that need an addend field. */
++typedef struct {
++	Elf32_Addr	r_offset;	/* Location to be relocated. */
++	Elf32_Word	r_info;		/* Relocation type and symbol index. */
++	Elf32_Sword	r_addend;	/* Addend. */
++} Elf32_Rela;
++
++/* Macros for accessing the fields of r_info. */
++#define ELF32_R_SYM(info)	((info) >> 8)
++#define ELF32_R_TYPE(info)	((unsigned char)(info))
++
++/* Macro for constructing r_info from field values. */
++#define ELF32_R_INFO(sym, type)	(((sym) << 8) + (unsigned char)(type))
++
++/*
++ * Symbol table entries.
++ */
++
++typedef struct {
++	Elf32_Word	st_name;	/* String table index of name. */
++	Elf32_Addr	st_value;	/* Symbol value. */
++	Elf32_Size	st_size;	/* Size of associated object. */
++	unsigned char	st_info;	/* Type and binding information. */
++	unsigned char	st_other;	/* Reserved (not used). */
++	Elf32_Half	st_shndx;	/* Section index of symbol. */
++} Elf32_Sym;
++
++/* Macros for accessing the fields of st_info. */
++#define ELF32_ST_BIND(info)		((info) >> 4)
++#define ELF32_ST_TYPE(info)		((info) & 0xf)
++
++/* Macro for constructing st_info from field values. */
++#define ELF32_ST_INFO(bind, type)	(((bind) << 4) + ((type) & 0xf))
++
++#endif /* !_SYS_ELF32_H_ */
+diff -Nur src.old/usr.sbin/btxld/elf_common.h src/usr.sbin/btxld/elf_common.h
+--- src.old/usr.sbin/btxld/elf_common.h	1970-01-01 01:00:00.000000000 +0100
++++ src/usr.sbin/btxld/elf_common.h	2004-10-28 22:50:06.000000000 +0200
+@@ -0,0 +1,251 @@
++/*-
++ * Copyright (c) 1998 John D. Polstra.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ * $FreeBSD: src/sys/sys/elf_common.h,v 1.11 2002/08/11 21:07:50 robert Exp $
++ */
++
++#ifndef _SYS_ELF_COMMON_H_
++#define _SYS_ELF_COMMON_H_ 1
++
++/*
++ * ELF definitions that are independent of architecture or word size.
++ */
++
++/*
++ * Note header.  The ".note" section contains an array of notes.  Each
++ * begins with this header, aligned to a word boundary.  Immediately
++ * following the note header is n_namesz bytes of name, padded to the
++ * next word boundary.  Then comes n_descsz bytes of descriptor, again
++ * padded to a word boundary.  The values of n_namesz and n_descsz do
++ * not include the padding.
++ */
++
++typedef struct {
++	u_int32_t	n_namesz;	/* Length of name. */
++	u_int32_t	n_descsz;	/* Length of descriptor. */
++	u_int32_t	n_type;		/* Type of this note. */
++} Elf_Note;
++
++/* Indexes into the e_ident array.  Keep synced with 
++   http://www.sco.com/developer/gabi/ch4.eheader.html */
++#define EI_MAG0		0	/* Magic number, byte 0. */
++#define EI_MAG1		1	/* Magic number, byte 1. */
++#define EI_MAG2		2	/* Magic number, byte 2. */
++#define EI_MAG3		3	/* Magic number, byte 3. */
++#define EI_CLASS	4	/* Class of machine. */
++#define EI_DATA		5	/* Data format. */
++#define EI_VERSION	6	/* ELF format version. */
++#define EI_OSABI	7	/* Operating system / ABI identification */
++#define EI_ABIVERSION	8	/* ABI version */
++#define OLD_EI_BRAND	8	/* Start of architecture identification. */
++#define EI_PAD		9	/* Start of padding (per SVR4 ABI). */
++#define EI_NIDENT	16	/* Size of e_ident array. */
++
++/* Values for the magic number bytes. */
++#define ELFMAG0		0x7f
++#define ELFMAG1		'E'
++#define ELFMAG2		'L'
++#define ELFMAG3		'F'
++#define ELFMAG		"\177ELF"	/* magic string */
++#define SELFMAG		4		/* magic string size */
++
++/* Values for e_ident[EI_VERSION] and e_version. */
++#define EV_NONE		0
++#define EV_CURRENT	1
++
++/* Values for e_ident[EI_CLASS]. */
++#define ELFCLASSNONE	0	/* Unknown class. */
++#define ELFCLASS32	1	/* 32-bit architecture. */
++#define ELFCLASS64	2	/* 64-bit architecture. */
++
++/* Values for e_ident[EI_DATA]. */
++#define ELFDATANONE	0	/* Unknown data format. */
++#define ELFDATA2LSB	1	/* 2's complement little-endian. */
++#define ELFDATA2MSB	2	/* 2's complement big-endian. */
++
++/* Values for e_ident[EI_OSABI]. */
++#define ELFOSABI_SYSV		0	/* UNIX System V ABI */
++#define ELFOSABI_NONE		ELFOSABI_SYSV	/* symbol used in old spec */
++#define ELFOSABI_HPUX		1	/* HP-UX operating system */
++#define ELFOSABI_NETBSD		2	/* NetBSD */
++#define ELFOSABI_LINUX		3	/* GNU/Linux */
++#define ELFOSABI_HURD		4	/* GNU/Hurd */
++#define ELFOSABI_86OPEN		5	/* 86Open common IA32 ABI */
++#define ELFOSABI_SOLARIS	6	/* Solaris */
++#define ELFOSABI_MONTEREY	7	/* Monterey */
++#define ELFOSABI_IRIX		8	/* IRIX */
++#define ELFOSABI_FREEBSD	9	/* FreeBSD */
++#define ELFOSABI_TRU64		10	/* TRU64 UNIX */
++#define ELFOSABI_MODESTO	11	/* Novell Modesto */
++#define ELFOSABI_OPENBSD	12	/* OpenBSD */
++#define ELFOSABI_ARM		97	/* ARM */
++#define ELFOSABI_STANDALONE	255	/* Standalone (embedded) application */
++
++/* e_ident */
++#define IS_ELF(ehdr)	((ehdr).e_ident[EI_MAG0] == ELFMAG0 && \
++			 (ehdr).e_ident[EI_MAG1] == ELFMAG1 && \
++			 (ehdr).e_ident[EI_MAG2] == ELFMAG2 && \
++			 (ehdr).e_ident[EI_MAG3] == ELFMAG3)
++
++/* Values for e_type. */
++#define ET_NONE		0	/* Unknown type. */
++#define ET_REL		1	/* Relocatable. */
++#define ET_EXEC		2	/* Executable. */
++#define ET_DYN		3	/* Shared object. */
++#define ET_CORE		4	/* Core file. */
++
++/* Values for e_machine. */
++#define EM_NONE		0	/* Unknown machine. */
++#define EM_M32		1	/* AT&T WE32100. */
++#define EM_SPARC	2	/* Sun SPARC. */
++#define EM_386		3	/* Intel i386. */
++#define EM_68K		4	/* Motorola 68000. */
++#define EM_88K		5	/* Motorola 88000. */
++#define EM_486		6	/* Intel i486. */
++#define EM_860		7	/* Intel i860. */
++#define EM_MIPS		8	/* MIPS R3000 Big-Endian only */
++
++/* Extensions.  This list is not complete. */
++#define EM_S370		9	/* IBM System/370 */
++#define EM_MIPS_RS4_BE	10	/* MIPS R4000 Big-Endian */ /* Depreciated */
++#define EM_PARISC	15	/* HPPA */
++#define EM_SPARC32PLUS	18	/* SPARC v8plus */
++#define EM_PPC		20	/* PowerPC 32-bit */
++#define EM_PPC64	21	/* PowerPC 64-bit */
++#define EM_ARM		40	/* ARM */
++#define EM_SPARCV9	43	/* SPARC v9 64-bit */
++#define EM_IA_64	50	/* Intel IA-46 Processor */
++#define EM_X86_64	62	/* Advanced Micro Devices x86-64 */
++#define EM_ALPHA	0x9026	/* Alpha (written in the absence of an ABI */
++
++/* Special section indexes. */
++#define SHN_UNDEF	     0		/* Undefined, missing, irrelevant. */
++#define SHN_LORESERVE	0xff00		/* First of reserved range. */
++#define SHN_LOPROC	0xff00		/* First processor-specific. */
++#define SHN_HIPROC	0xff1f		/* Last processor-specific. */
++#define SHN_ABS		0xfff1		/* Absolute values. */
++#define SHN_COMMON	0xfff2		/* Common data. */
++#define SHN_HIRESERVE	0xffff		/* Last of reserved range. */
++
++/* sh_type */
++#define SHT_NULL	0		/* inactive */
++#define SHT_PROGBITS	1		/* program defined information */
++#define SHT_SYMTAB	2		/* symbol table section */
++#define SHT_STRTAB	3		/* string table section */
++#define SHT_RELA	4		/* relocation section with addends */
++#define SHT_HASH	5		/* symbol hash table section */
++#define SHT_DYNAMIC	6		/* dynamic section */ 
++#define SHT_NOTE	7		/* note section */
++#define SHT_NOBITS	8		/* no space section */
++#define SHT_REL		9		/* relocation section - no addends */
++#define SHT_SHLIB	10		/* reserved - purpose unknown */
++#define SHT_DYNSYM	11		/* dynamic symbol table section */ 
++#define SHT_NUM		12		/* number of section types */
++#define SHT_LOPROC	0x70000000	/* reserved range for processor */
++#define SHT_HIPROC	0x7fffffff	/* specific section header types */
++#define SHT_LOUSER	0x80000000	/* reserved range for application */
++#define SHT_HIUSER	0xffffffff	/* specific indexes */
++
++/* Flags for sh_flags. */
++#define SHF_WRITE	0x1		/* Section contains writable data. */
++#define SHF_ALLOC	0x2		/* Section occupies memory. */
++#define SHF_EXECINSTR	0x4		/* Section contains instructions. */
++#define SHF_MASKPROC	0xf0000000	/* Reserved for processor-specific. */
++
++/* Values for p_type. */
++#define PT_NULL		0	/* Unused entry. */
++#define PT_LOAD		1	/* Loadable segment. */
++#define PT_DYNAMIC	2	/* Dynamic linking information segment. */
++#define PT_INTERP	3	/* Pathname of interpreter. */
++#define PT_NOTE		4	/* Auxiliary information. */
++#define PT_SHLIB	5	/* Reserved (not used). */
++#define PT_PHDR		6	/* Location of program header itself. */
++
++#define PT_COUNT	7	/* Number of defined p_type values. */
++
++#define PT_LOPROC	0x70000000	/* First processor-specific type. */
++#define PT_HIPROC	0x7fffffff	/* Last processor-specific type. */
++
++/* Values for p_flags. */
++#define PF_X		0x1	/* Executable. */
++#define PF_W		0x2	/* Writable. */
++#define PF_R		0x4	/* Readable. */
++
++/* Values for d_tag. */
++#define DT_NULL		0	/* Terminating entry. */
++#define DT_NEEDED	1	/* String table offset of a needed shared
++				   library. */
++#define DT_PLTRELSZ	2	/* Total size in bytes of PLT relocations. */
++#define DT_PLTGOT	3	/* Processor-dependent address. */
++#define DT_HASH		4	/* Address of symbol hash table. */
++#define DT_STRTAB	5	/* Address of string table. */
++#define DT_SYMTAB	6	/* Address of symbol table. */
++#define DT_RELA		7	/* Address of ElfNN_Rela relocations. */
++#define DT_RELASZ	8	/* Total size of ElfNN_Rela relocations. */
++#define DT_RELAENT	9	/* Size of each ElfNN_Rela relocation entry. */
++#define DT_STRSZ	10	/* Size of string table. */
++#define DT_SYMENT	11	/* Size of each symbol table entry. */
++#define DT_INIT		12	/* Address of initialization function. */
++#define DT_FINI		13	/* Address of finalization function. */
++#define DT_SONAME	14	/* String table offset of shared object
++				   name. */
++#define DT_RPATH	15	/* String table offset of library path. */
++#define DT_SYMBOLIC	16	/* Indicates "symbolic" linking. */
++#define DT_REL		17	/* Address of ElfNN_Rel relocations. */
++#define DT_RELSZ	18	/* Total size of ElfNN_Rel relocations. */
++#define DT_RELENT	19	/* Size of each ElfNN_Rel relocation. */
++#define DT_PLTREL	20	/* Type of relocation used for PLT. */
++#define DT_DEBUG	21	/* Reserved (not used). */
++#define DT_TEXTREL	22	/* Indicates there may be relocations in
++				   non-writable segments. */
++#define DT_JMPREL	23	/* Address of PLT relocations. */
++
++#define DT_COUNT	24	/* Number of defined d_tag values. */
++
++/* Values for n_type.  Used in core files. */
++#define NT_PRSTATUS	1	/* Process status. */
++#define NT_FPREGSET	2	/* Floating point registers. */
++#define NT_PRPSINFO	3	/* Process state info. */
++
++/* Symbol Binding - ELFNN_ST_BIND - st_info */
++#define STB_LOCAL	0	/* Local symbol */
++#define STB_GLOBAL	1	/* Global symbol */
++#define STB_WEAK	2	/* like global - lower precedence */
++#define STB_LOPROC	13	/* reserved range for processor */
++#define STB_HIPROC	15	/*  specific symbol bindings */
++
++/* Symbol type - ELFNN_ST_TYPE - st_info */
++#define STT_NOTYPE	0	/* Unspecified type. */
++#define STT_OBJECT	1	/* Data object. */
++#define STT_FUNC	2	/* Function. */
++#define STT_SECTION	3	/* Section. */
++#define STT_FILE	4	/* Source file. */
++#define STT_LOPROC	13	/* reserved range for processor */
++#define STT_HIPROC	15	/*  specific symbol types */
++
++/* Special symbol table indexes. */
++#define STN_UNDEF	0	/* Undefined symbol index. */
++
++#endif /* !_SYS_ELF_COMMON_H_ */
+diff -Nur src.old/usr.sbin/btxld/elfh.h src/usr.sbin/btxld/elfh.h
+--- src.old/usr.sbin/btxld/elfh.h	2000-01-04 15:10:36.000000000 +0100
++++ src/usr.sbin/btxld/elfh.h	2004-10-28 22:50:06.000000000 +0200
+@@ -26,7 +26,7 @@
+  * $FreeBSD: src/usr.sbin/btxld/elfh.h,v 1.3 2000/01/04 14:10:36 marcel Exp $
+  */
+ 
+-#include <sys/elf32.h>
++#include "elf32.h"
+ 
+ struct elfh {
+     Elf32_Ehdr e;		/* ELF header */
+diff -Nur src.old/usr.sbin/config/main.c src/usr.sbin/config/main.c
+--- src.old/usr.sbin/config/main.c	2004-10-28 22:44:01.000000000 +0200
++++ src/usr.sbin/config/main.c	2004-10-28 22:50:06.000000000 +0200
+@@ -85,6 +85,79 @@
+ 	struct hdr_list *h_next;
+ } *htab;
+ 
++#ifndef __FreeBSD__
++/*
++ * Copy src to string dst of size siz.  At most siz-1 characters
++ * will be copied.  Always NUL terminates (unless siz == 0).
++ * Returns strlen(src); if retval >= siz, truncation occurred.
++ */
++size_t strlcpy(dst, src, siz)
++	char *dst;
++	const char *src;
++	size_t siz;
++{
++	char *d = dst;
++	const char *s = src;
++	size_t n = siz;
++
++	/* Copy as many bytes as will fit */
++	if (n != 0 && --n != 0) {
++		do {
++			if ((*d++ = *s++) == 0)
++				break;
++		} while (--n != 0);
++	}
++
++	/* Not enough room in dst, add NUL and traverse rest of src */
++	if (n == 0) {
++		if (siz != 0)
++			*d = '\0';		/* NUL-terminate dst */
++		while (*s++)
++			;
++	}
++
++	return(s - src - 1);	/* count does not include NUL */
++}
++
++/*
++ * Appends src to string dst of size siz (unlike strncat, siz is the
++ * full size of dst, not space left).  At most siz-1 characters
++ * will be copied.  Always NUL terminates (unless siz <= strlen(dst)).
++ * Returns strlen(src) + MIN(siz, strlen(initial dst)).
++ * If retval >= siz, truncation occurred.
++ */
++size_t
++strlcat(dst, src, siz)
++	char *dst;
++	const char *src;
++	size_t siz;
++{
++	char *d = dst;
++	const char *s = src;
++	size_t n = siz;
++	size_t dlen;
++
++	/* Find the end of dst and adjust bytes left but don't go past end */
++	while (n-- != 0 && *d != '\0')
++		d++;
++	dlen = d - dst;
++	n = siz - dlen;
++
++	if (n == 0)
++		return(dlen + strlen(s));
++	while (*s != '\0') {
++		if (n != 1) {
++			*d++ = *s;
++			n--;
++		}
++		s++;
++	}
++	*d = '\0';
++
++	return(dlen + (s - src));	/* count does not include NUL */
++}
++#endif
++
+ /*
+  * Config builds a set of files for building a UNIX
+  * system given a description of the desired system.
+diff -Nur src.old/usr.sbin/mtree/Makefile src/usr.sbin/mtree/Makefile
+--- src.old/usr.sbin/mtree/Makefile	2003-11-05 23:26:07.000000000 +0100
++++ src/usr.sbin/mtree/Makefile	2004-10-28 22:50:06.000000000 +0200
+@@ -10,8 +10,8 @@
+ 
+ WARNS?=	4
+ 
+-CFLAGS+= -DMD5 -DSHA1 -DRMD160
++#CFLAGS+= -DMD5 -DSHA1 -DRMD160
+ DPADD=	${LIBMD}
+-LDADD=	-lmd
++#LDADD=	-lmd
+ 
+ .include <bsd.prog.mk>
+diff -Nur src.old/usr.sbin/mtree/compare.c src/usr.sbin/mtree/compare.c
+--- src.old/usr.sbin/mtree/compare.c	2004-10-28 22:44:09.000000000 +0200
++++ src/usr.sbin/mtree/compare.c	2004-10-28 22:50:06.000000000 +0200
+@@ -58,7 +58,9 @@
+ #include <stdio.h>
+ #include <time.h>
+ #include <unistd.h>
++#ifdef __FreeBSD__
+ #include <vis.h>
++#endif
+ 
+ #include "mtree.h"
+ #include "extern.h"
+@@ -370,6 +372,21 @@
+ 	if ((len = readlink(name, tbuf, sizeof(tbuf) - 1)) == -1)
+ 		err(1, "line %d: %s", lineno, name);
+ 	tbuf[len] = '\0';
++
++#ifdef __FreeBSD__
+ 	strvis(lbuf, tbuf, VIS_WHITE | VIS_OCTAL);
++#else
++	int i = 0, j = 0;
++	/* borrowed from src/lib/libc/gen/vis.c [rmh] */
++	while (tbuf[j] != 0)
++	  {
++	    lbuf[i++] = '\\';
++	    lbuf[i++] = ((u_char) tbuf[j] >> 6 & 07) + '0';
++	    lbuf[i++] = ((u_char) tbuf[j] >> 3 & 07) + '0';
++	    lbuf[i++] = ((u_char) tbuf[j] & 07) + '0';
++	    j++;
++	  }
++	lbuf[i++] = '\0';
++#endif
+ 	return (lbuf);
+ }
+diff -Nur src.old/usr.sbin/mtree/create.c src/usr.sbin/mtree/create.c
+--- src.old/usr.sbin/mtree/create.c	2004-10-28 22:44:09.000000000 +0200
++++ src/usr.sbin/mtree/create.c	2004-10-28 22:51:18.000000000 +0200
+@@ -59,7 +59,6 @@
+ #include <stdio.h>
+ #include <time.h>
+ #include <unistd.h>
+-#include <vis.h>
+ #include "mtree.h"
+ #include "extern.h"
+ 
+@@ -161,7 +160,23 @@
+ 	escaped_name = calloc(1, p->fts_namelen * 4  +  1);
+ 	if (escaped_name == NULL)
+ 		errx(1, "statf(): calloc() failed");
+-	strvis(escaped_name, p->fts_name, VIS_WHITE | VIS_OCTAL | VIS_GLOB);
++#ifdef __FreeBSD__
++  	strvis(escaped_name, p->fts_name, VIS_WHITE | VIS_OCTAL | VIS_GLOB);
++#else
++	/* borrowed from src/lib/libc/gen/vis.c
++	   FIXME: this replacement was meant for VIS_WHITE | VIS_OCTAL, but
++	   not VIS_GLOB. I'll have to review that. */
++	int i = 0, j = 0;
++	while (p->fts_name[j] != 0)
++	  {
++	    escaped_name[i++] = '\\';
++	    escaped_name[i++] = ((u_char) p->fts_name[j] >> 6 & 07) + '0';
++	    escaped_name[i++] = ((u_char) p->fts_name[j] >> 3 & 07) + '0';
++	    escaped_name[i++] = ((u_char) p->fts_name[j] & 07) + '0';
++	    j++;
++	  }
++	escaped_name[i++] = '\0';
++#endif
+ 
+ 	if (iflag || S_ISDIR(p->fts_statp->st_mode))
+ 		offset = printf("%*s%s", indent, "", escaped_name);
+diff -Nur src.old/usr.sbin/mtree/excludes.c src/usr.sbin/mtree/excludes.c
+--- src.old/usr.sbin/mtree/excludes.c	2004-10-28 22:44:09.000000000 +0200
++++ src/usr.sbin/mtree/excludes.c	2004-10-28 22:50:06.000000000 +0200
+@@ -27,6 +27,8 @@
+  * SUCH DAMAGE.
+  */
+ 
++#define _GNU_SOURCE /* getline */
++
+ #include <sys/cdefs.h>
+ #ifdef __FBSDID
+ __FBSDID("$FreeBSD: src/usr.sbin/mtree/excludes.c,v 1.8 2003/10/21 08:27:05 phk Exp $");
+@@ -45,6 +47,20 @@
+ #include "mtree.h"		/* XXX for extern.h */
+ #include "extern.h"
+ 
++#ifdef __GLIBC__
++char *
++fgetln (FILE *stream, size_t *len)
++{
++	char *line=NULL;
++
++	getline (&line, len, stream);
++
++	(*len)--; /* get rid of the trailing \0, fgetln
++	does not have it */
++	return line;
++}
++#endif
++
+ /*
+  * We're assuming that there won't be a whole lot of excludes,
+  * so it's OK to use a stupid algorithm.
+diff -Nur src.old/usr.sbin/mtree/spec.c src/usr.sbin/mtree/spec.c
+--- src.old/usr.sbin/mtree/spec.c	2004-10-28 22:44:09.000000000 +0200
++++ src/usr.sbin/mtree/spec.c	2004-10-28 22:52:17.000000000 +0200
+@@ -47,7 +47,6 @@
+ #include <pwd.h>
+ #include <stdio.h>
+ #include <unistd.h>
+-#include <vis.h>
+ #include "mtree.h"
+ #include "extern.h"
+ 
+@@ -145,8 +144,10 @@
+ #define	MAGIC	"?*["
+ 		if (strpbrk(p, MAGIC))
+ 			centry->flags |= F_MAGIC;
++#ifdef __FreeBSD__ /* this is just to detect invalid scape sequences */
+ 		if (strunvis(centry->name, p) == -1)
+ 			errx(1, "filename %s is ill-encoded", p);
++#endif
+ 		set(NULL, centry);
+ 
+ 		if (!root) {
+@@ -225,11 +226,7 @@
+ 			/* just set flag bit */
+ 			break;
+ 		case F_MODE:
+-			if ((m = setmode(val)) == NULL)
+-				errx(1, "line %d: invalid file mode %s",
+-				lineno, val);
+-			ip->st_mode = getmode(m, 0);
+-			free(m);
++			sscanf (val, "%o", &(ip->st_mode));
+ 			break;
+ 		case F_NLINK:
+ 			ip->st_nlink = strtoul(val, &ep, 10);
+@@ -247,8 +244,10 @@
+ 			ip->slink = malloc(strlen(val) + 1);
+ 			if (ip->slink == NULL)
+ 				errx(1, "malloc");
+-			if (strunvis(ip->slink, val) == -1)
+-				errx(1, "symlink %s is ill-encoded", val);
++#ifdef __FreeBSD__ /* this is just to detect invalid scape sequences */
++  			if (strunvis(ip->slink, val) == -1)
++  				errx(1, "symlink %s is ill-encoded", val);
++#endif
+ 			break;
+ #ifdef ST_MTIM
+ 		case F_TIME:
+diff -Nur src.old/usr.sbin/config/config.h src/usr.sbin/config/config.h
+--- src.old/usr.sbin/config/config.h	2004-08-31 01:03:56.000000000 +0200
++++ src/usr.sbin/config/config.h	2004-10-28 23:36:01.000000000 +0200
+@@ -34,7 +34,7 @@
+  * Config.
+  */
+ #include <sys/types.h>
+-#include <sys/queue.h>
++#include "queue.h"
+ #include <stdlib.h>
+ #include <string.h>
+ 
+diff -Nur src.old/usr.sbin/config/queue.h src/usr.sbin/config/queue.h
+--- src.old/usr.sbin/config/queue.h	1970-01-01 01:00:00.000000000 +0100
++++ src/usr.sbin/config/queue.h	2004-10-28 23:35:31.000000000 +0200
+@@ -0,0 +1,557 @@
++/*
++ * Copyright (c) 1991, 1993
++ *	The Regents of the University of California.  All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 3. All advertising materials mentioning features or use of this software
++ *    must display the following acknowledgement:
++ *	This product includes software developed by the University of
++ *	California, Berkeley and its contributors.
++ * 4. Neither the name of the University nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ *	@(#)queue.h	8.5 (Berkeley) 8/20/94
++ * $FreeBSD: src/sys/sys/queue.h,v 1.56 2003/08/14 14:49:26 kan Exp $
++ */
++
++#ifndef _SYS_QUEUE_H_
++#define	_SYS_QUEUE_H_
++
++#include <sys/cdefs.h>
++
++/*
++ * This file defines four types of data structures: singly-linked lists,
++ * singly-linked tail queues, lists and tail queues.
++ *
++ * A singly-linked list is headed by a single forward pointer. The elements
++ * are singly linked for minimum space and pointer manipulation overhead at
++ * the expense of O(n) removal for arbitrary elements. New elements can be
++ * added to the list after an existing element or at the head of the list.
++ * Elements being removed from the head of the list should use the explicit
++ * macro for this purpose for optimum efficiency. A singly-linked list may
++ * only be traversed in the forward direction.  Singly-linked lists are ideal
++ * for applications with large datasets and few or no removals or for
++ * implementing a LIFO queue.
++ *
++ * A singly-linked tail queue is headed by a pair of pointers, one to the
++ * head of the list and the other to the tail of the list. The elements are
++ * singly linked for minimum space and pointer manipulation overhead at the
++ * expense of O(n) removal for arbitrary elements. New elements can be added
++ * to the list after an existing element, at the head of the list, or at the
++ * end of the list. Elements being removed from the head of the tail queue
++ * should use the explicit macro for this purpose for optimum efficiency.
++ * A singly-linked tail queue may only be traversed in the forward direction.
++ * Singly-linked tail queues are ideal for applications with large datasets
++ * and few or no removals or for implementing a FIFO queue.
++ *
++ * A list is headed by a single forward pointer (or an array of forward
++ * pointers for a hash table header). The elements are doubly linked
++ * so that an arbitrary element can be removed without a need to
++ * traverse the list. New elements can be added to the list before
++ * or after an existing element or at the head of the list. A list
++ * may only be traversed in the forward direction.
++ *
++ * A tail queue is headed by a pair of pointers, one to the head of the
++ * list and the other to the tail of the list. The elements are doubly
++ * linked so that an arbitrary element can be removed without a need to
++ * traverse the list. New elements can be added to the list before or
++ * after an existing element, at the head of the list, or at the end of
++ * the list. A tail queue may be traversed in either direction.
++ *
++ * For details on the use of these macros, see the queue(3) manual page.
++ *
++ *
++ *				SLIST	LIST	STAILQ	TAILQ
++ * _HEAD			+	+	+	+
++ * _HEAD_INITIALIZER		+	+	+	+
++ * _ENTRY			+	+	+	+
++ * _INIT			+	+	+	+
++ * _EMPTY			+	+	+	+
++ * _FIRST			+	+	+	+
++ * _NEXT			+	+	+	+
++ * _PREV			-	-	-	+
++ * _LAST			-	-	+	+
++ * _FOREACH			+	+	+	+
++ * _FOREACH_SAFE		+	+	+	+
++ * _FOREACH_REVERSE		-	-	-	+
++ * _FOREACH_REVERSE_SAFE	-	-	-	+
++ * _INSERT_HEAD			+	+	+	+
++ * _INSERT_BEFORE		-	+	-	+
++ * _INSERT_AFTER		+	+	+	+
++ * _INSERT_TAIL			-	-	+	+
++ * _CONCAT			-	-	+	+
++ * _REMOVE_HEAD			+	-	+	-
++ * _REMOVE			+	+	+	+
++ *
++ */
++#define	QUEUE_MACRO_DEBUG 0
++#if QUEUE_MACRO_DEBUG
++/* Store the last 2 places the queue element or head was altered */
++struct qm_trace {
++	char * lastfile;
++	int lastline;
++	char * prevfile;
++	int prevline;
++};
++
++#define	TRACEBUF	struct qm_trace trace;
++#define	TRASHIT(x)	do {(x) = (void *)-1;} while (0)
++
++#define	QMD_TRACE_HEAD(head) do {					\
++	(head)->trace.prevline = (head)->trace.lastline;		\
++	(head)->trace.prevfile = (head)->trace.lastfile;		\
++	(head)->trace.lastline = __LINE__;				\
++	(head)->trace.lastfile = __FILE__;				\
++} while (0)
++
++#define	QMD_TRACE_ELEM(elem) do {					\
++	(elem)->trace.prevline = (elem)->trace.lastline;		\
++	(elem)->trace.prevfile = (elem)->trace.lastfile;		\
++	(elem)->trace.lastline = __LINE__;				\
++	(elem)->trace.lastfile = __FILE__;				\
++} while (0)
++
++#else
++#define	QMD_TRACE_ELEM(elem)
++#define	QMD_TRACE_HEAD(head)
++#define	TRACEBUF
++#define	TRASHIT(x)
++#endif	/* QUEUE_MACRO_DEBUG */
++
++/*
++ * Singly-linked List declarations.
++ */
++#define	SLIST_HEAD(name, type)						\
++struct name {								\
++	struct type *slh_first;	/* first element */			\
++}
++
++#define	SLIST_HEAD_INITIALIZER(head)					\
++	{ NULL }
++
++#define	SLIST_ENTRY(type)						\
++struct {								\
++	struct type *sle_next;	/* next element */			\
++}
++
++/*
++ * Singly-linked List functions.
++ */
++#define	SLIST_EMPTY(head)	((head)->slh_first == NULL)
++
++#define	SLIST_FIRST(head)	((head)->slh_first)
++
++#define	SLIST_FOREACH(var, head, field)					\
++	for ((var) = SLIST_FIRST((head));				\
++	    (var);							\
++	    (var) = SLIST_NEXT((var), field))
++
++#define	SLIST_FOREACH_SAFE(var, head, field, tvar)			\
++	for ((var) = SLIST_FIRST((head));				\
++	    (var) && ((tvar) = SLIST_NEXT((var), field), 1);		\
++	    (var) = (tvar))
++
++#define	SLIST_FOREACH_PREVPTR(var, varp, head, field)			\
++	for ((varp) = &SLIST_FIRST((head));				\
++	    ((var) = *(varp)) != NULL;					\
++	    (varp) = &SLIST_NEXT((var), field))
++
++#define	SLIST_INIT(head) do {						\
++	SLIST_FIRST((head)) = NULL;					\
++} while (0)
++
++#define	SLIST_INSERT_AFTER(slistelm, elm, field) do {			\
++	SLIST_NEXT((elm), field) = SLIST_NEXT((slistelm), field);	\
++	SLIST_NEXT((slistelm), field) = (elm);				\
++} while (0)
++
++#define	SLIST_INSERT_HEAD(head, elm, field) do {			\
++	SLIST_NEXT((elm), field) = SLIST_FIRST((head));			\
++	SLIST_FIRST((head)) = (elm);					\
++} while (0)
++
++#define	SLIST_NEXT(elm, field)	((elm)->field.sle_next)
++
++#define	SLIST_REMOVE(head, elm, type, field) do {			\
++	if (SLIST_FIRST((head)) == (elm)) {				\
++		SLIST_REMOVE_HEAD((head), field);			\
++	}								\
++	else {								\
++		struct type *curelm = SLIST_FIRST((head));		\
++		while (SLIST_NEXT(curelm, field) != (elm))		\
++			curelm = SLIST_NEXT(curelm, field);		\
++		SLIST_NEXT(curelm, field) =				\
++		    SLIST_NEXT(SLIST_NEXT(curelm, field), field);	\
++	}								\
++} while (0)
++
++#define	SLIST_REMOVE_HEAD(head, field) do {				\
++	SLIST_FIRST((head)) = SLIST_NEXT(SLIST_FIRST((head)), field);	\
++} while (0)
++
++/*
++ * Singly-linked Tail queue declarations.
++ */
++#define	STAILQ_HEAD(name, type)						\
++struct name {								\
++	struct type *stqh_first;/* first element */			\
++	struct type **stqh_last;/* addr of last next element */		\
++}
++
++#define	STAILQ_HEAD_INITIALIZER(head)					\
++	{ NULL, &(head).stqh_first }
++
++#define	STAILQ_ENTRY(type)						\
++struct {								\
++	struct type *stqe_next;	/* next element */			\
++}
++
++/*
++ * Singly-linked Tail queue functions.
++ */
++#define	STAILQ_CONCAT(head1, head2) do {				\
++	if (!STAILQ_EMPTY((head2))) {					\
++		*(head1)->stqh_last = (head2)->stqh_first;		\
++		(head1)->stqh_last = (head2)->stqh_last;		\
++		STAILQ_INIT((head2));					\
++	}								\
++} while (0)
++
++#define	STAILQ_EMPTY(head)	((head)->stqh_first == NULL)
++
++#define	STAILQ_FIRST(head)	((head)->stqh_first)
++
++#define	STAILQ_FOREACH(var, head, field)				\
++	for((var) = STAILQ_FIRST((head));				\
++	   (var);							\
++	   (var) = STAILQ_NEXT((var), field))
++
++
++#define	STAILQ_FOREACH_SAFE(var, head, field, tvar)			\
++	for ((var) = STAILQ_FIRST((head));				\
++	    (var) && ((tvar) = STAILQ_NEXT((var), field), 1);		\
++	    (var) = (tvar))
++
++#define	STAILQ_INIT(head) do {						\
++	STAILQ_FIRST((head)) = NULL;					\
++	(head)->stqh_last = &STAILQ_FIRST((head));			\
++} while (0)
++
++#define	STAILQ_INSERT_AFTER(head, tqelm, elm, field) do {		\
++	if ((STAILQ_NEXT((elm), field) = STAILQ_NEXT((tqelm), field)) == NULL)\
++		(head)->stqh_last = &STAILQ_NEXT((elm), field);		\
++	STAILQ_NEXT((tqelm), field) = (elm);				\
++} while (0)
++
++#define	STAILQ_INSERT_HEAD(head, elm, field) do {			\
++	if ((STAILQ_NEXT((elm), field) = STAILQ_FIRST((head))) == NULL)	\
++		(head)->stqh_last = &STAILQ_NEXT((elm), field);		\
++	STAILQ_FIRST((head)) = (elm);					\
++} while (0)
++
++#define	STAILQ_INSERT_TAIL(head, elm, field) do {			\
++	STAILQ_NEXT((elm), field) = NULL;				\
++	*(head)->stqh_last = (elm);					\
++	(head)->stqh_last = &STAILQ_NEXT((elm), field);			\
++} while (0)
++
++#define	STAILQ_LAST(head, type, field)					\
++	(STAILQ_EMPTY((head)) ?						\
++		NULL :							\
++	        ((struct type *)					\
++		((char *)((head)->stqh_last) - __offsetof(struct type, field))))
++
++#define	STAILQ_NEXT(elm, field)	((elm)->field.stqe_next)
++
++#define	STAILQ_REMOVE(head, elm, type, field) do {			\
++	if (STAILQ_FIRST((head)) == (elm)) {				\
++		STAILQ_REMOVE_HEAD((head), field);			\
++	}								\
++	else {								\
++		struct type *curelm = STAILQ_FIRST((head));		\
++		while (STAILQ_NEXT(curelm, field) != (elm))		\
++			curelm = STAILQ_NEXT(curelm, field);		\
++		if ((STAILQ_NEXT(curelm, field) =			\
++		     STAILQ_NEXT(STAILQ_NEXT(curelm, field), field)) == NULL)\
++			(head)->stqh_last = &STAILQ_NEXT((curelm), field);\
++	}								\
++} while (0)
++
++#define	STAILQ_REMOVE_HEAD(head, field) do {				\
++	if ((STAILQ_FIRST((head)) =					\
++	     STAILQ_NEXT(STAILQ_FIRST((head)), field)) == NULL)		\
++		(head)->stqh_last = &STAILQ_FIRST((head));		\
++} while (0)
++
++#define	STAILQ_REMOVE_HEAD_UNTIL(head, elm, field) do {			\
++	if ((STAILQ_FIRST((head)) = STAILQ_NEXT((elm), field)) == NULL)	\
++		(head)->stqh_last = &STAILQ_FIRST((head));		\
++} while (0)
++
++/*
++ * List declarations.
++ */
++#define	LIST_HEAD(name, type)						\
++struct name {								\
++	struct type *lh_first;	/* first element */			\
++}
++
++#define	LIST_HEAD_INITIALIZER(head)					\
++	{ NULL }
++
++#define	LIST_ENTRY(type)						\
++struct {								\
++	struct type *le_next;	/* next element */			\
++	struct type **le_prev;	/* address of previous next element */	\
++}
++
++/*
++ * List functions.
++ */
++
++#define	LIST_EMPTY(head)	((head)->lh_first == NULL)
++
++#define	LIST_FIRST(head)	((head)->lh_first)
++
++#define	LIST_FOREACH(var, head, field)					\
++	for ((var) = LIST_FIRST((head));				\
++	    (var);							\
++	    (var) = LIST_NEXT((var), field))
++
++#define	LIST_FOREACH_SAFE(var, head, field, tvar)			\
++	for ((var) = LIST_FIRST((head));				\
++	    (var) && ((tvar) = LIST_NEXT((var), field), 1);		\
++	    (var) = (tvar))
++
++#define	LIST_INIT(head) do {						\
++	LIST_FIRST((head)) = NULL;					\
++} while (0)
++
++#define	LIST_INSERT_AFTER(listelm, elm, field) do {			\
++	if ((LIST_NEXT((elm), field) = LIST_NEXT((listelm), field)) != NULL)\
++		LIST_NEXT((listelm), field)->field.le_prev =		\
++		    &LIST_NEXT((elm), field);				\
++	LIST_NEXT((listelm), field) = (elm);				\
++	(elm)->field.le_prev = &LIST_NEXT((listelm), field);		\
++} while (0)
++
++#define	LIST_INSERT_BEFORE(listelm, elm, field) do {			\
++	(elm)->field.le_prev = (listelm)->field.le_prev;		\
++	LIST_NEXT((elm), field) = (listelm);				\
++	*(listelm)->field.le_prev = (elm);				\
++	(listelm)->field.le_prev = &LIST_NEXT((elm), field);		\
++} while (0)
++
++#define	LIST_INSERT_HEAD(head, elm, field) do {				\
++	if ((LIST_NEXT((elm), field) = LIST_FIRST((head))) != NULL)	\
++		LIST_FIRST((head))->field.le_prev = &LIST_NEXT((elm), field);\
++	LIST_FIRST((head)) = (elm);					\
++	(elm)->field.le_prev = &LIST_FIRST((head));			\
++} while (0)
++
++#define	LIST_NEXT(elm, field)	((elm)->field.le_next)
++
++#define	LIST_REMOVE(elm, field) do {					\
++	if (LIST_NEXT((elm), field) != NULL)				\
++		LIST_NEXT((elm), field)->field.le_prev = 		\
++		    (elm)->field.le_prev;				\
++	*(elm)->field.le_prev = LIST_NEXT((elm), field);		\
++} while (0)
++
++/*
++ * Tail queue declarations.
++ */
++#define	TAILQ_HEAD(name, type)						\
++struct name {								\
++	struct type *tqh_first;	/* first element */			\
++	struct type **tqh_last;	/* addr of last next element */		\
++	TRACEBUF							\
++}
++
++#define	TAILQ_HEAD_INITIALIZER(head)					\
++	{ NULL, &(head).tqh_first }
++
++#define	TAILQ_ENTRY(type)						\
++struct {								\
++	struct type *tqe_next;	/* next element */			\
++	struct type **tqe_prev;	/* address of previous next element */	\
++	TRACEBUF							\
++}
++
++/*
++ * Tail queue functions.
++ */
++#define	TAILQ_CONCAT(head1, head2, field) do {				\
++	if (!TAILQ_EMPTY(head2)) {					\
++		*(head1)->tqh_last = (head2)->tqh_first;		\
++		(head2)->tqh_first->field.tqe_prev = (head1)->tqh_last;	\
++		(head1)->tqh_last = (head2)->tqh_last;			\
++		TAILQ_INIT((head2));					\
++		QMD_TRACE_HEAD(head);					\
++		QMD_TRACE_HEAD(head2);					\
++	}								\
++} while (0)
++
++#define	TAILQ_EMPTY(head)	((head)->tqh_first == NULL)
++
++#define	TAILQ_FIRST(head)	((head)->tqh_first)
++
++#define	TAILQ_FOREACH(var, head, field)					\
++	for ((var) = TAILQ_FIRST((head));				\
++	    (var);							\
++	    (var) = TAILQ_NEXT((var), field))
++
++#define	TAILQ_FOREACH_SAFE(var, head, field, tvar)			\
++	for ((var) = TAILQ_FIRST((head));				\
++	    (var) && ((tvar) = TAILQ_NEXT((var), field), 1);		\
++	    (var) = (tvar))
++
++#define	TAILQ_FOREACH_REVERSE(var, head, headname, field)		\
++	for ((var) = TAILQ_LAST((head), headname);			\
++	    (var);							\
++	    (var) = TAILQ_PREV((var), headname, field))
++
++#define	TAILQ_FOREACH_REVERSE_SAFE(var, head, headname, field, tvar)	\
++	for ((var) = TAILQ_LAST((head), headname);			\
++	    (var) && ((tvar) = TAILQ_PREV((var), headname, field), 1);	\
++	    (var) = (tvar))
++
++#define	TAILQ_INIT(head) do {						\
++	TAILQ_FIRST((head)) = NULL;					\
++	(head)->tqh_last = &TAILQ_FIRST((head));			\
++	QMD_TRACE_HEAD(head);						\
++} while (0)
++
++#define	TAILQ_INSERT_AFTER(head, listelm, elm, field) do {		\
++	if ((TAILQ_NEXT((elm), field) = TAILQ_NEXT((listelm), field)) != NULL)\
++		TAILQ_NEXT((elm), field)->field.tqe_prev = 		\
++		    &TAILQ_NEXT((elm), field);				\
++	else {								\
++		(head)->tqh_last = &TAILQ_NEXT((elm), field);		\
++		QMD_TRACE_HEAD(head);					\
++	}								\
++	TAILQ_NEXT((listelm), field) = (elm);				\
++	(elm)->field.tqe_prev = &TAILQ_NEXT((listelm), field);		\
++	QMD_TRACE_ELEM(&(elm)->field);					\
++	QMD_TRACE_ELEM(&listelm->field);				\
++} while (0)
++
++#define	TAILQ_INSERT_BEFORE(listelm, elm, field) do {			\
++	(elm)->field.tqe_prev = (listelm)->field.tqe_prev;		\
++	TAILQ_NEXT((elm), field) = (listelm);				\
++	*(listelm)->field.tqe_prev = (elm);				\
++	(listelm)->field.tqe_prev = &TAILQ_NEXT((elm), field);		\
++	QMD_TRACE_ELEM(&(elm)->field);					\
++	QMD_TRACE_ELEM(&listelm->field);				\
++} while (0)
++
++#define	TAILQ_INSERT_HEAD(head, elm, field) do {			\
++	if ((TAILQ_NEXT((elm), field) = TAILQ_FIRST((head))) != NULL)	\
++		TAILQ_FIRST((head))->field.tqe_prev =			\
++		    &TAILQ_NEXT((elm), field);				\
++	else								\
++		(head)->tqh_last = &TAILQ_NEXT((elm), field);		\
++	TAILQ_FIRST((head)) = (elm);					\
++	(elm)->field.tqe_prev = &TAILQ_FIRST((head));			\
++	QMD_TRACE_HEAD(head);						\
++	QMD_TRACE_ELEM(&(elm)->field);					\
++} while (0)
++
++#define	TAILQ_INSERT_TAIL(head, elm, field) do {			\
++	TAILQ_NEXT((elm), field) = NULL;				\
++	(elm)->field.tqe_prev = (head)->tqh_last;			\
++	*(head)->tqh_last = (elm);					\
++	(head)->tqh_last = &TAILQ_NEXT((elm), field);			\
++	QMD_TRACE_HEAD(head);						\
++	QMD_TRACE_ELEM(&(elm)->field);					\
++} while (0)
++
++#define	TAILQ_LAST(head, headname)					\
++	(*(((struct headname *)((head)->tqh_last))->tqh_last))
++
++#define	TAILQ_NEXT(elm, field) ((elm)->field.tqe_next)
++
++#define	TAILQ_PREV(elm, headname, field)				\
++	(*(((struct headname *)((elm)->field.tqe_prev))->tqh_last))
++
++#define	TAILQ_REMOVE(head, elm, field) do {				\
++	if ((TAILQ_NEXT((elm), field)) != NULL)				\
++		TAILQ_NEXT((elm), field)->field.tqe_prev = 		\
++		    (elm)->field.tqe_prev;				\
++	else {								\
++		(head)->tqh_last = (elm)->field.tqe_prev;		\
++		QMD_TRACE_HEAD(head);					\
++	}								\
++	*(elm)->field.tqe_prev = TAILQ_NEXT((elm), field);		\
++	TRASHIT((elm)->field.tqe_next);					\
++	TRASHIT((elm)->field.tqe_prev);					\
++	QMD_TRACE_ELEM(&(elm)->field);					\
++} while (0)
++
++
++#ifdef _KERNEL
++
++/*
++ * XXX insque() and remque() are an old way of handling certain queues.
++ * They bogusly assumes that all queue heads look alike.
++ */
++
++struct quehead {
++	struct quehead *qh_link;
++	struct quehead *qh_rlink;
++};
++
++#ifdef	__GNUC__
++
++static __inline void
++insque(void *a, void *b)
++{
++	struct quehead *element = (struct quehead *)a,
++		 *head = (struct quehead *)b;
++
++	element->qh_link = head->qh_link;
++	element->qh_rlink = head;
++	head->qh_link = element;
++	element->qh_link->qh_rlink = element;
++}
++
++static __inline void
++remque(void *a)
++{
++	struct quehead *element = (struct quehead *)a;
++
++	element->qh_link->qh_rlink = element->qh_rlink;
++	element->qh_rlink->qh_link = element->qh_link;
++	element->qh_rlink = 0;
++}
++
++#else /* !__GNUC__ */
++
++void	insque(void *a, void *b);
++void	remque(void *a);
++
++#endif /* __GNUC__ */
++
++#endif /* _KERNEL */
++
++#endif /* !_SYS_QUEUE_H_ */
+diff -ur src.old/usr.sbin/mtree/excludes.c src/usr.sbin/mtree/excludes.c
+--- src.old/usr.sbin/mtree/excludes.c	2003-10-21 10:27:05.000000000 +0200
++++ src/usr.sbin/mtree/excludes.c	2004-10-28 22:41:30.000000000 +0200
+@@ -102,6 +102,19 @@
+ 	/* fnmatch(3) has a funny return value convention... */
+ #define MATCH(g, n) (fnmatch((g), (n), FNM_PATHNAME) == 0)
+ 
++#ifndef LIST_FIRST
++#define	LIST_FIRST(head)	((head)->lh_first)
++#endif
++#ifndef LIST_NEXT
++#define	LIST_NEXT(elm, field)	((elm)->field.le_next)
++#endif
++#ifndef LIST_FOREACH
++#define	LIST_FOREACH(var, head, field)				\
++	for ((var) = LIST_FIRST((head));				\
++	    (var);							\
++	    (var) = LIST_NEXT((var), field))
++#endif
++
+ 	LIST_FOREACH(e, &excludes, link) {
+ 		if ((e->pathname && MATCH(e->glob, path))
+ 		    || MATCH(e->glob, fname))

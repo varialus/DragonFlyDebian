@@ -1,0 +1,358 @@
+diff -ur ports.old/Mk/bsd.port.subdir.mk ports/Mk/bsd.port.subdir.mk
+--- ports.old/Mk/bsd.port.subdir.mk	2004-12-28 01:59:06.000000000 +0100
++++ ports/Mk/bsd.port.subdir.mk	2004-12-28 02:04:56.000000000 +0100
+@@ -48,10 +48,10 @@
+ 
+ .if !defined(NOPRECIOUSMAKEVARS)
+ .if !defined(ARCH)
+-ARCH!=	/usr/bin/uname -p
++ARCH!=	uname -m
+ .endif
+ .if !defined(OSREL)
+-OSREL!=	/usr/bin/uname -r | sed -e 's/[-(].*//'
++OSREL!=	uname -r | sed -e 's/[-(].*//'
+ .endif
+ .if !defined(OSVERSION)
+ .if exists(/sbin/sysctl)
+@@ -77,7 +77,7 @@
+ PKGINSTALLVER!=	${PKG_INFO} -P 2>/dev/null | ${SED} -e 's/.*: //'
+ 
+ .if !defined(OPSYS)
+-OPSYS!=	/usr/bin/uname -s
++OPSYS!=	uname -s
+ .endif
+ 
+ ECHO_MSG?=	echo
+diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
+--- ports.old/Mk/bsd.port.mk	2004-12-28 17:32:35.000000000 +0100
++++ ports/Mk/bsd.port.mk	2004-12-28 17:44:14.000000000 +0100
+@@ -887,7 +887,7 @@
+ 
+ # Get the architecture
+ .if !defined(ARCH)
+-ARCH!=	${UNAME} -p
++ARCH!=	uname -m
+ .endif
+ 
+ # Kludge for pre-3.0 systems
+@@ -895,21 +895,17 @@
+ 
+ # Get the operating system type
+ .if !defined(OPSYS)
+-OPSYS!=	${UNAME} -s
++OPSYS!=	uname -s
+ .endif
+ 
+ # Get the operating system revision
+ .if !defined(OSREL)
+-OSREL!=	${UNAME} -r | ${SED} -e 's/[-(].*//'
++OSREL!=	uname -r | sed -e 's/[-(].*//'
+ .endif
+ 
+ # Get __FreeBSD_version
+ .if !defined(OSVERSION)
+-.if exists(/sbin/sysctl)
+-OSVERSION!=	/sbin/sysctl -n kern.osreldate
+-.else
+-OSVERSION!=	/usr/sbin/sysctl -n kern.osreldate
+-.endif
++OSVERSION!=	sysctl -n kern.osreldate
+ .endif
+ 
+ # Get the object format.
+diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
+--- ports.old/Mk/bsd.port.mk	2004-12-28 17:45:04.000000000 +0100
++++ ports/Mk/bsd.port.mk	2004-12-28 17:57:59.000000000 +0100
+@@ -809,73 +809,62 @@
+ .endif
+ .endif
+ 
+-AWK?=		/usr/bin/awk
+-BASENAME?=	/usr/bin/basename
+-BRANDELF?=	/usr/bin/brandelf
+-.if exists(/usr/bin/bzip2)
+-BZCAT?=		/usr/bin/bzcat
+-BZIP2_CMD?=	/usr/bin/bzip2
+-.else
+-BZCAT?=		${LOCALBASE}/bin/bzcat
+-BZIP2_CMD?=	${LOCALBASE}/bin/bzip2
+-BZIP2DEPENDS=	yes
+-.endif
+-CAT?=		/bin/cat
+-CHGRP?=		/usr/bin/chgrp
+-CHMOD?=		/bin/chmod
+-CHOWN?=		/usr/sbin/chown
+-COMM?=		/usr/bin/comm
+-CP?=		/bin/cp
+-CPIO?=		/usr/bin/cpio
+-CUT?=		/usr/bin/cut
+-DC?=		/usr/bin/dc
+-DIALOG?=	/usr/bin/dialog
+-DIRNAME?=	/usr/bin/dirname
+-EGREP?=		/usr/bin/egrep
+-EXPR?=		/bin/expr
++AWK?=		awk
++BASENAME?=	basename
++BRANDELF?=	brandelf
++BZCAT?=		bzcat
++BZIP2_CMD?=	bzip2
++CAT?=		cat
++CHGRP?=		chgrp
++CHMOD?=		chmod
++CHOWN?=		chown
++COMM?=		comm
++CP?=		cp
++CPIO?=		cpio
++CUT?=		cut
++DC?=		dc
++DIALOG?=	dialog
++DIRNAME?=	dirname
++EGREP?=		egrep
++EXPR?=		expr
+ FALSE?=		false				# Shell builtin
+-FILE?=		/usr/bin/file
+-FIND?=		/usr/bin/find
+-GREP?=		/usr/bin/grep
+-GUNZIP_CMD?=	/usr/bin/gunzip -f
+-GZCAT?=		/usr/bin/gzcat
++FILE?=		file
++FIND?=		find
++GREP?=		grep
++GUNZIP_CMD?=	gunzip -f
++GZCAT?=		gzcat
+ GZIP?=		-9
+-GZIP_CMD?=	/usr/bin/gzip -nf ${GZIP}
+-HEAD?=		/usr/bin/head
+-ID?=		/usr/bin/id
+-IDENT?=		/usr/bin/ident
+-LDCONFIG?=	/sbin/ldconfig
+-LN?=		/bin/ln
+-LS?=		/bin/ls
+-MKDIR?=		/bin/mkdir -p
+-MV?=		/bin/mv
+-OBJCOPY?=	/usr/bin/objcopy
+-PASTE?=		/usr/bin/paste
+-PAX?=		/bin/pax
+-PRINTF?=	/usr/bin/printf
+-REALPATH?=	/bin/realpath
+-RM?=		/bin/rm
+-RMDIR?=		/bin/rmdir
+-SED?=		/usr/bin/sed
+-SETENV?=	/usr/bin/env
+-SH?=		/bin/sh
+-SORT?=		/usr/bin/sort
+-STRIP_CMD?=	/usr/bin/strip
+-SU_CMD?=	/usr/bin/su root -c
+-TAIL?=		/usr/bin/tail
++GZIP_CMD?=	gzip -nf ${GZIP}
++HEAD?=		head
++ID?=		id
++IDENT?=		ident
++LDCONFIG?=	ldconfig
++LN?=		ln
++LS?=		ls
++MKDIR?=		mkdir -p
++MV?=		mv
++OBJCOPY?=	objcopy
++PASTE?=		paste
++PAX?=		pax
++PRINTF?=	printf
++REALPATH?=	realpath
++RM?=		rm
++RMDIR?=		rmdir
++SED?=		sed
++SETENV?=	env
++SH?=		sh
++SORT?=		sort
++STRIP_CMD?=	strip
++SU_CMD?=	su root -c
++TAIL?=		tail
+ TEST?=		test				# Shell builtin
+-TR?=		/usr/bin/tr
++TR?=		tr
+ TRUE?=		true				# Shell builtin
+-UNAME?=		/usr/bin/uname
+-.if exists(/usr/bin/unzip)
+-UNZIP_CMD?=	/usr/bin/unzip
+-.else
+-UNZIP_CMD?=	${LOCALBASE}/bin/unzip
+-ZIPDEPENDS=	yes
+-.endif
+-WHICH?=		/usr/bin/which
+-XARGS?=		/usr/bin/xargs
+-YACC?=		/usr/bin/yacc
++UNAME?=		uname
++UNZIP_CMD?=	unzip
++WHICH?=		which
++XARGS?=		xargs
++YACC?=		yacc
+ 
+ # ECHO is defined in /usr/share/mk/sys.mk, which can either be "echo",
+ # or "true" if the make flag -s is given.  Use ECHO_CMD where you mean
+@@ -910,7 +899,7 @@
+ 
+ # Get the object format.
+ .if !defined(PORTOBJFORMAT)
+-PORTOBJFORMAT!=		${TEST} -x /usr/bin/objformat && /usr/bin/objformat || ${ECHO_CMD} aout
++PORTOBJFORMAT!=		which objformat >/dev/null && objformat || ${ECHO_CMD} aout
+ .endif
+ 
+ MASTERDIR?=	${.CURDIR}
+@@ -1660,15 +1649,7 @@
+ GMAKE?=			gmake
+ XMKMF?=			xmkmf -a
+ MKHTMLINDEX?=		${X11BASE}/bin/mkhtmlindex
+-.if exists(/sbin/md5)
+-MD5?=			/sbin/md5
+-.elif exists(/bin/md5)
+-MD5?=			/bin/md5
+-.elif exists(/usr/bin/md5)
+-MD5?=			/usr/bin/md5
+-.else
+-MD5?=			md5
+-.endif
++MD5?=			md5sum.textutils
+ MD5_FILE?=		${MASTERDIR}/distinfo
+ 
+ MAKE_FLAGS?=	-f
+@@ -1715,11 +1696,11 @@
+ .endif
+ .endif
+ 
+-TOUCH?=			/usr/bin/touch
++TOUCH?=			touch
+ TOUCH_FLAGS?=	-f
+ 
+ DISTORIG?=	.bak.orig
+-PATCH?=			/usr/bin/patch
++PATCH?=			patch
+ PATCH_STRIP?=	-p0
+ PATCH_DIST_STRIP?=	-p0
+ .if defined(PATCH_DEBUG)
+@@ -1744,16 +1725,12 @@
+ PATCH_DIST_ARGS+=	-C
+ .endif
+ 
+-.if ${PATCH} == "/usr/bin/patch"
++.if ${PATCH} == "patch"
+ PATCH_ARGS+=	-b .orig
+ PATCH_DIST_ARGS+=	-b .orig
+ .endif
+ 
+-.if exists(/bin/tar)
+-TAR?=	/bin/tar
+-.else
+-TAR?=	/usr/bin/tar
+-.endif
++TAR?=	tar
+ 
+ # EXTRACT_SUFX is defined in .pre.mk section
+ .if defined(USE_ZIP)
+@@ -1786,7 +1763,7 @@
+ .endif
+ .endif
+ .endif
+-MTREE_CMD?=	/usr/sbin/mtree
++MTREE_CMD?=	mtree
+ MTREE_ARGS?=	-U ${MTREE_FOLLOWS_SYMLINKS} -f ${MTREE_FILE} -d -e -p
+ 
+ # Determine whether or not we can use rootly owner/group functions.
+@@ -1859,7 +1836,7 @@
+ PKG_INFO?=		${LOCALBASE}/sbin/pkg_info
+ PKG_VERSION?=		${LOCALBASE}/sbin/pkg_version
+ .else
+-PKG_CMD?=		/usr/sbin/pkg_create
++PKG_CMD?=		/usr/bin/pkg_create
+ PKG_ADD?=		/usr/sbin/pkg_add
+ PKG_DELETE?=	/usr/sbin/pkg_delete
+ PKG_INFO?=		/usr/sbin/pkg_info
+@@ -2408,11 +2385,7 @@
+ .if defined(GNU_CONFIGURE)
+ # Maximum command line length
+ .if !defined(CONFIGURE_MAX_CMD_LEN)
+-.if exists(/sbin/sysctl)
+-CONFIGURE_MAX_CMD_LEN!=	/sbin/sysctl -n kern.argmax
+-.else
+-CONFIGURE_MAX_CMD_LEN!=	/usr/sbin/sysctl -n kern.argmax
+-.endif
++CONFIGURE_MAX_CMD_LEN!=	sysctl -n kern.argmax
+ .endif
+ CONFIGURE_ARGS+=	--prefix=${PREFIX} ${CONFIGURE_TARGET}
+ CONFIGURE_ENV+=		lt_cv_sys_max_cmd_len=${CONFIGURE_MAX_CMD_LEN}
+@@ -3095,13 +3068,13 @@
+ 	@(cd ${CONFIGURE_WRKSRC} && \
+ 		if ! ${SETENV} CC="${CC}" CXX="${CXX}" \
+ 	    CFLAGS="${CFLAGS}" CXXFLAGS="${CXXFLAGS}" \
+-	    INSTALL="/usr/bin/install -c ${_BINOWNGRP}" \
++	    INSTALL="install -c ${_BINOWNGRP}" \
+ 	    INSTALL_DATA="${INSTALL_DATA}" \
+ 	    INSTALL_PROGRAM="${INSTALL_PROGRAM}" \
+ 	    INSTALL_SCRIPT="${INSTALL_SCRIPT}" \
+ 	    ${CONFIGURE_ENV} ./${CONFIGURE_SCRIPT} ${CONFIGURE_ARGS}; then \
+ 			 ${ECHO_CMD} "===>  Script \"${CONFIGURE_SCRIPT}\" failed unexpectedly."; \
+-			 (${ECHO_CMD} ${CONFIGURE_FAIL_MESSAGE}) | /usr/bin/fmt 75 79 ; \
++			 (${ECHO_CMD} ${CONFIGURE_FAIL_MESSAGE}) | fmt 75 79 ; \
+ 			 ${FALSE}; \
+ 		fi)
+ .endif
+@@ -3401,7 +3374,7 @@
+ 	| ${XARGS} -0 -J % ${FIND} % -prune -perm -0002 \! -type l 2> /dev/null > ${WRKDIR}/.PLIST.writable; \
+ 	${TR} '\n' '\0' < ${WRKDIR}/.PLIST.flattened \
+ 	| ${XARGS} -0 -J % ${FIND} % -prune ! -type l -type f -print0 2> /dev/null \
+-	| ${XARGS} -0 -n 1 /usr/bin/objdump -R 2> /dev/null > ${WRKDIR}/.PLIST.objdump; \
++	| ${XARGS} -0 -n 1 objdump -R 2> /dev/null > ${WRKDIR}/.PLIST.objdump; \
+ 	if \
+ 		! ${AWK} -v audit="$${PORTS_AUDIT}" -f ${PORTSDIR}/Tools/scripts/security-check.awk \
+ 		  ${WRKDIR}/.PLIST.flattened ${WRKDIR}/.PLIST.objdump ${WRKDIR}/.PLIST.setuid ${WRKDIR}/.PLIST.writable; \
+@@ -3435,7 +3408,7 @@
+ 	fi; \
+ 	for i in `${GREP} -v '^@' ${TMPPLIST}`; do \
+ 		if [ ! -L "${PREFIX}/$$i" -a -f "${PREFIX}/$$i" ]; then \
+-			/usr/bin/objdump -R ${PREFIX}/$$i > \
++			objdump -R ${PREFIX}/$$i > \
+ 				${WRKDIR}/.PLIST.objdump 2> /dev/null; \
+ 			if [ -s ${WRKDIR}/.PLIST.objdump ] ; then \
+ 				${EGREP} " $$stupid_functions_regexp" \
+@@ -3917,7 +3890,7 @@
+ 		${SH} ${PORTSDIR}/Tools/scripts/update-patches`; \
+ 	case $$toedit in "");; \
+ 	*) ${ECHO_CMD} -n 'edit patches: '; read i; \
+-	cd ${PATCHDIR} && $${VISUAL:-$${EDIT:-/usr/bin/vi}} $$toedit;; esac
++	cd ${PATCHDIR} && $${VISUAL:-$${EDIT:-vi}} $$toedit;; esac
+ 
+ # Checksumming utilities
+ 
+diff -ur ports.old/Mk/bsd.port.subdir.mk ports/Mk/bsd.port.subdir.mk
+--- ports.old/Mk/bsd.port.subdir.mk	2004-12-28 17:45:04.000000000 +0100
++++ ports/Mk/bsd.port.subdir.mk	2004-12-28 17:53:06.000000000 +0100
+@@ -54,18 +54,14 @@
+ OSREL!=	uname -r | sed -e 's/[-(].*//'
+ .endif
+ .if !defined(OSVERSION)
+-.if exists(/sbin/sysctl)
+-OSVERSION!= /sbin/sysctl -n kern.osreldate
+-.else
+-OSVERSION!= /usr/sbin/sysctl -n kern.osreldate
+-.endif
++OSVERSION!= sysctl -n kern.osreldate
+ .endif
+ .if !defined(PORTOBJFORMAT)
+-PORTOBJFORMAT!= test -x /usr/bin/objformat && /usr/bin/objformat || echo aout
++PORTOBJFORMAT!= which objformat >/dev/null && objformat || echo aout
+ .endif
+ .endif
+ 
+-ID?=	/usr/bin/id
++ID?=	id
+ UID!=	${ID} -u
+ LOCALBASE?=	${DESTDIR}/usr/local
+ .if exists(${LOCALBASE}/sbin/pkg_info)
+@@ -73,7 +69,7 @@
+ .else
+ PKG_INFO?=	/usr/sbin/pkg_info
+ .endif
+-SED?=		/usr/bin/sed
++SED?=		sed
+ PKGINSTALLVER!=	${PKG_INFO} -P 2>/dev/null | ${SED} -e 's/.*: //'
+ 
+ .if !defined(OPSYS)

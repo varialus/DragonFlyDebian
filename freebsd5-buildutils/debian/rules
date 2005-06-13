@@ -1,0 +1,155 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+DEB_BUILD_GNU_TYPE      := $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+DEB_BUILD_GNU_CPU       := $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
+DEB_HOST_GNU_TYPE       := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_HOST_GNU_CPU        := $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
+
+PMAKE=pmake
+CFLAGS=-O2 -g -Wall -DMACHINE_ARCH='\"$(DEB_BUILD_GNU_CPU)\"'
+MAKE_BUILD_FLAGS= COPTS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO
+YACC=$(CURDIR)/build-tree/src/usr.bin/yacc/yacc
+
+unpack: unpack-stamp
+unpack-stamp:
+	mkdir build-tree
+	tar -C build-tree -xzf src.tar.gz
+	find build-tree -type d -name CVS | xargs rm -rf
+	cd build-tree && \
+		for i in $(CURDIR)/debian/patches/* ; do \
+		  cat $$i | patch -p0 ; \
+		done
+	touch unpack-stamp
+
+build: unpack-stamp build-stamp
+build-stamp:
+	dh_testdir
+
+	cd build-tree/src/usr.bin/yacc ; \
+		$(PMAKE) $(MAKE_BUILD_FLAGS)
+
+	cd build-tree/src/contrib/one-true-awk ; \
+		$(YACC) -d -o awkgram.c ../../contrib/one-true-awk/awkgram.y
+	cd build-tree/src/usr.bin/awk ; \
+		ln -sf ../../contrib/one-true-awk/awkgram.h ytab.h ; \
+		$(PMAKE) $(MAKE_BUILD_FLAGS)
+
+	cd build-tree/src/usr.bin/cksum ; $(PMAKE) $(MAKE_BUILD_FLAGS)
+
+	cd build-tree/src/usr.bin/lex ; \
+		$(PMAKE) bootstrap ; \
+		$(YACC) -d -o parse.c parse.y ; \
+		$(PMAKE) $(MAKE_BUILD_FLAGS)
+
+	cd build-tree/src/usr.bin/make ; \
+		$(PMAKE) $(MAKE_BUILD_FLAGS)
+
+	cd build-tree/src/usr.bin/mkdep ; $(PMAKE) $(MAKE_BUILD_FLAGS)
+
+	cd build-tree/src/usr.sbin/config ; \
+		$(YACC) -d config.y ; \
+		cp y.tab.c config.c ; \
+		$(PMAKE) $(MAKE_BUILD_FLAGS)
+
+	cd build-tree/src/usr.sbin/mtree ; $(PMAKE) $(MAKE_BUILD_FLAGS)
+	cd build-tree/src/usr.bin/file2c ; $(PMAKE) $(MAKE_BUILD_FLAGS)
+	cd build-tree/src/usr.bin/brandelf ; $(PMAKE) $(MAKE_BUILD_FLAGS)
+	
+	touch build-stamp
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	
+	for i in awk cksum lex make mkdep yacc file2c brandelf ; do \
+		cd $(CURDIR)/build-tree/src/usr.bin/$$i; \
+		$(PMAKE) install DESTDIR=$(CURDIR)/debian/freebsd5-buildutils BINDIR=/usr/bin ; \
+	done
+	for i in mtree config ; do \
+		cd $(CURDIR)/build-tree/src/usr.sbin/$$i; \
+		$(PMAKE) install DESTDIR=$(CURDIR)/debian/freebsd5-buildutils BINDIR=/usr/sbin ; \
+	done
+	cd build-tree/src/share/mk ; \
+		$(PMAKE) install \
+		DESTDIR=$(CURDIR)/debian/freebsd5-buildutils BINDIR=/usr/share
+
+	cp -af $(CURDIR)/build-tree/ports \
+		$(CURDIR)/debian/freebsd5-buildutils/usr/share/freebsd5-buildutils
+
+	# remove trash
+	rm -rf 	$(CURDIR)/debian/freebsd5-buildutils/usr/include \
+		$(CURDIR)/debian/freebsd5-buildutils/usr/share/man \
+		$(CURDIR)/debian/freebsd5-buildutils/var
+
+	# rename awk
+	mv $(CURDIR)/debian/freebsd5-buildutils/usr/bin/nawk \
+		$(CURDIR)/debian/freebsd5-buildutils/usr/bin/awk
+
+	# relocate binaries
+	mv \
+		$(CURDIR)/debian/freebsd5-buildutils/usr/bin/* \
+		$(CURDIR)/debian/freebsd5-buildutils/usr/sbin/* \
+		$(CURDIR)/debian/freebsd5-buildutils/usr/lib/freebsd/
+	for i in `cd $(CURDIR)/debian/freebsd5-buildutils/usr/lib/freebsd && ls` ; do \
+		ln -s ../lib/freebsd/$$i \
+		$(CURDIR)/debian/freebsd5-buildutils/usr/bin/freebsd-$$i ; \
+	done
+	rmdir $(CURDIR)/debian/freebsd5-buildutils/usr/sbin
+
+	# make stuff
+	mv $(CURDIR)/debian/freebsd5-buildutils/usr/share/mk \
+		$(CURDIR)/debian/freebsd5-buildutils/usr/share/freebsd5-buildutils/mk
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -rf build-tree
+	rm -f *-stamp *-stamp *-stamp
+
+	dh_clean
+
+
+# Build architecture-independent files here.
+binary-indep: build install 
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+#	dh_installdebconf	
+	dh_installdocs
+#	dh_installexamples
+#	dh_installmenu
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime
+#	dh_installinit
+#	dh_installcron
+	dh_installman
+#	dh_installinfo
+	dh_installchangelogs 
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+#	dh_makeshlibs
+	dh_installdeb
+#	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install configure

@@ -1,0 +1,181 @@
+freebsd5-buildutils (5.3+2-3) unstable; urgency=low
+
+  * Package adopted by the GNU/kFreeBSD Maintainers. Thanks to Robert 
+    Millan for all the work done on this package.
+  * Added patch from Victor Hsieh to fix incompatibilities with linux
+    utilities (closes: bug#306146).
+  
+ -- Aurelien Jarno <aurel32@debian.org>  Thu,  9 Jun 2005 01:02:28 +0200
+
+freebsd5-buildutils (5.3+2-2) unstable; urgency=low
+
+  * Replace Architecture with Cpu/System in control.in.
+  * Add /usr/ports, installed as /usr/share/freebsd5-buildutils/ports.
+  * Move /usr/share/fbmk to /usr/share/freebsd5-buildutils/mk for consistency.
+  * Misc package cleanup (Nuked debian/mk, etc).
+
+ -- Robert Millan <rmh@debian.org>  Fri,  4 Feb 2005 01:30:26 +0100
+
+freebsd5-buildutils (5.3+1-1) unstable; urgency=low
+
+  * Add brandelf.
+    - patches/07_brandelf.diff
+
+ -- Robert Millan <rmh@debian.org>  Mon, 27 Dec 2004 21:39:45 +0100
+
+freebsd5-buildutils (5.3-2) unstable; urgency=low
+
+  * patches/01_make_fixes.diff:
+    - Set INSTALLINFO to `which ginstall-info || which install-info`.
+    - Do, however, not run install-info at all, and use manual install instead.
+  * patches/06_ftbfs_gcc-4.0.diff:  New.  Don't declare maxJobs as static.
+    This fixes build on gcc-4.0.  Thanks Andreas Jochens. (Closes: #285953)
+
+ -- Robert Millan <rmh@debian.org>  Sat, 18 Dec 2004 01:50:04 +0100
+
+freebsd5-buildutils (5.3-1) unstable; urgency=low
+
+  * Fork for 5.x branch (package been renamed).
+    - patches/02_silly_macros.diff:  Sync.
+
+ -- Robert Millan <rmh@debian.org>  Thu, 25 Nov 2004 20:14:35 +0100
+
+freebsd-buildutils (5.2.1+20041028.1-1) unstable; urgency=low
+
+  * Add file2c command.
+
+ -- Robert Millan <rmh@debian.org>  Fri, 12 Nov 2004 20:13:06 +0100
+
+freebsd-buildutils (5.2.1+20041028-1) unstable; urgency=low
+
+  * New upstream snapshot (6.x branch).  Drop support for btxld.
+    - patches/*.diff:  Sync.
+  * Use new CDBS debian/control auto-generation method.
+    - control.in:  New.  Set Build-Depends on @cdbs@ tag.
+    - rules:  Set DEB_AUTO_UPDATE_DEBIAN_CONTROL = yes.
+
+ -- Robert Millan <rmh@debian.org>  Thu, 28 Oct 2004 22:53:34 +0200
+
+freebsd-buildutils (5.2.1+20040403-11) unstable; urgency=low
+
+  * patches/002_upstream.diff: Unfuck __unused definition in
+    usr.bin/lex/flex.skl.
+
+ -- Robert Millan <rmh@debian.org>  Sun, 20 Jun 2004 13:05:13 +0200
+
+freebsd-buildutils (5.2.1+20040403-10) unstable; urgency=low
+
+  * patches/002_upstream.diff: Nuke __unused completely instead of defining
+    it as empty macro. (Closes: #249892)
+
+ -- Robert Millan <rmh@debian.org>  Wed,  9 Jun 2004 18:18:47 +0200
+
+freebsd-buildutils (5.2.1+20040403-9) unstable; urgency=low
+
+  * control (Build-Depends): Add flex. (Closes: #248265)
+
+ -- Robert Millan <rmh@debian.org>  Mon, 10 May 2004 14:11:02 +0200
+
+freebsd-buildutils (5.2.1+20040403-8) unstable; urgency=low
+
+  * Fix strl{cpy,cat} porting properly in config/main.c.
+
+ -- Robert Millan <rmh@debian.org>  Mon, 10 May 2004 02:48:47 +0200
+
+freebsd-buildutils (5.2.1+20040403-7) unstable; urgency=low
+
+  * Fix stupid FTBFS.
+    mk/build.mk: Don't attempt to use our make after building it!
+  * mk/build.mk: Misc cleanup.
+
+ -- Robert Millan <rmh@debian.org>  Sat,  8 May 2004 21:21:45 +0200
+
+freebsd-buildutils (5.2.1+20040403-6) unstable; urgency=low
+
+  * 003_glibc.diff: Fix stupid segfault in config.
+  * mk/build.mk: Set MACHINE_ARCH for make.
+
+ -- Robert Millan <rmh@debian.org>  Tue,  4 May 2004 16:20:17 +0200
+
+freebsd-buildutils (5.2.1+20040403-5) unstable; urgency=low
+
+  * Fix FTBFS.
+    mk/build.mk: Set PATH so that our own yacc is used for building config.
+
+ -- Robert Millan <rmh@debian.org>  Sun,  2 May 2004 18:06:29 +0200
+
+freebsd-buildutils (5.2.1+20040403-4) unstable; urgency=low
+
+  * Add awk and config.
+
+ -- Robert Millan <rmh@debian.org>  Sun,  2 May 2004 14:40:25 +0200
+
+freebsd-buildutils (5.2.1+20040403-3) unstable; urgency=low
+
+  * patches/004_lex_bootstrap.diff: Nuked.
+  * mk/build.mk: Use yacc to generate parse.h for src/usr.bin/lex.
+
+ -- Robert Millan <rmh@debian.org>  Wed, 14 Apr 2004 14:59:23 +0200
+
+freebsd-buildutils (5.2.1+20040403-2) unstable; urgency=low
+
+  * control (Depends): Add dash.
+  * patches/*.diff: Cleanup in order to submit upstream.
+
+ -- Robert Millan <rmh@debian.org>  Thu,  8 Apr 2004 00:17:41 +0200
+
+freebsd-buildutils (5.2.1+20040403-1) unstable; urgency=low
+
+  * New upstream snapshot.
+    - patches/*.diff: Resync.
+  * Really apply the change (Really Closes: #240023)
+
+ -- Robert Millan <rmh@debian.org>  Sat,  3 Apr 2004 16:02:23 +0200
+
+freebsd-buildutils (5.1-4) unstable; urgency=low
+
+  * Fix FTBFS on alpha. (Closes: #240023)
+    - patches/003_glibc.diff (mtree): Check for _STATBUF_ST_NSEC before
+      attempting nanosecond tests.
+  * control: Fix typo in description. (Closes: #239923)
+
+ -- Robert Millan <rmh@debian.org>  Sat,  3 Apr 2004 13:39:03 +0200
+
+freebsd-buildutils (5.1-3) unstable; urgency=low
+
+  * control (Build-Depends): Add bison.
+
+ -- Robert Millan <rmh@debian.org>  Wed, 24 Mar 2004 22:45:55 +0100
+
+freebsd-buildutils (5.1-2) unstable; urgency=low
+
+  * New package: freebsd-buildutils (based on freebsd-utils).
+    (Closes: #233074)
+
+ -- Robert Millan <rmh@debian.org>  Tue, 17 Feb 2004 13:36:30 +0100
+
+freebsd-utils (5.1-1) unstable; urgency=low
+
+  * Upgraded to 5.1
+  * Converted to cdbs, and added Build-Depends for freebsd-source-5.1,
+    which contains the actual source code.
+
+ -- Nathan Hawkins <utsl@debian.org>  Tue,  7 Oct 2003 15:18:34 -0500
+
+freebsd-utils (5.0-2) unstable; urgency=low
+
+  * Set maintainer to glibc-bsd-devel@lists.alioth.debian.org
+  * Added me to Uploaders.
+  * Turn into non-native package.
+  * Added missing packages to Build-Depends (-libc5-dev, -gcc, byacc)
+  * Minor fixes in debian/copyright.
+  * Added dummy freebsd-utils package for upgrading.
+
+ -- Robert Millan <rmh@debian.org>  Fri, 11 Jul 2003 04:28:37 +0200
+
+freebsd-utils-5.0 (5.0-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Nathan Hawkins <utsl@debian.org>  Fri, 11 Oct 2002 20:43:20 -0400
+
