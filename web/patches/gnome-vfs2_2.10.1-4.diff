@@ -1,0 +1,70 @@
+diff -u gnome-vfs2-2.10.1/debian/control.in gnome-vfs2-2.10.1/debian/control.in
+--- gnome-vfs2-2.10.1/debian/control.in
++++ gnome-vfs2-2.10.1/debian/control.in
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org> 
+ Uploaders: @GNOME_TEAM@
+-Build-Depends: cdbs, libbonobo2-dev (>= 2.6.0), libglib2.0-dev (>= 2.6.0), libgconf2-dev (>= 2.8.0-1), libxml2-dev, libbz2-dev, libfam-dev (>= 2.6.9-4) [ !hurd-i386 ], libsmbclient-dev [ !hurd-i386 ] , gettext, debhelper (>= 4.1.0), zlib1g-dev, intltool, gnome-mime-data, libgnutls11-dev (>= 1.0.4-3), liborbit2-dev (>= 1:2.10.0), gnome-pkg-tools, dbus-glib-1-dev  [ !hurd-i386 ], libhal-dev [ !hurd-i386 ], libhal-storage-dev [ !hurd-i386 ], libcdparanoia0-dev [ !hurd-i386 ]
++Build-Depends: cdbs, libbonobo2-dev (>= 2.6.0), libglib2.0-dev (>= 2.6.0), libgconf2-dev (>= 2.8.0-1), libxml2-dev, libbz2-dev, libfam-dev (>= 2.6.9-4) [ !hurd-i386 ], libsmbclient-dev [ !hurd-i386 ] , gettext, debhelper (>= 4.1.0), zlib1g-dev, intltool, gnome-mime-data, libgnutls11-dev (>= 1.0.4-3), liborbit2-dev (>= 1:2.10.0), gnome-pkg-tools, dbus-glib-1-dev  [ !hurd-i386 ], libhal-dev [ !hurd-i386 !kfreebsd-i386 ], libhal-storage-dev [ !hurd-i386 !kfreebsd-i386 ], libcdparanoia0-dev [ !hurd-i386 !kfreebsd-i386 ]
+ Standards-Version: 3.6.1
+ 
+ Package: libgnomevfs2-common
+diff -u gnome-vfs2-2.10.1/debian/changelog gnome-vfs2-2.10.1/debian/changelog
+--- gnome-vfs2-2.10.1.orig/debian/patches/20_kfreebsd_cdrom.patch
++++ gnome-vfs2-2.10.1/debian/patches/20_kfreebsd_cdrom.patch
+@@ -0,0 +1,54 @@
++--- libgnomevfs/gnome-vfs-cdrom.c.orig	2005-06-14 20:59:05.000000000 +0200
+++++ libgnomevfs/gnome-vfs-cdrom.c	2005-06-14 21:00:04.000000000 +0200
++@@ -89,9 +89,9 @@
++ 	return type;
++ #elif defined(HAVE_SYS_MNTCTL_H) || defined(__APPLE__)
++ 	return CDS_NO_INFO;
++-#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
+++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
++ 	struct ioc_toc_header header;
++-#if defined(__FreeBSD__) || defined(__DragonFly__)
+++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__)
++ 	struct ioc_read_toc_single_entry entry;
++ #else
++ 	struct ioc_read_toc_entry entries;
++@@ -113,7 +113,7 @@
++ 	}
++ 
++ 	type = CDS_DATA_1;
++-#if defined(__FreeBSD__) || defined(__DragonFly__)
+++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__)
++ 	for (entry.track = header.starting_track;
++ 		entry.track <= header.ending_track;
++ 		entry.track++) {
++--- libgnomevfs/gnome-vfs-volume-ops.c.orig	2005-06-14 21:01:39.000000000 +0200
+++++ libgnomevfs/gnome-vfs-volume-ops.c	2005-06-14 21:01:55.000000000 +0200
++@@ -261,7 +261,7 @@
++ 	}
++ 
++ 	if (info->should_eject) {
++-#ifdef __FreeBSD__
+++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++ 	    	char *argv[5] = {
++ 		    	"cdcontrol",
++ 			"-f",
++--- modules/cdda-method.c.orig	2005-06-14 21:02:29.000000000 +0200
+++++ modules/cdda-method.c	2005-06-14 21:02:54.000000000 +0200
++@@ -625,7 +625,7 @@
++ 		if (global_context != NULL) {
++ #ifdef __linux__
++ 			if (strcmp (drive->cdda_device_name, global_context->drive->cdda_device_name) == 0) {
++-#elif defined(__FreeBSD__)
+++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++ 			if (strcmp (drive->dev->device_path, global_context->drive->dev->device_path) == 0) {
++ #endif
++ 				use_cache = TRUE;
++@@ -715,7 +715,7 @@
++ 		if (global_context != NULL) {
++ #ifdef __linux__
++ 				if (strcmp (drive->cdda_device_name, global_context->drive->cdda_device_name) != 0) {
++-#elif defined(__FreeBSD__)
+++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++ 				if (strcmp (drive->dev->device_path, global_context->drive->dev->device_path) != 0) {
++ #endif
++ 					/*	Clear old cache */
