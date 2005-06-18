@@ -48,11 +48,11 @@ diff -ur src.old/usr.bin/make/main.c src/usr.bin/make/main.c
  #include <sys/signal.h>
  #include <sys/stat.h>
 -#if defined(__i386__)
-+#if defined(__FreeBSD__) && defined(__i386__)
++#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && defined(__i386__)
  #include <sys/sysctl.h>
  #endif
  #include <sys/time.h>
-@@ -491,8 +491,12 @@
+@@ -489,8 +489,12 @@
  	  iMkLvl = 0;
  	}
  	if (iMkLvl++ > MKLVL_MAXVAL) {
@@ -67,15 +67,15 @@ diff -ur src.old/usr.bin/make/main.c src/usr.bin/make/main.c
  	}
  	bzero(szMkLvl = emalloc(32), 32);
  	sprintf(szMkLvl, "%d", iMkLvl);
-@@ -520,6 +524,7 @@
+@@ -518,6 +522,7 @@
  	}
  #endif
  
-+#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
  	/*
  	 * PC-98 kernel sets the `i386' string to the utsname.machine and
  	 * it cannot be distinguished from IBM-PC by uname(3).  Therefore,
-@@ -539,6 +544,7 @@
+@@ -537,6 +542,7 @@
  				machine = "pc98";
  		}
  	}
@@ -126,16 +126,6 @@ diff -ur src.old/usr.sbin/config/main.c src/usr.sbin/config/main.c
 diff -ur src.old/usr.sbin/mtree/compare.c src/usr.sbin/mtree/compare.c
 --- src.old/usr.sbin/mtree/compare.c	2004-01-11 20:25:56.000000000 +0100
 +++ src/usr.sbin/mtree/compare.c	2004-10-28 22:41:30.000000000 +0200
-@@ -77,7 +77,9 @@
- 	off_t len;
- 	char *cp;
- 	const char *tab = "";
-+#ifdef __FreeBSD__
- 	char *fflags;
-+#endif
- 
- 	label = 0;
- 	switch(s->type) {
 @@ -173,21 +175,22 @@
  		    (intmax_t)s->st_size, (intmax_t)p->fts_statp->st_size);
  		tab = "\t";
@@ -177,7 +167,7 @@ diff -ur src.old/usr.sbin/mtree/compare.c src/usr.sbin/mtree/compare.c
  			}
  		}
  	}
-+#ifdef __FreeBSD__
++#if defined(__FreeBSD__)
  	if ((s->flags & F_FLAGS) && s->st_flags != p->fts_statp->st_flags) {
  		LABEL;
  		fflags = flags_to_string(s->st_flags);
@@ -205,16 +195,6 @@ diff -ur src.old/usr.sbin/mtree/create.c src/usr.sbin/mtree/create.c
  static int	statd(FTS *, FTSENT *, uid_t *, gid_t *, mode_t *, u_long *);
  static void	statf(int, FTSENT *);
  
-@@ -147,7 +151,9 @@
- 	uint32_t val;
- 	off_t len;
- 	int fd, offset;
-+#ifdef __FreeBSD__
- 	char *fflags;
-+#endif
- 	char *escaped_name;
- 
- 	escaped_name = calloc(1, p->fts_namelen * 4  +  1);
 @@ -208,10 +214,12 @@
  	if (keys & F_SIZE)
  		output(indent, &offset, "size=%jd",
@@ -234,7 +214,7 @@ diff -ur src.old/usr.sbin/mtree/create.c src/usr.sbin/mtree/create.c
  	if (keys & F_SLINK &&
  	    (p->fts_info == FTS_SL || p->fts_info == FTS_SLNONE))
  		output(indent, &offset, "link=%s", rlink(p->fts_accpath));
-+#ifdef __FreeBSD__
++#if defined(__FreeBSD__)
  	if (keys & F_FLAGS && p->fts_statp->st_flags != flags) {
  		fflags = flags_to_string(p->fts_statp->st_flags);
  		output(indent, &offset, "flags=%s", fflags);
@@ -244,21 +224,11 @@ diff -ur src.old/usr.sbin/mtree/create.c src/usr.sbin/mtree/create.c
  	(void)putchar('\n');
  }
  
-@@ -282,7 +292,9 @@
- 	u_long saveflags = *pflags;
- 	u_short maxgid, maxuid, maxmode, maxflags;
- 	u_short g[MAXGID], u[MAXUID], m[MAXMODE], f[MAXFLAGS];
-+#ifdef __FreeBSD__
- 	char *fflags;
-+#endif
- 	static int first = 1;
- 
- 	if ((p = fts_children(t, 0)) == NULL) {
 @@ -315,6 +327,7 @@
  				maxuid = u[suid];
  			}
  
-+#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
  			/*
  			 * XXX
  			 * note that the below will break when file flags
@@ -274,7 +244,7 @@ diff -ur src.old/usr.sbin/mtree/create.c src/usr.sbin/mtree/create.c
  			(void)printf(" mode=%#o", savemode);
  		if (keys & F_NLINK)
  			(void)printf(" nlink=1");
-+#ifdef __FreeBSD__
++#if defined(__FreeBSD__)
  		if (keys & F_FLAGS) {
  			fflags = flags_to_string(saveflags);
  			(void)printf(" flags=%s", fflags);
@@ -304,7 +274,7 @@ diff -ur src.old/usr.sbin/mtree/misc.c src/usr.sbin/mtree/misc.c
  	return (strcmp(((const KEY *)a)->name, ((const KEY *)b)->name));
  }
  
-+#ifdef __FreeBSD__
++#if defined(__FreeBSD__)
  char *
  flags_to_string(u_long fflags)
  {
@@ -363,7 +333,7 @@ diff -ur src.old/usr.sbin/mtree/spec.c src/usr.sbin/mtree/spec.c
  	char *kw, *val = NULL;
  	struct group *gr;
  	struct passwd *pw;
-+#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
  	mode_t *m;
 +#endif
  	int value;
@@ -373,7 +343,7 @@ diff -ur src.old/usr.sbin/mtree/spec.c src/usr.sbin/mtree/spec.c
  			if(!ip->rmd160digest)
  				errx(1, "strdup");
  			break;
-+#ifdef __FreeBSD__
++#if defined(__FreeBSD__)
  		case F_FLAGS:
  			if (strcmp("none", val) == 0)
  				ip->st_flags = 0;
@@ -413,7 +383,7 @@ diff -ur src.old/usr.sbin/mtree/specspec.c src/usr.sbin/mtree/specspec.c
  		printf(" sha1digest=%s", n->sha1digest);
  	if (f & F_RMD160)
  		printf(" rmd160digest=%s", n->rmd160digest);
-+#ifdef __FreeBSD__
++#if defined(__FreeBSD__)
  	if (f & F_FLAGS)
  		printf(" flags=%s", flags_to_string(n->st_flags));
 +#endif
@@ -439,7 +409,7 @@ diff -ur src.old/usr.sbin/mtree/verify.c src/usr.sbin/mtree/verify.c
  		if (chmod(path, p->st_mode))
  			(void)printf("%s: permissions not set: %s\n",
  			    path, strerror(errno));
-+#ifdef __FreeBSD__
++#if defined(__FreeBSD__)
  		if ((p->flags & F_FLAGS) && p->st_flags &&
  		    chflags(path, p->st_flags))
  			(void)printf("%s: file flags not set: %s\n",

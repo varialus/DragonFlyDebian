@@ -1,0 +1,111 @@
+diff -Nur src.old/usr.bin/make/arch.c src/usr.bin/make/arch.c
+--- src.old/usr.bin/make/arch.c	2005-06-17 14:31:36.000000000 +0200
++++ src/usr.bin/make/arch.c	2005-06-17 14:33:17.000000000 +0200
+@@ -124,6 +124,10 @@
+ static int ArchSVR4Entry(Arch *, char *, size_t, FILE *);
+ #endif
+ 
++#ifndef MAXPATHLEN
++#  define MAXPATHLEN 4096
++#endif
++
+ /*-
+  *-----------------------------------------------------------------------
+  * ArchFree --
+diff -Nur src.old/usr.bin/make/main.c src/usr.bin/make/main.c
+--- src.old/usr.bin/make/main.c	2005-06-17 14:44:03.000000000 +0200
++++ src/usr.bin/make/main.c	2005-06-17 14:45:27.000000000 +0200
+@@ -96,6 +96,10 @@
+ 
+ #define	MAKEFLAGS	".MAKEFLAGS"
+ 
++#ifndef MAXPATHLEN
++#  define MAXPATHLEN 4096
++#endif
++
+ Lst			create;		/* Targets to be made */
+ time_t			now;		/* Time at start of make */
+ GNode			*DEFAULT;	/* .DEFAULT node */
+diff -Nur src.old/usr.sbin/config/main.c src/usr.sbin/config/main.c 
+--- src.old/usr.sbin/config/main.c	2005-06-17 15:24:11.000000000 +0200
++++ src/usr.sbin/config/main.c	2005-06-17 15:25:05.000000000 +0200
+@@ -66,6 +66,10 @@
+ #define FALSE	(0)
+ #endif
+ 
++#ifndef MAXPATHLEN
++#  define MAXPATHLEN 4096
++#endif
++  
+ #define	CDIR	"../compile/"
+ 
+ char *	PREFIX;
+diff -Nur src.old/usr.sbin/config/mkheaders.c rc/usr.sbin/config/mkheaders.c
+--- src.old/usr.sbin/config/mkheaders.c	2005-06-17 15:54:53.000000000 +0200
++++ src/usr.sbin/config/mkheaders.c	2005-06-17 15:56:10.000000000 +0200
+@@ -47,6 +47,10 @@
+ #include "config.h"
+ #include "y.tab.h"
+ 
++#ifndef MAXPATHLEN
++#  define MAXPATHLEN 4096
++#endif
++  
+ static int do_header(char *, int);
+ static char *toheader(char *);
+ static char *tomacro(char *);
+diff -Nur  src.old/usr.sbin/config/mkmakefile.c src/usr.sbin/config/mkmakefile.c
+--- src.old/usr.sbin/config/mkmakefile.c	2005-06-17 15:46:40.000000000 +0200
++++ src/usr.sbin/config/mkmakefile.c	2005-06-17 15:49:31.000000000 +0200
+@@ -65,6 +65,10 @@
+ 		wd = word; \
+ 	}
+ 
++#ifndef MAXPATHLEN
++#  define MAXPATHLEN 4096
++#endif
++  
+ static char *tail(char *);
+ static void do_clean(FILE *);
+ static void do_rules(FILE *);
+diff -Nur src.old/usr.sbin/config/mkoptions.c src/usr.sbin/config/mkoptions.c
+--- src.old/usr.sbin/config/mkoptions.c	2005-06-17 16:05:11.000000000 +0200
++++ src/usr.sbin/config/mkoptions.c	2005-06-17 16:05:46.000000000 +0200
+@@ -48,6 +48,10 @@
+ #include "config.h"
+ #include "y.tab.h"
+ 
++#ifndef MAXPATHLEN
++#  define MAXPATHLEN 4096
++#endif
++  
+ static	struct users {
+ 	int	u_default;
+ 	int	u_min;
+diff -Nur src.old/usr.sbin/mtree/create.c src/usr.sbin/mtree/create.c
+--- src.old/usr.sbin/mtree/create.c	2005-06-17 17:04:13.000000000 +0200
++++ src/usr.sbin/mtree/create.c	2005-06-17 17:07:20.000000000 +0200
+@@ -65,6 +65,10 @@
+ #define	INDENTNAMELEN	15
+ #define	MAXLINELEN	80
+ 
++#ifndef MAXHOSTNAMELEN
++#  define MAXHOSTNAMELEN 255
++#endif
++
+ static gid_t gid;
+ static uid_t uid;
+ static mode_t mode;
+diff -Nur src.old/usr.sbin/mtree/extern.h src/usr.sbin/mtree/extern.h
+--- src.old/usr.sbin/mtree/extern.h	2005-06-17 17:31:46.000000000 +0200
++++ src/usr.sbin/mtree/extern.h	2005-06-17 17:12:59.000000000 +0200
+@@ -57,6 +57,7 @@
+ extern u_int keys;
+ extern int lineno;
+ extern int dflag, eflag, iflag, nflag, qflag, rflag, sflag, uflag, wflag;
+-#ifdef MAXPATHLEN
+-extern char fullpath[MAXPATHLEN];
++#ifndef MAXPATHLEN
++#  define MAXPATHLEN 4096
+ #endif
++extern char fullpath[MAXPATHLEN];
