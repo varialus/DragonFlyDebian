@@ -13,14 +13,21 @@ diff -u gdm-2.6.0.8/debian/control gdm-2.6.0.8/debian/control
 diff -u gdm-2.6.0.8/debian/rules gdm-2.6.0.8/debian/rules
 --- gdm-2.6.0.8/debian/rules
 +++ gdm-2.6.0.8/debian/rules
-@@ -8,10 +8,17 @@
+@@ -8,10 +8,24 @@
  # This is the debhelper compatability version to use.
  export DH_COMPAT=4
- 
-+DEB_HOST_GNU_SYSTEM	?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+
++export DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null)
++# Take account of old dpkg-architecture output.
++ifeq ($(DEB_HOST_ARCH_OS),)
++  DEB_HOST_ARCH_OS := $(subst -gnu,,$(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM))
++  ifeq ($(DEB_HOST_ARCH_OS),gnu)
++    DEB_HOST_ARCH_OS := hurd
++  endif
++endif 
 +
 +conf_args = --disable-dependency-tracking --with-tags= --prefix=/usr --libexecdir=\$${prefix}/lib --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --sysconfdir=/etc --libexecdir=\$${prefix}/lib/gdm --localstatedir=/var/lib
-+ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
++ifeq ($(DEB_HOST_ARCH_OS),linux)
 +conf_args += --with-selinux
 +endif
 +
