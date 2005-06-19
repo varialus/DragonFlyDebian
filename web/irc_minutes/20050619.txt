@@ -1,0 +1,92 @@
+                GNU/kFreeBSD IRC meeting, June 19, 2005
+                =======================================
+
+
+The second (and first official) Debian GNU/kFreeBSD meeting was held
+from 19:00 UTC to 20:20 UTC on Sunday June 19th.
+
+The next meeting will take place on Sunday July 3rd at 19:00 UTC.
+
+
+Minutes
+-------
+
+People mentioned:
+  aurel32: 	Aurelien Jarno
+  braindmg:	Guillem Jover
+  bal00:        Hector Garcia
+  nyu:		Robert Millan
+
+
+1) Time of the meeting : Everybody agreed with having the meeting at
+   19:00 UTC
+
+2) We need to have more people interested into GNU/kFreeBSD. aurel32
+   suggests to send a mail to debian-devel-announce, however we need a
+   reason for that. Having a first set of ISO images looks like a good
+   excuse. But we fist need a working d-i to do that.
+
+3) braindmg has spoken with Colin Watson about making it more
+   portable. Colin is going to integrate a bunch of changes for that 
+   into d-i. Then some work has to be done to have a working d-i on
+   GNU/kFreeBSD:
+    - fixing grub
+    - porting parted
+    - porting rootskel 
+    - have ramdisk working
+
+4) aurel32 explained he started to work on glibc 2.3.2. He started to
+   merge the files from glibc-kbsd to the Debian glibc package as
+   debian/patches/ files. nyu explained it is a wrong idea because the
+   revision history of the files is loosed and because it won't be easy
+   to modify them if they are merged into Debian. aurel32 explains the
+   idea was to get them included in the Debian package and then 
+   upstream. braindmg told it is not a problem if we can get a fast 
+   access into Debian glibc. nyu added that the glibc team is quite 
+   receptive. aurel32 concluded that we have to try.
+
+5) braindmg told that the next dpkg version will have support for
+   linux-any. aurel32 added that a change in the release policy forbids
+   to change the build dependencies during the build. That's the end of
+   type-handling.
+
+6) aurel32 explained that he has rebuilt 62 out of 72 packages that
+   were depending on libpthread2. The latest that have to be rebuild are:  
+     aolserver-nspostgres, avifile, erlang, firebird2, gcc-3.4, gnumail,
+     gworkspace, libsdl-erlang, rate-engine, wackamole
+   They currently fails to build from source, so some more work has to be
+   done to get them built.
+
+7) We currently only have gcc-3.3 and gcc-4.0 and so we are now unable
+   to follow the C++ ABI transition when it start. We need to work on
+   gcc-4.0 as soon as possible. gcc-4.0 should work on GNU/kFreeBSD,
+   except for boehm-gc.
+   If gcc-4.0 is not available at that time, we will need to stop the
+   build daemons, or stop them building C++ stuff.
+
+
+New action points
+-----------------
+* braindmg:		start the work on gcc-4.0
+* aurel32:		finish porting glibc-2.3.2 and start port
+                        of glibc-2.3.5
+* braindmg:		send a status of the port to debian-devel
+ 
+
+Opened action points
+-------------
+* aurel32:		rebuild all packages that are still using 
+                        lipthread2
+* braindmg:		work on util-linux
+* aurel32:		get the out-of-date packages down to 220 
+                        by 20050611
+* aurel32:		update gcc to 3.3.6 and add java support
+* braindmg:		send a status of the port to debian-devel
+
+
+Closed action points
+--------------------
+* aurel32 & braindmg:	adopt packages from nyu
+* braindmg:		talk with Colin Watson about d-i
+
+
