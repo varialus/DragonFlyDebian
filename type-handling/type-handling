@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
-all_cpus=`grep -v ^# /usr/share/dpkg/cputable | (while read debian gnu regex ; do echo ${gnu} ; done)`
-all_systems=`grep -v ^# /usr/share/dpkg/ostable | (while read debian gnu regex ; do echo ${gnu} ; done)`
+all_cpus=`grep -v ^# /usr/share/dpkg/cputable | (while read debian gnu regex ; do echo ${debian} ; done)`
+all_systems=`grep -v ^# /usr/share/dpkg/ostable | (while read debian gnu regex ; do echo ${debian} ; done)`
 
 if [ "$#" = "0" ] ; then
   echo "Known cpus: `for i in ${all_cpus} ; do echo -n $i\  ; done`"
