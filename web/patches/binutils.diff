@@ -1,10 +1,27 @@
-
-Status: On hold, the ld hack needs some rework. The libtool bits are merged in 
-upstream CVS.
-
-diff -ur binutils-2.14.90.0.7.old/libtool.m4 binutils-2.14.90.0.7/libtool.m4
---- binutils-2.14.90.0.7.old/libtool.m4	2003-05-05 23:46:46.000000000 +0200
-+++ binutils-2.14.90.0.7/libtool.m4	2004-07-20 01:31:51.000000000 +0200
+--- binutils-2.15.orig/ltconfig
++++ binutils-2.15/ltconfig
+@@ -1164,6 +1164,17 @@
+   hardcode_into_libs=yes
+   ;;
+ 
++kfreebsd*-gnu | knetbsd*-gnu)
++  version_type=linux
++  need_lib_prefix=no
++  need_version=no
++  library_names_spec='${libname}${release}.so$versuffix ${libname}${release}.so${major} ${libname}.so'
++  soname_spec='${libname}${release}.so$major'
++  shlibpath_var=LD_LIBRARY_PATH
++  shlibpath_overrides_runpath=yes
++  hardcode_into_libs=yes
++  ;;
++
+ hpux9* | hpux10* | hpux11*)
+   # Give a soname corresponding to the major version so that dld.sl refuses to
+   # link against other versions.
+only in patch2:
+unchanged:
+--- binutils-2.15.orig/libtool.m4
++++ binutils-2.15/libtool.m4
 @@ -577,7 +577,7 @@
    esac
    ;;
@@ -23,9 +40,10 @@ diff -ur binutils-2.14.90.0.7.old/libtool.m4 binutils-2.14.90.0.7/libtool.m4
    if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
      [lt_cv_deplibs_check_method='match_pattern /lib[^/\.]+\.so\.[0-9]+\.[0-9]+$']
    else
-diff -ur binutils-2.14.90.0.7.old/ltcf-c.sh binutils-2.14.90.0.7/ltcf-c.sh
---- binutils-2.14.90.0.7.old/ltcf-c.sh	2002-12-16 21:22:51.000000000 +0100
-+++ binutils-2.14.90.0.7/ltcf-c.sh	2004-07-20 01:31:51.000000000 +0200
+only in patch2:
+unchanged:
+--- binutils-2.15.orig/ltcf-c.sh
++++ binutils-2.15/ltcf-c.sh
 @@ -185,7 +185,7 @@
      whole_archive_flag_spec='-all_load $convenience'
      ;;
@@ -53,9 +71,10 @@ diff -ur binutils-2.14.90.0.7.old/ltcf-c.sh binutils-2.14.90.0.7/ltcf-c.sh
      if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
        archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
      else
-diff -ur binutils-2.14.90.0.7.old/ltcf-cxx.sh binutils-2.14.90.0.7/ltcf-cxx.sh
---- binutils-2.14.90.0.7.old/ltcf-cxx.sh	2003-03-19 18:19:13.000000000 +0100
-+++ binutils-2.14.90.0.7/ltcf-cxx.sh	2004-07-20 01:31:51.000000000 +0200
+only in patch2:
+unchanged:
+--- binutils-2.15.orig/ltcf-cxx.sh
++++ binutils-2.15/ltcf-cxx.sh
 @@ -244,7 +244,7 @@
      # C++ shared libraries reported to be fairly broken before switch to ELF
      ld_shlibs=no
@@ -83,9 +102,10 @@ diff -ur binutils-2.14.90.0.7.old/ltcf-cxx.sh binutils-2.14.90.0.7/ltcf-cxx.sh
        # FreeBSD uses GNU C++
        ;;
      gnu*)
-diff -ur binutils-2.14.90.0.7.old/ltcf-gcj.sh binutils-2.14.90.0.7/ltcf-gcj.sh
---- binutils-2.14.90.0.7.old/ltcf-gcj.sh	2003-03-19 18:19:13.000000000 +0100
-+++ binutils-2.14.90.0.7/ltcf-gcj.sh	2004-07-20 01:31:51.000000000 +0200
+only in patch2:
+unchanged:
+--- binutils-2.15.orig/ltcf-gcj.sh
++++ binutils-2.15/ltcf-gcj.sh
 @@ -178,7 +178,7 @@
        $CC $output_objdir/$soname-exp '$lt_cv_cc_dll_switch' -Wl,-e,'$dll_entry' -o $output_objdir/$soname '$ltdll_obj'$libobjs $deplibs $compiler_flags'
      ;;
@@ -113,30 +133,10 @@ diff -ur binutils-2.14.90.0.7.old/ltcf-gcj.sh binutils-2.14.90.0.7/ltcf-gcj.sh
      if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
        archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
      else
-diff -ur binutils-2.14.90.0.7.old/ltconfig binutils-2.14.90.0.7/ltconfig
---- binutils-2.14.90.0.7.old/ltconfig	2003-10-29 18:37:47.000000000 +0100
-+++ binutils-2.14.90.0.7/ltconfig	2004-07-20 01:31:51.000000000 +0200
-@@ -1164,6 +1164,17 @@
-   hardcode_into_libs=yes
-   ;;
- 
-+kfreebsd*-gnu | knetbsd*-gnu)
-+  version_type=linux
-+  need_lib_prefix=no
-+  need_version=no
-+  library_names_spec='${libname}${release}.so$versuffix ${libname}${release}.so${major} ${libname}.so'
-+  soname_spec='${libname}${release}.so$major'
-+  shlibpath_var=LD_LIBRARY_PATH
-+  shlibpath_overrides_runpath=yes
-+  hardcode_into_libs=yes
-+  ;;
-+
- hpux9* | hpux10* | hpux11*)
-   # Give a soname corresponding to the major version so that dld.sl refuses to
-   # link against other versions.
-diff -ur binutils-2.15.old/bfd/elfcode.h binutils-2.15/bfd/elfcode.h
---- binutils-2.15.old/bfd/elfcode.h	2004-05-17 21:36:02.000000000 +0200
-+++ binutils-2.15/bfd/elfcode.h	2004-11-12 18:53:12.000000000 +0100
+only in patch2:
+unchanged:
+--- binutils-2.15.orig/bfd/elfcode.h
++++ binutils-2.15/bfd/elfcode.h
 @@ -591,8 +591,22 @@
  	}
      }
@@ -161,6 +161,8 @@ diff -ur binutils-2.15.old/bfd/elfcode.h binutils-2.15/bfd/elfcode.h
    else if (i_ehdrp->e_type == ET_DYN)
      abfd->flags |= DYNAMIC;
  
+only in patch2:
+unchanged:
 --- binutils-2.15.orig/ld/emultempl/elf32.em
 +++ binutils-2.15/ld/emultempl/elf32.em
 @@ -463,11 +463,11 @@
