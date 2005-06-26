@@ -29,6 +29,9 @@ while [ $# -gt 0 ]; do
   shift
 done
 
+# linux-gnu is an alias for linux, normalise it first of all.
+systems="`echo ${systems} | sed "s/linux-gnu/linux/g"`"
+
 # check if we have a cached result for this
 if test -e "/usr/share/type-handling/${cpus}:${systems}" \
   && [ ":${TYPE_HANDLING_BOOTSTRAP}" = ":" ] \
