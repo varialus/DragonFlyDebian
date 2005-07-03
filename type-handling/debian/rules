@@ -1,7 +1,9 @@
 #!/usr/bin/make -f
-# This file is PUBLIC DOMAIN. 
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
 
-DEB_AUTO_UPDATE_DEBIAN_CONTROL	= yes
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
 DEB_BUILD_ARCH_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU)
 DEB_BUILD_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_SYSTEM)
@@ -17,21 +19,67 @@ not_systems := $(shell echo $(systems) | tr " " "\n" | grep -vx $(DEB_BUILD_GNU_
 not_cpus := $(shell for cpu in $(not_cpus) ; do echo -n , not+$$cpu ; done)
 not_systems := $(shell for system in $(not_systems) ; do echo -n , not+$$system ; done)
 
-print:
-	@echo not_cpus:$(provides)
+provides = $(DEB_BUILD_ARCH_CPU), $(DEB_BUILD_GNU_SYSTEM), $(DEB_BUILD_GNU_TYPE)$(not_cpus)$(not_systems)
 
-provides = $(DEB_BUILD_ARCH_CPU), $(DEB_BUILD_GNU_SYSTEM), \
-$(DEB_BUILD_GNU_TYPE)$(not_cpus)$(not_systems)
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp 
+	rm -f "any:linux" "i386:any"
+	dh_clean
 
-clean::
-	sed -e "s%@provides@%$(provides)%g" \
-	< debian/control.in.in > debian/control.in
+build: build-stamp
+build-stamp:
+	dh_testdir
+	sed -i -e "s%^Provides: .*%Provides: $(provides)%g" debian/control
 
-binary/type-handling:: common-install-prehook-arch
 	TYPE_HANDLING_BOOTSTRAP=yes ./type-handling any linux	> "any:linux"
 	TYPE_HANDLING_BOOTSTRAP=yes ./type-handling i386 any	> "i386:any"
+	
+	touch build-stamp
 
-clean::
-	rm -f "any:linux" "i386:any"
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
 
-include /usr/share/cdbs/1/rules/debhelper.mk
+	install -o root -g root -m 755 type-handling $(CURDIR)/debian/type-handling/usr/bin
+	install -o root -g root -m 644 i386:any	$(CURDIR)/debian/type-handling/usr/share/type-handling
+	install -o root -g root -m 644 any:linux $(CURDIR)/debian/type-handling/usr/share/type-handling
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf
+	dh_installdocs
+	dh_installexamples
+	dh_installmenu
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime	
+#	dh_installinit
+#	dh_installcron
+	dh_installman
+	dh_installinfo
+	dh_installchangelogs 
+	dh_link
+#	dh_strip
+	dh_compress
+	dh_fixperms
+#	dh_makeshlibs
+	dh_installdeb
+#	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install 
