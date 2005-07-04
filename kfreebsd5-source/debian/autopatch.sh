@@ -2,7 +2,6 @@
 set -e
 
 for i in `find src -type f` ; do
-  echo ${i}
   sed -i ${i} \
     -e 's/defined\( \|\t\)*(\( \|\t\)*__FreeBSD__\( \|\t\)*)/defined(__FreeBSD_kernel__)/g' \
     -e 's/#\( \|\t\)*ifdef\( \|\t\)*__FreeBSD__/#ifdef __FreeBSD_kernel__/g' \
