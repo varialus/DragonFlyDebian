@@ -1,4 +1,9 @@
 #!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
 full_version	:= $(shell dpkg-parsechangelog | grep ^Version | sed -e 's/^.*: //g')
 version		:= $(shell echo $(full_version) | sed -e 's/[+-].*//g')
@@ -6,74 +11,110 @@ major		:= $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 package		:= kfreebsd$(major)
 
-DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
-DEB_TAR_SRCDIR			:= src
-DEB_PATCHDIRS			:= /usr/src/kfreebsd$(major)/patches debian/patches
-DEB_PATCHDIRS_READONLY		:= yes
-DEB_DH_SHLIBDEPS_ARGS		:= -X/boot
-DEB_STRIP_EXCLUDE		:= /boot
-
-include /usr/share/cdbs/1/rules/tarball.mk
-include debian/simple-patchsys.mk
-include /usr/share/cdbs/1/rules/debhelper.mk
-
-KERNEL		:= GENERIC
-PATH		:= /usr/lib/freebsd:$(CURDIR)/bin:$(PATH)
-DESTDIR		:= $(CURDIR)/debian/$(package)
-MAKE		:= make DESTDIR=$(DESTDIR) WERROR=
-PWD		:= $(shell pwd)
-
-kfreebsd_cpu	:= $(DEB_HOST_GNU_CPU)
+kfreebsd_cpu	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 ifeq ($(kfreebsd_cpu), x86_64)
 kfreebsd_cpu	:= amd64
 endif
 
-# this is for kfreebsd-rtc
-#export SRC_BASE=$(CURDIR)/$(DEB_SRCDIR)
-#export SYS=$(SRC_BASE)/sys
-#export SYSDIR=$(SYS)
+KERNEL		:= GENERIC
+MAKE		:= make DESTDIR=$(CURDIR)/debian/$(package) MACHINE_ARCH=$(kfreebsd_cpu) WERROR=
+PATH		:= /usr/lib/freebsd:$(CURDIR)/bin:$(PATH)
 
-build/$(package):: debian/stamp-build
-debian/stamp-build: apply-patches
-	# make is stupid
-	set -e ; if ! test -e debian/stamp-build ; then \
-	mkdir -p bin ; \
-	ln -sf `which gcc-3.4` bin/cc ; \
-	ln -sf `which gcc-3.4` bin/gcc ; \
-	cd $(CURDIR)/$(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/conf \
-		&& config $(KERNEL) ; \
-	cd $(CURDIR)/$(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ \
-		&& $(MAKE) depend && $(MAKE) ; \
-	touch $(CURDIR)/debian/stamp-build ; \
-	fi
 
-install/$(package):: common-install-prehook-arch
+clean:
+	dh_testdir
+	dh_testroot
+	rm -rf src bin
+	rm -f *-stamp
+	dh_clean
+
+
+control:
+	dh_testdir
+	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" debian/control.in > debian/control
+
+
+unpack: unpack-stamp
+unpack-stamp:
+	dh_testdir
+	tar xfj /usr/src/kfreebsd$(major)/src.tar.bz2
+	cat /usr/src/kfreebsd$(major)/patches/* | patch -p0
+	touch unpack-stamp
+
+
+build: build-stamp
+build-stamp: unpack
+	dh_testdir
+
+	mkdir -p $(CURDIR)/bin
+	ln -sf `which gcc-3.4` $(CURDIR)/bin/cc
+	ln -sf `which gcc-3.4` $(CURDIR)/bin/gcc
+	cd $(CURDIR)/src/sys/$(kfreebsd_cpu)/conf \
+		&& config $(KERNEL)
+	cd $(CURDIR)/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ \
+		&& $(MAKE) depend
+	cd $(CURDIR)/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ \
+		&& $(MAKE)
+	
+	touch build-stamp
+
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
 	# install device.hints
 	install -o root -g root -m 644 \
-		$(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/conf/GENERIC.hints \
-		$(DESTDIR)/boot/device.hints
+		$(CURDIR)/src/sys/$(kfreebsd_cpu)/conf/GENERIC.hints \
+		$(CURDIR)/debian/$(package)/boot/device.hints
 	install -o root -g root -m 644 \
-		$(DEB_SRCDIR)/sys/boot/forth/loader.conf \
-		$(DESTDIR)/boot/loader.conf
-	touch $(DESTDIR)/boot/loader.conf
+		$(CURDIR)/src/sys/boot/forth/loader.conf \
+		$(CURDIR)/debian/$(package)/boot/loader.conf
 	install -o root -g root -m 644 \
-		$(DEB_SRCDIR)/sys/boot/forth/loader.conf \
-		 $(DESTDIR)/boot/defaults/loader.conf
+		$(CURDIR)/src/sys/boot/forth/loader.conf \
+		$(CURDIR)/debian/$(package)/boot/defaults/loader.conf
+
 	# now install the kernel
-	cd $(DEB_SRCDIR)/sys/$(kfreebsd_cpu)/compile/$(KERNEL) && \
+	cd src/sys/$(kfreebsd_cpu)/compile/$(KERNEL) && \
 		$(MAKE) install
-	chmod 644 $(DESTDIR)/boot/kernel/kernel
+	chmod 644 $(CURDIR)/debian/$(package)/boot/kernel/kernel
 
-clean::
-	lsdiff -h `for i in $(DEB_PATCHDIRS) ; do echo $$i/*.diff ; done` \
-		| grep -q src/sys/$(kfreebsd_cpu)/conf/GENERIC
 
-	sed \
-		-e "s/@major@/$(major)/g" \
-		-e "s/@version@/$(version)/g" \
-	> debian/control.in < debian/control.in.in
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
 
-	ln -sf /usr/src/kfreebsd$(major)/src.tar* $(CURDIR)/
 
-	rm -rf bin
-	rm -f debian/stamp-build
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf
+	dh_installdocs
+	dh_installexamples
+	dh_installmenu
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime	
+#	dh_installinit
+#	dh_installcron
+	dh_installman
+	dh_installinfo
+	dh_installchangelogs 
+	dh_link
+	dh_strip -X/boot
+	dh_compress
+	dh_fixperms
+	dh_makeshlibs
+	dh_installdeb
+#	dh_perl
+	dh_shlibdeps -X/boot
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install control
