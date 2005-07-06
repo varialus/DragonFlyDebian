@@ -1,23 +1,87 @@
 #!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
 
-DEB_TAR_SRCDIR			:= src
-DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
-package				:= freebsd-sendpr
-DESTDIR				:= $(CURDIR)/debian/$(package)
-PMAKE				:= freebsd-make DESTDIR=$(DESTDIR) BINDIR=/usr/bin
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
-build/$(package):: apply-patches
-	cd $(DEB_SRCDIR)/gnu/usr.bin/send-pr/ && $(PMAKE)
+PMAKE := freebsd-make DESTDIR=$(CURDIR)/debian/freebsd-sendpr BINDIR=/usr/bin
 
-binary/$(package):: common-install-prehook-arch
-	mkdir -p $(DESTDIR)/usr/share/man/man1
-	cd $(DEB_SRCDIR)/gnu/usr.bin/send-pr/ && \
+clean:
+	dh_testdir
+	dh_testroot
+	rm -rf src
+	rm -f *-stamp
+	dh_clean
+
+unpack: unpack-stamp
+unpack-stamp:
+	dh_testdir
+	tar xfz $(CURDIR)/src.tar.gz
+	cat $(CURDIR)/debian/patches/* | patch -p0
+	touch unpack-stamp
+
+
+build: build-stamp
+build-stamp: unpack
+	dh_testdir
+
+	cd src/gnu/usr.bin/send-pr/ && \
+		$(PMAKE)
+	
+	touch build-stamp
+
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	
+	cd src/gnu/usr.bin/send-pr/ && \
 		$(PMAKE) install etc-gnats-freefall
-	for i in $(DESTDIR)/usr/share/man/man1/*.gz ; do \
+	for i in $(CURDIR)/debian/freebsd-sendpr/usr/share/man/man1/*.gz ; do \
 		[ -L $$i ] || gunzip $$i ; \
 	done
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/rules/tarball.mk
-include /usr/share/cdbs/1/rules/simple-patchsys.mk
+
+# Build architecture-independent files here.
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf
+	dh_installdocs
+	dh_installexamples
+	dh_installmenu
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime	
+#	dh_installinit
+#	dh_installcron
+	dh_installman
+	dh_installinfo
+	dh_installchangelogs 
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_makeshlibs
+	dh_installdeb
+#	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+# Build architecture-dependent files here.
+binary-arch: build install
+# We have nothing to do by default.
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install control
