@@ -7,10 +7,7 @@ DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
 
 include /usr/share/cdbs/1/rules/debhelper.mk
 
-kfreebsd_cpu   := $(DEB_HOST_GNU_CPU)
-ifeq ($(kfreebsd_cpu), x86_64)
-kfreebsd_cpu   := amd64
-endif
+kfreebsd_cpu   := $(DEB_HOST_ARCH_CPU)
 
 binary/$(package):: common-install-prehook-arch
 	mkdir -p debian/$(package)/usr/src/kfreebsd$(major)-headers
