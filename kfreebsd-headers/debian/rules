@@ -1,15 +1,63 @@
 #!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
 
-package = kfreebsd-headers
-major = 5
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
-DEB_AUTO_UPDATE_DEBIAN_CONTROL	:= yes
+kfreebsd_cpu	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+ifeq ($(kfreebsd_cpu), x86_64)
+kfreebsd_cpu	:= amd64
+endif
 
-include /usr/share/cdbs/1/rules/debhelper.mk
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean
 
-kfreebsd_cpu   := $(DEB_HOST_ARCH_CPU)
+build: 
+	dh_testdir
 
-binary/$(package):: common-install-prehook-arch
-	mkdir -p debian/$(package)/usr/src/kfreebsd$(major)-headers
-	ln -sf $(kfreebsd_cpu)/include \
-		debian/$(package)/usr/src/kfreebsd$(major)-headers/machine
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	dh_link $(kfreebsd_cpu)/include /usr/src/kfreebsd5-headers/machine
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+#	dh_installdebconf
+	dh_installdocs
+#	dh_installexamples
+#	dh_installmenu
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime	
+#	dh_installinit
+#	dh_installcron
+#	dh_installman
+#	dh_installinfo
+	dh_installchangelogs 
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_makeshlibs
+	dh_installdeb
+#	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
