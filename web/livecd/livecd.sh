@@ -7,7 +7,7 @@
 
 set -ex
 
-version=12
+version=unreleased
 
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
@@ -40,23 +40,25 @@ cp base.tgz ${tmp1}/base/
 
 cd ${tmp1}
 
-if [ "${LIVECD_DEBUG}" != "yes" ] ; then
-  rm -f var/cache/apt/archives/*.deb
-fi
+rm -f var/cache/apt/archives/*.deb
+rm -rf var/cache/apt/lists
 
-# GRUB stuff
-mkdir -p boot/grub
-cp lib/grub/${cpu}-*/stage2_eltorito boot/grub/
-cat > boot/grub/menu.lst << EOF
-timeout 30
-default 0
-title  ${uname} (cdrom 0)
-root (cd)
-kernel /boot/kfreebsd.gz root=cd9660:acd0
-title  ${uname} (cdrom 1)
-root (cd)
-kernel /boot/kfreebsd.gz root=cd9660:acd1
-EOF
+# grub is disabled for now
+#mkdir -p boot/grub
+#cp lib/grub/${cpu}-*/stage2_eltorito boot/grub/
+#cat > boot/grub/menu.lst << EOF
+#timeout 30
+#default 0
+#title  ${uname} (cdrom 0)
+#root (cd)
+#kernel /boot/kfreebsd.gz root=cd9660:acd0
+#title  ${uname} (cdrom 1)
+#root (cd)
+#kernel /boot/kfreebsd.gz root=cd9660:acd1
+#EOF
+
+# this is only used by grub
+#gzip -c9 boot/kernel/kernel > boot/kfreebsd.gz
 
 # add this to make it a safe boot
 cat >> boot/device.hints << EOF
@@ -68,51 +70,66 @@ hw.ata.atapi_dma=0
 hw.ata.wc=0
 hw.eisa_slots=0
 EOF
-cat > etc/fstab << EOF
-/dev/acd0 / cd9660 ro 1 1
-EOF
-# keep inetutils-syslogd from bitching
-cp bin/true usr/sbin/syslogd
 
-# password-less login
-cat > etc/passwd << EOF
-root::0:0:root:/root:/bin/bash
+# filesystem tables
+cat > etc/fstab << EOF
+/dev/acd0	/	cd9660		ro	1 1
 EOF
+ln -s /proc/mounts etc/mtab
+
+# setup pseudo-initrd system.
+# - init runs /root/startup
+# - /root/startup creates an ufs ramdisk
+# - then mounts readonly directories as nullfs
+# - then copies writable directories into the ramdisk
 cat > etc/inittab << EOF
 id:S:initdefault:
-~~:S:wait:/sbin/sulogin -e
+~~:S:wait:/root/startup
 ca:12345:ctrlaltdel:/sbin/shutdown -t1 -a -r now
 EOF
 
-# setup writable filesystems
 mkdir -p ramdisk
-cat > root/writable.sh << EOF
-#!/bin/sh
+cat > root/startup << EOF
+#!/bin/bash
 set -e
-mdconfig -a -t malloc -o compress -s 32m -u md0
+mdconfig -a -t malloc -o compress -s 16m -u md0
 mkfs.ufs /dev/md0
-mount /dev/md0 /ramdisk
+mount -o rw -t ufs /dev/md0 /ramdisk
 for i in /* ; do
-  case ${i} in
-    /bin|/usr|/boot|/lib|/sbin|/root)
-      mkdir -p /ramdisk/${i}
-      mount -t nullfs /${i} /ramdisk/${i}
+  case \${i} in
+    /bin|/usr|/boot|/lib|/sbin|/base)
+      mkdir -p /ramdisk/\${i}
+      mount -t nullfs /\${i} /ramdisk/\${i}
     ;;
     /dev)
       mkdir -p /ramdisk/dev
-      mkdir -t devfs devfs /ramdisk/dev
+      mount -t devfs null /ramdisk/dev
+    ;;
+    /proc)
+      mkdir -p /ramdisk/proc
+      mount -t linprocfs null /ramdisk/proc
+    ;;
+    /ramdisk|/*-RELEASE|/root)
     ;;
     /*)
-      cp -a /${i} /ramdisk/${i}
+      cp -a /\${i} /ramdisk/\${i}
     ;;
   esac
 done
-chroot /ramdisk
+# doesn't work as expected (i.e. you still need -f to halt)
+#mknod -m 600 /ramdisk/etc/.initctl p
+export TERM=cons25
+# sysvinit inside the chroot doesn't work
+#cp /usr/share/sysvinit/inittab /ramdisk/etc/
+while ! test -e /ramdisk/tmp/get_me_the_hell_outta_here ; do
+  chroot /ramdisk
+  echo warning: shell died, respawning
+done
+echo
+echo congrats, you escaped the chroot
+while true ; do bash ; done
 EOF
-chmod +x root/writable.sh
-
-# mimic kfreebsd5's postinst
-gzip -c9 boot/kernel/kernel > boot/kfreebsd.gz
+chmod +x root/startup
 
 # hacks for being a FreeBSD compliant [tm] cdrom
 for i in 5 6 ; do for j in 0 1 2 3 4 5 6 7 8 9 ; do
@@ -124,14 +141,9 @@ ln -s ../base/base.tgz root/
 #########################
 #                    ignition!
 #################################
-mkisofs -b boot/grub/stage2_eltorito \
-  -no-emul-boot -boot-load-size 4 -boot-info-table \
-  -o ${pwd}/livecd${version}.iso -r .
+cp ${pwd}/cdboot boot/
+mkisofs -b boot/cdboot -no-emul-boot \
+  -o ${pwd}/livecd-${version}.iso -r .
 
+rm -rf ${tmp1} ${tmp2} &
 cd ${pwd}/
-if [ "${LIVECD_DEBUG}" = "yes" ] ; then
-  echo tmp1 = ${tmp1}
-  echo tmp2 = ${tmp2}
-else
-  rm -rf ${tmp1} ${tmp2}
-fi
