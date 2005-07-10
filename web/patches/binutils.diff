@@ -1,190 +1,152 @@
---- binutils-2.15.orig/ltconfig
-+++ binutils-2.15/ltconfig
-@@ -1164,6 +1164,17 @@
-   hardcode_into_libs=yes
-   ;;
+diff -u binutils-2.16.1/debian/patches/00list binutils-2.16.1/debian/patches/00list
+--- binutils-2.16.1/debian/patches/00list
++++ binutils-2.16.1/debian/patches/00list
+@@ -9,0 +10,2 @@
++123_kfreebsd_ld_so_conf.dpatch
++124_kfreebsd_ld_so_executable_shared.dpatch
+diff -u binutils-2.16.1/debian/rules binutils-2.16.1/debian/rules
+--- binutils-2.16.1/debian/rules
++++ binutils-2.16.1/debian/rules
+@@ -139,7 +139,7 @@
+ 	mkdir builddir-multi
+ 	cd builddir-multi \
+ 	    && env CC="$(CC)" ../configure $(CONFARGS) \
+-		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux-gnu
++		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-gnu,i486-kfreebsd-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux-gnu
+ 	$(MAKE) -C builddir-multi configure-host
+ 	touch configure-multi-stamp
  
-+kfreebsd*-gnu | knetbsd*-gnu)
-+  version_type=linux
-+  need_lib_prefix=no
-+  need_version=no
-+  library_names_spec='${libname}${release}.so$versuffix ${libname}${release}.so${major} ${libname}.so'
-+  soname_spec='${libname}${release}.so$major'
-+  shlibpath_var=LD_LIBRARY_PATH
-+  shlibpath_overrides_runpath=yes
-+  hardcode_into_libs=yes
-+  ;;
+--- binutils-2.16.1.orig/debian/patches/123_kfreebsd_ld_so_conf.dpatch
++++ binutils-2.16.1/debian/patches/123_kfreebsd_ld_so_conf.dpatch
+@@ -0,0 +1,72 @@
++#! /bin/sh -e
++## 123_kfreebsd_ld_so_conf.dpatch
++##
++## DP: Description: Enable ld.so.conf on GNU/k*BSD.
++## DP: Author: Aurelien Jarno <aurel32@debian.org>
++## DP: Upstream status: In CVS
++## DP: Date: 2005-06-20
 +
- hpux9* | hpux10* | hpux11*)
-   # Give a soname corresponding to the major version so that dld.sl refuses to
-   # link against other versions.
++if [ $# -lt 1 ]; then
++    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
++    exit 1
++fi
++
++[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
++patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
++
++case "$1" in
++    -patch) patch -p1 ${patch_opts} < $0;;
++    -unpatch) patch -R -p1 ${patch_opts} < $0;;
++    *)
++        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
++        exit 1;;
++esac
++
++exit 0
++
++@DPATCH@
++diff -Nur binutils-2.16.orig/ld/emultempl/elf32.em binutils-2.16/ld/emultempl/elf32.em
++--- binutils-2.16.orig/ld/emultempl/elf32.em	2005-04-13 19:59:07.000000000 +0200
+++++ binutils-2.16/ld/emultempl/elf32.em	2005-06-21 09:43:41.000000000 +0200
++@@ -65,7 +65,7 @@
++ 
++ if [ "x${USE_LIBPATH}" = xyes ] ; then
++   case ${target} in
++-    *-*-linux-gnu*)
+++    *-*-linux-gnu* | *-*-k*bsd*-gnu)
++   cat >>e${EMULATION_NAME}.c <<EOF
++ #ifdef HAVE_GLOB
++ #include <glob.h>
++@@ -350,7 +350,7 @@
++ 
++ EOF
++ case ${target} in
++-  *-*-linux-gnu*)
+++  *-*-linux-gnu* | *-*-k*bsd*-gnu)
++     cat >>e${EMULATION_NAME}.c <<EOF
++ 	  {
++ 	    struct bfd_link_needed_list *l;
++@@ -522,11 +522,11 @@
++ 
++ EOF
++   case ${target} in
++-    *-*-linux-gnu*)
+++    *-*-linux-gnu* | *-*-k*bsd*-gnu)
++       cat >>e${EMULATION_NAME}.c <<EOF
++ /* For a native linker, check the file /etc/ld.so.conf for directories
++    in which we may find shared libraries.  /etc/ld.so.conf is really
++-   only meaningful on Linux.  */
+++   only meaningful on Linux or on k*BSD. */
++ 
++ struct gld${EMULATION_NAME}_ld_so_conf
++ {
++@@ -932,7 +932,7 @@
++ EOF
++ if [ "x${USE_LIBPATH}" = xyes ] ; then
++   case ${target} in
++-    *-*-linux-gnu*)
+++    *-*-linux-gnu* | *-*-k*bsd*-gnu)
++       cat >>e${EMULATION_NAME}.c <<EOF
++ 	  if (gld${EMULATION_NAME}_check_ld_so_conf (l->name, force))
++ 	    break;
++
 only in patch2:
 unchanged:
---- binutils-2.15.orig/libtool.m4
-+++ binutils-2.15/libtool.m4
-@@ -577,7 +577,7 @@
-   esac
-   ;;
- 
--freebsd* )
-+freebsd* | kfreebsd*-gnu)
-   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
-     case $host_cpu in
-     i*86 )
-@@ -645,7 +645,7 @@
-   lt_cv_file_magic_test_file=`echo /lib/libc.so* /lib/libc-*.so`
-   ;;
- 
--netbsd*)
-+netbsd* | knetbsd*-gnu)
-   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
-     [lt_cv_deplibs_check_method='match_pattern /lib[^/\.]+\.so\.[0-9]+\.[0-9]+$']
-   else
-only in patch2:
-unchanged:
---- binutils-2.15.orig/ltcf-c.sh
-+++ binutils-2.15/ltcf-c.sh
-@@ -185,7 +185,7 @@
-     whole_archive_flag_spec='-all_load $convenience'
-     ;;
- 
--  netbsd*)
-+  netbsd* | knetbsd*-gnu)
-     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
-       archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
-       wlarc=
-@@ -409,7 +409,7 @@
-     ;;
- 
-   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
--  freebsd*)
-+  freebsd* | kfreebsd*-gnu)
-     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
-     hardcode_libdir_flag_spec='-R$libdir'
-     hardcode_direct=yes
-@@ -456,7 +456,7 @@
-     link_all_deplibs=yes
-     ;;
- 
--  netbsd*)
-+  netbsd* | knetbsd*-gnu)
-     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
-       archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
-     else
-only in patch2:
-unchanged:
---- binutils-2.15.orig/ltcf-cxx.sh
-+++ binutils-2.15/ltcf-cxx.sh
-@@ -244,7 +244,7 @@
-     # C++ shared libraries reported to be fairly broken before switch to ELF
-     ld_shlibs=no
-     ;;
--  freebsd*)
-+  freebsd* | kfreebsd*-gnu)
-     # FreeBSD 3 and later use GNU C++ and GNU ld with standard ELF
-     # conventions
-     ld_shlibs=yes
-@@ -404,7 +404,7 @@
-         ;;
-     esac
-     ;;
--  netbsd*)
-+  netbsd* | knetbsd*-gnu)
-     # NetBSD uses g++ - do we need to do anything?
-     ;;
-   osf3*)
-@@ -759,7 +759,7 @@
-           ;;
-       esac
-       ;;
--    freebsd*)
-+    freebsd* | kfreebsd*-gnu)
-       # FreeBSD uses GNU C++
-       ;;
-     gnu*)
-only in patch2:
-unchanged:
---- binutils-2.15.orig/ltcf-gcj.sh
-+++ binutils-2.15/ltcf-gcj.sh
-@@ -178,7 +178,7 @@
-       $CC $output_objdir/$soname-exp '$lt_cv_cc_dll_switch' -Wl,-e,'$dll_entry' -o $output_objdir/$soname '$ltdll_obj'$libobjs $deplibs $compiler_flags'
-     ;;
- 
--  netbsd*)
-+  netbsd* | knetbsd*-gnu)
-     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
-       archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
-       wlarc=
-@@ -402,7 +402,7 @@
-     ;;
- 
-   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
--  freebsd*)
-+  freebsd* | kfreebsd*-gnu)
-     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
-     hardcode_libdir_flag_spec='-R$libdir'
-     hardcode_direct=yes
-@@ -433,7 +433,7 @@
-     link_all_deplibs=yes
-     ;;
- 
--  netbsd*)
-+  netbsd* | knetbsd*-gnu)
-     if echo __ELF__ | $CC -E - | grep __ELF__ >/dev/null; then
-       archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
-     else
-only in patch2:
-unchanged:
---- binutils-2.15.orig/bfd/elfcode.h
-+++ binutils-2.15/bfd/elfcode.h
-@@ -591,8 +591,22 @@
- 	}
-     }
- 
-+  /* Determine whether the file is an executable or a shared object.
-+     It can even be both: The dynamic loader "ld.so*" is declared as an
-+     executable (so the kernel can exec it) but at the same time we
-+     treat it as a shared object (for symbol versioning purposes).  */
-   if (i_ehdrp->e_type == ET_EXEC)
--    abfd->flags |= EXEC_P;
-+    {
-+      const char *file_name = abfd->filename;
-+      const char *last_slash = strrchr (file_name, '/');
-+      const char *base_name = (last_slash ? last_slash + 1 : file_name);
-+      if (strncmp (base_name, "ld.so", 5) == 0)
-+	/* The dynamic loader.  */
-+	abfd->flags |= DYNAMIC;
-+      else
-+	/* Normal executable.  */
-+	abfd->flags |= EXEC_P;
-+    }
-   else if (i_ehdrp->e_type == ET_DYN)
-     abfd->flags |= DYNAMIC;
- 
-only in patch2:
-unchanged:
---- binutils-2.15.orig/ld/emultempl/elf32.em
-+++ binutils-2.15/ld/emultempl/elf32.em
-@@ -463,11 +463,11 @@
- 
- EOF
-   case ${target} in
--    *-*-linux-gnu*)
-+    *-*-linux-gnu* | *-*-k*bsd*-gnu)
-       cat >>e${EMULATION_NAME}.c <<EOF
- /* For a native linker, check the file /etc/ld.so.conf for directories
-    in which we may find shared libraries.  /etc/ld.so.conf is really
--   only meaningful on Linux.  */
-+   only meaningful on GNU/Linux or on GNU/*BSD. */
- 
- static bfd_boolean
- gld${EMULATION_NAME}_check_ld_so_conf (const char *name, int force)
-@@ -738,7 +738,7 @@
- EOF
- if [ "x${USE_LIBPATH}" = xyes ] ; then
-   case ${target} in
--    *-*-linux-gnu*)
-+    *-*-linux-gnu* | *-*-k*bsd*-gnu)
-       cat >>e${EMULATION_NAME}.c <<EOF
- 	  if (gld${EMULATION_NAME}_check_ld_so_conf (l->name, force))
- 	    break;
+--- binutils-2.16.1.orig/debian/patches/124_kfreebsd_ld_so_executable_shared.dpatch
++++ binutils-2.16.1/debian/patches/124_kfreebsd_ld_so_executable_shared.dpatch
+@@ -0,0 +1,54 @@
++#! /bin/sh -e
++## 124_kfreebsd_ld_so_executable_shared.dpatch
++##
++## DP: Description: Determine whether ld.so is an executable or a shared object
++## DP: Author: Robert Millan <rmh@aybabtu.com>
++## DP: Upstream status: In upstream BTS (#1029)
++## DP: Date: 2005-06-20
++
++if [ $# -lt 1 ]; then
++    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
++    exit 1
++fi
++
++[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
++patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
++
++case "$1" in
++    -patch) patch -p1 ${patch_opts} < $0;;
++    -unpatch) patch -R -p1 ${patch_opts} < $0;;
++    *)
++        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
++        exit 1;;
++esac
++
++exit 0
++
++@DPATCH@
++diff -Nur binutils-2.16.orig/bfd/elfcode.h binutils-2.16/bfd/elfcode.h
++--- binutils-2.16.orig/bfd/elfcode.h	2005-02-20 15:59:07.000000000 +0100
+++++ binutils-2.16/bfd/elfcode.h	2005-06-21 09:43:41.000000000 +0200
++@@ -592,8 +592,22 @@
++ 	}
++     }
++ 
+++  /* Determine whether the file is an executable or a shared object.
+++     It can even be both: The dynamic loader "ld.so*" is declared as an
+++     executable (so the kernel can exec it) but at the same time we
+++     treat it as a shared object (for symbol versioning purposes).  */
++   if (i_ehdrp->e_type == ET_EXEC)
++-    abfd->flags |= EXEC_P;
+++    {
+++      const char *file_name = abfd->filename;
+++      const char *last_slash = strrchr (file_name, '/');
+++      const char *base_name = (last_slash ? last_slash + 1 : file_name);
+++      if (strncmp (base_name, "ld.so", 5) == 0)
+++	/* The dynamic loader.  */
+++	abfd->flags |= DYNAMIC;
+++      else
+++	/* Normal executable.  */
+++	abfd->flags |= EXEC_P;
+++    }
++   else if (i_ehdrp->e_type == ET_DYN)
++     abfd->flags |= DYNAMIC;
++ 
