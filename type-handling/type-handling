@@ -29,8 +29,13 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-# linux-gnu is an alias for linux, normalise it first of all.
-systems="`echo ${systems} | sed "s/linux-gnu/linux/g"`"
+# Some ugly conversions
+systems="`echo ${systems} | sed "s/linux-gnu/linux/g" | sed "s/hurd/gnu/g"`"
+cpus="`echo ${cpus} | sed "s/amd64/x86_64/g"`"
+
+all_cpus="`echo ${all_cpus} | sed "s/amd64/x86_64/g"`"
+all_systems="`echo ${all_systems} | sed "s/hurd/gnu/g"`"
+
 
 # check if we have a cached result for this
 if test -e "/usr/share/type-handling/${cpus}:${systems}" \
