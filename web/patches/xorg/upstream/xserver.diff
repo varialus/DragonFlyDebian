@@ -1,0 +1,759 @@
+Index: programs/Xserver/hw/vfb/Imakefile
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/vfb/Imakefile,v
+retrieving revision 1.2
+diff -u -r1.2 Imakefile
+--- programs/Xserver/hw/vfb/Imakefile	23 Apr 2004 19:19:32 -0000	1.2
++++ programs/Xserver/hw/vfb/Imakefile	18 Jul 2005 19:17:35 -0000
+@@ -17,6 +17,7 @@
+     SystemV4 || \
+     defined(OSF1Architecture) || \
+     defined(i386BsdArchitecture) || \
++    defined(KFreeBSDArchitecture) || \
+     defined(LinuxArchitecture) || \
+     defined(DarwinArchitecture)
+ MMAPDEF = -DHAS_MMAP
+Index: programs/Xserver/hw/xfree86/Imakefile
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/Imakefile,v
+retrieving revision 1.7
+diff -u -r1.7 Imakefile
+--- programs/Xserver/hw/xfree86/Imakefile	1 Jul 2005 08:56:12 -0000	1.7
++++ programs/Xserver/hw/xfree86/Imakefile	18 Jul 2005 19:17:35 -0000
+@@ -154,7 +154,7 @@
+ DPI75USFONTPATH=\"$(LIBDIR)/fonts/75dpi/:unscaled\"
+ DPI100USFONTPATH=\"$(LIBDIR)/fonts/100dpi/:unscaled\"
+ 
+-#ifdef FreeBSDArchitecture
++#ifdef KFreeBSDArchitecture
+   FREEBSDMOUSEDEV="    Option	\"Device\"	\"/dev/mse0\""
+ #else
+   FREEBSDMOUSEDEV="XCOMM    Option	\"Device\"	\"/dev/mse0\""
+Index: programs/Xserver/hw/xfree86/common/Imakefile
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/common/Imakefile,v
+retrieving revision 1.13
+diff -u -r1.13 Imakefile
+--- programs/Xserver/hw/xfree86/common/Imakefile	4 Jul 2005 00:16:23 -0000	1.13
++++ programs/Xserver/hw/xfree86/common/Imakefile	18 Jul 2005 19:17:35 -0000
+@@ -19,7 +19,7 @@
+ #else
+ # if defined(i386BsdArchitecture) || defined(AlphaBsdArchitecture) \
+ 	|| defined(OpenBSDArchitecture) || defined(NetBSDArchitecture) \
+-	|| defined(FreeBSDArchitecture)
++	|| defined(KFreeBSDArchitecture)
+         KBD = xf86KbdBSD
+ # else
+ #  ifdef LinuxArchitecture
+Index: programs/Xserver/hw/xfree86/common/xf86Config.c
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/common/xf86Config.c,v
+retrieving revision 1.11
+diff -u -r1.11 xf86Config.c
+--- programs/Xserver/hw/xfree86/common/xf86Config.c	4 Jul 2005 18:41:01 -0000	1.11
++++ programs/Xserver/hw/xfree86/common/xf86Config.c	18 Jul 2005 19:17:36 -0000
+@@ -83,7 +83,8 @@
+ #endif
+ 
+ #if (defined(i386) || defined(__i386__)) && \
+-    (defined(__FreeBSD__) || defined(__NetBSD__) || defined(linux) || \
++    (defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || \
++     defined(__NetBSD__) || defined(linux) || \
+      (defined(SVR4) && !defined(sun)) || defined(__GNU__))
+ #define SUPPORT_PC98
+ #endif
+Index: programs/Xserver/hw/xfree86/common/xf86Configure.c
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/common/xf86Configure.c,v
+retrieving revision 1.12
+diff -u -r1.12 xf86Configure.c
+--- programs/Xserver/hw/xfree86/common/xf86Configure.c	3 Jul 2005 08:53:42 -0000	1.12
++++ programs/Xserver/hw/xfree86/common/xf86Configure.c	18 Jul 2005 19:17:38 -0000
+@@ -84,7 +84,7 @@
+ #elif defined(__QNXNTO__)
+ static char *DFLT_MOUSE_PROTO = "OSMouse";
+ static char *DFLT_MOUSE_DEV = "/dev/devi/mouse0";
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ static char *DFLT_MOUSE_DEV = "/dev/sysmouse";
+ static char *DFLT_MOUSE_PROTO = "auto";
+ #else
+Index: programs/Xserver/hw/xfree86/common/xf86Privstr.h
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/common/xf86Privstr.h,v
+retrieving revision 1.2
+diff -u -r1.2 xf86Privstr.h
+--- programs/Xserver/hw/xfree86/common/xf86Privstr.h	3 Jul 2005 07:01:24 -0000	1.2
++++ programs/Xserver/hw/xfree86/common/xf86Privstr.h	18 Jul 2005 19:17:38 -0000
+@@ -124,7 +124,7 @@
+     /* graphics part */
+     Bool		sharedMonitor;
+     ScreenPtr		currentScreen;
+-#ifdef CSRG_BASED
++#if defined(CSRG_BASED) || defined(__FreeBSD_kernel__)
+     int			screenFd;	/* fd for memory mapped access to
+ 					 * vga card */
+     int			consType;	/* Which console driver? */
+@@ -226,7 +226,7 @@
+ #define XCOMP	((unsigned long) 0x00008000)
+ 
+ /* BSD console driver types (consType) */
+-#ifdef CSRG_BASED
++#if defined(CSRG_BASED) || defined(__FreeBSD_kernel__)
+ #define PCCONS		   0
+ #define CODRV011	   1
+ #define CODRV01X	   2
+Index: programs/Xserver/hw/xfree86/input/joystick/Imakefile
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/input/joystick/Imakefile,v
+retrieving revision 1.3
+diff -u -r1.3 Imakefile
+--- programs/Xserver/hw/xfree86/input/joystick/Imakefile	7 Mar 2005 19:27:27 -0000	1.3
++++ programs/Xserver/hw/xfree86/input/joystick/Imakefile	18 Jul 2005 19:17:39 -0000
+@@ -15,7 +15,7 @@
+         ARCH_JSTK = ../os-support/linux/lnx_jstk.o
+ #endif
+ 
+-#if defined(FreeBSDArchitecture) || defined(NetBSDArchitecture) || defined(OpenBSDArchitecture)
++#if defined(KFreeBSDArchitecture) || defined(NetBSDArchitecture) || defined(OpenBSDArchitecture)
+         ARCH_JSTK = ../os-support/bsd/bsd_jstk.o
+ #endif
+ 
+Index: programs/Xserver/hw/xfree86/os-support/Imakefile
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/Imakefile,v
+retrieving revision 1.3
+diff -u -r1.3 Imakefile
+--- programs/Xserver/hw/xfree86/os-support/Imakefile	4 May 2005 04:14:58 -0000	1.3
++++ programs/Xserver/hw/xfree86/os-support/Imakefile	18 Jul 2005 19:17:39 -0000
+@@ -64,7 +64,7 @@
+ OS_SUBDIR = lynxos
+ #endif
+ 
+-#if defined(FreeBSDArchitecture) || defined(NetBSDArchitecture) || \
++#if defined(KFreeBSDArchitecture) || defined(NetBSDArchitecture) || \
+     defined(OpenBSDArchitecture)
+ OS_SUBDIR = bsd
+ #endif
+Index: programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h,v
+retrieving revision 1.10
+diff -u -r1.10 xf86_OSlib.h
+--- programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h	14 Jul 2005 00:02:05 -0000	1.10
++++ programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h	18 Jul 2005 19:17:39 -0000
+@@ -330,12 +330,24 @@
+ #endif /* DGUX && SVR4 */
+ 
+ /**************************************************************************/
+-/* Linux                                                                  */
++/* Linux or Glibc-based system                                            */
+ /**************************************************************************/
+-#if defined(linux)
++#if defined(__linux__) || defined(__GLIBC__)
+ # include <sys/ioctl.h>
+ # include <signal.h>
+-# include <termio.h>
++# include <stdlib.h>
++# include <sys/types.h>
++# include <assert.h>
++
++#ifdef __GNU__ /* GNU/Hurd */
++# define USE_OSMOUSE
++#endif
++
++# ifdef __linux__
++#  include <termio.h>
++# else /* __GLIBC__ */
++#  include <termios.h>
++# endif
+ # ifdef __sparc__
+ #  include <sys/param.h>
+ # endif
+@@ -344,20 +356,21 @@
+ 
+ # include <sys/stat.h>
+ 
+-# define HAS_USL_VTS
+ # include <sys/mman.h>
+-# include <sys/kd.h>
+-# include <sys/vt.h>
+-# define LDGMAP GIO_SCRNMAP
+-# define LDSMAP PIO_SCRNMAP
+-# define LDNMAP LDSMAP
+-
+-# define CLEARDTR_SUPPORT
+-# define USE_VT_SYSREQ
++# ifdef __linux__
++#  define HAS_USL_VTS
++#  include <sys/kd.h>
++#  include <sys/vt.h>
++#  define LDGMAP GIO_SCRNMAP
++#  define LDSMAP PIO_SCRNMAP
++#  define LDNMAP LDSMAP
++#  define CLEARDTR_SUPPORT
++#  define USE_VT_SYSREQ
++# endif
+ 
+ # define POSIX_TTY
+ 
+-#endif /* linux */
++#endif /* __linux__ || __GLIBC__ */
+ 
+ /**************************************************************************/
+ /* LynxOS AT                                                              */
+@@ -417,6 +430,30 @@
+ 
+ # include <errno.h>
+ 
++# include <sys/types.h>
++# include <sys/mman.h>
++# include <sys/stat.h>
++
++# if defined(__bsdi__)
++#  include <sys/param.h>
++# if (_BSDI_VERSION < 199510)
++#  include <i386/isa/vgaioctl.h>
++# endif
++# endif /* __bsdi__ */
++
++#endif /* CSRG_BASED */
++
++/**************************************************************************/
++/* Kernel of *BSD                                                         */
++/**************************************************************************/
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || \
++ defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__)
++
++# include <sys/param.h>
++# if defined(__FreeBSD_version) && !defined(__FreeBSD_kernel_version)
++#  define __FreeBSD_kernel_version __FreeBSD_version
++# endif
++
+ # if !defined(LINKKIT)
+   /* Don't need this stuff for the Link Kit */
+ #  if defined(__bsdi__)
+@@ -438,9 +475,8 @@
+ #    if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+ #     include <machine/console.h>
+ #    else
+-#     if defined(__FreeBSD__)
+-#        include <osreldate.h>
+-#        if __FreeBSD_version >= 410000
++#     if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#        if (__FreeBSD_kernel_version >= 410000)
+ #          include <sys/consio.h>
+ #          include <sys/kbio.h>
+ #        else
+@@ -454,7 +490,7 @@
+ #   if defined(PCVT_SUPPORT)
+ #    if !defined(SYSCONS_SUPPORT)
+       /* no syscons, so include pcvt specific header file */
+-#     if defined(__FreeBSD__) || defined(__DragonFly__)
++#     if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__DragonFly__)
+ #      include <machine/pcvt_ioctl.h>
+ #     else
+ #      if defined(__NetBSD__) || defined(__OpenBSD__)
+@@ -464,7 +500,7 @@
+ #      else
+ #       include <sys/pcvt_ioctl.h>
+ #      endif /* __NetBSD__ */
+-#     endif /* __FreeBSD__ || __OpenBSD__ */
++#     endif /* __FreeBSD_kernel__ || __OpenBSD__ */
+ #    else /* pcvt and syscons: hard-code the ID magic */
+ #     define VGAPCVTID _IOWR('V',113, struct pcvtid)
+       struct pcvtid {
+@@ -477,9 +513,8 @@
+ #    include <dev/wscons/wsconsio.h>
+ #    include <dev/wscons/wsdisplay_usl_io.h>
+ #   endif /* WSCONS_SUPPORT */
+-#   if defined(__FreeBSD__)
+-#    include <osreldate.h>
+-#    if __FreeBSD_version >= 500013
++#   if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#    if (__FreeBSD_kernel_version >= 500013)
+ #     include <sys/mouse.h>
+ #    else
+ #     undef MOUSE_GETINFO
+@@ -518,17 +553,6 @@
+ #  endif /* __bsdi__ */
+ # endif /* !LINKKIT */
+ 
+-# include <sys/types.h>
+-# include <sys/mman.h>
+-# include <sys/stat.h>
+-
+-# if defined(__bsdi__)
+-#  include <sys/param.h>
+-# if (_BSDI_VERSION < 199510)
+-#  include <i386/isa/vgaioctl.h>
+-# endif
+-# endif /* __bsdi__ */
+-
+ #if defined(USE_I386_IOPL) || defined(USE_AMD64_IOPL)
+ #include <machine/sysarch.h>
+ #endif
+@@ -539,7 +563,8 @@
+ #  define USE_VT_SYSREQ
+ # endif
+ 
+-#endif /* CSRG_BASED */
++#endif
++/* __FreeBSD_kernel__ || __NetBSD__ || __OpenBSD__ || __bsdi__ */
+ 
+ /**************************************************************************/
+ /* OS/2                                                                   */
+@@ -649,25 +674,6 @@
+ #endif
+ 
+ /**************************************************************************/
+-/* GNU/Hurd								  */
+-/**************************************************************************/
+-#if defined(__GNU__)
+-
+-#include <stdlib.h>
+-#include <sys/types.h>
+-#include <errno.h>
+-#include <signal.h>
+-#include <sys/ioctl.h>
+-#include <termios.h>
+-#include <sys/stat.h>
+-#include <assert.h>
+-
+-#define POSIX_TTY
+-#define USE_OSMOUSE
+-
+-#endif /* __GNU__ */
+-
+-/**************************************************************************/
+ /* IRIX                                                                   */
+ /**************************************************************************/
+ #if defined(sgi)
+Index: programs/Xserver/hw/xfree86/os-support/bsd/Imakefile
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile,v
+retrieving revision 1.4
+diff -u -r1.4 Imakefile
+--- programs/Xserver/hw/xfree86/os-support/bsd/Imakefile	24 Jul 2004 16:32:39 -0000	1.4
++++ programs/Xserver/hw/xfree86/os-support/bsd/Imakefile	18 Jul 2005 19:17:40 -0000
+@@ -8,7 +8,7 @@
+ 
+ #include <Server.tmpl>
+ 
+-#if defined(FreeBSDArchitecture) || defined(NetBSDArchitecture) || defined(OpenBSDArchitecture)
++#if defined(KFreeBSDArchitecture) || defined(NetBSDArchitecture) || defined(OpenBSDArchitecture)
+ #if BuildXInputExt
+ # if JoystickSupport
+  JOYSTICK_SRC = bsd_jstk.c
+@@ -47,7 +47,7 @@
+   IOPERM_SRC = ioperm_noop.c
+   IOPERM_OBJ = ioperm_noop.o
+ # endif
+-#elif defined(FreeBSDArchitecture)
++#elif defined(KFreeBSDArchitecture)
+ # if defined(i386Architecture) || defined(AMD64Architecture)
+   IOPERMDEFINES = -DUSE_DEV_IO
+ # elif defined(AlphaBsdArchitecture)
+@@ -106,7 +106,7 @@
+ APMOBJ = pm_noop.o
+ #endif
+ 
+-#if defined(FreeBSDArchitecture) && (OSMajorVersion > 2)
++#if defined(KFreeBSDArchitecture) && (OSMajorVersion > 2)
+ KMODSRC = bsd_kmod.c
+ KMODOBJ = bsd_kmod.o
+ #else
+@@ -127,7 +127,7 @@
+ AXP_OBJ=bsd_ev56.o xf86Axp.o bsd_axp.o
+ #endif
+ 
+-#if (defined(FreeBSDArchitecture) || defined(NetBSDArchitecture) || \
++#if (defined(KFreeBSDArchitecture) || defined(NetBSDArchitecture) || \
+ 	defined(OpenBSDArchitecture)) && HasAgpGart
+ AGP_SRC=lnx_agp.c
+ AGP_OBJ=lnx_agp.o
+@@ -219,7 +219,7 @@
+ LinkSourceFile(vidmem.c,../shared)
+ LinkSourceFile(sigio.c,../shared)
+ LinkSourceFile(kmod_noop.c,../shared)
+-#if (defined(FreeBSDArchitecture) || defined(NetBSDArchitecture) || \
++#if (defined(KFreeBSDArchitecture) || defined(NetBSDArchitecture) || \
+ 	defined(OpenBSDArchitecture)) && HasAgpGart
+ LinkSourceFile(lnx_agp.c,../linux)
+ #else
+Index: programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c,v
+retrieving revision 1.6
+diff -u -r1.6 alpha_video.c
+--- programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c	3 Jul 2005 07:01:30 -0000	1.6
++++ programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c	18 Jul 2005 19:17:40 -0000
+@@ -37,7 +37,7 @@
+ #include <sys/param.h>
+ #ifndef __NetBSD__
+ #  include <sys/sysctl.h>
+-#  ifdef __FreeBSD__
++#  if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #      include <machine/sysarch.h>
+ #   endif
+ # else
+@@ -399,7 +399,7 @@
+ }
+ 
+ 
+-#if defined(__FreeBSD__) || defined(__OpenBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__)
+ 
+ extern int ioperm(unsigned long from, unsigned long num, int on);
+ 
+@@ -417,7 +417,7 @@
+ 	return;
+ }
+ 
+-#endif /* __FreeBSD__ || __OpenBSD__ */
++#endif /* __FreeBSD_kernel__ || __OpenBSD__ */
+ 
+ #ifdef USE_ALPHA_PIO
+ 
+@@ -492,7 +492,7 @@
+ static void
+ writeSparse32(int Value, pointer Base, register unsigned long Offset);
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ extern int sysarch(int, void *);
+ #endif
+ 
+@@ -504,7 +504,7 @@
+ static int
+ sethae(u_int64_t hae)
+ {
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #ifndef ALPHA_SETHAE
+ #define ALPHA_SETHAE 0
+ #endif
+Index: programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c,v
+retrieving revision 1.4
+diff -u -r1.4 bsd_init.c
+--- programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c	3 Jul 2005 07:01:30 -0000	1.4
++++ programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c	18 Jul 2005 19:17:40 -0000
+@@ -38,7 +38,9 @@
+ #include "xf86_OSlib.h"
+ 
+ #include <sys/utsname.h>
++#include <sys/ioctl.h>
+ #include <stdlib.h>
++#include <errno.h>
+ 
+ static Bool KeepTty = FALSE;
+ static int devConsoleFd = -1;
+@@ -80,6 +82,10 @@
+ #define WSCONS_PCVT_COMPAT_CONSOLE_DEV "/dev/ttyE0"
+ #endif
+ 
++#ifdef __GLIBC__
++#define setpgrp setpgid
++#endif
++
+ #define CHECK_DRIVER_MSG \
+   "Check your kernel's console driver configuration and /dev entries"
+ 
+@@ -239,11 +245,11 @@
+ 	     * switching anymore. Here we check for FreeBSD 3.1 and up.
+ 	     * Add cases for other *BSD that behave the same.
+ 	    */
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	    uname (&uts);
+-	    if (strcmp(uts.sysname, "FreeBSD") == 0) {
+-		i = atof(uts.release) * 100;
+-		if (i >= 310) goto acquire_vt;
+-	    }
++	    i = atof(uts.release) * 100;
++	    if (i >= 310) goto acquire_vt;
++#endif
+ 	    /* otherwise fall through */
+ 	case PCVT:
+ 	    /*
+Index: programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c,v
+retrieving revision 1.4
+diff -u -r1.4 bsd_io.c
+--- programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c	3 Jul 2005 07:01:30 -0000	1.4
++++ programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c	18 Jul 2005 19:17:40 -0000
+@@ -31,6 +31,7 @@
+ #endif
+ 
+ #include <X11/X.h>
++#include <termios.h>
+ 
+ #include "compiler.h"
+ 
+@@ -148,7 +149,7 @@
+ }
+ 
+ #if defined(SYSCONS_SUPPORT) || defined(PCCONS_SUPPORT) || defined(PCVT_SUPPORT) || defined(WSCONS_SUPPORT)
+-static struct termio kbdtty;
++static struct termios kbdtty;
+ #endif
+ 
+ void
+Index: programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c,v
+retrieving revision 1.6
+diff -u -r1.6 bsd_kbd.c
+--- programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c	3 Jul 2005 07:01:30 -0000	1.6
++++ programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c	18 Jul 2005 19:17:40 -0000
+@@ -15,6 +15,7 @@
+ #endif
+ 
+ #include <X11/X.h>
++#include <termios.h>
+ 
+ #include "compiler.h"
+ 
+@@ -41,7 +42,7 @@
+ };
+ 
+ typedef struct {
+-   struct termio kbdtty;
++   struct termios kbdtty;
+ } BsdKbdPrivRec, *BsdKbdPrivPtr;
+ 
+ static
+@@ -74,10 +75,16 @@
+     KbdDevPtr pKbd = (KbdDevPtr) pInfo->private;
+     int real_leds = 0;
+ 
++#ifdef LED_CAP
+     if (leds & XLED1)  real_leds |= LED_CAP;
++#endif
++#ifdef LED_NUM
+     if (leds & XLED2)  real_leds |= LED_NUM;
++#endif
++#ifdef LED_SCR
+     if (leds & XLED3)  real_leds |= LED_SCR;
+     if (leds & XLED4)  real_leds |= LED_SCR;
++#endif
+ 
+     switch (pKbd->consType) {
+ 
+@@ -119,9 +126,15 @@
+ #endif
+     }
+ 
++#ifdef LED_CAP
+     if (real_leds & LED_CAP) leds |= XLED1;
++#endif
++#ifdef LED_NUM
+     if (real_leds & LED_NUM) leds |= XLED2;
++#endif
++#ifdef LED_SCR
+     if (real_leds & LED_SCR) leds |= XLED3;
++#endif
+ 
+     return(leds);
+ }
+@@ -311,16 +324,20 @@
+              case KEY_F8:
+              case KEY_F9:
+              case KEY_F10:
++#ifdef VT_ACTIVATE
+                   if (down) {
+                     ioctl(xf86Info.consoleFd, VT_ACTIVATE, key - KEY_F1 + 1);
+                     return TRUE;
+                   }
++#endif
+              case KEY_F11:
+              case KEY_F12:
++#ifdef VT_ACTIVATE
+                   if (down) {
+                     ioctl(xf86Info.consoleFd, VT_ACTIVATE, key - KEY_F11 + 11);
+                     return TRUE;
+                   }
++#endif
+          }
+       }
+     }
+Index: programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c,v
+retrieving revision 1.5
+diff -u -r1.5 bsd_mouse.c
+--- programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c	3 Jul 2005 07:01:30 -0000	1.5
++++ programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c	18 Jul 2005 19:17:40 -0000
+@@ -72,7 +72,7 @@
+ static void usbSigioReadInput (int fd, void *closure);
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ /* These are for FreeBSD */
+ #define DEFAULT_MOUSE_DEV		"/dev/mouse"
+ #define DEFAULT_SYSMOUSE_DEV		"/dev/sysmouse"
+@@ -101,7 +101,7 @@
+ {
+ #if defined(__NetBSD__)
+     return MSE_SERIAL | MSE_BUS | MSE_PS2 | MSE_AUTO;
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+     return MSE_SERIAL | MSE_BUS | MSE_PS2 | MSE_AUTO | MSE_MISC;
+ #else
+     return MSE_SERIAL | MSE_BUS | MSE_PS2 | MSE_XPS2 | MSE_AUTO;
+@@ -124,7 +124,7 @@
+  * main "mouse" driver.
+  */
+ static const char *miscNames[] = {
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	"SysMouse",
+ #endif
+ 	NULL
+@@ -153,7 +153,7 @@
+ static const char *
+ DefaultProtocol(void)
+ {
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+     return "Auto";
+ #elif defined(__OpenBSD__) && defined(WSCONS_SUPPORT)
+     return "WSMouse";
+@@ -162,7 +162,7 @@
+ #endif
+ }
+ 
+-#if defined(__FreeBSD__) && defined(MOUSE_PROTO_SYSMOUSE)
++#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && defined(MOUSE_PROTO_SYSMOUSE)
+ static struct {
+ 	int dproto;
+ 	const char *name;
+@@ -231,7 +231,7 @@
+     mode.rate = rate > 0 ? rate : -1;
+     mode.resolution = res > 0 ? res : -1;
+     mode.accelfactor = -1;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+     if (pMse->autoProbe ||
+ 	(protocol && xf86NameCmp(protocol, "SysMouse") == 0)) {
+ 	/*
+@@ -249,7 +249,7 @@
+ }
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 
+ #define MOUSED_PID_FILE "/var/run/moused.pid"
+ 
+@@ -773,7 +773,7 @@
+     p->BuiltinNames = BuiltinNames;
+     p->DefaultProtocol = DefaultProtocol;
+     p->CheckProtocol = CheckProtocol;
+-#if defined(__FreeBSD__) && defined(MOUSE_PROTO_SYSMOUSE)
++#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && defined(MOUSE_PROTO_SYSMOUSE)
+     p->SetupAuto = SetupAuto;
+     p->SetPS2Res = SetSysMouseRes;
+     p->SetBMRes = SetSysMouseRes;
+@@ -783,7 +783,7 @@
+     p->SetupAuto = SetupAuto;
+     p->SetMiscRes = SetMouseRes;
+ #endif
+-#if defined(__FreeBSD__) || defined(__OpenBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__)
+     p->FindDevice = FindDevice;
+ #endif
+     p->PreInit = bsdMousePreInit;
+Index: programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c,v
+retrieving revision 1.6
+diff -u -r1.6 i386_video.c
+--- programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c	3 Jul 2005 07:01:30 -0000	1.6
++++ programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c	18 Jul 2005 19:17:40 -0000
+@@ -34,6 +34,9 @@
+ #include "xf86.h"
+ #include "xf86Priv.h"
+ 
++#include <errno.h>
++#include <sys/mman.h>
++
+ #ifdef HAS_MTRR_SUPPORT
+ #ifndef __NetBSD__
+ #include <sys/types.h>
+Index: programs/Xserver/hw/xfree86/os-support/bsd/drm/Imakefile
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/bsd/drm/Imakefile,v
+retrieving revision 1.4
+diff -u -r1.4 Imakefile
+--- programs/Xserver/hw/xfree86/os-support/bsd/drm/Imakefile	23 Jun 2005 18:58:37 -0000	1.4
++++ programs/Xserver/hw/xfree86/os-support/bsd/drm/Imakefile	18 Jul 2005 19:17:40 -0000
+@@ -14,7 +14,7 @@
+ MTRR_DEFINES = -DHAS_MTRR_SUPPORT
+ #endif
+ 
+-#if defined(FreeBSDArchitecture)
++#if defined(KFreeBSDArchitecture)
+ OS_SUBDIR = freebsd
+ #elif defined(NetBSDArchitecture)
+ OS_SUBDIR = netbsd
+Index: programs/Xserver/hw/xfree86/os-support/bus/Imakefile
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/bus/Imakefile,v
+retrieving revision 1.7
+diff -u -r1.7 Imakefile
+--- programs/Xserver/hw/xfree86/os-support/bus/Imakefile	4 May 2005 04:14:58 -0000	1.7
++++ programs/Xserver/hw/xfree86/os-support/bus/Imakefile	18 Jul 2005 19:17:46 -0000
+@@ -88,7 +88,7 @@
+ PCIDRVRSRC = ix86Pci.c linuxPci.c
+ PCIDRVROBJ = ix86Pci.o linuxPci.o
+ 
+-#elif defined(FreeBSDArchitecture) && \
++#elif defined(KFreeBSDArchitecture) && \
+ 	(defined(AlphaArchitecture) || defined(AMD64Architecture))
+ 
+ XCOMM generic FreeBSD PCI driver (using /dev/pci)
+@@ -96,7 +96,7 @@
+ PCIDRVRSRC = freebsdPci.c
+ PCIDRVROBJ = freebsdPci.o
+ 
+-#elif defined(FreeBSDArchitecture) && defined(Sparc64Architecture)
++#elif defined(KFreeBSDArchitecture) && defined(Sparc64Architecture)
+ 
+ XCOMM Sparc SBUS & PCI drivers
+ 
+Index: programs/Xserver/hw/xfree86/os-support/linux/lnx_agp.c
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/linux/lnx_agp.c,v
+retrieving revision 1.6
+diff -u -r1.6 lnx_agp.c
+--- programs/Xserver/hw/xfree86/os-support/linux/lnx_agp.c	3 Jul 2005 07:01:32 -0000	1.6
++++ programs/Xserver/hw/xfree86/os-support/linux/lnx_agp.c	18 Jul 2005 19:17:46 -0000
+@@ -22,7 +22,7 @@
+ #if defined(linux)
+ #include <asm/ioctl.h>
+ #include <linux/agpgart.h>
+-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+ #include <sys/ioctl.h>
+ #include <sys/agpio.h>
+ #endif
+Index: programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drm.c
+===================================================================
+RCS file: /cvs/xorg/xc/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drm.c,v
+retrieving revision 1.5
+diff -u -r1.5 xf86drm.c
+--- programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drm.c	3 Jul 2005 07:01:32 -0000	1.5
++++ programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drm.c	18 Jul 2005 19:17:46 -0000
+@@ -90,7 +90,7 @@
+ 
+ #include "xf86drm.h"
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #define DRM_MAJOR 145
+ #endif
+ 
