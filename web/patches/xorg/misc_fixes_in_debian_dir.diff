@@ -1,0 +1,186 @@
+diff -ur xorg-x11-6.8.2.dfsg.1.old/debian/README xorg-x11-6.8.2.dfsg.1/debian/README
+--- xorg-x11-6.8.2.dfsg.1.old/debian/README	2005-07-14 20:20:37.000000000 +0200
++++ xorg-x11-6.8.2.dfsg.1/debian/README	2005-07-16 15:42:05.000000000 +0200
+@@ -62,7 +62,7 @@
+ 	550-599		sh{3,4}{,eb} architecture patches
+ 	600-649		amd64 architecture patches
+ 	800-819		Debian GNU/Hurd patches
+-	820-839		Debian GNU/FreeBSD patches
++	820-839		Debian GNU/kFreeBSD patches
+ 	840-859		Debian GNU/NetBSD patches
+ 	860-879		Debian OpenBSD patches
+ 
+diff -ur xorg-x11-6.8.2.dfsg.1.old/debian/control xorg-x11-6.8.2.dfsg.1/debian/control
+--- xorg-x11-6.8.2.dfsg.1.old/debian/control	2005-07-14 20:20:37.000000000 +0200
++++ xorg-x11-6.8.2.dfsg.1/debian/control	2005-07-18 16:42:40.000000000 +0200
+@@ -1971,7 +1971,7 @@
+  of the GCC 3.3 series; therefore, this package conflicts with those versions.
+ 
+ Package: xdmx
+-Architecture: alpha amd64 arm hppa hurd-i386 i386 ia64 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
++Architecture: alpha amd64 arm hppa hurd-i386 i386 ia64 kfreebsd-i386 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
+ Depends: ${shlibs:Depends}, ${misc:Depends}
+ Conflicts: xserver-xorg (<= 6.8.1-0.2)
+ Replaces: xserver-xorg (<= 6.8.1-0.2)
+@@ -2231,7 +2231,7 @@
+  Internet hosts will be allowed inbound access to local X servers.
+ 
+ Package: xlibmesa-dri
+-Architecture: alpha amd64 i386 ia64 powerpc sparc
++Architecture: alpha amd64 i386 ia64 kfreebsd-i386 powerpc sparc
+ Depends: xlibmesa-gl
+ Suggests: libglide3
+ Conflicts: xlibmesa3 (<< 4.2.1-5), xlibmesa3-gl
+@@ -2249,7 +2249,7 @@
+  for the PowerPC and SPARC architectures.
+ 
+ Package: xlibmesa-dri-dbg
+-Architecture: alpha amd64 i386 ia64 powerpc sparc
++Architecture: alpha amd64 i386 ia64 kfreebsd-i386 powerpc sparc
+ Depends: xlibmesa-dri (= ${Source-Version})
+ Conflicts: xlibmesa-gl-dbg (<< 4.3.0), xlibmesa3-gl-dbg (>= 4.2.1-13)
+ Replaces: xlibmesa-gl-dbg (<< 4.3.0), xlibmesa3-gl-dbg (>= 4.2.1-13)
+@@ -2365,7 +2365,7 @@
+ 
+ Package: xlibosmesa4
+ Section: libs
+-Architecture: alpha amd64 i386 ia64 powerpc sparc
++Architecture: alpha amd64 i386 ia64 kfreebsd-i386 powerpc sparc
+ Depends: xlibmesa-gl (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+ Description: Mesa off-screen rendering library [X.Org]
+  Mesa is a 3D graphics library which presents an API intended to be compatible
+@@ -2384,7 +2384,7 @@
+ Package: xlibosmesa4-dbg
+ Section: libdevel
+ Priority: extra
+-Architecture: alpha amd64 i386 ia64 powerpc sparc
++Architecture: alpha amd64 i386 ia64 kfreebsd-i386 powerpc sparc
+ Depends: xlibosmesa4 (= ${Source-Version}), ${misc:Depends}
+ Description: Mesa off-screen rendering library (unstripped) [X.Org]
+  This package is useful to provide a backtrace with symbol names in a
+@@ -2399,7 +2399,7 @@
+ 
+ Package: xlibosmesa-dev
+ Section: libdevel
+-Architecture: alpha amd64 i386 ia64 powerpc sparc
++Architecture: alpha amd64 i386 ia64 kfreebsd-i386 powerpc sparc
+ Depends: xlibosmesa4 (= ${Source-Version}), xlibmesa-gl-dev (= ${Source-Version}), libc6-dev | libc-dev
+ Description: Mesa off-screen rendering library development files [X.Org]
+  xlibosmesa-dev provides static versions of the libraries provided in
+@@ -2529,7 +2529,7 @@
+  xfonts-base, xfonts-100dpi or xfonts-75dpi, and xfonts-scalable packages.
+ 
+ Package: xserver-xorg
+-Architecture: alpha amd64 arm hppa hurd-i386 i386 ia64 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
++Architecture: alpha amd64 arm hppa hurd-i386 i386 ia64 kfreebsd-i386 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
+ Depends: xserver-common (>= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+ Recommends: discover1, mdetect, xresprobe (>= 0.4.13), laptop-detect
+ Suggests: libglide2 (>> 2001.01.26)
+@@ -2555,7 +2555,7 @@
+ 
+ Package: xserver-xorg-dbg
+ Priority: extra
+-Architecture: alpha amd64 arm hppa hurd-i386 i386 ia64 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
++Architecture: alpha amd64 arm hppa hurd-i386 i386 ia64 kfreebsd-i386 m68k mips mipsel netbsd-i386 powerpc sh3 sh4 sparc
+ Depends: xserver-common (>= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+ Recommends: xserver-xorg, discover1, mdetect, xresprobe, laptop-detect
+ Conflicts: libxfont-xtt
+diff -ur xorg-x11-6.8.2.dfsg.1.old/debian/xserver-xorg.config.in xorg-x11-6.8.2.dfsg.1/debian/xserver-xorg.config.in
+--- xorg-x11-6.8.2.dfsg.1.old/debian/xserver-xorg.config.in	2005-07-14 20:20:38.000000000 +0200
++++ xorg-x11-6.8.2.dfsg.1/debian/xserver-xorg.config.in	2005-07-18 18:28:03.000000000 +0200
+@@ -46,6 +46,9 @@
+ # get machine architecture
+ ARCH=$(dpkg --print-installation-architecture)
+ 
++# get system name
++SYS=`uname -s || echo unknown`
++
+ debug_echo () {
+   # Syntax: debug_echo message ...
+   if [ -n "$DEBUG_XORG_DEBCONF" ] || [ "$DEBCONF_DEBUG" = "user" ] \
+@@ -731,7 +734,7 @@
+     DRIVER_LIST=${DRIVER_LIST:=ati, chips, fbdev, glint, mga, nv, s3, s3virge, savage, sis, tdfx, trident, vga}
+     DEFAULT_DRIVER=fbdev
+     ;;
+-  hurd-i386)
++  *-i386)
+     DRIVER_LIST=${DRIVER_LIST:=apm, ark, ati, chips, cirrus, cyrix, fbdev, glint, i128, i740, i810, imstt, mga, neomagic, newport, nsc, nv, rendition, s3, s3virge, savage, siliconmotion, sis, tdfx, tga, trident, tseng, vesa, vga, via, vmware}
+     DEFAULT_DRIVER=vesa
+     ;;
+@@ -908,7 +911,7 @@
+ # use fbcon kernel functions?
+ 
+ case "$ARCH" in
+-  alpha|hurd-i386|i386|amd64)
++  alpha|*-i386|i386|amd64)
+     USE_FBDEV=false
+     ;;
+   *)
+@@ -1270,13 +1273,21 @@
+   USING_DEVFS=
+ fi
+ 
+-if [ -n "$USING_DEVFS" ]; then
+-  MOUSE_PORT_CHOICES="/dev/misc/psaux, /dev/tts/0, /dev/tts/1, /dev/tts/2, /dev/tts/3, /dev/input/mice, /dev/misc/atixl, /dev/gpmdata"
+-  DEFAULT_PORT="/dev/misc/psaux"
+-else
+-  MOUSE_PORT_CHOICES="/dev/psaux, /dev/ttyS0, /dev/ttyS1, /dev/ttyS2, /dev/ttyS3, /dev/input/mice, /dev/atibm, /dev/sunmouse, /dev/gpmdata"
+-  DEFAULT_PORT="/dev/psaux"
+-fi
++case "$SYS" in
++  Linux)
++    if [ -n "$USING_DEVFS" ]; then
++      MOUSE_PORT_CHOICES="/dev/misc/psaux, /dev/tts/0, /dev/tts/1, /dev/tts/2, /dev/tts/3, /dev/input/mice, /dev/misc/atixl, /dev/gpmdata"
++      DEFAULT_PORT="/dev/misc/psaux"
++    else
++     MOUSE_PORT_CHOICES="/dev/psaux, /dev/ttyS0, /dev/ttyS1, /dev/ttyS2, /dev/ttyS3, /dev/input/mice, /dev/atibm, /dev/sunmouse, /dev/gpmdata"
++     DEFAULT_PORT="/dev/psaux"
++    fi
++  ;;
++  GNU/kFreeBSD)
++    MOUSE_PORT_CHOICES="/dev/cuaa0, /dev/cuaa1, /dev/cuaa2, /dev/cuaa3, /dev/mse0, /dev/psm0, /dev/sysmouse, /dev/ums0, /dev/ums1, /dev/ums2, /dev/ums3"
++    DEFAULT_PORT="/dev/ums0"
++  ;;
++esac
+ 
+ if ! [ "x$XORG_FORCE_PROBE" = "xno" ]; then
+   # this will exit the loop immediatly
+@@ -1339,11 +1350,11 @@
+ 
+ db_get xserver-xorg/config/inputdevice/mouse/port
+ case "$RET" in
+-  *psaux)
+-    MOUSE_PROTOCOL_CHOICES="PS/2, ImPS/2, GlidePointPS/2, NetMousePS/2, NetScrollPS/2, ThinkingMousePS/2, MouseManPlusPS/2, ExplorerPS/2"
++  *psaux|*psm*)
++    MOUSE_PROTOCOL_CHOICES="Auto, PS/2, ImPS/2, GlidePointPS/2, NetMousePS/2, NetScrollPS/2, ThinkingMousePS/2, MouseManPlusPS/2, ExplorerPS/2"
+     DEFAULT_PROTOCOL="PS/2"
+     ;;
+-  *ttyS*|*tts/*)
++  *ttyS*|*tts/*|*cuaa*)
+     MOUSE_PROTOCOL_CHOICES="Auto, Microsoft, MouseSystems, GlidePoint, ThinkingMouse, ValuMouseScroll, MouseMan, Logitech, IntelliMouse, MMSeries, MMHitTab"
+     DEFAULT_PROTOCOL="Auto"
+     ;;
+@@ -1351,7 +1362,7 @@
+     MOUSE_PROTOCOL_CHOICES="ImPS/2"
+     DEFAULT_PROTOCOL="ImPS/2"
+     ;;
+-  *atibm|*atixl|*sunmouse)
++  *atibm|*atixl|*sunmouse|*mse*)
+     MOUSE_PROTOCOL_CHOICES="BusMouse"
+     DEFAULT_PROTOCOL="BusMouse"
+     ;;
+@@ -1359,6 +1370,14 @@
+     MOUSE_PROTOCOL_CHOICES="IntelliMouse"
+     DEFAULT_PROTOCOL="IntelliMouse"
+     ;;
++  *sysmouse)
++    MOUSE_PROTOCOL_CHOICES="SysMouse"
++    DEFAULT_PROTOCOL="SysMouse"
++    ;;
++  *ums*)
++    MOUSE_PROTOCOL_CHOICES="Auto"
++    DEFAULT_PROTOCOL="Auto"
++    ;;
+ esac
+ db_subst xserver-xorg/config/inputdevice/mouse/protocol choices $MOUSE_PROTOCOL_CHOICES
+ if ! expr "$MOUSE_PROTOCOL_CHOICES" : ".*,.*" > /dev/null 2>&1; then

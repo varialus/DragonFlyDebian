@@ -1,0 +1,631 @@
+diff -Nur xorg-x11-6.8.2.dfsg.1.old/debian.old/patches/820_gnu-freebsd_config.diff xorg-x11-6.8.2.dfsg.1.old/debian/patches/820_gnu-freebsd_config.diff
+--- xorg-x11-6.8.2.dfsg.1.old/debian.old/patches/820_gnu-freebsd_config.diff	2005-07-14 20:20:32.000000000 +0200
++++ xorg-x11-6.8.2.dfsg.1.old/debian/patches/820_gnu-freebsd_config.diff	1970-01-01 01:00:00.000000000 +0100
+@@ -1,577 +0,0 @@
+-$Id: 820_gnu-freebsd_config.diff 189 2005-06-11 00:04:27Z branden $
+-
+-Add GNU/FreeBSD build defines to xc/config/cf.  They're basically copied
+-and adapted from the defines for GNU OS.
+-
+-Should not be submitted upstream yet; the defines in linux.cf, gnu.cf and
+-gnu-freebsd.cf (specialy the last two) share a large amount of common
+-lines.  I want to split these into a gnu-common.cf file so gnu.cf and
+-gnu-freebsd.cf don't get easily outdated.
+-
+-Also, the debian-specific lines in linux.cf should be moved somewhere
+-else.  I suggested using site.def.
+-
+- -- Robert Millan <rmh@debian.org>
+-
+-This patch modified by Branden Robinson to:
+-* update it with the current "Debian section" of linux.cf
+-* fix ident strings to not lie about the name of the file
+-* comment out the definition of "DebianMaintainer" just like linux.cf
+-
+-XXX: Examine whether the following defs need to be restored to the file:
+-
+-#define PamLibraries            -lpam -rdynamic -ldl
+-#ifndef HasKatmaiSupport
+-# define HasKatmaiSupport       NO
+-#endif
+-
+-diff -ruN xc-old/config/cf/gfbLib.rules xc/config/cf/gfbLib.rules
+---- xc-old/config/cf/gfbLib.rules	1970-01-01 01:00:00.000000000 +0100
+-+++ xc/config/cf/gfbLib.rules	2004-10-18 14:49:52.792246264 +0200
+-@@ -0,0 +1,180 @@
+-+/*
+-+ * GNU/Hurd shared library rules
+-+ *
+-+ * xc/config/cf/gfbLib.rules
+-+ */
+-+
+-+/*
+-+ * GNU/FreeBSD shared library rules
+-+ * Cloned from GNU (ELF) shared library rules
+-+ */
+-+
+-+#ifndef HasSharedLibraries
+-+#define HasSharedLibraries YES
+-+#endif
+-+#ifndef ForceNormalLib
+-+#define ForceNormalLib NO
+-+#endif
+-+
+-+#ifndef SharedOldX
+-+#define SharedOldX NO
+-+#endif
+-+
+-+#undef SpecialMalloc
+-+#define SpecialMalloc NO
+-+
+-+#define BaseShLibReqs   -lc
+-+
+-+#ifndef SharedDataSeparation
+-+#define SharedDataSeparation NO
+-+#endif
+-+#ifndef SharedCodeDef
+-+#define SharedCodeDef /**/
+-+#endif
+-+#ifndef SharedLibraryDef
+-+#define SharedLibraryDef /**/
+-+#endif
+-+#ifndef ShLibIncludeFile
+-+#define ShLibIncludeFile <gfbLib.tmpl>
+-+#endif
+-+#ifndef SharedLibraryLoadFlags
+-+XCOMM XXX To rpath or not to rpath...
+-+XCOMM #define SharedLibraryLoadFlags -shared -Wl,-rpath=$(USRLIBDIR)
+-+#define SharedLibraryLoadFlags -shared
+-+#endif
+-+#ifndef PositionIndependentCFlags
+-+#define PositionIndependentCFlags -fPIC
+-+#endif
+-+#ifndef PositionIndependentCplusplusFlags
+-+#define PositionIndependentCplusplusFlags -fPIC
+-+#endif
+-+#ifndef ExtraLoadFlags
+-+#ifdef UseInstalled
+-+XCOMM XXX Maybe superfluous.
+-+#define ExtraLoadFlags -Wl,-rpath-link=$(USRLIBDIRPATH)
+-+#else
+-+#define ExtraLoadFlags -Wl,-rpath-link=$(BUILDLIBDIR)
+-+#endif
+-+#endif
+-+
+-+/*
+-+ * InstallSharedLibrary - generate rules to install the shared library.
+-+ * NOTE: file must be executable, hence "INSTBINFLAGS"
+-+ */
+-+#ifndef InstallSharedLibrary
+-+#define InstallSharedLibrary(libname,rev,dest)				@@\
+-+install:: Concat(lib,libname.so.rev) 					@@\
+-+	MakeDir($(DESTDIR)dest)						@@\
+-+	$(INSTALL) $(INSTALLFLAGS) $(INSTBINFLAGS) Concat(lib,libname.so.rev) $(DESTDIR)dest @@\
+-+	@T=`echo Concat($(DESTDIR)dest/lib,libname.so.rev) | sed 's/\.[^\.]*$$//'`;\
+-+	  set -x; $(RM) $$T && $(LN) Concat(lib,libname.so.rev) $$T	@@\
+-+	@if $(SOSYMLINK); then (set -x; \
+-+	  $(RM) Concat($(DESTDIR)dest/lib,libname.so); \		@@\
+-+	  $(LN) Concat(lib,libname.so.rev) Concat($(DESTDIR)dest/lib,libname.so)); fi
+-+#endif /* InstallSharedLibrary */
+-+
+-+/*
+-+ * InstallSharedLibraryData - generate rules to install the shared library data
+-+ */
+-+#ifndef InstallSharedLibraryData
+-+#define InstallSharedLibraryData(libname,rev,dest)
+-+#endif /* InstallSharedLibraryData */
+-+
+-+
+-+/*
+-+ * SharedLibraryTarget - generate rules to create a shared library;
+-+ * build it into a different name so that we do not hose people by having
+-+ * the library gone for long periods.
+-+ */
+-+#ifndef SharedLibraryTarget
+-+#ifdef UseInstalled  
+-+#define LinkBuildSonameLibrary(lib) true
+-+#else
+-+#define LinkBuildSonameLibrary(lib) (RemoveFile($(BUILDLIBDIR)/lib); \
+-+	cd $(BUILDLIBDIR); $(LN) $(BUILDINCTOP)/$(CURRENT_DIR)/lib .)
+-+#endif
+-+
+-+#define SharedLibraryTarget(libname,rev,solist,down,up)			@@\
+-+AllTarget(Concat(lib,libname.so.rev))					@@\
+-+									@@\
+-+Concat(lib,libname.so.rev):  solist $(EXTRALIBRARYDEPS)			@@\
+-+	$(RM) $@~							@@\
+-+	@SONAME=`echo $@ | sed 's/\.[^\.]*$$//'`; set -x; \		@@\
+-+		(cd down; $(CC) -o up/$@~ $(SHLIBLDFLAGS) -Wl,-soname,$$SONAME solist $(REQUIREDLIBS) BaseShLibReqs); \ @@\
+-+		$(RM) $$SONAME; $(LN) $@ $$SONAME; \			@@\
+-+		LinkBuildSonameLibrary($$SONAME)			@@\
+-+	$(RM) $@							@@\
+-+	$(MV) $@~ $@							@@\
+-+	@if $(SOSYMLINK); then (set -x; \				@@\
+-+	  $(RM) Concat(lib,libname.so); \				@@\
+-+	  $(LN) $@ Concat(lib,libname.so)); fi				@@\
+-+	LinkBuildLibrary($@)						@@\
+-+	LinkBuildLibraryMaybe(Concat(lib,libname.so),$(SOSYMLINK))	@@\
+-+									@@\
+-+clean::									@@\
+-+	@MAJREV=`expr rev : '\([^.]*\)'`; \				@@\
+-+	set -x; $(RM) Concat(lib,libname.so.$$MAJREV)			@@\
+-+	$(RM) Concat(lib,libname.so.rev) Concat(lib,libname.so)
+-+
+-+#endif /* SharedLibraryTarget */
+-+
+-+/*
+-+ * SharedDepLibraryTarget - generate rules to create a shared library.
+-+ */
+-+#ifndef SharedDepLibraryTarget
+-+#ifdef UseInstalled
+-+#ifndef LinkBuildSonameLibrary
+-+#define LinkBuildSonameLibrary(lib) true
+-+#endif
+-+#else
+-+#ifndef LinkBuildSonameLibrary
+-+#define LinkBuildSonameLibrary(lib) (RemoveFile($(BUILDLIBDIR)/lib); \
+-+	cd $(BUILDLIBDIR); $(LN) $(BUILDINCTOP)/$(CURRENT_DIR)/lib .)
+-+#endif
+-+#endif
+-+
+-+#define SharedDepLibraryTarget(libname,rev,deplist,solist,down,up)	@@\
+-+AllTarget(Concat(lib,libname.so.rev))					@@\
+-+									@@\
+-+Concat(lib,libname.so.rev):  deplist $(EXTRALIBRARYDEPS)		@@\
+-+	$(RM) $@~							@@\
+-+	@SONAME=`echo $@ | sed 's/\.[^\.]*$$//'`; set -x; \		@@\
+-+		(cd down; $(CC) -o up/$@~ $(SHLIBLDFLAGS) -Wl,-soname,$$SONAME solist $(REQUIREDLIBS) BaseShLibReqs); \ @@\
+-+		$(RM) $$SONAME; $(LN) $@ $$SONAME; \			@@\
+-+		LinkBuildSonameLibrary($$SONAME)			@@\
+-+	$(RM) $@ 							@@\
+-+	$(MV) $@~ $@							@@\
+-+	@if $(SOSYMLINK); then (set -x; \				@@\
+-+	  $(RM) Concat(lib,libname.so); \				@@\
+-+	  $(LN) $@ Concat(lib,libname.so)); fi				@@\
+-+	LinkBuildLibrary($@)						@@\
+-+	LinkBuildLibraryMaybe(Concat(lib,libname.so),$(SOSYMLINK))	@@\
+-+									@@\
+-+clean::									@@\
+-+	@MAJREV=`expr rev : '\([^.]*\)'`; \				@@\
+-+	set -x; $(RM) Concat(lib,libname.so.$$MAJREV)			@@\
+-+	$(RM) Concat(lib,libname.so.rev) Concat(lib,libname.so)
+-+
+-+#endif /* SharedDepLibraryTarget */
+-+
+-+#ifndef SharedDepModuleTarget
+-+#define SharedDepModuleTarget(name,deps,solist)				@@\
+-+AllTarget(name)								@@\
+-+									@@\
+-+name: deps								@@\
+-+	$(RM) $@~							@@\
+-+	$(CC) -o $@~ $(SHLIBLDFLAGS) solist $(REQUIREDLIBS) BaseShLibReqs @@\
+-+	$(RM) $@							@@\
+-+	$(MV) $@~ $@							@@\
+-+									@@\
+-+clean::									@@\
+-+	$(RM) name
+-+
+-+#endif /* SharedDepModuleTarget */
+-+
+-+/*
+-+ * SharedLibraryDataTarget - generate rules to create shlib data file;
+-+ */
+-+#ifndef SharedLibraryDataTarget
+-+#define SharedLibraryDataTarget(libname,rev,salist)
+-+#endif /* SharedLibraryTarget */
+-diff -ruN xc-old/config/cf/gfbLib.tmpl xc/config/cf/gfbLib.tmpl
+---- xc-old/config/cf/gfbLib.tmpl	1970-01-01 01:00:00.000000000 +0100
+-+++ xc/config/cf/gfbLib.tmpl	2004-10-18 14:49:52.793246112 +0200
+-@@ -0,0 +1,28 @@
+-+/*
+-+ * GNU/FreeBSD shared library template
+-+ */
+-+
+-+#ifndef FixupLibReferences
+-+#define FixupLibReferences()						@@\
+-+XMULIBONLY = -lXmu							@@\
+-+XMULIB = $(XMULIBONLY) $(XTOOLLIB) $(XLIB)
+-+#endif
+-+
+-+#ifndef XawClientLibs
+-+#define XawClientLibs $(XAWLIB) $(XMULIBONLY) $(XTOOLLIB) $(XPMLIB) $(XLIB)
+-+#endif
+-+
+-+#define CplusplusLibC
+-+
+-+#define SharedX11Reqs
+-+#define SharedOldXReqs	$(LDPRELIB) $(XLIBONLY)
+-+#define SharedXtReqs	$(LDPRELIB) $(XLIBONLY) $(SMLIB) $(ICELIB)
+-+#define SharedXaw6Reqs	$(LDPRELIB) $(XMULIB) $(XTOOLLIB) $(XLIB)
+-+#define SharedXawReqs	$(LDPRELIB) $(XMULIB) $(XTOOLLIB) $(XPMLIB) $(XLIB)
+-+#define SharedXmuReqs	$(LDPRELIB) $(XTOOLLIB) $(XLIB)
+-+#define SharedXextReqs	$(LDPRELIB) $(XLIBONLY)
+-+#define SharedXiReqs	$(LDPRELIB) $(XLIB)
+-+#define SharedPexReqs	$(LDPRELIB) $(XLIBONLY) MathLibrary
+-+#define SharedXtstReqs	$(LDPRELIB) $(XLIB)
+-+#define SharedXieReqs	$(LDPRELIB) $(XLIBONLY)
+-+#define SharedSMReqs	$(LDPRELIB) $(ICELIB)
+-diff -ruN xc-old/config/cf/gnu-freebsd.cf xc/config/cf/gnu-freebsd.cf
+---- xc-old/config/cf/gnu-freebsd.cf	1970-01-01 01:00:00.000000000 +0100
+-+++ xc/config/cf/gnu-freebsd.cf	2004-10-18 14:49:52.794245960 +0200
+-@@ -0,0 +1,314 @@
+-+XCOMM platform:  xc/config/cf/gnu-freebsd.cf
+-+
+-+#ifndef OSName
+-+#define OSName			DefaultOSName
+-+#endif
+-+
+-+#ifndef OSVendor
+-+#define OSVendor		/**/
+-+#endif
+-+#ifndef OSMajorVersion
+-+#define OSMajorVersion		DefaultOSMajorVersion
+-+#endif
+-+#ifndef OSMinorVersion
+-+#define OSMinorVersion		DefaultOSMinorVersion
+-+#endif
+-+#ifndef OSTeenyVersion
+-+#define OSTeenyVersion		DefaultOSTeenyVersion
+-+#endif
+-+XCOMM operating system:  OSName (OSMajorVersion./**/OSMinorVersion./**/OSTeenyVersion)
+-+
+-+#ifndef DefaultGcc2OptimizeOpt
+-+# define DefaultGcc2OptimizeOpt	-O2
+-+#endif
+-+#define DefaultGcc2AxpOpt	DefaultGcc2OptimizeOpt GccAliasingArgs
+-+#define DefaultGcc2i386Opt	DefaultGcc2OptimizeOpt GccAliasingArgs
+-+#define DefaultGcc2PpcOpt	DefaultGcc2OptimizeOpt GccAliasingArgs
+-+#define SystemManDirectory	/usr/share/man
+-+#define HasPam			YES
+-+#define HasTk			YES
+-+#define TkLibDir		/usr/lib
+-+#define TkIncDir		/usr/include
+-+#define TkLibName		tk8.4
+-+#define XF86SetupUsesStaticTk	NO
+-+#define HasTcl			YES
+-+#define TclLibDir		/usr/lib
+-+#define TclIncDir		/usr/include
+-+#define TclLibName		tcl8.4
+-+#define XF86SetupUsesStaticTcl	NO
+-+/* un-comment this when it is un-broken */
+-+/* # define JoystickSupport YES */
+-+#define XAppLoadDir		EtcX11Directory/app-defaults
+-+#define XFileSearchPathDefault	Concat4(EtcX11Directory/%L/%T/%N%C,%S:EtcX11Directory/%l/%T/%N%C,%S:EtcX11Directory/%T/%N%C,%S:EtcX11Directory/%L/%T/%N%S:EtcX11Directory/%l/%T/%N%S:EtcX11Directory/%T/%N%S):Concat4($(LIBDIR)/%L/%T/%N%C,%S:$(LIBDIR)/%l/%T/%N%C,%S:$(LIBDIR)/%T/%N%C,%S:$(LIBDIR)/%L/%T/%N%S:$(LIBDIR)/%l/%T/%N%S:$(LIBDIR)/%T/%N%S)
+-+#define InstallAppDefFiles	YES
+-+/* the relative symlink created by this rule causes problems for us */
+-+#ifdef InstallAppDefFiles
+-+# if InstallAppDefFiles
+-+#  define InstallAppDefaultsLong(file,class)				@@\
+-+InstallNamedTarget(install,file.ad,$(INSTAPPFLAGS),$(XAPPLOADDIR),class)
+-+# else
+-+#  define InstallAppDefaultsLong(file,class)				@@\
+-+InstallNamedTargetNoClobber(install,file.ad,$(INSTAPPFLAGS),$(XAPPLOADDIR),class)
+-+# endif
+-+#endif /* InstallAppDefFiles */
+-+#define SharedLibXdmGreet	NO
+-+#define LinkGLToUsrInclude	NO
+-+#define LinkGLToUsrLib		NO
+-+#define SharedLibFont		NO
+-+#define HasZlib			YES
+-+#define SharedLibGlu		YES
+-+#define NormalLibGlu		YES
+-+#define FSUseSyslog		YES
+-+
+-+/*
+-+ *
+-+ *
+-+#define DebianMaintainer	YES
+-+ *
+-+ *
+-+ */
+-+
+-+#ifdef DebianMaintainer
+-+# ifndef XFree86CustomVersion
+-+#  define XFree86CustomVersion		"Debian"
+-+# endif
+-+# ifndef BuilderEMailAddr
+-+#  define BuilderEMailAddr		"debian-x@lists.debian.org"
+-+# endif
+-+# define XFree86Devel			YES
+-+# define InstallXinitConfig		YES
+-+# define InstallXdmConfig		YES
+-+# define InstallFSConfig		YES
+-+# define DebuggableLibraries		YES
+-+# define ForceNormalLib			YES
+-+# define BuildRman			NO
+-+# define BuildHtmlManPages		NO
+-+/*
+-+ * Debian doesn't use certain parts of the tree when doing
+-+ * architecture-specific package builds.
+-+ */
+-+# ifndef BuildFonts
+-+#  define BuildFonts			YES
+-+# endif
+-+# ifndef BuildSpecsDocs
+-+#  define BuildSpecsDocs		YES
+-+# endif
+-+# if BuildSpecsDocs
+-+#  define BuildAllSpecsDocs		YES
+-+# endif
+-+/*
+-+ * The XFree86 Debian package uses a local patch that defines a
+-+ * PicLibraryTarget() Imake rule, instead of using upstream's method.
+-+ */
+-+# define StaticNeedsPicForShared	NO
+-+# define KernelVersionInBanner		YES
+-+# define ProjectManSuffix		x
+-+/* The TT/Meltho fonts are all under non-free licenses. */
+-+# define BuildTrueTypeFonts		NO
+-+# define BuildBethMarduthoFonts		NO
+-+/*
+-+ * The XFree86 Debian package build-depends on external Expat, Fontconfig,
+-+ * Freetype, Render, Xcursor, and Xft libraries.
+-+ */
+-+# define BuildExpatLibrary		NO
+-+# define HasExpat			YES
+-+# define ExpatIncDirStandard		YES
+-+# define BuildFontconfigLibrary		NO
+-+# define HasFontconfig			YES
+-+# define UseFontconfig			YES
+-+# define FontconfigIncDir		/usr/include/fontconfig
+-+# define BuildFreetype2Library		NO
+-+# define HasFreetype2			YES
+-+# define BuildRenderLibrary		NO
+-+# define HasRenderLibrary		YES
+-+# define BuildXcursorLibrary		NO
+-+# define HasXcursorLibrary		YES
+-+/* Xlib needs to know the available version of Xcursor. */
+-+# define SharedXcursorRev		1
+-+# define IconDir			Concat(ProjectRoot,/lib/X11/icons)
+-+# define BuildXftLibrary		NO
+-+# define HasXftLibrary			YES
+-+
+-+# ifdef UseInstalled
+-+#   define RenderLibraryDir		/usr
+-+#   define XftLibraryDir		/usr
+-+#   define XcursorLibraryDir		/usr
+-+# else
+-+/* The XFree86 Debian package uses a special hack to find these libraries. */
+-+#   define RenderLibraryDir		$(TOP)/../../imports
+-+#   define XftLibraryDir		$(TOP)/../../imports
+-+#   define XcursorLibraryDir		$(TOP)/../../imports
+-+# endif
+-+
+-+/*
+-+ * We want to be sure that the normal XFree86 X server and the debugging X
+-+ * server use the same FreeType2 library.  We'd *like* it if we could
+-+ * achieve this by both packages dynamically linking against the system's
+-+ * FreeType2 library; however, the normal X server package
+-+ * (xserver-xorg) *cannot* be built dynamically linked against the
+-+ * FreeType2 library when the module loader is enabled because of
+-+ * code/design issues.  Therefore, we encapsulate XFree86's internal "fork"
+-+ * of the FreeType2 library into *both* xserver-xorg and
+-+ * xserver-xorg-dbg.  When it becomes possible to build the
+-+ * module-loading server against an external FreeType2 shared library, we
+-+ * can drop this define:
+-+ */
+-+#  define FontLibSharedFreeType		NO
+-+
+-+#  define HasLinuxInput			NO
+-+#  define HasXdmAuth			YES
+-+#  define HasLatex			YES
+-+#  ifdef i386Architecture
+-+#   define HasX86Support		YES
+-+#   define HasMMXSupport		YES
+-+#   define Has3DNowSupport		YES
+-+#   define HasSSESupport		YES
+-+#  endif /* i386Architecture */
+-+#endif /* DebianMaintainer */
+-+
+-+#define GNUSourceDefines      -D_POSIX_C_SOURCE=199309L \
+-+                              -D_POSIX_SOURCE -D_XOPEN_SOURCE \
+-+                              -D_BSD_SOURCE -D_SVID_SOURCE
+-+
+-+XCOMM XXXMB: What about _GNU_SOURCE, see Linux/UseInstalled?
+-+
+-+#define XawI18nDefines        -DHAS_WCHAR_H -DHAS_WCTYPE_H -DNO_WIDEC_H
+-+
+-+XCOMM Enable this when we have pthreads.
+-+#define HasPosixThreads         YES
+-+#define ThreadedX               YES
+-+#define HasThreadSafeAPI        YES
+-+#define ThreadsLibraries        -lpthread
+-+#define SystemMTDefines         -D_REENTRANT
+-+
+-+#ifndef HasLibCrypt
+-+#define HasLibCrypt             YES
+-+#endif
+-+
+-+#ifndef BuildXF86RushExt
+-+# define BuildXF86RushExt	YES
+-+#endif
+-+
+-+#define BuildLibPathVar		LD_LIBRARY_PATH
+-+#define GccUsesGas		YES
+-+#define UseGas			YES
+-+#define GnuCpp			YES
+-+#define HasDlopen		YES
+-+#ifndef HasShadowPasswd
+-+#  define HasShadowPasswd	YES
+-+#endif
+-+#define HasPutenv		YES
+-+
+-+XCOMM Not implemented and will always fail.
+-+#define HasShm			YES
+-+
+-+XCOMM #define HasBSD44Sockets		YES
+-+#define HasSockets		YES
+-+#define HasSnprintf		YES
+-+#define HasMkstemp		YES
+-+#define HasUsableFileMmap	YES
+-+#ifndef HasNCurses
+-+#define HasNCurses		YES
+-+#endif
+-+
+-+#define AvoidNullMakeCommand	YES
+-+#ifndef DebuggableLibraries
+-+#define DebuggableLibraries	NO
+-+#endif
+-+#define CompressAllFonts	YES
+-+#define Malloc0ReturnsNull	YES
+-+#define NeedConstPrototypes	YES
+-+#define NeedFunctionPrototypes	YES
+-+#define NeedNestedPrototypes	YES
+-+#define NeedVarargsPrototypes	YES
+-+#ifndef NeedWidePrototypes
+-+#define NeedWidePrototypes	NO
+-+#endif
+-+#define SetTtyGroup		YES
+-+
+-+#ifndef UseStaticTermcapLib
+-+#define UseStaticTermcapLib	NO
+-+#endif
+-+
+-+#define MkdirHierCmd		mkdir -p
+-+#ifndef CcCmd
+-+#define CcCmd			gcc
+-+#endif
+-+#ifndef AsCmd
+-+#define AsCmd			as
+-+#endif
+-+#ifndef LdCmd
+-+#define LdCmd			ld
+-+#endif
+-+
+-+#define AsmDefines		-D__ELF__
+-+#define CplusplusCmd		c++
+-+#ifndef TermcapLibrary
+-+#if UseStaticTermcapLib
+-+#define TermcapLibrary		StaticLibrary(/usr/lib,ncurses)
+-+#else
+-+#define TermcapLibrary		-lncurses
+-+#endif
+-+#endif
+-+#ifndef DoLoadableServer
+-+#define DoLoadableServer	YES
+-+#endif
+-+#ifndef
+-+#define CppCmd			/lib/cpp
+-+#endif
+-+#define YaccCmd			bison -y
+-+#define LexCmd			flex -l
+-+#define HasFlex			YES
+-+#define LexLib			-lfl
+-+#define PreProcessCmd		CcCmd -E
+-+#define PostIncDir		DefaultGccIncludeDir
+-+#define LdCombineFlags		-r
+-+#ifndef LdPostLib
+-+#define LdPostLib		/* Never needed */
+-+#endif
+-+#define HasWChar32		YES
+-+#define StandardCppOptions	-traditional
+-+#define StandardCppDefines	StandardDefines
+-+
+-+#define HasVarRun		YES
+-+#define VarDbDirectory		$(VARDIR)/lib
+-+
+-+XCOMM i386Architecture
+-+#define OptimizedCDebugFlags	DefaultGcc2i386Opt
+-+#define DefaultGcc2i386Opt -O2
+-+#define GNUMachineDefines	-D__i386__
+-+#define ServerOSDefines		XFree86ServerOSDefines -DDDXTIME -DPART_NET
+-+#define ServerExtraDefines	-DGCCUSESGAS XFree86ServerDefines
+-+#define HasPlugin		YES
+-+#define VendorHasX11R6_3libXext	YES
+-+
+-+#ifndef StandardDefines
+-+#define StandardDefines		GNUMachineDefines GNUSourceDefines
+-+#endif
+-+
+-+#define DlLibrary		-rdynamic -ldl
+-+
+-+#define ServerExtraSysLibs	/**/
+-+
+-+#define ConnectionFlags		-DUNIXCONN -DTCPCONN
+-+
+-+#ifndef StaticLibrary
+-+#define StaticLibrary(libpath,libname) -Wl,-Bstatic Concat(-L,libpath) Concat(-l,libname) -Wl,-Bdynamic
+-+#endif
+-+
+-+#define HasGnuMake	YES
+-+
+-+#define MakeNamedTargetSubdir(dir,flags,subname)\
+-+        $(MAKE) -C dir $(MFLAGS) $(PARALLELMFLAGS) flags subname
+-+
+-+#define ArchitectureDefines	-DGNU_ARCHITECTURE
+-+
+-+#define XserverNeedsSetUID	YES
+-+
+-+#include <gnuLib.rules>
+-+
+-+XCOMM XXX Might need this if they are not careful with slashes.
+-+XCOMM #define DirFailPrefix -
+-+
+-+#include <xfree86.cf>
+-+
+-diff -ruN xc-old/config/cf/Imake.cf xc/config/cf/Imake.cf
+---- xc-old/config/cf/Imake.cf	2004-08-11 23:14:01.000000000 +0200
+-+++ xc/config/cf/Imake.cf	2004-10-18 14:49:52.792246264 +0200
+-@@ -253,6 +253,12 @@
+- #define KNetBSDArchitecture
+- #endif
+- 
+-+#ifdef __GNU_FreeBSD__
+-+#define MacroIncludeFile <gnu-freebsd.cf>
+-+#define MacroFile gnu-freebsd.cf
+-+#define GNUFreeBSDArchitecture
+-+#endif
+-+
+- #ifdef __FreeBSD__
+- # define MacroIncludeFile <FreeBSD.cf>
+- # define MacroFile FreeBSD.cf
+diff -Nur xorg-x11-6.8.2.dfsg.1.old/debian.old/patches/823_gnu-freebsd_xterm.diff xorg-x11-6.8.2.dfsg.1.old/debian/patches/823_gnu-freebsd_xterm.diff
+--- xorg-x11-6.8.2.dfsg.1.old/debian.old/patches/823_gnu-freebsd_xterm.diff	2005-07-14 20:20:33.000000000 +0200
++++ xorg-x11-6.8.2.dfsg.1.old/debian/patches/823_gnu-freebsd_xterm.diff	1970-01-01 01:00:00.000000000 +0100
+@@ -1,19 +0,0 @@
+-$Id: 823_gnu-freebsd_xterm.diff 315 2005-07-06 03:35:22Z dnusinow $
+-
+-GNU/FreeBSD needs the termios.h header included to know what "B38400" is.
+-
+-This patch by Robert Millan.
+-
+-Not submitted upstream to XFree86 or Thomas Dickey.
+-
+-diff -ruN xc-old/programs/xterm/main.c xc/programs/xterm/main.c
+---- xc-old/programs/xterm/main.c	2005-07-05 23:06:32.000000000 -0400
+-+++ xc/programs/xterm/main.c	2005-07-05 23:13:15.000000000 -0400
+-@@ -491,6 +491,7 @@
+-  * about padding generally store the code in a short, which does not have
+-  * enough bits for the extended values.
+-  */
+-+#include <termios.h>
+- #ifdef B38400			/* everyone should define this */
+- #define VAL_LINE_SPEED B38400
+- #else /* ...but xterm's used this for a long time */
+diff -Nur xorg-x11-6.8.2.dfsg.1.old/debian.old/patches/900_debian_config.diff xorg-x11-6.8.2.dfsg.1.old/debian/patches/900_debian_config.diff
+--- xorg-x11-6.8.2.dfsg.1.old/debian.old/patches/900_debian_config.diff	2005-07-14 20:20:31.000000000 +0200
++++ xorg-x11-6.8.2.dfsg.1.old/debian/patches/900_debian_config.diff	2005-07-18 21:37:05.000000000 +0200
+@@ -21,23 +21,6 @@
+  
+  # ifdef DebianMaintainer
+  #  ifndef XFree86CustomVersion
+-diff -ruN xc-old/config/cf/gnu-freebsd.cf xc/config/cf/gnu-freebsd.cf
+---- xc-old/config/cf/gnu-freebsd.cf	2004-10-27 13:52:55.000000000 +0000
+-+++ xc/config/cf/gnu-freebsd.cf	2004-10-27 13:53:28.000000000 +0000
+-@@ -60,13 +60,7 @@
+- #define NormalLibGlu		YES
+- #define FSUseSyslog		YES
+- 
+--/*
+-- *
+-- *
+- #define DebianMaintainer	YES
+-- *
+-- *
+-- */
+- 
+- #ifdef DebianMaintainer
+- # ifndef XFree86CustomVersion
+ diff -ruN xc-old/config/cf/gnu.cf xc/config/cf/gnu.cf
+ --- xc-old/config/cf/gnu.cf	2004-10-27 13:52:55.000000000 +0000
+ +++ xc/config/cf/gnu.cf	2004-10-27 13:53:28.000000000 +0000
