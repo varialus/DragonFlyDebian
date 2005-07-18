@@ -10,7 +10,7 @@ diff -u -r1.2 get_load.c
  #else /* not KVM_ROUTINES */
  
 -#ifdef linux
-+#if defined(linux) || defined(__FreeBSD_kernel__)
++#if defined(linux) || (defined(__FreeBSD_kernel__) && defined(__GLIBC__))
  
  void InitLoadPoint()
  {
