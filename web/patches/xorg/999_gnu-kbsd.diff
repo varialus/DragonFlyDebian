@@ -1,11 +1,6 @@
-
-  fix xfree86.cf
-  bsd_io.c
-  bsd_kbd.c
-
 diff -ur xc.old/config/cf/Imake.cf xc/config/cf/Imake.cf
 --- xc.old/config/cf/Imake.cf	2005-02-28 18:35:18.000000000 +0100
-+++ xc/config/cf/Imake.cf	2005-07-18 21:45:01.000000000 +0200
++++ xc/config/cf/Imake.cf	2005-07-18 21:21:34.000000000 +0200
 @@ -699,11 +699,13 @@
  # define Win32Architecture
  #endif /* WIN32 */
@@ -43,8 +38,8 @@ diff -ur xc.old/config/cf/Imake.cf xc/config/cf/Imake.cf
  #define MacroIncludeFile <gnu.cf>
  #define MacroFile gnu.cf
 diff -ur xc.old/config/cf/linux.cf xc/config/cf/linux.cf
---- xc.old/config/cf/linux.cf	2005-07-18 21:41:44.000000000 +0200
-+++ xc/config/cf/linux.cf	2005-07-18 21:45:01.000000000 +0200
+--- xc.old/config/cf/linux.cf	2005-07-18 21:15:01.000000000 +0200
++++ xc/config/cf/linux.cf	2005-07-18 21:21:34.000000000 +0200
 @@ -272,13 +272,14 @@
  #  define HasXdmAuth			YES
  
@@ -63,7 +58,7 @@ diff -ur xc.old/config/cf/linux.cf xc/config/cf/linux.cf
  #   define HasGlide3			YES
  #   define Glide3IncDir		/usr/include/glide3
  #  endif /* i386Architecture || AlphaArchitecture || ia64Architecture ||
-@@ -385,22 +387,23 @@
+@@ -385,22 +386,23 @@
  
  /* <linux/input.h> support mainly for USB support */
  #ifndef HasLinuxInput
@@ -91,7 +86,7 @@ diff -ur xc.old/config/cf/linux.cf xc/config/cf/linux.cf
  #  define HasLinuxJoystick	YES
  # else
  #  define HasLinuxJoystick	NO
-@@ -425,9 +428,9 @@
+@@ -425,9 +427,9 @@
  #endif
  
  #ifndef XF86INT10_BUILD
@@ -103,7 +98,7 @@ diff -ur xc.old/config/cf/linux.cf xc/config/cf/linux.cf
  #  define XF86INT10_BUILD	X86EMU_OS
  # else
  #  define XF86INT10_BUILD	X86EMU_GENERIC
-@@ -444,7 +447,9 @@
+@@ -444,7 +446,9 @@
  #  elif defined(HPArchitecture)
  #    define BuildXF86DRI	NO
  #  elif defined(i386Architecture)
@@ -114,7 +109,7 @@ diff -ur xc.old/config/cf/linux.cf xc/config/cf/linux.cf
  #      define BuildXF86DRI	YES
  #    else
  #      define BuildXF86DRI	NO
-@@ -549,7 +554,7 @@
+@@ -549,7 +553,7 @@
  # define BuildXF86RushExt	YES
  #endif
  
@@ -123,7 +118,7 @@ diff -ur xc.old/config/cf/linux.cf xc/config/cf/linux.cf
  # define LinuxFBDevSupport	YES
  #endif
  
-@@ -872,7 +877,11 @@
+@@ -872,7 +876,11 @@
  #endif
  
  #ifndef XF86OSCardDrivers
@@ -136,7 +131,7 @@ diff -ur xc.old/config/cf/linux.cf xc/config/cf/linux.cf
  #endif
  
  #ifndef OSXInputDrivers
-@@ -1052,7 +1067,11 @@
+@@ -1052,7 +1060,11 @@
  #endif /* AMD64Architecture */
  
  #ifndef StandardDefines
@@ -150,8 +145,8 @@ diff -ur xc.old/config/cf/linux.cf xc/config/cf/linux.cf
  
  #if UseElfFormat
 diff -ur xc.old/config/cf/xfree86.cf xc/config/cf/xfree86.cf
---- xc.old/config/cf/xfree86.cf	2005-07-18 21:41:43.000000000 +0200
-+++ xc/config/cf/xfree86.cf	2005-07-18 21:45:01.000000000 +0200
+--- xc.old/config/cf/xfree86.cf	2005-07-18 21:15:00.000000000 +0200
++++ xc/config/cf/xfree86.cf	2005-07-18 21:21:44.000000000 +0200
 @@ -1666,7 +1666,8 @@
  # if SystemV || SystemV4 || \
      defined(LinuxArchitecture) || \
@@ -162,18 +157,21 @@ diff -ur xc.old/config/cf/xfree86.cf xc/config/cf/xfree86.cf
  #   define BuildScanpci		YES
  # else
  #   define BuildScanpci		NO
-@@ -1772,7 +1773,7 @@
+@@ -1772,9 +1773,9 @@
  #endif
  
  #ifndef XFree86ConsoleDefines
 -# if defined(i386BsdArchitecture) || defined(AlphaBsdArchitecture)
 +# if defined(i386BsdArchitecture) || defined(AlphaBsdArchitecture) || (defined(KFreeBSDArchitecture) && defined(i386Architecture))
  #  define XFree86ConsoleDefines	-DPCCONS_SUPPORT -DSYSCONS_SUPPORT -DPCVT_SUPPORT
- # elif defined(FreeBSDArchitecture)
+-# elif defined(FreeBSDArchitecture)
++# elif defined(KFreeBSDArchitecture)
  #  define XFree86ConsoleDefines -DSYSCONS_SUPPORT
+ # else
+ #  define XFree86ConsoleDefines	/**/
 diff -ur xc.old/config/cf/xorg.cf xc/config/cf/xorg.cf
---- xc.old/config/cf/xorg.cf	2005-07-18 21:41:31.000000000 +0200
-+++ xc/config/cf/xorg.cf	2005-07-18 21:45:01.000000000 +0200
+--- xc.old/config/cf/xorg.cf	2005-07-18 21:14:58.000000000 +0200
++++ xc/config/cf/xorg.cf	2005-07-18 21:21:34.000000000 +0200
 @@ -1310,7 +1310,8 @@
  # if SystemV || SystemV4 || \
      (defined(LinuxArchitecture) && !defined(Mc68020Architecture)) || \
@@ -197,8 +195,8 @@ diff -ur xc.old/config/cf/xorg.cf xc/config/cf/xorg.cf
  # else
  #  define XFree86ConsoleDefines	/**/
 diff -ur xc.old/config/imake/imake.c xc/config/imake/imake.c
---- xc.old/config/imake/imake.c	2005-07-18 21:41:43.000000000 +0200
-+++ xc/config/imake/imake.c	2005-07-18 21:45:01.000000000 +0200
+--- xc.old/config/imake/imake.c	2005-07-18 21:15:01.000000000 +0200
++++ xc/config/imake/imake.c	2005-07-18 21:21:34.000000000 +0200
 @@ -251,7 +251,7 @@
  #  define SYS_NMLN 257
  # endif
@@ -277,7 +275,7 @@ diff -ur xc.old/config/imake/imake.c xc/config/imake/imake.c
  	  get_ld_version(inFile);
 diff -ur xc.old/config/imake/imakemdep.h xc/config/imake/imakemdep.h
 --- xc.old/config/imake/imakemdep.h	2005-02-28 18:35:18.000000000 +0100
-+++ xc/config/imake/imakemdep.h	2005-07-18 21:45:01.000000000 +0200
++++ xc/config/imake/imakemdep.h	2005-07-18 21:21:34.000000000 +0200
 @@ -349,7 +349,8 @@
  #endif
  #if defined(__386BSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || \
@@ -316,8 +314,8 @@ diff -ur xc.old/config/imake/imakemdep.h xc/config/imake/imakemdep.h
  int glibc_major = __GLIBC__ + 4;
  int glibc_minor = __GLIBC_MINOR__;
 diff -ur xc.old/extras/drm/shared/drm.h xc/extras/drm/shared/drm.h
---- xc.old/extras/drm/shared/drm.h	2005-07-18 21:41:29.000000000 +0200
-+++ xc/extras/drm/shared/drm.h	2005-07-18 21:45:01.000000000 +0200
+--- xc.old/extras/drm/shared/drm.h	2005-07-18 21:14:56.000000000 +0200
++++ xc/extras/drm/shared/drm.h	2005-07-18 21:21:34.000000000 +0200
 @@ -48,15 +48,15 @@
  #define DRM_IOC_WRITE		_IOC_WRITE
  #define DRM_IOC_READWRITE	_IOC_READ|_IOC_WRITE
@@ -339,7 +337,7 @@ diff -ur xc.old/extras/drm/shared/drm.h xc/extras/drm/shared/drm.h
  #define DRM_IOC_READ		IOC_OUT
 diff -ur xc.old/lib/GL/dri/drm/Imakefile xc/lib/GL/dri/drm/Imakefile
 --- xc.old/lib/GL/dri/drm/Imakefile	2005-02-28 18:35:18.000000000 +0100
-+++ xc/lib/GL/dri/drm/Imakefile	2005-07-18 21:45:01.000000000 +0200
++++ xc/lib/GL/dri/drm/Imakefile	2005-07-18 21:21:34.000000000 +0200
 @@ -25,7 +25,7 @@
  OS_SUBDIR2 = linux
  OS_SUBDIR3 = shared
@@ -351,7 +349,7 @@ diff -ur xc.old/lib/GL/dri/drm/Imakefile xc/lib/GL/dri/drm/Imakefile
  OS_SUBDIR2 = linux
 diff -ur xc.old/lib/xtrans/Xtranssock.c xc/lib/xtrans/Xtranssock.c
 --- xc.old/lib/xtrans/Xtranssock.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/lib/xtrans/Xtranssock.c	2005-07-18 21:45:01.000000000 +0200
++++ xc/lib/xtrans/Xtranssock.c	2005-07-18 21:21:34.000000000 +0200
 @@ -88,7 +88,7 @@
  #endif 
  
@@ -363,7 +361,7 @@ diff -ur xc.old/lib/xtrans/Xtranssock.c xc/lib/xtrans/Xtranssock.c
  #if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD__) 
 diff -ur xc.old/programs/Xserver/hw/vfb/Imakefile xc/programs/Xserver/hw/vfb/Imakefile
 --- xc.old/programs/Xserver/hw/vfb/Imakefile	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/vfb/Imakefile	2005-07-18 21:45:01.000000000 +0200
++++ xc/programs/Xserver/hw/vfb/Imakefile	2005-07-18 21:21:34.000000000 +0200
 @@ -17,6 +17,7 @@
      SystemV4 || \
      defined(OSF1Architecture) || \
@@ -374,7 +372,7 @@ diff -ur xc.old/programs/Xserver/hw/vfb/Imakefile xc/programs/Xserver/hw/vfb/Ima
  MMAPDEF = -DHAS_MMAP
 diff -ur xc.old/programs/Xserver/hw/xfree86/Imakefile xc/programs/Xserver/hw/xfree86/Imakefile
 --- xc.old/programs/Xserver/hw/xfree86/Imakefile	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/Imakefile	2005-07-18 21:45:00.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/Imakefile	2005-07-18 21:21:34.000000000 +0200
 @@ -154,7 +154,7 @@
  DPI75USFONTPATH=\"$(LIBDIR)/fonts/75dpi/:unscaled\"
  DPI100USFONTPATH=\"$(LIBDIR)/fonts/100dpi/:unscaled\"
@@ -385,8 +383,8 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/Imakefile xc/programs/Xserver/hw/xfr
  #else
    FREEBSDMOUSEDEV="XCOMM    Option	\"Device\"	\"/dev/mse0\""
 diff -ur xc.old/programs/Xserver/hw/xfree86/common/Imakefile xc/programs/Xserver/hw/xfree86/common/Imakefile
---- xc.old/programs/Xserver/hw/xfree86/common/Imakefile	2005-07-18 21:41:30.000000000 +0200
-+++ xc/programs/Xserver/hw/xfree86/common/Imakefile	2005-07-18 21:45:01.000000000 +0200
+--- xc.old/programs/Xserver/hw/xfree86/common/Imakefile	2005-07-18 21:14:58.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/common/Imakefile	2005-07-18 21:21:34.000000000 +0200
 @@ -19,7 +19,7 @@
  #else
  # if defined(i386BsdArchitecture) || defined(AlphaBsdArchitecture) \
@@ -397,8 +395,8 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/common/Imakefile xc/programs/Xserver
  # else
  #  ifdef LinuxArchitecture
 diff -ur xc.old/programs/Xserver/hw/xfree86/common/xf86Config.c xc/programs/Xserver/hw/xfree86/common/xf86Config.c
---- xc.old/programs/Xserver/hw/xfree86/common/xf86Config.c	2005-07-18 21:41:44.000000000 +0200
-+++ xc/programs/Xserver/hw/xfree86/common/xf86Config.c	2005-07-18 21:45:00.000000000 +0200
+--- xc.old/programs/Xserver/hw/xfree86/common/xf86Config.c	2005-07-18 21:15:01.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/common/xf86Config.c	2005-07-18 21:21:34.000000000 +0200
 @@ -79,7 +79,8 @@
  #endif
  
@@ -411,7 +409,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/common/xf86Config.c xc/programs/Xser
  #endif
 diff -ur xc.old/programs/Xserver/hw/xfree86/common/xf86Configure.c xc/programs/Xserver/hw/xfree86/common/xf86Configure.c
 --- xc.old/programs/Xserver/hw/xfree86/common/xf86Configure.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/common/xf86Configure.c	2005-07-18 21:45:00.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/common/xf86Configure.c	2005-07-18 21:21:34.000000000 +0200
 @@ -79,7 +79,7 @@
  #elif defined(__QNXNTO__)
  static char *DFLT_MOUSE_PROTO = "OSMouse";
@@ -423,7 +421,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/common/xf86Configure.c xc/programs/X
  #else
 diff -ur xc.old/programs/Xserver/hw/xfree86/common/xf86Privstr.h xc/programs/Xserver/hw/xfree86/common/xf86Privstr.h
 --- xc.old/programs/Xserver/hw/xfree86/common/xf86Privstr.h	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/common/xf86Privstr.h	2005-07-18 21:45:00.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/common/xf86Privstr.h	2005-07-18 21:21:34.000000000 +0200
 @@ -120,7 +120,7 @@
      /* graphics part */
      Bool		sharedMonitor;
@@ -444,7 +442,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/common/xf86Privstr.h xc/programs/Xse
  #define CODRV01X	   2
 diff -ur xc.old/programs/Xserver/hw/xfree86/input/joystick/Imakefile xc/programs/Xserver/hw/xfree86/input/joystick/Imakefile
 --- xc.old/programs/Xserver/hw/xfree86/input/joystick/Imakefile	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/input/joystick/Imakefile	2005-07-18 21:45:00.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/input/joystick/Imakefile	2005-07-18 21:21:35.000000000 +0200
 @@ -15,7 +15,7 @@
          ARCH_JSTK = ../os-support/linux/lnx_jstk.o
  #endif
@@ -455,8 +453,8 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/input/joystick/Imakefile xc/programs
  #endif
  
 diff -ur xc.old/programs/Xserver/hw/xfree86/input/wacom/wcmCommon.c xc/programs/Xserver/hw/xfree86/input/wacom/wcmCommon.c
---- xc.old/programs/Xserver/hw/xfree86/input/wacom/wcmCommon.c	2005-07-18 21:41:29.000000000 +0200
-+++ xc/programs/Xserver/hw/xfree86/input/wacom/wcmCommon.c	2005-07-18 21:45:01.000000000 +0200
+--- xc.old/programs/Xserver/hw/xfree86/input/wacom/wcmCommon.c	2005-07-18 21:14:56.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/input/wacom/wcmCommon.c	2005-07-18 21:21:35.000000000 +0200
 @@ -825,7 +825,11 @@
  	if (pChannel->nSamples < 4) ++pChannel->nSamples;
  
@@ -471,8 +469,8 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/input/wacom/wcmCommon.c xc/programs/
  		commonDispatchDevice(common,channel,pChannel);
  		resetSampleCounter(pChannel);
 diff -ur xc.old/programs/Xserver/hw/xfree86/input/wacom/xf86Wacom.h xc/programs/Xserver/hw/xfree86/input/wacom/xf86Wacom.h
---- xc.old/programs/Xserver/hw/xfree86/input/wacom/xf86Wacom.h	2005-07-18 21:41:29.000000000 +0200
-+++ xc/programs/Xserver/hw/xfree86/input/wacom/xf86Wacom.h	2005-07-18 21:45:01.000000000 +0200
+--- xc.old/programs/Xserver/hw/xfree86/input/wacom/xf86Wacom.h	2005-07-18 21:14:56.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/input/wacom/xf86Wacom.h	2005-07-18 21:21:35.000000000 +0200
 @@ -453,7 +453,7 @@
  	int bufpos;                        /* position with buffer */
  	unsigned char buffer[BUFFER_SIZE]; /* data read from device */
@@ -484,7 +482,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/input/wacom/xf86Wacom.h xc/programs/
  #endif
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/Imakefile xc/programs/Xserver/hw/xfree86/os-support/Imakefile
 --- xc.old/programs/Xserver/hw/xfree86/os-support/Imakefile	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/Imakefile	2005-07-18 21:45:00.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/Imakefile	2005-07-18 21:21:35.000000000 +0200
 @@ -63,7 +63,7 @@
  OS_SUBDIR = lynxos
  #endif
@@ -496,7 +494,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/Imakefile xc/programs/Xse
  #endif
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile xc/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile
 --- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile	2005-07-18 21:45:01.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile	2005-07-18 21:21:35.000000000 +0200
 @@ -8,7 +8,7 @@
  
  #include <Server.tmpl>
@@ -533,7 +531,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile xc/programs
  	defined(OpenBSDArchitecture)) && HasAgpGart
  AGP_SRC=lnx_agp.c
  AGP_OBJ=lnx_agp.o
-@@ -219,7 +221,7 @@
+@@ -219,7 +219,7 @@
  LinkSourceFile(vidmem.c,../shared)
  LinkSourceFile(sigio.c,../shared)
  LinkSourceFile(kmod_noop.c,../shared)
@@ -544,7 +542,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/Imakefile xc/programs
  #else
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c xc/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c
 --- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c	2005-07-18 21:45:00.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c	2005-07-18 21:21:35.000000000 +0200
 @@ -33,7 +33,7 @@
  #include <sys/param.h>
  #ifndef __NetBSD__
@@ -592,7 +590,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/alpha_video.c xc/prog
  #endif
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c
 --- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c	2005-07-18 21:45:00.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c	2005-07-18 21:21:35.000000000 +0200
 @@ -34,7 +34,9 @@
  #include "xf86_OSlib.h"
  
@@ -632,19 +630,17 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_init.c xc/program
  	    /*
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c
 --- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c	2005-07-18 21:45:00.000000000 +0200
-@@ -34,6 +34,10 @@
++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c	2005-07-18 21:22:16.000000000 +0200
+@@ -34,6 +34,8 @@
  #include "xf86Priv.h"
  #include "xf86_OSlib.h"
  
-+#ifdef __GLIBC__
 +#include <termios.h>
-+#endif
 +
  #ifdef WSCONS_SUPPORT
  #define KBD_FD(i) ((i).kbdFd != -1 ? (i).kbdFd : (i).consoleFd)
  #endif
-@@ -144,7 +148,7 @@
+@@ -144,7 +146,7 @@
  }
  
  #if defined(SYSCONS_SUPPORT) || defined(PCCONS_SUPPORT) || defined(PCVT_SUPPORT) || defined(WSCONS_SUPPORT)
@@ -655,31 +651,26 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_io.c xc/programs/
  void
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c
 --- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c	2005-07-18 21:45:00.000000000 +0200
-@@ -23,6 +23,10 @@
++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c	2005-07-18 21:22:33.000000000 +0200
+@@ -23,6 +23,8 @@
  #include "atKeynames.h"
  #include "bsd_kbd.h"
  
-+#ifdef __GLIBC__
 +#include <termios.h>
-+#endif
 +
  extern Bool VTSwitchEnabled;
  #ifdef USE_VT_SYSREQ
  extern Bool VTSysreqToggle;
-@@ -37,7 +41,11 @@
+@@ -37,7 +39,7 @@
  };
  
  typedef struct {
-+#ifdef __GLIBC__
+-   struct termio kbdtty;
 +   struct termios kbdtty;
-+#else
-    struct termio kbdtty;
-+#endif
  } BsdKbdPrivRec, *BsdKbdPrivPtr;
  
  static
-@@ -70,10 +78,16 @@
+@@ -70,10 +72,16 @@
      KbdDevPtr pKbd = (KbdDevPtr) pInfo->private;
      int real_leds = 0;
  
@@ -696,7 +687,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c xc/programs
  
      switch (pKbd->consType) {
  
-@@ -115,9 +129,15 @@
+@@ -115,9 +123,15 @@
  #endif
      }
  
@@ -712,7 +703,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c xc/programs
  
      return(leds);
  }
-@@ -307,16 +329,20 @@
+@@ -307,16 +321,20 @@
               case KEY_F8:
               case KEY_F9:
               case KEY_F10:
@@ -735,7 +726,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_kbd.c xc/programs
      }
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c
 --- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c	2005-07-18 21:45:00.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c	2005-07-18 21:21:35.000000000 +0200
 @@ -68,7 +68,7 @@
  static void usbSigioReadInput (int fd, void *closure);
  #endif
@@ -819,7 +810,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/bsd_mouse.c xc/progra
      p->PreInit = bsdMousePreInit;
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/drm/Imakefile xc/programs/Xserver/hw/xfree86/os-support/bsd/drm/Imakefile
 --- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/drm/Imakefile	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/bsd/drm/Imakefile	2005-07-18 21:45:01.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/drm/Imakefile	2005-07-18 21:21:35.000000000 +0200
 @@ -14,7 +14,7 @@
  MTRR_DEFINES = -DHAS_MTRR_SUPPORT
  #endif
@@ -831,7 +822,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/drm/Imakefile xc/prog
  OS_SUBDIR = freebsd
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c xc/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c
 --- xc.old/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c	2005-07-18 21:45:00.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c	2005-07-18 21:21:35.000000000 +0200
 @@ -30,6 +30,9 @@
  #include "xf86.h"
  #include "xf86Priv.h"
@@ -843,8 +834,8 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bsd/i386_video.c xc/progr
  #ifndef __NetBSD__
  #include <sys/types.h>
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bus/Imakefile xc/programs/Xserver/hw/xfree86/os-support/bus/Imakefile
---- xc.old/programs/Xserver/hw/xfree86/os-support/bus/Imakefile	2005-07-18 21:41:42.000000000 +0200
-+++ xc/programs/Xserver/hw/xfree86/os-support/bus/Imakefile	2005-07-18 21:45:00.000000000 +0200
+--- xc.old/programs/Xserver/hw/xfree86/os-support/bus/Imakefile	2005-07-18 21:15:00.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/bus/Imakefile	2005-07-18 21:21:35.000000000 +0200
 @@ -81,7 +81,7 @@
  PCIDRVRSRC = ix86Pci.c linuxPci.c
  PCIDRVROBJ = ix86Pci.o linuxPci.o
@@ -865,7 +856,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/bus/Imakefile xc/programs
  
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drm.c xc/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drm.c
 --- xc.old/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drm.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drm.c	2005-07-18 21:45:01.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drm.c	2005-07-18 21:21:35.000000000 +0200
 @@ -86,7 +86,7 @@
  
  #include "xf86drm.h"
@@ -877,7 +868,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drm.c xc/pr
  
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drmCompat.c xc/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drmCompat.c
 --- xc.old/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drmCompat.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drmCompat.c	2005-07-18 21:45:01.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drmCompat.c	2005-07-18 21:21:35.000000000 +0200
 @@ -78,7 +78,7 @@
  #include "r128_drm.h"
  #include <inttypes.h>		/* for int64_t & friends */
@@ -925,7 +916,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/linux/drm/xf86drmCompat.c
   * for binary backwards compatability with the old driver specific DRM
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/linux/lnx_agp.c xc/programs/Xserver/hw/xfree86/os-support/linux/lnx_agp.c
 --- xc.old/programs/Xserver/hw/xfree86/os-support/linux/lnx_agp.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/linux/lnx_agp.c	2005-07-18 21:45:01.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/linux/lnx_agp.c	2005-07-18 21:21:35.000000000 +0200
 @@ -18,7 +18,7 @@
  #if defined(linux)
  #include <asm/ioctl.h>
@@ -937,7 +928,7 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/linux/lnx_agp.c xc/progra
  #endif
 diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h xc/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h
 --- xc.old/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h	2005-07-18 21:45:01.000000000 +0200
++++ xc/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h	2005-07-18 21:21:35.000000000 +0200
 @@ -335,12 +335,24 @@
  #endif /* DGUX && SVR4 */
  
@@ -1126,8 +1117,8 @@ diff -ur xc.old/programs/Xserver/hw/xfree86/os-support/xf86_OSlib.h xc/programs/
  /**************************************************************************/
  #if defined(sgi)
 diff -ur xc.old/programs/xdm/config/Imakefile xc/programs/xdm/config/Imakefile
---- xc.old/programs/xdm/config/Imakefile	2005-07-18 21:41:44.000000000 +0200
-+++ xc/programs/xdm/config/Imakefile	2005-07-18 21:45:01.000000000 +0200
+--- xc.old/programs/xdm/config/Imakefile	2005-07-18 21:15:01.000000000 +0200
++++ xc/programs/xdm/config/Imakefile	2005-07-18 21:21:35.000000000 +0200
 @@ -10,7 +10,7 @@
  
  all:: Xservers.ws xdm-config Xservers Xresources
@@ -1139,7 +1130,7 @@ diff -ur xc.old/programs/xdm/config/Imakefile xc/programs/xdm/config/Imakefile
  
 diff -ur xc.old/programs/xload/get_load.c xc/programs/xload/get_load.c
 --- xc.old/programs/xload/get_load.c	2005-02-28 18:35:18.000000000 +0100
-+++ xc/programs/xload/get_load.c	2005-07-18 21:45:01.000000000 +0200
++++ xc/programs/xload/get_load.c	2005-07-18 21:21:35.000000000 +0200
 @@ -406,7 +406,7 @@
  }
  #else /* not KVM_ROUTINES */
@@ -1151,7 +1142,7 @@ diff -ur xc.old/programs/xload/get_load.c xc/programs/xload/get_load.c
  {
 diff -ur xc.old/util/memleak/Imakefile xc/util/memleak/Imakefile
 --- xc.old/util/memleak/Imakefile	2005-02-28 18:35:18.000000000 +0100
-+++ xc/util/memleak/Imakefile	2005-07-18 21:45:01.000000000 +0200
++++ xc/util/memleak/Imakefile	2005-07-18 21:21:35.000000000 +0200
 @@ -42,7 +42,7 @@
  GRA_SRCS = getreti386.c stackbottom.c
  #endif
