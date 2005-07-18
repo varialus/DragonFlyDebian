@@ -23,19 +23,36 @@
 <table width="70%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 <th colspan="3" align="left">
-<a name="xfree86"></a><font color="#990000"><h3>XFree86</h3></font></th>
+<a name="xorg"></a><font color="#990000"><h3>X.Org</h3></font></th>
 </tr>
 
 <tr>
 <td width="70%" align="left">
 <p>
-You can use this configuration to get a working mouse in XFree86.
-<br>First, <font color="#461b7e" size=-1><b>apt-get install moused</b></font> and edit /etc/moused.conf, then add the following to /etc/X11/XF86config-4.
+Mouse configuration is now handled via debconf (dpkg-reconfigure xserver-xorg).  The correspondence between mouse devices
+and their device node names is:</p>
 
-<p>
-<font color="#461b7e" size=-1><b>Option "Device" "/dev/sysmouse"</b>
-<br><b>Option "Protocol" "SysMouse"</b></font>
-</p>
+<table>
+<tr>
+  <td><font color="#461b7e" size=-1><b>/dev/psm0</td>
+  <td><font color="#461b7e" size=-1><b>PS/2</td>
+</tr>
+<tr>
+  <td><font color="#461b7e" size=-1><b>/dev/cuaa*</td>
+  <td><font color="#461b7e" size=-1><b>Serial</td>
+</tr>
+<tr>
+  <td><font color="#461b7e" size=-1><b>/dev/ums*</td>
+  <td><font color="#461b7e" size=-1><b>USB</td>
+</tr>
+<tr>
+  <td><font color="#461b7e" size=-1><b>/dev/sysmouse</td>
+  <td><font color="#461b7e" size=-1><b>mouse daemon (moused)</td>
+</tr>
+</table>
+
+<p>With regard to mouse daemon, you only need it if you use your mouse in the console (via syscons).  Otherwise it can be
+safely removed.  <b>FIXME: explain how to use syscons.</b></p>
 
 <p>
 If you're having trouble running X as a non-root user, the following script/hack has been used successfully.
