@@ -172,7 +172,7 @@ diff -u -r1.13 xfree86.cf
      defined(i386BsdArchitecture) || defined(LynxOSArchitecture) || \
 -    defined(OS2Architecture) || defined(GNUMachArchitecture)
 +    defined(OS2Architecture) || defined(GNUMachArchitecture) || \
-+    defined(KFreeBSDArchitecture)
++    (defined(KFreeBSDArchitecture) && defined(i386Architecture))
  #   define BuildScanpci		YES
  # else
  #   define BuildScanpci		NO
@@ -201,7 +201,7 @@ diff -u -r1.50 xorg.cf
      defined(i386BsdArchitecture) || defined(LynxOSArchitecture) || \
 -    defined(OS2Architecture) || defined(GNUMachArchitecture)
 +    defined(OS2Architecture) || defined(GNUMachArchitecture) || \
-+    defined(KFreeBSDArchitecture)
++    (defined(KFreeBSDArchitecture) && defined(i386Architecture))
  #   define BuildScanpci		YES
  # else
  #   define BuildScanpci		NO
@@ -360,22 +360,6 @@ diff -u -r1.7 Xtranssock.c
  #include <sys/param.h>
  #endif /* osf */
  #if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD__) || defined(__DragonFly__)
-Index: programs/xdm/config/Imakefile
-===================================================================
-RCS file: /cvs/xorg/xc/programs/xdm/config/Imakefile,v
-retrieving revision 1.4
-diff -u -r1.4 Imakefile
---- programs/xdm/config/Imakefile	20 Jun 2005 02:59:16 -0000	1.4
-+++ programs/xdm/config/Imakefile	18 Jul 2005 19:17:46 -0000
-@@ -10,7 +10,7 @@
- 
- all:: Xservers.ws xdm-config Xservers Xresources
- 
--#if (defined(i386Architecture) || defined(AMD64Architecture)) && (defined(KNetBSDArchitecture) || defined(KOpenBSDArchitecture))
-+#if (defined(i386Architecture) || defined(AMD64Architecture)) && (defined(NetBSDArchitecture) || defined(OpenBSDArchitecture))
- DEFAULTVT=vt05
- #endif
- 
 Index: programs/xload/get_load.c
 ===================================================================
 RCS file: /cvs/xorg/xc/programs/xload/get_load.c,v
