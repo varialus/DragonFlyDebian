@@ -1,0 +1,53 @@
+diff -ur dar-2.2.1.old/debian/control dar-2.2.1/debian/control
+--- dar-2.2.1.old/debian/control	2005-07-19 22:12:56.000000000 +0200
++++ dar-2.2.1/debian/control	2005-07-19 22:50:57.000000000 +0200
+@@ -2,7 +2,7 @@
+ Section: utils
+ Priority: optional
+ Maintainer: Brian May <bam@debian.org>
+-Build-Depends: debhelper (>= 4.0.0), zlib1g-dev, libattr1-dev, libbz2-dev, e2fslibs-dev, libssl-dev
++Build-Depends: debhelper (>= 4.0.0), zlib1g-dev, libattr1-dev [!kfreebsd-i386 !hurd-i386], libbz2-dev, e2fslibs-dev, libssl-dev
+ Standards-Version: 3.6.1
+ 
+ Package: libdar-dev
+diff -ur dar-2.2.1.old/debian/rules dar-2.2.1/debian/rules
+--- dar-2.2.1.old/debian/rules	2005-07-19 22:12:56.000000000 +0200
++++ dar-2.2.1/debian/rules	2005-07-19 23:08:18.000000000 +0200
+@@ -11,6 +11,7 @@
+ # from having to guess our platform (since we know it already)
+ DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
++DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+ 
+ 
+ CFLAGS = -Wall -g
+@@ -33,10 +34,16 @@
+ #major=`ls src/.libs/lib*.so.* | \
+ # awk '{if (match($$0,/\.so\.[0-9]+$$/)) print substr($$0,RSTART+4)}'`
+ 
++ifeq ($(DEB_HOST_GNU_SYSTEM), linux-gnu)
++confflags += --enable-ea-support
++else
++confflags += --disable-ea-support
++endif
++
+ config.status: configure
+ 	dh_testdir
+ 	# Add here commands to configure the package.
+-	CFLAGS="$(CFLAGS)" ./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info --enable-ea-support
++	CFLAGS="$(CFLAGS)" ./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info $(confflags)
+ 
+ 
+ build: build-stamp
+diff -ur dar-2.2.1.old/src/my_config.h dar-2.2.1/src/my_config.h
+--- dar-2.2.1.old/src/my_config.h	2005-02-20 17:05:45.000000000 +0100
++++ dar-2.2.1/src/my_config.h	2005-07-19 23:30:21.000000000 +0200
+@@ -27,6 +27,8 @@
+ #define MY_CONFIG_H
+ 
+ #if HAVE_CONFIG_H
++#define linux 0
++#define ext2fs 1
+ #include "../config.h"
+ 
+     // workaround for autoconf 2.59
