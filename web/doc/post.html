@@ -59,14 +59,12 @@ and their device node names is:</p>
 safely removed.  <b>FIXME: explain how to use syscons.</b></p>
 
 <p>
-If you're having trouble running X as a non-root user, the following script/hack has been used successfully.
+If you're having trouble running X as a non-root user, try the following:
 </p>
 
 <p>
 <font color="#461b7e" size=-1><b>
-#!/bin/bash -e
-<br>export DISPLAY=:0
-<br>sudo xinit /usr/bin/sudo -u `whoami` x-window-manager -- -nolistentcp 
+sudo sed -i /etc/X11/Xwrapper.config -e "s/^allowed_users=.*/allowed_users=anybody/g"
 </b></font>
 </p>
 
