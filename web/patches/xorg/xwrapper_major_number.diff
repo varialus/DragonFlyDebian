@@ -1,17 +1,60 @@
---- xorg-x11-6.8.2.dfsg.1/debian/local/xserver-wrapper.c~       2005-07-20 22:16:31.000000000 +0200
-+++ xorg-x11-6.8.2.dfsg.1/debian/local/xserver-wrapper.c        2005-07-22 20:21:14.000000000 +0200
-@@ -104,7 +104,14 @@
+--- debian/local/xserver-wrapper.c.old	2005-07-22 21:20:34.000000000 +0200
++++ debian/local/xserver-wrapper.c	2005-07-22 22:12:32.000000000 +0200
+@@ -98,13 +98,27 @@
+ #include <unistd.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
++#include <sys/sysmacros.h> /* major() / minor() */
+ 
+ #if !(NICE_USES_SUSV2_SEMANTICS)
+ # include <sys/time.h>
  # include <sys/resource.h>
  #endif
-
-+/* Define major number for local console terminals */
+ 
+-#define VT_MAJOR_DEV 4
++
++/* We need a way to obtain the major number for VTs.  This changes from kernel
++   to kernel. */
 +#if defined(__linux__)
- #define VT_MAJOR_DEV 4
++  /* On Linux, this is a constant. */
++# define VT_MAJOR_DEV	4
 +#elif defined(__FreeBSD_kernel__)
-+#define VT_MAJOR_DEV 234
++  /* On kFreeBSD, it is assigned dynamicaly.  We gather it from a sample
++     device. */
++# define VT_MAJOR_PATH	"/dev/ttyv0"
 +#else
-+#error Add your kernel here
++# warning Cannot distinguish console users, please add a check for your kernel
++# define VT_MAJOR_DEV	-1
 +#endif
  #define X_WRAPPER_CONFIG_FILE "/etc/X11/Xwrapper.config"
  #define X_SERVER_SYMLINK_DIR "/etc/X11"
  #define X_SERVER_SYMLINK "/etc/X11/X"
+@@ -154,16 +168,26 @@
+     break;
+   case Console:
+     if (getuid() == 0) return TRUE; /* root */
++#if !defined(VT_MAJOR_DEV) && defined(VT_MAJOR_PATH)
++    int vt_major_dev = -1;
++    if (stat (VT_MAJOR_PATH, &s) != 0)
++      (void) fprintf (stderr, "X: cannot stat %s\n", VT_MAJOR_PATH);
++    else
++      vt_major_dev = major(s.st_rdev);
++# define VT_MAJOR_DEV vt_major_dev
++#endif
+     /* see if stdin is a virtual console device */
+     if (fstat(0, &s) != 0) {
+       (void) fprintf(stderr,"X: cannot stat stdin\n");
+       return FALSE;
+     }
++#ifdef VT_MAJOR_DEV
+     if (S_ISCHR(s.st_mode) &&
+-        ((s.st_rdev >> 8) & 0xff) == VT_MAJOR_DEV &&
+-        (s.st_rdev & 0xff) < 64) {
++        major(s.st_rdev) == VT_MAJOR_DEV &&
++        minor(s.st_rdev) < 64) {
+       return TRUE;
+     }
++#endif
+     break;
+   case Anybody:
+     return TRUE;
