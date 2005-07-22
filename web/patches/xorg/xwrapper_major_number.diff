@@ -1,0 +1,17 @@
+--- xorg-x11-6.8.2.dfsg.1/debian/local/xserver-wrapper.c~       2005-07-20 22:16:31.000000000 +0200
++++ xorg-x11-6.8.2.dfsg.1/debian/local/xserver-wrapper.c        2005-07-22 20:21:14.000000000 +0200
+@@ -104,7 +104,14 @@
+ # include <sys/resource.h>
+ #endif
+
++/* Define major number for local console terminals */
++#if defined(__linux__)
+ #define VT_MAJOR_DEV 4
++#elif defined(__FreeBSD_kernel__)
++#define VT_MAJOR_DEV 234
++#else
++#error Add your kernel here
++#endif
+ #define X_WRAPPER_CONFIG_FILE "/etc/X11/Xwrapper.config"
+ #define X_SERVER_SYMLINK_DIR "/etc/X11"
+ #define X_SERVER_SYMLINK "/etc/X11/X"
