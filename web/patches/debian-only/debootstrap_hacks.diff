@@ -1,0 +1,22 @@
+
+Author: rmh
+Description: work around package name redundancy in gnuab's Packages files
+Status: won't send
+
+diff -ur debootstrap-0.3.1.4.old/functions debootstrap-0.3.1.4/functions
+--- debootstrap-0.3.1.4.old/functions	2005-06-27 05:35:13.000000000 +0200
++++ debootstrap-0.3.1.4/functions	2005-07-25 01:17:30.000000000 +0200
+@@ -337,11 +337,11 @@
+ }
+ 
+ download () {
+-    "$DOWNLOAD_DEBS" $(echo "$@" | tr ' ' '\n' | sort)
++    "$DOWNLOAD_DEBS" $(echo "$@" | tr ' ' '\n' | sort | uniq)
+ }
+ 
+ download_indices () {
+-    "$DOWNLOAD_INDICES" $(echo "$@" | tr ' ' '\n' | sort)
++    "$DOWNLOAD_INDICES" $(echo "$@" | tr ' ' '\n' | sort | uniq)
+ }
+ 
+ debfor () {
