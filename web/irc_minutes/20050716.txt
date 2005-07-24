@@ -1,0 +1,73 @@
+		GNU/kFreeBSD IRC meeting, July 16, 2005
+                =======================================
+
+
+The third Debian GNU/kFreeBSD meeting was held from 19:00 UTC to 19:55
+UTC on Saturday July 16th.
+
+The next meeting will take place on Sunday July 31th at 19:00 UTC.
+
+
+Minutes
+-------
+
+People mentioned:
+  aurel32: 	Aurelien Jarno
+  bal00:	Hector Garcia
+  braindmg:	Guillem Jover
+  nyu:		Robert Millan
+
+
+1) bal00 has finished porting pfctl and will start with authpf. He will 
+   then make a package, but libbsd has to be packaged first.
+
+2) aurel32 explained that he has finished to update gcc-3.3 and gcc-3.4. 
+   Java and ADA are disabled for all versions of gcc on kfreebsd. 
+   Porting has to be done before trying to reenable them.
+
+3) aurel32 has spoken with Goto Masanori at Debconf 5, and he agrees to 
+   include our glibc patches in the Debian package. aurel32 will 
+   continue working on glibc 2.3.5.
+
+4) aurel32 and braindmg have spoken with James Troup about the inclusion
+   of Debian GNU/kFreeBSD in the Debian archive. He basically agrees, 
+   but it would be only possible after the SCC split, which should 
+   occurs in one month and a half.
+
+5) aurel32 said that when kfreebsd will be an official port, it won't be 
+   possible to have modified source packages into the archive. That means
+   we should have the whole toolchain built from unmodified package 
+   sources. bal00 told we could fill RC bugs against packages that need
+   patches, but unfortunately has it is not a release architecture, it
+   won't be possible. nyu added that we need to decide whether having an 
+   official package in debian depending on a "tainted" package (i.e. 
+   either unreleased, or a package that in turn depends on tainted one) 
+   has a detrimental effect on the distribution.
+
+6) nyu explained that he ported libkvm just because gdb needs it, but he
+   didn't port it right and introduced a lots of dirty hacks. The entire 
+   patch needs to be reviewed before using it for anything serious thing.
+   
+
+New action points
+-----------------
+* somebody:		port libkvm in a clean manner
+
+
+Opened action points
+--------------------
+* aurel32:		rebuild all packages that are still using 
+                        lipthread2
+* braindmg:		work on util-linux
+* aurel32:		add java support to gcc
+* braindmg:		send a status of the port to debian-devel
+* aurel32:		finish porting glibc-2.3.5
+* aurel32 & braindmg:	fix our packages that are modifying 
+                        build-depends at build time
+
+			
+Closed action points
+--------------------
+* aurel32:		get the out-of-date packages down to 220 
+                        by 20050611
+
