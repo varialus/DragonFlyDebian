@@ -1,0 +1,86 @@
+diff -ur mdetect-0.5.2.old/mdetect.c mdetect-0.5.2/mdetect.c
+--- mdetect-0.5.2.old/mdetect.c	2002-02-28 02:45:17.000000000 +0100
++++ mdetect-0.5.2/mdetect.c	2005-07-25 22:52:43.000000000 +0200
+@@ -234,7 +234,11 @@
+ 		}
+ 	} else {
+ 		/* nasty, nasty special case logic for XFree86 */
+-		if ((strcmp(dev->name, "/dev/psaux") == 0) || (strcmp(dev->name, "/dev/misc/psaux") == 0)) {
++		if ((strcmp(dev->name, "/dev/psaux") == 0) || (strcmp(dev->name, "/dev/misc/psaux") == 0)
++#ifdef DEV_PSAUX_PREFIX
++		   || (strncmp(dev->name, "/dev/" DEV_PSAUX_PREFIX, sizeof("/dev/" DEV_PSAUX_PREFIX) - 1) == 0)
++#endif
++		   ) {
+ 			if (strcasecmp(driver->xfree86_protocol_name, "IntelliMouse") == 0) {
+ 				driver->xfree86_protocol_name = "ImPS/2";
+ 			}
+@@ -434,11 +438,28 @@
+ 	memset(&temp, 0, sizeof(temp));
+ 	strcat(strcpy(temp.name, "/dev/"), name);
+ 
+-	if (!strncmp(name, "ttyS", 4)) {
++	if (!strncmp(name, DEV_SERIAL_PREFIX, sizeof(DEV_SERIAL_PREFIX) - 1)) {
+ 		driver = get_mouse("serial");
+ 		temp.flags |= DEV_SERIAL_PORT;
+ 
+-	} else {
++	}
++#ifdef DEV_PSAUX_PREFIX
++	else if (!strncmp(name, DEV_PSAUX_PREFIX, sizeof(DEV_PSAUX_PREFIX) - 1)) {
++		driver = get_mouse("psaux");
++	}
++#endif
++#ifdef DEV_USB_PREFIX
++	else if (!strncmp(name, DEV_USB_PREFIX, sizeof(DEV_USB_PREFIX) - 1)) {
++		driver = get_mouse("usb");
++	}
++#endif
++#ifdef DEV_BUSMOUSE_PREFIX
++	else if (!strncmp(name, DEV_BUSMOUSE_PREFIX, sizeof(DEV_BUSMOUSE_PREFIX) - 1)) {
++		driver = get_mouse("sunmouse");
++	}
++#endif
++#ifdef __linux__
++	else {
+ 		if (lstat(temp.name, &stb) < 0 || !S_ISCHR(stb.st_mode))
+ 			return NULL;
+ 
+@@ -449,6 +470,7 @@
+ 			break;
+ 		}
+ 	}
++#endif
+ 
+ 	if (driver == NULL)
+ 		return NULL;
+diff -ur mdetect-0.5.2.old/mdetect.h mdetect-0.5.2/mdetect.h
+--- mdetect-0.5.2.old/mdetect.h	2002-02-28 02:45:17.000000000 +0100
++++ mdetect-0.5.2/mdetect.h	2005-07-25 22:35:45.000000000 +0200
+@@ -67,4 +67,13 @@
+ extern int		opt_verbose;
+ extern int		opt_nopnp;
+ 
++#if defined(__linux__)
++# define DEV_SERIAL_PREFIX		"ttyS"
++#elif defined(__FreeBSD_kernel__)
++# define DEV_SERIAL_PREFIX		"cuaa"
++# define DEV_PSAUX_PREFIX		"psm"
++# define DEV_USB_PREFIX			"ums"
++# define DEV_BUSMOUSE_PREFIX		"mse"
++#endif
++
+ #endif /* MDETECT_H */
+diff -ur mdetect-0.5.2.old/mice.c mdetect-0.5.2/mice.c
+--- mdetect-0.5.2.old/mice.c	2001-02-16 16:49:56.000000000 +0100
++++ mdetect-0.5.2/mice.c	2005-07-25 22:39:33.000000000 +0200
+@@ -45,7 +45,10 @@
+ 	tty.c_oflag	= 0;
+ 	tty.c_lflag	= 0;
+ 	tty.c_cflag	= flags | CREAD | CLOCAL | HUPCL;
++/* c_line is not POSIX */
++#ifdef __linux__
+ 	tty.c_line	= 0;
++#endif
+ 	tty.c_cc[VTIME]	= 0;
+ 	tty.c_cc[VMIN]	= 1;
+ 
