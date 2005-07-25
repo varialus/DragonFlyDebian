@@ -31,10 +31,10 @@ acpid: kfreebsd-i386 i386 ia64 amd64						      # acpi is kfreebsd-i386 i386/ia6
 %alsadriver: kfreebsd-i386 i386                                                     # kfreebsd-i386 i386 specifc
 %alsalib: kfreebsd-i386 i386                                                        # kfreebsd-i386 i386 specifc
 alsautils: kfreebsd-i386 i386                                                       # kfreebsd-i386 i386 specifc
-%alsa-modules-2.4.16-i386: i386					      # i386 specific
-%alsa-modules-2.4.18-i386: i386					      # i386 specific
-%alsa-modules-2.4.19-i386: i386					      # i386 specific
-%alsa-modules-i386: i386					      # i386 specific
+%alsa-modules-2.4.16-i386: i386					      # kfreebsd-i386 i386 specific
+%alsa-modules-2.4.18-i386: i386					      # kfreebsd-i386 i386 specific
+%alsa-modules-2.4.19-i386: i386					      # kfreebsd-i386 i386 specific
+%alsa-modules-i386: i386					      # kfreebsd-i386 i386 specific
 %amiga-fdisk: m68k powerpc                                            # m68k/powerpc specific
 %amd64-libs: i386						      # kfreebsd-i386 i386 only
 %arcboot: mips							      # mips boot loader
@@ -111,6 +111,7 @@ egcs64: sparc							      # sparc specfic
 elilo: kfreebsd-i386 i386 ia64						      # ia64 specific boot-loader
 %elilo-installer: ia64						      # Installer for ia64 boot-loader
 emacs19: !powerpc                                                     # too old
+%encfs: !hurd-i386 !kfreebsd-i386				      # linux specific
 %etherboot: kfreebsd-i386 i386						      # kfreebsd-i386 i386 specific
 %extipl: kfreebsd-i386 i386							      # PC boot loader
 fai-kernels: kfreebsd-i386 i386						      # kfreebsd-i386 i386 specific
@@ -121,6 +122,7 @@ fdflush: alpha kfreebsd-i386 i386                                               
 freej: kfreebsd-i386 i386							      # contains kfreebsd-i386 i386 assembler
 %ftape: i386 alpha						      # [?] ANAIS (!m68k anyway, others?)
 %ftape-tools: kfreebsd-i386 i386 alpha arm                                          # [?] ANAIS (!m68k anyway, others?)
+%fuse: !hurd-i386 !kfreebsd-i386				      # linux specific
 galeon-snapshot: !m68k                                                # depends on mozilla-snapshot
 %gatos: kfreebsd-i386 i386							      # no upstream !i386 support
 gcardscheme: kfreebsd-i386 i386 alpha powerpc					      # PCMCIA frontend
@@ -398,7 +400,13 @@ kernel-image-2.2.20-mvme16x: m68k
 %kernel-image-2.6.10-m68k: m68k
 %kernel-image-2.6.10-hppa: hppa
 %kernel-image-2.6.10-s390: s390
+%kernel-image-2.6.10-sparc: sparc
 %kernel-image-2.6.11-ia64: ia64
+%kernel-image-2.6.11-alpha: alpha
+%kernel-image-2.6.11-amd64: amd64
+%kernel-image-2.6.11-i386: i386
+%kernel-image-2.6.11-s390: s390
+%kernel-image-2.6.11-sparc: sparc
 %kernel-image-sparc-2.2: sparc
 %kernel-image-sparc-2.4: sparc
 %kernel-image-speakup-i386: i386
@@ -441,6 +449,7 @@ kernel-patch-2.2.19-reiserfs: i386
 %kernel-patch-2.4.26-mips: mips
 %kernel-patch-2.4.27-apus: powerpc
 %kernel-patch-2.4.27-powerpc: powerpc
+%kernel-patch-2.4.27-mips: mips
 %kernel-patch-2.4-kgdb: i386 powerpc				      # [ANAIS]
 %kernel-patch-pc9800: i386					      # .ja kfreebsd-i386 i386 machine variant mods
 %kernel-patch-powerpc-2.4.26: powerpc
@@ -525,6 +534,7 @@ loadlin: kfreebsd-i386 i386                                                     
 longrun: kfreebsd-i386 i386							      # kfreebsd-i386 i386 Crusoe specific
 ltrace: kfreebsd-i386 i386 m68k arm powerpc s390 amd64                              # [p] needs ported
 %lush: !ia64							      # ANAIS, #267494
+%m68kboot: m68k
 %maxdb: !hppa !ia64						      # ANAIS
 %maxdb-buildtools: !hppa !ia64					      # ANAIS
 %mac-fdisk: m68k powerpc 					      # Apple Mac fdisk
@@ -550,6 +560,8 @@ mkrboot: kfreebsd-i386 i386                                                     
 mlton: kfreebsd-i386 i386							      # Self-hosting ML compiler
 mmx-emu: kfreebsd-i386 i386                                                         # kfreebsd-i386 i386 specific
 mocka: kfreebsd-i386 i386							      # kfreebsd-i386 i386 only compiler
+%modutils: !kfreebsd-i386 !hurd-i386				      # Linux specific
+%module-init-tools:  !kfreebsd-i386 !hurd-i386			      # Linux specific
 mondo: kfreebsd-i386 i386							      # needs mindi
 morse: kfreebsd-i386 i386							      # kfreebsd-i386 i386 specific
 mosixview: kfreebsd-i386 i386							      # depends on kfreebsd-i386 i386-only mosix
@@ -563,6 +575,7 @@ mps: kfreebsd-i386 i386							      # mosix procps tools
 %mwavem: kfreebsd-i386 i386							      # IBM Thinkpad DSP/Modem programs
 %ncurses4.2: alpha arm kfreebsd-i386 i386 m68k powerpc sparc                        # compat only
 %ndiswrapper: i386                                                    # Windows DLL loader
+%ndiswrapper-modules-i386: i386
 %neon0.23: kfreebsd-i386 i386 powerpc s390 sparc amd64			      # [ANAIS] revived only for OOo, which only exists there
 netcfg-dhcp: !s390						      # s390 installs don't use DHCP
 %nhc98: !ia64 !alpha !amd64 !sparc !m68k			      # Per Ian Lynagh <igloo@earth.li>
@@ -597,11 +610,11 @@ oskit: kfreebsd-i386 i386 hurd-i386						      # kfreebsd-i386 i386 OS functions
 %gtkpbbuttons: powerpc						      # powerpc specific
 pbuilder-uml: i386						      # depends on user-mode-linux
 pciutils: !m68k                                                       # m68k doesn't do PCI; others?
-#%pcmcia-cs: kfreebsd-i386 i386 arm alpha powerpc ia64                              # should build anywhere with PCI now?
+#%pcmcia-cs: i386 arm alpha powerpc ia64                              # should build anywhere with PCI now?
 %pcmcia-cs: !s390						      # everywhere else has bridges.
-%pcmcia-modules-2.4.26-i386: kfreebsd-i386 i386				      # kfreebsd-i386 i386 specific
-%pcmcia-modules-2.4.27-i386: kfreebsd-i386 i386				      # kfreebsd-i386 i386 specific
-%pcmcia-modules-2.4.28-i386: kfreebsd-i386 i386				      # kfreebsd-i386 i386 specific
+%pcmcia-modules-2.4.26-i386: i386				      # i386 specific
+%pcmcia-modules-2.4.27-i386: i386				      # i386 specific
+%pcmcia-modules-2.4.28-i386: i386				      # i386 specific
 pearpc: !m68k							      # [ANAIS]
 %pfmon: ia64							      # ia64 specific
 pforth: arm kfreebsd-i386 i386 m68k powerpc s390 sparc hurd-i386 hppa		      # requires explicit porting
@@ -622,6 +635,7 @@ powerpc-utils: powerpc						      # powerpc specific
 %prelink: alpha amd64 kfreebsd-i386 i386 powerpc				      # No upstream support for others
 primaxscan: kfreebsd-i386 i386						      # [?]
 %prospect: i386 ia64						      # [ANAIS]
+%python-fuse: !hurd-i386 !kfreebsd-i386				      # linux specific
 %psyco: kfreebsd-i386 i386							      # [ANAIS] no upstream support
 %python-kinterbasdb: kfreebsd-i386 i386					      # depends on firebird
 %pupa: kfreebsd-i386 i386							      # kfreebsd-i386 i386 specific boot loader
@@ -672,6 +686,7 @@ speedtouch: !m68k !kfreebsd-i386				      # [ANAIS]
 %splay: kfreebsd-i386 i386 alpha arm m68k powerpc				      # [?] broken on sparc (see BTS]
 %sppc: !m68k							      # no xlibosmesa-dev build-dep for m68k
 %srm-reader: alpha						      # Alpha specific udeb
+%sshfs: !hurd-i386 !kfreebsd-i386				      # linux specific
 %stalin: alpha arm kfreebsd-i386 i386 sparc					      # [ANAIS]
 %strategoxt: kfreebsd-i386 i386 s390 sparc powerpc hppa mipsel mips		      # b-ds on xt-sdf2 package, doesn't work on arm #230574
 subterfugue: kfreebsd-i386 i386						      # kfreebsd-i386 i386 specific process tracing etc.
