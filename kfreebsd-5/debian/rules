@@ -9,17 +9,18 @@ full_version	:= $(shell dpkg-parsechangelog | grep ^Version | sed -e 's/^.*: //g
 version		:= $(shell echo $(full_version) | sed -e 's/[+-].*//g')
 major		:= $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
-kfreebsd_cpu    := $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
-ifeq ($(kfreebsd_cpu), i486)
-kfreebsd_cpu    := i386
+kfreebsd_cpu	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+ifeq ($(kfreebsd_cpu), amd64)
+kfreebsd_cpu	:= x86_64
 endif
 
 INDEP_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(major)
 ARCH_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(major)
+SRC_PACKAGE	:= $(CURDIR)/kfreebsd-source-$(version).tar.bz2
 
-KERNEL          := GENERIC
-MAKE            := make DESTDIR=$(ARCH_PACKAGE) MACHINE_ARCH=$(kfreebsd_cpu) WERROR=
-PATH            := /usr/lib/freebsd:$(CURDIR)/bin:$(PATH)
+KERNEL	:= GENERIC
+MAKE	:= make DESTDIR=$(ARCH_PACKAGE) MACHINE_ARCH=$(kfreebsd_cpu) WERROR=
+PATH	:= /usr/lib/freebsd:$(CURDIR)/bin:$(PATH)
 
 clean:
 	dh_testdir
@@ -28,47 +29,42 @@ clean:
 	rm -f *-stamp
 	dh_clean
 
-src: 
+src:
 	tar xfj $(CURDIR)/src.tar.bz2
 	
 	chmod +x $(CURDIR)/debian/autopatch.sh \
 		&& $(CURDIR)/debian/autopatch.sh
-
-	for i in `ls $(CURDIR)/debian/patches/*.diff` ; do \
+	
+	for i in `ls $(CURDIR)/debian/patches/*.diff`; do \
 		echo "--- Patch $$i ---" ; \
 		cat $$i | patch -p0 ; \
 	done
-
+	
 	sed -e "s/@version@/$(version)/g" -e "s/@revision@/$(revision)/g" \
 		$(CURDIR)/debian/patches/902_debian_version.diff.in \
 		| patch -p0
-	
 
 build-indep: build-indep-stamp
 build-indep-stamp: src
 	dh_testdir
-
-	tar cfj kfreebsd-source-$(version).tar.bz2 src
-
+	
+	tar cfj $(SRC_PACKAGE) src
+	
 	touch build-indep-stamp
-
 
 build-arch: build-arch-stamp
 build-arch-stamp: src
 	dh_testdir
-
-	mkdir -p $(CURDIR)/bin 
-	ln -s `which gcc-3.4` $(CURDIR)/bin/cc 
+	
+	mkdir -p $(CURDIR)/bin
+	ln -s `which gcc-3.4` $(CURDIR)/bin/cc
 	ln -s `which gcc-3.4` $(CURDIR)/bin/gcc
 	cd $(CURDIR)/src/sys/$(kfreebsd_cpu)/conf \
 		&& config $(KERNEL)
-	cd $(CURDIR)/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ \
-		&& $(MAKE) depend
-	cd $(CURDIR)/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ \
-		&& $(MAKE)
-
+	$(MAKE) -C $(CURDIR)/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ depend
+	$(MAKE) -C $(CURDIR)/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/
+	
 	touch build-arch-stamp
-
 
 install-indep: install-indep-stamp
 install-indep-stamp: build-indep
@@ -76,17 +72,17 @@ install-indep-stamp: build-indep
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-
-	mkdir -p $(INDEP_PACKAGE)/usr/src
-	install -m 644 -g root -o root $(CURDIR)/kfreebsd-source-$(version).tar.bz2 $(INDEP_PACKAGE)/usr/src/
-
-	touch install-indep-stamp
 	
+	mkdir -p $(INDEP_PACKAGE)/usr/src
+	install -m 644 -g root -o root \
+		$(SRC_PACKAGE) \
+		$(INDEP_PACKAGE)/usr/src/
+	
+	touch install-indep-stamp
 
 install-arch: install-arch-stamp
 install-arch-stamp: build-arch
-
-        # install device.hints
+	# install device.hints
 	mkdir -p $(ARCH_PACKAGE)/boot/kernel
 	install -o root -g root -m 644 \
 		$(CURDIR)/src/sys/$(kfreebsd_cpu)/conf/GENERIC.hints \
@@ -101,17 +97,16 @@ install-arch-stamp: build-arch
 	mkdir -p $(ARCH_PACKAGE)/sbin
 	ln -s /bin/true \
 		$(ARCH_PACKAGE)/sbin/fsck.cd9660
-
-        # now install the kernel
-	cd $(CURDIR)/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL) && \
-		$(MAKE) install
+	
+	# now install the kernel
+	$(MAKE) -C $(CURDIR)/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL) install
 	chmod 644 $(ARCH_PACKAGE)/boot/kernel/kernel
-
+	
 	# Override file
 	mkdir -p $(ARCH_PACKAGE)/usr/share/lintian/overrides
-	install -p -o root -g root -m 644 $(CURDIR)/debian/kfreebsd-image-$(major).overrides \
+	install -p -o root -g root -m 644 \
+		$(CURDIR)/debian/kfreebsd-image-$(major).overrides \
 		$(ARCH_PACKAGE)/usr/share/lintian/overrides/kfreebsd-image-$(major)
-
 
 # Build architecture-independent files here.
 binary-indep: build-indep install-indep
@@ -144,8 +139,11 @@ binary-arch: build-arch install-arch
 	dh_installdeb -a
 	dh_shlibdeps -a -X/boot
 	dh_gencontrol -a
-	dh_md5sums -a 
+	dh_md5sums -a
 	dh_builddeb -a
 
 binary: binary-indep binary-arch
-.PHONY: clean build build-indep build-stamp-indep binary-indep binary-arch binary-indep binary-arch binary
+
+.PHONY: clean build build-indep
+.PHONY: binary-indep binary-arch binary-indep binary-arch binary
+
