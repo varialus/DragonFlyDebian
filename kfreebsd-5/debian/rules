@@ -1,0 +1,151 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+full_version	:= $(shell dpkg-parsechangelog | grep ^Version | sed -e 's/^.*: //g')
+version		:= $(shell echo $(full_version) | sed -e 's/[+-].*//g')
+major		:= $(shell echo $(version) | sed -e 's/\..*//g')
+revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
+kfreebsd_cpu    := $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
+ifeq ($(kfreebsd_cpu), i486)
+kfreebsd_cpu    := i386
+endif
+
+INDEP_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(major)
+ARCH_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(major)
+
+KERNEL          := GENERIC
+MAKE            := make DESTDIR=$(ARCH_PACKAGE) MACHINE_ARCH=$(kfreebsd_cpu) WERROR=
+PATH            := /usr/lib/freebsd:$(CURDIR)/bin:$(PATH)
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -rf bin src kfreebsd-source-*.tar.bz2
+	rm -f *-stamp
+	dh_clean
+
+src: 
+	tar xfj $(CURDIR)/src.tar.bz2
+	
+	chmod +x $(CURDIR)/debian/autopatch.sh \
+		&& $(CURDIR)/debian/autopatch.sh
+
+	for i in `ls $(CURDIR)/debian/patches/*.diff` ; do \
+		echo "--- Patch $$i ---" ; \
+		cat $$i | patch -p0 ; \
+	done
+
+	sed -e "s/@version@/$(version)/g" -e "s/@revision@/$(revision)/g" \
+		$(CURDIR)/debian/patches/902_debian_version.diff.in \
+		| patch -p0
+	
+
+build-indep: build-indep-stamp
+build-indep-stamp: src
+	dh_testdir
+
+	tar cfj kfreebsd-source-$(version).tar.bz2 src
+
+	touch build-indep-stamp
+
+
+build-arch: build-arch-stamp
+build-arch-stamp: src
+	dh_testdir
+
+	mkdir -p $(CURDIR)/bin 
+	ln -s `which gcc-3.4` $(CURDIR)/bin/cc 
+	ln -s `which gcc-3.4` $(CURDIR)/bin/gcc
+	cd $(CURDIR)/src/sys/$(kfreebsd_cpu)/conf \
+		&& config $(KERNEL)
+	cd $(CURDIR)/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ \
+		&& $(MAKE) depend
+	cd $(CURDIR)/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ \
+		&& $(MAKE)
+
+	touch build-arch-stamp
+
+
+install-indep: install-indep-stamp
+install-indep-stamp: build-indep
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	mkdir -p $(INDEP_PACKAGE)/usr/src
+	install -m 644 -g root -o root $(CURDIR)/kfreebsd-source-$(version).tar.bz2 $(INDEP_PACKAGE)/usr/src/
+
+	touch install-indep-stamp
+	
+
+install-arch: install-arch-stamp
+install-arch-stamp: build-arch
+
+        # install device.hints
+	mkdir -p $(ARCH_PACKAGE)/boot/kernel
+	install -o root -g root -m 644 \
+		$(CURDIR)/src/sys/$(kfreebsd_cpu)/conf/GENERIC.hints \
+		$(ARCH_PACKAGE)/boot/device.hints
+	install -o root -g root -m 644 \
+		$(CURDIR)/src/sys/boot/forth/loader.conf \
+		$(ARCH_PACKAGE)/boot/loader.conf
+	mkdir -p $(ARCH_PACKAGE)/boot/defaults
+	install -o root -g root -m 644 \
+		$(CURDIR)/src/sys/boot/forth/loader.conf \
+		$(ARCH_PACKAGE)/boot/defaults/loader.conf
+	mkdir -p $(ARCH_PACKAGE)/sbin
+	ln -s /bin/true \
+		$(ARCH_PACKAGE)/sbin/fsck.cd9660
+
+        # now install the kernel
+	cd $(CURDIR)/src/sys/$(kfreebsd_cpu)/compile/$(KERNEL) && \
+		$(MAKE) install
+	chmod 644 $(ARCH_PACKAGE)/boot/kernel/kernel
+
+	# Override file
+	mkdir -p $(ARCH_PACKAGE)/usr/share/lintian/overrides
+	install -p -o root -g root -m 644 $(CURDIR)/debian/kfreebsd-image-$(major).overrides \
+		$(ARCH_PACKAGE)/usr/share/lintian/overrides/kfreebsd-image-$(major)
+
+
+# Build architecture-independent files here.
+binary-indep: build-indep install-indep
+	dh_testdir
+	dh_testroot
+	dh_installdocs -i
+	dh_installchangelogs -i
+	dh_link -i
+	dh_strip -i
+	dh_compress -i
+	dh_fixperms -i
+	dh_makeshlibs -i
+	dh_installdeb -i
+	dh_shlibdeps -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
+
+# Build architecture-dependent files here.
+binary-arch: build-arch install-arch
+	dh_testdir
+	dh_testroot
+	dh_installdocs -a
+	dh_installchangelogs -a
+	dh_link -a
+	dh_strip -a -X/boot
+	dh_compress -a
+	dh_fixperms -a
+	dh_makeshlibs -a
+	dh_installdeb -a
+	dh_shlibdeps -a -X/boot
+	dh_gencontrol -a
+	dh_md5sums -a 
+	dh_builddeb -a
+
+binary: binary-indep binary-arch
+.PHONY: clean build build-indep build-stamp-indep binary-indep binary-arch binary-indep binary-arch binary
