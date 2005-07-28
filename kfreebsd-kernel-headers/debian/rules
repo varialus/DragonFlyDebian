@@ -1,0 +1,93 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+kfreebsd_cpu	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+ifeq ($(kfreebsd_cpu), x86_64)
+kfreebsd_cpu	:= amd64
+endif
+
+major		:= 5
+
+HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-kernel-headers
+SRC_TAR		:= /usr/src/kfreebsd-source-$(major).tar.bz2
+SRC_DIR		:= kfreebsd-source-$(major)
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f *-stamp
+	rm -rf kfreebsd-source-* 
+	dh_clean
+
+build: build-stamp
+build-stamp:
+	dh_testdir
+	
+	tar xfj $(SRC_TAR)
+
+	for i in $(CURDIR)/debian/patches/*.diff ; do \
+		echo "--- Patch $$i ---" ; \
+		cat $$i | patch -p0 -d $(SRC_DIR) ; \
+	done
+
+	touch build-stamp
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	mkdir -p $(HEADERS_PACKAGE)/usr/include/machine
+	
+	cd $(SRC_DIR)/sys \
+		&& for file in `cat $(CURDIR)/debian/includes.list` ; do \
+			if [ -d $$file ] ; then \
+				find $$file -type f -name "*.h" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/include \; ; \
+			else \
+				cp --parents $$file $(HEADERS_PACKAGE)/usr/include ; \
+			fi ;\
+		done
+
+	cd $(SRC_DIR)/sys/$(kfreebsd_cpu)/include \
+		&& find . -type f -name "*.h" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/include/machine \;
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+#	dh_installdebconf
+	dh_installdocs
+#	dh_installexamples
+#	dh_installmenu
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime	
+#	dh_installinit
+#	dh_installcron
+#	dh_installman
+#	dh_installinfo
+	dh_installchangelogs 
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_makeshlibs
+	dh_installdeb
+#	dh_perl
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
