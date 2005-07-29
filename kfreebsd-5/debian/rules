@@ -7,28 +7,27 @@
 
 full_version	:= $(shell dpkg-parsechangelog | grep ^Version | sed -e 's/^.*: //g')
 version		:= $(shell echo $(full_version) | sed -e 's/[+-].*//g')
-major		:= $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 kfreebsd_cpu	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 ifeq ($(kfreebsd_cpu), amd64)
 kfreebsd_cpu	:= x86_64
 endif
 
-SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(major)
-IMAGE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(major)
-HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-headers-$(major)
-SRC_TAR		:= kfreebsd-source-$(major).tar.bz2
-SRC_DIR		:= kfreebsd-source-$(major)
-HEADERS_DIR	:= kfreebsd-headers-$(major)
+SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
+IMAGE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(version)
+HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-headers-$(version)
+SRC_TAR		:= kfreebsd-source-$(version).tar.bz2
+SRC_DIR		:= kfreebsd-source-$(version)
+HEADERS_DIR	:= kfreebsd-headers-$(version)
 
 KERNEL	:= GENERIC
-MAKE	:= make DESTDIR=$(IMAGE_PACKAGE) MACHINE_ARCH=$(kfreebsd_cpu) WERROR=
-PATH	:= /usr/lib/freebsd:$(CURDIR)/bin:$(PATH)
+MAKE	:= make MACHINE_ARCH=$(kfreebsd_cpu) CC=gcc-3.4 WERROR= 
+PATH	:= /usr/lib/freebsd:$(PATH)
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -rf bin src kfreebsd-source-*
+	rm -rf src kfreebsd-source-*
 	rm -f *-stamp
 	dh_clean
 
@@ -59,9 +58,6 @@ build-arch: build-arch-stamp
 build-arch-stamp: $(SRC_DIR)
 	dh_testdir
 	
-	mkdir -p $(CURDIR)/bin
-	ln -s `which gcc-3.4` $(CURDIR)/bin/cc
-	ln -s `which gcc-3.4` $(CURDIR)/bin/gcc
 	cd $(SRC_DIR)/sys/$(kfreebsd_cpu)/conf \
 		&& config $(KERNEL)
 	$(MAKE) -C $(SRC_DIR)/sys/$(kfreebsd_cpu)/compile/$(KERNEL)/ depend
@@ -76,17 +72,10 @@ install-indep-stamp: build-indep
 	dh_clean -k
 	dh_installdirs
 
-	# Source package
 	mkdir -p $(SOURCE_PACKAGE)/usr/src
 	chown -R root.src $(SRC_DIR)
 	tar cfj $(SOURCE_PACKAGE)/usr/src/$(SRC_TAR) $(SRC_DIR)
 
-	# Headers package
-	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
-	cd $(SRC_DIR) \
-		&& find . -type f -name "*.h" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \;
-	find $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) -type f -exec chmod 644 {} \;	
-	
 	touch install-indep-stamp
 
 install-arch: install-arch-stamp
@@ -108,15 +97,22 @@ install-arch-stamp: build-arch
 		$(IMAGE_PACKAGE)/sbin/fsck.cd9660
 	
 	# now install the kernel
-	$(MAKE) -C $(SRC_DIR)/sys/$(kfreebsd_cpu)/compile/$(KERNEL) install
+	$(MAKE) -C $(SRC_DIR)/sys/$(kfreebsd_cpu)/compile/$(KERNEL) DESTDIR=$(IMAGE_PACKAGE) install
 	chmod 644 $(IMAGE_PACKAGE)/boot/kernel/kernel
 	
-	# Override file
+	# override file
 	mkdir -p $(IMAGE_PACKAGE)/usr/share/lintian/overrides
 	install -p -o root -g root -m 644 \
-		$(CURDIR)/debian/kfreebsd-image-$(major).overrides \
-		$(IMAGE_PACKAGE)/usr/share/lintian/overrides/kfreebsd-image-$(major)
+		$(CURDIR)/debian/kfreebsd-image-$(version).overrides \
+		$(IMAGE_PACKAGE)/usr/share/lintian/overrides/kfreebsd-image-$(version)
 
+	# headers package
+	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
+	cd $(SRC_DIR) \
+		&& find . -type f -name "*.h" -not -regex ".*modules.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \; \
+		&& cp -d --parents sys/i386/compile/$(KERNEL)/machine $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
+	find $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) -type f -exec chmod 644 {} \;	
+	
 # Build architecture-independent files here.
 binary-indep: build-indep install-indep
 	dh_testdir

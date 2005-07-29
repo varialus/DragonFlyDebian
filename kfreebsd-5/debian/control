@@ -7,36 +7,36 @@ Build-Depends-Indep: debhelper (>= 4.1.0), bzip2, patchutils (>= 0.2.25)
 Build-Depends: debhelper (>= 4.1.0), bzip2, patchutils (>= 0.2.25), dpkg (>= 1.13.9), freebsd5-buildutils (>= 5.3), flex-old | flex, gcc-3.4
 Standards-Version: 3.6.2
 
-Package: kfreebsd-image-5
-Architecture: kfreebsd-i386
-Section: base
-Essential: yes
-Depends: freebsd-utils (>= 5)
-Provides: kfreebsd-image
-Conflicts: kfreebsd5
-Replaces: kfreebsd5
-Description: kernel of FreeBSD 5.3 image
- This package provides the binary image and pre-built loadable modules for 
- the kernel of FreeBSD 5.3, base of a GNU/kFreeBSD system.
-
-Package: kfreebsd-source-5
+Package: kfreebsd-source-5.3
 Architecture: all
 Section: devel
 Recommends: freebsd5-buildutils
-Provides: kfreebsd-source
+Provides: kfreebsd-source-5, kfreebsd-source
 Replaces: kfreebsd5-source
 Description: source code for kernel of FreeBSD 5.3 with Debian patches
  This package provides the source code for kernel of FreeBSD 5.3, base of 
  a GNU/kFreeBSD system.
 
-Package: kfreebsd-headers-5
-Architecture: all
+Package: kfreebsd-image-5.3
+Architecture: kfreebsd-i386
+Section: base
+Essential: yes
+Depends: freebsd-utils (>= 5)
+Provides: kfreebsd-image-5, kfreebsd-image
+Conflicts: kfreebsd5, kfreebsd-image
+Replaces: kfreebsd5
+Description: kernel of FreeBSD 5.3 image
+ This package provides the binary image and pre-built loadable modules for 
+ the kernel of FreeBSD 5.3, base of a GNU/kFreeBSD system.
+
+Package: kfreebsd-headers-5.3
+Architecture: kfreebsd-i386
 Section: devel
-Provides: kfreebsd-headers
+Provides: kfreebsd-headers-5, kfreebsd-headers
 Depends: coreutils
 Description: header files for kernel of FreeBSD 5.3
  This package provides the header files for kernel of FreeBSD 5.3, generally 
  used for building out-of-tree kernel modules. These files are going to be 
- installed into /usr/src/kfreebsd-headers-5, and can be used for building 
- modules that load into the kernel provided by the kfreebsd-image-5 package.
+ installed into /usr/src/kfreebsd-headers-5.3, and can be used for building 
+ modules that load into the kernel provided by the kfreebsd-image-5.3 package.
       
