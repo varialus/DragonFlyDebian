@@ -48,10 +48,6 @@ $(SRC_DIR):
 		echo "--- Patch $$i ---" ; \
 		cat $$i | patch -p0 -d $(SRC_DIR) ; \
 	done
-	
-	sed -e "s/@version@/$(version)/g" -e "s/@revision@/$(revision)/g" \
-		$(CURDIR)/debian/patches/902_debian_version.diff.in \
-		| patch -p0 -d $(SRC_DIR)
 
 build-indep: build-indep-stamp
 build-indep-stamp: $(SRC_DIR)
