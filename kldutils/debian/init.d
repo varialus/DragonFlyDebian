@@ -11,15 +11,17 @@
 #
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/sbin/kldload
-test -x $DAEMON || exit 0
+test -x /sbin/kldload || exit 1
+modules="`grep -vs \"^#\" /etc/modules`"
 
 set -e
+
+[ "${modules}" != "" ]
 
 case "$1" in
   start)
 	echo -n "Loading kernel modules:"
-	for i in `grep -vs "^#" /etc/modules || true` ; do
+	for i in ${modules} ; do
 	  kldload $i
 	  echo -n " $i"
 	done
@@ -27,7 +29,7 @@ case "$1" in
 	;;
   stop)
 	echo -n "Unloading kernel modules:"
-	for i in `grep -vs "^#" /etc/modules || true` ; do
+	for i in ${modules} ; do
 	  kldunload $i || true
 	  echo -n " $i"
 	done
