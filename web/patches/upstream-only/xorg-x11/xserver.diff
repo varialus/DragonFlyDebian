@@ -757,3 +757,25 @@ diff -u -r1.5 xf86drm.c
  #define DRM_MAJOR 145
  #endif
  
+--- xc/programs/Xserver/Xprint/etc/init.d/Imakefile	2005-02-28 18:35:18.000000000 +0100
++++ xc.old/programs/Xserver/Xprint/etc/init.d/Imakefile	2005-07-20 17:40:40.000000000 +0200
+@@ -55,7 +55,7 @@
+ #endif /* defined(SunArchitecture) && (OSMajorVersion > 4) */
+ 
+ XCOMM Create startup/shutdown links in /etc/init.d/ for Linux
+-#if defined(LinuxArchitecture)
++#if defined(LinuxDistribution)
+ # if (LinuxDistribution == LinuxSuSE) || \
+      (LinuxDistribution == LinuxDebian) || \
+      (LinuxDistribution == LinuxUnknown)
+--- xc/programs/Xserver/Xprint/etc/Xsession.d/Imakefile	2005-02-28 18:35:18.000000000 +0100
++++ xc.old/programs/Xserver/Xprint/etc/Xsession.d/Imakefile	2005-07-20 18:06:52.000000000 +0200
+@@ -18,7 +18,7 @@
+ XCOMM Install xdm startup glue for Xprint on Linux. Note that not all Linux
+ XCOMM platforms have /etc/X11/Xsession.d/ and/or /etc/X11/xinit/xinitrc.d
+ XCOMM (see http://xprint.freedesktop.org/cgi-bin/bugzilla/show_bug.cgi?id=182)
+-#if defined(LinuxArchitecture)
++#if defined(LinuxDistribution)
+ InstallNamedProg(cde_xsessiond_xprint.sh,92xprint-xpserverlist.sh,$(ETCDIR)/X11/Xsession.d)
+ InstallNamedProg(cde_xsessiond_xprint.sh,92xprint-xpserverlist.sh,$(ETCDIR)/X11/xinit/xinitrc.d)
+ #endif
