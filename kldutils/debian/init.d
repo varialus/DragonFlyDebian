@@ -14,7 +14,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 for i in load stat unload ; do
   test -x /sbin/kld$i || exit 1
 done
-modules="`sed -e \"s/#.*//g\" -e \"/^\( \|\t\)*$/d\" /etc/modules`"
+modules="`shopt -s nullglob ; cat /etc/modules /etc/modules.d/* | sed -e \"s/#.*//g\" -e \"/^\( \|\t\)*$/d\"`"
 
 set -e
 
@@ -22,28 +22,24 @@ set -e
 
 case "$1" in
   start)
-	echo -n "Loading kernel modules:"
 	for i in ${modules} ; do
 	  if ! kldstat -n $i >/dev/null 2>/dev/null ; then
+	    echo "Loading $i ..."
 	    kldload $i
-	    echo -n " $i"
 	  else
-	    echo -n " $i (already loaded)"
+	    echo "Not loading $i (already loaded)"
 	  fi
 	done
-	echo "."
 	;;
   stop)
-	echo -n "Unloading kernel modules:"
 	for i in ${modules} ; do
 	  if kldstat -n $i >/dev/null 2>/dev/null ; then
+	    echo "Unloading $i ..."
 	    kldunload $i
-	    echo -n " $i"
 	  else
-	    echo -n " $i (not loaded)"
+	    echo "Not unloading $i (not loaded)"
 	  fi
 	done
-	echo "."
 	;;
   *)
 	echo "Usage: $0 {start|stop}" >&2
