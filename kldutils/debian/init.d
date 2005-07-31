@@ -11,8 +11,10 @@
 #
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-test -x /sbin/kldload || exit 1
-modules="`grep -vs \"^#\" /etc/modules`"
+for i in load stat unload ; do
+  test -x /sbin/kld$i || exit 1
+done
+modules="`sed -e \"s/#.*//g\" -e \"/^\( \|\t\)*$/d\" /etc/modules`"
 
 set -e
 
@@ -22,16 +24,24 @@ case "$1" in
   start)
 	echo -n "Loading kernel modules:"
 	for i in ${modules} ; do
-	  kldload $i
-	  echo -n " $i"
+	  if ! kldstat -n $i >/dev/null 2>/dev/null ; then
+	    kldload $i
+	    echo -n " $i"
+	  else
+	    echo -n " $i (already loaded)"
+	  fi
 	done
 	echo "."
 	;;
   stop)
 	echo -n "Unloading kernel modules:"
 	for i in ${modules} ; do
-	  kldunload $i || true
-	  echo -n " $i"
+	  if kldstat -n $i >/dev/null 2>/dev/null ; then
+	    kldunload $i
+	    echo -n " $i"
+	  else
+	    echo -n " $i (not loaded)"
+	  fi
 	done
 	echo "."
 	;;
