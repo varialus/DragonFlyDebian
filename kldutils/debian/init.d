@@ -11,17 +11,25 @@
 #
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-for i in load stat unload ; do
+for i in config load stat unload ; do
   test -x /sbin/kld$i || exit 1
 done
 modules="`shopt -s nullglob ; cat /etc/modules /etc/modules.d/* | sed -e \"s/#.*//g\" -e \"/^\( \|\t\)*$/d\"`"
 
 set -e
 
-[ "${modules}" != "" ]
-
 case "$1" in
   start)
+        old="`kldconfig -r`"
+        new="/lib/modules/`uname -r`"
+        case ${old} in
+          *${new}*) ;;
+          *)
+            echo "Adding \"${new}\" to module search path."
+            kldconfig -i "${old};${new}"
+          ;;
+        esac
+        [ "${modules}" != "" ]
 	for i in ${modules} ; do
 	  if ! kldstat -n $i >/dev/null 2>/dev/null ; then
 	    echo "Loading $i ..."
@@ -32,6 +40,7 @@ case "$1" in
 	done
 	;;
   stop)
+        [ "${modules}" != "" ]
 	for i in ${modules} ; do
 	  if kldstat -n $i >/dev/null 2>/dev/null ; then
 	    echo "Unloading $i ..."
