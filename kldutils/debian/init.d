@@ -18,31 +18,13 @@ modules="`shopt -s nullglob ; cat /etc/modules /etc/modules.d/* | sed -e \"s/#.*
 
 set -e
 
-case "$1" in
-  start)
-	for i in ${modules} ; do
-	  if ! kldstat -n $i >/dev/null 2>/dev/null ; then
-	    echo "Loading $i ..."
-	    kldload $i
-	  else
-	    echo "Not loading $i (already loaded)"
-	  fi
-	done
-	;;
-  stop)
-	for i in ${modules} ; do
-	  if kldstat -n $i >/dev/null 2>/dev/null ; then
-	    echo "Unloading $i ..."
-	    kldunload $i
-	  else
-	    echo "Not unloading $i (not loaded)"
-	  fi
-	done
-	;;
-  *)
-	echo "Usage: $0 {start|stop}" >&2
-	exit 1
-	;;
-esac
+for i in ${modules} ; do
+  if ! kldstat -n $i >/dev/null 2>/dev/null ; then
+    echo "Loading $i ..."
+    kldload $i
+  else
+    echo "Not loading $i (already loaded)"
+  fi
+done
 
 exit 0
