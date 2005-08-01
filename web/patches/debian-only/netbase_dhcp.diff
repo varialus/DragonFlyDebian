@@ -1,0 +1,35 @@
+
+Author:	rmh
+Status: dirty hack
+Note:	This is linked from trunk/web/doc/post.html.  Don't move or delete
+	without updating that file.
+
+--- debian/netbase.init	2005-03-21 19:49:41.000000000 +0100
++++ /etc/init.d/networking	2005-08-01 20:33:58.000000000 +0200
+@@ -60,6 +60,8 @@
+     fi
+ }
+ 
++eth="ed0"
++
+ case "$1" in
+     start)
+ 	doopt spoofprotect yes
+@@ -68,6 +70,8 @@
+ 
+         echo -n "Configuring network interfaces..."
+         ifup -a
++	ifconfig $eth up
++	start-stop-daemon --start --quiet --background --exec `which dhclient` -- -v $eth
+ 	echo "done."
+ 	;;
+     stop)
+@@ -82,6 +86,8 @@
+             echo "NOT deconfiguring network interfaces: network shares still mounted."
+         else
+             echo -n "Deconfiguring network interfaces..."
++	    killall dhclient
++	    ifconfig $eth down
+             ifdown -a --exclude=lo
+ 	    echo "done."
+         fi
