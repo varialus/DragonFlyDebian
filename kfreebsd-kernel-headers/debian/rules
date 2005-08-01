@@ -6,15 +6,10 @@
 #export DH_VERBOSE=1
 
 kfreebsd_cpu	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
-ifeq ($(kfreebsd_cpu), x86_64)
-kfreebsd_cpu	:= amd64
-endif
-
-major		:= 5
 
 HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-kernel-headers
-SRC_TAR		:= /usr/src/kfreebsd-source-$(major).tar.bz2
-SRC_DIR		:= kfreebsd-source-$(major)
+SRC_TAR		:= /usr/src/kfreebsd-source-5.3.tar.bz2
+SRC_DIR		:= kfreebsd-source-5.3
 
 clean:
 	dh_testdir
