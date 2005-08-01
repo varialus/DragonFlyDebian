@@ -51,7 +51,7 @@ $(SRC_DIR):
 	done
 
 	# Add the abiname to the kernel version
-	sed -i -e 's/^RELEASE=".*"/RELEASE="$${REVISION}-$(abiname)/g" $(SRC_DIR)/sys/conf/newvers.sh 
+	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)"/g' $(SRC_DIR)/sys/conf/newvers.sh 
 	
 build-indep: build-indep-stamp
 build-indep-stamp: $(SRC_DIR)
