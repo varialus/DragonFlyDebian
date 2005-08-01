@@ -21,6 +21,21 @@
 <hr align="center" width="70%">
 
 <table width="70%" border="0" cellpadding="0" cellspacing="0">
+
+<tr>
+<th colspan="3" align="left">
+<a name="misc"></a><font color="#990000"><h3>Miscellaneous setup</h3></font></th>
+</tr>
+
+<tr>
+<td width="70%" align="left">
+<p>You can setup your soundcard (and other misc stuff) with the debconf templates in <i>kfreebsd-config</i> package.</p>
+<p>For keyboard mapping, use the <i>kbdcontrol</i> package.  <b>FIXME: document how to use it</b></p>
+<p>If you're setting up a firewall, you can use the <a href="http://www.openbsd.org/faq/pf/">OpenBSD Packet Filter</a>.
+Currently this is hacked in the base system but there's a <i>pf</i> package in preparation.</p>
+</td>
+</tr>
+
 <tr>
 <th colspan="3" align="left">
 <a name="xorg"></a><font color="#990000"><h3>X.Org</h3></font></th>
@@ -28,26 +43,26 @@
 
 <tr>
 <td width="70%" align="left">
-<p>
-Mouse configuration is now handled via debconf (dpkg-reconfigure xserver-xorg).  The correspondence between mouse devices
-and their device node names is:</p>
+<p>X server configuration is done normaly via debconf (dpkg-reconfigure xserver-xorg).</p>
+<p>Everything is as you would find on Debian GNU/Linux, except the mouse setup, whose device names are different.
+The correspondence between mouse devices and their device node names is:</p>
 
 <table>
-<tr>
-  <td><font color="#461b7e" size=-1><b>/dev/psm0</td>
-  <td><font color="#461b7e" size=-1><b>PS/2</td>
-</tr>
-<tr>
-  <td><font color="#461b7e" size=-1><b>/dev/cuaa*</td>
-  <td><font color="#461b7e" size=-1><b>Serial</td>
-</tr>
 <tr>
   <td><font color="#461b7e" size=-1><b>/dev/ums*</td>
   <td><font color="#461b7e" size=-1><b>USB</td>
 </tr>
 <tr>
-  <td><font color="#461b7e" size=-1><b>/dev/mse0</td>
+  <td><font color="#461b7e" size=-1><b>/dev/psm*</td>
+  <td><font color="#461b7e" size=-1><b>PS/2</td>
+</tr>
+<tr>
+  <td><font color="#461b7e" size=-1><b>/dev/mse*</td>
   <td><font color="#461b7e" size=-1><b>Bus mouse</td>
+</tr>
+<tr>
+  <td><font color="#461b7e" size=-1><b>/dev/cuaa*</td>
+  <td><font color="#461b7e" size=-1><b>Serial</td>
 </tr>
 <tr>
   <td><font color="#461b7e" size=-1><b>/dev/sysmouse</td>
@@ -55,10 +70,8 @@ and their device node names is:</p>
 </tr>
 </table>
 
-<p>With regard to mouse daemon, you only need it if you use your mouse in the console (via syscons).  Otherwise it can be
-safely removed.  <b>FIXME: explain how to use syscons.</b></p>
-
-</p>
+<p>With regard to mouse daemon, you only need it if you use your mouse in the console (via syscons).  Otherwise
+you don't have to install it.  <b>FIXME: explain how to use syscons.</b></p>
 
 </td>
 </tr>
@@ -73,22 +86,6 @@ safely removed.  <b>FIXME: explain how to use syscons.</b></p>
 <p>
 When building packages make sure you have the latest autotools-dev package installed. 
 <br>Many packages have outdated config.* files. See <a href="/porting/PORTING">PORTING</a> for more information.
-
-</p>
-
-</td>
-</tr>
-
-<tr>
-<th colspan="3" align="left">
-<a name="misc"></a><font color="#990000"><h3>Miscellaneous</h3></font></th>
-</tr>
-
-<tr>
-<td width="70%" align="left">
-<p>
-
-Stopping and starting daemons is done the Debian way with /etc/init.d/foo start|stop.
 
 </p>
 
