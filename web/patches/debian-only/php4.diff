@@ -1,139 +1,46 @@
 
-Description: disable caudium, zziplib and snmp
+Description: disable snmp
 Status: dirty
 
-diff -ur php4-4.3.10.old/debian/control php4-4.3.10/debian/control
---- php4-4.3.10.old/debian/control	2005-02-18 13:31:01.000000000 +0100
-+++ php4-4.3.10/debian/control	2005-02-18 12:18:03.000000000 +0100
+diff -u php4-4.3.10/debian/control php4-4.3.10/debian/control
+--- php4-4.3.10/debian/control
++++ php4-4.3.10/debian/control
 @@ -3,7 +3,7 @@
  Priority: optional
  Maintainer: Adam Conrad <adconrad@0c3.net>
- Uploaders: Steve Langasek <vorlon@debian.org>, Andres Salomon <dilinger@voxel.net>
--Build-Depends: apache-dev (>= 1.3.23), apache2-threaded-dev (>= 2.0.53-3), autoconf, automake1.4, bison, caudium-dev (>= 2:1.0.37-1), chrpath, debhelper (>= 3), flex (>= 2.5.4), freetds-dev, po-debconf, libbz2-dev (>= 1.0.0), libc-client-dev, libcurl3-dev, libdb4.2-dev, libexpat1-dev (>= 1.95.2-2.1), libfreetype6-dev, libgcrypt11-dev, libgd2-xpm-dev (>= 2.0.28-3), libjpeg62-dev, libkrb5-dev, libldap2-dev, libmcal0-dev (>= 0.6), libmhash-dev (>= 0.8.8), libmysqlclient10-dev (>= 3.23.49), libncurses5-dev, libpam0g-dev, libpcre3-dev (>= 4.3-1), libpng12-dev, librecode-dev, libsablot0-dev (>= 0.96), libsnmp5-dev, libssl-dev (>= 0.9.6), libttf-dev, libt1-dev, libtool (>= 1.4.2-4), libwrap0-dev, libxmltok1-dev, libxml2-dev (>= 2.4.14), libxslt1-dev (>= 1.0.18), libzzip-dev, re2c, unixodbc-dev, zlib1g-dev (>= 1.0.9)
-+Build-Depends: apache-dev (>= 1.3.23), apache2-threaded-dev (>= 2.0.53-3), autoconf, automake1.4, bison, chrpath, debhelper (>= 3), flex (>= 2.5.4), freetds-dev, po-debconf, libbz2-dev (>= 1.0.0), libc-client-dev, libcurl3-dev, libdb4.2-dev, libexpat1-dev (>= 1.95.2-2.1), libfreetype6-dev, libgcrypt11-dev, libgd2-xpm-dev (>= 2.0.28-3), libjpeg62-dev, libkrb5-dev, libldap2-dev, libmcal0-dev (>= 0.6), libmhash-dev (>= 0.8.8), libmysqlclient10-dev (>= 3.23.49), libncurses5-dev, libpam0g-dev, libpcre3-dev (>= 4.3-1), libpng12-dev, librecode-dev, libsablot0-dev (>= 0.96), libssl-dev (>= 0.9.6), libttf-dev, libt1-dev, libtool (>= 1.4.2-4), libwrap0-dev, libxmltok1-dev, libxml2-dev (>= 2.4.14), libxslt1-dev (>= 1.0.18), re2c, unixodbc-dev, zlib1g-dev (>= 1.0.9)
+ Uploaders: Steve Langasek <vorlon@debian.org>, Andres Salomon <dilinger@debian.org>, Jeroen van Wolffelaar <jeroen@wolffelaar.nl>
+-Build-Depends: apache-dev (>= 1.3.23), apache2-prefork-dev (>= 2.0.53-3), autoconf, automake1.4, bison, chrpath, debhelper (>= 3), flex (>= 2.5.4), freetds-dev, po-debconf, libbz2-dev (>= 1.0.0), libc-client-dev, libcurl3-dev, libdb4.2-dev, libexpat1-dev (>= 1.95.2-2.1), libfreetype6-dev, libgcrypt11-dev, libgd2-xpm-dev (>= 2.0.28-3), libjpeg62-dev, libkrb5-dev, libldap2-dev, libmcal0-dev (>= 0.6), libmhash-dev (>= 0.8.8), libmysqlclient12-dev, libncurses5-dev, libpam0g-dev, libpcre3-dev (>= 4.3-1), libpng12-dev, librecode-dev, libsablot0-dev (>= 0.96), libsnmp5-dev, libssl-dev (>= 0.9.6), libt1-dev, libtool (>= 1.4.2-4), libwrap0-dev, libxmltok1-dev, libxml2-dev (>= 2.4.14), libxslt1-dev (>= 1.0.18), libzzip-dev, re2c, unixodbc-dev, zlib1g-dev (>= 1.0.9)
++Build-Depends: apache-dev (>= 1.3.23), apache2-prefork-dev (>= 2.0.53-3), autoconf, automake1.4, bison, chrpath, debhelper (>= 3), flex (>= 2.5.4), freetds-dev, po-debconf, libbz2-dev (>= 1.0.0), libc-client-dev, libcurl3-dev, libdb4.2-dev, libexpat1-dev (>= 1.95.2-2.1), libfreetype6-dev, libgcrypt11-dev, libgd2-xpm-dev (>= 2.0.28-3), libjpeg62-dev, libkrb5-dev, libldap2-dev, libmcal0-dev (>= 0.6), libmhash-dev (>= 0.8.8), libmysqlclient12-dev, libncurses5-dev, libpam0g-dev, libpcre3-dev (>= 4.3-1), libpng12-dev, librecode-dev, libsablot0-dev (>= 0.96), libssl-dev (>= 0.9.6), libt1-dev, libtool (>= 1.4.2-4), libwrap0-dev, libxmltok1-dev, libxml2-dev (>= 2.4.14), libxslt1-dev (>= 1.0.18), libzzip-dev, re2c, unixodbc-dev, zlib1g-dev (>= 1.0.9)
  Build-Conflicts: bind-dev
  Standards-Version: 3.6.1
  
-@@ -299,31 +299,6 @@
+@@ -196,18 +196,6 @@
   in. The goal of the language is to allow web developers to write
   dynamically generated pages quickly.
  
--Package: caudium-php4
+-Package: php4-snmp
 -Architecture: any
--Depends: ${shlibs:Depends}, ${misc:Depends}, ${caudium:Depends}, php4-common (= ${Source-Version}), libmagic1
--Suggests: php4-pear
--Provides: ${php:Provides}
--Description: server-side, HTML-embedded scripting language (caudium module)
-- This package provides the PHP4 module for the caudium webserver.  Please note
-- that because caudium is a threaded webserver, PHP will also be operating with
-- threads.  While this is generally not a big problem, many of the underlying
-- libraries that PHP links to may not be threadsafe, and odd crashes may occur.
-- If this possibility frightens you, try using php4-cgi from a CGI interface
-- instead.  If you feel like living on the edge, install this package.
-- .
-- Compiled in extensions include: bcmath, bz2, calendar, ctype, dba, dbx,
-- exif, filepro, ftp, gettext, iconv, mbstring, mime_magic, openssl, overload,
-- pcre, posix, session, shmop, sockets, standard, sysvmsg, sysvsem, sysvshm,
-- tokenizer, wddx, xml, xmlrpc, yp, zip, and zlib.
+-Depends: ${shlibs:Depends}, ${misc:Depends}, ${php:Depends}, php4-common (= ${Source-Version})
+-Replaces: php4-cgi-snmp
+-Description: SNMP module for php4
+- This package provides a module for SNMP functions in PHP scripts.
 - .
 - PHP4 is an HTML-embedded scripting language. Much of its syntax is borrowed
 - from C, Java and Perl with a couple of unique PHP-specific features thrown
-- in. The goal of the language is to allow web developers to write dynamically
-- generated pages quickly.
-- .
-- Homepage: http://www.php.net/
+- in. The goal of the language is to allow web developers to write
+- dynamically generated pages quickly.
 -
- Package: libapache2-mod-php4
+ Package: php4-sybase
  Architecture: any
- Depends: ${shlibs:Depends}, ${misc:Depends}, mime-support (>= 2.03-1), ${apache2:Depends}, php4-common (= ${Source-Version}), libmagic1
-diff -ur php4-4.3.10.old/debian/rules php4-4.3.10/debian/rules
---- php4-4.3.10.old/debian/rules	2005-02-18 13:31:01.000000000 +0100
-+++ php4-4.3.10/debian/rules	2005-02-18 13:15:37.000000000 +0100
-@@ -72,7 +72,7 @@
- 		--without-pgsql \
- 		--with-kerberos=/usr \
- 		--with-openssl=/usr \
--		--with-zip=/usr \
-+		--without-zip \
- 		--enable-dbx \
- 		--with-mime-magic=/usr/share/misc/file/magic.mime \
- 		--with-exec-dir=/usr/lib/php4/libexec \
-@@ -119,7 +119,7 @@
- 	./buildconf --force
- 	rm -f patch-stamp
- 
--build: build-apache-stamp build-apache2-stamp build-cgi-stamp build-cli-stamp build-caudium-stamp
-+build: build-apache-stamp build-apache2-stamp build-cgi-stamp build-cli-stamp
- build-apache-stamp: configure-apache-stamp
- 	dh_testdir
- 	# Add here commands to compile the package.
-@@ -162,7 +162,7 @@
- 
- 	touch build-caudium-stamp
- 
--configure: configure-apache-stamp configure-apache2-stamp configure-cli-stamp configure-cgi-stamp configure-caudium-stamp
-+configure: configure-apache-stamp configure-apache2-stamp configure-cli-stamp configure-cgi-stamp
- configure-apache-stamp: patch-stamp
- 	dh_testdir
- 	if [ -d apache-build ]; then rm -rf apache-build; fi
-@@ -190,7 +190,7 @@
+ Depends: ${shlibs:Depends}, ${misc:Depends}, ${php:Depends}, php4-common (= ${Source-Version})
+diff -u php4-4.3.10/debian/rules php4-4.3.10/debian/rules
+--- php4-4.3.10/debian/rules
++++ php4-4.3.10/debian/rules
+@@ -181,7 +181,6 @@
  		--with-unixODBC=shared,/usr \
  		--with-recode=shared,/usr \
  		--enable-xslt=shared --with-xslt-sablot=shared,/usr \
 -		--with-snmp=shared,/usr \
-+		--without-snmp \
  		--with-sybase-ct=shared,/usr \
  		--with-ttf=shared,/usr --with-t1lib=shared,/usr
  	cd apache-build && \
-@@ -228,7 +228,7 @@
- 		--with-unixODBC=shared,/usr \
- 		--with-recode=shared,/usr \
- 		--enable-xslt=shared --with-xslt-sablot=shared,/usr \
--		--with-snmp=shared,/usr \
-+		--without-snmp \
- 		--with-sybase-ct=shared,/usr \
- 		--with-ttf=shared,/usr --with-t1lib=shared,/usr
- 	cd apache2-build && \
-@@ -361,7 +361,7 @@
- 
- 	# install extensions
- 	ext=`./debian/libapache-mod-php4/usr/bin/php-config --extension-dir`;\
--	for i in libapache-mod-php4 libapache2-mod-php4 caudium-php4 php4-cgi php4-cli; do \
-+	for i in libapache-mod-php4 libapache2-mod-php4 php4-cgi php4-cli; do \
- 		mkdir -p debian/$$i/$${ext}; \
- 	done; \
- 	cat debian/modulelist | while read package extname dsoname; do \
-@@ -386,9 +386,6 @@
- 	cp cli-build/sapi/cli/php debian/php4-cli/usr/bin/php4
- 	cp cli-build/sapi/cli/php.1 debian/php4-cli/usr/share/man/man1/php4.1
- 
--	# install caudium
--	cd caudium-build && make install-sapi INSTALL_ROOT=$(CURDIR)/debian/caudium-php4
--
- 	# move and install -dev files
- 	dh_movefiles --sourcedir=debian/libapache-mod-php4
- 	rm -rf debian/libapache-mod-php4/usr/lib/php4/build/ \
-@@ -483,7 +480,7 @@
- 	# symlinks makes dpkg do REALLY BAD THINGS.  Instead, I have to
- 	# create these in my postinst and override lintian.
- 	#	ln -s php4-common debian/$$package/usr/share/doc/$$package;
--	for package in php4-dev php4-cgi php4-cli caudium-php4 libapache-mod-php4 libapache2-mod-php4; do \
-+	for package in php4-dev php4-cgi php4-cli libapache-mod-php4 libapache2-mod-php4; do \
- 		rm -rf debian/$$package/usr/share/doc/$$package; \
- 		mkdir -p debian/$$package/usr/share/lintian/overrides; \
- 		echo "$$package: debian-changelog-file-missing" >> debian/$$package/usr/share/lintian/overrides/$$package; \
-@@ -518,14 +515,12 @@
- 	echo "php:Provides=phpapi-$(phpapiver)" >> debian/php4-cli.substvars
- 	echo "php:Provides=phpapi-$(phpapiver)" >> debian/php4-cgi.substvars
- 	echo "php:Provides=phpapi-$(phpapiver)" >> debian/libapache2-mod-php4.substvars
--	echo "php:Provides=phpapi-$(phpapiver)" >> debian/caudium-php4.substvars
- 
- 	cat debian/modulelist | while read package extname dsoname; do \
- 		echo "php:Depends=phpapi-$(phpapiver)" >> debian/php4-$$package.substvars; \
- 	done
- 
- 	echo "apache2:Depends=apache2-mpm-prefork (>> 2.0.52) | apache2 (>> 2.0.52)" >>debian/libapache2-mod-php4.substvars
--	echo "caudium:Depends=caudium (>= $(caudiumver)), caudium (<< $(caudiumver).1)" >> debian/caudium-php4.substvars
- 
- 	dh_gencontrol -a
- 	dh_md5sums -a
