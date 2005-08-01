@@ -1,3 +1,24 @@
+kfreebsd-config (0.0.3) unreleased; urgency=low
+
+  * postinst: Actualy, unload modules when they have been removed, not when they
+    have *not* been.
+  * Invoke /etc/init.d/networking to make sure that messing with network modules
+    doesn't kill the interface.
+    - postinst
+    - control: Depend on netbase.
+    - templates (network): Add warning about broken /etc/init.d/networking
+    files (dhclient).
+
+ -- Robert Millan <rmh@aybabtu.com>  Mon,  1 Aug 2005 15:48:26 +0200
+
+kfreebsd-config (0.0.2) unreleased; urgency=low
+
+  * control: Fill in Description field (I'm so lame).
+  * templates: Clarify in that snd_ich may also apply to integrated SiS cards.
+  * postinst: Only unload modules that are not listed to be loaded later!
+
+ -- Robert Millan <rmh@aybabtu.com>  Mon,  1 Aug 2005 15:03:25 +0200
+
 kfreebsd-config (0.0.1) unreleased; urgency=low
 
   * Initial release.
