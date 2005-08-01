@@ -1,22 +1,12 @@
-
-Author: rmh
-Status: sent to BTS
-
---- httpd-2.0.53/srclib/apr/build/apr_hints.m4~	2004-11-25 00:10:04.000000000 +0100
-+++ httpd-2.0.53/srclib/apr/build/apr_hints.m4	2005-03-24 21:11:37.000000000 +0100
-@@ -101,11 +101,11 @@
+--- build-tree.orig/apache2/srclib/apr/build/apr_hints.m4	2005-08-01 21:43:33.923988884 +0200
++++ build-tree/apache2/srclib/apr/build/apr_hints.m4	2005-08-01 21:44:16.534822122 +0200
+@@ -101,6 +101,9 @@
      *-hp-hpux*)
  	APR_ADDTO(CPPFLAGS, [-DHPUX -D_REENTRANT])
  	;;
--    *-linux-*)
--        case `uname -r` in
--	    2.* )  APR_ADDTO(CPPFLAGS, [-DLINUX=2])
-+    *-linux*-gnu | *-k*bsd*-gnu)
-+        case $host:`uname -r` in
-+	    *-linux*:2.* )  APR_ADDTO(CPPFLAGS, [-DLINUX=2])
- 	           ;;
--	    1.* )  APR_ADDTO(CPPFLAGS, [-DLINUX=1])
-+	    *-linux*:1.* )  APR_ADDTO(CPPFLAGS, [-DLINUX=1])
- 	           ;;
- 	    * )
- 	           ;;
++    *-k*bsd*-gnu)
++    	APR_ADDTO(CPPFLAGS, [-D_REENTRANT])
++    	;;
+     *-linux-*)
+         case `uname -r` in
+ 	    2.* )  APR_ADDTO(CPPFLAGS, [-DLINUX=2])
