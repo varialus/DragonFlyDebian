@@ -50,9 +50,6 @@ $(SRC_DIR):
 		cat $$i | patch -p0 -d $(SRC_DIR) ; \
 	done
 
-	# Add the abiname to the kernel version
-	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)"/g' $(SRC_DIR)/sys/conf/newvers.sh 
-	
 build-indep: build-indep-stamp
 build-indep-stamp: $(SRC_DIR)
 	dh_testdir
@@ -63,8 +60,14 @@ build-arch: build-arch-stamp
 build-arch-stamp: $(SRC_DIR)
 	dh_testdir
 	
+	# Add the abiname to the kernel version
+	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)"/g' $(SRC_DIR)/sys/conf/newvers.sh 
+
+	# Configure the kernel
 	cd $(SRC_DIR)/sys/$(cpu)/conf \
 		&& config $(KERNEL)
+
+	# Build it
 	$(MAKE) -C $(SRC_DIR)/sys/$(cpu)/compile/$(KERNEL)/ depend
 	$(MAKE) -C $(SRC_DIR)/sys/$(cpu)/compile/$(KERNEL)/
 
