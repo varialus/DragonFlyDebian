@@ -1,0 +1,13 @@
+--- sys/compat/linprocfs/linprocfs.c~	2005-08-01 01:20:40.000000000 +0200
++++ sys/compat/linprocfs/linprocfs.c	2005-08-01 01:40:21.000000000 +0200
+@@ -381,10 +381,6 @@
+ 
+ 		/* determine fs type */
+ 		fstype = mp->mnt_stat.f_fstypename;
+-		if (strcmp(fstype, pn->pn_info->pi_name) == 0)
+-			mntfrom = fstype = "proc";
+-		else if (strcmp(fstype, "procfs") == 0)
+-			continue;
+ 
+ 		sbuf_printf(sb, "%s %s %s %s", mntfrom, mntto, fstype,
+ 		    mp->mnt_stat.f_flags & MNT_RDONLY ? "ro" : "rw");
