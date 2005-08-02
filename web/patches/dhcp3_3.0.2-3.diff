@@ -1,0 +1,1220 @@
+diff -u dhcp3-3.0.2/debian/changelog dhcp3-3.0.2/debian/changelog
+--- dhcp3-3.0.2/debian/changelog
++++ dhcp3-3.0.2/debian/changelog
+@@ -1,3 +1,9 @@
++dhcp3 (3.0.2-3+kbsd) unreleased; urgency=low
++
++  * Added support for GNU/kFreeBSD
++
++ -- Aurelien Jarno <aurel32@debian.org>  Tue,  2 Aug 2005 17:33:03 +0200
++
+ dhcp3 (3.0.2-3) unstable; urgency=low
+ 
+   * debian/rules: fixed up installation of client/scripts/debian in build
+reverted:
+--- dhcp3-3.0.2/debian/dhclient-script
++++ dhcp3-3.0.2.orig/debian/dhclient-script
+@@ -1,234 +0,0 @@
+-#!/bin/bash
+-
+-# dhclient-script for Linux. Dan Halbert, March, 1997.
+-# Updated for Linux 2.[12] by Brian J. Murrell, January 1999.
+-# Modified for Debian.  Matt Zimmerman and Eloy Paris, December 2003
+-# Modified to remove useless tests for antiquated kernel versions that
+-# this doesn't even work with anyway, and introduces a dependency on /usr
+-# being mounted, which causes cosmetic errors on hosts that NFS mount /usr
+-# Andrew Pollock, February 2005
+-# Modified to work on point-to-point links. Andrew Pollock, June 2005
+-
+-# The alias handling in here probably still sucks. -mdz
+-
+-make_resolv_conf() {
+-    if [ -n "$new_domain_name" -o -n "$new_domain_name_servers" ]; then
+-        local new_resolv_conf=/etc/resolv.conf.dhclient-new
+-        rm -f $new_resolv_conf
+-        if [ -n "$new_domain_name" ]; then
+-            echo search $new_domain_name >>$new_resolv_conf
+-        fi
+-        if [ -n "$new_domain_name_servers" ]; then
+-                   for nameserver in $new_domain_name_servers; do
+-                       echo nameserver $nameserver >>$new_resolv_conf
+-            done
+-        else # keep 'old' nameservers
+-            sed -n /^\w*[Nn][Aa][Mm][Ee][Ss][Ee][Rr][Vv][Ee][Rr]/p /etc/resolv.conf >>$new_resolv_conf
+-        fi
+-        chown --reference=/etc/resolv.conf $new_resolv_conf
+-        chmod --reference=/etc/resolv.conf $new_resolv_conf
+-        mv -f $new_resolv_conf /etc/resolv.conf
+-    fi
+-}
+-
+-run_hook() {
+-    local script="$1"
+-    local exit_status
+-
+-    if [ -f $script ]; then
+-        . $script
+-    fi
+-
+-
+-    if [ -n "$exit_status" ] && [ "$exit_status" -ne 0 ]; then
+-        logger -p daemon.err "$script returned non-zero exit status $exit_status"
+-        save_exit_status=$exit_status
+-    fi
+-
+-    return $exit_status
+-}
+-
+-run_hookdir() {
+-    local dir="$1"
+-    local exit_status
+-
+-    if [ -d "$dir" ]; then
+-        for script in $(run-parts --list $dir); do
+-            run_hook $script || true
+-            exit_status=$?
+-        done
+-    fi
+-
+-    return $exit_status
+-}
+-
+-# Must be used on exit.   Invokes the local dhcp client exit hooks, if any.
+-exit_with_hooks() {
+-    exit_status=$1
+-
+-    # Source the documented exit-hook script, if it exists
+-    if ! run_hook /etc/dhcp3/dhclient-exit-hooks; then
+-        exit_status=$?
+-    fi
+-
+-    # Now run scripts in the Debian-specific directory.
+-    if ! run_hookdir /etc/dhcp3/dhclient-exit-hooks.d; then
+-        exit_status=$?
+-    fi
+-
+-    exit $exit_status
+-}
+-
+-set_hostname() {
+-    local current_hostname=$(hostname)
+-    if [ -z "$current_hostname" -o "$current_hostname" = "(none)" ]; then
+-        hostname "$new_host_name"
+-    fi
+-}
+-
+-if [ -n "$new_broadcast_address" ]; then
+-    new_broadcast_arg="broadcast $new_broadcast_address"
+-fi
+-if [ -n "$old_broadcast_address" ]; then
+-    old_broadcast_arg="broadcast $old_broadcast_address"
+-fi
+-if [ -n "$new_subnet_mask" ]; then
+-    new_subnet_arg="netmask $new_subnet_mask"
+-fi
+-if [ -n "$old_subnet_mask" ]; then
+-    old_subnet_arg="netmask $old_subnet_mask"
+-fi
+-if [ -n "$alias_subnet_mask" ]; then
+-    alias_subnet_arg="netmask $alias_subnet_mask"
+-fi
+-if [ -n "$new_interface_mtu" ]; then
+-    mtu_arg="mtu $new_interface_mtu"
+-fi
+-if [ -n "$IF_METRIC" ]; then
+-    metric_arg="metric $IF_METRIC"	# interfaces(5), "metric" option
+-fi
+-
+-
+-# The action starts here
+-
+-# Invoke the local dhcp client enter hooks, if they exist.
+-run_hook /etc/dhcp3/dhclient-enter-hooks
+-run_hookdir /etc/dhcp3/dhclient-enter-hooks.d
+-
+-# Execute the operation
+-case "$reason" in
+-    MEDIUM|ARPCHECK|ARPSEND)
+-        # Do nothing
+-        ;;
+-    PREINIT)
+-        # The DHCP client is requesting that an interface be
+-        # configured as required in order to send packets prior to
+-        # receiving an actual address. - dhclient-script(8)
+-
+-        if [ -n "$alias_ip_address" ]; then
+-            # Bring down alias interface. Its routes will disappear too.
+-            ifconfig $interface:0- inet 0
+-        fi
+-        ifconfig $interface 0 up
+-
+-        # We need to give the kernel some time to get the interface up.
+-        sleep 1
+-        ;;
+-    BOUND|RENEW|REBIND|REBOOT)
+-
+-        set_hostname
+-        
+-        if [ -n "$old_ip_address" -a -n "$alias_ip_address" -a \
+-             "$alias_ip_address" != "$old_ip_address" ]; then
+-            # Possible new alias. Remove old alias.
+-            ifconfig $interface:0- inet 0
+-        fi
+-
+-        if [ -n "$old_ip_address" -a \
+-             "$old_ip_address" != "$new_ip_address" ]; then
+-            # IP address changed. Bringing down the interface will delete all routes,
+-            # and clear the ARP cache.
+-            ifconfig $interface inet 0 down
+-
+-        fi
+-
+-        if [ -z "$old_ip_address" -o "$old_ip_address" != "$new_ip_address" -o \
+-            "$reason" = "BOUND" -o "$reason" = "REBOOT" ]; then
+-
+-            ifconfig $interface inet $new_ip_address $new_subnet_arg \
+-                $new_broadcast_arg $mtu_arg
+-
+-            for router in $new_routers; do
+-                route add default dev $interface gw $router $metric_arg
+-            done
+-        fi
+-
+-        if [ "$new_ip_address" != "$alias_ip_address" -a -n "$alias_ip_address" ];
+-            then
+-            ifconfig $interface:0- inet 0
+-            ifconfig $interface:0 inet $alias_ip_address $alias_subnet_arg
+-            route add -host $alias_ip_address $interface:0
+-        fi
+-
+-        make_resolv_conf
+-
+-        ;;
+-
+-    EXPIRE|FAIL|RELEASE|STOP)
+-        if [ -n "$alias_ip_address" ]; then
+-            # Turn off alias interface.
+-            ifconfig $interface:0- inet 0
+-        fi
+-
+-        if [ -n "$old_ip_address" ]; then
+-            # Shut down interface, which will delete routes and clear arp cache.
+-            ifconfig $interface inet 0 down
+-        fi
+-
+-        if [ -n "$alias_ip_address" ]; then
+-            ifconfig $interface:0 inet $alias_ip_address $alias_subnet_arg
+-            route add -host $alias_ip_address $interface:0
+-        fi
+-
+-        ;;
+-
+-    TIMEOUT)
+-        if [ -n "$alias_ip_address" ]; then
+-            ifconfig $interface:0- inet 0
+-        fi
+-
+-        ifconfig $interface inet $new_ip_address $new_subnet_arg \
+-            $new_broadcast_arg $mtu_arg
+-
+-        set -- $new_routers
+-        first_router="$1"
+-
+-        if ping -q -c 1 $first_router; then
+-            if [ "$new_ip_address" != "$alias_ip_address" -a \
+-                -n "$alias_ip_address" ]; then
+-                ifconfig $interface:0 inet $alias_ip_address $alias_subnet_arg
+-                route add -host $alias_ip_address dev $interface:0
+-            fi
+-	    
+-	    # point to point
+-	    if [ "$new_subnet_mask" == "255.255.255.255" ]; then
+-	    	for router in $new_routers; do
+-	    	    route add -host $router dev $interface
+-	    	done
+-	    fi
+-
+-            for router in $new_routers; do
+-                route add default dev $interface gw $router $metric_arg
+-            done
+-
+-            make_resolv_conf
+-        else
+-            # Changed from 'ifconfig $interface inet 0 down' - see Debian bug #144666
+-            ifconfig $interface inet 0
+-            exit_with_hooks 2
+-        fi
+-
+-        ;;
+-esac
+-
+-exit_with_hooks 0
+diff -u dhcp3-3.0.2/debian/dhcp3-client.docs dhcp3-3.0.2/debian/dhcp3-client.docs
+--- dhcp3-3.0.2/debian/dhcp3-client.docs
++++ dhcp3-3.0.2/debian/dhcp3-client.docs
+@@ -1 +1 @@
+-README RELNOTES doc/ debian/dhcp-on-linux.txt
++README RELNOTES doc/
+diff -u dhcp3-3.0.2/debian/dhcp3-relay.docs dhcp3-3.0.2/debian/dhcp3-relay.docs
+--- dhcp3-3.0.2/debian/dhcp3-relay.docs
++++ dhcp3-3.0.2/debian/dhcp3-relay.docs
+@@ -1 +1 @@
+-README RELNOTES doc/ debian/dhcp-on-linux.txt
++README RELNOTES doc/
+diff -u dhcp3-3.0.2/debian/dhcp3-server.docs dhcp3-3.0.2/debian/dhcp3-server.docs
+--- dhcp3-3.0.2/debian/dhcp3-server.docs
++++ dhcp3-3.0.2/debian/dhcp3-server.docs
+@@ -1 +1 @@
+-README RELNOTES doc/ debian/dhcp-on-linux.txt
++README RELNOTES doc/
+diff -u dhcp3-3.0.2/debian/patches/00list dhcp3-3.0.2/debian/patches/00list
+--- dhcp3-3.0.2/debian/patches/00list
++++ dhcp3-3.0.2/debian/patches/00list
+@@ -9,0 +10 @@
++kfreebsd
+diff -u dhcp3-3.0.2/debian/rules dhcp3-3.0.2/debian/rules
+--- dhcp3-3.0.2/debian/rules
++++ dhcp3-3.0.2/debian/rules
+@@ -8,6 +8,8 @@
+ 
+ export DH_COMPAT=3
+ 
++DEB_HOST_ARCH_OS := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
++
+ DESTDIR = `pwd`/debian/tmp
+ 
+ PACKAGE = dhcp3
+@@ -58,7 +60,7 @@
+ 	#cat site.conf
+ 	$(MAKE) $(BVARS) 
+ 
+-	cp debian/dhclient-script client/scripts/debian
++	cp debian/dhclient-script.$(DEB_HOST_ARCH_OS) client/scripts/debian
+ 
+ 	touch build-stamp
+ 
+@@ -72,7 +74,7 @@
+ 	-$(MAKE) distclean
+ 
+ 	# Remove leftover junk...
+-	rm -Rf work.linux-2.2/
++	rm -Rf work.*/
+ 
+ 	dh_clean
+ 
+@@ -129,6 +131,14 @@
+ 	rmdir $(DESTDIR)/usr/lib/
+ 	rm -Rf $(DESTDIR)/usr/include/
+ 
++ifeq ($(DEB_HOST_ARCH_OS), linux)
++	# Install Linux specific documentation
++	for p in dhcp3-client dhcp3-relay dhcp3-server ; do \
++		mkdir -p `pwd`/debian/$p/usr/share/doc; \
++		install -m 644 `pwd`/debian/dhcp-on-linux.txt `pwd`/debian/$p/usr/share/doc; \
++	done
++endif
++
+ 	touch install-stamp
+ 
+ UDEBPACKAGE=dhcp3-client-udeb
+only in patch2:
+unchanged:
+--- dhcp3-3.0.2.orig/debian/dhclient-script.kfreebsd
++++ dhcp3-3.0.2/debian/dhclient-script.kfreebsd
+@@ -0,0 +1,249 @@
++#!/bin/bash
++# dhclient-script for GNU/kFreeBSD. Aurelien Jarno, August, 2005.
++# Based on Linux and FreeBSD scripts.
++
++# Modified for Debian, same modification as on the Linux script, made by
++# Matt Zimmerman and Eloy Paris, December 2003
++
++make_resolv_conf() {
++    if [ -n "$new_domain_name" -o -n "$new_domain_name_servers" ]; then
++        local new_resolv_conf=/etc/resolv.conf.dhclient-new
++        rm -f $new_resolv_conf
++        if [ -n "$new_domain_name" ]; then
++            echo search $new_domain_name >>$new_resolv_conf
++        fi
++        if [ -n "$new_domain_name_servers" ]; then
++                   for nameserver in $new_domain_name_servers; do
++                       echo nameserver $nameserver >>$new_resolv_conf
++            done
++        else # keep 'old' nameservers
++            sed -n /^\w*[Nn][Aa][Mm][Ee][Ss][Ee][Rr][Vv][Ee][Rr]/p /etc/resolv.conf >>$new_resolv_conf
++        fi
++        chown --reference=/etc/resolv.conf $new_resolv_conf
++        chmod --reference=/etc/resolv.conf $new_resolv_conf
++        mv -f $new_resolv_conf /etc/resolv.conf
++    fi
++}
++
++run_hook() {
++    local script="$1"
++    local exit_status
++
++    if [ -f $script ]; then
++        . $script
++    fi
++
++
++    if [ -n "$exit_status" ] && [ "$exit_status" -ne 0 ]; then
++        logger -p daemon.err "$script returned non-zero exit status $exit_status"
++        save_exit_status=$exit_status
++    fi
++
++    return $exit_status
++}
++
++run_hookdir() {
++    local dir="$1"
++    local exit_status
++
++    if [ -d "$dir" ]; then
++        for script in $(run-parts --list $dir); do
++            run_hook $script || true
++            exit_status=$?
++        done
++    fi
++
++    return $exit_status
++}
++
++# Must be used on exit.   Invokes the local dhcp client exit hooks, if any.
++exit_with_hooks() {
++    exit_status=$1
++
++    # Source the documented exit-hook script, if it exists
++    if ! run_hook /etc/dhcp3/dhclient-exit-hooks; then
++        exit_status=$?
++    fi
++
++    # Now run scripts in the Debian-specific directory.
++    if ! run_hookdir /etc/dhcp3/dhclient-exit-hooks.d; then
++        exit_status=$?
++    fi
++
++    exit $exit_status
++}
++
++set_hostname() {
++    local current_hostname=$(hostname)
++    if [ -z "$current_hostname" -o "$current_hostname" = "(none)" ]; then
++        hostname "$new_host_name"
++    fi
++}
++
++if [ -n "$new_broadcast_address" ]; then
++    new_broadcast_arg="broadcast $new_broadcast_address"
++fi
++if [ -n "$old_broadcast_address" ]; then
++    old_broadcast_arg="broadcast $old_broadcast_address"
++fi
++if [ -n "$new_subnet_mask" ]; then
++    new_subnet_arg="netmask $new_subnet_mask"
++fi
++if [ -n "$old_subnet_mask" ]; then
++    old_subnet_arg="netmask $old_subnet_mask"
++fi
++if [ -n "$alias_subnet_mask" ]; then
++    alias_subnet_arg="netmask $alias_subnet_mask"
++fi
++if [ -n "$new_interface_mtu" ]; then
++    mtu_arg="mtu $new_interface_mtu"
++fi
++if [ -n "$IF_METRIC" ]; then
++    metric_arg="metric $IF_METRIC"	# interfaces(5), "metric" option
++fi
++
++
++# The action starts here
++
++# Invoke the local dhcp client enter hooks, if they exist.
++run_hook /etc/dhcp3/dhclient-enter-hooks
++run_hookdir /etc/dhcp3/dhclient-enter-hooks.d
++
++# Execute the operation
++case "$reason" in
++    ARPCHECK|ARPSEND)
++        # Do nothing
++        ;;
++    MEDIUM)
++        ifconfig $interface $medium
++        ifconfig $interface inet -alias 0.0.0.0 $medium >/dev/null 2>&1
++        sleep 1
++	;;
++    PREINIT)
++        # The DHCP client is requesting that an interface be
++        # configured as required in order to send packets prior to
++        # receiving an actual address. - dhclient-script(8)
++
++        if [ -n "$alias_ip_address" ]; then
++            ifconfig $interface inet -alias $alias_ip_address > /dev/null 2>&1
++            route delete $alias_ip_address 127.0.0.1 > /dev/null 2>&1
++        fi
++        ifconfig $interface inet 0.0.0.0 netmask 0.0.0.0 \
++            broadcast 255.255.255.255 up
++        ;;
++    BOUND|RENEW|REBIND|REBOOT)
++    
++        set_hostname
++
++        if [ -n "$old_ip_address" -a -n "$alias_ip_address" -a \
++             "$alias_ip_address" != "$old_ip_address" ]; then
++            # Possible new alias. Remove old alias.
++            ifconfig $interface inet -alias $alias_ip_address > /dev/null 2>&1
++            route delete $alias_ip_address 127.0.0.1 > /dev/null 2>&1
++        fi
++        if [ -n "$old_ip_address" -a \
++             "$old_ip_address" != "$new_ip_address" ]; then
++            ifconfig $interface inet -alias $old_ip_address $medium
++            route delete $old_ip_address 127.1 >/dev/null 2>&1
++            # IP address changed. Bringing down the interface will delete all other
++            # route, and clear the ARP cache.
++            ifconfig $interface inet 0 down
++        fi
++
++        if [ -z "$old_ip_address" -o "$old_ip_address" != "$new_ip_address" -o \
++            "$reason" = "BOUND" -o "$reason" = "REBOOT" ]; then
++
++            ifconfig $interface inet $new_ip_address $new_subnet_arg \
++                $new_broadcast_arg $medium $mtu_arg
++            route add $new_ip_address 127.1 $metric_arg >/dev/null 2>&1
++            for router in $new_routers; do
++                route add default $router >/dev/null 2>&1
++            done
++            if [ -n "$new_static_routes" ]; then
++                set -- $new_static_routes
++                while [ $# -gt 1 ]; do
++                    route add $1 $2
++                    shift; shift
++                done
++            fi
++        fi
++
++        if [ "$new_ip_address" != "$alias_ip_address" -a -n "$alias_ip_address" ];
++            then
++            ifconfig $interface inet alias $alias_ip_address $alias_subnet_arg
++            route add $alias_ip_address 127.0.0.1
++        fi
++
++        make_resolv_conf
++
++        ;;
++
++    EXPIRE|FAIL|RELEASE|STOP)
++        if [ -n "$alias_ip_address" ]; then
++            # Turn off alias interface.
++            ifconfig $interface inet -alias $alias_ip_address > /dev/null 2>&1
++            route delete $alias_ip_address 127.0.0.1 > /dev/null 2>&1
++        fi
++
++        if [ -n "$old_ip_address" ]; then
++            ifconfig $interface inet -alias $old_ip_address $medium
++            route delete $old_ip_address 127.1 >/dev/null 2>&1
++            # Shut down interface, which will delete all other routes and clear arp cache.
++            ifconfig $interface inet 0 down
++        fi
++
++        if [ -n "$alias_ip_address" ]; then
++            ifconfig $interface inet alias $alias_ip_address $alias_subnet_arg
++            route add $alias_ip_address 127.0.0.1
++        fi
++
++        ;;
++	
++    TIMEOUT)
++        if [ -n "$alias_ip_address" ]; then
++            ifconfig $interface inet -alias $alias_ip_address > /dev/null 2>&1
++            route delete $alias_ip_address 127.0.0.1 > /dev/null 2>&1
++        fi
++
++        ifconfig $interface inet $new_ip_address $new_subnet_arg \
++            $new_broadcast_arg $medium $mtu_arg
++        sleep 1
++
++        set -- $new_routers
++        first_router="$1"
++
++        if ping -q -c 1 $first_router; then
++            if [ "$new_ip_address" != "$alias_ip_address" -a \
++                -n "$alias_ip_address" ]; then
++	        ifconfig $interface inet alias $alias_ip_address $alias_subnet_arg
++	        route add $alias_ip_address 127.0.0.1
++            fi
++	    route add $new_ip_address 127.1 >/dev/null 2>&1
++	    
++	    # point to point
++	    if [ "$new_subnet_mask" == "255.255.255.255" ]; then
++	    	for router in $new_routers; do
++	    	    route add $router $new_ip_address
++	    	done
++	    fi
++
++            for router in $new_routers; do
++                route add default $router $metric_arg
++            done
++            set -- $new_static_routes
++            while [ $# -gt 1 ]; do
++                route add $1 $2
++                shift; shift
++            done
++
++            make_resolv_conf
++        else
++            # Changed from 'ifconfig $interface inet 0 down' - see Debian bug #144666
++            ifconfig $interface inet 0
++            exit_with_hooks 2
++        fi
++
++        ;;
++esac
++
++exit_with_hooks 0
+only in patch2:
+unchanged:
+--- dhcp3-3.0.2.orig/debian/dhclient-script.linux
++++ dhcp3-3.0.2/debian/dhclient-script.linux
+@@ -0,0 +1,234 @@
++#!/bin/bash
++
++# dhclient-script for Linux. Dan Halbert, March, 1997.
++# Updated for Linux 2.[12] by Brian J. Murrell, January 1999.
++# Modified for Debian.  Matt Zimmerman and Eloy Paris, December 2003
++# Modified to remove useless tests for antiquated kernel versions that
++# this doesn't even work with anyway, and introduces a dependency on /usr
++# being mounted, which causes cosmetic errors on hosts that NFS mount /usr
++# Andrew Pollock, February 2005
++# Modified to work on point-to-point links. Andrew Pollock, June 2005
++
++# The alias handling in here probably still sucks. -mdz
++
++make_resolv_conf() {
++    if [ -n "$new_domain_name" -o -n "$new_domain_name_servers" ]; then
++        local new_resolv_conf=/etc/resolv.conf.dhclient-new
++        rm -f $new_resolv_conf
++        if [ -n "$new_domain_name" ]; then
++            echo search $new_domain_name >>$new_resolv_conf
++        fi
++        if [ -n "$new_domain_name_servers" ]; then
++                   for nameserver in $new_domain_name_servers; do
++                       echo nameserver $nameserver >>$new_resolv_conf
++            done
++        else # keep 'old' nameservers
++            sed -n /^\w*[Nn][Aa][Mm][Ee][Ss][Ee][Rr][Vv][Ee][Rr]/p /etc/resolv.conf >>$new_resolv_conf
++        fi
++        chown --reference=/etc/resolv.conf $new_resolv_conf
++        chmod --reference=/etc/resolv.conf $new_resolv_conf
++        mv -f $new_resolv_conf /etc/resolv.conf
++    fi
++}
++
++run_hook() {
++    local script="$1"
++    local exit_status
++
++    if [ -f $script ]; then
++        . $script
++    fi
++
++
++    if [ -n "$exit_status" ] && [ "$exit_status" -ne 0 ]; then
++        logger -p daemon.err "$script returned non-zero exit status $exit_status"
++        save_exit_status=$exit_status
++    fi
++
++    return $exit_status
++}
++
++run_hookdir() {
++    local dir="$1"
++    local exit_status
++
++    if [ -d "$dir" ]; then
++        for script in $(run-parts --list $dir); do
++            run_hook $script || true
++            exit_status=$?
++        done
++    fi
++
++    return $exit_status
++}
++
++# Must be used on exit.   Invokes the local dhcp client exit hooks, if any.
++exit_with_hooks() {
++    exit_status=$1
++
++    # Source the documented exit-hook script, if it exists
++    if ! run_hook /etc/dhcp3/dhclient-exit-hooks; then
++        exit_status=$?
++    fi
++
++    # Now run scripts in the Debian-specific directory.
++    if ! run_hookdir /etc/dhcp3/dhclient-exit-hooks.d; then
++        exit_status=$?
++    fi
++
++    exit $exit_status
++}
++
++set_hostname() {
++    local current_hostname=$(hostname)
++    if [ -z "$current_hostname" -o "$current_hostname" = "(none)" ]; then
++        hostname "$new_host_name"
++    fi
++}
++
++if [ -n "$new_broadcast_address" ]; then
++    new_broadcast_arg="broadcast $new_broadcast_address"
++fi
++if [ -n "$old_broadcast_address" ]; then
++    old_broadcast_arg="broadcast $old_broadcast_address"
++fi
++if [ -n "$new_subnet_mask" ]; then
++    new_subnet_arg="netmask $new_subnet_mask"
++fi
++if [ -n "$old_subnet_mask" ]; then
++    old_subnet_arg="netmask $old_subnet_mask"
++fi
++if [ -n "$alias_subnet_mask" ]; then
++    alias_subnet_arg="netmask $alias_subnet_mask"
++fi
++if [ -n "$new_interface_mtu" ]; then
++    mtu_arg="mtu $new_interface_mtu"
++fi
++if [ -n "$IF_METRIC" ]; then
++    metric_arg="metric $IF_METRIC"	# interfaces(5), "metric" option
++fi
++
++
++# The action starts here
++
++# Invoke the local dhcp client enter hooks, if they exist.
++run_hook /etc/dhcp3/dhclient-enter-hooks
++run_hookdir /etc/dhcp3/dhclient-enter-hooks.d
++
++# Execute the operation
++case "$reason" in
++    MEDIUM|ARPCHECK|ARPSEND)
++        # Do nothing
++        ;;
++    PREINIT)
++        # The DHCP client is requesting that an interface be
++        # configured as required in order to send packets prior to
++        # receiving an actual address. - dhclient-script(8)
++
++        if [ -n "$alias_ip_address" ]; then
++            # Bring down alias interface. Its routes will disappear too.
++            ifconfig $interface:0- inet 0
++        fi
++        ifconfig $interface 0 up
++
++        # We need to give the kernel some time to get the interface up.
++        sleep 1
++        ;;
++    BOUND|RENEW|REBIND|REBOOT)
++
++        set_hostname
++        
++        if [ -n "$old_ip_address" -a -n "$alias_ip_address" -a \
++             "$alias_ip_address" != "$old_ip_address" ]; then
++            # Possible new alias. Remove old alias.
++            ifconfig $interface:0- inet 0
++        fi
++
++        if [ -n "$old_ip_address" -a \
++             "$old_ip_address" != "$new_ip_address" ]; then
++            # IP address changed. Bringing down the interface will delete all routes,
++            # and clear the ARP cache.
++            ifconfig $interface inet 0 down
++
++        fi
++
++        if [ -z "$old_ip_address" -o "$old_ip_address" != "$new_ip_address" -o \
++            "$reason" = "BOUND" -o "$reason" = "REBOOT" ]; then
++
++            ifconfig $interface inet $new_ip_address $new_subnet_arg \
++                $new_broadcast_arg $mtu_arg
++
++            for router in $new_routers; do
++                route add default dev $interface gw $router $metric_arg
++            done
++        fi
++
++        if [ "$new_ip_address" != "$alias_ip_address" -a -n "$alias_ip_address" ];
++            then
++            ifconfig $interface:0- inet 0
++            ifconfig $interface:0 inet $alias_ip_address $alias_subnet_arg
++            route add -host $alias_ip_address $interface:0
++        fi
++
++        make_resolv_conf
++
++        ;;
++
++    EXPIRE|FAIL|RELEASE|STOP)
++        if [ -n "$alias_ip_address" ]; then
++            # Turn off alias interface.
++            ifconfig $interface:0- inet 0
++        fi
++
++        if [ -n "$old_ip_address" ]; then
++            # Shut down interface, which will delete routes and clear arp cache.
++            ifconfig $interface inet 0 down
++        fi
++
++        if [ -n "$alias_ip_address" ]; then
++            ifconfig $interface:0 inet $alias_ip_address $alias_subnet_arg
++            route add -host $alias_ip_address $interface:0
++        fi
++
++        ;;
++
++    TIMEOUT)
++        if [ -n "$alias_ip_address" ]; then
++            ifconfig $interface:0- inet 0
++        fi
++
++        ifconfig $interface inet $new_ip_address $new_subnet_arg \
++            $new_broadcast_arg $mtu_arg
++
++        set -- $new_routers
++        first_router="$1"
++
++        if ping -q -c 1 $first_router; then
++            if [ "$new_ip_address" != "$alias_ip_address" -a \
++                -n "$alias_ip_address" ]; then
++                ifconfig $interface:0 inet $alias_ip_address $alias_subnet_arg
++                route add -host $alias_ip_address dev $interface:0
++            fi
++	    
++	    # point to point
++	    if [ "$new_subnet_mask" == "255.255.255.255" ]; then
++	    	for router in $new_routers; do
++	    	    route add -host $router dev $interface
++	    	done
++	    fi
++
++            for router in $new_routers; do
++                route add default dev $interface gw $router $metric_arg
++            done
++
++            make_resolv_conf
++        else
++            # Changed from 'ifconfig $interface inet 0 down' - see Debian bug #144666
++            ifconfig $interface inet 0
++            exit_with_hooks 2
++        fi
++
++        ;;
++esac
++
++exit_with_hooks 0
+only in patch2:
+unchanged:
+--- dhcp3-3.0.2.orig/debian/patches/kfreebsd.dpatch
++++ dhcp3-3.0.2/debian/patches/kfreebsd.dpatch
+@@ -0,0 +1,403 @@
++#! /bin/sh /usr/share/dpatch/dpatch-run
++## kfreebsd.dpatch by  <aurel32@debian.org>
++##
++## All lines beginning with `## DP:' are a description of the patch.
++## DP: No description.
++
++@DPATCH@
++--- dhcp3-3.0.2.orig/Makefile.conf
+++++ dhcp3-3.0.2/Makefile.conf
++@@ -485,3 +485,22 @@
++ #FFMANEXT = .5
++ #MANINSTALL = install -i -m 444
++ ##--hpux-gcc--
+++
+++## GNU/kFreeBSD
+++##--kfreebsd--
+++#CF = cf/kfreebsd.h
+++#COPTS = $(BINDDEF) $(CC_OPTIONS)
+++#ADMMANDIR = /usr/share/man/man8
+++#ADMMANEXT = .8
+++#FFMANDIR = /usr/share/man/man5
+++#FFMANEXT = .5
+++#LIBMANDIR = /usr/share/man/man3
+++#LIBMANEXT = .3
+++#USRMANDIR = /usr/share/man/man1
+++#USRMANEXT = .1
+++#MANCAT = man
+++#VARRUN = /var/run
+++#VARDB = /var/lib/dhcp
+++#SCRIPT=kfreebsd
+++##--kfreebsd--
+++
++--- dhcp3-3.0.2.orig/configure
+++++ dhcp3-3.0.2/configure
++@@ -184,6 +184,8 @@
++       sysname=nextstep;;
++     UnixWare)
++       sysname=uw7;;
+++    GNU/kFreeBSD)
+++      sysname=kfreebsd;
++   esac
++ fi
++ 
++@@ -213,6 +215,7 @@
++     echo "   qnx		QNX 4.2 or higher"
++     echo "   NEXTSTEP     NeXTSTEP"
++     echo "   sco	SCO Open Server"
+++    echo "   kfreebsd		GNU/kFreeBSD"
++     exit 1;
++   fi
++ fi
++--- dhcp3-3.0.2.orig/common/bpf.c
+++++ dhcp3-3.0.2/common/bpf.c
++@@ -407,7 +407,7 @@
++ 				       interface -> rbuf,
++ 				       (size_t)interface -> rbuf_max);
++ 			if (length <= 0) {
++-#ifdef __FreeBSD__
+++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++ 				if (errno == ENXIO) {
++ #else
++ 				if (errno == EIO) {
++--- dhcp3-3.0.2.orig/includes/osdep.h
+++++ dhcp3-3.0.2/includes/osdep.h
++@@ -133,6 +133,10 @@
++ # endif
++ #endif
++ 
+++#if defined(__FreeBSD_kernel__) && defined(__GLIBC__)
+++#  include "cf/kfreebsd.h"
+++#endif
+++
++ /* snprintf/vsnprintf hacks.  for systems with no libc versions only. */
++ #ifdef NO_SNPRINTF
++   extern int isc_print_snprintf(char *, size_t, const char *, ...);
++--- dhcp3-3.0.2.orig/includes/cf/kfreebsd.h
+++++ dhcp3-3.0.2/includes/cf/kfreebsd.h
++@@ -0,0 +1,148 @@
+++/* kfreebsd.h
+++
+++   System dependencies for GNU/kFreeBSD... */
+++
+++/*
+++ * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
+++ * Copyright (c) 1996-2003 by Internet Software Consortium
+++ *
+++ * Permission to use, copy, modify, and distribute this software for any
+++ * purpose with or without fee is hereby granted, provided that the above
+++ * copyright notice and this permission notice appear in all copies.
+++ *
+++ * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
+++ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+++ * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
+++ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+++ * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+++ *
+++ *   Internet Systems Consortium, Inc.
+++ *   950 Charter Street
+++ *   Redwood City, CA 94063
+++ *   <info@isc.org>
+++ *   http://www.isc.org/
+++ *
+++ * This software has been written for Internet Systems Consortium
+++ * by Ted Lemon in cooperation with Vixie Enterprises and Nominum, Inc.
+++ * To learn more about Internet Systems Consortium, see
+++ * ``http://www.isc.org/''.  To learn more about Vixie Enterprises,
+++ * see ``http://www.vix.com''.   To learn more about Nominum, Inc., see
+++ * ``http://www.nominum.com''.
+++ */
+++
+++#include <features.h>
+++
+++typedef u_int8_t u8;
+++typedef u_int16_t u16;
+++typedef u_int32_t u32;
+++
+++#include <syslog.h>
+++#include <sys/types.h>
+++#include <string.h>
+++#include <paths.h>
+++#include <errno.h>
+++#include <unistd.h>
+++#include <sys/wait.h>
+++#include <signal.h>
+++#include <setjmp.h>
+++#include <limits.h>
+++
+++extern int h_errno;
+++
+++#include <net/if.h>
+++#include <net/if_dl.h>
+++#include <net/if_arp.h>
+++#include <net/route.h>
+++#if !defined (INADDR_LOOPBACK)
+++# define INADDR_LOOPBACK ((u_int32_t)0x7f000001)
+++#endif
+++
+++#include <sys/time.h>		/* gettimeofday()*/
+++
+++/* Databases go in /var/state/dhcp.   It would also be valid to put them
+++   in /var/state/misc - indeed, given that there's only one lease file, it
+++   would probably be better.   However, I have some ideas for optimizing
+++   the lease database that may result in a _lot_ of smaller files being
+++   created, so in that context it makes more sense to have a seperate
+++   directory. */
+++
+++#ifndef _PATH_DHCPD_DB
+++#define _PATH_DHCPD_DB		"/var/state/dhcp/dhcpd.leases"
+++#endif
+++
+++#ifndef _PATH_DHCLIENT_DB
+++#define _PATH_DHCLIENT_DB	"/var/state/dhcp/dhclient.leases"
+++#endif
+++
+++/* Varargs stuff... */
+++#include <stdarg.h>
+++#define VA_DOTDOTDOT ...
+++#define VA_start(list, last) va_start (list, last)
+++#define va_dcl
+++
+++#if defined(__alpha__) || defined(__amd64__) || defined(__ia64__) || \
+++	defined(__sparc64__)
+++# define PTRSIZE_64BIT
+++#endif
+++
+++#define VOIDPTR	void *
+++
+++#define EOL	'\n'
+++
+++/* Time stuff... */
+++
+++#include <time.h>
+++
+++#define TIME time_t
+++#define GET_TIME(x)	time ((x))
+++
+++#define HAVE_SA_LEN
+++
+++#if defined (USE_DEFAULT_NETWORK)
+++#  define USE_BPF
+++#endif
+++#define HAVE_MKSTEMP
+++#ifdef NEED_PRAND_CONF
+++#ifndef HAVE_DEV_RANDOM
+++ # define HAVE_DEV_RANDOM 1
+++ #endif /* HAVE_DEV_RANDOM */
+++
+++const char *cmds[] = {
+++	"/bin/ps -axlw 2>&1",
+++	"/sbin/arp -an 2>&1",
+++	"/bin/netstat -an 2>&1",
+++	"/bin/df  2>&1",
+++	"/usr/bin/dig com. soa +ti=1 +retry=0 2>&1",
+++	"/usr/bin/uptime  2>&1",
+++	"/usr/bin/netstat -an 2>&1",
+++	"/usr/bin/dig . soa +ti=1 +retry=0 2>&1",
+++	"/usr/bin/vmstat  2>&1",
+++	"/usr/bin/w  2>&1",
+++	NULL
+++};
+++
+++const char *dirs[] = {
+++	"/tmp",
+++	"/usr/tmp",
+++	".",
+++	"/",
+++	"/var/spool",
+++	"/dev",
+++	"/var/spool/mail",
+++	"/home",
+++	"/usr/home",
+++	NULL
+++};
+++
+++const char *files[] = {
+++	"/proc/stat",
+++	"/proc/meminfo",
+++	"/proc/self/status",
+++	"/var/log/messages",
+++	"/var/log/wtmp",
+++	"/var/log/lastlog",
+++	NULL
+++};
+++#endif /* NEED_PRAND_CONF */
++--- dhcp3-3.0.2.orig/client/scripts/kfreebsd
+++++ dhcp3-3.0.2/client/scripts/kfreebsd
++@@ -0,0 +1,174 @@
+++#!/bin/bash
+++# dhclient-script for GNU/kFreeBSD. Aurelien Jarno, August, 2005.
+++# Based on Linux and FreeBSD scripts.
+++
+++make_resolv_conf() {
+++  if [ "x$new_domain_name" != x ] && [ x"$new_domain_name_servers" != x ]; then
+++    echo search $new_domain_name >/etc/resolv.conf
+++    chmod 644 /etc/resolv.conf
+++    for nameserver in $new_domain_name_servers; do
+++      echo nameserver $nameserver >>/etc/resolv.conf
+++    done
+++  fi
+++}
+++
+++# Must be used on exit.   Invokes the local dhcp client exit hooks, if any.
+++exit_with_hooks() {
+++  exit_status=$1
+++  if [ -f /etc/dhclient-exit-hooks ]; then
+++    . /etc/dhclient-exit-hooks
+++  fi
+++# probably should do something with exit status of the local script
+++  exit $exit_status
+++}
+++
+++# Invoke the local dhcp client enter hooks, if they exist.
+++if [ -f /etc/dhclient-enter-hooks ]; then
+++  exit_status=0
+++  . /etc/dhclient-enter-hooks
+++  # allow the local script to abort processing of this state
+++  # local script must set exit_status variable to nonzero.
+++  if [ $exit_status -ne 0 ]; then
+++    exit $exit_status
+++  fi
+++fi
+++
+++if [ x$new_broadcast_address != x ]; then
+++  new_broadcast_arg="broadcast $new_broadcast_address"
+++fi
+++if [ x$old_broadcast_address != x ]; then
+++  old_broadcast_arg="broadcast $old_broadcast_address"
+++fi
+++if [ x$new_subnet_mask != x ]; then
+++  new_subnet_arg="netmask $new_subnet_mask"
+++fi
+++if [ x$old_subnet_mask != x ]; then
+++  old_subnet_arg="netmask $old_subnet_mask"
+++fi
+++if [ x$alias_subnet_mask != x ]; then
+++  alias_subnet_arg="netmask $alias_subnet_mask"
+++fi
+++
+++if [ x$reason = xMEDIUM ]; then
+++  eval "ifconfig $interface $medium"
+++  eval "ifconfig $interface inet -alias 0.0.0.0 $medium" >/dev/null 2>&1
+++  sleep 1
+++  exit_with_hooks 0
+++fi
+++
+++if [ x$reason = xPREINIT ]; then
+++  if [ x$alias_ip_address != x ]; then
+++    ifconfig $interface inet -alias $alias_ip_address > /dev/null 2>&1
+++    route delete $alias_ip_address 127.0.0.1 > /dev/null 2>&1
+++  fi
+++  ifconfig $interface inet 0.0.0.0 netmask 0.0.0.0 \
+++		broadcast 255.255.255.255 up
+++  exit_with_hooks 0
+++fi
+++
+++if [ x$reason = xARPCHECK ] || [ x$reason = xARPSEND ]; then
+++  exit_with_hooks 0
+++fi
+++  
+++if [ x$reason = xBOUND ] || [ x$reason = xRENEW ] || \
+++   [ x$reason = xREBIND ] || [ x$reason = xREBOOT ]; then
+++  current_hostname=`hostname`
+++  if [ x$current_hostname = x ] || \
+++     [ x$current_hostname = x$old_host_name ]; then
+++    if [ x$current_hostname = x ] || \
+++       [ x$new_host_name != x$old_host_name ]; then
+++      hostname $new_host_name
+++    fi
+++  fi
+++
+++  if [ x$old_ip_address != x ] && [ x$alias_ip_address != x ] && \
+++		[ x$alias_ip_address != x$old_ip_address ]; then
+++    ifconfig $interface inet -alias $alias_ip_address > /dev/null 2>&1
+++    route delete $alias_ip_address 127.0.0.1 > /dev/null 2>&1
+++  fi
+++  if [ x$old_ip_address != x ] && [ x$old_ip_address != x$new_ip_address ]; then
+++    eval "ifconfig $interface inet -alias $old_ip_address $medium"
+++    route delete $old_ip_address 127.1 >/dev/null 2>&1
+++    # IP address changed. Bringing down the interface will delete all other
+++    # routes, and clear the ARP cache.
+++    ifconfig $interface inet 0 down
+++  fi
+++  if [ x$old_ip_address = x ] || [ x$old_ip_address != x$new_ip_address ] || \
+++     [ x$reason = xBOUND ] || [ x$reason = xREBOOT ]; then
+++    eval "ifconfig $interface inet $new_ip_address $new_subnet_arg \
+++					$new_broadcast_arg $medium"
+++    route add $new_ip_address 127.1 >/dev/null 2>&1
+++    for router in $new_routers; do
+++      route add default $router >/dev/null 2>&1
+++    done
+++    if [ -n "$new_static_routes" ]; then
+++      set -- $new_static_routes
+++      while [ $# -gt 1 ]; do
+++	route add $1 $2
+++	shift; shift
+++      done
+++    fi
+++  fi
+++  if [ x$new_ip_address != x$alias_ip_address ] && [ x$alias_ip_address != x ];
+++   then
+++    ifconfig $interface inet alias $alias_ip_address $alias_subnet_arg
+++    route add $alias_ip_address 127.0.0.1
+++  fi
+++  make_resolv_conf
+++  exit_with_hooks 0
+++fi
+++
+++if [ x$reason = xEXPIRE ] || [ x$reason = xFAIL ] || [ x$reason = xRELEASE ] \
+++   || [ x$reason = xSTOP ]; then
+++  if [ x$alias_ip_address != x ]; then
+++    ifconfig $interface inet -alias $alias_ip_address > /dev/null 2>&1
+++    route delete $alias_ip_address 127.0.0.1 > /dev/null 2>&1
+++  fi
+++  if [ x$old_ip_address != x ]; then
+++    eval "ifconfig $interface inet -alias $old_ip_address $medium"
+++    route delete $old_ip_address 127.1 >/dev/null 2>&1
+++    # Shut down interface, which will delete all other routes and clear arp cache.
+++    ifconfig $interface inet 0 down
+++  fi
+++  if [ x$alias_ip_address != x ]; then
+++    ifconfig $interface inet alias $alias_ip_address $alias_subnet_arg
+++    route add $alias_ip_address 127.0.0.1
+++  fi
+++  exit_with_hooks 0
+++fi
+++
+++if [ x$reason = xTIMEOUT ]; then
+++  if [ x$alias_ip_address != x ]; then
+++    ifconfig $interface inet -alias $alias_ip_address > /dev/null 2>&1
+++    route delete $alias_ip_address 127.0.0.1 > /dev/null 2>&1
+++  fi
+++  eval "ifconfig $interface inet $new_ip_address $new_subnet_arg \
+++					$new_broadcast_arg $medium"
+++  sleep 1
+++  if [ -n "$new_routers" ]; then
+++    set -- $new_routers
+++    if ping -q -c 1 $1; then
+++      if [ x$new_ip_address != x$alias_ip_address ] && \
+++			[ x$alias_ip_address != x ]; then
+++	ifconfig $interface inet alias $alias_ip_address $alias_subnet_arg
+++	route add $alias_ip_address 127.0.0.1
+++      fi
+++      route add $new_ip_address 127.1 >/dev/null 2>&1
+++      for router in $new_routers; do
+++	route add default $router >/dev/null 2>&1
+++      done
+++      set -- $new_static_routes
+++      while [ $# -gt 1 ]; do
+++	route add $1 $2
+++	shift; shift
+++      done
+++      make_resolv_conf
+++      exit_with_hooks 0
+++    fi
+++  fi
+++  eval "ifconfig $interface inet -alias $new_ip_address $medium"
+++  ifconfig $interface inet 0
+++  exit_with_hooks 1
+++fi
+++
+++exit_with_hooks 0
