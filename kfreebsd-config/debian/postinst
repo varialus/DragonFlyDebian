@@ -39,9 +39,13 @@ EOF
       done
       new=" `get_modules` "
 
+      network=false
       case " ${old} ${new}" in
-        *\ if_*) network=true ;;
-        *) network=false ;;
+        *\ if_*)
+          if test -x /etc/init.d/networking ; then
+            network=true
+          fi
+        ;;
       esac
 
       # Don't let network bother us when we mess with the interfaces
