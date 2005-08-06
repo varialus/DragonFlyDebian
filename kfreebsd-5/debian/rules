@@ -32,7 +32,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -rf src kfreebsd-source-*
-	rm -f kfreebsd-image-*.{conffiles,preinst,postinst}
+	rm -f debian/kfreebsd-image-*.{conffiles,preinst,postinst}
 
 	rm -f *-stamp
 	dh_clean
@@ -120,7 +120,7 @@ install-arch-stamp: build-arch
 	cp -f $(CURDIR)/debian/kfreebsd-image.postinst.in \
 		$(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname).postinst
 	cp -f $(CURDIR)/debian/kfreebsd-image.preinst.in \
-		$(CURDIR)/debian/kfreebsd-image-$(version)$(abiname).preinst
+		$(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname).preinst
 	
 	# headers package
 	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
