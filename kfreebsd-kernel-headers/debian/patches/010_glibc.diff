@@ -1,0 +1,343 @@
+diff -ur sys.orig/netinet6/in6.h sys/netinet6/in6.h
+--- sys.orig/netinet6/in6.h	2004-11-27 18:23:16.000000000 +0100
++++ sys/netinet6/in6.h	2004-11-27 18:27:41.000000000 +0100
+@@ -210,12 +210,6 @@
+  * Definition of some useful macros to handle IP6 addresses
+  */
+ #if __BSD_VISIBLE
+-#define IN6ADDR_ANY_INIT \
+-	{{{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+-	    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }}}
+-#define IN6ADDR_LOOPBACK_INIT \
+-	{{{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+-	    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }}}
+ #define IN6ADDR_NODELOCAL_ALLNODES_INIT \
+ 	{{{ 0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
+ 	    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }}}
+@@ -258,42 +252,6 @@
+ #endif
+ 
+ /*
+- * Unspecified
+- */
+-#define IN6_IS_ADDR_UNSPECIFIED(a)	\
+-	((*(const u_int32_t *)(const void *)(&(a)->s6_addr[0]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[4]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[8]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[12]) == 0))
+-
+-/*
+- * Loopback
+- */
+-#define IN6_IS_ADDR_LOOPBACK(a)		\
+-	((*(const u_int32_t *)(const void *)(&(a)->s6_addr[0]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[4]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[8]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[12]) == ntohl(1)))
+-
+-/*
+- * IPv4 compatible
+- */
+-#define IN6_IS_ADDR_V4COMPAT(a)		\
+-	((*(const u_int32_t *)(const void *)(&(a)->s6_addr[0]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[4]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[8]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[12]) != 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[12]) != ntohl(1)))
+-
+-/*
+- * Mapped
+- */
+-#define IN6_IS_ADDR_V4MAPPED(a)		      \
+-	((*(const u_int32_t *)(const void *)(&(a)->s6_addr[0]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[4]) == 0) &&	\
+-	 (*(const u_int32_t *)(const void *)(&(a)->s6_addr[8]) == ntohl(0x0000ffff)))
+-
+-/*
+  * KAME Scope Values
+  */
+ 
+@@ -313,20 +271,6 @@
+ #define __IPV6_ADDR_SCOPE_GLOBAL	0x0e
+ #endif
+ 
+-/*
+- * Unicast Scope
+- * Note that we must check topmost 10 bits only, not 16 bits (see RFC2373).
+- */
+-#define IN6_IS_ADDR_LINKLOCAL(a)	\
+-	(((a)->s6_addr[0] == 0xfe) && (((a)->s6_addr[1] & 0xc0) == 0x80))
+-#define IN6_IS_ADDR_SITELOCAL(a)	\
+-	(((a)->s6_addr[0] == 0xfe) && (((a)->s6_addr[1] & 0xc0) == 0xc0))
+-
+-/*
+- * Multicast
+- */
+-#define IN6_IS_ADDR_MULTICAST(a)	((a)->s6_addr[0] == 0xff)
+-
+ #ifdef _KERNEL	/* XXX nonstandard */
+ #define IPV6_ADDR_MC_SCOPE(a)		((a)->s6_addr[1] & 0x0f)
+ #else
+@@ -355,22 +299,6 @@
+ #define IN6_IS_ADDR_MC_GLOBAL(a)	\
+ 	(IN6_IS_ADDR_MULTICAST(a) &&	\
+ 	 (IPV6_ADDR_MC_SCOPE(a) == IPV6_ADDR_SCOPE_GLOBAL))
+-#else
+-#define IN6_IS_ADDR_MC_NODELOCAL(a)	\
+-	(IN6_IS_ADDR_MULTICAST(a) &&	\
+-	 (__IPV6_ADDR_MC_SCOPE(a) == __IPV6_ADDR_SCOPE_NODELOCAL))
+-#define IN6_IS_ADDR_MC_LINKLOCAL(a)	\
+-	(IN6_IS_ADDR_MULTICAST(a) &&	\
+-	 (__IPV6_ADDR_MC_SCOPE(a) == __IPV6_ADDR_SCOPE_LINKLOCAL))
+-#define IN6_IS_ADDR_MC_SITELOCAL(a)	\
+-	(IN6_IS_ADDR_MULTICAST(a) && 	\
+-	 (__IPV6_ADDR_MC_SCOPE(a) == __IPV6_ADDR_SCOPE_SITELOCAL))
+-#define IN6_IS_ADDR_MC_ORGLOCAL(a)	\
+-	(IN6_IS_ADDR_MULTICAST(a) &&	\
+-	 (__IPV6_ADDR_MC_SCOPE(a) == __IPV6_ADDR_SCOPE_ORGLOCAL))
+-#define IN6_IS_ADDR_MC_GLOBAL(a)	\
+-	(IN6_IS_ADDR_MULTICAST(a) &&	\
+-	 (__IPV6_ADDR_MC_SCOPE(a) == __IPV6_ADDR_SCOPE_GLOBAL))
+ #endif
+ 
+ #ifdef _KERNEL	/* nonstandard */
+@@ -412,12 +340,6 @@
+ #define IPV6_RETOPTS		8  /* ip6_opts; set/get IP6 options */
+ #endif
+ #define IPV6_SOCKOPT_RESERVED1	3  /* reserved for future use */
+-#define IPV6_UNICAST_HOPS	4  /* int; IP6 hops */
+-#define IPV6_MULTICAST_IF	9  /* u_int; set/get IP6 multicast i/f  */
+-#define IPV6_MULTICAST_HOPS	10 /* int; set/get IP6 multicast hops */
+-#define IPV6_MULTICAST_LOOP	11 /* u_int; set/get IP6 multicast loopback */
+-#define IPV6_JOIN_GROUP		12 /* ip6_mreq; join a group membership */
+-#define IPV6_LEAVE_GROUP	13 /* ip6_mreq; leave a group membership */
+ #define IPV6_PORTRANGE		14 /* int; range to choose for unspec port */
+ #define ICMP6_FILTER		18 /* icmp6_filter; icmp6 filter */
+ /* RFC2292 options */
+@@ -431,7 +353,6 @@
+ #define IPV6_2292PKTOPTIONS	25 /* buf/cmsghdr; set/get IPv6 options */
+ #endif
+ 
+-#define IPV6_CHECKSUM		26 /* int; checksum offset for raw socket */
+ #define IPV6_V6ONLY		27 /* bool; make AF_INET6 sockets v6 only */
+ #ifndef _KERNEL
+ #define IPV6_BINDV6ONLY		IPV6_V6ONLY
+@@ -474,15 +395,9 @@
+ 
+ /* more new socket options introduced in RFC2292bis */
+ #define IPV6_PKTINFO		46 /* in6_pktinfo; send if, src addr */
+-#define IPV6_HOPLIMIT		47 /* int; send hop limit */
+ #define IPV6_NEXTHOP		48 /* sockaddr; next hop addr */
+ #define IPV6_HOPOPTS		49 /* ip6_hbh; send hop-by-hop option */
+ #define IPV6_DSTOPTS		50 /* ip6_dest; send dst option befor rthdr */
+-#define IPV6_RTHDR		51 /* ip6_rthdr; send routing header */
+-#if 0
+-#define IPV6_PKTOPTIONS		52 /* buf/cmsghdr; set/get IPv6 options */
+-				   /* obsoleted by 2292bis */
+-#endif
+ 
+ #define IPV6_RECVTCLASS		57 /* bool; recv traffic class values */
+ 
+diff -ur sys.orig/net/if.h sys/net/if.h
+--- sys.orig/net/if.h	2004-11-30 01:19:11.000000000 +0100
++++ sys/net/if.h	2004-11-30 01:21:25.000000000 +0100
+@@ -61,11 +61,8 @@
+  * Note: this is the same size as a generic device's external name.
+  */
+ #define		IF_NAMESIZE	16
+-#if __BSD_VISIBLE
+ #define		IFNAMSIZ	IF_NAMESIZE
+ #define		IF_MAXUNIT	0x7fff	/* historical value */
+-#endif
+-#if __BSD_VISIBLE
+ 
+ /*
+  * Structure used to query names of interface cloners.
+@@ -330,8 +327,6 @@
+ 	struct	sockaddr_storage dstaddr; /* out */
+ };
+ 
+-#endif /* __BSD_VISIBLE */
+-
+ #ifdef _KERNEL
+ #ifdef MALLOC_DECLARE
+ MALLOC_DECLARE(M_IFADDR);
+diff -ur sys.orig/net/if.h sys/net/if.h
+--- sys.orig/net/if.h	2004-11-30 01:22:43.000000000 +0100
++++ sys/net/if.h	2004-11-30 01:22:54.000000000 +0100
+@@ -44,7 +44,6 @@
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ 
+-#if __BSD_VISIBLE
+ /*
+  * <net/if.h> does not depend on <sys/time.h> on most other systems.  This
+  * helps userland compatibility.  (struct timeval ifi_lastchange)
+@@ -54,7 +53,6 @@
+ #endif
+ 
+ struct ifnet;
+-#endif
+ 
+ /*
+  * Length of interface external name, including terminating '\0'.
+diff -ur sys.orig/netinet6/in6.h sys/netinet6/in6.h
+--- sys.orig/netinet6/in6.h	2004-11-30 01:19:35.000000000 +0100
++++ sys/netinet6/in6.h	2004-11-30 01:22:54.000000000 +0100
+@@ -68,7 +68,14 @@
+ #ifndef _NETINET6_IN6_H_
+ #define _NETINET6_IN6_H_
+ 
+-#include <sys/types.h>
++#include <sys/types.h>		/* size_t, __socklen_t */
++
++#if defined(__USE_BSD) || defined(__USE_XOPEN)
++# include <unistd.h>	  	/* socklen_t */
++#else
++typedef __socklen_t socklen_t;
++#endif
++
+ 
+ /*
+  * Identification of the network protocol stack
+@@ -113,17 +120,6 @@
+ #define	IPV6PORT_RESERVEDMAX	(IPV6PORT_RESERVED-1)
+ #endif
+ 
+-/*
+- * IPv6 address
+- */
+-struct in6_addr {
+-	union {
+-		uint8_t		__u6_addr8[16];
+-		uint16_t	__u6_addr16[8];
+-		uint32_t	__u6_addr32[4];
+-	} __u6_addr;			/* 128-bit IP6 address */
+-};
+-
+ #ifdef _KERNEL	/* XXX nonstandard */
+ #define s6_addr8  __u6_addr.__u6_addr8
+ #define s6_addr16 __u6_addr.__u6_addr16
+@@ -137,22 +133,6 @@
+  */
+ 
+ /*
+- * Socket address for IPv6
+- */
+-#if __BSD_VISIBLE
+-#define SIN6_LEN
+-#endif
+-
+-struct sockaddr_in6 {
+-	uint8_t		sin6_len;	/* length of this struct */
+-	sa_family_t	sin6_family;	/* AF_INET6 */
+-	in_port_t	sin6_port;	/* Transport layer port # */
+-	uint32_t	sin6_flowinfo;	/* IP6 flow information */
+-	struct in6_addr	sin6_addr;	/* IP6 address */
+-	uint32_t	sin6_scope_id;	/* scope zone index */
+-};
+-
+-/*
+  * Local definition for masks
+  */
+ #ifdef _KERNEL	/* XXX nonstandard */
+@@ -419,22 +399,6 @@
+ #define IPV6_DEFAULT_MULTICAST_LOOP 1	/* normally hear sends if a member */
+ 
+ /*
+- * Argument structure for IPV6_JOIN_GROUP and IPV6_LEAVE_GROUP.
+- */
+-struct ipv6_mreq {
+-	struct in6_addr	ipv6mr_multiaddr;
+-	unsigned int	ipv6mr_interface;
+-};
+-
+-/*
+- * IPV6_PKTINFO: Packet information(RFC2292 sec 5)
+- */
+-struct in6_pktinfo {
+-	struct in6_addr	ipi6_addr;	/* src/dst IPv6 address */
+-	unsigned int	ipi6_ifindex;	/* send/recv interface index */
+-};
+-
+-/*
+  * Control structure for IPV6_RECVPATHMTU socket option.
+  */
+ struct ip6_mtuinfo {
+@@ -543,16 +507,6 @@
+ extern int	(*faithprefix_p)(struct in6_addr *);
+ #endif /* _KERNEL */
+ 
+-#ifndef _SIZE_T_DECLARED
+-typedef	__size_t	size_t;
+-#define	_SIZE_T_DECLARED
+-#endif
+-
+-#ifndef _SOCKLEN_T_DECLARED
+-typedef	__socklen_t	socklen_t;
+-#define	_SOCKLEN_T_DECLARED
+-#endif
+-
+ #if __BSD_VISIBLE
+ 
+ __BEGIN_DECLS
+diff -ur sys.orig/sys/limits.h sys/sys/limits.h
+--- sys.orig/sys/limits.h	2004-04-07 06:19:49.000000000 +0200
++++ sys/sys/limits.h	2004-11-30 01:22:54.000000000 +0100
+@@ -34,39 +34,8 @@
+ 
+ #include <sys/cdefs.h>
+ #include <machine/_limits.h>
++#include <limits.h>
+ 
+-#define	CHAR_BIT	__CHAR_BIT	/* number of bits in a char */
+-
+-#define	SCHAR_MAX	__SCHAR_MAX	/* max value for a signed char */
+-#define	SCHAR_MIN	__SCHAR_MIN	/* min value for a signed char */
+-
+-#define	UCHAR_MAX	__UCHAR_MAX	/* max value for an unsigned char */
+-
+-#ifdef __CHAR_UNSIGNED__
+-#define	CHAR_MAX	UCHAR_MAX	/* max value for a char */
+-#define	CHAR_MIN	0		/* min value for a char */
+-#else
+-#define	CHAR_MAX	SCHAR_MAX
+-#define	CHAR_MIN	SCHAR_MIN
+-#endif
+-
+-#define	USHRT_MAX	__USHRT_MAX	/* max value for an unsigned short */
+-#define	SHRT_MAX	__SHRT_MAX	/* max value for a short */
+-#define	SHRT_MIN	__SHRT_MIN	/* min value for a short */
+-
+-#define	UINT_MAX	__UINT_MAX	/* max value for an unsigned int */
+-#define	INT_MAX		__INT_MAX	/* max value for an int */
+-#define	INT_MIN		__INT_MIN	/* min value for an int */
+-
+-#define	ULONG_MAX	__ULONG_MAX	/* max for an unsigned long */
+-#define	LONG_MAX	__LONG_MAX	/* max for a long */
+-#define	LONG_MIN	__LONG_MIN	/* min for a long */
+-
+-#ifdef __LONG_LONG_SUPPORTED
+-#define	ULLONG_MAX	__ULLONG_MAX	/* max for an unsigned long long */
+-#define	LLONG_MAX	__LLONG_MAX	/* max for a long long */
+-#define	LLONG_MIN	__LLONG_MIN	/* min for a long long */
+-#endif
+ 
+ #if __POSIX_VISIBLE || __XSI_VISIBLE
+ #define	SSIZE_MAX	__SSIZE_MAX	/* max value for an ssize_t */
+diff -ur sys.orig/sys/syslimits.h sys/sys/syslimits.h
+--- sys.orig/sys/syslimits.h	2004-11-30 01:05:19.000000000 +0100
++++ sys/sys/syslimits.h	2004-11-30 01:23:49.000000000 +0100
+@@ -33,12 +33,6 @@
+ #ifndef _SYS_SYSLIMITS_H_
+ #define _SYS_SYSLIMITS_H_
+ 
+-#if !defined(_KERNEL) && !defined(_LIMITS_H_) && !defined(_SYS_PARAM_H_)
+-#if defined(__GNUC__) || defined(__INTEL_COMPILER)
+-#warning "No user-serviceable parts inside."
+-#endif
+-#endif
+-
+ /*
+  * Do not add any new variables here.  (See the comment at the end of
+  * the file for why.)
