@@ -1,0 +1,107 @@
+		GNU/kFreeBSD IRC meeting, July 31, 2005
+                =======================================
+
+
+The third Debian GNU/kFreeBSD meeting was held from 19:00 UTC to 21:00
+UTC on Saturday July 31th.
+
+Due to the holidays of lot of developers, the next meeting will take 
+place in *three* weeks, on Sunday August 21st at 19:00 UTC.
+
+
+Minutes
+-------
+
+People mentioned:
+  aurel32: 	Aurelien Jarno
+  bal00:	Hector Garcia
+  braindmg:	Guillem Jover
+  nyu:		Robert Millan
+  otavio:	Otavio Salvador
+  tarzeau:	Gürkan Sengün
+
+
+1) nyu explained that x.org is almost totally ported for -5, except a
+   tiny patch for manifest. He would try to merge the patch before the
+   next upload of xorg.
+
+2) otavio announced that he would help to port debian-installer to 
+   GNU/kFreeBSD. To start the port, we basically need deboostrap
+   working, that means we need to have a complete base system in
+   unstable. Here is the list of packages that have to be ported: 
+    - freebsd-utils (it is getting smaller, but there is still a lot of
+      stuff in this package)
+    - procps (it is basically ported, but there is some problems
+      dealing with the maintainer)
+    - glibc (port to 2.3.5 in progress, maybe we can use version 2.3 at
+      the beginning)
+    - busybox (nyu will try to port it during its holidays)
+    - apt (otavio will try to merge the patch needed for kfreebsd)
+    - dpkg (upload is pending)
+    - ufsutils (upload to unstable is pending, udebs have to be created).
+   We also need to have a kernel that fits onto a floppy, which means
+   that a lot of stuff has to be put as modules. This also mean that 
+   hardware detection should work on GNU/kFreeBSD.
+   Parted has also to be ported to be able to partition the hard disks.
+
+3) braindmg has splitted the pool on gnuab.org. There is now one pool 
+   for hurd-i386, one for kfreebsd-i386, and one for knetbsd-i386. That
+   makes now possible to upload .all.deb packages, and thus the packages
+   have now to be built with -b. That's already case for the 
+   autobuilder.
+   braindmg expects that it will soon be possible to also have 
+   binary-all-only packages in gnuab, so that the kfreebsd-i386 could be
+   self contained. He is also working on auto-obsoleting the old 
+   versions of the packages.
+
+4) nyu made a pair of nice improvements in livecd.sh, ie. cdboot and 
+   writable filesystem. He asked for more people to test it. When the
+   crosshurd bug (#319778) is solved, it will be possible to release
+   a new version of the livecd.
+
+5) braindmg will upload ufsutils to unstable soon, and will then add
+   support for udebs.
+
+6) A few work is still need to libbsd before braindmg or bal00 would
+   upload it to unstable. It includes splitting the header files and 
+   checking if nothing else is missing.
+
+7) aurel32 explained the new kfreebsd-5 package is now in a good state
+   and it will be possible to upload it to unstable soon. otavio asked
+   if the package also provides udebs for debian-installer. 
+   aurel32 answers that it is currently not the case, and we need to
+   decide if the udebs has to be build by this package or by another
+   package getting its source from kfreebsd-source-5.3.
+
+8) aurel32 said he has almost finished to setup io.debian.net, the Debian
+   developer machine that will be hosted by ETH Zürich. He expects to 
+   ship it to tarzeau on tuesday. When it is installed, we will have to
+   send a mail to debian-devel-announce that also includes some propaganda
+   a about GNU/kFreeBSD.
+
+9) aurel32 explained he hasn't done much work on glibc, because he worked
+   on the debian developer machine and on the autobuilder.
+
+
+New action points
+-----------------
+* nyu:			port busybox
+* braindmg:		upload ufsutils to unstable
+
+
+Opened action points
+--------------------
+* aurel32:		rebuild all packages that are still using 
+                        lipthread2
+* braindmg:		work on util-linux
+* aurel32:		add java support to gcc
+* braindmg:		send a status of the port to debian-devel
+* aurel32:		finish porting glibc-2.3.5
+* aurel32 & braindmg:	fix our packages that are modifying 
+                        build-depends at build time
+* somebody:		port libkvm in a clean manner
+
+			
+Closed action points
+--------------------
+
