@@ -1,5 +1,14 @@
 --- sys.orig/i386/conf/GENERIC	2005-08-01 16:45:29.000000000 +0200
 +++ sys/i386/conf/GENERIC	2005-08-01 16:46:08.000000000 +0200
+@@ -75,6 +75,8 @@
+ device		atapicd		# ATAPI CDROM drives
+ device		atapifd		# ATAPI floppy drives
+ device		atapist		# ATAPI tape drives
++device		atapicam	# emulate ATAPI devices as SCSI ditto via CAM
++				# needs CAM to be present (scbus & pass)
+ options 	ATA_STATIC_ID	# Static device numbering
+ 
+ # SCSI Controllers
 @@ -166,7 +166,7 @@
  device		ppc
  device		ppbus		# Parallel port bus (required)
