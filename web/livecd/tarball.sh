@@ -18,7 +18,7 @@ if ! dpkg -s crosshurd > /dev/null ; then
   exit 1
 fi
 
-cpu="i386"
+cpu="i486"
 system="kfreebsd-gnu"
 uname="GNU/kFreeBSD"
 tmp1=`tempfile` && rm -f ${tmp1} && mkdir -p ${tmp1}
