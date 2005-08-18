@@ -309,3 +309,11 @@ Since we don't support RT signals, kFreeBSD counts as a "Linux 2.0" kernel,
 and we use SIGUSR1 and SIGUSR2.  Programs with custom use of SIGUSR1 and
 SIGUSR2 will interfere with the pthread implementation and cause trouble
 (this happens with Linux 2.0 too).
+
+
+Get libc soname (6 or 6.1 on linux-gnu, 0.1 on kfreebsd-gnu, etc)
+-----------------------------------------------------------------
+
+When obtaining the libc soname it is better to not hardcode it like a number of
+programs do.  Instead, you can use something like get_libc_path.c to obtain the
+full path to libc shared object, and then strip the soname from there.
