@@ -1,0 +1,28 @@
+
+Author: rmh
+Status: in BTS
+
+--- circuslinux-1.0.3.old/configure.in	2005-08-03 15:06:25.000000000 +0200
++++ circuslinux-1.0.3/configure.in	2005-08-03 15:03:54.000000000 +0200
+@@ -80,14 +80,18 @@
+ 	
+ 
+ dnl Target
+-case "$target" in
+-	*-*-linux*)
++case "$target_os" in
++	linux* | k*bsd*-gnu)
+ 	TARGET_DEF=LINUX
+ 	;;	
+ 
+- *-*-cygwin* | *-*-mingw32*)
++	cygwin* | mingw32*)
+ 	TARGET_DEF=WIN32
+ 	;;
++
++	*)
++	echo Unidentified $target_os
++	;;
+ esac	
+ AC_SUBST(TARGET_DEF)
+ 

@@ -1,0 +1,16 @@
+
+Author: rmh
+Status: sent upstream
+
+diff -ur p7zip-4.20.old/7zip/Crypto/AES/aesopt.h p7zip-4.20/7zip/Crypto/AES/aesopt.h
+--- p7zip-4.20.old/7zip/Crypto/AES/aesopt.h	2005-02-05 13:01:08.000000000 +0100
++++ p7zip-4.20/7zip/Crypto/AES/aesopt.h	2005-08-03 11:38:38.000000000 +0200
+@@ -166,7 +166,7 @@
+ // #if defined(__GNUC__) || defined(__GNU_LIBRARY__)
+ #if (defined(__GNUC__) || defined(__GNU_LIBRARY__)) && !defined(_WIN32) && !defined(__CYGWIN__)
+ 
+-#ifdef __linux__
++#if defined(__linux__) || defined(__GLIBC__)
+ #include <endian.h>
+ #include <byteswap.h>
+ #elif defined(__APPLE_CC__)

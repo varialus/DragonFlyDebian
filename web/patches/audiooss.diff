@@ -1,0 +1,70 @@
+
+Author: rmh
+Status: sent upstream, waiting in BTS
+
+diff -ur audiooss-1.0.0.old/Imakefile audiooss-1.0.0/Imakefile
+--- audiooss-1.0.0.old/Imakefile	2002-03-22 20:38:00.000000000 +0100
++++ audiooss-1.0.0/Imakefile	2005-08-09 20:24:11.000000000 +0200
+@@ -62,7 +62,7 @@
+  MALLOC_DEFINES = -DMALLOC_0_RETURNS_NULL
+ #endif
+ 
+-        DEFINES = $(MALLOC_DEFINES) $(SYSV_DEFINES) -D_REENTRANT -D__REENTRANT -DLINUX_IOCTL
++        DEFINES = $(MALLOC_DEFINES) $(SYSV_DEFINES) -D_REENTRANT -D__REENTRANT
+ 
+ HEADERS = 
+ 
+diff -ur audiooss-1.0.0.old/audiooss.c audiooss-1.0.0/audiooss.c
+--- audiooss-1.0.0.old/audiooss.c	2005-08-09 20:23:51.000000000 +0200
++++ audiooss-1.0.0/audiooss.c	2005-08-09 20:24:29.000000000 +0200
+@@ -48,14 +48,15 @@
+ 
+ #define YELL	if (arg == NULL) { DPRINTF("ioctl with argp == NULL, returning -1\n"); errno = EINVAL; return -1; }
+ 
+-#ifdef LINUX_IOCTL
+-#include <linux/ioctl.h>
+-#endif
++/* Hack to avoid ioctl() declaration */
++#define ioctl __dummy_ioctl
++#include <sys/soundcard.h>
++#undef ioctl
++
+ #include <dlfcn.h>
+ #include <stdarg.h>
+ #include <unistd.h>
+ 
+-#include "soundcard.h"
+ #include "nasaudio.h"
+ 
+ typedef struct _nasInfo {
+@@ -625,14 +626,30 @@
+       errno = EINVAL;
+       return -1;
+ 
++#ifdef SOUND_MIXER_ACCESS
+     case SOUND_MIXER_ACCESS:
++#endif
++#ifdef SOUND_MIXER_AGC
+     case SOUND_MIXER_AGC:
++#endif
++#ifdef SOUND_MIXER_3DSE
+     case SOUND_MIXER_3DSE:
++#endif
++#ifdef SOUND_MIXER_PRIVATE1
+     case SOUND_MIXER_PRIVATE1:
++#endif
++#ifdef SOUND_MIXER_PRIVATE2
+     case SOUND_MIXER_PRIVATE2:
++#endif
++#ifdef SOUND_MIXER_PRIVATE3
+     case SOUND_MIXER_PRIVATE3:
++#endif
++#ifdef SOUND_MIXER_PRIVATE4
+     case SOUND_MIXER_PRIVATE4:
++#endif
++#ifdef SOUND_MIXER_PRIVATE5
+     case SOUND_MIXER_PRIVATE5:
++#endif
+       DPRINTF("MIXER: sound_mixer r/w obscure ioctl %x\n", request);
+       errno = EINVAL;
+       return -1;
