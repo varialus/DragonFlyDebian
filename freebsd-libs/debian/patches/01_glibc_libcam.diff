@@ -1,0 +1,290 @@
+diff -ur lib.old/libcam/Makefile lib/libcam/Makefile
+--- lib.old/libcam/Makefile	2004-02-05 23:44:22.000000000 +0100
++++ lib/libcam/Makefile	2005-08-13 11:29:33.000000000 +0200
+@@ -1,12 +1,12 @@
+ # $FreeBSD: src/lib/libcam/Makefile,v 1.12 2004/02/05 22:44:22 ru Exp $
+ 
+ LIB=		cam
+-SHLIBDIR?=	/lib
++SHLIB_MAJOR=    0
++SHLIBDIR?=	/usr/lib
+ SRCS=		camlib.c scsi_cmdparse.c scsi_all.c scsi_da.c scsi_sa.c cam.c
+ INCS=		camlib.h
+ 
+-DPADD=		${LIBSBUF}
+-LDADD=		-lsbuf
++LDADD=		-L../libsbuf/ -lbsd -lsbuf
+ 
+ MAN=		cam.3 cam_cdbparse.3
+ 
+@@ -34,9 +34,11 @@
+ 		cam_cdbparse.3 csio_encode_visit.3 \
+ 		cam_cdbparse.3 buff_encode_visit.3
+ 
+-.PATH:		${.CURDIR}/../../sys/cam/scsi ${.CURDIR}/../../sys/cam
++KERNEL=		${.CURDIR}
+ 
+-SDIR=		${.CURDIR}/../../sys
++.PATH:		${KERNEL}/cam/scsi ${KERNEL}/cam
++
++SDIR=		${KERNEL}
+ CFLAGS+=	-I${.CURDIR} -I${SDIR}
+ 
+ .include <bsd.lib.mk>
+diff -ur lib.old/libcam/cam/cam.c lib/libcam/cam/cam.c
+--- lib.old/libcam/cam/cam.c	2003-06-15 00:17:38.000000000 +0200
++++ lib/libcam/cam/cam.c	2005-08-15 08:18:42.000000000 +0200
+@@ -27,7 +27,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/cam.c,v 1.8 2003/06/14 22:17:38 njl Exp $");
+ 
+ #include <sys/param.h>
+ #ifdef _KERNEL
+@@ -37,6 +36,7 @@
+ #include <sys/sysctl.h>
+ #else /* _KERNEL */
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <stdio.h>
+ #endif /* _KERNEL */
+ 
+diff -ur lib.old/libcam/cam/cam_periph.c lib/libcam/cam/cam_periph.c
+--- lib.old/libcam/cam/cam_periph.c	2003-11-08 11:56:57.000000000 +0100
++++ lib/libcam/cam/cam_periph.c	2005-08-13 11:06:04.000000000 +0200
+@@ -28,7 +28,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/cam_periph.c,v 1.56 2003/11/08 10:56:57 scottl Exp $");
+ 
+ #include <sys/param.h>
+ #include <sys/systm.h>
+diff -ur lib.old/libcam/cam/cam_queue.c lib/libcam/cam/cam_queue.c
+--- lib.old/libcam/cam/cam_queue.c	2003-06-10 19:50:20.000000000 +0200
++++ lib/libcam/cam/cam_queue.c	2005-08-13 11:06:04.000000000 +0200
+@@ -27,7 +27,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/cam_queue.c,v 1.7 2003/06/10 17:50:20 obrien Exp $");
+ 
+ #include <sys/param.h>
+ #include <sys/systm.h>
+diff -ur lib.old/libcam/cam/cam_sim.c lib/libcam/cam/cam_sim.c
+--- lib.old/libcam/cam/cam_sim.c	2003-06-10 19:50:20.000000000 +0200
++++ lib/libcam/cam/cam_sim.c	2005-08-13 11:06:04.000000000 +0200
+@@ -27,7 +27,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/cam_sim.c,v 1.7 2003/06/10 17:50:20 obrien Exp $");
+ 
+ #include <sys/param.h>
+ #include <sys/systm.h>
+diff -ur lib.old/libcam/cam/cam_xpt.c lib/libcam/cam/cam_xpt.c
+--- lib.old/libcam/cam/cam_xpt.c	2004-07-15 10:25:59.000000000 +0200
++++ lib/libcam/cam/cam_xpt.c	2005-08-13 11:06:04.000000000 +0200
+@@ -28,7 +28,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/cam_xpt.c,v 1.142 2004/07/15 08:25:59 phk Exp $");
+ 
+ #include <sys/param.h>
+ #include <sys/bus.h>
+diff -ur lib.old/libcam/cam/scsi/scsi_all.c lib/libcam/cam/scsi/scsi_all.c
+--- lib.old/libcam/cam/scsi/scsi_all.c	2004-08-13 20:45:04.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_all.c	2005-08-15 08:21:32.000000000 +0200
+@@ -28,7 +28,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_all.c,v 1.45 2004/08/13 18:45:04 mjacob Exp $");
+ 
+ #include <sys/param.h>
+ 
+@@ -41,6 +40,7 @@
+ #include <sys/sysctl.h>
+ #else
+ #include <errno.h>
++#include <stdint.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff -ur lib.old/libcam/cam/scsi/scsi_all.h lib/libcam/cam/scsi/scsi_all.h
+--- lib.old/libcam/cam/scsi/scsi_all.h	2003-04-30 02:35:22.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_all.h	2005-08-15 08:22:30.000000000 +0200
+@@ -32,6 +32,8 @@
+  * bus reset.
+  */
+ extern int scsi_delay;
++#else
++#include <stdint.h>
+ #endif /* _KERNEL */
+ 
+ /*
+diff -ur lib.old/libcam/cam/scsi/scsi_cd.c lib/libcam/cam/scsi/scsi_cd.c
+--- lib.old/libcam/cam/scsi/scsi_cd.c	2004-09-13 08:26:57.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_cd.c	2005-08-13 11:06:04.000000000 +0200
+@@ -46,7 +46,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_cd.c,v 1.89.2.1 2004/09/13 06:26:57 phk Exp $");
+ 
+ #include "opt_cd.h"
+ 
+diff -ur lib.old/libcam/cam/scsi/scsi_ch.c lib/libcam/cam/scsi/scsi_ch.c
+--- lib.old/libcam/cam/scsi/scsi_ch.c	2004-06-16 11:46:31.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_ch.c	2005-08-13 11:06:04.000000000 +0200
+@@ -68,7 +68,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_ch.c,v 1.40 2004/06/16 09:46:31 phk Exp $");
+ 
+ #include <sys/param.h>
+ #include <sys/queue.h>
+diff -ur lib.old/libcam/cam/scsi/scsi_da.c lib/libcam/cam/scsi/scsi_da.c
+--- lib.old/libcam/cam/scsi/scsi_da.c	2004-08-13 01:17:09.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_da.c	2005-08-13 11:06:04.000000000 +0200
+@@ -27,7 +27,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_da.c,v 1.171 2004/08/12 23:17:09 sanpei Exp $");
+ 
+ #ifdef _KERNEL
+ #include "opt_hw_wdog.h"
+diff -ur lib.old/libcam/cam/scsi/scsi_low.c lib/libcam/cam/scsi/scsi_low.c
+--- lib.old/libcam/cam/scsi/scsi_low.c	2003-06-15 00:17:38.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_low.c	2005-08-13 11:06:04.000000000 +0200
+@@ -2,7 +2,6 @@
+ /*	$NetBSD$	*/
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_low.c,v 1.21 2003/06/14 22:17:38 njl Exp $");
+ 
+ #define	SCSI_LOW_STATICS
+ #define	SCSI_LOW_DEBUG
+diff -ur lib.old/libcam/cam/scsi/scsi_low_pisa.c lib/libcam/cam/scsi/scsi_low_pisa.c
+--- lib.old/libcam/cam/scsi/scsi_low_pisa.c	2003-06-10 20:14:05.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_low_pisa.c	2005-08-13 11:06:04.000000000 +0200
+@@ -32,7 +32,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_low_pisa.c,v 1.7 2003/06/10 18:14:05 obrien Exp $");
+ 
+ #ifdef	__NetBSD__
+ #include <sys/param.h>
+diff -ur lib.old/libcam/cam/scsi/scsi_pass.c lib/libcam/cam/scsi/scsi_pass.c
+--- lib.old/libcam/cam/scsi/scsi_pass.c	2004-06-16 11:46:31.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_pass.c	2005-08-13 11:06:04.000000000 +0200
+@@ -26,7 +26,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_pass.c,v 1.41 2004/06/16 09:46:31 phk Exp $");
+ 
+ #include <sys/param.h>
+ #include <sys/systm.h>
+diff -ur lib.old/libcam/cam/scsi/scsi_pt.c lib/libcam/cam/scsi/scsi_pt.c
+--- lib.old/libcam/cam/scsi/scsi_pt.c	2004-06-16 11:46:31.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_pt.c	2005-08-13 11:06:04.000000000 +0200
+@@ -27,7 +27,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_pt.c,v 1.42 2004/06/16 09:46:31 phk Exp $");
+ 
+ #include <sys/param.h>
+ #include <sys/queue.h>
+diff -ur lib.old/libcam/cam/scsi/scsi_sa.c lib/libcam/cam/scsi/scsi_sa.c
+--- lib.old/libcam/cam/scsi/scsi_sa.c	2004-06-16 11:46:31.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_sa.c	2005-08-13 11:06:04.000000000 +0200
+@@ -27,7 +27,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_sa.c,v 1.101 2004/06/16 09:46:31 phk Exp $");
+ 
+ #include <sys/param.h>
+ #include <sys/queue.h>
+diff -ur lib.old/libcam/cam/scsi/scsi_ses.c lib/libcam/cam/scsi/scsi_ses.c
+--- lib.old/libcam/cam/scsi/scsi_ses.c	2004-06-16 11:46:31.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_ses.c	2005-08-13 11:06:04.000000000 +0200
+@@ -25,7 +25,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_ses.c,v 1.29 2004/06/16 09:46:31 phk Exp $");
+ 
+ #include <sys/param.h>
+ #include <sys/queue.h>
+diff -ur lib.old/libcam/cam/scsi/scsi_targ_bh.c lib/libcam/cam/scsi/scsi_targ_bh.c
+--- lib.old/libcam/cam/scsi/scsi_targ_bh.c	2003-09-30 10:03:52.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_targ_bh.c	2005-08-13 11:06:04.000000000 +0200
+@@ -27,7 +27,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_targ_bh.c,v 1.20 2003/09/30 08:03:52 simokawa Exp $");
+ 
+ #include <sys/param.h>
+ #include <sys/queue.h>
+diff -ur lib.old/libcam/cam/scsi/scsi_target.c lib/libcam/cam/scsi/scsi_target.c
+--- lib.old/libcam/cam/scsi/scsi_target.c	2004-08-15 08:24:40.000000000 +0200
++++ lib/libcam/cam/scsi/scsi_target.c	2005-08-13 11:06:04.000000000 +0200
+@@ -28,7 +28,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/sys/cam/scsi/scsi_target.c,v 1.63 2004/08/15 06:24:40 jmg Exp $");
+ 
+ #include <sys/param.h>
+ #include <sys/systm.h>
+diff -ur lib.old/libcam/camlib.c lib/libcam/camlib.c
+--- lib.old/libcam/camlib.c	2004-07-29 17:35:45.000000000 +0200
++++ lib/libcam/camlib.c	2005-08-15 08:23:38.000000000 +0200
+@@ -24,10 +24,12 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/lib/libcam/camlib.c,v 1.12 2004/07/29 15:35:45 scottl Exp $");
+ 
+ #include <sys/types.h>
+ #include <sys/param.h>
++#ifndef __FreeBSD__
++#include <bsd/bsd.h>		/* strlcpy */
++#endif
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff -ur lib.old/libcam/camlib.h lib/libcam/camlib.h
+--- lib.old/libcam/camlib.h	2002-04-24 01:58:20.000000000 +0200
++++ lib/libcam/camlib.h	2005-08-13 11:06:04.000000000 +0200
+@@ -64,6 +64,10 @@
+ #ifndef _CAMLIB_H
+ #define _CAMLIB_H
+ 
++#ifndef __FreeBSD__
++#include <bsd/bsd.h>
++#endif
++
+ #include <sys/cdefs.h>
+ #include <sys/param.h>
+ 
+diff -ur lib.old/libcam/scsi_cmdparse.c lib/libcam/scsi_cmdparse.c
+--- lib.old/libcam/scsi_cmdparse.c	2002-09-16 09:18:27.000000000 +0200
++++ lib/libcam/scsi_cmdparse.c	2005-08-13 11:06:04.000000000 +0200
+@@ -35,7 +35,6 @@
+  */
+ 
+ #include <sys/cdefs.h>
+-__FBSDID("$FreeBSD: src/lib/libcam/scsi_cmdparse.c,v 1.7 2002/09/16 07:18:27 mike Exp $");
+ 
+ #include <sys/types.h>
+ 

@@ -1,0 +1,109 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+SHELL=bash
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+SRC_DIR=lib
+PATH:=/usr/lib/freebsd:$(PATH)
+DESTDIR=$(CURDIR)/debian/tmp
+PMAKE=make DESTDIR=$(DESTDIR)
+
+CFLAGS = -Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+$(SRC_DIR):
+	tar -xzf $(CURDIR)/lib.tar.gz
+	
+	for i in $(CURDIR)/debian/patches/*.diff ; do \
+		echo "--- Patch $$i ---" ; \
+		patch -p1 -d $(SRC_DIR) < $$i ; \
+	done
+
+build: build-arch build-indep
+
+build-arch: build-arch-stamp
+build-arch-stamp: $(SRC_DIR)
+	cd $(SRC_DIR)/libcam && $(PMAKE)
+	cd $(SRC_DIR)/libsbuf && $(PMAKE)
+	touch build-arch-stamp
+
+build-indep: build-indep-stamp
+build-indep-stamp:
+	touch build-indep-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-arch-stamp build-indep-stamp
+
+	# Add here commands to clean up after the build process.
+	rm -rf $(SRC_DIR)
+
+	dh_clean 
+
+install: install-indep install-arch
+install-indep:
+
+install-arch:
+	dh_testdir
+	dh_testroot
+	dh_clean -k -s 
+	dh_installdirs -s
+
+	mkdir -p $(DESTDIR)/usr/{lib,include,share/man/man3}
+	cd $(SRC_DIR)/libcam && $(PMAKE) install
+	cd $(SRC_DIR)/libsbuf && $(PMAKE) install
+
+	dh_install -s
+# Must not depend on anything. This is to be called by
+# binary-arch/binary-indep
+# in another 'make' thread.
+binary-common:
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs 
+#	dh_installdocs
+#	dh_installexamples
+#	dh_installmenu
+#	dh_installdebconf	
+#	dh_installlogrotate	
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime
+#	dh_installinit
+#	dh_installcron
+#	dh_installinfo
+#	dh_installman
+#	dh_link
+	dh_strip
+	dh_compress 
+	dh_fixperms
+#	dh_perl
+#	dh_python
+	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+# Build architecture independant packages using the common target.
+binary-indep: build-indep install-indep
+#	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+
+# Build architecture dependant packages using the common target.
+binary-arch: build-arch install-arch
+	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
+
+binary: binary-arch binary-indep
+.PHONY: build clean binary-indep binary-arch binary install install-indep install-arch configure
