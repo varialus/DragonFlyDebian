@@ -1,0 +1,262 @@
+
+Author: rmh
+Status: pending
+Description: Enable misc kfreebsd-specific functionality.
+
+diff -ur MPlayer-1.0pre7.old/cpudetect.c MPlayer-1.0pre7/cpudetect.c
+--- MPlayer-1.0pre7.old/cpudetect.c	2005-01-12 22:56:25.000000000 +0100
++++ MPlayer-1.0pre7/cpudetect.c	2005-08-05 17:35:00.000000000 +0200
+@@ -20,7 +20,7 @@
+ #include <machine/cpu.h>
+ #endif
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <sys/types.h>
+ #include <sys/sysctl.h>
+ #endif
+@@ -169,7 +169,7 @@
+ #endif
+ 
+ 		/* FIXME: Does SSE2 need more OS support, too? */
+-#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__CYGWIN__) || defined(__OpenBSD__)
++#if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__CYGWIN__) || defined(__OpenBSD__)
+ 		if (caps->hasSSE)
+ 			check_os_katmai_support();
+ 		if (!caps->hasSSE)
+@@ -324,7 +324,7 @@
+ #ifdef ARCH_X86_64
+    gCpuCaps.hasSSE=1;
+    gCpuCaps.hasSSE2=1;
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+    int has_sse=0, ret;
+    size_t len=sizeof(has_sse);
+ 
+diff -ur MPlayer-1.0pre7.old/libdha/pci.c MPlayer-1.0pre7/libdha/pci.c
+--- MPlayer-1.0pre7.old/libdha/pci.c	2004-06-26 14:40:56.000000000 +0200
++++ MPlayer-1.0pre7/libdha/pci.c	2005-08-05 18:33:38.000000000 +0200
+@@ -62,7 +62,7 @@
+ /* OS depended stuff */
+ #if defined (linux)
+ #include "sysdep/pci_linux.c"
+-#elif defined (__FreeBSD__)
++#elif defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include "sysdep/pci_freebsd.c"
+ #elif defined (__386BSD__)
+ #include "sysdep/pci_386bsd.c"
+diff -ur MPlayer-1.0pre7.old/libdha/sysdep/AsmMacros_alpha.h MPlayer-1.0pre7/libdha/sysdep/AsmMacros_alpha.h
+--- MPlayer-1.0pre7.old/libdha/sysdep/AsmMacros_alpha.h	2002-01-15 09:31:53.000000000 +0100
++++ MPlayer-1.0pre7/libdha/sysdep/AsmMacros_alpha.h	2005-08-05 18:34:29.000000000 +0200
+@@ -6,7 +6,7 @@
+ 
+ #ifndef __ASM_MACROS_ALPHA_H
+ #define __ASM_MACROS_ALPHA_H
+-#if defined (linux)
++#if defined (linux) || defined(__GLIBC__)
+ #include <sys/io.h>
+ #elif defined (__FreeBSD__)
+ #include <sys/types.h>
+diff -ur MPlayer-1.0pre7.old/libmpdemux/cddb.c MPlayer-1.0pre7/libmpdemux/cddb.c
+--- MPlayer-1.0pre7.old/libmpdemux/cddb.c	2004-04-26 11:33:35.000000000 +0200
++++ MPlayer-1.0pre7/libmpdemux/cddb.c	2005-08-05 18:36:51.000000000 +0200
+@@ -30,7 +30,7 @@
+ 
+ #if defined(__linux__)
+ 	#include <linux/cdrom.h>
+-#elif defined(__FreeBSD__) || defined(__bsdi__) || defined(__NetBSD__) || defined(__OpenBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__bsdi__) || defined(__NetBSD__) || defined(__OpenBSD__)
+ 	#include <sys/cdio.h>
+ #endif
+ 
+@@ -82,7 +82,7 @@
+ 	return tochdr.cdth_trk1;
+ }
+ 
+-#elif defined(__FreeBSD__) || defined(__bsdi__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__bsdi__)
+ int 
+ read_toc(const char *dev) {
+ 	int drive;
+diff -ur MPlayer-1.0pre7.old/libmpdemux/open.c MPlayer-1.0pre7/libmpdemux/open.c
+--- MPlayer-1.0pre7.old/libmpdemux/open.c	2005-02-27 05:25:12.000000000 +0100
++++ MPlayer-1.0pre7/libmpdemux/open.c	2005-08-05 18:37:17.000000000 +0200
+@@ -11,7 +11,7 @@
+ #include "mp_msg.h"
+ #include "help_mp.h"
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <sys/cdrio.h>
+ #endif
+ 
+diff -ur MPlayer-1.0pre7.old/libmpdemux/stream_vcd.c MPlayer-1.0pre7/libmpdemux/stream_vcd.c
+--- MPlayer-1.0pre7.old/libmpdemux/stream_vcd.c	2005-04-06 13:53:45.000000000 +0200
++++ MPlayer-1.0pre7/libmpdemux/stream_vcd.c	2005-08-05 18:39:17.000000000 +0200
+@@ -14,7 +14,7 @@
+ #include <sys/ioctl.h>
+ #include <errno.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <sys/cdrio.h>
+ #include "vcd_read_fbsd.h" 
+ #elif defined(__NetBSD__) || defined (__OpenBSD__)
+@@ -70,7 +70,7 @@
+   struct stream_priv_s* p = (struct stream_priv_s*)opts;
+   int ret,ret2,f;
+   mp_vcd_priv_t* vcd;
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+   int bsize = VCD_SECTOR_SIZE;
+ #endif
+ 
+@@ -118,7 +118,7 @@
+   }
+   mp_msg(MSGT_OPEN,MSGL_V,"VCD start byte position: 0x%X  end: 0x%X\n",ret,ret2);
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+   if (ioctl (f, CDRIOCSETBLOCKSIZE, &bsize) == -1) {
+     mp_msg(MSGT_OPEN,MSGL_WARN,"Error in CDRIOCSETBLOCKSIZE");
+   }
+diff -ur MPlayer-1.0pre7.old/libmpdvdkit2/bswap.h MPlayer-1.0pre7/libmpdvdkit2/bswap.h
+--- MPlayer-1.0pre7.old/libmpdvdkit2/bswap.h	2005-03-11 03:40:28.000000000 +0100
++++ MPlayer-1.0pre7/libmpdvdkit2/bswap.h	2005-08-05 18:41:39.000000000 +0200
+@@ -32,7 +32,7 @@
+ 
+ #else 
+ 
+-#if defined(__linux__)
++#if defined(__linux__) || defined(__GLIBC__)
+ #include <byteswap.h>
+ #define B2N_16(x) x = bswap_16(x)
+ #define B2N_32(x) x = bswap_32(x)
+diff -ur MPlayer-1.0pre7.old/libmpdvdkit2/dvd_reader.c MPlayer-1.0pre7/libmpdvdkit2/dvd_reader.c
+--- MPlayer-1.0pre7.old/libmpdvdkit2/dvd_reader.c	2005-03-11 03:40:28.000000000 +0100
++++ MPlayer-1.0pre7/libmpdvdkit2/dvd_reader.c	2005-08-05 18:44:36.000000000 +0200
+@@ -45,7 +45,7 @@
+ #include </usr/conf/h/mnttab.h>
+ #elif defined(SYS_BSD)
+ #include <fstab.h>
+-#elif defined(__linux__)
++#elif defined(__linux__) || defined(__GLIBC__)
+ #include <mntent.h>
+ #endif
+ 
+@@ -320,7 +320,7 @@
+ 	char *path_copy;
+ #if defined(SYS_BSD)
+ 	struct fstab* fe;
+-#elif defined(__sun) || defined(__linux__)
++#elif defined(__sun) || defined(__linux__) || defined(__GLIBC__)
+ 	FILE *mntfile;
+ #endif
+ 
+@@ -393,8 +393,8 @@
+ 	    }
+ 	    fclose( mntfile );
+ 	}
+-#elif defined(__linux__)
+-        mntfile = fopen( MOUNTED, "r" );
++#elif defined(__linux__) || defined(__GLIBC__)
++        mntfile = fopen(_PATH_MOUNTED, "r" );
+         if( mntfile ) {
+             struct mntent *me;
+  
+diff -ur MPlayer-1.0pre7.old/loader/ldt_keeper.c MPlayer-1.0pre7/loader/ldt_keeper.c
+--- MPlayer-1.0pre7.old/loader/ldt_keeper.c	2005-04-15 22:17:12.000000000 +0200
++++ MPlayer-1.0pre7/loader/ldt_keeper.c	2005-08-05 18:48:43.000000000 +0200
+@@ -50,7 +50,7 @@
+ }
+ #endif
+ #else
+-#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
++#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__)
+ #include <machine/segments.h>
+ #include <machine/sysarch.h>
+ #endif
+@@ -100,7 +100,7 @@
+ #define       LDT_SEL(idx) ((idx) << 3 | 1 << 2 | 3)
+ 
+ /* i got this value from wine sources, it's the first free LDT entry */
+-#if defined(__FreeBSD__) && defined(LDT_AUTO_ALLOC)
++#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && defined(LDT_AUTO_ALLOC)
+ #define       TEB_SEL_IDX     LDT_AUTO_ALLOC
+ #endif
+ 
+@@ -165,7 +165,7 @@
+ #endif
+ #endif
+ 
+-#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
++#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__)
+ static void LDT_EntryToBytes( unsigned long *buffer, const struct modify_ldt_ldt_s *content )
+ {
+     *buffer++ = ((content->base_addr & 0x0000ffff) << 16) |
+@@ -227,12 +227,12 @@
+     }
+ #endif /*linux*/
+ 
+-#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
++#if defined(__NetBSD__) || defined(__FreeBSD__) || (__FreeBSD_kernel__) || defined(__OpenBSD__)
+     {
+         unsigned long d[2];
+ 
+         LDT_EntryToBytes( d, &array );
+-#if defined(__FreeBSD__) && defined(LDT_AUTO_ALLOC)
++#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && defined(LDT_AUTO_ALLOC)
+         ret = i386_set_ldt(LDT_AUTO_ALLOC, (union descriptor *)d, 1);
+         array.entry_number = ret;
+         fs_ldt = ret;
+@@ -246,7 +246,7 @@
+             printf("Did you reconfigure the kernel with \"options USER_LDT\"?\n");
+         }
+     }
+-#endif  /* __NetBSD__ || __FreeBSD__ || __OpenBSD__ */
++#endif  /* __NetBSD__ || __FreeBSD_kernel__ || __OpenBSD__ */
+ 
+ #if defined(__svr4__)
+     {
+diff -ur MPlayer-1.0pre7.old/loader/pe_image.c MPlayer-1.0pre7/loader/pe_image.c
+--- MPlayer-1.0pre7.old/loader/pe_image.c	2005-04-15 22:17:12.000000000 +0200
++++ MPlayer-1.0pre7/loader/pe_image.c	2005-08-05 18:49:33.000000000 +0200
+@@ -905,7 +905,7 @@
+  */
+ static void __attribute__((noinline)) extend_stack_for_dll_alloca(void)
+ {
+-#ifndef __FreeBSD__
++#if !defined(__FreeBSD__) && !defined(__FreeBSD_kernel__)
+     volatile int* mem=alloca(0x20000);
+     *mem=0x1234;
+ #endif
+diff -ur MPlayer-1.0pre7.old/loader/win32.c MPlayer-1.0pre7/loader/win32.c
+--- MPlayer-1.0pre7.old/loader/win32.c	2005-04-15 22:17:12.000000000 +0200
++++ MPlayer-1.0pre7/loader/win32.c	2005-08-05 18:55:32.000000000 +0200
+@@ -993,7 +993,7 @@
+ 
+ /* disable cpuid based detection (mplayer's cpudetect.c does this - see above) */
+ #ifndef MPLAYER
+-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__svr4__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__svr4__)
+     do_cpuid(1, regs);
+     switch ((regs[0] >> 8) & 0xf) {			// cpu family
+     case 3: cachedsi.dwProcessorType = PROCESSOR_INTEL_386;
+@@ -1027,7 +1027,7 @@
+ 
+ /* MPlayer: linux detection enabled (based on proc/cpuinfo) for checking
+    fdiv_bug and fpu emulation flags -- alex/MPlayer */
+-#ifdef __linux__
++#if defined(__linux__) || (defined(__GLIBC__) && (defined(__FreeBSD_kernel__) || defined(__NetBSD_kernel__)))
+     {
+ 	char buf[20];
+ 	char line[200];
+@@ -3280,7 +3280,7 @@
+     {0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46}
+ };
+ 
+-static long WINAPI expCoCreateInstance(GUID* rclsid, struct IUnknown* pUnkOuter,
++static long WINAPI expCoCreateInstance(GUID* rclsid, struct IUnknown* pUnkOuter,
+ 				       long dwClsContext, const GUID* riid, void** ppv)
+ {
+     int i;

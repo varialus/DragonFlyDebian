@@ -1,0 +1,152 @@
+
+Author: rmh
+Status: in BTS
+Description: fix ntp client hang bug, and other stuff.
+
+diff -x configure -ur ntp-4.2.0a+stable.old/configure.in ntp-4.2.0a+stable/configure.in
+--- ntp-4.2.0a+stable.old/configure.in	2005-08-03 09:18:16.000000000 +0200
++++ ntp-4.2.0a+stable/configure.in	2005-08-03 10:08:31.000000000 +0200
+@@ -258,8 +258,8 @@
+ dnl does Strange Things with extra processes using the Posix-compatibility
+ dnl real-time library, so we don't want to use it.
+ 
+-case "$host" in
+- *-*-linux*) ;;
++case "$host_os" in
++ linux* | k*bsd*-gnu) ;;
+  *)
+     AC_CHECK_LIB(rt, sched_setscheduler, ,
+ 	AC_CHECK_LIB(posix4, sched_setscheduler))
+@@ -742,8 +742,8 @@
+ esac
+ AC_TYPE_UID_T
+ 
+-case "$host" in
+- *-*-linux*)
++case "$host_os" in
++ linux* | k*bsd*-gnu)
+     AC_CHECK_FUNCS(__adjtimex __ntp_gettime)
+     ;;
+ esac
+@@ -1149,20 +1149,20 @@
+ esac
+ 
+ AC_CACHE_CHECK(if process groups are set with -pid, ac_cv_arg_setpgrp_negpid,
+-[case "$host" in
+- *-*-hpux[[567]]*)
++[case "$host_os" in
++ hpux[[567]]*)
+     ans=no
+     ;;
+- *-*-hpux*)
++ hpux*)
+     ans=yes
+     ;;
+- *-*-linux*)
++ linux* | k*bsd*-gnu)
+     ans=yes
+     ;;
+- *-*-sunos3*)
++ sunos3*)
+     ans=yes
+     ;;
+- *-*-ultrix2*)
++ ultrix2*)
+     ans=yes
+     ;;
+  *)
+@@ -1296,7 +1296,7 @@
+      *-*-irix6*)
+ 	ans=no
+ 	;;
+-     *-*-freebsd*)
++     *-*-freebsd* | *-*-kfreebsd*-gnu)
+ 	ans=no
+ 	;;
+      *-*-linux*)
+@@ -1488,7 +1488,7 @@
+     ;;
+  i?86-*-freebsd[[123]].*)
+     ;;
+- i?86-*-freebsd*)
++ i?86-*-freebsd* | i?86-*-kfreebsd*-gnu)
+     ans=yes
+     ;;
+  *-*-unicosmp*)
+@@ -2892,7 +2892,7 @@
+       *-ibm-aix[[45]]*)
+ 	 ans=yes
+ 	 ;;
+-      *-*-linux*)
++      *-*-linux* | *-*-k*bsd*-gnu)
+ 	 ans=yes
+ 	 ;;
+       *-*-solaris2.[[01]])
+@@ -3387,7 +3387,7 @@
+       *-*-irix6*)
+ 	 ans=yes
+ 	 ;;
+-      *-*-linux*)
++      *-*-linux* | *-*-k*bsd*-gnu)
+ 	 ans=yes
+ 	 ;;
+       *-*-mpeix*)
+Only in ntp-4.2.0a+stable.old/libntp: net.c.bak
+diff -x configure -ur ntp-4.2.0a+stable.old/ntpd/ntpd.c ntp-4.2.0a+stable/ntpd/ntpd.c
+--- ntp-4.2.0a+stable.old/ntpd/ntpd.c	2005-08-03 09:18:16.000000000 +0200
++++ ntp-4.2.0a+stable/ntpd/ntpd.c	2005-08-03 09:43:38.000000000 +0200
+@@ -114,11 +114,16 @@
+ #endif
+ #endif
+ 
++/* On Glibc systems that use linuxthreads-based libpthread, whose kernel doesn't
++   implement RT signals, SIGUSR{1,2} are reserved signal codes. */
++#if !defined(__GLIBC__) || !defined(__FreeBSD_kernel__) || \
++  !defined(__NetBSD_kernel__)
+ /*
+  * Signals we catch for debugging.	If not debugging we ignore them.
+  */
+ #define MOREDEBUGSIG	SIGUSR1
+ #define LESSDEBUGSIG	SIGUSR2
++#endif
+ 
+ /*
+  * Signals which terminate us gracefully.
+@@ -754,11 +759,19 @@
+ 
+ #if !defined(SYS_WINNT) && !defined(VMS)
+ # ifdef DEBUG
++#  ifdef MOREDEBUGSIG
+ 	(void) signal_no_reset(MOREDEBUGSIG, moredebug);
++#  endif
++#  ifdef LESSDEBUGSIG
+ 	(void) signal_no_reset(LESSDEBUGSIG, lessdebug);
++#  endif
+ # else
++#  ifdef MOREDEBUGSIG
+ 	(void) signal_no_reset(MOREDEBUGSIG, no_debug);
++#  endif
++#  ifdef LESSDEBUGSIG
+ 	(void) signal_no_reset(LESSDEBUGSIG, no_debug);
++#  endif
+ # endif /* DEBUG */
+ #endif /* !SYS_WINNT && !VMS */
+ 
+diff -x configure -ur ntp-4.2.0a+stable.old/sntp/configure.ac ntp-4.2.0a+stable/sntp/configure.ac
+--- ntp-4.2.0a+stable.old/sntp/configure.ac	2003-11-19 04:58:18.000000000 +0100
++++ ntp-4.2.0a+stable/sntp/configure.ac	2005-08-03 10:02:49.000000000 +0200
+@@ -69,11 +69,11 @@
+ AC_CHECK_FUNCS(sqrt, , AC_CHECK_LIB(m, sqrt))
+ AC_CHECK_FUNCS([strrchr])
+ 
+-case "$host" in
+- *-*-linux*)
++case "$host_os" in
++ linux* | k*bsd*-gnu)
+     CFLAGS="$CFLAGS -DADJTIME_MISSING"
+     ;;
+- *-*-sunos*)
++ sunos*)
+     CFLAGS="$CFLAGS -DNONBLOCK_BROKEN"
+     ;;
+ esac

@@ -1,0 +1,29 @@
+
+Author: rmh
+Status: First hunk is on hold untill my upstream fixes are merged in upstream (sent already)
+	Second hunk is not to merge.  I reported to BTS that patch 22 is fucked, hoping that
+	they will address the problem.
+
+diff -ur cdrtools-2.01+01a01.old/debian/control cdrtools-2.01+01a01/debian/control
+--- cdrtools-2.01+01a01.old/debian/control	2005-08-10 13:20:07.000000000 +0200
++++ cdrtools-2.01+01a01/debian/control	2005-08-13 13:43:07.000000000 +0200
+@@ -3,7 +3,7 @@
+ Section: otherosfs
+ Maintainer: Joerg Jaspert <joerg@debian.org>
+ Uploaders: Eduard Bloch <blade@debian.org>
+-Build-Depends: debhelper (>=4.1.16), autotools-dev, smake, zlib1g-dev, dpatch, libcap-dev
++Build-Depends: debhelper (>=4.1.16), autotools-dev, smake, zlib1g-dev, dpatch, libcap-dev [!kfreebsd-i386], libcam-dev [kfreebsd-i386]
+ Standards-Version: 3.6.1.0
+ 
+ Package: cdrecord
+diff -ur cdrtools-2.01+01a01.old/debian/patches/00list cdrtools-2.01+01a01/debian/patches/00list
+--- cdrtools-2.01+01a01.old/debian/patches/00list	2005-08-10 13:20:07.000000000 +0200
++++ cdrtools-2.01+01a01/debian/patches/00list	2005-08-10 13:40:07.000000000 +0200
+@@ -14,7 +14,6 @@
+ 18_donotopen_hda
+ 20_rsh-bugfix
+ 21_makefile_fix_for_kernel
+-22_linux_rawio_capability
+ 23_o_excl
+ 24_debug_tmpfile
+ 25_mkisofs_iconv_manpage
