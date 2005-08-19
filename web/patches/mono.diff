@@ -1,0 +1,258 @@
+
+Author: rmh
+Status: need to fix some messy things first
+
+  - Switch to --with-gc=boehm (see bug #322599)
+  - SIGUSR1 and SIGUSR2 need to swapped in some places, but I'd like to figure out
+    if we can switch it ourselves instead first.
+  - s/eax/sc_eax/g changes are too frequent and start to be annoying.  Can we
+    change it in the system header?
+  - How to mirror a struct declaration from standard headers?  See FIXME below
+
+diff -x configure -ur mono-1.1.8.2.old/configure.in mono-1.1.8.2/configure.in
+--- mono-1.1.8.2.old/configure.in	2005-07-01 01:34:06.000000000 +0200
++++ mono-1.1.8.2/configure.in	2005-08-09 11:37:58.000000000 +0200
+@@ -167,7 +167,7 @@
+ 		libdl=
+ 		libgc_threads=pthreads
+ 		;;
+-	*-*-linux*)
++	*-*-linux* | *-*-k*bsd*-gnu)
+ 		platform_win32=no
+ 		CPPFLAGS="$CPPFLAGS -DGC_LINUX_THREADS -D_GNU_SOURCE -D_REENTRANT"
+ 		libmono_cflags="-D_REENTRANT"
+@@ -1523,11 +1523,11 @@
+ 	SQLITE3="libsqlite3.0.dylib"
+ 	X11="libX11.dylib"
+ 	;;
+-     *-*-*netbsd*)
++     *-*-netbsd*)
+ 	LIBC="libc.so.12"
+ 	INTL="libintl.so.0"
+ 	;;
+-    *-*-*freebsd*)
++    *-*-freebsd*)
+     	LIBC="libc.so"
+ 	INTL="libintl.so"
+ 	;;
+@@ -1535,7 +1535,11 @@
+     	LIBC="libc.so"
+ 	INTL="libintl.so"
+ 	;;
+-    *-*-*linux*)
++    *-*-*linux* | *-*-k*bsd*-gnu) # Glibc systems
++	case "$host_os" in
++		k*bsd*-gnu) LIBC="libc.so.0.1" ;;
++	esac
++	INTL="$LIBC"
+ 	AC_PATH_X
+ 	AC_MSG_CHECKING(for the soname of libX11.so)
+ 	for i in $x_libraries /usr/lib /usr/lib64; do
+diff -x configure -ur mono-1.1.8.2.old/debian/control mono-1.1.8.2/debian/control
+--- mono-1.1.8.2.old/debian/control	2005-08-03 13:42:53.000000000 +0200
++++ mono-1.1.8.2/debian/control	2005-08-09 20:10:29.000000000 +0200
+@@ -8,7 +8,7 @@
+ Standards-Version: 3.6.1
+ 
+ Package: mono-common
+-Architecture: i386 powerpc amd64
++Architecture: i386 powerpc amd64 kfreebsd-i386
+ Depends: binfmt-support (>= 1.1.2)
+ Description: common files for Mono
+  Mono is a platform for running and developing applications based on the
+@@ -21,7 +21,7 @@
+ 
+ Package: mono-jit
+ Provides: cli-virtual-machine
+-Architecture: i386 powerpc amd64
++Architecture: i386 powerpc amd64 kfreebsd-i386
+ Depends: mono-common (= ${Source-Version}), mono-classlib-1.0-${mono:upversion}, ${shlibs:Depends}
+ Description: fast CLI (.NET) JIT compiler for Mono
+  Mono is a platform for running and developing applications based on the
+@@ -35,7 +35,7 @@
+  only.
+ 
+ Package: mono
+-Architecture: i386 powerpc amd64
++Architecture: i386 powerpc amd64 kfreebsd-i386
+ Depends: mono-common (= ${Source-Version}), mono-jit (= ${Source-Version})
+ Description: Mono CLI (.NET) runtime
+  Mono is a platform for running and developing applications based on the
+@@ -50,7 +50,7 @@
+ 
+ Package: mono-devel
+ Section: devel
+-Architecture: i386 powerpc amd64
++Architecture: i386 powerpc amd64 kfreebsd-i386
+ Depends: mono (= ${Source-Version}), mono-mcs, mono-gac, mono-utils, mono-jay
+ Suggests: mono-gmcs
+ Description: Mono CLI (.NET) runtime with development tools
+@@ -64,7 +64,7 @@
+ 
+ Package: mono-utils
+ Section: devel
+-Architecture: i386 powerpc amd64
++Architecture: i386 powerpc amd64 kfreebsd-i386
+ Replaces: mono-mcs (<= 1.1.6-4)
+ Depends: ${shlibs:Depends}, mono-classlib-1.0
+ Provides: cil-disassembler
+@@ -79,7 +79,7 @@
+ 
+ Package: libmono0
+ Section: libs
+-Architecture: i386 powerpc amd64
++Architecture: i386 powerpc amd64 kfreebsd-i386
+ Replaces: libmono-dev (<= 1.1.6-4)
+ Depends:  ${shlibs:Depends}
+ Provides: libmono-${mono:upversion}
+@@ -95,7 +95,7 @@
+ 
+ Package: libmono-dev
+ Section: devel
+-Architecture: i386 powerpc amd64
++Architecture: i386 powerpc amd64 kfreebsd-i386
+ Depends: libmono0 (= ${Source-Version}), libglib2.0-dev
+ Description: libraries for the Mono JIT - Development files
+  Header files and static libraries for libmono and libmono-profiler-conv.
+@@ -229,7 +229,7 @@
+ 
+ Package: mono-jay
+ Section: devel
+-Architecture: i386 powerpc amd64
++Architecture: i386 powerpc amd64 kfreebsd-i386
+ Depends: ${shlibs:Depends}
+ Description: LALR(1) parser generator oriented to Java/.NET
+  Mono is a platform for running and developing applications based on the
+diff -x configure -ur mono-1.1.8.2.old/debian/rules mono-1.1.8.2/debian/rules
+--- mono-1.1.8.2.old/debian/rules	2005-08-03 13:42:53.000000000 +0200
++++ mono-1.1.8.2/debian/rules	2005-08-09 15:15:27.000000000 +0200
+@@ -36,7 +36,7 @@
+ 	./configure $(confflags) --prefix=/usr \
+ 	  --mandir=\$${prefix}/share/man \
+ 	  --infodir=\$${prefix}/share/info --sysconfdir=/etc \
+-	  --with-sigaltstack=no --with-gc=included \
++	  --with-sigaltstack=no --with-gc=none \
+ 	  --with-jit=yes --with-ikvm-native=no --with-preview=yes
+ 	$(MAKE)
+ 	touch build-stamp
+@@ -51,6 +51,7 @@
+ 	rm -rf $(MONO_SHARED_DIR)/.wapi
+ 	-cd debian && \
+ 	  rm -f dh_installxsp.1
++	rm -f Makefile
+ 	dh_clean
+ 
+ install: build
+@@ -107,8 +108,8 @@
+ 	dh_compress -i
+ 	dh_fixperms -i
+ 	dh_installdeb -i
+-	dh_makeclilibs -i -m 1.0 internal-mono
+-	dh_clideps -i internal-mono
++	-dh_makeclilibs -i -m 1.0 internal-mono
++	-dh_clideps -i internal-mono
+ 	dh_gencontrol -i -- -Vmono:upversion=$(UPVERSION) -Vmono:next-upversion=$(NEXT_UPVERSION)
+ 	dh_md5sums -i
+ 	dh_builddeb -i
+diff -x configure -ur mono-1.1.8.2.old/mcs/tools/mono-service/mono-service.cs mono-1.1.8.2/mcs/tools/mono-service/mono-service.cs
+--- mono-1.1.8.2.old/mcs/tools/mono-service/mono-service.cs	2005-06-10 12:10:46.000000000 +0200
++++ mono-1.1.8.2/mcs/tools/mono-service/mono-service.cs	2005-08-10 13:30:00.000000000 +0200
+@@ -261,13 +261,13 @@
+ 							running = false;
+ 						}
+ 						break;
+-					case Signum.SIGUSR1:
++					case Signum.SIGUSR2:
+ 						if (service.CanPauseAndContinue) {
+ 							info (logname, "Pausing service {0}", service.ServiceName);
+ 							call (service, "OnPause", null);
+ 						}
+ 						break;
+-					case Signum.SIGUSR2:
++					case Signum.SIGUSR1:
+ 						if (service.CanPauseAndContinue) {
+ 							info (logname, "Continuing service {0}", service.ServiceName);
+ 							call (service, "OnContinue", null);
+diff -x configure -ur mono-1.1.8.2.old/mono/metadata/threads.c mono-1.1.8.2/mono/metadata/threads.c
+--- mono-1.1.8.2.old/mono/metadata/threads.c	2005-06-06 05:30:45.000000000 +0200
++++ mono-1.1.8.2/mono/metadata/threads.c	2005-08-04 17:38:13.000000000 +0200
+@@ -1380,13 +1380,13 @@
+ {
+ #if defined (__MINGW32__) || defined (_MSC_VER)
+ 	return -1;
++#elif defined(SIGRTMIN)
++	return SIGRTMIN;
++#elif defined(PTHREAD_SIG_CANCEL)
++	return PTHREAD_SIG_CANCEL;
+ #else
+-#ifndef	SIGRTMIN
+ 	return SIGUSR1;
+-#else
+-	return SIGRTMIN;
+ #endif
+-#endif /*defined (__MINGW32__) || defined (_MSC_VER) */
+ }
+ 
+ #if defined (__MINGW32__) || defined (_MSC_VER)
+diff -x configure -ur mono-1.1.8.2.old/mono/mini/mini-x86.h mono-1.1.8.2/mono/mini/mini-x86.h
+--- mono-1.1.8.2.old/mono/mini/mini-x86.h	2005-04-11 16:16:27.000000000 +0200
++++ mono-1.1.8.2/mono/mini/mini-x86.h	2005-08-04 12:55:25.000000000 +0200
+@@ -131,7 +131,7 @@
+ 
+ typedef void* MonoCompileArch;
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
++#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD_kernel__)
+ # define SC_EAX sc_eax
+ # define SC_EBX sc_ebx
+ # define SC_ECX sc_ecx
+diff -x configure -ur mono-1.1.8.2.old/mono/mini/mini.c mono-1.1.8.2/mono/mini/mini.c
+--- mono-1.1.8.2.old/mono/mini/mini.c	2005-06-20 20:31:51.000000000 +0200
++++ mono-1.1.8.2/mono/mini/mini.c	2005-08-04 18:16:59.000000000 +0200
+@@ -9726,6 +9726,10 @@
+ 	sigemptyset (&sa.sa_mask);
+ 	sa.sa_flags = 0;
+ #endif
++#if defined(__FreeBSD_kernel__) && defined(__GLIBC__)
++	if ((signo == SIGUSR1) || (signo == SIGUSR2))
++		return 0;
++#endif
+ 	g_assert (sigaction (signo, &sa, NULL) != -1);
+ }
+ #endif
+diff -x configure -ur mono-1.1.8.2.old/support/sys-statvfs.c mono-1.1.8.2/support/sys-statvfs.c
+--- mono-1.1.8.2.old/support/sys-statvfs.c	2005-06-14 02:39:30.000000000 +0200
++++ mono-1.1.8.2/support/sys-statvfs.c	2005-08-04 18:09:48.000000000 +0200
+@@ -27,6 +27,7 @@
+ 
+ G_BEGIN_DECLS
+ 
++#ifndef HAVE_SYS_STATVFS_H
+ struct Mono_Posix_Statvfs {
+ 	guint64         f_bsize;    /* file system block size */
+ 	guint64         f_frsize;   /* fragment size */
+@@ -40,8 +41,23 @@
+ 	guint64         f_flag;     /* mount flags */
+ 	guint64         f_namemax;  /* maximum filename length */
+ };
++#else
++struct Mono_Posix_Statvfs {
++/* FIXME: unproperly copied from bits/statvfs.h */
++  unsigned long int f_bsize;
++  unsigned long int f_frsize;
++  fsblkcnt_t f_blocks;
++  fsblkcnt_t f_bfree;
++  fsblkcnt_t f_bavail;
++  fsfilcnt_t f_files;
++  fsfilcnt_t f_ffree;
++  fsfilcnt_t f_favail;
++  fsid_t f_fsid;
++  unsigned long int f_flag;
++  unsigned long int f_namemax;
++  unsigned int f_spare[6];
++};
+ 
+-#ifdef HAVE_SYS_STATVFS_H
+ static void
+ copy_statvfs (struct Mono_Posix_Statvfs *to, struct statvfs *from)
+ {
