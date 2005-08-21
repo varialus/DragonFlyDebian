@@ -24,39 +24,41 @@
 #ifndef _BITS_SIGCONTEXT_H
 #define _BITS_SIGCONTEXT_H  1
 
-/* State of this thread when the signal was taken.  */
+/* State of this thread when the signal was taken.
+   The unions below are for compatibility with Linux (whose sigcontext
+   components don't have sc_ prefix) */
 struct sigcontext
   {
     __sigset_t sc_mask;		/* Blocked signals to restore.  */
     int sc_onstack;		/* Nonzero if running on sigstack.  */
 
     /* Segment registers.  */
-    int sc_gs;
-    int sc_fs;
-    int sc_es;
-    int sc_ds;
+    union { int sc_gs; int gs; };
+    union { int sc_fs; int fs; };
+    union { int sc_es; int es; };
+    union { int sc_ds; int ds; };
 
     /* "General" registers.  These members are in the order that the i386
        `pusha' and `popa' instructions use (`popa' ignores %esp).  */
-    int sc_edi;
-    int sc_esi;
-    int sc_ebp;
-    int sc_isp;			/* Not used; sc_esp is used instead.  */
-    int sc_ebx;
-    int sc_edx;
-    int sc_ecx;
-    int sc_eax;
+    union { int sc_edi; int edi; };
+    union { int sc_esi; int esi; };
+    union { int sc_ebp; int ebp; };
+    union { int sc_isp; int isp; };		/* Not used; sc_esp is used instead.  */
+    union { int sc_ebx; int ebx; };
+    union { int sc_edx; int edx; };
+    union { int sc_ecx; int ecx; };
+    union { int sc_eax; int eax; };
 
-    int sc_trapno;
-    int sc_err;
+    union { int sc_trapno; int trapno; };
+    union { int sc_err; int err; };
 
-    int sc_eip;			/* Instruction pointer.  */
-    int sc_cs;			/* Code segment register.  */
+    union { int sc_eip; int eip; };		/* Instruction pointer.  */
+    union { int sc_cs; int cs; };		/* Code segment register.  */
 
-    int sc_efl;			/* Processor flags.  */
+    int sc_efl;					/* Processor flags.  */
 
-    int sc_esp;			/* This stack pointer is used.  */
-    int sc_ss;			/* Stack segment register.  */
+    union { int sc_esp; int esp; };		/* This stack pointer is used.  */
+    union { int sc_ss; int ss; };		/* Stack segment register.  */
 
     int sc_fpregs[28];
     int sc_spare[17];
@@ -68,6 +70,7 @@ struct sigcontext
 #define sc_pc		sc_eip		/* Process counter.  */
 #define sc_ps		sc_efl
 #define sc_eflags	sc_efl
+#define eflags		sc_efl		/* Linux-style name. */
 
 
 /* Codes for SIGFPE.  */
