@@ -9,7 +9,8 @@ ifeq ($(subdir),misc)
 sysdep_headers += \
  sys/ktrace.h \
  sys/mount.h \
- sys/rfork.h
+ sys/rfork.h \
+ sys/kd.h
 endif
 
 ifeq ($(subdir),stdlib)
