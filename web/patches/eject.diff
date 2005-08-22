@@ -1,0 +1,306 @@
+diff -ur eject-2.0.13deb.old/debian/rules eject-2.0.13deb/debian/rules
+--- eject-2.0.13deb.old/debian/rules	2005-08-22 14:28:37.000000000 +0200
++++ eject-2.0.13deb/debian/rules	2005-08-22 15:26:38.000000000 +0200
+@@ -17,13 +17,21 @@
+ CFLAGS += -Os -fomit-frame-pointer
+ endif
+ 
++DEB_HOST_ARCH_OS	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
++DEB_HOST_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
++DEB_BUILD_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
++
++ifeq ($(DEB_HOST_ARCH_OS), kfreebsd)
++cdrom		=	--enable-default-device=acd0
++endif
++
+ deb_dir		=	debian/eject
+ udeb_dir	=	debian/eject-udeb
+ build_dirs	=	$(deb_dir) $(udeb_dir)
+ 
+ build:
+ 	dh_testdir
+-	./configure --prefix=/usr
++	./configure --prefix=/usr --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) $(cdrom)
+ 	$(MAKE) AM_CFLAGS= CFLAGS="$(CFLAGS)"
+ 	touch build
+ 
+diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
+--- eject-2.0.13deb.old/eject.c	2005-08-22 14:28:37.000000000 +0200
++++ eject-2.0.13deb/eject.c	2005-08-22 15:26:38.000000000 +0200
+@@ -36,12 +36,6 @@
+ #error DEFAULTDEVICE not set, check Makefile
+ #endif
+ 
+-#include <linux/version.h>
+-/* handy macro found in 2.1 kernels, but not in older ones */
+-#ifndef KERNEL_VERSION
+-#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+-#endif
+-
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+@@ -59,17 +53,33 @@
+ #include <sys/ioctl.h>
+ #include <sys/wait.h>
+ #include <sys/mtio.h>
++#include <sys/mount.h>
++
++#if defined(__linux__)
++#include <linux/version.h>
++/* handy macro found in 2.1 kernels, but not in older ones */
++#ifndef KERNEL_VERSION
++#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
++#endif
+ #include <linux/types.h>
+ #include <linux/cdrom.h>
+ #if LINUX_VERSION_CODE < KERNEL_VERSION(2,1,0)
+ #include <linux/ucdrom.h>
+ #endif
+ #include <linux/fd.h>
+-#include <sys/mount.h>
+ #include <scsi/scsi.h>
+ #include <scsi/sg.h>
+ #include <scsi/scsi_ioctl.h>
+ 
++#define HAVE_EJECT_SCSI
++#define HAVE_EJECT_FLOPPY
++#define HAVE_EJECT_TAPE
++
++#elif defined(__FreeBSD_kernel__)
++#include <sys/cdio.h>
++#endif
++
++
+ #define CLOSE(fd) if (close(fd)==-1) { \
+     perror(programName); \
+     exit(1); \
+@@ -137,9 +147,15 @@
+ "  -v\t-- enable verbose output\n"
+ "  -n\t-- don't eject, just show device found\n"
+ "  -r\t-- eject CD-ROM\n"
++#ifdef HAVE_EJECT_SCSI
+ "  -s\t-- eject SCSI device\n"
++#endif
++#ifdef HAVE_EJECT_FLOPPY
+ "  -f\t-- eject floppy\n"
++#endif
++#ifdef HAVE_EJECT_TAPE
+ "  -q\t-- eject tape\n"
++#endif
+ "  -p\t-- use /proc/mounts instead of /etc/mtab\n"
+ "  -m\t-- do not unmount device even if it is mounted\n"
+ )
+@@ -149,8 +165,18 @@
+ "Long options:\n"
+ "  -h --help   -v --verbose	 -d --default\n"
+ "  -a --auto   -c --changerslot  -t --trayclose  -x --cdspeed\n"
+-"  -r --cdrom  -s --scsi	 -f --floppy\n"
+-"  -q --tape   -n --noop	 -V --version\n"
++"  -r --cdrom"
++#ifdef HAVE_EJECT_SCSI
++"  -s --scsi"
++#endif
++#ifdef HAVE_EJECT_FLOPPY
++"  -f --floppy"
++#endif
++#ifdef HAVE_EJECT_TAPE
++"  -q --tape"
++#endif
++"\n"
++"-n --noop	 -V --version\n"
+ "  -p --proc   -m --no-unmount\n"));
+ #endif /* GETOPTLONG */
+ 	fprintf(stderr,_(
+@@ -404,9 +430,13 @@
+ /* Set or clear auto-eject mode. */
+ static void AutoEject(int fd, int onOff)
+ {
+-	int status;
++	int status = -1;
+ 
++#ifdef CDROMEJECT_SW
+ 	status = ioctl(fd, CDROMEJECT_SW, onOff);
++#else
++	errno = ENOSYS;
++#endif
+ 	if (status != 0) {
+ 		fprintf(stderr, _("%s: CD-ROM auto-eject command failed: %s\n"), programName, strerror(errno));
+ 		exit(1);
+@@ -420,17 +450,13 @@
+  */
+ static void ChangerSelect(int fd, int slot)
+ {
+-	int status;
+-
+ #ifdef CDROM_SELECT_DISC
+-	status = ioctl(fd, CDROM_SELECT_DISC, slot);
+-	if (status < 0) {
++	if (ioctl(fd, CDROM_SELECT_DISC, slot) < 0) {
+ 		fprintf(stderr, _("%s: CD-ROM select disc command failed: %s\n"), programName, strerror(errno));
+ 		exit(1);
+ 	}
+ #elif defined CDROMLOADFROMSLOT
+-	status = ioctl(fd, CDROMLOADFROMSLOT, slot);
+-	if (status != 0) {
++	if (ioctl(fd, CDROMLOADFROMSLOT, slot) != 0) {
+ 		fprintf(stderr, _("%s: CD-ROM load from slot command failed: %s\n"), programName, strerror(errno));
+ 		exit(1);
+ 	}
+@@ -445,17 +471,18 @@
+  */
+ static void CloseTray(int fd)
+ {
+-	int status;
+-
+-#ifdef CDROMCLOSETRAY
+-	status = ioctl(fd, CDROMCLOSETRAY);
+-	if (status != 0) {
++#if defined(CDROMCLOSETRAY)
++	if (ioctl(fd, CDROMCLOSETRAY) != 0)
++#elif defined(CDIOCCLOSE)
++	if (ioctl(fd, CDIOCCLOSE) != 0)
++#else
++	if (0)
++#endif
++	{
+ 		fprintf(stderr, _("%s: CD-ROM tray close command failed: %s\n"), programName, strerror(errno));
+ 		exit(1);
+ 	}
+-#else
+     fprintf(stderr, _("%s: CD-ROM tray close command not supported by this kernel\n"), programName);
+-#endif
+ }
+ 
+ 
+@@ -466,16 +493,13 @@
+  */
+ static void SelectSpeedCdrom(int fd, int speed)
+ {
+-	int status;
+-
+ #ifdef CDROM_SELECT_SPEED
+-	status = ioctl(fd, CDROM_SELECT_SPEED, speed);
+-	if (status != 0) {
++	if (ioctl(fd, CDROM_SELECT_SPEED, speed) != 0) {
+ 		fprintf(stderr, _("%s: CD-ROM select speed command failed: %s\n"), programName, strerror(errno));
+ 		exit(1);
+ 	}
+ #else
+-    fprintf(stderr, _("%s: CD-ROM select speed command not supported by this kernel\n"), programName);
++	fprintf(stderr, _("%s: CD-ROM select speed command not supported by this kernel\n"), programName);
+ #endif
+ }
+ 
+@@ -485,12 +509,21 @@
+  */
+ static int EjectCdrom(int fd)
+ {
+-	int status;
++	int status = -1;
+ 
++#if defined(CDROMEJECT)
+ 	status = ioctl(fd, CDROMEJECT);
++#elif defined(CDIOCEJECT)
++	status = ioctl(fd, CDIOCEJECT);
++#else
++/* Some kernels implement cdrom-eject only, but I don't think any kernel in the
++   world would implement eject only for non-cdrom drives.  Let's die. */
++# error
++#endif
+ 	return (status == 0);
+ }
+ 
++#ifdef HAVE_EJECT_SCSI
+ /*
+  * Eject using SCSI SG_IO commands. Return 1 if successful, 0 otherwise.
+  */
+@@ -538,8 +571,10 @@
+ 	status = ioctl(fd, BLKRRPART);
+ 	return 1;
+ }
++#endif
+ 
+ 
++#ifdef HAVE_EJECT_FLOPPY
+ /*
+  * Eject using FDEJECT ioctl. Return 1 if successful, 0 otherwise.
+  */
+@@ -550,8 +585,10 @@
+ 	status = ioctl(fd, FDEJECT);
+ 	return (status >= 0);
+ }
++#endif
+ 
+ 
++#ifdef HAVE_EJECT_TAPE
+ /*
+  * Eject using tape ioctl. Return 1 if successful, 0 otherwise.
+  */
+@@ -565,6 +602,7 @@
+ 	status = ioctl(fd, MTIOCTOP, &op);
+ 	return (status >= 0);
+ }
++#endif
+ 
+ 
+ /* Unmount a device. */
+@@ -576,10 +614,10 @@
+ 	  case 0: /* child */
+ 		  setuid(getuid()); /* reduce likelyhood of security holes when running setuid */
+ 		  if(p_option)
+-			  execl("/bin/umount", "/bin/umount", fullName, "-n", NULL);
++			  execlp("umount", "umount", fullName, "-n", NULL);
+ 		  else
+-			  execl("/bin/umount", "/bin/umount", fullName, NULL);
+-		  fprintf(stderr, _("%s: unable to exec /bin/umount of `%s': %s\n"),
++			  execlp("umount", "umount", fullName, NULL);
++		  fprintf(stderr, _("%s: unable to exec umount of `%s': %s\n"),
+ 				  programName, fullName, strerror(errno));
+ 		  exit(1);
+ 		  break;
+@@ -624,7 +662,7 @@
+ 	if (min) *min = -1;
+ 	if (stat(name, &sstat) == -1)
+ 		return -1;
+-	if (! S_ISBLK(sstat.st_mode))
++	if (! S_ISBLK(sstat.st_mode) && ! S_ISCHR(sstat.st_mode))
+ 		return -1;
+ 	if (maj) *maj = major(sstat.st_rdev);
+ 	if (min) *min = minor(sstat.st_rdev);
+@@ -1042,6 +1080,7 @@
+ 		}
+ 	}
+ 
++#ifdef HAVE_EJECT_SCSI
+ 	if (s_option && !worked) {
+ 		if (v_option)
+ 			printf(_("%s: trying to eject `%s' using SCSI commands\n"), programName, deviceName);
+@@ -1053,7 +1092,9 @@
+ 				printf(_("%s: SCSI eject failed\n"), programName);
+ 		}
+ 	}
++#endif
+ 
++#ifdef HAVE_EJECT_FLOPPY
+ 	if (f_option && !worked) {
+ 		if (v_option)
+ 			printf(_("%s: trying to eject `%s' using floppy eject command\n"), programName, deviceName);
+@@ -1065,7 +1106,9 @@
+ 				printf(_("%s: floppy eject command failed\n"), programName);
+ 		}
+ 	}
++#endif
+ 
++#ifdef HAVE_EJECT_TAPE
+ 	if (q_option && !worked) {
+ 		if (v_option)
+ 			printf(_("%s: trying to eject `%s' using tape offline command\n"), programName, deviceName);
+@@ -1077,6 +1120,7 @@
+ 				printf(_("%s: tape offline command failed\n"), programName);
+ 		}
+ 	}
++#endif
+ 
+ 	if (!worked) {
+ 		fprintf(stderr, _("%s: unable to eject, last error: %s\n"), programName, strerror(errno));
