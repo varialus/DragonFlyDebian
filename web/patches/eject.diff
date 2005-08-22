@@ -1,32 +1,6 @@
-diff -ur eject-2.0.13deb.old/debian/rules eject-2.0.13deb/debian/rules
---- eject-2.0.13deb.old/debian/rules	2005-08-22 14:28:37.000000000 +0200
-+++ eject-2.0.13deb/debian/rules	2005-08-22 15:26:38.000000000 +0200
-@@ -17,13 +17,21 @@
- CFLAGS += -Os -fomit-frame-pointer
- endif
- 
-+DEB_HOST_ARCH_OS	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
-+DEB_HOST_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-+DEB_BUILD_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
-+
-+ifeq ($(DEB_HOST_ARCH_OS), kfreebsd)
-+cdrom		=	--enable-default-device=acd0
-+endif
-+
- deb_dir		=	debian/eject
- udeb_dir	=	debian/eject-udeb
- build_dirs	=	$(deb_dir) $(udeb_dir)
- 
- build:
- 	dh_testdir
--	./configure --prefix=/usr
-+	./configure --prefix=/usr --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) $(cdrom)
- 	$(MAKE) AM_CFLAGS= CFLAGS="$(CFLAGS)"
- 	touch build
- 
-diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
---- eject-2.0.13deb.old/eject.c	2005-08-22 14:28:37.000000000 +0200
-+++ eject-2.0.13deb/eject.c	2005-08-22 15:26:38.000000000 +0200
+diff -u eject-2.0.13deb/eject.c eject-2.0.13deb/eject.c
+--- eject-2.0.13deb/eject.c
++++ eject-2.0.13deb/eject.c
 @@ -36,12 +36,6 @@
  #error DEFAULTDEVICE not set, check Makefile
  #endif
@@ -127,72 +101,21 @@ diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
  	if (status != 0) {
  		fprintf(stderr, _("%s: CD-ROM auto-eject command failed: %s\n"), programName, strerror(errno));
  		exit(1);
-@@ -420,17 +450,13 @@
-  */
- static void ChangerSelect(int fd, int slot)
+@@ -447,8 +477,12 @@
  {
--	int status;
--
- #ifdef CDROM_SELECT_DISC
--	status = ioctl(fd, CDROM_SELECT_DISC, slot);
--	if (status < 0) {
-+	if (ioctl(fd, CDROM_SELECT_DISC, slot) < 0) {
- 		fprintf(stderr, _("%s: CD-ROM select disc command failed: %s\n"), programName, strerror(errno));
- 		exit(1);
- 	}
- #elif defined CDROMLOADFROMSLOT
--	status = ioctl(fd, CDROMLOADFROMSLOT, slot);
--	if (status != 0) {
-+	if (ioctl(fd, CDROMLOADFROMSLOT, slot) != 0) {
- 		fprintf(stderr, _("%s: CD-ROM load from slot command failed: %s\n"), programName, strerror(errno));
- 		exit(1);
- 	}
-@@ -445,17 +471,18 @@
-  */
- static void CloseTray(int fd)
- {
--	int status;
--
+ 	int status;
+ 
 -#ifdef CDROMCLOSETRAY
--	status = ioctl(fd, CDROMCLOSETRAY);
--	if (status != 0) {
++#if defined(CDROMCLOSETRAY) || defined(CDIOCCLOSE)
 +#if defined(CDROMCLOSETRAY)
-+	if (ioctl(fd, CDROMCLOSETRAY) != 0)
+ 	status = ioctl(fd, CDROMCLOSETRAY);
 +#elif defined(CDIOCCLOSE)
-+	if (ioctl(fd, CDIOCCLOSE) != 0)
-+#else
-+	if (0)
++	status = ioctl(fd, CDIOCCLOSE);
 +#endif
-+	{
+ 	if (status != 0) {
  		fprintf(stderr, _("%s: CD-ROM tray close command failed: %s\n"), programName, strerror(errno));
  		exit(1);
- 	}
--#else
-     fprintf(stderr, _("%s: CD-ROM tray close command not supported by this kernel\n"), programName);
--#endif
- }
- 
- 
-@@ -466,16 +493,13 @@
-  */
- static void SelectSpeedCdrom(int fd, int speed)
- {
--	int status;
--
- #ifdef CDROM_SELECT_SPEED
--	status = ioctl(fd, CDROM_SELECT_SPEED, speed);
--	if (status != 0) {
-+	if (ioctl(fd, CDROM_SELECT_SPEED, speed) != 0) {
- 		fprintf(stderr, _("%s: CD-ROM select speed command failed: %s\n"), programName, strerror(errno));
- 		exit(1);
- 	}
- #else
--    fprintf(stderr, _("%s: CD-ROM select speed command not supported by this kernel\n"), programName);
-+	fprintf(stderr, _("%s: CD-ROM select speed command not supported by this kernel\n"), programName);
- #endif
- }
- 
-@@ -485,12 +509,21 @@
+@@ -485,12 +519,21 @@
   */
  static int EjectCdrom(int fd)
  {
@@ -215,7 +138,7 @@ diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
  /*
   * Eject using SCSI SG_IO commands. Return 1 if successful, 0 otherwise.
   */
-@@ -538,8 +571,10 @@
+@@ -538,8 +581,10 @@
  	status = ioctl(fd, BLKRRPART);
  	return 1;
  }
@@ -226,7 +149,7 @@ diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
  /*
   * Eject using FDEJECT ioctl. Return 1 if successful, 0 otherwise.
   */
-@@ -550,8 +585,10 @@
+@@ -550,8 +595,10 @@
  	status = ioctl(fd, FDEJECT);
  	return (status >= 0);
  }
@@ -237,7 +160,7 @@ diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
  /*
   * Eject using tape ioctl. Return 1 if successful, 0 otherwise.
   */
-@@ -565,6 +602,7 @@
+@@ -565,6 +612,7 @@
  	status = ioctl(fd, MTIOCTOP, &op);
  	return (status >= 0);
  }
@@ -245,7 +168,7 @@ diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
  
  
  /* Unmount a device. */
-@@ -576,10 +614,10 @@
+@@ -576,10 +624,10 @@
  	  case 0: /* child */
  		  setuid(getuid()); /* reduce likelyhood of security holes when running setuid */
  		  if(p_option)
@@ -259,7 +182,7 @@ diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
  				  programName, fullName, strerror(errno));
  		  exit(1);
  		  break;
-@@ -624,7 +662,7 @@
+@@ -624,7 +672,7 @@
  	if (min) *min = -1;
  	if (stat(name, &sstat) == -1)
  		return -1;
@@ -268,7 +191,7 @@ diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
  		return -1;
  	if (maj) *maj = major(sstat.st_rdev);
  	if (min) *min = minor(sstat.st_rdev);
-@@ -1042,6 +1080,7 @@
+@@ -1042,6 +1090,7 @@
  		}
  	}
  
@@ -276,7 +199,7 @@ diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
  	if (s_option && !worked) {
  		if (v_option)
  			printf(_("%s: trying to eject `%s' using SCSI commands\n"), programName, deviceName);
-@@ -1053,7 +1092,9 @@
+@@ -1053,7 +1102,9 @@
  				printf(_("%s: SCSI eject failed\n"), programName);
  		}
  	}
@@ -286,7 +209,7 @@ diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
  	if (f_option && !worked) {
  		if (v_option)
  			printf(_("%s: trying to eject `%s' using floppy eject command\n"), programName, deviceName);
-@@ -1065,7 +1106,9 @@
+@@ -1065,7 +1116,9 @@
  				printf(_("%s: floppy eject command failed\n"), programName);
  		}
  	}
@@ -296,7 +219,7 @@ diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
  	if (q_option && !worked) {
  		if (v_option)
  			printf(_("%s: trying to eject `%s' using tape offline command\n"), programName, deviceName);
-@@ -1077,6 +1120,7 @@
+@@ -1077,6 +1130,7 @@
  				printf(_("%s: tape offline command failed\n"), programName);
  		}
  	}
@@ -304,3 +227,29 @@ diff -ur eject-2.0.13deb.old/eject.c eject-2.0.13deb/eject.c
  
  	if (!worked) {
  		fprintf(stderr, _("%s: unable to eject, last error: %s\n"), programName, strerror(errno));
+diff -u eject-2.0.13deb/debian/rules eject-2.0.13deb/debian/rules
+--- eject-2.0.13deb/debian/rules
++++ eject-2.0.13deb/debian/rules
+@@ -17,13 +17,21 @@
+ CFLAGS += -Os -fomit-frame-pointer
+ endif
+ 
++DEB_HOST_ARCH_OS	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
++DEB_HOST_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
++DEB_BUILD_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
++
++ifeq ($(DEB_HOST_ARCH_OS), kfreebsd)
++cdrom		=	--enable-default-device=acd0
++endif
++
+ deb_dir		=	debian/eject
+ udeb_dir	=	debian/eject-udeb
+ build_dirs	=	$(deb_dir) $(udeb_dir)
+ 
+ build:
+ 	dh_testdir
+-	./configure --prefix=/usr
++	./configure --prefix=/usr --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) $(cdrom)
+ 	$(MAKE) AM_CFLAGS= CFLAGS="$(CFLAGS)"
+ 	touch build
+ 
