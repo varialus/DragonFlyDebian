@@ -65,6 +65,8 @@ rm -rf var/cache/apt/lists
 # this is only used by grub
 #gzip -c9 boot/kernel/kernel > boot/kfreebsd.gz
 
+dpkg --extract var/cache/apt/archives/kfreebsd-image-5.*.deb .
+
 # add this to make it a safe boot
 cat >> boot/device.hints << EOF
 hint.acpi.0.disabled=1
