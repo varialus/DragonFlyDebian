@@ -38,7 +38,7 @@ ca:12345:ctrlaltdel:/sbin/shutdown -t1 -a -r now
 EOF
 
 # maybe-missing kernel package
-dpkg --extract var/cache/apt/archives/kfreebsd-image-5.*.deb .
+cd ${tmp1} && dpkg --extract var/cache/apt/archives/kfreebsd-image-5.*.deb .
 
 cd ${tmp1} && tar --same-owner -czpf ${pwd}/base.tgz ./*
 rm -rf ${tmp1}
