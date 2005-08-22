@@ -22,6 +22,11 @@ for i in mkisofs crosshurd ; do
   fi
 done
 
+if ! test -e cdboot ; then
+  echo Get cdboot from the same place you got this script, then try again
+  exit 1
+fi
+
 cpu="i386"
 system="kfreebsd-gnu"
 uname="GNU/kFreeBSD"
