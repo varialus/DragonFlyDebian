@@ -11,7 +11,14 @@ kfreebsd-config (0.0.4) unreleased; urgency=low
     description of snd_sbc which superceeds them.
   * Add snd_probe command to detect soundcard, and refer to it in sound
     template.
-  * Never mess with acpi module in postinst.
+    - snd_probe
+    - dirs
+    - install
+    - templates
+  * postinst:  Fix flaw in the routine that determines wether to unload modules.
+    Now modules are unloaded only when required by the logic described in the
+    comments.  As for "acpi", explicitly avoid to mess with this module, since
+    it can only be handled by the kernel loader.
 
  -- Robert Millan <rmh@aybabtu.com>  Tue,  2 Aug 2005 13:48:10 +0200
 
