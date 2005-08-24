@@ -1,6 +1,39 @@
+diff -ur ufsutils-0.0+2004.06.26.old/debian/changelog ufsutils-0.0+2004.06.26/debian/changelog
+--- ufsutils-0.0+2004.06.26.old/debian/changelog	2005-08-25 00:54:56.000000000 +0200
++++ ufsutils-0.0+2004.06.26/debian/changelog	2005-08-25 01:02:22.000000000 +0200
+@@ -1,3 +1,18 @@
++ufsutils (0.0+2004.06.26-4+kbsd.2) unreleased; urgency=low
++
++  * Document previous (.1) changelog entry.
++  * Set priority to `required' (otherwise crosshurd doesn't pick it).
++
++ -- Robert Millan <rmh@aybabtu.com>  Thu, 25 Aug 2005 01:01:53 +0200
++
++ufsutils (0.0+2004.06.26-4+kbsd.1) unreleased; urgency=low
++
++  * Fix "Cannot retrieve operator gid" error (bug #293411).
++  * Supress a pair of lines in 02_fsck.ufs.patch that avoid marking the
++    filesystem as clean (bug #286121).
++
++ -- Robert Millan <rmh@debian.org>  Mon, 18 Apr 2005 01:41:41 +0200
++
+ ufsutils (0.0+2004.06.26-4) experimental; urgency=low
+ 
+   * Fix integer overflow on get_block_device_size on GNU/Linux.
+diff -ur ufsutils-0.0+2004.06.26.old/debian/control ufsutils-0.0+2004.06.26/debian/control
+--- ufsutils-0.0+2004.06.26.old/debian/control	2005-08-25 00:54:56.000000000 +0200
++++ ufsutils-0.0+2004.06.26/debian/control	2005-08-25 00:56:07.000000000 +0200
+@@ -1,6 +1,6 @@
+ Source: ufsutils
+ Section: utils
+-Priority: optional
++Priority: required
+ Maintainer: Guillem Jover <guillem@debian.org>
+ Build-Depends: debhelper (>= 4.0.0), libedit-dev, libncurses5-dev
+ Standards-Version: 3.6.1
 diff -ur ufsutils-0.0+2004.06.26.old/debian/patches/02_fsck.ufs.patch ufsutils-0.0+2004.06.26/debian/patches/02_fsck.ufs.patch
---- ufsutils-0.0+2004.06.26.old/debian/patches/02_fsck.ufs.patch	2005-04-18 01:33:37.000000000 +0200
-+++ ufsutils-0.0+2004.06.26/debian/patches/02_fsck.ufs.patch	2005-04-18 01:38:43.000000000 +0200
+--- ufsutils-0.0+2004.06.26.old/debian/patches/02_fsck.ufs.patch	2005-08-25 00:54:56.000000000 +0200
++++ ufsutils-0.0+2004.06.26/debian/patches/02_fsck.ufs.patch	2005-08-25 00:55:02.000000000 +0200
 @@ -572,8 +572,8 @@
   	if (bkgrdflag == 0 && mntp != NULL && (mntp->f_flags & MNT_RDONLY) == 0)
   		resolved = 0;
@@ -14,7 +47,7 @@ diff -ur ufsutils-0.0+2004.06.26.old/debian/patches/02_fsck.ufs.patch ufsutils-0
   
 diff -ur ufsutils-0.0+2004.06.26.old/mkfs.ufs/mkfs.c ufsutils-0.0+2004.06.26/mkfs.ufs/mkfs.c
 --- ufsutils-0.0+2004.06.26.old/mkfs.ufs/mkfs.c	2004-04-09 21:58:33.000000000 +0200
-+++ ufsutils-0.0+2004.06.26/mkfs.ufs/mkfs.c	2005-04-18 01:40:16.000000000 +0200
++++ ufsutils-0.0+2004.06.26/mkfs.ufs/mkfs.c	2005-08-25 01:05:07.000000000 +0200
 @@ -733,10 +733,18 @@
  {
  	union dinode node;
