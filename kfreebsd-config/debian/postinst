@@ -59,8 +59,9 @@ EOF
       #   a) were listed to be loaded in the old list
       #   b) are actualy loaded
       #   c) are not listed to be loaded in the new list
+      #   d) are not acpi
       for i in ${old} ; do case $i in
-        "* ${new} *")
+        "* ${new} *"|acpi*)
 	;;
         *)
           if kldstat -n $i >/dev/null 2>/dev/null ; then
