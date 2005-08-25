@@ -7,7 +7,9 @@
 
 set -ex
 
-version=unreleased
+if [ "$version" = "" ] ; then
+  version=unreleased
+fi
 
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
@@ -16,7 +18,7 @@ if [ "$UID" != "0" ] ; then
 fi
 
 for i in mkisofs crosshurd ; do
-  if ! dpkg -s ${i} > /dev/null ; then
+  if ! dpkg -s ${i} | grep -q "^Status: .* installed$" > /dev/null ; then
     echo Install ${i} and try again
     exit 1
   fi
@@ -97,6 +99,7 @@ mkdir -p ramdisk
 cat > root/startup << EOF
 #!/bin/bash
 set -e
+trap "echo \"Something wicked happened.  Press enter to try again.\" ; read i" 0
 mdconfig -a -t malloc -o compress -s 16m -u md0
 mkfs.ufs /dev/md0
 mount -o rw -t ufs /dev/md0 /ramdisk
@@ -114,7 +117,7 @@ for i in /* ; do
       mkdir -p /ramdisk/proc
       mount -t linprocfs null /ramdisk/proc
     ;;
-    /ramdisk|/*-RELEASE|/root)
+    /ramdisk|/*-RELEASE)
     ;;
     /*)
       cp -a /\${i} /ramdisk/\${i}
@@ -126,13 +129,14 @@ done
 export TERM=cons25
 # sysvinit inside the chroot doesn't work
 #cp /usr/share/sysvinit/inittab /ramdisk/etc/
-while ! test -e /ramdisk/tmp/get_me_the_hell_outta_here ; do
-  chroot /ramdisk
+while chroot /ramdisk ; do
   echo warning: shell died, respawning
 done
 echo
-echo congrats, you escaped the chroot
-while true ; do bash ; done
+echo chrooted shell exitted with non-zero status.  NOT respawning.
+echo Issue \"chroot /ramdisk\" to try manualy.
+while bash ; do true ; done
+halt -f
 EOF
 chmod +x root/startup
 

@@ -40,5 +40,8 @@ EOF
 # maybe-missing kernel package
 cd ${tmp1} && dpkg --extract var/cache/apt/archives/kfreebsd-image-5.*.deb .
 
+# crosshurd uses host machine /etc/resolv.conf.  we don't really want that
+echo -n > ${tmp1}/etc/resolv.conf
+
 cd ${tmp1} && tar --same-owner -czpf ${pwd}/base.tgz ./*
 rm -rf ${tmp1}
