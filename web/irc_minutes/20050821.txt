@@ -1,0 +1,80 @@
+		GNU/kFreeBSD IRC meeting, July 31, 2005
+                =======================================
+
+
+The sixth Debian GNU/kFreeBSD meeting was held from 19:00 UTC to 20:05
+UTC on Saturday August 21th.
+
+The next meeting will take place on Sunday September 4th at 19:00 UTC.
+
+
+Minutes
+-------
+
+People mentioned:
+  aurel32: 	Aurelien Jarno
+  bal00:	Hector Garcia
+  braindmg:	Guillem Jover
+  nyu:		Robert Millan
+  otavio:	Otavio Salvador
+  tarzeau:	Gürkan Sengün
+
+
+1) aurel32 explained that io.debian.net, the GNU/kFreeBSD developer 
+   machine is now up and works well. An annoucement, including the
+   status of the port, has to be posted on debian-devel-announce.
+   We just need to wait for gnuab.org to be back again, and for the
+   new livecd to be released.
+   
+2) aurel32 announced that all gcc packages from Debian unstable, that 
+   is to say gcc-3.3, gcc-3.4 and gcc-4.0 are building on 
+   kfreebsd-i386 without any patch.
+
+3) aurel32 is still porting the glibc. He has changed the sigaction 
+   glibc function to use the new sigaction syscall that has been 
+   introduced in kFreeBSD 5.0 instead of the old sigvec syscall. This 
+   should make possible to use up to 128 signals, which should also make
+   possible to free SIGUSR1 and SIGUSR2 that are currently used by 
+   linuxthreads.
+   He also have removed the ugly "#include /usr/src/..", and solved the
+   namespace collision (glibc and kfreebsd-kernel-headers providing the
+   same file).
+
+4) nyu announced that CD burning is now supposed to work on kfreebsd-i386,
+   but there is a long dependency chain. cdrtools needs libcam, which he 
+   ported and packaged in freebsd-libs source package. This package also 
+   include libsbuf, which libcam needs. freebsd-libs also needs libbsd.
+
+5) nyu ported libattr, but it doesn't really work (segfault). This is a
+   first step for having libacl.
+   
+6) nyu also ported busybox, and has sent the patch in the upstream BTS.
+
+7) nyu explained that a some of packages fails to build because the 
+   register names have different name on GNU/kFreeBSD. They are named
+   eax, ebx, etc. on GNU/Linux and sc_eax, sc_ebx, etc. on GNU/kFreeBSD.
+   aurel32 proposed to use an union in the structure definition, so that
+   both name could be used.
+
+
+New action points
+-----------------
+* all: 			write an announcement mail for io.debian.net
+
+Opened action points
+--------------------
+* aurel32:		rebuild all packages that are still using 
+                        lipthread2
+* braindmg:		work on util-linux
+* aurel32:		add java support to gcc
+* braindmg:		send a status of the port to debian-devel
+* aurel32:		finish porting glibc-2.3.5
+* aurel32 & braindmg:	fix our packages that are modifying 
+                        build-depends at build time
+* braindmg:		upload ufsutils to unstable
+* somebody:		port libkvm in a clean manner
+			
+Closed action points
+--------------------
+* nyu:			port busybox
+
