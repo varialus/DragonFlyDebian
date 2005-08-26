@@ -29,11 +29,11 @@ if ! test -e cdboot ; then
   exit 1
 fi
 
-cpu="i386"
+cpu="i486"
 system="kfreebsd-gnu"
 uname="GNU/kFreeBSD"
-tmp1=`tempfile` && rm -f ${tmp1} && mkdir -p ${tmp1}
-tmp2=`tempfile`
+tmp1=`mktemp -d`
+tmp2=`mktemp`
 pwd=`pwd`
 
 if ! test -e base.tgz ; then ./tarball.sh ; fi
