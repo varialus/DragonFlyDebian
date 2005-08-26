@@ -2,7 +2,7 @@
 #
 # Build-Depends: mkisofs, crosshurd, fakeroot
 #
-# Copyright 2004  Robert Millan <rmh@debian.org>
+# Copyright 2004, 2005  Robert Millan <rmh@aybabtu.com>
 # See /usr/share/common-licenses/GPL for license terms.
 
 set -ex
@@ -21,7 +21,7 @@ fi
 cpu="i486"
 system="kfreebsd-gnu"
 uname="GNU/kFreeBSD"
-tmp1=`tempfile` && rm -f ${tmp1} && mkdir -p ${tmp1}
+tmp1=`mktemp -d`
 pwd=`pwd`
 export GZIP=--best
 
@@ -39,6 +39,18 @@ EOF
 
 # maybe-missing kernel package
 cd ${tmp1} && dpkg --extract var/cache/apt/archives/kfreebsd-image-5.*.deb .
+
+# if X server wrapper is installed, allow console users to run it
+if test -e ${tmp1}/etc/X11/Xwrapper.config ; then
+  sed -i ${tmp1}/etc/X11/Xwrapper.config -e "s/^allowed_users=.*/allowed_users=console/g"
+fi
+
+# if X server auto-configurator is installed, enable it
+if test -e ${tmp1}/etc/init.d/xserver-xorg ; then
+  cat > ${tmp1}/etc/default/xorg << __EOF__
+GENERATE_XCFG_AT_BOOT=true
+__EOF__
+fi
 
 # crosshurd uses host machine /etc/resolv.conf.  we don't really want that
 echo -n > ${tmp1}/etc/resolv.conf
