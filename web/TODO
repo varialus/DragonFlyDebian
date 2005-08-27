@@ -9,6 +9,19 @@ the particular issue.
 I'd be nice if tasks and subtasks were sorted by priority. It'd be also nice
 if all tasks were fixed. We goalt neither of these though :P
 
+ - ifupdown when used with static IPs does not handle the gateway entry
+   correctly, so do not add it in your interfaces file, just add an up hook,
+   that will do as a gatewa y entry:
+
+   [-- /etc/network/interfaces --]
+   auto rl0
+   iface rl0 inet static
+	address 192.168.1.100
+	netmask 255.255.255.0
+	broadcast 192.168.1.255
+	up route add -net 0.0.0.0 192.168.1.1
+   [-- /etc/network/interfaces --]
+
  - Glibc
         - Update to the current glibc in sid (2.3.5)
 	- Sync with current CVS. (merge into upstream, etc).
