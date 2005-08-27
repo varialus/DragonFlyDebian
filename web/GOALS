@@ -2,13 +2,10 @@
 Base system as installed by debootstrap:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-at			- ftbfs
 console-common		- not for us
 console-data		- not for us
 console-tools		- not for us
-dhcp-client		- dhcp3-client builds (w/ patches and works fine)
-dpkg			- fixed in experimental
-exim4			- patch sent upstream ML
+dpkg			- patch in BTS
 fdutils			- not for us?
 ifupdown		- not fully working due to incompatible route
 initscripts		- hacked to work with incompatible utils
@@ -20,15 +17,13 @@ libacl1			- needs a working libattr prior to porting
 libattr1		- builds but segfaults at runtime
 libcap1			- not for us
 libgdbm3		- ftbfs. libtool?
-libpcap0.7		- ftbfs. patch in BTS and upstream BTS
+libpcap0.7		- fail to install (namespace conflict), packages should swith to libpcap0.8
 libssl0.9.7		- ftbfs. patch sent upstream
 libtextwrap1		- config.guess
 logrotate		- problem with inetutils-inetd, see #294833
 makedev			- not for us (we have devfs)
-man-db			- config.guess
 manpages		- many Linux-isms.  needs package split (post-sarge)
 modutils		- not for us (kld*)
-ncurses			- ftbfs
 net-tools		- not for us (inetutils-tools)
 netbase			- see #256919
 netkit-inetd		- not for us (inetutils-inetd)
@@ -46,7 +41,6 @@ Build-essential:
 
 binutils		- ld.so hack needed until new glibc is used
 gcc			- all current versions work
-glibc			- needs update to match sid version (Aurelien working on it)
 
 
 Other very important stuff we can't live without
@@ -56,6 +50,7 @@ parted			- either this, or a working fdisk
 grub			- or grub2.  whatever that fully works.
 kfreebsd-headers	- no comment
 freebsd-utils		- no comment
+kld-utils		- no comment
 cdebootstrap		- hangs in infin loop.  also, see #285785
 debian-installer	- a bunch or dependencies needed first (Otavio working on this)
 
