@@ -1,0 +1,1075 @@
+diff -u cdparanoia-3a9.8/Makefile.in cdparanoia-3a9.8/Makefile.in
+--- cdparanoia-3a9.8/Makefile.in
++++ cdparanoia-3a9.8/Makefile.in
+@@ -32,10 +32,10 @@
+ 
+ ifeq ($(STATIC),TRUE)
+ 	LIBS = interface/libcdda_interface.a paranoia/libcdda_paranoia.a \
+-		-static -lm
++		-static -lm @LIBCAM@
+ 	LIBDEP = interface/libcdda_interface.a paranoia/libcdda_paranoia.a
+ else
+-	LIBS = -lcdda_interface -lcdda_paranoia -lm
++	LIBS = -lcdda_interface -lcdda_paranoia -lm @LIBCAM@
+ 	LIBDEP = interface/libcdda_interface.so paranoia/libcdda_paranoia.so
+ endif
+ 
+diff -u cdparanoia-3a9.8/configure cdparanoia-3a9.8/configure
+--- cdparanoia-3a9.8/configure
++++ cdparanoia-3a9.8/configure
+@@ -1480,6 +1480,46 @@
+ fi
+ done
+ 
++for ac_hdr in cam/cam.h
++do
++ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
++echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
++echo "configure:1488: checking for $ac_hdr" >&5
++if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
++  echo $ac_n "(cached) $ac_c" 1>&6
++else
++  cat > conftest.$ac_ext <<EOF
++#line 1493 "configure"
++#include "confdefs.h"
++#include <$ac_hdr>
++EOF
++ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++{ (eval echo configure:1498: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++if test -z "$ac_err"; then
++  rm -rf conftest*
++  eval "ac_cv_header_$ac_safe=yes"
++else
++  echo "$ac_err" >&5
++  echo "configure: failed program was:" >&5
++  cat conftest.$ac_ext >&5
++  rm -rf conftest*
++  eval "ac_cv_header_$ac_safe=no"
++fi
++rm -f conftest*
++fi
++if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
++  echo "$ac_t""yes" 1>&6
++    ac_tr_hdr=HAVE_`echo $ac_hdr | sed 'y%abcdefghijklmnopqrstuvwxyz./-%ABCDEFGHIJKLMNOPQRSTUVWXYZ___%'`
++  cat >> confdefs.h <<EOF
++#define $ac_tr_hdr 1
++EOF
++ LIBCAM="-lcam"
++else
++  echo "$ac_t""no" 1>&6
++fi
++done
++
+ 
+ echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
+ echo "configure:1486: checking whether ${MAKE-make} sets \${MAKE}" >&5
+@@ -1748,6 +1788,7 @@
+ s%@SET_MAKE@%$SET_MAKE%g
+ s%@SBPCD_H@%$SBPCD_H%g
+ s%@UCDROM_H@%$UCDROM_H%g
++s%@LIBCAM@%$LIBCAM%g
+ s%@TYPESIZES@%$TYPESIZES%g
+ s%@OPT@%$OPT%g
+ s%@DEBUG@%$DEBUG%g
+diff -u cdparanoia-3a9.8/interface/scan_devices.c cdparanoia-3a9.8/interface/scan_devices.c
+--- cdparanoia-3a9.8/interface/scan_devices.c
++++ cdparanoia-3a9.8/interface/scan_devices.c
+@@ -1,6 +1,8 @@
+ /******************************************************************
+  * CopyPolicy: GNU Public License 2 applies
+  * Copyright (C) 1998 Monty xiphmont@mit.edu
++ * FreeBSD porting (c) 2003
++ * 	Simon 'corecode' Schubert <corecode@corecode.ath.cx>
+  * 
+  * Autoscan for or verify presence of a cdrom device
+  * 
+@@ -21,6 +23,8 @@
+ 
+ #define MAX_DEV_LEN 20 /* Safe because strings only come from below */
+ /* must be absolute paths! */
++
++#if defined(__linux__)
+ static char *scsi_cdrom_prefixes[]={
+   "/dev/scd",
+   "/dev/sr",
+@@ -49,6 +53,17 @@
+   "/dev/cm206cd",
+   "/dev/gscd",
+   "/dev/optcd",NULL};
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++static char *cdrom_devices[] = {
++	"/dev/cd?",
++	"/dev/acd?",
++	"/dev/wcd?",
++	"/dev/mcd?",
++	"/dev/cd?c",
++	"/dev/acd?c",
++	"/dev/wcd?c",
++	"/dev/mcd?c", NULL};
++#endif
+ 
+ /* Functions here look for a cdrom drive; full init of a drive type
+    happens in interface.c */
+@@ -75,10 +90,12 @@
+ 	if((d=cdda_identify(buffer,messagedest,messages)))
+ 	  return(d);
+ 	idmessage(messagedest,messages,"",NULL);
++#if defined(__linux__)
+ 	buffer[pos-(cdrom_devices[i])]=j+97;
+ 	if((d=cdda_identify(buffer,messagedest,messages)))
+ 	  return(d);
+ 	idmessage(messagedest,messages,"",NULL);
++#endif
+       }
+     }else{
+       /* Name.  Go for it. */
+@@ -117,8 +134,14 @@
+   }
+ #endif
+ 
++#if defined(__linux__)	/* is order of checks important? */
+   d=cdda_identify_cooked(device,messagedest,messages);
+   if(!d)d=cdda_identify_scsi(device,NULL,messagedest,messages);
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++  d = cdda_identify_scsi(device, NULL, messagedest, messages);
++  if (d == NULL)
++	  d = cdda_identify_cooked(device, messagedest, messages);
++#endif
+ 
+ #ifdef CDDA_TEST
+   if(!d)d=cdda_identify_test(device,messagedest,messages);
+@@ -143,6 +166,7 @@
+ 
+ }
+ 
++#if defined(__linux__)
+ cdrom_drive *cdda_identify_cooked(const char *dev, int messagedest,
+ 				  char **messages){
+ 
+@@ -275,6 +299,60 @@
+   return(d);
+ }
+ 
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++cdrom_drive *
++cdda_identify_cooked(const char *dev, int messagedest, char **messages)
++{
++	cdrom_drive *d;
++	struct stat st;
++
++	if (stat(dev, &st)) {
++		idperror(messagedest, messages, "\t\tCould not stat %s", dev);
++		return NULL;
++	}
++
++	if (!S_ISCHR(st.st_mode)) {
++		idmessage(messagedest, messages, "\t\t%s is no block device", dev);
++		return NULL;
++	}
++	
++	if ((d = calloc(1, sizeof(*d))) == NULL) {
++		idperror(messagedest, messages, "\t\tCould not allocate memory", NULL);
++		return NULL;
++	}
++	d->ioctl_fd = -1;
++
++	if ((d->ioctl_fd = open(dev, O_RDONLY)) == -1) {
++		idperror(messagedest, messages, "\t\tCould not open %s", dev);
++		goto cdda_identify_cooked_fail;
++	}
++
++	if (ioctl_ping_cdrom(d->ioctl_fd)) {
++		idmessage(messagedest, messages, "\t\tDevice %s is not a CDROM", dev);
++		goto cdda_identify_cooked_fail;
++	}
++
++	d->drive_model = copystring("Generic cooked ioctl CDROM");
++	d->interface = COOKED_IOCTL;
++	d->bigendianp = -1;
++	d->nsectors = -1;
++
++	idmessage(messagedest, messages, "\t\tCDROM sensed: %s\n", d->drive_model);
++
++	return d;
++
++cdda_identify_cooked_fail:
++	if (d != NULL) {
++		if (d->ioctl_fd != -1)
++			close(d->ioctl_fd);
++		free(d);
++	}
++	return NULL;
++}
++#endif
++
++
++#if defined(__linux__)
+ struct  sg_id {
+   long    l1; /* target | lun << 8 | channel << 16 | low_ino << 24 */
+   long    l2; /* Unique id */
+@@ -390,6 +468,7 @@
+   if(dev!=-1)close(dev);
+   return(NULL);
+ }
++#endif
+ 
+ void strscat(char *a,char *b,int n){
+   int i;
+@@ -401,6 +480,7 @@
+   strcat(a," ");
+ }
+ 
++#if defined(__linux__)
+ /* At this point, we're going to punt compatability before SG2, and
+    allow only SG2 and SG3 */
+ static int verify_SG_version(cdrom_drive *d,int messagedest,
+@@ -654,6 +734,88 @@
+   if(g_fd!=-1)close(g_fd);
+   return(NULL);
+ }
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++
++cdrom_drive *cdda_identify_scsi(const char *device,
++    const char *dummy,
++    int messagedest,
++    char **messages)
++{
++	char *devname;
++	cdrom_drive *d = NULL;
++
++	if (device == NULL) {
++		idperror(messagedest, messages, "\t\tNo device specified", NULL);
++		return NULL;
++	}
++
++	if ((devname = test_resolve_symlink(device, messagedest, messages)) == NULL)
++		return NULL;
++
++	if ((d = calloc(1, sizeof(*d))) == NULL) {
++		idperror(messagedest, messages, "\t\tCould not allocate memory", NULL);
++		free(devname);
++		return NULL;
++	}
++
++	if ((d->dev = cam_open_device(devname, O_RDWR)) == NULL) {
++		idperror(messagedest, messages, "\t\tCould not open SCSI device: %s", cam_errbuf);
++		goto cdda_identify_scsi_fail;
++	}
++
++	if ((d->ccb = cam_getccb(d->dev)) == NULL) {
++		idperror(messagedest, messages, "\t\tCould not allocate ccb", NULL);
++		goto cdda_identify_scsi_fail;
++	}
++
++	if (strncmp(d->dev->inq_data.vendor, "TOSHIBA", 7) == 0 &&
++	    strncmp(d->dev->inq_data.product, "CD_ROM", 6) == 0 &&
++	    SID_TYPE(&d->dev->inq_data) == T_DIRECT) {
++		d->dev->inq_data.device = T_CDROM;
++		d->dev->inq_data.dev_qual2 |= 0x80;
++	}
++
++	if (SID_TYPE(&d->dev->inq_data) != T_CDROM &&
++	    SID_TYPE(&d->dev->inq_data) != T_WORM) {
++		idmessage(messagedest, messages,
++		    "\t\tDevice is neither a CDROM nor a WORM device\n", NULL);
++		goto cdda_identify_scsi_fail;
++	}
++
++	d->ioctl_fd = -1;
++	d->bigendianp = -1;
++	d->nsectors = -1;
++	d->lun = d->dev->target_lun;
++	d->interface = GENERIC_SCSI;
++
++	if ((d->sg_buffer = malloc(MAX_BIG_BUFF_SIZE)) == NULL) {
++		idperror(messagedest, messages, "Could not allocate buffer memory", NULL);
++		goto cdda_identify_scsi_fail;
++	}
++
++	if ((d->drive_model = calloc(36,1)) == NULL) {
++	}
++
++	strscat(d->drive_model, d->dev->inq_data.vendor, SID_VENDOR_SIZE);
++	strscat(d->drive_model, d->dev->inq_data.product, SID_PRODUCT_SIZE);
++	strscat(d->drive_model, d->dev->inq_data.revision, SID_REVISION_SIZE);
++
++	idmessage(messagedest, messages, "\nCDROM model sensed: %s", d->drive_model);
++
++	return d;
++
++cdda_identify_scsi_fail:
++	free(devname);
++	if (d) {
++		if (d->ccb)
++			cam_freeccb(d->ccb);
++		if (d->dev)
++			cam_close_device(d->dev);
++		free(d);
++	}
++	return NULL;
++}
++#endif
+ 
+ #ifdef CDDA_TEST
+ 
+diff -u cdparanoia-3a9.8/interface/utils.h cdparanoia-3a9.8/interface/utils.h
+--- cdparanoia-3a9.8/interface/utils.h
++++ cdparanoia-3a9.8/interface/utils.h
+@@ -1,4 +1,9 @@
++#ifdef LINUX
+ #include <endian.h>
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <machine/endian.h>
++#endif
++
+ #include <stdio.h>
+ #include <errno.h>
+ #include <string.h>
+diff -u cdparanoia-3a9.8/debian/changelog cdparanoia-3a9.8/debian/changelog
+--- cdparanoia-3a9.8/debian/changelog
++++ cdparanoia-3a9.8/debian/changelog
+@@ -1,3 +1,9 @@
++cdparanoia (3a9.8-11+kbsd) unreleased; urgency=low
++
++  * Added support for GNU/kFreeBSD 
++
++ -- Aurelien Jarno <aurel32@debian.org>  Sat, 27 Aug 2005 17:35:25 +0200
++
+ cdparanoia (3a9.8-11) unstable; urgency=low
+ 
+   * Fix double heartbeat (Closes: #235415)
+diff -u cdparanoia-3a9.8/debian/control cdparanoia-3a9.8/debian/control
+--- cdparanoia-3a9.8/debian/control
++++ cdparanoia-3a9.8/debian/control
+@@ -1,5 +1,5 @@
+ Source: cdparanoia
+-Build-Depends: debhelper (>> 3.0.0)
++Build-Depends: debhelper (>> 3.0.0), libcam-dev [kfreebsd-i386]
+ Section: sound
+ Priority: optional
+ Maintainer: Aaron Lehmann <aaronl@vitelus.com>
+--- cdparanoia-3a9.8.orig/configure.in
++++ cdparanoia-3a9.8/configure.in
+@@ -62,12 +62,14 @@
+ 	
+ AC_CHECK_HEADERS(linux/sbpcd.h, SBPCD_H="-DSBPCD_H='1' ")
+ AC_CHECK_HEADERS(linux/ucdrom.h, UCDROM_H="-DUCDROM_H='1' ")
++AC_CHECK_HEADERS(cam/cam.h, LIBCAM="-lcam")
+ 
+ AC_PROG_MAKE_SET
+ AC_C_CONST
+ 
+ AC_SUBST(SBPCD_H)
+ AC_SUBST(UCDROM_H)
++AC_SUBST(LIBCAM)
+ AC_SUBST(TYPESIZES)
+ AC_SUBST(OPT)
+ AC_SUBST(DEBUG)
+--- cdparanoia-3a9.8.orig/utils.h
++++ cdparanoia-3a9.8/utils.h
+@@ -1,5 +1,9 @@
+ #include <stdlib.h>
++#if defined (__linux__)
+ #include <endian.h>
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <machine/endian.h>
++#endif
+ #include <stdio.h>
+ #include <errno.h>
+ #include <string.h>
+--- cdparanoia-3a9.8.orig/version.h
++++ cdparanoia-3a9.8/version.h
+@@ -8,6 +8,8 @@
+ 
+ 
+ #define VERSION "cdparanoia III release 9.8 (March 23, 2001)\n"\
+-                "(C) 2001 Monty <monty@xiph.org> and Xiphophorus\n\n"\
++                "(C) 2001 Monty <monty@xiph.org> and Xiphophorus\n"\
++		"FreeBSD porting (c) 2003\n"\
++		"\tSimon 'corecode' Schubert <corecode@corecode.ath.cx>\n\n"\
+ 		"Report bugs to paranoia@xiph.org\n"\
+ 		"http://www.xiph.org/paranoia/\n"
+--- cdparanoia-3a9.8.orig/interface/Makefile.in
++++ cdparanoia-3a9.8/interface/Makefile.in
+@@ -15,7 +15,7 @@
+ LDFLAGS=@LDFLAGS@ $(FLAGS)
+ AR=@AR@
+ RANLIB=@RANLIB@
+-LIBS = -lm
++LIBS = -lm @LIBCAM@
+ CPPFLAGS+=-D_REENTRANT
+ 
+ OFILES = scan_devices.o	common_interface.o cooked_interface.o interface.o\
+@@ -46,7 +46,7 @@
+ 	$(RANLIB) libcdda_interface.a
+ 
+ libcdda_interface.so: 	$(OFILES)	
+-	$(CC) -fpic -shared -o libcdda_interface.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_interface.so.0 $(OFILES)
++	$(CC) -fpic -shared -o libcdda_interface.so.0.$(VERSION) -Wl,-soname -Wl,libcdda_interface.so.0 $(OFILES) $(LIBS)
+ 	[ -e libcdda_interface.so.0 ] || ln -s libcdda_interface.so.0.$(VERSION) libcdda_interface.so.0
+ 	[ -e libcdda_interface.so ] || ln -s libcdda_interface.so.0.$(VERSION) libcdda_interface.so
+ 
+--- cdparanoia-3a9.8.orig/interface/cdda_interface.h
++++ cdparanoia-3a9.8/interface/cdda_interface.h
+@@ -21,6 +21,11 @@
+ #include <sys/types.h>
+ #include <signal.h>
+ 
++#if defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <stdio.h>
++#include <camlib.h>
++#endif
++
+ #define MAXTRK 100
+ 
+ typedef struct TOC {	/* structure of table of contents */
+@@ -46,14 +51,20 @@
+ 
+   int opened; /* This struct may just represent a candidate for opening */
+ 
++#if defined(__linux__)
+   char *cdda_device_name;
+   char *ioctl_device_name;
+ 
+   int cdda_fd;
+-  int ioctl_fd;
+ 
+-  char *drive_model;
+   int drive_type;
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++  struct cam_device *dev;
++  union ccb *ccb;
++#endif
++
++  int ioctl_fd;
++  char *drive_model;
+   int interface;
+   int bigendianp;
+   int nsectors;
+@@ -83,9 +94,13 @@
+   int is_mmc;
+ 
+   /* SCSI command buffer and offset pointers */
++#if defined(__linux__)
+   unsigned char *sg;
+   unsigned char *sg_buffer;
+   unsigned char inqbytes[4];
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++  unsigned char *sg_buffer;
++#endif
+ 
+   /* Scsi parameters and state */
+   unsigned char density;
+--- cdparanoia-3a9.8.orig/interface/common_interface.c
++++ cdparanoia-3a9.8/interface/common_interface.c
+@@ -13,12 +13,19 @@
+ #include "utils.h"
+ #include "smallft.h"
+ 
++#if defined(__linux__)
+ #include <linux/hdreg.h>
++#endif
+ 
+ /* Test for presence of a cdrom by pinging with the 'CDROMVOLREAD' ioctl() */
+ int ioctl_ping_cdrom(int fd){
++#if defined(__linux__)
+   struct cdrom_volctrl volctl;
+   if (ioctl(fd, CDROMVOLREAD, &volctl)) 
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++  struct ioc_vol volctl;
++  if (ioctl(fd, CDIOCGETVOL, &volctl))
++#endif
+     return(1); /* failure */
+ 
+   return(0);
+@@ -26,6 +33,7 @@
+ }
+ 
+ 
++#if defined(__linux__)
+ /* Use the ioctl thingy above ping the cdrom; this will get model info */
+ char *atapi_drive_info(int fd){
+   /* Work around the fact that the struct grew without warning in
+@@ -46,6 +54,7 @@
+   free(id);
+   return(ret);
+ }
++#endif
+ 
+ int data_bigendianp(cdrom_drive *d){
+   float lsb_votes=0;
+@@ -171,7 +180,9 @@
+    knows the leasoud/leadin size. */
+ 
+ int FixupTOC(cdrom_drive *d,int tracks){
++#if defined(__linux__)
+   struct cdrom_multisession ms_str;
++#endif
+   int j;
+   
+   /* First off, make sure the 'starting sector' is >=0 */
+@@ -208,6 +219,8 @@
+   /* For a scsi device, the ioctl must go to the specialized SCSI
+      CDROM device, not the generic device. */
+ 
++  /* XXX */
++#if defined(__linux__)
+   if (d->ioctl_fd != -1) {
+     int result;
+ 
+@@ -231,6 +244,7 @@
+       return 1;
+     }
+   }
++#endif
+   return 0;
+ }
+ 
+--- cdparanoia-3a9.8.orig/interface/cooked_interface.c
++++ cdparanoia-3a9.8/interface/cooked_interface.c
+@@ -1,6 +1,8 @@
+ /******************************************************************
+  * CopyPolicy: GNU Public License 2 applies
+  * Copyright (C) Monty xiphmont@mit.edu
++ * FreeBSD porting (c) 2003
++ * 	Simon 'corecode' Schubert <corecode@corecode.ath.cx>
+  *
+  * CDROM code specific to the cooked ioctl interface
+  *
+@@ -10,6 +12,7 @@
+ #include "common_interface.h"
+ #include "utils.h"
+ 
++#if defined(__linux__)
+ static int cooked_readtoc (cdrom_drive *d){
+   int i;
+   int tracks;
+@@ -129,6 +132,140 @@
+   return(sectors);
+ }
+ 
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++static int
++cooked_readtoc(cdrom_drive *d)
++{
++	int i;
++	struct ioc_toc_header hdr;
++	struct ioc_read_toc_single_entry entry;
++
++	if (ioctl(d->ioctl_fd, CDIOREADTOCHEADER, &hdr) == -1) {
++		int ret;
++
++		if (errno == EPERM) {
++			ret = -102;
++			cderror(d, "102: ");
++		} else {
++			ret = -4;
++			cderror(d, "004: Unable to read table of contents header: ");
++		}
++		cderror(d, strerror(errno));
++		cderror(d, "\n");
++		return ret;
++	}
++
++	entry.address_format = CD_LBA_FORMAT;
++	for (i = hdr.starting_track; i <= hdr.ending_track; ++i) {
++		entry.track = i;
++		
++		if (ioctl(d->ioctl_fd, CDIOREADTOCENTRY, &entry) == -1) {
++			cderror(d, "005: Unable to read table of contents entry\n");
++			return -5;
++		}
++
++		d->disc_toc[i - hdr.starting_track].bFlags = entry.entry.control;
++		d->disc_toc[i - hdr.starting_track].bTrack = entry.entry.track;
++		d->disc_toc[i - hdr.starting_track].dwStartSector = be32_to_cpu(entry.entry.addr.lba);
++	}
++	
++	entry.track = 0xaa;	/* leadout */
++
++	if (ioctl(d->ioctl_fd, CDIOREADTOCENTRY, &entry) == -1) {
++		cderror(d, "005: Unable to read table of contents entry\n");
++		return -5;
++	}
++
++	d->disc_toc[i - hdr.starting_track].bFlags = entry.entry.control;
++	d->disc_toc[i - hdr.starting_track].bTrack = entry.entry.track;
++	d->disc_toc[i - hdr.starting_track].dwStartSector = be32_to_cpu(entry.entry.addr.lba);
++	
++	d->cd_extra = FixupTOC(d, hdr.ending_track - hdr.starting_track + 2);	/* with TOC */
++
++	return hdr.ending_track - hdr.starting_track + 1;
++}
++
++static int
++cooked_setspeed(cdrom_drive *d, int speed)
++{
++#ifdef CDRIOCREADSPEED
++	speed *= 177;
++	return ioctl(d->ioctl_fd, CDRIOCREADSPEED, &speed);
++#else
++	return -1;
++#endif
++}
++
++
++static long
++cooked_read(cdrom_drive *d, void *p, long begin, long sectors)
++{
++	int retry_count = 0;
++#ifndef CDIOCREADAUDIO
++	int bsize = CD_FRAMESIZE_RAW;
++#else
++	struct ioc_read_audio arg;
++
++	if (sectors > d->nsectors)
++		sectors = d->nsectors;
++
++	arg.address_format = CD_LBA_FORMAT;
++	arg.address.lba = begin;
++	arg.buffer = p;
++#endif
++
++#ifndef CDIOCREADAUDIO
++	if (ioctl(d->ioctl_fd, CDRIOCSETBLOCKSIZE, &bsize) == -1)
++		return -7;
++#endif
++	for (;;) {
++#ifndef CDIOCREADAUDIO
++		if (pread(d->ioctl_fd, p, sectors*bsize, begin*bsize) != sectors*bsize) {
++#else
++		arg.nframes = sectors;
++		if (ioctl(d->ioctl_fd, CDIOCREADAUDIO, &arg) == -1) {
++#endif
++			if (!d->error_retry)
++				return -7;
++
++			switch (errno) {
++			case ENOMEM:
++				if (sectors == 1) {
++					cderror(d, "300: Kernel memory error\n");
++					return -300;
++				}
++				/* FALLTHROUGH */
++			default:
++				if (sectors == 1) {
++					if (retry_count > MAX_RETRIES - 1) {
++						char b[256];
++						snprintf(b, sizeof(b),
++						    "010: Unable to access sector %ld; "
++						    "skipping...\n", begin);
++						cderror(d, b);
++						return -10;
++					}
++					break;
++				}
++			}
++
++			if (retry_count > 4 && sectors > 1)
++				sectors = sectors * 3 / 4;
++
++			++retry_count;
++
++			if (retry_count > MAX_RETRIES) {
++				cderror(d, "007: Unknown, unrecoverable error reading data\n");
++				return -7;
++			}
++		} else
++			break;
++	}
++
++	return sectors;
++}
++#endif
++
+ /* hook */
+ static int Dummy (cdrom_drive *d,int Switch){
+   return(0);
+@@ -193,6 +330,7 @@
+ int cooked_init_drive (cdrom_drive *d){
+   int ret;
+ 
++#if defined(__linux__)
+   switch(d->drive_type){
+   case MATSUSHITA_CDROM_MAJOR:	/* sbpcd 1 */
+   case MATSUSHITA_CDROM2_MAJOR:	/* sbpcd 2 */
+@@ -243,6 +381,9 @@
+   default:
+     d->nsectors=40; 
+   }
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++  d->nsectors = 26;		/* FreeBSD only support 64K I/O transfer size */
++#endif
+   d->enable_cdda = Dummy;
+   d->read_audio = cooked_read;
+   d->set_speed = cooked_setspeed;
+--- cdparanoia-3a9.8.orig/interface/interface.c
++++ cdparanoia-3a9.8/interface/interface.c
+@@ -29,12 +29,25 @@
+       d->enable_cdda(d,0);
+ 
+     _clean_messages(d);
++#if defined(__linux__)
+     if(d->cdda_device_name)free(d->cdda_device_name);
+     if(d->ioctl_device_name)free(d->ioctl_device_name);
+     if(d->drive_model)free(d->drive_model);
+     if(d->cdda_fd!=-1)close(d->cdda_fd);
+     if(d->ioctl_fd!=-1 && d->ioctl_fd!=d->cdda_fd)close(d->ioctl_fd);
+     if(d->sg)free(d->sg);
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++    if (d->drive_model)
++	    free(d->drive_model);
++    if (d->ccb)
++	    cam_freeccb(d->ccb);
++    if (d->dev)
++	    cam_close_device(d->dev);
++    if (d->sg_buffer)
++	    free(d->sg_buffer);
++    if (d->ioctl_fd != -1)
++	    close(d->ioctl_fd);
++#endif
+     
+     free(d);
+   }
+--- cdparanoia-3a9.8.orig/interface/low_interface.h
++++ cdparanoia-3a9.8/interface/low_interface.h
+@@ -25,6 +25,8 @@
+ #include <sys/time.h>
+ #include <sys/types.h>
+ 
++#if defined(__linux__)
++
+ #include <linux/major.h>
+ #include <linux/version.h>
+ 
+@@ -48,12 +50,27 @@
+ #include <linux/cdrom.h>
+ #include <linux/major.h>
+ 
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++
++#include <sys/cdio.h>
++#include <sys/cdrio.h>
++
++#include <cam/scsi/scsi_message.h>
++#include <camlib.h>
++
++#endif
++
+ #include "cdda_interface.h"
+ 
+ #define MAX_RETRIES 8
+ #define MAX_BIG_BUFF_SIZE 65536
+ #define MIN_BIG_BUFF_SIZE 4096
++
++#if defined(__linux__)
+ #define SG_OFF sizeof(struct sg_header)
++#else
++#define SG_OFF (0)
++#endif
+ 
+ #ifndef SG_EMULATED_HOST
+ /* old kernel version; the check for the ioctl is still runtime, this
+@@ -64,7 +81,9 @@
+ #endif
+ 
+ extern int  cooked_init_drive (cdrom_drive *d);
++#if defined(__linux__)
+ extern unsigned char *scsi_inquiry (cdrom_drive *d);
++#endif
+ extern int  scsi_init_drive (cdrom_drive *d);
+ #ifdef CDDA_TEST
+ extern int  test_init_drive (cdrom_drive *d);
+--- cdparanoia-3a9.8.orig/interface/scsi_interface.c
++++ cdparanoia-3a9.8/interface/scsi_interface.c
+@@ -3,6 +3,8 @@
+  * Original interface.c Copyright (C) 1994-1997 
+  *            Eissfeldt heiko@colossus.escape.de
+  * Current blenderization Copyright (C) 1998-1999 Monty xiphmont@mit.edu
++ * FreeBSD porting (c) 2003
++ * 	Simon 'corecode' Schubert <corecode@corecode.ath.cx>
+  * 
+  * Generic SCSI interface specific code.
+  *
+@@ -23,6 +25,7 @@
+   int table,reserved;
+   char buffer[256];
+ 
++#if defined(__linux__)
+   /* maximum transfer size? */
+   if(ioctl(d->cdda_fd,SG_GET_RESERVED_SIZE,&reserved)){
+     /* Up, guess not. */
+@@ -59,8 +62,17 @@
+     cdmessage(d,"\tCouldn't disable command queue!  Continuing anyway...\n");
+   }
+ 
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++  d->nsectors = 26;		/* FreeBSD only supports 64K I/O transfer size */
++  d->bigbuff = d->nsectors * CD_FRAMESIZE_RAW;
++  
++  sprintf(buffer,"\tSetting default read size to %d sectors (%d bytes).\n\n",
++      d->nsectors,d->nsectors*CD_FRAMESIZE_RAW);
++  cdmessage(d,buffer);
++#endif
+ }
+ 
++#if defined(__linux__)
+ static void reset_scsi(cdrom_drive *d){
+   int arg;
+   d->enable_cdda(d,0);
+@@ -74,6 +86,30 @@
+   d->enable_cdda(d,1);
+ }
+ 
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++static void reset_scsi(cdrom_drive *d) {
++	d->enable_cdda(d,0);
++
++	d->ccb->ccb_h.func_code = XPT_RESET_DEV;
++	d->ccb->ccb_h.timeout = 5000;
++
++	cdmessage(d, "sending SCSI reset... ");
++	if (cam_send_ccb(d->dev, d->ccb)) {
++		cdmessage(d, "error sending XPT_RESET_DEV CCB");
++	} else {
++	
++		if (((d->ccb->ccb_h.status & CAM_STATUS_MASK) == CAM_REQ_CMP) ||
++		    ((d->ccb->ccb_h.status & CAM_STATUS_MASK) == CAM_BDR_SENT))
++			cdmessage(d,"OK\n");
++		else
++			cdmessage(d,"FAILED\n");
++	}
++
++	d->enable_cdda(d,1);
++}
++#endif
++
++#if defined(__linux__)
+ static void clear_garbage(cdrom_drive *d){
+   fd_set fdset;
+   struct timeval tv;
+@@ -104,8 +140,10 @@
+     flag=1;
+   }
+ }
++#endif
+ 
+ /* process a complete scsi command. */
++#if defined(__linux__)
+ static int handle_scsi_cmd(cdrom_drive *d,
+ 			   unsigned int cmd_len, 
+ 			   unsigned int in_size, 
+@@ -284,6 +322,84 @@
+   return(0);
+ }
+ 
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++static int handle_scsi_cmd(cdrom_drive *d,
++			   unsigned int cmd_len, 
++			   unsigned int out_size, 
++			   unsigned int in_size,
++			   unsigned char bytefill,
++			   int bytecheck) {
++	int result;
++	
++	bzero(&d->ccb->csio, sizeof(d->ccb->csio));
++
++	memcpy(d->ccb->csio.cdb_io.cdb_bytes, d->sg_buffer, cmd_len);
++
++	if (bytecheck && out_size == 0)
++		memset(d->sg_buffer, bytefill, in_size);
++
++	cam_fill_csio(&d->ccb->csio,
++	    /* retries */ 0,
++	    /* cbfcnp */ NULL,
++	    /* flags */ CAM_DEV_QFRZDIS | (out_size ? CAM_DIR_OUT : CAM_DIR_IN),
++	    /* tag_action */ MSG_SIMPLE_Q_TAG,
++	    /* data_ptr */ out_size ? d->sg_buffer + cmd_len : d->sg_buffer,
++	    /* dxfer_len */ out_size ? out_size : in_size,
++	    /* sense_len */ SSD_FULL_SIZE,
++	    /* cdb_len */ cmd_len,
++	    /* timeout */ 60000);	/* XXX */
++
++	if ((result = cam_send_ccb(d->dev, d->ccb)) < 0 ||
++	    (d->ccb->ccb_h.status & CAM_STATUS_MASK) == 0 /* hack? */)
++		return TR_EREAD;
++
++	if ((d->ccb->ccb_h.status & CAM_STATUS_MASK) != CAM_REQ_CMP &&
++	    (d->ccb->ccb_h.status & CAM_STATUS_MASK) != CAM_SCSI_STATUS_ERROR) {
++		fprintf (stderr, "\t\terror returned from SCSI command:\n"
++				 "\t\tccb->ccb_h.status == %d\n", d->ccb->ccb_h.status);
++		errno = EIO;
++		return TR_UNKNOWN;
++	}
++
++	if (d->ccb->csio.dxfer_len != in_size) {
++		errno = EIO;
++		return TR_EREAD;
++	}
++
++	if (d->ccb->csio.sense_data.error_code & SSD_ERRCODE) {
++		switch (d->ccb->csio.sense_data.flags & SSD_KEY) {
++		case SSD_KEY_NO_SENSE:
++			errno = EIO;
++			return TR_UNKNOWN;
++		case SSD_KEY_RECOVERED_ERROR:
++			break;
++		case SSD_KEY_NOT_READY:
++			errno = EBUSY;
++			return TR_BUSY;
++		case SSD_KEY_MEDIUM_ERROR:
++			errno = EIO;
++			if (d->ccb->csio.sense_data.add_sense_code == 0x0c &&
++			    d->ccb->csio.sense_data.add_sense_code_qual == 0x09)
++				return TR_STREAMING;
++			else
++				return TR_MEDIUM;
++		case SSD_KEY_HARDWARE_ERROR:
++			errno = EIO;
++			return TR_FAULT;
++		case SSD_KEY_ILLEGAL_REQUEST:
++			errno = EINVAL;
++			return TR_ILLEGAL;
++		default:
++			errno = EIO;
++			return TR_UNKNOWN;
++		}
++	}
++
++	return 0;
++}
++#endif
++
++
+ /* Group 1 (10b) command */
+ 
+ static int mode_sense_atapi(cdrom_drive *d,int size,int page){ 
+@@ -833,30 +949,33 @@
+   while(1) {
+     if((err=map(d,(p?buffer:NULL),begin,sectors))){
+       if(d->report_all){
++#if defined(__linux__)
+ 	struct sg_header *sg_hd=(struct sg_header *)d->sg;
++#endif
+ 	char b[256];
+ 
+ 	sprintf(b,"scsi_read error: sector=%ld length=%ld retry=%d\n",
+ 		begin,sectors,retry_count);
++	fputs(b, stderr);
+ 	cdmessage(d,b);
+ 	sprintf(b,"                 Sense key: %x ASC: %x ASCQ: %x\n",
++#if defined(__linux__)
+ 		(int)(sg_hd->sense_buffer[2]&0xf),
+ 		(int)(sg_hd->sense_buffer[12]),
+ 		(int)(sg_hd->sense_buffer[13]));
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++		d->ccb->csio.sense_data.flags & SSD_KEY,
++		d->ccb->csio.sense_data.add_sense_code,
++		d->ccb->csio.sense_data.add_sense_code_qual);
++#endif
++	fputs(b, stderr);
+ 	cdmessage(d,b);
+ 	sprintf(b,"                 Transport error: %s\n",strerror_tr[err]);
++	fputs(b, stderr);
+ 	cdmessage(d,b);
+ 	sprintf(b,"                 System error: %s\n",strerror(errno));
++	fputs(b, stderr);
+ 	cdmessage(d,b);
+-
+-	fprintf(stderr,"scsi_read error: sector=%ld length=%ld retry=%d\n",
+-		begin,sectors,retry_count);
+-	fprintf(stderr,"                 Sense key: %x ASC: %x ASCQ: %x\n",
+-		(int)(sg_hd->sense_buffer[2]&0xf),
+-		(int)(sg_hd->sense_buffer[12]),
+-		(int)(sg_hd->sense_buffer[13]));
+-	fprintf(stderr,"                 Transport error: %s\n",strerror_tr[err]);
+-	fprintf(stderr,"                 System error: %s\n",strerror(errno));
+       }
+ 
+       if(!d->error_retry)return(-7);
+@@ -1307,6 +1426,7 @@
+   return;
+ }
+ 
++#if defined(__linux__)
+ static int check_atapi(cdrom_drive *d){
+   int atapiret=-1;
+   int fd = d->cdda_fd; /* this is the correct fd (not ioctl_fd), as the 
+@@ -1333,6 +1453,47 @@
+   }
+ }  
+ 
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++static int
++check_atapi(cdrom_drive *d)
++{
++	bzero(&(&d->ccb->ccb_h)[1], sizeof(d->ccb->cpi) - sizeof(d->ccb->ccb_h));
++	
++	d->ccb->ccb_h.func_code = XPT_PATH_INQ;
++
++	cdmessage(d, "\nChecking for ATAPICAM...\n");
++
++	if (cam_send_ccb(d->dev, d->ccb) < 0) {
++		cderror(d, "\terror sending XPT_PATH_INQ CCB: ");
++		cderror(d, cam_errbuf);
++		cderror(d, "\n");
++		return -1;
++	}
++
++	if ((d->ccb->ccb_h.status & CAM_STATUS_MASK) != CAM_REQ_CMP) {
++		cderror(d, "\tXPT_PATH_INQ CCB failed: ");
++		cderror(d, cam_errbuf);
++		cderror(d, "\n");
++		return -1;
++	}
++
++	/*
++	 * if the bus device name is `ata', we're (obviously)
++	 * running ATAPICAM.
++	 */
++
++	if (strncmp(d->ccb->cpi.dev_name, "ata", 3) == 0) {
++		cdmessage(d, "\tDrive is ATAPI (using ATAPICAM)\n");
++		d->is_atapi = 1;
++	} else {
++		cdmessage(d, "\tDrive is SCSI\n");
++		d->is_atapi = 0;
++	}
++	
++	return d->is_atapi;
++}
++#endif
++
+ static int check_mmc(cdrom_drive *d){
+   char *b;
+   cdmessage(d,"\nChecking for MMC style command set...\n");
+@@ -1379,6 +1540,7 @@
+   }
+ }
+ 
++#if defined(__linux__)
+ /* request vendor brand and model */
+ unsigned char *scsi_inquiry(cdrom_drive *d){
+   memcpy(d->sg_buffer,(char[]){ 0x12,0,0,0,56,0},6);
+@@ -1389,6 +1551,7 @@
+   }
+   return (d->sg_buffer);
+ }
++#endif
+ 
+ 
+ int scsi_init_drive(cdrom_drive *d){
+@@ -1458,8 +1621,12 @@
+   check_fua_bit(d);
+ 
+   d->error_retry=1;
++#if defined(__linux__)
+   d->sg=realloc(d->sg,d->nsectors*CD_FRAMESIZE_RAW + SG_OFF + 128);
+   d->sg_buffer=d->sg+SG_OFF;
++#elif defined(__FreeBSD__)
++  d->sg_buffer = realloc(d->sg_buffer, d->nsectors * CD_FRAMESIZE_RAW);
++#endif
+   d->report_all=1;
+   return(0);
+ }
