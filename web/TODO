@@ -10,21 +10,17 @@ I'd be nice if tasks and subtasks were sorted by priority. It'd be also nice
 if all tasks were fixed. We goalt neither of these though :P
 
  - Glibc
-        - Update to the current glibc in sid (2.3.2)
-	- Try to port glibc from experimental (2.3.4)
+        - Update to the current glibc in sid (2.3.5)
 	- Sync with current CVS. (merge into upstream, etc).
-	- Update kFreeBSD headers.
 
  - GCC
 	- Port boehm-gc so we can enable java etc.
 
  - Binutils
-	- Fixed in upstream. Push upstream fixes into Debian (#248182).
 	- The ld.so problem (see #246825) is not fixed in upstream.  We have
 	  a patch in the bug that is acceptable for debian, but not for
-	  upstream.  Guillem rewrote the patch in a way that upstream likes,
-	  but his patch got obsoleted with an upstream update and no longer
-	  works.
+	  upstream. Aurelien Jarno fix the kernel instead, but glibc and 
+	  binutils have to be rebuilt before getting rid of that patch.
 	- Pass "make check".
 
  - FreeBSD
@@ -66,9 +62,8 @@ if all tasks were fixed. We goalt neither of these though :P
    dpkg that will solve what this tried to solve in a clean way. Please stop
    using type-handling.
 
- - lipthread2 is still used by a lot of packages. They should be rebuilt on a system
-   without libpthread2. Note note that we have packages that didn't depend on 
-   libpthread2 but still had objects that depended on libpthread2.so.
+ - lipthread2 is still used by a few of packages. They should be rebuilt on a system
+   without libpthread2.
 
 
      Big beasts
