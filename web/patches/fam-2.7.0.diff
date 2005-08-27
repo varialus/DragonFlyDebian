@@ -1,51 +1,107 @@
+--- fam-2.7.0.orig/debian/patches/08_sockaddr_un.patch
++++ fam-2.7.0/debian/patches/08_sockaddr_un.patch
+@@ -0,0 +1,103 @@
++--- config.h.in.orig	2005-08-05 01:08:01.000000000 +0200
+++++ config.h.in	2005-08-05 01:08:28.000000000 +0200
++@@ -76,6 +76,9 @@
++ /* Define to 1 if `sa_len' is member of `struct sockaddr'. */
++ #undef HAVE_STRUCT_SOCKADDR_SA_LEN
++ 
+++/* Define to 1 if `sun_len' is member of `struct sockaddr_un'. */
+++#undef HAVE_STRUCT_SOCKADDR_UN_SUN_LEN
+++
++ /* Define to 1 if you have the <syslog.h> header file. */
++ #undef HAVE_SYSLOG_H
++ 
++--- src/Listener.c++.orig	2005-08-05 01:20:35.000000000 +0200
+++++ src/Listener.c++	2005-08-05 01:20:58.000000000 +0200
++@@ -209,7 +209,7 @@
++ #endif
++ 
++     char *tmpfile = tempnam("/tmp", ".fam");
++-#ifdef HAVE_SOCKADDR_SUN_LEN
+++#ifdef HAVE_STRUCT_SOCKADDR_UN_SUN_LEN
++     sockaddr_un sun = { sizeof(sockaddr_un), AF_UNIX, "" };
++ #else
++     sockaddr_un sun = { AF_UNIX, "" };
++@@ -283,7 +283,7 @@
++ 
++     // Get the new socket.
++ 
++-#ifdef HAVE_SOCKADDR_SUN_LEN
+++#ifdef HAVE_STRUCT_SOCKADDR_UN_SUN_LEN
++     struct sockaddr_un sun = { sizeof(sockaddr_un), AF_UNIX, "" };
++ #else
++     struct sockaddr_un sun = { AF_UNIX, "" };
++@@ -349,7 +349,7 @@
++ void
++ Listener::dirty_ugly_hack()
++ {
++-#ifdef HAVE_SOCKADDR_SUN_LEN
+++#ifdef HAVE_STRUCT_SOCKADDR_UN_SUN_LEN
++     static sockaddr_un sun = { sizeof (sockaddr_un), AF_UNIX, "/tmp/.fam_socket" };
++ #else
++     static sockaddr_un sun = { AF_UNIX, "/tmp/.fam_socket" };
++--- configure.ac.orig	2005-08-05 01:27:21.000000000 +0200
+++++ configure.ac	2005-08-05 01:23:28.000000000 +0200
++@@ -5,7 +5,6 @@
++ AC_PREREQ(2.57)
++ AC_INIT(fam, 2.7.0, fam@oss.sgi.com)
++ AM_INIT_AUTOMAKE
++-AM_MAINTAINER_MODE
++ dnl AC_CONFIG_SRCDIR([acconfig.h])
++ AM_CONFIG_HEADER([config.h])
++ AC_LANG(C++)
++@@ -34,26 +33,7 @@
++ AC_HEADER_DIRENT
++ AC_CHECK_HEADERS([fcntl.h limits.h linux/imon.h netinet/in.h rpc/rpc.h rpcsvc/mount.h stddef.h stdlib.h string.h syslog.h sys/imon.h sys/param.h sys/select.h sys/statvfs.h sys/syssgi.h sys/time.h sys/types.h sys/un.h unistd.h])
++ 
++-# Test for the linux dnotify fcntl
++-AC_MSG_CHECKING([for dnotify fcntl support])
++-AC_TRY_COMPILE([
++-#define _GNU_SOURCE  
++-#include <fcntl.h>
++-#include <unistd.h>
++-],
++-[ int fd = 1;
++-  fcntl (fd, F_NOTIFY, (DN_MODIFY|DN_CREATE|DN_DELETE|DN_RENAME|DN_ATTRIB)
++-                       |DN_MULTISHOT);
++-], have_dnotify=yes, have_dnotify=no)
++-
++-use_dnotify=false
++-AC_MSG_RESULT($have_dnotify)
++-
++-if test "$have_dnotify"; then
++-        MONITOR_FUNCS=IMonNone
++-        AC_DEFINE(USE_DNOTIFY)
++-	use_dnotify=true
++-elif test "$have_sys_imon_h"; then
+++if test "$have_sys_imon_h"; then
++ 	MONITOR_FUNCS=IMonIRIX
++ elif test "$have_linux_imon_h"; then
++ 	MONITOR_FUNCS=IMonLinux
++@@ -61,7 +41,6 @@
++ 	MONITOR_FUNCS=IMonNone
++ fi
++ AC_SUBST(MONITOR_FUNCS)
++-AM_CONDITIONAL(USE_DNOTIFY, $use_dnotify)
++ 
++ # Checks for typedefs, structures, and compiler characteristics.
++ AC_HEADER_STDBOOL
++@@ -72,12 +51,13 @@
++ AC_TYPE_PID_T
++ AC_TYPE_SIZE_T
++ AC_HEADER_TIME
++-AC_CHECK_MEMBERS(struct sockaddr.sa_len, struct sockaddr_un.sun_len)
+++AC_CHECK_MEMBERS([struct sockaddr.sa_len],,, [#include <sys/socket.h>])
+++AC_CHECK_MEMBERS([struct sockaddr_un.sun_len],,, [#include <sys/un.h>])
++ 
++ # Checks for library functions.
++ AC_FUNC_ERROR_AT_LINE
++ AC_FUNC_SELECT_ARGTYPES
++-AC_CHECK_FUNCS([bindresvport _daemonize daemon getgrmember getgrouplist select])
+++AC_CHECK_FUNCS([bindresvport _daemonize daemon getgrmember select])
++ 
++ AC_CONFIG_FILES([Makefile
++                  src/Makefile
 
-Status: unfinished, don't merge.
-
---- fam-2.7.0.old/src/Listener.c++	2003-01-20 01:37:29.000000000 +0100
-+++ fam-2.7.0/src/Listener.c++	2004-08-08 08:13:46.000000000 +0200
-@@ -209,11 +209,11 @@
- #endif
- 
-     char *tmpfile = tempnam("/tmp", ".fam");
-+    sockaddr_un sun;
- #ifdef HAVE_SOCKADDR_SUN_LEN
--    sockaddr_un sun = { sizeof(sockaddr_un), AF_UNIX, "" };
--#else
--    sockaddr_un sun = { AF_UNIX, "" };
-+    sun.sun_len = sizeof (sockaddr_un);
- #endif
-+    sun.sun_family = AF_UNIX;
-     if(strlen(tmpfile) >= (sizeof(sun.sun_path) - 1))
-     {
-         Log::error("tmpnam() too long for sun_path (%d >= %d)!",
-@@ -283,11 +283,11 @@
- 
-     // Get the new socket.
- 
-+    struct sockaddr_un sun;
- #ifdef HAVE_SOCKADDR_SUN_LEN
--    struct sockaddr_un sun = { sizeof(sockaddr_un), AF_UNIX, "" };
--#else
--    struct sockaddr_un sun = { AF_UNIX, "" };
-+    sun.sun_len = sizeof (sockaddr_un);
- #endif
-+    sun.sun_family = AF_UNIX;
-     socklen_t sunlen = sizeof(sun);
-     int client_fd = accept(ofd, (struct sockaddr *) &sun, &sunlen);
-     if (client_fd < 0)
-@@ -349,11 +349,12 @@
- void
- Listener::dirty_ugly_hack()
- {
-+    static sockaddr_un sun;
- #ifdef HAVE_SOCKADDR_SUN_LEN
--    static sockaddr_un sun = { sizeof (sockaddr_un), AF_UNIX, "/tmp/.fam_socket" };
--#else
--    static sockaddr_un sun = { AF_UNIX, "/tmp/.fam_socket" };
-+    sun.sun_len = sizeof (sockaddr_un);
- #endif
-+    sun.sun_family = AF_UNIX;
-+    strncpy (sun.sun_path, "/tmp/.fam_socket", sizeof (sun.sun_path));
- 
-     int sock = socket(PF_UNIX, SOCK_STREAM, 0);
-     if (sock < 0)
