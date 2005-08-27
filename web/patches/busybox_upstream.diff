@@ -2,209 +2,23 @@
 Author: rmh
 Status: sent (http://busybox.net/bugs/view.php?id=395)
 
-diff -Nur busybox-1.00.old/Makefile busybox-1.00/Makefile
---- busybox-1.00.old/Makefile	2005-08-19 14:37:59.000000000 +0200
-+++ busybox-1.00/Makefile	2005-08-19 14:38:40.000000000 +0200
-@@ -39,10 +39,13 @@
+Index: busybox/Rules.mak
+===================================================================
+--- busybox/Rules.mak	(revision 11260)
++++ busybox/Rules.mak	(working copy)
+@@ -46,7 +46,7 @@
  
- -include $(top_builddir)/Rules.mak
- 
--DIRS:=applets archival archival/libunarchive coreutils console-tools \
--	debianutils editors findutils init miscutils modutils modutils/obj modutils/obj-2.6 networking \
--	networking/libiproute networking/udhcp procps loginutils shell \
--	sysklogd util-linux libpwdgrp coreutils/libcoreutils libbb
-+DIRS:=applets archival archival/libunarchive coreutils debianutils editors \
-+	findutils init miscutils networking procps loginutils shell util-linux \
-+	libpwdgrp coreutils/libcoreutils libbb
-+
-+ifeq ($(host_os_unified), linux)
-+DIRS+=console-tools modutils modutils/obj modutils/obj-2.6 networking/libiproute networking/udhcp sysklogd
-+endif
- 
- SRC_DIRS:=$(patsubst %,$(top_srcdir)/%,$(DIRS))
- 
-diff -Nur busybox-1.00.old/Rules.mak.in busybox-1.00/Rules.mak.in
---- busybox-1.00.old/Rules.mak.in	2005-08-19 14:37:59.000000000 +0200
-+++ busybox-1.00/Rules.mak.in	2005-08-19 14:38:40.000000000 +0200
-@@ -42,6 +42,7 @@
- host_cpu_modutils_biarch = @host_cpu_modutils_biarch@
- host_os = @host_os@
- host_os_unified = @host_os_unified@
-+glibc = @glibc@
+ # What OS are you compiling busybox for?  This allows you to include
+ # OS specific things, syscall overrides, etc.
+-TARGET_OS=linux
++TARGET_OS=$(shell uname | tr "[A-Z]" "[a-z]" | sed -e "s,/,-,g")
  
  # Select the compiler needed to build binaries for your development system
  HOSTCC    = gcc
-@@ -122,7 +123,7 @@
- 	LIBRARIES:=-lefence
-     endif
- endif
--ifeq ($(host_os),linux-gnu)
-+ifeq ($(glibc), yes)
- 	CFLAGS += -D_GNU_SOURCE
- endif
- ifeq ($(strip $(CONFIG_DEBUG)),y)
-diff -Nur busybox-1.00.old/configure.ac busybox-1.00/configure.ac
---- busybox-1.00.old/configure.ac	2005-08-19 14:37:59.000000000 +0200
-+++ busybox-1.00/configure.ac	2005-08-19 14:38:40.000000000 +0200
-@@ -40,10 +40,17 @@
- 
- case "$host_os" in
-   linux*)    host_os_unified=linux ;;
-+  kfreebsd*-gnu)    host_os_unified=kfreebsd-gnu ;;
-   *)         host_os_unified=$host_os ;;
- esac
- 
-+case "$host_os" in
-+  *-gnu|gnu*)	glibc=yes ;;
-+  *)		glibc=no ;;
-+esac
-+
- AC_SUBST(host_os_unified)
-+AC_SUBST(glibc)
- 
- AC_OUTPUT([
- Rules.mak
-diff -Nur busybox-1.00.old/init/init.c busybox-1.00/init/init.c
---- busybox-1.00.old/init/init.c	2005-06-09 16:10:17.000000000 +0200
-+++ busybox-1.00/init/init.c	2005-08-19 14:38:40.000000000 +0200
-@@ -167,14 +167,28 @@
- #else
- #define MAYBE_CONSOLE	CONSOLE
- #endif
-+
-+#if !defined(RB_HALT_SYSTEM) && defined(RB_HALT)
-+#define RB_HALT_SYSTEM RB_HALT
-+#endif
-+
-+#if defined(__linux__)
- #ifndef RB_HALT_SYSTEM
- static const int RB_HALT_SYSTEM = 0xcdef0123;
-+#endif
-+#ifndef RB_ENABLE_CAD
- static const int RB_ENABLE_CAD = 0x89abcdef;
-+#endif
-+#ifndef RB_DISABLE_CAD
- static const int RB_DISABLE_CAD = 0;
--
-+#endif
-+#ifndef RB_POWER_OFF
- #define RB_POWER_OFF    0x4321fedc
-+#endif
-+#ifndef RB_AUTOBOOT
- static const int RB_AUTOBOOT = 0x01234567;
- #endif
-+#endif
- 
- static const char * const environment[] = {
- 	"HOME=/",
-@@ -288,10 +302,19 @@
- 	tty.c_cc[VSTOP] = 19;	/* C-s */
- 	tty.c_cc[VSUSP] = 26;	/* C-z */
- 
-+/* c_line is not POSIX */
-+#ifdef __linux__
- 	/* use line dicipline 0 */
- 	tty.c_line = 0;
-+#endif
- 
- 	/* Make it be sane */
-+#ifndef CBAUD
-+#define CBAUD 0
-+#endif
-+#ifndef CBAUDEX
-+#define CBAUDEX 0
-+#endif
- 	tty.c_cflag &= CBAUD | CBAUDEX | CSIZE | CSTOPB | PARENB | PARODD;
- 	tty.c_cflag |= CREAD | HUPCL | CLOCAL;
- 
-@@ -313,6 +336,7 @@
-    Units are kBytes to avoid overflow on 4GB machines */
- static unsigned int check_free_memory(void)
- {
-+#ifdef __linux__
- 	struct sysinfo info;
- 	unsigned int result, u, s = 10;
- 
-@@ -336,6 +360,9 @@
- 	} else {
- 		return(result * u);
- 	}
-+#else
-+	return -1;
-+#endif
- }
- 
- static void console_init(void)
-@@ -359,10 +386,13 @@
- #endif
- 	} else {
- 		/* 2.2 kernels: identify the real console backend and try to use it */
-+#ifdef TIOCGSERIAL
- 		if (ioctl(0, TIOCGSERIAL, &sr) == 0) {
- 			/* this is a serial console */
- 			snprintf(console, sizeof(console) - 1, SC_FORMAT, sr.line);
--		} else if (ioctl(0, VT_GETSTATE, &vt) == 0) {
-+		} else
-+#endif
-+		if (ioctl(0, VT_GETSTATE, &vt) == 0) {
- 			/* this is linux virtual tty */
- 			snprintf(console, sizeof(console) - 1, VC_FORMAT, vt.v_active);
- 		} else {
-@@ -387,6 +417,7 @@
- 	} else {
- 		s = getenv("TERM");
- 		/* check for serial console */
-+#if defined(__linux__) && defined(TIOCGSERIAL)
- 		if (ioctl(fd, TIOCGSERIAL, &sr) == 0) {
- 			/* Force the TERM setting to vt102 for serial console --
- 			 * if TERM is set to linux (the default) */
-@@ -395,10 +426,16 @@
- #ifndef CONFIG_SYSLOGD
- 			log = console;
- #endif
--		} else {
--			if (s == NULL)
-+		} else
-+#endif
-+		if (s == NULL)
-+#if defined(__linux__)
- 				putenv("TERM=linux");
--		}
-+#elif defined(__FreeBSD_kernel__)
-+				putenv("TERM=cons25");
-+#else
-+				putenv("TERM=dumb");
-+#endif
- 		close(fd);
- 	}
- 	messageD(LOG, "console=%s", console);
-@@ -703,8 +740,10 @@
- 	sigaddset(&block_signals, SIGTSTP);
- 	sigprocmask(SIG_BLOCK, &block_signals, NULL);
- 
-+#ifdef RB_ENABLE_CAD
- 	/* Allow Ctrl-Alt-Del to reboot system. */
- 	init_reboot(RB_ENABLE_CAD);
-+#endif
- 
- 	message(CONSOLE | LOG, "The system is going down NOW !!");
- 	sync();
-@@ -1105,10 +1144,12 @@
- 	signal(SIGSTOP, stop_handler);
- 	signal(SIGTSTP, stop_handler);
- 
-+#ifdef RB_DISABLE_CAD
- 	/* Turn off rebooting via CTL-ALT-DEL -- we get a
- 	 * SIGINT on CAD so we can shut things down gracefully... */
- 	init_reboot(RB_DISABLE_CAD);
- #endif
-+#endif
- 
- 	/* Figure out where the default console should be */
- 	console_init();
-diff -Nur busybox-1.00.old/libbb/Makefile.in busybox-1.00/libbb/Makefile.in
---- busybox-1.00.old/libbb/Makefile.in	2005-06-09 16:10:17.000000000 +0200
-+++ busybox-1.00/libbb/Makefile.in	2005-08-19 14:38:40.000000000 +0200
+Index: busybox/libbb/Makefile.in
+===================================================================
+--- busybox/libbb/Makefile.in	(revision 11260)
++++ busybox/libbb/Makefile.in	(working copy)
 @@ -16,6 +16,12 @@
  # along with this program; if not, write to the Free Software
  # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -213,7 +27,7 @@ diff -Nur busybox-1.00.old/libbb/Makefile.in busybox-1.00/libbb/Makefile.in
 +top_builddir=$(CURDIR)
 +endif
 +
-+-include $(top_builddir)/Rules.mak # for $(host_os_unified)
++-include $(top_builddir)/Rules.mak # for $(TARGET_OS)
 +
  LIBBB_AR:=libbb.a
  ifndef $(LIBBB_DIR)
@@ -229,39 +43,27 @@ diff -Nur busybox-1.00.old/libbb/Makefile.in busybox-1.00/libbb/Makefile.in
  	make_directory.c mode_string.c module_syscalls.c mtab.c mtab_file.c \
  	my_getgrgid.c my_getgrnam.c my_getpwnam.c my_getug.c\
  	my_getpwuid.c obscure.c parse_mode.c parse_number.c perror_msg.c \
-@@ -48,6 +54,10 @@
- 	perror_nomsg_and_die.c perror_nomsg.c skip_whitespace.c bb_askpass.c \
- 	warn_ignoring_args.c concat_subpath_file.c vfork_daemon_rexec.c
+@@ -49,6 +55,10 @@
+ 	warn_ignoring_args.c concat_subpath_file.c vfork_daemon_rexec.c \
+ 	bb_echo.c
  
-+ifeq ($(host_os_unified), linux)
++ifeq ($(TARGET_OS), linux)
 +LIBBB_SRC+= interface.c loop.c
 +endif
 +
  LIBBB_OBJS=$(patsubst %.c,$(LIBBB_DIR)%.o, $(LIBBB_SRC))
  
  LIBBB_MSRC0:=$(srcdir)/messages.c
-diff -Nur busybox-1.00.old/libbb/bb_askpass.c busybox-1.00/libbb/bb_askpass.c
---- busybox-1.00.old/libbb/bb_askpass.c	2004-05-07 15:47:44.000000000 +0200
-+++ busybox-1.00/libbb/bb_askpass.c	2005-08-19 14:38:40.000000000 +0200
-@@ -53,6 +53,9 @@
- 	fflush(stdout);
- 
- 	tcgetattr(STDIN_FILENO, &new);
-+#ifndef IUCLC
-+#define IUCLC 0
-+#endif
- 	new.c_iflag &= ~(IUCLC|IXON|IXOFF|IXANY);
- 	new.c_lflag &= ~(ECHO|ECHOE|ECHOK|ECHONL|TOSTOP);
- 	tcsetattr(STDIN_FILENO, TCSANOW, &new);
-diff -Nur busybox-1.00.old/libbb/procps.c busybox-1.00/libbb/procps.c
---- busybox-1.00.old/libbb/procps.c	2005-06-09 16:10:17.000000000 +0200
-+++ busybox-1.00/libbb/procps.c	2005-08-19 14:49:55.000000000 +0200
-@@ -12,7 +12,19 @@
+Index: busybox/libbb/procps.c
+===================================================================
+--- busybox/libbb/procps.c	(revision 11260)
++++ busybox/libbb/procps.c	(working copy)
+@@ -12,8 +12,20 @@
  #include <string.h>
  #include <stdlib.h>
  #include <unistd.h>
 -#include <asm/page.h>
-+
+ 
 +/* get page info */  
 +#if defined(__linux__)
 +#include <asm/page.h>  
@@ -274,15 +76,31 @@ diff -Nur busybox-1.00.old/libbb/procps.c busybox-1.00/libbb/procps.c
 +#undef PAGE_SHIFT
 +#define PAGE_SHIFT sysconf (_SC_PAGE_SHIFT)
 +#endif 
- 
++
  #include "libbb.h"
  
-diff -Nur busybox-1.00.old/libbb/syscalls.c busybox-1.00/libbb/syscalls.c
---- busybox-1.00.old/libbb/syscalls.c	2004-04-02 23:39:15.000000000 +0200
-+++ busybox-1.00/libbb/syscalls.c	2005-08-19 14:38:40.000000000 +0200
+ extern procps_status_t * procps_scan(int save_user_arg0)
+Index: busybox/libbb/bb_askpass.c
+===================================================================
+--- busybox/libbb/bb_askpass.c	(revision 11260)
++++ busybox/libbb/bb_askpass.c	(working copy)
+@@ -53,6 +53,9 @@
+ 	fflush(stdout);
+ 
+ 	tcgetattr(STDIN_FILENO, &new);
++#ifndef IUCLC
++#define IUCLC 0
++#endif
+ 	new.c_iflag &= ~(IUCLC|IXON|IXOFF|IXANY);
+ 	new.c_lflag &= ~(ECHO|ECHOE|ECHOK|ECHONL|TOSTOP);
+ 	tcsetattr(STDIN_FILENO, TCSANOW, &new);
+Index: busybox/libbb/syscalls.c
+===================================================================
+--- busybox/libbb/syscalls.c	(revision 11260)
++++ busybox/libbb/syscalls.c	(working copy)
 @@ -31,7 +31,21 @@
  
- int sysfs( int option, unsigned int fs_index, char * buf)
+ int sysfs(int option, unsigned int fs_index, char * buf)
  {
 -	return(syscall(__NR_sysfs, option, fs_index, buf));
 +#ifndef __NR_sysfs
@@ -303,10 +121,35 @@ diff -Nur busybox-1.00.old/libbb/syscalls.c busybox-1.00/libbb/syscalls.c
  }
  
  int pivot_root(const char * new_root,const char * put_old)
-diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
---- busybox-1.00.old/loginutils/getty.c	2005-06-09 16:10:17.000000000 +0200
-+++ busybox-1.00/loginutils/getty.c	2005-08-19 14:38:40.000000000 +0200
-@@ -103,11 +103,11 @@
+Index: busybox/Makefile
+===================================================================
+--- busybox/Makefile	(revision 11260)
++++ busybox/Makefile	(working copy)
+@@ -39,11 +39,15 @@
+ 
+ include $(top_srcdir)/Rules.mak
+ 
+-DIRS:=applets archival archival/libunarchive coreutils console-tools \
+-	debianutils editors findutils init miscutils modutils networking \
+-	networking/libiproute networking/udhcp procps loginutils shell \
+-	sysklogd util-linux e2fsprogs libpwdgrp coreutils/libcoreutils libbb
++DIRS:=applets archival archival/libunarchive coreutils debianutils editors \
++	findutils init miscutils networking procps loginutils shell util-linux \
++	e2fsprogs libpwdgrp coreutils/libcoreutils libbb
+ 
++ifeq ($(TARGET_OS), linux)
++DIRS+=console-tools modutils modutils/obj modutils/obj-2.6 \
++	networking/libiproute networking/udhcp sysklogd
++endif
++
+ SRC_DIRS:=$(patsubst %,$(top_srcdir)/%,$(DIRS))
+ 
+ ifeq ($(strip $(CONFIG_SELINUX)),y)
+Index: busybox/loginutils/getty.c
+===================================================================
+--- busybox/loginutils/getty.c	(revision 11260)
++++ busybox/loginutils/getty.c	(working copy)
+@@ -107,11 +107,11 @@
  #undef	TCGETA
  #undef	TCSETA
  #undef	TCSETAW
@@ -319,7 +162,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
   /*
    * This program tries to not use the standard-i/o library.  This keeps the
-@@ -601,8 +601,8 @@
+@@ -605,8 +605,8 @@
  	 * 5 seconds seems to be a good value.
  	 */
  
@@ -330,7 +173,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
  	/*
  	 * It seems to be a terminal. Set proper protections and ownership. Mode
-@@ -662,17 +662,18 @@
+@@ -666,17 +666,18 @@
  	 * reads will be done in raw mode anyway. Errors will be dealt with
  	 * lateron.
  	 */
@@ -353,7 +196,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  	tp->c_cc[VMIN] = 1;
  	tp->c_cc[VTIME] = 0;
  
-@@ -683,7 +684,7 @@
+@@ -687,7 +688,7 @@
  		tp->c_cflag |= CRTSCTS;
  #endif
  
@@ -362,7 +205,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
  	/* go to blocking input even in local mode */
  	fcntl(0, F_SETFL, fcntl(0, F_GETFL, 0) & ~O_NONBLOCK);
-@@ -725,7 +726,7 @@
+@@ -729,7 +730,7 @@
  	tp->c_iflag |= ISTRIP;		/* enable 8th-bit stripping */
  	vmin = tp->c_cc[VMIN];
  	tp->c_cc[VMIN] = 0;			/* don't block if queue empty */
@@ -371,7 +214,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
  	/*
  	 * Wait for a while, then read everything the modem has said so far and
-@@ -738,6 +739,9 @@
+@@ -742,6 +743,9 @@
  		for (bp = buf; bp < buf + nread; bp++) {
  			if (isascii(*bp) && isdigit(*bp)) {
  				if ((speed = bcode(bp))) {
@@ -381,7 +224,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  					tp->c_cflag &= ~CBAUD;
  					tp->c_cflag |= speed;
  				}
-@@ -749,7 +753,7 @@
+@@ -753,7 +757,7 @@
  
  	tp->c_iflag = iflag;
  	tp->c_cc[VMIN] = vmin;
@@ -390,7 +233,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  }
  
  /* do_prompt - show login prompt, optionally preceded by /etc/issue contents */
-@@ -769,7 +773,7 @@
+@@ -773,7 +777,7 @@
  	baud_index = (baud_index + 1) % op->numspeed;
  	tp->c_cflag &= ~CBAUD;
  	tp->c_cflag |= op->speeds[baud_index];
@@ -399,7 +242,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  }
  
  /* get_logname - get user name, establish parity, speed, erase, kill, eol */
-@@ -796,7 +800,7 @@
+@@ -800,7 +804,7 @@
  	/* Flush pending input (esp. after parsing or switching the baud rate). */
  
  	(void) sleep(1);
@@ -408,7 +251,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
  	/* Prompt for and read a login name. */
  
-@@ -895,7 +899,9 @@
+@@ -899,7 +903,9 @@
  	tp->c_cc[VQUIT] = DEF_QUIT;	/* default quit */
  	tp->c_cc[VEOF] = DEF_EOF;	/* default EOF character */
  	tp->c_cc[VEOL] = DEF_EOL;
@@ -418,7 +261,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
  	/* Account for special characters seen in input. */
  
-@@ -926,9 +932,15 @@
+@@ -930,9 +936,15 @@
  	/* Account for upper case without lower case. */
  
  	if (cp->capslock) {
@@ -434,7 +277,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  	}
  	/* Optionally enable hardware flow control */
  
-@@ -939,8 +951,8 @@
+@@ -943,8 +955,8 @@
  
  	/* Finally, make the new settings effective */
  
@@ -445,353 +288,11 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  }
  
  /* caps_lock - string contains upper case without lower case */
-diff -Nur busybox-1.00.old/procps/free.c busybox-1.00/procps/free.c
---- busybox-1.00.old/procps/free.c	2004-04-02 23:39:15.000000000 +0200
-+++ busybox-1.00/procps/free.c	2005-08-19 14:38:40.000000000 +0200
-@@ -29,6 +29,7 @@
- 
- extern int free_main(int argc, char **argv)
- {
-+#ifdef __linux__
- 	struct sysinfo info;
- 	sysinfo(&info);
- 
-@@ -80,5 +81,8 @@
- 			info.freeram+info.freeswap);
- #endif
- 	return EXIT_SUCCESS;
-+#else
-+	return EXIT_FAILURE;
-+#endif
- }
- 
-diff -Nur busybox-1.00.old/procps/top.c busybox-1.00/procps/top.c
---- busybox-1.00.old/procps/top.c	2005-06-09 16:10:17.000000000 +0200
-+++ busybox-1.00/procps/top.c	2005-08-19 14:47:13.000000000 +0200
-@@ -33,8 +33,6 @@
- #include <unistd.h>
- #include <string.h>
- #include <sys/ioctl.h>
--/* get page info */
--#include <asm/page.h>
- #include "busybox.h"
- 
- //#define FEATURE_CPU_USAGE_PERCENTAGE  /* + 2k */
-diff -Nur busybox-1.00.old/procps/uptime.c busybox-1.00/procps/uptime.c
---- busybox-1.00.old/procps/uptime.c	2004-04-08 21:59:31.000000000 +0200
-+++ busybox-1.00/procps/uptime.c	2005-08-19 14:38:40.000000000 +0200
-@@ -35,7 +35,9 @@
- #include <stdlib.h>
- #include "busybox.h"
- 
-+#ifndef FSHIFT
- static const int FSHIFT = 16;              /* nr of bits of precision */
-+#endif
- #define FIXED_1         (1<<FSHIFT)     /* 1.0 as fixed-point */
- #define LOAD_INT(x) ((x) >> FSHIFT)
- #define LOAD_FRAC(x) LOAD_INT(((x) & (FIXED_1-1)) * 100)
-diff -Nur busybox-1.00.old/sysdeps/kfreebsd-gnu/Config.in busybox-1.00/sysdeps/kfreebsd-gnu/Config.in
---- busybox-1.00.old/sysdeps/kfreebsd-gnu/Config.in	1970-01-01 01:00:00.000000000 +0100
-+++ busybox-1.00/sysdeps/kfreebsd-gnu/Config.in	2005-08-19 14:38:40.000000000 +0200
-@@ -0,0 +1,294 @@
-+#
-+# For a description of the syntax of this configuration file,
-+# see scripts/kbuild/config-language.txt.
-+#
-+
-+mainmenu "BusyBox Configuration"
-+
-+config HAVE_DOT_CONFIG
-+	bool
-+	default y
-+
-+menu "General Configuration"
-+
-+choice
-+	prompt "Buffer allocation policy"
-+	default CONFIG_FEATURE_BUFFERS_USE_MALLOC
-+	help
-+	  There are 3 ways BusyBox can handle buffer allocations:
-+	  - Use malloc. This costs code size for the call to xmalloc.
-+	  - Put them on stack. For some very small machines with limited stack
-+	    space, this can be deadly.  For most folks, this works just fine.
-+	  - Put them in BSS. This works beautifully for computers with a real
-+	    MMU (and OS support), but wastes runtime RAM for uCLinux. This
-+	    behavior was the only one available for BusyBox versions 0.48 and
-+	    earlier.
-+
-+config CONFIG_FEATURE_BUFFERS_USE_MALLOC
-+	bool "Allocate with Malloc"
-+
-+config CONFIG_FEATURE_BUFFERS_GO_ON_STACK
-+	bool "Allocate on the Stack"
-+
-+config CONFIG_FEATURE_BUFFERS_GO_IN_BSS
-+	bool "Allocate in the .bss section"
-+
-+endchoice
-+
-+config CONFIG_FEATURE_VERBOSE_USAGE
-+	bool "Show verbose applet usage messages"
-+	default n
-+	help
-+	  All BusyBox applets will show more verbose help messages when
-+	  busybox is invoked with --help.  This will add a lot of text to the
-+	  busybox binary.  In the default configuration, this will add about
-+	  13k, but it can add much more depending on your configuration.
-+
-+config CONFIG_FEATURE_INSTALLER
-+	bool "Support --install [-s] to install applet links at runtime"
-+	default n
-+	help
-+	  Enable 'busybox --install [-s]' support.  This will allow you to use
-+	  busybox at runtime to create hard links or symlinks for all the
-+	  applets that are compiled into busybox.  This feature requires the
-+	  /proc filesystem.
-+
-+config CONFIG_LOCALE_SUPPORT
-+	bool "Enable locale support (system needs locale for this to work)"
-+	default n
-+	help
-+	  Enable this if your system has locale support and you would like
-+	  busybox to support locale settings.
-+
-+config CONFIG_FEATURE_DEVFS
-+	bool "Support for devfs"
-+	default n
-+	help
-+	  Enable if you want BusyBox to work with devfs.
-+
-+config CONFIG_FEATURE_DEVPTS
-+	bool "Use the devpts filesystem for Unix98 PTYs"
-+	default y if CONFIG_FEATURE_DEVFS
-+	help
-+	  Enable if you want BusyBox to use Unix98 PTY support. If enabled,
-+	  busybox will use /dev/ptmx for the master side of the pseudoterminal
-+	  and /dev/pts/<number> for the slave side.  Otherwise, BSD style
-+	  /dev/ttyp<number> will be used. To use this option, you should have
-+	  devpts or devfs mounted.
-+
-+config CONFIG_FEATURE_CLEAN_UP
-+	bool "Clean up all memory before exiting (usually not needed)"
-+	default n
-+	help
-+	  As a size optimization, busybox by default does not cleanup memory
-+	  that is dynamically allocated or close files before exiting. This
-+	  saves space and is usually not needed since the OS will clean up for
-+	  us.  Don't enable this unless you have a really good reason to clean
-+	  things up manually.
-+
-+config CONFIG_FEATURE_SUID
-+	bool "Support for SUID/SGID handling"
-+	default n
-+	help
-+	  Support SUID and SGID binaries.
-+
-+config CONFIG_FEATURE_SUID_CONFIG
-+	bool "Runtime SUID/SGID configuration via /etc/busybox.conf"
-+	default y if CONFIG_FEATURE_SUID
-+	depends on CONFIG_FEATURE_SUID
-+	help
-+	  Allow the SUID / SGID state of an applet to be determined runtime by
-+	  checking /etc/busybox.conf.  The format of this file is as follows:
-+
-+	  <applet> = [Ssx-][Ssx-][x-] (<username>|<uid>).(<groupname>|<gid>)
-+	
-+	  An example might help:
-+
-+	  [SUID]
-+	  su = ssx root.0 # applet su can be run by anyone and runs with euid=0/egid=0
-+	  su = ssx        # exactly the same
-+
-+	  mount = sx- root.disk # applet mount can be run by root and members of group disk
-+	                        # and runs with euid=0
-+
-+	  cp = --- # disable applet cp for everyone
-+
-+	  Robert 'sandman' Griebl has more information here:
-+	  <url: http://www.softforge.de/bb/suid.html >.
-+
-+config CONFIG_FEATURE_SUID_CONFIG_QUIET
-+	bool "Suppress warning message if /etc/busybox.conf is not readable"
-+	default n
-+	depends on CONFIG_FEATURE_SUID_CONFIG
-+	help
-+	  /etc/busybox.conf should be readable by the user needing the SUID, check
-+	  this option to avoid users to be notified about missing permissions.
-+
-+config CONFIG_SELINUX
-+	bool "Support NSA Security Enhanced Linux"
-+	default n
-+	help
-+	  Enable support for SE Linux in applets ls, ps, and id.  Also provide
-+	  the option of compiling in SE Linux applets.
-+
-+	  If you do not have a complete SE Linux Full Userland installed, this
-+	  stuff will not compile.  Go visit
-+		http://www.nsa.gov/selinux/index.html
-+	  to download the necessary stuff to allow busybox to compile with this
-+	  option enabled.
-+
-+	  Most people will leave this set to 'N'.
-+
-+endmenu
-+
-+menu 'Build Options'
-+
-+config CONFIG_STATIC
-+	bool "Build BusyBox as a static binary (no shared libs)"
-+	default n
-+	help
-+	  If you want to build a static BusyBox binary, which does not
-+	  use or require any shared libraries, then enable this option.
-+	  This can cause BusyBox to be considerably larger, so you should
-+	  leave this option false unless you have a good reason (i.e.
-+	  your target platform does not support shared libraries, or
-+	  you are building an initrd which doesn't need anything but
-+	  BusyBox, etc).
-+
-+	  Most people will leave this set to 'N'.
-+
-+config CONFIG_LFS
-+	bool "Build with Large File Support (for accessing files > 2 GB)"
-+	default n
-+	select FDISK_SUPPORT_LARGE_DISKS
-+	help
-+	  If you want to build BusyBox with large file support, then enable
-+	  this option.  This will have no effect if your kernel or your C
-+	  library lacks large file support for large files.  Some of the
-+	  programs that can benefit from large file support include dd, gzip,
-+	  cp, mount, tar, and many others.  If you want to access files larger
-+	  than 2 Gigabytes, enable this option.  Otherwise, leave it set to 'N'.
-+
-+config USING_CROSS_COMPILER
-+	bool "Do you want to build BusyBox with a Cross Compiler?"
-+	default n
-+	help
-+	  Do you want to build BusyBox with a Cross Compiler?  If so,
-+	  then enable this option.  Otherwise leave it set to 'N'.
-+
-+config CROSS_COMPILER_PREFIX
-+	string "Cross Compiler prefix"
-+	default "/usr/i386-linux-uclibc/bin/i386-uclibc-"
-+	depends on USING_CROSS_COMPILER
-+	help
-+	  If you want to build BusyBox with a cross compiler, then you
-+	  will need to set this to the cross-compiler prefix.  For example,
-+	  if my cross-compiler is /usr/i386-linux-uclibc/bin/i386-uclibc-gcc
-+	  then I would enter '/usr/i386-linux-uclibc/bin/i386-uclibc-' here,
-+	  which will ensure the correct compiler is used.
-+
-+config EXTRA_CFLAGS_OPTIONS
-+	string "Any extra CFLAGS options for the compiler?"
-+	default ""
-+	help
-+	  Do you want to pass any extra CFLAGS options to the compiler as
-+	  you build BusyBox? If so, this is the option for you...  For example,
-+	  if you want to add some simple compiler switches (like -march=i686),
-+	  or check for warnings using -Werror, just those options here.
-+
-+endmenu
-+
-+menu 'Installation Options'
-+
-+config CONFIG_INSTALL_NO_USR
-+	bool "Don't use /usr"
-+	default n
-+	help
-+	  Disable use of /usr. Don't activate this option if you don't know
-+	  that you really want this behaviour.
-+
-+config PREFIX
-+	string "BusyBox installation prefix"
-+	default "./_install"
-+	help
-+	  Define your directory to install BusyBox files/subdirs in.
-+
-+
-+
-+endmenu
-+
-+source archival/Config.in
-+source coreutils/Config.in
-+source console-tools/Config.in
-+source debianutils/Config.in
-+source editors/Config.in
-+source findutils/Config.in
-+source init/Config.in
-+source loginutils/Config.in
-+source miscutils/Config.in
-+source modutils/Config.in
-+source networking/Config.in
-+source procps/Config.in
-+source shell/Config.in
-+source sysklogd/Config.in
-+source util-linux/Config.in
-+
-+menu 'Debugging Options'
-+
-+config CONFIG_DEBUG
-+	bool "Build BusyBox with Debugging symbols"
-+	default n
-+	help
-+	  Say Y here if you wish to compile BusyBox with debugging symbols.
-+	  This will allow you to use a debugger to examine BusyBox internals
-+	  while applets are running.  This increases the size of the binary
-+	  considerably and should only be used when doing development.
-+	  If you are doing development and want to debug BusyBox, answer Y.
-+
-+	  Most people should answer N.
-+
-+choice
-+	prompt "Additional debugging library"
-+	default CONFIG_NO_DEBUG_LIB
-+	depends on CONFIG_DEBUG
-+	help
-+	  Using an additional debugging library will make BusyBox become
-+	  considerable larger and will cause it to run more slowly.  You
-+	  should always leave this option disabled for production use.
-+
-+	  dmalloc support:
-+	  ----------------
-+	  This enables compiling with dmalloc ( http://dmalloc.com/ )
-+	  which is an excellent public domain mem leak and malloc problem
-+	  detector.  To enable dmalloc, before running busybox you will
-+	  want to properly set your environment, for example:
-+	    export DMALLOC_OPTIONS=debug=0x34f47d83,inter=100,log=logfile
-+	  The 'debug=' value is generated using the following command
-+	    dmalloc -p log-stats -p log-non-free -p log-bad-space -p log-elapsed-time \
-+	       -p check-fence -p check-heap -p check-lists -p check-blank \
-+	       -p check-funcs -p realloc-copy -p allow-free-null
-+
-+	  Electric-fence support:
-+	  -----------------------
-+	  This enables compiling with Electric-fence support.  Electric
-+	  fence is another very useful malloc debugging library which uses
-+	  your computer's virtual memory hardware to detect illegal memory
-+	  accesses.  This support will make BusyBox be considerable larger
-+	  and run slower, so you should leave this option disabled unless
-+	  you are hunting a hard to find memory problem.
-+
-+
-+config CONFIG_NO_DEBUG_LIB
-+	bool "None"
-+
-+config CONFIG_DMALLOC
-+	bool "Dmalloc"
-+
-+config CONFIG_EFENCE
-+	bool "Electric-fence"
-+
-+endchoice
-+
-+
-+endmenu
-+
-diff -Nur busybox-1.00.old/sysdeps/kfreebsd-gnu/defconfig busybox-1.00/sysdeps/kfreebsd-gnu/defconfig
---- busybox-1.00.old/sysdeps/kfreebsd-gnu/defconfig	1970-01-01 01:00:00.000000000 +0100
-+++ busybox-1.00/sysdeps/kfreebsd-gnu/defconfig	2005-08-19 14:38:40.000000000 +0200
-@@ -0,0 +1,421 @@
+Index: busybox/sysdeps/gnu-kfreebsd/defconfig
+===================================================================
+--- busybox/sysdeps/gnu-kfreebsd/defconfig	(revision 0)
++++ busybox/sysdeps/gnu-kfreebsd/defconfig	(revision 0)
+@@ -0,0 +1,423 @@
 +#
 +# Automatically generated make config: don't edit
 +#
@@ -1191,6 +692,8 @@ diff -Nur busybox-1.00.old/sysdeps/kfreebsd-gnu/defconfig busybox-1.00/sysdeps/k
 +# CONFIG_GETOPT is not set
 +CONFIG_HEXDUMP=y
 +# CONFIG_HWCLOCK is not set
++# CONFIG_IPCRM is not set
++# CONFIG_IPCS is not set
 +# CONFIG_LOSETUP is not set
 +# CONFIG_MKSWAP is not set
 +CONFIG_MORE=y
@@ -1213,9 +716,503 @@ diff -Nur busybox-1.00.old/sysdeps/kfreebsd-gnu/defconfig busybox-1.00/sysdeps/k
 +# Debugging Options
 +#
 +# CONFIG_DEBUG is not set
-diff -Nur busybox-1.00.old/util-linux/mkswap.c busybox-1.00/util-linux/mkswap.c
---- busybox-1.00.old/util-linux/mkswap.c	2005-08-19 14:37:59.000000000 +0200
-+++ busybox-1.00/util-linux/mkswap.c	2005-08-19 14:50:37.000000000 +0200
+Index: busybox/sysdeps/gnu-kfreebsd/Config.in
+===================================================================
+--- busybox/sysdeps/gnu-kfreebsd/Config.in	(revision 0)
++++ busybox/sysdeps/gnu-kfreebsd/Config.in	(revision 0)
+@@ -0,0 +1,301 @@
++#
++# For a description of the syntax of this configuration file,
++# see scripts/kbuild/config-language.txt.
++#
++
++mainmenu "BusyBox Configuration"
++
++config HAVE_DOT_CONFIG
++	bool
++	default y
++
++menu "General Configuration"
++
++choice
++	prompt "Buffer allocation policy"
++	default CONFIG_FEATURE_BUFFERS_USE_MALLOC
++	help
++	  There are 3 ways BusyBox can handle buffer allocations:
++	  - Use malloc. This costs code size for the call to xmalloc.
++	  - Put them on stack. For some very small machines with limited stack
++	    space, this can be deadly.  For most folks, this works just fine.
++	  - Put them in BSS. This works beautifully for computers with a real
++	    MMU (and OS support), but wastes runtime RAM for uCLinux. This
++	    behavior was the only one available for BusyBox versions 0.48 and
++	    earlier.
++
++config CONFIG_FEATURE_BUFFERS_USE_MALLOC
++	bool "Allocate with Malloc"
++
++config CONFIG_FEATURE_BUFFERS_GO_ON_STACK
++	bool "Allocate on the Stack"
++
++config CONFIG_FEATURE_BUFFERS_GO_IN_BSS
++	bool "Allocate in the .bss section"
++
++endchoice
++
++config CONFIG_FEATURE_VERBOSE_USAGE
++	bool "Show verbose applet usage messages"
++	default n
++	help
++	  All BusyBox applets will show more verbose help messages when
++	  busybox is invoked with --help.  This will add a lot of text to the
++	  busybox binary.  In the default configuration, this will add about
++	  13k, but it can add much more depending on your configuration.
++
++config CONFIG_FEATURE_INSTALLER
++	bool "Support --install [-s] to install applet links at runtime"
++	default n
++	help
++	  Enable 'busybox --install [-s]' support.  This will allow you to use
++	  busybox at runtime to create hard links or symlinks for all the
++	  applets that are compiled into busybox.  This feature requires the
++	  /proc filesystem.
++
++config CONFIG_LOCALE_SUPPORT
++	bool "Enable locale support (system needs locale for this to work)"
++	default n
++	help
++	  Enable this if your system has locale support and you would like
++	  busybox to support locale settings.
++
++config CONFIG_FEATURE_DEVFS
++	bool "Support for devfs"
++	default n
++	help
++	  Enable if you want BusyBox to work with devfs.
++
++config CONFIG_FEATURE_DEVPTS
++	bool "Use the devpts filesystem for Unix98 PTYs"
++	default y if CONFIG_FEATURE_DEVFS
++	help
++	  Enable if you want BusyBox to use Unix98 PTY support. If enabled,
++	  busybox will use /dev/ptmx for the master side of the pseudoterminal
++	  and /dev/pts/<number> for the slave side.  Otherwise, BSD style
++	  /dev/ttyp<number> will be used. To use this option, you should have
++	  devpts or devfs mounted.
++
++config CONFIG_FEATURE_CLEAN_UP
++	bool "Clean up all memory before exiting (usually not needed)"
++	default n
++	help
++	  As a size optimization, busybox by default does not cleanup memory
++	  that is dynamically allocated or close files before exiting. This
++	  saves space and is usually not needed since the OS will clean up for
++	  us.  Don't enable this unless you have a really good reason to clean
++	  things up manually.
++
++config CONFIG_FEATURE_SUID
++	bool "Support for SUID/SGID handling"
++	default n
++	help
++	  Support SUID and SGID binaries.
++
++config CONFIG_FEATURE_SUID_CONFIG
++	bool "Runtime SUID/SGID configuration via /etc/busybox.conf"
++	default n if CONFIG_FEATURE_SUID
++	depends on CONFIG_FEATURE_SUID
++	help
++	  Allow the SUID / SGID state of an applet to be determined runtime by
++	  checking /etc/busybox.conf.  The format of this file is as follows:
++
++	  <applet> = [Ssx-][Ssx-][x-] (<username>|<uid>).(<groupname>|<gid>)
++
++	  An example might help:
++
++	  [SUID]
++	  su = ssx root.0 # applet su can be run by anyone and runs with euid=0/egid=0
++	  su = ssx        # exactly the same
++
++	  mount = sx- root.disk # applet mount can be run by root and members of group disk
++	                        # and runs with euid=0
++
++	  cp = --- # disable applet cp for everyone
++
++	  The file has to be owned by user root, group root and has to be
++	  writeable only by root:
++	  	(chown 0.0 /etc/busybox.conf; chmod 600 /etc/busybox.conf)
++	  The busybox executable has to be owned by user root, group
++	  root and has to be setuid root for this to work:
++	  	(chown 0.0 /bin/busybox; chmod 4755 /bin/busybox)
++
++	  Robert 'sandman' Griebl has more information here:
++	  <url: http://www.softforge.de/bb/suid.html >.
++
++config CONFIG_FEATURE_SUID_CONFIG_QUIET
++	bool "Suppress warning message if /etc/busybox.conf is not readable"
++	default n
++	depends on CONFIG_FEATURE_SUID_CONFIG
++	help
++	  /etc/busybox.conf should be readable by the user needing the SUID, check
++	  this option to avoid users to be notified about missing permissions.
++
++config CONFIG_SELINUX
++	bool "Support NSA Security Enhanced Linux"
++	default n
++	help
++	  Enable support for SE Linux in applets ls, ps, and id.  Also provide
++	  the option of compiling in SE Linux applets.
++
++	  If you do not have a complete SE Linux Full Userland installed, this
++	  stuff will not compile.  Go visit
++		http://www.nsa.gov/selinux/index.html
++	  to download the necessary stuff to allow busybox to compile with this
++	  option enabled.
++
++	  Most people will leave this set to 'N'.
++
++endmenu
++
++menu 'Build Options'
++
++config CONFIG_STATIC
++	bool "Build BusyBox as a static binary (no shared libs)"
++	default n
++	help
++	  If you want to build a static BusyBox binary, which does not
++	  use or require any shared libraries, then enable this option.
++	  This can cause BusyBox to be considerably larger, so you should
++	  leave this option false unless you have a good reason (i.e.
++	  your target platform does not support shared libraries, or
++	  you are building an initrd which doesn't need anything but
++	  BusyBox, etc).
++
++	  Most people will leave this set to 'N'.
++
++config CONFIG_LFS
++	bool "Build with Large File Support (for accessing files > 2 GB)"
++	default n
++	select FDISK_SUPPORT_LARGE_DISKS
++	help
++	  If you want to build BusyBox with large file support, then enable
++	  this option.  This will have no effect if your kernel or your C
++	  library lacks large file support for large files.  Some of the
++	  programs that can benefit from large file support include dd, gzip,
++	  cp, mount, tar, and many others.  If you want to access files larger
++	  than 2 Gigabytes, enable this option.  Otherwise, leave it set to 'N'.
++
++config USING_CROSS_COMPILER
++	bool "Do you want to build BusyBox with a Cross Compiler?"
++	default n
++	help
++	  Do you want to build BusyBox with a Cross Compiler?  If so,
++	  then enable this option.  Otherwise leave it set to 'N'.
++
++config CROSS_COMPILER_PREFIX
++	string "Cross Compiler prefix"
++	default "/usr/i386-linux-uclibc/bin/i386-uclibc-"
++	depends on USING_CROSS_COMPILER
++	help
++	  If you want to build BusyBox with a cross compiler, then you
++	  will need to set this to the cross-compiler prefix.  For example,
++	  if my cross-compiler is /usr/i386-linux-uclibc/bin/i386-uclibc-gcc
++	  then I would enter '/usr/i386-linux-uclibc/bin/i386-uclibc-' here,
++	  which will ensure the correct compiler is used.
++
++config EXTRA_CFLAGS_OPTIONS
++	string "Any extra CFLAGS options for the compiler?"
++	default ""
++	help
++	  Do you want to pass any extra CFLAGS options to the compiler as
++	  you build BusyBox? If so, this is the option for you...  For example,
++	  if you want to add some simple compiler switches (like -march=i686),
++	  or check for warnings using -Werror, just those options here.
++
++endmenu
++
++menu 'Installation Options'
++
++config CONFIG_INSTALL_NO_USR
++	bool "Don't use /usr"
++	default n
++	help
++	  Disable use of /usr. Don't activate this option if you don't know
++	  that you really want this behaviour.
++
++config PREFIX
++	string "BusyBox installation prefix"
++	default "./_install"
++	help
++	  Define your directory to install BusyBox files/subdirs in.
++
++
++
++endmenu
++
++source archival/Config.in
++source coreutils/Config.in
++source console-tools/Config.in
++source debianutils/Config.in
++source e2fsprogs/Config.in
++source editors/Config.in
++source findutils/Config.in
++source init/Config.in
++source loginutils/Config.in
++source miscutils/Config.in
++source modutils/Config.in
++source networking/Config.in
++source procps/Config.in
++source shell/Config.in
++source sysklogd/Config.in
++source util-linux/Config.in
++
++menu 'Debugging Options'
++
++config CONFIG_DEBUG
++	bool "Build BusyBox with Debugging symbols"
++	default n
++	help
++	  Say Y here if you wish to compile BusyBox with debugging symbols.
++	  This will allow you to use a debugger to examine BusyBox internals
++	  while applets are running.  This increases the size of the binary
++	  considerably and should only be used when doing development.
++	  If you are doing development and want to debug BusyBox, answer Y.
++
++	  Most people should answer N.
++
++choice
++	prompt "Additional debugging library"
++	default CONFIG_NO_DEBUG_LIB
++	depends on CONFIG_DEBUG
++	help
++	  Using an additional debugging library will make BusyBox become
++	  considerable larger and will cause it to run more slowly.  You
++	  should always leave this option disabled for production use.
++
++	  dmalloc support:
++	  ----------------
++	  This enables compiling with dmalloc ( http://dmalloc.com/ )
++	  which is an excellent public domain mem leak and malloc problem
++	  detector.  To enable dmalloc, before running busybox you will
++	  want to properly set your environment, for example:
++	    export DMALLOC_OPTIONS=debug=0x34f47d83,inter=100,log=logfile
++	  The 'debug=' value is generated using the following command
++	    dmalloc -p log-stats -p log-non-free -p log-bad-space -p log-elapsed-time \
++	       -p check-fence -p check-heap -p check-lists -p check-blank \
++	       -p check-funcs -p realloc-copy -p allow-free-null
++
++	  Electric-fence support:
++	  -----------------------
++	  This enables compiling with Electric-fence support.  Electric
++	  fence is another very useful malloc debugging library which uses
++	  your computer's virtual memory hardware to detect illegal memory
++	  accesses.  This support will make BusyBox be considerable larger
++	  and run slower, so you should leave this option disabled unless
++	  you are hunting a hard to find memory problem.
++
++
++config CONFIG_NO_DEBUG_LIB
++	bool "None"
++
++config CONFIG_DMALLOC
++	bool "Dmalloc"
++
++config CONFIG_EFENCE
++	bool "Electric-fence"
++
++endchoice
++
++
++endmenu
+Index: busybox/init/init.c
+===================================================================
+--- busybox/init/init.c	(revision 11260)
++++ busybox/init/init.c	(working copy)
+@@ -166,14 +166,28 @@
+ #else
+ #define MAYBE_CONSOLE	CONSOLE
+ #endif
++
++#if !defined(RB_HALT_SYSTEM) && defined(RB_HALT)
++#define RB_HALT_SYSTEM RB_HALT
++#endif
++
++#if defined(__linux__)
+ #ifndef RB_HALT_SYSTEM
+ static const int RB_HALT_SYSTEM = 0xcdef0123;
++#endif
++#ifndef RB_ENABLE_CAD
+ static const int RB_ENABLE_CAD = 0x89abcdef;
++#endif
++#ifndef RB_DISABLE_CAD
+ static const int RB_DISABLE_CAD = 0;
+-
++#endif
++#ifndef RB_POWER_OFF
+ #define RB_POWER_OFF    0x4321fedc
++#endif
++#ifndef RB_AUTOBOOT
+ static const int RB_AUTOBOOT = 0x01234567;
+ #endif
++#endif
+ 
+ static const char * const environment[] = {
+ 	"HOME=/",
+@@ -287,10 +301,19 @@
+ 	tty.c_cc[VSTOP] = 19;	/* C-s */
+ 	tty.c_cc[VSUSP] = 26;	/* C-z */
+ 
++/* c_line is not POSIX */
++#ifdef __linux__
+ 	/* use line dicipline 0 */
+ 	tty.c_line = 0;
++#endif
+ 
+ 	/* Make it be sane */
++#ifndef CBAUD
++#define CBAUD 0
++#endif
++#ifndef CBAUDEX
++#define CBAUDEX 0
++#endif
+ 	tty.c_cflag &= CBAUD | CBAUDEX | CSIZE | CSTOPB | PARENB | PARODD;
+ 	tty.c_cflag |= CREAD | HUPCL | CLOCAL;
+ 
+@@ -313,6 +336,7 @@
+    Units are kBytes to avoid overflow on 4GB machines */
+ static unsigned int check_free_memory(void)
+ {
++#ifdef __linux__
+ 	struct sysinfo info;
+ 	unsigned int result, u, s = 10;
+ 
+@@ -336,6 +360,9 @@
+ 	} else {
+ 		return(result * u);
+ 	}
++#else
++	return -1;
++#endif
+ }
+ #endif /* CONFIG_FEATURE_INIT_SWAPON */
+ 
+@@ -360,10 +387,13 @@
+ #endif
+ 	} else {
+ 		/* 2.2 kernels: identify the real console backend and try to use it */
++#ifdef TIOCGSERIAL
+ 		if (ioctl(0, TIOCGSERIAL, &sr) == 0) {
+ 			/* this is a serial console */
+ 			snprintf(console, sizeof(console) - 1, SC_FORMAT, sr.line);
+-		} else if (ioctl(0, VT_GETSTATE, &vt) == 0) {
++		} else
++#endif
++		if (ioctl(0, VT_GETSTATE, &vt) == 0) {
+ 			/* this is linux virtual tty */
+ 			snprintf(console, sizeof(console) - 1, VC_FORMAT, vt.v_active);
+ 		} else {
+@@ -388,6 +418,7 @@
+ 	} else {
+ 		s = getenv("TERM");
+ 		/* check for serial console */
++#if defined(__linux__) && defined(TIOCGSERIAL)
+ 		if (ioctl(fd, TIOCGSERIAL, &sr) == 0) {
+ 			/* Force the TERM setting to vt102 for serial console --
+ 			 * if TERM is set to linux (the default) */
+@@ -396,10 +427,16 @@
+ #ifndef CONFIG_SYSLOGD
+ 			log_console = console;
+ #endif
+-		} else {
+-			if (s == NULL)
++		} else
++#endif
++		if (s == NULL)
++#if defined(__linux__)
+ 				putenv("TERM=linux");
+-		}
++#elif defined(__FreeBSD_kernel__)
++				putenv("TERM=cons25");
++#else
++				putenv("TERM=dumb");
++#endif
+ 		close(fd);
+ 	}
+ 	messageD(LOG, "console=%s", console);
+@@ -714,8 +751,10 @@
+ 	sigaddset(&block_signals, SIGTSTP);
+ 	sigprocmask(SIG_BLOCK, &block_signals, NULL);
+ 
++#ifdef RB_ENABLE_CAD
+ 	/* Allow Ctrl-Alt-Del to reboot system. */
+ 	init_reboot(RB_ENABLE_CAD);
++#endif
+ 
+ 	message(CONSOLE | LOG, "The system is going down NOW !!");
+ 	sync();
+@@ -1121,10 +1160,12 @@
+ 	signal(SIGSTOP, stop_handler);
+ 	signal(SIGTSTP, stop_handler);
+ 
++#ifdef RB_DISABLE_CAD
+ 	/* Turn off rebooting via CTL-ALT-DEL -- we get a
+ 	 * SIGINT on CAD so we can shut things down gracefully... */
+ 	init_reboot(RB_DISABLE_CAD);
+ #endif
++#endif
+ 
+ 	/* Figure out where the default console should be */
+ 	console_init();
+Index: busybox/procps/free.c
+===================================================================
+--- busybox/procps/free.c	(revision 11260)
++++ busybox/procps/free.c	(working copy)
+@@ -29,6 +29,7 @@
+ 
+ extern int free_main(int argc, char **argv)
+ {
++#ifdef __linux__
+ 	struct sysinfo info;
+ 	sysinfo(&info);
+ 
+@@ -80,5 +81,8 @@
+ 			info.freeram+info.freeswap);
+ #endif
+ 	return EXIT_SUCCESS;
++#else
++	return EXIT_FAILURE;
++#endif
+ }
+ 
+Index: busybox/procps/top.c
+===================================================================
+--- busybox/procps/top.c	(revision 11260)
++++ busybox/procps/top.c	(working copy)
+@@ -33,8 +33,6 @@
+ #include <unistd.h>
+ #include <string.h>
+ #include <sys/ioctl.h>
+-/* get page info */
+-#include <asm/page.h>
+ #include "busybox.h"
+ 
+ //#define FEATURE_CPU_USAGE_PERCENTAGE  /* + 2k */
+Index: busybox/procps/uptime.c
+===================================================================
+--- busybox/procps/uptime.c	(revision 11260)
++++ busybox/procps/uptime.c	(working copy)
+@@ -35,7 +35,9 @@
+ #include <stdlib.h>
+ #include "busybox.h"
+ 
++#ifndef FSHIFT
+ static const int FSHIFT = 16;              /* nr of bits of precision */
++#endif
+ #define FIXED_1         (1<<FSHIFT)     /* 1.0 as fixed-point */
+ #define LOAD_INT(x) ((x) >> FSHIFT)
+ #define LOAD_FRAC(x) LOAD_INT(((x) & (FIXED_1-1)) * 100)
+Index: busybox/util-linux/mkswap.c
+===================================================================
+--- busybox/util-linux/mkswap.c	(revision 11260)
++++ busybox/util-linux/mkswap.c	(working copy)
 @@ -42,8 +42,23 @@
  #include <stdlib.h>
  #include <sys/ioctl.h>			/* for _IO */
@@ -1242,9 +1239,10 @@ diff -Nur busybox-1.00.old/util-linux/mkswap.c busybox-1.00/util-linux/mkswap.c
  #include "busybox.h"
  
  #ifndef _IO
-diff -Nur busybox-1.00.old/util-linux/swaponoff.c busybox-1.00/util-linux/swaponoff.c
---- busybox-1.00.old/util-linux/swaponoff.c	2004-04-02 23:39:15.000000000 +0200
-+++ busybox-1.00/util-linux/swaponoff.c	2005-08-19 14:38:40.000000000 +0200
+Index: busybox/util-linux/swaponoff.c
+===================================================================
+--- busybox/util-linux/swaponoff.c	(revision 11260)
++++ busybox/util-linux/swaponoff.c	(working copy)
 @@ -54,7 +54,11 @@
  	}
  

@@ -1,0 +1,84 @@
+
+Description: avoid messing with cpufreq in postinst (rmh)
+             fix FTBFS (aurel32)
+Status: both in BTS (#320962)
+
+diff -ur gnome-applets-2.10.1.old/debian/gnome-applets.config gnome-applets-2.10.1/debian/gnome-applets.config
+--- gnome-applets-2.10.1.old/debian/gnome-applets.config	2005-08-26 16:22:59.000000000 +0200
++++ gnome-applets-2.10.1/debian/gnome-applets.config	2005-08-26 16:37:32.000000000 +0200
+@@ -3,6 +3,8 @@
+ # Debconf config script for gnome-applets
+ prog=/usr/bin/cpufreq-selector
+ 
++test -e $prog || exit 0
++
+ # Load Debconf
+ . /usr/share/debconf/confmodule
+ db_version 2.0
+diff -ur gnome-applets-2.10.1.old/debian/gnome-applets.postinst gnome-applets-2.10.1/debian/gnome-applets.postinst
+--- gnome-applets-2.10.1.old/debian/gnome-applets.postinst	2005-08-26 16:22:59.000000000 +0200
++++ gnome-applets-2.10.1/debian/gnome-applets.postinst	2005-08-26 16:36:03.000000000 +0200
+@@ -10,10 +10,12 @@
+ 
+ case "$1" in
+     configure)
+-	db_get gnome-applets/cpufreq_SUID_bit
+-	if [ "$RET" = "false" ]; then
+-		chmod 0755 $prog
+-	fi;
++	if test -e $prog ; then
++		db_get gnome-applets/cpufreq_SUID_bit
++		if [ "$RET" = "false" ]; then
++			chmod 0755 $prog
++		fi;
++	fi
+     ;;
+ 
+     abort-upgrade|abort-remove|abort-deconfigure)
+--- gnome-applets-2.10.1.orig/debian/patches/10_kfreebsd.patch
++++ gnome-applets-2.10.1/debian/patches/10_kfreebsd.patch
+@@ -0,0 +1,44 @@
++--- configure.in.orig
+++++ configure.in
++@@ -250,7 +250,7 @@
++ 	   AC_CHECK_LIB(apm,apm_read,[HAVE_LIBAPM=yes],[HAVE_LIBAPM=no])
++ 	   ;;
++        # list of supported OS cores that do not use libapm
++-       *-*-freebsd*|*-*-netbsd*|*-*-openbsd*)
+++       *-*-freebsd*|*-*-netbsd*|*-*-openbsd*|*-*kfreebsd*-gnu)
++ 	   ;;
++        *)
++ 	   echo "warning: ${host} is not supported by battstat_applet, not building" >&2
++--- configure.orig
+++++ configure
++@@ -24989,7 +24989,7 @@
++ 
++ 	   ;;
++        # list of supported OS cores that do not use libapm
++-       *-*-freebsd*|*-*-netbsd*|*-*-openbsd*)
+++       *-*-freebsd*|*-*-netbsd*|*-*-openbsd*|*-*-kfreebsd*-gnu)
++ 	   ;;
++        *)
++ 	   echo "warning: ${host} is not supported by battstat_applet, not building" >&2
++--- battstat.orig/properties.c
+++++ battstat/properties.c
++@@ -27,7 +27,7 @@
++ 
++ #include <stdio.h>
++ 
++-#ifdef __FreeBSD__
+++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++ #include <machine/apm_bios.h>
++ #elif defined(__NetBSD__) || defined(__OpenBSD__)
++ #include <sys/param.h>
++--- battstat.orig/power-management.c
+++++ battstat/power-management.c
++@@ -73,7 +73,7 @@
++  * the problem might be.  This error message is not to be freed.
++  */
++ 
++-#ifdef __FreeBSD__
+++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++ 
++ #include <machine/apm_bios.h>
++ 
