@@ -83,38 +83,9 @@ If no match is found, we need to re-libtoolize. Generaly, this involves:
 
     grep kfreebsd configure
 
-This should do it.  If you failed to update libtool due to broken autotools
-templates or some other weird reason, there's a workaround solution you can
-use.  Since the gnu system (GNU/Hurd) is already supported by old versions
-of libtool, and since the definitions are actualy not kernel-specific but
-specific to things like libc, ld.so, or binary format, we can cloak
-k*bsd-gnu as if it were gnu and this will work fine for us.
+This should do it.
 
-  *PLEASE* make sure the package doesn't use any kernel-specific interfaces
-  that are supported by kfreebsd. If it does, the kfreebsd-gnu triplet needs
-  to be used to match with freebsd in the corresponding test, and using this
-  hack will break it.  Don't use this hack unless you know what you're doing.
-  Don't encourage package maintainers who are not aware of this porting issue
-  to use this hack without checking the package properly. If in doubt, ask.
-
-  I generaly do it like this.  In debian/rules:
-
-  DEB_BUILD_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
-  DEB_BUILD_GNU_CPU	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
-  DEB_BUILD_GNU_SYSTEM	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_SYSTEM)
-
-  ifneq (, $(filter $(DEB_BUILD_GNU_SYSTEM), kfreebsd-gnu knetbsd-gnu))
-  DEB_BUILD_GNU_TYPE = $(DEB_BUILD_GNU_CPU)-gnu
-  endif
-
-  [...]
-  ./configure [...] $(DEB_BUILD_GNU_TYPE)
-
-When you submit the bug, please point the maintainer to bug #242950, it
-contains some useful info for maintainers.
-
-
-Finaly, if the library doesn't use libtool, expect a hardcoded check for
+Finally, if the library doesn't use libtool, expect a hardcoded check for
 Linux somewhere.  This is how badly-portable libraries generaly handle the
 shared object definitions.  Just find the check for Linux and add our triplet
 or uname output where it belongs.
@@ -240,39 +211,6 @@ make sure the proper init.d script restores it.
 Generaly, you should use /var/run for your named pipe.  The only exception
 is sysvinit, which can't assume /var is mounted and hence uses /etc. All
 other daemons can assume /var is mounted, so this shouldn't be an issue.
-
-
-gcc attempting to link C programs with C++ libraries
-----------------------------------------------------
-
-If you see an error like this:
-
-gcc -o foo foo.o -lbar ...
-/usr/lib/libbar.so: undefined reference to `operator new[](unsigned)'
-/usr/lib/libbar.so: undefined reference to `vtable for __cxxabiv1::__si_class_type_info'
-/usr/lib/libbar.so: undefined reference to `operator delete(void*)'
-/usr/lib/libbar.so: undefined reference to `__gxx_personality_v0'
-/usr/lib/libbar.so: undefined reference to `__cxa_pure_virtual'
-
-It means you should be using g++ instead of gcc to link.  In some
-systems/situations, adding -lstdc++ works around the problem, but it might
-result in even more weird errors too.  In particular, if you see something
-really weird like this:
-
-/usr/bin/ld: foo: hidden symbol `__umoddi3' in /usr/lib/gcc-lib/[...]/libgcc.a(_umoddi3.oS) is referenced by DSO
-
-it most likely means upstream hardcoded -lstdc++ which only seems to break
-for us.
-
-Replacing gcc with g++ when linking non-c++ programs with autotools is a bit
-tricky:
-
-  - Make sure configure.ac has AC_PROG_CXX
-  - Create an empty empty.cc file and edit Makefile.am.  Make the foo_SOURCES
-    line look like "foo_SOURCES = foo.c empty.cc".  This will fool automake
-    into thinking foo is a C++ program.  If you know a better way to do this,
-    please let us know.
-
 
 
 RT signals
