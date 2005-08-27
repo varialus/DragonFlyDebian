@@ -56,7 +56,7 @@ __FBSDID("$FreeBSD: src/contrib/pf/pfctl/parse.y,v 1.6 2004/06/16 23:39:31 mlaie
 #include <limits.h>
 #include <pwd.h>
 #include <grp.h>
-#include <md5.h>
+#include <bsd/md5.h>
 
 #include "pfctl_parser.h"
 #include "pfctl.h"
