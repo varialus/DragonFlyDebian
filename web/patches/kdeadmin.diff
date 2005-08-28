@@ -1,0 +1,71 @@
+Author: aurel32
+Status: ugly, don't merge! We need the new dpkg to make it cleaner
+
+diff -u kdeadmin-3.4.2/debian/control kdeadmin-3.4.2/debian/control
+--- kdeadmin-3.4.2/debian/control
++++ kdeadmin-3.4.2/debian/control
+@@ -8,8 +8,8 @@
+ 
+ Package: kdeadmin
+ Section: kde
+-Architecture: all
+-Depends: kcron (>= ${Source-Version}), kdat (>= ${Source-Version}), kdeadmin-kfile-plugins (>= ${Source-Version}), kpackage (>= ${Source-Version}), ksysv (>= ${Source-Version}), kuser (>= ${Source-Version}), secpolicy (>= ${Source-Version})
++Architecture: any
++Depends: kcron (>= ${Source-Version}), ${kdat}, kdeadmin-kfile-plugins (>= ${Source-Version}), kpackage (>= ${Source-Version}), ksysv (>= ${Source-Version}), kuser (>= ${Source-Version}), secpolicy (>= ${Source-Version})
+ Recommends: lilo-config (>= ${Source-Version})
+ Suggests: kdeadmin-doc-html (>= ${Source-Version})
+ Description: system adminstration tools from the official KDE release
+@@ -53,7 +53,7 @@
+ 
+ Package: kdat
+ Section: admin
+-Architecture: any
++Architecture: i386 ia64 alpha amd64 arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc
+ Depends: ${shlibs:Depends}
+ Suggests: khelpcenter
+ Description: a KDE tape backup tool
+diff -u kdeadmin-3.4.2/debian/rules kdeadmin-3.4.2/debian/rules
+--- kdeadmin-3.4.2/debian/rules
++++ kdeadmin-3.4.2/debian/rules
+@@ -10,0 +11,11 @@
++
++kdat (>= ${Source-Version})
++
++###
++
++DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
++
++binary-predeb/kdeadmin::
++ifeq (linux,$(DEB_HOST_ARCH_OS))
++	echo "kdat=kdat (>= ${Source-Version})" >>debian/kdeadmin.substvars
++endif
+only in patch2:
+unchanged:
+--- kdeadmin-3.4.2.orig/debian/patches/02_kfreebsd.diff
++++ kdeadmin-3.4.2/debian/patches/02_kfreebsd.diff
+@@ -0,0 +1,25 @@
++#DPATCHLEVEL=0
++--- configure.orig	2005-08-28 16:15:33.000000000 +0200
+++++ configure	2005-08-28 16:16:41.000000000 +0200
++@@ -33309,6 +33309,7 @@
++ echo "$as_me:$LINENO: checking if ksysv can be compiled" >&5
++ echo $ECHO_N "checking if ksysv can be compiled... $ECHO_C" >&6
++ case "$host" in
+++  *-*-*bsd-gnu) ksysv_compile=yes;;
++   *-*-*bsd*) ksysv_compile=no;;
++   *) ksysv_compile=yes;;
++ esac
++--- configure.in.orig	2005-08-28 16:15:29.000000000 +0200
+++++ configure.in	2005-08-28 16:16:17.000000000 +0200
++@@ -99,9 +99,10 @@
++ dnl FILE: ./ksysv/configure.in.in
++ dnl =======================================================
++ 
++-dnl Disabled on BSD, where it doesn't apply
+++dnl Disabled on BSD, where it doesn't apply, except with a GNU userland
++ AC_MSG_CHECKING(if ksysv can be compiled)
++ case "$host" in
+++  *-*-*bsd-gnu) ksysv_compile=yes;;
++   *-*-*bsd*) ksysv_compile=no;;
++   *) ksysv_compile=yes;;
++ esac
