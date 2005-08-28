@@ -1,6 +1,7 @@
 
 Author: rmh, aurel32
-Status: in BTS
+Status: in debian
+Note: you still need to set default device to /dev/acd0
 
 diff -u eject-2.0.13deb/eject.c eject-2.0.13deb/eject.c
 --- eject-2.0.13deb/eject.c
@@ -231,29 +232,3 @@ diff -u eject-2.0.13deb/eject.c eject-2.0.13deb/eject.c
  
  	if (!worked) {
  		fprintf(stderr, _("%s: unable to eject, last error: %s\n"), programName, strerror(errno));
-diff -u eject-2.0.13deb/debian/rules eject-2.0.13deb/debian/rules
---- eject-2.0.13deb/debian/rules
-+++ eject-2.0.13deb/debian/rules
-@@ -17,13 +17,21 @@
- CFLAGS += -Os -fomit-frame-pointer
- endif
- 
-+DEB_HOST_ARCH_OS	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
-+DEB_HOST_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-+DEB_BUILD_GNU_TYPE	?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
-+
-+ifeq ($(DEB_HOST_ARCH_OS), kfreebsd)
-+cdrom		=	--enable-default-device=acd0
-+endif
-+
- deb_dir		=	debian/eject
- udeb_dir	=	debian/eject-udeb
- build_dirs	=	$(deb_dir) $(udeb_dir)
- 
- build:
- 	dh_testdir
--	./configure --prefix=/usr
-+	./configure --prefix=/usr --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) $(cdrom)
- 	$(MAKE) AM_CFLAGS= CFLAGS="$(CFLAGS)"
- 	touch build
- 
