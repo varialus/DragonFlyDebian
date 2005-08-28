@@ -1,31 +1,10 @@
 
-Author: rmh
+Authors: rmh, aurel32
 Status: in BTS
 
-diff -ur kdelibs-3.4.2.old/configure.in.in kdelibs-3.4.2/configure.in.in
---- kdelibs-3.4.2.old/configure.in.in	2005-05-23 14:17:19.000000000 +0200
-+++ kdelibs-3.4.2/configure.in.in	2005-08-27 23:48:59.000000000 +0200
-@@ -47,7 +47,7 @@
- KDE_CHECK_STL
- AC_HEADER_DIRENT
- AC_HEADER_STDC
--AC_CHECK_HEADERS(sys/param.h sys/mman.h sys/time.h sysent.h strings.h sys/stat.h sys/select.h paths.h malloc.h limits.h sys/soundcard.h dlfcn.h termios.h)
-+AC_CHECK_HEADERS(sys/param.h sys/mman.h sys/time.h sysent.h strings.h sys/stat.h sys/select.h paths.h malloc.h limits.h sys/soundcard.h dlfcn.h termios.h sys/prctl.h)
- 
- DCOPIDL2CPP="compiled"
- DCOPIDL="compiled"
-@@ -118,7 +118,7 @@
- AC_CHECK_MKSTEMPS
- AC_CHECK_MKSTEMP
- AC_CHECK_MKDTEMP
--AC_CHECK_FUNCS(strtoll socket seteuid setegid strfmon stpcpy gettimeofday)
-+AC_CHECK_FUNCS(strtoll socket seteuid setegid strfmon stpcpy gettimeofday tcgetattr tcsetattr)
- 
- AH_BOTTOM([
- /* provide a definition for a 32 bit entity, usable as a typedef, possibly
-diff -ur kdelibs-3.4.2.old/debian/control kdelibs-3.4.2/debian/control
---- kdelibs-3.4.2.old/debian/control	2005-08-27 13:06:22.000000000 +0200
-+++ kdelibs-3.4.2/debian/control	2005-08-27 15:16:22.000000000 +0200
+diff -u kdelibs-3.4.2/debian/control kdelibs-3.4.2/debian/control
+--- kdelibs-3.4.2/debian/control
++++ kdelibs-3.4.2/debian/control
 @@ -3,7 +3,7 @@
  Priority: optional
  Maintainer: Debian Qt/KDE Maintainers <debian-qt-kde@lists.debian.org>
@@ -35,106 +14,195 @@ diff -ur kdelibs-3.4.2.old/debian/control kdelibs-3.4.2/debian/control
  Build-Depends-Indep: doxygen, qt3-doc, graphviz, gsfonts-x11
  Standards-Version: 3.6.2
  
-diff -ur kdelibs-3.4.2.old/kdecore/kmountpoint.cpp kdelibs-3.4.2/kdecore/kmountpoint.cpp
---- kdelibs-3.4.2.old/kdecore/kmountpoint.cpp	2005-05-23 14:16:21.000000000 +0200
-+++ kdelibs-3.4.2/kdecore/kmountpoint.cpp	2005-08-27 16:26:09.000000000 +0200
-@@ -224,7 +224,7 @@
- {
-   KMountPoint::List result;
+@@ -67,7 +67,7 @@
+ Package: kdelibs4-dev
+ Section: libdevel
+ Architecture: any
+-Depends: kdelibs4c2 (= ${Source-Version}), kdelibs-bin (= ${Source-Version}), libart-2.0-dev (>= 2.3.17), libarts1-dev (>= 1.4.2), libasound2-dev, libaspell-dev, libbz2-dev, libcupsys2-dev, libfam-dev, libidn11-dev, libjasper-1.701-dev, libkrb5-dev, libopenexr-dev (>= 1.2.2-3), libpcre3-dev, libqt3-mt-dev (>= 3:3.3.4-4), libsasl2-dev, libssl-dev, libtiff4-dev (>= 3.7.3-1), libxml2-dev, libxml2-utils, libxslt1-dev
++Depends: kdelibs4c2 (= ${Source-Version}), kdelibs-bin (= ${Source-Version}), libart-2.0-dev (>= 2.3.17), libarts1-dev (>= 1.4.2), ${libasound2-dev}, libaspell-dev, libbz2-dev, libcupsys2-dev, libfam-dev, libidn11-dev, libjasper-1.701-dev, libkrb5-dev, libopenexr-dev (>= 1.2.2-3), libpcre3-dev, libqt3-mt-dev (>= 3:3.3.4-4), libsasl2-dev, libssl-dev, libtiff4-dev (>= 3.7.3-1), libxml2-dev, libxml2-utils, libxslt1-dev
+ Provides: kdelibs-dev
+ Replaces: kdebase-dev (<< 4:3.4.0)
+ Description: development files for the KDE core libraries
+diff -u kdelibs-3.4.2/debian/rules kdelibs-3.4.2/debian/rules
+--- kdelibs-3.4.2/debian/rules
++++ kdelibs-3.4.2/debian/rules
+@@ -32,0 +33,5 @@
++
++binary-predeb/kdelibs4-dev::
++ifeq (linux,$(DEB_HOST_ARCH_OS))
++	echo "libasound2-dev=libasound2-dev" >>debian/libarts1-dev.substvars
++endif
+diff -u kdelibs-3.4.2/debian/changelog kdelibs-3.4.2/debian/changelog
+--- kdelibs-3.4.2/debian/changelog
++++ kdelibs-3.4.2/debian/changelog
+@@ -1,3 +1,9 @@
++kdelibs (4:3.4.2-2+kbsd) unreleased; urgency=low
++
++  * Added support for GNU/kFreeBSD, patch by Robert Millan.
++
++ -- Aurelien Jarno <aurel32@debian.org>  Sat, 27 Aug 2005 23:03:45 +0200
++
+ kdelibs (4:3.4.2-2) unstable; urgency=low
  
--#ifdef HAVE_GETMNTINFO
-+#if defined(HAVE_GETMNTINFO) && defined(MNT_NOWAIT)
- 
-     struct statfs *mounted;
- 
-diff -ur kdelibs-3.4.2.old/kdecore/kpty.cpp kdelibs-3.4.2/kdecore/kpty.cpp
---- kdelibs-3.4.2.old/kdecore/kpty.cpp	2005-05-23 14:16:21.000000000 +0200
-+++ kdelibs-3.4.2/kdecore/kpty.cpp	2005-08-27 15:15:37.000000000 +0200
-@@ -95,24 +95,24 @@
- # endif
- #endif
- 
--#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || defined (__bsdi__) || defined(__APPLE__)
-+#if defined(HAVE_TCGETATTR)
-+# define _tcgetattr(fd, ttmode) tcgetattr(fd, ttmode)
-+#elif defined(TIOCGETA)
- # define _tcgetattr(fd, ttmode) ioctl(fd, TIOCGETA, (char *)ttmode)
-+#elif defined(TCGETS)
-+# define _tcgetattr(fd, ttmode) ioctl(fd, TCGETS, (char *)ttmode)
- #else
--# if defined(_HPUX_SOURCE) || defined(__Lynx__)
--#  define _tcgetattr(fd, ttmode) tcgetattr(fd, ttmode)
--# else
--#  define _tcgetattr(fd, ttmode) ioctl(fd, TCGETS, (char *)ttmode)
--# endif
-+# error
- #endif
- 
--#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || defined (__bsdi__) || defined(__APPLE__)
-+#if defined(HAVE_TCSETATTR) && defined(TCSANOW)
-+# define _tcsetattr(fd, ttmode) tcsetattr(fd, TCSANOW, ttmode)
-+#elif defined(TIOCSETA)
- # define _tcsetattr(fd, ttmode) ioctl(fd, TIOCSETA, (char *)ttmode)
-+#elif defined(TCSETS)
-+# define _tcsetattr(fd, ttmode) ioctl(fd, TCSETS, (char *)ttmode)
- #else
--# ifdef _HPUX_SOURCE
--#  define _tcsetattr(fd, ttmode) tcsetattr(fd, TCSANOW, ttmode)
--# else
--#  define _tcsetattr(fd, ttmode) ioctl(fd, TCSETS, (char *)ttmode)
--# endif
-+# error
- #endif
- 
- #if defined (_HPUX_SOURCE)
-diff -ur kdelibs-3.4.2.old/kinit/kinit.cpp kdelibs-3.4.2/kinit/kinit.cpp
---- kdelibs-3.4.2.old/kinit/kinit.cpp	2005-07-20 11:19:21.000000000 +0200
-+++ kdelibs-3.4.2/kinit/kinit.cpp	2005-08-27 15:15:37.000000000 +0200
-@@ -59,7 +59,7 @@
- #include <kapplication.h>
- #include <klocale.h>
- 
--#ifdef Q_OS_LINUX
-+#ifdef HAVE_SYS_PRCTL_H
- #include <sys/prctl.h>
- #ifndef PR_SET_NAME
- #define PR_SET_NAME 15
-@@ -524,7 +524,7 @@
-        d.argv[argc] = 0;
- 
-        /** Give the process a new name **/
--#ifdef Q_OS_LINUX
-+#ifdef HAVE_SYS_PRCTL_H
-        /* set the process name, so that killall works like intended */
-        r = prctl(PR_SET_NAME, (unsigned long) name.data(), 0, 0, 0);
-        if ( r == 0 )
-diff -ur kdelibs-3.4.2.old/kio/kio/global.cpp kdelibs-3.4.2/kio/kio/global.cpp
---- kdelibs-3.4.2.old/kio/kio/global.cpp	2005-07-20 11:19:22.000000000 +0200
-+++ kdelibs-3.4.2/kio/kio/global.cpp	2005-08-27 19:34:15.000000000 +0200
-@@ -1291,7 +1291,7 @@
-  *
-  ***************************************************************/
- 
--#ifndef HAVE_GETMNTINFO
-+#if !defined(HAVE_GETMNTINFO) || !defined(MNT_NOWAIT)
- 
- #ifdef _PATH_MOUNTED
- // On some Linux, MNTTAB points to /etc/fstab !
-@@ -1419,7 +1419,7 @@
- 
-     //kdDebug(7007) << "findDeviceMountPoint realname=" << realname << endl;
- 
--#ifdef HAVE_GETMNTINFO
-+#if defined(HAVE_GETMNTINFO) && defined(MNT_NOWAIT)
- 
-     struct statfs *mounted;
- 
-@@ -1685,7 +1685,7 @@
-      * How kinky can you get with a filesystem?
-      */
- 
--#ifdef HAVE_GETMNTINFO
-+#if defined(HAVE_GETMNTINFO) && defined(MNT_NOWAIT)
- 
-     struct statfs *mounted;
-     char    realpath_buffer[MAXPATHLEN];
+   +++ Changes by Christopher Martin and Adeodato Simó:
+only in patch2:
+unchanged:
+--- kdelibs-3.4.2.orig/debian/patches/21_kdelibs.diff
++++ kdelibs-3.4.2/debian/patches/21_kdelibs.diff
+@@ -0,0 +1,156 @@
++--- kde.orig/configure.in.in	2005-05-23 14:17:19.000000000 +0200
+++++ kde.patched/configure.in.in	2005-08-27 23:48:59.000000000 +0200
++@@ -47,7 +47,7 @@
++ KDE_CHECK_STL
++ AC_HEADER_DIRENT
++ AC_HEADER_STDC
++-AC_CHECK_HEADERS(sys/param.h sys/mman.h sys/time.h sysent.h strings.h sys/stat.h sys/select.h paths.h malloc.h limits.h sys/soundcard.h dlfcn.h termios.h)
+++AC_CHECK_HEADERS(sys/param.h sys/mman.h sys/time.h sysent.h strings.h sys/stat.h sys/select.h paths.h malloc.h limits.h sys/soundcard.h dlfcn.h termios.h sys/prctl.h)
++ 
++ DCOPIDL2CPP="compiled"
++ DCOPIDL="compiled"
++@@ -118,7 +118,7 @@
++ AC_CHECK_MKSTEMPS
++ AC_CHECK_MKSTEMP
++ AC_CHECK_MKDTEMP
++-AC_CHECK_FUNCS(strtoll socket seteuid setegid strfmon stpcpy gettimeofday)
+++AC_CHECK_FUNCS(strtoll socket seteuid setegid strfmon stpcpy gettimeofday tcgetattr tcsetattr)
++ 
++ AH_BOTTOM([
++ /* provide a definition for a 32 bit entity, usable as a typedef, possibly
++--- kde.orig/kdecore/kpty.cpp	2005-05-23 14:16:21.000000000 +0200
+++++ kde.patched/kdecore/kpty.cpp	2005-08-27 15:15:37.000000000 +0200
++@@ -95,24 +95,24 @@
++ # endif
++ #endif
++ 
++-#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || defined (__bsdi__) || defined(__APPLE__)
+++#if defined(HAVE_TCGETATTR)
+++# define _tcgetattr(fd, ttmode) tcgetattr(fd, ttmode)
+++#elif defined(TIOCGETA)
++ # define _tcgetattr(fd, ttmode) ioctl(fd, TIOCGETA, (char *)ttmode)
+++#elif defined(TCGETS)
+++# define _tcgetattr(fd, ttmode) ioctl(fd, TCGETS, (char *)ttmode)
++ #else
++-# if defined(_HPUX_SOURCE) || defined(__Lynx__)
++-#  define _tcgetattr(fd, ttmode) tcgetattr(fd, ttmode)
++-# else
++-#  define _tcgetattr(fd, ttmode) ioctl(fd, TCGETS, (char *)ttmode)
++-# endif
+++# error
++ #endif
++ 
++-#if defined (__FreeBSD__) || defined (__NetBSD__) || defined (__OpenBSD__) || defined (__bsdi__) || defined(__APPLE__)
+++#if defined(HAVE_TCSETATTR) && defined(TCSANOW)
+++# define _tcsetattr(fd, ttmode) tcsetattr(fd, TCSANOW, ttmode)
+++#elif defined(TIOCSETA)
++ # define _tcsetattr(fd, ttmode) ioctl(fd, TIOCSETA, (char *)ttmode)
+++#elif defined(TCSETS)
+++# define _tcsetattr(fd, ttmode) ioctl(fd, TCSETS, (char *)ttmode)
++ #else
++-# ifdef _HPUX_SOURCE
++-#  define _tcsetattr(fd, ttmode) tcsetattr(fd, TCSANOW, ttmode)
++-# else
++-#  define _tcsetattr(fd, ttmode) ioctl(fd, TCSETS, (char *)ttmode)
++-# endif
+++# error
++ #endif
++ 
++ #if defined (_HPUX_SOURCE)
++--- kde.orig/kinit/kinit.cpp	2005-07-20 11:19:21.000000000 +0200
+++++ kde.patched/kinit/kinit.cpp	2005-08-27 15:15:37.000000000 +0200
++@@ -59,7 +59,7 @@
++ #include <kapplication.h>
++ #include <klocale.h>
++ 
++-#ifdef Q_OS_LINUX
+++#ifdef HAVE_SYS_PRCTL_H
++ #include <sys/prctl.h>
++ #ifndef PR_SET_NAME
++ #define PR_SET_NAME 15
++@@ -524,7 +524,7 @@
++        d.argv[argc] = 0;
++ 
++        /** Give the process a new name **/
++-#ifdef Q_OS_LINUX
+++#ifdef HAVE_SYS_PRCTL_H
++        /* set the process name, so that killall works like intended */
++        r = prctl(PR_SET_NAME, (unsigned long) name.data(), 0, 0, 0);
++        if ( r == 0 )
++--- kde.orig/kio/kio/global.cpp	2005-07-20 11:19:22.000000000 +0200
+++++ kde.patched/kio/kio/global.cpp	2005-08-27 19:34:15.000000000 +0200
++@@ -1291,7 +1291,7 @@
++  *
++  ***************************************************************/
++ 
++-#ifndef HAVE_GETMNTINFO
+++#if !defined(HAVE_GETMNTINFO) || !defined(MNT_NOWAIT)
++ 
++ #ifdef _PATH_MOUNTED
++ // On some Linux, MNTTAB points to /etc/fstab !
++@@ -1419,7 +1419,7 @@
++ 
++     //kdDebug(7007) << "findDeviceMountPoint realname=" << realname << endl;
++ 
++-#ifdef HAVE_GETMNTINFO
+++#if defined(HAVE_GETMNTINFO) && defined(MNT_NOWAIT)
++ 
++     struct statfs *mounted;
++ 
++@@ -1685,7 +1685,7 @@
++      * How kinky can you get with a filesystem?
++      */
++ 
++-#ifdef HAVE_GETMNTINFO
+++#if defined(HAVE_GETMNTINFO) && defined(MNT_NOWAIT)
++ 
++     struct statfs *mounted;
++     char    realpath_buffer[MAXPATHLEN];
++--- kde.orig/configure	2005-08-27 23:06:38.000000000 +0200
+++++ kde.patched/configure	2005-08-27 23:09:08.000000000 +0200
++@@ -26064,7 +25899,8 @@
++ 
++ 
++ 
++-for ac_header in sys/param.h sys/mman.h sys/time.h sysent.h strings.h sys/stat.h sys/select.h paths.h malloc.h limits.h sys/soundcard.h dlfcn.h termios.h
+++
+++for ac_header in sys/param.h sys/mman.h sys/time.h sysent.h strings.h sys/stat.h sys/select.h paths.h malloc.h limits.h sys/soundcard.h dlfcn.h termios.h sys/prctl.h
++ do
++ as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
++ if eval "test \"\${$as_ac_Header+set}\" = set"; then
++@@ -38862,7 +38578,9 @@
++ 
++ 
++ 
++-for ac_func in strtoll socket seteuid setegid strfmon stpcpy gettimeofday
+++
+++
+++for ac_func in strtoll socket seteuid setegid strfmon stpcpy gettimeofday tcgetattr tcsetattr
++ do
++ as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
++ echo "$as_me:$LINENO: checking for $ac_func" >&5
++--- kde.orig/config.h.in	2005-07-20 23:16:31.000000000 +0200
+++++ kde.patched/config.h.in	2005-08-27 23:29:48.000000000 +0200
++@@ -540,6 +540,9 @@
++ /* Define to 1 if you have the <sys/param.h> header file. */
++ #undef HAVE_SYS_PARAM_H
++ 
+++/* Define to 1 if you have the <sys/prctl.h> header file. */
+++#undef HAVE_SYS_PRCTL_H
+++
++ /* Define to 1 if you have the <sys/select.h> header file. */
++ #undef HAVE_SYS_SELECT_H
++ 
++@@ -564,6 +567,12 @@
++ /* Define if sys/stat.h declares S_ISSOCK. */
++ #undef HAVE_S_ISSOCK
++ 
+++/* Define to 1 if you have the `tcgetattr' function. */
+++#undef HAVE_TCGETATTR
+++
+++/* Define to 1 if you have the `tcsetattr' function. */
+++#undef HAVE_TCSETATTR
+++
++ /* Define to 1 if you have the <termios.h> header file. */
++ #undef HAVE_TERMIOS_H
++ 
