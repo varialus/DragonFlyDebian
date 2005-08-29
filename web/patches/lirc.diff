@@ -1,0 +1,189 @@
+Author: aurel32
+Status: ugly, we need to wait for the new dpkg to make it cleaner.
+
+diff -u lirc-0.7.1pre2/debian/control lirc-0.7.1pre2/debian/control
+--- lirc-0.7.1pre2/debian/control
++++ lirc-0.7.1pre2/debian/control
+@@ -2,7 +2,7 @@
+ Section: utils
+ Priority: extra
+ Maintainer: Amaya Rodrigo Sastre <amaya@debian.org>
+-Build-Depends: debhelper (>= 4.2.20), libusb-dev, libasound2-dev, libice-dev, libsm-dev, libx11-dev, svgalibg1-dev [i386], libirman-dev, autotools-dev, devscripts, dpatch
++Build-Depends: debhelper (>= 4.2.20), libusb-dev, libasound2-dev [!kfreebsd-i386], libice-dev, libsm-dev, libx11-dev, svgalibg1-dev [i386], libirman-dev, autotools-dev, devscripts, dpatch
+ Standards-Version: 3.6.1.0
+ Uploaders: Manuel Estrada Sainz <ranty@debian.org>, Pierre Machard <pmachard@debian.org>, Riku Voipio <riku.voipio@iki.fi>
+ 
+@@ -49,7 +49,7 @@
+  oscilloscope (through svgalib). This is not needed for TV cards or the Irman.
+ 
+ Package: lirc-modules-source
+-Architecture: any
++Architecture: i386 ia64 alpha amd64 arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc
+ Depends: ${misc:Depends}, debianutils (>= 1.7), debhelper (>= 4)
+ Recommends: make, dpkg-dev, gcc | c-compiler, kernel-package
+ Suggests: kernel-source 
+diff -u lirc-0.7.1pre2/debian/rules lirc-0.7.1pre2/debian/rules
+--- lirc-0.7.1pre2/debian/rules
++++ lirc-0.7.1pre2/debian/rules
+@@ -24,6 +24,7 @@
+ #major=`ls src/.libs/lib*.so.* | \
+ # awk '{if (match($$0,/\.so\.[0-9]+$$/)) print substr($$0,RSTART+4)}'`
+ 
++export DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+ export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+ 
+@@ -94,7 +95,7 @@
+ 
+ debian/lirc.config: debian/lirc.config.in configure.in setup.sh \
+ 			debian/lirc.config.md5sum
+-	@if ! md5sum -v -c debian/lirc.config.md5sum; then \
++	@if ! md5sum -c debian/lirc.config.md5sum; then \
+ 		echo "#####################################################"; \
+ 		echo "# The files above have changed:                     #"; \
+ 		echo "# Please check that the extraction will be correct  #"; \
+@@ -209,13 +210,15 @@
+ 	cp -dpR remotes  debian/lirc/usr/share/lirc/remotes
+ 	dh_installexamples -s
+ 	dh_install -s --sourcedir=debian/tmp --list-missing
++ifeq (linux,$(DEB_HOST_ARCH_OS))
+ 	cd debian/lirc-modules-source/usr/src/ && \
+ 		tar czf lirc-modules.tar.gz modules && \
+ 		rm -rf modules
++	dh_installdebconf -plirc-modules-source
++endif
+ 	dh_installmenu -s
+ #	dh_installdebconf	
+ 	dh_installdebconf -plirc
+-	dh_installdebconf -plirc-modules-source
+ #	dh_installlogrotate
+ #	dh_installemacsen
+ #	dh_installpam
+diff -u lirc-0.7.1pre2/debian/patches/00list lirc-0.7.1pre2/debian/patches/00list
+--- lirc-0.7.1pre2/debian/patches/00list
++++ lirc-0.7.1pre2/debian/patches/00list
+@@ -2,0 +3 @@
++05_kfreebsd
+--- lirc-0.7.1pre2/patch-stamp
++++ lirc-0.7.1pre2.orig/patch-stamp
+@@ -1,8 +0,0 @@
+-Patches applied in the Debian version of :
+-
+-debian/patches/03_configure-duplicates.dpatch (Manuel Estrada Sainz <ranty@debian.org>):
+-  Don't use sed to remove duplicates in configure, it segfaults.
+-
+-debian/patches/04_forgotten-files.dpatch (Manuel Estrada Sainz <ranty@debian.org>):
+-  Some files where left out from the upstream tarball.
+-
+--- lirc-0.7.1pre2.orig/debian/patches/05_kfreebsd.dpatch
++++ lirc-0.7.1pre2/debian/patches/05_kfreebsd.dpatch
+@@ -0,0 +1,109 @@
++#! /bin/sh -e
++## 05_kfreebsd.dpatch by Aurelien Jarno <aurel32@debian.org>
++##
++## All lines beginning with `## DP:' are a description of the patch.
++## DP: Some files where left out from the upstream tarball.
++
++if [ $# -ne 1 ]; then
++    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
++    exit 1
++fi
++case "$1" in
++       -patch) patch -f --no-backup-if-mismatch -p1 < $0;;
++       -unpatch) patch -f --no-backup-if-mismatch -R -p1 < $0;;
++	*)
++		echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
++		exit 1;;
++esac
++
++exit 0
++	
++--- lirc-0.7.1pre2.orig/aclocal.m4
+++++ lirc-0.7.1pre2/aclocal.m4
++@@ -2212,7 +2212,7 @@
++     ;;
++ 
++   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
++-  freebsd*)
+++  freebsd* | kfreebsd*-gnu)
++     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
++     hardcode_libdir_flag_spec='-R$libdir'
++     hardcode_direct=yes
++@@ -2667,7 +2667,7 @@
++   dynamic_linker=no
++   ;;
++ 
++-freebsd*-gnu*)
+++kfreebsd*-gnu*)
++   version_type=linux
++   need_lib_prefix=no
++   need_version=no
++@@ -2676,7 +2676,7 @@
++   shlibpath_var=LD_LIBRARY_PATH
++   shlibpath_overrides_runpath=no
++   hardcode_into_libs=yes
++-  dynamic_linker='GNU/FreeBSD ld.so'
+++  dynamic_linker='GNU/kFreeBSD ld.so'
++   ;;
++ 
++ freebsd*)
++@@ -3929,7 +3929,7 @@
++   esac
++   ;;
++ 
++-freebsd*)
+++freebsd* | kfreebsd*-gnu*)
++   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
++     case $host_cpu in
++     i*86 )
++--- lirc-0.7.1pre2.orig/configure
+++++ lirc-0.7.1pre2/configure
++@@ -2210,7 +2210,7 @@
++   esac
++   ;;
++ 
++-freebsd*)
+++freebsd* | kfreebsd*-gnu)
++   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
++     case $host_cpu in
++     i*86 )
++@@ -3957,7 +3957,7 @@
++     ;;
++ 
++   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
++-  freebsd*)
+++  freebsd* | kfreebsd*-gnu)
++     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
++     hardcode_libdir_flag_spec='-R$libdir'
++     hardcode_direct=yes
++@@ -4415,7 +4415,7 @@
++   dynamic_linker=no
++   ;;
++ 
++-freebsd*-gnu*)
+++kfreebsd*-gnu*)
++   version_type=linux
++   need_lib_prefix=no
++   need_version=no
++@@ -4424,7 +4424,7 @@
++   shlibpath_var=LD_LIBRARY_PATH
++   shlibpath_overrides_runpath=no
++   hardcode_into_libs=yes
++-  dynamic_linker='GNU/FreeBSD ld.so'
+++  dynamic_linker='GNU/kFreeBSD ld.so'
++   ;;
++ 
++ freebsd*)
++--- lirc-0.7.1pre2.orig/tools/irpty.c
+++++ lirc-0.7.1pre2/tools/irpty.c
++@@ -142,6 +142,10 @@
++ 	return;
++ }
++ 
+++#undef RESET
+++#undef RAW
+++#undef CBREAK
+++
++ static struct termios save_termios;
++ static int ttysavefd = -1;
++ static enum {

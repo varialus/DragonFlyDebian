@@ -1,0 +1,97 @@
+Author: aurel32
+Status: in BTS
+
+--- xine-lib-1.0.1.orig/src/input/input_vcd.c
++++ xine-lib-1.0.1/src/input/input_vcd.c
+@@ -39,7 +39,7 @@
+ #ifdef HAVE_SYS_CDIO_H
+ # include <sys/cdio.h>
+ /* TODO: not clean yet */
+-# if defined (__FreeBSD__)
++# if defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
+ #  include <sys/cdrio.h>
+ # endif
+ #endif
+@@ -94,7 +94,7 @@
+ #if defined (__linux__) || defined(__sun)
+   struct cdrom_tochdr    tochdr;
+   struct cdrom_tocentry  tocent[100];
+-#elif defined (__FreeBSD__)
++#elif defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
+   struct ioc_toc_header  tochdr;
+   struct cd_toc_entry    *tocent;
+   off_t                  cur_sec;
+@@ -119,7 +119,7 @@
+ 
+   int                    cur_track;
+ 
+-#if defined (__linux__) || defined(__sun) || defined(__FreeBSD__)
++#if defined (__linux__) || defined(__sun) || defined(__FreeBSD__) || defined (__FreeBSD_kernel__)
+   uint8_t                cur_min, cur_sec, cur_frame;
+ #endif
+ 
+@@ -179,7 +179,7 @@
+ 
+   return 0;
+ }
+-#elif defined (__FreeBSD__)
++#elif defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
+ static int input_vcd_read_toc (vcd_input_class_t *this, int fd) {
+ 
+   struct ioc_read_toc_entry te;
+@@ -395,7 +395,7 @@
+   memcpy (buf, data.data, VCDSECTORSIZE); /* FIXME */
+   return VCDSECTORSIZE;
+ }
+-#elif defined (__FreeBSD__)
++#elif defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
+ static off_t vcd_plugin_read (input_plugin_t *this_gen, 
+ 				char *buf, off_t nlen) {
+   vcd_input_plugin_t *this = (vcd_input_plugin_t *) this_gen;
+@@ -533,7 +533,7 @@
+   memcpy (buf->mem, data.data, VCDSECTORSIZE); /* FIXME */
+   return buf;
+ }
+-#elif defined (__FreeBSD__)
++#elif defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
+ static buf_element_t *vcd_plugin_read_block (input_plugin_t *this_gen, 
+ 					     fifo_buffer_t *fifo, off_t nlen) {
+   
+@@ -692,7 +692,7 @@
+ 
+   return offset ; /* FIXME */
+ }
+-#elif defined (__FreeBSD__)
++#elif defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
+ static off_t vcd_plugin_seek (input_plugin_t *this_gen, 
+ 				off_t offset, int origin) {
+ 
+@@ -766,7 +766,7 @@
+ 
+   return (off_t) 0;
+ }
+-#elif defined (__FreeBSD__)
++#elif defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
+ static off_t vcd_plugin_get_length (input_plugin_t *this_gen) {
+   vcd_input_plugin_t *this = (vcd_input_plugin_t *) this_gen;
+   off_t len ;
+@@ -861,7 +861,7 @@
+   this->cur_min   = this->cls->tocent[this->cur_track].cdte_addr.msf.minute;
+   this->cur_sec   = this->cls->tocent[this->cur_track].cdte_addr.msf.second;
+   this->cur_frame = this->cls->tocent[this->cur_track].cdte_addr.msf.frame;
+-#elif defined (__FreeBSD__)
++#elif defined (__FreeBSD__) || defined (__FreeBSD_kernel__)
+   {
+     int bsize = 2352;
+     if (ioctl (this->fd, CDRIOCSETBLOCKSIZE, &bsize) == -1) {
+--- xine-lib-1.0.1.orig/src/input/libdvdnav/bswap.h
++++ xine-lib-1.0.1/src/input/libdvdnav/bswap.h
+@@ -35,7 +35,7 @@
+ #include <sys/param.h>
+ #endif
+ 
+-#if defined(__linux__)
++#if defined(__linux__) || defined(__GLIBC__)
+ #include <byteswap.h>
+ #define B2N_16(x) x = bswap_16(x)
+ #define B2N_32(x) x = bswap_32(x)
