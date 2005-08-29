@@ -1,0 +1,84 @@
+diff -u kdeutils-3.4.2/debian/control kdeutils-3.4.2/debian/control
+--- kdeutils-3.4.2/debian/control
++++ kdeutils-3.4.2/debian/control
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Debian Qt/KDE Maintainers <debian-qt-kde@lists.debian.org>
+ Uploaders: Isaac Clerencia <isaac@debian.org>, Pierre Habouzit <madcoder@debian.org>, Christopher Martin <chrsmrtn@freeshell.org>, Adeodato Simó <asp16@alu.ua.es>, Riku Voipio <riku.voipio@iki.fi>, Luk Claes <luk@debian.org>
+-Build-Depends: cdbs (>= 0.4.27), debhelper (>= 4.2.30), autotools-dev, gawk, gettext, kdelibs4-dev (>= 4:3.4.2), libkonq4-dev (>= 4:3.4.2), libsnmp5-dev, libxtst-dev, pbbuttonsd-dev [powerpc], sharutils, tpctl [i386]
++Build-Depends: cdbs (>= 0.4.27), debhelper (>= 4.2.30), autotools-dev, gawk, gettext, kdelibs4-dev (>= 4:3.4.2), libkonq4-dev (>= 4:3.4.2), libsnmp5-dev [!kfreebsd-i386], libxtst-dev, pbbuttonsd-dev [powerpc], sharutils, tpctl [i386]
+ Standards-Version: 3.6.2
+ 
+ Package: kdeutils
+diff -u kdeutils-3.4.2/debian/ksim.install kdeutils-3.4.2/debian/ksim.install
+--- kdeutils-3.4.2/debian/ksim.install
++++ kdeutils-3.4.2/debian/ksim.install
+@@ -5,12 +5,7 @@
+ debian/tmp/usr/lib/libksimcore.so.1.0.0
+ debian/tmp/usr/share/applications/kde/ksim.desktop
+ debian/tmp/usr/share/apps/kicker/extensions/ksim.desktop
+-debian/tmp/usr/share/apps/ksim/monitors/DFree.desktop
+-debian/tmp/usr/share/apps/ksim/monitors/Lm_sensors.desktop
+-debian/tmp/usr/share/apps/ksim/monitors/Net.desktop
+-debian/tmp/usr/share/apps/ksim/monitors/Snmp.desktop
+-debian/tmp/usr/share/apps/ksim/monitors/cpu.desktop
+-debian/tmp/usr/share/apps/ksim/monitors/disk.desktop
++debian/tmp/usr/share/apps/ksim/monitors/*.desktop
+ debian/tmp/usr/share/apps/ksim/pics/clock.png
+ debian/tmp/usr/share/apps/ksim/pics/uptime.png
+ debian/tmp/usr/share/apps/ksim/themes/ksim/bg_chart.png
+--- kdeutils-3.4.2.orig/debian/patches/11_kfreebsd.diff
++++ kdeutils-3.4.2/debian/patches/11_kfreebsd.diff
+@@ -0,0 +1,31 @@
++--- kde.orig/ksim/monitors/cpu/ksimcpu.h	2005-08-29 16:36:23.000000000 +0200
+++++ kde.patched/ksim/monitors/cpu/ksimcpu.h	2005-05-23 14:09:16.000000000 +0200
++@@ -191,7 +191,7 @@
++     bool m_firstTime;
++     CpuList m_cpus;
++ 
++-#ifdef __linux__
+++#ifdef Q_OS_LINUX
++     FILE *m_procFile;
++     QTextStream *m_procStream;
++ #endif
++--- kde.orig/ksim/monitors/disk/ksimdisk.cpp	2005-08-29 16:41:47.000000000 +0200
+++++ kde.patched/ksim/monitors/disk/ksimdisk.cpp	2005-05-23 14:09:16.000000000 +0200
++@@ -52,7 +52,7 @@
++ #include <stdlib.h>
++ #endif
++ 
++-#ifdef Q_OS_LINUX
+++#if __linux__
++ #include <linux/major.h>
++ #endif
++ 
++@@ -403,7 +403,7 @@
++ 
++ QString DiskView::diskName( int major, int minor ) const
++ {
++-#ifdef Q_OS_LINUX
+++#ifdef __linux__
++   QString returnValue;
++   switch ( major )
++   {
+--- kdeutils-3.4.2.orig/debian/kmilo.install.kfreebsd-i386
++++ kdeutils-3.4.2/debian/kmilo.install.kfreebsd-i386
+@@ -0,0 +1,18 @@
++debian/tmp/usr/lib/kde3/kcm_thinkpad.la
++debian/tmp/usr/lib/kde3/kcm_thinkpad.so
++debian/tmp/usr/lib/kde3/kded_kmilod.la
++debian/tmp/usr/lib/kde3/kded_kmilod.so
++debian/tmp/usr/lib/kde3/kmilo_asus.la
++debian/tmp/usr/lib/kde3/kmilo_asus.so
++debian/tmp/usr/lib/kde3/kmilo_generic.la
++debian/tmp/usr/lib/kde3/kmilo_generic.so
++debian/tmp/usr/lib/kde3/kmilo_thinkpad.la
++debian/tmp/usr/lib/kde3/kmilo_thinkpad.so
++debian/tmp/usr/lib/libkmilo.so.1
++debian/tmp/usr/lib/libkmilo.so.1.0.0
++debian/tmp/usr/share/applications/kde/thinkpad.desktop
++debian/tmp/usr/share/services/kded/kmilod.desktop
++debian/tmp/usr/share/services/kmilo/kmilo_asus.desktop
++debian/tmp/usr/share/services/kmilo/kmilo_generic.desktop
++debian/tmp/usr/share/services/kmilo/kmilo_thinkpad.desktop
++debian/tmp/usr/share/servicetypes/kmilo/kmilopluginsvc.desktop
