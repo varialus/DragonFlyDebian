@@ -8,7 +8,8 @@
 set -ex
 
 version=unreleased
-cdname=debian-${version}-kfreebsd-i386-netinst.iso
+cpu=i386
+cdname=debian-${version}-kfreebsd-${cpu}-netinst.iso
 
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
@@ -52,7 +53,7 @@ done ; done
 #                    ignition!
 #################################
 (cd ${tmp} && mkisofs -b boot/cdboot -no-emul-boot \
-  -r -J -V mylabel -publisher mypublisher \
+  -r -J -V "Debian $version $cpu Bin-1" \
   -o ${pwd}/${cdname} .)
 
 rm -rf ${tmp} &
