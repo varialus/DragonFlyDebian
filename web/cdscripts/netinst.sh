@@ -48,6 +48,15 @@ cp base.tgz ${tmp}/base/
 # hack for being a FreeBSD compliant [tm] cdrom
 ln -sf . ${tmp}/${freebsd}-RELEASE
 
+# "persuade" sysinstall to tell the user to switch to ttyv2
+tmp1=`mktemp`
+gunzip -c ${tmp}/boot/mfsroot.gz > ${tmp1}
+# this is very tricky.  we're editing an ELF file inside an UFS image.  just
+# make sure both strings have exactly the same size, and everything will work
+sed -e "s,Attempting to install all selected distributions\.\.,Press ALT-F3 to proceed with GNU/kFreeBSD setup...,g" \
+< ${tmp1} | gzip -c > ${tmp}/boot/mfsroot.gz
+rm -f ${tmp1}
+
 #########################
 #                    ignition!
 #################################
