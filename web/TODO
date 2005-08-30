@@ -81,6 +81,41 @@ if all tasks were fixed. We goalt neither of these though :P
  - lipthread2 is still used by a few packages. They should be rebuilt on a system
    without libpthread2.
 
+Social work (dealing with maintainers)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There's a lot of effort in this port that requires social work rather than
+hacking skills, in the area of dealing with maintainers.
+
+ - e2fsprogs transition.  e2fsprogs contains utilities for ext2fs handling
+   which we don't normaly use (in fact, the kernel doesn't support using ext2fs
+   as /).  However, this package is Essential: yes because it is needed for the
+   generic parts like fsck frontend and badblocks checking utility.
+
+   It should be split in two parts.  The transition is not trivial but there is
+   already a patch and proposed course of action.  See bug #111651.
+
+ - List of conflictive bugs, requiring someone with social skills to help:
+
+   procps: #290719, #291458
+   netbase: #256919
+
+ - Another task you could do to help is reviewing patches from our subversion
+   repository (see http://glibc-bsd.alioth.debian.org/patches/).
+
+   Note that patches in upstream-only/ and debian-only/ directories contain
+   patches that are only applicable to upstream and debian, respectively.
+
+   Each patch should have a note in its header describing (at least) its
+   current status.  If there isn't, someone should find out what it is (check
+   the BTS, read changelogs, verify if it is merged, etc) and either add it,
+   move the patch to one of the *-only directories (if partialy merged), or
+   remove it (if totaly merged).
+
+   The status for most patches is "in BTS".  For each of these, you can help us
+   by looking at the bug log and see what is left to be done.  If the
+   maintainer has been unresponsive for some time after we sent the patch (e.g.
+   a few months), it might help to send a friendly reminder.
 
 Big beasts
 ~~~~~~~~~~
