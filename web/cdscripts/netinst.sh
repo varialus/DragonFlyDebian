@@ -8,6 +8,7 @@
 set -ex
 
 version=unreleased
+freebsd=5.4
 cpu=i386
 cdname=debian-${version}-kfreebsd-${cpu}-netinst.iso
 
@@ -27,10 +28,10 @@ done
 pwd=`pwd`
 tmp=`mktemp -d`
 
-installer="5.4-RELEASE-i386-bootonly.iso"
+installer="${freebsd}-RELEASE-${cpu}-bootonly.iso"
 
 if ! test -e ${installer} ; then
-  wget -c ftp://ftp.freebsd.org/pub/FreeBSD/ISO-IMAGES-i386/5.4/${installer}
+  wget -c ftp://ftp.freebsd.org/pub/FreeBSD/ISO-IMAGES-${cpu}/${freebsd}/${installer}
 fi
 
 if ! test -e base.tgz ; then ./tarball.sh ; fi
@@ -44,10 +45,8 @@ umount /mnt
 mkdir ${tmp}/base/
 cp base.tgz ${tmp}/base/
 
-# hacks for being a FreeBSD compliant [tm] cdrom
-for i in 5 6 ; do for j in 0 1 2 3 4 5 6 7 8 9 ; do
-  ln -sf . ${tmp}/$i.$j-RELEASE
-done ; done
+# hack for being a FreeBSD compliant [tm] cdrom
+ln -sf . ${tmp}/${freebsd}-RELEASE
 
 #########################
 #                    ignition!
