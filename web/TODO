@@ -10,8 +10,8 @@ I'd be nice if tasks and subtasks were sorted by priority. It'd be also nice
 if all tasks were fixed. We goalt neither of these though :P
 
  - ifupdown when used with static IPs does not handle the gateway entry
-   correctly, so do not add it in your interfaces file, just add an up hook,
-   that will do as a gatewa y entry:
+   correctly, so do not add it in your interfaces file.  As a workaround, just
+   add an up hook, that will do as a gateway entry:
 
    [-- /etc/network/interfaces --]
    auto rl0
@@ -19,7 +19,8 @@ if all tasks were fixed. We goalt neither of these though :P
 	address 192.168.1.100
 	netmask 255.255.255.0
 	broadcast 192.168.1.255
-	up route add -net 0.0.0.0 192.168.1.1
+	up route add -net 0.0.0.0 192.168.1.1 > /dev/null
+	down route -q flush > /dev/null
    [-- /etc/network/interfaces --]
 
  - Glibc
@@ -41,9 +42,7 @@ if all tasks were fixed. We goalt neither of these though :P
 
 	- freebsd-utils. This is a hacked package built from staticaly-linked
 	  binaries. It'll eventualy be rewriten semi-portably and replaced
-	  (mount, ifconfig, etc). This is a long-term transition. For now,
-	  I'm preparing a proper package with the same tools ported to Glibc
-	  and built from source on gnu environment.
+	  (mount, ifconfig, etc). This is a long-term transition.
 
  - libkvm is ported badly.  It still has some dummy stubs that need replacing
    with decent code.
@@ -59,8 +58,8 @@ if all tasks were fixed. We goalt neither of these though :P
    but the patch still hasn't been merged.
 
  - GRUB
-	- Fix userspace emulator to work on kFreeBSD-based systems.  This
-	  is supposedly fixed but I haven't tested it yet (rmh).
+	- Fix userspace emulator to work on kFreeBSD-based systems (currently
+	fails when attempting to write into the device)
 	- Fix kfreebsd loader so we can boot directly the kernel and not need
 	  the FreeBSD loader.  (The debian package has a patch by Guillem
 	  which does this, but doesn't work reliably enough to merge it yet).
@@ -71,7 +70,7 @@ if all tasks were fixed. We goalt neither of these though :P
 
    Colin Watson has also been working on de-Linuxificating d-i (for the Hurd).
 
- - xterm is horribly fucked (I use rxvt instead).
+ - xterm fails to run because it's using unsupported ioctls.
 
  - Package Glibc for the FreeBSD ports collection.
 
@@ -83,11 +82,10 @@ if all tasks were fixed. We goalt neither of these though :P
    without libpthread2.
 
 
-     Big beasts
-     ~~~~~~~~~~
+Big beasts
+~~~~~~~~~~
 
 These are presumably somewhere in the libc implementation and are the most
 hard to debug from this list.
 
 Look at the bugs/ directory for test cases.  Good luck!
-
