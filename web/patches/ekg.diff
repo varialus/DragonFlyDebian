@@ -1,0 +1,43 @@
+Author: aurel32
+Status: in BTS
+
+--- ekg-1.5+20050808+1.6rc3.orig/src/ioctld.c
++++ ekg-1.5+20050808+1.6rc3/src/ioctld.c
+@@ -26,7 +26,7 @@
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+ #include <sys/socket.h>
+-#ifdef __FreeBSD__
++#if defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #  include <sys/kbio.h>
+ #endif
+ #ifdef sun /* Solaris */
+@@ -124,7 +124,7 @@
+ 		
+ 	for (s = 0; tone[s] >= 0 && s < IOCTLD_MAX_ITEMS; s++) {
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 		ioctl(fd, KIOCSOUND, 0);
+ #endif
+ 
+--- ekg-1.5+20050808+1.6rc3.orig/aclocal.m4
++++ ekg-1.5+20050808+1.6rc3/aclocal.m4
+@@ -238,6 +238,7 @@
+         AC_MSG_CHECKING([if more special flags are required for pthreads])
+         flag=no
+ 	case "$UNAME_SYSTEM" in 
++		*GNU/kFreeBSD*) flag=no;;
+                 *AIX* | *FreeBSD*)     flag="-D_THREAD_SAFE";;
+                 *SunOS* | *OSF* | *HP-UX*) flag="-D_REENTRANT";;
+         esac
+--- ekg-1.5+20050808+1.6rc3.orig/configure
++++ ekg-1.5+20050808+1.6rc3/configure
+@@ -4227,6 +4227,7 @@
+ echo $ECHO_N "checking if more special flags are required for pthreads... $ECHO_C" >&6
+         flag=no
+ 	case "$UNAME_SYSTEM" in
++		*GNU/kFreeBSD*) flag=no;;
+                 *AIX* | *FreeBSD*)     flag="-D_THREAD_SAFE";;
+                 *SunOS* | *OSF* | *HP-UX*) flag="-D_REENTRANT";;
+         esac

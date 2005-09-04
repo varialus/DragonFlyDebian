@@ -1,5 +1,5 @@
 Author: aurel32
-Status: ugly, we need to wait for the new dpkg to make it cleaner.
+Status: ugly, we need the new dpkg to make a cleaner patch
 
 diff -u lirc-0.7.1pre2/debian/control lirc-0.7.1pre2/debian/control
 --- lirc-0.7.1pre2/debian/control
@@ -8,9 +8,9 @@ diff -u lirc-0.7.1pre2/debian/control lirc-0.7.1pre2/debian/control
  Section: utils
  Priority: extra
  Maintainer: Amaya Rodrigo Sastre <amaya@debian.org>
--Build-Depends: debhelper (>= 4.2.20), libusb-dev, libasound2-dev, libice-dev, libsm-dev, libx11-dev, svgalibg1-dev [i386], libirman-dev, autotools-dev, devscripts, dpatch
-+Build-Depends: debhelper (>= 4.2.20), libusb-dev, libasound2-dev [!kfreebsd-i386], libice-dev, libsm-dev, libx11-dev, svgalibg1-dev [i386], libirman-dev, autotools-dev, devscripts, dpatch
- Standards-Version: 3.6.1.0
+-Build-Depends: debhelper (>= 4.2.20), libusb-dev, libasound2-dev, libice-dev, libsm-dev, libx11-dev, svgalibg1-dev [i386], libirman-dev, autotools-dev, devscripts, dpatch, libxt-dev
++Build-Depends: debhelper (>= 4.2.20), libusb-dev, libasound2-dev [!kfreebsd-i386], libice-dev, libsm-dev, libx11-dev, svgalibg1-dev [i386], libirman-dev, autotools-dev, devscripts, dpatch, libxt-dev
+ Standards-Version: 3.6.2
  Uploaders: Manuel Estrada Sainz <ranty@debian.org>, Pierre Machard <pmachard@debian.org>, Riku Voipio <riku.voipio@iki.fi>
  
 @@ -49,7 +49,7 @@
@@ -20,7 +20,7 @@ diff -u lirc-0.7.1pre2/debian/control lirc-0.7.1pre2/debian/control
 -Architecture: any
 +Architecture: i386 ia64 alpha amd64 arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc
  Depends: ${misc:Depends}, debianutils (>= 1.7), debhelper (>= 4)
- Recommends: make, dpkg-dev, gcc | c-compiler, kernel-package
+ Recommends: make, dpkg-dev, gcc | c-compiler, kernel-package, dpkg (>= 1.13)
  Suggests: kernel-source 
 diff -u lirc-0.7.1pre2/debian/rules lirc-0.7.1pre2/debian/rules
 --- lirc-0.7.1pre2/debian/rules
@@ -33,15 +33,6 @@ diff -u lirc-0.7.1pre2/debian/rules lirc-0.7.1pre2/debian/rules
  export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
  export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
  
-@@ -94,7 +95,7 @@
- 
- debian/lirc.config: debian/lirc.config.in configure.in setup.sh \
- 			debian/lirc.config.md5sum
--	@if ! md5sum -v -c debian/lirc.config.md5sum; then \
-+	@if ! md5sum -c debian/lirc.config.md5sum; then \
- 		echo "#####################################################"; \
- 		echo "# The files above have changed:                     #"; \
- 		echo "# Please check that the extraction will be correct  #"; \
 @@ -209,13 +210,15 @@
  	cp -dpR remotes  debian/lirc/usr/share/lirc/remotes
  	dh_installexamples -s
@@ -64,6 +55,7 @@ diff -u lirc-0.7.1pre2/debian/patches/00list lirc-0.7.1pre2/debian/patches/00lis
 +++ lirc-0.7.1pre2/debian/patches/00list
 @@ -2,0 +3 @@
 +05_kfreebsd
+reverted:
 --- lirc-0.7.1pre2/patch-stamp
 +++ lirc-0.7.1pre2.orig/patch-stamp
 @@ -1,8 +0,0 @@
@@ -75,6 +67,23 @@ diff -u lirc-0.7.1pre2/debian/patches/00list lirc-0.7.1pre2/debian/patches/00lis
 -debian/patches/04_forgotten-files.dpatch (Manuel Estrada Sainz <ranty@debian.org>):
 -  Some files where left out from the upstream tarball.
 -
+only in patch2:
+unchanged:
+--- lirc-0.7.1pre2.orig/tools/irpty.c
++++ lirc-0.7.1pre2/tools/irpty.c
+@@ -142,6 +142,10 @@
+ 	return;
+ }
+ 
++#undef RESET
++#undef RAW
++#undef CBREAK
++
+ static struct termios save_termios;
+ static int ttysavefd = -1;
+ static enum {
+only in patch2:
+unchanged:
 --- lirc-0.7.1pre2.orig/debian/patches/05_kfreebsd.dpatch
 +++ lirc-0.7.1pre2/debian/patches/05_kfreebsd.dpatch
 @@ -0,0 +1,109 @@

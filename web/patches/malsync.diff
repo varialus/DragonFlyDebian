@@ -1,0 +1,60 @@
+Author: aurel32
+Status: in BTS
+
+diff -u malsync-2.2.0/debian/patches/00list malsync-2.2.0/debian/patches/00list
+--- malsync-2.2.0/debian/patches/00list
++++ malsync-2.2.0/debian/patches/00list
+@@ -2,0 +3 @@
++30_kfreebsd
+--- malsync-2.2.0.orig/debian/patches/30_kfreebsd.dpatch
++++ malsync-2.2.0/debian/patches/30_kfreebsd.dpatch
+@@ -0,0 +1,49 @@
++#!/bin/sh -e
++## 30_kfreebd.dpatch by Aurelien Jarno <aurel32@debian.org>
++##
++## All lines beginning with `## DP:' are a description of the patch.
++## DP: No description.
++
++if [ $# -ne 1 ]; then
++    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
++    exit 1
++fi
++
++[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
++patch_opts="${patch_opts:--f --no-backup-if-mismatch}"
++
++case "$1" in
++       -patch) patch $patch_opts -p0 < $0;;
++       -unpatch) patch $patch_opts -p0 -R < $0;;
++        *)
++                echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
++                exit 1;;
++esac
++
++exit 0
++
++@DPATCH@
++--- mal/common/AGNet.h	2003-10-29 22:59:06.000000000 +0100
+++++ mal/common/AGNet.h	2005-09-02 23:53:03.000000000 +0200
++@@ -61,7 +61,7 @@
++ #               include <sys/filio.h>
++ #               include <arpa/inet.h>
++ #           else
++-#               if defined(__FreeBSD__) || defined(_HPUX_SOURCE)
+++#               if defined(__FreeBSD__) || defined (__FreeBSD_kernel__) || defined(_HPUX_SOURCE)
++ #                   include <sys/ioctl.h>
++ #                   include <arpa/inet.h>
++ #               else
++--- Makefile	2005-09-02 23:59:43.000000000 +0200
+++++ Makefile	2005-09-03 00:00:03.000000000 +0200
++@@ -10,6 +10,10 @@
++ LINKLIBS = -ldl -lm
++ endif
++ 
+++ifeq ($(PLAT),GNU/kFreeBSD)
+++LINKLIBS = -ldl -lm
+++endif
+++
++ ifeq ($(PLAT),Darwin)
++ LINKLIBS = -lm
++ endif
