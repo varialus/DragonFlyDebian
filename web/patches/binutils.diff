@@ -1,13 +1,12 @@
-diff -u binutils-2.16.1/debian/patches/00list binutils-2.16.1/debian/patches/00list
---- binutils-2.16.1/debian/patches/00list
-+++ binutils-2.16.1/debian/patches/00list
-@@ -9,0 +10,2 @@
-+123_kfreebsd_ld_so_conf.dpatch
-+124_kfreebsd_ld_so_executable_shared.dpatch
-diff -u binutils-2.16.1/debian/rules binutils-2.16.1/debian/rules
---- binutils-2.16.1/debian/rules
-+++ binutils-2.16.1/debian/rules
-@@ -139,7 +139,7 @@
+diff -u binutils-2.16.1cvs20050902/debian/patches/00list binutils-2.16.1cvs20050902/debian/patches/00list
+--- binutils-2.16.1cvs20050902/debian/patches/00list
++++ binutils-2.16.1cvs20050902/debian/patches/00list
+@@ -9,0 +10 @@
++121_kfreebsd_ld_so_executable_shared.dpatch
+diff -u binutils-2.16.1cvs20050902/debian/rules binutils-2.16.1cvs20050902/debian/rules
+--- binutils-2.16.1cvs20050902/debian/rules
++++ binutils-2.16.1cvs20050902/debian/rules
+@@ -134,7 +134,7 @@
  	mkdir builddir-multi
  	cd builddir-multi \
  	    && env CC="$(CC)" ../configure $(CONFARGS) \
@@ -16,85 +15,8 @@ diff -u binutils-2.16.1/debian/rules binutils-2.16.1/debian/rules
  	$(MAKE) -C builddir-multi configure-host
  	touch configure-multi-stamp
  
---- binutils-2.16.1.orig/debian/patches/123_kfreebsd_ld_so_conf.dpatch
-+++ binutils-2.16.1/debian/patches/123_kfreebsd_ld_so_conf.dpatch
-@@ -0,0 +1,72 @@
-+#! /bin/sh -e
-+## 123_kfreebsd_ld_so_conf.dpatch
-+##
-+## DP: Description: Enable ld.so.conf on GNU/k*BSD.
-+## DP: Author: Aurelien Jarno <aurel32@debian.org>
-+## DP: Upstream status: In CVS
-+## DP: Date: 2005-06-20
-+
-+if [ $# -lt 1 ]; then
-+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
-+    exit 1
-+fi
-+
-+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
-+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
-+
-+case "$1" in
-+    -patch) patch -p1 ${patch_opts} < $0;;
-+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
-+    *)
-+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
-+        exit 1;;
-+esac
-+
-+exit 0
-+
-+@DPATCH@
-+diff -Nur binutils-2.16.orig/ld/emultempl/elf32.em binutils-2.16/ld/emultempl/elf32.em
-+--- binutils-2.16.orig/ld/emultempl/elf32.em	2005-04-13 19:59:07.000000000 +0200
-++++ binutils-2.16/ld/emultempl/elf32.em	2005-06-21 09:43:41.000000000 +0200
-+@@ -65,7 +65,7 @@
-+ 
-+ if [ "x${USE_LIBPATH}" = xyes ] ; then
-+   case ${target} in
-+-    *-*-linux-gnu*)
-++    *-*-linux-gnu* | *-*-k*bsd*-gnu)
-+   cat >>e${EMULATION_NAME}.c <<EOF
-+ #ifdef HAVE_GLOB
-+ #include <glob.h>
-+@@ -350,7 +350,7 @@
-+ 
-+ EOF
-+ case ${target} in
-+-  *-*-linux-gnu*)
-++  *-*-linux-gnu* | *-*-k*bsd*-gnu)
-+     cat >>e${EMULATION_NAME}.c <<EOF
-+ 	  {
-+ 	    struct bfd_link_needed_list *l;
-+@@ -522,11 +522,11 @@
-+ 
-+ EOF
-+   case ${target} in
-+-    *-*-linux-gnu*)
-++    *-*-linux-gnu* | *-*-k*bsd*-gnu)
-+       cat >>e${EMULATION_NAME}.c <<EOF
-+ /* For a native linker, check the file /etc/ld.so.conf for directories
-+    in which we may find shared libraries.  /etc/ld.so.conf is really
-+-   only meaningful on Linux.  */
-++   only meaningful on Linux or on k*BSD. */
-+ 
-+ struct gld${EMULATION_NAME}_ld_so_conf
-+ {
-+@@ -932,7 +932,7 @@
-+ EOF
-+ if [ "x${USE_LIBPATH}" = xyes ] ; then
-+   case ${target} in
-+-    *-*-linux-gnu*)
-++    *-*-linux-gnu* | *-*-k*bsd*-gnu)
-+       cat >>e${EMULATION_NAME}.c <<EOF
-+ 	  if (gld${EMULATION_NAME}_check_ld_so_conf (l->name, force))
-+ 	    break;
-+
-only in patch2:
-unchanged:
---- binutils-2.16.1.orig/debian/patches/124_kfreebsd_ld_so_executable_shared.dpatch
-+++ binutils-2.16.1/debian/patches/124_kfreebsd_ld_so_executable_shared.dpatch
+--- binutils-2.16.1cvs20050902.orig/debian/patches/121_kfreebsd_ld_so_executable_shared.dpatch
++++ binutils-2.16.1cvs20050902/debian/patches/121_kfreebsd_ld_so_executable_shared.dpatch
 @@ -0,0 +1,54 @@
 +#! /bin/sh -e
 +## 124_kfreebsd_ld_so_executable_shared.dpatch
