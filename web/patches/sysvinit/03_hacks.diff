@@ -1,0 +1,115 @@
+
+Author: rmh (based on guillem's patch)
+Status: don't send.  just fix dmesg, swap{on,off} and {u,}mount instead
+
+diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/bootmisc.sh sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/bootmisc.sh
+--- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/bootmisc.sh	2005-09-06 13:37:35.000000000 +0200
++++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/bootmisc.sh	2005-09-06 13:52:51.000000000 +0200
+@@ -65,7 +65,7 @@
+ 	#
+ 	if [ -x /bin/dmesg ] || [ -x /sbin/dmesg ]
+ 	then
+-		dmesg -s 524288 > /var/log/dmesg
++		dmesg > /var/log/dmesg
+ 	elif [ -c /dev/klog ]
+ 	then
+ 		dd if=/dev/klog of=/var/log/dmesg &
+diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/checkroot.sh sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/checkroot.sh
+--- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/checkroot.sh	2005-09-06 13:37:35.000000000 +0200
++++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/checkroot.sh	2005-09-06 14:42:31.000000000 +0200
+@@ -133,7 +133,7 @@
+ 	if [ "$doswap" = yes ]
+ 	then
+ 		[ "$VERBOSE" != no ] && log_success_msg "Activating swap."
+-		swapon -a 2> /dev/null
++		swapon -a > /dev/null 2> /dev/null
+ 		log_end_msg $?
+ 	fi
+ 
+@@ -219,8 +219,8 @@
+ 		#
+ 		# As a compromise we try both.
+ 		#
+-		if ! mount -n -o remount,ro $rootdev / 2>/dev/null &&
+-		   ! mount -n -o remount,ro /
++		if ! mount -o ro $rootdev / 2>/dev/null &&
++		   ! mount -o ro /
+ 		then
+ 			log_failure_msg "Cannot fsck root fs because it is not mounted read-only!"
+ 			rootcheck=no
+@@ -284,7 +284,7 @@
+ 		log_failure_msg "mounted read-only. However, the command to remount it read-write "
+ 		log_failure_msg "is:"
+ 		echo
+-		log_failure_msg "  # mount -n -o remount,rw /"
++		log_failure_msg "  # mount -o rw /"
+ 		echo
+ 		log_failure_msg "In order to exit from the maintenance shell, press CONTROL-D"
+ 		log_failure_msg "and the system will REBOOT."
+@@ -309,9 +309,9 @@
+ 	#	See the comments above at the previous "mount -o remount"
+ 	#	for an explanation why we try this twice.
+ 	#
+-	if ! mount -n -o remount,$rootopts,$rootmode $fstabroot / 2>/dev/null
++	if ! mount -o $rootopts,$rootmode $fstabroot / 2>/dev/null
+ 	then
+-		mount -n -o remount,$rootopts,$rootmode /
++		mount -o $rootopts,$rootmode /
+ 	fi
+ 
+ 	#
+diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountall.sh sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/mountall.sh
+--- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountall.sh	2005-09-06 13:37:35.000000000 +0200
++++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/mountall.sh	2005-09-06 14:42:47.000000000 +0200
+@@ -73,7 +73,7 @@
+ 	esac
+ 	if [ $doswap = yes ]
+ 	then
+-		swapon -a 2> /dev/null
++		swapon -a > /dev/null 2> /dev/null
+ 	fi
+ 
+ 	#
+diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountvirtfs sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/mountvirtfs
+--- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountvirtfs	2005-09-06 14:49:35.000000000 +0200
++++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/mountvirtfs	2005-09-06 14:44:55.000000000 +0200
+@@ -137,7 +137,6 @@
+ 	#	it is not writable.
+ 	#
+ 	DO_MTAB=
+-	MOUNT_N=-n
+ 	MTAB_PATH="`readlink -f /etc/mtab || :`"
+ 	case "$MTAB_PATH" in
+ 		/proc/*)
+diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountfs sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/umountfs
+--- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountfs	2005-09-06 14:49:35.000000000 +0200
++++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/umountfs	2005-09-06 14:42:11.000000000 +0200
+@@ -38,12 +38,14 @@
+         esac
+ 	DIRS="$DIRS $DIR"
+     done
+-    umount -r -d $DIRS
++    for i in $DIRS ; do
++      umount $i || mount -o ro $i
++    done
+     )
+     log_end_msg $?
+ 
+     log_begin_msg "Deactivating swap..."
+-    swapoff -a
++    swapoff -a > /dev/null
+     log_end_msg $?
+ }
+ 
+diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountroot sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/umountroot
+--- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountroot	2005-09-06 13:37:35.000000000 +0200
++++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/umountroot	2005-09-06 14:10:46.000000000 +0200
+@@ -21,7 +21,7 @@
+ 
+ do_stop () {
+     [ "$VERBOSE" != no ] && log_begin_msg "Mounting root filesystem read-only..."
+-    mount -n -o remount,ro /
++    mount -o ro /
+     [ "$VERBOSE" != no ] && log_end_msg $?
+ }
+ 
