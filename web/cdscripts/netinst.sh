@@ -7,10 +7,10 @@
 
 set -ex
 
-version=unreleased
+version=`date +%Y%m%d`
 freebsd=5.4
 cpu=i386
-cdname=debian-${version}-kfreebsd-${cpu}-netinst.iso
+cdname=debian-${version}-kfreebsd-${cpu}-install.iso
 
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
