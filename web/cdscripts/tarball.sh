@@ -55,6 +55,7 @@ fi
 for i in /etc/protocols /etc/services ; do
   mv \${i}.dpkg-dist \${i}
 done
+rm -f /etc/rc.conf
 
 # remove unneeded files added by f-i
 rm -rf /etc/rc.conf /etc/defaults/
@@ -64,6 +65,7 @@ mv /etc/fstab.freebsd /etc/fstab
 echo "null	/proc	linprocfs	rw	0 0" >> /etc/fstab
 
 rm -f /native-install
+rm -f /bin/mtree
 __EOF__
 chmod +x ${tmp}/bin/mtree
 
