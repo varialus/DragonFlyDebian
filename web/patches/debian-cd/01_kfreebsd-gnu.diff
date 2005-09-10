@@ -1,0 +1,71 @@
+
+Author: rmh
+Description: generic GNU/kFreeBSD fixes
+Status: in BTS
+
+diff -ur debian-cd.old/CONF.sh debian-cd/CONF.sh
+--- debian-cd.old/CONF.sh	2005-08-23 01:12:12.000000000 +0200
++++ debian-cd/CONF.sh	2005-09-10 13:30:04.000000000 +0200
+@@ -74,7 +74,10 @@
+ #export OFFICIAL="Official Beta"
+ 
+ # ... for arch  
+-export ARCH=`dpkg --print-architecture`
++export CPU=`dpkg-architecture -qDEB_HOST_DPKG_CPU`
++export KERNEL=`dpkg-architecture -qDEB_HOST_DPKG_OS`
++export KERNEL_NAME=`uname -s | sed -e "s,GNU/,,g" -e "s,GNU,Hurd,g"`
++export ARCH=${KERNEL}-${CPU}
+ 
+ # IMPORTANT : The 4 following paths must be on the same partition/device.
+ #	      If they aren't then you must set COPYLINK below to 1. This
+@@ -147,8 +150,10 @@
+ # export MKISOFS_OPTS="-r"		#For normal users
+ # export MKISOFS_OPTS="-r -F ."	#For symlink farmers
+ 
++if [ "$KERNEL" = "linux" ] ; then
+ # ISOLinux support for multiboot on CD1 for i386
+ export ISOLINUX=1
++fi
+ 
+ # uncomment this to if you want to see more of what the Makefile is doing
+ #export VERBOSE_MAKE=1
+diff -ur debian-cd.old/Makefile debian-cd/Makefile
+--- debian-cd.old/Makefile	2005-08-23 01:12:12.000000000 +0200
++++ debian-cd/Makefile	2005-09-10 13:27:54.000000000 +0200
+@@ -23,24 +23,30 @@
+ ifndef CAPCODENAME
+ CAPCODENAME:=$(shell perl -e "print ucfirst("$(CODENAME)")")
+ endif
++ifndef KERNEL_NAME
++KERNEL_NAME=Linux
++endif
+ ifndef BINDISKINFO
+-export BINDISKINFO="Debian GNU/Linux $(DEBVERSION) \"$(CAPCODENAME)\" - $(OFFICIAL) $(ARCH) Binary-$$num ($$DATE)"
++export BINDISKINFO="Debian GNU/$(KERNEL_NAME) $(DEBVERSION) \"$(CAPCODENAME)\" - $(OFFICIAL) $(ARCH) Binary-$$num ($$DATE)"
+ endif
+ ifndef SRCDISKINFO
+-export SRCDISKINFO="Debian GNU/Linux $(DEBVERSION) \"$(CAPCODENAME)\" - $(OFFICIAL) Source-$$num ($$DATE)"
++export SRCDISKINFO="Debian GNU/$(KERNEL_NAME) $(DEBVERSION) \"$(CAPCODENAME)\" - $(OFFICIAL) Source-$$num ($$DATE)"
+ endif
+ # ND=No-Date versions for README
+ ifndef BINDISKINFOND
+-export BINDISKINFOND="Debian GNU/Linux $(DEBVERSION) \"$(CAPCODENAME)\" - $(OFFICIAL) $(ARCH) Binary-$$num"
++export BINDISKINFOND="Debian GNU/$(KERNEL_NAME) $(DEBVERSION) \"$(CAPCODENAME)\" - $(OFFICIAL) $(ARCH) Binary-$$num"
+ endif
+ ifndef SRCDISKINFOND
+-export SRCDISKINFOND="Debian GNU/Linux $(DEBVERSION) \"$(CAPCODENAME)\" - $(OFFICIAL) Source-$$num"
++export SRCDISKINFOND="Debian GNU/$(KERNEL_NAME) $(DEBVERSION) \"$(CAPCODENAME)\" - $(OFFICIAL) Source-$$num"
+ endif
+ ifndef BINVOLID
+-ifeq ($(ARCH),powerpc)
++ifndef CPU
++CPU=$(ARCH)
++endif
++ifeq ($(CPU),powerpc)
+ BINVOLID="Debian $(DEBVERSION) ppc Bin-$$num"
+ else
+-BINVOLID="Debian $(DEBVERSION) $(ARCH) Bin-$$num"
++BINVOLID="Debian $(DEBVERSION) $(CPU) Bin-$$num"
+ endif
+ endif
+ ifndef SRCVOLID

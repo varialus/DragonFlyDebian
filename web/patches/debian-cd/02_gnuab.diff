@@ -1,0 +1,118 @@
+
+Author: rmh
+Description: hacks to make it work with gnuab
+Status: don't merge
+
+diff -ur debian-cd.old/CONF.sh debian-cd/CONF.sh
+--- debian-cd.old/CONF.sh	2005-09-10 13:37:59.000000000 +0200
++++ debian-cd/CONF.sh	2005-09-10 13:36:10.000000000 +0200
+@@ -49,7 +49,7 @@
+ export BASEDIR=`pwd`
+ 
+ # Building sarge cd set ...
+-export CODENAME=sarge
++export CODENAME=sid
+ 
+ # By default use Debian installer packages from $CODENAME
+ if [ ! "$DI_CODENAME" ]
+@@ -64,7 +64,7 @@
+ #export DI_WWW_HOME=default
+ 
+ # Version number, "2.2 r0", "2.2 r1" etc.
+-export DEBVERSION="3.1"
++export DEBVERSION="unreleased"
+ 
+ # Official or non-official set.
+ # NOTE: THE "OFFICIAL" DESIGNATION IS ONLY ALLOWED FOR IMAGES AVAILABLE
+@@ -74,9 +74,9 @@
+ #export OFFICIAL="Official Beta"
+ 
+ # ... for arch  
+-export CPU=`dpkg-architecture -qDEB_HOST_DPKG_CPU`
+-export KERNEL=`dpkg-architecture -qDEB_HOST_DPKG_OS`
+-export KERNEL_NAME=`uname -s | sed -e "s,GNU/,,g" -e "s,GNU,Hurd,g"`
++export CPU=i386
++export KERNEL=kfreebsd
++export KERNEL_NAME=kFreeBSD
+ export ARCH=${KERNEL}-${CPU}
+ 
+ # IMPORTANT : The 4 following paths must be on the same partition/device.
+@@ -85,7 +85,7 @@
+ #	      images, however. Also, if you are using an NFS partition for
+ #	      some part of this, you must use this option.
+ # Paths to the mirrors
+-export MIRROR=/ftp/debian
++export MIRROR=~/tmp/www/gnuab
+ 
+ # Comment the following line if you don't have/want non-US
+ #export NONUS=/ftp/debian-non-US
+@@ -96,20 +96,20 @@
+ #export FORCENONUSONCD1=1
+ 
+ # Path of the temporary directory
+-export TDIR=/ftp/tmp
++export TDIR=~/tmp/debian-cd/tmp
+ 
+ # Path where the images will be written
+-export OUT=/rack/debian-cd
++export OUT=~/tmp/debian-cd/out
+ 
+ # Where we keep the temporary apt stuff.
+ # This cannot reside on an NFS mount.
+-export APTTMP=/ftp/tmp/apt
++export APTTMP=~/tmp/debian-cd/tmp
+ 
+ # Do I want to have NONFREE merged in the CD set
+ # export NONFREE=1
+ 
+ # Do I want to have CONTRIB merged in the CD set
+-export CONTRIB=1
++# export CONTRIB=1
+ 
+ # Do I want to have NONFREE on a separate CD (the last CD of the CD set)
+ # WARNING: Don't use NONFREE and EXTRANONFREE at the same time !
+@@ -147,7 +147,7 @@
+ 
+ # Options
+ # export MKISOFS=/usr/bin/mkisofs
+-# export MKISOFS_OPTS="-r"		#For normal users
++export MKISOFS_OPTS="-r"		#For normal users
+ # export MKISOFS_OPTS="-r -F ."	#For symlink farmers
+ 
+ if [ "$KERNEL" = "linux" ] ; then
+@@ -272,7 +272,7 @@
+ # INSTALLER_CD=0: nothing special (default)
+ # INSTALLER_CD=1: just add debian-installer (use TASK=tasks/debian-installer-$CODENAME)
+ # INSTALLER_CD=2: add d-i and base (use TASK=tasks/debian-installer+kernel-$CODENAME)
+-#export INSTALLER_CD=0
++export INSTALLER_CD=0
+ 
+ # Parameters to pass to kernel when the CD boots. Not currently supported
+ # for all architectures.
+diff -ur debian-cd.old/Makefile debian-cd/Makefile
+--- debian-cd.old/Makefile	2005-09-10 13:37:59.000000000 +0200
++++ debian-cd/Makefile	2005-09-10 13:37:23.000000000 +0200
+@@ -207,6 +207,12 @@
+ 	$(Q)if [ ! -d $(BASEDIR)/tools/boot/sid ] ; then \
+ 		ln -s sarge $(BASEDIR)/tools/boot/sid ; \
+ 	fi
++	$(Q)if [ ! -d $(BASEDIR)/data/unreleased ] ; then \
++		ln -s sarge $(BASEDIR)/data/unreleased ; \
++	fi
++	$(Q)if [ ! -d $(BASEDIR)/tools/boot/unreleased ] ; then \
++		ln -s sarge $(BASEDIR)/tools/boot/unreleased ; \
++	fi
+ 
+ ## CLEANINGS ##
+ 
+diff -ur debian-cd.old/tools/apt-selection debian-cd/tools/apt-selection
+--- debian-cd.old/tools/apt-selection	2005-08-23 01:12:11.000000000 +0200
++++ debian-cd/tools/apt-selection	2005-09-10 13:33:44.000000000 +0200
+@@ -50,6 +50,7 @@
+ 	# Generating a correct sources.list file
+ 	echo "deb file:$MIRROR $CODENAME $sections" \
+ 	> $APTTMP/$CODENAME-$ARCH/apt/sources.list
++	echo "deb file:$MIRROR unreleased $sections" >> $APTTMP/$CODENAME-$ARCH/apt/sources.list
+ 	if [ -n "$NONUS" ]; then
+ 	     echo "deb file:$NONUS $CODENAME/non-US $sections" \
+ 	     >> $APTTMP/$CODENAME-$ARCH/apt/sources.list
