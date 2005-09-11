@@ -1,0 +1,76 @@
+
+Author: rmh
+Description: See freebsd.diff.  Take care of that first.  The last hunk is
+  dirty (but since it only affects kFreeBSD-based systems, it could be applied
+  to debian.
+Status: in BTS.
+
+diff -ur qemu-0.7.2.freebsd/configure qemu-0.7.2/configure
+--- qemu-0.7.2.freebsd/configure	2005-09-04 19:11:31.000000000 +0200
++++ qemu-0.7.2/configure	2005-09-11 13:35:29.000000000 +0200
+@@ -96,7 +96,7 @@
+ MINGW32*)
+ mingw32="yes"
+ ;;
+-FreeBSD)
++*FreeBSD)
+ bsd="yes"
+ oss="yes"
+ if [ "$cpu" = "i386" -o "$cpu" = "x86_64" ] ; then
+@@ -124,11 +124,7 @@
+ ;;
+ esac
+ 
+-if [ "$bsd" = "yes" ] ; then
+-  if [ ! "$darwin" = "yes" ] ; then
+-    make="gmake"
+-  fi
+-fi
++make="`which gmake || which make`"
+ 
+ # find source path
+ # XXX: we assume an absolute path is given when launching configure, 
+@@ -593,13 +589,19 @@
+ echo "SRC_PATH=$source_path" >> $config_mak
+ echo "TARGET_DIRS=$target_list" >> $config_mak
+ 
+-# XXX: suppress that
+ if [ "$bsd" = "yes" ] ; then
+-  echo "#define O_LARGEFILE 0" >> $config_h
+-  echo "#define MAP_ANONYMOUS MAP_ANON" >> $config_h
+   echo "#define _BSD 1" >> $config_h
+ fi
+ 
++cat >> $config_h << __EOF__
++#ifndef O_LARGEFILE
++# define O_LARGEFILE 0
++#endif
++#ifndef MAP_ANONYMOUS
++# define MAP_ANONYMOUS MAP_ANON
++#endif
++__EOF__
++
+ for target in $target_list; do 
+ 
+ target_dir="$target"
+diff -ur qemu-0.7.2.freebsd/vl.c qemu-0.7.2/vl.c
+--- qemu-0.7.2.freebsd/vl.c	2005-09-11 13:31:17.000000000 +0200
++++ qemu-0.7.2/vl.c	2005-09-11 13:46:19.000000000 +0200
+@@ -46,7 +46,7 @@
+ #endif
+ #ifdef _BSD
+ #include <sys/stat.h>
+-#ifndef __APPLE__
++#if !defined(__APPLE__) && !defined(__GLIBC__)
+ #include <libutil.h>
+ #endif
+ #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+@@ -1731,7 +1731,7 @@
+ #endif
+ 
+     fstat(fd, &s);
+-    dev = devname(s.st_rdev, S_IFCHR);
++    dev = "/dev/tap";
+     pstrcpy(ifname, ifname_size, dev);
+ 
+     fcntl(fd, F_SETFL, O_NONBLOCK);
