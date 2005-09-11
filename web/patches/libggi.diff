@@ -1,0 +1,99 @@
+Author: aurel32
+Status: ugly
+
+diff -u libggi-2.0.5/debian/control libggi-2.0.5/debian/control
+--- libggi-2.0.5/debian/control
++++ libggi-2.0.5/debian/control
+@@ -151,28 +151,6 @@
+  text-mode target using the "monotext" target.)  Output is displayed in
+  a terminal-independent fashion using the "ncurses" library.
+ 
+-Package: libggi-target-fbdev
+-Architecture: any
+-Section: libs
+-Priority: optional
+-Depends: ${shlibs:Depends}, makedev (>= 2.3.1-24) | devfsd
+-Provides: libggi-target
+-Conflicts: libggi2 (<< 1:2.0.1+)
+-Replaces: libggi2 (<< 1:2.0.1+)
+-Enhances: libggi2
+-Description: General Graphics Interface direct access framebuffer target
+- "General Graphics Interface" - a fast, portable graphics environment.
+- .
+- This package contains the driver for the "fbdev" target, enabling
+- libGGI (and therefore any program using libGGI) to display its output
+- on the kernel framebuffer device.  The framebuffer device is the usual
+- means of displaying graphics on most non-i386 architectures, and, for
+- i386, kernels from the stable 2.2 kernel series on contain a working i386
+- framebuffer device.
+- .
+- Installation of libdirectfb is recommended for accellerated drawing on
+- supported graphic cards.
+-
+ Package: libggi-target-x
+ Architecture: any
+ Section: libs
+diff -u libggi-2.0.5/debian/rules libggi-2.0.5/debian/rules
+--- libggi-2.0.5/debian/rules
++++ libggi-2.0.5/debian/rules
+@@ -46,7 +46,6 @@
+ taapkg=$(baspkg)-target-aa
+ tmtpkg=$(baspkg)-target-monotext
+ tvcpkg=$(baspkg)-target-vcsa
+-tfbpkg=$(baspkg)-target-fbdev
+ ttipkg=$(baspkg)-target-terminfo
+ tgdpkg=$(baspkg)-target-glide
+ tsvpkg=$(baspkg)-target-svgalib
+@@ -92,19 +91,13 @@
+ 	 cp display/trueemu/README	$(INSTDIR)/README.trueemu;	\
+ 	 cp display/monotext/README	$(INSTDIR)/README.monotext;	\
+ 	 cp display/X/README		$(INSTDIR)/README.X;		\
+-	 cp default/fbdev/ati/mach64/README $(INSTDIR)/README.mach64;	\
+ 	 cp programs/demos/.libs/flying_ggis $(INSTDIR)/usr/bin/ggi-flying_ggis; \
+ 	 cp programs/demos/.libs/demo	 $(INSTDIR)/usr/bin/ggi-demo;	\
+ 	 cd $(INSTDIR)/usr;						\
+ 	 mv bin/cube3d			bin/ggi-cube3d;			\
+ 	 mv bin/monitest		bin/ggi-monitest;		\
+ 	 mv share/man/man1/cube3d.1	share/man/man1/ggi-cube3d.1;	\
+-	 mv share/man/man1/monitest.1	share/man/man1/ggi-monitest.1;	\
+-	 \
+-	 cd $(INSTDIR)/etc/ggi/targets;					\
+-	 mv fbdev.conf fbdev.conf-unhacked;				\
+-	 sed -e '/directfb/ s/^/#/' <fbdev.conf-unhacked >fbdev.conf;	\
+-	 rm fbdev.conf-unhacked;					)
++	 mv share/man/man1/monitest.1	share/man/man1/ggi-monitest.1;  )
+ 
+ 
+ # Build architecture-independent files here.
+@@ -120,17 +113,12 @@
+ 					usr/lib/*.so usr/lib/*.la	\
+ 					usr/lib/ggi/display/*.la	\
+ 					usr/lib/ggi/helper/*.la		\
+-					usr/lib/ggi/default/*.la	\
+-					usr/lib/ggi/default/fbdev/*/*.la
++					usr/lib/ggi/default/*.la	
+ 	dh_movefiles	-p$(emupkg)	usr/lib/ggi/display/*emu.*
+ 	dh_movefiles	-p$(taapkg)	usr/lib/ggi/display/aa.*
+ 	dh_movefiles	-p$(tmtpkg)	usr/lib/ggi/display/monotext.*
+ 	dh_movefiles	-p$(ttipkg)	usr/lib/ggi/display/terminfo.*
+ 	dh_movefiles	-p$(tvcpkg)	usr/lib/ggi/display/vcsa.*
+-	dh_movefiles	-p$(tfbpkg)	usr/lib/ggi/display/fbdev.*	\
+-					usr/lib/ggi/display/linvtsw.*	\
+-					usr/lib/ggi/default/fbdev/*/*.so\
+-					etc/ggi/targets/fbdev.conf
+ 	dh_movefiles	-p$(tgdpkg)	usr/lib/ggi/display/glide.*
+ 	dh_movefiles	-p$(tsvpkg)	usr/lib/ggi/display/vgagl.*	\
+ 					usr/lib/ggi/display/svgalib*.*
+@@ -166,11 +154,10 @@
+ 	dh_link		-p$(devpkg)	usr/share/doc/$(libpkg)		\
+ 					usr/share/doc/$(devpkg)
+ #	dh_installdebconf
+-	dh_installdocs	-N$(smppkg) -N$(emupkg) -N$(tmtpkg) -N$(tfbpkg)	-N$(txxpkg)
++	dh_installdocs	-N$(smppkg) -N$(emupkg) -N$(tmtpkg) -N$(txxpkg)
+ 	dh_installdocs	-p$(smppkg)	debian/README.samples
+ 	dh_installdocs	-p$(emupkg)	debian/tmp/README.*emu
+ 	dh_installdocs	-p$(tmtpkg)	debian/tmp/README.monotext
+-	dh_installdocs	-p$(tfbpkg)	debian/tmp/README.mach64
+ 	dh_installdocs	-p$(txxpkg)	debian/tmp/README.X
+ 	dh_installexamples -p$(smppkg)	programs/demos/*.c programs/util/*.c
+ 	dh_installmenu

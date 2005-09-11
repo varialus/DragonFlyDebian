@@ -1,0 +1,40 @@
+Author: aurel32
+Status: in BTS
+
+diff -u smartmontools-5.33+5.34cvs20050802/debian/control smartmontools-5.33+5.34cvs20050802/debian/control
+--- smartmontools-5.33+5.34cvs20050802/debian/control
++++ smartmontools-5.33+5.34cvs20050802/debian/control
+@@ -2,7 +2,7 @@
+ Section: utils
+ Priority: optional
+ Maintainer: Guido Guenther <agx@debian.org>
+-Build-Depends: debhelper (>= 4)
++Build-Depends: debhelper (>= 4), libcam-dev [kfreebsd-i386]
+ Standards-Version: 3.6.1
+ 
+ Package: smartmontools
+diff -u smartmontools-5.33+5.34cvs20050802/configure smartmontools-5.33+5.34cvs20050802/configure
+--- smartmontools-5.33+5.34cvs20050802/configure
++++ smartmontools-5.33+5.34cvs20050802/configure
+@@ -6443,7 +6443,7 @@
+ 
+ 		os_libs=''
+  ;;
+-	*-*-freebsd*)
++	*-*-freebsd* | *-*-kfreebsd*-gnu)
+ 		os_deps='os_freebsd.o'
+ 
+ 		os_libs='-lcam'
+only in patch2:
+unchanged:
+--- smartmontools-5.33+5.34cvs20050802.orig/configure.in
++++ smartmontools-5.33+5.34cvs20050802/configure.in
+@@ -129,7 +129,7 @@
+ 	*-*-linux*)
+ 		AC_SUBST([os_deps], ['os_linux.o']) 
+ 		AC_SUBST([os_libs], ['']) ;;
+-	*-*-freebsd*)
++	*-*-freebsd* | *-*-kfreebsd*-gnu)
+ 		AC_SUBST([os_deps], ['os_freebsd.o']) 
+ 		AC_SUBST([os_libs], ['-lcam']);;
+ 	sparc-*-solaris*) 

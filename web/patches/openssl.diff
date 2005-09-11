@@ -1,84 +1,39 @@
+Author: aurel32
+Status: in BTS
 
-Status: sent upstream
+diff -u openssl-0.9.7g/Configure openssl-0.9.7g/Configure
+--- openssl-0.9.7g/Configure
++++ openssl-0.9.7g/Configure
+@@ -427,6 +427,7 @@
+ "debian-sparc","gcc:-DB_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG RC4_CHAR RC4_CHUNK DES_UNROLL BF_PTR::::::::::dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
+ "debian-sparc-v8","gcc:-DB_ENDIAN -DTERMIO -O3 -mcpu=v8 -fomit-frame-pointer -Wall -DBN_DIV2W::-D_REENTRANT::-ldl:BN_LLONG RC4_CHAR RC4_CHUNK DES_UNROLL BF_PTR:asm/sparcv8.o:::::::::dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
+ "debian-sparc-v9","gcc:-DB_ENDIAN -DTERMIO -O3 -mcpu=v9 -Wa,-Av8plus -fomit-frame-pointer -Wall -DULTRASPARC -DBN_DIV2W::-D_REENTRANT::-ldl:BN_LLONG RC4_CHAR RC4_CHUNK DES_UNROLL BF_PTR:asm/sparcv8plus.o:::asm/md5-sparcv8plus.o::::::dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
++"debian-kfreebsd-i386","gcc:-DL_ENDIAN -DTERMIOS -O3 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}::::::::::dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
+ # The intel boxes :-), It would be worth seeing if bsdi-gcc can use the
+ # bn86-elf.o file file since it is hand tweaked assembler.
+ "linux-elf",	"gcc:-DL_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -m486 -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
+diff -u openssl-0.9.7g/Makefile openssl-0.9.7g/Makefile
+--- openssl-0.9.7g/Makefile
++++ openssl-0.9.7g/Makefile
+@@ -12,9 +12,9 @@
+ SHLIB_MAJOR=0
+ SHLIB_MINOR=9.7
+ SHLIB_EXT=.so.$(SHLIB_MAJOR).$(SHLIB_MINOR)
+-PLATFORM=debian-i386
++PLATFORM=debian-kfreebsd-i386
+ OPTIONS=--prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5 zlib-dynamic no-krb5
+-CONFIGURE_ARGS=--prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5 zlib-dynamic debian-i386
++CONFIGURE_ARGS=--prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5 zlib-dynamic debian-kfreebsd-i386
+ SHLIB_TARGET=linux-shared
+ 
+ # HERE indicates where this Makefile lives.  This can be used to indicate
+@@ -62,7 +62,7 @@
+ #TOP=$(shell pwd)
+ CC= gcc
+ #CFLAG= -DL_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -m486 -Wall -Wuninitialized -DSHA1_ASM -DMD5_ASM -DRMD160_ASM
+-CFLAG= -DZLIB_SHARED -DZLIB -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DOPENSSL_NO_KRB5 -DOPENSSL_NO_IDEA -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC5 -DL_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -Wall
++CFLAG= -DZLIB_SHARED -DZLIB -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DOPENSSL_NO_KRB5 -DOPENSSL_NO_IDEA -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC5 -DL_ENDIAN -DTERMIOS -O3 -fomit-frame-pointer -Wall
+ DEPFLAG= -DOPENSSL_NO_IDEA -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC5 
+ PEX_LIBS= 
+ EX_LIBS= -ldl
 
-diff -ur openssl-0.9.7e.old/Configure openssl-0.9.7e/Configure
---- openssl-0.9.7e.old/Configure	2004-12-05 17:55:48.000000000 +0100
-+++ openssl-0.9.7e/Configure	2004-12-05 17:53:48.000000000 +0100
-@@ -595,8 +595,11 @@
- ##### Sony NEWS-OS 4.x
- "newsos4-gcc","gcc:-O -DB_ENDIAN::(unknown):NEWS4:-lmld -liberty:BN_LLONG RC4_CHAR RC4_CHUNK DES_PTR DES_RISC1 DES_UNROLL BF_PTR::::",
- 
--##### GNU Hurd
--"hurd-x86",  "gcc:-DL_ENDIAN -DTERMIOS -O3 -fomit-frame-pointer -m486 -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC",
-+##### GNUish (Glibc-based) systems
-+"i386-gnuish","gcc:-DL_ENDIAN -DTERMIOS -O3 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}::::::::::dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
-+"i486-gnuish","gcc:-DL_ENDIAN -DTERMIOS -O3 -march=i486 -mcpu=i486 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
-+"i586-gnuish","gcc:-DL_ENDIAN -DTERMIOS -O3 -march=i586 -mcpu=i586 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
-+"i686-gnuish","gcc:-DL_ENDIAN -DTERMIOS -O3 -march=i686 -mcpu=i686 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
- 
- ##### OS/2 EMX
- "OS2-EMX", "gcc::::::::",
-diff -ur openssl-0.9.7e.old/debian/rules openssl-0.9.7e/debian/rules
---- openssl-0.9.7e.old/debian/rules	2004-12-05 17:55:49.000000000 +0100
-+++ openssl-0.9.7e/debian/rules	2004-12-05 17:54:59.000000000 +0100
-@@ -17,6 +17,7 @@
- export VERSION=$(shell dpkg-parsechangelog | grep '^Version:' | sed -e 's/^.*://' -e 's/-.*//')
- 
- # The binary architeture
-+DEB_HOST_GNU_SYSTEM = $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
- DEB_HOST_ARCH = $(shell dpkg-architecture -qDEB_HOST_ARCH)
- 
- CONFARGS  = --prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5
-@@ -27,12 +28,18 @@
- OPTS      = $($(ARCHOPTS))
- WANTED_LIBC_VERSION = 2.3.1-10
- 
-+ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
-+HOST_ARCH = debian-$(DEB_HOST_ARCH)
-+else
-+HOST_ARCH = $(shell ./config -t | grep '^Operating system: ' | cut -d ' ' -f 3)
-+endif
-+
- build:
- 	dh_testdir
- 	perl util/perlpath.pl /usr/bin
- #	perl util/ssldir.pl /usr/lib/ssl
- #	chmod +x debian/libtool
--	./Configure no-shared $(CONFARGS) debian-$(DEB_HOST_ARCH)
-+	./Configure no-shared $(CONFARGS) $(HOST_ARCH)
- 	make -f Makefile DIRS="crypto ssl" all
- 	mv libcrypto.a libcrypto.static
- 	mv libssl.a libssl.static
-@@ -40,20 +47,20 @@
- 	test -z "$(OPTS)" || for opt in $(OPTS); \
- 	do \
- 		set -xe; \
--		./Configure shared $(CONFARGS) debian-$(DEB_HOST_ARCH)-$$opt; \
-+		./Configure shared $(CONFARGS) $(HOST_ARCH)-$$opt; \
- 		make -f Makefile DIRS="crypto ssl" all; \
- 		mkdir -p $$opt; \
- 		mv libcrypto.so* libssl.so* $$opt/; \
- 		make -f Makefile DIRS="crypto ssl" clean; \
- 	done
--	./Configure shared $(CONFARGS) debian-$(DEB_HOST_ARCH)
-+	./Configure shared $(CONFARGS) $(HOST_ARCH)
- 	#make -f Makefile depend
- 	ln -sf apps/openssl.pod crypto/crypto.pod ssl/ssl.pod doc/
- #	make -f Makefile linux-shared
- 	make -f Makefile all
- #	strip apps/openssl
- #	make -f Makefile clean DIRS="crypto ssl"
--#	./Configure --prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5 debian-$(DEB_HOST_ARCH)
-+#	./Configure --prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5 $(HOST_ARCH)
- #	make -f Makefile all DIRS="crypto ssl"
- 	touch build
- 
-@@ -62,7 +69,7 @@
- 	dh_testroot
- 	-rm -f build
- 	perl util/perlpath.pl /usr/bin
--	./Configure $(CONFARGS) debian-$(DEB_HOST_ARCH)
-+	./Configure $(CONFARGS) $(HOST_ARCH)
- 	-make -f Makefile  clean clean-shared
- 	#-make -f Makefile  dclean
- 	perl util/perlpath.pl /usr/local/bin

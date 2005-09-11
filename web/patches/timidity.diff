@@ -1,0 +1,55 @@
+Author: aurel32
+Status: in BTS
+
+diff -u timidity-2.13.2/debian/control timidity-2.13.2/debian/control
+--- timidity-2.13.2/debian/control
++++ timidity-2.13.2/debian/control
+@@ -2,7 +2,7 @@
+ Section: sound
+ Priority: optional
+ Maintainer: Henrique de Moraes Holschuh <hmh@debian.org>
+-Build-Depends: debhelper (>= 4), libasound2-dev, libaudiofile-dev, libesd0-dev, libarts1-dev, libjack0.100.0-dev, libaudio-dev, libvorbis-dev (>= 1.0.0-3), libspeex-dev (>= 1.0), liboggflac-dev (>= 1.1.2-1), libflac-dev (>= 1.1.2-1), libncurses-dev, libslang2-dev, xlibs-dev, libxaw8-dev, tcl8.4-dev, tk8.4-dev, libgtk2.0-dev, autotools-dev
++Build-Depends: debhelper (>= 4), libasound2-dev [!kfreebsd-i386], libaudiofile-dev, libesd0-dev, libarts1-dev, libjack0.100.0-dev, libaudio-dev, libvorbis-dev (>= 1.0.0-3), libspeex-dev (>= 1.0), liboggflac-dev (>= 1.1.2-1), libflac-dev (>= 1.1.2-1), libncurses-dev, libslang2-dev, xlibs-dev, libxaw8-dev, tcl8.4-dev, tk8.4-dev, libgtk2.0-dev, autotools-dev
+ Standards-Version: 3.6.2
+ 
+ Package: timidity
+diff -u timidity-2.13.2/debian/rules timidity-2.13.2/debian/rules
+--- timidity-2.13.2/debian/rules
++++ timidity-2.13.2/debian/rules
+@@ -15,6 +15,7 @@
+ # Autotools
+ export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
++export DEB_BUILD_ARCH_OS ?= $(shell dpkg-architecture -q-qDEB_BUILD_ARCH_OS)
+ 
+ # FOR AUTOCONF 2.52 AND NEWER ONLY
+ CONFFLAGS =
+@@ -36,6 +37,16 @@
+ 	CONFFLAGS += --enable-debug
+ endif
+ 
++# audio and interface
++ifeq ($(DEB_BUILD_ARCH_OS), linux)
++audio = default,oss,nas,arts,esd,jack,vorbis,flac,speex,alsa
++interface = ncurses,emacs,xaw,alsaseq
++else
++audio = default,oss,nas,arts,esd,jack,vorbis,flac,speex
++interface = ncurses,emacs,xaw
++endif
++
++
+ ##
+ ##  The rules
+ ##
+@@ -55,9 +66,9 @@
+ 	 --with-x \
+ 	 --with-tcl-includes=/usr/include/tcl8.4 \
+ 	 --with-tk-includes=/usr/include/tcl8.4 \
+-	 --enable-audio=default,oss,alsa,nas,arts,esd,jack,vorbis,flac,speex \
++	 --enable-audio=$(audio) \
+ 	 --with-default-output=default \
+-	 --enable-interface=ncurses,emacs,xaw,alsaseq \
++	 --enable-interface=$(interface) \
+ 	 --enable-dynamic=slang,tcltk,vt100,xskin,gtk \
+ 	 --enable-server --enable-network --enable-spectrogram --enable-wrd
+ 	$(MAKE)

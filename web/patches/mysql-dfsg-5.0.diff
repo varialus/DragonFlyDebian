@@ -1,0 +1,29 @@
+Author: aurel32
+Status: in BTS
+
+diff -u mysql-dfsg-5.0-5.0.11beta/debian/patches/00list mysql-dfsg-5.0-5.0.11beta/debian/patches/00list
+--- mysql-dfsg-5.0-5.0.11beta/debian/patches/00list
++++ mysql-dfsg-5.0-5.0.11beta/debian/patches/00list
+@@ -14,0 +15 @@
++70_kfreebsd.dpatch
+--- mysql-dfsg-5.0-5.0.11beta.orig/debian/patches/70_kfreebsd.dpatch
++++ mysql-dfsg-5.0-5.0.11beta/debian/patches/70_kfreebsd.dpatch
+@@ -0,0 +1,18 @@
++#! /bin/sh /usr/share/dpatch/dpatch-run
++##
++## All lines beginning with `## DP:' are a description of the patch.
++## DP: Support for GNU/kFreeBSD
++
++@DPATCH@
++
++--- old/include/my_global.h.orig	2005-09-09 23:56:12.000000000 +0200
+++++ new/include/my_global.h	2005-09-09 23:56:44.000000000 +0200
++@@ -102,7 +102,7 @@
++ 
++ 
++ /* Fix problem with S_ISLNK() on Linux */
++-#if defined(TARGET_OS_LINUX)
+++#if defined(TARGET_OS_LINUX) || defined(__GLIBC__)
++ #undef  _GNU_SOURCE
++ #define _GNU_SOURCE 1
++ #endif
