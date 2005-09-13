@@ -2,9 +2,9 @@
 Author: rmh (based on guillem's patch)
 Status: don't send.  just fix dmesg, swap{on,off} and {u,}mount instead
 
-diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/bootmisc.sh sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/bootmisc.sh
---- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/bootmisc.sh	2005-09-06 13:37:35.000000000 +0200
-+++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/bootmisc.sh	2005-09-06 13:52:51.000000000 +0200
+diff -ur sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/bootmisc.sh sysvinit-2.86.ds1/debian/initscripts/etc/init.d/bootmisc.sh
+--- sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/bootmisc.sh	2005-09-12 20:31:23.000000000 +0200
++++ sysvinit-2.86.ds1/debian/initscripts/etc/init.d/bootmisc.sh	2005-09-12 20:02:53.000000000 +0200
 @@ -65,7 +65,7 @@
  	#
  	if [ -x /bin/dmesg ] || [ -x /sbin/dmesg ]
@@ -14,9 +14,9 @@ diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/bootmisc.sh sysvinit-2.
  	elif [ -c /dev/klog ]
  	then
  		dd if=/dev/klog of=/var/log/dmesg &
-diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/checkroot.sh sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/checkroot.sh
---- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/checkroot.sh	2005-09-06 13:37:35.000000000 +0200
-+++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/checkroot.sh	2005-09-06 14:42:31.000000000 +0200
+diff -ur sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/checkroot.sh sysvinit-2.86.ds1/debian/initscripts/etc/init.d/checkroot.sh
+--- sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/checkroot.sh	2005-09-12 20:31:23.000000000 +0200
++++ sysvinit-2.86.ds1/debian/initscripts/etc/init.d/checkroot.sh	2005-09-12 20:02:53.000000000 +0200
 @@ -133,7 +133,7 @@
  	if [ "$doswap" = yes ]
  	then
@@ -58,9 +58,9 @@ diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/checkroot.sh sysvinit-2
  	fi
  
  	#
-diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountall.sh sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/mountall.sh
---- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountall.sh	2005-09-06 13:37:35.000000000 +0200
-+++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/mountall.sh	2005-09-06 14:42:47.000000000 +0200
+diff -ur sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/mountall.sh sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountall.sh
+--- sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/mountall.sh	2005-09-12 20:31:23.000000000 +0200
++++ sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountall.sh	2005-09-12 20:02:53.000000000 +0200
 @@ -73,7 +73,7 @@
  	esac
  	if [ $doswap = yes ]
@@ -70,9 +70,9 @@ diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountall.sh sysvinit-2.
  	fi
  
  	#
-diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountvirtfs sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/mountvirtfs
---- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountvirtfs	2005-09-06 14:49:35.000000000 +0200
-+++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/mountvirtfs	2005-09-06 14:44:55.000000000 +0200
+diff -ur sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/mountvirtfs sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountvirtfs
+--- sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/mountvirtfs	2005-09-12 20:31:23.000000000 +0200
++++ sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountvirtfs	2005-09-12 20:02:53.000000000 +0200
 @@ -137,7 +137,6 @@
  	#	it is not writable.
  	#
@@ -81,9 +81,9 @@ diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/mountvirtfs sysvinit-2.
  	MTAB_PATH="`readlink -f /etc/mtab || :`"
  	case "$MTAB_PATH" in
  		/proc/*)
-diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountfs sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/umountfs
---- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountfs	2005-09-06 14:49:35.000000000 +0200
-+++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/umountfs	2005-09-06 14:42:11.000000000 +0200
+diff -ur sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/umountfs sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountfs
+--- sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/umountfs	2005-09-12 20:31:23.000000000 +0200
++++ sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountfs	2005-09-12 20:02:53.000000000 +0200
 @@ -38,12 +38,14 @@
          esac
  	DIRS="$DIRS $DIR"
@@ -101,9 +101,9 @@ diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountfs sysvinit-2.86.
      log_end_msg $?
  }
  
-diff -ur sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountroot sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/umountroot
---- sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountroot	2005-09-06 13:37:35.000000000 +0200
-+++ sysvinit-2.86.ds1.new/debian/initscripts/etc/init.d/umountroot	2005-09-06 14:10:46.000000000 +0200
+diff -ur sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/umountroot sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountroot
+--- sysvinit-2.86.ds1.old/debian/initscripts/etc/init.d/umountroot	2005-09-12 20:31:23.000000000 +0200
++++ sysvinit-2.86.ds1/debian/initscripts/etc/init.d/umountroot	2005-09-12 20:02:53.000000000 +0200
 @@ -21,7 +21,7 @@
  
  do_stop () {

@@ -1,0 +1,24 @@
+
+Author: rmh
+Status: in BTS
+
+diff -ur vsound-0.6.old/vsound.c vsound-0.6/vsound.c
+--- vsound-0.6.old/vsound.c	2004-07-10 23:29:33.000000000 +0200
++++ vsound-0.6/vsound.c	2005-09-07 13:28:03.000000000 +0200
+@@ -46,6 +46,8 @@
+ #include "config.h"
+ #endif
+ 
++/* Hack to avoid ioctl() declaration */
++#define ioctl __dummy_ioctl
+ #ifdef HAVE_MACHINE_SOUNDCARD_H
+ 	#include <machine/soundcard.h>
+ #else
+@@ -55,6 +57,7 @@
+ 		#include <sys/soundcard.h>
+ 	#endif
+ #endif
++#undef ioctl
+ 
+ /* It seems that Debian Woody (and possibly others) do not define RTLD_NEXT. */
+ #include <dlfcn.h>
