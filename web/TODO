@@ -92,6 +92,23 @@ I'd be nice if tasks and subtasks were sorted by priority.
    unpatched initscripts.  For details, see:
    http://lists.alioth.debian.org/pipermail/glibc-bsd-devel/2005-September/000507.html
 
+ - debootstrap is broken.  There's a patch in svn, but the main reason is that
+   it doesn't support fetching from two separate repositories, and also gnuab is
+   not fully compatible with the official Debian archive.  This will improve
+   when the port is added officialy.
+
+ - Port debtakeover (so we can migrate a FreeBSD system to Debian GNU/kFreeBSD).
+   This requires a working debootstrap (see above).
+
+     http://www.hadrons.org/~guillem/debian/debtakeover/
+
+ - Make a patch for kFreeBSD to honor Linux swap signature when activating swap
+   partitions (currently it would activate them, but trash the signature).
+   There's code to do that in [hurd]/sutils/swapon.c, but if you use this code
+   note that it's GPLed.  GPL code can be accepted in kFreeBSD upstream if they
+   find it useful enough, but it would go into separate gnu/ directories, and be
+   disabled by default.
+
 Social work (dealing with maintainers)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
