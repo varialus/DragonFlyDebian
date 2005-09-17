@@ -1,6 +1,5 @@
-diff -ur sys.old/conf/kern.mk sys/conf/kern.mk
---- sys.old/conf/kern.mk	2004-05-14 15:35:46.000000000 +0200
-+++ sys/conf/kern.mk	2004-11-16 18:16:45.000000000 +0100
+--- sys.old/conf/kern.mk	2005-03-16 13:54:36.000000000 -0500
++++ sys/conf/kern.mk	2005-09-02 20:07:25.000000000 -0400
 @@ -12,7 +12,7 @@
  .else
  CWARNFLAGS?=	-Wall -Wredundant-decls -Wnested-externs -Wstrict-prototypes \
@@ -14,14 +13,14 @@ diff -ur sys.old/conf/kern.mk sys/conf/kern.mk
  # cache tag lines)
  #
  .if ${MACHINE_ARCH} == "i386" && ${CC} != "icc"
--CFLAGS+=	-mno-align-long-strings -mpreferred-stack-boundary=2
-+CFLAGS+=	-mpreferred-stack-boundary=2
+-CFLAGS+=	-mno-align-long-strings -mpreferred-stack-boundary=2 \
++CFLAGS+=	-mpreferred-stack-boundary=2 \
+ 		-mno-mmx -mno-3dnow -mno-sse -mno-sse2
  INLINE_LIMIT?=	8000
  .endif
- 
-diff -ur sys.old/conf/kern.post.mk sys/conf/kern.post.mk
---- sys.old/conf/kern.post.mk	2004-09-20 19:39:02.000000000 +0200
-+++ sys/conf/kern.post.mk	2004-11-16 18:16:08.000000000 +0100
+
+--- sys.old/conf/kern.post.mk	2004-09-20 13:39:02.000000000 -0400
++++ sys/conf/kern.post.mk	2005-09-02 20:09:31.000000000 -0400
 @@ -185,11 +185,9 @@
  .if exists(${DESTDIR}${KODIR})
  	-thiskernel=`sysctl -n kern.bootfile` ; \
@@ -34,7 +33,7 @@ diff -ur sys.old/conf/kern.post.mk sys/conf/kern.post.mk
  			rm -rf ${DESTDIR}${KODIR}.old ; \
  		fi ; \
  		mv ${DESTDIR}${KODIR} ${DESTDIR}${KODIR}.old ; \
-@@ -198,17 +196,17 @@
+@@ -198,17 +196,16 @@
  .endif
  	mkdir -p ${DESTDIR}${KODIR}
  .if defined(DEBUG) && defined(INSTALL_DEBUG)
@@ -46,7 +45,7 @@ diff -ur sys.old/conf/kern.post.mk sys/conf/kern.post.mk
  .endif
  
  kernel-reinstall:
- 	@-chflags -R noschg ${DESTDIR}${KODIR}
+-	@-chflags -R noschg ${DESTDIR}${KODIR}
  .if defined(DEBUG) && defined(INSTALL_DEBUG)
 -	${INSTALL} -p -m 555 -o root -g wheel ${FULLKERNEL} ${DESTDIR}${KODIR}
 +	${INSTALL} -p -m 555 -o root -g root ${FULLKERNEL} ${DESTDIR}${KODIR}
