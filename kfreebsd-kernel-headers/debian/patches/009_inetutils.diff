@@ -1,7 +1,6 @@
-diff -ur sys.orig/net/if.h sys/net/if.h
---- sys.orig/net/if.h	2004-11-30 01:05:19.000000000 +0100
-+++ sys/net/if.h	2004-11-30 01:17:54.000000000 +0100
-@@ -83,30 +83,30 @@
+--- sys/net/if.h.orig	2005-09-04 12:21:38.000000000 -0400
++++ sys/net/if.h	2005-09-04 14:25:46.000000000 -0400
+@@ -78,30 +78,30 @@
   */
  struct if_data {
  	/* generic interface information */
@@ -52,10 +51,10 @@ diff -ur sys.orig/net/if.h sys/net/if.h
 +	unsigned long	ifi_iqdrops;		/* dropped on input, this interface */
 +	unsigned long	ifi_noproto;		/* destined for unsupported protocol */
 +	unsigned long	ifi_hwassist;		/* HW offload capabilities */
- 	time_t	ifi_epoch;		/* time of attach or stat reset */
+ 	time_t	ifi_epoch;		/* uptime at attach or stat reset */
  #ifdef __alpha__
  	u_int	ifi_timepad;		/* time_t is int, not long on alpha */
-@@ -177,12 +177,12 @@
+@@ -172,12 +172,12 @@
   * from getkerninfo and the routing socket
   */
  struct if_msghdr {
@@ -72,7 +71,7 @@ diff -ur sys.orig/net/if.h sys/net/if.h
  	struct	if_data ifm_data;/* statistics and other data about if */
  };
  
-@@ -191,12 +191,12 @@
+@@ -186,12 +186,12 @@
   * from getkerninfo and the routing socket
   */
  struct ifa_msghdr {
@@ -89,7 +88,7 @@ diff -ur sys.orig/net/if.h sys/net/if.h
  	int	ifam_metric;	/* value of ifa_metric */
  };
  
-@@ -205,24 +205,24 @@
+@@ -200,24 +200,24 @@
   * from the routing socket
   */
  struct ifma_msghdr {
@@ -123,7 +122,7 @@ diff -ur sys.orig/net/if.h sys/net/if.h
  };
  
  #define	IFAN_ARRIVAL	0	/* interface arrival */
-@@ -247,7 +247,7 @@
+@@ -241,7 +241,7 @@
  		int	ifru_mtu;
  		int	ifru_phys;
  		int	ifru_media;
@@ -132,7 +131,7 @@ diff -ur sys.orig/net/if.h sys/net/if.h
  		int	ifru_cap[2];
  	} ifr_ifru;
  #define	ifr_addr	ifr_ifru.ifru_addr	/* address */
-@@ -310,7 +310,7 @@
+@@ -303,7 +303,7 @@
  struct	ifconf {
  	int	ifc_len;		/* size of associated buffer */
  	union {
@@ -141,7 +140,7 @@ diff -ur sys.orig/net/if.h sys/net/if.h
  		struct	ifreq *ifcu_req;
  	} ifc_ifcu;
  #define	ifc_buf	ifc_ifcu.ifcu_buf	/* buffer address */
-@@ -323,9 +323,9 @@
+@@ -316,9 +316,9 @@
   */
  struct if_laddrreq {
  	char	iflr_name[IFNAMSIZ];
