@@ -1,0 +1,82 @@
+		GNU/kFreeBSD IRC meeting, September 04, 2005
+                ============================================
+
+
+The seventh Debian GNU/kFreeBSD meeting was held from 19:00 UTC to 20:05
+UTC on Sunday September 04th.
+
+The next meeting will take place on Sunday September 18th at 19:00 UTC.
+
+
+Minutes
+-------
+
+People mentioned:
+  aurel32: 	Aurelien Jarno
+  bal00:	Hector Garcia
+  braindmg:	Guillem Jover
+  nyu:		Robert Millan
+  otavio:	Otavio Salvador
+  stu: 		Robert Edmonds
+  tarzeau:	Gürkan Sengün
+
+
+1) braindmg explained he has done some work on mini-dak on gnuab.org.
+   He finished his work about the pool split, which means that there 
+   aren't anymore mixed -all packages between the Hurd and GNU/kFreeBSD.
+   However, pure -all packages are still not accepted yet.
+   He also finished the auto-obsoleting functionality, so that only the
+   latest package is kept in the archive. The script considers both 
+   unreleased and unstable as the same repository, so that it will be 
+   possible to produce stats about the kind of packages in unreleased.
+   braindmg also added the overrides files to the archive.
+
+2) stu explained that the freebsd utilities depends on the major version
+   of the kernel, and thus we will need to have one version for 5.x
+   kernels and one version for 6.x kernels. aurel32 added the we 
+   currently only support 5.x kernels, but that is something that have 
+   to be planned.
+
+3) stu suggested that we provide a meta-package that depends on the 
+   various FreeBSD util packages, as well as GNU replacements for 
+   userland BSD programs. That's something that has to be discussed.
+
+4) aurel32 explained he has some problems concerning the threads to 
+   upgrade the kfreebsd's glibc from 2.3 to 2.3.5.
+   There is some work to do on linuxthreads, as a lot of things have
+   changed in that part. He also explained that linuxthreads is 
+   considered as deprecated, so he started to find alternatives to this
+   threading system:
+   - NPTL, which is currently linux specific, needs a lot of changes in 
+     the kernel, mostly arround the clone() function, and the new futex 
+     functionality. 
+   - using libpthread from FreeBSD seems to be complicated, as that 
+     means the glibc won't be threaded.
+   So he decided to continue to work on linuxthreads, but a solution have
+   to be found and planned before linuxthreads is simply dropped.
+
+5) aurel32 announced that almost all KDE packages, but kdemultmedia and
+   kdeaddons are not available on kfreebsd-i386.
+
+
+New action points
+-----------------
+
+Opened action points
+--------------------
+* aurel32:		rebuild all packages that are still using 
+                        lipthread2
+* braindmg:		work on util-linux
+* aurel32:		add java support to gcc
+* aurel32:		finish porting glibc-2.3.5
+* aurel32 & braindmg:	fix our packages that are modifying 
+                        build-depends at build time
+* braindmg:		upload ufsutils to unstable
+* somebody:		port libkvm in a clean manner
+			
+Closed action points
+--------------------
+* all: 			write an announcement mail for io.debian.net
+* nyu:			port busybox
+* braindmg:		send a status of the port to debian-devel
+
