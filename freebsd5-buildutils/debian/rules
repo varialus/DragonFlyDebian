@@ -9,11 +9,10 @@
 # from having to guess our platform (since we know it already)
 DEB_BUILD_GNU_TYPE      := $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 DEB_BUILD_GNU_CPU       := $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
-DEB_HOST_GNU_TYPE       := $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-DEB_HOST_GNU_CPU        := $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
+DEB_HOST_ARCH_CPU        := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 PMAKE=pmake
-CFLAGS=-O2 -g -Wall -DMACHINE_ARCH='\"$(DEB_BUILD_GNU_CPU)\"'
+CFLAGS=-O2 -g -Wall -DMACHINE_ARCH='\"$(DEB_HOST_ARCH_CPU)\"'
 MAKE_BUILD_FLAGS= COPTS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO
 YACC=$(CURDIR)/build-tree/src/usr.bin/yacc/yacc
 
