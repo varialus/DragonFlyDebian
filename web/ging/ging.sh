@@ -96,76 +96,8 @@ ca:12345:ctrlaltdel:/sbin/shutdown -t1 -a -r now
 EOF
 
 mkdir -p ramdisk
-cat > root/startup << __EOF__
-#!/bin/bash
-set -e
-trap "echo \"Something wicked happened.  Press enter for rescue shell.\" ; read i ; bash" 0
-mdconfig -a -t malloc -o compress -s 32m -u md0
-mkfs.ufs /dev/md0
-mount -o rw -t ufs /dev/md0 /ramdisk
-echo "Populating ramdisk node \(this might take a while\) ..."
-for i in /* ; do
-  case \${i} in
-    /bin|/usr|/boot|/lib|/libexec|/sbin|/base)
-      mkdir -p /ramdisk/\${i}
-      mount -t nullfs /\${i} /ramdisk/\${i}
-    ;;
-    /dev)
-      mkdir -p /ramdisk/dev
-      mount -t devfs null /ramdisk/dev
-    ;;
-    /proc)
-      mkdir -p /ramdisk/proc
-      mount -t linprocfs null /ramdisk/proc
-    ;;
-    /var)
-      mkdir -p /ramdisk/var
-      for i in \${i}/* ; do
-        case \${i} in
-          /var/lib|/var/cache)
-            mkdir -p /ramdisk/\${i}
-            mount -t nullfs /\${i} /ramdisk/\${i}
-          ;;
-          *)
-            cp -a /\${i} /ramdisk/\${i}
-          ;;
-        esac
-      done
-    ;;
-    /ramdisk|/*-RELEASE)
-    ;;
-    /*)
-      cp -a /\${i} /ramdisk/\${i}
-    ;;
-  esac
-done
-# doesn't work as expected (i.e. you still need -f to halt)
-#mknod -m 600 /ramdisk/etc/.initctl p
-export TERM=cons25
-
-# attempt to setup network via DHCP
-if which dhclient3 >/dev/null 2>/dev/null ; then
-  chroot /ramdisk dhclient3 >/dev/null 2>/dev/null &
-fi
-
-# make /etc/init.d/checkroot happy
-# (we don't use <<EOF because bash requires a tempfile to do that)
-echo "/dev/md0	/	ufs		rw	1 1" > /ramdisk/etc/fstab
-
-while chroot /ramdisk ; do true ; done
-echo "chrooted shell exitted with non-zero status.  NOT respawning."
-while bash ; do true ; done
-echo "Ok, you get what you wanted ..."
-halt -f
-__EOF__
+cp ${pwd}/startup root/
 chmod +x root/startup
-
-# hacks for being a FreeBSD compliant [tm] cdrom
-for i in 5 6 ; do for j in 0 1 2 3 4 5 6 7 8 9 ; do
-  ln -sf . $i.$j-RELEASE
-done ; done
-ln -s ../base/base.tgz root/
-
 
 #########################
 #                    ignition!
