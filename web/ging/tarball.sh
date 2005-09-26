@@ -66,7 +66,6 @@ chroot ${tmp1} apt-get -y install ${packages} || true
 username="ging"
 chroot ${tmp1} adduser --disabled-password $username
 sed -i ${tmp1}/etc/shadow -e "s/^ging:\*:/ging::/g"
-echo "case \`tty\` in /dev/ttyv*) xinit /usr/bin/gnome-session ;; esac" >> ${tmp1}/home/$username/.bashrc
 
 cat > ${tmp1}/etc/sudoers << __EOF__
 $username ALL=NOPASSWD: ALL
