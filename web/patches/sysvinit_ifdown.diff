@@ -1,0 +1,29 @@
+
+Author: rmh (with help from Petter Reinholdtsen)
+Status: in BTS
+
+--- sysvinit-2.86.ds1.old/src/ifdown.c	1998-06-02 22:41:47.000000000 +0200
++++ sysvinit-2.86.ds1/src/ifdown.c	2005-09-15 12:41:55.000000000 +0200
+@@ -61,10 +61,18 @@
+ 				continue;
+ 			if (strchr(ifr[i].ifr_name, ':') != NULL)
+ 				continue;
+-			ifr[i].ifr_flags &= ~(IFF_UP);
+-			if (ioctl(fd, SIOCSIFFLAGS, &ifr[i]) < 0) {
+-				fprintf(stderr, "ifdown: shutdown ");
+-				perror(ifr[i].ifr_name);
++
++#ifdef ifr_flagshigh
++#define FLAGS ifr_flagshigh
++#else
++#define FLAGS ifr_flags
++#endif
++			if (ifr[i].FLAGS & IFF_UP) {
++				ifr[i].FLAGS &= ~(IFF_UP);
++				if (ioctl(fd, SIOCSIFFLAGS, &ifr[i]) < 0) {
++					fprintf(stderr, "ifdown: shutdown ");
++					perror(ifr[i].ifr_name);
++				}
+ 			}
+ 		}
+ 	}
