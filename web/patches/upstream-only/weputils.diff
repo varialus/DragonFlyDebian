@@ -1,0 +1,69 @@
+
+Author: rmh
+Status: sent upstream (no response)
+
+diff -ur bsd-airtools.old/dweputils/dwepcrack/dwepcrack.h bsd-airtools/dweputils/dwepcrack/dwepcrack.h
+--- bsd-airtools.old/dweputils/dwepcrack/dwepcrack.h	2003-07-20 10:11:42.000000000 +0200
++++ bsd-airtools/dweputils/dwepcrack/dwepcrack.h	2005-09-16 15:45:04.000000000 +0200
+@@ -38,7 +38,7 @@
+ #include <sys/types.h>
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+@@ -76,7 +76,7 @@
+ /*
+  * macros
+  */
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #define le32toh(x) (x)
+ #define htole16(x) (x)
+ #define le16toh(x) (x)
+diff -ur bsd-airtools.old/dweputils/dwepcrack/weakksa.c bsd-airtools/dweputils/dwepcrack/weakksa.c
+--- bsd-airtools.old/dweputils/dwepcrack/weakksa.c	2003-07-20 07:43:59.000000000 +0200
++++ bsd-airtools/dweputils/dwepcrack/weakksa.c	2005-09-16 15:33:49.000000000 +0200
+@@ -168,7 +168,7 @@
+           memcpy(samples[B].s[samples[B].len].iv, iv, IV_SIZE);
+           samples[B].s[samples[B].len++].byte = iv[4] ^ 0xaa;
+ 
+-          fail:
++          fail: break;
+         }
+       }
+     }
+diff -ur bsd-airtools.old/dweputils/dwepcrack/wordfile.c bsd-airtools/dweputils/dwepcrack/wordfile.c
+--- bsd-airtools.old/dweputils/dwepcrack/wordfile.c	2003-07-20 07:09:26.000000000 +0200
++++ bsd-airtools/dweputils/dwepcrack/wordfile.c	2005-09-16 15:46:02.000000000 +0200
+@@ -36,6 +36,7 @@
+  */
+ 
+ #include <stdio.h>
++#include <stdlib.h> /* exit */
+ #include <unistd.h>
+ #include <string.h>
+ #include <signal.h>
+diff -ur bsd-airtools.old/dweputils/dwepdump/dwepdump.c bsd-airtools/dweputils/dwepdump/dwepdump.c
+--- bsd-airtools.old/dweputils/dwepdump/dwepdump.c	2003-07-20 10:12:26.000000000 +0200
++++ bsd-airtools/dweputils/dwepdump/dwepdump.c	2005-09-16 15:51:44.000000000 +0200
+@@ -47,7 +47,7 @@
+ 
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+@@ -74,7 +74,7 @@
+ /*
+  * macros
+  */
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #define le16toh(x) (x)
+ #else
+ #ifdef __OpenBSD__
