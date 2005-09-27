@@ -1,3 +1,8 @@
+
+Author: rmh
+Status: Maybe we need this hack to build dar, but it's not clean.  We're
+ supposed to provide ACLs..
+
 diff -ur dar-2.2.1.old/debian/control dar-2.2.1/debian/control
 --- dar-2.2.1.old/debian/control	2005-07-19 22:12:56.000000000 +0200
 +++ dar-2.2.1/debian/control	2005-07-19 22:50:57.000000000 +0200
@@ -39,15 +44,3 @@ diff -ur dar-2.2.1.old/debian/rules dar-2.2.1/debian/rules
  
  
  build: build-stamp
-diff -ur dar-2.2.1.old/src/my_config.h dar-2.2.1/src/my_config.h
---- dar-2.2.1.old/src/my_config.h	2005-02-20 17:05:45.000000000 +0100
-+++ dar-2.2.1/src/my_config.h	2005-07-19 23:30:21.000000000 +0200
-@@ -27,6 +27,8 @@
- #define MY_CONFIG_H
- 
- #if HAVE_CONFIG_H
-+#define linux 0
-+#define ext2fs 1
- #include "../config.h"
- 
-     // workaround for autoconf 2.59
