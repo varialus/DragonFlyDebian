@@ -1,0 +1,83 @@
+--- apt-rpm-0.5.15cnc6.orig/debian/patches/libtool.patch
++++ apt-rpm-0.5.15cnc6/debian/patches/libtool.patch
+@@ -0,0 +1,80 @@
++# Libtool update for GNU/kFreeBSD
++
++--- apt-rpm-0.5.15cnc6.orig/aclocal.m4
+++++ apt-rpm-0.5.15cnc6/aclocal.m4
++@@ -2443,7 +2443,7 @@
++     ;;
++ 
++   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
++-  freebsd*)
+++  freebsd* | kfreebsd*-gnu)
++     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
++     hardcode_libdir_flag_spec='-R$libdir'
++     hardcode_direct=yes
++@@ -2898,6 +2898,18 @@
++   dynamic_linker=no
++   ;;
++ 
+++kfreebsd*-gnu)
+++  version_type=linux
+++  need_lib_prefix=no
+++  need_version=no
+++  library_names_spec='${libname}${release}.so$versuffix ${libname}${release}.so$major $libname.so'
+++  soname_spec='${libname}${release}.so$major'
+++  shlibpath_var=LD_LIBRARY_PATH
+++  shlibpath_overrides_runpath=no
+++  hardcode_into_libs=yes
+++  dynamic_linker='ld.so'
+++  ;;
+++
++ freebsd*)
++   objformat=`test -x /usr/bin/objformat && /usr/bin/objformat || echo aout`
++   version_type=freebsd-$objformat
++@@ -4147,7 +4159,7 @@
++   esac
++   ;;
++ 
++-freebsd*)
+++freebsd* | kfreebsd*-gnu)
++   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
++     case $host_cpu in
++     i*86 )
++--- apt-rpm-0.5.15cnc6.orig/configure
+++++ apt-rpm-0.5.15cnc6/configure
++@@ -3456,7 +3456,7 @@
++   esac
++   ;;
++ 
++-freebsd*)
+++freebsd* | kfreebsd*-gnu)
++   if echo __ELF__ | $CC -E - | grep __ELF__ > /dev/null; then
++     case $host_cpu in
++     i*86 )
++@@ -5940,7 +5940,7 @@
++     ;;
++ 
++   # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
++-  freebsd*)
+++  freebsd* | kfreebsd*-gnu)
++     archive_cmds='$CC -shared -o $lib $libobjs $deplibs $compiler_flags'
++     hardcode_libdir_flag_spec='-R$libdir'
++     hardcode_direct=yes
++@@ -6402,6 +6402,18 @@
++   dynamic_linker=no
++   ;;
++ 
+++kfreebsd*-gnu)
+++  version_type=linux
+++  need_lib_prefix=no
+++  need_version=no
+++  library_names_spec='${libname}${release}.so$versuffix ${libname}${release}.so$major $libname.so'
+++  soname_spec='${libname}${release}.so$major'
+++  shlibpath_var=LD_LIBRARY_PATH
+++  shlibpath_overrides_runpath=no
+++  hardcode_into_libs=yes
+++  dynamic_linker='ld.so'
+++  ;;
+++
++ freebsd*)
++   objformat=`test -x /usr/bin/objformat && /usr/bin/objformat || echo aout`
++   version_type=freebsd-$objformat

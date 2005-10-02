@@ -1,0 +1,51 @@
+Author: aurel32
+Status: in BTS
+
+--- asmix-1.3.orig/autoconf/config.h.in
++++ asmix-1.3/autoconf/config.h.in
+@@ -9,8 +9,8 @@
+ /* Define if you have the <linux/soundcard.h> header file.  */
+ #undef HAVE_LINUX_SOUNDCARD_H
+ 
+-/* Define if you have the <machine/soundcard.h> header file.  */
+-#undef HAVE_MACHINE_SOUNDCARD_H
++/* Define if you have the <sys/soundcard.h> header file.  */
++#undef HAVE_SYS_SOUNDCARD_H
+ 
+ /* Define if you have the <sys/mount.h> header file.  */
+ #undef HAVE_SYS_MOUNT_H
+--- asmix-1.3.orig/autoconf/configure.in
++++ asmix-1.3/autoconf/configure.in
+@@ -58,7 +58,7 @@
+ AC_PATH_XTRA
+ AC_CHECK_HEADERS(sys/wait.h sys/time.h)
+ AC_CHECK_HEADERS(sys/statvfs.h sys/vfs.h sys/mount.h ustat.h)
+-AC_CHECK_HEADERS(machine/soundcard.h linux/soundcard.h linux/radio.h)
++AC_CHECK_HEADERS(sys/soundcard.h linux/soundcard.h linux/radio.h)
+ AC_CONFIG_HEADER(config.h)
+ 
+ dnl# Check for X
+--- asmix-1.3.orig/configure
++++ asmix-1.3/configure
+@@ -2018,7 +2018,7 @@
+ fi
+ done
+ 
+-for ac_hdr in machine/soundcard.h linux/soundcard.h linux/radio.h
++for ac_hdr in sys/soundcard.h linux/soundcard.h linux/radio.h
+ do
+ ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
+ echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
+--- asmix-1.3.orig/asmix.c
++++ asmix-1.3/asmix.c
+@@ -22,8 +22,8 @@
+ #include <sys/errno.h>
+ #include <sys/ioctl.h>
+ #include <fcntl.h>
+-#ifdef HAVE_MACHINE_SOUNDCARD_H
+-#  include <machine/soundcard.h>
++#ifdef HAVE_SYS_SOUNDCARD_H
++#  include <sys/soundcard.h>
+ #endif
+ #ifdef HAVE_LINUX_SOUNDCARD_H
+ #  include <linux/soundcard.h>
