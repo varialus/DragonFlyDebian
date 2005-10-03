@@ -1,23 +1,14 @@
 
-Author: rmh
-Description: fixes xdm, kdm, etc (probably gdm if this one didn't mess with SIGUSR1)
-Status: pending
+Use SysV UTMP instead of BSD one (this fixes runtime failure on xdm/kdm/etc)
 
-diff -Nur xorg-x11-6.8.2.dfsg.1.old/debian/patches/freebsd/003_gnu-kbsd_sessreg.diff xorg-x11-6.8.2.dfsg.1/debian/patches/freebsd/003_gnu-kbsd_sessreg.diff
---- xorg-x11-6.8.2.dfsg.1.old/debian/patches/freebsd/003_gnu-kbsd_sessreg.diff	1970-01-01 01:00:00.000000000 +0100
-+++ xorg-x11-6.8.2.dfsg.1/debian/patches/freebsd/003_gnu-kbsd_sessreg.diff	2005-08-29 23:58:15.000000000 +0200
-@@ -0,0 +1,14 @@
-+
-+Use SysV UTMP instead of BSD one (this fixes runtime failure on xdm/kdm/etc)
-+
-+--- xc/programs/xdm/sessreg.c~	2005-02-28 18:35:18.000000000 +0100
-++++ xc/programs/xdm/sessreg.c	2005-08-29 23:16:45.000000000 +0200
-+@@ -74,7 +74,7 @@
-+ # include	<pwd.h>
-+ #endif
-+ 
-+-#if defined(SVR4) || defined(linux)
-++#if defined(SVR4) || defined(linux) || defined(__GLIBC__)
-+ #define SYSV
-+ #endif
-+ 
+--- xc/programs/xdm/sessreg.c~	2005-02-28 18:35:18.000000000 +0100
++++ xc/programs/xdm/sessreg.c	2005-08-29 23:16:45.000000000 +0200
+@@ -74,7 +74,7 @@
+ # include	<pwd.h>
+ #endif
+ 
+-#if defined(SVR4) || defined(linux)
++#if defined(SVR4) || defined(linux) || defined(__GLIBC__)
+ #define SYSV
+ #endif
+ 
