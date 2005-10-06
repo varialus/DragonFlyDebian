@@ -1,150 +1,68 @@
 
-Status: pending (guillem)
+Author: guillem (updated by rmh)
+Status: no fucking idea.  check it out!
 
-diff -ur util-linux-2.12.old/debian/control util-linux-2.12/debian/control
---- util-linux-2.12.old/debian/control	2004-07-29 01:21:18.000000000 +0200
-+++ util-linux-2.12/debian/control	2004-07-29 01:21:35.000000000 +0200
-@@ -54,7 +54,7 @@
-  Included are: logger, renice, replay, script, wall
- 
- Package: fdisk-udeb
--Architecture: alpha arm hppa i386 ia64 mips mipsel powerpc hurd-i386 sparc
-+Architecture: alpha arm hppa i386 ia64 mips mipsel powerpc hurd-i386 sparc kfreebsd-i386 knetbsd-i386
- Priority: extra
- Section: debian-installer
- Depends: ${cfdisk-udeb:Depends}
-diff -ur util-linux-2.12.old/debian/rules util-linux-2.12/debian/rules
---- util-linux-2.12.old/debian/rules	2004-07-29 01:21:18.000000000 +0200
-+++ util-linux-2.12/debian/rules	2004-07-29 01:21:35.000000000 +0200
-@@ -3,46 +3,42 @@
- SHELL = bash
- package = util-linux
- 
--ifndef DEB_HOST_ARCH
--DEB_BUILD_ARCH := $(shell dpkg --print-installation-architecture)
--DEB_HOST_ARCH = $(DEB_BUILD_ARCH)
--endif
--
--ifndef DEB_HOST_GNU_SYSTEM
--DEB_HOST_GNU_SYSTEM := $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
--endif
-+DEB_BUILD_GNU_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
-+DEB_BUILD_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_SYSTEM)
-+DEB_BUILD_ARCH ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH)
-+export cpu = $(DEB_BUILD_GNU_CPU)
-+export system = $(DEB_BUILD_GNU_SYSTEM)
-+export type = $(cpu)-$(system)
-+export arch = $(DEB_BUILD_ARCH)
- 
--export arch = $(DEB_HOST_ARCH)
- version := $(shell sed -e '1{;s|^util-linux (\(.*\))\ .*|\1|;q;}' debian/changelog)
- 
--fdisk_arch = $(findstring $(arch),alpha i386 powerpc arm mips mipsel hppa ia64 hurd-i386)
--sparc = $(findstring $(arch),sparc)
--nohwclock = $(findstring $(arch),s390)
-+fdisk_cpu = $(findstring $(cpu),alpha i386 powerpc arm mips mipsel hppa ia64)
-+fdisk_system = $(findstring $(system),linux gnu kfreebsd-gnu knetbsd-gnu)
-+sparc = $(findstring $(cpu),sparc)
-+nohwclock = $(findstring $(cpu),s390)
+diff -ur util-linux-2.12p.old/debian/patches/00list util-linux-2.12p/debian/patches/00list
+--- util-linux-2.12p.old/debian/patches/00list	2005-10-06 18:45:25.000000000 +0200
++++ util-linux-2.12p/debian/patches/00list	2005-10-06 19:47:00.000000000 +0200
+@@ -1,4 +1,3 @@
+-10agetty
+ 10cal-widechar
+ 10cfdisk
+ 10debian
+diff -ur util-linux-2.12p.old/debian/rules util-linux-2.12p/debian/rules
+--- util-linux-2.12p.old/debian/rules	2005-10-06 18:45:25.000000000 +0200
++++ util-linux-2.12p/debian/rules	2005-10-06 19:52:35.000000000 +0200
+@@ -25,7 +25,7 @@
+ sparc = $(findstring $(arch),sparc)
+ nohwclock = $(findstring $(arch),s390)
  
 -SUBDIRS=po lib getopt disk-utils login-utils misc-utils mount sys-utils text-utils
--ifeq ($(arch),$(fdisk_arch))
-+SUBDIRS=po lib getopt disk-utils login-utils misc-utils mount text-utils
-+ifeq ($(type),$(fdisk_cpu)-$(fdisk_system))
++SUBDIRS=po lib getopt disk-utils login-utils misc-utils sys-utils text-utils
+ ifeq ($(arch),$(fdisk_arch))
  SUBDIRS += fdisk
  endif
--ifeq ($(arch),$(sparc))
-+ifeq ($(type),$(sparc)-$(fdisk_system))
- SUBDIRS += fdisk
- endif
--ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
--ifneq ($(arch),$(nohwclock))
-+ifeq ($(system),linux)
-+SUBDIRS += sys-utils
-+ifneq ($(cpu),$(nohwclock))
+@@ -36,6 +36,7 @@
+ ifneq ($(arch),$(nohwclock))
  SUBDIRS += hwclock 
  endif
++SUBDIRS += mount
  endif
  
--ifneq ($(DEB_HOST_GNU_SYSTEM),linux)
--util-linux_Conflicts = getty
--endif
--
- CFDISK_PO_DIR=cfdisk-po
- CFDISK_POT=$(CFDISK_PO_DIR)/cfdisk.pot
- 
- build:
- 	$(checkdir)
- 	./configure
--	$(MAKE) all arch=$(arch) SUBDIRS="${SUBDIRS}"
-+	$(MAKE) all SUBDIRS="${SUBDIRS}"
- 	# $(MAKE) disk-utils/raw - this is done above if linux/raw.h exists
- 	touch build
- 
-@@ -60,32 +56,27 @@
- # Architecture independant stuff
+ ifneq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
+@@ -68,9 +69,12 @@
  
  SUIDFILES = debian/tmp-mount/bin/{u,}mount
--BINFILES  = sys-utils/arch text-utils/more
+ BINFILES  = sys-utils/arch text-utils/more
 -UBINFILES = sys-utils/{ipcs,ipcrm,setsid} \
 -	misc-utils/{namei,setterm,mcookie,whereis,ddate} \
-+BINFILES  = text-utils/more
-+UBINFILES = misc-utils/{namei,setterm,mcookie,whereis,ddate} \
++UBINFILES = sys-utils/{ipcrm,setsid} \
++	misc-utils/{namei,mcookie,whereis,ddate} \
  	getopt/getopt text-utils/{rev,line,pg}
--SBINFILES = disk-utils/mkswap
-+SBINFILES = disk-utils/mkswap login-utils/agetty
++ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
++UBINFILES += sys-utils/ipcs misc-utils/setterm
++endif
+ SBINFILES = disk-utils/mkswap
  
--ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
--ifneq ($(arch),$(nohwclock))
-+ifeq ($(system),linux)
-+ifneq ($(cpu),$(nohwclock))
- INITFILES = debian/hwclock.sh debian/hwclockfirst.sh
+ ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
+@@ -79,11 +83,15 @@
  SBINFILES += hwclock/hwclock
  endif
--BINFILES  += sys-utils/dmesg
+ BINFILES  += sys-utils/dmesg
 -SBINFILES += disk-utils/{blockdev,raw} mount/pivot_root login-utils/agetty
-+BINFILES  += sys-utils/{dmesg,arch}
 +SBINFILES += disk-utils/{blockdev,raw} mount/pivot_root
  UBINFILES += disk-utils/fdformat
  USBINFILES = sys-utils/readprofile disk-utils/elvtune # disk-utils/setfdprm
-+UBINFILES += sys-utils/{ipcs,ipcrm,setsid}
  endif
  
- UBINFILES2= misc-utils/chkdupexe # debian/fdformat # don't strip these
- 
--ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
--MOUNTBINFILES  = mount/mount mount/umount
--MOUNTSBINFILES = mount/swapon mount/losetup
--endif
--
- #BSDBINFILES = # misc-utils/kill
--BSDUBINFILES = misc-utils/script misc-utils/logger sys-utils/renice \
-+BSDUBINFILES = misc-utils/script misc-utils/logger \
-                login-utils/wall
-                # misc-utils/replay is handled seperately
- BSDMAN1FILES = login-utils/wall.1 misc-utils/script.1 \
-@@ -93,62 +84,69 @@
- BSDMAN8FILES = sys-utils/renice.8
- BSDDOCFILES = debian/README.script
- 
-+ifeq ($(system),linux)
-+MOUNTBINFILES  = mount/mount mount/umount
-+MOUNTSBINFILES = mount/swapon mount/losetup
-+BSDUBINFILES += sys-utils/renice
++ifneq ($(DEB_HOST_GNU_SYSTEM),gnu)
++SBINFILES += login-utils/agetty
 +endif
 +
- # Architecture independant docs
+ UBINFILES2= misc-utils/chkdupexe # debian/fdformat # don't strip these
  
- MAN1FILES = text-utils/{pg,more,line,rev}.1 misc-utils/{namei.1,mcookie.1} \
-             misc-utils/{chkdupexe.1,setterm.1,whereis.1,ddate.1} \
- 	    sys-utils/arch.1 getopt/getopt.1
--MAN8FILES = sys-utils/{ipcrm.8,ipcs.8,setsid.8} disk-utils/mkswap.8
--ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
--ifneq ($(arch),$(nohwclock))
-+MAN8FILES = sys-utils/{ipcrm.8,ipcs.8,setsid.8} disk-utils/mkswap.8 \
-+	login-utils/agetty.8
-+ifeq ($(system),linux)
-+ifneq ($(cpu),$(nohwclock))
+ ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
+@@ -111,11 +119,14 @@
  MAN8FILES += hwclock/hwclock.8
  endif
  MAN1FILES += sys-utils/readprofile.1
@@ -154,804 +72,453 @@ diff -ur util-linux-2.12.old/debian/rules util-linux-2.12/debian/rules
  	     disk-utils/fdformat.8 disk-utils/raw.8 # disk-utils/setfdprm.8
  endif
  
++ifneq ($(DEB_HOST_GNU_SYSTEM),gnu)
++MAN8FILES += login-utils/agetty.8
++endif
  
  EXAMPLES = fdisk/sfdisk.examples getopt/getopt-{test,parse}.{ba,tc}sh
--ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
-+ifeq ($(system),linux)
- EXAMPLES += debian/fstab.example2
+ ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
+@@ -123,8 +134,11 @@
  endif
  
  INFOFILES = sys-utils/ipc.info
--ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
+-ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
++ifneq ($(DEB_HOST_GNU_SYSTEM),gnu)
  DOCFILES  = login-utils/{README.getty,README.modems-with-agetty,README.poeigl}
--ifneq ($(arch),$(nohwclock))
-+ifeq ($(system),linux)
-+ifneq ($(cpu),$(nohwclock))
++endif
++
++ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
+ ifneq ($(arch),$(nohwclock))
  DOCFILES += debian/README.Debian.hwclock
  endif
- endif
- 
--ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
-+ifeq ($(system),linux)
- MOUNTMAN5FILES = mount/fstab.5 mount/nfs.5
- MOUNTMAN8FILES = mount/losetup.8 mount/swapoff.8 mount/umount.8 \
- 		 mount/mount.8 mount/swapon.8
- MOUNTDOCFILES  = mount/README.mount
- endif
- 
--ifneq ($(arch),$(sparc))
-+ifneq ($(cpu),$(sparc))
- SBINFILES := $(SBINFILES) disk-utils/{{fsck,mkfs}.{minix,cramfs},mkfs}
- MAN8FILES := $(MAN8FILES) disk-utils/{{fsck,mkfs}.minix.8,mkfs.8}	# no cramfs man
- endif
--ifeq ($(arch),$(fdisk_arch))
-+ifeq ($(type),$(fdisk_cpu)-$(fdisk_system))
- SBINFILES := $(SBINFILES) fdisk/{cfdisk,fdisk,sfdisk}
- MAN8FILES := $(MAN8FILES) fdisk/{cfdisk.8,fdisk.8,sfdisk.8}
- DOCFILES  := $(DOCFILES) fdisk/README.{c,}fdisk
--ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
-+ifeq ($(system),linux)
- USBINFILES:= $(USBINFILES) sys-utils/{tunelp,cytune}
- MAN8FILES := $(MAN8FILES) sys-utils/{tunelp.8,cytune.8}
- endif
- endif
--ifeq ($(arch),$(sparc))
-+ifeq ($(cpu),$(sparc))
- SBINFILES := $(SBINFILES) fdisk/fdisk
- MAN8FILES := $(MAN8FILES) fdisk/fdisk.8
- DOCFILES  := $(DOCFILES) fdisk/README.fdisk
- endif
--ifeq ($(arch),i386)
-+ifeq ($(type),i386-linux)
- USBINFILES:= $(USBINFILES) sys-utils/rdev
- MAN8FILES := $(MAN8FILES) sys-utils/{rdev.8,vidmode.8} \
- 		sys-utils/{ramsize.8,rootflags.8}
-@@ -172,7 +170,7 @@
- 	install    $(UBINFILES2) debian/tmp/usr/bin
- ifneq ($(USBINFILES),)
- 	install -s $(USBINFILES) debian/tmp/usr/sbin
--ifeq ($(arch), i386)
-+ifeq ($(type),i386-linux)
- 	ln -s rdev debian/tmp/usr/sbin/ramsize
- 	ln -s rdev debian/tmp/usr/sbin/vidmode
- 	ln -s rdev debian/tmp/usr/sbin/rootflags
-@@ -190,28 +188,29 @@
- 	install -m 644 $(DOCFILES)  debian/tmp/usr/share/doc/$(package)
- endif
- 	install -m 644 $(EXAMPLES)  debian/tmp/usr/share/doc/$(package)/examples
--ifeq ($(arch), powerpc)
-+ifeq ($(type),powerpc-linux)
+@@ -204,11 +218,11 @@
  	mv -f debian/tmp/sbin/fdisk debian/tmp/sbin/ddisk
  	mv -f debian/tmp/usr/share/man/man8/fdisk.8 debian/tmp/usr/share/man/man8/ddisk.8
  endif
 -ifeq ($(DEB_HOST_GNU_SYSTEM),gnu)
-+ifneq ($(system),linux)
++ifneq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
  	(cd debian/tmp/sbin ; mv mkswap mkswap.linux)
  	(cd debian/tmp/usr/share/man/man8 ; mv mkswap.8 mkswap.linux.8)
  endif
--ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
+-ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
++ifneq ($(DEB_HOST_GNU_SYSTEM),gnu)
  	(cd debian/tmp/sbin ; mv agetty getty)
  	(cd debian/tmp/usr/share/man/man8 ; mv agetty.8 getty.8)
--ifneq ($(arch), $(nohwclock))
--ifneq ($(arch), powerpc)
-+ifeq ($(system),linux)
-+ifneq ($(cpu), $(nohwclock))
-+ifneq ($(cpu), powerpc)
- 	(cd debian/tmp/usr/share/man/man8 && ln -s hwclock.8.gz clock.8.gz)
- endif
+ ifneq ($(arch), $(nohwclock))
+diff -ur util-linux-2.12p.old/disk-utils/Makefile util-linux-2.12p/disk-utils/Makefile
+--- util-linux-2.12p.old/disk-utils/Makefile	2004-12-21 18:14:16.000000000 +0100
++++ util-linux-2.12p/disk-utils/Makefile	2005-10-06 19:17:28.000000000 +0200
+@@ -16,16 +16,19 @@
+ 
+ SBIN= 	mkfs mkswap blockdev elvtune fsck.minix mkfs.minix mkfs.bfs
+ 
+-USRBIN=	fdformat isosize
++USRBIN=	isosize
+ 
+-ETC=	fdprm
+-
+-MAYBE=  setfdprm raw fsck.cramfs mkfs.cramfs
++MAYBE=  raw fsck.cramfs mkfs.cramfs
+ 
++ifeq ($(shell uname -s), Linux)
++USRBIN += fdformat
++ETC=	fdprm
++MAYBE += setfdprm
+ ifneq "$(HAVE_FDUTILS)" "yes"
+ USRBIN:=$(USRBIN) setfdprm
+ MAN8:=$(MAN8) setfdprm.8
  endif
 +endif
- 	(cd debian/tmp/usr/share/doc/$(package) ; mv README.modems-with-agetty README.modems-with-getty )
- 	perl -pi.bak -e 's/agetty/getty/g' debian/tmp/usr/share/man/man8/getty.8 \
- 	debian/tmp/usr/share/doc/$(package)/README.getty \
- 	debian/tmp/usr/share/doc/$(package)/README.modems-with-getty
- 	rm `find debian/tmp/usr -name \*.bak`
--endif
-+
- 	install -m 644 debian/changelog \
- 	  debian/tmp/usr/share/doc/$(package)/changelog.Debian
- 	install -m 644 HISTORY debian/tmp/usr/share/doc/$(package)/changelog
-@@ -219,8 +218,8 @@
- 	install -m 644 debian/mime.$(package) debian/tmp/usr/lib/mime/packages/$(package)
- 	install -m 644 debian/copyright debian/tmp/usr/share/doc/$(package)/copyright
- 	install debian/{preinst,postinst,prerm,postrm} debian/tmp/DEBIAN/
--ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
--ifneq ($(arch),$(nohwclock))
-+ifeq ($system),linux)
-+ifneq ($(cpu),$(nohwclock))
- 	install -m 644 debian/conffiles debian/tmp/DEBIAN/
- endif
- endif
-@@ -237,7 +236,7 @@
- 	dpkg-gencontrol -isp -putil-linux -Vutil-linux:Conflicts="$(util-linux_Conflicts)"
- 	dpkg --build debian/tmp ..
  
--ifeq ($(arch),$(fdisk_arch))
-+ifeq ($(type),$(fdisk_cpu)-$(fdisk_system))
- # Do the udeb
- 	install -d debian/tmp-fdisk-udeb/usr/sbin
- 	install -d debian/tmp-fdisk-udeb/DEBIAN
-@@ -262,7 +261,7 @@
- 	dpkg-distaddfile fdisk-udeb_$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)_$(arch).udeb debian-installer extra
- 	dpkg --build debian/tmp-fdisk-udeb ../fdisk-udeb_$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)_$(arch).udeb
- endif
--ifeq ($(arch),$(sparc))
-+ifeq ($(type),$(sparc)-linux)
- # Do the udeb
- 	install -d debian/tmp-fdisk-udeb/usr/sbin
- 	install -d debian/tmp-fdisk-udeb/DEBIAN
-@@ -276,7 +275,7 @@
- 	dpkg --build debian/tmp-fdisk-udeb ../fdisk-udeb_$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)_$(arch).udeb
- endif
+ ifeq "$(HAVE_RAW_H)" "yes"
+ USRBIN:=$(USRBIN) raw
+diff -ur util-linux-2.12p.old/disk-utils/fsck.cramfs.c util-linux-2.12p/disk-utils/fsck.cramfs.c
+--- util-linux-2.12p.old/disk-utils/fsck.cramfs.c	2005-10-06 18:45:25.000000000 +0200
++++ util-linux-2.12p/disk-utils/fsck.cramfs.c	2005-10-06 19:13:12.000000000 +0200
+@@ -76,7 +76,11 @@
  
--ifeq ($(DEB_HOST_GNU_SYSTEM),linux)
-+ifeq ($(system),linux)
- 	# Mount
- 	install -d debian/tmp-mount/{DEBIAN,bin,sbin,usr/share/{man/{man8,man5},doc/mount/examples}}
- 	install -m 4755 -o root -s $(MOUNTBINFILES) debian/tmp-mount/bin/.
-diff -ur util-linux-2.12.old/disk-utils/fsck.minix.c util-linux-2.12/disk-utils/fsck.minix.c
---- util-linux-2.12.old/disk-utils/fsck.minix.c	2004-07-29 01:21:18.000000000 +0200
-+++ util-linux-2.12/disk-utils/fsck.minix.c	2004-07-29 01:21:35.000000000 +0200
-@@ -280,7 +280,10 @@
- 	int cont;
- 	int fd;
+ #define PAD_SIZE 512
  
--	if ((f = setmntent (MOUNTED, "r")) == NULL)
-+#ifndef _PATH_MOUNTED
-+#define _PATH_MOUNTED "/etc/mtab"
++#if defined(__linux__)
+ #include <asm/page.h>
++#elif defined(__FreeBSD_kernel__)
++#include <machine/param.h>
 +#endif
-+	if ((f = setmntent (_PATH_MOUNTED, "r")) == NULL)
- 		return;
- 	while ((mnt = getmntent (f)) != NULL)
- 		if (strcmp (device_name, mnt->mnt_fsname) == 0)
-@@ -294,7 +297,7 @@
- 	 * probably not correct; so we won't issue a warning based on
- 	 * it.
- 	 */
--	fd = open(MOUNTED, O_RDWR);
-+	fd = open (_PATH_MOUNTED, O_RDWR);
- 	if (fd < 0 && errno == EROFS)
- 		return;
- 	else
-diff -ur util-linux-2.12.old/disk-utils/mkfs.minix.c util-linux-2.12/disk-utils/mkfs.minix.c
---- util-linux-2.12.old/disk-utils/mkfs.minix.c	2004-07-29 01:21:18.000000000 +0200
-+++ util-linux-2.12/disk-utils/mkfs.minix.c	2004-07-29 01:21:35.000000000 +0200
-@@ -183,7 +183,10 @@
- 	FILE * f;
- 	struct mntent * mnt;
- 
--	if ((f = setmntent (MOUNTED, "r")) == NULL)
-+#ifndef _PATH_MOUNTED
-+#define _PATH_MOUNTED "/etc/mtab"
-+#endif
-+	if ((f = setmntent (_PATH_MOUNTED, "r")) == NULL)
- 		return;
- 	while ((mnt = getmntent (f)) != NULL)
- 		if (strcmp (device_name, mnt->mnt_fsname) == 0)
-diff -ur util-linux-2.12.old/fdisk/cfdisk.c util-linux-2.12/fdisk/cfdisk.c
---- util-linux-2.12.old/fdisk/cfdisk.c	2004-07-29 01:21:18.000000000 +0200
-+++ util-linux-2.12/fdisk/cfdisk.c	2004-07-29 01:21:35.000000000 +0200
-@@ -185,7 +185,7 @@
- #define round_int(d) ((double)((int)(d+0.5)))
- #define ceiling(d) ((double)(((d) != (int)(d)) ? (int)(d+1.0) : (int)(d)))
- 
--struct partition {
-+struct fdisk_partition {
-         unsigned char boot_ind;         /* 0x80 - active */
-         unsigned char head;             /* starting head */
-         unsigned char sector;           /* starting sector */
-@@ -235,12 +235,12 @@
- }
- 
- static void
--set_hsc_begin(struct partition *p, long long sector) {
-+set_hsc_begin(struct fdisk_partition *p, long long sector) {
- 	set_hsc(& p->head, & p->sector, & p->cyl, sector);
- }
- 
- static void
--set_hsc_end(struct partition *p, long long sector) {
-+set_hsc_end(struct fdisk_partition *p, long long sector) {
- 	set_hsc(& p->end_head, & p->end_sector, & p->end_cyl, sector);
- }
- 
-@@ -270,22 +270,22 @@
- }
- 
- static void
--set_start_sect(struct partition *p, unsigned int start_sect) {
-+set_start_sect(struct fdisk_partition *p, unsigned int start_sect) {
- 	store4_little_endian(p->start4, start_sect);
- }
- 
- static unsigned int
--get_start_sect(struct partition *p) {
-+get_start_sect(struct fdisk_partition *p) {
- 	return read4_little_endian(p->start4);
- }
- 
- static void
--set_nr_sects(struct partition *p, unsigned int nr_sects) {
-+set_nr_sects(struct fdisk_partition *p, unsigned int nr_sects) {
- 	store4_little_endian(p->size4, nr_sects);
- }
- 
- static unsigned int
--get_nr_sects(struct partition *p) {
-+get_nr_sects(struct fdisk_partition *p) {
- 	return read4_little_endian(p->size4);
- }
- 
-@@ -298,7 +298,7 @@
-     struct {
- 	unsigned char align[ALIGNMENT];
- 	unsigned char buffer[0x1BE];
--	struct partition part[4];
-+	struct fdisk_partition part[4];
- 	unsigned char magicflag[2];
-     } p;
- } partition_table;
-@@ -1521,7 +1521,7 @@
- 
- static void
- get_partition_table_geometry(partition_table *bufp) {
--    struct partition *p;
-+    struct fdisk_partition *p;
-     int i,h,s,hh,ss;
-     int first = TRUE;
-     int bad = FALSE;
-@@ -1612,7 +1612,7 @@
- fill_p_info(void) {
-     int pn, i;
-     long long bs, bsz;
--    struct partition *p;
-+    struct fdisk_partition *p;
-     partition_table buffer;
-     partition_info tmp_ext = { 0, 0, 0, 0, FREE_SPACE, PRIMARY };
- 
-@@ -1720,7 +1720,7 @@
- }
- 
- static void
--fill_part_table(struct partition *p, partition_info *pi) {
-+fill_part_table(struct fdisk_partition *p, partition_info *pi) {
-     long long begin;
- 
-     p->boot_ind = pi->flags;
-@@ -1756,7 +1756,7 @@
- 
- static void
- fill_logical_table(partition_table *buffer, partition_info *pi) {
--    struct partition *p;
-+    struct fdisk_partition *p;
-     int i;
- 
-     for (i = 0; i < logical && pi->first_sector != logical_sectors[i]; i++);
-diff -ur util-linux-2.12.old/fdisk/fdisk.c util-linux-2.12/fdisk/fdisk.c
---- util-linux-2.12.old/fdisk/fdisk.c	2004-07-29 01:21:19.000000000 +0200
-+++ util-linux-2.12/fdisk/fdisk.c	2004-07-29 01:21:35.000000000 +0200
-@@ -19,6 +19,10 @@
- #include <getopt.h>
- #include <sys/stat.h>
- 
-+#if defined(__FreeBSD_kernel__) || defined(__NetBSD_kernel__)
-+#include <sys/disklabel.h>
-+#endif
-+
- #include "nls.h"
- #include "common.h"
- #include "get_blocks.h"
-@@ -43,8 +47,8 @@
- 
- 
- #define LINE_LENGTH	800
--#define pt_offset(b, n)	((struct partition *)((b) + 0x1be + \
--				(n) * sizeof(struct partition)))
-+#define pt_offset(b, n)	((struct fdisk_partition *)((b) + 0x1be + \
-+				(n) * sizeof(struct fdisk_partition)))
- #define sector(s)	((s) & 0x3f)
- #define cylinder(s, c)	((c) | (((s) & 0xc0) << 2))
- 
-@@ -94,22 +98,22 @@
- }
- 
- static void
--set_start_sect(struct partition *p, unsigned int start_sect) {
-+set_start_sect(struct fdisk_partition *p, unsigned int start_sect) {
- 	store4_little_endian(p->start4, start_sect);
- }
- 
- unsigned int
--get_start_sect(struct partition *p) {
-+get_start_sect(struct fdisk_partition *p) {
- 	return read4_little_endian(p->start4);
- }
- 
- static void
--set_nr_sects(struct partition *p, unsigned int nr_sects) {
-+set_nr_sects(struct fdisk_partition *p, unsigned int nr_sects) {
- 	store4_little_endian(p->size4, nr_sects);
- }
- 
- unsigned int
--get_nr_sects(struct partition *p) {
-+get_nr_sects(struct fdisk_partition *p) {
- 	return read4_little_endian(p->size4);
- }
- 
-@@ -131,8 +135,8 @@
-  * partition and one link to the next one.
-  */
- struct pte {
--	struct partition *part_table;	/* points into sectorbuffer */
--	struct partition *ext_pointer;	/* points into sectorbuffer */
-+	struct fdisk_partition *part_table;	/* points into sectorbuffer */
-+	struct fdisk_partition *ext_pointer;	/* points into sectorbuffer */
- 	char changed;			/* boolean */
- 	unsigned int offset;		/* disk sector number */
- 	char *sectorbuffer;		/* disk sector contents */
-@@ -278,7 +282,7 @@
- 	return pe->offset + get_start_sect(pe->part_table);
- }
- 
--struct partition *
-+struct fdisk_partition *
- get_part_table(int i) {
- 	return ptes[i].part_table;
- }
-@@ -502,14 +506,14 @@
- }
- 
- static int
--is_cleared_partition(struct partition *p) {
-+is_cleared_partition(struct fdisk_partition *p) {
- 	return !(!p || p->boot_ind || p->head || p->sector || p->cyl ||
- 		 p->sys_ind || p->end_head || p->end_sector || p->end_cyl ||
- 		 get_start_sect(p) || get_nr_sects(p));
- }
- 
- static void
--clear_partition(struct partition *p) {
-+clear_partition(struct fdisk_partition *p) {
- 	if (!p)
- 		return;
- 	p->boot_ind = 0;
-@@ -527,7 +531,7 @@
- static void
- set_partition(int i, int doext, unsigned int start, unsigned int stop,
- 	      int sysid) {
--	struct partition *p;
-+	struct fdisk_partition *p;
- 	unsigned int offset;
- 
- 	if (doext) {
-@@ -608,7 +612,7 @@
- read_extended(int ext) {
- 	int i;
- 	struct pte *pex;
--	struct partition *p, *q;
-+	struct fdisk_partition *p, *q;
- 
- 	ext_index = ext;
- 	pex = &ptes[ext];
-@@ -758,7 +762,7 @@
- 
- static void
- get_kernel_geometry(int fd) {
--#ifdef HDIO_GETGEO
-+#if defined(HDIO_GETGEO)
- 	struct hd_geometry geometry;
- 
- 	if (!ioctl(fd, HDIO_GETGEO, &geometry)) {
-@@ -766,13 +770,18 @@
- 		kern_sectors = geometry.sectors;
- 		/* never use geometry.cylinders - it is truncated */
- 	}
-+#elif defined(DIOCGDINFO)
-+	struct disklabel geometry;
-+	if (!ioctl (fd, DIOCGDINFO, &geometry))
-+		kern_heads = geometry.d_ntracks;
-+		kern_sectors = geometry.d_nsectors;
- #endif
- }
- 
- static void
- get_partition_table_geometry(void) {
- 	unsigned char *bufp = MBRbuffer;
--	struct partition *p;
-+	struct fdisk_partition *p;
- 	int i, h, s, hh, ss;
- 	int first = 1;
- 	int bad = 0;
-@@ -1164,7 +1173,7 @@
- 
- 	for (i = 0; i < max; i++) {
- 		struct pte *pe = &ptes[i];
--		struct partition *p = pe->part_table;
-+		struct fdisk_partition *p = pe->part_table;
- 
- 		if (p && !is_cleared_partition(p)) {
- 			if (pno >= 0)
-@@ -1190,7 +1199,7 @@
- 
- 	for (i = 0; i < max; i++) {
- 		struct pte *pe = &ptes[i];
--		struct partition *p = pe->part_table;
-+		struct fdisk_partition *p = pe->part_table;
- 
- 		if (p && is_cleared_partition(p)) {
- 			if (pno >= 0)
-@@ -1228,7 +1237,7 @@
- static void
- toggle_active(int i) {
- 	struct pte *pe = &ptes[i];
--	struct partition *p = pe->part_table;
-+	struct fdisk_partition *p = pe->part_table;
- 
- 	if (IS_EXTENDED (p->sys_ind) && !p->boot_ind)
- 		fprintf(stderr,
-@@ -1254,8 +1263,8 @@
- static void
- delete_partition(int i) {
- 	struct pte *pe = &ptes[i];
--	struct partition *p = pe->part_table;
--	struct partition *q = pe->ext_pointer;
-+	struct fdisk_partition *p = pe->part_table;
-+	struct fdisk_partition *q = pe->ext_pointer;
- 
- /* Note that for the fifth partition (i == 4) we don't actually
-  * decrement partitions.
-@@ -1328,7 +1337,7 @@
- change_sysid(void) {
- 	char *temp;
- 	int i, sys, origsys;
--	struct partition *p;
-+	struct fdisk_partition *p;
- 
- 	/* If sgi_label then don't use get_existing_partition,
- 	   let the user select a partition, since get_existing_partition()
-@@ -1417,7 +1426,7 @@
- 	*s = ls % sectors + 1;	/* sectors count from 1 */
- }
- 
--static void check_consistency(struct partition *p, int partition) {
-+static void check_consistency(struct fdisk_partition *p, int partition) {
- 	unsigned int pbc, pbh, pbs;	/* physical beginning c, h, s */
- 	unsigned int pec, peh, pes;	/* physical ending c, h, s */
- 	unsigned int lbc, lbh, lbs;	/* logical beginning c, h, s */
-@@ -1510,7 +1519,7 @@
- static int
- wrong_p_order(int *prev) {
- 	struct pte *pe;
--	struct partition *p;
-+	struct fdisk_partition *p;
- 	unsigned int last_p_start_pos = 0, p_start_pos;
- 	int i, last_i = 0;
- 
-@@ -1552,7 +1561,7 @@
- static void
- fix_chain_of_logicals(void) {
- 	int j, oj, ojj, sj, sjj;
--	struct partition *pj,*pjj,tmp;
-+	struct fdisk_partition *pj,*pjj,tmp;
- 
- 	/* Stage 1: sort sectors but leave sector of part 4 */
- 	/* (Its sector is the global extended_offset.) */
-@@ -1612,7 +1621,7 @@
- 	while ((i = wrong_p_order(&k)) != 0 && i < 4) {
- 		/* partition i should have come earlier, move it */
- 		/* We have to move data in the MBR */
--		struct partition *pi, *pk, *pe, pbuf;
-+		struct fdisk_partition *pi, *pk, *pe, pbuf;
- 		pei = &ptes[i];
- 		pek = &ptes[k];
- 
-@@ -1623,9 +1632,9 @@
- 		pi = pei->part_table;
- 		pk = pek->part_table;
- 
--		memmove(&pbuf, pi, sizeof(struct partition));
--		memmove(pi, pk, sizeof(struct partition));
--		memmove(pk, &pbuf, sizeof(struct partition));
-+		memmove(&pbuf, pi, sizeof(struct fdisk_partition));
-+		memmove(pi, pk, sizeof(struct fdisk_partition));
-+		memmove(pk, &pbuf, sizeof(struct fdisk_partition));
- 
- 		pei->changed = pek->changed = 1;
- 	}
-@@ -1639,7 +1648,7 @@
- 
- static void
- list_table(int xtra) {
--	struct partition *p;
-+	struct fdisk_partition *p;
- 	char *type;
- 	int i, w;
- 
-@@ -1714,7 +1723,7 @@
- static void
- x_list_table(int extend) {
- 	struct pte *pe;
--	struct partition *p;
-+	struct fdisk_partition *p;
- 	int i;
- 
- 	printf(_("\nDisk %s: %d heads, %d sectors, %d cylinders\n\n"),
-@@ -1741,7 +1750,7 @@
- fill_bounds(unsigned int *first, unsigned int *last) {
- 	int i;
- 	struct pte *pe = &ptes[0];
--	struct partition *p;
-+	struct fdisk_partition *p;
- 
- 	for (i = 0; i < partitions; pe++,i++) {
- 		p = pe->part_table;
-@@ -1786,7 +1795,7 @@
- 	int i, j;
- 	unsigned int total = 1;
- 	unsigned int first[partitions], last[partitions];
--	struct partition *p;
-+	struct fdisk_partition *p;
- 
- 	if (warn_geometry())
- 		return;
-@@ -1858,8 +1867,8 @@
- add_partition(int n, int sys) {
- 	char mesg[256];		/* 48 does not suffice in Japanese */
- 	int i, read = 0;
--	struct partition *p = ptes[n].part_table;
--	struct partition *q = ptes[ext_index].part_table;
-+	struct fdisk_partition *p = ptes[n].part_table;
-+	struct fdisk_partition *q = ptes[ext_index].part_table;
- 	long long llimit;
- 	unsigned int start, stop = 0, limit, temp,
- 		first[partitions], last[partitions];
-@@ -2187,7 +2196,7 @@
- static void
- move_begin(int i) {
- 	struct pte *pe = &ptes[i];
--	struct partition *p = pe->part_table;
-+	struct fdisk_partition *p = pe->part_table;
- 	unsigned int new, first;
- 
- 	if (warn_geometry())
-diff -ur util-linux-2.12.old/fdisk/fdisk.h util-linux-2.12/fdisk/fdisk.h
---- util-linux-2.12.old/fdisk/fdisk.h	2003-07-13 20:25:00.000000000 +0200
-+++ util-linux-2.12/fdisk/fdisk.h	2004-07-29 01:21:35.000000000 +0200
-@@ -29,7 +29,7 @@
- extern long long ext2_llseek(unsigned int fd, long long offset,
- 			     unsigned int origin);
- 
--struct partition {
-+struct fdisk_partition {
- 	unsigned char boot_ind;         /* 0x80 - active */
- 	unsigned char head;             /* starting head */
- 	unsigned char sector;           /* starting sector */
-@@ -68,7 +68,7 @@
- extern char read_char(char *mesg);
- extern int read_hex(struct systypes *sys);
- extern void reread_partition_table(int leave);
--extern struct partition *get_part_table(int);
-+extern struct fdisk_partition *get_part_table(int);
- extern int valid_part_table_flag(unsigned char *b);
- extern unsigned int read_int(unsigned int low, unsigned int dflt,
- 			     unsigned int high, unsigned int base, char *mesg);
-@@ -78,8 +78,8 @@
- #define SINGULAR 1
- extern char *const str_units(int);
- 
--extern unsigned int get_start_sect(struct partition *p);
--extern unsigned int get_nr_sects(struct partition *p);
-+extern unsigned int get_start_sect(struct fdisk_partition *p);
-+extern unsigned int get_nr_sects(struct fdisk_partition *p);
- 
- extern int osf_label;
- 
-diff -ur util-linux-2.12.old/fdisk/fdiskbsdlabel.c util-linux-2.12/fdisk/fdiskbsdlabel.c
---- util-linux-2.12.old/fdisk/fdiskbsdlabel.c	2004-07-29 01:21:19.000000000 +0200
-+++ util-linux-2.12/fdisk/fdiskbsdlabel.c	2004-07-29 01:21:35.000000000 +0200
-@@ -72,10 +72,10 @@
- static int xbsd_check_new_partition (int *i);
- static void xbsd_list_types (void);
- static u_short xbsd_dkcksum (struct xbsd_disklabel *lp);
--static int xbsd_initlabel  (struct partition *p, struct xbsd_disklabel *d,
-+static int xbsd_initlabel  (struct fdisk_partition *p, struct xbsd_disklabel *d,
- 			    int pindex);
--static int xbsd_readlabel  (struct partition *p, struct xbsd_disklabel *d);
--static int xbsd_writelabel (struct partition *p, struct xbsd_disklabel *d);
-+static int xbsd_readlabel  (struct fdisk_partition *p, struct xbsd_disklabel *d);
-+static int xbsd_writelabel (struct fdisk_partition *p, struct xbsd_disklabel *d);
- static void sync_disks (void);
- 
- #if defined (__alpha__)
-@@ -85,7 +85,7 @@
- #if !defined (__alpha__)
- static int xbsd_translate_fstype (int linux_type);
- static void xbsd_link_part (void);
--static struct partition *xbsd_part;
-+static struct fdisk_partition *xbsd_part;
- static int xbsd_part_index;
- #endif
- 
-@@ -163,7 +163,7 @@
- bselect (void) {
- #if !defined (__alpha__)
-   int t, ss;
--  struct partition *p;
-+  struct fdisk_partition *p;
- 
-   for (t=0; t<4; t++) {
-     p = get_part_table(t);
-@@ -662,7 +662,7 @@
- }
- 
- static int
--xbsd_initlabel (struct partition *p, struct xbsd_disklabel *d, int pindex) {
-+xbsd_initlabel (struct fdisk_partition *p, struct xbsd_disklabel *d, int pindex) {
- 	struct xbsd_partition *pp;
- 	struct geom g;
- 
-@@ -734,7 +734,7 @@
-  * If it has the right magic, return 1.
-  */
- static int
--xbsd_readlabel (struct partition *p, struct xbsd_disklabel *d)
-+xbsd_readlabel (struct fdisk_partition *p, struct xbsd_disklabel *d)
- {
- 	int t, sector;
- 
-@@ -770,7 +770,7 @@
- }
- 
- static int
--xbsd_writelabel (struct partition *p, struct xbsd_disklabel *d)
-+xbsd_writelabel (struct fdisk_partition *p, struct xbsd_disklabel *d)
- {
-   unsigned int sector;
- 
-@@ -840,7 +840,7 @@
- xbsd_link_part (void)
- {
-   int k, i;
--  struct partition *p;
-+  struct fdisk_partition *p;
- 
-   k = get_partition (1, partitions);
- 
-diff -ur util-linux-2.12.old/fdisk/sfdisk.8 util-linux-2.12/fdisk/sfdisk.8
---- util-linux-2.12.old/fdisk/sfdisk.8	2003-07-05 22:10:40.000000000 +0200
-+++ util-linux-2.12/fdisk/sfdisk.8	2004-07-29 01:21:35.000000000 +0200
-@@ -327,7 +327,7 @@
- .br
- .nf
- .RS
--struct partition {
-+struct fdisk_partition {
-     unsigned char bootable;		/* 0 or 0x80 */
-     hsc begin_hsc;
-     unsigned char id;
-diff -ur util-linux-2.12.old/fdisk/sfdisk.c util-linux-2.12/fdisk/sfdisk.c
---- util-linux-2.12.old/fdisk/sfdisk.c	2004-07-29 01:21:19.000000000 +0200
-+++ util-linux-2.12/fdisk/sfdisk.c	2004-07-29 01:21:35.000000000 +0200
-@@ -617,7 +617,7 @@
- 
- /* MS/DOS partition */
- 
--struct partition {
-+struct fdisk_partition {
-     unsigned char bootable;		/* 0 or 0x80 */
-     chs begin_chs;
-     unsigned char sys_type;
-@@ -648,7 +648,7 @@
- }
- 
- static void
--copy_to_part(char *cp, struct partition *p) {
-+copy_to_part(char *cp, struct fdisk_partition *p) {
-     p->bootable = *cp++;
-     p->begin_chs.h = *cp++;
-     p->begin_chs.s = *cp++;
-@@ -662,7 +662,7 @@
- }
- 
- static void
--copy_from_part(struct partition *p, char *cp) {
-+copy_from_part(struct fdisk_partition *p, char *cp) {
-     *cp++ = p->bootable;
-     *cp++ = p->begin_chs.h;
-     *cp++ = p->begin_chs.s;
-@@ -685,7 +685,7 @@
-     unsigned long start;
-     unsigned long size;
-     unsigned long sector, offset; /* disk location of this info */
--    struct partition p;
-+    struct fdisk_partition p;
-     struct part_desc *ep;	  /* extended partition containing this one */
-     int ptype;
- #define DOS_TYPE	0
-@@ -722,7 +722,7 @@
- 
-     for (pno = 0; pno < z->partno; pno++) {
- 	p = &(z->partitions[pno]);
--	p->offset = 0x1be + (pno%4)*sizeof(struct partition);
-+	p->offset = 0x1be + (pno%4)*sizeof(struct fdisk_partition);
- 	p->sector = (p->ep ? p->ep->start : 0);
-     }
- }
-@@ -1309,7 +1309,7 @@
-     struct sector *s;
-     unsigned long start, here, next;
-     int i, moretodo = 1;
--    struct partition p;
-+    struct fdisk_partition p;
-     struct part_desc *partitions = &(z->partitions[0]);
-     int pno = z->partno;
- 
-@@ -1350,7 +1350,7 @@
- 
- 	next = 0;
- 
--	for (i=0; i<4; i++,cp += sizeof(struct partition)) {
-+	for (i=0; i<4; i++,cp += sizeof(struct fdisk_partition)) {
- 	    partitions[pno].sector = here;
- 	    partitions[pno].offset = cp - s->data;
- 	    partitions[pno].ep = ep;
-@@ -1460,7 +1460,7 @@
- msdos_partition(char *dev, int fd, unsigned long start, struct disk_desc *z) {
-     int i;
-     char *cp;
--    struct partition pt;
-+    struct fdisk_partition pt;
-     struct sector *s;
-     struct part_desc *partitions = &(z->partitions[0]);
-     int pno = z->partno;
-@@ -1497,7 +1497,7 @@
-       }
-     }
- 
--    for (pno=0; pno<4; pno++,cp += sizeof(struct partition)) {
-+    for (pno=0; pno<4; pno++,cp += sizeof(struct fdisk_partition)) {
- 	partitions[pno].sector = start;
- 	partitions[pno].offset = cp - s->data;
- 	copy_to_part(cp,&pt);
-diff -ur util-linux-2.12.old/login-utils/agetty.c util-linux-2.12/login-utils/agetty.c
---- util-linux-2.12.old/login-utils/agetty.c	2004-07-29 01:21:19.000000000 +0200
-+++ util-linux-2.12/login-utils/agetty.c	2004-07-29 01:21:41.000000000 +0200
-@@ -29,9 +29,11 @@
- #include <getopt.h>
- #include <time.h>
- #include <sys/file.h>
+ #ifdef PAGE_SIZE
+ #define PAGE_CACHE_SIZE ((int) PAGE_SIZE)
+ #elif defined __ia64__
+diff -ur util-linux-2.12p.old/login-utils/agetty.c util-linux-2.12p/login-utils/agetty.c
+--- util-linux-2.12p.old/login-utils/agetty.c	2002-07-29 09:36:42.000000000 +0200
++++ util-linux-2.12p/login-utils/agetty.c	2005-10-06 19:57:13.000000000 +0200
+@@ -18,7 +18,12 @@
+ #include <stdlib.h>
+ #include <string.h>
  #include <sys/ioctl.h>
 +#ifdef __linux__
- #include <sys/vt.h>
- #include <linux/tty.h>
+ #include <termio.h>
++#else
++#include <termios.h>
++#define termio termios
 +#endif
- #include "xgethostname.h"
+ #include <signal.h>
+ #include <errno.h>
+ #include <sys/types.h>
+@@ -33,11 +38,9 @@
  #include "xstrncpy.h"
  #include "nls.h"
-@@ -634,6 +636,7 @@
- 	if ((st.st_mode & S_IFMT) != S_IFCHR)
- 	    error(_("/dev/%s: not a character device"), tty);
+ 
+-#ifdef __linux__
+ #include "pathnames.h"
+ #include <sys/param.h>
+ #define USE_SYSLOG
+-#endif
+ 
+  /* If USE_SYSLOG is undefined all diagnostics go directly to /dev/console. */
+ 
+@@ -113,6 +116,11 @@
+ #define	TCSETAW	TCSETSW
+ #endif
+ 
++/* Linux-specific */
++#ifndef CBAUD
++#define CBAUD 0
++#endif
++
+  /*
+   * This program tries to not use the standard-i/o library.  This keeps the
+   * executable small on systems that do not have shared libraries (System V
+@@ -299,9 +307,7 @@
+ 
+     parse_args(argc, argv, &options);
+ 
+-#ifdef __linux__
+ 	setsid();
+-#endif
+ 	
+     /* Update the utmp file. */
+ 
+@@ -686,8 +692,13 @@
+      * 5 seconds seems to be a good value.
+      */
  
 +#ifdef __linux__
- 	/*
- 	 * Try to avoid opening a vt that is already open, as this will
- 	 * mean that the keyboard will be unusable.
-@@ -701,6 +704,7 @@
- 		}
- 	    }
- 	}
+     if (ioctl(0, TCGETA, tp) < 0)
+ 	error("%s: ioctl: %m", tty);
++#else
++    if (tcgetattr (0, tp) < 0)
++	error("%s: tcgetattr: %m", tty);
 +#endif
  
- 	/* Open the tty as standard input. */
- 
-@@ -739,6 +743,9 @@
-     if (tcgetattr(0, tp) < 0)
- 	error("%s: tcgetattr: %m", tty);
- 
-+    ioctl (0, TIOCSCTTY);
-+    putenv ("TERM=cons25");
-+
      /*
       * It seems to be a terminal. Set proper protections and ownership. Mode
-      * 0622 is suitable for SYSV <4 because /bin/login does not change
+@@ -723,9 +734,11 @@
+      * reads will be done in raw mode anyway. Errors will be dealt with
+      * lateron.
+      */
+-#ifdef __linux__
+     /* flush input and output queues, important for modems! */
++#ifdef __linux__
+     (void) ioctl(0, TCFLSH, TCIOFLUSH);
++#else
++    tcflush (0, TCIOFLUSH);
+ #endif
+ 
+     tp->c_cflag = CS8 | HUPCL | CREAD | speed;
+@@ -733,7 +746,10 @@
+ 	tp->c_cflag |= CLOCAL;
+     }
+ 
+-    tp->c_iflag = tp->c_lflag = tp->c_oflag = tp->c_line = 0;
++    tp->c_iflag = tp->c_lflag = tp->c_oflag = 0;
++#ifdef __linux__
++    tp->c_line = 0;
++#endif
+     tp->c_cc[VMIN] = 1;
+     tp->c_cc[VTIME] = 0;
+ 
+@@ -744,7 +760,11 @@
+ 	tp->c_cflag |= CRTSCTS;
+ #endif
+ 
++#ifdef __linux__
+     (void) ioctl(0, TCSETA, tp);
++#else
++    tcsetattr (0, TCSANOW, tp);
++#endif
+ 
+     /* go to blocking input even in local mode */
+     fcntl(0, F_SETFL, fcntl(0, F_GETFL, 0) & ~O_NONBLOCK);
+@@ -764,6 +784,11 @@
+     char   *bp;
+     int     nread;
+ 
++#ifdef __FreeBSD_kernel__
++    ioctl (0, TIOCSCTTY);
++    putenv ("TERM=cons25");
++#endif
++
+     /*
+      * This works only if the modem produces its status code AFTER raising
+      * the DCD line, and if the computer is fast enough to set the proper
+@@ -788,7 +813,11 @@
+     tp->c_iflag |= ISTRIP;			/* enable 8th-bit stripping */
+     vmin = tp->c_cc[VMIN];
+     tp->c_cc[VMIN] = 0;				/* don't block if queue empty */
++#ifdef __linux__
+     (void) ioctl(0, TCSETA, tp);
++#else
++    tcsetattr (0, TCSANOW, tp);
++#endif
+ 
+     /*
+      * Wait for a while, then read everything the modem has said so far and
+@@ -812,7 +841,11 @@
+ 
+     tp->c_iflag = iflag;
+     tp->c_cc[VMIN] = vmin;
++#if defined(__linux__) && !defined(__GLIBC__)
+     (void) ioctl(0, TCSETA, tp);
++#else
++    tcsetattr (0, TCSANOW, tp);
++#endif
+ }
+ 
+ /* do_prompt - show login prompt, optionally preceded by /etc/issue contents */
+@@ -835,8 +868,11 @@
+     if ((op->flags & F_ISSUE) && (fd = fopen(op->issue, "r"))) {
+ 	oflag = tp->c_oflag;			/* save current setting */
+ 	tp->c_oflag |= (ONLCR | OPOST);		/* map NL in output to CR-NL */
++#ifdef __linux__
+ 	(void) ioctl(0, TCSETAW, tp);
+-
++#else
++        tcsetattr (0, TCSADRAIN, tp);
++#endif
+ 
+ 	while ((c = getc(fd)) != EOF)
+ 	{
+@@ -947,18 +983,22 @@
+ 	fflush(stdout);
+ 
+ 	tp->c_oflag = oflag;			/* restore settings */
++#ifdef __linux__
+ 	(void) ioctl(0, TCSETAW, tp);		/* wait till output is gone */
++#else
++        tcsetattr (0, TCSADRAIN, tp);
++#endif
+ 	(void) fclose(fd);
+     }
+ #endif
+-#ifdef __linux__
++#ifdef MAXHOSTNAMELEN
+ 	{
+ 		char hn[MAXHOSTNAMELEN+1];
+ 
+ 		(void) gethostname(hn, MAXHOSTNAMELEN);
+ 		write(1, hn, strlen(hn));
+ 	}
+-#endif		
++#endif
+     (void) write(1, LOGIN, sizeof(LOGIN) - 1);	/* always show login prompt */
+ }
+ 
+@@ -973,7 +1013,11 @@
+     baud_index = (baud_index + 1) % op->numspeed;
+     tp->c_cflag &= ~CBAUD;
+     tp->c_cflag |= op->speeds[baud_index];
++#ifdef __linux__
+     (void) ioctl(0, TCSETA, tp);
++#else
++    tcsetattr (0, TCSANOW, tp);
++#endif
+ }
+ 
+ /* get_logname - get user name, establish parity, speed, erase, kill, eol */
+@@ -1003,7 +1047,11 @@
+     /* Flush pending input (esp. after parsing or switching the baud rate). */
+ 
+     (void) sleep(1);
++#ifdef __linux__
+     (void) ioctl(0, TCFLSH, TCIFLUSH);
++#else
++    tcflush (0, TCIFLUSH);
++#endif
+ 
+     /* Prompt for and read a login name. */
+ 
+@@ -1105,9 +1153,9 @@
+     tp->c_cc[VQUIT] = DEF_QUIT;			/* default quit */
+     tp->c_cc[VEOF] = DEF_EOF;			/* default EOF character */
+     tp->c_cc[VEOL] = DEF_EOL;
+-#ifdef __linux__
++#if defined(__linux__)
+     tp->c_cc[VSWTC] = DEF_SWITCH;		/* default switch character */
+-#else
++#elif defined(VSWTCH)
+     tp->c_cc[VSWTCH] = DEF_SWITCH;		/* default switch character */
+ #endif
+ 
+@@ -1140,9 +1188,15 @@
+     /* Account for upper case without lower case. */
+ 
+     if (cp->capslock) {
++#ifdef IUCLC
+ 	tp->c_iflag |= IUCLC;
++#endif
++#ifdef XCASE
+ 	tp->c_lflag |= XCASE;
++#endif
++#ifdef OLCUC
+ 	tp->c_oflag |= OLCUC;
++#endif
+     }
+     /* Optionally enable hardware flow control */
+ 
+@@ -1153,8 +1207,13 @@
+ 
+     /* Finally, make the new settings effective */
+ 
++#ifdef __linux__
+     if (ioctl(0, TCSETA, tp) < 0)
+ 	error("%s: ioctl: TCSETA: %m", op->tty);
++#else
++    if (tcsetattr (0, TCSANOW, tp) < 0)
++	error("%s: tcsetattr: %m", op->tty);
++#endif
+ }
+ 
+ /* caps_lock - string contains upper case without lower case */
+diff -ur util-linux-2.12p.old/misc-utils/Makefile util-linux-2.12p/misc-utils/Makefile
+--- util-linux-2.12p.old/misc-utils/Makefile	2004-12-05 20:09:12.000000000 +0100
++++ util-linux-2.12p/misc-utils/Makefile	2005-10-06 19:37:23.000000000 +0200
+@@ -22,7 +22,11 @@
+ USRBIN=		cal chkdupexe ddate logger look mcookie \
+ 		namei rename script whereis
+ 
+-MAYBE=		reset setterm
++MAYBE=		reset
++
++ifeq ($(shell uname -s), Linux)
++MAYBE += setterm
++endif
+ 
+ ifeq "$(HAVE_RESET)" "no"
+ USRBIN:=$(USRBIN) reset
+@@ -39,10 +43,12 @@
+ MAN1:=$(MAN1) kill.1
+ endif
+ 
++ifeq ($(shell uname -s), Linux)
+ ifeq "$(HAVE_NCURSES)" "yes"
+ USRBIN:=$(USRBIN) setterm
+ MAN1:=$(MAN1) setterm.1
+ endif
++endif
+ 
+ # For script only
+ LIBPTY=
+@@ -51,7 +57,9 @@
+ endif
+ 
+ # Programs requiring special compilation
++ifeq ($(shell uname -s), Linux)
+ NEEDS_CURSES=  setterm
++endif
+ NEEDS_OPENPTY= script
+ 
+ all: $(BIN) $(USRBIN) $(USRBIN.NONSHADOW)
+@@ -99,9 +107,11 @@
+ write.o: $(LIB)/carefulputc.h
+ write: write.o $(LIB)/carefulputc.o
+ 
++ifeq ($(shell uname -s), Linux)
+ ifeq "$(HAVE_NCURSES)" "yes"
+ setterm: setterm.o
+ endif
++endif
+ 
+ install: all
+ 	$(INSTALLDIR) $(BINDIR) $(USRBINDIR)
+diff -ur util-linux-2.12p.old/misc-utils/mcookie.c util-linux-2.12p/misc-utils/mcookie.c
+--- util-linux-2.12p.old/misc-utils/mcookie.c	2002-03-09 00:00:52.000000000 +0100
++++ util-linux-2.12p/misc-utils/mcookie.c	2005-10-06 19:34:11.000000000 +0200
+@@ -20,7 +20,7 @@
+  *
+  */
+ 
+-#ifdef __linux__
++#if defined(__linux__) || defined(__GLIBC__)
+ #define HAVE_GETTIMEOFDAY 1
+ #endif
+ 
+diff -ur util-linux-2.12p.old/misc-utils/script.c util-linux-2.12p/misc-utils/script.c
+--- util-linux-2.12p.old/misc-utils/script.c	2004-03-26 18:07:16.000000000 +0100
++++ util-linux-2.12p/misc-utils/script.c	2005-10-06 19:34:51.000000000 +0200
+@@ -54,10 +54,8 @@
+ #include <sys/signal.h>
+ #include "nls.h"
+ 
+-#ifdef __linux__
+ #include <unistd.h>
+ #include <string.h>
+-#endif
+ 
+ #include "../defines.h"
+ #ifdef HAVE_openpty
+diff -ur util-linux-2.12p.old/sys-utils/Makefile util-linux-2.12p/sys-utils/Makefile
+--- util-linux-2.12p.old/sys-utils/Makefile	2004-11-15 18:47:47.000000000 +0100
++++ util-linux-2.12p/sys-utils/Makefile	2005-10-06 19:42:31.000000000 +0200
+@@ -17,9 +17,9 @@
+ # Where to put binaries?
+ # See the "install" rule for the links. . .
+ 
+-BIN=            arch dmesg
++BIN=            arch
+ 
+-USRBIN=		cytune flock ipcrm ipcs renice setsid
++USRBIN=		flock ipcrm renice setsid
+ 
+ USRSBIN=	readprofile tunelp
+ 
+@@ -27,6 +27,11 @@
+ 
+ NOTMADE=
+ 
++ifeq ($(shell uname -s), Linux)
++BIN += dmesg
++USRBIN += cytune ipcs
++endif
++
+ CWFLAGS := $(subst -Wmissing-prototypes,,$(CFLAGS))
+ 
+ ifeq "$(HAVE_SLN)" "no"
+diff -ur util-linux-2.12p.old/text-utils/more.c util-linux-2.12p/text-utils/more.c
+--- util-linux-2.12p.old/text-utils/more.c	2004-12-22 11:46:25.000000000 +0100
++++ util-linux-2.12p/text-utils/more.c	2005-10-06 19:45:17.000000000 +0200
+@@ -76,6 +76,15 @@
+ 
+ #define stty(fd,argp)  tcsetattr(fd,TCSANOW,argp)
+ 
++/* Linux-specific */
++#ifndef CBAUD
++#define CBAUD 0
++#endif
++
++#ifndef TABDLY
++#define TABDLY 0
++#endif
++
+ /* some function declarations */
+ void initterm(void);
+ void kill_line(void);
+@@ -1560,10 +1569,6 @@
+     }
+     if (feof (file)) {
+ 	if (!no_intty) {
+-#ifndef __linux__
+-				/* No longer in libc 4.5.8. . . */
+-	    file->_flags &= ~STDIO_S_EOF_SEEN; /* why doesn't fseek do this ??!!??! */
+-#endif
+ 	    Currline = saveln;
+ 	    Fseek (file, startline);
+ 	}
