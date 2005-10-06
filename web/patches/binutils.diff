@@ -6,12 +6,22 @@ diff -u binutils-2.16.1cvs20050902/debian/patches/00list binutils-2.16.1cvs20050
 diff -u binutils-2.16.1cvs20050902/debian/rules binutils-2.16.1cvs20050902/debian/rules
 --- binutils-2.16.1cvs20050902/debian/rules
 +++ binutils-2.16.1cvs20050902/debian/rules
-@@ -134,7 +134,7 @@
+@@ -72,6 +72,9 @@
+ ifeq ($(DEB_HOST_ARCH),i386)
+ 	CONFARGS += --enable-targets=x86_64-linux-gnu
+ endif
++ifeq ($(DEB_HOST_ARCH),kfreebsd-i386)
++	CONFARGS += --enable-targets=x86_64-kfreebsd-gnu
++endif
+ ifeq ($(DEB_HOST_ARCH),mips)
+        CONFARGS += --enable-targets=mips64-linux-gnu
+ endif
+@@ -134,7 +137,7 @@
  	mkdir builddir-multi
  	cd builddir-multi \
  	    && env CC="$(CC)" ../configure $(CONFARGS) \
 -		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux-gnu
-+		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-gnu,i486-kfreebsd-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux-gnu
++		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-gnu,i486-kfreebsd-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux-gnu,x86_64-kfreebsd-gnu
  	$(MAKE) -C builddir-multi configure-host
  	touch configure-multi-stamp
  
