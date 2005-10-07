@@ -62,7 +62,7 @@ rm -rf /etc/rc.conf /etc/defaults/
 
 # restore f-i's /etc/fstab, and add linprocfs
 mv /etc/fstab.freebsd /etc/fstab
-echo "null	/proc	linprocfs	rw	0 0" >> /etc/fstab
+echo "null			/proc		linprocfs	rw	0	0" >> /etc/fstab
 
 rm -f /native-install
 rm -f /bin/mtree
