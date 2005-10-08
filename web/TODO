@@ -8,19 +8,24 @@ the particular issue.
 
 I'd be nice if tasks and subtasks were sorted by priority.
 
- - ifupdown when used with static IPs does not handle the gateway entry
-   correctly, so do not add it in your interfaces file.  As a workaround, just
-   add an up hook, that will do as a gateway entry:
+ - The gateway command in /etc/network/interfaces, which is dessigned to be a
+   per-interface setup, is being mapped to a generic routing setup.  This is
+   because of route.real backend semantics and is not easy to fix.
 
-   [-- /etc/network/interfaces --]
-   auto rl0
-   iface rl0 inet static
-	address 192.168.1.100
-	netmask 255.255.255.0
-	broadcast 192.168.1.255
-	up route add -net 0.0.0.0 192.168.1.1 > /dev/null
-	down route -q flush > /dev/null
-   [-- /etc/network/interfaces --]
+   The result is that the following command:
+
+   auto ed0
+   iface ed0 inet static
+        [...]
+        gateway 1.2.3.4
+
+   Is mapped to:
+
+	route add -net 0.0.0.0 1.2.3.4  # for ifup
+	route -q flush  # for ifdown
+
+  This shouldn't concern you unless you have more than one interface requiring
+  gateway setup.
 
  - Glibc
 	- Update to the current glibc in sid (2.3.5)
