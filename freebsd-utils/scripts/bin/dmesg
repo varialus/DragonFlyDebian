@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+args=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -s) shift ;;
+    *)  if [ -n "${args}" ] ; then args="${args} $1" ; else args="$1" ; fi ;;
+  esac
+  shift
+done
+
+dmesg.real ${args}

@@ -1,0 +1,32 @@
+#!/bin/sh
+set -e
+
+if [ $# = 0 ] ; then
+  route.real
+fi
+
+args=""
+
+cmd="$1"
+shift
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    default)
+      shift
+      if [ "$1" = "gw" ] ; then shift ; fi
+      args="${args} -net 0.0.0.0 $1"
+    ;;
+    *.*.*.*) args="${args} $1" ;;
+    *[0-9]) ;;
+    *) args="${args} $1" ;;
+  esac
+  shift
+done
+
+if [ ${cmd} = "del" ] ; then
+  cmd=""
+  args="-q flush"
+fi
+
+route.real ${cmd} ${args} > /dev/null
