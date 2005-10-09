@@ -1,0 +1,50 @@
+Author: aurel32
+Status: in BTS
+
+--- ghc6-6.4.orig/ghc/driver/mangler/ghc-asm.lprl
++++ ghc6-6.4/ghc/driver/mangler/ghc-asm.lprl
+@@ -160,7 +160,7 @@
+     $T_HDR_vector   = "\.text\n\t\.align 2\n"; # NB: requires padding
+ 
+     #--------------------------------------------------------#
+-    } elsif ( $TargetPlatform =~ /^i386-.*-(solaris2|linux|freebsd|netbsd|openbsd)$/ ) {
++    } elsif ( $TargetPlatform =~ /^i386-.*-(solaris2|linux|freebsd|netbsd|openbsd|kfreebsdgnu)$/ ) {
+ 
+     $T_STABBY	    = 0; # 1 iff .stab things (usually if a.out format)
+     $T_US	    = ''; # _ if symbols have an underscore on the front
+--- ghc6-6.4.orig/configure.ac
++++ ghc6-6.4/configure.ac
+@@ -188,6 +188,15 @@
+         HostVendor_CPP='unknown'
+         HostOS_CPP='linux'
+         ;;
++i[3456]86-*-kfreebsd*-gnu)
++	HostPlatform=i386-unknown-kfreebsdgnu # hack again
++	TargetPlatform=i386-unknown-kfreebsdgnu
++	BuildPlatform=i386-unknown-kfreebsdgnu
++	HostPlatform_CPP='i386_unknown_kfreebsdgnu'
++	HostArch_CPP='i386'
++	HostVendor_CPP='unknown'
++	HostOS_CPP='kfreebsdgnu'
++	;;
+ i[[3456]]86-*-freebsd[[3-9]]*) # FreeBSD 3.0+ uses ELF
+ 	HostPlatform=i386-unknown-freebsd # hack again
+ 	TargetPlatform=i386-unknown-freebsd
+--- ghc6-6.4.orig/configure
++++ ghc6-6.4/configure
+@@ -1577,6 +1577,15 @@
+         HostVendor_CPP='unknown'
+         HostOS_CPP='linux'
+         ;;
++i[3456]86-*-kfreebsd*-gnu)
++	HostPlatform=i386-unknown-kfreebsdgnu # hack again
++	TargetPlatform=i386-unknown-kfreebsdgnu
++	BuildPlatform=i386-unknown-kfreebsdgnu
++	HostPlatform_CPP='i386_unknown_kfreebsdgnu'
++	HostArch_CPP='i386'
++	HostVendor_CPP='unknown'
++	HostOS_CPP='kfreebsdgnu'
++	;;
+ i[3456]86-*-freebsd[3-9]*) # FreeBSD 3.0+ uses ELF
+ 	HostPlatform=i386-unknown-freebsd # hack again
+ 	TargetPlatform=i386-unknown-freebsd
