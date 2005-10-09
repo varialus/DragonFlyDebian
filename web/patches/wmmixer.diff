@@ -1,0 +1,16 @@
+Author: aurel32
+Status: in BTS
+
+--- wmmixer-1.5.orig/mixctl.h
++++ wmmixer-1.5/mixctl.h
+@@ -23,8 +23,8 @@
+ #ifdef __NetBSD__
+ #include <soundcard.h>
+ #endif
+-#ifdef __FreeBSD__
+-#include <machine/soundcard.h>
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
+ #endif
+ #ifdef __linux__
+ #include <linux/soundcard.h>

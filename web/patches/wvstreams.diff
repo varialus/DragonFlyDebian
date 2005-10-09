@@ -1,0 +1,22 @@
+Author: aurel32
+Status: in BTS
+
+--- wvstreams-4.0.2.orig/utils/wvsubproc.cc
++++ wvstreams-4.0.2/utils/wvsubproc.cc
+@@ -47,6 +47,7 @@
+ 	// unblock the parent.
+ 	close(waitfd);
+ 	
++#ifdef RLIMIT_AS	
+         // Set memory limit, if applicable
+         if (memlimit > 0)
+         {
+@@ -56,7 +57,7 @@
+             rlim.rlim_max = memlimit * 1024 * 1024;
+             setrlimit(RLIMIT_AS, &rlim);
+         }
+-
++#endif
+ 	// run the subprocess.
+ 	execvp(cmd, (char * const *)argv);
+ 	

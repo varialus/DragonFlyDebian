@@ -1,0 +1,32 @@
+Author: aurel32
+Status: in BTS
+
+--- python-cddb-1.4.orig/unix/cdrommodule.c
++++ python-cddb-1.4/unix/cdrommodule.c
+@@ -28,7 +28,7 @@
+ #include <linux/cdrom.h>
+ #endif
+ 
+-#if defined(sun) || defined(__FreeBSD__) || defined(__OpenBSD__)
++#if defined(sun) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__)
+ #include <sys/cdio.h>
+ #endif
+ 
+@@ -38,7 +38,7 @@
+  * so that we don't have to repeat the code.
+  */
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 
+ #define CDDB_TOC_HEADER_STRUCT ioc_toc_header 
+ #define CDDB_STARTING_TRACK_FIELD starting_track 
+@@ -92,7 +92,7 @@
+ 
+ #define CDDB_DEFAULT_CDROM_FLAGS O_RDONLY | O_NONBLOCK
+ 
+-#endif /* __FreeBSD__ */
++#endif /* __FreeBSD__ || __FreeBSD_kernel__ */
+ 
+ static PyObject *cdrom_error;
+ 

@@ -1,0 +1,30 @@
+Author: aurel32
+Status: in BTS
+
+--- gnomebaker-0.4.2.orig/src/devices.c
++++ gnomebaker-0.4.2/src/devices.c
+@@ -32,7 +32,7 @@
+ #include <fcntl.h>
+ #include <stdlib.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <sys/cdio.h>
+ #define CDROM_DRIVE_STATUS     0x5326
+ #define CDS_NO_DISC        1
+@@ -684,13 +684,13 @@
+ 			
+ 
+     /* Use ioctl to send the CDROMEJECT (CDIOCEJECT on FreeBSD) command to the device */
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined (__FreeBSD_kernel__)
+ 	if (ioctl(cdrom,CDIOCEJECT,0)<0)
+ #else 
+     if (ioctl(cdrom,CDROMEJECT,0)<0)    
+ #endif    
+ 	{
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined (__FreeBSD_kernel__)
+         return TRUE;
+ #else
+         g_critical("devices_query_cdstatus - ioctl failed");
