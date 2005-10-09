@@ -28,55 +28,26 @@ else
   /usr/share/crosshurd/makehurddir.sh ${tmp} i486 kfreebsd-gnu
 fi
 
+# !!!! FIXME: ultra-ugly hack!!
+base_url="http://ftp.gnuab.org/debian/pool-kfreebsd-i386/main/k/kfreebsd-5"
+(cd ${tmp}/var/cache/apt/archives/ && \
+  wget -c ${base_url}/kfreebsd-image-5{,.4-1}-{4,5,6}86_5.4-1_kfreebsd-i386.deb)
+
 if test -e native-install ; then
   cp native-install ${tmp}/
 fi
 
 # this command is called by f-i after untarring, let's exploit that
-cat > ${tmp}/bin/mtree << __EOF__
-#!/bin/bash
-set -ex
-# be idempotent
-if ! test -e /native-install ; then
-  exit 0
-fi
-
-# f-i's /etc/fstab is more accurate than native-install's
-mv /etc/fstab /etc/fstab.freebsd
-
-# ttyv0 is sysinstall, ttyv1 is tar/cpio, ttyv3 is a chrooted shell
-# ttyv2 will be for native-install
-if ! /native-install </dev/ttyv2 >/dev/ttyv2 2>/tmp/native-install.log ; then
-  echo native-install exitted with non-zero status, spawning debug shell > /dev/ttyv2
-  bash </dev/ttyv2 >/dev/ttyv2 2>/dev/ttyv2
-fi
-
-# restore files messed up by f-i
-for i in /etc/protocols /etc/services ; do
-  mv \${i}.dpkg-dist \${i}
-done
-rm -f /etc/rc.conf
-
-# remove unneeded files added by f-i
-rm -rf /etc/rc.conf /etc/defaults/
-
-# restore f-i's /etc/fstab, and add linprocfs
-mv /etc/fstab.freebsd /etc/fstab
-echo "null			/proc		linprocfs	rw	0	0" >> /etc/fstab
-
-rm -f /native-install
-rm -f /bin/mtree
-__EOF__
+cp startup ${tmp}/bin/mtree
 chmod +x ${tmp}/bin/mtree
-
-# maybe-missing kernel package
-cd ${tmp} && dpkg --extract var/cache/apt/archives/kfreebsd-image-5.*.deb .
 
 # crosshurd gathers some defaults from host machine, we don't really want that
 echo -n > ${tmp}/etc/resolv.conf
 echo "127.0.0.1		localhost" > ${tmp}/etc/hosts
 echo debian > ${tmp}/etc/hostname
 
-mv ${pwd}/base.tgz{,.old}
+if test -e ${pwd}/base.tgz ; then
+  mv ${pwd}/base.tgz{,.old}
+fi
 (cd ${tmp} && tar --same-owner -czpf ${pwd}/base.tgz ./*)
 rm -rf ${tmp} ${pwd}/base.tgz.old

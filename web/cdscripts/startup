@@ -1,0 +1,39 @@
+#!/bin/bash
+set -ex
+# be idempotent
+if ! test -e /native-install ; then
+  exit 0
+fi
+
+# f-i's /etc/fstab is more accurate than native-install's
+mv /etc/fstab /etc/fstab.freebsd
+
+# ttyv0 is sysinstall, ttyv1 is tar/cpio, ttyv3 is a chrooted shell
+# ttyv2 will be for native-install
+if ! /native-install </dev/ttyv2 >/dev/ttyv2 2>/tmp/native-install.log ; then
+  echo native-install exitted with non-zero status, spawning debug shell > /dev/ttyv2
+  bash </dev/ttyv2 >/dev/ttyv2 2>/dev/ttyv2
+fi
+
+# restore files messed up by f-i
+for i in /etc/protocols /etc/services ; do
+  mv \${i}.dpkg-dist \${i}
+done
+rm -f /etc/rc.conf
+
+# remove unneeded files added by f-i
+rm -rf /etc/rc.conf /etc/defaults/
+
+# restore f-i's /etc/fstab, and add linprocfs
+mv /etc/fstab.freebsd /etc/fstab
+echo "null			/proc		linprocfs	rw	0	0" >> /etc/fstab
+
+# get the right kernel installed
+case `uname -m` in
+  i686)	dpkg -i /var/cache/apt/archives/kfreebsd-image-*-686_*.deb ;;
+  i586)	dpkg -i /var/cache/apt/archives/kfreebsd-image-*-586_*.deb ;;
+  *)	dpkg -i /var/cache/apt/archives/kfreebsd-image-*-486_*.deb ;;
+esac
+
+rm -f /native-install
+rm -f `which $0`
