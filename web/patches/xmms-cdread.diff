@@ -1,0 +1,119 @@
+Author: aurel32
+Status: in BTS
+Note: libtool update necessary (libtoolize -c -f && aclocal-1.4 && autoconf && automake-1.4)
+
+diff -Nur xmms-cdread-0.14a/cdread.c xmms-cdread-0.14a.old/cdread.c
+--- xmms-cdread-0.14a/cdread.c	2005-09-22 19:24:25.000000000 +0200
++++ xmms-cdread-0.14a.old/cdread.c	2005-09-22 19:24:07.000000000 +0200
+@@ -58,7 +58,7 @@
+ #endif
+ 
+ /*\ Neat.. Three OSes with three different ways of talking to CDROM drives.. \*/
+-#if defined(HAVE_SYS_CDIO_H) && (defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__OpenBSD__))
++#if defined(HAVE_SYS_CDIO_H) && (defined(__FreeBSD__) || defined(__OpenBSD__))
+ #include "cdrombsd.h"
+ #elif defined(__SOLARIS__) || defined(__Solaris__) || defined(__solaris__) || defined(__sun__) || defined(sun)
+ #include "cdromsolaris.h"
+@@ -719,7 +719,7 @@
+ #endif
+ 	{
+ 
+-#if defined(HAVE_SYS_CDIO_H) && (defined(__FreeBSD__) || defined(__FreeBSD_kernel__))
++#if defined(HAVE_SYS_CDIO_H) && defined(__FreeBSD__)
+ 		struct ioc_vol vol;
+ 
+ 		CD_LOCK();
+@@ -754,7 +754,7 @@
+ static void
+ set_volume(gint l, gint r)
+ {
+-#if defined(HAVE_SYS_CDIO_H) && (defined(__FreeBSD__) || defined(__FreeBSD_kernel__))
++#if defined(HAVE_SYS_CDIO_H) && defined(__FreeBSD__)
+ 	struct ioc_vol vol;
+ #else
+ 	struct cdrom_volctrl vol;
+@@ -788,7 +788,7 @@
+ 		CD_LOCK();
+ 		if (cd_cur && (cd_cur->cdfd >= 0))
+ 		{
+-#if defined(HAVE_SYS_CDIO_H) && (defined(__FreeBSD__) || defined(__FreeBSD_kernel__))
++#if defined(HAVE_SYS_CDIO_H) && defined(__FreeBSD__)
+ 			vol.vol[0] = vol.vol[2] = (l * 255) / 100;
+ 			vol.vol[1] = vol.vol[3] = (r * 255) / 100;
+ 			ioctl(cd_cur->cdfd, CDIOCSETVOL, &vol);
+diff -Nur xmms-cdread-0.14a/cdrombsd.h xmms-cdread-0.14a.old/cdrombsd.h
+--- xmms-cdread-0.14a/cdrombsd.h	2005-09-22 19:24:25.000000000 +0200
++++ xmms-cdread-0.14a.old/cdrombsd.h	2001-08-18 12:09:10.000000000 +0200
+@@ -5,21 +5,15 @@
+ #ifndef CDROMBSD_H
+ #define CDROMBSD_H
+ #include <sys/param.h>
+-#include <sys/cdrio.h>
+-#ifndef CD_FRAMESIZE_RAW
+-#define CD_FRAMESIZE_RAW 2352
+-#endif
+ /*\
+ |*| FreeBSD (?) specific code
+ \*/
+ 
+-#ifndef __FreeBSD_kernel_version
+-#define __FreeBSD_kernel_version __FreeBSD_version
+-#endif
+-
+-#define GET_LBA(entry) ((entry.addr.msf.minute * 60 + \
+-			 entry.addr.msf.second) * 75 + \
+-			 entry.addr.msf.frame)
++#define GET_LBA(entry) ((entry.addr_type == CD_LBA_FORMAT) ? \
++				ntohl(entry.addr.lba) : \
++					((entry.addr.msf.minute * 60 + \
++					entry.addr.msf.second) * 75 + \
++					entry.addr.msf.frame))
+ 
+ 
+ /*\
+@@ -90,16 +84,6 @@
+ |*|  from device cdfd, at position lba
+ |*|  Return number of successfully read frames, -1 on error.
+ \*/
+-#if __FreeBSD_kernel_version >= 501106
+-static int
+-cdrom_read_audio(int cdfd, int lba, char *buf, int btw)
+-{
+-	int bsize = CD_FRAMESIZE_RAW;
+-	if (ioctl(cdfd, CDRIOCSETBLOCKSIZE, &bsize) == -1) return -errno;
+-	if (pread(cdfd, buf, btw*bsize, (lba - 150)*bsize) != btw*bsize) return 0;
+-	return btw; 
+-}
+-#else // 4-STABLE
+ static int
+ cdrom_read_audio(int cdfd, int lba, char *buf, int btw)
+ {
+@@ -117,7 +101,6 @@
+ 	} while (--rtr >= 0);
+ 	return -1;
+ }
+-#endif //FreeBSD_kernel_version
+ 
+ /*\ Play audio from lba address from, to lba address to
+ |*|  return -1 on failure
+diff -Nur xmms-cdread-0.14a/server.c xmms-cdread-0.14a.old/server.c
+--- xmms-cdread-0.14a/server.c	2005-09-22 19:24:25.000000000 +0200
++++ xmms-cdread-0.14a.old/server.c	2005-09-22 19:24:07.000000000 +0200
+@@ -281,7 +281,7 @@
+ 		if (r < 0) {
+ 			req->rest[0] = 0;
+ 			if (errno == EAGAIN) {
+-				errno = ETIMEDOUT;
++				errno = ETIME;
+ 				if (++rtr < READ_TIMEOUT) {
+ 					xmms_usleep(READ_USEC);
+ 					continue;
+@@ -311,7 +311,7 @@
+ 		gint w = write(sock, p, strlen(p));
+ 		if (w < 0) {
+ 			if (errno == EAGAIN) {
+-				errno = ETIMEDOUT;
++				errno = ETIME;
+ 				if (++rtr < READ_TIMEOUT) {
+ 					xmms_usleep(READ_USEC);
+ 					continue;

@@ -1,0 +1,81 @@
+Author: aurel32
+Status: in BTS
+
+--- le-dico-de-rene-cougnenc-1.3.orig/src/dico.c
++++ le-dico-de-rene-cougnenc-1.3/src/dico.c
+@@ -19,6 +19,7 @@
+     |                                                                       |
+     +-----------------------------------------------------------------------+
+ */
++#ifndef __GLIBC__
+ #ifndef linux
+ #ifndef sony
+ #ifndef MSDOS
+@@ -26,6 +27,7 @@
+ #endif
+ #endif
+ #endif
++#endif
+ 
+ #ifdef sony                             /* Sony News WorkStations        */
+ #define UNIX
+@@ -34,6 +36,12 @@
+ char *getenv();
+ #endif
+ 
++#ifdef __GLIBC__                        /* GLIBC based Operating System  */
++#define UNIX
++#define ISO_CHARS
++#define MYOS "GLIBC Based OS" 
++#endif
++
+ #ifdef linux                            /* Linux Operating System        */ 
+ #define UNIX
+ #define ISO_CHARS
+@@ -58,11 +66,13 @@
+ #define OK    0
+ #define MYVBUF 10240                     /* pour setvbuf() eventuel         */
+ 
++#ifndef __GLIBC__
+ #ifndef linux
+ #ifndef sony
+ #define MUST_HAVE_BUF                  /* Linux va moins vite avec setvbuf! */
+ #endif
+ #endif
++#endif
+ 
+ typedef unsigned char byte;
+ 
+@@ -73,7 +83,7 @@
+ #endif
+ 
+ //Ajout
+-#ifdef linux
++#if defined(linux) || defined (__GLIBC__)
+ #include <locale.h>
+ #include <langinfo.h>
+ #include <iconv.h>
+only in patch2:
+unchanged:
+--- le-dico-de-rene-cougnenc-1.3.orig/src/killposte.c
++++ le-dico-de-rene-cougnenc-1.3/src/killposte.c
+@@ -12,15 +12,19 @@
+ +-----------------------------------------------------------------------+
+ */
+ 
++#ifndef __GLIBC__
+ #ifndef linux
+ #ifndef MSDOS
+ #error "Vous devez definir le systeme d'exploitation linux ou MSDOS."
+ #endif
+ #endif
++#endif
+ 
+ #ifdef linux
+ #define UNIX
+ #define MYOS "linux"                    /* Pour affichage version only    */
++#elif defined(__GLIBC__)
++#define MYOS "GLIBC Based OS" 
+ #else
+ #define MYOS "MSDOS"
+ #endif

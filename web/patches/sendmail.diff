@@ -1,0 +1,23 @@
+Author: aurel32
+Status: in BTS
+
+diff -u sendmail-8.13.5/debian/patches/8.13/8.13.5/kfreebsd.patch sendmail-8.13.5/debian/patches/8.13/8.13.5/kfreebsd.patch
+--- sendmail-8.13.5/debian/patches/8.13/8.13.5/kfreebsd.patch
++++ sendmail-8.13.5/debian/patches/8.13/8.13.5/kfreebsd.patch
+@@ -30,7 +30,7 @@
+  
+  
+  /*
+-@@ -1491,6 +1491,68 @@
++@@ -1491,6 +1491,69 @@
+  
+  
+  /*
+@@ -39,6 +39,7 @@
+ + */
+ +
+ +# if defined (__GLIBC__) && defined(__FreeBSD_kernel__)
+++#  define BSD		1	/* include BSD defines */
+ +#  define HASSETREGID	1	/* use setregid(2) to set saved gid */
+ +#  ifndef REQUIRES_DIR_FSYNC
+ +#   define REQUIRES_DIR_FSYNC	1	/* requires fsync() on directory */

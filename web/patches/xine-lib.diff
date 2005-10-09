@@ -1,6 +1,19 @@
 Author: aurel32
 Status: in BTS
 
+diff -u xine-lib-1.0.1/debian/control xine-lib-1.0.1/debian/control
+--- xine-lib-1.0.1/debian/control
++++ xine-lib-1.0.1/debian/control
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Siggi Langauf <siggi@debian.org>
+ Uploaders: Philipp Matthias Hahn <pmhahn@debian.org>
+-Build-Depends: debhelper (>= 4.0.4), libaa1-dev (>= 1.4p5-2), libcaca-dev, xlibs-dev (>> 4.1), libxinerama-dev, libesd0-dev, zlib1g-dev | libz-dev, libartsc0-dev (>>1.1.0), liblircclient-dev, libogg-dev, libvorbis-dev, libtheora-dev, libasound2-dev, libflac-dev (>>1.1.0), libmodplug-dev, libgnomevfs2-dev, libsmbclient-dev, libspeex-dev, libmng-dev, libpng12-dev | libpng-dev, libfreetype6-dev, libsdl1.2-dev (>=1.1.5)
++Build-Depends: debhelper (>= 4.0.4), libaa1-dev (>= 1.4p5-2), libcaca-dev, xlibs-dev (>> 4.1), libxinerama-dev, libesd0-dev, zlib1g-dev | libz-dev, libartsc0-dev (>>1.1.0), liblircclient-dev, libogg-dev, libvorbis-dev, libtheora-dev, libasound2-dev [!kfreebsd-i386 !hurd-i386], libflac-dev (>>1.1.0), libmodplug-dev, libgnomevfs2-dev, libsmbclient-dev, libspeex-dev, libmng-dev, libpng12-dev | libpng-dev, libfreetype6-dev, libsdl1.2-dev (>=1.1.5)
+ Build-Conflicts: libdvdnav-dev
+ Standards-Version: 3.5.9
+ 
+diff -u xine-lib-1.0.1/debian/changelog xine-lib-1.0.1/debian/changelog
 --- xine-lib-1.0.1.orig/src/input/input_vcd.c
 +++ xine-lib-1.0.1/src/input/input_vcd.c
 @@ -39,7 +39,7 @@
@@ -84,6 +97,8 @@ Status: in BTS
    {
      int bsize = 2352;
      if (ioctl (this->fd, CDRIOCSETBLOCKSIZE, &bsize) == -1) {
+only in patch2:
+unchanged:
 --- xine-lib-1.0.1.orig/src/input/libdvdnav/bswap.h
 +++ xine-lib-1.0.1/src/input/libdvdnav/bswap.h
 @@ -35,7 +35,7 @@

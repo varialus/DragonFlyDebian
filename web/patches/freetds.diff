@@ -1,0 +1,15 @@
+Author: aurel32
+Status: workaround until libtool.m4 get fixed
+
+diff -u freetds-0.63/debian/rules freetds-0.63/debian/rules
+--- freetds-0.63/debian/rules
++++ freetds-0.63/debian/rules
+@@ -104,7 +104,7 @@
+ 	dh_compress -a
+ 	dh_fixperms -a
+ 	chmod a+x ./debian/dh_makeshlibs
+-	./debian/dh_makeshlibs -a -Xtdsodbc
++	dh_makeshlibs -a -Xtdsodbc
+ 	dh_installdeb -a
+ 	dh_shlibdeps -a
+ 	dh_gencontrol -a

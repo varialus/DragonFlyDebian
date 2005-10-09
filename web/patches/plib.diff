@@ -1,0 +1,47 @@
+Author: aurel32
+Status: in BTS
+
+--- plib-1.8.4.orig/src/js/jsBSD.cxx
++++ plib-1.8.4/src/js/jsBSD.cxx
+@@ -45,7 +45,7 @@
+ #endif
+ 
+ #include <sys/ioctl.h>
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ # include <sys/joystick.h>
+ #else
+ # include <machine/joystick.h>		// For analog joysticks
+--- plib-1.8.4.orig/src/sl/slDSP.cxx
++++ plib-1.8.4/src/sl/slDSP.cxx
+@@ -413,7 +413,7 @@
+ /* NetBSD/OpenBSD 2.3 this should be very close to SUN Audio    */
+ /* ------------------------------------------------------------ */
+ 
+-#elif (defined(UL_BSD) && !defined(__FreeBSD__)) || defined(UL_SOLARIS)
++#elif (defined(UL_BSD) && !defined(__FreeBSD__) && !defined(__FreeBSD_kernel__)) || defined(UL_SOLARIS)
+ void slDSP::open ( const char *device, int _rate, int _stereo, int _bps )
+ {
+ 
+--- plib-1.8.4.orig/src/sl/slPortability.h
++++ plib-1.8.4/src/sl/slPortability.h
+@@ -59,8 +59,8 @@
+ #  if defined(UL_LINUX)
+ #    include <linux/soundcard.h>
+ #    include <sys/ioctl.h>
+-#  elif defined(__FreeBSD__)
+-#    include <machine/soundcard.h>
++#  elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#    include <sys/soundcard.h>
+ #  else
+     /*
+       Tom thinks this file may be <sys/soundcard.h> under some
+@@ -75,7 +75,7 @@
+ #endif
+ 
+ #ifdef UL_BSD
+-#ifndef __FreeBSD__
++#if !defined(__FreeBSD__) && !defined(__FreeBSD_kernel__)
+ #  include <sys/audioio.h>
+ #endif
+ #endif
