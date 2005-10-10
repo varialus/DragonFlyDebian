@@ -28,12 +28,5 @@ rm -rf /etc/rc.conf /etc/defaults/
 mv /etc/fstab.freebsd /etc/fstab
 echo "null			/proc		linprocfs	rw	0	0" >> /etc/fstab
 
-# get the right kernel installed
-case `uname -m` in
-  i686)	dpkg -i /var/cache/apt/archives/kfreebsd-image-*-686_*.deb ;;
-  i586)	dpkg -i /var/cache/apt/archives/kfreebsd-image-*-586_*.deb ;;
-  *)	dpkg -i /var/cache/apt/archives/kfreebsd-image-*-486_*.deb ;;
-esac
-
 rm -f /native-install
 rm -f `which $0`

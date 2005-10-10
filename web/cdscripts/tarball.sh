@@ -28,11 +28,6 @@ else
   /usr/share/crosshurd/makehurddir.sh ${tmp} i486 kfreebsd-gnu
 fi
 
-# !!!! FIXME: ultra-ugly hack!!
-base_url="http://ftp.gnuab.org/debian/pool-kfreebsd-i386/main/k/kfreebsd-5"
-(cd ${tmp}/var/cache/apt/archives/ && \
-  wget -c ${base_url}/kfreebsd-image-5{,.4-1}-{4,5,6}86_5.4-1_kfreebsd-i386.deb)
-
 if test -e native-install ; then
   cp native-install ${tmp}/
 fi
