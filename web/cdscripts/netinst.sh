@@ -41,18 +41,9 @@ case `uname -s` in
   GNU/kFreeBSD) echo FIXME ; exit 1 ;;
 esac
 cp -a /mnt/* ${tmp}/
-umount /mnt
+umount -d /mnt
 mkdir ${tmp}/base/
 cp base.tgz ${tmp}/base/
-rm -rf ${tmp}/boot/kernel
-
-tmp2=`mktemp -d`
-tar -C ${tmp2} --same-owner -xzpf base.tgz
-  tmp3=`mktemp -d`
-  dpkg --extract ${tmp2}/var/cache/apt/archives/kfreebsd-image-${freebsd}-*-486_*.deb ${tmp3}
-  mv ${tmp3}/boot/kernel ${tmp}/boot/
-  rm -rf ${tmp3}
-rm -rf ${tmp2}
 
 # hack for being a FreeBSD compliant [tm] cdrom
 ln -sf . ${tmp}/${freebsd}-RELEASE
