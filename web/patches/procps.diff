@@ -1,0 +1,155 @@
+
+Author: rmh
+Status: in BTS
+
+diff -Nur procps-3.2.5.old/debian/patches/00list procps-3.2.5/debian/patches/00list
+--- procps-3.2.5.old/debian/patches/00list	2005-10-10 11:32:40.000000000 +0200
++++ procps-3.2.5/debian/patches/00list	2005-10-10 18:16:44.000000000 +0200
+@@ -5,3 +5,4 @@
+ 30_pgrep_start_time
+ 30_readproc_c
+ 30_tload_no_optargs
++40_gnu-kbsd.dpatch
+diff -Nur procps-3.2.5.old/debian/patches/40_gnu-kbsd.dpatch procps-3.2.5/debian/patches/40_gnu-kbsd.dpatch
+--- procps-3.2.5.old/debian/patches/40_gnu-kbsd.dpatch	1970-01-01 01:00:00.000000000 +0100
++++ procps-3.2.5/debian/patches/40_gnu-kbsd.dpatch	2005-10-10 18:17:00.000000000 +0200
+@@ -0,0 +1,89 @@
++#! /bin/sh -e
++## 40_gnu-kbsd.dpatch by Robert Millan
++##
++## All lines beginning with `## DP:' are a description of the patch.
++## DP: GNU/kFreeBSD support.
++
++[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
++patch_opts="${patch_opts:--f --no-backup-if-mismatch}"
++
++if [ $# -ne 1 ]; then
++    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
++    exit 1
++fi
++case "$1" in
++       -patch) patch $patch_opts -p1 < $0;;
++       -unpatch) patch $patch_opts -p1 -R < $0;;
++        *)
++                echo >&2 "`basename $0`: script expects -patch|-unpatch as argum
++ent"
++                exit 1;;
++esac
++
++exit 0
++@DPATCH@
++diff -ur procps-3.2.5.old/proc/sig.c procps-3.2.5/proc/sig.c
++--- procps-3.2.5.old/proc/sig.c	2003-03-19 01:52:39.000000000 +0100
+++++ procps-3.2.5/proc/sig.c	2005-10-10 18:13:46.000000000 +0200
++@@ -50,6 +50,10 @@
++ #  define SIGPWR 29
++ #endif
++ 
+++#ifndef SIGPOLL
+++#define SIGPOLL SIGIO
+++#endif
+++
++ typedef struct mapstruct {
++   const char *name;
++   int num;
++diff -ur procps-3.2.5.old/proc/version.c procps-3.2.5/proc/version.c
++--- procps-3.2.5.old/proc/version.c	2003-01-29 02:11:43.000000000 +0100
+++++ procps-3.2.5/proc/version.c	2005-10-10 18:13:46.000000000 +0200
++@@ -35,6 +35,9 @@
++ 
++ static void init_Linux_version(void) __attribute__((constructor));
++ static void init_Linux_version(void) {
+++#ifndef __linux__
+++    int x = 2, y = 0, z = 0;
+++#else
++     static struct utsname uts;
++     int x = 0, y = 0, z = 0;	/* cleared in case sscanf() < 3 */
++     
++@@ -45,5 +48,6 @@
++ 		"Non-standard uts for running kernel:\n"
++ 		"release %s=%d.%d.%d gives version code %d\n",
++ 		uts.release, x, y, z, LINUX_VERSION(x,y,z));
+++#endif
++     linux_version_code = LINUX_VERSION(x, y, z);
++ }
++diff -ur procps-3.2.5.old/ps/common.h procps-3.2.5/ps/common.h
++--- procps-3.2.5.old/ps/common.h	2004-10-09 05:55:50.000000000 +0200
+++++ procps-3.2.5/ps/common.h	2005-10-10 18:13:53.000000000 +0200
++@@ -14,7 +14,13 @@
++ 
++ #include "../proc/procps.h"
++ #include "../proc/readproc.h"
++-#include <asm/page.h>  /* looks safe for glibc, we need PAGE_SIZE */
+++
+++/* looks safe for glibc, we need PAGE_SIZE */
+++#if defined(__linux__)
+++# include <asm/page.h>
+++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+++# include <machine/param.h>
+++#endif
++ 
++ #if 0
++ #define trace(args...) printf(## args)
++diff -ur procps-3.2.5.old/top.c procps-3.2.5/top.c
++--- procps-3.2.5.old/top.c	2005-01-26 06:15:18.000000000 +0100
+++++ procps-3.2.5/top.c	2005-10-10 18:13:46.000000000 +0200
++@@ -1869,6 +1869,9 @@
++       std_err("failed tty get");
++    newtty = Savedtty;
++    newtty.c_lflag &= ~(ICANON | ECHO);
+++#ifndef TAB3
+++#define TAB3 XTABS
+++#endif
++    newtty.c_oflag &= ~(TAB3);
++    newtty.c_cc[VMIN] = 1;
++    newtty.c_cc[VTIME] = 0;
+diff -Nur procps-3.2.5.old/debian/procps.sh procps-3.2.5/debian/procps.sh
+--- procps-3.2.5.old/debian/procps.sh	2005-10-10 11:32:39.000000000 +0200
++++ procps-3.2.5/debian/procps.sh	2005-10-10 18:17:28.000000000 +0200
+@@ -8,7 +8,8 @@
+ [ -r /etc/default/rcS ] || exit 0
+ . /etc/default/rcS
+ 
+-[ -x /sbin/sysctl ] || exit 0
++PATH=/sbin:$PATH
++which sysctl > /dev/null || exit 0
+ 
+ 
+ case "$1" in
+@@ -26,7 +27,7 @@
+                        n=""
+                        redir=""
+                fi
+-               eval "/sbin/sysctl $n -q -p $redir"
++               eval "sysctl $n -q -p $redir"
+                if [ "$VERBOSE" = "yes" ]
+                then
+ 			echo "... done."
+diff -Nur procps-3.2.5.old/debian/rules procps-3.2.5/debian/rules
+--- procps-3.2.5.old/debian/rules	2005-10-10 11:32:39.000000000 +0200
++++ procps-3.2.5/debian/rules	2005-10-10 18:17:28.000000000 +0200
+@@ -10,6 +10,8 @@
+ 
+ PACKAGE="procps"
+ 
++DEB_HOST_GNU_SYSTEM	?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
++
+ ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
+ 	INSTALL_PROGRAM += -s
+ endif
+@@ -58,6 +60,15 @@
+ 	(cp proc/*.h $(CURDIR)/debian/procps/usr/include/proc)
+ 	cp static/libproc.a $(CURDIR)/debian/libproc-dev/usr/lib
+ 
++ifneq ($(DEB_HOST_GNU_SYSTEM), linux-gnu)
++	rm -f \
++		$(CURDIR)/debian/procps/bin/kill \
++		$(CURDIR)/debian/procps/usr/share/man/man1/kill.1 \
++		$(CURDIR)/debian/procps/sbin/sysctl \
++		$(CURDIR)/debian/procps/usr/share/man/man8/sysctl.8 \
++		$(NULL)
++endif
++
+ 	dh_movefiles --sourcedir=debian/procps
+ 	rmdir $(CURDIR)/debian/procps/usr/include/proc
+ 
