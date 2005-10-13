@@ -2,29 +2,26 @@
 Author: rmh
 Status: in BTS.  see also debootstrap_hacks.diff
 
-diff -ur debootstrap-0.3.1.4.old/functions debootstrap-0.3.1.4/functions
---- debootstrap-0.3.1.4.old/functions	2005-06-27 05:35:13.000000000 +0200
-+++ debootstrap-0.3.1.4/functions	2005-07-25 01:17:30.000000000 +0200
-@@ -731,13 +731,24 @@
-   fi
+diff -ur debootstrap-0.3.1.7.old/functions debootstrap-0.3.1.7/functions
+--- debootstrap-0.3.1.7.old/functions	2005-08-13 07:40:54.000000000 +0200
++++ debootstrap-0.3.1.7/functions	2005-10-13 10:09:50.000000000 +0200
+@@ -732,12 +732,21 @@
  }
  
-+uname="`uname -s`"
-+
  setup_proc () {
 -  on_exit "umount $TARGET/dev/pts"
 -  on_exit "umount $TARGET/dev/shm"
 -  on_exit "umount $TARGET/proc/bus/usb"
-+  case "$uname" in
-+    Linux)
++  case "$ARCH" in
++    kfreebsd-*)
++      on_exit "umount $TARGET/dev"
++      procfs="linprocfs"
++    ;;
++    *)
 +      on_exit "umount $TARGET/dev/pts"
 +      on_exit "umount $TARGET/dev/shm"
 +      on_exit "umount $TARGET/proc/bus/usb"
 +      procfs="proc"
-+    ;;
-+    GNU/kFreeBSD)
-+      on_exit "umount $TARGET/dev"
-+      procfs="linprocfs"
 +    ;;
 +  esac
    on_exit "umount $TARGET/proc"
@@ -34,12 +31,34 @@ diff -ur debootstrap-0.3.1.4.old/functions debootstrap-0.3.1.4/functions
  }
  
  setup_proc_fakechroot () {
-@@ -749,7 +760,7 @@
-   if [ -e $DEVICES_TARGZ ]; then
-     (cd "$TARGET"; zcat $DEVICES_TARGZ | tar -xf -)
-   else
+@@ -746,15 +755,21 @@
+ }
+ 
+ setup_devices () {
+-  if [ -e $DEVICES_TARGZ ]; then
+-    (cd "$TARGET"; zcat $DEVICES_TARGZ | tar -xf -)
+-  else
 -    if [ -e /dev/.devfsd ]; then
-+    if [ -e /dev/.devfsd ] || [ "$uname" = "GNU/kFreeBSD" ] ; then
-       in_target mount -t devfs devfs /dev
-     else
-       error 1 NODEVTGZ "no %s. cannot create devices" "$DEVICES_TARGZ"
+-      in_target mount -t devfs devfs /dev
+-    else
+-      error 1 NODEVTGZ "no %s. cannot create devices" "$DEVICES_TARGZ"
+-    fi
+-  fi
++  case "$ARCH" in
++    kfreebsd-*)
++      in_target mount -t devfs devfs /dev ;;
++    *)
++      if [ -e $DEVICES_TARGZ ]; then
++        (cd "$TARGET"; zcat $DEVICES_TARGZ | tar -xf -)
++      else
++        if [ -e /dev/.devfsd ] ; then
++          in_target mount -t devfs devfs /dev
++        else
++          error 1 NODEVTGZ "no %s. cannot create devices" "$DEVICES_TARGZ"
++        fi
++      fi
++    ;;
++  esac
+ }
+ 
+ setup_devices_fakechroot () {
