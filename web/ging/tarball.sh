@@ -33,8 +33,6 @@ export GZIP=--best
 # BEGIN package stuff
 ######################################################################
 /usr/share/crosshurd/makehurddir.sh ${tmp1} ${cpu} ${system}
-(set -e ; cd ${tmp1}/var/cache/apt/archives/ && wget -c \
-  http://ftp.gnuab.org/debian/obsolete/2005-10-06/openssl/libssl0.9.7_0.9.7g-2+kbsd_kfreebsd-i386.deb)
 
 cat > ${tmp1}/etc/apt/apt.conf << __EOF__
 APT::Get::AllowUnauthenticated "yes";
