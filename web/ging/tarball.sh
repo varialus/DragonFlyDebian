@@ -7,7 +7,7 @@
 
 set -ex
 
-version=0.1.0
+version=0.1.0.rc1
 
 if [ "$UID" != "0" ] ; then
   # I call that incest, don't you?
@@ -20,6 +20,9 @@ if ! dpkg -s crosshurd > /dev/null ; then
   exit 1
 fi
 
+username="ging"
+hostname="ging"
+
 cpu="i486"
 system="kfreebsd-gnu"
 uname="GNU/kFreeBSD"
@@ -27,7 +30,23 @@ tmp1=`mktemp -d`
 pwd=`pwd`
 export GZIP=--best
 
+# BEGIN package stuff
+######################################################################
 /usr/share/crosshurd/makehurddir.sh ${tmp1} ${cpu} ${system}
+(set -e ; cd ${tmp1}/var/cache/apt/archives/ && wget -c \
+  http://ftp.gnuab.org/debian/obsolete/2005-10-06/openssl/libssl0.9.7_0.9.7g-2+kbsd_kfreebsd-i386.deb)
+
+cat > ${tmp1}/etc/apt/apt.conf << __EOF__
+APT::Get::AllowUnauthenticated "yes";
+__EOF__
+mount -t devfs null ${tmp1}/dev
+chroot ${tmp1} /native-install
+
+if test -e ./packages ; then packages=`grep -v "^#" ./packages | tr "\n" " "` ; fi
+chroot ${tmp1} apt-get update
+chroot ${tmp1} apt-get -y install ${packages} kfreebsd-image-5-686 || true
+######################################################################
+# END package stuff
 
 # password-less login
 cat > ${tmp1}/etc/passwd << EOF  
@@ -39,14 +58,6 @@ id:S:initdefault:
 ca:12345:ctrlaltdel:/sbin/shutdown -t1 -a -r now
 EOF
 
-# maybe-missing kernel package
-cd ${tmp1} && dpkg --extract var/cache/apt/archives/kfreebsd-image-5.*.deb .
-
-echo ging > ${tmp1}/etc/hostname
-cat > ${tmp1}/etc/hosts << __EOF__
-127.0.0.1	localhost ging
-__EOF__
-
 echo > ${tmp1}/etc/motd
 
 cat > ${tmp1}/etc/issue << __EOF__
@@ -54,39 +65,24 @@ Ging $version \n \l
 
 __EOF__
 
-cat > ${tmp1}/etc/apt/apt.conf << __EOF__
-APT::Get::AllowUnauthenticated "yes";
-__EOF__
-chroot ${tmp1} /native-install
-
-if test -e ./packages ; then packages=`grep -v "^#" ./packages | tr "\n" " "` ; fi
-chroot ${tmp1} apt-get update
-chroot ${tmp1} apt-get -y install ${packages} || true
-
-username="ging"
-chroot ${tmp1} adduser --disabled-password $username
-sed -i ${tmp1}/etc/shadow -e "s/^ging:\*:/ging::/g"
+chroot ${tmp1} adduser --disabled-password ${username}
+sed -i ${tmp1}/etc/shadow -e "s/^${username}:\*:/${username}::/g"
 
 cat > ${tmp1}/etc/sudoers << __EOF__
-$username ALL=NOPASSWD: ALL
+${username} ALL=NOPASSWD: ALL
 __EOF__
 
-# avoid messed-up file with "ed0"
-cat > ${tmp1}/etc/network/interfaces << __EOF__
-auto lo0
-iface lo0 inet loopback
-__EOF__
+chroot ${tmp1} apt-get clean
 
+set +x
 echo "Spawning a shell.  The following packages are supposedly installed:"
 echo ${packages}
+echo "System size: `du -hs ${tmp1}`"
 chroot ${tmp1}
+set -x
 
-rm -f ${tmp1}/var/cache/apt/archives/*.deb ${tmp1}/native-install
-
-# if X server wrapper is installed, allow console users to run it
-if test -e ${tmp1}/etc/X11/Xwrapper.config ; then
-  sed -i ${tmp1}/etc/X11/Xwrapper.config -e "s/^allowed_users=.*/allowed_users=console/g"
-fi
+chroot ${tmp1} apt-get clean
+rm -f ${tmp1}/native-install
 
 # if X server auto-configurator is installed, enable it
 if test -e ${tmp1}/etc/init.d/xserver-xorg ; then
@@ -95,8 +91,19 @@ GENERATE_XCFG_AT_BOOT=true
 __EOF__
 fi
 
-# crosshurd uses host machine /etc/resolv.conf.  we don't really want that
-echo -e "127.0.0.1\t\tlocalhost" > ${tmp1}/etc/resolv.conf
+# enable DMA on atapi
+if ! grep -q "^hw\.ata\.atapi_dma=1" ${tmp1}/boot/loader.conf ; then
+  echo "hw.ata.atapi_dma=1" >> ${tmp1}/boot/loader.conf
+fi
+
+# crosshurd gathers some defaults from host machine, we don't really want that
+echo -n > ${tmp1}/etc/resolv.conf
+echo "127.0.0.1		localhost $hostname" > ${tmp1}/etc/hosts
+echo $hostname > ${tmp1}/etc/hostname
+
+# everything must be unmounted before tarring
+umount -f ${tmp1}/dev
+umount -f ${tmp1}/proc
 
 cd ${tmp1} && tar --same-owner -czpf ${pwd}/base.tgz ./*
 rm -rf ${tmp1}

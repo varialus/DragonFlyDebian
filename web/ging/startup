@@ -38,6 +38,9 @@ if which dhclient3 >/dev/null 2>/dev/null ; then
   chroot /ramdisk dhclient3 >/dev/null 2>/dev/null &
 fi
 
+# attempt to setup sound
+kldload snd_driver || true
+
 # make /etc/init.d/checkroot happy
 # (we don't use <<EOF because bash requires a tempfile to do that)
 echo "/dev/md0	/	ufs		rw	1 1" > /ramdisk/etc/fstab
