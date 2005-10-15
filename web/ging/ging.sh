@@ -2,18 +2,13 @@
 #
 # Build-Depends: mkisofs, crosshurd, fakeroot
 #
-# Copyright 2004, 2005 Robert Millan <rmh@aybabtu.com>
+# Copyright 2004, 2005  Robert Millan <rmh@aybabtu.com>
 # See /usr/share/common-licenses/GPL for license terms.
 
 set -ex
 
-if [ "$version" = "" ] ; then
-  version=unreleased
-fi
-
 if [ "$UID" != "0" ] ; then
-  # I call that incest, don't you?
-  fakeroot $0 $@
+  sudo $0 $@
   exit 0
 fi
 
@@ -29,58 +24,48 @@ if ! test -e cdboot ; then
   exit 1
 fi
 
-cpu="i486"
-system="kfreebsd-gnu"
-uname="GNU/kFreeBSD"
-tmp1=`mktemp -d`
-tmp2=`mktemp`
-pwd=`pwd`
-
-if ! test -e base.tgz ; then ./tarball.sh ; fi
-tar -C ${tmp1} --same-owner -xzpf base.tgz
-mkdir ${tmp1}/base
-cp base.tgz ${tmp1}/base/
+. vars
 
 ##################
 #  add some trickery
 ###########################
 
-cd ${tmp1}
+cd tmp
 
-rm -f var/cache/apt/archives/*.deb
+chroot . apt-get clean
 rm -rf var/cache/apt/lists
 
-# grub is disabled for now
-#mkdir -p boot/grub
-#cp lib/grub/${cpu}-*/stage2_eltorito boot/grub/
-#cat > boot/grub/menu.lst << EOF
-#timeout 30
-#default 0
-#title  ${uname} (cdrom 0)
-#root (cd)
-#kernel /boot/kfreebsd.gz root=cd9660:acd0
-#title  ${uname} (cdrom 1)
-#root (cd)
-#kernel /boot/kfreebsd.gz root=cd9660:acd1
-#EOF
+# if X server auto-configurator is installed, enable it
+if test -e etc/init.d/xserver-xorg ; then
+  rm -f etc/X11/xorg.conf*
+  touch etc/X11/xorg.conf
+  cat > ${tmp1}/etc/default/xorg << __EOF__
+GENERATE_XCFG_AT_BOOT=true
+__EOF__
+fi
 
-# this is only used by grub
-#gzip -c9 boot/kernel/kernel > boot/kfreebsd.gz
+# shut up silly warning
+if test -e boot/kernel/linker.hints ; then
+  touch boot/kernel/linker.hints
+fi
 
-# add this to make it a safe boot
-cat >> boot/device.hints << EOF
-hint.acpi.0.disabled=1
-loader.acpi_disabled_by_user=1
-hint.apic.0.disabled=1
-hw.ata.ata_dma=0
-hw.ata.atapi_dma=0
-hw.ata.wc=0
-hw.eisa_slots=0
+# enable DMA on atapi
+if ! grep -q "^hw\.ata\.atapi_dma=1" boot/loader.conf ; then
+  echo "hw.ata.atapi_dma=1" >> boot/loader.conf
+fi
+
+# avoid non-sense wizards for kde and gimp
+tar --same-owner -xzpf ${pwd}/home_ging.tar.gz
+
+# probe for sound cards
+cat > etc/modules.d/ging << EOF
+# added for ging $version
+snd_driver
 EOF
 
 # filesystem tables
 cat > etc/fstab << EOF
-/dev/acd0	/	cd9660		ro	1 1
+/dev/acd0	/	cd9660		ro	0 0
 EOF
 ln -sf /proc/mounts etc/mtab
 
@@ -105,7 +90,6 @@ chmod +x root/startup
 cp ${pwd}/cdboot boot/
 # -r messes up file permissions, use -R instead
 mkisofs -b boot/cdboot -no-emul-boot \
-  -o ${pwd}/livecd-${version}.iso -R .
+  -o ${pwd}/${distribution}-${version}.iso -R .
 
-rm -rf ${tmp1} ${tmp2} &
 cd ${pwd}/

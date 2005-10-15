@@ -1,12 +1,14 @@
 #!/bin/bash
 set -e
-trap "echo \"Something wicked happened.  Press enter for rescue shell.\" ; read i ; bash" 0
+trap "echo \"Something wicked happened.  Press enter for rescue shell.\" ; read ; bash" 0
+
 mdconfig -a -t malloc -o compress -s 32m -u md0
 mkfs.ufs /dev/md0
 mount -o rw -t ufs /dev/md0 /ramdisk
+
 echo "Populating ramdisk node (this might take a while) ..."
 
-for i in bin usr boot lib libexec sbin var/lib/{dpkg,apt}   var/cache/apt ; do
+for i in bin usr boot lib libexec sbin var/{lib/{dpkg,apt},cache/apt} ; do
   mkdir -p /ramdisk/$i
   mount -t nullfs /$i /ramdisk/$i
 done
@@ -29,23 +31,16 @@ for i in /* ; do
   esac
 done
 
-# doesn't work as expected (i.e. you still need -f to halt)
-#mknod -m 600 /ramdisk/etc/.initctl p
-export TERM=cons25
-
-# attempt to setup network via DHCP
+echo "Setting up network via DHCP (in background)."
 if which dhclient3 >/dev/null 2>/dev/null ; then
   chroot /ramdisk dhclient3 >/dev/null 2>/dev/null &
 fi
 
-# attempt to setup sound
-kldload snd_driver || true
-
 # make /etc/init.d/checkroot happy
 # (we don't use <<EOF because bash requires a tempfile to do that)
-echo "/dev/md0	/	ufs		rw	1 1" > /ramdisk/etc/fstab
+echo "/dev/md0	/	ufs		rw	0 0" > /ramdisk/etc/fstab
 
 # exec chrooted init using -i hack
 cp /usr/share/sysvinit/inittab /ramdisk/etc/
-exec chroot /ramdisk init -i
+TERM=cons25 exec chroot /ramdisk init -i
 false

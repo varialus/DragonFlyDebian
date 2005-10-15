@@ -7,10 +7,7 @@
 
 set -ex
 
-version=0.1.0.rc1
-
 if [ "$UID" != "0" ] ; then
-  # I call that incest, don't you?
   sudo $0 $@
   exit 0
 fi
@@ -20,15 +17,9 @@ if ! dpkg -s crosshurd > /dev/null ; then
   exit 1
 fi
 
-username="ging"
-hostname="ging"
+. vars
 
-cpu="i486"
-system="kfreebsd-gnu"
-uname="GNU/kFreeBSD"
 tmp1=`mktemp -d`
-pwd=`pwd`
-export GZIP=--best
 
 # BEGIN package stuff
 ######################################################################
@@ -42,7 +33,7 @@ chroot ${tmp1} /native-install
 
 if test -e ./packages ; then packages=`grep -v "^#" ./packages | tr "\n" " "` ; fi
 chroot ${tmp1} apt-get update
-chroot ${tmp1} apt-get -y install ${packages} kfreebsd-image-5-686 || true
+chroot ${tmp1} apt-get -y install ${packages} || true
 ######################################################################
 # END package stuff
 
@@ -76,23 +67,11 @@ set +x
 echo "Spawning a shell.  The following packages are supposedly installed:"
 echo ${packages}
 echo "System size: `du -hs ${tmp1}`"
-chroot ${tmp1}
+chroot ${tmp1} || true
 set -x
 
 chroot ${tmp1} apt-get clean
 rm -f ${tmp1}/native-install
-
-# if X server auto-configurator is installed, enable it
-if test -e ${tmp1}/etc/init.d/xserver-xorg ; then
-  cat > ${tmp1}/etc/default/xorg << __EOF__
-GENERATE_XCFG_AT_BOOT=true
-__EOF__
-fi
-
-# enable DMA on atapi
-if ! grep -q "^hw\.ata\.atapi_dma=1" ${tmp1}/boot/loader.conf ; then
-  echo "hw.ata.atapi_dma=1" >> ${tmp1}/boot/loader.conf
-fi
 
 # crosshurd gathers some defaults from host machine, we don't really want that
 echo -n > ${tmp1}/etc/resolv.conf
