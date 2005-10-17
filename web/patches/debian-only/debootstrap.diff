@@ -1,37 +1,52 @@
 
 Author: rmh
-Status: in BTS.  see also debootstrap_hacks.diff
+Status:
+11:00 < nyu> aj: btw, is #319799 ok now?
+11:01 < aj> -  in_target mount -t proc proc /proc
+11:01 < aj> +  in_target mount -t ${procfs} proc /proc
+11:01 < aj> err, ewww
+11:02 < nyu> no?
+11:02 < aj> just move it into the case
+11:02 < nyu> ok
+11:02 < aj> otherwise that's fine
+11:02 < aj> feel free to double check it works on linux and nmu
+11:03 < nyu> i'll check, but i'm no longer DD.  I'll ask someone else to NMU
+11:03 < nyu> thanks
+11:03 < aj> oh, right
 
 diff -ur debootstrap-0.3.1.7.old/functions debootstrap-0.3.1.7/functions
 --- debootstrap-0.3.1.7.old/functions	2005-08-13 07:40:54.000000000 +0200
-+++ debootstrap-0.3.1.7/functions	2005-10-13 10:09:50.000000000 +0200
-@@ -732,12 +732,21 @@
++++ debootstrap-0.3.1.7/functions	2005-10-17 11:07:58.000000000 +0200
+@@ -732,12 +732,22 @@
  }
  
  setup_proc () {
 -  on_exit "umount $TARGET/dev/pts"
 -  on_exit "umount $TARGET/dev/shm"
 -  on_exit "umount $TARGET/proc/bus/usb"
+-  on_exit "umount $TARGET/proc"
+-  umount $TARGET/proc 2>/dev/null || true
+-  in_target mount -t proc proc /proc
 +  case "$ARCH" in
 +    kfreebsd-*)
 +      on_exit "umount $TARGET/dev"
-+      procfs="linprocfs"
++      on_exit "umount $TARGET/proc"
++      umount $TARGET/proc 2>/dev/null || true
++      in_target mount -t linprocfs proc /proc
 +    ;;
 +    *)
 +      on_exit "umount $TARGET/dev/pts"
 +      on_exit "umount $TARGET/dev/shm"
 +      on_exit "umount $TARGET/proc/bus/usb"
-+      procfs="proc"
++      on_exit "umount $TARGET/proc"
++      umount $TARGET/proc 2>/dev/null || true
++      in_target mount -t proc proc /proc
 +    ;;
 +  esac
-   on_exit "umount $TARGET/proc"
-   umount $TARGET/proc 2>/dev/null || true
--  in_target mount -t proc proc /proc
-+  in_target mount -t ${procfs} proc /proc
  }
  
  setup_proc_fakechroot () {
-@@ -746,15 +755,21 @@
+@@ -746,15 +756,21 @@
  }
  
  setup_devices () {
