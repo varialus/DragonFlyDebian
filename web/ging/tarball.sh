@@ -73,11 +73,6 @@ set -x
 chroot ${tmp1} apt-get clean
 rm -f ${tmp1}/native-install
 
-# crosshurd gathers some defaults from host machine, we don't really want that
-echo -n > ${tmp1}/etc/resolv.conf
-echo "127.0.0.1		localhost $hostname" > ${tmp1}/etc/hosts
-echo $hostname > ${tmp1}/etc/hostname
-
 # everything must be unmounted before tarring
 umount -f ${tmp1}/dev
 umount -f ${tmp1}/proc
