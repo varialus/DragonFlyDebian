@@ -1,0 +1,1896 @@
+diff -u xerces26-2.6.0/debian/control xerces26-2.6.0/debian/control
+--- xerces26-2.6.0/debian/control
++++ xerces26-2.6.0/debian/control
+@@ -1,7 +1,7 @@
+ Source: xerces26
+ Section: libs
+ Priority: extra
+-Build-Depends: debhelper (>= 4.1.0), libicu34-dev, cdbs
++Build-Depends: debhelper (>= 4.1.0), libicu34-dev, cdbs, autotools-dev
+ Maintainer: Debian XML/SGML Group <debian-xml-sgml-pkgs@lists.alioth.debian.org>
+ Uploaders: Jay Berkenbilt <qjb@debian.org>
+ Standards-Version: 3.6.2
+diff -u xerces26-2.6.0/debian/rules xerces26-2.6.0/debian/rules
+--- xerces26-2.6.0/debian/rules
++++ xerces26-2.6.0/debian/rules
+@@ -42,6 +42,13 @@
+ include /usr/share/cdbs/1/rules/simple-patchsys.mk
+ include /usr/share/cdbs/1/rules/debhelper.mk
+ 
++DEB_HOST_ARCH_OS := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null)
++
++# backwards compatibility for sarge dpkg (linux only)
++ifeq ($(DEB_HOST_ARCH_OS),)
++        DEB_HOST_ARCH_OS := linux
++endif
++
+ # Environment variables used by the build
+ export USELIBWWW=0
+ export ICUROOT=/usr
+@@ -55,7 +62,7 @@
+ 	chmod a+x $(l_BUILD_DIR)/src/xercesc/runConfigure
+ 	cd $(l_BUILD_DIR)/src/xercesc \
+ 		&& XERCESCROOT=$(l_PWD)/$(l_BUILD_DIR) \
+-		sh runConfigure -plinux -cgcc -xg++ -minmem -ticu \
++		sh runConfigure -p$(DEB_HOST_ARCH_OS) -cgcc -xg++ -minmem -ticu \
+ 		                   -z -g \
+ 		                   -C --prefix=/usr \
+ 				   -C --mandir=\$${prefix}/share/man \
+--- xerces26-2.6.0.orig/debian/patches/03-kfreebsd.patch
++++ xerces26-2.6.0/debian/patches/03-kfreebsd.patch
+@@ -0,0 +1,967 @@
++diff -urN ../samples/Makefile.incl samples/Makefile.incl
++--- ../samples/Makefile.incl	2004-09-17 11:58:09.000000000 +0200
+++++ samples/Makefile.incl	2005-10-21 22:27:34.000000000 +0200
++@@ -175,6 +175,16 @@
++ SHLIBSUFFIX=.so
++ endif
++ 
+++#=============== KFREEBSD SPECIFIC OPTIONS =========================
+++ifeq (${PLATFORM}, KFREEBSD)
+++CMP= -c ${CXXFLAGS}
+++CC= ${COMPILER} -c -D${PLATFORM} -D_REENTRANT -fpic
+++LINK =  ${COMPILER} -D${PLATFORM} -fpic ${LDFLAGS}
+++PLATFORM_LIB_LINK_OPTIONS=-L/usr/local/lib
+++EXTRA_LINK_OPTIONS=-lc ${EXTRA_LIBS}
+++SHLIBSUFFIX=.so
+++endif
+++
++ #=============== QNX SPECIFIC OPTIONS =========================
++ ifeq (${PLATFORM}, QNX)
++ CMP= -c ${CXXFLAGS}
++diff -urN ../samples/configure.in samples/configure.in
++--- ../samples/configure.in	2004-07-09 17:47:57.000000000 +0200
+++++ samples/configure.in	2005-10-21 17:03:45.000000000 +0200
++@@ -39,6 +39,7 @@
++         *-*-beos*)      platform=BEOS ;;
++         *-*-linux*)     platform=LINUX ;;
++         *-*-nto*)       platform=QNX ;;
+++        *-*-kfreebsd*)  platform=KFREEBSD ;;
++         *-*-freebsd*)   platform=FREEBSD ;;
++         *-*-netbsd*)    platform=NETBSD ;;
++         *-*-irix*)      platform=IRIX ;;
++diff -urN ../samples/runConfigure samples/runConfigure
++--- ../samples/runConfigure	2004-09-10 01:52:24.000000000 +0200
+++++ samples/runConfigure	2005-10-21 17:04:39.000000000 +0200
++@@ -44,7 +44,7 @@
++ platforms"
++     echo "Usage: runConfigure \"options\""
++     echo "       where options may be any of the following:"
++-    echo "       -p <platform> (accepts 'aix', 'beos', 'linux', 'freebsd', 'netbsd',
+++    echo "       -p <platform> (accepts 'aix', 'beos', 'linux', 'kfreebsd', 'freebsd', 'netbsd',
++             'solaris', 'hp-10', 'hp-11', 'openserver', 'unixware',
++             'os400', 'os390', 'irix', 'ptx', 'tru64', 'macosx', 'cygwin', 'qnx',
++             'interix', 'mingw-msys')
++@@ -196,7 +196,7 @@
++ # Now check if the options are correct or not, bail out if incorrect
++ #
++ case $platform in
++-   aix | openserver | unixware | beos | linux | freebsd | netbsd | solaris | hp-10 | hp-11 | os400 | os390 | irix | ptx | tru64 | macosx | cygwin | qnx | interix | mingw-msys)
+++   aix | openserver | unixware | beos | linux | kfreebsd | freebsd | netbsd | solaris | hp-10 | hp-11 | os400 | os390 | irix | ptx | tru64 | macosx | cygwin | qnx | interix | mingw-msys)
++        # platform has been recognized
++        ;;
++    *)
++diff -urN ../src/xercesc/Makefile.incl src/xercesc/Makefile.incl
++--- ../src/xercesc/Makefile.incl	2004-09-30 20:51:25.000000000 +0200
+++++ src/xercesc/Makefile.incl	2005-10-21 09:34:41.000000000 +0200
++@@ -356,6 +356,43 @@
++ LD_SODEPDOM = -Wl,-soname,${SO_DEPDOM}
++ endif
++ 
+++#=============== KFREEBSD SPECIFIC OPTIONS =========================
+++ifeq (${PLATFORM}, KFREEBSD)
+++PLATFORM_COMPILE_OPTIONS = -fPIC -D${PLATFORM} -D_REENTRANT
+++MAKE_SHARED = ${CXX} -D${PLATFORM} -shared -fPIC ${LDFLAGS}
+++MAKE_SHARED_C = ${CC} -D${PLATFORM} -shared -fPIC ${LDFLAGS}
+++
+++ifeq (${BITSTOBUILD}, 64)
+++ifeq (${TRANSCODER}, ICU)
+++    ALLLIBS = ${LIBS} -L/usr/lib64 -L/usr/lib -L/usr/local/lib -L/usr/ccs/lib -licuuc -licudata
+++else
+++    ALLLIBS = ${LIBS} -L/usr/lib64 -L/usr/lib -L/usr/local/lib -L/usr/ccs/lib
+++endif
+++
+++ifeq (${MESSAGELOADER}, ICU)
+++    ALLLIBS = ${LIBS} -L/usr/lib64 -L/usr/lib -L/usr/local/lib -L/usr/ccs/lib -licuuc -licudata -lXercesMessages
+++endif
+++else
+++ifeq (${TRANSCODER}, ICU)
+++    ALLLIBS = ${LIBS} -L/usr/lib -L/usr/local/lib -L/usr/ccs/lib -licuuc -licudata
+++else
+++    ALLLIBS = ${LIBS} -L/usr/lib -L/usr/local/lib -L/usr/ccs/lib
+++endif
+++
+++ifeq (${MESSAGELOADER}, ICU)
+++    ALLLIBS = ${LIBS} -L/usr/lib -L/usr/local/lib -L/usr/ccs/lib -licuuc -licudata -lXercesMessages
+++endif
+++endif
+++
+++EXTRA_LINK_OPTIONS = -Xlinker -Map -Xlinker $(XML_OBJ)/${SO_NAME}.map
+++DEPDOM_LINK_OPTIONS = -Xlinker -Map -Xlinker $(XML_OBJ)/${SO_DEPDOM}.map
+++SHLIBSUFFIX=.so
+++ICUSHLIBSUFFIX=.so
+++## Compiler switch to embed a library name
+++LD_SONAME = -Wl,-soname,${SO_NAME}
+++LD_SODEPDOM = -Wl,-soname,${SO_DEPDOM}
+++endif
+++
++ #=============== QNX SPECIFIC OPTIONS =========================
++ ifeq (${PLATFORM}, QNX)
++ PLATFORM_COMPILE_OPTIONS = -shared
++diff -urN ../src/xercesc/configure.in src/xercesc/configure.in
++--- ../src/xercesc/configure.in	2004-09-30 20:51:25.000000000 +0200
+++++ src/xercesc/configure.in	2005-10-21 10:50:24.000000000 +0200
++@@ -35,6 +35,7 @@
++         *-*-beos*)      platform=BEOS ;;
++         *-*-nto*)       platform=QNX ;;
++         *-*-linux*)     platform=LINUX ;;
+++        *-*-kfreebsd*)  platform=KFREEBSD ;;
++         *-*-freebsd*)   platform=FREEBSD ;;
++         *-*-netbsd*)    platform=NETBSD ;;
++         *-*-irix*)      platform=IRIX ;;
++@@ -132,6 +133,7 @@
++ util/Platforms/BeOS/Makefile \
++ util/Platforms/QNX/Makefile \
++ util/Platforms/Linux/Makefile \
+++util/Platforms/KFreeBSD/Makefile \
++ util/Platforms/FreeBSD/Makefile \
++ util/Platforms/NetBSD/Makefile \
++ util/Platforms/HPUX/Makefile \
++diff -urN ../src/xercesc/runConfigure src/xercesc/runConfigure
++--- ../src/xercesc/runConfigure	2004-09-10 01:43:17.000000000 +0200
+++++ src/xercesc/runConfigure	2005-10-21 13:18:21.000000000 +0200
++@@ -46,7 +46,7 @@
++               supported platforms"
++     echo "Usage: runConfigure \"options\""
++     echo "       where options may be any of the following:"
++-    echo "       -p <platform> (accepts 'aix', 'beos', 'linux', 'freebsd', 
+++    echo "       -p <platform> (accepts 'aix', 'beos', 'linux', 'kfreebsd', 'freebsd', 
++             'netbsd', 'solaris', 'hp-10', 'hp-11', 'openserver', 'unixware', 
++             'os400', 'os390', 'irix', 'ptx', 'tru64', 'macosx', 'cygwin', 
++             'qnx', 'interix', 'mingw-msys')
++@@ -251,7 +251,7 @@
++ #
++ 
++ case $platform in
++-   aix | openserver | unixware | beos | linux | freebsd | netbsd | solaris | hp-10 | hp-11 | os400 | os390 | irix | ptx | tru64 | macosx | cygwin | qnx | interix | mingw-msys)
+++   aix | openserver | unixware | beos | linux | kfreebsd | freebsd | netbsd | solaris | hp-10 | hp-11 | os400 | os390 | irix | ptx | tru64 | macosx | cygwin | qnx | interix | mingw-msys)
++        # platform has been recognized
++        ;;
++    *)
++diff -urN ../src/xercesc/util/AutoSense.hpp src/xercesc/util/AutoSense.hpp
++--- ../src/xercesc/util/AutoSense.hpp	2004-09-08 15:56:21.000000000 +0200
+++++ src/xercesc/util/AutoSense.hpp	2005-10-21 10:47:25.000000000 +0200
++@@ -191,6 +191,9 @@
++ #elif defined(__FreeBSD__)
++     #define XML_FREEBSD
++     #define XML_UNIX
+++#elif defined(__FreeBSD_kernel__)
+++    #define XML_KFREEBSD
+++    #define XML_UNIX
++ #elif defined(IRIX) || defined(__sgi)
++     #define XML_IRIX
++     #define XML_UNIX
++diff -urN ../src/xercesc/util/Compilers/Makefile.in src/xercesc/util/Compilers/Makefile.in
++--- ../src/xercesc/util/Compilers/Makefile.in	2004-09-08 15:56:32.000000000 +0200
+++++ src/xercesc/util/Compilers/Makefile.in	2005-10-21 10:46:35.000000000 +0200
++@@ -106,6 +106,9 @@
++     ifeq (${PLATFORM},LINUX)
++         CPP_OBJECTS = GCCDefs.$(TO)
++     endif
+++    ifeq (${PLATFORM},KFREEBSD)
+++        CPP_OBJECTS = GCCDefs.$(TO)
+++    endif
++     ifeq (${PLATFORM},FREEBSD)
++         CPP_OBJECTS = GCCDefs.$(TO)
++     endif
++diff -urN ../src/xercesc/util/Platforms/KFreeBSD/KFreeBSDDefs.hpp src/xercesc/util/Platforms/KFreeBSD/KFreeBSDDefs.hpp
++--- ../src/xercesc/util/Platforms/KFreeBSD/KFreeBSDDefs.hpp	1970-01-01 01:00:00.000000000 +0100
+++++ src/xercesc/util/Platforms/KFreeBSD/KFreeBSDDefs.hpp	2005-10-21 10:19:35.000000000 +0200
++@@ -0,0 +1,68 @@
+++/*
+++ * Copyright 1999-2000,2004 The Apache Software Foundation.
+++ * 
+++ * Licensed under the Apache License, Version 2.0 (the "License");
+++ * you may not use this file except in compliance with the License.
+++ * You may obtain a copy of the License at
+++ * 
+++ *      http://www.apache.org/licenses/LICENSE-2.0
+++ * 
+++ * Unless required by applicable law or agreed to in writing, software
+++ * distributed under the License is distributed on an "AS IS" BASIS,
+++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+++ * See the License for the specific language governing permissions and
+++ * limitations under the License.
+++ */
+++
+++/*
+++ * $Log: LinuxDefs.hpp,v $
+++ * Revision 1.4  2004/09/08 13:56:40  peiyongz
+++ * Apache License Version 2.0
+++ *
+++ * Revision 1.3  2002/11/19 18:19:41  tng
+++ * [Bug 13487] Linux runs on many non-i386 platforms.
+++ *
+++ * Revision 1.2  2002/10/29 18:58:14  tng
+++ * Support for Linux/390 which is big endian
+++ *
+++ * Revision 1.1.1.1  2002/02/01 22:22:24  peiyongz
+++ * sane_include
+++ *
+++ * Revision 1.3  2000/03/02 19:55:24  roddey
+++ * This checkin includes many changes done while waiting for the
+++ * 1.1.0 code to be finished. I can't list them all here, but a list is
+++ * available elsewhere.
+++ *
+++ * Revision 1.2  2000/02/06 07:48:28  rahulj
+++ * Year 2K copyright swat.
+++ *
+++ * Revision 1.1.1.1  1999/11/09 01:07:00  twl
+++ * Initial checkin
+++ *
+++ * Revision 1.2  1999/11/08 20:45:30  rahul
+++ * Swat for adding in Product name and CVS comment log variable.
+++ *
+++ */
+++
+++
+++// ---------------------------------------------------------------------------
+++//  Detect endian mode
+++// ---------------------------------------------------------------------------
+++#include <endian.h>
+++#ifdef __BYTE_ORDER
+++    #if __BYTE_ORDER == __LITTLE_ENDIAN
+++        #define ENDIANMODE_LITTLE
+++    #else
+++        #if __BYTE_ORDER == __BIG_ENDIAN
+++            #define ENDIANMODE_BIG
+++        #else
+++            #error: unknown byte order!
+++        #endif
+++    #endif
+++#endif /* __BYTE_ORDER */
+++
+++typedef void* FileHandle;
+++
+++#ifndef KFREEBSD
+++#define KFREEBSD
+++#endif
++diff -urN ../src/xercesc/util/Platforms/KFreeBSD/KFreeBSDPlatformUtils.cpp src/xercesc/util/Platforms/KFreeBSD/KFreeBSDPlatformUtils.cpp
++--- ../src/xercesc/util/Platforms/KFreeBSD/KFreeBSDPlatformUtils.cpp	1970-01-01 01:00:00.000000000 +0100
+++++ src/xercesc/util/Platforms/KFreeBSD/KFreeBSDPlatformUtils.cpp	2005-10-21 10:24:25.000000000 +0200
++@@ -0,0 +1,562 @@
+++/*
+++ * Copyright 1999-2004 The Apache Software Foundation.
+++ * 
+++ * Licensed under the Apache License, Version 2.0 (the "License");
+++ * you may not use this file except in compliance with the License.
+++ * You may obtain a copy of the License at
+++ * 
+++ *      http://www.apache.org/licenses/LICENSE-2.0
+++ * 
+++ * Unless required by applicable law or agreed to in writing, software
+++ * distributed under the License is distributed on an "AS IS" BASIS,
+++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+++ * See the License for the specific language governing permissions and
+++ * limitations under the License.
+++ */
+++
+++
+++// ---------------------------------------------------------------------------
+++//  Includes
+++// ---------------------------------------------------------------------------
+++
+++#if !defined(APP_NO_THREADS)
+++#include    <pthread.h>
+++#endif
+++
+++#ifndef _GNU_SOURCE
+++    #error _GNU_SOURCE is not defined in your compile settings
+++#endif
+++
+++#include    <unistd.h>
+++#include    <stdio.h>
+++#include    <stdlib.h>
+++#include    <errno.h>
+++#include    <libgen.h>
+++#include    <sys/param.h>           //for PATH_MAX
+++#include    <sys/timeb.h>
+++#include    <string.h>
+++#include    <xercesc/util/PlatformUtils.hpp>
+++#include    <xercesc/util/RuntimeException.hpp>
+++#include    <xercesc/util/Janitor.hpp>
+++#include    <xercesc/util/Mutexes.hpp>
+++#include    <xercesc/util/XMLString.hpp>
+++#include    <xercesc/util/XMLUniDefs.hpp>
+++#include    <xercesc/util/XMLUni.hpp>
+++#include    <xercesc/util/PanicHandler.hpp>
+++#include    <xercesc/util/OutOfMemoryException.hpp>
+++
+++#if defined(XML_USE_ICU_TRANSCODER)
+++    #include <xercesc/util/Transcoders/ICU/ICUTransService.hpp>
+++#elif defined (XML_USE_GNU_TRANSCODER)
+++    #include <xercesc/util/Transcoders/IconvGNU/IconvGNUTransService.hpp>
+++#else
+++    // Use native transcoder. Same as -DXML_USE_NATIVE_TRANSCODER
+++    #include <xercesc/util/Transcoders/Iconv/IconvTransService.hpp>
+++#endif
+++
+++
+++#if defined(XML_USE_ICU_MESSAGELOADER)
+++    #include <xercesc/util/MsgLoaders/ICU/ICUMsgLoader.hpp>
+++#elif defined (XML_USE_ICONV_MESSAGELOADER)
+++    #include <xercesc/util/MsgLoaders/MsgCatalog/MsgCatalogLoader.hpp>
+++#else
+++    // Same as -DXML_USE_INMEM_MESSAGELOADER
+++    #include <xercesc/util/MsgLoaders/InMemory/InMemMsgLoader.hpp>
+++#endif
+++
+++
+++#if defined (XML_USE_NETACCESSOR_SOCKET)
+++    #include <xercesc/util/NetAccessors/Socket/SocketNetAccessor.hpp>
+++#elif defined (XML_USE_NETACCESSOR_LIBWWW)
+++    #include <xercesc/util/NetAccessors/libWWW/LibWWWNetAccessor.hpp>
+++#endif
+++
+++
+++XERCES_CPP_NAMESPACE_BEGIN
+++
+++// ---------------------------------------------------------------------------
+++//  XMLPlatformUtils: Private Static Methods
+++// ---------------------------------------------------------------------------
+++
+++XMLNetAccessor* XMLPlatformUtils::makeNetAccessor()
+++{
+++#if defined (XML_USE_NETACCESSOR_SOCKET)
+++    return new SocketNetAccessor();
+++#elif defined (XML_USE_NETACCESSOR_LIBWWW)
+++    return new LibWWWNetAccessor();
+++#else
+++    return 0;
+++#endif
+++}
+++
+++
+++
+++//
+++//  This method is called by the platform independent part of this class
+++//  when client code asks to have one of the supported message sets loaded.
+++//
+++
+++XMLMsgLoader* XMLPlatformUtils::loadAMsgSet(const XMLCh* const msgDomain)
+++{
+++    XMLMsgLoader* retVal;
+++    try
+++    {
+++#if defined (XML_USE_ICU_MESSAGELOADER)
+++        retVal = new ICUMsgLoader(msgDomain);
+++#elif defined (XML_USE_ICONV_MESSAGELOADER)
+++        retVal = new MsgCatalogLoader(msgDomain);
+++#else
+++        // same as -DXML_USE_INMEM_MESSAGELOADER
+++        retVal = new InMemMsgLoader(msgDomain);
+++#endif
+++    }
+++    catch(const OutOfMemoryException&)
+++    {
+++        throw;
+++    }
+++    catch(...)
+++    {
+++        panic(PanicHandler::Panic_CantLoadMsgDomain);
+++    }
+++    return retVal;
+++}
+++
+++
+++//
+++//  This method is called very early in the bootstrapping process. This guy
+++//  must create a transcoding service and return it. It cannot use any string
+++//  methods, any transcoding services, throw any exceptions, etc... It just
+++//  makes a transcoding service and returns it, or returns zero on failure.
+++//
+++
+++XMLTransService* XMLPlatformUtils::makeTransService()
+++{
+++#if defined (XML_USE_ICU_TRANSCODER)
+++    // Use ICU transcoding services.
+++    // same as -DXML_USE_ICU_MESSAGELOADER
+++    return new ICUTransService;
+++#elif defined (XML_USE_GNU_TRANSCODER)
+++    return new IconvGNUTransService;
+++#else
+++    // Use native transcoding services.
+++    // same as -DXML_USE_NATIVE_TRANSCODER
+++    return new IconvTransService;
+++
+++#endif
+++}
+++
+++// ---------------------------------------------------------------------------
+++//  XMLPlatformUtils: The panic method
+++// ---------------------------------------------------------------------------
+++void XMLPlatformUtils::panic(const PanicHandler::PanicReasons reason)
+++{
+++    fgUserPanicHandler? fgUserPanicHandler->panic(reason) : fgDefaultPanicHandler->panic(reason);	
+++}
+++
+++
+++// ---------------------------------------------------------------------------
+++//  XMLPlatformUtils: File Methods
+++// ---------------------------------------------------------------------------
+++
+++unsigned int XMLPlatformUtils::curFilePos(FileHandle theFile
+++                                          , MemoryManager* const manager)
+++{
+++    int curPos = ftell( (FILE*)theFile);
+++    if (curPos == -1)
+++        ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                 XMLExcepts::File_CouldNotGetSize, manager);
+++
+++    return (unsigned int)curPos;
+++}
+++
+++void XMLPlatformUtils::closeFile(FileHandle theFile
+++                                 , MemoryManager* const manager)
+++{
+++    if (fclose((FILE*)theFile))
+++        ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                 XMLExcepts::File_CouldNotCloseFile, manager);
+++}
+++
+++unsigned int XMLPlatformUtils::fileSize(FileHandle theFile
+++                                        , MemoryManager* const manager)
+++{
+++    // Get the current position
+++    long  int curPos = ftell((FILE*) theFile);
+++    if (curPos == -1)
+++        ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                 XMLExcepts::File_CouldNotGetCurPos, manager);
+++
+++    // Seek to the end and save that value for return
+++     if (fseek((FILE*) theFile, 0, SEEK_END))
+++        ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                 XMLExcepts::File_CouldNotSeekToEnd, manager);
+++
+++    long int retVal = ftell((FILE*)theFile);
+++    if (retVal == -1)
+++        ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                 XMLExcepts::File_CouldNotSeekToEnd, manager);
+++
+++    // And put the pointer back
+++
+++    if (fseek( (FILE*)theFile, curPos, SEEK_SET) )
+++        ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                 XMLExcepts::File_CouldNotSeekToPos, manager);
+++
+++    return (unsigned int)retVal;
+++}
+++
+++FileHandle XMLPlatformUtils::openFile(const XMLCh* const fileName
+++                                      , MemoryManager* const manager)
+++{
+++    const char* tmpFileName = XMLString::transcode(fileName, manager);
+++    ArrayJanitor<char> janText((char*)tmpFileName, manager);
+++    FileHandle retVal = (FILE*)fopen( tmpFileName , "rb" );
+++
+++    if (retVal == NULL)
+++        return 0;
+++    return retVal;
+++}
+++
+++FileHandle XMLPlatformUtils::openFile(const char* const fileName
+++                                      , MemoryManager* const manager)
+++{
+++    FileHandle retVal = (FILE*)fopen( fileName , "rb" );
+++
+++    if (retVal == NULL)
+++        return 0;
+++    return retVal;
+++}
+++
+++FileHandle XMLPlatformUtils::openFileToWrite(const XMLCh* const fileName
+++                                             , MemoryManager* const manager)
+++{
+++    const char* tmpFileName = XMLString::transcode(fileName, manager);
+++    ArrayJanitor<char> janText((char*)tmpFileName, manager);
+++    return fopen( tmpFileName , "wb" );
+++}
+++
+++FileHandle XMLPlatformUtils::openFileToWrite(const char* const fileName
+++                                             , MemoryManager* const manager)
+++{
+++    return fopen( fileName , "wb" );
+++}
+++
+++FileHandle XMLPlatformUtils::openStdInHandle(MemoryManager* const manager)
+++{
+++    return (FileHandle)fdopen(dup(0), "rb");
+++}
+++
+++unsigned int
+++XMLPlatformUtils::readFileBuffer( FileHandle          theFile
+++                                , const unsigned int  toRead
+++                                , XMLByte* const      toFill
+++                                , MemoryManager* const manager)
+++{
+++    size_t noOfItemsRead = fread((void*) toFill, 1, toRead, (FILE*)theFile);
+++
+++    if(ferror((FILE*)theFile))
+++    {
+++        ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                 XMLExcepts::File_CouldNotReadFromFile, manager);
+++    }
+++
+++    return (unsigned int)noOfItemsRead;
+++}
+++
+++void
+++XMLPlatformUtils::writeBufferToFile( FileHandle     const  theFile
+++                                   , long                  toWrite
+++                                   , const XMLByte* const  toFlush
+++                                   , MemoryManager* const manager)
+++{
+++    if (!theFile        ||
+++        (toWrite <= 0 ) ||
+++        !toFlush         )
+++        return;
+++
+++    const XMLByte* tmpFlush = (const XMLByte*) toFlush;
+++    size_t bytesWritten = 0;
+++
+++    while (true)
+++    {
+++        bytesWritten=fwrite(tmpFlush, sizeof(XMLByte), toWrite, (FILE*)theFile);
+++
+++        if(ferror((FILE*)theFile))
+++        {
+++            ThrowXMLwithMemMgr(XMLPlatformUtilsException, XMLExcepts::File_CouldNotWriteToFile, manager);
+++        }
+++
+++        if (bytesWritten < toWrite) //incomplete write
+++        {
+++            tmpFlush+=bytesWritten;
+++            toWrite-=bytesWritten;
+++            bytesWritten=0;
+++        }
+++        else
+++            return;
+++    }
+++
+++    return;
+++}
+++
+++void XMLPlatformUtils::resetFile(FileHandle theFile
+++                                 , MemoryManager* const manager)
+++{
+++    // Seek to the start of the file
+++    if (fseek((FILE*)theFile, 0, SEEK_SET))
+++        ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                 XMLExcepts::File_CouldNotResetFile, manager);
+++}
+++
+++
+++// ---------------------------------------------------------------------------
+++//  XMLPlatformUtils: File system methods
+++// ---------------------------------------------------------------------------
+++XMLCh* XMLPlatformUtils::getFullPath(const XMLCh* const srcPath,
+++                                     MemoryManager* const manager)
+++{
+++    //
+++    //  NOTE: The path provided has always already been opened successfully,
+++    //  so we know that its not some pathological freaky path. It comes in
+++    //  in native format, and goes out as Unicode always
+++    //
+++    char* newSrc = XMLString::transcode(srcPath, manager);
+++    ArrayJanitor<char> janText(newSrc, manager);
+++
+++    // Use a local buffer that is big enough for the largest legal path
+++    char absPath[PATH_MAX + 1];
+++    // get the absolute path
+++    char* retPath = realpath(newSrc, &absPath[0]);
+++
+++    if (!retPath)
+++    {
+++        ThrowXMLwithMemMgr(XMLPlatformUtilsException, XMLExcepts::File_CouldNotGetBasePathName, manager);
+++    }
+++    return XMLString::transcode(absPath, manager);
+++}
+++
+++bool XMLPlatformUtils::isRelative(const XMLCh* const toCheck
+++                                  , MemoryManager* const manager)
+++{
+++    // Check for pathological case of empty path
+++    if (!toCheck[0])
+++        return false;
+++
+++    //
+++    //  If it starts with a slash, then it cannot be relative. This covers
+++    //  both something like "\Test\File.xml" and an NT Lan type remote path
+++    //  that starts with a node like "\\MyNode\Test\File.xml".
+++    //
+++    if (toCheck[0] == XMLCh('/'))
+++        return false;
+++
+++    // Else assume its a relative path
+++    return true;
+++}
+++
+++XMLCh* XMLPlatformUtils::getCurrentDirectory(MemoryManager* const manager)
+++{
+++    char  dirBuf[PATH_MAX + 2];
+++    char  *curDir = getcwd(&dirBuf[0], PATH_MAX + 1);
+++
+++    if (!curDir)
+++    {
+++        ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                 XMLExcepts::File_CouldNotGetBasePathName, manager);
+++    }
+++
+++    return XMLString::transcode(curDir, manager);
+++}
+++
+++inline bool XMLPlatformUtils::isAnySlash(XMLCh c) 
+++{
+++    return ( chBackSlash == c || chForwardSlash == c);
+++}
+++
+++// ---------------------------------------------------------------------------
+++//  XMLPlatformUtils: Timing Methods
+++// ---------------------------------------------------------------------------
+++
+++unsigned long XMLPlatformUtils::getCurrentMillis()
+++{
+++    timeb aTime;
+++    ftime(&aTime);
+++    return (unsigned long)(aTime.time*1000 + aTime.millitm);
+++
+++}
+++
+++// -----------------------------------------------------------------------
+++//  Mutex methods
+++// -----------------------------------------------------------------------
+++
+++#if !defined(APP_NO_THREADS)
+++
+++// ---------------------------------------------------------------------------
+++//  XMLPlatformUtils: Platform init method
+++// ---------------------------------------------------------------------------
+++
+++static XMLMutex* atomicOpsMutex = 0;
+++
+++void XMLPlatformUtils::platformInit()
+++{
+++    //
+++    // The atomicOps mutex needs to be created early.
+++    // Normally, mutexes are created on first use, but there is a
+++    // circular dependency between compareAndExchange() and
+++    // mutex creation that must be broken.
+++    if ( atomicOpsMutex == 0 )
+++    {
+++	    atomicOpsMutex = new (fgMemoryManager) XMLMutex;
+++	    if (atomicOpsMutex->fHandle == 0)
+++	        atomicOpsMutex->fHandle = XMLPlatformUtils::makeMutex();
+++    }
+++}
+++
+++void* XMLPlatformUtils::makeMutex()
+++{
+++    pthread_mutex_t* mutex = new pthread_mutex_t;
+++    pthread_mutexattr_t*  attr = new pthread_mutexattr_t;
+++    pthread_mutexattr_init(attr);
+++    pthread_mutexattr_settype(attr, PTHREAD_MUTEX_RECURSIVE_NP);
+++    if (pthread_mutex_init(mutex, attr))
+++    {
+++        ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                 XMLExcepts::Mutex_CouldNotCreate, fgMemoryManager);
+++    }
+++    pthread_mutexattr_destroy(attr);
+++    delete attr;
+++    return (void*)(mutex);
+++
+++}
+++
+++void XMLPlatformUtils::closeMutex(void* const mtxHandle)
+++{
+++    if (mtxHandle != NULL)
+++    {
+++        if (pthread_mutex_destroy((pthread_mutex_t*) mtxHandle))
+++        {
+++            ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                     XMLExcepts::Mutex_CouldNotDestroy, fgMemoryManager);
+++        }
+++        delete (pthread_mutex_t*) mtxHandle;
+++    }
+++}
+++
+++
+++void XMLPlatformUtils::lockMutex(void* const mtxHandle)
+++{
+++    if (mtxHandle != NULL)
+++    {
+++        if (pthread_mutex_lock((pthread_mutex_t*) mtxHandle))
+++        {
+++            ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                     XMLExcepts::Mutex_CouldNotLock, fgMemoryManager);
+++        }
+++    }
+++}
+++
+++
+++void XMLPlatformUtils::unlockMutex(void* const mtxHandle)
+++{
+++    if (mtxHandle != NULL)
+++    {
+++        if (pthread_mutex_unlock((pthread_mutex_t*) mtxHandle))
+++        {
+++            ThrowXMLwithMemMgr(XMLPlatformUtilsException,
+++                     XMLExcepts::Mutex_CouldNotUnlock, fgMemoryManager);
+++        }
+++    }
+++}
+++
+++
+++// -----------------------------------------------------------------------
+++//  Miscellaneous synchronization methods
+++// -----------------------------------------------------------------------
+++
+++void* XMLPlatformUtils::compareAndSwap(void**            toFill
+++                                     , const void* const newValue
+++                                     , const void* const toCompare)
+++{
+++    XMLMutexLock lockMutex(atomicOpsMutex);
+++
+++    void *retVal = *toFill;
+++    if (*toFill == toCompare)
+++        *toFill = (void *)newValue;
+++
+++    return retVal;
+++}
+++
+++int XMLPlatformUtils::atomicIncrement(int &location)
+++{
+++    XMLMutexLock localLock(atomicOpsMutex);
+++
+++    return ++location;
+++}
+++
+++int XMLPlatformUtils::atomicDecrement(int &location)
+++{
+++    XMLMutexLock localLock(atomicOpsMutex);
+++
+++    return --location;
+++}
+++
+++#else // #if !defined (APP_NO_THREADS)
+++
+++void XMLPlatformUtils::platformInit()
+++{
+++}
+++
+++void* XMLPlatformUtils::makeMutex()
+++{
+++        return 0;
+++}
+++
+++void XMLPlatformUtils::closeMutex(void* const mtxHandle)
+++{
+++}
+++
+++void XMLPlatformUtils::lockMutex(void* const mtxHandle)
+++{
+++}
+++
+++void XMLPlatformUtils::unlockMutex(void* const mtxHandle)
+++{
+++}
+++
+++void* XMLPlatformUtils::compareAndSwap (void**             toFill,
+++                                        const void* const  newValue,
+++                                        const void* const  toCompare)
+++{
+++    void *retVal = *toFill;
+++    if (*toFill == toCompare)
+++       *toFill = (void *)newValue;
+++    return retVal;
+++}
+++
+++int XMLPlatformUtils::atomicIncrement(int &location)
+++{
+++    return ++location;
+++}
+++
+++int XMLPlatformUtils::atomicDecrement(int &location)
+++{
+++    return --location;
+++}
+++
+++#endif // APP_NO_THREADS
+++
+++void XMLPlatformUtils::platformTerm()
+++{
+++#if !defined(APP_NO_THREADS)
+++    // delete the mutex we created
+++	closeMutex(atomicOpsMutex->fHandle);
+++	atomicOpsMutex->fHandle = 0;
+++	delete atomicOpsMutex;
+++    atomicOpsMutex = 0;
+++#endif
+++}
+++
+++#include <xercesc/util/LogicalPath.c>
+++
+++XERCES_CPP_NAMESPACE_END
+++
++diff -urN ../src/xercesc/util/Platforms/KFreeBSD/Makefile.in src/xercesc/util/Platforms/KFreeBSD/Makefile.in
++--- ../src/xercesc/util/Platforms/KFreeBSD/Makefile.in	1970-01-01 01:00:00.000000000 +0100
+++++ src/xercesc/util/Platforms/KFreeBSD/Makefile.in	2005-10-21 09:42:11.000000000 +0200
++@@ -0,0 +1,68 @@
+++#
+++# Copyright 1999-2000,2004 The Apache Software Foundation.
+++# 
+++# Licensed under the Apache License, Version 2.0 (the "License");
+++# you may not use this file except in compliance with the License.
+++# You may obtain a copy of the License at
+++# 
+++#      http://www.apache.org/licenses/LICENSE-2.0
+++# 
+++# Unless required by applicable law or agreed to in writing, software
+++# distributed under the License is distributed on an "AS IS" BASIS,
+++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+++# See the License for the specific language governing permissions and
+++# limitations under the License.
+++#
+++#
+++# $Log: Makefile.in,v $
+++# Revision 1.4  2004/09/08 13:56:40  peiyongz
+++# Apache License Version 2.0
+++#
+++# Revision 1.3  2004/07/09 16:21:36  peiyongz
+++# Build on HP-Itanium, aCC A.05.52
+++#
+++# Revision 1.2  2002/07/26 16:49:28  tng
+++# [Bug 2681] Can't build with gcc/g++ not named 'gcc'/'g++'.  Patch from Jonathan Lennox.
+++#
+++# Revision 1.1.1.1  2002/02/01 22:22:24  peiyongz
+++# sane_include
+++#
+++# Revision 1.3  2001/07/06 17:12:05  tng
+++# Automatic build of single-threaded library.  By Martin Kalen.
+++#
+++# Revision 1.2  2001/06/27 17:09:08  tng
+++# [Bug 1147] Headers install in wrong directory.  By Murray Cumming.
+++#
+++# Revision 1.1  2000/03/01 22:33:38  abagchi
+++# Initial checkin to create object files directly under obj
+++#:
+++#
+++
+++PLATFORM = @platform@
+++CC  = @cc@
+++CXX = @cxx@
+++CXXVER = @cxxver@
+++GCC = @GCC@
+++GXX = @GXX@
+++CXXFLAGS = @cxxflags@
+++CFLAGS = @cflags@
+++PREFIX = @prefix@
+++PREFIX_INCLUDE = @prefix_include@
+++LDFLAGS = @ldflags@
+++LIBS = @libs@
+++OSVER = @osver@
+++USELIBWWW = @uselibwww@
+++MESSAGELOADER = @messageloader@
+++TRANSCODER = @transcoder@
+++THREADS = @threads@
+++
+++MODULE = util
+++
+++include ../../../Makefile.incl
+++
+++SUBMODULE = Platforms/KFreeBSD
+++CXXFLAGS += -D_GNU_SOURCE -D__USE_GNU
+++CPP_PUBHEADERS = KFreeBSDDefs.hpp
+++CPP_OBJECTS = KFreeBSDPlatformUtils.$(TO)
+++
+++include ../../Makefile.util.submodule
++Binary files ../src/xercesc/util/Platforms/KFreeBSD/a.o and src/xercesc/util/Platforms/KFreeBSD/a.o differ
++diff -urN ../src/xercesc/util/Platforms/Makefile.in src/xercesc/util/Platforms/Makefile.in
++--- ../src/xercesc/util/Platforms/Makefile.in	2004-09-08 15:56:37.000000000 +0200
+++++ src/xercesc/util/Platforms/Makefile.in	2005-10-21 10:32:30.000000000 +0200
++@@ -146,6 +146,9 @@
++ ifeq (${PLATFORM}, LINUX)
++     SUBMODULE = Linux
++ endif
+++ifeq (${PLATFORM}, KFREEBSD)
+++    SUBMODULE = KFreeBSD
+++endif
++ ifeq (${PLATFORM}, FREEBSD)
++     SUBMODULE = FreeBSD
++ endif
++diff -urN ../src/xercesc/util/XercesDefs.hpp src/xercesc/util/XercesDefs.hpp
++--- ../src/xercesc/util/XercesDefs.hpp	2004-09-08 15:56:25.000000000 +0200
+++++ src/xercesc/util/XercesDefs.hpp	2005-10-21 10:57:15.000000000 +0200
++@@ -259,6 +259,10 @@
++ #include    <xercesc/util/Platforms/Linux/LinuxDefs.hpp>
++ #endif
++ 
+++#if defined(XML_KFREEBSD)
+++#include    <xercesc/util/Platforms/KFreeBSD/KFreeBSDDefs.hpp>
+++#endif
+++
++ #if defined(XML_FREEBSD)
++ #include    <xercesc/util/Platforms/FreeBSD/FreeBSDDefs.hpp>
++ #endif
++diff -urN ../tests/Makefile.incl tests/Makefile.incl
++--- ../tests/Makefile.incl	2004-09-17 11:58:09.000000000 +0200
+++++ tests/Makefile.incl	2005-10-21 09:33:38.000000000 +0200
++@@ -175,6 +175,16 @@
++ SHLIBSUFFIX=.so
++ endif
++ 
+++#=============== KFREEBSD SPECIFIC OPTIONS =========================
+++ifeq (${PLATFORM}, KFREEBSD)
+++CMP= -c ${CXXFLAGS}
+++CC= ${COMPILER} -c -D${PLATFORM} -D_REENTRANT -fpic
+++LINK =  ${COMPILER} -D${PLATFORM} -fpic ${LDFLAGS}
+++PLATFORM_LIB_LINK_OPTIONS=-L/usr/local/lib
+++EXTRA_LINK_OPTIONS=-lc ${EXTRA_LIBS}
+++SHLIBSUFFIX=.so
+++endif
+++
++ #=============== QNX SPECIFIC OPTIONS =========================
++ ifeq (${PLATFORM}, QNX)
++ CMP= -c ${CXXFLAGS}
++diff -urN ../tests/ThreadTest/ThreadTest.cpp tests/ThreadTest/ThreadTest.cpp
++--- ../tests/ThreadTest/ThreadTest.cpp	2004-09-08 15:57:05.000000000 +0200
+++++ tests/ThreadTest/ThreadTest.cpp	2005-10-21 16:52:52.000000000 +0200
++@@ -88,7 +88,7 @@
++ }
++ 
++ 
++-#elif defined (AIX) || defined(SOLARIS) || defined(LINUX) || defined(HPUX) || defined (OS390) || defined(MACOSX) || defined(FREEBSD) || defined(__CYGWIN__) || defined(__QNXNTO__)
+++#elif defined (AIX) || defined(SOLARIS) || defined(LINUX) || defined(KFREEBSD) ||defined(HPUX) || defined (OS390) || defined(MACOSX) || defined(FREEBSD) || defined(__CYGWIN__) || defined(__QNXNTO__)
++ #include <pthread.h>
++ #include <unistd.h>
++ #include <errno.h>
++diff -urN ../tests/configure.in tests/configure.in
++--- ../tests/configure.in	2004-08-19 19:45:23.000000000 +0200
+++++ tests/configure.in	2005-10-21 10:33:23.000000000 +0200
++@@ -39,6 +39,7 @@
++         *-*-beos*)      platform=BEOS ;;
++         *-*-linux*)     platform=LINUX ;;
++         *-*-nto*)       platform=QNX ;;
+++        *-*-kfreebsd*)  platform=KFREEBSD ;;
++         *-*-freebsd*)   platform=FREEBSD ;;
++         *-*-netbsd*)    platform=NETBSD ;;
++         *-*-irix*)      platform=IRIX ;;
++diff -urN ../tests/runConfigure tests/runConfigure
++--- ../tests/runConfigure	2004-09-10 01:52:24.000000000 +0200
+++++ tests/runConfigure	2005-10-21 16:13:08.000000000 +0200
++@@ -43,7 +43,7 @@
++     echo "runConfigure: Helper script to run \"configure\" for one of the supported platforms"
++     echo "Usage: runConfigure \"options\""
++     echo "       where options may be any of the following:"
++-    echo "       -p <platform> (accepts 'aix', 'beos', 'linux', 'freebsd', 'netbsd',
+++    echo "       -p <platform> (accepts 'aix', 'beos', 'linux', 'kfreebsd', 'freebsd', 'netbsd',
++             'solaris', 'hp-10', 'hp-11', 'openserver', 'unixware',
++             'os400', 'os390', 'irix', 'ptx', 'tru64', 'macosx', 'cygwin', 'qnx',
++             'interix', 'mingw-msys')
++@@ -195,7 +195,7 @@
++ # Now check if the options are correct or not, bail out if incorrect
++ #
++ case $platform in
++-   aix | openserver | unixware | beos | linux | freebsd | netbsd | solaris | hp-10 | hp-11 | os400 | os390 | irix | ptx | tru64 | macosx | cygwin | qnx | interix | mingw-msys)
+++   aix | openserver | unixware | beos | linux | kfreebsd | freebsd | netbsd | solaris | hp-10 | hp-11 | os400 | os390 | irix | ptx | tru64 | macosx | cygwin | qnx | interix | mingw-msys)
++        # platform has been recognized
++        ;;
++    *)
+--- xerces26-2.6.0.orig/debian/patches/13-kfreebsd_autoreconf.patch
++++ xerces26-2.6.0/debian/patches/13-kfreebsd_autoreconf.patch
+@@ -0,0 +1,885 @@
++diff -ur xerces-c-src_2_6_0.OLD/samples/configure samples/configure
++--- xerces-c-src_2_6_0.OLD/samples/configure	2004-07-09 17:47:57.000000000 +0200
+++++ samples/configure	2005-10-22 01:05:49.000000000 +0200
++@@ -887,57 +887,6 @@
++   fi
++ fi
++ 
++-for ac_declaration in \
++-   ''\
++-   '#include <stdlib.h>' \
++-   'extern "C" void std::exit (int) throw (); using std::exit;' \
++-   'extern "C" void std::exit (int); using std::exit;' \
++-   'extern "C" void exit (int) throw ();' \
++-   'extern "C" void exit (int);' \
++-   'void exit (int);'
++-do
++-  cat > conftest.$ac_ext <<EOF
++-#line 901 "configure"
++-#include "confdefs.h"
++-#include <stdlib.h>
++-$ac_declaration
++-int main() {
++-exit (42);
++-; return 0; }
++-EOF
++-if { (eval echo configure:909: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
++-  :
++-else
++-  echo "configure: failed program was:" >&5
++-  cat conftest.$ac_ext >&5
++-  rm -rf conftest*
++-  continue
++-fi
++-rm -f conftest*
++-  cat > conftest.$ac_ext <<EOF
++-#line 919 "configure"
++-#include "confdefs.h"
++-$ac_declaration
++-int main() {
++-exit (42);
++-; return 0; }
++-EOF
++-if { (eval echo configure:926: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
++-  rm -rf conftest*
++-  break
++-else
++-  echo "configure: failed program was:" >&5
++-  cat conftest.$ac_ext >&5
++-fi
++-rm -f conftest*
++-done
++-if test -n "$ac_declaration"; then
++-  echo '#ifdef __cplusplus' >>confdefs.h
++-  echo $ac_declaration      >>confdefs.h
++-  echo '#endif'             >>confdefs.h
++-fi
++-
++-
++ ac_aux_dir=
++ for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
++   if test -f $ac_dir/install-sh; then
++@@ -969,7 +918,7 @@
++ # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
++ # ./install, which can be erroneously created by make from ./install.sh.
++ echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
++-echo "configure:973: checking for a BSD compatible install" >&5
+++echo "configure:922: checking for a BSD compatible install" >&5
++ if test -z "$INSTALL"; then
++ if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++@@ -1024,7 +973,7 @@
++ # Extract the first word of "autoconf", so it can be a program name with args.
++ set dummy autoconf; ac_word=$2
++ echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
++-echo "configure:1028: checking for $ac_word" >&5
+++echo "configure:977: checking for $ac_word" >&5
++ if eval "test \"`echo '$''{'ac_cv_prog_AUTOCONF'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++ else
++@@ -1053,7 +1002,7 @@
++ 
++ 
++ echo $ac_n "checking for floor in -lm""... $ac_c" 1>&6
++-echo "configure:1057: checking for floor in -lm" >&5
+++echo "configure:1006: checking for floor in -lm" >&5
++ ac_lib_var=`echo m'_'floor | sed 'y%./+-%__p_%'`
++ if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++@@ -1061,7 +1010,7 @@
++   ac_save_LIBS="$LIBS"
++ LIBS="-lm  $LIBS"
++ cat > conftest.$ac_ext <<EOF
++-#line 1065 "configure"
+++#line 1014 "configure"
++ #include "confdefs.h"
++ /* Override any gcc2 internal prototype to avoid an error.  */
++ /* We use char because int might match the return type of a gcc2
++@@ -1072,7 +1021,7 @@
++ floor()
++ ; return 0; }
++ EOF
++-if { (eval echo configure:1076: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+++if { (eval echo configure:1025: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
++   rm -rf conftest*
++   eval "ac_cv_lib_$ac_lib_var=yes"
++ else
++@@ -1101,7 +1050,7 @@
++ 
++ 
++ echo $ac_n "checking for pthread_create in -lpthread""... $ac_c" 1>&6
++-echo "configure:1105: checking for pthread_create in -lpthread" >&5
+++echo "configure:1054: checking for pthread_create in -lpthread" >&5
++ ac_lib_var=`echo pthread'_'pthread_create | sed 'y%./+-%__p_%'`
++ if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++@@ -1109,7 +1058,7 @@
++   ac_save_LIBS="$LIBS"
++ LIBS="-lpthread  $LIBS"
++ cat > conftest.$ac_ext <<EOF
++-#line 1113 "configure"
+++#line 1062 "configure"
++ #include "confdefs.h"
++ /* Override any gcc2 internal prototype to avoid an error.  */
++ /* We use char because int might match the return type of a gcc2
++@@ -1120,7 +1069,7 @@
++ pthread_create()
++ ; return 0; }
++ EOF
++-if { (eval echo configure:1124: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+++if { (eval echo configure:1073: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
++   rm -rf conftest*
++   eval "ac_cv_lib_$ac_lib_var=yes"
++ else
++@@ -1149,7 +1098,7 @@
++ 
++ if test $ac_cv_lib_pthread_pthread_create = no; then
++ echo $ac_n "checking for pthread_create in -lpthreads""... $ac_c" 1>&6
++-echo "configure:1153: checking for pthread_create in -lpthreads" >&5
+++echo "configure:1102: checking for pthread_create in -lpthreads" >&5
++ ac_lib_var=`echo pthreads'_'pthread_create | sed 'y%./+-%__p_%'`
++ if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++@@ -1157,7 +1106,7 @@
++   ac_save_LIBS="$LIBS"
++ LIBS="-lpthreads  $LIBS"
++ cat > conftest.$ac_ext <<EOF
++-#line 1161 "configure"
+++#line 1110 "configure"
++ #include "confdefs.h"
++ /* Override any gcc2 internal prototype to avoid an error.  */
++ /* We use char because int might match the return type of a gcc2
++@@ -1168,7 +1117,7 @@
++ pthread_create()
++ ; return 0; }
++ EOF
++-if { (eval echo configure:1172: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+++if { (eval echo configure:1121: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
++   rm -rf conftest*
++   eval "ac_cv_lib_$ac_lib_var=yes"
++ else
++@@ -1198,7 +1147,7 @@
++ fi
++ 
++ echo $ac_n "checking how to run the C preprocessor""... $ac_c" 1>&6
++-echo "configure:1202: checking how to run the C preprocessor" >&5
+++echo "configure:1151: checking how to run the C preprocessor" >&5
++ # On Suns, sometimes $CPP names a directory.
++ if test -n "$CPP" && test -d "$CPP"; then
++   CPP=
++@@ -1213,13 +1162,13 @@
++   # On the NeXT, cc -E runs the code through the compiler's parser,
++   # not just through cpp.
++   cat > conftest.$ac_ext <<EOF
++-#line 1217 "configure"
+++#line 1166 "configure"
++ #include "confdefs.h"
++ #include <assert.h>
++ Syntax Error
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1223: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1172: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   :
++@@ -1230,13 +1179,13 @@
++   rm -rf conftest*
++   CPP="${CC-cc} -E -traditional-cpp"
++   cat > conftest.$ac_ext <<EOF
++-#line 1234 "configure"
+++#line 1183 "configure"
++ #include "confdefs.h"
++ #include <assert.h>
++ Syntax Error
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1240: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1189: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   :
++@@ -1247,13 +1196,13 @@
++   rm -rf conftest*
++   CPP="${CC-cc} -nologo -E"
++   cat > conftest.$ac_ext <<EOF
++-#line 1251 "configure"
+++#line 1200 "configure"
++ #include "confdefs.h"
++ #include <assert.h>
++ Syntax Error
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1257: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1206: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   :
++@@ -1281,17 +1230,17 @@
++ do
++ ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
++ echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
++-echo "configure:1285: checking for $ac_hdr" >&5
+++echo "configure:1234: checking for $ac_hdr" >&5
++ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++ else
++   cat > conftest.$ac_ext <<EOF
++-#line 1290 "configure"
+++#line 1239 "configure"
++ #include "confdefs.h"
++ #include <$ac_hdr>
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1295: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1244: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   rm -rf conftest*
++@@ -1331,7 +1280,7 @@
++ fi
++ 
++ echo $ac_n "checking host system type""... $ac_c" 1>&6
++-echo "configure:1335: checking host system type" >&5
+++echo "configure:1284: checking host system type" >&5
++ 
++ host_alias=$host
++ case "$host_alias" in
++@@ -1362,6 +1311,7 @@
++         *-*-beos*)      platform=BEOS ;;
++         *-*-linux*)     platform=LINUX ;;
++         *-*-nto*)       platform=QNX ;;
+++        *-*-kfreebsd*)  platform=KFREEBSD ;;
++         *-*-freebsd*)   platform=FREEBSD ;;
++         *-*-netbsd*)    platform=NETBSD ;;
++         *-*-irix*)      platform=IRIX ;;
++@@ -1373,7 +1323,6 @@
++                             *)            osver=HPUX11;;
++                         esac;;
++         *-*-mvs*)       platform=OS390 ;;
++-        *-*ibm-openedition*|*-*-os390*) platform=OS390;;
++         *-*-os400*)     platform=OS400 ;;
++         *-*-OS400*)     platform=OS400 ;;
++         *-*-osf*)       platform=TRU64 ;;
++@@ -1387,6 +1336,9 @@
++ 
++ compiler=${CXX}
++ 
+++
+++
+++
++ cxxver=${CXXVER}
++ 
++ 
++@@ -1484,11 +1436,7 @@
++ s%\]%\\&%g
++ s%\$%$$%g
++ EOF
++-if test "$platform"="OS400" || test "$platform" = "OS390";then
++-DEFS=`sed -f conftest.defs confdefs.h | tr '\n' ' '`          
++-else                                                          
++-DEFS=`sed -f conftest.defs confdefs.h | tr '\012' ' '`        
++-fi                                                            
+++DEFS=`sed -f conftest.defs confdefs.h | tr '\012' ' '`
++ rm -f conftest.defs
++ 
++ 
++@@ -1590,9 +1538,9 @@
++ s%@host_os@%$host_os%g
++ s%@platform@%$platform%g
++ s%@compiler@%$compiler%g
++-s%@cxxver@%$cxxver%g
++ s%@GXX@%$GXX%g
++ s%@GCC@%$GCC%g
+++s%@cxxver@%$cxxver%g
++ s%@cxxflags@%$cxxflags%g
++ s%@cflags@%$cflags%g
++ s%@ldflags@%$ldflags%g
++diff -ur xerces-c-src_2_6_0.OLD/src/xercesc/configure src/xercesc/configure
++--- xerces-c-src_2_6_0.OLD/src/xercesc/configure	2004-07-09 18:06:02.000000000 +0200
+++++ src/xercesc/configure	2005-10-22 01:05:56.000000000 +0200
++@@ -887,57 +887,6 @@
++   fi
++ fi
++ 
++-for ac_declaration in \
++-   ''\
++-   '#include <stdlib.h>' \
++-   'extern "C" void std::exit (int) throw (); using std::exit;' \
++-   'extern "C" void std::exit (int); using std::exit;' \
++-   'extern "C" void exit (int) throw ();' \
++-   'extern "C" void exit (int);' \
++-   'void exit (int);'
++-do
++-  cat > conftest.$ac_ext <<EOF
++-#line 901 "configure"
++-#include "confdefs.h"
++-#include <stdlib.h>
++-$ac_declaration
++-int main() {
++-exit (42);
++-; return 0; }
++-EOF
++-if { (eval echo configure:909: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
++-  :
++-else
++-  echo "configure: failed program was:" >&5
++-  cat conftest.$ac_ext >&5
++-  rm -rf conftest*
++-  continue
++-fi
++-rm -f conftest*
++-  cat > conftest.$ac_ext <<EOF
++-#line 919 "configure"
++-#include "confdefs.h"
++-$ac_declaration
++-int main() {
++-exit (42);
++-; return 0; }
++-EOF
++-if { (eval echo configure:926: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
++-  rm -rf conftest*
++-  break
++-else
++-  echo "configure: failed program was:" >&5
++-  cat conftest.$ac_ext >&5
++-fi
++-rm -f conftest*
++-done
++-if test -n "$ac_declaration"; then
++-  echo '#ifdef __cplusplus' >>confdefs.h
++-  echo $ac_declaration      >>confdefs.h
++-  echo '#endif'             >>confdefs.h
++-fi
++-
++-
++ ac_aux_dir=
++ for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
++   if test -f $ac_dir/install-sh; then
++@@ -969,7 +918,7 @@
++ # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
++ # ./install, which can be erroneously created by make from ./install.sh.
++ echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
++-echo "configure:973: checking for a BSD compatible install" >&5
+++echo "configure:922: checking for a BSD compatible install" >&5
++ if test -z "$INSTALL"; then
++ if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++@@ -1024,7 +973,7 @@
++ # Extract the first word of "autoconf", so it can be a program name with args.
++ set dummy autoconf; ac_word=$2
++ echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
++-echo "configure:1028: checking for $ac_word" >&5
+++echo "configure:977: checking for $ac_word" >&5
++ if eval "test \"`echo '$''{'ac_cv_prog_AUTOCONF'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++ else
++@@ -1054,7 +1003,7 @@
++ 
++ 
++ echo $ac_n "checking how to run the C preprocessor""... $ac_c" 1>&6
++-echo "configure:1058: checking how to run the C preprocessor" >&5
+++echo "configure:1007: checking how to run the C preprocessor" >&5
++ # On Suns, sometimes $CPP names a directory.
++ if test -n "$CPP" && test -d "$CPP"; then
++   CPP=
++@@ -1069,13 +1018,13 @@
++   # On the NeXT, cc -E runs the code through the compiler's parser,
++   # not just through cpp.
++   cat > conftest.$ac_ext <<EOF
++-#line 1073 "configure"
+++#line 1022 "configure"
++ #include "confdefs.h"
++ #include <assert.h>
++ Syntax Error
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1079: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1028: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   :
++@@ -1086,13 +1035,13 @@
++   rm -rf conftest*
++   CPP="${CC-cc} -E -traditional-cpp"
++   cat > conftest.$ac_ext <<EOF
++-#line 1090 "configure"
+++#line 1039 "configure"
++ #include "confdefs.h"
++ #include <assert.h>
++ Syntax Error
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1096: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1045: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   :
++@@ -1103,13 +1052,13 @@
++   rm -rf conftest*
++   CPP="${CC-cc} -nologo -E"
++   cat > conftest.$ac_ext <<EOF
++-#line 1107 "configure"
+++#line 1056 "configure"
++ #include "confdefs.h"
++ #include <assert.h>
++ Syntax Error
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1113: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1062: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   :
++@@ -1134,12 +1083,12 @@
++ echo "$ac_t""$CPP" 1>&6
++ 
++ echo $ac_n "checking for ANSI C header files""... $ac_c" 1>&6
++-echo "configure:1138: checking for ANSI C header files" >&5
+++echo "configure:1087: checking for ANSI C header files" >&5
++ if eval "test \"`echo '$''{'ac_cv_header_stdc'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++ else
++   cat > conftest.$ac_ext <<EOF
++-#line 1143 "configure"
+++#line 1092 "configure"
++ #include "confdefs.h"
++ #include <stdlib.h>
++ #include <stdarg.h>
++@@ -1147,7 +1096,7 @@
++ #include <float.h>
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1151: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1100: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   rm -rf conftest*
++@@ -1164,7 +1113,7 @@
++ if test $ac_cv_header_stdc = yes; then
++   # SunOS 4.x string.h does not declare mem*, contrary to ANSI.
++ cat > conftest.$ac_ext <<EOF
++-#line 1168 "configure"
+++#line 1117 "configure"
++ #include "confdefs.h"
++ #include <string.h>
++ EOF
++@@ -1182,7 +1131,7 @@
++ if test $ac_cv_header_stdc = yes; then
++   # ISC 2.0.2 stdlib.h does not declare free, contrary to ANSI.
++ cat > conftest.$ac_ext <<EOF
++-#line 1186 "configure"
+++#line 1135 "configure"
++ #include "confdefs.h"
++ #include <stdlib.h>
++ EOF
++@@ -1203,7 +1152,7 @@
++   :
++ else
++   cat > conftest.$ac_ext <<EOF
++-#line 1207 "configure"
+++#line 1156 "configure"
++ #include "confdefs.h"
++ #include <ctype.h>
++ #define ISLOWER(c) ('a' <= (c) && (c) <= 'z')
++@@ -1214,7 +1163,7 @@
++ exit (0); }
++ 
++ EOF
++-if { (eval echo configure:1218: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+++if { (eval echo configure:1167: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
++ then
++   :
++ else
++@@ -1238,12 +1187,12 @@
++ fi
++ 
++ echo $ac_n "checking for XMLByte""... $ac_c" 1>&6
++-echo "configure:1242: checking for XMLByte" >&5
+++echo "configure:1191: checking for XMLByte" >&5
++ if eval "test \"`echo '$''{'ac_cv_type_XMLByte'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++ else
++   cat > conftest.$ac_ext <<EOF
++-#line 1247 "configure"
+++#line 1196 "configure"
++ #include "confdefs.h"
++ #include <sys/types.h>
++ #if STDC_HEADERS
++@@ -1278,7 +1227,7 @@
++ fi
++ 
++ echo $ac_n "checking host system type""... $ac_c" 1>&6
++-echo "configure:1282: checking host system type" >&5
+++echo "configure:1231: checking host system type" >&5
++ 
++ host_alias=$host
++ case "$host_alias" in
++@@ -1308,6 +1257,7 @@
++         *-*-beos*)      platform=BEOS ;;
++         *-*-nto*)       platform=QNX ;;
++         *-*-linux*)     platform=LINUX ;;
+++        *-*-kfreebsd*)  platform=KFREEBSD ;;
++         *-*-freebsd*)   platform=FREEBSD ;;
++         *-*-netbsd*)    platform=NETBSD ;;
++         *-*-irix*)      platform=IRIX ;;
++@@ -1326,7 +1276,6 @@
++                             *)            osver=HPUX11;;
++                         esac;;
++         *-*-mvs*)       platform=OS390 ;;
++-        *-*ibm-openedition*|*-*-os390*) platform=OS390;;
++         *-*-os400*)     platform=OS400 ;;
++         *-*-OS400*)     platform=OS400 ;;
++         *-*-osf*)		platform=TRU64 ;;
++@@ -1340,8 +1289,11 @@
++ 
++ cxx=${CXX}
++ 
+++
+++
++ cxxver=${CXXVER}
++ 
+++
++ cc=${CC}
++ 
++ 
++@@ -1458,11 +1410,7 @@
++ s%\]%\\&%g
++ s%\$%$$%g
++ EOF
++-if test "$platform"="OS400" || test "$platform" = "OS390";then
++-DEFS=`sed -f conftest.defs confdefs.h | tr '\n' ' '`          
++-else                                                          
++-DEFS=`sed -f conftest.defs confdefs.h | tr '\012' ' '`        
++-fi                                                            
+++DEFS=`sed -f conftest.defs confdefs.h | tr '\012' ' '`
++ rm -f conftest.defs
++ 
++ 
++@@ -1518,8 +1466,8 @@
++ util/Platforms/AIX/Makefile \
++ util/Platforms/BeOS/Makefile \
++ util/Platforms/QNX/Makefile \
++-util/Platforms/Interix/Makefile \
++ util/Platforms/Linux/Makefile \
+++util/Platforms/KFreeBSD/Makefile \
++ util/Platforms/FreeBSD/Makefile \
++ util/Platforms/NetBSD/Makefile \
++ util/Platforms/HPUX/Makefile \
++@@ -1604,8 +1552,8 @@
++ s%@host_os@%$host_os%g
++ s%@platform@%$platform%g
++ s%@cxx@%$cxx%g
++-s%@cxxver@%$cxxver%g
++ s%@GXX@%$GXX%g
+++s%@cxxver@%$cxxver%g
++ s%@cc@%$cc%g
++ s%@GCC@%$GCC%g
++ s%@prefix_include@%$prefix_include%g
++@@ -1678,8 +1626,8 @@
++ util/Platforms/AIX/Makefile \
++ util/Platforms/BeOS/Makefile \
++ util/Platforms/QNX/Makefile \
++-util/Platforms/Interix/Makefile \
++ util/Platforms/Linux/Makefile \
+++util/Platforms/KFreeBSD/Makefile \
++ util/Platforms/FreeBSD/Makefile \
++ util/Platforms/NetBSD/Makefile \
++ util/Platforms/HPUX/Makefile \
++diff -ur xerces-c-src_2_6_0.OLD/tests/configure tests/configure
++--- xerces-c-src_2_6_0.OLD/tests/configure	2004-08-19 19:45:23.000000000 +0200
+++++ tests/configure	2005-10-22 01:05:43.000000000 +0200
++@@ -887,57 +887,6 @@
++   fi
++ fi
++ 
++-for ac_declaration in \
++-   ''\
++-   '#include <stdlib.h>' \
++-   'extern "C" void XERCES_STD_QUALIFIER exit (int) throw (); using XERCES_STD_QUALIFIER exit;' \
++-   'extern "C" void XERCES_STD_QUALIFIER exit (int); using XERCES_STD_QUALIFIER exit;' \
++-   'extern "C" void exit (int) throw ();' \
++-   'extern "C" void exit (int);' \
++-   'void exit (int);'
++-do
++-  cat > conftest.$ac_ext <<EOF
++-#line 901 "configure"
++-#include "confdefs.h"
++-#include <stdlib.h>
++-$ac_declaration
++-int main() {
++-exit (42);
++-; return 0; }
++-EOF
++-if { (eval echo configure:909: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
++-  :
++-else
++-  echo "configure: failed program was:" >&5
++-  cat conftest.$ac_ext >&5
++-  rm -rf conftest*
++-  continue
++-fi
++-rm -f conftest*
++-  cat > conftest.$ac_ext <<EOF
++-#line 919 "configure"
++-#include "confdefs.h"
++-$ac_declaration
++-int main() {
++-exit (42);
++-; return 0; }
++-EOF
++-if { (eval echo configure:926: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
++-  rm -rf conftest*
++-  break
++-else
++-  echo "configure: failed program was:" >&5
++-  cat conftest.$ac_ext >&5
++-fi
++-rm -f conftest*
++-done
++-if test -n "$ac_declaration"; then
++-  echo '#ifdef __cplusplus' >>confdefs.h
++-  echo $ac_declaration      >>confdefs.h
++-  echo '#endif'             >>confdefs.h
++-fi
++-
++-
++ ac_aux_dir=
++ for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
++   if test -f $ac_dir/install-sh; then
++@@ -969,7 +918,7 @@
++ # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
++ # ./install, which can be erroneously created by make from ./install.sh.
++ echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
++-echo "configure:973: checking for a BSD compatible install" >&5
+++echo "configure:922: checking for a BSD compatible install" >&5
++ if test -z "$INSTALL"; then
++ if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++@@ -1024,7 +973,7 @@
++ # Extract the first word of "autoconf", so it can be a program name with args.
++ set dummy autoconf; ac_word=$2
++ echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
++-echo "configure:1028: checking for $ac_word" >&5
+++echo "configure:977: checking for $ac_word" >&5
++ if eval "test \"`echo '$''{'ac_cv_prog_AUTOCONF'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++ else
++@@ -1053,7 +1002,7 @@
++ 
++ 
++ echo $ac_n "checking for floor in -lm""... $ac_c" 1>&6
++-echo "configure:1057: checking for floor in -lm" >&5
+++echo "configure:1006: checking for floor in -lm" >&5
++ ac_lib_var=`echo m'_'floor | sed 'y%./+-%__p_%'`
++ if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++@@ -1061,7 +1010,7 @@
++   ac_save_LIBS="$LIBS"
++ LIBS="-lm  $LIBS"
++ cat > conftest.$ac_ext <<EOF
++-#line 1065 "configure"
+++#line 1014 "configure"
++ #include "confdefs.h"
++ /* Override any gcc2 internal prototype to avoid an error.  */
++ /* We use char because int might match the return type of a gcc2
++@@ -1072,7 +1021,7 @@
++ floor()
++ ; return 0; }
++ EOF
++-if { (eval echo configure:1076: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+++if { (eval echo configure:1025: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
++   rm -rf conftest*
++   eval "ac_cv_lib_$ac_lib_var=yes"
++ else
++@@ -1101,7 +1050,7 @@
++ 
++ 
++ echo $ac_n "checking for pthread_create in -lpthread""... $ac_c" 1>&6
++-echo "configure:1105: checking for pthread_create in -lpthread" >&5
+++echo "configure:1054: checking for pthread_create in -lpthread" >&5
++ ac_lib_var=`echo pthread'_'pthread_create | sed 'y%./+-%__p_%'`
++ if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++@@ -1109,7 +1058,7 @@
++   ac_save_LIBS="$LIBS"
++ LIBS="-lpthread  $LIBS"
++ cat > conftest.$ac_ext <<EOF
++-#line 1113 "configure"
+++#line 1062 "configure"
++ #include "confdefs.h"
++ /* Override any gcc2 internal prototype to avoid an error.  */
++ /* We use char because int might match the return type of a gcc2
++@@ -1120,7 +1069,7 @@
++ pthread_create()
++ ; return 0; }
++ EOF
++-if { (eval echo configure:1124: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+++if { (eval echo configure:1073: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
++   rm -rf conftest*
++   eval "ac_cv_lib_$ac_lib_var=yes"
++ else
++@@ -1149,7 +1098,7 @@
++ 
++ if test $ac_cv_lib_pthread_pthread_create = no; then
++ echo $ac_n "checking for pthread_create in -lpthreads""... $ac_c" 1>&6
++-echo "configure:1153: checking for pthread_create in -lpthreads" >&5
+++echo "configure:1102: checking for pthread_create in -lpthreads" >&5
++ ac_lib_var=`echo pthreads'_'pthread_create | sed 'y%./+-%__p_%'`
++ if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++@@ -1157,7 +1106,7 @@
++   ac_save_LIBS="$LIBS"
++ LIBS="-lpthreads  $LIBS"
++ cat > conftest.$ac_ext <<EOF
++-#line 1161 "configure"
+++#line 1110 "configure"
++ #include "confdefs.h"
++ /* Override any gcc2 internal prototype to avoid an error.  */
++ /* We use char because int might match the return type of a gcc2
++@@ -1168,7 +1117,7 @@
++ pthread_create()
++ ; return 0; }
++ EOF
++-if { (eval echo configure:1172: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+++if { (eval echo configure:1121: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
++   rm -rf conftest*
++   eval "ac_cv_lib_$ac_lib_var=yes"
++ else
++@@ -1198,7 +1147,7 @@
++ fi
++ 
++ echo $ac_n "checking how to run the C preprocessor""... $ac_c" 1>&6
++-echo "configure:1202: checking how to run the C preprocessor" >&5
+++echo "configure:1151: checking how to run the C preprocessor" >&5
++ # On Suns, sometimes $CPP names a directory.
++ if test -n "$CPP" && test -d "$CPP"; then
++   CPP=
++@@ -1213,13 +1162,13 @@
++   # On the NeXT, cc -E runs the code through the compiler's parser,
++   # not just through cpp.
++   cat > conftest.$ac_ext <<EOF
++-#line 1217 "configure"
+++#line 1166 "configure"
++ #include "confdefs.h"
++ #include <assert.h>
++ Syntax Error
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1223: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1172: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   :
++@@ -1230,13 +1179,13 @@
++   rm -rf conftest*
++   CPP="${CC-cc} -E -traditional-cpp"
++   cat > conftest.$ac_ext <<EOF
++-#line 1234 "configure"
+++#line 1183 "configure"
++ #include "confdefs.h"
++ #include <assert.h>
++ Syntax Error
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1240: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1189: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   :
++@@ -1247,13 +1196,13 @@
++   rm -rf conftest*
++   CPP="${CC-cc} -nologo -E"
++   cat > conftest.$ac_ext <<EOF
++-#line 1251 "configure"
+++#line 1200 "configure"
++ #include "confdefs.h"
++ #include <assert.h>
++ Syntax Error
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1257: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1206: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   :
++@@ -1281,17 +1230,17 @@
++ do
++ ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
++ echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
++-echo "configure:1285: checking for $ac_hdr" >&5
+++echo "configure:1234: checking for $ac_hdr" >&5
++ if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
++   echo $ac_n "(cached) $ac_c" 1>&6
++ else
++   cat > conftest.$ac_ext <<EOF
++-#line 1290 "configure"
+++#line 1239 "configure"
++ #include "confdefs.h"
++ #include <$ac_hdr>
++ EOF
++ ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++-{ (eval echo configure:1295: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+++{ (eval echo configure:1244: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
++ ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
++ if test -z "$ac_err"; then
++   rm -rf conftest*
++@@ -1331,7 +1280,7 @@
++ fi
++ 
++ echo $ac_n "checking host system type""... $ac_c" 1>&6
++-echo "configure:1335: checking host system type" >&5
+++echo "configure:1284: checking host system type" >&5
++ 
++ host_alias=$host
++ case "$host_alias" in
++@@ -1362,6 +1311,7 @@
++         *-*-beos*)      platform=BEOS ;;
++         *-*-linux*)     platform=LINUX ;;
++         *-*-nto*)       platform=QNX ;;
+++        *-*-kfreebsd*)  platform=KFREEBSD ;;
++         *-*-freebsd*)   platform=FREEBSD ;;
++         *-*-netbsd*)    platform=NETBSD ;;
++         *-*-irix*)      platform=IRIX ;;
++@@ -1373,7 +1323,6 @@
++                             *)            osver=HPUX11;;
++                         esac;;
++         *-*-mvs*)       platform=OS390 ;;
++-        *-*ibm-openedition*|*-*-os390*) platform=OS390;;
++         *-*-os400*)     platform=OS400 ;;
++         *-*-OS400*)     platform=OS400 ;;
++         *-*-osf*)       platform=TRU64 ;;
++@@ -1387,6 +1336,9 @@
++ 
++ compiler=${CXX}
++ 
+++
+++
+++
++ cxxver=${CXXVER}
++ 
++ 
++@@ -1484,11 +1436,7 @@
++ s%\]%\\&%g
++ s%\$%$$%g
++ EOF
++-if test "$platform"="OS400" || test "$platform" = "OS390";then
++-DEFS=`sed -f conftest.defs confdefs.h | tr '\n' ' '`          
++-else                                                          
++-DEFS=`sed -f conftest.defs confdefs.h | tr '\012' ' '`        
++-fi                                                            
+++DEFS=`sed -f conftest.defs confdefs.h | tr '\012' ' '`
++ rm -f conftest.defs
++ 
++ 
++@@ -1588,9 +1536,9 @@
++ s%@host_os@%$host_os%g
++ s%@platform@%$platform%g
++ s%@compiler@%$compiler%g
++-s%@cxxver@%$cxxver%g
++ s%@GXX@%$GXX%g
++ s%@GCC@%$GCC%g
+++s%@cxxver@%$cxxver%g
++ s%@cxxflags@%$cxxflags%g
++ s%@cflags@%$cflags%g
++ s%@ldflags@%$ldflags%g
