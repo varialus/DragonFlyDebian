@@ -13,7 +13,6 @@ cpu=i386
 cdname=debian-${version}-kfreebsd-${cpu}-install.iso
 
 if [ "$UID" != "0" ] ; then
-  # I call that incest, don't you?
   sudo $0 $@
   exit 0
 fi
@@ -44,12 +43,13 @@ for i in ${tmp1}/var/cache/apt/archives/kfreebsd-{loader,image-5.*-486}_*_kfreeb
 done
 rm -rf ${tmp1}
 
-# get loader.conf and mfsroot from freebsd image
+# get some stuff from freebsd image
 case `uname -s` in
   Linux) mount ./${installer} /mnt -o loop ;;
   GNU/kFreeBSD) echo FIXME ; exit 1 ;;
 esac
 cp /mnt/boot/{loader.conf,mfsroot.gz} ${tmp}/boot/
+cp /mnt/cdrom.inf ${tmp}/
 umount -d /mnt
 
 # copy our base into it
