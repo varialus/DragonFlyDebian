@@ -1,0 +1,28 @@
+
+Author: Petr Salinger <Petr.Salinger@t-systems.cz>
+Status: in BTS
+
+diff -ur ../cegui_mk2-0.3.0/include/CEGUIFactoryModule.h cegui_mk2-0.3.0/include/CEGUIFactoryModule.h
+--- ../cegui_mk2-0.3.0/include/CEGUIFactoryModule.h	2005-01-15 20:18:18.000000000 +0100
++++ cegui_mk2-0.3.0/include/CEGUIFactoryModule.h	2005-10-24 16:41:08.000000000 +0200
+@@ -42,7 +42,7 @@
+ 	struct HINSTANCE__;
+ 	typedef struct HINSTANCE__* hInstance;
+ 
+-#elif defined(__linux__)
++#elif defined(__linux__) || defined(__GLIBC__)
+ #    define DYNLIB_HANDLE void*
+ #    define DYNLIB_LOAD( a ) dlopen( a, RTLD_LAZY )
+ #    define DYNLIB_GETSYM( a, b ) dlsym( a, b )
+diff -ur ../cegui_mk2-0.3.0/src/CEGUIFactoryModule.cpp cegui_mk2-0.3.0/src/CEGUIFactoryModule.cpp
+--- ../cegui_mk2-0.3.0/src/CEGUIFactoryModule.cpp	2005-01-15 20:18:24.000000000 +0100
++++ cegui_mk2-0.3.0/src/CEGUIFactoryModule.cpp	2005-10-24 16:42:34.000000000 +0200
+@@ -40,7 +40,7 @@
+ #   include "macPlugins.h"
+ #endif
+ 
+-#if defined(__linux__)
++#if defined(__linux__) || defined(__GLIBC__)
+ #   include "dlfcn.h"
+ #endif
+ 
