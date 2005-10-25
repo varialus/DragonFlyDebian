@@ -22,6 +22,13 @@ tmp=`mktemp -d`
 pwd=`pwd`
 export GZIP=--best
 
+for i in dhcp3-client popularity-contest ; do
+  if ! grep -qx $i /etc/crosshurd/packages/{common,kfreebsd-gnu} ; then
+    echo "Please add $i to /etc/crosshurd/packages/"
+    exit 1
+  fi
+done
+
 if test -e base.tgz ; then
   tar --same-owner -xzpf base.tgz -C ${tmp}
 else
@@ -31,6 +38,9 @@ fi
 if test -e native-install ; then
   cp native-install ${tmp}/
 fi
+
+# having dialog pre-installed makes it a bit prettier
+dpkg --extract ${tmp}/var/cache/apt/archives/dialog_*.deb ${tmp}/
 
 # this command is called by f-i after untarring, let's exploit that
 cp startup ${tmp}/bin/mtree
