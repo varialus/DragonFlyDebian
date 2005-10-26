@@ -8,7 +8,6 @@
 set -ex
 
 version=`date +%Y%m%d`
-freebsd=5.4
 cpu=i386
 cdname=debian-${version}-kfreebsd-${cpu}-install.iso
 
@@ -27,46 +26,35 @@ done
 pwd=`pwd`
 tmp=`mktemp -d`
 
-installer="${freebsd}-RELEASE-${cpu}-bootonly.iso"
-
-if ! test -e ${installer} ; then
-  wget -c ftp://ftp.freebsd.org/pub/FreeBSD/ISO-IMAGES-${cpu}/${freebsd}/${installer}
-fi
-
 if ! test -e base.tgz ; then ./tarball.sh ; fi
+if ! test -e mfsroot.gz ; then ./mfsroot.sh ; fi
 
 # get kernel and loader (this must be before loader.conf, so that it gets overwritten)
 tmp1=`mktemp -d`
 tar -C ${tmp1} -xzf base.tgz
-for i in ${tmp1}/var/cache/apt/archives/kfreebsd-{loader,image-5.*-486}_*_kfreebsd-i386.deb ; do \
-  dpkg --extract ${i} ${tmp}/
-done
+dpkg --extract ${tmp1}/var/cache/apt/archives/kfreebsd-loader_*_kfreebsd-i386.deb ${tmp}/
+kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-5.*-486_*_kfreebsd-i386.deb`
+dpkg --extract ${kfreebsd_image} ${tmp}/
+kfreebsd_version=`echo ${kfreebsd_image} | sed -e "s,.*/kfreebsd-image-,,g" -e "s,_.*,,g"`
+gzip -9 ${tmp}/boot/kernel/kernel
 rm -rf ${tmp1}
 
-# get some stuff from freebsd image
-case `uname -s` in
-  Linux) mount ./${installer} /mnt -o loop ;;
-  GNU/kFreeBSD) echo FIXME ; exit 1 ;;
-esac
-cp /mnt/boot/{loader.conf,mfsroot.gz} ${tmp}/boot/
-cp /mnt/cdrom.inf ${tmp}/
-umount -d /mnt
+# put mfsroot and other extras
+echo "CD_VERSION = ${kfreebsd_version}" > ${tmp}/cdrom.inf
+cat > ${tmp}/boot/loader.conf << EOF
+mfsroot_load="YES"
+mfsroot_type="mfs_root"
+mfsroot_name="/boot/mfsroot"
+loader_color="YES"
+EOF
+cp mfsroot.gz ${tmp}/boot/
 
 # copy our base into it
 mkdir ${tmp}/base/
 cp base.tgz ${tmp}/base/
 
 # hack for being a FreeBSD compliant [tm] cdrom
-ln -sf . ${tmp}/${freebsd}-RELEASE
-
-# "persuade" sysinstall to tell the user to switch to ttyv2
-tmp1=`mktemp`
-gunzip -c ${tmp}/boot/mfsroot.gz > ${tmp1}
-# this is very tricky.  we're editing an ELF file inside an UFS image.  just
-# make sure both strings have exactly the same size, and everything will work
-sed -e "s,Attempting to install all selected distributions\.\.,Press ALT-F3 to proceed with GNU/kFreeBSD setup...,g" \
-< ${tmp1} | gzip -c9 > ${tmp}/boot/mfsroot.gz
-rm -f ${tmp1}
+ln -sf . ${tmp}/${kfreebsd_version}
 
 #########################
 #                    ignition!
