@@ -29,7 +29,7 @@ cp /boot/{boot*,mbr} ${mnt}/boot/
 # the same size, and everything will work.
 zcat sysinstall.gz | \
 sed -e "s,Attempting to install all selected distributions\.\.,Press ALT-F3 to proceed with GNU/kFreeBSD setup...,g" \
-< sysinstall > ${mnt}/stand/sysinstall
+> ${mnt}/stand/sysinstall
 chmod 755 ${mnt}/stand/sysinstall
 
 # freebsd commands.  always try to reduce this list!
