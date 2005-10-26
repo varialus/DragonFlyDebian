@@ -1,0 +1,19 @@
+
+Sometimes, when a process attempts to open() /dev/tty, it fails with ENXIO.
+
+It is not yet known what are the exact conditions that make this happen.  What
+we know is:
+
+  - When init is in runlevel one, it works fine.  But inmediately after entering
+  runlevel 2 (but still before any of the /etc/init.d scripts is run), it
+  breaks.  At this point, the process and its descendants still have
+  /dev/console as their terminal, and /dev/tty opens result in ENXIO.
+
+  - When gettys are run on /dev/ttyv*, unless they issue TIOCSCTTY on their
+  terminal, the same problem happens to the spawned shell.
+
+  - sysvinit code appears to issue TIOCSCTTY when opening /dev/console.
+  However, a ktrace run revealed that it does not.
+
+  - This problem is not related to a bug specific to our kernel.  I've
+  reproduced the same situation using upstream pristine kernels (5.4-RELEASE).
