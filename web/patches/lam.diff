@@ -1,20 +1,35 @@
 
-Author: Petr Salinger <Petr.Salinger@t-systems.cz>
+Author: Petr Salinger <Petr.Salinger@t-systems.cz>, Aurelien Jarno <aurel32@debian.org>
 Status: in BTS
 
---- romio/adio/ad_ufs/ad_ufs_wait.c~	2005-10-25 09:51:28.000000000 +0200
-+++ romio/adio/ad_ufs/ad_ufs_wait.c	2005-10-25 09:51:28.000000000 +0200
-@@ -107,7 +107,7 @@
- /* DEC, SGI IRIX 5 and 6 */
-     if ((*request)->queued) {
- 	do {
--	    err = aio_suspend((const aiocb_t **) &((*request)->handle), 1, 0);
-+	    err = aio_suspend((const struct aiocb **) &((*request)->handle), 1, 0);
- 	} while ((err == -1) && (errno == EINTR));
+diff -u lam-7.1.1/debian/rules lam-7.1.1/debian/rules
+--- lam-7.1.1/debian/rules
++++ lam-7.1.1/debian/rules
+@@ -48,6 +48,7 @@
  
- 	if (err != -1) {
---- romio/adio/ad_nfs/ad_nfs_wait.c~	2005-10-25 10:02:38.000000000 +0200
-+++ romio/adio/ad_nfs/ad_nfs_wait.c	2005-10-25 10:02:38.000000000 +0200
+ export DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ export DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
++export DEB_HOST_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+ 
+ ARCHT:=$(shell echo $(DEB_HOST_GNU_TYPE) | cut -f1 -d-)
+ OPTFLAGS:=
+@@ -162,7 +163,14 @@
+ 	mkdir tmp
+ 	cd tmp && echo $(addprefix ../,$<) | xargs -t -n 1 ar x && rm -f $(ERM)
+ 	mkdir -p $(@D)
++
++ifeq ($(DEB_HOST_GNU_SYSTEM),kfreebsd-gnu)
++# aio is enable by default on GNU/kFreeBSD, because of UFS support
++	$(CC) -shared -Wl,-soname=$(@F:.$(VER)=.$(SO)) -o $@ tmp/*.o -L$(LDIR) -llam -lutil -lrt
++else
+ 	$(CC) -shared -Wl,-soname=$(@F:.$(VER)=.$(SO)) -o $@ tmp/*.o -L$(LDIR) -llam -lutil
++endif
++	
+ 	rm -rf tmp
+ 
+ $(LDIR)/liblam++.so.$(VER): $(SHLDIR)/liblammpi++.a $(LDIR)/liblam.so
+--- lam-7.1.1.orig/romio/adio/ad_nfs/ad_nfs_wait.c
++++ lam-7.1.1/romio/adio/ad_nfs/ad_nfs_wait.c
 @@ -106,7 +106,7 @@
  /* DEC, SGI IRIX 5 and 6 */
      if ((*request)->queued) {
@@ -24,3 +39,24 @@ Status: in BTS
  	} while ((err == -1) && (errno == EINTR));
  
  	if (err != -1) {
+--- lam-7.1.1.orig/romio/adio/ad_ufs/ad_ufs_wait.c
++++ lam-7.1.1/romio/adio/ad_ufs/ad_ufs_wait.c
+@@ -107,7 +107,7 @@
+ /* DEC, SGI IRIX 5 and 6 */
+     if ((*request)->queued) {
+ 	do {
+-	    err = aio_suspend((const aiocb_t **) &((*request)->handle), 1, 0);
++	    err = aio_suspend((const struct aiocb **) &((*request)->handle), 1, 0);
+ 	} while ((err == -1) && (errno == EINTR));
+ 
+ 	if (err != -1) {
+--- lam-7.1.1.orig/romio/util/tarch
++++ lam-7.1.1/romio/util/tarch
+@@ -94,6 +94,7 @@
+         next)            FARCH=NeXT ; break ;;	
+ 	KSR1|KSR2)       FARCH=ksr ; break ;;	
+         FreeBSD)         FARCH=freebsd ; break ;;
++        GNU/kFreeBSD)    FARCH=freebsd ; break ;;
+         OpenBSD)         FARCH=openbsd ; break ;;
+         NetBSD)          FARCH=netbsd ; break ;;
+ 	i386)            GARCH=ipsc2 ;;
