@@ -1,0 +1,26 @@
+
+Author: Petr Salinger <Petr.Salinger@t-systems.cz>
+Status: in BTS
+
+--- romio/adio/ad_ufs/ad_ufs_wait.c~	2005-10-25 09:51:28.000000000 +0200
++++ romio/adio/ad_ufs/ad_ufs_wait.c	2005-10-25 09:51:28.000000000 +0200
+@@ -107,7 +107,7 @@
+ /* DEC, SGI IRIX 5 and 6 */
+     if ((*request)->queued) {
+ 	do {
+-	    err = aio_suspend((const aiocb_t **) &((*request)->handle), 1, 0);
++	    err = aio_suspend((const struct aiocb **) &((*request)->handle), 1, 0);
+ 	} while ((err == -1) && (errno == EINTR));
+ 
+ 	if (err != -1) {
+--- romio/adio/ad_nfs/ad_nfs_wait.c~	2005-10-25 10:02:38.000000000 +0200
++++ romio/adio/ad_nfs/ad_nfs_wait.c	2005-10-25 10:02:38.000000000 +0200
+@@ -106,7 +106,7 @@
+ /* DEC, SGI IRIX 5 and 6 */
+     if ((*request)->queued) {
+ 	do {
+-	    err = aio_suspend((const aiocb_t **) &((*request)->handle), 1, 0);
++	    err = aio_suspend((const struct aiocb **) &((*request)->handle), 1, 0);
+ 	} while ((err == -1) && (errno == EINTR));
+ 
+ 	if (err != -1) {

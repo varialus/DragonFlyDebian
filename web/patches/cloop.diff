@@ -1,0 +1,133 @@
+
+Author: rmh
+Status: in BTS
+
+diff -ur cloop-2.02.1+eb.10.old/advancecomp-1.14/advfs.cc cloop-2.02.1+eb.10+kbsd/advancecomp-1.14/advfs.cc
+--- cloop-2.02.1+eb.10.old/advancecomp-1.14/advfs.cc	2005-10-04 01:37:21.000000000 +0200
++++ cloop-2.02.1+eb.10+kbsd/advancecomp-1.14/advfs.cc	2005-10-26 09:12:55.000000000 +0200
+@@ -38,6 +38,7 @@
+ #include <sys/stat.h>
+ #include <pthread.h>
+ #include <time.h>
++#include <endian.h>
+ #include <fcntl.h>
+ #include <zlib.h>
+ #include "compressed_loop.h"
+@@ -90,33 +91,27 @@
+ 
+ #define MAXLEN(blocksize) ((blocksize) + (blocksize)/1000 + 12)
+ 
+-# if defined(linux) || defined(__linux__)
+-#include <asm/byteorder.h>
+-#define ENSURE64UINT(x) __cpu_to_be64(x)
++#ifdef __CYGWIN__
++typedef uint64_t loff_t;
+ #endif
+-
+-#if defined(__CYGWIN__)
+-
++#ifndef be64toh
+ static __inline __uint64_t
+ __bswap64(__uint64_t _x)
+ {
+ 
+-	return ((_x >> 56) | ((_x >> 40) & 0xff00) | ((_x >> 24) & 0xff0000) |
+-	    ((_x >> 8) & 0xff000000) | ((_x << 8) & ((__uint64_t)0xff << 32)) |
+-	    ((_x << 24) & ((__uint64_t)0xff << 40)) |
+-	    ((_x << 40) & ((__uint64_t)0xff << 48)) | ((_x << 56)));
++        return ((_x >> 56) | ((_x >> 40) & 0xff00) | ((_x >> 24) & 0xff0000) |
++            ((_x >> 8) & 0xff000000) | ((_x << 8) & ((__uint64_t)0xff << 32)) |
++            ((_x << 24) & ((__uint64_t)0xff << 40)) |
++            ((_x << 40) & ((__uint64_t)0xff << 48)) | ((_x << 56)));
+ }
+-#define ENSURE64UINT(x) __bswap64(x)
+-#endif
+-
+-// FIXME: also use __bswap64 on BSD with additional checks, see
+-// extract_compressed_fs.c
+-
+-#ifndef ENSURE64UINT
+-#warning System not Linux, endian correction macro not available
+-#warning Assuming the system is Big-Endian (eg. PowerPC)
+-#define ENSURE64UINT(x) (uint64_t) x
++#if BYTE_ORDER == LITTLE_ENDIAN
++#define be64toh(x)      __bswap64(x)
++#else
++#define be64toh(x)
+ #endif
++#endif /* !be64toh */
++#define __be64_to_cpu be64toh
++#define ENSURE64UINT __be64_to_cpu
+ 
+ #define die(msg) { cerr << "ERROR: " << msg << ". Exiting..."<<endl;  exit(1); }
+ 
+diff -ur cloop-2.02.1+eb.10.old/debian/control cloop-2.02.1+eb.10+kbsd/debian/control
+--- cloop-2.02.1+eb.10.old/debian/control	2005-08-20 10:19:52.000000000 +0200
++++ cloop-2.02.1+eb.10+kbsd/debian/control	2005-10-26 08:59:10.000000000 +0200
+@@ -2,7 +2,7 @@
+ Section: misc
+ Priority: optional
+ Maintainer: Eduard Bloch <blade@debian.org>
+-Build-Depends: debhelper (>> 3.0.0), zlib1g-dev, module-assistant, bzip2
++Build-Depends: debhelper (>> 3.0.0), zlib1g-dev, module-assistant [!kfreebsd-i386], bzip2
+ Standards-Version: 3.6.2.1
+ 
+ Package: cloop-utils
+diff -ur cloop-2.02.1+eb.10.old/extract_compressed_fs.c cloop-2.02.1+eb.10+kbsd/extract_compressed_fs.c
+--- cloop-2.02.1+eb.10.old/extract_compressed_fs.c	2005-09-25 17:17:36.000000000 +0200
++++ cloop-2.02.1+eb.10+kbsd/extract_compressed_fs.c	2005-10-26 09:12:17.000000000 +0200
+@@ -5,39 +5,15 @@
+ #include <stdlib.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
++#include <endian.h>
+ #include <errno.h>
+ #include <string.h>
+ #include <zlib.h>
+ #include <netinet/in.h>
+-#if defined(__FreeBSD__)
+-#include <sys/endian.h>
+-#include <netinet/in.h>
+-typedef uint64_t loff_t;
+-#ifndef be64toh
+-static __inline __uint64_t
+-__bswap64(__uint64_t _x)
+-{
+ 
+-	return ((_x >> 56) | ((_x >> 40) & 0xff00) | ((_x >> 24) & 0xff0000) |
+-	    ((_x >> 8) & 0xff000000) | ((_x << 8) & ((__uint64_t)0xff << 32)) |
+-	    ((_x << 24) & ((__uint64_t)0xff << 40)) |
+-	    ((_x << 40) & ((__uint64_t)0xff << 48)) | ((_x << 56)));
+-}
+-#if BYTE_ORDER == LITTLE_ENDIAN
+-#define be64toh(x)	__bswap64(x)
+-#else
+-#define be64toh(x)
+-#endif
+-#endif
+-#define __be64_to_cpu be64toh
+-#else
+-#include <asm/byteorder.h>
+-#endif
+-#include "compressed_loop.h"
+-
+-#if defined(__CYGWIN__)
+-#include <netinet/in.h>
++#ifdef __CYGWIN__
+ typedef uint64_t loff_t;
++#endif
+ #ifndef be64toh
+ static __inline __uint64_t
+ __bswap64(__uint64_t _x)
+@@ -53,9 +29,9 @@
+ #else
+ #define be64toh(x)
+ #endif
+-#endif
++#endif /* !be64toh */
+ #define __be64_to_cpu be64toh
+-#endif
++#include "compressed_loop.h"
+ 
+ struct compressed_block
+ {

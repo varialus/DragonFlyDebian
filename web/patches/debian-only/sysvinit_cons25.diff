@@ -1,0 +1,22 @@
+
+Author: rmh
+Status: in BTS
+
+diff -ur sysvinit-2.86.ds1.old/src/init.c sysvinit-2.86.ds1/src/init.c
+--- sysvinit-2.86.ds1.old/src/init.c	2004-07-30 14:16:20.000000000 +0200
++++ sysvinit-2.86.ds1/src/init.c	2005-10-21 15:53:03.000000000 +0200
+@@ -685,6 +685,14 @@
+ 		return;
+ 	}
+ 
++#ifdef __FreeBSD_kernel__
++	/* The kernel of FreeBSD expects userland to set TERM.  Usualy, we want
++	"cons25".  Later, gettys might disagree on this (i.e. we're not using
++	syscons) but some boot scripts, like /etc/init.d/xserver-xorg, still
++	need a non-dumb terminal. */
++	putenv ("TERM=cons25");
++#endif
++
+ 	(void) tcgetattr(fd, &tty);
+ 
+ 	tty.c_cflag &= CBAUD|CBAUDEX|CSIZE|CSTOPB|PARENB|PARODD;
