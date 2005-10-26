@@ -40,7 +40,9 @@ if test -e native-install ; then
 fi
 
 # having dialog pre-installed makes it a bit prettier
-dpkg --extract ${tmp}/var/cache/apt/archives/dialog_*.deb ${tmp}/
+for i in dialog libncursesw5 ; do
+  dpkg --extract ${tmp}/var/cache/apt/archives/${i}_*.deb ${tmp}/
+done
 
 # this command is called by f-i after untarring, let's exploit that
 cp startup ${tmp}/bin/mtree
