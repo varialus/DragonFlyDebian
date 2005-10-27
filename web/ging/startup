@@ -1,4 +1,7 @@
 #!/bin/bash
+# IMPORTANT:
+# don't use <<EOF anywhere in this file.  Bash would attempt to create a
+# tempfile and, since our /tmp is readonly, would fail.
 
 ging_msg ()
   {
@@ -12,15 +15,16 @@ ging_msg ()
 # if we don't have proper std streams, get some
 if ! ging_msg "Ging @version@ starting" ; then
   export TERM=cons25
-  exec $0 < /dev/console > /dev/console 2> /dev/console
+  exec $0 $@ < /dev/console > /dev/console 2> /dev/console
 fi
 
+# do this as soon as we have stdio
 set -e
 trap "echo \"Something wicked happened.  Press enter for rescue shell.\" ; read ; bash" 0
 
-# IMPORTANT:
-# don't use <<EOF anywhere in this file.  Bash would attempt to create a
-# tempfile and, since our /tmp is readonly, would fail.
+# these are set by Linux, but kFreeBSD doesn't.  so let's do them here
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/bin2
+export HOME=/
 
 ramdisk_size=32
 ging_msg "Generating ${ramdisk_size} MB UFS2 ramdisk"
@@ -63,6 +67,5 @@ ging_msg "Preparing environment for chrooted init"
 # make /etc/init.d/checkroot happy
 echo "/dev/md0	/	ufs		rw	0 0" > /ramdisk/etc/fstab
 
-# -i|--init is an undocumented flag.  read the source.
-exec chroot /ramdisk /sbin/init -i <&- >&- 2>&- 255>&-
+exec chroot /ramdisk init $@ <&- >&- 2>&- 255>&-
 false

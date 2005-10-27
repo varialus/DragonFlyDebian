@@ -37,30 +37,6 @@ chroot ${tmp1} apt-get -y install ${packages} || true
 ######################################################################
 # END package stuff
 
-# password-less login
-cat > ${tmp1}/etc/passwd << EOF  
-root::0:0:root:/root:/bin/bash
-EOF
-cat > ${tmp1}/etc/inittab << EOF
-id:S:initdefault:
-~~:S:wait:/sbin/sulogin -e
-ca:12345:ctrlaltdel:/sbin/shutdown -t1 -a -r now
-EOF
-
-echo > ${tmp1}/etc/motd
-
-cat > ${tmp1}/etc/issue << __EOF__
-Ging $version \n \l
-
-__EOF__
-
-chroot ${tmp1} adduser --disabled-password ${username}
-sed -i ${tmp1}/etc/shadow -e "s/^${username}:\*:/${username}::/g"
-
-cat > ${tmp1}/etc/sudoers << __EOF__
-${username} ALL=NOPASSWD: ALL
-__EOF__
-
 chroot ${tmp1} apt-get clean
 
 set +x

@@ -34,6 +34,32 @@ rm -rf ${dirs}
 mkdir -p ${dirs}
 chmod 1777 ${dirs}
 
+# Ging-like feel
+echo > etc/motd
+
+# Hide ugly errors ;)
+clear > etc/issue
+cat >> etc/issue << __EOF__
+Ging ${version} \n \l
+
+(login as ${username})
+
+__EOF__
+
+# setup ging user, with password-less login and sudo access
+if ! grep -q "^${username}" etc/shadow ; then
+  echo "Beware: invoking possibly-buggy adduser"
+  chroot . adduser --disabled-password ${username}
+fi
+for i in root ${username} ; do
+  sed -i etc/shadow -e "s/^${i}:[^:]*:/${i}::/g"
+done
+if ! grep -q "^${username}" etc/sudoers ; then
+  cat >> etc/sudoers << __EOF__
+${username} ALL=NOPASSWD: ALL
+__EOF__
+fi
+
 # if X server auto-configurator is installed, enable it
 if test -e etc/init.d/xserver-xorg ; then
   rm -f etc/X11/xorg.conf*
@@ -87,7 +113,7 @@ EOF
 ln -sf /proc/mounts etc/mtab
 
 # activate startup script
-sed -i boot/loader.conf -e "s,^#init_path=.*,init_path=\"/root/startup\",g"
+sed -i boot/loader.conf -e "s,^#*init_path=.*,init_path=\"/root/startup\",g"
 
 mkdir -p ramdisk
 sed -e "s/@version@/${version}/g" \
