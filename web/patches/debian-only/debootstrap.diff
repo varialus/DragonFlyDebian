@@ -14,10 +14,10 @@ Status:
 11:03 < nyu> thanks
 11:03 < aj> oh, right
 
-diff -ur debootstrap-0.3.1.7.old/functions debootstrap-0.3.1.7/functions
---- debootstrap-0.3.1.7.old/functions	2005-08-13 07:40:54.000000000 +0200
-+++ debootstrap-0.3.1.7/functions	2005-10-17 11:07:58.000000000 +0200
-@@ -732,12 +732,22 @@
+diff -ur debootstrap-0.3.2.old/functions debootstrap-0.3.2/functions
+--- debootstrap-0.3.2.old/functions	2005-10-23 17:45:24.000000000 +0200
++++ debootstrap-0.3.2/functions	2005-10-28 15:38:38.000000000 +0200
+@@ -759,29 +759,45 @@
  }
  
  setup_proc () {
@@ -27,6 +27,11 @@ diff -ur debootstrap-0.3.1.7.old/functions debootstrap-0.3.1.7/functions
 -  on_exit "umount $TARGET/proc"
 -  umount $TARGET/proc 2>/dev/null || true
 -  in_target mount -t proc proc /proc
+-  if [ -d "$TARGET/sys" ] && grep -q '[[:space:]]sysfs' /proc/filesystems 2>/dev/null; then
+-    on_exit "umount $TARGET/sys"
+-    umount $TARGET/sys 2>/dev/null || true
+-    in_target mount -t sysfs sysfs /sys
+-  fi
 +  case "$ARCH" in
 +    kfreebsd-*)
 +      on_exit "umount $TARGET/dev"
@@ -41,12 +46,13 @@ diff -ur debootstrap-0.3.1.7.old/functions debootstrap-0.3.1.7/functions
 +      on_exit "umount $TARGET/proc"
 +      umount $TARGET/proc 2>/dev/null || true
 +      in_target mount -t proc proc /proc
++      if [ -d "$TARGET/sys" ] && grep -q '[[:space:]]sysfs' /proc/filesystems 2>/dev/null; then
++        on_exit "umount $TARGET/sys"
++        umount $TARGET/sys 2>/dev/null || true
++        in_target mount -t sysfs sysfs /sys
++      fi
 +    ;;
 +  esac
- }
- 
- setup_proc_fakechroot () {
-@@ -746,15 +756,21 @@
  }
  
  setup_devices () {
@@ -76,4 +82,4 @@ diff -ur debootstrap-0.3.1.7.old/functions debootstrap-0.3.1.7/functions
 +  esac
  }
  
- setup_devices_fakechroot () {
+ setup_dselect_method () {
