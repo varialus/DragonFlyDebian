@@ -8,3 +8,12 @@ system="kfreebsd-gnu"
 uname="GNU/kFreeBSD"
 unset GZIP
 pwd=`pwd`
+
+if [ "${OPTS}" = "qemu" ] ; then
+  dot_gz=""
+  gzip="true"
+  version="${version}.qemu"
+else
+  dot_gz=".gz"
+  gzip="gzip -9"
+fi

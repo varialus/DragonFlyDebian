@@ -12,6 +12,8 @@ if [ "$UID" != "0" ] ; then
   exit 0
 fi
 
+if ! test -e mfsroot${dot_gz} ; then ./mfsroot.sh ; fi
+
 for i in mkisofs crosshurd ; do
   if ! dpkg -s ${i} | grep -q "^Status: .* installed$" > /dev/null ; then
     echo Install ${i} and try again
@@ -20,111 +22,46 @@ for i in mkisofs crosshurd ; do
 done
 
 . vars
-cd tmp
+tmp=`mktemp -d`
 
 ##################
 #  add some trickery
 ###########################
 
-# misc cleanup
-chroot . apt-get clean
-rm -rf var/cache/apt/lists
-dirs="tmp var/lock var/tmp"
-rm -rf ${dirs}
-mkdir -p ${dirs}
-chmod 1777 ${dirs}
-
-# Ging-like feel
-echo > etc/motd
-
-# Hide ugly errors ;)
-clear > etc/issue
-cat >> etc/issue << __EOF__
-Ging ${version} \n \l
-
-(login as ${username})
-
-__EOF__
-
-# setup ging user, with password-less login and sudo access
-if ! grep -q "^${username}" etc/shadow ; then
-  echo "Beware: invoking possibly-buggy adduser"
-  chroot . adduser --disabled-password ${username}
-fi
-for i in root ${username} ; do
-  sed -i etc/shadow -e "s/^${i}:[^:]*:/${i}::/g"
-done
-if ! grep -q "^${username}" etc/sudoers ; then
-  cat >> etc/sudoers << __EOF__
-${username} ALL=NOPASSWD: ALL
-__EOF__
-fi
-
-# if X server auto-configurator is installed, enable it
-if test -e etc/init.d/xserver-xorg ; then
-  rm -f etc/X11/xorg.conf*
-  touch etc/X11/xorg.conf
-  cat > etc/default/xorg << __EOF__
-GENERATE_XCFG_AT_BOOT=true
-__EOF__
-fi
-
-# if kdm is installed, tell it to auto-login as ging
-if test -e etc/kde3/kdm/kdmrc ; then
-  sed -i etc/kde3/kdm/kdmrc \
-  -e "s/^#AutoLoginEnable=.*/AutoLoginEnable=true/g" \
-  -e "s/^#AutoLoginUser=.*/AutoLoginUser=${username}/g"
+# get kernel and loader from cloop image (FIXME: exclude this from cloop!)
+cp -a ${pwd}/tmp/boot ${tmp}/
+if [ "${OPTS}" != "qemu" ] ; then
+  ${gzip} ${tmp}/boot/kernel/kernel
 fi
 
 # shut up silly warning
-if test -e boot/kernel/linker.hints ; then
-  touch boot/kernel/linker.hints
+if test -e ${tmp}/boot/kernel/linker.hints ; then
+  touch ${tmp}/boot/kernel/linker.hints
 fi
 
-# some splash customisation
-if ! grep -q "^loader_color=\"YES\"" boot/loader.conf ; then
-  echo "loader_color=\"YES\"" >> boot/loader.conf
-fi
-sed -i boot/beastie.4th -e "s/Debian/Ging/g"
+sed -i ${tmp}/boot/beastie.4th -e "s/Debian/Ging/g"
 
-# enable DMA on atapi
-if ! grep -q "^hw\.ata\.atapi_dma=1" boot/loader.conf ; then
-  echo "hw.ata.atapi_dma=1" >> boot/loader.conf
-fi
-
-# avoid non-sense wizards for kde and gimp
-tar --same-owner -xzpf ${pwd}/home_ging.tar.gz
-
-# probe for sound cards
-cat > etc/modules.d/ging << EOF
-# added for ging $version
-snd_driver
+cat > ${tmp}/boot/loader.conf << EOF
+loader_color="YES"
+hw.ata.atapi_dma=1
+mfsroot_load="YES"
+mfsroot_type="mfs_root"
+mfsroot_name="/boot/mfsroot"
+geom_uzip_load="YES"
+linprocfs_load="YES"
+nullfs_load="YES"
 EOF
+cp ${pwd}/mfsroot${dot_gz} ${tmp}/boot/
 
-# crosshurd gathers some defaults from host machine, we don't really want that
-echo -n > etc/resolv.conf
-echo "127.0.0.1		localhost $hostname" > etc/hosts
-echo $hostname > etc/hostname
-
-# filesystem tables
-cat > etc/fstab << EOF
-/dev/acd0	/	cd9660		ro	0 0
-EOF
-ln -sf /proc/mounts etc/mtab
-
-# activate startup script
-sed -i boot/loader.conf -e "s,^#*init_path=.*,init_path=\"/root/startup\",g"
-
-mkdir -p ramdisk
-sed -e "s/@version@/${version}/g" \
-  < ${pwd}/startup > root/startup
-chmod +x root/startup
+# copy ging.cloop in
+${pwd}/cloop.sh ${tmp}/ging.cloop
 
 #########################
 #                    ignition!
 #################################
 # -r messes up file permissions, use -R instead
-mkisofs -b boot/cdboot -no-emul-boot \
-  -o ${pwd}/${distribution}-${version}.iso -R .
+(cd ${tmp} && mkisofs -b boot/cdboot -no-emul-boot \
+  -o ${pwd}/${distribution}-${version}.iso -R .)
 
 cd ${pwd}/
+rm -rf ${tmp} &

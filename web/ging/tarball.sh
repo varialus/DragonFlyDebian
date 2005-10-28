@@ -31,7 +31,13 @@ __EOF__
 mount -t devfs null ${tmp1}/dev
 chroot ${tmp1} /native-install
 
-if test -e ./packages ; then packages=`grep -v "^#" ./packages | tr "\n" " "` ; fi
+if test -e ./packages ; then
+  packages=`grep -v "^#" ./packages | tr "\n" " "`
+  if [ "${OPTS}" = "qemu" ] ; then
+    packages=`echo "${packages}" | sed -e "s/\(kfreebsd-image-[^ ]*\)-.86/\1-686/g"`
+  fi
+fi
+
 chroot ${tmp1} apt-get update
 chroot ${tmp1} apt-get -y install ${packages} || true
 ######################################################################

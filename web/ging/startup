@@ -22,50 +22,74 @@ fi
 set -e
 trap "echo \"Something wicked happened.  Press enter for rescue shell.\" ; read ; bash" 0
 
-# these are set by Linux, but kFreeBSD doesn't.  so let's do them here
-export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/bin2
-export HOME=/
+# this will allow us to run stuff from the cloop directly, once it's accessible
+export PATH=/cloop/sbin:/cloop/bin:/cloop/usr/sbin:/cloop/usr/bin:/sbin:/bin:/usr/sbin:/usr/bin
+export LD_LIBRARY_PATH=/cloop/lib:/cloop/usr/lib
+
+ging_msg "Searching for Ging cdrom"
+for i in /dev/acd* /dev/cd* ; do
+  if mount_cd9660 $i /cdrom > /dev/null && test -f /cdrom/ging.cloop ; then
+    break
+  fi
+  umount /cdrom 2> /dev/null
+done
+# assert we found it
+test -f /cdrom/ging.cloop
+
+ging_msg "Accessing cloop image"
+md1=`mdconfig -a -t vnode -f /cdrom/ging.cloop`
+# According to FreeSBIE, there's race condition here.  Let's add a semaphore
+while ! test -e /dev/${md1}.uzip ; do ging_msg "cloop device not yet ready, retrying" ; sleep 1 ; done
+mount_cd9660 /dev/${md1}.uzip /cloop
+
+# IMPORTANT: We just mounted the cloop image.  From now on, we're using commands
+# from the cloop.  We don't need to add any commands to the mfsroot unless
+# they're needed in the steps before this point!
 
 ramdisk_size=32
 ging_msg "Generating ${ramdisk_size} MB UFS2 ramdisk"
-mdconfig -a -t malloc -o compress -s ${ramdisk_size}m -u md0
-mkfs.ufs /dev/md0 > /dev/null
-mount -o rw -t ufs /dev/md0 /ramdisk
+md2=`mdconfig -a -t malloc -o compress -s ${ramdisk_size}m`
+mkfs.ufs -U /dev/${md2} > /dev/null 2> /dev/null
+mount -o rw,noatime -t ufs /dev/${md2} /ramdisk
 
 ging_msg "Populating ramdisk node (this might take a while)"
 
+# readonly dirs from cloop
 for i in bin usr boot lib libexec sbin var/{lib/{dpkg,apt},cache/apt} ; do
   mkdir -p /ramdisk/$i
-  mount -t nullfs /$i /ramdisk/$i
+  mount_nullfs /cloop/$i /ramdisk/$i
 done
 
+# virtual mounts
 mkdir -p /ramdisk/{dev,proc}
-mount -t devfs null /ramdisk/dev
-mount -t linprocfs null /ramdisk/proc
+mount_devfs null /ramdisk/dev
+mount_linprocfs null /ramdisk/proc
 
-for i in /* ; do
+for i in `cd /cloop && echo *` ; do
   case $i in
-    /dev|/proc|/bin|/usr|/boot|/lib|/libexec|/sbin|/base|/ramdisk|/*-RELEASE)
+    dev|proc|bin|usr|boot|lib|libexec|sbin)
     ;;
-    /var)
+    var)
       # partialy readonly, so expect failure
-      cp -a $i /ramdisk/ 2>/dev/null || true
+      cp -a /cloop/$i /ramdisk/ 2>/dev/null || true
     ;;
     *)
-      cp -a $i /ramdisk/
+      cp -a /cloop/$i /ramdisk/
     ;;
   esac
 done
 
 ging_msg "Setting up network via DHCP (in background)"
-if which dhclient3 >/dev/null 2>/dev/null ; then
-  chroot /ramdisk dhclient3 < /dev/null >/dev/null 2>/dev/null &
-fi
+chroot /ramdisk dhclient3 < /dev/null > /dev/null 2> /dev/null &
 
-ging_msg "Preparing environment for chrooted init"
+ging_msg "Spawning chrooted init"
 
-# make /etc/init.d/checkroot happy
-echo "/dev/md0	/	ufs		rw	0 0" > /ramdisk/etc/fstab
-
-exec chroot /ramdisk init $@ <&- >&- 2>&- 255>&-
+unset LD_LIBRARY_PATH
+# Save chroot path, before we can no longer find it
+chroot=`which chroot`
+# These are set by Linux, but kFreeBSD doesn't play with them.  So, let's set
+# them here just in case.
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/bin2
+export HOME=/
+exec ${chroot} /ramdisk init $@ <&- >&- 2>&- 255>&-
 false

@@ -9,46 +9,42 @@ if [ "$UID" != "0" ] ; then
   exit 0
 fi
 
-pwd=`pwd`
+if ! test -d tmp ; then ./tarball.sh ; fi
+
+. vars
 mnt=`mktemp -d`
 
-rm -f mfsroot.gz
+rm -f mfsroot${dot_gz}
 
-dd if=/dev/zero of=mfsroot bs=1M count=4
+dd if=/dev/zero of=mfsroot bs=1M count=8
 md=`mdconfig -a -t vnode -f mfsroot`
 mkfs.ufs /dev/${md}
 mount /dev/${md} ${mnt}
 
-mkdir -p ${mnt}/{stand/etc,boot,lib}
-for i in bin sbin ; do ln -s stand ${mnt}/$i ; done
+mkdir -p ${mnt}/{lib,sbin,dev,cdrom,ramdisk,cloop}
 
-cp /boot/{boot*,mbr} ${mnt}/boot/
+sed -e "s/@version@/${version}/g" \
+< startup > ${mnt}/sbin/init
+chmod 755 ${mnt}/sbin/init
 
-# "persuade" sysinstall to tell the user to switch to ttyv2.  This is very tricky.
-# We're editing an ELF file with sed.  Just make sure both strings have exactly
-# the same size, and everything will work.
-zcat sysinstall.gz | \
-sed -e "s,Attempting to install all selected distributions\.\.,Press ALT-F3 to proceed with GNU/kFreeBSD setup...,g" \
-> ${mnt}/stand/sysinstall
-chmod 755 ${mnt}/stand/sysinstall
-
-# freebsd commands.  always try to reduce this list!
 for i in \
-  -sh [ arp boot_crunch camcontrol cpio dhclient find fsck_ffs gunzip gzip \
-  hostname ifconfig minigzip mount_nfs ppp pwd rm route rtsol sed sh \
-  slattach test tunefs usbd usbdevs zcat
+  /bin/sh /bin/bash \
+    /lib/ld.so.1 /lib/libc.so.0.1 /lib/libncurses.so.5 /lib/libdl.so.2 \
+  /sbin/mdconfig \
+    /libexec/ld-elf.so.1 /lib/libc.so.5 \
+  /sbin/mount_cd9660 \
+    /lib/libkiconv.so.1 \
+  ${NULL}
 do
-  ln ${mnt}/stand/sysinstall ${mnt}/stand/$i
+  mkdir -p ${mnt}/$i
+  rmdir ${mnt}/$i
+  cp tmp/$i ${mnt}/$i
 done
-
-# debian commands
-for i in ld.so.1 libc.so.0.1 libufs.so.2 ; do
-  cp /lib/$i ${mnt}/lib/
-done
-cp `which mkfs.ufs` ${mnt}/stand/newfs
 
 umount ${mnt}
 mdconfig -d -u ${md}
 rmdir ${mnt}
 
-gzip -9 mfsroot
+if [ "${OPTS}" != "qemu" ] ; then
+  ${gzip} mfsroot
+fi
