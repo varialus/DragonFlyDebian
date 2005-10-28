@@ -1,0 +1,29 @@
+
+Ging generator scripts follow a modular dessign.  Each of them invokes the
+others when needed, so, _in theory_, it should be enough to run "ging.sh"
+to get a working livecd.
+
+Below is a brief description of what we have currently:
+
+packages - List of packages that Ging will contain.  Dependencies are resolved
+automaticaly via apt.
+
+tarball.sh - Generates a Debian tree in ./tmp, installs the packages listed in
+"packages" and performs some other operations.  When debugging/hacking on Ging,
+generaly this is the only script that is run only once (since ./tmp can be
+reused).
+
+startup - It'll become /sbin/init of the mfsroot.gz rescue system.  See below.
+
+mfsroot.sh - Generates the base mfsroot.gz rescue system.  This is the first
+thing loaded by kernel.  All it does is preparing the environment using the cloop
+image and a ramdisk to permit a seemingly read-write Debian tree to exist (which
+in fact is only read-write up to 32 MB).  Depends on tarball.sh.
+
+cloop.sh - Generates the compressed ging.cloop containing the Debian tree,
+depends on tarball.sh.
+
+ging.sh - Puts everything together.  It'll generate a cdrom image containing a
+loader + kernel, plus the rescue mfsroot, plus the compressed cloop.
+
+vars - Common file included by all the others.  Sets up some variables.
