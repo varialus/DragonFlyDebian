@@ -49,10 +49,8 @@ chroot ./tmp apt-get -y install ${packages} || true
 chroot ./tmp apt-get clean
 
 set +x
-echo "Spawning a shell.  The following packages are supposedly installed:"
-echo ${packages}
+echo "The following packages are supposedly installed: ${packages}"
 echo "System size: `du -hs ./tmp`"
-chroot ./tmp || true
 set -x
 
 chroot ./tmp apt-get clean

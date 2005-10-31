@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+
+sudo cp /etc/resolv.conf tmp/etc/
+sudo mount -t devfs null ./tmp/dev
+sudo mount -t linprocfs null ./tmp/proc
+sudo chroot tmp/ || true
+sudo umount tmp/dev
+sudo umount tmp/proc
+
+echo "$0 finished cleanly"
