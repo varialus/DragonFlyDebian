@@ -39,7 +39,7 @@ if test -e ${tmp}/boot/kernel/linker.hints ; then
   touch ${tmp}/boot/kernel/linker.hints
 fi
 
-sed -i ${tmp}/boot/beastie.4th -e "s/Debian/Ging/g"
+sed -i ${tmp}/boot/beastie.4th -e "s/Debian/${distribution}/g"
 
 cat > ${tmp}/boot/loader.conf << EOF
 loader_color="YES"
@@ -61,7 +61,7 @@ ${pwd}/cloop.sh ${tmp}/ging.cloop
 #################################
 # -r messes up file permissions, use -R instead
 (cd ${tmp} && mkisofs -b boot/cdboot -no-emul-boot \
-  -o ${pwd}/${distribution}-${version}${rc}.iso -R .)
+  -o ${pwd}/${distribution_lowcase}-${version}${rc}.iso -R .)
 
 cd ${pwd}/
 rm -rf ${tmp} &

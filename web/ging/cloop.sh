@@ -50,7 +50,7 @@ echo > etc/motd
 # Hide ugly errors ;)
 clear > etc/issue
 cat >> etc/issue << __EOF__
-Ging ${version} \n \l
+${distribution} ${version} \n \l
 
 (login as ${username})
 

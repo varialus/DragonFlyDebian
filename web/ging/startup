@@ -7,13 +7,13 @@ ging_msg ()
   {
     # enable green
     echo -en "\x1B[0;32m"
-    echo "ging: $@ ..."
+    echo "@distribution_lowcase@: $@ ..."
     # disable green
     echo -en "\x1B[0m"
   }
 
 # if we don't have proper std streams, get some
-if ! ging_msg "Ging @version@ starting" ; then
+if ! ging_msg "@distribution@ @version@ starting" ; then
   export TERM=cons25
   exec $0 $@ < /dev/console > /dev/console 2> /dev/console
 fi
@@ -26,7 +26,7 @@ trap "echo \"Something wicked happened.  Press enter for rescue shell.\" ; read 
 export PATH=/cloop/sbin:/cloop/bin:/cloop/usr/sbin:/cloop/usr/bin:/sbin:/bin:/usr/sbin:/usr/bin
 export LD_LIBRARY_PATH=/cloop/lib:/cloop/usr/lib
 
-ging_msg "Searching for Ging cdrom"
+ging_msg "Searching for @distribution@ cdrom"
 for i in /dev/acd* /dev/cd* ; do
   if mount_cd9660 $i /cdrom > /dev/null && test -f /cdrom/ging.cloop ; then
     break
