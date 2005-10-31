@@ -25,6 +25,8 @@ for i in mkisofs ; do
 done
 
 . vars
+
+if ! test -d tmp ; then ./tarball.sh ; fi
 cd tmp
 
 set -x

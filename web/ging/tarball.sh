@@ -19,17 +19,20 @@ fi
 
 . vars
 
-tmp1=`mktemp -d`
+if test -d ./tmp ; then
+  echo ./tmp already exists, aborting
+  exit 1
+fi
 
 # BEGIN package stuff
 ######################################################################
-/usr/share/crosshurd/makehurddir.sh ${tmp1} ${cpu} ${system}
+/usr/share/crosshurd/makehurddir.sh ./tmp ${cpu} ${system}
 
-cat > ${tmp1}/etc/apt/apt.conf << __EOF__
+cat > ./tmp/etc/apt/apt.conf << __EOF__
 APT::Get::AllowUnauthenticated "yes";
 __EOF__
-mount -t devfs null ${tmp1}/dev
-chroot ${tmp1} /native-install
+mount -t devfs null ./tmp/dev
+chroot ./tmp /native-install
 
 if test -e ./packages ; then
   packages=`grep -v "^#" ./packages | tr "\n" " "`
@@ -38,26 +41,23 @@ if test -e ./packages ; then
   fi
 fi
 
-chroot ${tmp1} apt-get update
-chroot ${tmp1} apt-get -y install ${packages} || true
+chroot ./tmp apt-get update
+chroot ./tmp apt-get -y install ${packages} || true
 ######################################################################
 # END package stuff
 
-chroot ${tmp1} apt-get clean
+chroot ./tmp apt-get clean
 
 set +x
 echo "Spawning a shell.  The following packages are supposedly installed:"
 echo ${packages}
-echo "System size: `du -hs ${tmp1}`"
-chroot ${tmp1} || true
+echo "System size: `du -hs ./tmp`"
+chroot ./tmp || true
 set -x
 
-chroot ${tmp1} apt-get clean
-rm -f ${tmp1}/native-install
+chroot ./tmp apt-get clean
+rm -f ./tmp/native-install
 
-# everything must be unmounted before tarring
-umount -f ${tmp1}/dev
-umount -f ${tmp1}/proc
-
-cd ${tmp1} && tar --same-owner -czpf ${pwd}/base.tgz ./*
-rm -rf ${tmp1}
+# unmounted everything when done
+umount -f ./tmp/dev
+umount -f ./tmp/proc

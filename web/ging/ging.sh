@@ -1,7 +1,5 @@
 #!/bin/bash
 #
-# Build-Depends: mkisofs, crosshurd, fakeroot
-#
 # Copyright 2004, 2005  Robert Millan <rmh@aybabtu.com>
 # See /usr/share/common-licenses/GPL for license terms.
 
@@ -13,8 +11,9 @@ if [ "$UID" != "0" ] ; then
 fi
 
 if ! test -e mfsroot${dot_gz} ; then ./mfsroot.sh ; fi
+if ! test -d tmp ; then ./tarball.sh ; fi
 
-for i in mkisofs crosshurd ; do
+for i in mkisofs ; do
   if ! dpkg -s ${i} | grep -q "^Status: .* installed$" > /dev/null ; then
     echo Install ${i} and try again
     exit 1
