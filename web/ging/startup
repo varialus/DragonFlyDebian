@@ -46,9 +46,8 @@ mount_cd9660 /dev/${md1}.uzip /cloop
 # from the cloop.  We don't need to add any commands to the mfsroot unless
 # they're needed in the steps before this point!
 
-ramdisk_size=32
-ging_msg "Generating ${ramdisk_size} MB UFS2 ramdisk"
-md2=`mdconfig -a -t malloc -o compress -s ${ramdisk_size}m`
+ging_msg "Generating @ramdisk_size@ MB UFS2 ramdisk"
+md2=`mdconfig -a -t malloc -o compress -s @ramdisk_size@m`
 mkfs.ufs -U /dev/${md2} > /dev/null 2> /dev/null
 mount -o rw,noatime -t ufs /dev/${md2} /ramdisk
 

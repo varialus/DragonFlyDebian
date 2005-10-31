@@ -10,6 +10,8 @@ if [ "$UID" != "0" ] ; then
   exit 0
 fi
 
+. vars
+
 if ! test -e mfsroot${dot_gz} ; then ./mfsroot.sh ; fi
 if ! test -d tmp ; then ./tarball.sh ; fi
 
@@ -20,7 +22,6 @@ for i in mkisofs ; do
   fi
 done
 
-. vars
 tmp=`mktemp -d`
 
 ##################

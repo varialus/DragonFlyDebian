@@ -1,13 +1,16 @@
-distribution=ging
-username=${distribution}
-hostname=${distribution}
+distribution=Ging
+distribution_lowcase=`echo ${distribution} | tr [A-Z] [a-z] | tr " " "_"`
+username=${distribution_lowcase}
+hostname=${distribution_lowcase}
 
 # the string that will be embedded in the livecd itself
 version=0.1.0
-
-# only used for the filename.  this way, RC versions can be converted into a
+# ${rc} is only used for the filename.  this way, RC versions can be converted into a
 # final release without need to re-masterise.
 rc=.rc1
+
+ramdisk_size=32
+#OPTS=qemu
 
 cpu="i486"
 system="kfreebsd-gnu"

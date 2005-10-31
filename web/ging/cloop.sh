@@ -8,23 +8,24 @@ if ! [ "$#" = "1" ] ; then
   echo "Usage: $0 ging.cloop"
   exit 1
 fi
-touch $1
-target=`realpath $1`
-rm -f ${target}
+
+. vars
 
 if [ "$UID" != "0" ] ; then
   sudo $0 $@
   exit 0
 fi
 
-for i in mkisofs ; do
+for i in mkisofs realpath ; do
   if ! dpkg -s ${i} | grep -q "^Status: .* installed$" > /dev/null ; then
     echo Install ${i} and try again
     exit 1
   fi
 done
 
-. vars
+touch $1
+target=`realpath $1`
+rm -f ${target}
 
 if ! test -d tmp ; then ./tarball.sh ; fi
 cd tmp

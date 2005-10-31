@@ -23,7 +23,7 @@ mount /dev/${md} ${mnt}
 
 mkdir -p ${mnt}/{lib,sbin,dev,cdrom,ramdisk,cloop}
 
-sed -e "s/@version@/${version}/g" \
+sed -e "s/@version@/${version}/g" -e "s/@ramdisk_size@/${ramdisk_size}/g" \
 < startup > ${mnt}/sbin/init
 chmod 755 ${mnt}/sbin/init
 
