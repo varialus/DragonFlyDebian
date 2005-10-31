@@ -60,7 +60,7 @@ ${pwd}/cloop.sh ${tmp}/ging.cloop
 #################################
 # -r messes up file permissions, use -R instead
 (cd ${tmp} && mkisofs -b boot/cdboot -no-emul-boot \
-  -o ${pwd}/${distribution}-${version}.iso -R .)
+  -o ${pwd}/${distribution}-${version}${rc}.iso -R .)
 
 cd ${pwd}/
 rm -rf ${tmp} &
