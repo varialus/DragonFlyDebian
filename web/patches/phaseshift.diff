@@ -1,0 +1,61 @@
+Author: aurel32
+Status: in BTS
+
+diff -u phaseshift-0.40/phaseshift/phaseshift.cpp phaseshift-0.40/phaseshift/phaseshift.cpp
+--- phaseshift-0.40/phaseshift/phaseshift.cpp
++++ phaseshift-0.40/phaseshift/phaseshift.cpp
+@@ -19,7 +19,11 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ #include <stdio.h>
++#if defined(__linux__)
+ #include <linux/soundcard.h>
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
++#endif
+ #include <sys/ioctl.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+diff -u phaseshift-0.40/debian/control phaseshift-0.40/debian/control
+--- phaseshift-0.40/debian/control
++++ phaseshift-0.40/debian/control
+@@ -1,5 +1,5 @@
+ Source: phaseshift
+-Build-Depends: debhelper (>= 4), libqt3-mt-dev, libmng-dev, libgl-dev, libjpeg62-dev, libpng12-dev,  xlibs-dev | xlib6g-dev, zlib1g-dev, libqt3-compat-headers, libqt3-headers
++Build-Depends: debhelper (>= 4), libqt3-mt-dev, libmng-dev, libgl-dev, libjpeg62-dev, libpng12-dev,  xlibs-dev | xlib6g-dev, zlib1g-dev, libqt3-compat-headers, libqt3-headers, autotools-dev
+ Section: hamradio
+ Priority: optional
+ Maintainer: Hamish Moffatt <hamish@debian.org>
+diff -u phaseshift-0.40/debian/rules phaseshift-0.40/debian/rules
+--- phaseshift-0.40/debian/rules
++++ phaseshift-0.40/debian/rules
+@@ -2,6 +2,7 @@
+ 
+ build:
+ 	dh_testdir
++	cp -f /usr/share/misc/config.{sub,guess} $(CURDIR)
+ 	./configure --prefix=/usr --with-qt-includes=/usr/include/qt3 --with-qt-libraries=/usr/lib
+ 	$(MAKE) MOC=/usr/bin/moc-qt3
+ 	touch build
+@@ -11,6 +12,7 @@
+ 	-rm -f build
+ 	-make distclean
+ 	-rm -f `find . -name "*~"`
++	-rm -f config.{sub,guess}
+ 	dh_clean
+ 
+ binary-indep:	build
+--- phaseshift-0.40.orig/phaseshift/mixer.cpp
++++ phaseshift-0.40/phaseshift/mixer.cpp
+@@ -15,7 +15,11 @@
+  *                                                                         *
+  ***************************************************************************/
+ 
++#if defined(__linux__)
+ #include <linux/soundcard.h>
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
++#endif
+ #include <sys/ioctl.h>
+ #include <unistd.h>
+ #include <ctype.h>

@@ -1,0 +1,18 @@
+Author: aurel32
+Status: in BTS
+
+--- dtmfdial-0.2.orig/dial.c
++++ dtmfdial-0.2/dial.c
+@@ -10,7 +10,12 @@
+ #include <malloc.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#if defined(__linux__)
+ #include <linux/soundcard.h>
++#endif
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
++#endif
+ 
+ #define DEBUG(x)
+ 

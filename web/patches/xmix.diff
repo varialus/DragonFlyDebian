@@ -1,0 +1,20 @@
+Author: aurel32
+Status: in BTS
+
+diff -u xmix-2.1/xmix.c xmix-2.1/xmix.c
+--- xmix-2.1/xmix.c
++++ xmix-2.1/xmix.c
+@@ -78,7 +78,12 @@
+ #include "square_empty.bit"
+ #include "square_with_x.bit"
+ 
++#if defined(__linux__)
+ #include <linux/soundcard.h>
++#endif
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
++#endif
+ 
+ #define SOUND_FULL_SCALE 100.0
+ #define MAX_SOUND_VOL 95
+

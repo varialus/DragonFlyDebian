@@ -1,0 +1,35 @@
+Author: aurel32
+Status: in BTS
+
+--- twpsk-2.1+2.2beta1.orig/modes/psk31-transmitter.C
++++ twpsk-2.1+2.2beta1/modes/psk31-transmitter.C
+@@ -11,7 +11,12 @@
+ #include <errno.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#if defined(__linux__)
+ #include <linux/soundcard.h>
++#endif
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
++#endif
+ #include <sys/ioctl.h>
+ #include "psk31-coder.h"
+ #include "psk31-transmitter.h"
+only in patch2:
+unchanged:
+--- twpsk-2.1+2.2beta1.orig/gui/GUI.h
++++ twpsk-2.1+2.2beta1/gui/GUI.h
+@@ -36,7 +36,12 @@
+ #include <stdlib.h>
+ #include <sys/ioctl.h>
+ #include <fcntl.h>
++#if defined(__linux__)
+ #include <linux/soundcard.h>
++#endif
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
++#endif
+ #include <X11/cursorfont.h>
+ #include <Xm/Form.h>
+ #include <Xm/CascadeB.h>

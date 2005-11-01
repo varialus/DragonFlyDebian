@@ -1,0 +1,19 @@
+Author: aurel32
+Status: in BTS
+
+diff -u asmixer-0.5/asmixer.c asmixer-0.5/asmixer.c
+--- asmixer-0.5/asmixer.c
++++ asmixer-0.5/asmixer.c
+@@ -26,7 +26,12 @@
+ #include <unistd.h>
+ 
+ #include <sys/mount.h>
++#if defined(__linux__)
+ #include <linux/soundcard.h>
++#endif
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
++#endif
+ 
+   
+ /* XPM struct and icons ******************************************************/

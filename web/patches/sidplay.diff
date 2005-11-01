@@ -1,0 +1,39 @@
+Author: aurel32
+Status: in BTS
+
+--- sidplay-2.0.9.orig/unix/config.h.in
++++ sidplay-2.0.9/unix/config.h.in
+@@ -78,6 +78,9 @@
+ /* Define to 1 if you have the <sys/ioctl.h> header file. */
+ #undef HAVE_SYS_IOCTL_H
+ 
++/* Define to 1 if you have the <sys/soundcard.h> header file. */
++#undef HAVE_SYS_SOUNDCARD_H
++
+ /* Define to 1 if you have the <sys/stat.h> header file. */
+ #undef HAVE_SYS_STAT_H
+ 
+--- sidplay-2.0.9.orig/configure.ac
++++ sidplay-2.0.9/configure.ac
+@@ -21,7 +21,7 @@
+ 
+ dnl Checks what version of Unix we have and soundcard support
+ AC_CHECK_HEADERS(sys/ioctl.h linux/soundcard.h machine/soundcard.h  \
+-soundcard.h sys/audio.h sun/audioio.h sun/dbriio.h sys/audioio.h  \
++sys/soundcard.h soundcard.h sys/audio.h sun/audioio.h sun/dbriio.h sys/audioio.h  \
+ audio.h dmedia/audio.h)
+ 
+ AH_TOP(
+--- sidplay-2.0.9.orig/configure
++++ sidplay-2.0.9/configure
+@@ -19527,8 +20078,9 @@
+ 
+ 
+ 
++
+ for ac_header in sys/ioctl.h linux/soundcard.h machine/soundcard.h  \
+-soundcard.h sys/audio.h sun/audioio.h sun/dbriio.h sys/audioio.h  \
++sys/soundcard.h soundcard.h sys/audio.h sun/audioio.h sun/dbriio.h sys/audioio.h  \
+ audio.h dmedia/audio.h
+ do
+ as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`

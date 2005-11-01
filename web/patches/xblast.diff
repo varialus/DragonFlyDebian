@@ -1,0 +1,30 @@
+Author: aurel32
+Status: in BTS
+
+diff -u xblast-2.6.1/xbsndsrv.c xblast-2.6.1/xbsndsrv.c
+--- xblast-2.6.1/xbsndsrv.c
++++ xblast-2.6.1/xbsndsrv.c
+@@ -110,8 +110,8 @@
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
+ #include <sys/time.h>
+-#ifdef __FreeBSD__
+-#include <machine/soundcard.h>
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
+ #else
+ #include <linux/soundcard.h>
+ #endif
+--- xblast-2.6.1.orig/sound.c
++++ xblast-2.6.1/sound.c
+@@ -109,8 +109,8 @@
+ #include <sys/fcntl.h>
+ #include <sys/stat.h>
+ #include <sys/wait.h>
+-#ifdef __FreeBSD__
+-#include <machine/soundcard.h>
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
+ #else
+ #include <linux/soundcard.h>
+ #endif

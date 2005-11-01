@@ -1,0 +1,18 @@
+Author: aurel32
+Status: in BTS
+
+--- xscavenger-1.4.4.orig/src/sound.c
++++ xscavenger-1.4.4/src/sound.c
+@@ -5,7 +5,12 @@
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <sys/ioctl.h>
++#if defined(__linux__)
+ #include <linux/soundcard.h>
++#endif
++#if defined(__FreeBSD_kernel__) || defined(__FreeBSD__)
++#include <sys/soundcard.h>
++#endif
+ #include <sys/time.h>
+ #include <signal.h>
+ #include <string.h>

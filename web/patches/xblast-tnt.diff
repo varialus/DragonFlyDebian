@@ -1,0 +1,16 @@
+Author: aurel32
+Status: in BTS
+
+--- xblast-tnt-2.10.2.orig/xbsndsrv.c
++++ xblast-tnt-2.10.2/xbsndsrv.c
+@@ -61,8 +61,8 @@
+ /* format for pids, non-sun */
+ #define PID_FORMAT "%u"
+ /* non-sun audio includes */
+-#ifdef __FreeBSD__
+-#include <machine/soundcard.h>
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
+ #else
+ #include <linux/soundcard.h>
+ #endif
