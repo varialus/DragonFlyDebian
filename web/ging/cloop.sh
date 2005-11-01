@@ -107,8 +107,8 @@ fi
 
 # crosshurd gathers some defaults from host machine, we don't really want that
 echo -n > etc/resolv.conf
-echo "127.0.0.1		localhost $hostname" > etc/hosts
-echo $hostname > etc/hostname
+echo "127.0.0.1		localhost ${hostname}" > etc/hosts
+echo ${hostname} > etc/hostname
 
 # filesystem tables
 cat > etc/fstab << EOF

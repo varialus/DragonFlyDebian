@@ -42,7 +42,7 @@ if test -e ./packages ; then
 fi
 
 chroot ./tmp apt-get update
-chroot ./tmp apt-get -y install ${packages} || true
+DEBIAN_FRONTEND=noninteractive chroot ./tmp apt-get -y install ${packages} || true
 ######################################################################
 # END package stuff
 

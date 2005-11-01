@@ -1,0 +1,128 @@
+diff -ur orig/xserver-xorg.config tmp/var/lib/dpkg/info/xserver-xorg.config
+--- orig/xserver-xorg.config	2005-11-01 19:25:37.000000000 +0100
++++ tmp/var/lib/dpkg/info/xserver-xorg.config	2005-11-01 19:39:07.000000000 +0100
+@@ -1570,6 +1570,9 @@
+                       | egrep -v '(atimisc|dummy|r128|radeon|v4l)' | sort) \
+                | sed 's/ /, /g')"
+ 
++# hack
++DEFAULT_DRIVER=vesa
++
+ if [ -z "$DRIVER_LIST" ]; then
+   observe "no video driver modules found in $DRIVER_DIR"
+ 
+@@ -2116,8 +2119,10 @@
+ # synaptic on laptop is detected via dexconf directly.
+ # Let's keep the changes not intrusive, even if less elegant.
+ 
+-# priority of xserver-xorg/config/inputdevice/mouse/{port,protocol}
++# priority of xserver-xorg/config/inputdevice/mouse/{port,protocol} and
++# xserver-xorg/autodetect_mouse
+ PRIORITY=medium
++PRIORITY_CEILING=high
+ AUTODETECTED_PORT=
+ AUTODETECTED_PROTOCOL=
+ 
+@@ -2149,12 +2154,10 @@
+   ;;
+ esac
+ 
+-if ! [ "x$XORG_FORCE_PROBE" = "xno" ]; then
+-  # this will exit the loop immediatly
++if ! [ "x$XORG_FORCE_PROBE" = "xno" ] && which mdetect > /dev/null 2>&1 ; then
++  # this will exit the loop immediately
+   auto_answer db_input "$(priority_ceil $PRIORITY)" xserver-xorg/autodetect_mouse "true"
+   while :; do
+-    # bail out if autodetection tool not available
+-    which mdetect > /dev/null 2>&1 || break
+     db_get xserver-xorg/autodetect_mouse
+     if [ "$RET" = "true" ]; then
+       # Reset values of templates that are to be autodetected to make sure that
+@@ -2206,17 +2209,33 @@
+   debug_echo "not prompting for mouse autodetection; not probing"
+ fi
+ 
++# On GNU/kFreeBSD, devfs already does autodetection for us
++if [ "$SYS" = "GNU/kFreeBSD" ] ; then
++  # cuaa (serial) and sysmouse (virtual repeater) don't indicate real presence
++  # of a mouse, but ums (usb), psm (ps/2) and mse (bus mouse) do.  So if one and
++  # only one of these is present, use it.  Otherwise we have to ask.
++  if [ "`echo $MOUSE_PORT_CHOICES | sed -e "s/,//g" | tr " " "\n" | grep -x "/dev/\(ums\|psm\|mse\)[0-9]*" | wc -l`" = "1" ] ; then
++    AUTODETECTED_PORT="$DEFAULT_PORT"
++    PRIORITY=medium
++  else
++    PRIORITY=high
++  fi
++fi
++
+ db_subst xserver-xorg/config/inputdevice/mouse/port choices $MOUSE_PORT_CHOICES
+ if [ -z "$AUTODETECTED_PORT" ] || [ "$AUTODETECTED_PORT" = "/dev/psaux" ]; then 
+   AUTODETECTED_PORT="/dev/input/mice"
+ fi
++# auto_answer's "default" parameter has NO EFFECT when this template has already
++# been set.  force it.
++db_set xserver-xorg/config/inputdevice/mouse/port "${AUTODETECTED_PORT:-$DEFAULT_PORT}"
+ auto_answer db_input "$(priority_ceil $PRIORITY)" xserver-xorg/config/inputdevice/mouse/port "${AUTODETECTED_PORT:-$DEFAULT_PORT}"
+ 
+ db_get xserver-xorg/config/inputdevice/mouse/port
+ case "$RET" in
+   *psaux|*psm*)
+     MOUSE_PROTOCOL_CHOICES="Auto, PS/2, ImPS/2, GlidePointPS/2, NetMousePS/2, NetScrollPS/2, ThinkingMousePS/2, MouseManPlusPS/2, ExplorerPS/2"
+-    DEFAULT_PROTOCOL="PS/2"
++    DEFAULT_PROTOCOL="Auto"
+     ;;
+   *ttyS*|*tts/*|*cuaa*)
+     MOUSE_PROTOCOL_CHOICES="Auto, Microsoft, MouseSystems, GlidePoint, ThinkingMouse, ValuMouseScroll, MouseMan, Logitech, IntelliMouse, MMSeries, MMHitTab"
+@@ -2248,7 +2267,7 @@
+   debug_echo "\$MOUSE_PROTOCOL_CHOICES has only one value; setting xserver-xorg/config/inputdevice/mouse/protocol to \"$DEFAULT_PROTOCOL\""
+   db_set xserver-xorg/config/inputdevice/mouse/protocol "$DEFAULT_PROTOCOL"
+ else
+-  auto_answer db_input "$(priority_ceil $PRIORITY)" xserver-xorg/config/inputdevice/mouse/protocol "${AUTODETECTED_PROTOCOL:-$DEFAULT_PROTOCOL}"
++  auto_answer db_input "$(priority_ceil medium)" xserver-xorg/config/inputdevice/mouse/protocol "${AUTODETECTED_PROTOCOL:-$DEFAULT_PROTOCOL}"
+ fi
+ 
+ db_input "$(priority_ceil low)" xserver-xorg/config/inputdevice/mouse/emulate3buttons || debug_report_status "db_input $(priority_ceil low) xserver-xorg/config/inputdevice/mouse/emulate3buttons" "$?"
+diff -ur orig/xserver-xorg.postinst tmp/var/lib/dpkg/info/xserver-xorg.postinst
+--- orig/xserver-xorg.postinst	2005-11-01 19:25:37.000000000 +0100
++++ tmp/var/lib/dpkg/info/xserver-xorg.postinst	2005-11-01 19:25:12.000000000 +0100
+@@ -1219,7 +1219,7 @@
+   # Resolution hell:
+   # we need to know if we probed resolutions, if so add them to debconf template
+   # as choices, so that we don't lose them across updates or reconfiguration.
+-  PRIORITY=high
++  PRIORITY=medium
+   if [ -z "$NOPROBE" ]; then
+     NRES=0
+     if [ -n "$RESOLUTION" ]; then
+@@ -1229,8 +1229,6 @@
+     fi
+ 
+     if [ "$NRES" -gt "0" ]; then
+-      # got RESOLUTIONS. Lower question priority
+-      PRIORITY=medium
+       DCRESOLUTIONS=$(for i in $DCRESOLUTIONS $RESOLUTIONS; do echo $i; done | sort -unr)
+       DCRESOLUTIONS=$(echo $DCRESOLUTIONS | sed -e 's/ /, /g')
+     fi
+@@ -1248,11 +1246,6 @@
+     fi
+   fi
+ 
+-  if [ -z "$RECONFIGURE" ] && [ -z "$FIRSTINST" ]; then
+-    # drop priority on upgrades
+-    PRIORITY=medium
+-  fi
+-
+   db_metaget xserver-xorg/config/display/modes choices
+   if [ -n "$RET" ]; then
+     DCRESOLUTIONS="$RET"
+diff -ur orig/xserver-xorg.templates tmp/var/lib/dpkg/info/xserver-xorg.templates
+--- orig/xserver-xorg.templates	2005-11-01 19:25:37.000000000 +0100
++++ tmp/var/lib/dpkg/info/xserver-xorg.templates	2005-11-01 19:25:12.000000000 +0100
+@@ -6998,7 +6998,6 @@
+ Template: xserver-xorg/config/display/modes
+ Type: multiselect
+ Choices: ${choices}
+-Default: 1024x768, 800x600, 640x480
+ Description: Select the video modes you would like the X server to use.
+  If there are some resolutions you would not like the X server to use even if
+  your hardware is capable of them, remove them from the list below.  Removing
