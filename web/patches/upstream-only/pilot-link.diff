@@ -1,0 +1,13 @@
+--- libpisock/freebsdusb.c	2005-09-02 22:27:03.000000000 +0200
++++ libpisock/freebsdusb.c	2005-09-02 22:27:23.000000000 +0200
+@@ -50,8 +50,9 @@
+ # define O_NONBLOCK 0
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ /* freebsd usb header */
++#include <sys/ioctl.h>
+ #include <dev/usb/usb.h>
+ #define MAX_BUF 256
+ #endif
