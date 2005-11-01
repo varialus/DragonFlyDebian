@@ -1,0 +1,29 @@
+Author: aurel32
+Status: in BTS
+
+--- xmms-coverviewer-0.11.orig/src/cd-discid.c
++++ xmms-coverviewer-0.11/src/cd-discid.c
+@@ -34,7 +34,7 @@
+ #define CD_MSF_OFFSET	150
+ #define CD_FRAMES	75
+ 
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 
+ #include <sys/cdio.h>
+ #define        CDROM_LBA       CD_LBA_FORMAT   /* first frame is 0 */
+@@ -205,12 +205,12 @@
+ 	}
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	TocEntry[i].cdte_track_address = ntohl(TocEntry[i].cdte_track_address);
+ #endif       
+ 
+ 	for (i=0; i < last; i++) {
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 		TocEntry[i].cdte_track_address = ntohl(TocEntry[i].cdte_track_address);
+ #endif
+ 		cksum += cddb_sum((TocEntry[i].cdte_track_address + CD_MSF_OFFSET) / CD_FRAMES);

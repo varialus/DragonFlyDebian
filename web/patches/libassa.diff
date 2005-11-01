@@ -1,0 +1,36 @@
+Author: aurel32
+Status: in BTS
+
+--- libassa-3.3.2.orig/assa/Handlers.h
++++ libassa-3.3.2/assa/Handlers.h
+@@ -27,7 +27,7 @@
+  */
+ 
+ 
+-#if defined (__FreeBSD__)
++#if defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #   define ASSAIOSIG SIGIO
+ #else
+ #   define ASSAIOSIG SIGPOLL
+--- libassa-3.3.2.orig/assa/GenServer.cpp
++++ libassa-3.3.2/assa/GenServer.cpp
+@@ -158,7 +158,7 @@
+ 	
+     ignore_act.register_action( SIGPIPE );
+     ignore_act.register_action( SIGCHLD );
+-#if !defined (__FreeBSD__)
++#if !defined (__FreeBSD__) && !defined(__FreeBSD_kernel__)
+     ignore_act.register_action( SIGCLD );
+ #endif
+     ignore_act.register_action( SIGALRM );
+--- libassa-3.3.2.orig/assa/Socket.cpp
++++ libassa-3.3.2/assa/Socket.cpp
+@@ -17,7 +17,7 @@
+ #include <sstream>
+ #include <rpc/rpc.h>
+ 
+-#if defined (__FreeBSD__)
++#if defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #  include <sys/ioctl.h>
+ #endif
+ 

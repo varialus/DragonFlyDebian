@@ -1,0 +1,41 @@
+Author: aurel32
+Status: in BTS
+
+--- gtoaster-0.2002083100+1.0Beta6.orig/cdromlow.c
++++ gtoaster-0.2002083100+1.0Beta6/cdromlow.c
+@@ -9,7 +9,7 @@
+ #include <fcntl.h>
+ #include <signal.h>
+ #include <unistd.h>
+-#if !defined( __FreeBSD__) && !defined(__svr4__ )
++#if !defined( __FreeBSD__) && !defined( __FreeBSD_kernel__) && !defined(__svr4__ )
+ # include <linux/cdrom.h>
+ #else
+ # include <sys/cdio.h>
+@@ -37,7 +37,7 @@
+ 
+ /* we provide some macro mappings here. FreeBSD structs are a bit
+  * different to those used by Linux so we will use macros to compensate that */
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined( __FreeBSD_kernel__)
+ 
+ /* Needed by FreeBSD */
+ # define CDROM_DATA_TRACK 4
+@@ -147,7 +147,7 @@
+ 	       entry.cdromlow_tocent_track=x;
+ 	       entry.cdromlow_tocent_format=CDROM_LBA;
+ 	       ioctl(info->filedescriptor,CDROMREADTOCENTRY,&entry);
+-#ifndef __FreeBSD__
++#if !defined(__FreeBSD__) && !defined(__FreeBSD_kernel__)
+ 	       if (entry.cdte_ctrl&CDROM_DATA_TRACK)
+ #else
+ 		 if (entry.entry.control & CDROM_DATA_TRACK)
+@@ -324,7 +324,7 @@
+ 	track.cdromlow_tocent_format=CDROM_LBA;
+ 	if (ioctl(info->filedescriptor,CDROMREADTOCENTRY,&track)==-1)
+ 	  ok=0;
+-#ifndef __FreeBSD__
++#if !defined(__FreeBSD__) && !defined(__FreeBSD_kernel__)
+ 	if (track.cdte_ctrl&CDROM_DATA_TRACK)
+ #else
+ 	  if (track.entry.control & CDROM_DATA_TRACK)
