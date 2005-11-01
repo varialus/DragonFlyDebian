@@ -1,0 +1,32 @@
+Author: aurel32
+Status: in BTS
+
+diff -u sndobj-2.6.1a/debian/control sndobj-2.6.1a/debian/control
+--- sndobj-2.6.1a/debian/control
++++ sndobj-2.6.1a/debian/control
+@@ -2,7 +2,7 @@
+ Section: sound
+ Priority: optional
+ Maintainer: Guenter Geiger (Debian/GNU) <geiger@debian.org>
+-Build-Depends: debhelper (>> 3.0.0), cdbs, fftw-dev, libasound2-dev, libjack0.100.0-dev | libjack-dev
++Build-Depends: debhelper (>> 3.0.0), cdbs, fftw-dev, libasound2-dev [!kfreebsd-i386], libjack0.100.0-dev | libjack-dev
+ Standards-Version: 3.6.2
+ 
+ Package: libsndobj-dev
+diff -u sndobj-2.6.1a/debian/rules sndobj-2.6.1a/debian/rules
+--- sndobj-2.6.1a/debian/rules
++++ sndobj-2.6.1a/debian/rules
+@@ -7,7 +7,13 @@
+ include /usr/share/cdbs/1/class/makefile.mk
+ include /usr/share/cdbs/1/rules/simple-patchsys.mk
+ 
++DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
++
++ifeq (linux,$(DEB_HOST_ARCH_OS))
+ DEB_MAKE_BUILD_TARGET := CFLAGS="-O2 -fPIC -I../include -DALSA -DJACK" PLATFORM=.alsa FFTWOBJS= LFLAGS="-lpthread -lrfftw -lfftw" lib/libsndobj.a
++else
++DEB_MAKE_BUILD_TARGET := CFLAGS="-O2 -fPIC -I../include -DJACK" PLATFORM=.oss FFTWOBJS= LFLAGS="-lpthread -lrfftw -lfftw" lib/libsndobj.a
++endif
+ 
+ DEB_MAKE_INSTALL_TARGET := 
+ 

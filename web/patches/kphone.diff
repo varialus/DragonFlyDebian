@@ -1,0 +1,33 @@
+Author: aurel32
+Status: in BTS
+
+diff -u kphone-4.2/debian/control kphone-4.2/debian/control
+--- kphone-4.2/debian/control
++++ kphone-4.2/debian/control
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Debian VoIP Team <pkg-voip-maintainers@lists.alioth.debian.org>
+ Uploaders: Mark Purcell <msp@debian.org>, Kilian Krause <kilian@debian.org>, Jose Carlos Garcia Sogo <jsogo@debian.org>, Santiago Garcia Mantinan <manty@debian.org>, Simon Richter <sjr@debian.org>
+-Build-Depends: debhelper (>> 4.0.0), libssl-dev, autotools-dev, dpatch,  libqt3-mt-dev (>= 3:3.3.4-4), libasound2-dev
++Build-Depends: debhelper (>> 4.0.0), libssl-dev, autotools-dev, dpatch,  libqt3-mt-dev (>= 3:3.3.4-4), libasound2-dev [!kfreebsd-i386 !hurd-i386]
+ Standards-Version: 3.5.8
+ 
+ Package: kphone
+--- kphone-4.2.orig/dissipate2/udpmessagesocket.cpp
++++ kphone-4.2/dissipate2/udpmessagesocket.cpp
+@@ -1,5 +1,6 @@
+ #include <sys/types.h>
+ #include <sys/socket.h>
++#include <netinet/in.h>
+ #include <netinet/ip.h>
+ #include <errno.h>
+ #include <string.h>
+@@ -57,7 +58,7 @@
+ 	tos=IPTOS_LOWDELAY;
+ #endif
+ 	optlen=1;
+-	if(setsockopt(socketfd,SOL_IP,IP_TOS,&tos,optlen) != 0){
++	if(setsockopt(socketfd,IPPROTO_IP,IP_TOS,&tos,optlen) != 0){
+ 		perror("UDPMessageSocket::SetTOS");
+                 return -1 ;
+ 	}

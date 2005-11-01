@@ -1,0 +1,101 @@
+Author: aurel32
+Status: in BTS
+
+diff -u gtk+2.0-directfb-2.0.9.2/debian/control gtk+2.0-directfb-2.0.9.2/debian/control
+--- gtk+2.0-directfb-2.0.9.2/debian/control
++++ gtk+2.0-directfb-2.0.9.2/debian/control
+@@ -3,14 +3,14 @@
+ Priority: optional
+ Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
+ Uploaders: Alastair McKinstry <mckinstry@debian.org>
+-Build-Depends: debhelper (>> 4.0.0), libgtk2.0-dev, libdirectfb-dev (>= 0.9.22), autoconf, dbs
++Build-Depends: debhelper (>> 4.0.0), libgtk2.0-dev, libdirectfb-dev (>= 0.9.22), autoconf, dbs, libtool, automake1.4
+ Standards-Version: 3.6.2
+ 
+ Package: libgtk+2.0-directfb0-udeb
+ Priority: extra
+ Section: debian-installer
+ Provides: libgtk-directfb-2.0-0
+-Architecture: i386 ia64 arm alpha hppa mips mipsel sparc powerpc s390 m68k amd64
++Architecture: i386 ia64 arm alpha hppa mips mipsel sparc powerpc s390 m68k amd64 kfreebsd-i386
+ Depends: libc-udeb, libdirectfb-0.9-22
+ XC-Package-Type: udeb
+ Description: gtk+2.0 implementation for the frame buffer
+@@ -23,7 +23,7 @@
+ Package: libgtk+2.0-directfb-dev
+ Section: libdevel
+ Priority: optional
+-Architecture: i386 ia64 arm alpha hppa mips mipsel sparc powerpc s390 m68k amd64
++Architecture: i386 ia64 arm alpha hppa mips mipsel sparc powerpc s390 m68k amd64 kfreebsd-i386
+ Depends: ${shlibs:Depends}
+ Requires: libgtk-directfb-2.0-0
+ Description: gtk+2.0 implementation for the frame buffer, development files
+@@ -40,7 +40,7 @@
+ Priority: optional
+ Section: libs
+ Provides: libgtk-directfb-2.0-0
+-ptArchitecture: i386 ia64 arm alpha hppa mips mipsel sparc powerpc s390 m68k amd64
++Architecture: i386 ia64 arm alpha hppa mips mipsel sparc powerpc s390 m68k amd64 kfreebsd-i386
+ Depends: libc6 | libc, libdirectfb-0.9-22
+ Description: gtk+2.0 implementation for the frame buffer
+  DirectFB is a thin library that provides hardware graphics acceleration, input
+diff -u gtk+2.0-directfb-2.0.9.2/debian/rules gtk+2.0-directfb-2.0.9.2/debian/rules
+--- gtk+2.0-directfb-2.0.9.2/debian/rules
++++ gtk+2.0-directfb-2.0.9.2/debian/rules
+@@ -42,6 +42,13 @@
+ 
+ $(configure-stamp): $(patched)
+ 	dh_testdir
++
++	cd $(BUILD_TREE) && \
++	libtoolize -c -f && \
++	aclocal-1.4 -I m4macros && \
++	automake-1.4 && \
++	autoconf
++	
+ 	cd $(BUILD_TREE) && \
+ 	CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"	\
+ 	./configure --prefix=/usr \
+diff -u gtk+2.0-directfb-2.0.9.2/debian/patches/10_build_fixes.patch gtk+2.0-directfb-2.0.9.2/debian/patches/10_build_fixes.patch
+--- gtk+2.0-directfb-2.0.9.2/debian/patches/10_build_fixes.patch
++++ gtk+2.0-directfb-2.0.9.2/debian/patches/10_build_fixes.patch
+@@ -12,20 +12,18 @@
+ diff -ruN gtk+-directfb-2.0.9-2-old/gtk/Makefile.am gtk+-directfb-2.0.9-2/gtk/Makefile.am
+ --- gtk+-directfb-2.0.9-2-old/gtk/Makefile.am	2003-04-07 14:41:31.000000000 +0100
+ +++ gtk+-directfb-2.0.9-2/gtk/Makefile.am	2005-09-18 11:33:13.907265744 +0100
+-@@ -69,12 +69,16 @@
++@@ -69,12 +69,14 @@
+  	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)			\
+  	-export-dynamic								\
+  	-rpath $(libdir)							\
+-+	-BStatic
+-+\
+++	-BStatic								\
+  	$(no_undefined)								\
+  	@LIBTOOL_EXPORT_OPTIONS@						\
+  	$(top_builddir)/gdk-pixbuf/libgdk_pixbuf-$(GTK_API_VERSION).la		\
+  	$(top_builddir)/gdk/@gdktargetlib@					\
+  	$(libgtk_target_ldflags)						\
+  	@GTK_DEP_LIBS@								\
+-+	-Bdynamic
+-+\
+++	-Bdynamic								\
+  @STRIP_END@
+  
+  #
+only in patch2:
+unchanged:
+--- gtk+2.0-directfb-2.0.9.2.orig/debian/patches/20_configure.in.patch
++++ gtk+2.0-directfb-2.0.9.2/debian/patches/20_configure.in.patch
+@@ -0,0 +1,11 @@
++--- gtk+-directfb-2.0.9-2-old/acinclude.m4	2005-10-09 11:00:44.000000000 +0200
+++++ gtk+-directfb-2.0.9-2/acinclude.m4	2005-10-09 11:00:26.000000000 +0200
++@@ -253,7 +253,7 @@
++      AC_DEFINE(HAVE_STPCPY)
++    fi
++ 
++-   AM_LC_MESSAGES
+++   gt_LC_MESSAGES
++    AM_GTK_WITH_NLS
++ 
++    if test "x$CATOBJEXT" != "x"; then
