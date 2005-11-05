@@ -2,6 +2,7 @@
 #
 # Copyright 2005 Robert Millan <rmh@aybabtu.com>
 # See /usr/share/common-licenses/GPL for license terms.
+
 set -ex
 
 if [ "$UID" != "0" ] ; then
@@ -23,9 +24,11 @@ mount /dev/${md} ${mnt}
 
 mkdir -p ${mnt}/{lib,sbin,dev,cdrom,ramdisk,cloop}
 
-sed -e "s/@version@/${version}/g" -e "s/@ramdisk_size@/${ramdisk_size}/g" \
-  "s/@distribution@/${distribution}/g" -e "s/@distribution_lowcase@/${distribution_lowcase}/g"
-< startup > ${mnt}/sbin/init
+sed -e "s/@version@/${version}/g" \
+    -e "s/@ramdisk_size@/${ramdisk_size}/g" \
+    -e "s/@distribution@/${distribution}/g" \
+    -e "s/@distribution_lowcase@/${distribution_lowcase}/g" \
+    < startup > ${mnt}/sbin/init
 chmod 755 ${mnt}/sbin/init
 
 for i in \
@@ -49,3 +52,4 @@ rmdir ${mnt}
 if [ "${OPTS}" != "qemu" ] ; then
   ${gzip} mfsroot
 fi
+

@@ -2,6 +2,7 @@
 #
 # Copyright 2004, 2005  Robert Millan <rmh@aybabtu.com>
 # See /usr/share/common-licenses/GPL for license terms.
+
 set -e
 
 if ! [ "$#" = "1" ] ; then
@@ -129,3 +130,4 @@ create_compressed_fs ${args} ${tmp} ${target}
 rm -f ${tmp}
 
 cd ${pwd}/
+

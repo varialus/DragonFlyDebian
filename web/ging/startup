@@ -39,7 +39,10 @@ test -f /cdrom/ging.cloop
 ging_msg "Accessing cloop image"
 md1=`mdconfig -a -t vnode -f /cdrom/ging.cloop`
 # According to FreeSBIE, there's race condition here.  Let's add a semaphore
-while ! test -e /dev/${md1}.uzip ; do ging_msg "cloop device not yet ready, retrying" ; sleep 1 ; done
+while ! test -e /dev/${md1}.uzip ; do
+  ging_msg "cloop device not yet ready, retrying"
+  sleep 1
+done
 mount_cd9660 /dev/${md1}.uzip /cloop
 
 # IMPORTANT: We just mounted the cloop image.  From now on, we're using commands
@@ -92,3 +95,4 @@ export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/bin2
 export HOME=/
 exec ${chroot} /ramdisk init $@ <&- >&- 2>&- 255>&-
 false
+
