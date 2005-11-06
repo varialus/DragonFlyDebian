@@ -1,0 +1,97 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+##
+## DP: Add linux specific rawio capability allocation to work with kernels > 2.6.8
+
+@DPATCH@
+diff -ur cdrtools-2.01+01a01.old/RULES/os-linux.id cdrtools-2.01+01a01/RULES/os-linux.id
+--- cdrtools-2.01+01a01.old/RULES/os-linux.id	1997-02-01 01:10:06.000000000 +0100
++++ cdrtools-2.01+01a01/RULES/os-linux.id	2005-08-19 20:53:43.000000000 +0200
+@@ -22,3 +22,5 @@
+ ###########################################################################
+ O_ARCH=		linux
+ -O_ARCH=	-$(O_ARCH)
++
++LIB_CAP= -lcap
+diff -ur cdrtools-2.01+01a01.old/cdrecord/Makefile cdrtools-2.01+01a01/cdrecord/Makefile
+--- cdrtools-2.01+01a01.old/cdrecord/Makefile	2004-05-26 09:31:00.000000000 +0200
++++ cdrtools-2.01+01a01/cdrecord/Makefile	2005-08-19 20:55:47.000000000 +0200
+@@ -33,7 +33,7 @@
+ 		../include/scg/scgio.h ../include/scg/scsidefs.h \
+ 		../include/scg/scsireg.h ../include/scg/scsitransp.h
+ #LIBS=		-lschily $(LIB_SOCKET)
+-LIBS=		-lrscg -lscg $(LIB_VOLMGT) -ledc_ecc -ldeflt -lschily $(SCSILIB) $(LIB_SOCKET)
++LIBS=		-lrscg -lscg $(LIB_VOLMGT) -ledc_ecc -ldeflt -lschily $(SCSILIB) $(LIB_SOCKET) $(LIB_CAP)
+ XMK_FILE=	Makefile.man
+ 
+ ###########################################################################
+diff -ur cdrtools-2.01+01a01.old/cdrecord/cdrecord.c cdrtools-2.01+01a01/cdrecord/cdrecord.c
+--- cdrtools-2.01+01a01.old/cdrecord/cdrecord.c	2004-10-17 13:44:58.000000000 +0200
++++ cdrtools-2.01+01a01/cdrecord/cdrecord.c	2005-08-19 20:55:06.000000000 +0200
+@@ -58,6 +58,9 @@
+ #include "defaults.h"
+ #include "movesect.h"
+ 
++#ifdef __linux__
++#include <sys/capability.h> 	/* for rawio capability */
++#endif
+ 
+ char	cdr_version[] = "2.01.01a01";
+ 
+@@ -244,6 +247,10 @@
+ LOCAL	void	set_wrmode	__PR((cdr_t *dp, int wmode, int tflags));
+ LOCAL	void	linuxcheck	__PR((void));
+ 
++#ifdef __linux__
++LOCAL int get_cap   __PR((cap_value_t cap_array));
++#endif
++
+ struct exargs {
+ 	SCSI	*scgp;
+ 	cdr_t	*dp;
+@@ -505,6 +512,14 @@
+ #endif
+ 			comerr("Panic cannot set back effective uid.\n");
+ 	}
++
++#ifdef __linux__
++	/* get the rawio capability */
++	if (get_cap(CAP_SYS_RAWIO))
++		perror("Error: Cannot gain SYS_RAWIO capability."
++			"Is cdrecord installed SUID root?\n");
++#endif
++
+ 	/*
+ 	 * WARNING: We now are no more able to do any privilleged operation
+ 	 * unless we have been called by root.
+@@ -1032,6 +1047,12 @@
+ 			if (setreuid(-1, getuid()) < 0)
+ 				comerr("Panic cannot set back effective uid.\n");
+ 		}
++#ifdef __linux__
++		if (get_cap(CAP_SYS_RAWIO))
++			perror("Error: Cannot gain SYS_RAWIO capability."
++				"Is cdrecord installed SUID root?\n");
++#endif
++
+ #endif
+ 	}
+ 	if ((*dp->cdr_set_speed_dummy)(scgp, dp, &speed) < 0) {
+@@ -4724,3 +4745,18 @@
+ 	}
+ #endif
+ }
++
++#ifdef __linux__
++LOCAL int
++get_cap(cap_array)
++	cap_value_t cap_array;
++{ 
++    	  int ret;
++	  cap_t capa;
++	  capa = cap_get_proc();
++	  cap_set_flag(capa, CAP_EFFECTIVE,  1, &cap_array, CAP_SET);
++	  ret = cap_set_proc(capa);
++	  cap_free(capa);
++	  return ret; 
++}
++#endif
