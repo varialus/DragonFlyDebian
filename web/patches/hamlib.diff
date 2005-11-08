@@ -1,0 +1,16 @@
+Author: Petr Salinger
+Status: ugly, don't merge !!! Could be removed when the new glibc 2.3.5 is ported
+
+--- hamlib-1.2.4.orig/rpcrig/rpcrig.x
++++ hamlib-1.2.4/rpcrig/rpcrig.x
+@@ -26,6 +26,10 @@
+ %#include "config.h"
+ %#endif
+ %#include <rpc/xdr.h>
++%#undef IXDR_GET_LONG
++%#undef IXDR_PUT_LONG
++%#define IXDR_GET_LONG(buf) ((long)IXDR_GET_U_INT32(buf))
++%#define IXDR_PUT_LONG(buf, v) ((long)IXDR_PUT_INT32(buf, (long)(v)))
+ %#include <hamlib/rig.h>
+ #endif
+ 
