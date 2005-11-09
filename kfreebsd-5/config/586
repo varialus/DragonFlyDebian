@@ -4,7 +4,7 @@
 machine		i386
 cpu		I586_CPU
 cpu		I686_CPU
-makeoptions     COPTFLAGS="-mtune=i586"
+makeoptions     COPTFLAGS="-O -pipe -march=i586"
 ident		Debian-i586
 
 # To statically compile in device wiring instead of /boot/device.hints
@@ -264,3 +264,11 @@ device		rue		# RealTek RTL8150 USB Ethernet
 device		firewire	# FireWire bus code
 device		sbp		# SCSI over FireWire (Requires scbus and da)
 device		fwe		# Ethernet over FireWire (non-standard!)
+
+# Alternate queueing
+options		ALTQ
+options		ALTQ_CBQ	# Class Bases Queuing (CBQ)
+options		ALTQ_RED	# Random Early Detection (RED)
+options		ALTQ_RIO	# RED In/Out
+options		ALTQ_HFSC	# Hierarchical Packet Scheduler (HFSC)
+options		ALTQ_PRIQ	# Priority Queuing (PRIQ)
