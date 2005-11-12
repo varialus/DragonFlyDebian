@@ -51,7 +51,7 @@ src:
 		&& cd src/ \
 		&& $(CURDIR)/debian/autopatch.sh
 	
-	for i in $(CURDIR)/debian/patches/*.diff ; do \
+	set -e ; for i in $(CURDIR)/debian/patches/*.diff ; do \
 		echo "--- Patch $$i ---" ; \
 		cat $$i | patch -p0 -d src/ ; \
 	done
