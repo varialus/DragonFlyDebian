@@ -5,12 +5,15 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+config_files	:= $(wildcard config/*)
+flavours	:= $(config_files:config/%=%)
 full_version	:= $(shell dpkg-parsechangelog | grep ^Version | sed -e 's/^.*: //g')
 version		:= $(shell echo $(full_version) | sed -e 's/[+-].*//g')
 major		:= $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 os		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 cpu		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+configfile	:= DEBCUSTOM
 abiname		:= 1
 
 SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
@@ -19,66 +22,54 @@ HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-headers-$(version)-$(abiname)
 SRC_TAR		:= kfreebsd-source-$(version).tar.bz2
 SRC_DIR		:= kfreebsd-source-$(version)
 HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
+FLAVOR_DIR	:= flavor-$(version)-$(abiname)
 
-KERNEL	:= GENERIC
-MAKE	:= make MACHINE_ARCH=$(cpu) CC=gcc-3.4 WERROR= 
-PATH	:= /usr/lib/freebsd:$(PATH)
+MAKE		:= make MACHINE_ARCH=$(cpu) CC=gcc-3.4 WERROR= 
+PATH		:= /usr/lib/freebsd:$(PATH)
 
 control:
-	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" \
+	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
 		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
+	for flavor in $(flavours) ; do \
+		sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
+			$(CURDIR)/debian/control.flavor.in >> $(CURDIR)/debian/control ; \
+	done
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -rf src kfreebsd-source-*
+	rm -rf src kfreebsd-source-* flavor-*
 	rm -f debian/kfreebsd-image-*.{conffiles,preinst,postinst}
 
 	rm -f *-stamp
 	dh_clean
 
-$(SRC_DIR):
+src:
 	tar xfj $(CURDIR)/src.tar.bz2
-	mv src $(SRC_DIR)
 	
 	chmod +x $(CURDIR)/debian/autopatch.sh \
-		&& cd $(SRC_DIR) \
+		&& cd src/ \
 		&& $(CURDIR)/debian/autopatch.sh
 	
 	for i in $(CURDIR)/debian/patches/*.diff ; do \
 		echo "--- Patch $$i ---" ; \
-		cat $$i | patch -p0 -d $(SRC_DIR) ; \
+		cat $$i | patch -p0 -d src/ ; \
 	done
 
 build-indep: build-indep-stamp
-build-indep-stamp: $(SRC_DIR)
+build-indep-stamp: src
 	dh_testdir
 	
+	cp -af src $(SRC_DIR)
+
 	touch build-indep-stamp
-
-build-arch: build-arch-stamp
-build-arch-stamp: $(SRC_DIR)
-	dh_testdir
-	
-	# Add the abiname to the kernel version
-	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)"/g' $(SRC_DIR)/sys/conf/newvers.sh 
-
-	# Configure the kernel
-	cd $(SRC_DIR)/sys/$(cpu)/conf \
-		&& config $(KERNEL)
-
-	# Build it
-	$(MAKE) -C $(SRC_DIR)/sys/$(cpu)/compile/$(KERNEL)/ depend
-	$(MAKE) -C $(SRC_DIR)/sys/$(cpu)/compile/$(KERNEL)/
-
-	touch build-arch-stamp
 
 install-indep: install-indep-stamp
 install-indep-stamp: build-indep
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_installdirs
+	dh_installdirs -i
 
 	mkdir -p $(SOURCE_PACKAGE)/usr/src
 	chown -R root.src $(SRC_DIR)
@@ -86,48 +77,82 @@ install-indep-stamp: build-indep
 
 	touch install-indep-stamp
 
-install-arch: install-arch-stamp
-install-arch-stamp: build-arch
+build-arch: $(foreach flavor,$(flavours),build-flavor-$(flavor)-stamp)
+build-flavor-%-stamp: src
+	cp -af src $(FLAVOR_DIR)-$*
+	
+	# Add the abiname and the flavor to the kernel version
+	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)-$*"/g' $(FLAVOR_DIR)-$*/sys/conf/newvers.sh 
+
+	# Configure the kernel
+	cp config/$* $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/$(configfile)
+	cd $(FLAVOR_DIR)-$*/sys/$(cpu)/conf \
+		&& config $(configfile)
+
+	# Build it
+	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(cpu)/compile/$(configfile)/ depend
+	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(cpu)/compile/$(configfile)/
+
+	touch build-flavor-$*-stamp
+
+install-common-stamp: src
+	dh_testdir 
+	dh_testroot
+	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
+	cd src \
+		&& find . -type f -name "*.h" -not -regex ".*modules.*" -not -regex ".*sys/i386/.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \; 
+	find $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) -type f -exec chmod 644 {} \;
+
+	touch install-common-stamp
+
+install-arch: $(foreach flavor,$(flavours),install-flavor-$(flavor)-stamp)
+install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
+	dh_testdir
+	dh_testroot
+
 	# install device.hints
-	mkdir -p $(IMAGE_PACKAGE)/boot/kernel
+	mkdir -p $(IMAGE_PACKAGE)-$*/boot/kernel
 	install -o root -g root -m 644 \
-		$(SRC_DIR)/sys/$(cpu)/conf/GENERIC.hints \
-		$(IMAGE_PACKAGE)/boot/device.hints
+		$(FLAVOR_DIR)-$*/sys/$(cpu)/conf/GENERIC.hints \
+		$(IMAGE_PACKAGE)-$*/boot/device.hints
 	install -o root -g root -m 644 \
-		$(SRC_DIR)/sys/boot/forth/loader.conf \
-		$(IMAGE_PACKAGE)/boot/loader.conf
-	mkdir -p $(IMAGE_PACKAGE)/boot/defaults
+		$(FLAVOR_DIR)-$*/sys/boot/forth/loader.conf \
+		$(IMAGE_PACKAGE)-$*/boot/loader.conf
+	mkdir -p $(IMAGE_PACKAGE)-$*/boot/defaults
 	install -o root -g root -m 644 \
-		$(SRC_DIR)/sys/boot/forth/loader.conf \
-		$(IMAGE_PACKAGE)/boot/defaults/loader.conf
-	mkdir -p $(IMAGE_PACKAGE)/sbin
-	ln -s /bin/true \
-		$(IMAGE_PACKAGE)/sbin/fsck.cd9660
+		$(FLAVOR_DIR)-$*/sys/boot/forth/loader.conf \
+		$(IMAGE_PACKAGE)-$*/boot/defaults/loader.conf
 	
 	# now install the kernel
-	$(MAKE) -C $(SRC_DIR)/sys/$(cpu)/compile/$(KERNEL) DESTDIR=$(IMAGE_PACKAGE) install
-	chmod 644 $(IMAGE_PACKAGE)/boot/kernel/kernel
+	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(cpu)/compile/$(configfile) DESTDIR=$(IMAGE_PACKAGE)-$* install
+	chmod 644 $(IMAGE_PACKAGE)-$*/boot/kernel/kernel
 	
 	# override file
-	mkdir -p $(IMAGE_PACKAGE)/usr/share/lintian/overrides
+	mkdir -p $(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides
 	install -p -o root -g root -m 644 \
-		$(CURDIR)/debian/kfreebsd-image.overrides \
-		$(IMAGE_PACKAGE)/usr/share/lintian/overrides/kfreebsd-image-$(version)-$(abiname)
+		debian/kfreebsd-image.overrides \
+		$(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides/kfreebsd-image-$(version)-$(abiname)-$*
 
 	# scripts
-	cp -f $(CURDIR)/debian/kfreebsd-image.conffiles.in \
-		$(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname).conffiles
-	cp -f $(CURDIR)/debian/kfreebsd-image.postinst.in \
-		$(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname).postinst
-	cp -f $(CURDIR)/debian/kfreebsd-image.preinst.in \
-		$(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname).preinst
+	cp -f debian/kfreebsd-image.conffiles.in \
+		debian/kfreebsd-image-$(version)-$(abiname)-$*.conffiles
+	cp -f debian/kfreebsd-image.postinst.in \
+		debian/kfreebsd-image-$(version)-$(abiname)-$*.postinst
+	cp -f debian/kfreebsd-image.preinst.in \
+		debian/kfreebsd-image-$(version)-$(abiname)-$*.preinst
 	
 	# headers package
-	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
-	cd $(SRC_DIR) \
-		&& find . -type f -name "*.h" -not -regex ".*modules.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \; \
-		&& cp -d --parents sys/i386/compile/$(KERNEL)/machine $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
-	find $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) -type f -exec chmod 644 {} \;
+	mkdir -p $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu)
+	cd $(FLAVOR_DIR)-$*/sys/$(cpu) \
+		&& find . -type f -name "*.h" -not -regex ".*modules.*" -exec cp --parents {} $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu) \; \
+		&& cp -d --parents compile/$(configfile)/machine $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu) \
+		&& cp -d --parents conf/$(configfile) $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu) 
+	find $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu) -type f -exec chmod 644 {} \;
+	for dir in `ls $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)/sys` ; do \
+		ln -s ../../$(HEADERS_DIR)/sys/$$dir $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$$dir ; \
+	done
+
+	touch install-flavor-$*-stamp
 
 
 # Build architecture-independent files here.

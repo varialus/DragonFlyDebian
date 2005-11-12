@@ -1,0 +1,41 @@
+Package: kfreebsd-image-@version@-@abiname@-@flavor@
+Architecture: kfreebsd-i386
+Section: base
+Depends: freebsd-utils (>= 5), kldutils (>= @version@)
+Provides: kfreebsd-image-@major@, kfreebsd-image
+Conflicts: kfreebsd5, kfreebsd-image
+Replaces: kfreebsd5
+Description: kernel of FreeBSD @version@ image
+ This package provides the binary image and pre-built loadable modules for 
+ the kernel of FreeBSD @version@, base of a GNU/kFreeBSD system.
+ .
+ This package is compiled for a @flavor@-class machine.
+
+Package: kfreebsd-image-@major@-@flavor@
+Architecture: kfreebsd-i386
+Section: base
+Depends: kfreebsd-image-@version@-@abiname@-@flavor@
+Description: kernel of FreeBSD @major@ image
+ This package depends on the latest binary image for kernel of FreeBSD @major@ on
+ @flavor@-class machines.
+
+Package: kfreebsd-headers-@version@-@abiname@-@flavor@
+Architecture: kfreebsd-i386
+Section: devel
+Provides: kfreebsd-headers-@major@
+Depends: kfreebsd-headers-@version@-@abiname@ (= ${Source-Version})
+Description: header files for kernel of FreeBSD @version@
+ This package provides the header files for kernel of FreeBSD @version@, generally 
+ used for building out-of-tree kernel modules. These files are going to be 
+ installed into /usr/src/kfreebsd-headers-@version@-@abiname@-@flavor@, and can be 
+ used for building modules that load into the kernel provided by the 
+ kfreebsd-image-@version@-@abiname@-@flavor@ package.
+
+Package: kfreebsd-headers-@major@-@flavor@
+Architecture: kfreebsd-i386
+Section: devel
+Depends: kfreebsd-headers-@version@-@abiname@-@flavor@
+Description: header files for kernel of FreeBSD @major@
+ This package depends on the latest header files for kernel of FreeBSD @major@ on
+ @flavor@-class machines.
+  
