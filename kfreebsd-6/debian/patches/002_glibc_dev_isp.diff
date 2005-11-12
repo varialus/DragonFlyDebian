@@ -1,22 +1,6 @@
-
-  * add "#include <stdint.h>"
-  * s/u_intXX_t/uintXX_t/g
-
-diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
---- src.old/sys/dev/isp/isp.c	2004-05-24 09:02:24.000000000 +0200
-+++ src/sys/dev/isp/isp.c	2004-11-09 00:42:02.000000000 +0100
-@@ -55,6 +55,10 @@
- #include "isp_solaris.h"
- #endif
- 
-+#if 0
-+#include <stdint.h>    /* uintXX_t */
-+#endif
-+
- /*
-  * General defines
-  */
-@@ -113,12 +117,12 @@
+--- sys.old/dev/isp/isp.c	2005-01-23 01:26:45.000000000 -0500
++++ sys/dev/isp/isp.c	2005-09-03 16:08:55.000000000 -0400
+@@ -113,12 +113,12 @@
  /*
   * Local function prototypes.
   */
@@ -32,7 +16,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  static int isp_mbox_continue(struct ispsoftc *);
  static void isp_scsi_init(struct ispsoftc *);
  static void isp_scsi_channel_init(struct ispsoftc *, int);
-@@ -126,7 +130,7 @@
+@@ -126,7 +126,7 @@
  static void isp_mark_getpdb_all(struct ispsoftc *);
  static int isp_getmap(struct ispsoftc *, fcpos_map_t *);
  static int isp_getpdb(struct ispsoftc *, int, isp_pdb_t *);
@@ -41,7 +25,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  static int isp_fclink_test(struct ispsoftc *, int);
  static char *isp2100_fw_statename(int);
  static int isp_pdb_sync(struct ispsoftc *);
-@@ -142,11 +146,11 @@
+@@ -142,11 +142,11 @@
  static void isp_update_bus(struct ispsoftc *, int);
  static void isp_setdfltparm(struct ispsoftc *, int);
  static int isp_read_nvram(struct ispsoftc *);
@@ -58,7 +42,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  /*
   * Reset Hardware.
-@@ -160,7 +164,7 @@
+@@ -160,7 +160,7 @@
  isp_reset(struct ispsoftc *isp)
  {
  	mbreg_t mbs;
@@ -67,7 +51,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	int loops, i, dodnld = 1;
  	char *btype = "????";
  
-@@ -275,7 +279,7 @@
+@@ -275,7 +275,7 @@
  		 */
  	} else if (IS_ULTRA2(isp)) {
  		static const char m[] = "bus %d is in %s Mode";
@@ -76,7 +60,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		sdparam *sdp = isp->isp_param;
  
  		isp->isp_clock = 100;
-@@ -517,7 +521,7 @@
+@@ -517,7 +517,7 @@
  	 * be done later after fetching from NVRAM.
  	 */
  	if (IS_SCSI(isp)) {
@@ -85,7 +69,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		/*
  		 * Busted FIFO. Turn off all but burst enables.
  		 */
-@@ -1021,7 +1025,7 @@
+@@ -1021,7 +1021,7 @@
  #endif
  #endif
  	if (mbs.param[1] != 0) {
@@ -94,7 +78,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		isp_mboxcmd(isp, &mbs, MBLOGALL);
  		if (mbs.param[0] == MBOX_COMMAND_COMPLETE) {
  			isp_prt(isp, ISP_LOGINFO,
-@@ -1063,7 +1067,7 @@
+@@ -1063,7 +1063,7 @@
  	 */
  	for (tgt = 0; tgt < MAX_TARGETS; tgt++) {
  		int lun;
@@ -103,7 +87,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  		if (sdp->isp_devparam[tgt].dev_enable == 0) {
  			continue;
-@@ -1162,7 +1166,7 @@
+@@ -1162,7 +1162,7 @@
  	isp_icb_t local, *icbp = &local;
  	mbreg_t mbs;
  	int loopid;
@@ -112,7 +96,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  	fcp = isp->isp_param;
  
-@@ -1379,10 +1383,10 @@
+@@ -1387,10 +1387,10 @@
  		MAKE_NODE_NAME_FROM_WWN(icbp->icb_portname, pwwn);
  		isp_prt(isp, ISP_LOGDEBUG1,
  		    "Setting ICB Node 0x%08x%08x Port 0x%08x%08x",
@@ -127,7 +111,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	} else {
  		isp_prt(isp, ISP_LOGDEBUG1, "Not using any WWNs");
  		icbp->icb_fwoptions &= ~(ICBOPT_BOTH_WWNS|ICBOPT_FULL_LOGIN);
-@@ -1514,10 +1518,10 @@
+@@ -1522,10 +1522,10 @@
  	return (-1);
  }
  
@@ -140,7 +124,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	mbreg_t mbs;
  
  	mbs.param[0] = MBOX_GET_PORT_NAME;
-@@ -1527,14 +1531,14 @@
+@@ -1535,14 +1535,14 @@
  	isp_mboxcmd(isp, &mbs, MBLOGALL & ~MBOX_COMMAND_PARAM_ERROR);
  	if (mbs.param[0] == MBOX_COMMAND_COMPLETE) {
  		wwn =
@@ -163,7 +147,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	}
  	return (wwn);
  }
-@@ -1555,7 +1559,7 @@
+@@ -1563,7 +1563,7 @@
  	};
  	mbreg_t mbs;
  	int count, check_for_fabric;
@@ -172,7 +156,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	fcparam *fcp;
  	struct lportdb *lp;
  	isp_pdb_t pdb;
-@@ -1572,8 +1576,8 @@
+@@ -1580,8 +1580,8 @@
  	lwfs = FW_CONFIG_WAIT;
  	count = 0;
  	while (count < usdelay) {
@@ -183,7 +167,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		NANOTIME_T hra, hrb;
  
  		GET_NANOTIME(&hra);
-@@ -1598,7 +1602,7 @@
+@@ -1606,7 +1606,7 @@
  		isp_prt(isp, ISP_LOGDEBUG1,
  		    "usec%d: 0x%lx->0x%lx enano 0x%x%08x",
  		    count, (long) GET_NANOSEC(&hra), (long) GET_NANOSEC(&hrb),
@@ -192,7 +176,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  		/*
  		 * If the elapsed time is less than 1 millisecond,
-@@ -1606,23 +1610,23 @@
+@@ -1614,23 +1614,23 @@
  		 * waiting.
  		 *
  		 * This peculiar code is an attempt to try and avoid
@@ -221,7 +205,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  			}
  			wrk = enano;
  			count += (wrk / 1000);
-@@ -1699,23 +1703,23 @@
+@@ -1707,23 +1707,23 @@
  		 */
  		lp = &fcp->portdb[loopid];
  		lp->node_wwn =
@@ -261,7 +245,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		lp->roles =
  		    (pdb.pdb_prli_svc3 & SVC3_ROLE_MASK) >> SVC3_ROLE_SHIFT;
  		lp->portid = BITS2WORD(pdb.pdb_portid_bits);
-@@ -1879,7 +1883,7 @@
+@@ -1887,7 +1887,7 @@
  	 * for the moment.
  	 */
  	for (lp = &fcp->portdb[base]; lp < &fcp->portdb[lim]; lp++) {
@@ -270,7 +254,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		mbreg_t mbs;
  
  		loopid = lp - fcp->portdb;
-@@ -1914,29 +1918,29 @@
+@@ -1922,29 +1922,29 @@
  		if (lp->loggedin && lp->force_logout == 0 &&
  		    isp_getpdb(isp, lp->loopid, &pdb) == 0) {
  			int nrole;
@@ -318,7 +302,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  			    nwwnn == lp->node_wwn && nwwpn == lp->port_wwn &&
  			    lp->roles == nrole && lp->force_logout == 0) {
  				lp->loggedin = lp->valid = 1;
-@@ -2057,7 +2061,7 @@
+@@ -2065,7 +2065,7 @@
  			goto dump_em;
  		}
  
@@ -327,7 +311,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  			isp_prt(isp, ISP_LOGWARN, pdbmfail2,
  			    lp->portid, BITS2WORD(pdb.pdb_portid_bits));
  			goto dump_em;
-@@ -2066,23 +2070,23 @@
+@@ -2074,23 +2074,23 @@
  		lp->roles =
  		    (pdb.pdb_prli_svc3 & SVC3_ROLE_MASK) >> SVC3_ROLE_SHIFT;
  		lp->node_wwn =
@@ -367,7 +351,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		/*
  		 * Check to make sure this all makes sense.
  		 */
-@@ -2205,23 +2209,23 @@
+@@ -2213,23 +2213,23 @@
  		 * Save the pertinent info locally.
  		 */
  		lp->node_wwn =
@@ -407,7 +391,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		lp->roles =
  		    (pdb.pdb_prli_svc3 & SVC3_ROLE_MASK) >> SVC3_ROLE_SHIFT;
  		lp->portid = BITS2WORD(pdb.pdb_portid_bits);
-@@ -2441,7 +2445,7 @@
+@@ -2449,7 +2449,7 @@
  isp_scan_fabric(struct ispsoftc *isp, int ftype)
  {
  	fcparam *fcp = isp->isp_param;
@@ -416,7 +400,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	int hicap, last_port_same;
  
  	if (fcp->isp_onfabric == 0) {
-@@ -2465,7 +2469,7 @@
+@@ -2473,7 +2473,7 @@
  		sns_screq_t *rq;
  		sns_ga_nxt_rsp_t *rs0, *rs1;
  		struct lportdb lcl;
@@ -425,7 +409,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  		rq = (sns_screq_t *)sc;
  		MEMZERO((void *) rq, SNS_GA_NXT_REQ_SIZE);
-@@ -2498,7 +2502,7 @@
+@@ -2506,7 +2506,7 @@
  		}
  		MEMORYBARRIER(isp, SYNC_SFORCPU, 0x100, SNS_GA_NXT_RESP_SIZE);
  		rs1 = (sns_ga_nxt_rsp_t *) sc;
@@ -434,7 +418,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		isp_get_ga_nxt_response(isp, rs0, rs1);
  		if (rs1->snscb_cthdr.ct_response != FS_ACC) {
  			int level;
-@@ -2515,9 +2519,9 @@
+@@ -2523,9 +2523,9 @@
  			return (0);
  		}
  		portid =
@@ -447,7 +431,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  		/*
  		 * XXX: We should check to make sure that this entry
-@@ -2536,23 +2540,23 @@
+@@ -2544,23 +2544,23 @@
  		lcl.fc4_type = ftype;
  		lcl.portid = portid;
  		lcl.node_wwn =
@@ -487,7 +471,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  		/*
  		 * Does this fabric object support the type we want?
-@@ -2653,7 +2657,7 @@
+@@ -2661,7 +2661,7 @@
  	}
  	MEMORYBARRIER(isp, SYNC_SFORCPU, IGPOFF, GIDLEN);
  	rs1 = (sns_gid_ft_rsp_t *) fcp->tport;
@@ -496,7 +480,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	isp_get_gid_ft_response(isp, rs0, rs1, NGENT);
  	if (rs1->snscb_cthdr.ct_response != FS_ACC) {
  		int level;
-@@ -2691,9 +2695,9 @@
+@@ -2699,9 +2699,9 @@
  		MEMZERO(&lcl, sizeof (lcl));
  		lcl.fc4_type = ftype;
  		lcl.portid =
@@ -509,7 +493,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  		MEMZERO((void *) gq, sizeof (sns_gxn_id_req_t));
  		gq->snscb_rblen = SNS_GXN_ID_RESP_SIZE >> 1;
-@@ -2728,7 +2732,7 @@
+@@ -2736,7 +2736,7 @@
  			return (-1);
  		}
  		MEMORYBARRIER(isp, SYNC_SFORCPU, GXOFF, SNS_GXN_ID_RESP_SIZE);
@@ -518,7 +502,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		isp_get_gxn_id_response(isp, gs0, gs1);
  		if (gs1->snscb_cthdr.ct_response != FS_ACC) {
  			isp_prt(isp, ISP_LOGWARN, swrej, "GPN_ID",
-@@ -2741,14 +2745,14 @@
+@@ -2749,14 +2749,14 @@
  			continue;
  		}
  		lcl.port_wwn = 
@@ -541,7 +525,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  		MEMZERO((void *) gq, sizeof (sns_gxn_id_req_t));
  		gq->snscb_rblen = SNS_GXN_ID_RESP_SIZE >> 1;
-@@ -2783,7 +2787,7 @@
+@@ -2791,7 +2791,7 @@
  			return (-1);
  		}
  		MEMORYBARRIER(isp, SYNC_SFORCPU, GXOFF, SNS_GXN_ID_RESP_SIZE);
@@ -550,7 +534,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		isp_get_gxn_id_response(isp, gs0, gs1);
  		if (gs1->snscb_cthdr.ct_response != FS_ACC) {
  			isp_prt(isp, ISP_LOGWARN, swrej, "GNN_ID",
-@@ -2796,14 +2800,14 @@
+@@ -2804,14 +2804,14 @@
  			continue;
  		}
  		lcl.node_wwn = 
@@ -573,7 +557,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  		/*
  		 * The QLogic f/w is bouncing this with a parameter error.
-@@ -2846,7 +2850,7 @@
+@@ -2854,7 +2854,7 @@
  			return (-1);
  		}
  		MEMORYBARRIER(isp, SYNC_SFORCPU, GXOFF, SNS_GFF_ID_RESP_SIZE);
@@ -582,7 +566,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		isp_get_gff_id_response(isp, fs0, fs1);
  		if (fs1->snscb_cthdr.ct_response != FS_ACC) {
  			isp_prt(isp, /* ISP_LOGDEBUG0 */ ISP_LOGWARN,
-@@ -2906,7 +2910,7 @@
+@@ -2914,7 +2914,7 @@
  isp_register_fc4_type(struct ispsoftc *isp)
  {
  	fcparam *fcp = isp->isp_param;
@@ -591,7 +575,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	sns_screq_t *reqp = (sns_screq_t *) local;
  	mbreg_t mbs;
  
-@@ -2950,8 +2954,8 @@
+@@ -2958,8 +2958,8 @@
  isp_start(XS_T *xs)
  {
  	struct ispsoftc *isp;
@@ -602,7 +586,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	ispreq_t *reqp, *qep;
  	int target, i;
  
-@@ -3197,7 +3201,7 @@
+@@ -3205,7 +3205,7 @@
  	 */
  	reqp = (ispreq_t *) local;
  	if (isp->isp_sendmarker) {
@@ -611,7 +595,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		/*
  		 * Check ports to send markers for...
  		 */
-@@ -3323,7 +3327,7 @@
+@@ -3331,7 +3331,7 @@
  	XS_T *xs;
  	mbreg_t mbs;
  	int bus, tgt;
@@ -620,7 +604,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  	switch (ctl) {
  	default:
-@@ -3516,10 +3520,10 @@
+@@ -3524,10 +3524,10 @@
  #endif
  
  void
@@ -633,7 +617,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	int i, nlooked = 0, ndone = 0;
  
  again:
-@@ -3668,7 +3672,7 @@
+@@ -3676,7 +3676,7 @@
  		ispstatusreq_t local, *sp = &local;
  		isphdr_t *hp;
  		int type;
@@ -642,7 +626,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		int buddaboom = 0;
  
  		hp = (isphdr_t *) ISP_QUEUE_ENTRY(isp->isp_result, optr);
-@@ -3775,7 +3779,7 @@
+@@ -3787,7 +3787,7 @@
  		}
  		xs = isp_find_xs(isp, sp->req_handle);
  		if (xs == NULL) {
@@ -651,7 +635,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  			MEMZERO(hp, QENTRY_LEN);	/* PERF */
  			/*
  			 * Only whine if this isn't the expected fallout of
-@@ -3957,7 +3961,7 @@
+@@ -3969,7 +3969,7 @@
   */
  
  static int
@@ -660,16 +644,16 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  {
  	int rval = 0;
  	int bus;
-@@ -4282,7 +4286,7 @@
+@@ -4298,7 +4298,7 @@
  
  	if (bus & 0x100) {
  		int i, nh;
--		u_int16_t handles[5];
-+		uint16_t handles[5];
+-		u_int16_t handles[16];
++		uint16_t handles[16];
  
  		for (nh = 0, i = 1; i < MAX_MAILBOX; i++) {
  			if ((bus & (1 << i)) == 0) {
-@@ -4311,7 +4315,7 @@
+@@ -4327,7 +4327,7 @@
  
  static int
  isp_handle_other_response(struct ispsoftc *isp, int type,
@@ -678,7 +662,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  {
  	switch (type) {
  	case RQSTYPE_STATUS_CONT:
-@@ -4729,7 +4733,7 @@
+@@ -4759,7 +4759,7 @@
  }
  
  static void
@@ -687,7 +671,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  {
  	XS_T *xs;
  
-@@ -4765,7 +4769,7 @@
+@@ -4795,7 +4795,7 @@
  isp_mbox_continue(struct ispsoftc *isp)
  {
  	mbreg_t mbs;
@@ -696,7 +680,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  	switch (isp->isp_lastmbxcmd) {
  	case MBOX_WRITE_RAM_WORD:
-@@ -4813,7 +4817,7 @@
+@@ -4843,7 +4843,7 @@
  #define	HIBYT(x)			((x) >> 0x8)
  #define	LOBYT(x)			((x)  & 0xff)
  #define	ISPOPMAP(a, b)			(((a) << 8) | (b))
@@ -705,7 +689,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	ISPOPMAP(0x01, 0x01),	/* 0x00: MBOX_NO_OP */
  	ISPOPMAP(0x1f, 0x01),	/* 0x01: MBOX_LOAD_RAM */
  	ISPOPMAP(0x03, 0x01),	/* 0x02: MBOX_EXEC_FIRMWARE */
-@@ -5009,7 +5013,7 @@
+@@ -5039,7 +5039,7 @@
  };
  #endif
  
@@ -714,7 +698,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	ISPOPMAP(0x01, 0x01),	/* 0x00: MBOX_NO_OP */
  	ISPOPMAP(0x1f, 0x01),	/* 0x01: MBOX_LOAD_RAM */
  	ISPOPMAP(0x03, 0x01),	/* 0x02: MBOX_EXEC_FIRMWARE */
-@@ -5282,7 +5286,7 @@
+@@ -5312,7 +5312,7 @@
  isp_mboxcmd_qnw(struct ispsoftc *isp, mbreg_t *mbp, int nodelay)
  {
  	unsigned int ibits, obits, box, opcode;
@@ -723,7 +707,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  	if (IS_FC(isp)) {
  		mcp = mbpfc;
-@@ -5321,7 +5325,7 @@
+@@ -5351,7 +5351,7 @@
  {
  	char *cname, *xname, tname[16], mname[16];
  	unsigned int lim, ibits, obits, box, opcode;
@@ -732,7 +716,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  	if (IS_FC(isp)) {
  		mcp = mbpfc;
-@@ -5507,7 +5511,7 @@
+@@ -5537,7 +5537,7 @@
  	sdp += bus;
  
  	for (tgt = 0; tgt < MAX_TARGETS; tgt++) {
@@ -741,7 +725,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		int get;
  
  		if (sdp->isp_devparam[tgt].dev_enable == 0) {
-@@ -5676,8 +5680,8 @@
+@@ -5706,8 +5706,8 @@
  		}
  		if (isp->isp_confopts & ISP_CFG_OWNWWNN) {
  			isp_prt(isp, ISP_LOGCONFIG, "Using Node WWN 0x%08x%08x",
@@ -752,7 +736,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  			ISP_NODEWWN(isp) = DEFAULT_NODEWWN(isp);
  		} else {
  			/*
-@@ -5688,8 +5692,8 @@
+@@ -5718,8 +5718,8 @@
  		}
  		if (isp->isp_confopts & ISP_CFG_OWNWWPN) {
  			isp_prt(isp, ISP_LOGCONFIG, "Using Port WWN 0x%08x%08x",
@@ -763,7 +747,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  			ISP_PORTWWN(isp) = DEFAULT_PORTWWN(isp);
  		} else {
  			/*
-@@ -5786,7 +5790,7 @@
+@@ -5816,7 +5816,7 @@
  	 * the default to the SAFE default state- that's not the goal state.
  	 */
  	for (tgt = 0; tgt < MAX_TARGETS; tgt++) {
@@ -772,7 +756,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		sdp->isp_devparam[tgt].actv_offset = 0;
  		sdp->isp_devparam[tgt].actv_period = 0;
  		sdp->isp_devparam[tgt].actv_flags = 0;
-@@ -5864,7 +5868,7 @@
+@@ -5894,7 +5894,7 @@
  	isp->isp_nactive = 0;
  
  	for (i = 0; i < isp->isp_maxcmds; i++) {
@@ -781,7 +765,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		xs = isp->isp_xflist[i];
  		if (xs == NULL) {
  			continue;
-@@ -5889,10 +5893,10 @@
+@@ -5919,10 +5919,10 @@
  isp_read_nvram(struct ispsoftc *isp)
  {
  	int i, amt;
@@ -795,7 +779,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	} _n;
  #define	nvram_data	_n._x
  #define	nvram_words	_n._s
-@@ -5960,10 +5964,10 @@
+@@ -5990,10 +5990,10 @@
  }
  
  static void
@@ -808,7 +792,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  	ISP_WRITE(isp, BIU_NVRAM, BIU_NVRAM_SELECT);
  	USEC_DELAY(2);
-@@ -6008,7 +6012,7 @@
+@@ -6038,7 +6038,7 @@
  	 */
  	*rp = 0;
  	for (i = 0; i < 16; i++) {
@@ -817,7 +801,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		*rp <<= 1;
  		ISP_WRITE(isp, BIU_NVRAM, BIU_NVRAM_SELECT|BIU_NVRAM_CLOCK);
  		USEC_DELAY(2);
-@@ -6026,7 +6030,7 @@
+@@ -6056,7 +6056,7 @@
  }
  
  static void
@@ -826,7 +810,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  {
  	sdparam *sdp = (sdparam *) isp->isp_param;
  	int tgt;
-@@ -6152,7 +6156,7 @@
+@@ -6182,7 +6182,7 @@
  }
  
  static void
@@ -835,7 +819,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  {
  	sdparam *sdp = (sdparam *) isp->isp_param;
  	int tgt;
-@@ -6244,7 +6248,7 @@
+@@ -6274,7 +6274,7 @@
  }
  
  static void
@@ -844,7 +828,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  {
  	sdparam *sdp = (sdparam *) isp->isp_param;
  	int tgt;
-@@ -6335,10 +6339,10 @@
+@@ -6365,10 +6365,10 @@
  }
  
  static void
@@ -857,7 +841,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  	/*
  	 * There is NVRAM storage for both Port and Node entities-
-@@ -6354,9 +6358,9 @@
+@@ -6384,9 +6384,9 @@
  	wwn = ISP2100_NVRAM_PORT_NAME(nvram_data);
  	if (wwn) {
  		isp_prt(isp, ISP_LOGCONFIG, "NVRAM Port WWN 0x%08x%08x",
@@ -869,7 +853,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		}
  	}
  	fcp->isp_portwwn = wwn;
-@@ -6364,14 +6368,14 @@
+@@ -6394,14 +6394,14 @@
  		wwn = ISP2200_NVRAM_NODE_NAME(nvram_data);
  		if (wwn) {
  			isp_prt(isp, ISP_LOGCONFIG, "NVRAM Node WWN 0x%08x%08x",
@@ -888,7 +872,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  	}
  	fcp->isp_nodewwn = wwn;
  
-@@ -6391,13 +6395,13 @@
+@@ -6421,13 +6421,13 @@
  	 * for the Port WWN.
  	 */
  	if (fcp->isp_nodewwn && fcp->isp_portwwn) {
@@ -906,7 +890,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  		}
  	}
  
-@@ -6435,7 +6439,7 @@
+@@ -6465,7 +6465,7 @@
  {
  	int i, j;
  	mbreg_t mbs;
@@ -915,7 +899,7 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  	ptr = FCPARAM(isp)->isp_dump_data;
  	if (ptr == NULL) {
-@@ -6579,7 +6583,7 @@
+@@ -6609,7 +6609,7 @@
  {
  	int i, j;
  	mbreg_t mbs;
@@ -924,21 +908,10 @@ diff -ur src.old/sys/dev/isp/isp.c src/sys/dev/isp/isp.c
  
  	ptr = FCPARAM(isp)->isp_dump_data;
  	if (ptr == NULL) {
-diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
---- src.old/sys/dev/isp/ispvar.h	2004-05-24 09:02:25.000000000 +0200
-+++ src/sys/dev/isp/ispvar.h	2004-11-09 00:41:53.000000000 +0100
-@@ -53,6 +53,10 @@
- #endif
- #endif
- 
-+#if 0
-+#include <stdint.h>	/* uintXX_t */
-+#endif
-+
- #define	ISP_CORE_VERSION_MAJOR	2
- #define	ISP_CORE_VERSION_MINOR	8
- 
-@@ -62,20 +66,20 @@
+
+--- sys.old/dev/isp/ispvar.h	2005-05-10 20:22:17.000000000 -0400
++++ sys/dev/isp/ispvar.h	2005-09-03 16:09:08.000000000 -0400
+@@ -62,20 +62,20 @@
  struct ispsoftc;
  struct ispmdvec {
  	int		(*dv_rd_isr)
@@ -967,7 +940,7 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
  };
  
  /*
-@@ -90,9 +94,9 @@
+@@ -90,9 +90,9 @@
   * 'Types'
   */
  #ifdef	ISP_DAC_SUPPORTED
@@ -979,16 +952,7 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
  #endif
  
  /*
-@@ -176,7 +180,7 @@
-  */
- 
- typedef struct {
--	u_int		isp_gotdparms		: 1,
-+	unsigned int	isp_gotdparms		: 1,
- 			isp_req_ack_active_neg	: 1,
- 			isp_data_line_active_neg: 1,
- 			isp_cmd_dma_burst_enable: 1,
-@@ -188,14 +192,14 @@
+@@ -188,14 +188,14 @@
  			isp_fast_mttr		: 1,	/* fast sram */
  			isp_initiator_id	: 4,
  			isp_async_data_setup	: 4;
@@ -1000,17 +964,17 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
 -	u_int8_t	isp_retry_delay;
 +	uint16_t	isp_selection_timeout;
 +	uint16_t	isp_max_queue_depth;
-+	uint8_t		isp_tag_aging;
-+	uint8_t		isp_bus_reset_delay;
-+	uint8_t		isp_retry_count;
-+	uint8_t		isp_retry_delay;
++	uint8_t	isp_tag_aging;
++	uint8_t	isp_bus_reset_delay;
++	uint8_t	isp_retry_count;
++	uint8_t	isp_retry_delay;
  	struct {
 -		u_int32_t	
 +		uint32_t	
  			exc_throttle	:	8,
  					:	1,
  			dev_enable	:	1,	/* ignored */
-@@ -204,12 +208,12 @@
+@@ -204,12 +204,12 @@
  			actv_offset	:	4,
  			goal_offset	:	4,
  			nvrm_offset	:	4;
@@ -1020,16 +984,16 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
 -		u_int16_t	actv_flags;	/* current device flags */
 -		u_int16_t	goal_flags;	/* goal device flags */
 -		u_int16_t	nvrm_flags;	/* nvram device flags */
-+		uint8_t		actv_period;	/* current sync period */
-+		uint8_t		goal_period;	/* goal sync period */
-+		uint8_t		nvrm_period;	/* nvram sync period */
++		uint8_t	actv_period;	/* current sync period */
++		uint8_t	goal_period;	/* goal sync period */
++		uint8_t	nvrm_period;	/* nvram sync period */
 +		uint16_t	actv_flags;	/* current device flags */
 +		uint16_t	goal_flags;	/* goal device flags */
 +		uint16_t	nvrm_flags;	/* nvram device flags */
  	} isp_devparam[MAX_TARGETS];
  } sdparam;
  
-@@ -254,7 +258,7 @@
+@@ -254,7 +254,7 @@
  #endif
  
  typedef struct {
@@ -1038,7 +1002,7 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
  				isp_gbspeed	: 2,
  				isp_iid_set	: 1,
  				loop_seen_once	: 1,
-@@ -263,20 +267,20 @@
+@@ -263,20 +263,20 @@
  				isp_gotdparms	: 1,
  				isp_topo	: 3,
  				isp_onfabric	: 1;
@@ -1056,16 +1020,16 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
 -	u_int16_t		isp_maxfrmlen;
 -	u_int64_t		isp_nodewwn;
 -	u_int64_t		isp_portwwn;
-+	uint8_t			isp_iid;	/* 'initiator' id */
-+	uint8_t			isp_loopid;	/* hard loop id */
-+	uint8_t			isp_alpa;	/* ALPA */
++	uint8_t		isp_iid;	/* 'initiator' id */
++	uint8_t		isp_loopid;	/* hard loop id */
++	uint8_t		isp_alpa;	/* ALPA */
 +	uint32_t		isp_portid;
 +	volatile uint16_t	isp_lipseq;	/* LIP sequence # */
 +	uint16_t		isp_fwattr;	/* firmware attributes */
-+	uint8_t			isp_execthrottle;
-+	uint8_t			isp_retry_delay;
-+	uint8_t			isp_retry_count;
-+	uint8_t			isp_reserved;
++	uint8_t		isp_execthrottle;
++	uint8_t		isp_retry_delay;
++	uint8_t		isp_retry_count;
++	uint8_t		isp_reserved;
 +	uint16_t		isp_maxalloc;
 +	uint16_t		isp_maxfrmlen;
 +	uint64_t		isp_nodewwn;
@@ -1073,7 +1037,7 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
  	/*
  	 * Port Data Base. This is indexed by 'target', which is invariate.
  	 * However, elements within can move around due to loop changes,
-@@ -287,7 +291,7 @@
+@@ -287,7 +287,7 @@
  	 * to move around.
  	 */
  	struct lportdb {
@@ -1082,7 +1046,7 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
  					port_type	: 8,
  					loopid		: 8,
  					fc4_type	: 4,
-@@ -300,9 +304,9 @@
+@@ -300,9 +300,9 @@
  					loggedin	: 1,
  					roles		: 2,
  					valid		: 1;
@@ -1095,7 +1059,7 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
  	} portdb[MAX_FC_TARG], tport[FC_PORT_ID];
  
  	/*
-@@ -311,7 +315,7 @@
+@@ -311,7 +311,7 @@
  	caddr_t			isp_scratch;
  	isp_dma_addr_t		isp_scdma;
  #ifdef	ISP_FW_CRASH_DUMP
@@ -1104,7 +1068,7 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
  #endif
  } fcparam;
  
-@@ -360,14 +364,14 @@
+@@ -360,14 +360,14 @@
  	 */
  
  	void * 			isp_param;	/* type specific */
@@ -1117,8 +1081,8 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
 +	uint16_t		isp_fwrev[3];	/* Loaded F/W revision */
 +	uint16_t		isp_romfw_rev[3]; /* PROM F/W revision */
 +	uint16_t		isp_maxcmds;	/* max possible I/O cmds */
-+	uint8_t			isp_type;	/* HBA Chip Type */
-+	uint8_t			isp_revision;	/* HBA Chip H/W Revision */
++	uint8_t		isp_type;	/* HBA Chip Type */
++	uint8_t		isp_revision;	/* HBA Chip H/W Revision */
 +	uint32_t		isp_maxluns;	/* maximum luns supported */
  
 -	u_int32_t		isp_clock	: 8,	/* input clock */
@@ -1126,7 +1090,7 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
  						: 4,
  				isp_port	: 1,	/* 23XX only */
  				isp_failed	: 1,	/* board failed */
-@@ -378,47 +382,47 @@
+@@ -378,47 +378,47 @@
  				isp_role	: 2,	/* roles supported */
  				isp_dblev	: 12;	/* debug log mask */
  
@@ -1199,7 +1163,7 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
  	void *			isp_mbxworkp;
  
  	/*
-@@ -622,7 +626,7 @@
+@@ -622,7 +622,7 @@
   * semaphore register and first mailbox register (if appropriate). This also
   * means that most spurious/bogus interrupts not for us can be filtered first.
   */
@@ -1208,7 +1172,7 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
  
  
  /*
-@@ -807,7 +811,7 @@
+@@ -808,7 +808,7 @@
   *
   *	GET_NANOTIME(NANOTIME_T *)		get current nanotime.
   *
@@ -1217,7 +1181,7 @@ diff -ur src.old/sys/dev/isp/ispvar.h src/sys/dev/isp/ispvar.h
   *
   *	NANOTIME_SUB(NANOTIME_T *, NANOTIME_T *)
   *						subtract two NANOTIME_T values
-@@ -896,15 +900,15 @@
+@@ -897,15 +897,15 @@
   *
   *	(XXX these do endian specific transformations- in transition XXX)
   *

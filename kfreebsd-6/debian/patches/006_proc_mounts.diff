@@ -1,0 +1,39 @@
+
+Status: sent upstream
+
+--- sys.old/compat/linprocfs/linprocfs.c	2005-03-03 12:44:21.000000000 +0100
++++ sys/compat/linprocfs/linprocfs.c	2005-03-05 19:47:40.000000000 +0100
+@@ -345,13 +345,11 @@
+ #endif /* __i386__ || __amd64__ */
+ 
+ /*
+- * Filler function for proc/mtab
++ * Filler function for proc/mounts
+  *
+- * This file doesn't exist in Linux' procfs, but is included here so
+- * users can symlink /compat/linux/etc/mtab to /proc/mtab
+  */
+ static int
+-linprocfs_domtab(PFS_FILL_ARGS)
++linprocfs_domounts(PFS_FILL_ARGS)
+ {
+ 	struct nameidata nd;
+ 	struct mount *mp;
+@@ -402,7 +400,7 @@
+ 		ADD_OPTION(MNT_NOSYMFOLLOW,	"nosymfollow");
+ 		ADD_OPTION(MNT_NOATIME,		"noatime");
+ #undef ADD_OPTION
+-		/* a real Linux mtab will also show NFS options */
++		/* a real Linux mounts will also show NFS options */
+ 		sbuf_printf(sb, " 0 0\n");
+ 	}
+ 	mtx_unlock(&mountlist_mtx);
+@@ -1031,7 +1029,7 @@
+ 	pfs_create_file(root, "modules", &linprocfs_domodules,
+ 	    NULL, NULL, PFS_RD);
+ #endif
+-	pfs_create_file(root, "mtab", &linprocfs_domtab,
++	pfs_create_file(root, "mounts", &linprocfs_domounts,
+ 	    NULL, NULL, PFS_RD);
+ 	pfs_create_link(root, "self", &procfs_docurproc,
+ 	    NULL, NULL, 0);

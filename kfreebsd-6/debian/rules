@@ -1,0 +1,176 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# GNU copyright 1997 to 1999 by Joey Hess.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+full_version	:= $(shell dpkg-parsechangelog | grep ^Version | sed -e 's/^.*: //g')
+version		:= $(shell echo $(full_version) | sed -e 's/[+-].*//g')
+major		:= $(shell echo $(version) | sed -e 's/\..*//g')
+revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
+os		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+cpu		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+abiname		:= 1
+
+SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
+IMAGE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname)
+HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-headers-$(version)-$(abiname)
+SRC_TAR		:= kfreebsd-source-$(version).tar.bz2
+SRC_DIR		:= kfreebsd-source-$(version)
+HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
+
+KERNEL	:= GENERIC
+MAKE	:= make MACHINE_ARCH=$(cpu) CC=gcc-3.4 WERROR= 
+PATH	:= /usr/lib/freebsd:$(PATH)
+
+control:
+	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" \
+		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -rf src kfreebsd-source-*
+	rm -f debian/kfreebsd-image-*.{conffiles,preinst,postinst}
+
+	rm -f *-stamp
+	dh_clean
+
+$(SRC_DIR):
+	tar xfj $(CURDIR)/src.tar.bz2
+	mv src $(SRC_DIR)
+	
+	chmod +x $(CURDIR)/debian/autopatch.sh \
+		&& cd $(SRC_DIR) \
+		&& $(CURDIR)/debian/autopatch.sh
+	
+	for i in $(CURDIR)/debian/patches/*.diff ; do \
+		echo "--- Patch $$i ---" ; \
+		cat $$i | patch -p0 -d $(SRC_DIR) ; \
+	done
+
+build-indep: build-indep-stamp
+build-indep-stamp: $(SRC_DIR)
+	dh_testdir
+	
+	touch build-indep-stamp
+
+build-arch: build-arch-stamp
+build-arch-stamp: $(SRC_DIR)
+	dh_testdir
+	
+	# Add the abiname to the kernel version
+	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)"/g' $(SRC_DIR)/sys/conf/newvers.sh 
+
+	# Configure the kernel
+	cd $(SRC_DIR)/sys/$(cpu)/conf \
+		&& config $(KERNEL)
+
+	# Build it
+	$(MAKE) -C $(SRC_DIR)/sys/$(cpu)/compile/$(KERNEL)/ depend
+	$(MAKE) -C $(SRC_DIR)/sys/$(cpu)/compile/$(KERNEL)/
+
+	touch build-arch-stamp
+
+install-indep: install-indep-stamp
+install-indep-stamp: build-indep
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	mkdir -p $(SOURCE_PACKAGE)/usr/src
+	chown -R root.src $(SRC_DIR)
+	tar cfj $(SOURCE_PACKAGE)/usr/src/$(SRC_TAR) $(SRC_DIR)
+
+	touch install-indep-stamp
+
+install-arch: install-arch-stamp
+install-arch-stamp: build-arch
+	# install device.hints
+	mkdir -p $(IMAGE_PACKAGE)/boot/kernel
+	install -o root -g root -m 644 \
+		$(SRC_DIR)/sys/$(cpu)/conf/GENERIC.hints \
+		$(IMAGE_PACKAGE)/boot/device.hints
+	install -o root -g root -m 644 \
+		$(SRC_DIR)/sys/boot/forth/loader.conf \
+		$(IMAGE_PACKAGE)/boot/loader.conf
+	mkdir -p $(IMAGE_PACKAGE)/boot/defaults
+	install -o root -g root -m 644 \
+		$(SRC_DIR)/sys/boot/forth/loader.conf \
+		$(IMAGE_PACKAGE)/boot/defaults/loader.conf
+	mkdir -p $(IMAGE_PACKAGE)/sbin
+	ln -s /bin/true \
+		$(IMAGE_PACKAGE)/sbin/fsck.cd9660
+	
+	# now install the kernel
+	$(MAKE) -C $(SRC_DIR)/sys/$(cpu)/compile/$(KERNEL) DESTDIR=$(IMAGE_PACKAGE) install
+	chmod 644 $(IMAGE_PACKAGE)/boot/kernel/kernel
+	
+	# override file
+	mkdir -p $(IMAGE_PACKAGE)/usr/share/lintian/overrides
+	install -p -o root -g root -m 644 \
+		$(CURDIR)/debian/kfreebsd-image.overrides \
+		$(IMAGE_PACKAGE)/usr/share/lintian/overrides/kfreebsd-image-$(version)-$(abiname)
+
+	# scripts
+	cp -f $(CURDIR)/debian/kfreebsd-image.conffiles.in \
+		$(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname).conffiles
+	cp -f $(CURDIR)/debian/kfreebsd-image.postinst.in \
+		$(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname).postinst
+	cp -f $(CURDIR)/debian/kfreebsd-image.preinst.in \
+		$(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname).preinst
+	
+	# headers package
+	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
+	cd $(SRC_DIR) \
+		&& find . -type f -name "*.h" -not -regex ".*modules.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \; \
+		&& cp -d --parents sys/i386/compile/$(KERNEL)/machine $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
+	find $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) -type f -exec chmod 644 {} \;
+
+
+# Build architecture-independent files here.
+binary-indep: build-indep install-indep
+	dh_testdir
+	dh_testroot
+	dh_installdocs -i
+	dh_installchangelogs -i
+	dh_link -i
+	dh_strip -i
+	dh_compress -i
+	dh_fixperms -i
+	dh_makeshlibs -i
+	dh_installdeb -i
+	dh_shlibdeps -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
+
+# Build architecture-dependent files here.
+ifeq ($(os), kfreebsd)
+binary-arch: build-arch install-arch
+	dh_testdir
+	dh_testroot
+	dh_installdocs -a
+	dh_installchangelogs -a
+	dh_link -a
+	dh_strip -a -X/boot
+	dh_compress -a
+	dh_fixperms -a
+	dh_makeshlibs -a
+	dh_installdeb -a
+	dh_shlibdeps -a -X/boot
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+else
+binary-arch:
+	# We have nothing to do
+endif	
+
+binary: binary-indep binary-arch
+
+.PHONY: clean build build-indep
+.PHONY: binary-indep binary-arch binary-indep binary-arch binary
+

@@ -1,8 +1,7 @@
-diff -ur src.old/sys/sys/conf.h src/sys/sys/conf.h
---- src.old/sys/sys/conf.h	2004-11-08 21:11:48.000000000 +0100
-+++ src/sys/sys/conf.h	2004-11-09 00:52:56.000000000 +0100
-@@ -273,15 +273,15 @@
- void devfs_destroy(struct cdev *dev);
+--- sys/sys/conf.h.old	2004-10-05 00:22:17.000000000 +0200
++++ sys/sys/conf.h	2004-10-05 00:37:00.000000000 +0200
+@@ -295,15 +295,15 @@
+ void devfs_destroy(dev_t dev);
  
  #define		UID_ROOT	0
 -#define		UID_BIN		3
@@ -22,6 +21,5 @@ diff -ur src.old/sys/sys/conf.h src/sys/sys/conf.h
 +#define		GID_GAMES	60	/* debian games */
 +#define		GID_DIALER	20	/* linux ttyS0 */
  
- typedef void (*dev_clone_fn)(void *arg, char *name, int namelen, struct cdev **result);
+ typedef void (*dev_clone_fn)(void *arg, char *name, int namelen, dev_t *result);
  
-Only in src/sys/sys: conf.h.orig

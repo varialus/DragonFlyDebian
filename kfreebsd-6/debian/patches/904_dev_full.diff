@@ -1,7 +1,6 @@
-diff -ur src.old/sys/dev/null/null.c src/sys/dev/null/null.c
---- src.old/sys/dev/null/null.c	2004-08-02 21:59:41.000000000 +0200
-+++ src/sys/dev/null/null.c	2004-11-09 01:50:39.000000000 +0100
-@@ -42,14 +42,17 @@
+--- /usr/local/src/sys/dev/null/null.c	2005-02-27 17:00:45.000000000 -0500
++++ sys/dev/null/null.c	2005-09-03 20:03:19.000000000 -0400
+@@ -42,13 +42,16 @@
  
  /* For use with destroy_dev(9). */
  static struct cdev *null_dev;
@@ -13,14 +12,13 @@ diff -ur src.old/sys/dev/null/null.c src/sys/dev/null/null.c
  static d_ioctl_t null_ioctl;
  static d_read_t zero_read;
  
- #define CDEV_MAJOR	2
  #define NULL_MINOR	2
 +#define FULL_MINOR	3
  #define ZERO_MINOR	12
  
  static struct cdevsw null_cdevsw = {
-@@ -61,6 +64,15 @@
- 	.d_maj =	CDEV_MAJOR,
+@@ -59,6 +62,14 @@
+ 	.d_name =	"null",
  };
  
 +static struct cdevsw full_cdevsw = {
@@ -29,13 +27,12 @@ diff -ur src.old/sys/dev/null/null.c src/sys/dev/null/null.c
 +	.d_write =	full_write,
 +	.d_ioctl =	null_ioctl,
 +	.d_name =	"full",
-+	.d_maj =	CDEV_MAJOR,
 +};
 +
  static struct cdevsw zero_cdevsw = {
  	.d_version =	D_VERSION,
  	.d_read =	zero_read,
-@@ -83,6 +95,15 @@
+@@ -80,6 +91,15 @@
  
  /* ARGSUSED */
  static int
@@ -51,7 +48,7 @@ diff -ur src.old/sys/dev/null/null.c src/sys/dev/null/null.c
  null_ioctl(struct cdev *dev __unused, u_long cmd, caddr_t data __unused,
      int flags __unused, struct thread *td)
  {
-@@ -119,12 +140,15 @@
+@@ -116,12 +136,15 @@
  		zbuf = (void *)malloc(PAGE_SIZE, M_TEMP, M_WAITOK | M_ZERO);
  		null_dev = make_dev(&null_cdevsw, NULL_MINOR, UID_ROOT,
  			GID_WHEEL, 0666, "null");

@@ -1,7 +1,6 @@
-diff -ur src.old/sys/conf/kmod.mk src/sys/conf/kmod.mk
---- src.old/sys/conf/kmod.mk	2004-10-24 10:26:48.000000000 +0200
-+++ src/sys/conf/kmod.mk	2004-11-09 00:46:12.000000000 +0100
-@@ -170,7 +170,7 @@
+--- sys.old/conf/kmod.mk	2005-04-22 13:39:58.000000000 -0400
++++ sys/conf/kmod.mk	2005-09-03 16:11:36.000000000 -0400
+@@ -180,7 +180,7 @@
  	grep -v '^#' < ${EXPORT_SYMS} > export_syms
  .endif
  	awk -f ${SYSDIR}/conf/kmod_syms.awk ${.TARGET} \
@@ -9,10 +8,11 @@ diff -ur src.old/sys/conf/kmod.mk src/sys/conf/kmod.mk
 +	    export_syms | xargs -i% ${OBJCOPY} % ${.TARGET}
  .endif
  .endif
- .if !defined(DEBUG_FLAGS) && ${MACHINE_ARCH} == amd64
-diff -ur src.old/sys/contrib/dev/acpica/acpica_prep.sh src/sys/contrib/dev/acpica/acpica_prep.sh
---- src.old/sys/contrib/dev/acpica/acpica_prep.sh	2004-04-14 04:03:33.000000000 +0200
-+++ src/sys/contrib/dev/acpica/acpica_prep.sh	2004-11-09 00:46:36.000000000 +0100
+ .if !defined(DEBUG_FLAGS) && ${MACHINE_ARCH} == amd64diff -ur sys.old/conf/kmod.mk sys/conf/kmod.mk
+
+diff -ur sys.old/contrib/dev/acpica/acpica_prep.sh sys/contrib/dev/acpica/acpica_prep.sh
+--- sys.old/contrib/dev/acpica/acpica_prep.sh	2004-04-14 04:03:33.000000000 +0200
++++ sys/contrib/dev/acpica/acpica_prep.sh	2004-11-16 18:22:34.000000000 +0100
 @@ -52,12 +52,12 @@
  
  echo copying full dirs

@@ -1,0 +1,42 @@
+Source: kfreebsd-6
+Section: devel
+Priority: optional
+Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
+Uploaders: Aurelien Jarno <aurel32@debian.org>, Guillem Jover <guillem@debian.org>
+Build-Depends-Indep: debhelper (>= 4.1.0), bzip2, patchutils (>= 0.2.25)
+Build-Depends: debhelper (>= 4.1.0), bzip2, patchutils (>= 0.2.25), dpkg (>= 1.13.9), freebsd5-buildutils (>= 6.0), libdb4.3-dev, flex-old | flex, gcc-3.4
+Standards-Version: 3.6.2
+
+Package: kfreebsd-source-6.0
+Architecture: all
+Section: devel
+Recommends: freebsd5-buildutils (>= 6.0)
+Provides: kfreebsd-source-6, kfreebsd-source
+Replaces: kfreebsd6-source
+Description: source code for kernel of FreeBSD 6.0 with Debian patches
+ This package provides the source code for kernel of FreeBSD 6.0, base of 
+ a GNU/kFreeBSD system.
+
+Package: kfreebsd-image-6.0-1
+Architecture: kfreebsd-i386
+Section: base
+Essential: yes
+Depends: freebsd-utils (>= 5)
+Provides: kfreebsd-image-6, kfreebsd-image
+Conflicts: kfreebsd5, kfreebsd-image
+Replaces: kfreebsd5
+Description: kernel of FreeBSD 6.0 image
+ This package provides the binary image and pre-built loadable modules for 
+ the kernel of FreeBSD 6.0, base of a GNU/kFreeBSD system.
+
+Package: kfreebsd-headers-6.0-1
+Architecture: kfreebsd-i386
+Section: devel
+Provides: kfreebsd-headers-6, kfreebsd-headers
+Depends: coreutils
+Description: header files for kernel of FreeBSD 6.0
+ This package provides the header files for kernel of FreeBSD 6.0, generally 
+ used for building out-of-tree kernel modules. These files are going to be 
+ installed into /usr/src/kfreebsd-headers-6.0-1, and can be used for building 
+ modules that load into the kernel provided by the kfreebsd-image-6.0-1 package.
+      
