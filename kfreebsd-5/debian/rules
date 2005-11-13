@@ -126,6 +126,7 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	# now install the kernel
 	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(cpu)/compile/$(configfile) DESTDIR=$(IMAGE_PACKAGE)-$* install
 	chmod 644 $(IMAGE_PACKAGE)-$*/boot/kernel/kernel
+	gzip -9 $(IMAGE_PACKAGE)-$*/boot/kernel/kernel
 	
 	# override file
 	mkdir -p $(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides
