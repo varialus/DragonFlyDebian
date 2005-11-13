@@ -12,8 +12,8 @@ fi
 
 . vars
 
-if ! test -e mfsroot${dot_gz} ; then ./mfsroot.sh ; fi
 if ! test -d tmp ; then ./tarball.sh ; fi
+./mfsroot.sh
 
 for i in mkisofs ; do
   if ! dpkg -s ${i} | grep -q "^Status: .* installed$" > /dev/null ; then
