@@ -30,9 +30,11 @@ PATH		:= /usr/lib/freebsd:$(PATH)
 control:
 	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
 		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
-	for flavor in $(flavours) ; do \
-		sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
-			$(CURDIR)/debian/control.flavor.in >> $(CURDIR)/debian/control ; \
+	for arch in `ls $(CURDIR)/debian/arch` ; do \
+		for flavor in `ls $(CURDIR)/debian/arch/$$arch/` ; do \
+			sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@arch@/$$arch/g" \
+				$(CURDIR)/debian/control.flavor.in >> $(CURDIR)/debian/control ; \
+		done ; \
 	done
 
 clean:
@@ -100,7 +102,7 @@ install-common-stamp: src
 	dh_testroot
 	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
 	cd src \
-		&& find . -type f -name "*.h" -not -regex ".*modules.*" -not -regex ".*sys/i386/.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \; 
+		&& find . -type f -name "*.h" -not -regex ".*modules.*" -not -regex ".*sys/$(cpu)/.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \; 
 	find $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) -type f -exec chmod 644 {} \;
 
 	touch install-common-stamp
