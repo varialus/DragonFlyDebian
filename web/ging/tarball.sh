@@ -60,3 +60,4 @@ rm -f ./tmp/native-install
 umount -f ./tmp/dev
 umount -f ./tmp/proc
 
+exit 0
