@@ -12,7 +12,7 @@ revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 os		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 cpu		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 config_files	:= $(wildcard debian/arch/$(cpu)/*)
-flavours	:= $(config_files:config/%=%)
+flavours	:= $(config_files:debian/arch/$(cpu)/%=%)
 configfile	:= DEBCUSTOM
 abiname		:= 1
 
