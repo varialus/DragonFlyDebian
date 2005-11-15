@@ -21,6 +21,7 @@ set -e
 
 get_modules ()
   {
+    test -e /etc/modules.d/kfreebsd-config || return
     sed -e "s/#.*//g" -e "/^\( \|\t\)*$/d" /etc/modules.d/kfreebsd-config \
       | tr "\n" ":" | sed -e "s/ /:/g" -e "s/^://g" -e s/:$//g -e "s/::*/:/g"
   }
