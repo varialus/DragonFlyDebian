@@ -1,0 +1,162 @@
+diff -ur lrmi.old/lrmi.c lrmi/lrmi.c
+--- lrmi.old/lrmi.c	2005-08-20 14:19:10.000000000 +0200
++++ lrmi/lrmi.c	2005-08-20 14:02:32.000000000 +0200
+@@ -23,7 +23,11 @@
+ OTHER DEALINGS IN THE SOFTWARE.
+ */
+ 
+-#if (defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD__)) && \
++#if defined(__FreeBSD__) && !defined(__FreeBSD_kernel__)
++# define __FreeBSD_kernel__
++#endif
++
++#if (defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD_kernel__)) && \
+ 	defined(__i386__)
+ 
+ #include <stdio.h>
+@@ -37,7 +41,7 @@
+ #include <sys/vm86.h>
+ #endif
+ 
+-#elif defined(__NetBSD__) || defined(__FreeBSD__)
++#elif defined(__NetBSD__) || defined(__FreeBSD_kernel__)
+ 
+ #include <sys/param.h>
+ #include <signal.h>
+@@ -46,7 +50,7 @@
+ #include <machine/vm86.h>
+ #include <machine/sysarch.h>
+ 
+-#endif /* __NetBSD__ || __FreeBSD__ */
++#endif /* __NetBSD__ || __FreeBSD_kernel__ */
+ 
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -203,7 +207,7 @@
+ 
+ #if defined(__linux__)
+ #define DEFAULT_VM86_FLAGS 	(IF_MASK | IOPL_MASK)
+-#elif defined(__NetBSD__) || defined(__FreeBSD__)
++#elif defined(__NetBSD__) || defined(__FreeBSD_kernel__)
+ #define DEFAULT_VM86_FLAGS  (PSL_I | PSL_IOPL)
+ #define TF_MASK         PSL_T
+ #define VIF_MASK        PSL_VIF
+@@ -217,7 +221,7 @@
+ #elif defined(__NetBSD__)
+ #define CONTEXT_REGS	context.vm.substr.regs
+ #define REG(x)			vmsc.sc_ ## x
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ #define CONTEXT_REGS	context.vm.uc
+ #define REG(x)			uc_mcontext.mc_ ## x
+ #endif
+@@ -228,13 +232,13 @@
+ 	unsigned short stack_seg, stack_off;
+ #if defined(__linux__) || defined(__NetBSD__)
+ 	struct vm86_struct vm;
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	struct {
+ 		struct vm86_init_args init;
+ 		ucontext_t uc;
+ 	} vm;
+ #endif
+-#if defined(__NetBSD__) || defined(__FreeBSD__)
++#if defined(__NetBSD__) || defined(__FreeBSD_kernel__)
+ 	int success;
+ 	jmp_buf env;
+ 	void *old_sighandler;
+@@ -354,7 +358,7 @@
+ 	set_bit(RETURN_TO_32_INT, &context.vm.int_revectored);
+ #elif defined(__NetBSD__)
+ 	set_bit(RETURN_TO_32_INT, &context.vm.int_byuser);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	set_bit(RETURN_TO_32_INT, &context.vm.init.int_map);
+ #endif
+ 
+@@ -805,7 +809,7 @@
+ 
+ 	return 0;
+ }
+-#elif defined(__NetBSD__) || defined(__FreeBSD__)
++#elif defined(__NetBSD__) || defined(__FreeBSD_kernel__)
+ #if defined(__NetBSD__)
+ static void
+ vm86_callback(int sig, int code, struct sigcontext *sc)
+@@ -852,7 +856,7 @@
+ 	/* ...and sync our context back to the kernel. */
+ 	memcpy(sc, &CONTEXT_REGS, sizeof(*sc));
+ }
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ static void
+ vm86_callback(int sig, int code, struct sigcontext *sc)
+ {
+@@ -894,7 +898,7 @@
+ 	/* ...and sync our context back to the kernel. */
+ 	memcpy(sc, &CONTEXT_REGS, sizeof(*sc));
+ }
+-#endif /* __FreeBSD__ */
++#endif /* __FreeBSD_kernel__ */
+ 
+ static int
+ run_vm86(void)
+@@ -908,7 +912,7 @@
+ 
+ #if defined(__NetBSD__)
+ 	context.old_sighandler = signal(SIGURG, (void (*)(int))vm86_callback);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	context.old_sighandler = signal(SIGBUS, (void (*)(int))vm86_callback);
+ #endif
+ 
+@@ -923,7 +927,7 @@
+ 	if (setjmp(context.env)) {
+ #if defined(__NetBSD__)
+ 		(void) signal(SIGURG, context.old_sighandler);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 		(void) signal(SIGBUS, context.old_sighandler);
+ #endif
+ 		context.old_sighandler = NULL;
+@@ -937,18 +941,18 @@
+ #if defined(__NetBSD__)
+ 	if (i386_vm86(&context.vm) == -1)
+ 		return (0);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD_kernel__)
+ 	if (i386_vm86(VM86_INIT, &context.vm.init))
+ 		return 0;
+ 
+ 	CONTEXT_REGS.REG(eflags) |= PSL_VM | PSL_VIF;
+ 	sigreturn(&context.vm.uc);
+-#endif /* __FreeBSD__ */
++#endif /* __FreeBSD_kernel__ */
+ 
+ 	/* NOTREACHED */
+ 	return (0);
+ }
+-#endif	/* __NetBSD__ || __FreeBSD__ */
++#endif	/* __NetBSD__ || __FreeBSD_kernel__ */
+ 
+ int
+ LRMI_call(struct LRMI_regs *r)
+@@ -1027,4 +1031,4 @@
+ 	return vret;
+ }
+ 
+-#endif /* (__linux__ || __NetBSD__ || __FreeBSD__) && __i386__ */
++#endif /* (__linux__ || __NetBSD__ || __FreeBSD_kernel__) && __i386__ */
+diff -ur lrmi.old/lrmi.h lrmi/lrmi.h
+--- lrmi.old/lrmi.h	2005-08-20 14:19:10.000000000 +0200
++++ lrmi/lrmi.h	2005-08-20 13:57:34.000000000 +0200
+@@ -26,7 +26,7 @@
+ #ifndef LRMI_H
+ #define LRMI_H
+ 
+-#if (defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD__)) && \
++#if (defined(__linux__) || defined(__NetBSD__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && \
+ 	defined(__i386__)
+ 
+ 

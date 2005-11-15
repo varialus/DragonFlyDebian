@@ -1,0 +1,186 @@
+diff -ur vesautils.old/Makefile vesautils/Makefile
+--- vesautils.old/Makefile	2005-08-12 19:48:15.000000000 +0200
++++ vesautils/Makefile	2005-08-20 14:17:25.000000000 +0200
+@@ -1,7 +1,7 @@
+-CFLAGS ?= -g -Wall
+-LDFLAGS = -llrmi
++CFLAGS ?= -g -Wall -I.
++LDFLAGS = lrmi.o
+ 
+-all = dosint mode3 vbemodeinfo vbetest vga_reset vbetool
++all = dosint vbemodeinfo vbetest vbetool
+ 
+ %.o: %.c
+ 	$(CC) -c $(CFLAGS) -o $@ $<
+diff -ur vesautils.old/dosint.c vesautils/dosint.c
+--- vesautils.old/dosint.c	2005-08-12 19:48:15.000000000 +0200
++++ vesautils/dosint.c	2005-08-20 13:58:19.000000000 +0200
+@@ -4,6 +4,10 @@
+ #include <string.h>
+ #include <lrmi.h>
+ 
++#ifdef __GLIBC__
++#include <sys/io.h>
++#endif
++
+ unsigned char * edid = NULL;
+ 
+ int read_edid() 
+diff -ur vesautils.old/libvbe/Makefile vesautils/libvbe/Makefile
+--- vesautils.old/libvbe/Makefile	2005-08-12 19:49:53.000000000 +0200
++++ vesautils/libvbe/Makefile	2005-08-20 14:26:50.000000000 +0200
+@@ -1,7 +1,7 @@
+ LIBDIR ?= /usr/local/lib
+ INCDIR ?= /usr/local/include
+ 
+-CFLAGS = -g -Wall
++CFLAGS = -g -Wall -I. lrmi.o
+ 
+ sources = vbe.c
+ objects = vbe.o
+diff -ur vesautils.old/libvbe/vbe.c vesautils/libvbe/vbe.c
+--- vesautils.old/libvbe/vbe.c	2005-08-12 19:53:54.000000000 +0200
++++ vesautils/libvbe/vbe.c	2005-08-20 14:25:23.000000000 +0200
+@@ -20,7 +20,7 @@
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <sys/ioctl.h>
+-#include <linux/kd.h>
++#include <sys/kd.h>
+ 
+ #include <lrmi.h>
+ #include "vbe.h"
+diff -ur vesautils.old/vbemodeinfo.c vesautils/vbemodeinfo.c
+--- vesautils.old/vbemodeinfo.c	2005-08-12 19:48:15.000000000 +0200
++++ vesautils/vbemodeinfo.c	2005-08-20 14:07:57.000000000 +0200
+@@ -8,10 +8,12 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+-#include <sys/ioctl.h>
+-#include <sys/kd.h>
+ #include <sys/stat.h>
+ 
++#ifdef __GLIBC__
++#include <sys/io.h>
++#endif
++
+ #include <lrmi.h>
+ #include "vbe.h"
+ 
+diff -ur vesautils.old/vbetest.c vesautils/vbetest.c
+--- vesautils.old/vbetest.c	2005-08-12 19:48:15.000000000 +0200
++++ vesautils/vbetest.c	2005-08-20 14:24:52.000000000 +0200
+@@ -10,18 +10,21 @@
+ #include <unistd.h>
+ #include <sys/ioctl.h>
+ #if defined(__linux__)
+-#include <sys/io.h>
+-#include <sys/kd.h>
+ #include <sys/stat.h>
+ #elif defined(__NetBSD__)
+ #include <time.h>
+ #include <dev/wscons/wsconsio.h>
+ #include <machine/sysarch.h>
+-#elif defined(__FreeBSD__)
+-#include <machine/console.h>
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/consio.h>
+ #include <machine/sysarch.h>
+ #endif
+ 
++#ifdef __GLIBC__
++#include <sys/kd.h>
++#include <sys/io.h>
++#endif
++
+ #include <lrmi.h>
+ #include "vbe.h"
+ 
+@@ -247,7 +250,7 @@
+ 	struct stat stat;
+ #elif defined(__NetBSD__)
+ 	struct wsdisplay_fbinfo wsi;
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	struct vid_info vi;
+ #endif
+ 
+@@ -268,7 +271,7 @@
+ 	 || (stat.st_rdev & 0xff) > 63)
+ #elif defined(__NetBSD__)
+ 	if (ioctl(0, WSDISPLAYIO_GINFO, &wsi) == -1)
+-#elif defined(__FreeBSD__) 
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) 
+ 	memset(&vi, 0, sizeof(vi));
+ 	vi.size = sizeof(vi);
+ 	if (ioctl(0, CONS_GETINFO, &vi) == -1)
+@@ -281,7 +284,7 @@
+ 
+ 	printf("setting mode %d\n", n);
+ 
+-#if defined(__linux__) || defined(__FreeBSD__)
++#if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	ioctl(0, KDSETMODE, KD_GRAPHICS);
+ #elif defined(__NetBSD__)
+ 	ioctl(0, WSDISPLAYIO_SMODE, WSDISPLAYIO_MODE_MAPPED);
+@@ -301,7 +304,7 @@
+ 	text_mode();
+ 	restore_state(state);
+ 
+-#if defined(__linux__) || defined(__FreeBSD__)
++#if defined(__linux__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	ioctl(0, KDSETMODE, KD_TEXT);
+ #elif defined(__NetBSD__)
+ 	ioctl(0, WSDISPLAYIO_SMODE, WSDISPLAYIO_MODE_EMUL);
+@@ -367,7 +370,7 @@
+ 	/*
+ 	 Allow read/write to ALL io ports
+ 	*/
+-#if defined(__linux__)
++#if defined(__linux__) || defined(__GLIBC__)
+ 	ioperm(0, 1024, 1);
+ 	iopl(3);
+ #elif defined(__NetBSD__)
+diff -ur vesautils.old/vbetool.c vesautils/vbetool.c
+--- vesautils.old/vbetool.c	2005-08-18 10:38:16.000000000 +0200
++++ vesautils/vbetool.c	2005-08-21 12:01:20.000000000 +0200
+@@ -15,14 +15,22 @@
+ #include <unistd.h>
+ #include <sys/ioctl.h>
+ #include <sys/types.h>
+-#include <sys/io.h>
+-#include <sys/kd.h>
+ #include <sys/stat.h>
+ #include <errno.h>
+ #ifdef HAVE_PCI
+ #include <pci/pci.h>
+ #endif
+ 
++#if defined(__linux__)
++#include <sys/kd.h>
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/consio.h>
++#endif
++
++#ifdef __GLIBC__
++#include <sys/io.h>
++#endif
++
+ #include <lrmi.h>
+ #include "vbetool.h"
+ 
+@@ -177,12 +185,12 @@
+ 
+ int do_post()
+ {
++#ifdef HAVE_PCI
+ 	struct pci_dev *p;
+ 	unsigned int c;
+ 	unsigned int pci_id;
+ 	int error;
+ 
+-#ifdef HAVE_PCI
+ 	pci_scan_bus(pacc);
+ 
+ 	for (p = pacc->devices; p; p = p->next) {
