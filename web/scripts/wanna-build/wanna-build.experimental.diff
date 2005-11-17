@@ -1,9 +1,10 @@
-Author: aurel32
+Author: Wouter Verhelst
 Description: Add support for an experimental distribution
+
 
 diff -Nru wanna-build-2005.11.15/sbuild wanna-build-2005.11.15+aurel32/sbuild
 --- wanna-build-2005.11.15/sbuild	2005-11-15 09:28:42.000000000 +0100
-+++ wanna-build-2005.11.15+aurel32/sbuild	2005-11-16 02:12:42.000000000 +0100
++++ wanna-build-2005.11.15+aurel32/sbuild	2005-11-17 17:29:41.000000000 +0100
 @@ -86,7 +86,7 @@
  
  $main::distribution = "unstable";
@@ -13,6 +14,95 @@ diff -Nru wanna-build-2005.11.15/sbuild wanna-build-2005.11.15+aurel32/sbuild
  
  chomp( $main::arch = `$conf::dpkg --print-installation-architecture` );
  $main::username = (getpwuid($<))[0] || $ENV{'LOGNAME'} || $ENV{'USER'};
+@@ -1453,6 +1453,7 @@
+ 		}
+ 	}
+ 	my $status = get_dpkg_status( keys %names );
++	my %policy = get_apt_policy( keys %names );
+ 
+ 	foreach $dep (@$dependencies) {
+ 		$name = $dep->{'Package'};
+@@ -1507,6 +1508,23 @@
+ 			if (!$stat->{'Installed'}) {
+ 				print "$name: pos dep, not installed\n" if $main::debug;
+ 				print PLOG "$name: missing\n";
++				if($rel) {
++					if(!WannaBuild::version_compare($policy{$name}->{defversion}, $rel, $vers)) {
++						print PLOG "Default version of $name not sufficient, ";
++						foreach my $cvers (@{$policy{$name}->{versions}}) {
++							if(WannaBuild::version_compare($cvers, $rel, $vers)) {
++								print PLOG "using version $cvers\n";
++								$installable = $name . "=" . $cvers if !$installable;
++								last;
++							}
++						}
++						if(!$installable) {
++							print PLOG "no suitable version found. Skipping for now, maybe there are alternatives.\n" if !$installable;
++						}
++					} else {
++						print PLOG "Using default version " . $policy{$name}->{defversion} . "\n";
++					}
++				}
+ 				$installable = $name if !$installable;
+ 				next;
+ 			}
+@@ -1531,6 +1549,20 @@
+ 				print PLOG "$name: would have to downgrade!\n";
+ 			}
+ 			else {
++				if(!WannaBuild::version_compare($policy{$name}->{defversion}, $rel, $vers)) {
++					print PLOG "Default version of $name not sufficient, ";
++					foreach my $cvers (@{$policy{$name}->{versions}}) {
++						if(WannaBuild::version_compare($cvers, $rel, $vers)) {
++							print PLOG "using version $cvers\n";
++							$upgradeable = $name if ! $upgradeable;
++							last;
++						}
++					}
++					print PLOG "no suitable alternative found. I probably should dep-wait this one.\n" if !$upgradeable;
++					return 0;
++				} else {
++					print PLOG "Using default version " . $policy{$name}->{defversion} . "\n";
++				}
+ 				$upgradeable = $name if !$upgradeable;
+ 			}
+ 		}
+@@ -1544,9 +1576,9 @@
+ 				push( @$pos_list, $installable );
+ 			}
+ 			else {
+-				print PLOG "To satisfy this dependency the package(s) would ",
+-						   "have\n",
+-						   "to be downgraded; this is not implemented.\n";
++				print PLOG "This dependency could not be satisfied. Possible reasons:\n";
++				print PLOG "* The package has a versioned dependency that is not yet available.\n";
++				print PLOG "* The package has a versioned dependency on a package version that is\n  older than the currently-installed package. Downgrades are not implemented.\n";
+ 				return 0;
+ 			}
+ 		}
+@@ -1629,6 +1661,22 @@
+ 	return $fail;
+ }
+ 
++sub get_apt_policy {
++	my @interest = @_;
++	my $package;
++	my %packages;
++
++	$ENV{LC_ALL}='C';
++	open(APTCACHE, "$conf::apt_cache $main::chroot_apt_options policy @interest |");
++	while(<APTCACHE>) {
++		$package=$1 if /^([0-9a-z+.-]+):$/;
++		$packages{$package}->{curversion}=$1 if /^ {2}Installed: ([0-9a-zA-Z-.:+]*)$/;
++		$packages{$package}->{defversion}=$1 if /^ {2}Candidate: ([0-9a-zA-Z-.:+]*)$/;
++		push @{$packages{$package}->{versions}}, "$2" if /^ (\*{3}| {3}) ([0-9a-zA-Z-.:+]*) 0$/;
++	}
++	return %packages;
++}
++
+ sub get_dpkg_status {
+ 	my @interest = @_;
+ 	my %result;
 diff -Nru wanna-build-2005.11.15/wanna-build wanna-build-2005.11.15+aurel32/wanna-build
 --- wanna-build-2005.11.15/wanna-build	2005-11-15 09:28:42.000000000 +0100
 +++ wanna-build-2005.11.15+aurel32/wanna-build	2005-11-16 01:22:35.000000000 +0100
