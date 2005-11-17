@@ -1,0 +1,52 @@
+Author: braindmg, aurel32
+Description: Add support for GNU/kFreeBSD.
+
+diff -Nru wanna-build-2005.11.15/buildd-mail-wrapper.c wanna-build-2005.11.15+aurel32/buildd-mail-wrapper.c
+--- wanna-build-2005.11.15/buildd-mail-wrapper.c	2005-10-02 02:14:00.000000000 +0200
++++ wanna-build-2005.11.15+aurel32/buildd-mail-wrapper.c	2005-11-16 00:44:54.000000000 +0100
+@@ -30,6 +30,13 @@
+ #include <time.h>
+ #include <dirent.h>
+ #include <sys/sysinfo.h>
++#ifndef SI_LOAD_SHIFT
++#define SI_LOAD_SHIFT 16
++#endif
++#include <limits.h> /* LONG_MAX */
++#ifndef LONG_MAX
++#define LONG_MAX sysconf (_SC_LONG_MAX);
++#endif
+ #include <sys/types.h>
+ #include <signal.h>
+ 
+@@ -157,10 +164,15 @@
+ 	 * mailer-running yet. So, in this case, wait some time and then check for
+ 	 * mailer-running again. */
+ 	if (!dir_was_empty) {
+-		struct sysinfo info;
+ 		int waittime;
+-		sysinfo( &info );
+-		waittime = (info.loads[0] >> (SI_LOAD_SHIFT-2))*6 + 20;
++		double loadavg[0];
++		long load;
++		getloadavg (loadavg, 1);
++		if (loadavg[0] > LONG_MAX)
++		  load = LONG_MAX;
++		else
++		  load = (long) loadavg[0];
++		waittime = (load >> (SI_LOAD_SHIFT-2))*6 + 20;
+ 		DPRINTF( "dir was not empty, sleeping\nload*4=%d waittime=%d\n",
+ 				 (waittime-20)/6, waittime );
+ 		sleep( waittime );
+diff -Nru wanna-build-2005.11.15/sbuild wanna-build-2005.11.15+aurel32/sbuild
+--- wanna-build-2005.11.15/sbuild	2005-11-15 09:28:42.000000000 +0100
++++ wanna-build-2005.11.15+aurel32/sbuild	2005-11-16 02:12:42.000000000 +0100
+@@ -47,7 +47,7 @@
+ $log_dir = "$main::HOME/logs";
+ $mailto = "";
+ $purge_build_directory = "successful";
+-@toolchain_regex = ( 'binutils$', 'gcc-[\d.]+$', 'g\+\+-[\d.]+$', 'libstdc\+\+', 'libc[\d.]+-dev$', 'linux-kernel-headers$' );
++@toolchain_regex = ( 'binutils$', 'gcc-[\d.]+$', 'g\+\+-[\d.]+$', 'libstdc\+\+', 'libc[\d.]+-dev$', '[\w]+-kernel-headers$' );
+ $stalled_pkg_timeout = 90; # minutes
+ $srcdep_lock_wait = 1; # minutes
+ $chroot_only = 0;
+

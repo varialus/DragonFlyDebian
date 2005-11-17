@@ -1,0 +1,41 @@
+Author: aurel32
+Description: Add support for an experimental distribution
+
+diff -Nru wanna-build-2005.11.15/sbuild wanna-build-2005.11.15+aurel32/sbuild
+--- wanna-build-2005.11.15/sbuild	2005-11-15 09:28:42.000000000 +0100
++++ wanna-build-2005.11.15+aurel32/sbuild	2005-11-16 02:12:42.000000000 +0100
+@@ -86,7 +86,7 @@
+ 
+ $main::distribution = "unstable";
+ 
+-%main::dist_order = ( 'oldstable-security' => 0, stable => 1, 'stable-security' => 1, testing => 2, 'testing-security' => 2, unstable => 3 );
++%main::dist_order = ( 'oldstable-security' => 0, stable => 1, 'stable-security' => 1, testing => 2, 'testing-security' => 2, unstable => 3, experimental => 4);
+ 
+ chomp( $main::arch = `$conf::dpkg --print-installation-architecture` );
+ $main::username = (getpwuid($<))[0] || $ENV{'LOGNAME'} || $ENV{'USER'};
+diff -Nru wanna-build-2005.11.15/wanna-build wanna-build-2005.11.15+aurel32/wanna-build
+--- wanna-build-2005.11.15/wanna-build	2005-11-15 09:28:42.000000000 +0100
++++ wanna-build-2005.11.15+aurel32/wanna-build	2005-11-16 01:22:35.000000000 +0100
+@@ -57,8 +57,8 @@
+ $ENV{'PATH'} = "/bin:/usr/bin:/usr/local/bin";
+ $verbose = 0;
+ $mail_logs = "";
+-@distributions = qw(oldstable-security stable testing unstable stable-security testing-security);
+-%dist_order = ( 'oldstable-security' => 0, stable => 1, 'stable-security' => 1, testing => 2, 'testing-security' => 2, unstable => 3 );
++@distributions = qw(oldstable-security stable testing unstable stable-security testing-security experimental);
++%dist_order = ( 'oldstable-security' => 0, stable => 1, 'stable-security' => 1, testing => 2, 'testing-security' => 2, unstable => 3, experimental => 4);
+ $curr_date = strftime("%Y %b %d %H:%M:%S",localtime);
+ $short_date = strftime("%m/%d/%y",localtime);
+ $| = 1;
+diff -Nru wanna-build-2005.11.15/wanna-build-statistics wanna-build-2005.11.15+aurel32/wanna-build-statistics
+--- wanna-build-2005.11.15/wanna-build-statistics	2005-06-01 11:28:43.000000000 +0200
++++ wanna-build-2005.11.15+aurel32/wanna-build-statistics	2005-11-16 01:23:10.000000000 +0100
+@@ -59,7 +59,7 @@
+ 		$dist = "stable"   if $dist eq "s";
+ 		$dist = "testing"  if $dist eq "t";
+ 		$dist = "unstable" if $dist eq "u";
+-		die "Bad distribution\n" if !isin($dist, qw(stable testing unstable stable-security testing-security));
++		die "Bad distribution\n" if !isin($dist, qw(stable testing unstable stable-security testing-security experimental));
+ 	}
+ 	elsif (/^--$/) {
+ 		last;
