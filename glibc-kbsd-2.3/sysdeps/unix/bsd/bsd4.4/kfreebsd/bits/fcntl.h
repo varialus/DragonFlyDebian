@@ -21,6 +21,7 @@
 #error "Never use <bits/fcntl.h> directly; include <fcntl.h> instead."
 #endif
 
+#include <sys/types.h>
 
 /* File access modes for `open' and `fcntl'.  */
 #define	O_RDONLY	0	/* Open read-only.  */
