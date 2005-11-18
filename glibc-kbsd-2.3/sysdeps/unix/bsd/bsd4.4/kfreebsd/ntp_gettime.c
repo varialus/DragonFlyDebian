@@ -20,6 +20,10 @@
 #include <sys/sysctl.h>
 #include <stddef.h>
 
+#ifndef ntptimeval
+#define ntptimeval ntptimeval4
+#endif
+
 int
 ntp_gettime (struct ntptimeval *ntv)
 {
