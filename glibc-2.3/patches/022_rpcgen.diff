@@ -1,0 +1,44 @@
+Backport from head.
+
+--- glibc-2.3/sunrpc/rpc/xdr.h.orig	1999-10-09 21:19:33.000000000 +0200
++++ glibc-2.3/sunrpc/rpc/xdr.h	2005-11-18 05:39:32.000000000 +0100
+@@ -126,7 +126,7 @@
+ 	/* returns bytes off from beginning */
+ 	bool_t (*x_setpostn) (XDR *__xdrs, u_int __pos);
+ 	/* lets you reposition the stream */
+-	int32_t *(*x_inline) (XDR *__xdrs, int __len);
++	int32_t *(*x_inline) (XDR *__xdrs, u_int __len);
+ 	/* buf quick ptr to buffered data */
+ 	void (*x_destroy) (XDR *__xdrs);
+ 	/* free privates of this xdr_stream */
+@@ -139,7 +139,7 @@
+     caddr_t x_public;		/* users' data */
+     caddr_t x_private;		/* pointer to private data */
+     caddr_t x_base;		/* private used for position info */
+-    int x_handy;		/* extra private word */
++    u_int x_handy;		/* extra private word */
+   };
+ 
+ /*
+@@ -262,10 +262,8 @@
+  * and shouldn't be used any longer. Code which use this defines or longs
+  * in the RPC code will not work on 64bit Solaris platforms !
+  */
+-#define IXDR_GET_LONG(buf) \
+-	((long)ntohl((u_long)*__extension__((u_int32_t*)(buf))++))
+-#define IXDR_PUT_LONG(buf, v) \
+-	(*__extension__((u_int32_t*)(buf))++ = (long)htonl((u_long)(v)))
++#define IXDR_GET_LONG(buf) ((long)IXDR_GET_U_INT32(buf))
++#define IXDR_PUT_LONG(buf, v) ((long)IXDR_PUT_INT32(buf, (long)(v)))
+ #define IXDR_GET_U_LONG(buf)	      ((u_long)IXDR_GET_LONG(buf))
+ #define IXDR_PUT_U_LONG(buf, v)	      IXDR_PUT_LONG(buf, (long)(v))
+ 
+@@ -305,6 +303,8 @@
+ extern bool_t xdr_uint32_t (XDR *__xdrs, uint32_t *__up) __THROW;
+ extern bool_t xdr_int64_t (XDR *__xdrs, int64_t *__ip) __THROW;
+ extern bool_t xdr_uint64_t (XDR *__xdrs, uint64_t *__up) __THROW;
++extern bool_t xdr_quad_t (XDR *__xdrs, quad_t *__ip) __THROW;
++extern bool_t xdr_u_quad_t (XDR *__xdrs, u_quad_t *__up) __THROW;
+ extern bool_t xdr_bool (XDR *__xdrs, bool_t *__bp) __THROW;
+ extern bool_t xdr_enum (XDR *__xdrs, enum_t *__ep) __THROW;
+ extern bool_t xdr_array (XDR * _xdrs, caddr_t *__addrp, u_int *__sizep,
