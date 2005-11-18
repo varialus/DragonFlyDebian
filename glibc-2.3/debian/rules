@@ -157,7 +157,7 @@ endif
 arch_packages  += $(libc) libc-udeb $(libc)-dev $(libc)-prof $(libc)-dbg \
 $(libc)-pic $(addsuffix -pkg,$(opt_packages))
 
-indep_packages = locales $(glibc)-doc
+indep_packages = locales
 
 ifeq ($(threads),yes)
 # nscd requires pthreads
@@ -182,7 +182,6 @@ include $(package_rules)/libc-pic.mk
 include $(package_rules)/libc-prof.mk
 include $(package_rules)/nscd.mk
 include $(package_rules)/locales.mk
-include $(package_rules)/glibc-doc.mk
 include $(package_rules)/optimized.mk
 ifeq ($(DEB_HOST_GNU_CPU),sparc)
 #include $(package_rules)/sparc64.mk
@@ -192,7 +191,7 @@ include $(package_rules)/s390x.mk
 endif
 
 setperms: debian/perms
-	@for dir in glibc-doc libc libc-* locales nscd; \
+	@for dir in libc libc-* locales nscd; \
 	do \
 		chmod 0755 debian/$$dir; \
 		find debian/$$dir -type f -name p\* | xargs chmod -v 0755; \
