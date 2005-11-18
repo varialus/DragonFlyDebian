@@ -103,10 +103,4 @@ ifeq ($(subdir),elf)
 
 sysdep-rtld-routines += dl-brk dl-sbrk
 
-# Make ld.so.1 executable.
-$(objpfx)mkexec: ../sysdeps/unix/bsd/bsd4.4/kfreebsd/mkexec.c
-	gcc $< -o $@
-$(objpfx)ld.so: $(objpfx)mkexec
-POSTPROCESS_LD_SO = ; $(objpfx)mkexec $(objpfx)ld.so
-
 endif
