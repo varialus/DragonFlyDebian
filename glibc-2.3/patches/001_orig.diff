@@ -22,18 +22,6 @@ diff -ur glibc-2.3.old/configure.in glibc-2.3/configure.in
      ;;
    *)
      echo "*** The GNU C library is currently not available for this platform."
-diff -ur glibc-2.3.old/elf/dl-load.c glibc-2.3/elf/dl-load.c
---- glibc-2.3.old/elf/dl-load.c	2002-09-13 00:08:11.000000000 +0200
-+++ glibc-2.3/elf/dl-load.c	2003-07-03 16:43:05.000000000 +0200
-@@ -854,6 +854,8 @@
-      and then read in the program header table.  */
-   l->l_entry = header->e_entry;
-   type = header->e_type;
-+  if (type == ET_EXEC && strncmp (name, "ld.so", 5) == 0)
-+    type = ET_DYN;
-   l->l_phnum = header->e_phnum;
- 
-   maplength = header->e_phnum * sizeof (ElfW(Phdr));
 diff -ur glibc-2.3.old/elf/Makefile glibc-2.3/elf/Makefile
 --- glibc-2.3.old/elf/Makefile	2002-10-02 09:28:04.000000000 +0200
 +++ glibc-2.3/elf/Makefile	2003-07-03 16:43:05.000000000 +0200
