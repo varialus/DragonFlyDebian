@@ -1,84 +1,15 @@
-diff -u binutils-2.16.1cvs20050902/debian/patches/00list binutils-2.16.1cvs20050902/debian/patches/00list
---- binutils-2.16.1cvs20050902/debian/patches/00list
-+++ binutils-2.16.1cvs20050902/debian/patches/00list
-@@ -9,0 +10 @@
-+121_kfreebsd_ld_so_executable_shared.dpatch
-diff -u binutils-2.16.1cvs20050902/debian/rules binutils-2.16.1cvs20050902/debian/rules
---- binutils-2.16.1cvs20050902/debian/rules
-+++ binutils-2.16.1cvs20050902/debian/rules
-@@ -72,6 +72,9 @@
- ifeq ($(DEB_HOST_ARCH),i386)
- 	CONFARGS += --enable-targets=x86_64-linux-gnu
- endif
-+ifeq ($(DEB_HOST_ARCH),kfreebsd-i386)
-+	CONFARGS += --enable-targets=x86_64-kfreebsd-gnu
-+endif
- ifeq ($(DEB_HOST_ARCH),mips)
-        CONFARGS += --enable-targets=mips64-linux-gnu
- endif
-@@ -134,7 +137,7 @@
+Author: aurel32
+Status: in BTS
+
+diff -u binutils-2.16.1cvs20051117/debian/rules binutils-2.16.1cvs20051117/debian/rules
+--- binutils-2.16.1cvs20051117/debian/rules
++++ binutils-2.16.1cvs20051117/debian/rules
+@@ -134,7 +134,7 @@
  	mkdir builddir-multi
  	cd builddir-multi \
  	    && env CC="$(CC)" ../configure $(CONFARGS) \
 -		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux-gnu
-+		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-gnu,i486-kfreebsd-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux-gnu,x86_64-kfreebsd-gnu
++		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-gnu,i486-kfreebsd-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux-gnu
  	$(MAKE) -C builddir-multi configure-host
  	touch configure-multi-stamp
  
---- binutils-2.16.1cvs20050902.orig/debian/patches/121_kfreebsd_ld_so_executable_shared.dpatch
-+++ binutils-2.16.1cvs20050902/debian/patches/121_kfreebsd_ld_so_executable_shared.dpatch
-@@ -0,0 +1,54 @@
-+#! /bin/sh -e
-+## 124_kfreebsd_ld_so_executable_shared.dpatch
-+##
-+## DP: Description: Determine whether ld.so is an executable or a shared object
-+## DP: Author: Bruno Haible
-+## DP: Upstream status: In upstream BTS (#1029)
-+## DP: Date: 2005-06-20
-+
-+if [ $# -lt 1 ]; then
-+    echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
-+    exit 1
-+fi
-+
-+[ -f debian/patches/00patch-opts ] && . debian/patches/00patch-opts
-+patch_opts="${patch_opts:--f --no-backup-if-mismatch} ${2:+-d $2}"
-+
-+case "$1" in
-+    -patch) patch -p1 ${patch_opts} < $0;;
-+    -unpatch) patch -R -p1 ${patch_opts} < $0;;
-+    *)
-+        echo "`basename $0`: script expects -patch|-unpatch as argument" >&2
-+        exit 1;;
-+esac
-+
-+exit 0
-+
-+@DPATCH@
-+diff -Nur binutils-2.16.orig/bfd/elfcode.h binutils-2.16/bfd/elfcode.h
-+--- binutils-2.16.orig/bfd/elfcode.h	2005-02-20 15:59:07.000000000 +0100
-++++ binutils-2.16/bfd/elfcode.h	2005-06-21 09:43:41.000000000 +0200
-+@@ -592,8 +592,22 @@
-+ 	}
-+     }
-+ 
-++  /* Determine whether the file is an executable or a shared object.
-++     It can even be both: The dynamic loader "ld.so*" is declared as an
-++     executable (so the kernel can exec it) but at the same time we
-++     treat it as a shared object (for symbol versioning purposes).  */
-+   if (i_ehdrp->e_type == ET_EXEC)
-+-    abfd->flags |= EXEC_P;
-++    {
-++      const char *file_name = abfd->filename;
-++      const char *last_slash = strrchr (file_name, '/');
-++      const char *base_name = (last_slash ? last_slash + 1 : file_name);
-++      if (strncmp (base_name, "ld.so", 5) == 0)
-++	/* The dynamic loader.  */
-++	abfd->flags |= DYNAMIC;
-++      else
-++	/* Normal executable.  */
-++	abfd->flags |= EXEC_P;
-++    }
-+   else if (i_ehdrp->e_type == ET_DYN)
-+     abfd->flags |= DYNAMIC;
-+ 
