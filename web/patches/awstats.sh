@@ -1,6 +1,9 @@
 #!/bin/sh
 set -e
 
+# Author: rmh
+# Status: in upstream BTS
+
 ln -sf gnu.png wwwroot/icon/os/gnukfreebsd.png
 patch -p1 < $0
 exit 0
