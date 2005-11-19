@@ -39,6 +39,7 @@ if ($DEB_HOST_GNU_SYSTEM eq "linux") {
 		'ppp (<= 2.2.0f-24)', 'libgdbmg1-dev (<= 1.7.3-24)');
 }
 if ($DEB_HOST_GNU_SYSTEM eq "kfreebsd-gnu") {
+    push @{$libc_c{'Conflicts'}}, ('kfreebsd-image-5.3-1 (<< 5.3-5)', 'kfreebsd5');
     push @{$libc_dev_c{'Depends'}}, ('kfreebsd-kernel-headers');
     push @{$libc_dev_c{'Conflicts'}}, ('libpthread-dev');
     push @{$libc_dev_c{'Replaces'}}, ('libpthread-dev');
