@@ -1,0 +1,71 @@
+Author: aurel32
+Status: in BTS
+
+diff -u gcc-3.3-3.3.6/debian/patches/kbsd-gnu.dpatch gcc-3.3-3.3.6/debian/patches/kbsd-gnu.dpatch
+--- gcc-3.3-3.3.6/debian/patches/kbsd-gnu.dpatch
++++ gcc-3.3-3.3.6/debian/patches/kbsd-gnu.dpatch
+@@ -91,7 +91,7 @@
+ diff -Nur gcc-3.3.6.orig/gcc/config/i386/kfreebsd-gnu.h gcc-3.3.6/gcc/config/i386/kfreebsd-gnu.h
+ --- gcc-3.3.6.orig/gcc/config/i386/kfreebsd-gnu.h	1970-01-01 01:00:00.000000000 +0100
+ +++ gcc-3.3.6/gcc/config/i386/kfreebsd-gnu.h	2005-07-18 01:53:05.000000000 +0200
+-@@ -0,0 +1,26 @@
++@@ -0,0 +1,45 @@
+ +/* Definitions for Intel 386 running kFreeBSD-based GNU systems with ELF format
+ +   Copyright (C) 2004
+ +   Free Software Foundation, Inc.
+@@ -118,6 +118,25 @@
+ +#define LINK_EMULATION "elf_i386_fbsd"
+ +#undef REG_NAME
+ +#define REG_NAME(reg) sc_ ## reg
+++
+++#undef TARGET_OS_CPP_BUILTINS    
+++#define TARGET_OS_CPP_BUILTINS()		\
+++  do						\
+++    {						\
+++	builtin_define ("__FreeBSD_kernel__");	\
+++	builtin_define ("__GLIBC__");		\
+++	builtin_define_std ("unix");		\
+++	builtin_define ("__ELF__");		\
+++	builtin_assert ("system=unix");		\
+++	builtin_assert ("system=posix");	\
+++	if (flag_pic)				\
+++	  {					\
+++	    builtin_define ("__PIC__");		\
+++	    builtin_define ("__pic__");		\
+++	  }					\
+++    }						\
+++  while (0)
+++
+ diff -Nur gcc-3.3.6.orig/gcc/config/i386/knetbsd-gnu.h gcc-3.3.6/gcc/config/i386/knetbsd-gnu.h
+ --- gcc-3.3.6.orig/gcc/config/i386/knetbsd-gnu.h	1970-01-01 01:00:00.000000000 +0100
+ +++ gcc-3.3.6/gcc/config/i386/knetbsd-gnu.h	2005-07-18 01:53:05.000000000 +0200
+@@ -251,7 +270,7 @@
+ diff -Nur gcc-3.3.6.orig/gcc/config/kfreebsd-gnu.h gcc-3.3.6/gcc/config/kfreebsd-gnu.h
+ --- gcc-3.3.6.orig/gcc/config/kfreebsd-gnu.h	1970-01-01 01:00:00.000000000 +0100
+ +++ gcc-3.3.6/gcc/config/kfreebsd-gnu.h	2005-07-18 01:54:10.000000000 +0200
+-@@ -0,0 +1,37 @@
++@@ -0,0 +1,24 @@
+ +/* Definitions for kFreeBSD-based GNU systems with ELF format
+ +   Copyright (C) 2004
+ +   Free Software Foundation, Inc.
+@@ -274,19 +293,6 @@
+ +the Free Software Foundation, 59 Temple Place - Suite 330,
+ +Boston, MA 02111-1307, USA.  */
+ +
+-+#undef TARGET_OS_CPP_BUILTINS    
+-+#define TARGET_OS_CPP_BUILTINS()		\
+-+  do						\
+-+    {						\
+-+	builtin_define ("__FreeBSD_kernel__");	\
+-+	builtin_define ("__GLIBC__");		\
+-+	builtin_define_std ("unix");		\
+-+	builtin_define ("__ELF__");		\
+-+	builtin_assert ("system=unix");		\
+-+	builtin_assert ("system=posix");	\
+-+    }						\
+-+  while (0)
+-+
+ +#undef DYNAMIC_LINKER
+ +#define DYNAMIC_LINKER "/lib/ld.so.1"
+ diff -Nur gcc-3.3.6.orig/gcc/config/knetbsd-gnu.h gcc-3.3.6/gcc/config/knetbsd-gnu.h
+
