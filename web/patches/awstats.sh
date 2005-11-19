@@ -1,33 +1,34 @@
 #!/bin/sh
 set -e
 
-ln -sf gnu.png wwwroot/icon/os/gnu.kfreebsd.png
+ln -sf gnu.png wwwroot/icon/os/gnukfreebsd.png
 patch -p1 < $0
 exit 0
 
---- awstats-6.5.old/wwwroot/cgi-bin/lib/operating_systems.pm	2005-10-09 16:32:40.000000000 +0200
-+++ awstats-6.5/wwwroot/cgi-bin/lib/operating_systems.pm	2005-11-19 21:34:08.000000000 +0100
-@@ -44,6 +44,7 @@
+diff -ur awstats.old/wwwroot/cgi-bin/lib/operating_systems.pm awstats/wwwroot/cgi-bin/lib/operating_systems.pm
+--- awstats.old/wwwroot/cgi-bin/lib/operating_systems.pm	2005-10-09 16:32:40.000000000 +0200
++++ awstats/wwwroot/cgi-bin/lib/operating_systems.pm	2005-11-19 22:21:40.000000000 +0100
+@@ -42,6 +42,7 @@
+ 'hp-ux',
+ 'netbsd',
  'bsdi',
++'gnu/kfreebsd',									# Must be before freebsd and gnu
  'freebsd',
  'openbsd',
-+'gnu.kfreebsd',
  'gnu.hurd',
- 'unix','x11',
- # Other famous OS
-@@ -92,6 +93,7 @@
+@@ -90,6 +91,7 @@
+ 'hp-ux','hp-ux',
+ 'netbsd','netbsd',
  'bsdi','bsdi',
++'gnu/kfreebsd','gnukfreebsd',								# Must be before freebsd and gnu
  'freebsd','freebsd',
  'openbsd','openbsd',
-+'gnu.kfreebsd','gnu.kfreebsd',
  'gnu.hurd','gnu',
- 'unix','unix','x11','unix',
- # Other famous OS
-@@ -138,6 +140,7 @@
+@@ -136,6 +138,7 @@
+ 'hp-ux','HP Unix',
+ 'netbsd','NetBSD',
  'bsdi','BSDi',
++'gnukfreebsd','GNU/kFreeBSD',
  'freebsd','FreeBSD',
  'openbsd','OpenBSD',
-+'gnu.kfreebsd','GNU/kFreeBSD',
  'gnu','GNU Hurd',
- 'unix','Unknown Unix system',
- # Other famous OS
