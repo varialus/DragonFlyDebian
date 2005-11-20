@@ -231,24 +231,6 @@ functionality is added someday but for now it's a porting issue for us.
 You can detect wether RT signals are available in the system via the SIGRTMIN
 and SIGRTMAX macros (which are not defined on kfreebsd-gnu).
 
-The lack of this feature is more annoying that it might seem, as it produces
-breakage in programs that don't use LinuxThreads properly.  From the
-LinuxThreads FAQ:
-
-  "On ``old'' kernels (2.0 and early 2.1 kernels), there are only 32 signals
-  available and the kernel reserves all of them but two: SIGUSR1 and SIGUSR2.
-  So, LinuxThreads has no choice but use those two signals."
-
-  "On recent kernels (2.2 and up), more than 32 signals are provided in the
-  form of realtime signals. When run on one of those kernels, LinuxThreads
-  uses two reserved realtime signals for its internal operation, thus leaving
-  SIGUSR1 and SIGUSR2 free for user code."
-
-Since we don't support RT signals, kFreeBSD counts as a "Linux 2.0" kernel,
-and we use SIGUSR1 and SIGUSR2.  Programs with custom use of SIGUSR1 and
-SIGUSR2 will interfere with the pthread implementation and cause trouble
-(this happens with Linux 2.0 too).
-
 
 Get libc soname (6 or 6.1 on linux-gnu, 0.1 on kfreebsd-gnu, etc)
 -----------------------------------------------------------------
