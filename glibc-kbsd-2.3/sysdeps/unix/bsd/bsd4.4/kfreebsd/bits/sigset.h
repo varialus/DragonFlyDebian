@@ -44,7 +44,7 @@ typedef struct
 # endif
 
 /* Return a mask that includes SIG only.  */
-# define __sigmask(sig)	((unsigned int) 1 << ((sig) - 1))
+# define __sigmask(sig)	((unsigned int) 1 << ((sig) - 1) % 32)
 
 /* Return the word index for SIG.  */
 # define __sigword(sig)	(((sig) - 1) >> 5)
