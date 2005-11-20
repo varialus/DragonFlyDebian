@@ -73,6 +73,11 @@
 #define RFLINUXTHPN     (1<<16) /* do linux clone exit parent notification */
 #define RFPPWAIT	(1<<31) /* parent sleeps until child exits (vfork) */
 
+#define RFTHPNSHIFT	24	/* reserve bits 24-30 */
+#define RFTHPNMASK	0x7F    /* for compatibility with linuxthreads/clone()   */
+				/* allow to specify  "clone exit parent notification" signal */
+#define RFTHPNSIGNUM(flags)	(((flags) >> RFTHPNSHIFT) & RFTHPNMASK)
+
 __BEGIN_DECLS
 
 extern int rfork (int __flags) __THROW;

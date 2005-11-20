@@ -47,7 +47,7 @@ extern int __start_thread (int flags, void *child_stack,
 int __clone (int (*fn) (void *), void *child_stack, int flags, void *arg)
 {
   int rfork_flags = RFPROC;
-
+  
   if (fn == NULL || child_stack == NULL)
     {
       __set_errno (EINVAL);
@@ -64,13 +64,12 @@ int __clone (int (*fn) (void *), void *child_stack, int flags, void *arg)
 
   if ((flags & CSIGNAL) != 0 && (flags & CSIGNAL) != SIGCHLD)
     {
-      /* This implementation of clone() supports only the SIGUSR1 signal.  */
-      if ((flags & CSIGNAL) != SIGUSR1)
+      if ((flags & CSIGNAL) & ~RFTHPNMASK)
 	{
 	  __set_errno (EINVAL);
 	  return -1;
 	}
-      rfork_flags |= RFLINUXTHPN;
+      rfork_flags |= (RFLINUXTHPN | ((flags & CSIGNAL) <<  RFTHPNSHIFT));
     }
 
   if (flags & CLONE_VM)
