@@ -10,46 +10,6 @@ diff -Nur glibc-2.3.old/linuxthreads/Makefile glibc-2.3/linuxthreads/Makefile
  tests = ex1 ex2 ex3 ex4 ex5 ex6 ex7 ex8 ex9 $(librt-tests) ex12 ex13 joinrace \
  	tststack $(tests-nodelete-$(have-z-nodelete)) ecmutex ex14 ex15 ex16 \
  	ex17 ex18 tst-cancel tst-context bug-sleep
-diff -Nur glibc-2.3.old/linuxthreads/condvar.c glibc-2.3/linuxthreads/condvar.c
---- glibc-2.3.old/linuxthreads/condvar.c	2001-04-10 18:37:53.000000000 +0200
-+++ glibc-2.3/linuxthreads/condvar.c	2004-09-01 14:48:46.000000000 +0200
-@@ -96,7 +96,9 @@
-     __pthread_do_exit(PTHREAD_CANCELED, CURRENT_STACK_FRAME);
-   }
- 
-+  //__pthread_message("pcw before mutex unlock\n");
-   pthread_mutex_unlock(mutex);
-+  //__pthread_message("pcw after mutex unlock\n");
- 
-   spurious_wakeup_count = 0;
-   while (1)
-@@ -107,6 +109,7 @@
- 	      || THREAD_GETMEM(self, p_cancelstate) != PTHREAD_CANCEL_ENABLE))
- 	{
- 	  /* Count resumes that don't belong to us. */
-+	  //__pthread_message("pcw ignoring spurious wakeup\n");
- 	  spurious_wakeup_count++;
- 	  continue;
- 	}
-@@ -171,7 +174,10 @@
-     __pthread_do_exit(PTHREAD_CANCELED, CURRENT_STACK_FRAME);
-   }
- 
-+  //__pthread_message("status (%d p_resume_count = %ld)\n",self->p_pid,self->p_resume_count.p_count);
-+  //__pthread_message("pctw before mutex unlock\n");
-   pthread_mutex_unlock(mutex);
-+  //__pthread_message("pctw after mutex unlock\n");
- 
-   spurious_wakeup_count = 0;
-   while (1)
-@@ -201,6 +207,7 @@
- 	      || THREAD_GETMEM(self, p_cancelstate) != PTHREAD_CANCEL_ENABLE))
- 	{
- 	  /* Count resumes that don't belong to us. */
-+	  //__pthread_message("pctw ignoring spurious wakeup\n");
- 	  spurious_wakeup_count++;
- 	  continue;
- 	}
 diff -Nur glibc-2.3.old/linuxthreads/lockfile.c glibc-2.3/linuxthreads/lockfile.c
 --- glibc-2.3.old/linuxthreads/lockfile.c	2002-08-27 06:52:34.000000000 +0200
 +++ glibc-2.3/linuxthreads/lockfile.c	2004-09-01 14:48:46.000000000 +0200
@@ -110,153 +70,20 @@ diff -Nur glibc-2.3.old/linuxthreads/lockfile.c glibc-2.3/linuxthreads/lockfile.
 diff -Nur glibc-2.3.old/linuxthreads/pthread.c glibc-2.3/linuxthreads/pthread.c
 --- glibc-2.3.old/linuxthreads/pthread.c	2002-09-29 19:45:47.000000000 +0200
 +++ glibc-2.3/linuxthreads/pthread.c	2004-09-01 14:48:46.000000000 +0200
-@@ -14,6 +14,7 @@
- /* GNU Library General Public License for more details.                 */
- 
- /* Thread creation, initialization, and basic low-level routines */
-+#define DEBUG 1
- 
- #include <errno.h>
- #include <stddef.h>
-@@ -30,6 +31,7 @@
- #include "internals.h"
- #include "spinlock.h"
- #include "restart.h"
-+#include "pthreadsig.h"
- #include "smp.h"
- #include <ldsodefs.h>
- #include <tls.h>
-@@ -261,8 +263,8 @@
+@@ -261,9 +261,10 @@
  #ifndef __SIGRTMIN
  static int current_rtmin = -1;
  static int current_rtmax = -1;
 -int __pthread_sig_restart = SIGUSR1;
 -int __pthread_sig_cancel = SIGUSR2;
-+int __pthread_sig_restart = PTHREAD_SIG_RESTART;
-+int __pthread_sig_cancel = PTHREAD_SIG_CANCEL;
- int __pthread_sig_debug;
+-int __pthread_sig_debug;
++/* Use same signals number as on GNU/Linux with RT signals. */
++int __pthread_sig_restart = 32;
++int __pthread_sig_cancel = 33;
++int __pthread_sig_debug = 34;
  #else
  static int current_rtmin;
-@@ -273,8 +275,8 @@
- int __pthread_sig_cancel = __SIGRTMIN + 1;
- int __pthread_sig_debug = __SIGRTMIN + 2;
- #else
--int __pthread_sig_restart = SIGUSR1;
--int __pthread_sig_cancel = SIGUSR2;
-+int __pthread_sig_restart = PTHREAD_SIG_RESTART;
-+int __pthread_sig_cancel = PTHREAD_SIG_CANCEL;
- int __pthread_sig_debug;
- #endif
- 
-@@ -293,8 +295,8 @@
-       current_rtmin = -1;
-       current_rtmax = -1;
- # if __SIGRTMAX - __SIGRTMIN >= 3
--      __pthread_sig_restart = SIGUSR1;
--      __pthread_sig_cancel = SIGUSR2;
-+      __pthread_sig_restart = PTHREAD_SIG_RESTART;
-+      __pthread_sig_cancel = PTHREAD_SIG_CANCEL;
-       __pthread_sig_debug = 0;
- # endif
-     }
-@@ -919,7 +921,11 @@
-     request.req_args.exit.code = retcode;
-     TEMP_FAILURE_RETRY(__libc_write(__pthread_manager_request,
- 				    (char *) &request, sizeof(request)));
-+#if 0 /* The manager thread is already dead at this point.  Attempting
-+	 to wait on the __pthread_sig_cancel signal from it means waiting
-+	 for Godot.  */
-     suspend(self);
-+#endif
-     /* Main thread should accumulate times for thread manager and its
-        children, so that timings for main thread account for all threads. */
-     if (self == __pthread_main_thread)
-@@ -959,6 +965,7 @@
- {
-   pthread_descr self = thread_self();
-   THREAD_SETMEM(self, p_signal, sig);
-+  //__pthread_message("received restart signal\n");
-   if (THREAD_GETMEM(self, p_signal_jmp) != NULL)
-     siglongjmp(*THREAD_GETMEM(self, p_signal_jmp), 1);
- }
-@@ -1129,7 +1136,7 @@
- void __pthread_wait_for_restart_signal(pthread_descr self)
- {
-   sigset_t mask;
--
-+  //__pthread_message("going sigsuspend\n");
-   sigprocmask(SIG_SETMASK, NULL, &mask); /* Get current signal mask */
-   sigdelset(&mask, __pthread_sig_restart); /* Unblock the restart signal */
-   THREAD_SETMEM(self, p_signal, 0);
-@@ -1150,12 +1157,18 @@
- 
- void __pthread_restart_old(pthread_descr th)
- {
--  if (atomic_increment(&th->p_resume_count) == -1)
-+  //__pthread_message("status (%d p_resume_count = %ld)\n",thread_self()->p_pid,thread_self()->p_resume_count.p_count);
-+  if (atomic_increment(&th->p_resume_count) == -1) {
-+    //__pthread_message("sending restart signal to %d\n",th->p_pid);
-     kill(th->p_pid, __pthread_sig_restart);
-+  } else {
-+    //__pthread_message("NOT sending restart signal to %d (%d p_resume_count = %ld)\n",th->p_pid,th->p_pid,th->p_resume_count.p_count);
-+  }
- }
- 
- void __pthread_suspend_old(pthread_descr self)
- {
-+  //__pthread_message("suspend_old (%d p_resume_count = %ld)\n",self->p_pid,self->p_resume_count.p_count);
-   if (atomic_decrement(&self->p_resume_count) <= 0)
-     __pthread_wait_for_restart_signal(self);
- }
-@@ -1167,6 +1180,7 @@
-   int was_signalled = 0;
-   sigjmp_buf jmpbuf;
- 
-+  //__pthread_message("timedsuspend_old (%d p_resume_count = %ld)\n",self->p_pid,self->p_resume_count.p_count);
-   if (atomic_decrement(&self->p_resume_count) == 0) {
-     /* Set up a longjmp handler for the restart signal, unblock
-        the signal and sleep. */
-@@ -1205,8 +1219,22 @@
-       was_signalled = 1;
-     }
-     THREAD_SETMEM(self, p_signal_jmp, NULL);
-+
-+    if (!was_signalled) {
-+      /* woke spontaneously but did not consume restart---caller must resolve */
-+      //__pthread_message("timedsuspend_old returns 0 (was_signalled = 0, %d p_resume_count = %ld)\n",self->p_pid,self->p_resume_count.p_count);
-+      return 0;
-+    }
-+    /* woken due to restart signal */
-+    //__pthread_message("timedsuspend_old returns 1 (was_signalled = 1, %d p_resume_count = %ld)\n",self->p_pid,self->p_resume_count.p_count);
-+    return 1;
-+  } else {
-+    /* consumed queued restart signal */
-+    //__pthread_message("timedsuspend_old returns 1 (was_signalled = 0, %d p_resume_count = %ld)\n",self->p_pid,self->p_resume_count.p_count);
-+    return 1;
-   }
- 
-+#if 0
-   /* Now was_signalled is true if we exited the above code
-      due to the delivery of a restart signal.  In that case,
-      we know we have been dequeued and resumed and that the
-@@ -1228,13 +1256,17 @@
-       __pthread_wait_for_restart_signal(self);
-       atomic_decrement(&self->p_resume_count); /* should be zero now! */
-       /* woke spontaneously and consumed restart signal */
-+      //__pthread_message("timedsuspend_old returns 1 (was_signalled = 0, %d p_resume_count = %ld)\n",self->p_pid,self->p_resume_count.p_count);
-       return 1;
-     }
-     /* woke spontaneously but did not consume restart---caller must resolve */
-+    //__pthread_message("timedsuspend_old returns 0 (was_signalled = 0, %d p_resume_count = %ld)\n",self->p_pid,self->p_resume_count.p_count);
-     return 0;
-   }
-   /* woken due to restart signal */
-+  //__pthread_message("timedsuspend_old returns 1 (was_signalled = 1, %d p_resume_count = %ld)\n",self->p_pid,self->p_resume_count.p_count);
-   return 1;
-+#endif
- }
- #endif /* __ASSUME_REALTIME_SIGNALS */
- 
+ static int current_rtmax;
 diff -Nur glibc-2.3.old/linuxthreads/shlib-versions glibc-2.3/linuxthreads/shlib-versions
 --- glibc-2.3.old/linuxthreads/shlib-versions	2002-09-05 12:14:21.000000000 +0200
 +++ glibc-2.3/linuxthreads/shlib-versions	2004-09-01 14:48:46.000000000 +0200
@@ -646,33 +473,6 @@ diff -Nur glibc-2.3.old/linuxthreads/sysdeps/unix/bsd/bsd4.4/kfreebsd/i386/bits/
 +#define _POSIX_BARRIERS	200912L
 +
 +#endif /* bits/posix_opt.h */
-diff -Nur glibc-2.3.old/linuxthreads/sysdeps/unix/bsd/bsd4.4/kfreebsd/pthreadsig.h glibc-2.3/linuxthreads/sysdeps/unix/bsd/bsd4.4/kfreebsd/pthreadsig.h
---- glibc-2.3.old/linuxthreads/sysdeps/unix/bsd/bsd4.4/kfreebsd/pthreadsig.h	1970-01-01 01:00:00.000000000 +0100
-+++ glibc-2.3/linuxthreads/sysdeps/unix/bsd/bsd4.4/kfreebsd/pthreadsig.h	2002-07-24 00:00:42.000000000 +0200
-@@ -0,0 +1,23 @@
-+/* Copyright (C) 2002 Free Software Foundation, Inc.
-+   This file is part of the GNU C Library.
-+
-+   The GNU C Library is free software; you can redistribute it and/or
-+   modify it under the terms of the GNU Library General Public License as
-+   published by the Free Software Foundation; either version 2 of the
-+   License, or (at your option) any later version.
-+
-+   The GNU C Library is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+   Library General Public License for more details.
-+
-+   You should have received a copy of the GNU Library General Public
-+   License along with the GNU C Library; see the file COPYING.LIB.  If not,
-+   write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-+   Boston, MA 02111-1307, USA.  */
-+
-+/* On FreeBSD, only SIGUSR1 can be used as the thread termination notification.
-+   This is hardwired in the kernel.  */
-+
-+#define PTHREAD_SIG_RESTART	SIGUSR2
-+#define PTHREAD_SIG_CANCEL	SIGUSR1
 diff -Nur glibc-2.3.old/linuxthreads/sysdeps/unix/bsd/bsd4.4/kfreebsd/smp.h glibc-2.3/linuxthreads/sysdeps/unix/bsd/bsd4.4/kfreebsd/smp.h
 --- glibc-2.3.old/linuxthreads/sysdeps/unix/bsd/bsd4.4/kfreebsd/smp.h	1970-01-01 01:00:00.000000000 +0100
 +++ glibc-2.3/linuxthreads/sysdeps/unix/bsd/bsd4.4/kfreebsd/smp.h	2002-09-17 02:51:12.000000000 +0200
@@ -713,30 +513,6 @@ diff -Nur glibc-2.3.old/linuxthreads/sysdeps/unix/bsd/bsd4.4/kfreebsd/smp.h glib
 +
 +  return (result > 1);
 +}
-diff -Nur glibc-2.3.old/linuxthreads/sysdeps/unix/sysv/linux/pthreadsig.h glibc-2.3/linuxthreads/sysdeps/unix/sysv/linux/pthreadsig.h
---- glibc-2.3.old/linuxthreads/sysdeps/unix/sysv/linux/pthreadsig.h	1970-01-01 01:00:00.000000000 +0100
-+++ glibc-2.3/linuxthreads/sysdeps/unix/sysv/linux/pthreadsig.h	2002-07-23 23:59:27.000000000 +0200
-@@ -0,0 +1,20 @@
-+/* Copyright (C) 2002 Free Software Foundation, Inc.
-+   This file is part of the GNU C Library.
-+
-+   The GNU C Library is free software; you can redistribute it and/or
-+   modify it under the terms of the GNU Library General Public License as
-+   published by the Free Software Foundation; either version 2 of the
-+   License, or (at your option) any later version.
-+
-+   The GNU C Library is distributed in the hope that it will be useful,
-+   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+   Library General Public License for more details.
-+
-+   You should have received a copy of the GNU Library General Public
-+   License along with the GNU C Library; see the file COPYING.LIB.  If not,
-+   write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-+   Boston, MA 02111-1307, USA.  */
-+
-+#define PTHREAD_SIG_RESTART	SIGUSR1
-+#define PTHREAD_SIG_CANCEL	SIGUSR2
 --- glibc-2.3/linuxthreads_db/td_thr_getgregs.c~	2002-07-16 05:24:27.000000000 +0200
 +++ glibc-2.3/linuxthreads_db/td_thr_getgregs.c	2004-09-17 01:19:13.000000000 +0200
 @@ -31,7 +31,7 @@
