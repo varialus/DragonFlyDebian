@@ -630,3 +630,21 @@ unchanged:
 ++   type pthread_key_t is new unsigned;
 ++
 ++end System.OS_Interface;
+diff -u gcc-4.0-4.0.2/debian/rules.conf gcc-4.0-4.0.2/debian/rules.conf
+--- gcc-4.0-4.0.2/debian/rules.conf
++++ gcc-4.0-4.0.2/debian/rules.conf
+@@ -298,11 +298,11 @@
+ else
+ # avoid it ...
+ ada_no_archs    := $(strip $(foreach cpu,$(ada_no_cpus),!$(cpu)) \
+-			!kfreebsd-any !knetbsd-any !netbsd-any \
+-			!kfreebsd-i386 !knetbsd-i386 !netbsd-i386 \
++			!knetbsd-any !netbsd-any \
++			!knetbsd-i386 !netbsd-i386 \
+ 			!hurd-any !hurd-i386)
+ java_no_archs   := $(strip $(foreach cpu,$(java_no_cpus),!$(cpu)) \
+-			!knetbsd-any !netbsd-any !knetbsd-i386 !netbsd-i386)
++			!kfreebsd-i386 !knetbsd-any !netbsd-any !knetbsd-i386 !netbsd-i386)
+ pascal_no_archs := $(strip $(foreach cpu,$(pascal_no_cpus),!$(cpu)) \
+ 			!netbsd-any !netbsd-i386)
+ f95_no_archs	:= $(strip $(foreach cpu,$(f95_no_cpus),!$(cpu)) \
