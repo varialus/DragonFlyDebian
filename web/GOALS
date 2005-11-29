@@ -7,8 +7,8 @@ console-data		- not for us
 console-tools		- not for us
 dpkg			- patch in BTS
 fdutils			- not for us?
-ifupdown		- not fully working due to incompatible route
-initscripts		- hacked to work with incompatible utils
+ifupdown		- should work with compat freebsd-utils package
+initscripts		- should work with compat freebsd-utils package
 ipchains		- not for us (pf)
 iptables		- not for us (pf)
 iputils-ping		- not for us (inetutils-ping)
@@ -17,11 +17,13 @@ libacl1			- needs a working libattr prior to porting
 libattr1		- builds but segfaults at runtime
 libcap1			- not for us
 libgdbm3		- ftbfs. libtool?
-libpcap0.7		- fail to install (namespace conflict), packages should switch to libpcap0.8
+libpcap0.7		- fail to install (namespace conflict), packages should
+			  switch to libpcap0.8
 libssl0.9.7		- ftbfs. patch sent upstream
 libtextwrap1		- config.guess
 logrotate		- problem with inetutils-inetd, see #294833
-makedev			- not for us (we have devfs)
+makedev			- not for us (we have devfs, but we need it, packages
+			  expect to be able to call MAKEDEV)
 manpages		- many Linux-isms.  needs package split (post-sarge)
 modutils		- not for us (kldutils)
 net-tools		- not for us (inetutils-tools once it's finished)
@@ -29,7 +31,8 @@ netbase			- see #256919
 netkit-inetd		- not for us (inetutils-inetd)
 nvi			- config.guess
 pciutils		- patch in BTS but not upstream AFAIK (#292324)
-ppp			- not for us? could be ported but using FreeBSD version seems easier
+ppp			- not for us? could be ported but using FreeBSD version
+			  seems easier
 pppconfig		- just a frontend, would need some work
 procps			- patch in BTS and applied for next upstream release
 sysklogd		- not for us (inetutils-syslogd)
@@ -39,9 +42,10 @@ util-linux		- needs work in upstream (Guillem is working on it)
 Build-essential:
 ~~~~~~~~~~~~~~~~
 
-binutils		- binutils-multiarch does not have support for i486-kfreebsd-gnu
-gcc			- all current versions work (gcc-3.3 patch needs to be merged
-                          in the debian package).
+binutils		- binutils-multiarch does not have support for
+			  i486-kfreebsd-gnu
+gcc			- all current versions work (gcc-3.3 patch needs
+			  to be merged in the debian package).
 
 
 Other very important stuff we can't live without
@@ -51,7 +55,8 @@ parted			- either this, or a working fdisk
 grub			- or grub2.  whatever that fully works.
 kfreebsd-headers	- no comment
 freebsd-utils		- no comment
-kld-utils		- no comment
+kldutils		- no comment
 cdebootstrap		- hangs in infin loop.  also, see #285785
-debian-installer	- a bunch or dependencies needed first (Otavio working on this)
+debian-installer	- a bunch or dependencies needed first (Otavio
+			  working on this)
 
