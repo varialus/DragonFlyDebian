@@ -1,0 +1,16 @@
+Author: Petr Salinger
+Status: in BTS
+
+--- hugs98-98.200503.08.orig/fptools/libraries/unix/System/Posix/Resource.hsc
++++ hugs98-98.200503.08/fptools/libraries/unix/System/Posix/Resource.hsc
+@@ -93,8 +93,10 @@
+ 
+ unpackRLimit :: CRLim -> ResourceLimit
+ unpackRLimit (#const RLIM_INFINITY)  = ResourceLimitInfinity
++#ifdef RLIM_SAVED_MAX
+ unpackRLimit (#const RLIM_SAVED_MAX) = ResourceLimitUnknown
+ unpackRLimit (#const RLIM_SAVED_CUR) = ResourceLimitUnknown
++#endif
+ unpackRLimit other = ResourceLimit (fromIntegral other)
+ 
+ packRLimit :: ResourceLimit -> Bool -> CRLim
