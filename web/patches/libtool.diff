@@ -1,0 +1,30 @@
+Author: aurel32
+Status: in BTS
+
+diff -u libtool-1.5.20/debian/patches/link_all_deplibs.dpatch libtool-1.5.20/debian/patches/link_all_deplibs.dpatch
+--- libtool-1.5.20/debian/patches/link_all_deplibs.dpatch
++++ libtool-1.5.20/debian/patches/link_all_deplibs.dpatch
+@@ -11,17 +11,20 @@
+ diff -urNad --exclude=CVS --exclude=.svn ./libtool.m4 /tmp/dpep-work.DH3vrV/libtool-1.5.20/libtool.m4
+ --- ./libtool.m4	2005-09-14 20:50:48.404325960 +0200
+ +++ /tmp/dpep-work.DH3vrV/libtool-1.5.20/libtool.m4	2005-09-14 20:50:48.488313192 +0200
+-@@ -5216,6 +5216,9 @@
++@@ -5216,6 +5216,12 @@
+    cygwin* | mingw*)
+      _LT_AC_TAGVAR(export_symbols_cmds, $1)='$NM $libobjs $convenience | $global_symbol_pipe | $SED -e '\''/^[[BCDGRS]] /s/.* \([[^ ]]*\)/\1 DATA/;/^.* __nm__/s/^.* __nm__\([[^ ]]*\) [[^ ]]*/\1 DATA/;/^I /d;/^[[AITW]] /s/.* //'\'' | sort | uniq > $export_symbols'
+    ;;
+++  kfreebsd*-gnu)
+++    _LT_AC_TAGVAR(link_all_deplibs, $1)=no
+++  ;;
+ +  linux*)
+ +    _LT_AC_TAGVAR(link_all_deplibs, $1)=no
+ +  ;;
+    *)
+      _LT_AC_TAGVAR(export_symbols_cmds, $1)='$NM $libobjs $convenience | $global_symbol_pipe | $SED '\''s/.* //'\'' | sort | uniq > $export_symbols'
+    ;;
+-@@ -5393,6 +5396,7 @@
++@@ -5393,6 +5399,7 @@
+    $echo "local: *; };" >> $output_objdir/$libname.ver~
+  	  $CC -shared'"$tmp_addflag"' $libobjs $deplibs $compiler_flags ${wl}-soname $wl$soname ${wl}-version-script ${wl}$output_objdir/$libname.ver -o $lib'
+  	fi
+
