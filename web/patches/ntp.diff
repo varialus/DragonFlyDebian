@@ -91,47 +91,6 @@ diff -x configure -ur ntp-4.2.0a+stable.old/configure.in ntp-4.2.0a+stable/confi
  	 ans=yes
  	 ;;
        *-*-mpeix*)
-Only in ntp-4.2.0a+stable.old/libntp: net.c.bak
-diff -x configure -ur ntp-4.2.0a+stable.old/ntpd/ntpd.c ntp-4.2.0a+stable/ntpd/ntpd.c
---- ntp-4.2.0a+stable.old/ntpd/ntpd.c	2005-08-03 09:18:16.000000000 +0200
-+++ ntp-4.2.0a+stable/ntpd/ntpd.c	2005-08-03 09:43:38.000000000 +0200
-@@ -114,11 +114,16 @@
- #endif
- #endif
- 
-+/* On Glibc systems that use linuxthreads-based libpthread, whose kernel doesn't
-+   implement RT signals, SIGUSR{1,2} are reserved signal codes. */
-+#if !defined(__GLIBC__) || !defined(__FreeBSD_kernel__) || \
-+  !defined(__NetBSD_kernel__)
- /*
-  * Signals we catch for debugging.	If not debugging we ignore them.
-  */
- #define MOREDEBUGSIG	SIGUSR1
- #define LESSDEBUGSIG	SIGUSR2
-+#endif
- 
- /*
-  * Signals which terminate us gracefully.
-@@ -754,11 +759,19 @@
- 
- #if !defined(SYS_WINNT) && !defined(VMS)
- # ifdef DEBUG
-+#  ifdef MOREDEBUGSIG
- 	(void) signal_no_reset(MOREDEBUGSIG, moredebug);
-+#  endif
-+#  ifdef LESSDEBUGSIG
- 	(void) signal_no_reset(LESSDEBUGSIG, lessdebug);
-+#  endif
- # else
-+#  ifdef MOREDEBUGSIG
- 	(void) signal_no_reset(MOREDEBUGSIG, no_debug);
-+#  endif
-+#  ifdef LESSDEBUGSIG
- 	(void) signal_no_reset(LESSDEBUGSIG, no_debug);
-+#  endif
- # endif /* DEBUG */
- #endif /* !SYS_WINNT && !VMS */
- 
 diff -x configure -ur ntp-4.2.0a+stable.old/sntp/configure.ac ntp-4.2.0a+stable/sntp/configure.ac
 --- ntp-4.2.0a+stable.old/sntp/configure.ac	2003-11-19 04:58:18.000000000 +0100
 +++ ntp-4.2.0a+stable/sntp/configure.ac	2005-08-03 10:02:49.000000000 +0200

@@ -3,8 +3,6 @@ Author: rmh
 Status: need to fix some messy things first
 
   - Switch to --with-gc=boehm (see bug #322599)
-  - SIGUSR1 and SIGUSR2 need to swapped in some places, but I'd like to figure out
-    if we can switch it ourselves instead first.
   - s/eax/sc_eax/g changes are too frequent and start to be annoying.  Can we
     change it in the system header?
   - How to mirror a struct declaration from standard headers?  See FIXME below
@@ -154,46 +152,6 @@ diff -x configure -ur mono-1.1.8.2.old/debian/rules mono-1.1.8.2/debian/rules
  	dh_gencontrol -i -- -Vmono:upversion=$(UPVERSION) -Vmono:next-upversion=$(NEXT_UPVERSION)
  	dh_md5sums -i
  	dh_builddeb -i
-diff -x configure -ur mono-1.1.8.2.old/mcs/tools/mono-service/mono-service.cs mono-1.1.8.2/mcs/tools/mono-service/mono-service.cs
---- mono-1.1.8.2.old/mcs/tools/mono-service/mono-service.cs	2005-06-10 12:10:46.000000000 +0200
-+++ mono-1.1.8.2/mcs/tools/mono-service/mono-service.cs	2005-08-10 13:30:00.000000000 +0200
-@@ -261,13 +261,13 @@
- 							running = false;
- 						}
- 						break;
--					case Signum.SIGUSR1:
-+					case Signum.SIGUSR2:
- 						if (service.CanPauseAndContinue) {
- 							info (logname, "Pausing service {0}", service.ServiceName);
- 							call (service, "OnPause", null);
- 						}
- 						break;
--					case Signum.SIGUSR2:
-+					case Signum.SIGUSR1:
- 						if (service.CanPauseAndContinue) {
- 							info (logname, "Continuing service {0}", service.ServiceName);
- 							call (service, "OnContinue", null);
-diff -x configure -ur mono-1.1.8.2.old/mono/metadata/threads.c mono-1.1.8.2/mono/metadata/threads.c
---- mono-1.1.8.2.old/mono/metadata/threads.c	2005-06-06 05:30:45.000000000 +0200
-+++ mono-1.1.8.2/mono/metadata/threads.c	2005-08-04 17:38:13.000000000 +0200
-@@ -1380,13 +1380,13 @@
- {
- #if defined (__MINGW32__) || defined (_MSC_VER)
- 	return -1;
-+#elif defined(SIGRTMIN)
-+	return SIGRTMIN;
-+#elif defined(PTHREAD_SIG_CANCEL)
-+	return PTHREAD_SIG_CANCEL;
- #else
--#ifndef	SIGRTMIN
- 	return SIGUSR1;
--#else
--	return SIGRTMIN;
- #endif
--#endif /*defined (__MINGW32__) || defined (_MSC_VER) */
- }
- 
- #if defined (__MINGW32__) || defined (_MSC_VER)
 diff -x configure -ur mono-1.1.8.2.old/mono/mini/mini-x86.h mono-1.1.8.2/mono/mini/mini-x86.h
 --- mono-1.1.8.2.old/mono/mini/mini-x86.h	2005-04-11 16:16:27.000000000 +0200
 +++ mono-1.1.8.2/mono/mini/mini-x86.h	2005-08-04 12:55:25.000000000 +0200
@@ -206,20 +164,6 @@ diff -x configure -ur mono-1.1.8.2.old/mono/mini/mini-x86.h mono-1.1.8.2/mono/mi
  # define SC_EAX sc_eax
  # define SC_EBX sc_ebx
  # define SC_ECX sc_ecx
-diff -x configure -ur mono-1.1.8.2.old/mono/mini/mini.c mono-1.1.8.2/mono/mini/mini.c
---- mono-1.1.8.2.old/mono/mini/mini.c	2005-06-20 20:31:51.000000000 +0200
-+++ mono-1.1.8.2/mono/mini/mini.c	2005-08-04 18:16:59.000000000 +0200
-@@ -9726,6 +9726,10 @@
- 	sigemptyset (&sa.sa_mask);
- 	sa.sa_flags = 0;
- #endif
-+#if defined(__FreeBSD_kernel__) && defined(__GLIBC__)
-+	if ((signo == SIGUSR1) || (signo == SIGUSR2))
-+		return 0;
-+#endif
- 	g_assert (sigaction (signo, &sa, NULL) != -1);
- }
- #endif
 diff -x configure -ur mono-1.1.8.2.old/support/sys-statvfs.c mono-1.1.8.2/support/sys-statvfs.c
 --- mono-1.1.8.2.old/support/sys-statvfs.c	2005-06-14 02:39:30.000000000 +0200
 +++ mono-1.1.8.2/support/sys-statvfs.c	2005-08-04 18:09:48.000000000 +0200
