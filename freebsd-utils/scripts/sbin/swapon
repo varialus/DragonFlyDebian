@@ -1,3 +1,13 @@
 #!/bin/sh
 set -e
-exec -a swapon swapon.real $@ >/dev/null
+
+args=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -e) ;;
+    *)  if [ -n "${args}" ] ; then args="${args} $1" ; else args="$1" ; fi ;;
+  esac
+  shift
+done
+
+exec -a swapon swapon.real ${args} >/dev/null
