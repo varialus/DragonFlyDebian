@@ -1,0 +1,45 @@
+#! /bin/sh -e
+
+# All lines beginning with `# DP:' are a description of the patch.
+# DP: Description: Ugly hacks to support GNU/kFreeBSD
+# DP: Related bugs: 
+# DP: Dpatch author: aurel32@debian.org
+# DP: Patch author: aurel32@debian.org
+# DP: Upstream status: Not submitted
+# DP: Status Details: 
+# DP: Date: 20050616
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p0 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p0 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+# append the patch here and adjust the -p? flag in the patch calls.
+--- sysdeps/gnu/_G_config.h.orig	2005-08-18 23:12:51.000000000 +0200
++++ sysdeps/gnu/_G_config.h	2005-08-18 23:13:09.000000000 +0200
+@@ -69,7 +69,6 @@
+ 
+ #define _G_HAVE_PRINTF_FP 1
+ #define _G_HAVE_MMAP 1
+-#define _G_HAVE_MREMAP 1
+ #define _G_HAVE_LONG_DOUBLE_IO 1
+ #define _G_HAVE_IO_FILE_OPEN 1
+ #define _G_HAVE_IO_GETLINE_INFO 1
+--- elf/dl-load.c.orig	2005-08-24 01:45:36.000000000 +0200
++++ elf/dl-load.c	2005-08-18 16:54:47.000000000 +0200
+@@ -1495,7 +1495,7 @@
+     [EI_CLASS] = ELFW(CLASS),
+     [EI_DATA] = byteorder,
+     [EI_VERSION] = EV_CURRENT,
+-    [EI_OSABI] = ELFOSABI_SYSV,
++    [EI_OSABI] = ELFOSABI_FREEBSD,
+     [EI_ABIVERSION] = 0
+   };
+   static const struct
