@@ -202,10 +202,10 @@ struct msghdr
     socklen_t msg_namelen;	/* Length of address data.  */
 
     struct iovec *msg_iov;	/* Vector of data to send/receive into.  */
-    int msg_iovlen;		/* Number of elements in the vector.  */
+    size_t msg_iovlen;		/* Number of elements in the vector.  */
 
     void *msg_control;		/* Ancillary data (eg BSD filedesc passing). */
-    socklen_t msg_controllen;	/* Ancillary data buffer length.  */
+    size_t msg_controllen;	/* Ancillary data buffer length.  */
 
     int msg_flags;		/* Flags in received message.  */
   };
@@ -248,7 +248,7 @@ extern struct cmsghdr *__cmsg_nxthdr (struct msghdr *__mhdr,
 #  define _EXTERN_INLINE extern __inline
 # endif
 _EXTERN_INLINE struct cmsghdr *
-__cmsg_nxthdr (struct msghdr *__mhdr, struct cmsghdr *__cmsg) __THROW
+__NTH (__cmsg_nxthdr (struct msghdr *__mhdr, struct cmsghdr *__cmsg))
 {
   if ((size_t) __cmsg->cmsg_len < sizeof (struct cmsghdr))
     /* The kernel header does this so there may be a reason.  */

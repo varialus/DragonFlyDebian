@@ -1,6 +1,5 @@
-/* Copyright (C) 2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 1996, 2002, 2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-   Contributed by Bruno Haible <bruno@clisp.org>, 2002.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -17,21 +16,21 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+#include <signal.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sysdep.h>
+#include <bits/libc-lock.h>
 
-/* The real system call has a word of padding before the 64-bit off_t
-   argument.  */
-extern ssize_t __syscall_pread (int __fd, void *__buf, size_t __nbytes,
-				int __unused1, __off_t __offset) __THROW;
+#ifndef SHARED
+weak_extern (__pthread_raise)
+#endif
 
-ssize_t
-__libc_pread (int fd, void *buf, size_t nbytes, __off_t offset)
+/* Raise the signal SIG.  */
+int
+raise (sig)
+     int sig;
 {
-  /* We pass 5 arguments in 6 words.  */
-  return INLINE_SYSCALL (pread, 5, fd, buf, nbytes, 0, offset);
+  return __libc_maybe_call2 (pthread_raise, (sig),
+			     __kill (__getpid (), sig));
 }
-
-strong_alias (__libc_pread, __pread)
-weak_alias (__libc_pread, pread)
+libc_hidden_def (raise)
+weak_alias (raise, gsignal)

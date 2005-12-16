@@ -73,6 +73,3 @@ __mmap (void *addr, size_t len, int prot, int flags, int fd, __off_t offset)
 
 weak_alias (__mmap, mmap)
 
-/* 'mmap64' is the same as 'mmap', because __off64_t == __off_t.  */
-strong_alias (__mmap, __mmap64)
-weak_alias (__mmap64, mmap64)

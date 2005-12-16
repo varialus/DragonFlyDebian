@@ -34,7 +34,3 @@ __ftruncate (int fd, __off_t length)
 }
 
 weak_alias (__ftruncate, ftruncate)
-
-/* 'ftruncate64' is the same as 'ftruncate', because __off64_t == __off_t.  */
-strong_alias (__ftruncate, __ftruncate64)
-weak_alias (__ftruncate64, ftruncate64)

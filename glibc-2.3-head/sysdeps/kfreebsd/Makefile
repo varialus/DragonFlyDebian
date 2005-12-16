@@ -9,8 +9,7 @@ ifeq ($(subdir),misc)
 sysdep_headers += \
  sys/ktrace.h \
  sys/mount.h \
- sys/rfork.h \
- sys/kd.h
+ sys/rfork.h
 endif
 
 ifeq ($(subdir),stdlib)
@@ -75,7 +74,7 @@ sysdep_routines += sysctl sysctlbyname
 # For <sys/uio.h>.
 sysdep_routines += sys_readv sys_writev
 # Other.
-sysdep_routines += sys_aio_cancel sys_aio_error sys_aio_read sys_aio_return sys_aio_suspend sys_aio_waitcomplete sys_aio_write getresgid getresuid sys_lio_listio issetugid modfind modfnext modnext modstat obreak quotactl rfork setresgid setresuid sysarch thr_sleep thr_wakeup undelete yield
+sysdep_routines += sys_aio_cancel sys_aio_error sys_aio_read sys_aio_return sys_aio_suspend sys_aio_waitcomplete sys_aio_write sys_lio_listio issetugid modfind modfnext modnext modstat obreak quotactl rfork sysarch thr_sleep thr_wakeup undelete yield
 endif
 
 ifeq ($(subdir),posix)

@@ -18,11 +18,13 @@ sys_aio_write	-	aio_write		i:p	__syscall_aio_write
 sys_clock_getres -	clock_getres		i:ip	__syscall_clock_getres
 sys_clock_gettime -	clock_gettime		i:ip	__syscall_clock_gettime
 sys_clock_settime -	clock_settime		i:ip	__syscall_clock_settime
+sys_execve	-	execve			i:ppp	__syscall_execve
 extattrctl	-	extattrctl		i:sisI	extattrctl
 extattr_delete_file -	extattr_delete_file	i:ss	extattr_delete_file
 extattr_get_file -	extattr_get_file	i:ssbn	extattr_get_file
 extattr_set_file -	extattr_set_file	i:ssbn	extattr_set_file
 fhopen		-	fhopen			i:pi	fhopen
+sys_fork	-	fork			i:	__syscall_fork fork
 sys_fhstat	-	fhstat			i:pp	__syscall_fhstat
 fhstatfs	-	fhstatfs		i:pp	__fhstatfs	fhstatfs
 sys_fstat	-	fstat			i:ip	__syscall_fstat
@@ -56,7 +58,7 @@ sys_lio_listio	-	lio_listio		i:ibnP	__syscall_lio_listio
 sys_lseek	-	lseek			i:iiii	__syscall_lseek
 sys_lstat	-	lstat			i:sp	__syscall_lstat
 lutimes		-	lutimes			i:sp	__lutimes	lutimes
-madvise		-	madvise			i:pii	posix_madvise	madvise
+posix_madvise	-	madvise			i:pii	posix_madvise
 minherit	-	minherit		i:aii	minherit
 mincore		-	mincore			i:anV	mincore
 mlock		-	mlock			i:bn	mlock
@@ -113,7 +115,7 @@ shmat		-	shmat			i:iai	shmat
 shmctl		-	shmctl			i:iip	shmctl
 shmdt		-	shmdt			i:a	shmdt
 shmget		-	shmget			i:iii	shmget
-sigaction	-	sigaction		i:iPP	__libc_sigaction __sigaction sigaction
+sys_sigaction	-	sigaction		i:ipp   __syscall_sigaction
 sigpending	-	sigpending		i:p	sigpending
 sigprocmask	-	sigprocmask		i:iPP	__sigprocmask	sigprocmask
 sigsuspend	-	sigsuspend		i:p	__sigsuspend	sigsuspend

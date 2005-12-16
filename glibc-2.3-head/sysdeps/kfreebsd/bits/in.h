@@ -56,12 +56,6 @@
 #define	IP_IPSEC_POLICY	21	/* int; set/get security policy */
 #define	IP_FAITH	22	/* bool; accept FAITH'ed connections */
 
-#define IP_FW_TABLE_ADD		40	/* add entry */
-#define IP_FW_TABLE_DEL		41	/* delete entry */
-#define IP_FW_TABLE_FLUSH	42	/* flush table */
-#define IP_FW_TABLE_GETSIZE	43	/* get table size */
-#define IP_FW_TABLE_LIST	44	/* list table contents */
-
 #define	IP_FW_ADD    	50	/* add a firewall rule to chain */
 #define	IP_FW_DEL    	51	/* delete a firewall rule from chain */
 #define	IP_FW_FLUSH   	52	/* flush firewall rule chain */
@@ -121,18 +115,11 @@ struct ip_opts
     char ip_opts[40];		/* Actually variable in size.  */
   };
 
-/* Structure used for IP_ADD_MEMBERSHIP and IP_DROP_MEMBERSHIP. */
-struct ip_mreq
-  {
-    struct in_addr imr_multiaddr;	/* IP multicast address of group */
-    struct in_addr imr_interface;	/* local IP address of interface */
-  };
-
 /* IPV6 socket options.  */
 #define IPV6_ADDRFORM		1
 #define IPV6_RXINFO		2
-#define IPV6_RXHOPOPTS		3
-#define IPV6_RXDSTOPTS		4
+#define IPV6_HOPOPTS		3
+#define IPV6_DSTOPTS		4
 #define IPV6_RTHDR		5
 #define IPV6_PKTOPTIONS		6
 #define IPV6_CHECKSUM		7
@@ -152,6 +139,8 @@ struct ip_mreq
 /* Obsolete synonyms for the above.  */
 #define IPV6_ADD_MEMBERSHIP	IPV6_JOIN_GROUP
 #define IPV6_DROP_MEMBERSHIP	IPV6_LEAVE_GROUP
+#define IPV6_RXHOPOPTS		IPV6_HOPOPTS
+#define IPV6_RXDSTOPTS		IPV6_DSTOPTS
 
 /* Routing header options for IPv6.  */
 #define IPV6_RTHDR_LOOSE	0	/* Hop doesn't need to be neighbour. */

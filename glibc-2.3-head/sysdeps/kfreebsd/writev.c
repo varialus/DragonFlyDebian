@@ -28,17 +28,20 @@
 
 extern ssize_t __syscall_writev (int, const struct iovec *__unbounded, int);
 
-#define __writev static __inline internal_function __atomic_writev_replacement
-#include <sysdeps/posix/writev.c>
-#undef __writev
+static ssize_t __atomic_writev_replacement (int, const struct iovec *,
+					    int) internal_function;
 
 ssize_t
-__writev (int fd, const struct iovec *vector, int count)
+__libc_writev (int fd, const struct iovec *vector, int count)
 {
   if (count <= UIO_MAXIOV)
     return INLINE_SYSCALL (writev, 3, fd, CHECK_N (vector, count), count);
   else
     return __atomic_writev_replacement (fd, vector, count);
 }
+strong_alias (__libc_writev, __writev)
+weak_alias (__libc_writev, writev)
 
-weak_alias (__writev, writev)
+#define __libc_writev static internal_function __atomic_writev_replacement
+#include <sysdeps/posix/writev.c>
+

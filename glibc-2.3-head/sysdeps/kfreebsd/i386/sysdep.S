@@ -18,21 +18,6 @@
 
 #include <sysdep.h>
 
-/* Because the FreeBSD version is in fact i386/ELF and the start.? file
-   for this system (sysdeps/i386/elf/start.S) is also used by The Hurd
-   and therefore this files must not contain the definition of the
-   `errno' variable (I don't know why, ask Roland), we have to define
-   it somewhere else.
-
-   ...and this place is here.  */
-	.bss
-	.globl	errno
-	.type errno,@object
-	.size errno,4
-errno:
-	.space	4
-weak_alias (errno, _errno)
-
 /* The following code is only used in the shared library when we
    compile the reentrant version.  Otherwise each system call defines
    its own version.  */

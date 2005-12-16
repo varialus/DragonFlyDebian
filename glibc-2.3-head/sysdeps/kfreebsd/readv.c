@@ -28,17 +28,19 @@
 
 extern ssize_t __syscall_readv (int, __const struct iovec *__unbounded, int);
 
-#define __readv static __inline internal_function __atomic_readv_replacement
-#include <sysdeps/posix/readv.c>
-#undef __readv
+static ssize_t __atomic_readv_replacement (int, __const struct iovec *,
+					   int) internal_function;
 
 ssize_t
-__readv (int fd, const struct iovec *vector, int count)
+__libc_readv (int fd, const struct iovec *vector, int count)
 {
   if (count <= UIO_MAXIOV)
     return INLINE_SYSCALL (readv, 3, fd, CHECK_N (vector, count), count);
   else
     return __atomic_readv_replacement (fd, vector, count);
 }
+strong_alias (__libc_readv, __readv)
+weak_alias (__libc_readv, readv)
 
-weak_alias (__readv, readv)
+#define __libc_readv static internal_function __atomic_readv_replacement
+#include <sysdeps/posix/readv.c>

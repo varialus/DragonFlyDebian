@@ -1,53 +1,96 @@
-GLIBC_PROVIDES dnl See aclocal.m4 in the top level source directory.
-# Local configure fragment for sysdeps/unix/bsd/bsd4.4/kfreebsd.
+# This file is generated from configure.in by Autoconf.  DO NOT EDIT!
+ # Local configure fragment for sysdeps/unix/bsd/bsd4.4/kfreebsd.
 
 # The kFreeBSD headers can be found in
 #   /usr/src/sys/
 # Check whether this directory is available.
-if test -z "$sysheaders" && 
+if test -z "$sysheaders" &&
    test "x$cross_compiling" = xno &&
    test -d /usr/src/sys/ ; then
   sysheaders="/usr/src/sys/"
   ccheaders=`$CC -print-file-name=include`
-  dnl We don't have to use -nostdinc.  We just want one more directory
-  dnl to be used.
-  SYSINCLUDES="-I $sysheaders"
+      SYSINCLUDES="-I $sysheaders"
 fi
 
 # Don't bother trying to generate any glue code to be compatible with the
 # existing system library, because we are the only system library.
 inhibit_glue=yes
 
-define([LIBC_KFREEBSD_VERSION],[5.2.0])dnl
 if test -n "$sysheaders"; then
   OLD_CPPFLAGS=$CPPFLAGS
   CPPFLAGS="$CPPFLAGS $SYSINCLUDES"
 fi
-define([libc_cv_linuxVER], [libc_cv_linux]patsubst(LIBC_KFREEBSD_VERSION,[\.]))dnl
-AC_CACHE_CHECK(installed kFreeBSD kernel header files, libc_cv_kfreebsdVER, [dnl
-AC_EGREP_CPP([eat flaming death], [#include <osreldate.h>
-#if !defined __FreeBSD_kernel_version || __FreeBSD_kernel_version < ]dnl
-patsubst(LIBC_KFREEBSD_VERSION,[^\([^.]*\)\.\([^.]*\)\.\([^.]*\)$],dnl
-[ (\1 *10000+ \2 *100+ \3) /* \1.\2.\3 */])[
+
+
+echo "$as_me:$LINENO: checking for egrep" >&5
+echo $ECHO_N "checking for egrep... $ECHO_C" >&6
+if test "${ac_cv_prog_egrep+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if echo a | (grep -E '(a|b)') >/dev/null 2>&1
+    then ac_cv_prog_egrep='grep -E'
+    else ac_cv_prog_egrep='egrep'
+    fi
+fi
+echo "$as_me:$LINENO: result: $ac_cv_prog_egrep" >&5
+echo "${ECHO_T}$ac_cv_prog_egrep" >&6
+ EGREP=$ac_cv_prog_egrep
+
+
+echo "$as_me:$LINENO: checking installed kFreeBSD kernel header files" >&5
+echo $ECHO_N "checking installed kFreeBSD kernel header files... $ECHO_C" >&6
+if test "${libc_cv_kfreebsdVER+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <osreldate.h>
+#if !defined __FreeBSD_kernel_version || __FreeBSD_kernel_version <  (5 *10000+ 2 *100+ 0) /* 5.2.0 */
 eat flaming death
-#endif],
-	     libc_cv_kfreebsdVER='TOO OLD!',
-	     libc_cv_kfreebsdVER='LIBC_KFREEBSD_VERSION or later')])
-if test "$libc_cv_kfreebsdVER" != 'LIBC_KFREEBSD_VERSION or later'; then
-  AC_MSG_ERROR([GNU libc requires kernel header files from
-kFreeBSD LIBC_KFREEBSD_VERSION or later to be installed before configuring.
+#endif
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "eat flaming death" >/dev/null 2>&1; then
+  libc_cv_kfreebsdVER='TOO OLD!'
+else
+  libc_cv_kfreebsdVER='5.2.0 or later'
+fi
+rm -f conftest*
+
+fi
+echo "$as_me:$LINENO: result: $libc_cv_kfreebsdVER" >&5
+echo "${ECHO_T}$libc_cv_kfreebsdVER" >&6
+if test "$libc_cv_kfreebsdVER" != '5.2.0 or later'; then
+  { { echo "$as_me:$LINENO: error: GNU libc requires kernel header files from
+kFreeBSD 5.2.0 or later to be installed before configuring.
 The kernel header files are found usually in /usr/src/sys/; make sure
-these directories use files from kFreeBSD LIBC_KFREEBSD_VERSION or later.  
+these directories use files from kFreeBSD 5.2.0 or later.
 This check uses <osreldate.h>, so
 make sure that file was built correctly when installing the kernel header
 files.  To use kernel headers not from /usr/src/sys/, use the
-configure option --with-headers.])
+configure option --with-headers." >&5
+echo "$as_me: error: GNU libc requires kernel header files from
+kFreeBSD 5.2.0 or later to be installed before configuring.
+The kernel header files are found usually in /usr/src/sys/; make sure
+these directories use files from kFreeBSD 5.2.0 or later.
+This check uses <osreldate.h>, so
+make sure that file was built correctly when installing the kernel header
+files.  To use kernel headers not from /usr/src/sys/, use the
+configure option --with-headers." >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
-AC_ARG_ENABLE(compatible-utmp, dnl
-[  --disable-compatible-utmp  use a struct utmp which is the same as struct
-                          utmpx, as on kFreeBSD, but incompatible with FreeBSD],
-              enable_utmp_compat=$enableval, enable_utmp_compat=no)
+# Check whether --enable-compatible-utmp or --disable-compatible-utmp was given.
+if test "${enable_compatible_utmp+set}" = set; then
+  enableval="$enable_compatible_utmp"
+  enable_utmp_compat=$enableval
+else
+  enable_utmp_compat=no
+fi;
 if test "$enable_utmp_compat" = no; then
   utmp_subdir=utmp-utmpx
 else
@@ -68,12 +111,13 @@ case "$machine" in
     ;;
 esac
 if test -n "$minimum_kernel"; then
-  changequote(,)
+
   user_version=$((`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/\1 \* 10000 + \2 \* 100 + \3/'`))
   arch_version=$((`echo "$arch_minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/\1 \* 10000 + \2 \* 100 + \3/'`))
-  changequote([,])
+
   if test $user_version -lt $arch_version; then
-    AC_MSG_WARN([minimum kernel version reset to $arch_minimum_kernel])
+    { echo "$as_me:$LINENO: WARNING: minimum kernel version reset to $arch_minimum_kernel" >&5
+echo "$as_me: WARNING: minimum kernel version reset to $arch_minimum_kernel" >&2;}
     minimum_kernel=$arch_minimum_kernel
   fi
 else
@@ -83,22 +127,46 @@ else
 fi
 
 if test -n "$minimum_kernel"; then
-  AC_MSG_CHECKING(for kernel header at least $minimum_kernel)
-changequote(,)dnl
+  echo "$as_me:$LINENO: checking for kernel header at least $minimum_kernel" >&5
+echo $ECHO_N "checking for kernel header at least $minimum_kernel... $ECHO_C" >&6
   decnum=`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/(\1 * 10000 + \2 * 100 + \3)/'`;
   abinum=`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/\1,\2,\3/'`;
-changequote([,])dnl
-  AC_EGREP_CPP([eat flaming death], [#include <osreldate.h>
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <osreldate.h>
 #if __FreeBSD_kernel_version < $decnum
 eat flaming death
-#endif], libc_minimum_kernel='too old!', libc_minimum_kernel=ok)
-  AC_MSG_RESULT($libc_minimum_kernel)
+#endif
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "eat flaming death" >/dev/null 2>&1; then
+  libc_minimum_kernel='too old!'
+else
+  libc_minimum_kernel=ok
+fi
+rm -f conftest*
+
+  echo "$as_me:$LINENO: result: $libc_minimum_kernel" >&5
+echo "${ECHO_T}$libc_minimum_kernel" >&6
   if test "$libc_minimum_kernel" = ok; then
-    AC_DEFINE_UNQUOTED(__KFREEBSD_KERNEL_VERSION, $decnum)
-    AC_DEFINE_UNQUOTED(__ABI_TAG_VERSION, $abinum)
+    cat >>confdefs.h <<_ACEOF
+#define __KFREEBSD_KERNEL_VERSION $decnum
+_ACEOF
+
+    cat >>confdefs.h <<_ACEOF
+#define __ABI_TAG_VERSION $abinum
+_ACEOF
+
   else
-    AC_MSG_ERROR([*** The available kernel headers are older than the requested
-*** compatible kernel version])
+    { { echo "$as_me:$LINENO: error: *** The available kernel headers are older than the requested
+*** compatible kernel version" >&5
+echo "$as_me: error: *** The available kernel headers are older than the requested
+*** compatible kernel version" >&2;}
+   { (exit 1); exit 1; }; }
   fi
 fi
 
@@ -195,7 +263,8 @@ if test $host = $build; then
   else
     ac_prefix=$ac_default_prefix
   fi
-  AC_MSG_CHECKING([for symlinks in ${ac_prefix}/include])
+  echo "$as_me:$LINENO: checking for symlinks in ${ac_prefix}/include" >&5
+echo $ECHO_N "checking for symlinks in ${ac_prefix}/include... $ECHO_C" >&6
   ac_message=
   if test -L ${ac_prefix}/include/net; then
     ac_message="$ac_message
@@ -206,12 +275,18 @@ if test $host = $build; then
    ${ac_prefix}/include/scsi is a symlink"
   fi
   if test -n "$ac_message"; then
-    AC_MSG_ERROR([$ac_message
+    { { echo "$as_me:$LINENO: error: $ac_message
 \`make install' will destroy the target of the link(s).
 Delete the links and re-run configure, or better still, move the entire
-${ac_prefix}/include directory out of the way.])
+${ac_prefix}/include directory out of the way." >&5
+echo "$as_me: error: $ac_message
+\`make install' will destroy the target of the link(s).
+Delete the links and re-run configure, or better still, move the entire
+${ac_prefix}/include directory out of the way." >&2;}
+   { (exit 1); exit 1; }; }
   else
-    AC_MSG_RESULT(ok)
+    echo "$as_me:$LINENO: result: ok" >&5
+echo "${ECHO_T}ok" >&6
   fi
 fi
 
