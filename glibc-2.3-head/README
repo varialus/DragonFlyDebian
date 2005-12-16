@@ -1,0 +1,34 @@
+
+This is an attempt to port recent glibc-2.3.x for kfreebsd.
+It is based on previous work for glibc 2.3.0.
+
+As glibc source is used a post-2.3.6 snapshot, available from
+ftp://sources.redhat.com/pub/glibc/snapshots/glibc-2.3-20051212.tar.bz2
+
+The main part are new arch specific files, 
+linked into glibc-2.3.x tree as follows:
+
+sysdeps/kfreebsd
+	-> $SRC/sysdeps/unix/bsd/bsd4.4/kfreebsd
+
+linuxthreads/kfreebsd
+	-> $SRC/linuxthreads/sysdeps/unix/bsd/bsd4.4/kfreebsd
+
+Remaining part are miscellaneous kfreebsd changes and hacks,
+stored in dir patches. 
+
+
+
+
+			glibc-2.3 			glibc-2.3-head
+===============================================================================
+glibc base		2.3.0				2.3.6
+-------------------------------------------------------------------------------
+gcc			3.3.x				4.0.x
+-------------------------------------------------------------------------------
+kernel headers		kfreebsd5-headers		kfreebsd-kernel-headers
+-------------------------------------------------------------------------------
+sysdeps			external in glibc-kbsd		integrated into glibc
+-------------------------------------------------------------------------------
+thread local storage	no				yes
+-------------------------------------------------------------------------------

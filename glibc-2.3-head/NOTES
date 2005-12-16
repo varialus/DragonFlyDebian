@@ -1,0 +1,35 @@
+
+working copy prepare:
+=====================
+
+wget ftp://sources.redhat.com/pub/glibc/snapshots/glibc-2.3-20051212.tar.bz2
+tar jxf glibc-2.3-20051212.tar.bz2
+mv glibc-2.3-20051212 src
+
+ln -s sysdeps/kfreebsd src/sysdeps/unix/bsd/bsd4.4/
+mkdir -p src/linuxthreads/sysdeps/unix/bsd/bsd4.4/
+ln -s linuxthreads/kfreebsd src/linuxthreads/sysdeps/unix/bsd/bsd4.4/
+
+apply patches from patches/
+
+
+
+roadmap:
+========
+
+- initial sysdeps dir based on glibc-kbsd-2.3/sysdeps/unix/bsd/bsd4.4/kfreebsd/
+- initial linuxthreads dir based on glibc-2.3/patches/020_linuxthreads.diff
+- basic configure changes
+
+- make glibc buildable (at this point, it doesn't have to work, only build)
+
+- upgrade syscalls.list (from kernel 5.4 or 6.0)
+- port remaining patches from glibc-2.3/patches/
+- port remaining patches from web/patches/glibc-2.3.5.diff
+
+- make glibc functional
+
+- enable TLS
+
+- prepare integration into debian glibc package
+
