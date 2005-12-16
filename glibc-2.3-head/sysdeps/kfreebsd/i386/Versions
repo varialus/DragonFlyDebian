@@ -1,0 +1,15 @@
+libc {
+  # The comment lines with "#errlist-compat" are magic; see errlist-compat.awk.
+  # When you get an error from errlist-compat.awk, you need to add a new
+  # version here.  Don't do this blindly, since this means changing the ABI
+  # for all GNU/kFreeBSD configurations.
+	  
+  GLIBC_2.2.6 {
+    i386_get_ioperm; i386_set_ioperm; i386_vm86;
+    ioperm; iopl;
+  }
+  GLIBC_2.3 {
+    #errlist-compat     87
+    _sys_errlist; sys_errlist; _sys_nerr; sys_nerr;
+  }
+}
