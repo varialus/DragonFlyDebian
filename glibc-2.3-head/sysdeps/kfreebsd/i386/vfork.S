@@ -48,7 +48,8 @@ L(error):
 
 	/* Branch to the error handler, hidden in PSEUDO_END.  */
 	jmp	SYSCALL_ERROR_LABEL
-
+L(pseudo_end):
+	ret
 PSEUDO_END (__vfork)
 libc_hidden_def (__vfork)
 

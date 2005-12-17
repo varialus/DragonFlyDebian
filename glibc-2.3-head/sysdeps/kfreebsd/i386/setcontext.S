@@ -89,6 +89,7 @@ ENTRY(__setcontext)
 	popa
 	/* The following 'ret' will pop the addres of the code and jump
 	   to it.  */
+L(pseudo_end):
 	ret
 
 PSEUDO_END(__setcontext)

@@ -165,6 +165,7 @@ L(simple):/* Simple case without signal mask handling.  */
 	addl	$32, %esp
 	popl	%ebx
 	popl	%ebp
+L(pseudo_end):
 	ret
 
 L(simple_child):/* Here we are in the child thread.  */
@@ -183,5 +184,4 @@ L(error):
 	popl	%ebx
 	popl	%ebp
 	jmp	SYSCALL_ERROR_LABEL
-
 PSEUDO_END (__start_thread)

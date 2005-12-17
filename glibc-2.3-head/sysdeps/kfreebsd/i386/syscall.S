@@ -18,12 +18,14 @@
 
 #include <sysdep.h>
 
+	  .text;
 ENTRY (syscall)
 	popl %ecx		/* Pop return address into %ecx.  */
 	popl %eax		/* Pop syscall number into %eax.  */
 	pushl %ecx		/* Push back return address.  */
 	int $0x80		/* Do the system call.  */
-	jb SYSCALL_ERROR_LABEL	/* Jump to error handler if error.  */
-	ret			/* Return to caller.  */
+	jb SYSCALL_ERROR_LABEL;	/* Jump to error handler if error.  */
 
+L(pseudo_end):
+	ret			/* Return to caller.  */
 PSEUDO_END (syscall)

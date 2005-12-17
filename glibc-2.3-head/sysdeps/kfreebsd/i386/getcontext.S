@@ -69,6 +69,7 @@ ENTRY(__getcontext)
 
 	/* All done, return 0 for success.  */
 	xorl	%eax, %eax
+L(pseudo_end):
 	ret
 
 PSEUDO_END(__getcontext)
