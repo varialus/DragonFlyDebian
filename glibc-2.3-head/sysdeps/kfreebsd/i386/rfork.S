@@ -18,14 +18,26 @@
 
 #include <sysdep.h>
 
-SYSCALL__ (rfork, 1)
+.text;
+ENTRY (__rfork)
+	/* save the return PC value into ECX, 
+	   preserve stack frame with argument  */
+	movl 0(%esp), %ecx; 
+	DO_CALL (rfork, 1)
+	jb SYSCALL_ERROR_LABEL;
 	/* R1 is now 0 for the parent and 1 for the child.  Decrement it to
 	   make it -1 (all bits set) for the parent, and 0 (no bits set)
 	   for the child.  Then AND it with R0, so the parent gets
 	   R0&-1==R0, and the child gets R0&0==0.  */
-	decl r1
-	andl r1, r0
+	decl %edx
+	andl %edx, %eax
+
+	popl %edx
+	jmp  *%ecx
+
+L(pseudo_end):
 	ret
 PSEUDO_END (__rfork)
 
 weak_alias (__rfork, rfork)
+
