@@ -75,6 +75,8 @@ sysdep_routines += sysctl sysctlbyname
 sysdep_routines += sys_readv sys_writev
 # Other.
 sysdep_routines += sys_aio_cancel sys_aio_error sys_aio_read sys_aio_return sys_aio_suspend sys_aio_waitcomplete sys_aio_write sys_lio_listio issetugid modfind modfnext modnext modstat obreak quotactl rfork sysarch thr_sleep thr_wakeup undelete yield
+# for INLINE_SYSCALL
+sysdep_routines += sys_fork sys_execve sys_sigaction
 endif
 
 ifeq ($(subdir),posix)
