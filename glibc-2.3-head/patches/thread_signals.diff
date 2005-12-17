@@ -1,0 +1,39 @@
+diff -ur linuxthreads/pthread.c linuxthreads/pthread.c
+--- linuxthreads/pthread.c	2004-10-06 10:04:43.000000000 +0200
++++ linuxthreads/pthread.c	2005-12-17 01:53:44.000000000 +0100
+@@ -36,10 +36,13 @@
+ #include <version.h>
+ #include <not-cancel.h>
+ 
++#define KFREEBSD_HACK 1
++#ifndef KFREEBSD_HACK
+ /* Sanity check.  */
+ #if !defined __SIGRTMIN || (__SIGRTMAX - __SIGRTMIN) < 3
+ # error "This must not happen"
+ #endif
++#endif
+ 
+ #if !(USE_TLS && HAVE___THREAD)
+ /* These variables are used by the setup code.  */
+@@ -181,6 +184,13 @@
+    platform does not support any real-time signals we will define the
+    values to some unreasonable value which will signal failing of all
+    the functions below.  */
++
++#ifdef KFREEBSD_HACK   
++int __pthread_sig_restart = 32;
++int __pthread_sig_cancel  = 33;
++int __pthread_sig_debug   = 34;
++static void init_rtsigs (void) {;}
++#else
+ int __pthread_sig_restart = __SIGRTMIN;
+ int __pthread_sig_cancel = __SIGRTMIN + 1;
+ int __pthread_sig_debug = __SIGRTMIN + 2;
+@@ -212,6 +222,7 @@
+   rtsigs_initialized = 1;
+ }
+ #endif
++#endif
+ 
+ 
+ /* Initialize the pthread library.
