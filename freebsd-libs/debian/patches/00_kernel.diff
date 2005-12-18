@@ -1,0 +1,34 @@
+diff -ur lib.old/kernel/sys/cam/cam.c lib/kernel/sys/cam/cam.c
+--- lib.old/kernel/sys/cam/cam.c	2003-06-15 00:17:38.000000000 +0200
++++ lib/kernel/sys/cam/cam.c	2005-08-15 08:18:42.000000000 +0200
+@@ -37,6 +37,7 @@
+ #include <sys/sysctl.h>
+ #else /* _KERNEL */
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <stdio.h>
+ #endif /* _KERNEL */
+ 
+diff -ur lib.old/kernel/sys/cam/scsi/scsi_all.c lib/kernel/sys/cam/scsi/scsi_all.c
+--- lib.old/kernel/sys/cam/scsi/scsi_all.c	2004-08-13 20:45:04.000000000 +0200
++++ lib/kernel/sys/cam/scsi/scsi_all.c	2005-08-15 08:21:32.000000000 +0200
+@@ -41,6 +41,7 @@
+ #include <sys/sysctl.h>
+ #else
+ #include <errno.h>
++#include <stdint.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+diff -ur lib.old/kernel/sys/cam/scsi/scsi_all.h lib/kernel/sys/cam/scsi/scsi_all.h
+--- lib.old/kernel/sys/cam/scsi/scsi_all.h	2003-04-30 02:35:22.000000000 +0200
++++ lib/kernel/sys/cam/scsi/scsi_all.h	2005-08-15 08:22:30.000000000 +0200
+@@ -32,6 +32,8 @@
+  * bus reset.
+  */
+ extern int scsi_delay;
++#else
++#include <stdint.h>
+ #endif /* _KERNEL */
+ 
+ /*
