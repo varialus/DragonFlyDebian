@@ -1,0 +1,41 @@
+.TH TYPE-HANDLING 1 "November 2005" "Debian"
+.SH NAME
+type-handling \- dpkg architecture generation script
+.SH SYNOPSIS
+\fBtype-handling\fR [\fB\-n\fR|\fB\-\-negated\fR] [\fB\-r\fR|\fB\-\-reverted\fR] \fIcpu...\fR \fIsystem...\fR
+.SH DESCRIPTION
+The main purpose of this utility is using it in combination with \fBsed\fR
+to generate a \fIdebian/control\fR file with architecture lists that \fBdpkg\fR
+can understand.  \fIcpu\fR is a CPU as recognized by \fBdpkg-architecture\fR.
+A list of CPUs must be comma-separated.  The string \fBany\fR is a wildcard and
+will be translated to a list of all recognised CPUs. \fIsystem\fR is the same
+for systems recognised by \fBdpkg-architecture\fR.
+.PP
+\fBtype-handling\fR will print every \fBdpkg\fR architecture that matches
+\fIboth\fR one of the specified CPUs and one of the specified systems.
+.SH OPTIONS
+.TP
+.B \-n
+\fBtype-handling\fR will instead print architectures that do \fInot\fR match.
+.TP
+.B \-r
+\fBtype-handling\fR will print a reverted \fIequivalent\fR of the same string
+by prefixing with \fB!\fR.  This option has no practical effect and is only
+intended for aesthetical/readability purposes.  Note that in some situations,
+the \fB!\fR negated string cannot be parsed by dpkg (e.g., in
+\fBArchitecture\fR fields), so use with care.
+.SH EXAMPLES
+.sp
+.nf
+$ \fBtype-handling i386,powerpc,x86_64 linux-gnu\fR
+i386 powerpc amd64
+.sp
+$ \fBtype-handling any linux-gnu\fR
+alpha arm hppa [...] sparc64 amd64
+.sp
+$ \fBtype-handling i386 any\fR
+darwin-i386 freebsd-i386 hurd-i386 kfreebsd-i386 knetbsd-i386 i386 netbsd-i386 openbsd-i386
+.sp
+.fi
+.SH "SEE ALSO"
+.BR dpkg (1)
