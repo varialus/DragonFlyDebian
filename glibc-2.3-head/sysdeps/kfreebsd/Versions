@@ -64,5 +64,11 @@ libc {
   GLIBC_PRIVATE {
     # needed by libpthread.
     __clone; __libc_fork; __libc_sigaction;
+    # needed by libpthread as INLINE_SYSCALL:
+    __syscall_fork; __syscall_execve;
+    # misc fixes for FreeBSD:
+    __syscall_open; __syscall_lseek; __syscall_pread; __syscall_pwrite;
+    __syscall_sigaction; 
+    __wait4; __sigprocmask; __futimes; __ioctl;
   }
 }
