@@ -41,3 +41,28 @@ roadmap:
 
 - prepare integration into debian glibc package
 
+
+status:
+=======
+- compile - OK
+- execute; (via  /opt/tst/lib/ld-2.3.6.so --library-path /opt/tst/lib $cmd) 
+	OK	/opt/tst/lib/libc-2.3.6.so 
+	OK	/bin/cat /proc/self/maps 
+	OK	/bin/sed --help
+	OK	/bin/grep  ....
+
+	FAIL	/bin/bash 
+
+details:
+
+ bash: xmalloc: ../bash/locale.c:68: cannot allocate 2 bytes (0 bytes allocated)
+
+ 14647 ld-2.3.6.so CALL  open(0x80c1ea2,0x6,0)
+ 14647 ld-2.3.6.so NAMI  "/dev/tty"
+ 14647 ld-2.3.6.so RET   open 3
+ 14647 ld-2.3.6.so CALL  close(0x3)
+ 14647 ld-2.3.6.so RET   close 0
+ 14647 ld-2.3.6.so CALL  __sysctl(0xbfbfe7e8,0x2,0x201601ac,0xbfbfe7f0,0,0)
+ 14647 ld-2.3.6.so RET   __sysctl 0
+ 14647 ld-2.3.6.so CALL  break(0x20162000)
+ 14647 ld-2.3.6.so RET   break -1 errno 12 Cannot allocate memory
