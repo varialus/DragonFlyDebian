@@ -30,3 +30,6 @@ __libc_lseek64 (int fd, __off64_t offset, int whence)
 
 weak_alias (__libc_lseek64, __lseek64)
 weak_alias (__libc_lseek64, lseek64)
+
+strong_alias (__libc_lseek64, __llseek)
+weak_alias (__libc_lseek64, llseek)
