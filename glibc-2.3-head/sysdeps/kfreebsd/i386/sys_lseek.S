@@ -21,70 +21,11 @@
 /* lseek returns a 64-bit result in %eax, %edx.  This means that in the
    error case we have to set both %eax and %edx to -1.  */
 
-#undef SYSCALL_ERROR_LABEL
-#define SYSCALL_ERROR_LABEL 0f
-
-#undef SYSCALL_ERROR_HANDLER
-#ifndef PIC
-#ifdef _LIBC_REENTRANT
-#define SYSCALL_ERROR_HANDLER						      \
-0:pushl %eax;								      \
-  PUSH_ERRNO_LOCATION_RETURN;						      \
-  call BP_SYM (__errno_location);					      \
-  POP_ERRNO_LOCATION_RETURN;						      \
-  popl %ecx;								      \
-  movl $-1, %edx;							      \
-  movl %ecx, (%eax);							      \
-  movl %edx, %eax;							      \
-  ret;
-/* A quick note: it is assumed that the call to `__errno_location' does
-   not modify the stack!  */
-#else
-#define SYSCALL_ERROR_HANDLER						      \
-0:movl $-1, %edx;							      \
-  movl %eax, errno;							      \
-  movl %edx, %eax;							      \
-  ret;
-#endif	/* _LIBC_REENTRANT */
-#else
-/* Store %eax into errno through the GOT.  */
-#ifdef _LIBC_REENTRANT
-#define SYSCALL_ERROR_HANDLER						      \
-0:pushl %ebx;								      \
-  call 1f;								      \
-  .subsection 1;							      \
-1:movl (%esp), %ebx;							      \
-  ret;									      \
-  .previous;								      \
-  addl $_GLOBAL_OFFSET_TABLE_, %ebx;					      \
-  pushl %eax;								      \
-  PUSH_ERRNO_LOCATION_RETURN;						      \
-  call BP_SYM (__errno_location)@PLT;					      \
-  POP_ERRNO_LOCATION_RETURN;						      \
-  popl %ecx;								      \
-  popl %ebx;								      \
-  movl $-1, %edx;							      \
-  movl %ecx, (%eax);							      \
-  movl %edx, %eax;							      \
-  ret;
-/* A quick note: it is assumed that the call to `__errno_location' does
-   not modify the stack!  */
-#else
-#define SYSCALL_ERROR_HANDLER						      \
-0:call 1f;								      \
-  .subsection 1;							      \
-1:movl (%esp), %ecx;							      \
-  ret;									      \
-  .previous;								      \
-  addl $_GLOBAL_OFFSET_TABLE_, %ecx;					      \
-  movl errno@GOT(%ecx), %ecx;						      \
-  movl $-1, %edx;							      \
-  movl %eax, (%ecx);							      \
-  movl %edx, %eax;							      \
-  ret;
-#endif	/* _LIBC_REENTRANT */
-#endif	/* PIC */
-
-PSEUDO (__syscall_lseek, lseek, 4)
+PSEUDO_NOERRNO(__syscall_lseek, lseek, 4)
+        jnb L(no_error)
+	call SYSCALL_ERROR_LABEL;
+	orl $-1, %edx; 
+L(pseudo_end):
+L(no_error):
 	ret
 PSEUDO_END(__syscall_lseek)
