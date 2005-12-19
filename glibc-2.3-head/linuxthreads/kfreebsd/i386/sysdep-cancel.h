@@ -1,6 +1,7 @@
 /* Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jakub Jelinek <jakub@redhat.com>, 2002.
+   Modification for FreeBSD by Petr Salinger, 2005.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -47,8 +48,25 @@
     jb SYSCALL_ERROR_LABEL;						      \
   L(pseudo_end):
 
+/* 
+  on FreeBSD some syscalls return result in pair edx+eax, 
+  therefore proper way would be
+
 # define PUSHRESULT	pushl %edx; pushl %eax; pushfl		
 # define POPRESULT	popfl; popl %eax; popl %edx
+ 
+  for FreeBSD 5.4 affected syscalls are
+  
+	lseek()
+	fork()
+	vfork()
+	rfork()
+   
+   none of them is cancelable, therefore
+*/
+
+# define PUSHRESULT	pushl %eax; pushfl
+# define POPRESULT	popfl; popl %eax
 
 # ifdef IS_IN_libpthread
 #  define CENABLE	call __pthread_enable_asynccancel;
