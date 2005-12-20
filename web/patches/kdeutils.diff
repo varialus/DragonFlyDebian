@@ -1,18 +1,18 @@
-diff -u kdeutils-3.4.2/debian/control kdeutils-3.4.2/debian/control
---- kdeutils-3.4.2/debian/control
-+++ kdeutils-3.4.2/debian/control
+diff -u kdeutils-3.4.3/debian/control kdeutils-3.4.3/debian/control
+--- kdeutils-3.4.3/debian/control
++++ kdeutils-3.4.3/debian/control
 @@ -3,7 +3,7 @@
  Priority: optional
  Maintainer: Debian Qt/KDE Maintainers <debian-qt-kde@lists.debian.org>
- Uploaders: Isaac Clerencia <isaac@debian.org>, Pierre Habouzit <madcoder@debian.org>, Christopher Martin <chrsmrtn@freeshell.org>, Adeodato Simó <asp16@alu.ua.es>, Riku Voipio <riku.voipio@iki.fi>, Luk Claes <luk@debian.org>
--Build-Depends: cdbs (>= 0.4.27), debhelper (>= 4.2.30), autotools-dev, gawk, gettext, kdelibs4-dev (>= 4:3.4.2), libkonq4-dev (>= 4:3.4.2), libsnmp5-dev, libxtst-dev, pbbuttonsd-dev [powerpc], sharutils, tpctl [i386]
-+Build-Depends: cdbs (>= 0.4.27), debhelper (>= 4.2.30), autotools-dev, gawk, gettext, kdelibs4-dev (>= 4:3.4.2), libkonq4-dev (>= 4:3.4.2), libsnmp5-dev [!kfreebsd-i386], libxtst-dev, pbbuttonsd-dev [powerpc], sharutils, tpctl [i386]
+ Uploaders: Isaac Clerencia <isaac@debian.org>, Pierre Habouzit <madcoder@debian.org>, Christopher Martin <chrsmrtn@debian.org>, Adeodato Simó <dato@net.com.org.es>, Riku Voipio <riku.voipio@iki.fi>, Luk Claes <luk@debian.org>
+-Build-Depends: g++-3.4 [arm hppa m68k], cdbs (>= 0.4.27), debhelper (>= 4.2.30), autotools-dev, gawk, gettext, kdelibs4-dev (>= 4:3.4.3), libkonq4-dev (>= 4:3.4.3), libsnmp9-dev, libxtst-dev, pbbuttonsd-dev [powerpc], sharutils, tpctl [i386]
++Build-Depends: g++-3.4 [arm hppa m68k], cdbs (>= 0.4.27), debhelper (>= 4.2.30), autotools-dev, gawk, gettext, kdelibs4-dev (>= 4:3.4.3), libkonq4-dev (>= 4:3.4.3), libsnmp9-dev [!kfreebsd-i386], libxtst-dev, pbbuttonsd-dev [powerpc], sharutils, tpctl [i386]
  Standards-Version: 3.6.2
  
  Package: kdeutils
-diff -u kdeutils-3.4.2/debian/ksim.install kdeutils-3.4.2/debian/ksim.install
---- kdeutils-3.4.2/debian/ksim.install
-+++ kdeutils-3.4.2/debian/ksim.install
+diff -u kdeutils-3.4.3/debian/ksim.install kdeutils-3.4.3/debian/ksim.install
+--- kdeutils-3.4.3/debian/ksim.install
++++ kdeutils-3.4.3/debian/ksim.install
 @@ -5,12 +5,7 @@
  debian/tmp/usr/lib/libksimcore.so.1.0.0
  debian/tmp/usr/share/applications/kde/ksim.desktop
@@ -27,9 +27,9 @@ diff -u kdeutils-3.4.2/debian/ksim.install kdeutils-3.4.2/debian/ksim.install
  debian/tmp/usr/share/apps/ksim/pics/clock.png
  debian/tmp/usr/share/apps/ksim/pics/uptime.png
  debian/tmp/usr/share/apps/ksim/themes/ksim/bg_chart.png
---- kdeutils-3.4.2.orig/debian/patches/11_kfreebsd.diff
-+++ kdeutils-3.4.2/debian/patches/11_kfreebsd.diff
-@@ -0,0 +1,31 @@
+--- kdeutils-3.4.3.orig/debian/patches/11_kfreebsd.diff
++++ kdeutils-3.4.3/debian/patches/11_kfreebsd.diff
+@@ -0,0 +1,42 @@
 +--- kde.orig/ksim/monitors/cpu/ksimcpu.h	2005-08-29 16:36:23.000000000 +0200
 ++++ kde.patched/ksim/monitors/cpu/ksimcpu.h	2005-05-23 14:09:16.000000000 +0200
 +@@ -191,7 +191,7 @@
@@ -61,8 +61,21 @@ diff -u kdeutils-3.4.2/debian/ksim.install kdeutils-3.4.2/debian/ksim.install
 +   QString returnValue;
 +   switch ( major )
 +   {
---- kdeutils-3.4.2.orig/debian/kmilo.install.kfreebsd-i386
-+++ kdeutils-3.4.2/debian/kmilo.install.kfreebsd-i386
++--- kde.orig/ark/arkutils.cpp	2005-12-18 00:25:06.000000000 +0100
+++++ kde.orig/ark/arkutils.cpp	2005-12-18 00:23:36.000000000 +0100
++@@ -46,7 +46,7 @@
++ // for statfs:
++ #ifdef BSD4_4
++ #include <sys/mount.h>
++-#elif defined(__linux__)
+++#elif defined(__linux__) || defined(__GLIBC__)
++ #include <sys/vfs.h>
++ #elif defined(__sun)
++ #include <sys/statvfs.h>
+only in patch2:
+unchanged:
+--- kdeutils-3.4.3.orig/debian/kmilo.install.kfreebsd-i386
++++ kdeutils-3.4.3/debian/kmilo.install.kfreebsd-i386
 @@ -0,0 +1,18 @@
 +debian/tmp/usr/lib/kde3/kcm_thinkpad.la
 +debian/tmp/usr/lib/kde3/kcm_thinkpad.so
