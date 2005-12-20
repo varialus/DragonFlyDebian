@@ -6,7 +6,8 @@
 
 LIB_SRCS = nlist.c getbootfile.c
 
-LIB_INCLUDES = include/freebsd/nlist.h include/freebsd/paths.h
+LIB_FREEBSDINCLUDES = include/freebsd/paths.h
+LIB_INCLUDES = include/nlist.h
 
 LIB_MANS = man/nlist.3 man/getbootfile.3
 
@@ -54,7 +55,8 @@ install: libs
 	mkdir -p $(DESTDIR)/usr/share/man/man3
 	install -m644 $(LIB_STATIC) $(DESTDIR)/usr/lib/
 	install -m644 $(LIB_SHARED) $(DESTDIR)/usr/lib/
-	install -m644 $(LIB_INCLUDES) $(DESTDIR)/usr/include/freebsd/
+	install -m644 $(LIB_INCLUDES) $(DESTDIR)/usr/include/
+	install -m644 $(LIB_FREEBSDINCLUDES) $(DESTDIR)/usr/include/freebsd
 	install -m644 $(LIB_MANS) $(DESTDIR)/usr/share/man/man3
 	cd $(DESTDIR)/usr/lib/ ; ln -fs $(LIB_SHARED) $(LIB_SHARED_SO)
 	cd $(DESTDIR)/usr/lib/ ; ln -fs $(LIB_SHARED) $(LIB_SONAME)
