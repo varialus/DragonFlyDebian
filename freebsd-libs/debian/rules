@@ -35,11 +35,17 @@ $(SRC_DIR):
 build: build-arch build-indep
 
 build-arch: build-arch-stamp
-build-arch-stamp: build-cam build-sbuf build-usbhid
+build-arch-stamp: build-cam build-sbuf build-ipx build-kvm build-usbhid
 	touch build-arch-stamp
 
 build-cam: build-sbuf $(SRC_DIR)
 	cd $(SRC_DIR)/libcam && $(PMAKE)
+
+build-ipx: $(SRC_DIR)
+	cd $(SRC_DIR)/libipx && $(PMAKE)
+
+build-kvm: $(SRC_DIR)
+	cd $(SRC_DIR)/libkvm && $(PMAKE)
 
 build-sbuf: $(SRC_DIR)
 	cd $(SRC_DIR)/libsbuf && $(PMAKE)
@@ -73,6 +79,8 @@ install-arch:
 	mkdir -p $(DESTDIR)/usr/{lib,include,share/man/man3}
 	cd $(SRC_DIR)/libsbuf && $(PMAKE) install
 	cd $(SRC_DIR)/libcam && $(PMAKE) install
+	cd $(SRC_DIR)/libipx && $(PMAKE) install
+	cd $(SRC_DIR)/libkvm && $(PMAKE) install
 	cd $(SRC_DIR)/libusbhid && $(PMAKE) install
 
 	dh_install -s --list-missing --sourcedir=debian/tmp
