@@ -66,3 +66,63 @@ details:
  14647 ld-2.3.6.so RET   __sysctl 0
  14647 ld-2.3.6.so CALL  break(0x20162000)
  14647 ld-2.3.6.so RET   break -1 errno 12 Cannot allocate memory
+
+
+previous glibc-2.3.0 fails too, 
+problem is that in this case dynamic loader is loaded at base addr 0
+
+
+On Linux:
+
+$ /bin/cat /proc/self/maps 
+08048000-0804c000 r-xp 00000000 21:08 1746245                            /bin/cat
+0804c000-0804d000 rwxp 00003000 21:08 1746245                            /bin/cat
+0804d000-0806e000 rwxp 0804d000 00:00 0                                  [heap]
+55555000-5556b000 r-xp 00000000 21:08 2007380                            /lib/ld-2.3.2.so
+5556b000-5556c000 rwxp 00015000 21:08 2007380                            /lib/ld-2.3.2.so
+5556c000-5556d000 rwxp 5556c000 00:00 0 
+5557b000-556a5000 r-xp 00000000 21:08 2007449                            /lib/tls/i686/cmov/libc-2.3.2.so
+556a5000-556ae000 rwxp 00129000 21:08 2007449                            /lib/tls/i686/cmov/libc-2.3.2.so
+556ae000-556b1000 rwxp 556ae000 00:00 0 
+ffffb000-ffffe000 rw-p ffffb000 00:00 0                                  [stack]
+ffffe000-fffff000 r-xp ffffe000 00:00 0 
+
+$  /lib/ld-2.3.2.so /bin/cat /proc/self/maps 
+08048000-0804c000 r-xp 00000000 21:08 1746245                            /bin/cat
+0804c000-0804d000 rwxp 00003000 21:08 1746245                            /bin/cat
+55555000-55556000 rwxp 55555000 00:00 0 
+55564000-5568e000 r-xp 00000000 21:08 2007449                            /lib/tls/i686/cmov/libc-2.3.2.so
+5568e000-55697000 rwxp 00129000 21:08 2007449                            /lib/tls/i686/cmov/libc-2.3.2.so
+55697000-5569a000 rwxp 55697000 00:00 0 
+56555000-5656b000 r-xp 00000000 21:08 2007380                            /lib/ld-2.3.2.so
+5656b000-5656c000 rwxp 00015000 21:08 2007380                            /lib/ld-2.3.2.so
+5656c000-5658d000 rwxp 5656c000 00:00 0                                  [heap]
+ffffb000-ffffe000 rw-p ffffb000 00:00 0                                  [stack]
+ffffe000-fffff000 r-xp ffffe000 00:00 0 
+
+
+On kFreeBSD:
+
+$ /bin/cat /proc/self/maps
+08048000-0804c000 r-xp 00005000 00:00 94537     /bin/cat
+0804c000-0804d000 rw-p 00003000 00:00 0
+0804d000-0804f000 rwxp 00003000 00:00 0
+2804c000-2805f000 r-xp 00016000 00:00 94584     /lib/ld-2.3.so
+2805f000-28060000 rw-p 00001000 00:00 0
+28060000-28066000 r-xp 00006000 00:00 72476     /etc/ld.so.cache
+28066000-28180000 r-xp 0011f000 00:00 94587     /lib/libc-2.3.so
+28180000-28184000 rwxp 0011f000 00:00 94587     /lib/libc-2.3.so
+28184000-28188000 rwxp 00004000 00:00 0
+bfbe0000-bfc00000 rwxp 00020000 00:00 0
+
+$ /lib/ld-2.3.so /bin/cat /proc/self/maps 
+00000000-00013000 r-xp 00016000 00:00 94584     /lib/ld-2.3.so
+00013000-00014000 rw-p 00001000 00:00 0
+08048000-0804c000 r-xp 00005000 00:00 94537     /bin/cat
+0804c000-0804d000 rwxp 00005000 00:00 94537     /bin/cat
+20013000-20019000 r-xp 00006000 00:00 72476     /etc/ld.so.cache
+20019000-20133000 r-xp 0011f000 00:00 94587     /lib/libc-2.3.so
+20133000-20137000 rwxp 0011f000 00:00 94587     /lib/libc-2.3.so
+20137000-2023b000 rwxp 00104000 00:00 0
+bfbe0000-bfc00000 rwxp 00020000 00:00 0
+
