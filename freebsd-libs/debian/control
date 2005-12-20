@@ -4,43 +4,56 @@ Priority: optional
 Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>
 Build-Depends: debhelper (>= 4.1.0), kfreebsd-source-5.4, freebsd5-buildutils, libbsd-dev
-Standards-Version: 3.6.1
-
-Package: libcam-dev
-Section: libdevel
-Architecture: kfreebsd-i386
-Depends: ${shlibs:Depends}, libcam0 (>= ${Source-Version}), libc0.1-dev | libc-dev, libbsd-dev
-Description: FreeBSD CAM (Common Access Method) library
- This package includes static objects and headers.
+Standards-Version: 3.6.2
 
 Package: libcam0
 Architecture: kfreebsd-i386
 Depends: ${shlibs:Depends}, libsbuf0 (>= ${Source-Version})
 Description: FreeBSD CAM (Common Access Method) library
- This package includes shared objects.
+ The CAM (Common Access Method) library provides a way for userland
+ SCSI applications to construct a SCSI command.
 
-Package: libsbuf-dev
+Package: libcam-dev
 Section: libdevel
 Architecture: kfreebsd-i386
-Depends: ${shlibs:Depends}, libsbuf0 (>= ${Source-Version}), libc0.1-dev | libc-dev
-Description: FreeBSD libsbuf
- This package includes static objects.
+Depends: ${shlibs:Depends}, libcam0 (>= ${Source-Version}), libc0.1-dev | libc-dev, libbsd-dev
+Description: Development files for libcam 
+ This package contains the header files and static library needed to
+ compile applications that use libcam.
 
 Package: libsbuf0
 Architecture: kfreebsd-i386
 Depends: ${shlibs:Depends}
-Description: FreeBSD libsbuf
- This package includes shared objects.
+Description: FreeBSD string buffer library
+ This library provide a way to handle string buffers. It contains 
+ numerous functions such as append, copy, cat, print, trim whitespace
+ characters, etc.
  
-Package: libusbhid-dev
+Package: libsbuf-dev
 Section: libdevel
 Architecture: kfreebsd-i386
-Depends: ${shlibs:Depends}, libusbhid1 (>= ${Source-Version}), libc0.1-dev | libc-dev
-Description: FreeBSD libsbuf
- This package includes static objects.
+Depends: ${shlibs:Depends}, libsbuf0 (>= ${Source-Version}), libc0.1-dev | libc-dev
+Description: Development files for libsbuf
+ This package contains the header files and static library needed to
+ compile applications that use libsbuf.
 
 Package: libusbhid1
 Architecture: kfreebsd-i386
 Depends: ${shlibs:Depends}
-Description: FreeBSD libsbuf
- This package includes shared objects.
+Description: FreeBSD library to access USB HID devices
+ The usbhid library provides routines to extract data from USB Human 
+ Interface Devices.
+ .
+ USB HID devices send and receive data layed out in a device dependent 
+ way. The usbhid library contains routines to extract the report 
+ descriptor which contains the data layout information and then use this 
+ information.
+		
+Package: libusbhid-dev
+Section: libdevel
+Architecture: kfreebsd-i386
+Depends: ${shlibs:Depends}, libusbhid1 (>= ${Source-Version}), libc0.1-dev | libc-dev
+Description: Development files for libusbhid
+ This package contains the header files and static library needed to
+ compile applications that use libusbhid.
+
