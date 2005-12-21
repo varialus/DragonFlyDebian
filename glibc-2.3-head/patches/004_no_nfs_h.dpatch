@@ -1,0 +1,36 @@
+#! /bin/sh -e
+
+# All lines beginning with `# DP:' are a description of the patch.
+# DP: Description: temporary hack
+# DP: Upstream status: In CVS
+
+PATCHLEVEL=1
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p$PATCHLEVEL < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p$PATCHLEVEL < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+
+--- glibc-2.3/sunrpc/rpcsvc/bootparam_prot.x~	1999-04-18 19:16:14.000000000 +0200
++++ glibc-2.3/sunrpc/rpcsvc/bootparam_prot.x	2004-11-27 22:27:20.000000000 +0100
+@@ -44,8 +44,10 @@
+ %#include <rpc/types.h>
+ %#include <sys/time.h>
+ %#include <sys/errno.h>
++#ifdef __linux__
+ %#include <nfs/nfs.h>
+ #endif
++#endif
+ 
+ const MAX_MACHINE_NAME  = 255;
+ const MAX_PATH_LEN	= 1024;
