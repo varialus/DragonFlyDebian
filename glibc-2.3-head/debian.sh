@@ -92,3 +92,13 @@ diff -ur glibc-2.3.5.old/debian/sysdeps/kfreebsd.mk glibc-2.3.5/debian/sysdeps/k
  
 -extra_config_options = $(extra_config_options) --disable-compatible-utmp --enable-kernel-include=4.6
 +extra_config_options += --without-tls
+--- glibc-2.3.5/debian/control.in/libc.old      2005-12-21 21:26:37.000000000 +0100
++++ glibc-2.3.5/debian/control.in/libc  2005-12-21 23:21:46.000000000 +0100
+@@ -3,6 +3,7 @@
+ Section: libs
+ Priority: required
+ Provides: ${locale:Depends}
++Replaces: @libc@-dev (<< 2.3.2.ds1-14)
+ Description: GNU C Library: Shared libraries and Timezone data
+  Contains the standard libraries that are used by nearly all programs on
+  the system. This package includes shared versions of the standard C library
