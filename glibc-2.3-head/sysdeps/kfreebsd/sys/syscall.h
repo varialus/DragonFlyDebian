@@ -19,6 +19,13 @@
 #ifndef _SYSCALL_H
 #define _SYSCALL_H	1
 
+
+#define SYS_bsd4_getfsstat	18
+#define SYS_bsd4_statfs		157
+#define SYS_bsd4_fstatfs	158
+#define SYS_bsd4_fhstatfs	297
+
+
 #define	SYS_syscall	0
 #define	SYS_exit	1
 #define	SYS_fork	2

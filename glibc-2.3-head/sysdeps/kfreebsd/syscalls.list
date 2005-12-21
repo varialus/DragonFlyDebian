@@ -26,7 +26,10 @@ extattr_set_file -	extattr_set_file	i:ssbn	extattr_set_file
 fhopen		-	fhopen			i:pi	fhopen
 sys_fork	-	fork			i:	__syscall_fork fork
 sys_fhstat	-	fhstat			i:pp	__syscall_fhstat
-fhstatfs	-	fhstatfs		i:pp	__fhstatfs	fhstatfs
+getfsstat	-	bsd4_getfsstat		i:pii	__getfsstat	getfsstat
+statfs		-	bsd4_statfs		i:sp	__statfs	statfs
+fstatfs		-	bsd4_fstatfs		i:ip	__fstatfs	fstatfs
+fhstatfs	-	bsd4_fhstatfs		i:pp	__fhstatfs	fhstatfs
 sys_fstat	-	fstat			i:ip	__syscall_fstat
 sys_ftruncate	-	ftruncate		i:iii	__syscall_ftruncate
 futimes		-	futimes			i:ip	__futimes	futimes
@@ -34,7 +37,6 @@ sys_getcwd	-	getcwd			i:bn	__syscall_getcwd
 sys_getdents	-	getdents		i:ibn	__syscall_getdents
 sys_getdirentries -	getdirentries		i:ibnP	__syscall_getdirentries
 getfh		-	getfh			i:sp	getfh
-getfsstat	-	getfsstat		i:pii	__getfsstat	getfsstat
 sys_getlogin	-	getlogin		i:bn	__syscall_getlogin
 getpgid		-	getpgid			i:i	__getpgid	__getpgid_internal getpgid
 getpgrp		-	getpgrp			i:	getpgrp

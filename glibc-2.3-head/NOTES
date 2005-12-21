@@ -45,15 +45,36 @@ roadmap:
 status:
 =======
 - compile - OK
-- execute; (via  /opt/tst/lib/ld-2.3.6.so --library-path /opt/tst/lib $cmd) 
+- execute (via  /opt/tst/lib/ld-2.3.6.so --library-path /opt/tst/lib $cmd) 
 	OK	/opt/tst/lib/libc-2.3.6.so 
 	OK	/bin/cat /proc/self/maps 
 	OK	/bin/sed --help
 	OK	/bin/grep  ....
 
-	FAIL	/bin/bash 
+- execute (in chroot)
 
-details:
+	OK	/bin/bash 
+
+
+problems:
+=========
+
+* struct statfs
+
+Previous glibc based on 2.3.0 uses older version of struct statfs,
+for now 2.3.6 uses the same, but the right approach is probably   
+to update struct statfs and use versioned symbols for related functions.
+
+
+* directly executing dynamic libraries (same problem with 2.3.0 too)
+
+  libraries (as is also dynamic loader) are loaded at base addr 0
+
+  /opt/tst/lib/ld-2.3.6.so --library-path /opt/tst/lib /bin/cat/proc/self/maps
+
+
+  due this problem fails bash
+ /opt/tst/lib/ld-2.3.6.so --library-path /opt/tst/lib /bin/bash     
 
  bash: xmalloc: ../bash/locale.c:68: cannot allocate 2 bytes (0 bytes allocated)
 
@@ -66,10 +87,6 @@ details:
  14647 ld-2.3.6.so RET   __sysctl 0
  14647 ld-2.3.6.so CALL  break(0x20162000)
  14647 ld-2.3.6.so RET   break -1 errno 12 Cannot allocate memory
-
-
-previous glibc-2.3.0 fails too, 
-problem is that in this case dynamic loader is loaded at base addr 0
 
 
 On Linux:
