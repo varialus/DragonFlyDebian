@@ -19,9 +19,12 @@ case "$1" in
     install)
     ;;
     upgrade)
-    	rm -f /boot/kfreebsd.gz{,.old}
-#	mv /boot/kfreebsd.gz{,.old}
-	mv /boot/kernel/kernel{,.old}
+        if [ -f /boot/kernel/kernel ] ; then
+		gzip -9 /boot/kernel/kernel
+	fi
+	if [ -f /boot/kernel/kernel.gz ] ; then
+		mv /boot/kernel/kernel.gz{,.old}
+	fi
     ;;
 
     abort-upgrade)

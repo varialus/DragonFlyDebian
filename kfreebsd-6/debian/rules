@@ -12,7 +12,7 @@ revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 os		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 cpu		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 config_files	:= $(wildcard debian/arch/$(cpu)/*)
-flavours	:= $(config_files:config/%=%)
+flavours	:= $(config_files:debian/arch/$(cpu)/%=%)
 configfile	:= DEBCUSTOM
 abiname		:= 1
 
@@ -25,14 +25,16 @@ HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
 FLAVOR_DIR	:= flavor-$(version)-$(abiname)
 
 MAKE		:= make MACHINE_ARCH=$(cpu) CC=gcc-3.4 WERROR= 
-PATH		:= /usr/lib/freebsd:$(PATH)
+PATH		:= /usr/lib/freebsd6:/usr/lib/freebsd:$(PATH)
 
 control:
 	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
 		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
-	for flavor in $(flavours) ; do \
-		sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
-			$(CURDIR)/debian/control.flavor.in >> $(CURDIR)/debian/control ; \
+	for arch in `ls $(CURDIR)/debian/arch` ; do \
+		for flavor in `ls $(CURDIR)/debian/arch/$$arch/` ; do \
+			sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@arch@/$$arch/g" \
+				$(CURDIR)/debian/control.flavor.in >> $(CURDIR)/debian/control ; \
+		done ; \
 	done
 
 clean:
@@ -100,7 +102,7 @@ install-common-stamp: src
 	dh_testroot
 	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
 	cd src \
-		&& find . -type f -name "*.h" -not -regex ".*modules.*" -not -regex ".*sys/i386/.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \; 
+		&& find . -type f -name "*.h" -not -regex ".*modules.*" -not -regex ".*sys/$(cpu)/.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \; 
 	find $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) -type f -exec chmod 644 {} \;
 
 	touch install-common-stamp
@@ -126,6 +128,7 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	# now install the kernel
 	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(cpu)/compile/$(configfile) DESTDIR=$(IMAGE_PACKAGE)-$* install
 	chmod 644 $(IMAGE_PACKAGE)-$*/boot/kernel/kernel
+	gzip -9 $(IMAGE_PACKAGE)-$*/boot/kernel/kernel
 	
 	# override file
 	mkdir -p $(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides

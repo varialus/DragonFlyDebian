@@ -1,6 +1,6 @@
-diff -Nur sys.old/conf/files sys/conf/files
---- sys.old/conf/files	2005-09-03 20:20:59.000000000 -0400
-+++ sys/conf/files	2005-09-03 20:22:50.000000000 -0400
+diff -ur sys.old/conf/files sys/conf/files
+--- sys.old/conf/files	2005-10-08 20:00:40.000000000 +0200
++++ sys/conf/files	2005-12-16 22:56:50.000000000 +0100
 @@ -240,7 +240,6 @@
  contrib/dev/acpica/utmisc.c	optional acpi
  contrib/dev/acpica/utobject.c	optional acpi
@@ -21,10 +21,10 @@ diff -Nur sys.old/conf/files sys/conf/files
  dev/awi/am79c930.c		optional awi
  dev/awi/awi.c			optional awi
  dev/awi/if_awi_pccard.c		optional awi pccard
-diff -Nur sys.old/conf/files.i386 sys/conf/files.i386
---- sys.old/conf/files.i386	2005-09-03 20:20:56.000000000 -0400
-+++ sys/conf/files.i386	2005-09-03 20:23:58.000000000 -0400
-@@ -46,37 +46,6 @@
+diff -ur sys.old/conf/files.i386 sys/conf/files.i386
+--- sys.old/conf/files.i386	2005-08-30 16:56:02.000000000 +0200
++++ sys/conf/files.i386	2005-12-16 23:13:34.000000000 +0100
+@@ -46,15 +46,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -37,32 +37,21 @@ diff -Nur sys.old/conf/files.i386 sys/conf/files.i386
 -	dependency	"$S/contrib/dev/ath/public/i386-elf.hal.o.uu"	\
 -	compile-with	"uudecode < $S/contrib/dev/ath/public/i386-elf.hal.o.uu" \
 -	no-implicit-rule
--opt_ah.h			optional	ath_hal			\
--	dependency	"$S/contrib/dev/ath/public/i386-elf.opt_ah.h"	\
--	compile-with	"cp $S/contrib/dev/ath/public/i386-elf.opt_ah.h opt_ah.h" \
--	no-obj no-implicit-rule before-depend				\
--	clean		"opt_ah.h"
--#
--nvenetlib.o			optional	nve pci			\
--	dependency	"$S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu"	\
--	compile-with	"uudecode $S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
--	no-implicit-rule
--#
--os+%DIKED-nve.h		optional	nve pci			\
--	dependency	"$S/contrib/dev/nve/os.h"			\
--	compile-with	"sed -e 's/^.*#include.*phy\.h.*$$//' $S/contrib/dev/nve/os.h > os+%DIKED-nve.h" \
--	no-implicit-rule no-obj before-depend				\
--	clean		"os+%DIKED-nve.h"
--#
+ opt_ah.h			optional	ath_hal			\
+ 	dependency	"$S/contrib/dev/ath/public/i386-elf.opt_ah.h"	\
+ 	compile-with	"cp $S/contrib/dev/ath/public/i386-elf.opt_ah.h opt_ah.h" \
+@@ -72,10 +63,6 @@
+ 	no-implicit-rule no-obj before-depend				\
+ 	clean		"os+%DIKED-nve.h"
+ #
 -hptmvraid.o			optional	hptmv			\
 -	dependency	"$S/dev/hptmv/i386-elf.raid.o.uu"	\
 -	compile-with	"uudecode < $S/dev/hptmv/i386-elf.raid.o.uu" \
 -	no-implicit-rule
--#
+ #
  #
  compat/linux/linux_file.c	optional compat_linux
- compat/linux/linux_getcwd.c	optional compat_linux
-@@ -173,11 +142,6 @@
+@@ -173,11 +160,6 @@
  dev/fdc/fdc_isa.c		optional fdc isa
  dev/fdc/fdc_pccard.c		optional fdc pccard
  dev/fe/if_fe_isa.c		optional fe isa
@@ -74,17 +63,9 @@ diff -Nur sys.old/conf/files.i386 sys/conf/files.i386
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_pentium.c	optional hwpmc
  dev/hwpmc/hwpmc_piv.c		optional hwpmc
-@@ -198,7 +162,6 @@
- dev/mem/memutil.c		optional mem
- dev/mse/mse.c			optional mse
- dev/mse/mse_isa.c		optional mse isa
--dev/nve/if_nve.c		optional nve pci
- dev/ppc/ppc.c			optional ppc
- dev/ppc/ppc_puc.c		optional ppc puc pci
- dev/random/nehemiah.c		optional random
-diff -Nur sys.old/conf/kern.pre.mk sys/conf/kern.pre.mk
---- sys.old/conf/kern.pre.mk	2005-09-03 20:21:12.000000000 -0400
-+++ sys/conf/kern.pre.mk	2005-09-03 20:24:14.000000000 -0400
+diff -ur sys.old/conf/kern.pre.mk sys/conf/kern.pre.mk
+--- sys.old/conf/kern.pre.mk	2005-10-07 15:55:58.000000000 +0200
++++ sys/conf/kern.pre.mk	2005-12-16 22:53:46.000000000 +0100
 @@ -61,9 +61,6 @@
  # ... and the same for pf
  INCLUDES+= -I$S/contrib/pf
@@ -95,9 +76,20 @@ diff -Nur sys.old/conf/kern.pre.mk sys/conf/kern.pre.mk
  # ... and the same for the NgATM stuff
  INCLUDES+= -I$S/contrib/ngatm
  
-diff -Nur sys.old/modules/Makefile sys/modules/Makefile
---- sys.old/modules/Makefile	2005-09-03 20:21:53.000000000 -0400
-+++ sys/modules/Makefile	2005-09-03 20:25:21.000000000 -0400
+diff -ur sys.old/i386/conf/GENERIC sys/i386/conf/GENERIC
+--- sys.old/i386/conf/GENERIC	2005-10-28 21:22:41.000000000 +0200
++++ sys/i386/conf/GENERIC	2005-12-16 22:53:46.000000000 +0100
+@@ -118,7 +118,6 @@
+ device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
+ device		ciss		# Compaq Smart RAID 5*
+ device		dpt		# DPT Smartcache III, IV - See NOTES for options
+-device		hptmv		# Highpoint RocketRAID 182x
+ device		iir		# Intel Integrated RAID
+ device		ips		# IBM (Adaptec) ServeRAID
+ device		mly		# Mylex AcceleRAID/eXtremeRAID
+diff -ur sys.old/modules/Makefile sys/modules/Makefile
+--- sys.old/modules/Makefile	2005-10-07 17:56:30.000000000 +0200
++++ sys/modules/Makefile	2005-12-16 22:55:52.000000000 +0100
 @@ -25,11 +25,6 @@
  	${_arl} \
  	${_asr} \
@@ -140,8 +132,8 @@ diff -Nur sys.old/modules/Makefile sys/modules/Makefile
 -_ath_hal=	ath_hal
  _awi=		awi
  _bktr=		bktr
- _coff=		coff
-@@ -347,7 +338,6 @@
+ _cardbus=	cardbus
+@@ -350,7 +341,6 @@
  _ndis=		ndis
  _nsp=		nsp
  _nwfs=		nwfs
@@ -150,9 +142,9 @@ diff -Nur sys.old/modules/Makefile sys/modules/Makefile
  _pcfclock=	pcfclock
  _pecoff=	pecoff
 @@ -387,14 +377,12 @@
+ _dpt=		dpt
  _el=		el
  _ex=		ex
- _exca=		exca
 -_hptmv=		hptmv
  _ichwd=		ichwd
  _ida=		ida
@@ -164,7 +156,7 @@ diff -Nur sys.old/modules/Makefile sys/modules/Makefile
  .if !defined(NO_CRYPT) || defined(ALL_MODULES)
  .if exists(${.CURDIR}/../crypto/via)
  _padlock=	padlock
-@@ -427,7 +415,6 @@
+@@ -427,14 +415,12 @@
  #_acpi=		acpi		# doesn't work on amd64 yet
  _agp=		agp
  _arcmsr=	arcmsr
@@ -172,7 +164,14 @@ diff -Nur sys.old/modules/Makefile sys/modules/Makefile
  _ciss=		ciss
  _cpufreq=	cpufreq
  _digi=		digi
-@@ -444,7 +431,6 @@
+ _drm=		drm
+ _em=		em
+ _ext2fs=	ext2fs
+-_hptmv=		hptmv
+ _i2c=		i2c
+ _ichwd=		ichwd
+ _ida=		ida
+@@ -445,7 +431,6 @@
  #_lnc=		lnc
  _mly=		mly
  _ndis=		ndis

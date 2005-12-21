@@ -1,4 +1,3 @@
-#
 # Kernel for Debian GNU/kFreeBSD on an i486 machine
 
 machine		i386
@@ -10,8 +9,6 @@ ident		Debian-i486
 
 # To statically compile in device wiring instead of /boot/device.hints
 #hints		"GENERIC.hints"		# Default places to look for devices.
-
-makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
 
 #options 	SCHED_ULE		# ULE scheduler
 options 	SCHED_4BSD		# 4BSD scheduler
@@ -33,18 +30,18 @@ options 	PSEUDOFS		# Pseudo-filesystem framework
 options 	GEOM_GPT		# GUID Partition Tables.
 options 	COMPAT_43		# Compatible with BSD 4.3 [KEEP THIS!]
 options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
-options		COMPAT_FREEBSD5		# Compatible with FreeBSD5
+options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
 options 	SCSI_DELAY=2000		# Delay (in ms) before probing SCSI
 options 	KTRACE			# ktrace(1) support
 options 	SYSVSHM			# SYSV-style shared memory
-options		SHMMAXPGS=4096
-options		SHMSEG=256
+options         SHMMAXPGS=4096
+options         SHMSEG=256
 options 	SYSVMSG			# SYSV-style message queues
 options 	SYSVSEM			# SYSV-style semaphores
-options		SEMMNI=256
-options		SEMMNS=512
-options		SEMMNU=256
-options		SEMMAP=256
+options         SEMMNI=256
+options         SEMMNS=512
+options         SEMMNU=256
+options         SEMMAP=256
 options 	_KPOSIX_PRIORITY_SCHEDULING # POSIX P1003_1B real-time extensions
 options 	KBD_INSTALL_CDEV	# install a CDEV entry in /dev
 options 	AHC_REG_PRETTY_PRINT	# Print register bitfields in debug
@@ -53,21 +50,9 @@ options 	AHD_REG_PRETTY_PRINT	# Print register bitfields in debug
 					# output.  Adds ~215k to driver.
 options 	ADAPTIVE_GIANT		# Giant mutex is adaptive.
 
-# Debugging for use in -current
-options 	KDB			# Enable kernel debugger support.
-options 	DDB			# Support DDB.
-options 	GDB			# Support remote GDB.
-options 	INVARIANTS		# Enable calls of extra sanity checking
-options 	INVARIANT_SUPPORT	# Extra sanity checks of internal structures, required by INVARIANTS
-options 	WITNESS			# Enable checks to detect deadlocks and cycles
-options 	WITNESS_SKIPSPIN	# Don't run witness on spinlocks for speed
-
-# To make an SMP kernel, the next two lines are needed
-#options 	SMP			# Symmetric MultiProcessor Kernel
 device		apic			# I/O APIC
 
-# Bus support.  Do not remove isa, even if you have no isa slots
-device		isa
+# Bus support.
 device		eisa
 device		pci
 
@@ -154,9 +139,6 @@ device		sc
 
 device		agp		# support several AGP chipsets
 
-# Floating point support - do not disable.
-device		npx
-
 # Power management support (see NOTES for more options)
 #device		apm
 # Add suspend/resume support for the i8254.
@@ -241,8 +223,6 @@ device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
 
 # Pseudo devices.
 device		loop		# Network loopback
-device		mem		# Memory and kernel memory devices
-device		io		# I/O device
 device		random		# Entropy device
 device		ether		# Ethernet support
 #device		sl		# Kernel SLIP

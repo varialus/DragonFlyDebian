@@ -19,13 +19,12 @@ set -e
 
 case "$1" in
     configure)
-	if diff -q /boot/kernel/kernel{,.old} >/dev/null 2>/dev/null ; then
-		rm -f /boot/kernel/kernel.old \
-			/boot/kfreebsd.gz.old
+	if diff -q /boot/kernel/kernel.gz{,.old} >/dev/null 2>/dev/null ; then
+		rm -f /boot/kernel/kernel.gz.old
 	fi
-#        gzip -c9 /boot/kernel/kernel > /boot/kfreebsd.gz
-
-	if ! test -e /etc/mtab ; then ln -sf /proc/mounts /etc/mtab ; fi
+	if [ -e /etc/mtab ] ; then
+		ln -sf /proc/mounts /etc/mtab
+	fi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
