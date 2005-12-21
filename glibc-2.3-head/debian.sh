@@ -29,11 +29,11 @@ fi
 patch -p1 < $0
 exit 0
 
-diff -ur glibc-2.3.5.old/debian/control glibc-2.3.5/debian/control
---- glibc-2.3.5.old/debian/control	2005-12-21 21:26:39.000000000 +0100
-+++ glibc-2.3.5/debian/control	2005-12-21 21:30:25.000000000 +0100
+diff -ur glibc-2.3.5.old/debian/control.in/main glibc-2.3.5/debian/control.in/main
+--- glibc-2.3.5.old/debian/control.in/main	2005-12-21 21:26:37.000000000 +0100
++++ glibc-2.3.5/debian/control.in/main	2005-12-21 22:52:45.000000000 +0100
 @@ -1,7 +1,7 @@
- Source: glibc
+ Source: @glibc@
  Section: libs
  Priority: required
 -Build-Depends: gettext (>= 0.10.37-1), make (>= 3.80-1), dpkg-dev (>= 1.13.5), debianutils (>= 1.13.1), tar (>= 1.13.11), bzip2, texinfo (>= 4.0), linux-kernel-headers (>= 2.6.13+0rc3-2) [!hurd-i386], mig (>= 1.3-2) [hurd-i386], hurd-dev (>= 20020608-1) [hurd-i386], gnumach-dev [hurd-i386], texi2html, file, gcc-4.0 [!powerpc !m68k !hppa !hurd-i386], gcc-3.4 (>= 3.4.4-6) [powerpc], gcc-3.4 [m68k hppa], gcc-3.3 [hurd-i386], autoconf, binutils (>= 2.14.90.0.7-5), sed (>= 4.0.5-4), gawk, debhelper (>= 4.1.76), libc6-dev-amd64 [i386], libc6-dev-ppc64 [powerpc]
@@ -41,76 +41,41 @@ diff -ur glibc-2.3.5.old/debian/control glibc-2.3.5/debian/control
  Build-Depends-Indep: perl, po-debconf
  Maintainer: GNU Libc Maintainers <debian-glibc@lists.debian.org>
  Uploaders: Ben Collins <bcollins@debian.org>, GOTO Masanori <gotom@debian.org>, Philip Blundell <pb@nexus.co.uk>, Jeff Bailey <jbailey@raspberryginger.com>, Daniel Jacobowitz <dan@debian.org>, Clint Adams <schizo@debian.org>
-@@ -265,8 +265,8 @@
-  This package contains a minimal set of libraries needed for the Debian
-  installer.  Do not install it on a normal system.
+diff -ur glibc-2.3.5.old/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control.mk
+--- glibc-2.3.5.old/debian/rules.d/control.mk	2005-12-21 21:26:39.000000000 +0100
++++ glibc-2.3.5/debian/rules.d/control.mk	2005-12-21 22:55:45.000000000 +0100
+@@ -1,6 +1,6 @@
+-control_deps := $(addprefix debian/control.in/, libc6 libc6.1 libc0.3 libc1 sparc64 s390x ppc64 opt amd64)
++control_deps := $(addprefix debian/control.in/, libc6 libc6.1 libc0.3 libc0.1 sparc64 s390x ppc64 opt amd64)
  
--Package: libc1
--Architecture: freebsd-i386
-+Package: libc0.1
-+Architecture: kfreebsd-i386
- Section: libs
- Priority: required
- Provides: ${locale:Depends}
-@@ -276,8 +276,8 @@
-  and the standard math library, as well as many others.
-  Timezone data is also included.
+-threads_archs := alpha amd64 arm armeb i386 m68k mips mipsel powerpc sparc ia64 hppa s390 sh3 sh4 sh3eb sh4eb freebsd-i386
++threads_archs := alpha amd64 arm armeb i386 m68k mips mipsel powerpc sparc ia64 hppa s390 sh3 sh4 sh3eb sh4eb kfreebsd-i386
  
--Package: libc1-dev
--Architecture: freebsd-i386
-+Package: libc0.1-dev
-+Architecture: kfreebsd-i386
- Section: libdevel
- Priority: standard
- Depends: libc1 (= ${Source-Version})
-@@ -286,8 +286,8 @@
-  Contains the symlinks, headers, and object files needed to compile
-  and link programs which use the standard C library.
+ debian/control.in/libc6: debian/control.in/libc debian/rules.d/control.mk
+ 	sed -e 's%@libc@%libc6%g' \
+@@ -12,8 +12,8 @@
+ debian/control.in/libc0.3: debian/control.in/libc debian/rules.d/control.mk
+ 	sed -e 's%@libc@%libc0.3%g;s%@archs@%hurd-i386%g;s/nscd, //' < $< > $@
  
--Package: libc1-dbg
--Architecture: freebsd-i386
-+Package: libc0.1-dbg
-+Architecture: kfreebsd-i386
- Section: libdevel
- Priority: extra
- Provides: libc-dbg
-@@ -300,8 +300,8 @@
-  used by placing that directory in LD_LIBRARY_PATH.
-  Most people will not need this package.
+-debian/control.in/libc1: debian/control.in/libc debian/rules.d/control.mk
+-	sed -e 's%@libc@%libc1%g;s%@archs@%freebsd-i386%g' < $< > $@
++debian/control.in/libc0.1: debian/control.in/libc debian/rules.d/control.mk
++	sed -e 's%@libc@%libc0.1%g;s%@archs@%kfreebsd-i386%g' < $< > $@
  
--Package: libc1-prof
--Architecture: freebsd-i386
-+Package: libc0.1-prof
-+Architecture: kfreebsd-i386
- Section: libdevel
- Priority: extra
- Depends: libc1 (= ${Source-Version})
-@@ -309,8 +309,8 @@
-  Static libraries compiled with profiling info (-pg) suitable for use
-  with gprof.
- 
--Package: libc1-pic
--Architecture: freebsd-i386
-+Package: libc0.1-pic
-+Architecture: kfreebsd-i386
- Section: libdevel
- Priority: optional
- Conflicts: libc-pic
-@@ -323,9 +323,9 @@
-  boot floppies. If you are not making your own set of Debian boot floppies
-  using the `boot-floppies' package, you probably don't need this package.
- 
--Package: libc1-udeb
-+Package: libc0.1-udeb
- XC-Package-Type: udeb
--Architecture: freebsd-i386
-+Architecture: kfreebsd-i386
- Section: debian-installer
- Priority: extra
- Provides: libc1, libc-udeb, ${locale:Depends}
+ debian/control: debian/control.in/main $(control_deps) \
+ 		   debian/rules.d/control.mk # debian/sysdeps/depflags.pl
+@@ -21,7 +21,7 @@
+ 	cat debian/control.in/libc6		>> $@T
+ 	cat debian/control.in/libc6.1		>> $@T
+ 	cat debian/control.in/libc0.3		>> $@T
+-	cat debian/control.in/libc1		>> $@T
++	cat debian/control.in/libc0.1		>> $@T
+ 	cat debian/control.in/sparc64		>> $@T
+ 	cat debian/control.in/s390x		>> $@T
+ 	cat debian/control.in/amd64		>> $@T
 diff -ur glibc-2.3.5.old/debian/sysdeps/kfreebsd.mk glibc-2.3.5/debian/sysdeps/kfreebsd.mk
 --- glibc-2.3.5.old/debian/sysdeps/kfreebsd.mk	2005-12-21 21:26:38.000000000 +0100
-+++ glibc-2.3.5/debian/sysdeps/kfreebsd.mk	2005-12-21 21:41:16.000000000 +0100
++++ glibc-2.3.5/debian/sysdeps/kfreebsd.mk	2005-12-21 21:57:10.000000000 +0100
 @@ -1,11 +1,9 @@
 -# This is for a Glibc-using FreeBSD system.
 -
