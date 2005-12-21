@@ -1,0 +1,21 @@
+
+  This should really be in libbsd
+
+--- src/usr.bin/make/main.c~	2005-12-17 11:35:07.000000000 +0100
++++ src/usr.bin/make/main.c	2005-12-17 11:45:47.000000000 +0100
+@@ -629,11 +629,13 @@
+ 	int	level = (value == NULL) ? 0 : atoi(value);
+ 
+ 	if (level < 0) {
+-		errc(2, EAGAIN, "Invalid value for recursion level (%d).",
++		err(EAGAIN, "Invalid value for recursion level (%d).",
+ 		    level);
++                exit(2);
+ 	} else if (level > MKLVL_MAXVAL) {
+-		errc(2, EAGAIN, "Max recursion level (%d) exceeded.",
++		err(EAGAIN, "Max recursion level (%d) exceeded.",
+ 		    MKLVL_MAXVAL);
++                exit(2);
+ 	} else {
+ 		char new_value[32];
+ 		sprintf(new_value, "%d", level + 1);

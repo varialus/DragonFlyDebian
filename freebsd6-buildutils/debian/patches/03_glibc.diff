@@ -1,0 +1,360 @@
+
+  FIXME:  use libbsd instead (strlcpy, strvis, strunvis ...)
+
+diff -ur ../foo.old/src/usr.bin/make/main.c ./src/usr.bin/make/main.c
+--- ../foo.old/src/usr.bin/make/main.c	2005-12-16 23:52:51.000000000 +0100
++++ ./src/usr.bin/make/main.c	2005-12-16 23:53:18.000000000 +0100
+@@ -64,7 +64,7 @@
+ #include <sys/param.h>
+ #include <sys/stat.h>
+ #include <sys/sysctl.h>
+-#include <sys/time.h>
++#include <time.h>
+ #include <sys/queue.h>
+ #include <sys/resource.h>
+ #include <sys/utsname.h>
+diff -ur ../foo.old/src/usr.sbin/btxld/btx.h ./src/usr.sbin/btxld/btx.h
+--- ../foo.old/src/usr.sbin/btxld/btx.h	1999-08-28 03:15:41.000000000 +0200
++++ ./src/usr.sbin/btxld/btx.h	2005-12-16 23:52:43.000000000 +0100
+@@ -30,6 +30,7 @@
+ #define _BTX_H_
+ 
+ #include <sys/types.h>
++#include <stdint.h>
+ 
+ #define BTX_PGSIZE	0x1000		/* Page size */
+ #define BTX_PGBASE	0x5000		/* Start of page tables */
+diff -ur ../foo.old/src/usr.sbin/btxld/elfh.c ./src/usr.sbin/btxld/elfh.c
+--- ../foo.old/src/usr.sbin/btxld/elfh.c	2004-06-22 19:05:37.000000000 +0200
++++ ./src/usr.sbin/btxld/elfh.c	2005-12-16 23:52:43.000000000 +0100
+@@ -30,6 +30,7 @@
+ #include <sys/endian.h>
+ 
+ #include <stddef.h>
++#include <stdint.h>
+ #include "elfh.h"
+ 
+ #define SET_ME	0xeeeeeeee    /* filled in by btxld */
+diff -ur ../foo.old/src/usr.sbin/btxld/elfh.h ./src/usr.sbin/btxld/elfh.h
+--- ../foo.old/src/usr.sbin/btxld/elfh.h	2000-01-04 15:10:36.000000000 +0100
++++ ./src/usr.sbin/btxld/elfh.h	2005-12-16 23:52:43.000000000 +0100
+@@ -26,7 +26,7 @@
+  * $FreeBSD: ./src/usr.sbin/btxld/elfh.h,v 1.3 2000/01/04 14:10:36 marcel Exp $
+  */
+ 
+-#include <sys/elf32.h>
++#include "elf32.h"
+ 
+ struct elfh {
+     Elf32_Ehdr e;		/* ELF header */
+diff -ur ../foo.old/src/usr.sbin/config/main.c ./src/usr.sbin/config/main.c
+--- ../foo.old/src/usr.sbin/config/main.c	2005-12-16 23:52:51.000000000 +0100
++++ ./src/usr.sbin/config/main.c	2005-12-16 23:52:43.000000000 +0100
+@@ -87,6 +87,79 @@
+ 	struct hdr_list *h_next;
+ } *htab;
+ 
++#ifndef __FreeBSD__
++/*
++ * Copy src to string dst of size siz.  At most siz-1 characters
++ * will be copied.  Always NUL terminates (unless siz == 0).
++ * Returns strlen(src); if retval >= siz, truncation occurred.
++ */
++size_t strlcpy(dst, src, siz)
++	char *dst;
++	const char *src;
++	size_t siz;
++{
++	char *d = dst;
++	const char *s = src;
++	size_t n = siz;
++
++	/* Copy as many bytes as will fit */
++	if (n != 0 && --n != 0) {
++		do {
++			if ((*d++ = *s++) == 0)
++				break;
++		} while (--n != 0);
++	}
++
++	/* Not enough room in dst, add NUL and traverse rest of src */
++	if (n == 0) {
++		if (siz != 0)
++			*d = '\0';		/* NUL-terminate dst */
++		while (*s++)
++			;
++	}
++
++	return(s - src - 1);	/* count does not include NUL */
++}
++
++/*
++ * Appends src to string dst of size siz (unlike strncat, siz is the
++ * full size of dst, not space left).  At most siz-1 characters
++ * will be copied.  Always NUL terminates (unless siz <= strlen(dst)).
++ * Returns strlen(src) + MIN(siz, strlen(initial dst)).
++ * If retval >= siz, truncation occurred.
++ */
++size_t
++strlcat(dst, src, siz)
++	char *dst;
++	const char *src;
++	size_t siz;
++{
++	char *d = dst;
++	const char *s = src;
++	size_t n = siz;
++	size_t dlen;
++
++	/* Find the end of dst and adjust bytes left but don't go past end */
++	while (n-- != 0 && *d != '\0')
++		d++;
++	dlen = d - dst;
++	n = siz - dlen;
++
++	if (n == 0)
++		return(dlen + strlen(s));
++	while (*s != '\0') {
++		if (n != 1) {
++			*d++ = *s;
++			n--;
++		}
++		s++;
++	}
++	*d = '\0';
++
++	return(dlen + (s - src));	/* count does not include NUL */
++}
++#endif
++
+ /*
+  * Config builds a set of files for building a UNIX
+  * system given a description of the desired system.
+diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
+--- ../foo.old/src/usr.sbin/mtree/Makefile	2005-03-29 13:44:17.000000000 +0200
++++ ./src/usr.sbin/mtree/Makefile	2005-12-16 23:53:50.000000000 +0100
+@@ -10,8 +10,4 @@
+ 
+ WARNS?=	4
+ 
+-CFLAGS+= -DMD5 -DSHA1 -DRMD160 -DSHA256
+-DPADD=	${LIBMD}
+-LDADD=	-lmd
+-
+ .include <bsd.prog.mk>
+diff -ur ../foo.old/src/usr.sbin/mtree/compare.c ./src/usr.sbin/mtree/compare.c
+--- ../foo.old/src/usr.sbin/mtree/compare.c	2005-12-16 23:52:51.000000000 +0100
++++ ./src/usr.sbin/mtree/compare.c	2005-12-16 23:52:43.000000000 +0100
+@@ -59,7 +59,9 @@
+ #include <stdio.h>
+ #include <time.h>
+ #include <unistd.h>
++#ifdef __FreeBSD__
+ #include <vis.h>
++#endif
+ 
+ #include "mtree.h"
+ #include "extern.h"
+@@ -387,6 +389,21 @@
+ 	if ((len = readlink(name, tbuf, sizeof(tbuf) - 1)) == -1)
+ 		err(1, "line %d: %s", lineno, name);
+ 	tbuf[len] = '\0';
++
++#ifdef __FreeBSD__
+ 	strvis(lbuf, tbuf, VIS_WHITE | VIS_OCTAL);
++#else
++	int i = 0, j = 0;
++	/* borrowed from src/lib/libc/gen/vis.c [rmh] */
++	while (tbuf[j] != 0)
++	  {
++	    lbuf[i++] = '\\';
++	    lbuf[i++] = ((u_char) tbuf[j] >> 6 & 07) + '0';
++	    lbuf[i++] = ((u_char) tbuf[j] >> 3 & 07) + '0';
++	    lbuf[i++] = ((u_char) tbuf[j] & 07) + '0';
++	    j++;
++	  }
++	lbuf[i++] = '\0';
++#endif
+ 	return (lbuf);
+ }
+diff -ur ../foo.old/src/usr.sbin/mtree/create.c ./src/usr.sbin/mtree/create.c
+--- ../foo.old/src/usr.sbin/mtree/create.c	2005-12-16 23:52:51.000000000 +0100
++++ ./src/usr.sbin/mtree/create.c	2005-12-16 23:52:43.000000000 +0100
+@@ -60,7 +60,6 @@
+ #include <stdio.h>
+ #include <time.h>
+ #include <unistd.h>
+-#include <vis.h>
+ #include "mtree.h"
+ #include "extern.h"
+ 
+@@ -160,7 +159,23 @@
+ 	escaped_name = calloc(1, p->fts_namelen * 4  +  1);
+ 	if (escaped_name == NULL)
+ 		errx(1, "statf(): calloc() failed");
+-	strvis(escaped_name, p->fts_name, VIS_WHITE | VIS_OCTAL | VIS_GLOB);
++#ifdef __FreeBSD__
++  	strvis(escaped_name, p->fts_name, VIS_WHITE | VIS_OCTAL | VIS_GLOB);
++#else
++	/* borrowed from src/lib/libc/gen/vis.c
++	   FIXME: this replacement was meant for VIS_WHITE | VIS_OCTAL, but
++	   not VIS_GLOB. I'll have to review that. */
++	int i = 0, j = 0;
++	while (p->fts_name[j] != 0)
++	  {
++	    escaped_name[i++] = '\\';
++	    escaped_name[i++] = ((u_char) p->fts_name[j] >> 6 & 07) + '0';
++	    escaped_name[i++] = ((u_char) p->fts_name[j] >> 3 & 07) + '0';
++	    escaped_name[i++] = ((u_char) p->fts_name[j] & 07) + '0';
++	    j++;
++	  }
++	escaped_name[i++] = '\0';
++#endif
+ 
+ 	if (iflag || S_ISDIR(p->fts_statp->st_mode))
+ 		offset = printf("%*s%s", indent, "", escaped_name);
+diff -ur ../foo.old/src/usr.sbin/mtree/excludes.c ./src/usr.sbin/mtree/excludes.c
+--- ../foo.old/src/usr.sbin/mtree/excludes.c	2003-10-21 10:27:05.000000000 +0200
++++ ./src/usr.sbin/mtree/excludes.c	2005-12-16 23:52:43.000000000 +0100
+@@ -27,6 +27,8 @@
+  * SUCH DAMAGE.
+  */
+ 
++#define _GNU_SOURCE /* getline */
++
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD: ./src/usr.sbin/mtree/excludes.c,v 1.8 2003/10/21 08:27:05 phk Exp $");
+ 
+@@ -43,6 +45,20 @@
+ #include "mtree.h"		/* XXX for extern.h */
+ #include "extern.h"
+ 
++#ifdef __GLIBC__
++char *
++fgetln (FILE *stream, size_t *len)
++{
++	char *line=NULL;
++
++	getline (&line, len, stream);
++
++	(*len)--; /* get rid of the trailing \0, fgetln
++	does not have it */
++	return line;
++}
++#endif
++
+ /*
+  * We're assuming that there won't be a whole lot of excludes,
+  * so it's OK to use a stupid algorithm.
+@@ -102,6 +118,19 @@
+ 	/* fnmatch(3) has a funny return value convention... */
+ #define MATCH(g, n) (fnmatch((g), (n), FNM_PATHNAME) == 0)
+ 
++#ifndef LIST_FIRST
++#define	LIST_FIRST(head)	((head)->lh_first)
++#endif
++#ifndef LIST_NEXT
++#define	LIST_NEXT(elm, field)	((elm)->field.le_next)
++#endif
++#ifndef LIST_FOREACH
++#define	LIST_FOREACH(var, head, field)				\
++	for ((var) = LIST_FIRST((head));				\
++	    (var);							\
++	    (var) = LIST_NEXT((var), field))
++#endif
++
+ 	LIST_FOREACH(e, &excludes, link) {
+ 		if ((e->pathname && MATCH(e->glob, path))
+ 		    || MATCH(e->glob, fname))
+diff -ur ../foo.old/src/usr.sbin/mtree/spec.c ./src/usr.sbin/mtree/spec.c
+--- ../foo.old/src/usr.sbin/mtree/spec.c	2005-12-16 23:52:51.000000000 +0100
++++ ./src/usr.sbin/mtree/spec.c	2005-12-16 23:52:43.000000000 +0100
+@@ -45,7 +45,6 @@
+ #include <pwd.h>
+ #include <stdio.h>
+ #include <unistd.h>
+-#include <vis.h>
+ #include "mtree.h"
+ #include "extern.h"
+ 
+@@ -143,8 +142,10 @@
+ #define	MAGIC	"?*["
+ 		if (strpbrk(p, MAGIC))
+ 			centry->flags |= F_MAGIC;
++#ifdef __FreeBSD__ /* this is just to detect invalid scape sequences */
+ 		if (strunvis(centry->name, p) == -1)
+ 			errx(1, "filename %s is ill-encoded", p);
++#endif
+ 		set(NULL, centry);
+ 
+ 		if (!root) {
+@@ -228,11 +229,7 @@
+ 			/* just set flag bit */
+ 			break;
+ 		case F_MODE:
+-			if ((m = setmode(val)) == NULL)
+-				errx(1, "line %d: invalid file mode %s",
+-				lineno, val);
+-			ip->st_mode = getmode(m, 0);
+-			free(m);
++			sscanf (val, "%o", &(ip->st_mode));
+ 			break;
+ 		case F_NLINK:
+ 			ip->st_nlink = strtoul(val, &ep, 10);
+@@ -250,8 +247,10 @@
+ 			ip->slink = malloc(strlen(val) + 1);
+ 			if (ip->slink == NULL)
+ 				errx(1, "malloc");
+-			if (strunvis(ip->slink, val) == -1)
+-				errx(1, "symlink %s is ill-encoded", val);
++#ifdef __FreeBSD__ /* this is just to detect invalid scape sequences */
++  			if (strunvis(ip->slink, val) == -1)
++  				errx(1, "symlink %s is ill-encoded", val);
++#endif
+ 			break;
+ #ifdef ST_MTIM
+ 		case F_TIME:
+--- src/usr.bin/make/Makefile~	2005-12-17 11:53:50.000000000 +0100
++++ src/usr.bin/make/Makefile	2005-12-17 11:55:56.000000000 +0100
+@@ -4,6 +4,7 @@
+ 
+ PROG=	make
+ CFLAGS+=-I${.CURDIR}
++LDADD += -lbsd # arc4random
+ SRCS=	arch.c buf.c cond.c dir.c for.c hash.c hash_tables.c job.c	\
+ 	lst.c main.c make.c parse.c proc.c shell.c str.c suff.c targ.c	\
+ 	util.c var.c
+--- src/usr.sbin/mtree/specspec.c~	2005-12-17 11:59:50.000000000 +0100
++++ src/usr.sbin/mtree/specspec.c	2005-12-17 12:04:11.000000000 +0100
+@@ -83,8 +83,6 @@
+ 		printf(" rmd160digest=%s", n->rmd160digest);
+ 	if (f & F_SHA256)
+ 		printf(" sha256digest=%s", n->sha256digest);
+-	if (f & F_FLAGS)
+-		printf(" flags=%s", flags_to_string(n->st_flags));
+ 	printf("\n");
+ }
+ 
+--- src/usr.bin/file2c/file2c.c~	2005-12-17 12:04:33.000000000 +0100
++++ src/usr.bin/file2c/file2c.c	2005-12-17 12:07:12.000000000 +0100
+@@ -19,7 +19,7 @@
+ {
+ 
+ 	fprintf(stderr, "usage: %s [-n count] [-x] [prefix [suffix]]\n",
+-	    getprogname());
++	    argv[0]);
+ 	exit(1);
+ }
+ 
+--- src/usr.bin/file2c/file2c.c~	2005-12-17 12:07:42.000000000 +0100
++++ src/usr.bin/file2c/file2c.c	2005-12-17 12:10:00.000000000 +0100
+@@ -18,8 +18,7 @@
+ usage(void)
+ {
+ 
+-	fprintf(stderr, "usage: %s [-n count] [-x] [prefix [suffix]]\n",
+-	    argv[0]);
++	fprintf(stderr, "usage: file2c [-n count] [-x] [prefix [suffix]]\n");
+ 	exit(1);
+ }
+ 
