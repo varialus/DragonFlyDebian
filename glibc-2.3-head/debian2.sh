@@ -11,7 +11,7 @@ fi
 cat << EOF > debian/patches/kfreebsd-sysdeps.dpatch
 #! /bin/sh -e
 
-# All lines beginning with \`# DP:\' are a description of the patch.
+# All lines beginning with \`# DP:' are a description of the patch.
 # DP: Description: sysdeps to support GNU/kFreeBSD
 # DP: Related bugs:
 # DP: Upstream status: Not submitted
@@ -34,7 +34,15 @@ esac
 exit 0
 
 EOF
-(cd $1 && diff -x .svn -Nurd null sysdeps/ && diff -x .svn -Nurd null linuxthreads) >> debian/patches/kfreebsd-sysdeps.dpatch
+
+# sysdeps dir
+tmp=`mktemp -d`
+mkdir -p ${tmp}/sysdeps/unix/bsd/bsd4.4 ${tmp}/linuxthreads/sysdeps/unix/bsd/bsd4.4
+cp -a $1/sysdeps/kfreebsd ${tmp}/sysdeps/unix/bsd/bsd4.4/
+cp -a $1/linuxthreads/kfreebsd ${tmp}/linuxthreads/sysdeps/unix/bsd/bsd4.4/
+(cd ${tmp} && diff -x .svn -Nurd null sysdeps/ ) >> debian/patches/kfreebsd-sysdeps.dpatch
+(cd ${tmp} && diff -x .svn -Nurd null linuxthreads/ ) >> debian/patches/kfreebsd-sysdeps.dpatch
+rm -rf ${tmp}
 echo kfreebsd-sysdeps >> debian/patches/00list
 
 cp $1/patches/* debian/patches/
@@ -291,7 +299,7 @@ diff -u glibc-2.3.5/debian/control glibc-2.3.5/debian/control
 +threads = yes
 +libc_add-ons = linuxthreads $(add-ons)
 +
-+libc_extra_config_options = $(extra_config_options) --without-tls --disable-compatible-utmp
++libc_extra_config_options = $(extra_config_options) --with-tls --with-__thread --disable-compatible-utmp
 +
 +ifndef KFREEBSD_SOURCE
 +  KFREEBSD_HEADERS := /usr/include
