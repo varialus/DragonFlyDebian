@@ -49,6 +49,10 @@ cp $1/patches/* debian/patches/
 ls $1/patches | sed -e "s,\.dpatch$,,g" >> debian/patches/00list
 
 patch -p1 < $0
+
+# re-generate debian/control
+debian/rules debian/control
+
 exit 0
 
 diff -u glibc-2.3.5/debian/control.in/main glibc-2.3.5/debian/control.in/main
@@ -133,149 +137,6 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
  	cat debian/control.in/sparc64		>> $@T
  	cat debian/control.in/s390x		>> $@T
  	cat debian/control.in/amd64		>> $@T
-diff -u glibc-2.3.5/debian/control glibc-2.3.5/debian/control
---- glibc-2.3.5/debian/control
-+++ glibc-2.3.5/debian/control
-@@ -1,7 +1,7 @@
- Source: glibc
- Section: libs
- Priority: required
--Build-Depends: gettext (>= 0.10.37-1), make (>= 3.80-1), dpkg-dev (>= 1.13.5), debianutils (>= 1.13.1), tar (>= 1.13.11), bzip2, texinfo (>= 4.0), linux-kernel-headers (>= 2.6.13+0rc3-2) [!hurd-i386], mig (>= 1.3-2) [hurd-i386], hurd-dev (>= 20020608-1) [hurd-i386], gnumach-dev [hurd-i386], texi2html, file, gcc-4.0 [!powerpc !m68k !hppa !hurd-i386], gcc-3.4 (>= 3.4.4-6) [powerpc], gcc-3.4 [m68k hppa], gcc-3.3 [hurd-i386], autoconf, binutils (>= 2.14.90.0.7-5), sed (>= 4.0.5-4), gawk, debhelper (>= 4.1.76), libc6-dev-amd64 [i386], libc6-dev-ppc64 [powerpc]
-+Build-Depends: gettext (>= 0.10.37-1), make (>= 3.80-1), dpkg-dev (>= 1.13.5), debianutils (>= 1.13.1), tar (>= 1.13.11), bzip2, texinfo (>= 4.0), linux-kernel-headers (>= 2.6.13+0rc3-2) [!hurd-i386 !kfreebsd-i386], mig (>= 1.3-2) [hurd-i386], hurd-dev (>= 20020608-1) [hurd-i386], gnumach-dev [hurd-i386], kfreebsd-kernel-headers (>= 0.01), texi2html, file, gcc-4.0 [!powerpc !m68k !hppa !hurd-i386], gcc-3.4 (>= 3.4.4-6) [powerpc], gcc-3.4 [m68k hppa], gcc-3.3 [hurd-i386], autoconf, binutils (>= 2.14.90.0.7-5), sed (>= 4.0.5-4), gawk, debhelper (>= 4.1.76), libc6-dev-amd64 [i386], libc6-dev-ppc64 [powerpc]
- Build-Depends-Indep: perl, po-debconf
- Maintainer: GNU Libc Maintainers <debian-glibc@lists.debian.org>
- Uploaders: Ben Collins <bcollins@debian.org>, GOTO Masanori <gotom@debian.org>, Philip Blundell <pb@nexus.co.uk>, Jeff Bailey <jbailey@raspberryginger.com>, Daniel Jacobowitz <dan@debian.org>, Clint Adams <schizo@debian.org>
-@@ -26,7 +26,7 @@
- Provides: i18ndata
- Depends: ${locale:Depends}, debconf | debconf-2.0
- Conflicts: localebin, wg15-locale, i18ndata, locale-ja, locale-ko, locale-vi, locale-zh
--Replaces: localebin, wg15-locale, libc6-bin, i18ndata, glibc2, locale-ja, locale-ko, locale-vi, locale-zh
-+Replaces: localebin, wg15-locale, libc0.1-bin, i18ndata, glibc2, locale-ja, locale-ko, locale-vi, locale-zh
- Description: GNU C Library: National Language (locale) data [support]
-  Machine-readable data files, shared objects and programs used by the
-  C library for localization (l10n) and internationalization (i18n) support.
-@@ -38,7 +38,7 @@
-  by default. This created a package that unpacked to an excess of 30 megs.
- 
- Package: nscd
--Architecture: alpha amd64 arm armeb i386 m68k mips mipsel powerpc sparc ia64 hppa s390 sh3 sh4 sh3eb sh4eb freebsd-i386
-+Architecture: alpha amd64 arm armeb i386 m68k mips mipsel powerpc sparc ia64 hppa s390 sh3 sh4 sh3eb sh4eb kfreebsd-i386
- Section: admin
- Priority: optional
- Depends: libc6 (>= ${Source-Version})
-@@ -265,8 +265,8 @@
-  This package contains a minimal set of libraries needed for the Debian
-  installer.  Do not install it on a normal system.
- 
--Package: libc1
--Architecture: freebsd-i386
-+Package: libc0.1
-+Architecture: kfreebsd-i386
- Section: libs
- Priority: required
- Provides: ${locale:Depends}
-@@ -276,22 +276,22 @@
-  and the standard math library, as well as many others.
-  Timezone data is also included.
- 
--Package: libc1-dev
--Architecture: freebsd-i386
-+Package: libc0.1-dev
-+Architecture: kfreebsd-i386
- Section: libdevel
- Priority: standard
--Depends: libc1 (= ${Source-Version})
-+Depends: libc0.1 (= ${Source-Version})
- Recommends: gcc | c-compiler
- Description: GNU C Library: Development Libraries and Header Files
-  Contains the symlinks, headers, and object files needed to compile
-  and link programs which use the standard C library.
- 
--Package: libc1-dbg
--Architecture: freebsd-i386
-+Package: libc0.1-dbg
-+Architecture: kfreebsd-i386
- Section: libdevel
- Priority: extra
- Provides: libc-dbg
--Depends: libc1 (= ${Source-Version})
-+Depends: libc0.1 (= ${Source-Version})
- Description: GNU C Library: Libraries with debugging symbols
-  Contains unstripped shared libraries.
-  This package is provided primarily to provide a backtrace with
-@@ -300,22 +300,22 @@
-  used by placing that directory in LD_LIBRARY_PATH.
-  Most people will not need this package.
- 
--Package: libc1-prof
--Architecture: freebsd-i386
-+Package: libc0.1-prof
-+Architecture: kfreebsd-i386
- Section: libdevel
- Priority: extra
--Depends: libc1 (= ${Source-Version})
-+Depends: libc0.1 (= ${Source-Version})
- Description: GNU C Library: Profiling Libraries
-  Static libraries compiled with profiling info (-pg) suitable for use
-  with gprof.
- 
--Package: libc1-pic
--Architecture: freebsd-i386
-+Package: libc0.1-pic
-+Architecture: kfreebsd-i386
- Section: libdevel
- Priority: optional
- Conflicts: libc-pic
- Provides: libc-pic, glibc-pic
--Depends: libc1 (= ${Source-Version})
-+Depends: libc0.1 (= ${Source-Version})
- Description: GNU C Library: PIC archive library
-  Contains an archive library (ar file) composed of individual shared objects.
-  This is used for creating a library which is a smaller subset of the
-@@ -323,12 +323,13 @@
-  boot floppies. If you are not making your own set of Debian boot floppies
-  using the `boot-floppies' package, you probably don't need this package.
- 
--Package: libc1-udeb
-+Package: libc0.1-udeb
- XC-Package-Type: udeb
--Architecture: freebsd-i386
-+Architecture: kfreebsd-i386
- Section: debian-installer
- Priority: extra
--Provides: libc1, libc-udeb, ${locale:Depends}
-+Provides: libc0.1, libc-udeb, ${locale:Depends}
-+Depends: libnss-dns-udeb, libnss-files-udeb
- Description: GNU C Library: Shared libraries - udeb
-  Contains the standard libraries that are used by nearly all programs on
-  the system. This package includes shared versions of the standard C library
-@@ -428,7 +429,7 @@
- Architecture: sparc
- Section: libs
- Priority: extra
--Pre-Depends: libc6 (= ${Source-Version})
-+Pre-Depends: libc0.1 (= ${Source-Version})
- Description: GNU C Library: Shared libraries [v9 optimized]
-  Contains the standard libraries that are used by nearly all programs on
-  the system. This package includes shared versions of the standard C
-@@ -446,7 +447,7 @@
- Architecture: sparc
- Section: libs
- Priority: extra
--Pre-Depends: libc6 (= ${Source-Version})
-+Pre-Depends: libc0.1 (= ${Source-Version})
- Description: GNU C Library: Shared libraries [v9b optimized]
-  Contains the standard libraries that are used by nearly all programs on
-  the system. This package includes shared versions of the standard C
-@@ -464,7 +465,7 @@
- Architecture: i386
- Section: libs
- Priority: extra
--Pre-Depends: libc6 (= ${Source-Version})
-+Pre-Depends: libc0.1 (= ${Source-Version})
- Description: GNU C Library: Shared libraries [i686 optimized]
-  Contains the standard libraries that are used by nearly all programs on
-  the system. This package includes shared versions of the standard C
 --- glibc-2.3.5.orig/debian/sysdeps/kfreebsd.mk
 +++ glibc-2.3.5/debian/sysdeps/kfreebsd.mk
 @@ -0,0 +1,60 @@

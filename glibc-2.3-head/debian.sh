@@ -27,6 +27,10 @@ if test -e debian/sysdeps/kfreebsd-gnu.mk ; then
 fi
 
 patch -p1 < $0
+
+# re-generate debian/control
+debian/rules debian/control
+
 exit 0
 
 diff -ur glibc-2.3.5.old/debian/control.in/main glibc-2.3.5/debian/control.in/main
