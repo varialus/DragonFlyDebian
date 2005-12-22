@@ -74,3 +74,12 @@ __libc_lseek (int fd, __off_t offset, int whence)
 weak_alias (__libc_lseek, __lseek)
 libc_hidden_def (__lseek)
 weak_alias (__libc_lseek, lseek)
+
+/* 'lseek64' is the same as 'lseek', because __off64_t == __off_t.  */
+strong_alias (__libc_lseek, __libc_lseek64)
+weak_alias (__libc_lseek64, __lseek64)
+weak_alias (__lseek64, lseek64)
+
+/* 'llseek' is the same as 'lseek', because __off64_t == __off_t.  */
+strong_alias (__libc_lseek, __llseek)
+weak_alias (__llseek, llseek)

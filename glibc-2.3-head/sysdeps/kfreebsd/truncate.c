@@ -34,3 +34,7 @@ __truncate (const char *file, __off_t length)
 }
 
 weak_alias (__truncate, truncate)
+
+/* 'truncate64' is the same as 'truncate', because __off64_t == __off_t.  */
+strong_alias (__truncate, __truncate64)
+weak_alias (__truncate64, truncate64)

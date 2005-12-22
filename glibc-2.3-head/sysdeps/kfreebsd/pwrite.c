@@ -34,4 +34,9 @@ __libc_pwrite (int fd, const void *buf, size_t nbytes, __off_t offset)
 }
 
 strong_alias (__libc_pwrite, __pwrite)
-weak_alias (__libc_pwrite, pwrite)
+weak_alias (__pwrite, pwrite)
+
+/* 'pwrite64' is the same as 'pwrite', because __off64_t == __off_t.  */
+strong_alias (__libc_pwrite, __libc_pwrite64)
+weak_alias (__libc_pwrite64, __pwrite64)
+weak_alias (__libc_pwrite64, pwrite64)

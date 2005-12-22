@@ -34,4 +34,9 @@ __libc_pread (int fd, void *buf, size_t nbytes, __off_t offset)
 }
 
 strong_alias (__libc_pread, __pread)
-weak_alias (__libc_pread, pread)
+weak_alias (__pread, pread)
+
+/* 'pread64' is the same as 'pread', because __off64_t == __off_t.  */
+strong_alias (__libc_pread, __libc_pread64)
+weak_alias (__libc_pread64, __pread64)
+weak_alias (__libc_pread64, pread64)
