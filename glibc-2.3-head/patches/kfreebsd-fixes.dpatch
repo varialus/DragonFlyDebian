@@ -707,3 +707,50 @@ exit 0
 +#endif /* _KERNEL */
 +
 +#endif /* !_SYS_QUEUE_H_ */
+--- resolv/res_send.c.orig	2005-12-22 21:55:13.000000000 +0100
++++ resolv/res_send.c	2005-12-22 21:59:38.000000000 +0100
+@@ -654,7 +654,9 @@
+ 		}
+ 		__set_errno (0);
+ 		if (connect(statp->_vcsock, (struct sockaddr *)nsap,
+-			    sizeof *nsap) < 0) {
++			    (nsap->sin6_family == PF_INET6) ?
++			    sizeof(struct sockaddr_in6) : 
++			    sizeof(struct sockaddr_in)) < 0) {
+ 			*terrno = errno;
+ 			Aerror(statp, stderr, "connect/vc", errno,
+ 			       (struct sockaddr *) nsap);
+@@ -841,7 +843,9 @@
+ 		 * the absence of a nameserver without timing out.
+ 		 */
+ 		if (connect(EXT(statp).nssocks[ns], (struct sockaddr *)nsap,
+-			    sizeof *nsap) < 0) {
++			    (nsap->sin6_family == PF_INET6) ?
++			    sizeof(struct sockaddr_in6) :
++			    sizeof(struct sockaddr_in)) < 0) {
+ 			Aerror(statp, stderr, "connect(dg)", errno,
+ 			       (struct sockaddr *) nsap);
+ 			res_nclose(statp);
+--- linuxthreads/old_pthread_atfork.c~	2005-12-22 13:26:01.000000000 +0000
++++ linuxthreads/old_pthread_atfork.c	2005-12-22 13:26:01.000000000 +0000
+@@ -19,7 +19,7 @@
+ 
+ #include <shlib-compat.h>
+ 
+-#if SHLIB_COMPAT (libpthread, GLIBC_2_0, GLIBC_2_3)
++#if SHLIB_COMPAT (libpthread, GLIBC_2_0, GLIBC_2_3_2)
+ # define __pthread_atfork __dyn_pthread_atfork
+ # include "pthread_atfork.c"
+ # undef __pthread_atfork
+--- glibc-2.3/sysdeps/gnu/errlist-compat.awk.orig	2005-11-18 07:48:29.000000000 +0100
++++ glibc-2.3/sysdeps/gnu/errlist-compat.awk	2005-11-18 07:48:41.000000000 +0100
+@@ -35,7 +35,7 @@
+   # Don't process any further Versions files
+   ARGC = ARGIND + 1;
+   cnt = $2 + 0;
+-  if (cnt < 100) {
++  if (cnt < 80) {
+     print "*** this line seems bogus:", $0 > "/dev/stderr";
+     exit 1;
+   }
+
