@@ -216,3 +216,13 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
  
  # ${glibc}-doc is suggested by $libc_c and $libc_dev_c.
  push @{$libc_c{'Suggests'}}, "${glibc}-doc";
+--- glibc-2.3.5/debian/rules~  2005-12-23 11:32:12.000000000 +0100
++++ glibc-2.3.5/debian/rules   2005-12-23 11:38:31.000000000 +0100
+@@ -45,6 +45,7 @@
+ DEB_HOST_ARCH         ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+ DEB_HOST_GNU_CPU      ?= $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
+ DEB_HOST_GNU_TYPE     ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
++DEB_HOST_GNU_SYSTEM   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+ DEB_HOST_ARCH_OS      ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+ DEB_BUILD_ARCH        ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH)
+ DEB_BUILD_GNU_CPU     ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
