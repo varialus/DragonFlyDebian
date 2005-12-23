@@ -96,13 +96,19 @@ diff -ur glibc-2.3.5.old/debian/sysdeps/kfreebsd.mk glibc-2.3.5/debian/sysdeps/k
  
 -extra_config_options = $(extra_config_options) --disable-compatible-utmp --enable-kernel-include=4.6
 +extra_config_options += --without-tls
---- glibc-2.3.5/debian/control.in/libc.old      2005-12-21 21:26:37.000000000 +0100
-+++ glibc-2.3.5/debian/control.in/libc  2005-12-21 23:21:46.000000000 +0100
-@@ -3,6 +3,7 @@
- Section: libs
- Priority: required
- Provides: ${locale:Depends}
-+Replaces: @libc@-dev (<< 2.3.2.ds1-14)
- Description: GNU C Library: Shared libraries and Timezone data
-  Contains the standard libraries that are used by nearly all programs on
-  the system. This package includes shared versions of the standard C library
+--- glibc-2.3.5.old/debian/sysdeps/depflags.pl	2005-12-23 00:40:20.000000000 +0100
++++ glibc-2.3.5/debian/sysdeps/depflags.pl	2005-12-23 00:44:38.000000000 +0100
+@@ -33,6 +33,13 @@
+ 		'ppp (<= 2.2.0f-24)', 'libgdbmg1-dev (<= 1.7.3-24)');
+     push @{$libc_dev_c{'Depends'}}, 'linux-kernel-headers';
+ }
++if ($DEB_HOST_GNU_SYSTEM eq "kfreebsd-gnu") {
++    push @{$libc_c{'Suggests'}, 'locales';
++    push @{$libc_c{'Replaces'}}, 'libc0.1-dev (<< 2.3.2.ds1-14)';
++    push @{$libc_dev_c{'Recommends'}}, 'c-compiler';
++    push @{$libc_dev_c{'Replaces'}}, 'kfreebsd-kernel-headers (<< 0.09)';
++    push @{$libc_dev_c{'Depends'}}, 'kfreebsd-kernel-headers (>= 0.09)';
++}
+ 
+ # ${glibc}-doc is suggested by $libc_c and $libc_dev_c.
+ push @{$libc_c{'Suggests'}}, "${glibc}-doc";
