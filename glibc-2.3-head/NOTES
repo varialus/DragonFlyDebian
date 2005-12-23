@@ -16,6 +16,10 @@ apply patches from patches/
 mkdir build ; cd build
  ../src/configure --prefix=/opt/tst --enable-add-ons=linuxthreads --without-tls i486-kfreebsd-gnu
 
+or even
+
+ ../src/configure --prefix=/opt/tst --enable-add-ons=linuxthreads --with-tls --with-__thread i486-kfreebsd-gnu
+
 
 roadmap:
 ========
@@ -59,6 +63,36 @@ status:
 problems:
 =========
 
+* thread cancelation
+   cancelable functions are not properly marked in syscalls.list, ...
+   informal list of such functions is include in linuxthreads/tst-cancel4.c, nptl/tst-cancel4.c
+        beware, the test doesn't cover all affected functions
+   see also http://h71000.www7.hp.com/doc/73final/6493/6101pro_030.html#unix_thread_cancel
+
+* "make check" fails 
+	examine why for each case
+
+make[2]: *** [/build/glibc-2.3-head/build/libio/tst_wprintf2.out] Error 134
+make[2]: *** [/build/glibc-2.3-head/build/libio/tst-fopenloc.check] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/posix/tst-waitid.out] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/posix/bug-glob2.out] Error 1
+make[2]: [/build/glibc-2.3-head/build/posix/annexc.out] Error 1 (ignored)
+make[2]: *** [/build/glibc-2.3-head/build/misc/tst-error1-mem] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/linuxthreads/tst-clock1.out] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/linuxthreads/bug-sleep.out] Error 142
+make[2]: *** [/build/glibc-2.3-head/build/linuxthreads/tst-cancel4.out] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/linuxthreads/tst-cancel5.out] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/linuxthreads/tst-cancel-static.out] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/linuxthreads/tst-cancel-wrappers.out] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/rt/tst-aio.out] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/rt/tst-aio64.out] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/rt/tst-timer4.o] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/inet/test_ifindex] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/inet/test-ifaddrs.out] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/inet/bug-if1.out] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/elf/check-textrel.out] Error 1
+
+
 * struct statfs
 
 Previous glibc based on 2.3.0 uses older version of struct statfs,
@@ -70,6 +104,7 @@ to update struct statfs and use versioned symbols for related functions.
 
   libraries (as is also dynamic loader) are loaded at base addr 0
 
+  can be examined by
   /opt/tst/lib/ld-2.3.6.so --library-path /opt/tst/lib /bin/cat/proc/self/maps
 
 
