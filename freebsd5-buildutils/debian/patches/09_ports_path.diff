@@ -1,6 +1,6 @@
-diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
---- ports.old/Mk/bsd.port.mk	2004-12-28 17:45:04.000000000 +0100
-+++ ports/Mk/bsd.port.mk	2004-12-28 17:57:59.000000000 +0100
+diff -Nurd ports/Mk/bsd.port.mk ports/Mk/bsd.port.mk
+--- ports/Mk/bsd.port.mk	2005-12-23 15:35:43.000000000 +0100
++++ ports/Mk/bsd.port.mk	2005-12-23 15:36:00.000000000 +0100
 @@ -490,7 +490,7 @@
  #				  files.
  #				  Default: ${.CURDIR}
@@ -86,7 +86,7 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  SORT?=		/usr/bin/sort
  STRIP_CMD?=	/usr/bin/strip
 -SU_CMD?=	/usr/bin/su root -c
-+SU_CMD?=	su root -c
++SU_CMD?=	/bin/su root -c
  TAIL?=		/usr/bin/tail
  TEST?=		test				# Shell builtin
  TR?=		/usr/bin/tr
@@ -152,9 +152,9 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  MTREE_ARGS?=	-U ${MTREE_FOLLOWS_SYMLINKS} -f ${MTREE_FILE} -d -e -p
  
  # Determine whether or not we can use rootly owner/group functions.
-diff -ur ports.old/Mk/bsd.port.subdir.mk ports/Mk/bsd.port.subdir.mk
---- ports.old/Mk/bsd.port.subdir.mk	2004-12-28 17:45:04.000000000 +0100
-+++ ports/Mk/bsd.port.subdir.mk	2004-12-28 17:53:06.000000000 +0100
+diff -Nurd ports/Mk/bsd.port.subdir.mk ports/Mk/bsd.port.subdir.mk
+--- ports/Mk/bsd.port.subdir.mk	2005-12-23 15:35:43.000000000 +0100
++++ ports/Mk/bsd.port.subdir.mk	2005-12-23 15:36:00.000000000 +0100
 @@ -48,10 +48,10 @@
  
  .if !defined(NOPRECIOUSMAKEVARS)
@@ -200,20 +200,9 @@ diff -ur ports.old/Mk/bsd.port.subdir.mk ports/Mk/bsd.port.subdir.mk
  .endif
  TEMPLATES ?= ${PORTSDIR}/Templates
  .if defined(PORTSTOP)
-diff -ur src.old/share/mk/bsd.port.subdir.mk src/share/mk/bsd.port.subdir.mk
---- src.old/share/mk/bsd.port.subdir.mk 2004-07-02 22:47:18.000000000 +0200
-+++ src/share/mk/bsd.port.subdir.mk     2004-12-28 00:47:40.000000000 +0100
-@@ -1,6 +1,6 @@
- # $FreeBSD: src/share/mk/bsd.port.subdir.mk,v 1.31 2004/07/02 20:47:18 eik Exp $
- 
--PORTSDIR?=	/usr/ports
-+PORTSDIR?=	/usr/share/freebsd5-buildutils/ports
- BSDPORTSUBDIRMK?=	${PORTSDIR}/Mk/bsd.port.subdir.mk
- 
- .include "${BSDPORTSUBDIRMK}"
-diff -ur src.old/share/mk/bsd.port.mk src.old/share/mk/bsd.port.mk
---- src.old/share/mk/bsd.port.mk	2004-07-02 22:47:18.000000000 +0200
-+++ src/share/mk/bsd.port.mk	2004-12-28 00:47:40.000000000 +0100
+diff -Nurd src/share/mk/bsd.port.mk src/share/mk/bsd.port.mk
+--- src/share/mk/bsd.port.mk	2005-12-23 15:35:45.000000000 +0100
++++ src/share/mk/bsd.port.mk	2005-12-23 15:36:00.000000000 +0100
 @@ -1,6 +1,6 @@
  # $FreeBSD: src/share/mk/bsd.port.mk,v 1.307 2004/07/02 20:47:18 eik Exp $
  
@@ -222,3 +211,14 @@ diff -ur src.old/share/mk/bsd.port.mk src.old/share/mk/bsd.port.mk
  BSDPORTMK?=	${PORTSDIR}/Mk/bsd.port.mk
  
  .include <bsd.own.mk>
+diff -Nurd src/share/mk/bsd.port.subdir.mk src/share/mk/bsd.port.subdir.mk
+--- src/share/mk/bsd.port.subdir.mk	2005-12-23 15:35:45.000000000 +0100
++++ src/share/mk/bsd.port.subdir.mk	2005-12-23 15:36:00.000000000 +0100
+@@ -1,6 +1,6 @@
+ # $FreeBSD: src/share/mk/bsd.port.subdir.mk,v 1.31 2004/07/02 20:47:18 eik Exp $
+ 
+-PORTSDIR?=	/usr/ports
++PORTSDIR?=	/usr/share/freebsd5-buildutils/ports
+ BSDPORTSUBDIRMK?=	${PORTSDIR}/Mk/bsd.port.subdir.mk
+ 
+ .include "${BSDPORTSUBDIRMK}"
