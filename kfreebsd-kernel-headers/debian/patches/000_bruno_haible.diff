@@ -166,37 +166,6 @@ diff -ur sys.orig/net/ethernet.h sys/net/ethernet.h
  #endif /* !_KERNEL */
  
  #endif /* !_NET_ETHERNET_H_ */
-diff -ur sys.orig/net/if.h sys/net/if.h
---- sys.orig/net/if.h	2004-12-07 23:50:18.000000000 +0100
-+++ sys/net/if.h	2004-12-07 23:48:33.000000000 +0100
-@@ -39,6 +39,11 @@
- #include <sys/queue.h>
- #endif
- 
-+#include <features.h>
-+
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+
- #if __BSD_VISIBLE
- /*
-  * <net/if.h> does not depend on <sys/time.h> on most other systems.  This
-@@ -235,6 +240,7 @@
- 		struct	sockaddr ifru_addr;
- 		struct	sockaddr ifru_dstaddr;
- 		struct	sockaddr ifru_broadaddr;
-+		struct	sockaddr ifru_netmask;
- 		short	ifru_flags[2];
- 		short	ifru_index;
- 		int	ifru_metric;
-@@ -247,6 +253,7 @@
- #define	ifr_addr	ifr_ifru.ifru_addr	/* address */
- #define	ifr_dstaddr	ifr_ifru.ifru_dstaddr	/* other end of p-to-p link */
- #define	ifr_broadaddr	ifr_ifru.ifru_broadaddr	/* broadcast address */
-+#define	ifr_netmask	ifr_ifru.ifru_netmask	/* interface net mask */
- #define	ifr_flags	ifr_ifru.ifru_flags[0]	/* flags (low 16 bits) */
- #define	ifr_flagshigh	ifr_ifru.ifru_flags[1]	/* flags (high 16 bits) */
- #define	ifr_metric	ifr_ifru.ifru_metric	/* metric */
 diff -ur sys.orig/net/if_arp.h sys/net/if_arp.h
 --- sys.orig/net/if_arp.h	2004-12-07 23:50:18.000000000 +0100
 +++ sys/net/if_arp.h	2004-12-07 23:48:33.000000000 +0100
@@ -638,77 +607,6 @@ diff -ur sys.orig/sys/memrange.h sys/sys/memrange.h
  #endif
  
 +#endif /* _SYS_MEMRANGE_H_ */
-diff -ur sys.orig/sys/param.h sys/sys/param.h
---- sys.orig/sys/param.h	2004-12-07 23:50:18.000000000 +0100
-+++ sys/sys/param.h	2004-12-07 23:48:37.000000000 +0100
-@@ -38,7 +38,9 @@
- #ifndef _SYS_PARAM_H_
- #define _SYS_PARAM_H_
- 
--#include <sys/_null.h>
-+#ifndef NULL
-+#define NULL 0
-+#endif
- 
- #define	BSD	199506		/* System version (year & month). */
- #define BSD4_3	1
-@@ -57,9 +59,8 @@
- #undef __FreeBSD_version
- #define __FreeBSD_version 503001	/* Master, propagated to newvers */
- 
--#ifndef LOCORE
-+/* Some inet code expects that this file defines the 'u_int32_t' type.  */
- #include <sys/types.h>
--#endif
- 
- /*
-  * Machine-independent constants (some used in following include files).
-@@ -69,6 +70,7 @@
-  * MAXLOGNAME should be == UT_NAMESIZE+1 (see <utmp.h>)
-  */
- #include <sys/syslimits.h>
-+#include <limits.h>
- 
- #define	MAXCOMLEN	19		/* max command name remembered */
- #define	MAXINTERP	32		/* max interpreter file name length */
-@@ -179,8 +181,6 @@
- #define	PCATCH	0x100		/* OR'd with pri for tsleep to check signals */
- #define	PDROP	0x200	/* OR'd with pri to stop re-entry of interlock mutex */
- 
--#define	NZERO	0		/* default "nice" */
--
- #define	NBBY	8		/* number of bits in a byte */
- #define	NBPW	sizeof(int)	/* number of bytes per word (integer) */
- 
-@@ -278,28 +278,6 @@
- #endif /* _KERNEL */
- 
- /*
-- * Constants for setting the parameters of the kernel memory allocator.
-- *
-- * 2 ** MINBUCKET is the smallest unit of memory that will be
-- * allocated. It must be at least large enough to hold a pointer.
-- *
-- * Units of memory less or equal to MAXALLOCSAVE will permanently
-- * allocate physical memory; requests for these size pieces of
-- * memory are quite fast. Allocations greater than MAXALLOCSAVE must
-- * always allocate and free physical memory; requests for these
-- * size allocations should be done infrequently as they will be slow.
-- *
-- * Constraints: PAGE_SIZE <= MAXALLOCSAVE <= 2 ** (MINBUCKET + 14), and
-- * MAXALLOCSIZE must be a power of two.
-- */
--#if defined(__alpha__) || defined(__ia64__) || defined(__sparc64__)
--#define MINBUCKET	5		/* 5 => min allocation of 32 bytes */
--#else
--#define MINBUCKET	4		/* 4 => min allocation of 16 bytes */
--#endif
--#define MAXALLOCSAVE	(2 * PAGE_SIZE)
--
--/*
-  * Scale factor for scaled integers used to count %cpu time and load avgs.
-  *
-  * The number of CPU `tick's that map to a unique `%age' can be expressed
 diff -ur sys.orig/sys/pciio.h sys/sys/pciio.h
 --- sys.orig/sys/pciio.h	2004-12-07 23:50:18.000000000 +0100
 +++ sys/sys/pciio.h	2004-12-07 23:48:37.000000000 +0100

@@ -138,49 +138,6 @@ diff -ur sys.orig/netinet6/in6.h sys/netinet6/in6.h
  
  #define IPV6_RECVTCLASS		57 /* bool; recv traffic class values */
  
-diff -ur sys.orig/net/if.h sys/net/if.h
---- sys.orig/net/if.h	2004-11-30 01:19:11.000000000 +0100
-+++ sys/net/if.h	2004-11-30 01:21:25.000000000 +0100
-@@ -61,11 +61,8 @@
-  * Note: this is the same size as a generic device's external name.
-  */
- #define		IF_NAMESIZE	16
--#if __BSD_VISIBLE
- #define		IFNAMSIZ	IF_NAMESIZE
- #define		IF_MAXUNIT	0x7fff	/* historical value */
--#endif
--#if __BSD_VISIBLE
- 
- /*
-  * Structure used to query names of interface cloners.
-@@ -330,8 +327,6 @@
- 	struct	sockaddr_storage dstaddr; /* out */
- };
- 
--#endif /* __BSD_VISIBLE */
--
- #ifdef _KERNEL
- #ifdef MALLOC_DECLARE
- MALLOC_DECLARE(M_IFADDR);
-diff -ur sys.orig/net/if.h sys/net/if.h
---- sys.orig/net/if.h	2004-11-30 01:22:43.000000000 +0100
-+++ sys/net/if.h	2004-11-30 01:22:54.000000000 +0100
-@@ -44,7 +44,6 @@
- #include <sys/types.h>
- #include <sys/socket.h>
- 
--#if __BSD_VISIBLE
- /*
-  * <net/if.h> does not depend on <sys/time.h> on most other systems.  This
-  * helps userland compatibility.  (struct timeval ifi_lastchange)
-@@ -54,7 +53,6 @@
- #endif
- 
- struct ifnet;
--#endif
- 
- /*
-  * Length of interface external name, including terminating '\0'.
 diff -ur sys.orig/netinet6/in6.h sys/netinet6/in6.h
 --- sys.orig/netinet6/in6.h	2004-11-30 01:19:35.000000000 +0100
 +++ sys/netinet6/in6.h	2004-11-30 01:22:54.000000000 +0100
