@@ -207,7 +207,7 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
      push @{$libc_dev_c{'Depends'}}, 'linux-kernel-headers';
  }
 +if ($DEB_HOST_GNU_SYSTEM eq "kfreebsd-gnu") {
-+    push @{$libc_c{'Suggests'}, 'locales';
++    push @{$libc_c{'Suggests'}}, 'locales';
 +    push @{$libc_c{'Replaces'}}, 'libc0.1-dev (<< 2.3.2.ds1-14)';
 +    push @{$libc_dev_c{'Recommends'}}, 'c-compiler';
 +    push @{$libc_dev_c{'Replaces'}}, 'kfreebsd-kernel-headers (<< 0.09)';
