@@ -22,6 +22,16 @@ case "$1" in
 esac
 exit 0
 # append the patch here and adjust the -p? flag in the patch calls.
+--- include/sys/wait.h~	2005-12-28 09:31:34.000000000 +0100
++++ include/sys/wait.h	2005-12-28 09:31:34.000000000 +0100
+@@ -13,6 +13,5 @@
+ extern __pid_t __wait3 (__WAIT_STATUS __stat_loc,
+ 			int __options, struct rusage * __usage);
+ extern __pid_t __wait4 (__pid_t __pid, __WAIT_STATUS __stat_loc,
+-			int __options, struct rusage *__usage)
+-			attribute_hidden;
++			int __options, struct rusage *__usage);
+ #endif
 --- include/features.h.orig	2005-02-18 01:08:56.000000000 +0100
 +++ include/features.h	2005-07-17 22:18:23.000000000 +0200
 @@ -288,6 +288,7 @@
