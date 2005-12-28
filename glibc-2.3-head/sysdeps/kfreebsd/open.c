@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <sysdep-cancel.h>
 
 extern int __syscall_open (const char *file, int oflag, int mode);
 extern int __futimes (int fd, const struct timeval tvp[2]);
@@ -40,8 +41,17 @@ __libc_open (const char *file, int oflag, ...)
       mode = va_arg (arg, int);
       va_end (arg);
     }
-
-  fd = INLINE_SYSCALL (open, 3, file, oflag, mode);
+  
+  if (SINGLE_THREAD_P)
+  { 
+    fd = INLINE_SYSCALL (open, 3, file, oflag, mode);
+  }
+  else
+  {
+    int oldtype = LIBC_CANCEL_ASYNC ();
+    fd = INLINE_SYSCALL (open, 3, file, oflag, mode);
+    LIBC_CANCEL_RESET (oldtype);
+  }
 
   if (fd >= 0 && (oflag & O_TRUNC))
     {

@@ -23,22 +23,14 @@
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 
+#include <ifreq.h>
 
 /* The FreeBSD ioctl SIOCGIFCONF returns the list if interfaces as a
    concatenation of records of different size, each having at least
    sizeof (struct ifreq) bytes.  */
 
-static inline struct ifreq *
-__if_nextreq (struct ifreq *ifr)
-{
-  return (struct ifreq *)
-	 ((char *) ifr + (ifr->ifr_addr.sa_len <= sizeof (ifr->ifr_addr)
-			  ? sizeof (struct ifreq)
-			  : sizeof (struct ifreq) - sizeof (ifr->ifr_addr)
-			    + ifr->ifr_addr.sa_len));
-}
 
-static inline void
+void
 __ifreq (struct ifreq **ifreqs, int *num_ifs, int sockfd)
 {
   int fd = sockfd;
@@ -98,10 +90,4 @@ __ifreq (struct ifreq **ifreqs, int *num_ifs, int sockfd)
 
   *num_ifs = nifs;
   *ifreqs = realloc (ifc.ifc_buf, ifc.ifc_len);
-}
-
-static inline void
-__if_freereq (struct ifreq *ifreqs, int num_ifs)
-{
-  free (ifreqs);
 }

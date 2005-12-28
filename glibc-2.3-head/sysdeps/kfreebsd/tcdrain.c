@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1995, 1996, 1997, 2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,25 +16,26 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <sys/socket.h>
-#include <sysdep.h>
+#include <errno.h>
+#include <termios.h>
+#include <sys/ioctl.h>
 #include <sysdep-cancel.h>
+#include <stddef.h>
 
-/* The real syscall's name.  See sysdeps/unix/inet/syscalls.list.  */
-#define __syscall_sendto __libc_sendto
-
-/* Send N bytes of BUF to socket FD.
-   Return the number of bytes sent or -1.  */
-
-ssize_t
-__libc_send (int fd, const void *buf, size_t n, int flags)
+/* Wait for pending output to be written on FD.  */
+int
+__libc_tcdrain (int fd)
 {
-  return INLINE_SYSCALL (sendto, 6, fd, buf, n, flags, NULL, 0);
+  if (SINGLE_THREAD_P)
+    return __ioctl (fd, TIOCDRAIN);
+
+  int oldtype = LIBC_CANCEL_ASYNC ();
+
+  int result = __ioctl (fd, TIOCDRAIN);
+
+  LIBC_CANCEL_RESET (oldtype);
+
+  return result;
 }
+weak_alias (__libc_tcdrain, tcdrain)
 
-weak_alias (__libc_send, __send)
-libc_hidden_weak (__send)
-
-weak_alias (__send, send)
-
-LIBC_CANCEL_HANDLED (); /* in __libc_sendto */

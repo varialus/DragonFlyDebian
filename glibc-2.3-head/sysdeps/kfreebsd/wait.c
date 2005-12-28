@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 1995, 1996, 1997 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,25 +16,21 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <sys/socket.h>
-#include <sysdep.h>
-#include <sysdep-cancel.h>
+#include <sys/wait.h>
+#include <errno.h>
+#include <sys/resource.h>
+#include <stddef.h>
+#include <sysdep-cancel.h> 
 
-/* The real syscall's name.  See sysdeps/unix/inet/syscalls.list.  */
-#define __syscall_sendto __libc_sendto
-
-/* Send N bytes of BUF to socket FD.
-   Return the number of bytes sent or -1.  */
-
-ssize_t
-__libc_send (int fd, const void *buf, size_t n, int flags)
+/* Wait for a child to die.  When one does, put its status in *STAT_LOC
+   and return its process ID.  For errors, return (pid_t) -1.  */
+__pid_t
+__libc_wait (__WAIT_STATUS_DEFN stat_loc)
 {
-  return INLINE_SYSCALL (sendto, 6, fd, buf, n, flags, NULL, 0);
+  return __wait4 (WAIT_ANY, stat_loc, 0, (struct rusage *) NULL);
 }
 
-weak_alias (__libc_send, __send)
-libc_hidden_weak (__send)
+weak_alias (__libc_wait, __wait)
+weak_alias (__libc_wait, wait)
 
-weak_alias (__send, send)
-
-LIBC_CANCEL_HANDLED (); /* in __libc_sendto */
+LIBC_CANCEL_HANDLED (); /* in __wait4 */

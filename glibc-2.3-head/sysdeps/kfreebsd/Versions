@@ -75,10 +75,14 @@ libc {
     __clone; __libc_fork; __libc_sigaction;
     # needed by libpthread as INLINE_SYSCALL:
     __syscall_fork; __syscall_execve;
-    # misc fixes for FreeBSD:
-    __syscall_open; __syscall_lseek; __syscall_pread; __syscall_pwrite;
-    __syscall_sigaction; 
-    __wait4; __sigprocmask; __futimes; __ioctl;
+    __syscall_open; __syscall_close;
+    __syscall_read; __syscall_write;
+    __syscall_writev;
+    __syscall_wait4; __syscall_fcntl;
+     # misc fixes for FreeBSD:
+    __syscall_lseek; __syscall_pread; __syscall_pwrite;
+    __syscall_sigaction; __syscall_fcntl; __wait4;
+    __sigprocmask; __futimes; __ioctl;
      # global variable used in brk()
     _end;
   }

@@ -18,6 +18,7 @@
 
 #include <sys/socket.h>
 #include <sysdep.h>
+#include <sysdep-cancel.h>
 
 /* The real syscall's name.  See sysdeps/unix/inet/syscalls.list.  */
 #define __syscall_recvfrom __libc_recvfrom
@@ -32,3 +33,5 @@ __libc_recv (int fd, void *buf, size_t n, int flags)
 }
 
 weak_alias (__libc_recv, recv)
+
+LIBC_CANCEL_HANDLED (); /* in __libc_recvfrom */

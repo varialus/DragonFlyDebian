@@ -25,6 +25,7 @@
 #include <sysdep.h>
 #include <sys/syscall.h>
 #include <bp-checks.h>
+#include <sysdep-cancel.h>
 
 extern ssize_t __syscall_readv (int, __const struct iovec *__unbounded, int);
 
@@ -35,7 +36,16 @@ ssize_t
 __libc_readv (int fd, const struct iovec *vector, int count)
 {
   if (count <= UIO_MAXIOV)
-    return INLINE_SYSCALL (readv, 3, fd, CHECK_N (vector, count), count);
+  {
+    if (SINGLE_THREAD_P)
+      return INLINE_SYSCALL (readv, 3, fd, CHECK_N (vector, count), count);
+
+    int oldtype = LIBC_CANCEL_ASYNC ();
+    ssize_t result = INLINE_SYSCALL (readv, 3, fd, CHECK_N (vector, count), count);
+    LIBC_CANCEL_RESET (oldtype);
+    return result;
+    
+  }
   else
     return __atomic_readv_replacement (fd, vector, count);
 }

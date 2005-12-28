@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sysdep.h>
+#include <sysdep-cancel.h>
 
 /* The real system call has a word of padding before the 64-bit off_t
    argument.  */
@@ -30,7 +31,13 @@ ssize_t
 __libc_pread (int fd, void *buf, size_t nbytes, __off_t offset)
 {
   /* We pass 5 arguments in 6 words.  */
-  return INLINE_SYSCALL (pread, 5, fd, buf, nbytes, 0, offset);
+  if (SINGLE_THREAD_P)
+    return INLINE_SYSCALL (pread, 5, fd, buf, nbytes, 0, offset);
+
+  int oldtype = LIBC_CANCEL_ASYNC ();
+  ssize_t result = INLINE_SYSCALL (pread, 5, fd, buf, nbytes, 0, offset);
+  LIBC_CANCEL_RESET (oldtype);
+  return result; 
 }
 
 strong_alias (__libc_pread, __pread)
