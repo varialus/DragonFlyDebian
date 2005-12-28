@@ -1,0 +1,1258 @@
+Author: aurel32
+Status: in BTS
+
+diff -u gnat-3.15p/debian/rules gnat-3.15p/debian/rules
+--- gnat-3.15p/debian/rules
++++ gnat-3.15p/debian/rules
+@@ -55,6 +55,7 @@
+ 	fi
+ 
+ config-stamp: patch-stamp
++	cp -f /usr/share/misc/config.{guess,sub} .
+ 	CC=gnatgcc ./configure --prefix=/usr --host=$(OS) --target=$(OS)
+ 	cd ada && touch treeprs.ads a-einfo.h a-sinfo.h nmake.adb nmake.ads
+ 	: # Prevent running autoheader, which isn't necessary
+@@ -293,6 +294,7 @@
+ 	-$(MAKE) distclean
+ 	rm -f install
+ 	rm -f *.so *.so.*
++	rm -f config.{guess,sub}
+ 	dh_clean
+ 
+ install: DH_OPTIONS=
+diff -u gnat-3.15p/debian/control gnat-3.15p/debian/control
+--- gnat-3.15p/debian/control
++++ gnat-3.15p/debian/control
+@@ -4,11 +4,11 @@
+ Section: devel
+ Priority: optional
+ Standards-Version: 3.6.2
+-Build-Depends: gnat (>=3.14), gnat (<<3.16), debhelper (>=4.1)
++Build-Depends: gnat (>=3.14), gnat (<<3.16), debhelper (>=4.1), autotools-dev
+ 
+ Package: gnat
+-Architecture: i386 sparc powerpc
+-Depends: libc6-dev, binutils, libgnat-3.15p-1 (=${Source-Version}), libgnatprj-3.15p (=${Source-Version})
++Architecture: i386 kfreebsd-i386 sparc powerpc
++Depends: libc6-dev | lic0.1-dev | libc-dev, binutils, libgnat-3.15p-1 (=${Source-Version}), libgnatprj-3.15p (=${Source-Version})
+ Recommends: ada-reference-manual, ada-mode, gnat-gps, ${gnat-gdb}
+ Suggests: gnat-doc, gnat-glade, gnade-dev, adabrowse, asis-programs, gch, libflorist-3.15p-1-dev, libgtkada2-dev, libcharles0-dev, libxmlada1-dev, libaunit-dev, libopentoken-dev, libaws-dev, libadabindx-dev, libtexttools-dev
+ Conflicts: gnat-3.2, gnat-3.3, gnat-3.4, gnat-4.0, gnat-4.1
+@@ -38,16 +38,16 @@
+  FSF version is available in packages gnat-3.3, gnat-3.4 and gnat-4.0.
+ 
+ Package: libgnat-3.15p-1
+-Architecture: i386 sparc powerpc
++Architecture: i386 kfreebsd-i386 sparc powerpc
+ Section: libs
+-Depends: libc6, libgnatprj-3.15p (=${Source-Version})
++Depends: libc6 | libc0.1-dev | libc-dev, libgnatprj-3.15p (=${Source-Version})
+ Description: The GNU Ada 95 compiler runtime libraries
+  This package contains the libraries needed to run applications compiled with
+  GNAT, the GNU Ada 95 compiler. If you want to develop or compile Ada
+  applications, you will need to use the `gnat' package.
+ 
+ Package: libgnatprj-dev
+-Architecture: i386 sparc powerpc
++Architecture: i386 kfreebsd-i386 sparc powerpc
+ Section: libdevel
+ Depends: libgnatprj-3.15p (=${Source-Version}), gnat (=${Source-Version})
+ Description: GNU Ada Project Manager development files
+@@ -61,7 +61,7 @@
+  that understand GNAT project files.
+ 
+ Package: libgnatprj-3.15p
+-Architecture: i386 sparc powerpc
++Architecture: i386 kfreebsd-i386 sparc powerpc
+ Section: libs
+ Depends: libgnat-3.15p-1 (=${Source-Version}), libgnatvsn-3.15p (=${Source-Version})
+ Description: GNU Ada Project Manager
+@@ -75,7 +75,7 @@
+  This package contains the run-time shared library.
+ 
+ Package: libgnatvsn-dev
+-Architecture: i386 sparc powerpc
++Architecture: i386 kfreebsd-i386 sparc powerpc
+ Section: libdevel
+ Depends: gnat $(=${Source-Version}), libgnatvsn-3.15p (=${Source-Version})
+ Description: GNU Ada compiler version library - development files
+@@ -86,7 +86,7 @@
+  This package contains the development files and static library.
+ 
+ Package: libgnatvsn-3.15p
+-Architecture: i386 sparc powerpc
++Architecture: i386 kfreebsd-i386 sparc powerpc
+ Section: libs
+ Depends: libgnat-3.15p-1 (=${Source-Version})
+ Description: GNU Ada compiler version library
+diff -u gnat-3.15p/debian/00-makefile.patch gnat-3.15p/debian/00-makefile.patch
+--- gnat-3.15p/debian/00-makefile.patch
++++ gnat-3.15p/debian/00-makefile.patch
+@@ -1,7 +1,7 @@
+ Fix the build process so we build the static and shared libraries
+ properly.
+ 
+-Add support for powerpc-*-linux and sparc-*-linux.
++Add support for powerpc-*-linux, sparc-*-linux and i486-*-kfreebsd-gnu
+ 
+ Add support for symbolic tracebacks.
+ 
+@@ -61,7 +61,7 @@
+  
+    ifeq ($(strip $(filter-out fsu FSU,$(THREAD_KIND))),)
+      LIBGNAT_TARGET_PAIRS = \
+-@@ -820,6 +818,44 @@
++@@ -820,6 +818,67 @@
+    endif
+  endif
+  
+@@ -103,10 +103,33 @@
+ +  EXTRA_GNATRTL_NONTASKING_OBJS=convert_addresses.o
+ +endif
+ +
+++ifeq ($(strip $(filter-out %86 kfreebsd%,$(arch) $(osys))),)
+++  LIBGNAT_TARGET_PAIRS = \
+++  a-intnam.ads<45intnam.ads \
+++  g-soccon.ads<35soccon.ads \
+++  a-numaux.adb<86numaux.adb \
+++  a-numaux.ads<86numaux.ads \
+++  s-inmaop.adb<7sinmaop.adb \
+++  s-intman.adb<5lintman.adb \
+++  s-mastop.adb<5omastop.adb \
+++  s-osinte.adb<5iosinte.adb \
+++  s-osinte.ads<57osinte.ads \
+++  s-osprim.adb<7sosprim.adb \
+++  s-taprop.adb<5itaprop.adb \
+++  s-taspri.ads<5itaspri.ads \
+++  s-tpopsp.adb<5atpopsp.adb \
+++  system.ads<56system.ads
+++
+++  TOOLS_TARGET_PAIRS=mlib-tgt.adb<5lml-tgt.adb
+++  THREADSLIB=-lpthread
+++  GNATLIB_SHARED=gnatlib-shared-dual
+++  GMEM_LIB=gmemlib
+++endif
+++
+  ifeq ($(strip $(filter-out mips sgi irix%,$(targ))),)
+    ifeq ($(strip $(filter-out mips sgi irix6%,$(targ))),)
+      LIBGNAT_TARGET_PAIRS = \
+-@@ -867,7 +903,6 @@
++@@ -867,7 +926,6 @@
+    TGT_LIB=-lexc
+    MISCLIB=-lexc
+    SO_OPTS=-Wl,-all,-set_version,sgi1.0,-update_registry,../so_locations,-soname,
+@@ -114,7 +137,7 @@
+  endif
+  
+  ifeq ($(strip $(filter-out hppa% hp hpux%,$(targ))),)
+-@@ -889,7 +924,7 @@
++@@ -889,7 +947,7 @@
+    TGT_LIB=/usr/lib/libcl.a
+    THREADSLIB=-lpthread
+    MISCLIB=
+@@ -123,7 +146,7 @@
+    soext=.sl
+    SO_OPTS=-Wl,+h,
+    GNATLIB_SHARED=gnatlib-shared-dual
+-@@ -1041,11 +1076,12 @@
++@@ -1041,11 +1099,12 @@
+    system.ads<5asystem.ads
+  
+    MISCLIB=
+@@ -138,7 +161,7 @@
+  # Warning - Also update Makefile.vms
+  ifeq ($(strip $(filter-out alpha% dec vms% openvms% alphavms%,$(targ))),)
+  
+-@@ -1138,7 +1174,7 @@
++@@ -1138,7 +1197,7 @@
+    system.ads<5wsystem.ads
+  
+    MISCLIB = -lwsock32
+@@ -147,7 +170,7 @@
+    GMEM_LIB=gmemlib
+    EXTRA_GNATTOOLS = ../../gnatdll$(exeext)
+    EXTRA_GNATRTL_NONTASKING_OBJS = g-regist.o
+-@@ -1687,7 +1723,7 @@
++@@ -1687,7 +1746,7 @@
+  # sources using the same mechanism as for gnatlib. The other sources are 
+  # accessed using the vpath directive below
+  
+@@ -156,7 +179,7 @@
+  	-$(RM) tools/*
+  	-$(RMDIR) tools
+  	-$(MKDIR) tools
+-@@ -1770,64 +1806,64 @@
++@@ -1770,64 +1829,64 @@
+  ../../gnatchop$(exeext):
+  	$(GNATMAKE) -c $(ADA_INCLUDES) gnatchop --GCC="$(CC) $(ALL_ADAFLAGS)"
+  	$(GNATBIND) $(ADA_INCLUDES) $(GNATBIND_FLAGS) gnatchop 
+@@ -233,7 +256,7 @@
+  
+  gnatmake-re:
+  	$(GNATMAKE) $(ADA_INCLUDES) -u sdefault --GCC="$(CC) $(MOST_ADA_FLAGS)"
+-@@ -1957,12 +1993,12 @@
++@@ -1957,12 +2016,12 @@
+  
+  gnatlib: ../stamp-gnatlib1 ../stamp-gnatlib2
+  	../xgcc -B../ -dD -E ../config.h $(INCLUDES) > rts/config.h
+@@ -248,7 +271,7 @@
+  	        ADA_INCLUDES="$(ADA_INCLUDES_FOR_SUBDIR)" \
+                  CFLAGS="$(GNATLIBCFLAGS)" \
+  	        ADAFLAGS="$(GNATLIBFLAGS)" \
+-@@ -2105,21 +2141,31 @@
++@@ -2105,21 +2164,31 @@
+  	    system.ads<5ysystem.ads" internal-ravenlib
+  
+  # Warning: this target assumes that LIBRARY_VERSION has been set correctly.
+@@ -288,7 +311,7 @@
+  	cd rts; $(LN) libgnat-$(LIBRARY_VERSION)$(soext) libgnat$(soext)
+  	cd rts; $(LN) libgnarl-$(LIBRARY_VERSION)$(soext) libgnarl$(soext)
+  
+-@@ -2319,6 +2365,7 @@
++@@ -2319,6 +2388,7 @@
+  	  -fno-omit-frame-pointer $< $(OUTPUT_OPTION)
+  
+  mkdir.o     : mkdir.c
+only in patch2:
+unchanged:
+--- gnat-3.15p.orig/debian/02-kfreebsd-gnu.patch
++++ gnat-3.15p/debian/02-kfreebsd-gnu.patch
+@@ -0,0 +1,1038 @@
++Add support for i486-*-kfreebsd-gnu. Backported from gcc-4.1 via gcc-4.0,
++gcc-3.4 and gcc-3.3.
++
++--- configure.in.old
+++++ configure.in
++@@ -854,6 +854,19 @@
++  			thread_file='posix'
++  		fi
++ 		;;
+++	i[[34567]]86-*-kfreebsd*-gnu)	# Intel 80386's running GNU/kFreeBSD
+++		xm_file=i386/xm-linux.h # with ELF format using glibc 2
+++		xmake_file=x-linux
+++		tm_file=i386/kfreebsd-gnu.h
+++		tmake_file="t-linux i386/t-crtstuff"
+++		extra_parts="crtbegin.o crtbeginS.o crtend.o crtendS.o"
+++		fixincludes=Makefile.in # The headers are ok already.
+++		broken_install=yes
+++		gnu_ld=yes
+++ 		if [[ x$enable_threads = xyes ]]; then
+++ 			thread_file='posix'
+++ 		fi
+++		;;
++ 	i[[34567]]86-*-gnu*)
++ 		;;
++ 	i[[34567]]86-go32-msdos | i[[34567]]86-*-go32*)
++@@ -2541,7 +2554,7 @@
++ 	esac
++ 
++ 	case $machine in
++-	*-*-linux-gnu*)
+++	*-*-linux-gnu* | *-*-kfreebsd*-gnu)
++ 	        ;; # Existing Linux/GNU systems do not use the GNU setup.
++ 	*-*-gnu*)
++ 		# On the GNU system, the setup is just about the same on
++--- configure.old	2005-12-27 00:18:00.000000000 +0100
+++++ configure	2005-12-27 00:19:32.000000000 +0100
++@@ -3348,6 +3348,19 @@
++  			thread_file='posix'
++  		fi
++ 		;;
+++	i[34567]86-*-kfreebsd-gnu*)	# Intel 80386's running GNU/kFreeBSD
+++		xm_file=i386/xm-linux.h # with ELF format using glibc 2
+++		xmake_file=x-linux
+++		tm_file=i386/kfreebsd-gnu.h
+++		tmake_file="t-linux i386/t-crtstuff"
+++		extra_parts="crtbegin.o crtbeginS.o crtend.o crtendS.o"
+++		fixincludes=Makefile.in # The headers are ok already.
+++		broken_install=yes
+++		gnu_ld=yes
+++ 		if [ x$enable_threads = xyes ]; then
+++ 			thread_file='posix'
+++ 		fi
+++		;;
++ 	i[34567]86-*-gnu*)
++ 		;;
++ 	i[34567]86-go32-msdos | i[34567]86-*-go32*)
++@@ -5035,7 +5048,7 @@
++ 	esac
++ 
++ 	case $machine in
++-	*-*-linux-gnu*)
+++	*-*-linux-gnu* | *-*-kfreebsd*-gnu)
++ 	        ;; # Existing Linux/GNU systems do not use the GNU setup.
++ 	*-*-gnu*)
++ 		# On the GNU system, the setup is just about the same on
++--- config.old/i386/kfreebsd-gnu.h
+++++ config/i386/kfreebsd-gnu.h
++@@ -0,0 +1,46 @@
+++/* Definitions for Intel 386 running kFreeBSD-based GNU systems with ELF format
+++   Copyright (C) 2005
+++   Free Software Foundation, Inc.
+++   Contributed by Aurelien Jarno.
+++
+++This file is part of GNU CC.
+++
+++GCC is free software; you can redistribute it and/or modify
+++it under the terms of the GNU General Public License as published by
+++the Free Software Foundation; either version 2, or (at your option)
+++any later version.
+++
+++GCC is distributed in the hope that it will be useful,
+++but WITHOUT ANY WARRANTY; without even the implied warranty of
+++MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+++GNU General Public License for more details.
+++
+++You should have received a copy of the GNU General Public License
+++along with GCC; see the file COPYING.  If not, write to
+++the Free Software Foundation, 59 Temple Place - Suite 330,
+++Boston, MA 02111-1307, USA.  */
+++
+++#include <i386/linux.h>
+++
+++#undef CPP_PREDEFINES
+++#define CPP_PREDEFINES "-D__FreeBSD_kernel__ -D__GLIBC__ -D__ELF__ -Dunix -Asystem(unix) -Asystem(posix)"
+++
+++/* Provide a LINK_SPEC appropriate for GNU/kFreeBSD.  Here we provide support
+++   for the special GCC options -static and -shared, which allow us to
+++   link things in one of these three modes by applying the appropriate
+++   combinations of options at link-time.
+++
+++   When the -shared link option is used a final link is not being
+++   done.  */
+++
+++/* If ELF is the default format. */
+++
+++#undef	LINK_SPEC
+++#define LINK_SPEC "-m elf_i386_fbsd %{shared:-shared} \
+++  %{!shared: \
+++    %{!ibcs: \
+++      %{!static: \
+++	%{rdynamic:-export-dynamic} \
+++	%{!dynamic-linker:-dynamic-linker /lib/ld.so.1}} \
+++	%{static:-static}}}"
+++
++--- ada.old/45intnam.ads	2005-12-26 17:22:28.000000000 +0100
+++++ ada/45intnam.ads	2005-12-26 17:21:50.000000000 +0100
++@@ -0,0 +1,139 @@
+++------------------------------------------------------------------------------
+++--                                                                          --
+++--                GNU ADA RUN-TIME LIBRARY (GNARL) COMPONENTS               --
+++--                                                                          --
+++--                   A D A . I N T E R R U P T S . N A M E S                --
+++--                                                                          --
+++--                                  S p e c                                 --
+++--                                                                          --
+++--                             $Revision: 1.7 $
+++--                                                                          --
+++--           Copyright (C) 1991-2002 Free Software Foundation, Inc.         --
+++--                                                                          --
+++-- GNARL is free software; you can  redistribute it  and/or modify it under --
+++-- terms of the  GNU General Public License as published  by the Free Soft- --
+++-- ware  Foundation;  either version 2,  or (at your option) any later ver- --
+++-- sion. GNARL is distributed in the hope that it will be useful, but WITH- --
+++-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+++-- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
+++-- for  more details.  You should have  received  a copy of the GNU General --
+++-- Public License  distributed with GNARL; see file COPYING.  If not, write --
+++-- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
+++-- MA 02111-1307, USA.                                                      --
+++--                                                                          --
+++-- As a special exception,  if other files  instantiate  generics from this --
+++-- unit, or you link  this unit with other files  to produce an executable, --
+++-- this  unit  does not  by itself cause  the resulting  executable  to  be --
+++-- covered  by the  GNU  General  Public  License.  This exception does not --
+++-- however invalidate  any other reasons why  the executable file  might be --
+++-- covered by the  GNU Public License.                                      --
+++--                                                                          --
+++-- GNARL was developed by the GNARL team at Florida State University. It is --
+++-- now maintained by Ada Core Technologies Inc. in cooperation with Florida --
+++-- State University (http://www.gnat.com).                                  --
+++--                                                                          --
+++------------------------------------------------------------------------------
+++
+++--  This is the FreeBSD THREADS version of this package
+++
+++with System.OS_Interface;
+++--  used for names of interrupts
+++
+++package Ada.Interrupts.Names is
+++
+++   SIGHUP : constant Interrupt_ID :=
+++     System.OS_Interface.SIGHUP;      --  hangup
+++
+++   SIGINT : constant Interrupt_ID :=
+++     System.OS_Interface.SIGINT;      --  interrupt (rubout)
+++
+++   SIGQUIT : constant Interrupt_ID :=
+++     System.OS_Interface.SIGQUIT;     --  quit (ASCD FS)
+++
+++   SIGILL : constant Interrupt_ID :=
+++     System.OS_Interface.SIGILL;      --  illegal instruction (not reset)
+++
+++   SIGTRAP : constant Interrupt_ID :=
+++     System.OS_Interface.SIGTRAP;     --  trace trap (not reset)
+++
+++   SIGIOT : constant Interrupt_ID :=
+++     System.OS_Interface.SIGIOT;      --  IOT instruction
+++
+++   SIGABRT : constant Interrupt_ID := --  used by abort,
+++     System.OS_Interface.SIGABRT;     --  replace SIGIOT in the  future
+++
+++   SIGFPE : constant Interrupt_ID :=
+++     System.OS_Interface.SIGFPE;      --  floating point exception
+++
+++   SIGKILL : constant Interrupt_ID :=
+++     System.OS_Interface.SIGKILL;     --  kill (cannot be caught or ignored)
+++
+++   SIGBUS : constant Interrupt_ID :=
+++     System.OS_Interface.SIGBUS;      --  bus error
+++
+++   SIGSEGV : constant Interrupt_ID :=
+++     System.OS_Interface.SIGSEGV;     --  segmentation violation
+++
+++   SIGPIPE : constant Interrupt_ID := --  write on a pipe with
+++     System.OS_Interface.SIGPIPE;     --  no one to read it
+++
+++   SIGALRM : constant Interrupt_ID :=
+++     System.OS_Interface.SIGALRM;     --  alarm clock
+++
+++   SIGTERM : constant Interrupt_ID :=
+++     System.OS_Interface.SIGTERM;     --  software termination signal from kill
+++
+++   SIGURG : constant Interrupt_ID :=
+++     System.OS_Interface.SIGURG;      --  urgent condition on IO channel
+++
+++   SIGSTOP : constant Interrupt_ID :=
+++     System.OS_Interface.SIGSTOP;     --  stop (cannot be caught or ignored)
+++
+++   SIGTSTP : constant Interrupt_ID :=
+++     System.OS_Interface.SIGTSTP;     --  user stop requested from tty
+++
+++   SIGCONT : constant Interrupt_ID :=
+++     System.OS_Interface.SIGCONT;     --  stopped process has been continued
+++
+++   SIGCHLD : constant Interrupt_ID :=
+++     System.OS_Interface.SIGCHLD;     --  4.3BSD's/POSIX name for SIGCLD
+++
+++   SIGCLD : constant Interrupt_ID :=
+++     System.OS_Interface.SIGCLD;      --  child status change
+++
+++   SIGTTIN : constant Interrupt_ID :=
+++     System.OS_Interface.SIGTTIN;     --  background tty read attempted
+++
+++   SIGTTOU : constant Interrupt_ID :=
+++     System.OS_Interface.SIGTTOU;     --  background tty write attempted
+++
+++   SIGIO : constant Interrupt_ID :=   --  input/output possible,
+++     System.OS_Interface.SIGIO;       --  SIGPOLL alias (Solaris)
+++
+++   SIGXCPU : constant Interrupt_ID :=
+++     System.OS_Interface.SIGXCPU;     --  CPU time limit exceeded
+++
+++   SIGXFSZ : constant Interrupt_ID :=
+++     System.OS_Interface.SIGXFSZ;     --  filesize limit exceeded
+++
+++   SIGVTALRM : constant Interrupt_ID :=
+++     System.OS_Interface.SIGVTALRM;   --  virtual timer expired
+++
+++   SIGPROF : constant Interrupt_ID :=
+++     System.OS_Interface.SIGPROF;     --  profiling timer expired
+++
+++   SIGWINCH : constant Interrupt_ID :=
+++     System.OS_Interface.SIGWINCH;    --  window size change
+++
+++   SIGUSR1 : constant Interrupt_ID :=
+++     System.OS_Interface.SIGUSR1;     --  user defined signal 1
+++
+++   SIGUSR2 : constant Interrupt_ID :=
+++     System.OS_Interface.SIGUSR2;     --  user defined signal 2
+++
+++   --  Beware that the mapping of names to signals may be
+++   --  many-to-one.  There may be aliases.  Also, for all
+++   --  signal names that are not supported on the current system
+++   --  the value of the corresponding constant will be zero.
+++
+++end Ada.Interrupts.Names;
++--- ada.old/56system.ads	2005-12-26 17:39:13.000000000 +0100
+++++ ada/56system.ads	2005-12-26 17:44:01.000000000 +0100
++@@ -0,0 +1,139 @@
+++------------------------------------------------------------------------------
+++--                                                                          --
+++--                        GNAT RUN-TIME COMPONENTS                          --
+++--                                                                          --
+++--                               S Y S T E M                                --
+++--                                                                          --
+++--                                 S p e c                                  --
+++--                           (FreeBSD/x86 Version)                          --
+++--                                                                          --
+++--                            $Revision: 1.8 $                              --
+++--                                                                          --
+++--          Copyright (C) 1992-2002 Free Software Foundation, Inc.          --
+++--                                                                          --
+++-- This specification is derived from the Ada Reference Manual for use with --
+++-- GNAT. The copyright notice above, and the license provisions that follow --
+++-- apply solely to the  contents of the part following the private keyword. --
+++--                                                                          --
+++-- GNAT is free software;  you can  redistribute it  and/or modify it under --
+++-- terms of the  GNU General Public License as published  by the Free Soft- --
+++-- ware  Foundation;  either version 2,  or (at your option) any later ver- --
+++-- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+++-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+++-- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
+++-- for  more details.  You should have  received  a copy of the GNU General --
+++-- Public License  distributed with GNAT;  see file COPYING.  If not, write --
+++-- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
+++-- MA 02111-1307, USA.                                                      --
+++--                                                                          --
+++-- As a special exception,  if other files  instantiate  generics from this --
+++-- unit, or you link  this unit with other files  to produce an executable, --
+++-- this  unit  does not  by itself cause  the resulting  executable  to  be --
+++-- covered  by the  GNU  General  Public  License.  This exception does not --
+++-- however invalidate  any other reasons why  the executable file  might be --
+++-- covered by the  GNU Public License.                                      --
+++--                                                                          --
+++-- GNAT was originally developed  by the GNAT team at  New York University. --
+++-- It is now maintained by Ada Core Technologies Inc (http://www.gnat.com). --
+++--                                                                          --
+++------------------------------------------------------------------------------
+++
+++package System is
+++pragma Pure (System);
+++--  Note that we take advantage of the implementation permission to
+++--  make this unit Pure instead of Preelaborable, see RM 13.7(36)
+++
+++   type Name is (SYSTEM_NAME_GNAT);
+++   System_Name : constant Name := SYSTEM_NAME_GNAT;
+++
+++   --  System-Dependent Named Numbers
+++
+++   Min_Int               : constant := Long_Long_Integer'First;
+++   Max_Int               : constant := Long_Long_Integer'Last;
+++
+++   Max_Binary_Modulus    : constant := 2 ** Long_Long_Integer'Size;
+++   Max_Nonbinary_Modulus : constant := Integer'Last;
+++
+++   Max_Base_Digits       : constant := Long_Long_Float'Digits;
+++   Max_Digits            : constant := Long_Long_Float'Digits;
+++
+++   Max_Mantissa          : constant := 63;
+++   Fine_Delta            : constant := 2.0 ** (-Max_Mantissa);
+++
+++   Tick                  : constant := 1.0;
+++
+++   --  Storage-related Declarations
+++
+++   type Address is private;
+++   Null_Address : constant Address;
+++
+++   Storage_Unit : constant := 8;
+++   Word_Size    : constant := 32;
+++   Memory_Size  : constant := 2 ** 32;
+++
+++   --  Address comparison
+++
+++   function "<"  (Left, Right : Address) return Boolean;
+++   function "<=" (Left, Right : Address) return Boolean;
+++   function ">"  (Left, Right : Address) return Boolean;
+++   function ">=" (Left, Right : Address) return Boolean;
+++   function "="  (Left, Right : Address) return Boolean;
+++
+++   pragma Import (Intrinsic, "<");
+++   pragma Import (Intrinsic, "<=");
+++   pragma Import (Intrinsic, ">");
+++   pragma Import (Intrinsic, ">=");
+++   pragma Import (Intrinsic, "=");
+++
+++   --  Other System-Dependent Declarations
+++
+++   type Bit_Order is (High_Order_First, Low_Order_First);
+++   Default_Bit_Order : constant Bit_Order := Low_Order_First;
+++
+++   --  Priority-related Declarations (RM D.1)
+++
+++   Max_Priority           : constant Positive := 30;
+++   Max_Interrupt_Priority : constant Positive := 31;
+++
+++   subtype Any_Priority       is Integer      range  0 .. 31;
+++   subtype Priority           is Any_Priority range  0 .. 30;
+++   subtype Interrupt_Priority is Any_Priority range 31 .. 31;
+++
+++   Default_Priority : constant Priority := 15;
+++
+++private
+++
+++   type Address is mod Memory_Size;
+++   Null_Address : constant Address := 0;
+++
+++   --------------------------------------
+++   -- System Implementation Parameters --
+++   --------------------------------------
+++
+++   --  These parameters provide information about the target that is used
+++   --  by the compiler. They are in the private part of System, where they
+++   --  can be accessed using the special circuitry in the Targparm unit
+++   --  whose source should be consulted for more detailed descriptions
+++   --  of the individual switch values.
+++
+++   AAMP                      : constant Boolean := False;
+++   Backend_Divide_Checks     : constant Boolean := False;
+++   Backend_Overflow_Checks   : constant Boolean := False;
+++   Command_Line_Args         : constant Boolean := True;
+++   Denorm                    : constant Boolean := True;
+++   Fractional_Fixed_Ops      : constant Boolean := False;
+++   Frontend_Layout           : constant Boolean := False;
+++   Functions_Return_By_DSP   : constant Boolean := False;
+++   Long_Shifts_Inlined       : constant Boolean := True;
+++   High_Integrity_Mode       : constant Boolean := False;
+++   Machine_Overflows         : constant Boolean := False;
+++   Machine_Rounds            : constant Boolean := True;
+++   OpenVMS                   : constant Boolean := False;
+++   Signed_Zeros              : constant Boolean := True;
+++   Stack_Check_Default       : constant Boolean := False;
+++   Stack_Check_Probes        : constant Boolean := False;
+++   Use_Ada_Main_Program_Name : constant Boolean := False;
+++   ZCX_By_Default            : constant Boolean := False;
+++   GCC_ZCX_Support           : constant Boolean := False;
+++   Front_End_ZCX_Support     : constant Boolean := True;
+++end System;
++--- ada.old/57osinte.ads	2005-12-26 17:39:13.000000000 +0100
+++++ ada/57osinte.ads	2005-12-26 17:36:23.000000000 +0100
++@@ -0,0 +1,522 @@
+++------------------------------------------------------------------------------
+++--                                                                          --
+++--                GNU ADA RUN-TIME LIBRARY (GNARL) COMPONENTS               --
+++--                                                                          --
+++--                   S Y S T E M . O S _ I N T E R F A C E                  --
+++--                                                                          --
+++--                                  S p e c                                 --
+++--                                                                          --
+++--          Copyright (C) 1992-2001 Free Software Foundation, Inc.          --
+++--                                                                          --
+++-- GNARL is free software; you can  redistribute it  and/or modify it under --
+++-- terms of the  GNU General Public License as published  by the Free Soft- --
+++-- ware  Foundation;  either version 2,  or (at your option) any later ver- --
+++-- sion. GNARL is distributed in the hope that it will be useful, but WITH- --
+++-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+++-- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
+++-- for  more details.  You should have  received  a copy of the GNU General --
+++-- Public License  distributed with GNARL; see file COPYING.  If not, write --
+++-- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
+++-- MA 02111-1307, USA.                                                      --
+++--                                                                          --
+++-- As a special exception,  if other files  instantiate  generics from this --
+++-- unit, or you link  this unit with other files  to produce an executable, --
+++-- this  unit  does not  by itself cause  the resulting  executable  to  be --
+++-- covered  by the  GNU  General  Public  License.  This exception does not --
+++-- however invalidate  any other reasons why  the executable file  might be --
+++-- covered by the  GNU Public License.                                      --
+++--                                                                          --
+++-- GNARL was developed by the GNARL team at Florida State University.       --
+++-- Extensive contributions were provided by Ada Core Technologies Inc.      --
+++--                                                                          --
+++------------------------------------------------------------------------------
+++
+++--  This is the GNU/kFreeBSD (GNU/LinuxThreads) version of this package.
+++
+++--  This package encapsulates all direct interfaces to OS services
+++--  that are needed by children of System.
+++
+++--  PLEASE DO NOT add any with-clauses to this package
+++--  or remove the pragma Elaborate_Body.
+++--  It is designed to be a bottom-level (leaf) package.
+++
+++with Interfaces.C;
+++package System.OS_Interface is
+++   pragma Preelaborate;
+++
+++   pragma Linker_Options ("-lpthread");
+++
+++   subtype int            is Interfaces.C.int;
+++   subtype char           is Interfaces.C.char;
+++   subtype short          is Interfaces.C.short;
+++   subtype long           is Interfaces.C.long;
+++   subtype unsigned       is Interfaces.C.unsigned;
+++   subtype unsigned_short is Interfaces.C.unsigned_short;
+++   subtype unsigned_long  is Interfaces.C.unsigned_long;
+++   subtype unsigned_char  is Interfaces.C.unsigned_char;
+++   subtype plain_char     is Interfaces.C.plain_char;
+++   subtype size_t         is Interfaces.C.size_t;
+++
+++   -----------
+++   -- Errno --
+++   -----------
+++
+++   function errno return int;
+++   pragma Import (C, errno, "__get_errno");
+++
+++   EAGAIN   : constant := 35;
+++   EINTR    : constant := 4;
+++   EINVAL   : constant := 22;
+++   ENOMEM   : constant := 12;
+++   EPERM    : constant := 1;
+++   ETIMEDOUT    : constant := 60;
+++
+++   -------------
+++   -- Signals --
+++   -------------
+++
+++   Max_Interrupt : constant := 128;
+++   type Signal is new int range 0 .. Max_Interrupt;
+++   for Signal'Size use int'Size;
+++
+++   SIGHUP     : constant := 1; --  hangup
+++   SIGINT     : constant := 2; --  interrupt (rubout)
+++   SIGQUIT    : constant := 3; --  quit (ASCD FS)
+++   SIGILL     : constant := 4; --  illegal instruction (not reset)
+++   SIGTRAP    : constant := 5; --  trace trap (not reset)
+++   SIGIOT     : constant := 6; --  IOT instruction
+++   SIGABRT    : constant := 6; --  used by abort, replace SIGIOT in the  future
+++   SIGEMT     : constant := 7; --  EMT instruction
+++   SIGFPE     : constant := 8; --  floating point exception
+++   SIGKILL    : constant := 9; --  kill (cannot be caught or ignored)
+++   SIGBUS     : constant := 10; --  bus error
+++   SIGSEGV    : constant := 11; --  segmentation violation
+++   SIGSYS     : constant := 12; --  bad argument to system call
+++   SIGPIPE    : constant := 13; --  write on a pipe with no one to read it
+++   SIGALRM    : constant := 14; --  alarm clock
+++   SIGTERM    : constant := 15; --  software termination signal from kill
+++   SIGURG     : constant := 16; --  urgent condition on IO channel
+++   SIGSTOP    : constant := 17; --  stop (cannot be caught or ignored)
+++   SIGTSTP    : constant := 18; --  user stop requested from tty
+++   SIGCONT    : constant := 19; --  stopped process has been continued
+++   SIGCLD     : constant := 20; --  alias for SIGCHLD
+++   SIGCHLD    : constant := 20; --  child status change
+++   SIGTTIN    : constant := 21; --  background tty read attempted
+++   SIGTTOU    : constant := 22; --  background tty write attempted
+++   SIGIO      : constant := 23; --  I/O possible (Solaris SIGPOLL alias)
+++   SIGXCPU    : constant := 24; --  CPU time limit exceeded
+++   SIGXFSZ    : constant := 25; --  filesize limit exceeded
+++   SIGVTALRM  : constant := 26; --  virtual timer expired
+++   SIGPROF    : constant := 27; --  profiling timer expired
+++   SIGWINCH   : constant := 28; --  window size change
+++   SIGINFO    : constant := 29; --  information request (NetBSD/FreeBSD)
+++   SIGUSR1    : constant := 30; --  user defined signal 1
+++   SIGUSR2    : constant := 31; --  user defined signal 2
+++   SIGLTHRRES : constant := 32; --  GNU/LinuxThreads restart signal
+++   SIGLTHRCAN : constant := 33; --  GNU/LinuxThreads cancel signal
+++   SIGLTHRDBG : constant := 34; --  GNU/LinuxThreads debugger signal
+++
+++   SIGADAABORT : constant := SIGABRT;
+++   --  Change this if you want to use another signal for task abort.
+++   --  SIGTERM might be a good one.
+++
+++   type Signal_Set is array (Natural range <>) of Signal;
+++
+++   Unmasked    : constant Signal_Set := (
+++      SIGTRAP,
+++      --  To enable debugging on multithreaded applications, mark SIGTRAP to
+++      --  be kept unmasked.
+++
+++      SIGBUS,
+++
+++      SIGTTIN, SIGTTOU, SIGTSTP,
+++      --  Keep these three signals unmasked so that background processes
+++      --  and IO behaves as normal "C" applications
+++
+++      SIGPROF,
+++      --  To avoid confusing the profiler
+++
+++      SIGKILL, SIGSTOP,
+++      --  These two signals actually cannot be masked;
+++      --  POSIX simply won't allow it.
+++
+++      SIGLTHRRES, SIGLTHRCAN, SIGLTHRDBG);
+++      --  These three signals are used by GNU/LinuxThreads starting from
+++      --  glibc 2.1 (future 2.2).
+++
+++   Reserved    : constant Signal_Set :=
+++   --  I am not sure why the following signal is reserved.
+++   --  I guess they are not supported by this version of GNU/kFreeBSD.
+++     (0 .. 0 => SIGVTALRM);
+++
+++   type sigset_t is private;
+++
+++   function sigaddset (set : access sigset_t; sig : Signal) return int;
+++   pragma Import (C, sigaddset, "sigaddset");
+++
+++   function sigdelset (set : access sigset_t; sig : Signal) return int;
+++   pragma Import (C, sigdelset, "sigdelset");
+++
+++   function sigfillset (set : access sigset_t) return int;
+++   pragma Import (C, sigfillset, "sigfillset");
+++
+++   function sigismember (set : access sigset_t; sig : Signal) return int;
+++   pragma Import (C, sigismember, "sigismember");
+++
+++   function sigemptyset (set : access sigset_t) return int;
+++   pragma Import (C, sigemptyset, "sigemptyset");
+++
+++   --  sigcontext is architecture dependent, so define it private
+++   type struct_sigcontext is private;
+++
+++   type struct_sigaction is record
+++      sa_handler : System.Address;
+++      sa_flags   : int;
+++      sa_mask    : sigset_t;
+++   end record;
+++   pragma Convention (C, struct_sigaction);
+++   type Machine_State is record
+++      eip : unsigned_long;
+++      ebx : unsigned_long;
+++      esp : unsigned_long;
+++      ebp : unsigned_long;
+++      esi : unsigned_long;
+++      edi : unsigned_long;
+++   end record;
+++   type Machine_State_Ptr is access all Machine_State;
+++   type struct_sigaction_ptr is access all struct_sigaction;
+++
+++   SIG_BLOCK   : constant := 1;
+++   SIG_UNBLOCK : constant := 2;
+++   SIG_SETMASK : constant := 3;
+++
+++   SIG_DFL : constant := 0;
+++   SIG_IGN : constant := 1;
+++
+++   function sigaction
+++     (sig  : Signal;
+++      act  : struct_sigaction_ptr;
+++      oact : struct_sigaction_ptr) return int;
+++   pragma Import (C, sigaction, "sigaction");
+++
+++   ----------
+++   -- Time --
+++   ----------
+++
+++   type timespec is private;
+++
+++   function To_Duration (TS : timespec) return Duration;
+++   pragma Inline (To_Duration);
+++
+++   function To_Timespec (D : Duration) return timespec;
+++   pragma Inline (To_Timespec);
+++
+++   type struct_timeval is private;
+++
+++   function To_Duration (TV : struct_timeval) return Duration;
+++   pragma Inline (To_Duration);
+++
+++   function To_Timeval (D : Duration) return struct_timeval;
+++   pragma Inline (To_Timeval);
+++
+++   function gettimeofday
+++     (tv : access struct_timeval;
+++      tz : System.Address := System.Null_Address) return int;
+++   pragma Import (C, gettimeofday, "gettimeofday");
+++
+++   -------------------------
+++   -- Priority Scheduling --
+++   -------------------------
+++
+++   SCHED_FIFO  : constant := 1;
+++   SCHED_OTHER : constant := 2;
+++   SCHED_RR    : constant := 3;
+++
+++   -------------
+++   -- Process --
+++   -------------
+++
+++   type pid_t is private;
+++
+++   function kill (pid : pid_t; sig : Signal) return int;
+++   pragma Import (C, kill, "kill");
+++
+++   function getpid return pid_t;
+++   pragma Import (C, getpid, "getpid");
+++
+++   -------------
+++   -- Threads --
+++   -------------
+++
+++   type Thread_Body is access
+++     function (arg : System.Address) return System.Address;
+++   type pthread_t           is private;
+++   subtype Thread_Id        is pthread_t;
+++
+++   type pthread_mutex_t     is limited private;
+++   type pthread_cond_t      is limited private;
+++   type pthread_attr_t      is limited private;
+++   type pthread_mutexattr_t is limited private;
+++   type pthread_condattr_t  is limited private;
+++   type pthread_key_t       is private;
+++
+++   PTHREAD_CREATE_DETACHED : constant := 1;
+++
+++   -----------
+++   -- Stack --
+++   -----------
+++
+++   function Get_Stack_Base (thread : pthread_t) return Address;
+++   pragma Inline (Get_Stack_Base);
+++   --  This is a dummy procedure to share some GNULLI files
+++
+++   ---------------------------------------
+++   -- Nonstandard Thread Initialization --
+++   ---------------------------------------
+++
+++   procedure pthread_init;
+++   pragma Inline (pthread_init);
+++   --  This is a dummy procedure to share some GNULLI files
+++
+++   -------------------------
+++   -- POSIX.1c  Section 3 --
+++   -------------------------
+++
+++   function sigwait (set : access sigset_t; sig : access Signal) return int;
+++   pragma Import (C, sigwait, "sigwait");
+++
+++   function pthread_kill (thread : pthread_t; sig : Signal) return int;
+++   pragma Import (C, pthread_kill, "pthread_kill");
+++
+++   type sigset_t_ptr is access all sigset_t;
+++
+++   function pthread_sigmask
+++     (how  : int;
+++      set  : sigset_t_ptr;
+++      oset : sigset_t_ptr) return int;
+++   pragma Import (C, pthread_sigmask, "pthread_sigmask");
+++
+++   --------------------------
+++   -- POSIX.1c  Section 11 --
+++   --------------------------
+++
+++   function pthread_mutexattr_init
+++     (attr : access pthread_mutexattr_t) return int;
+++   pragma Import (C, pthread_mutexattr_init, "pthread_mutexattr_init");
+++
+++   function pthread_mutexattr_destroy
+++     (attr : access pthread_mutexattr_t) return int;
+++   pragma Import (C, pthread_mutexattr_destroy, "pthread_mutexattr_destroy");
+++
+++   function pthread_mutex_init
+++     (mutex : access pthread_mutex_t;
+++      attr  : access pthread_mutexattr_t) return int;
+++   pragma Import (C, pthread_mutex_init, "pthread_mutex_init");
+++
+++   function pthread_mutex_destroy (mutex : access pthread_mutex_t) return int;
+++   pragma Import (C, pthread_mutex_destroy, "pthread_mutex_destroy");
+++
+++   function pthread_mutex_lock (mutex : access pthread_mutex_t) return int;
+++   pragma Import (C, pthread_mutex_lock, "pthread_mutex_lock");
+++
+++   function pthread_mutex_unlock (mutex : access pthread_mutex_t) return int;
+++   pragma Import (C, pthread_mutex_unlock, "pthread_mutex_unlock");
+++
+++   function pthread_condattr_init
+++     (attr : access pthread_condattr_t) return int;
+++   pragma Import (C, pthread_condattr_init, "pthread_condattr_init");
+++
+++   function pthread_condattr_destroy
+++     (attr : access pthread_condattr_t) return int;
+++   pragma Import (C, pthread_condattr_destroy, "pthread_condattr_destroy");
+++
+++   function pthread_cond_init
+++     (cond : access pthread_cond_t;
+++      attr : access pthread_condattr_t) return int;
+++   pragma Import (C, pthread_cond_init, "pthread_cond_init");
+++
+++   function pthread_cond_destroy (cond : access pthread_cond_t) return int;
+++   pragma Import (C, pthread_cond_destroy, "pthread_cond_destroy");
+++
+++   function pthread_cond_signal (cond : access pthread_cond_t) return int;
+++   pragma Import (C, pthread_cond_signal, "pthread_cond_signal");
+++
+++   function pthread_cond_wait
+++     (cond  : access pthread_cond_t;
+++      mutex : access pthread_mutex_t) return int;
+++   pragma Import (C, pthread_cond_wait, "pthread_cond_wait");
+++
+++   function pthread_cond_timedwait
+++     (cond    : access pthread_cond_t;
+++      mutex   : access pthread_mutex_t;
+++      abstime : access timespec) return int;
+++   pragma Import (C, pthread_cond_timedwait, "pthread_cond_timedwait");
+++
+++   Relative_Timed_Wait : constant Boolean := False;
+++   --  pthread_cond_timedwait requires an absolute delay time
+++
+++   --------------------------
+++   -- POSIX.1c  Section 13 --
+++   --------------------------
+++
+++   type struct_sched_param is record
+++      sched_priority : int;  --  scheduling priority
+++   end record;
+++   pragma Convention (C, struct_sched_param);
+++
+++   function pthread_setschedparam
+++     (thread : pthread_t;
+++      policy : int;
+++      param  : access struct_sched_param) return int;
+++   pragma Import (C, pthread_setschedparam, "pthread_setschedparam");
+++
+++   function pthread_attr_setschedpolicy
+++     (attr   : access pthread_attr_t;
+++      policy : int) return int;
+++   pragma Import
+++     (C, pthread_attr_setschedpolicy, "pthread_attr_setschedpolicy");
+++
+++   function sched_yield return int;
+++   pragma Import (C, sched_yield, "sched_yield");
+++
+++   ---------------------------
+++   -- P1003.1c - Section 16 --
+++   ---------------------------
+++
+++   function pthread_attr_init
+++     (attributes : access pthread_attr_t) return int;
+++   pragma Import (C, pthread_attr_init, "pthread_attr_init");
+++
+++   function pthread_attr_destroy
+++     (attributes : access pthread_attr_t) return int;
+++   pragma Import (C, pthread_attr_destroy, "pthread_attr_destroy");
+++
+++   function pthread_attr_setdetachstate
+++     (attr        : access pthread_attr_t;
+++      detachstate : int) return int;
+++   pragma Import
+++     (C, pthread_attr_setdetachstate, "pthread_attr_setdetachstate");
+++
+++   function pthread_attr_setstacksize
+++     (attr      : access pthread_attr_t;
+++      stacksize : size_t) return int;
+++   pragma Import (C, pthread_attr_setstacksize, "pthread_attr_setstacksize");
+++
+++   function pthread_create
+++     (thread        : access pthread_t;
+++      attributes    : access pthread_attr_t;
+++      start_routine : Thread_Body;
+++      arg           : System.Address) return int;
+++   pragma Import (C, pthread_create, "pthread_create");
+++
+++   procedure pthread_exit (status : System.Address);
+++   pragma Import (C, pthread_exit, "pthread_exit");
+++
+++   function pthread_self return pthread_t;
+++   pragma Import (C, pthread_self, "pthread_self");
+++
+++   --------------------------
+++   -- POSIX.1c  Section 17 --
+++   --------------------------
+++
+++   function pthread_setspecific
+++     (key   : pthread_key_t;
+++      value : System.Address) return int;
+++   pragma Import (C, pthread_setspecific, "pthread_setspecific");
+++
+++   function pthread_getspecific (key : pthread_key_t) return System.Address;
+++   pragma Import (C, pthread_getspecific, "pthread_getspecific");
+++
+++   type destructor_pointer is access procedure (arg : System.Address);
+++
+++   function pthread_key_create
+++     (key        : access pthread_key_t;
+++      destructor : destructor_pointer) return int;
+++   pragma Import (C, pthread_key_create, "pthread_key_create");
+++
+++private
+++
+++   type sigset_t is array (1 .. 4) of unsigned;
+++
+++   --  In FreeBSD the component sa_handler turns out to
+++   --  be one a union type, and the selector is a macro:
+++   --  #define sa_handler __sigaction_u._handler
+++   --  #define sa_sigaction __sigaction_u._sigaction
+++
+++   --  Should we add a signal_context type here ?
+++   --  How could it be done independent of the CPU architecture ?
+++   --  sigcontext type is opaque, so it is architecturally neutral.
+++   --  It is always passed as an access type, so define it as an empty record
+++   --  since the contents are not used anywhere.
+++   type struct_sigcontext is null record;
+++   pragma Convention (C, struct_sigcontext);
+++
+++   type pid_t is new int;
+++
+++   type time_t is new long;
+++
+++   type timespec is record
+++      tv_sec  : time_t;
+++      tv_nsec : long;
+++   end record;
+++   pragma Convention (C, timespec);
+++
+++   type struct_timeval is record
+++      tv_sec  : time_t;
+++      tv_usec : time_t;
+++   end record;
+++   pragma Convention (C, struct_timeval);
+++
+++   type pthread_attr_t is record
+++      detachstate   : int;
+++      schedpolicy   : int;
+++      schedparam    : struct_sched_param;
+++      inheritsched  : int;
+++      scope         : int;
+++      guardsize     : size_t;
+++      stackaddr_set : int;
+++      stackaddr     : System.Address;
+++      stacksize     : size_t;
+++   end record;
+++   pragma Convention (C, pthread_attr_t);
+++
+++   type pthread_condattr_t is record
+++      dummy : int;
+++   end record;
+++   pragma Convention (C, pthread_condattr_t);
+++
+++   type pthread_mutexattr_t is record
+++      mutexkind : int;
+++   end record;
+++   pragma Convention (C, pthread_mutexattr_t);
+++
+++   type pthread_t is new unsigned_long;
+++
+++   type struct_pthread_fast_lock is record
+++      status   : long;
+++      spinlock : int;
+++   end record;
+++   pragma Convention (C, struct_pthread_fast_lock);
+++
+++   type pthread_mutex_t is record
+++      m_reserved : int;
+++      m_count    : int;
+++      m_owner    : System.Address;
+++      m_kind     : int;
+++      m_lock     : struct_pthread_fast_lock;
+++   end record;
+++   pragma Convention (C, pthread_mutex_t);
+++
+++   type pthread_cond_padding_t is array (0 .. 35) of unsigned_char;
+++   pragma Convention (C, pthread_cond_padding_t);
+++
+++   type pthread_cond_t is record
+++      c_lock     : struct_pthread_fast_lock;
+++      c_waiting  : System.Address;
+++      c_padding  : pthread_cond_padding_t;
+++   end record;
+++   pragma Convention (C, pthread_cond_t);
+++
+++   type pthread_key_t is new unsigned;
+++
+++end System.OS_Interface;
++--- ada.old/35soccon.ads	2005-12-26 17:39:13.000000000 +0100
+++++ ada/35soccon.ads	2005-12-26 17:47:20.000000000 +0100
++@@ -0,0 +1,112 @@
+++------------------------------------------------------------------------------
+++--                                                                          --
+++--                         GNAT COMPILER COMPONENTS                         --
+++--                                                                          --
+++--               G N A T . S O C K E T S . C O N S T A N T S                --
+++--                                                                          --
+++--                                 S p e c                                  --
+++--                                                                          --
+++--              Copyright (C) 2001 Ada Core Technologies, Inc.              --
+++--                                                                          --
+++-- GNAT is free software;  you can  redistribute it  and/or modify it under --
+++-- terms of the  GNU General Public License as published  by the Free Soft- --
+++-- ware  Foundation;  either version 2,  or (at your option) any later ver- --
+++-- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
+++-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
+++-- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
+++-- for  more details.  You should have  received  a copy of the GNU General --
+++-- Public License  distributed with GNAT;  see file COPYING.  If not, write --
+++-- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
+++-- MA 02111-1307, USA.                                                      --
+++--                                                                          --
+++-- As a special exception,  if other files  instantiate  generics from this --
+++-- unit, or you link  this unit with other files  to produce an executable, --
+++-- this  unit  does not  by itself cause  the resulting  executable  to  be --
+++-- covered  by the  GNU  General  Public  License.  This exception does not --
+++-- however invalidate  any other reasons why  the executable file  might be --
+++-- covered by the  GNU Public License.                                      --
+++--                                                                          --
+++-- GNAT is maintained by Ada Core Technologies Inc (http://www.gnat.com).   --
+++--                                                                          --
+++------------------------------------------------------------------------------
+++
+++--  This is the version for i386 FreeBSD
+++
+++package GNAT.Sockets.Constants is
+++
+++   --  Families
+++
+++   AF_INET              : constant :=                 2;
+++   AF_INET6             : constant :=                28;
+++
+++   SOCK_STREAM          : constant :=                 1;
+++   SOCK_DGRAM           : constant :=                 2;
+++
+++   --  Socket errors
+++
+++   EBADF                : constant :=                 9;
+++   ENOTSOCK             : constant :=                38;
+++   ENOTCONN             : constant :=                57;
+++   ENOBUFS              : constant :=                55;
+++   EOPNOTSUPP           : constant :=                45;
+++   EFAULT               : constant :=                14;
+++   EWOULDBLOCK          : constant :=                35;
+++   EADDRNOTAVAIL        : constant :=                49;
+++   EMSGSIZE             : constant :=                40;
+++   EADDRINUSE           : constant :=                48;
+++   EINVAL               : constant :=                22;
+++   EACCES               : constant :=                13;
+++   EAFNOSUPPORT         : constant :=                47;
+++   EISCONN              : constant :=                56;
+++   ETIMEDOUT            : constant :=                60;
+++   ECONNREFUSED         : constant :=                61;
+++   ENETUNREACH          : constant :=                51;
+++   EALREADY             : constant :=                37;
+++   EINPROGRESS          : constant :=                36;
+++   ENOPROTOOPT          : constant :=                42;
+++   EPROTONOSUPPORT      : constant :=                43;
+++   EINTR                : constant :=                 4;
+++   EIO                  : constant :=                 5;
+++   ESOCKTNOSUPPORT      : constant :=                44;
+++
+++   --  Host errors
+++
+++   HOST_NOT_FOUND       : constant :=                 1;
+++   TRY_AGAIN            : constant :=                 2;
+++   NO_ADDRESS           : constant :=                 4;
+++   NO_RECOVERY          : constant :=                 3;
+++
+++   --  Control flags
+++
+++   FIONBIO              : constant :=       -2147195266;
+++   FIONREAD             : constant :=        1074030207;
+++
+++   --  Shutdown modes
+++
+++   SHUT_RD              : constant :=                 0;
+++   SHUT_WR              : constant :=                 1;
+++   SHUT_RDWR            : constant :=                 2;
+++
+++   --  Protocol levels
+++
+++   SOL_SOCKET           : constant :=             65535;
+++   IPPROTO_IP           : constant :=                 0;
+++   IPPROTO_UDP          : constant :=                17;
+++   IPPROTO_TCP          : constant :=                 6;
+++
+++   --  Socket options
+++
+++   TCP_NODELAY          : constant :=                 1;
+++   SO_SNDBUF            : constant :=              4097;
+++   SO_RCVBUF            : constant :=              4098;
+++   SO_REUSEADDR         : constant :=                 4;
+++   SO_KEEPALIVE         : constant :=                 8;
+++   SO_LINGER            : constant :=               128;
+++   SO_ERROR             : constant :=              4103;
+++   SO_BROADCAST         : constant :=                32;
+++   IP_ADD_MEMBERSHIP    : constant :=                12;
+++   IP_DROP_MEMBERSHIP   : constant :=                13;
+++   IP_MULTICAST_TTL     : constant :=                10;
+++   IP_MULTICAST_LOOP    : constant :=                11;
+++
+++end GNAT.Sockets.Constants;
