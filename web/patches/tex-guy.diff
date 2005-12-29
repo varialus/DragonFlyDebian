@@ -1,0 +1,57 @@
+Status: in BTS
+Author: aurel32
+
+diff -u tex-guy-1.2.4/DVIlib2-2.7.1/dvi.c tex-guy-1.2.4/DVIlib2-2.7.1/dvi.c
+--- tex-guy-1.2.4/DVIlib2-2.7.1/dvi.c
++++ tex-guy-1.2.4/DVIlib2-2.7.1/dvi.c
+@@ -291,7 +291,7 @@
+ 
+ 
+ #ifdef HAVE_STAT 
+-# if defined(__linux__)
++# if defined(__linux__) || defined(__GLIBC__)
+   f_ac = ((stat(path, &st) >= 0) && S_ISREG(st.st_mode));
+ # else
+   f_ac = ((stat(path, &st) >= 0) && ((st.st_mode & S_IFMT) == S_IFREG));
+@@ -421,7 +421,7 @@
+ # if defined(__svr4__)
+   PD(dvi,file_timestamp1) = st.st_mtime;
+   PD(dvi,file_timestamp2) = 0;
+-# elif defined(__linux__)
++# elif defined(__linux__) || defined(__GLIBC__)
+   PD(dvi,file_timestamp1) = st.st_mtime;
+   PD(dvi,file_timestamp2) = 0;
+ # else
+@@ -457,7 +457,7 @@
+ # if defined(__svr4__)
+   if (PD(dvi,file_timestamp1) != (long)st.st_mtime)
+     return 1;   /* modified */
+-# elif defined(__linux__)
++# elif defined(__linux__) || defined(__GLIBC__)
+   if (PD(dvi,file_timestamp1) != (long)st.st_mtime)
+     return 1;   /* modified */
+ # else
+--- tex-guy-1.2.4.orig/xgdvi-1.6.1/xgdvi.c.pixmap
++++ tex-guy-1.2.4/xgdvi-1.6.1/xgdvi.c.pixmap
+@@ -373,7 +373,7 @@
+ #if HAVE_STAT
+   f = g_strdup_printf("%s%s%s", g_get_home_dir(), "/", XGDVI_PERSONAL_DIR);
+   if (stat(f, &st) >= 0){
+-#ifndef __linux__
++#if !defined(__linux__) && !defined(__GLIBC__)
+     isdir = ((st.st_mode & S_IFDIR) != 0);
+ #else
+     isdir = S_ISDIR(st.st_mode);
+only in patch2:
+unchanged:
+--- tex-guy-1.2.4.orig/DVIlib2-2.7.1/utils.c
++++ tex-guy-1.2.4/DVIlib2-2.7.1/utils.c
+@@ -119,7 +119,7 @@
+ #ifdef HAVE_STAT
+       if (stat(path, &st) < 0)
+ 	continue;
+-# ifndef __linux__
++# if !defined(__linux__) && ! defined(__GLIBC__)
+       if ((st.st_mode & S_IFREG) == 0)
+ 	continue;
+ # else

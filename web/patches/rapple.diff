@@ -1,0 +1,58 @@
+Status: in BTS
+Author: aurel32
+
+diff -u rapple-1.0/debian/control rapple-1.0/debian/control
+--- rapple-1.0/debian/control
++++ rapple-1.0/debian/control
+@@ -2,7 +2,7 @@
+ Section: web
+ Priority: optional
+ Maintainer: Adrian von Bidder <cmot@debian.org>
+-Build-Depends: debhelper (>= 4.0.0), expat, libpcre3-dev, libtidy-dev, libsablot0-dev (>= 1.0.2-4)
++Build-Depends: debhelper (>= 4.0.0), expat, libpcre3-dev, libtidy-dev, libsablot0-dev (>= 1.0.2-4), autotools-dev
+ Standards-Version: 3.6.2
+ 
+ Package: rapple
+diff -u rapple-1.0/debian/rules rapple-1.0/debian/rules
+--- rapple-1.0/debian/rules
++++ rapple-1.0/debian/rules
+@@ -11,6 +11,7 @@
+ configure: configure-stamp
+ configure-stamp:
+ 	dh_testdir
++	cp -f /usr/share/misc/config.{guess,sub} .
+ 	./configure \
+ 		--prefix=/usr \
+ 		--mandir=/usr/share/man
+@@ -34,6 +35,8 @@
+ 
+ 	-$(MAKE) clean
+ 
++	rm -f config.{guess,sub}
++
+ 	dh_clean
+ 
+ install: build
+--- rapple-1.0.orig/configure.in
++++ rapple-1.0/configure.in
+@@ -100,6 +100,9 @@
+ AC_SEARCH_LIBS(acos, m,, AC_MSG_ERROR(math library must be installed))
+ dnl on BSD systems certain library tests must be done
+ case $host_os in
++	*gnu*)
++		dnl on systems using a GNU libc, those tests must not be done
++	;;
+ 	*bsd*)
+ 		LIBS="-L /lib -R /lib -L/usr/local/lib -R/usr/local/lib -L ${prefix}/lib -R ${prefix}/lib"
+ 		AC_SEARCH_LIBS(libiconv_open, iconv,, AC_MSG_ERROR(iconv library must be installed))
+--- rapple-1.0.orig/configure
++++ rapple-1.0/configure
+@@ -5596,6 +5596,8 @@
+ fi
+ 
+ case $host_os in
++	*gnu*)
++	;;
+ 	*bsd*)
+ 		LIBS="-L /lib -R /lib -L/usr/local/lib -R/usr/local/lib -L ${prefix}/lib -R ${prefix}/lib"
+ 		echo "$as_me:$LINENO: checking for library containing libiconv_open" >&5

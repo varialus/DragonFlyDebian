@@ -1,0 +1,67 @@
+Status: in BTS
+Author: aurel32
+
+diff -u gpsim-0.20.14/modules/paraface.cc gpsim-0.20.14/modules/paraface.cc
+--- gpsim-0.20.14/modules/paraface.cc
++++ gpsim-0.20.14/modules/paraface.cc
+@@ -41,9 +41,20 @@
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ 
++#if defined(__linux__)
+ #include <linux/parport.h>
+ #include <linux/ppdev.h>
+-
++#elif defined(__FreeBSD_kernel__) || defined(__FreeBSD__)
++#include <dev/ppbus/ppi.h>
++#include <dev/ppbus/ppbconf.h>
++#define PPRSTATUS 		PPIGSTATUS
++#define PPWDATA			PPISDATA
++#define PARPORT_STATUS_ACK	nACK
++#define PARPORT_STATUS_BUSY	nBUSY
++#define PARPORT_STATUS_PAPEROUT	PERROR
++#define PARPORT_STATUS_SELECT	SELECT
++#define PARPORT_STATUS_ERROR	nFAULT
++#endif
+ 
+ #include <errno.h>
+ #include <stdlib.h>
+@@ -345,14 +356,17 @@
+ 		perror ("open");
+ 		return -1;
+     }
+-
++
++#if defined(PPCLAIM)
+     if (ioctl (fd, PPCLAIM)) {
+ 		perror ("PPCLAIM");
+ 		close (fd);
+         fd=-1;
+ 		return -1;
+     }
++#endif
+ 
++#if defined(PPNEGOT)
+     /* Switch to compatibility mode.  (In fact we don't need
+      * to do this, since we start off in compatibility mode
+      * anyway, but this demonstrates PPNEGOT.)*/
+@@ -364,6 +378,19 @@
+ 		return -1;
+     }
+ 	return 0;		// SUCCESS
++#elif defined(PPISECR)
++    /* Switch to compatibility mode.  (In fact we don't need
++     * to do this, since we start off in compatibility mode
++     * anyway, but this demonstrates PPISECR.)*/
++    mode = PPB_COMPATIBLE;
++    if (ioctl (fd, PPISECR, &mode)) {
++    		perror ("PPISECR");
++		close (fd);
++        fd=-1;
++		return -1;
++    }
++	return 0;		// SUCCESS
++#endif
+ }
+ 
+ // Return low five bits containing:
