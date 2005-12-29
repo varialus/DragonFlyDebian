@@ -1,0 +1,25 @@
+Author: aurel32
+Status: in BTS
+
+--- libpri-1.2.0-rc1.orig/Makefile
++++ libpri-1.2.0-rc1/Makefile
+@@ -32,6 +32,10 @@
+ OSARCH=$(shell uname -s)
+ PROC?=$(shell uname -m)
+ 
++ifneq (,$(findstring $(OSARCH), Linux GNU/kFreeBSD))
++OSARCH=GNU
++endif
++
+ TOBJS=testpri.o
+ T2OBJS=testprilib.o
+ STATIC_LIBRARY=libpri.a
+@@ -43,7 +47,7 @@
+ INSTALL_BASE=/usr
+ SOFLAGS = -Wl,-hlibpri.so.1
+ LDCONFIG = /sbin/ldconfig
+-ifeq (${OSARCH},Linux)
++ifeq (${OSARCH},GNU)
+ LDCONFIG_FLAGS=-n
+ else
+ ifeq (${OSARCH},FreeBSD)

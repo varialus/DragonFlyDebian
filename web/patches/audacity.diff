@@ -1,0 +1,53 @@
+Status: in BTS
+Author: aurel32
+
+--- audacity-1.2.4b.orig/lib-src/libnyquist/snd/sndconfig.h
++++ audacity-1.2.4b/lib-src/libnyquist/snd/sndconfig.h
+@@ -60,7 +60,7 @@
+ #elif defined(IRIX)
+   #include "sndirix.h"
+ 
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+   #include "sndfreebsd.h"
+ 
+ #elif defined(_WIN32)
+only in patch2:
+unchanged:
+--- audacity-1.2.4b.orig/lib-src/libnyquist/sys/term.c
++++ audacity-1.2.4b/lib-src/libnyquist/sys/term.c
+@@ -40,7 +40,7 @@
+ #else
+ 
+ #include <termios.h>
+-#ifndef __APPLE__
++#if !defined(__APPLE__) && !defined(__FreeBSD__) && !defined(__FreeBSD_kernel__)
+ #include <asm/ioctls.h>
+ #endif
+ #include <signal.h>
+only in patch2:
+unchanged:
+--- audacity-1.2.4b.orig/lib-src/portaudio/pa_unix_oss/pa_unix_oss.c
++++ audacity-1.2.4b/lib-src/portaudio/pa_unix_oss/pa_unix_oss.c
+@@ -42,6 +42,8 @@
+ 
+ #ifdef __linux__
+ #include <linux/soundcard.h>
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
+ #else
+ #include <machine/soundcard.h> /* JH20010905 */
+ #endif
+only in patch2:
+unchanged:
+--- audacity-1.2.4b.orig/lib-src/portmixer/px_unix_oss/px_unix_oss.c
++++ audacity-1.2.4b/lib-src/portmixer/px_unix_oss/px_unix_oss.c
+@@ -37,6 +37,8 @@
+ 
+ #ifdef __linux__
+ #include <linux/soundcard.h>
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/soundcard.h>
+ #else
+ #include <machine/soundcard.h> /* JH20010905 */
+ #endif

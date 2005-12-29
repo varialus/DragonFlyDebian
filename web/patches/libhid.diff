@@ -1,0 +1,36 @@
+Author: aurel32
+Status: in BTS
+
+--- libhid-0.2.15.orig/m4/md_check_os.m4
++++ libhid-0.2.15/m4/md_check_os.m4
+@@ -9,7 +9,7 @@
+         MD_OS=linux
+         AC_MSG_RESULT(Linux)
+         ;;
+-      *-freebsd*|*-openbsd*|*-netbsd*)
++      *-freebsd*|*-openbsd*|*-netbsd*|*-k*bsd*-gnu)
+         AC_DEFINE(OS_BSD, [], [define to 1 if building for BSD])
+         AC_SUBST(OS_BSD)
+         MD_OS=bsd
+--- libhid-0.2.15.orig/configure
++++ libhid-0.2.15/configure
+@@ -2280,7 +2280,7 @@
+         echo "$as_me:$LINENO: result: Linux" >&5
+ echo "${ECHO_T}Linux" >&6
+         ;;
+-      *-freebsd*|*-openbsd*|*-netbsd*)
++      *-freebsd*|*-openbsd*|*-netbsd*|*-k*bsd*-gnu)
+ 
+ cat >>confdefs.h <<\_ACEOF
+ #define OS_BSD
+--- libhid-0.2.15.orig/src/bsd.c
++++ libhid-0.2.15/src/bsd.c
+@@ -12,6 +12,8 @@
+ hid_return hid_os_force_claim(HIDInterface* const hidif, int const interface,
+     HIDInterfaceMatcher const* const matcher, unsigned short retries)
+ {
++  retries = retries;
++	
+   if (!hidif) {
+     ERROR("cannot open NULL HIDInterface.");
+     return HID_RET_INVALID_PARAMETER;
