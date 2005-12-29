@@ -1,0 +1,178 @@
+Status: in BTS
+Author: aurel32
+
+diff -u freeglut-2.4.0/debian/control freeglut-2.4.0/debian/control
+--- freeglut-2.4.0/debian/control
++++ freeglut-2.4.0/debian/control
+@@ -2,7 +2,7 @@
+ Section: graphics
+ Priority: optional
+ Maintainer: Jamie Wilkinson <jaq@debian.org>
+-Build-Depends: debhelper (>= 4.0.0), libx11-dev, libxt-dev, libxext-dev, xlibmesa-gl-dev | mesag-dev | libgl-dev, libglu1-xorg-dev | xlibmesa-glu-dev | libglu-dev, automake1.8, autoconf, libtool
++Build-Depends: debhelper (>= 4.0.0), libx11-dev, libxt-dev, libxext-dev, xlibmesa-gl-dev | mesag-dev | libgl-dev, libglu1-xorg-dev | xlibmesa-glu-dev | libglu-dev, libusbhid-dev [kfreebsd-i386], automake1.8, autoconf, libtool
+ Standards-Version: 3.6.1
+ 
+ Package: freeglut3
+--- freeglut-2.4.0.orig/src/Makefile.am
++++ freeglut-2.4.0/src/Makefile.am
+@@ -41,7 +41,7 @@
+ #
+ # Additional linker flags
+ #	 
+-lib@LIBRARY@_la_LIBADD = $(LIBM) $(X_LIBS) -lGL -lGLU -lXext -lX11 $(LIBXXF86VM)
++lib@LIBRARY@_la_LIBADD = $(LIBM) $(X_LIBS) -lGL -lGLU -lXext -lX11 $(LIBXXF86VM) $(LIBUSBHID)
+ lib@LIBRARY@_la_LDFLAGS = -version-info 11:0:8
+ lib@LIBRARY@_la_CFLAGS = $(X_CFLAGS)
+ 
+--- freeglut-2.4.0.orig/src/freeglut_joystick.c
++++ freeglut-2.4.0/src/freeglut_joystick.c
+@@ -76,11 +76,11 @@
+ #        include <fcntl.h>
+ #    endif
+ #    include <errno.h>
+-#    if defined(__FreeBSD__) || defined(__NetBSD__)
++#    if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
+ /* XXX The below hack is done until freeglut's autoconf is updated. */
+ #        define HAVE_USB_JS    1
+ 
+-#        if defined(__FreeBSD__) && __FreeBSD_version >= 500000
++#        if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && (__FreeBSD_version >= 500000 || __FreeBSD_kernel_version >= 500000)
+ #            include <sys/joystick.h>
+ #        else
+ /*
+@@ -131,7 +131,7 @@
+ 
+ /* BSD defines from "jsBSD.cxx" around lines 42-270 */
+ 
+-#if defined(__NetBSD__) || defined(__FreeBSD__)
++#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 
+ #    ifdef HAVE_USB_JS
+ #        if defined(__NetBSD__)
+@@ -142,13 +142,11 @@
+ #            else
+ #                include <usb.h>
+ #            endif
+-#        elif defined(__FreeBSD__)
+-#            if __FreeBSD_version < 500000
+-#                include <libusbhid.h>
+-#            else
+-/* XXX The below hack is done until freeglut's autoconf is updated. */
+-#                define HAVE_USBHID_H 1
++#        elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#            ifdef HAVE_USBHID_H
+ #                include <usbhid.h>
++#            else
++#                include <libusbhid.h>
+ #            endif
+ #        endif
+ #        include <dev/usb/usb.h>
+@@ -393,7 +391,7 @@
+ 
+ 
+ #if TARGET_HOST_UNIX_X11
+-#   if defined(__FreeBSD__) || defined(__NetBSD__)
++#   if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
+        struct os_specific_s *os;
+ #   endif
+ 
+@@ -461,7 +459,7 @@
+     int status;
+ #endif
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
+     int len;
+ #endif
+ 
+@@ -598,7 +596,7 @@
+ #endif
+ 
+ #if TARGET_HOST_UNIX_X11
+-#    if defined(__FreeBSD__) || defined(__NetBSD__)
++#    if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
+     if ( joy->os->is_analog )
+     {
+         int status = read ( joy->os->fd, &joy->os->ajs, sizeof(joy->os->ajs) );
+@@ -656,9 +654,9 @@
+                if (usage > 0 && usage < _JS_MAX_BUTTONS + 1)
+                {
+                    if (d)
+-                       joy->os->cache_buttons |= (1 << usage - 1);
++                       joy->os->cache_buttons |= (1 << (usage - 1));
+                    else
+-                       joy->os->cache_buttons &= ~(1 << usage - 1);
++                       joy->os->cache_buttons &= ~(1 << (usage - 1));
+                }
+             }
+         }
+@@ -744,7 +742,7 @@
+     }
+ 
+     if ( buttons )
+-#        if defined( __FreeBSD__ ) || defined( __NetBSD__ )
++#        if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
+         *buttons = ( joy->js.b1 ? 1 : 0 ) | ( joy->js.b2 ? 2 : 0 );  /* XXX Should not be here -- BSD is handled earlier */
+ #        else
+         *buttons = joy->js.buttons;
+@@ -1054,12 +1052,12 @@
+     CFTypeRef topLevelElement;
+ #endif
+ #if TARGET_HOST_UNIX_X11
+-#    if defined( __FreeBSD__ ) || defined( __NetBSD__ )
++#    if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
+        char *cp;
+ #    endif
+ #    ifdef JS_NEW
+        unsigned char u;
+-#    else
++#    elif defined(__linux__)
+        int counter;
+ #    endif
+ #endif
+@@ -1285,7 +1283,7 @@
+ #endif
+ 
+ #if TARGET_HOST_UNIX_X11
+-#if defined( __FreeBSD__ ) || defined( __NetBSD__ )
++#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
+     for( i = 0; i < _JS_MAX_AXES; i++ )
+         joy->os->cache_axes[ i ] = 0.0f;
+ 
+@@ -1549,7 +1547,7 @@
+ #endif
+ 
+ #if TARGET_HOST_UNIX_X11
+-#    if defined( __FreeBSD__ ) || defined( __NetBSD__ )
++#    if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
+     fgJoystick[ ident ]->id = ident;
+     fgJoystick[ ident ]->error = GL_FALSE;
+ 
+@@ -1619,7 +1617,7 @@
+ #endif
+ 
+ #if TARGET_HOST_UNIX_X11
+-#if defined( __FreeBSD__ ) || defined( __NetBSD__ )
++#if defined( __FreeBSD__ ) || defined(__FreeBSD_kernel__) || defined( __NetBSD__ )
+             if( fgJoystick[ident]->os )
+             {
+                 if( ! fgJoystick[ ident ]->error )
+only in patch2:
+unchanged:
+--- freeglut-2.4.0.orig/configure.ac
++++ freeglut-2.4.0/configure.ac
+@@ -24,9 +24,13 @@
+              [$X_LIBS -lXext -lX11])
+ AC_SUBST([LIBXXF86VM])
+ 
++AC_CHECK_LIB([usbhid], [hid_init],
++             [LIBUSBHID=-lusbhid], [LIBUSBHID=])
++AC_SUBST(LIBUSBHID)
++
+ # Checks for header files.
+ AC_HEADER_STDC
+-AC_CHECK_HEADERS([GL/gl.h GL/glu.h GL/glx.h fcntl.h limits.h sys/ioctl.h sys/param.h sys/time.h])
++AC_CHECK_HEADERS([GL/gl.h GL/glu.h GL/glx.h fcntl.h limits.h sys/ioctl.h sys/param.h sys/time.h usbhid.h libusbhid.h])
+ AC_HEADER_TIME
+ 
+ save_CFLAGS="$CFLAGS"

@@ -1,0 +1,43 @@
+Status: in BTS
+Author: aurel32
+
+--- cl-sql-3.4.6.orig/db-mysql/make.sh
++++ cl-sql-3.4.6/db-mysql/make.sh
+@@ -3,6 +3,7 @@
+ case "`uname`" in
+     Linux) os_linux=1 ;;
+     FreeBSD) os_freebsd=1 ;;
++    GNU/kFreeBSD) os_gnukfreebsd=1;;
+     Darwin) os_darwin=1 ;;
+     SunOS) os_sunos=1 ;;
+     AIX) os_aix=1 ;;
+@@ -10,7 +11,7 @@
+        exit 1 ;;	
+ esac
+     
+-if [ "$os_linux" -o "$os_freebsd" ]; then
++if [ "$os_linux" -o "$os_freebsd" -o "$os_gnukfreebsd" ]; then
+     gcc $CFLAGS -fPIC -c $SOURCE -o $OBJECT
+     ld -shared -soname=$BASE  $OBJECT $LDFLAGS -o $SHARED_LIB
+ elif [ "$os_darwin" ]; then
+only in patch2:
+unchanged:
+--- cl-sql-3.4.6.orig/uffi/make.sh
++++ cl-sql-3.4.6/uffi/make.sh
+@@ -3,6 +3,7 @@
+ case "`uname`" in
+     Linux) os_linux=1 ;;
+     FreeBSD) os_freebsd=1 ;;
++    GNU/kFreeBSD) os_gnukfreebsd=1;;
+     Darwin) os_darwin=1 ;;
+     SunOS) os_sunos=1 ;;
+     AIX) os_aix=1 ;;
+@@ -10,7 +11,7 @@
+        exit 1 ;;	
+ esac
+     
+-if [ "$os_linux" -o "$os_freebsd" ]; then
++if [ "$os_linux" -o "$os_freebsd" -o "$os_gnukfreebsd" ]; then
+     gcc -fPIC -DPIC -c $SOURCE -o $OBJECT
+     ld -shared -soname=$BASE $LDFLAGS $OBJECT -o $SHARED_LIB
+ elif [ "$os_darwin" ]; then

@@ -1,0 +1,68 @@
+Author: aurel32
+Status: in BTS
+
+diff -u psemu-sound-peops-1.7/debian/control psemu-sound-peops-1.7/debian/control
+--- psemu-sound-peops-1.7/debian/control
++++ psemu-sound-peops-1.7/debian/control
+@@ -2,7 +2,7 @@
+ Section: games
+ Priority: optional
+ Maintainer: Ryan Schultz <schultz.ryan@gmail.com>
+-Build-Depends: debhelper (>= 4.0.0), libgtk1.2-dev | libgtk-dev, libasound2-dev
++Build-Depends: debhelper (>= 4.0.0), libgtk1.2-dev | libgtk-dev, libasound2-dev [!kfreebsd-i386]
+ Standards-Version: 3.6.2
+ 
+ Package: psemu-sound-oss
+diff -u psemu-sound-peops-1.7/debian/rules psemu-sound-peops-1.7/debian/rules
+--- psemu-sound-peops-1.7/debian/rules
++++ psemu-sound-peops-1.7/debian/rules
+@@ -3,6 +3,7 @@
+ # Uncomment this to turn on verbose mode.
+ #export DH_VERBOSE=1
+ 
++DEB_HOST_ARCH_OS := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null)
+ 
+ configure: configure-stamp
+ configure-stamp:
+@@ -20,7 +21,11 @@
+ 	# Add here commands to compile the package.
+ 	$(MAKE) -C src
+ 	$(MAKE) -C src clean
++ifeq (linux,$(DEB_HOST_ARCH_OS))
+ 	$(MAKE) -C src USEALSA=TRUE
++else
++	$(MAKE) -C src USEALSA=FALSE
++endif
+ 	$(MAKE) -C src/spucfg-0.1df/src
+ 
+ 	touch build-stamp
+@@ -45,8 +50,10 @@
+ 	install -D --mode 0644 src/libspuPeopsOSS.so.1.0.7 \
+ 	debian/psemu-sound-oss/usr/lib/games/psemu/lib/libspuPeopsOSS.so.1.0.7
+ 
++ifeq (linux,$(DEB_HOST_ARCH_OS))
+ 	install -D --mode 0644 src/libspuPeopsALSA.so.1.0.7 \
+ 	debian/psemu-sound-alsa/usr/lib/games/psemu/lib/libspuPeopsALSA.so.1.0.7
++endif
+ 
+ 	install -D --mode 0755 src/spucfg-0.1df/src/cfgPeopsOSS \
+ 	debian/psemu-sound-oss/usr/lib/games/psemu/config/cfgPeopsOSS
+@@ -67,9 +74,14 @@
+ 	dh_fixperms
+ 	dh_installdeb
+ 	dh_shlibdeps
+-	dh_gencontrol
+-	dh_md5sums
+-	dh_builddeb
++	dh_gencontrol -ppsemu-sound-oss
++	dh_md5sums -ppsemu-sound-oss
++	dh_builddeb -ppsemu-sound-oss
++ifeq (linux,$(DEB_HOST_ARCH_OS))
++	dh_gencontrol -ppsemu-sound-alsa
++	dh_md5sums -ppsemu-sound-alsa
++	dh_builddeb -ppsemu-sound-alsa
++endif
+ 
+ binary: binary-indep binary-arch
+ .PHONY: build clean binary-indep binary-arch binary install configure
+
