@@ -109,8 +109,14 @@
 /* POSIX timers are available.  */
 #define _POSIX_TIMERS 1
 
+/* CPU-time clocks somewhere supported.  */
+#define _POSIX_CPUTIME	0
+
+/* We support somewhere the clock also in threads.  */
+#define _POSIX_THREAD_CPUTIME	0
+
 /* Reader/Writer locks are available.  */
-#define _POSIX_READER_WRITER_LOCKS	200912L
+#define _POSIX_READER_WRITER_LOCKS	200112L
 
 /* GNU libc provides regular expression handling.  */
 #define _POSIX_REGEXP	1
@@ -119,15 +125,15 @@
 #define _POSIX_SHELL	1
 
 /* We support the Timeouts option.  */
-#define _POSIX_TIMEOUTS	200912L
+#define _POSIX_TIMEOUTS	200112L
 
 /* We support spinlocks.  */
-#define _POSIX_SPIN_LOCKS	200912L
+#define _POSIX_SPIN_LOCKS	200112L
 
 /* The `spawn' function family is supported.  */
-#define _POSIX_SPAWN	200912L
+#define _POSIX_SPAWN	200112L
 
 /* The barrier functions are available.  */
-#define _POSIX_BARRIERS	200912L
+#define _POSIX_BARRIERS	200112L
 
 #endif /* bits/posix_opt.h */
