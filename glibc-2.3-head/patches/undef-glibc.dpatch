@@ -1,0 +1,35 @@
+#! /bin/sh -e
+
+# All lines beginning with `# DP:' are a description of the patch.
+# DP: Description: #undef __GLIBC__ before defining it
+# DP: Dpatch author: rmh
+# DP: Patch author: rmh
+# DP: Upstream status: REJECTED.  DO NOT SUBMIT.  (send to debian instead)
+# DP: Status Details: 
+# DP: Date: 20051231
+
+if [ $# -ne 2 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -d "$2" -f --no-backup-if-mismatch -p0 < $0;;
+    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p0 < $0;;
+    *)
+	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+	exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+
+--- include/features.h.orig	2005-02-18 01:08:56.000000000 +0100
++++ include/features.h	2005-07-17 22:18:23.000000000 +0200
+@@ -288,6 +288,7 @@
+ 
+ /* Major and minor version number of the GNU C library package.  Use
+    these macros to test for features in specific releases.  */
++#undef __GLIBC__
+ #define	__GLIBC__	2
+ #define	__GLIBC_MINOR__	3
+ 
