@@ -20,7 +20,7 @@
 #include <time.h>
 #include <unistd.h>
 
-extern int __libc_nanosleep (const struct timespec *requested_time,
+extern int __nanosleep (const struct timespec *requested_time,
 			     struct timespec *remaining);
 
 int
@@ -46,5 +46,8 @@ usleep (useconds_t useconds)
   ts.tv_sec = sec;
   ts.tv_nsec = usec * 1000;	/* Multiply as 32-bit integers.  */
 
-  return __libc_nanosleep (&ts, NULL);
+  /* Note the usleep() is a cancellation point.  But since we call
+     nanosleep() which itself is a cancellation point we do not have
+     to do anything here.  */
+  return __nanosleep (&ts, NULL);
 }
