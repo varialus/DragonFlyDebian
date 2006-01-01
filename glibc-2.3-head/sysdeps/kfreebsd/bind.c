@@ -26,6 +26,7 @@
    there. The code below emulate this behaviour. */
 
 extern int __libc_sa_len (sa_family_t __af);
+extern int __libc_sa_len_internal (sa_family_t __af);
 
 extern int __syscall_bind (int fd, __CONST_SOCKADDR_ARG addr, 
 			   socklen_t addrlen) __THROW;
@@ -38,8 +39,14 @@ extern int __syscall_bind (int fd, __CONST_SOCKADDR_ARG addr,
 int
 __bind (int fd, __CONST_SOCKADDR_ARG addr, socklen_t addrlen)
 {
-  socklen_t new_addrlen = __libc_sa_len ((addr.__sockaddr__)->sa_family);
-
+  socklen_t new_addrlen;
+  
+#ifndef NOT_IN_libc
+  new_addrlen = INTUSE(__libc_sa_len) ((addr.__sockaddr__)->sa_family);
+#else
+  new_addrlen = __libc_sa_len ((addr.__sockaddr__)->sa_family);
+#endif
+	
   /* Only allow a smaller size, otherwise it could lead to
     stack corruption */
   if (new_addrlen < addrlen)
