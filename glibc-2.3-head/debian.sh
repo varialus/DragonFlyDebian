@@ -32,7 +32,7 @@ exit 0
 
 EOF
 
-echo $0 >> debian/patches/00list
+echo $1 >> debian/patches/00list
 }
 
 pwd=`pwd`
