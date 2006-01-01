@@ -139,7 +139,7 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
  	cat debian/control.in/amd64		>> $@T
 --- glibc-2.3.5.orig/debian/sysdeps/kfreebsd.mk
 +++ glibc-2.3.5/debian/sysdeps/kfreebsd.mk
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,62 @@
 +GLIBC_OVERLAYS ?= $(shell ls glibc-linuxthreads* glibc-ports* glibc-libidn*)
 +MIN_KERNEL_SUPPORTED := 5.2.0
 +libc = libc0.1
@@ -177,6 +177,8 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
 +	mkdir debian/include
 +	ln -s $(KFREEBSD_HEADERS)/machine debian/include
 +	ln -s $(KFREEBSD_HEADERS)/net debian/include
++	ln -s $(KFREEBSD_HEADERS)/netatalk debian/include
++	ln -s $(KFREEBSD_HEADERS)/netipx debian/include
 +	ln -s $(KFREEBSD_HEADERS)/osreldate.h debian/include
 +	ln -s $(KFREEBSD_HEADERS)/sys debian/include
 +	ln -s $(KFREEBSD_HEADERS)/vm debian/include

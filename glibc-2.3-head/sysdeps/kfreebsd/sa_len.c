@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2002 Free Software Foundation, Inc.
+/* Copyright (C) 1998, 1999, 2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -17,30 +17,28 @@
    02111-1307 USA.  */
 
 #include <sys/socket.h>
-#include <sysdep.h>
-#include <sysdep-cancel.h>
 
-extern ssize_t __syscall_sendto (int fd, __const __ptr_t buf, 
-		                 size_t n, int flags, 
-				 __CONST_SOCKADDR_ARG addr, 
-				 socklen_t addrlen);
+#include <netatalk/at.h>
+#include <netinet/in.h>
+#include <netipx/ipx.h>
+#include <sys/un.h>
 
-/* Send N bytes of BUF to socket FD.
-   Return the number of bytes sent or -1.  */
-
-ssize_t
-__libc_send (int fd, const void *buf, size_t n, int flags)
+int
+__libc_sa_len (sa_family_t af)
 {
-  if (SINGLE_THREAD_P)
-    return INLINE_SYSCALL (sendto, 6, fd, buf, n, flags, NULL, 0);
-  
-  int oldtype = LIBC_CANCEL_ASYNC ();
-  int result = INLINE_SYSCALL (sendto, 6, fd, buf, n, flags, NULL, 0);
-  LIBC_CANCEL_RESET (oldtype);
-  return result;
+  switch (af)
+    {
+    case AF_APPLETALK:
+      return sizeof (struct sockaddr_at);
+    case AF_INET:
+      return sizeof (struct sockaddr_in);
+    case AF_INET6:
+      return sizeof (struct sockaddr_in6);
+    case AF_IPX:
+      return sizeof (struct sockaddr_ipx);
+    case AF_LOCAL:
+      return sizeof (struct sockaddr_un);
+    }
+  return 0;
 }
-
-weak_alias (__libc_send, __send)
-libc_hidden_weak (__send)
-
-weak_alias (__send, send)
+INTDEF(__libc_sa_len)

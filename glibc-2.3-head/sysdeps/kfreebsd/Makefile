@@ -89,6 +89,10 @@ ifeq ($(subdir),time)
 sysdep_routines += ntp_adjtime ntp_gettime
 endif
 
+ifeq ($(subdir),socket)
+sysdep_routines += sa_len sys_bind sys_connect sys_sendto
+endif
+
 # Linuxthreads dependencies.
 
 ifeq ($(subdir),posix)
