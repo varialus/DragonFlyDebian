@@ -1,29 +1,3 @@
-#! /bin/sh -e
-
-# All lines beginning with `# DP:' are a description of the patch.
-# DP: Description: @DESCRIPTION@
-# DP: Related bugs: 
-# DP: Dpatch author: 
-# DP: Patch author: 
-# DP: Upstream status: [In CVS | Debian-Specific | Pending | Not submitted ]
-# DP: Status Details: 
-
-PATCHLEVEL=1
-
-if [ $# -ne 2 ]; then
-    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
-    exit 1
-fi
-case "$1" in
-    -patch) patch -d "$2" -f --no-backup-if-mismatch -p$PATCHLEVEL < $0;;
-    -unpatch) patch -d "$2" -f --no-backup-if-mismatch -R -p$PATCHLEVEL < $0;;
-    *)
-	echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
-	exit 1
-esac
-exit 0
-
-# append the patch here and adjust the -p? flag in the patch calls.
 diff -urN src.orig/nscd/grpcache.c src/nscd/grpcache.c
 --- src.orig/nscd/grpcache.c	2005-07-19 05:23:49.000000000 +0200
 +++ src/nscd/grpcache.c	2005-12-17 21:04:44.000000000 +0100

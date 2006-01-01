@@ -1,22 +1,19 @@
 #!/bin/sh
 set -ex
 
-pwd=`pwd`
+create_dpatch_header()
+{
+  # $1 = filename
+  # $2 = description
 
-if [ "$1" = "" ] ; then
-  echo "Usage: $0 ..../glibc-2.3-head/  (to be run from debian source tree)"
-  exit 1
-fi
-
-cat << EOF > debian/patches/kfreebsd-sysdeps.dpatch
+  cat << EOF > debian/patches/$1.dpatch
 #! /bin/sh -e
 
 # All lines beginning with \`# DP:' are a description of the patch.
-# DP: Description: sysdeps to support GNU/kFreeBSD
+# DP: Description: $2
 # DP: Related bugs:
 # DP: Upstream status: Not submitted
 # DP: Status Details:
-# DP: Date: 2005-12-20
 
 PATCHLEVEL=0
 
@@ -35,18 +32,31 @@ exit 0
 
 EOF
 
+echo $0 >> debian/patches/00list
+}
+
+pwd=`pwd`
+
+if [ "$1" = "" ] ; then
+  echo "Usage: $0 ..../glibc-2.3-head/  (to be run from debian source tree)"
+  exit 1
+fi
+
+
 # sysdeps dir
 tmp=`mktemp -d`
 mkdir -p ${tmp}/sysdeps/unix/bsd/bsd4.4 ${tmp}/linuxthreads/sysdeps/unix/bsd/bsd4.4
 cp -a $1/sysdeps/kfreebsd ${tmp}/sysdeps/unix/bsd/bsd4.4/
 cp -a $1/linuxthreads/kfreebsd ${tmp}/linuxthreads/sysdeps/unix/bsd/bsd4.4/
+create_dpatch_header kfreebsd-sysdeps "sysdeps to support GNU/kFreeBSD"
 (cd ${tmp} && diff -x .svn -Nurd null sysdeps/ ) >> debian/patches/kfreebsd-sysdeps.dpatch
 (cd ${tmp} && diff -x .svn -Nurd null linuxthreads/ ) >> debian/patches/kfreebsd-sysdeps.dpatch
 rm -rf ${tmp}
-echo kfreebsd-sysdeps >> debian/patches/00list
 
-cp $1/patches/* debian/patches/
-ls $1/patches | sed -e "s,\.dpatch$,,g" >> debian/patches/00list
+for i in `ls $1/patches` ; do
+  create_dpatch_header kfreebsd-$i
+  cat $1/patches/$i/* >> debian/patches/kfreebsd-$i.dpatch
+done
 
 patch -p1 < $0
 
