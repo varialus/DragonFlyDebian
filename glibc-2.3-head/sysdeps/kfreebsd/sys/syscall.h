@@ -242,6 +242,8 @@
 #define	SYS_nstat	278
 #define	SYS_nfstat	279
 #define	SYS_nlstat	280
+#define	SYS_preadv	289
+#define	SYS_pwritev	290
 				/* 297 is old fhstatfs */
 #define	SYS_fhopen	298
 #define	SYS_fhstat	299
@@ -267,8 +269,8 @@
 #define	SYS_aio_write	319
 #define	SYS_lio_listio	320
 #define	SYS_yield	321
-#define	SYS_thr_sleep	322
-#define	SYS_thr_wakeup	323
+				/* 322 is obsolete thr_sleep */
+				/* 323 is obsolete thr_wakeup */
 #define	SYS_mlockall	324
 #define	SYS_munlockall	325
 #define	SYS_getcwd	326

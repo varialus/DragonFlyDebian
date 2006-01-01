@@ -151,7 +151,7 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
 +++ glibc-2.3.5/debian/sysdeps/kfreebsd.mk
 @@ -0,0 +1,62 @@
 +GLIBC_OVERLAYS ?= $(shell ls glibc-linuxthreads* glibc-ports* glibc-libidn*)
-+MIN_KERNEL_SUPPORTED := 5.2.0
++MIN_KERNEL_SUPPORTED := 5.4.0
 +libc = libc0.1
 +
 +# Support multiple makes at once based on number of processors
