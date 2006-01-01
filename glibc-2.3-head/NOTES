@@ -2,24 +2,10 @@
 working copy prepare:
 =====================
 
-wget ftp://sources.redhat.com/pub/glibc/snapshots/glibc-2.3-20051212.tar.bz2
-tar jxf glibc-2.3-20051212.tar.bz2
-mv glibc-2.3-20051212 src
-
-cp -a sysdeps/kfreebsd src/sysdeps/unix/bsd/bsd4.4/
-mkdir -p src/linuxthreads/sysdeps/unix/bsd/bsd4.4/
-cp -a linuxthreads/kfreebsd src/linuxthreads/sysdeps/unix/bsd/bsd4.4/
-
-apply patches from patches/
-( cd src ; patch -p0 < ../patches/xxx.dpatch )
-
-mkdir build ; cd build
- ../src/configure --prefix=/opt/tst --enable-add-ons=linuxthreads --without-tls i486-kfreebsd-gnu
-
-or even
-
- ../src/configure --prefix=/opt/tst --enable-add-ons=linuxthreads --with-tls --with-__thread i486-kfreebsd-gnu
-
+apt-get source glibc
+cd glibc-2.3.5
+../debian.sh ..
+<build normaly>
 
 roadmap:
 ========
