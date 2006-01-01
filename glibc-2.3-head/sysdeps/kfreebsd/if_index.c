@@ -153,6 +153,7 @@ indextoname_aux (void *private, unsigned int index, const char *name)
       l->retval = l->name;
       return 1;
     }
+  __set_errno (ENXIO);
   return 0;
 }
 
@@ -283,6 +284,7 @@ if_nameindex (void)
     }
   return l.s_array;
 }
+libc_hidden_def (if_nameindex)
 
 /* ------------------------------------------------------------------------- */
 
@@ -298,3 +300,4 @@ if_freenameindex (struct if_nameindex *ifn)
       free (ifn);
     }
 }
+libc_hidden_def (if_freenameindex)
