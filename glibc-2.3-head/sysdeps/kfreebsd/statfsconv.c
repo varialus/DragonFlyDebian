@@ -33,10 +33,6 @@
 
 #define MFSNAMELEN	16		/* length of type name including null */
 #define MNAMELEN	88		/* size of on/from name bufs */
-#define STATFS_VERSION	0x20030518	/* current version number */
-
-#define OMFSNAMELEN	16		/* length of fs type name, including null */
-#define OMNAMELEN	(88 - 2 * sizeof(long)) /* size of on/from name bufs */
 
 struct statfs_fbsd5 {
 	uint32_t f_version;		/* structure version number */
@@ -63,10 +59,10 @@ struct statfs_fbsd5 {
 	char	 f_mntonname[MNAMELEN];	   /* directory on which mounted */
 };
 
-int __syscall_getfsstat(struct statfs_fbsd5 *buf, long bufsize, int flags);
-int __syscall_statfs(const char *path, struct statfs_fbsd5 *buf);
-int __syscall_fstatfs(int fd, struct statfs_fbsd5 *buf);
-int __syscall_fhstatfs(const struct fhandle *u_fhp, struct statfs_fbsd5 *buf);
+extern int __syscall_getfsstat(struct statfs_fbsd5 *buf, long bufsize, int flags);
+extern int __syscall_statfs(const char *path, struct statfs_fbsd5 *buf);
+extern int __syscall_fstatfs(int fd, struct statfs_fbsd5 *buf);
+extern int __syscall_fhstatfs(const struct fhandle *u_fhp, struct statfs_fbsd5 *buf);
 
 
 /*
