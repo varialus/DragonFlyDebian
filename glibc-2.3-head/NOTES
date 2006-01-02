@@ -2,10 +2,36 @@
 working copy prepare:
 =====================
 
+a) Debian version:
+------------------
+
 apt-get source glibc
 cd glibc-2.3.5
 ../debian.sh ..
-<build normaly>
+<build normally>
+
+
+b) upstream snapshot:
+---------------------
+
+wget ftp://sources.redhat.com/pub/glibc/snapshots/glibc-2.3-20060102.tar.bz2
+tar jxf glibc-2.3-20060102.tar.bz2
+mv glibc-2.3-20060102 src
+
+cp -a sysdeps/kfreebsd src/sysdeps/unix/bsd/bsd4.4/
+mkdir -p src/linuxthreads/sysdeps/unix/bsd/bsd4.4/
+cp -a linuxthreads/kfreebsd src/linuxthreads/sysdeps/unix/bsd/bsd4.4/
+
+cd src 
+for i in ../patches/*/*.patch
+do
+        patch -p0 < $i
+done
+cd ..
+
+mkdir build ; cd build
+../src/configure --prefix=/opt/tst --enable-add-ons=linuxthreads --with-tls --with-__thread i486-kfreebsd-gnu
+
 
 roadmap:
 ========
@@ -75,13 +101,6 @@ make[2]: [/build/glibc-2.3-head/build/posix/annexc.out] Error 1 (ignored)
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-timer2.o] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-mqueue5.o] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-timer4.o] Error 1
-
-* struct statfs
-
-Previous glibc based on 2.3.0 uses older version of struct statfs,
-for now 2.3.6 uses the same, but the right approach is probably   
-to update struct statfs and use versioned symbols for related functions.
-
 
 * directly executing dynamic libraries (same problem with 2.3.0 too)
 
