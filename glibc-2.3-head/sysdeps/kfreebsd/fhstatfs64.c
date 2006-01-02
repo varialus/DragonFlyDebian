@@ -21,18 +21,16 @@
 
 #include "statfsconv.c"
 
-extern int __fhstatfs (const fhandle_t *fhp, struct statfs *buf);
-
 int
 fhstatfs64 (const fhandle_t *fhp, struct statfs64 *buf)
 {
-  struct statfs buf32;
-
-  if (__fhstatfs (fhp, &buf32) < 0)
+  struct statfs_fbsd5 kbuf;
+   
+  if (__syscall_fhstatfs (fhp, &kbuf) < 0)
     return -1;
 
   /* Convert a 'struct statfs' to 'struct statfs64'.  */
-  statfs_to_statfs64 (&buf32, buf);
+  statfs5_to_statfs64 (&kbuf, buf);
 
   return 0;
 }

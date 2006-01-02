@@ -1,7 +1,6 @@
-/* Return information about the filesystem on which FD resides.
-   Copyright (C) 2002 Free Software Foundation, Inc.
+/* Copyright (C) 2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-   Contributed by Bruno Haible <bruno@clisp.org>, 2002.
+   Contributed by Petr Salinger, 2006.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -18,24 +17,19 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <sys/statvfs.h>
-#include <sys/statfs.h>
+#include <sys/mount.h>
 
 #include "statfsconv.c"
 
-/* Return information about the filesystem on which FD resides.  */
 int
-__fstatvfs64 (int fd, struct statvfs64 *buf)
+fhstatfs (const fhandle_t *fhp, struct statfs *buf)
 {
   struct statfs_fbsd5 kbuf;
-
-  if (__syscall_fstatfs (fd, &kbuf) < 0)
+   
+  if (__syscall_fhstatfs (fhp, &kbuf) < 0)
     return -1;
 
-  /* Convert a 'struct statfs' to 'struct statvfs64'.  */
-  statfs5_to_statvfs64 (&kbuf, buf);
+  statfs5_to_statfs (&kbuf, buf);
 
   return 0;
 }
-
-weak_alias (__fstatvfs64, fstatvfs64)

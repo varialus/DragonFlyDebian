@@ -21,19 +21,19 @@
 #include <sys/statvfs.h>
 #include <sys/statfs.h>
 
-#include "statvfsconv.c"
+#include "statfsconv.c"
 
 /* Return information about the filesystem on which FILE resides.  */
 int
 __statvfs64 (const char *file, struct statvfs64 *buf)
 {
-  struct statfs buf32;
+  struct statfs_fbsd5 kbuf;
 
-  if (__statfs (file, &buf32) < 0)
+  if (__syscall_statfs (file, &kbuf) < 0)
     return -1;
 
   /* Convert a 'struct statfs' to 'struct statvfs64'.  */
-  statfs_to_statvfs64 (&buf32, buf);
+  statfs5_to_statvfs64 (&kbuf, buf);
 
   return 0;
 }

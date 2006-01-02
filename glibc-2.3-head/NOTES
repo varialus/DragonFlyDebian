@@ -21,24 +21,7 @@ roadmap:
 
 - [DONE] make glibc buildable (at this point, it doesn't have to work, only build)
 
-- upgrade syscalls.list (from kernel 5.4 or 6.0): 
-The only obsolete syscall we are using are:
-
-18      COMPAT4 { int getfsstat(struct ostatfs *buf, long bufsize, int flags); }
-157     COMPAT4 { int statfs(char *path, struct ostatfs *buf); }
-158     COMPAT4 { int fstatfs(int fd, struct ostatfs *buf); }
-297     COMPAT4 { int fhstatfs(const struct fhandle *u_fhp, \
-                    struct ostatfs *buf); }
-
-They should be replaced by:
-395     STD     { int getfsstat(struct statfs *buf, long bufsize, \
-                    int flags); }
-396     STD     { int statfs(char *path, struct statfs *buf); }
-397     STD     { int fstatfs(int fd, struct statfs *buf); }
-398     STD     { int fhstatfs(const struct fhandle *u_fhp, \
-                    struct statfs *buf); }
-		 
-
+- [DONE] upgrade syscalls.list (from kernel 5.4 or 6.0): 
 - [DONE] port remaining patches from glibc-2.3/patches/
 - [DONE] port remaining patches from web/patches/glibc-2.3.5.diff
 
@@ -81,7 +64,7 @@ make[2]: *** [/build/glibc-2.3-head/build/posix/tst-regex2.out] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/posix/tst-waitid.out] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/posix/bug-glob2.out] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/posix/tst-sysconf.o] Error 1
-make[2]: *** [/build/glibc-2.3-head/build/misc/tst-error1-mem] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/misc/tst-error1-mem] Error 1 [not a regression]
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-aio.out] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-aio64.out] Error 1
 

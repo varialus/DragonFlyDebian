@@ -18,6 +18,7 @@
    02111-1307 USA.  */
 
 #include <sys/mount.h>
+#include <alloca.h>
 
 #include "statfsconv.c"
 
@@ -25,22 +26,22 @@ int
 __getfsstat64 (struct statfs64 *buf, long bufsize, int flags)
 {
   long bufcount;
-  struct statfs *smallbuf;
+  struct statfs_fbsd5 *tmpbuf;
   int count, i;
 
   if (bufsize < 0)
     bufsize = 0;
   bufcount = bufsize / sizeof (struct statfs64);
-
-  /* Since sizeof (struct statfs) <= sizeof (struct statfs64), we can use
-     buf as temporary buffer.  */
-  smallbuf = (struct statfs *) buf;
-
-  count = __getfsstat (smallbuf, bufcount * sizeof (struct statfs), flags);
+  
+  if (bufcount == 0)
+    tmpbuf = NULL;
+  else  
+    tmpbuf = alloca(bufcount * sizeof (struct statfs_fbsd5));
+      
+  count = __syscall_getfsstat (tmpbuf, bufcount * sizeof (struct statfs_fbsd5), flags);
   if (count > 0)
     for (i = count - 1; i >= 0; i--)
-      /* Convert a 'struct statfs' to 'struct statfs64'.  */
-      statfs_to_statfs64 (&smallbuf[i], &buf[i]);
+      statfs5_to_statfs64 (&tmpbuf[i], &buf[i]);
 
   return count;
 }

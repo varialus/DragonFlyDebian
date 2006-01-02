@@ -28,7 +28,7 @@
 
 struct statfs
   {
-    unsigned long __unused1;
+    unsigned long f_version;
     unsigned long f_bsize;
     unsigned long f_iosize;
 #ifndef __USE_FILE_OFFSET64
@@ -51,11 +51,11 @@ struct statfs
     unsigned long int f_syncwrites;
     unsigned long int f_asyncwrites;
     char f_fstypename[16];
-    char f_mntonname[sizeof(long) == 8 ? 72 : 80];
+    char f_mntonname[80];
     unsigned long int f_syncreads;
     unsigned long int f_asyncreads;
-    short __unused2;
-    char f_mntfromname[sizeof(long) == 8 ? 72 : 80];
+    unsigned short f_namemax;
+    char f_mntfromname[80];
     short __unused3;
     long __unused4[2];
   };
@@ -63,7 +63,7 @@ struct statfs
 #ifdef __USE_LARGEFILE64
 struct statfs64
   {
-    unsigned long __unused1;
+    unsigned long f_version;
     unsigned long f_bsize;
     unsigned long f_iosize;
     __fsblkcnt64_t f_blocks;
@@ -78,11 +78,11 @@ struct statfs64
     unsigned long int f_syncwrites;
     unsigned long int f_asyncwrites;
     char f_fstypename[16];
-    char f_mntonname[sizeof(long) == 8 ? 72 : 80];
+    char f_mntonname[80];
     unsigned long int f_syncreads;
     unsigned long int f_asyncreads;
-    short __unused2;
-    char f_mntfromname[sizeof(long) == 8 ? 72 : 80];
+    unsigned short f_namemax;
+    char f_mntfromname[80];
     short __unused3;
     long __unused4[2];
   };

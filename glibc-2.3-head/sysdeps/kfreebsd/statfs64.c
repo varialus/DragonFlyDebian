@@ -26,13 +26,12 @@
 int
 statfs64 (const char *file, struct statfs64 *buf)
 {
-  struct statfs buf32;
-
-  if (__statfs (file, &buf32) < 0)
+  struct statfs_fbsd5 kbuf;
+ 
+  if (__syscall_statfs (file, &kbuf) < 0)
     return -1;
 
-  /* Convert a 'struct statfs' to 'struct statfs64'.  */
-  statfs_to_statfs64 (&buf32, buf);
+  statfs5_to_statfs64 (&kbuf, buf);
 
   return 0;
 }

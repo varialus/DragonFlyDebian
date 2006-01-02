@@ -32,7 +32,7 @@ sysdep_routines += sys_open
 # For <sys/stat.h>.
 sysdep_routines += sys_fstat sys_lstat sys_mknod sys_nfstat sys_nlstat sys_nstat sys_stat
 # For <sys/statfs.h>.
-sysdep_routines += fstatfs64 statfs64
+sysdep_routines += fstatfs64 statfs64 sys_fstatfs sys_statfs   
 # Other.
 sysdep_routines += lchmod
 endif
@@ -60,7 +60,7 @@ sysdep_routines += kldfind kldfirstmod kldload kldnext kldstat kldsym kldunload
 # For <sys/mman.h>.
 sysdep_routines += minherit sys_mmap
 # For <sys/mount.h>.
-sysdep_routines += fhopen sys_fhstat fhstat fhstat64 fhstatfs fhstatfs64 getfh getfsstat getfsstat64 getmntinfo getmntinfo64
+sysdep_routines += fhopen sys_fhstat sys_fhstatfs fhstat fhstat64 fhstatfs fhstatfs64 getfh getfsstat getfsstat64 sys_getfsstat getmntinfo getmntinfo64 
 # For <sys/ptrace.h>.
 sysdep_routines += sys_ptrace
 # For <sys/rfork.h>.
