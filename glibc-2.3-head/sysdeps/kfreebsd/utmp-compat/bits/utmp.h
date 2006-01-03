@@ -43,7 +43,7 @@ struct utmp
     char ut_user[UT_NAMESIZE];
 #define ut_name ut_user
     char ut_host[UT_HOSTSIZE];
-    __kernel_time_t ut_time;
+    __time_t ut_time;
   };
 
 
