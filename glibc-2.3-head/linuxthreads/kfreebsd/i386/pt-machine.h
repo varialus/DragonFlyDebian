@@ -53,12 +53,6 @@
 
 /* Initialize the thread-unique value. */
 
-#ifndef I386_SET_GSBASE
-#define I386_SET_GSBASE   10
-#endif
-
-// extern int sysarch(int cmd, void * param);
-
 #define INIT_THREAD_SELF(descr, nr)		\
 {						\
   long tmp;					\

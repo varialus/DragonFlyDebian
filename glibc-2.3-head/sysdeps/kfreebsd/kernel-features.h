@@ -38,7 +38,3 @@
 /* No real-time signals in FreeBSD 5.x or 6.x.  */
 #define __ASSUME_REALTIME_SIGNALS	0
 
-/* LDT manipulation function of sysarch is by default not compiled into
-   the FreeBSD 4.0 kernel.  */
-#define __ASSUME_LDT_WORKS		0
-

@@ -32,7 +32,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)errno.h	8.5 (Berkeley) 1/21/94
- * based on $FreeBSD: src/sys/sys/errno.h,v 1.26.2.1 2005/01/31 23:26:56 imp Exp $
+ * based on $FreeBSD: src/sys/sys/errno.h,v 1.28 2005/04/02 12:33:28 das Exp $
  */
 
 #ifdef _ERRNO_H
@@ -151,7 +151,12 @@
 
 #define EDOOFUS		88		/* Programming error */
 
-#define	ELAST		88		/* Must be equal largest errno */
+#define	EBADMSG		89		/* Bad message */
+#define	EMULTIHOP	90		/* Multihop attempted */
+#define	ENOLINK		91		/* Link has been severed */
+#define	EPROTO		92		/* Protocol error */
+
+#define	ELAST		92		/* Must be equal largest errno */
 
 # ifndef __ASSEMBLER__
 /* Function to get address of global `errno' variable.  */
