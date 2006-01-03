@@ -18,9 +18,27 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* No real-time signals in FreeBSD 4.0.  */
+#ifndef __KFREEBSD_KERNEL_VERSION
+/* We assume the worst; all kernels should be supported.  */
+# define __KFREEBSD_KERNEL_VERSION	0
+#endif
+
+/* We assume for __KFREEBSD_KERNEL_VERSION the same encoding used in
+   osreldate.h.  I.e., the major, minor, and subminor are all 
+   concatenated, with two digits for each.  This means we can do 
+   numeric comparisons.
+
+   In the following we will define certain symbols depending on
+   whether the describes kernel feature is available in the kernel
+   version given by __KFREEBSD_KERNEL_VERSION.  We are not always exactly
+   recording the correct versions in which the features were
+   introduced.  If somebody cares these values can afterwards be
+   corrected.  */
+
+/* No real-time signals in FreeBSD 5.x or 6.x.  */
 #define __ASSUME_REALTIME_SIGNALS	0
 
 /* LDT manipulation function of sysarch is by default not compiled into
    the FreeBSD 4.0 kernel.  */
 #define __ASSUME_LDT_WORKS		0
+
