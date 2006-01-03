@@ -46,9 +46,9 @@ struct semid_ds
   struct ipc_perm sem_perm;		/* operation permission struct */
   void *__sem_base;
   unsigned short int sem_nsems;		/* number of semaphores in set */
-  __kernel_time_t sem_otime;		/* last semop() time */
+  __time_t sem_otime;			/* last semop() time */
   long __unused1;
-  __kernel_time_t sem_ctime;		/* last time changed by semctl() */
+  __time_t sem_ctime;			/* last time changed by semctl() */
   long __unused2;
   long __unused3[4];
 };

@@ -127,4 +127,17 @@ struct __kernel_shmid_ds
     void *__shm_internal;
   };
 
+/* This structure corresponds to the newer FreeBSD 'struct semid_ds' */
+struct semid_ds
+{
+  struct ipc_perm sem_perm;		/* operation permission struct */
+  void *__sem_base;
+  unsigned short int sem_nsems;		/* number of semaphores in set */
+  int sem_otime;			/* last semop() time */
+  long __unused1;
+  int sem_ctime;			/* last time changed by semctl() */
+  long __unused2;
+  long __unused3[4];
+};
+
 #endif

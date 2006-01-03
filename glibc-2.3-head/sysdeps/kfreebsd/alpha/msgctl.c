@@ -59,4 +59,4 @@ __msgctl (int msqid, int cmd, struct msqid_ds *buf)
   return retval;
 }
 
-weak_alias (__getrusage, getrusage)
+weak_alias (__msgctl, msgctl)
