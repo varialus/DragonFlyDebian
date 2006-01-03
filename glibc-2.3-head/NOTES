@@ -180,3 +180,36 @@ $ /lib/ld-2.3.so /bin/cat /proc/self/maps
 20137000-2023b000 rwxp 00104000 00:00 0
 bfbe0000-bfc00000 rwxp 00020000 00:00 0
 
+
+on kFreeBSD, with Linux emulation:
+
+$ /compat/linux/bin/cat /proc/self/maps
+08048000-0804c000 r-xp 00005000 00:00 450090     /usr/compat/linux/bin/cat
+0804c000-0804d000 rw-p 00022000 00:00 0
+0804d000-0806e000 rwxp 00022000 00:00 0
+2804c000-28061000 r-xp 00016000 00:00 899679     /usr/compat/linux/lib/ld-linux.so.2
+28061000-28062000 rw-p 00016000 00:00 899679     /usr/compat/linux/lib/ld-linux.so.2
+28062000-28063000 rw-p 00001000 00:00 0
+28089000-28196000 r-xp 00118000 00:00 450089     /usr/compat/linux/lib/libc.so.6
+28196000-2819d000 r-xp 00118000 00:00 450089     /usr/compat/linux/lib/libc.so.6
+2819d000-281a0000 rwxp 00118000 00:00 450089     /usr/compat/linux/lib/libc.so.6
+281a0000-281a2000 rwxp 00002000 00:00 0
+281a2000-28303000 r-xp 00161000 00:00 1275117     /usr/lib/locale/locale-archive
+bfbe0000-bfc00000 rwxp 00020000 00:00 0
+
+$ /compat/linux/lib/ld-linux.so.2 /compat/linux/bin/cat /proc/self/maps
+00000000-00015000 r-xp 00016000 00:00 899679     /usr/compat/linux/lib/ld-linux.so.2
+00015000-00016000 rw-p 00016000 00:00 899679     /usr/compat/linux/lib/ld-linux.so.2
+00016000-00017000 rw-p 00022000 00:00 0
+00017000-00038000 rwxp 00022000 00:00 0
+08048000-0804c000 r-xp 00005000 00:00 450090     /usr/compat/linux/bin/cat
+0804c000-0804d000 rwxp 00005000 00:00 450090     /usr/compat/linux/bin/cat
+2003b000-20148000 r-xp 00118000 00:00 450089     /usr/compat/linux/lib/libc.so.6
+20148000-2014f000 r-xp 00118000 00:00 450089     /usr/compat/linux/lib/libc.so.6
+2014f000-20152000 rwxp 00118000 00:00 450089     /usr/compat/linux/lib/libc.so.6
+20152000-20154000 rwxp 00002000 00:00 0
+20154000-202b5000 r-xp 00161000 00:00 1275117     /usr/lib/locale/locale-archive
+bfbe0000-bfc00000 rwxp 00020000 00:00 0
+
+As the problem also occurs with the Linux emulation, the problem is
+probably in the kernel.
