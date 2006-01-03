@@ -20,6 +20,7 @@
 #include <stddef.h>
 #include <errno.h>
 #include <sys/time.h>
+#include <bits/kernel_time_t.h>
 
 extern int __syscall_gettimeofday (struct __kernel_timeval *tv,
 				   struct timezone *tz);

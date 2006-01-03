@@ -20,6 +20,7 @@
 #include <stddef.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#include <bits/kernel_time_t.h>
 
 extern int __syscall_select (int nfds,
 			     fd_set *readfds,

@@ -22,6 +22,7 @@
 #include <time.h>
 #include <sched.h>
 #include <sys/types.h>
+#include <bits/kernel_time_t.h>
 
 extern int __syscall_sched_rr_get_interval (pid_t pid,
 					    struct __kernel_timespec *t);

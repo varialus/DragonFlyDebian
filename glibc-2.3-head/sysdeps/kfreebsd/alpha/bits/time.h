@@ -41,34 +41,24 @@
 
 #  ifdef __USE_POSIX199309
 /* Identifier for system-wide realtime clock.  */
-#   define CLOCK_REALTIME	0
+#   define CLOCK_REALTIME		0
 /* These are declared in FreeBSD, but not implemented.  */
 #   ifdef __USE_BSD
-#    define CLOCK_VIRTUAL	1
-#    define CLOCK_PROF		2
+#    define CLOCK_VIRTUAL		1
+#    define CLOCK_PROF			2
 #   endif
 
 /* Flag to indicate time is absolute.  */
-#   define TIMER_ABSTIME	1
+#   define TIMER_ABSTIME		1
 #  endif
-
-#  include <bits/types.h>
-
-struct __kernel_timespec
-  {
-    __kernel_time_t tv_sec;	/* Seconds.  */
-    long int tv_nsec;		/* Nanoseconds.  */
-  };
 
 # endif	/* bits/time.h */
 #endif
-
 
 #ifdef __need_timeval
 # undef __need_timeval
 # ifndef _STRUCT_TIMEVAL
 #  define _STRUCT_TIMEVAL	1
-
 #  include <bits/types.h>
 
 /* A time value that is accurate to the nearest
@@ -78,20 +68,5 @@ struct timeval
     __time_t tv_sec;		/* Seconds.  */
     __suseconds_t tv_usec;	/* Microseconds.  */
   };
-
-struct __kernel_timeval
-  {
-    __kernel_time_t tv_sec;	/* Seconds.  */
-    __suseconds_t tv_usec;	/* Microseconds.  */
-  };
-
-struct __kernel_itimerval
-  {
-    /* Value to put into `it_value' when the timer expires.  */
-    struct __kernel_timeval it_interval;
-    /* Time to the next timer expiration.  */
-    struct __kernel_timeval it_value;
-  };
-
 # endif	/* struct timeval */
 #endif	/* need timeval */

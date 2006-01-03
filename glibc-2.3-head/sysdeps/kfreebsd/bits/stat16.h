@@ -31,11 +31,11 @@ struct stat16
 
     __dev_t st_rdev;		/* Device number, if device.  */
 
-    __kernel_time_t st_atime;	/* Time of last access.  */
+    long int st_atime;		/* Time of last access.  */
     long int st_atimensec;	/* Nanoseconds of last access.  */
-    __kernel_time_t st_mtime;	/* Time of last modification.  */
+    long int st_mtime;		/* Time of last modification.  */
     long int st_mtimensec;	/* Nanoseconds of last modification.  */
-    __kernel_time_t st_ctime;	/* Time of last status change.  */
+    long int st_ctime;		/* Time of last status change.  */
     long int st_ctimensec;	/* Nanoseconds of last status change.  */
 
     __off_t st_size;		/* Size of file, in bytes.  */

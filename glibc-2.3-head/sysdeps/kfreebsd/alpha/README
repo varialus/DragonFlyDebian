@@ -1,3 +1,11 @@
 Note that even on 64-bit platforms, because __ino64_t != __ino_t, we have
 stat64 != stat, fstat64 != fstat, lstat64 != lstat, fhstat64 != fhstat,
 glob64 != glob.
+
+Note that on alpha glue code is used in order to use a 64-bit __time_t with a
+32-bit __kernel_time_t type. All system calls taking arguments with
+'time_t', 'struct timeval', 'struct timespec', 'struct itimerval',
+'struct rusage', 'struct msqid_ds', 'struct shmid_ds' need some special 
+handling. The benefit is that user programs will not need to switch from a 
+32-bit time_t to a 64-bit time_t in 2038.
+

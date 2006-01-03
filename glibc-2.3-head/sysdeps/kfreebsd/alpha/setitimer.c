@@ -20,6 +20,7 @@
 #include <stddef.h>
 #include <errno.h>
 #include <sys/time.h>
+#include <bits/kernel_time_t.h>
 
 extern int __syscall_setitimer (int which,
 				const struct __kernel_itimerval *new,

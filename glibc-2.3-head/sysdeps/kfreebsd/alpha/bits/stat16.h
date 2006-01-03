@@ -16,26 +16,26 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* This structure corresponds to the newer FreeBSD 'struct nstat'
-   (i.e. _STAT_VER_nstat).  */
-struct stat32
+/* This structure corresponds to the original FreeBSD 'struct stat'
+   (i.e. _STAT_VER_stat), and is used by the fhstat() system call.  */
+struct stat16
   {
     __dev_t st_dev;		/* Device containing the file.  */
     __ino_t st_ino;		/* File serial number.  */
 
-    __uint32_t st_mode;		/* File mode.  */
-    __uint32_t st_nlink;	/* Link count.  */
+    __uint16_t st_mode;		/* File mode.  */
+    __uint16_t st_nlink;	/* Link count.  */
 
     __uid_t st_uid;		/* User ID of the file's owner.  */
     __gid_t st_gid;		/* Group ID of the file's group.  */
 
     __dev_t st_rdev;		/* Device number, if device.  */
 
-    long int st_atime;		/* Time of last access.  */
+    int st_atime;		/* Time of last access.  */
     long int st_atimensec;	/* Nanoseconds of last access.  */
-    long int st_mtime;		/* Time of last modification.  */
+    int st_mtime;		/* Time of last modification.  */
     long int st_mtimensec;	/* Nanoseconds of last modification.  */
-    long int st_ctime;		/* Time of last status change.  */
+    int st_ctime;		/* Time of last status change.  */
     long int st_ctimensec;	/* Nanoseconds of last status change.  */
 
     __off_t st_size;		/* Size of file, in bytes.  */
@@ -48,5 +48,6 @@ struct stat32
 
     __uint32_t st_gen;		/* Generation number.  */
 
-    __quad_t __unused1[2];
+    __uint32_t __unused1;
+    __quad_t __unused2[2];
   };

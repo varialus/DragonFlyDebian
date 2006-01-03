@@ -42,11 +42,11 @@ struct msqid_ds
   msglen_t msg_qbytes;		/* max number of bytes allowed on queue */
   __pid_t msg_lspid;		/* pid of last msgsnd() */
   __pid_t msg_lrpid;		/* pid of last msgrcv() */
-  __kernel_time_t msg_stime;	/* time of last msgsnd command */
+  __time_t msg_stime;		/* time of last msgsnd command */
   long __unused1;
-  __kernel_time_t msg_rtime;	/* time of last msgrcv command */
+  __time_t msg_rtime;		/* time of last msgrcv command */
   long __unused2;
-  __kernel_time_t msg_ctime;	/* time of last change */
+  __time_t msg_ctime;		/* time of last change */
   long __unused3;
   long __unused4[4];
 };

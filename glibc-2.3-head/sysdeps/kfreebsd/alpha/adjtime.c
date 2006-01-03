@@ -19,6 +19,7 @@
 
 #include <stddef.h>
 #include <sys/time.h>
+#include <bits/kernel_time_t.h>
 
 extern int __syscall_adjtime (const struct __kernel_timeval *delta,
 			      struct __kernel_timeval *olddelta);

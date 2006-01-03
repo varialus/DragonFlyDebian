@@ -54,8 +54,8 @@ struct shmid_ds
     __pid_t shm_lpid;			/* pid of last shmop */
     __pid_t shm_cpid;			/* pid of creator */
     shmatt_t shm_nattch;		/* number of current attaches */
-    __kernel_time_t shm_atime;		/* time of last shmat() */
-    __kernel_time_t shm_dtime;		/* time of last shmdt() */
-    __kernel_time_t shm_ctime;		/* time of last change by shmctl() */
+    __time_t shm_atime;			/* time of last shmat() */
+    __time_t shm_dtime;			/* time of last shmdt() */
+    __time_t shm_ctime;			/* time of last change by shmctl() */
     void *__shm_internal;
   };

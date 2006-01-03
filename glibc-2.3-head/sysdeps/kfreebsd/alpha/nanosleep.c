@@ -20,6 +20,7 @@
 #include <stddef.h>
 #include <errno.h>
 #include <time.h>
+#include <bits/kernel_time_t.h>
 
 extern int __syscall_nanosleep (const struct __kernel_timespec *requested_time,
 				struct __kernel_timespec *remaining);

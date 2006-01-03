@@ -20,6 +20,7 @@
 #include <stddef.h>
 #include <errno.h>
 #include <sys/resource.h>
+#include <bits/kernel_time_t.h>
 
 extern int __syscall_getrusage (int who, struct __kernel_rusage *usage);
 
