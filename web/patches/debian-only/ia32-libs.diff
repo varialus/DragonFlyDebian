@@ -1,0 +1,47 @@
+
+Author: rmh
+
+diff -ur ia32-libs-1.5.old/debian/control ia32-libs-1.5/debian/control
+--- ia32-libs-1.5.old/debian/control	2005-11-12 12:23:04.000000000 +0100
++++ ia32-libs-1.5/debian/control	2006-01-04 12:09:18.000000000 +0100
+@@ -6,7 +6,7 @@
+ Standards-Version: 3.6.1.0
+ 
+ Package: ia32-libs
+-Architecture: amd64 ia64
++Architecture: amd64 ia64 kfreebsd-i386
+ Depends: lsb-release, lib32gcc1, ${lib:Depends}
+ Replaces: ia32-libs-openoffice.org
+ Description: ia32 shared libraries for use on amd64 and ia64 systems
+@@ -15,7 +15,7 @@
+  a 64-bit kernel.
+ 
+ Package: ia32-libs-dev
+-Architecture: amd64 ia64
++Architecture: amd64 ia64 kfreebsd-i386
+ Section: libdevel
+ Depends: ia32-libs (= ${Source-Version}), ${dev:Depends}
+ Description: ia32 development libraries and headers for use on ia32/ia64 systems
+diff -ur ia32-libs-1.5.old/debian/rules ia32-libs-1.5/debian/rules
+--- ia32-libs-1.5.old/debian/rules	2005-11-12 12:42:51.000000000 +0100
++++ ia32-libs-1.5/debian/rules	2006-01-04 12:06:42.000000000 +0100
+@@ -85,13 +85,16 @@
+ 
+ # Make ldd work for 32-bit and 64-bit binaries.
+ 	[ -x debian/ia32-libs/usr/bin/ldd ]
+-	case $$(uname -m) in \
+-		x86_64) \
++	case $$(uname -s):$$(uname -m) in \
++		Linux:x86_64) \
+ 			RTLDLIST="/lib/ld-linux-x86-64.so.2 /lib/ld-linux.so.2" \
+ 		;; \
+-		ia64) \
++		Linux:ia64) \
+ 			RTLDLIST="/lib/ld-linux-ia64.so.2 /lib/ld-linux.so.2" \
+ 		;; \
++		*:i*86) \
++			RTLDLIST="/lib/ld.so.1 /lib/ld-linux.so.2" \
++		;; \
+ 		*) \
+ 			echo "Unsupported architecture"; exit 1 \
+ 		;; \
