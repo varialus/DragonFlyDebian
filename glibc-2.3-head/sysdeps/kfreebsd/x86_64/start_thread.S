@@ -135,7 +135,7 @@ L(complex):
 
         /* Perform the rfork system call.  */
         DO_CALL (rfork, 1)
-        jb      L(error)
+        jb      L(error_unmask)
 
         /* %rdx is now 0 for the parent and 1 for the child.  */
         testq   %rdx, %rdx
@@ -155,6 +155,20 @@ L(complex):
         addq    $32, %rsp
 L(pseudo_end):
         ret
+
+L(error_unmask):
+
+        /* Save the error code, currently in %rax.  */
+        movl    %rax, 0(%rsp)
+
+        /* Restore the previous signal mask.  */
+        movq    $SIG_SETMASK, %rdi
+        leaq    16(%rsp), %rsi
+        movq    $0,%rdx
+        DO_CALL (sigprocmask, 3)
+
+	/* load saved error code */
+        movq    0(%rsp), %rax
 
 L(error):
         addq    $32, %rsp

@@ -87,7 +87,7 @@ ENTRY (__start_thread)
 	movl	8(%ebp), %eax	/* flags */
 	movl	%eax, 4(%esp)
 	DO_CALL (rfork, 1)
-	jb	L(error)
+	jb	L(error_unmask)
 
 	/* %edx is now 0 for the parent and 1 for the child.  */
 	testl	%edx, %edx
@@ -178,6 +178,21 @@ L(simple_child):/* Here we are in the child thread.  */
 	movl	4(%esp), %edi
 
 	jmp	L(child1)
+
+L(error_unmask):
+
+	/* Save the error code, currently in %eax.  */
+	movl	%eax, %ebx
+
+	/* Restore the previous signal mask.  */
+	leal	16(%esp), %eax
+	movl	$SIG_SETMASK, 4(%esp)
+	movl	%eax, 8(%esp)
+	movl	$0, 12(%esp)
+	DO_CALL (sigprocmask, 3)
+
+	/* load saved error code */
+	movl	%ebx, %eax
 
 L(error):
 	addl	$32, %esp
