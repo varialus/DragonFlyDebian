@@ -1,0 +1,20 @@
+$Id$
+
+This is merged in upstream CVS (both production and development branches).
+This will have to be removed in the future when we catch up with upstream.
+
+This patch by Robert Millan
+
+Index: xc/programs/Xserver/hw/xfree86/input/wacom/xf86Wacom.h
+===================================================================
+--- xc/programs/Xserver/hw/xfree86/input/wacom/xf86Wacom.h.orig	2006-01-04 22:15:07.000000000 -0500
++++ xc/programs/Xserver/hw/xfree86/input/wacom/xf86Wacom.h	2006-01-04 22:19:59.000000000 -0500
+@@ -461,7 +461,7 @@
+ 	int bufpos;                        /* position with buffer */
+ 	unsigned char buffer[BUFFER_SIZE]; /* data read from device */
+ 
+-#if LINUX_INPUT
++#ifdef LINUX_INPUT
+ 	int wcmEventCnt;
+ 	struct input_event wcmEvents[MAX_USB_EVENTS];  /* events for current change */
+ #endif

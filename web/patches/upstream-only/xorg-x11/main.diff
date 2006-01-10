@@ -1,0 +1,63 @@
+Index: xc/config/cf/linux.cf
+===================================================================
+--- xc/config/cf/linux.cf.orig	2006-01-10 09:26:06.000000000 +0100
++++ xc/config/cf/linux.cf	2006-01-10 09:26:07.000000000 +0100
+@@ -259,6 +259,7 @@
+ /* Wraphelp.c magic is supplied via a custom patch. */
+ #  define HasXdmAuth			YES
+ 
++#  ifdef LinuxArchitecture
+ /* Glide2 only works on i386. */
+ #  ifdef i386Architecture
+ #   define HasGlide2			YES
+@@ -271,6 +272,7 @@
+ #   define Glide3IncDir		/usr/include/glide3
+ #  endif /* i386Architecture || AlphaArchitecture || ia64Architecture ||
+             AMD64Architecture */
++#  endif /* LinuxArchitecture */
+ 
+ /* Enable extended instruction set support. */
+ #  ifdef i386Architecture
+Index: xc/extras/drm/shared/drm.h
+===================================================================
+--- xc/extras/drm/shared/drm.h.orig	2005-12-29 03:38:49.000000000 +0100
++++ xc/extras/drm/shared/drm.h	2006-01-10 09:26:07.000000000 +0100
+@@ -73,8 +73,8 @@
+ #define DRM_IOC_WRITE		_IOC_WRITE
+ #define DRM_IOC_READWRITE	_IOC_READ|_IOC_WRITE
+ #define DRM_IOC(dir, group, nr, size) _IOC(dir, group, nr, size)
+-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+-#if defined(__FreeBSD__) && defined(IN_MODULE)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
++#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && defined(IN_MODULE)
+ /* Prevent name collision when including sys/ioccom.h */
+ #undef ioctl
+ #include <sys/ioccom.h>
+Index: xc/extras/drm/shared-core/drm.h
+===================================================================
+--- xc/extras/drm/shared-core/drm.h.orig	2005-12-29 03:38:50.000000000 +0100
++++ xc/extras/drm/shared-core/drm.h	2006-01-10 09:26:07.000000000 +0100
+@@ -79,8 +79,8 @@
+ #define DRM_IOC_WRITE		_IOC_WRITE
+ #define DRM_IOC_READWRITE	_IOC_READ|_IOC_WRITE
+ #define DRM_IOC(dir, group, nr, size) _IOC(dir, group, nr, size)
+-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+-#if defined(__FreeBSD__) && defined(IN_MODULE)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
++#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && defined(IN_MODULE)
+ /* Prevent name collision when including sys/ioccom.h */
+ #undef ioctl
+ #include <sys/ioccom.h>
+Index: xc/lib/GL/dri/drm/Imakefile
+===================================================================
+--- xc/lib/GL/dri/drm/Imakefile.orig	2005-12-29 03:38:22.000000000 +0100
++++ xc/lib/GL/dri/drm/Imakefile	2006-01-10 09:26:07.000000000 +0100
+@@ -25,7 +25,7 @@
+ OS_SUBDIR2 = linux
+ OS_SUBDIR3 = shared-core
+ #endif
+-#if defined(FreeBSDArchitecture) || defined(BSDOSArchitecture) || \
++#if defined(KFreeBSDArchitecture) || defined(BSDOSArchitecture) || \
+     defined(NetBSDArchitecture) || defined(OpenBSDArchitecture)
+ OS_SUBDIR = bsd
+ OS_SUBDIR2 = linux
