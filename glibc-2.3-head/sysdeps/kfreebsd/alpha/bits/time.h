@@ -42,7 +42,9 @@
 #  ifdef __USE_POSIX199309
 /* Identifier for system-wide realtime clock.  */
 #   define CLOCK_REALTIME		0
-/* These are declared in FreeBSD, but not implemented.  */
+/* Monotonic system-wide clock.  */
+#   define CLOCK_MONOTONIC		4
+/* These are BSD specific clocks.  */
 #   ifdef __USE_BSD
 #    define CLOCK_VIRTUAL		1
 #    define CLOCK_PROF			2
