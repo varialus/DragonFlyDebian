@@ -39,7 +39,7 @@ __getfsstat (struct statfs *buf, long bufsize, int flags)
     tmpbuf = alloca(bufcount * sizeof (struct statfs_fbsd5));
       
   count = __syscall_getfsstat (tmpbuf, bufcount * sizeof (struct statfs_fbsd5), flags);
-  if (count > 0)
+  if (tmpbuf && count > 0)
     for (i = count - 1; i >= 0; i--)
       statfs5_to_statfs (&tmpbuf[i], &buf[i]);
 
