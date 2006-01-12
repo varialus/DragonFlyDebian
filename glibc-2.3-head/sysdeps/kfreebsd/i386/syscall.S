@@ -21,9 +21,9 @@
 	  .text;
 ENTRY (syscall)
 	popl %ecx		/* Pop return address into %ecx.  */
-	popl %eax		/* Pop syscall number into %eax.  */
-	pushl %ecx		/* Push back return address.  */
+	movl 0(%esp), %eax	/* Load syscall number into %eax. */
 	int $0x80		/* Do the system call.  */
+	pushl %ecx		/* Push back return address.  */
 	jb SYSCALL_ERROR_LABEL;	/* Jump to error handler if error.  */
 
 L(pseudo_end):
