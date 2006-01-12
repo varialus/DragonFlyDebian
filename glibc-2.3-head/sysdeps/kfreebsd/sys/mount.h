@@ -343,8 +343,7 @@ extern int getfsstat (struct statfs *__buf, long __bufsize,
 #else
 # ifdef __REDIRECT
 extern int __REDIRECT (getfsstat,
-		       (struct statfs *__buf, long __bufsize, int __flags)
-			 __THROW,
+		       (struct statfs *__buf, long __bufsize, int __flags),
 		       getfsstat64);
 # else
 #  define getfsstat getfsstat64
@@ -367,7 +366,7 @@ extern int getmntinfo (struct statfs **__mntbufp, int __flags) __THROW;
 #else
 # ifdef __REDIRECT
 extern int __REDIRECT (getmntinfo,
-		       (struct statfs **__mntbufp, int __flags) __THROW,
+		       (struct statfs **__mntbufp, int __flags),
 		       getmntinfo64);
 # else
 #  define getmntinfo getmntinfo64
@@ -423,7 +422,7 @@ extern int fhstatfs (__const fhandle_t *__fhp, struct statfs *__buf) __THROW;
 #else
 # ifdef __REDIRECT
 extern int __REDIRECT (fhstatfs,
-		       (__const fhandle_t *__fhp, struct statfs *__buf) __THROW,
+		       (__const fhandle_t *__fhp, struct statfs *__buf),
 		       fhstatfs64);
 # else
 #  define fhstatfs fhstatfs64
