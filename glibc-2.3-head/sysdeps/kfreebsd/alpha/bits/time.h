@@ -42,6 +42,10 @@
 #  ifdef __USE_POSIX199309
 /* Identifier for system-wide realtime clock.  */
 #   define CLOCK_REALTIME		0
+/* High-resolution timer from the CPU.  */
+#   define CLOCK_PROCESS_CPUTIME_ID	2
+/* Thread-specific CPU-time clock.  */
+#   define CLOCK_THREAD_CPUTIME_ID	3
 /* Monotonic system-wide clock.  */
 #   define CLOCK_MONOTONIC		4
 /* These are BSD specific clocks.  */
