@@ -1,5 +1,5 @@
 /* Initialization code run first thing by the ELF startup code.  Linux version.
-   Copyright (C) 1995-1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1995-1999,2000,01,02,03,2004 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -28,23 +28,9 @@
 #include <libc-internal.h>
 
 #include <ldsodefs.h>
-#ifndef SHARED
-# include "dl-osinfo.h"
-#endif
-
-/* _FPU_INITIAL is the value of the floating-point control word, at
-   the moment the kernel passes control to the program.  _FPU_DEFAULT
-   is the default value of the floating-point control word, at the
-   moment when control gets passed to the main() function.  */
-#ifndef _FPU_INITIAL
-# define _FPU_INITIAL _FPU_DEFAULT
-#endif
 
 /* The function is called from assembly stubs the compiler can't see.  */
-static void init (int, char **, char **) __attribute__ ((unused));
-
-extern int _dl_starting_up;
-weak_extern (_dl_starting_up)
+static void init (int, char **, char **) __attribute__ ((used));
 
 /* Set nonzero if we have to be prepared for more then one libc being
    used in the process.  Safe assumption if initializer never runs.  */
@@ -62,25 +48,22 @@ init (int argc, char **argv, char **envp)
 #ifdef USE_NONOPTION_FLAGS
   extern void __getopt_clean_environment (char **);
 #endif
-  /* The next variable is only here to work around a bug in gcc <= 2.7.2.2.
-     If the address would be taken inside the expression the optimizer
-     would try to be too smart and throws it away.  Grrr.  */
-  int *dummy_addr = &_dl_starting_up;
 
-  __libc_multiple_libcs = dummy_addr && !_dl_starting_up;
+  __libc_multiple_libcs = &_dl_starting_up && !_dl_starting_up;
 
   /* Make sure we don't initialize twice.  */
   if (!__libc_multiple_libcs)
     {
-#ifndef SHARED
-# ifdef DL_SYSDEP_OSCHECK
-      DL_SYSDEP_OSCHECK (__libc_fatal);
-# endif
-#endif
-
       /* Set the FPU control word to the proper default value if the
-	 kernel would use a different value.  */
-      if (__fpu_control != _FPU_INITIAL)
+	 kernel would use a different value.  (In a static program we
+	 don't have this information.)  */
+#if 0
+      /* at least on kFreeBSD set it even if SHARED,
+      fixes "make check" failures like math/test-fpucw.out */
+#ifdef SHARED
+      if (__fpu_control != GLRO(dl_fpu_control))
+#endif
+#endif
 	__setfpucw (__fpu_control);
     }
 
