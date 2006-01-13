@@ -39,10 +39,7 @@ roadmap:
 - [DONE] initial sysdeps dir based on glibc-kbsd-2.3/sysdeps/unix/bsd/bsd4.4/kfreebsd/ 
 - [DONE] initial linuxthreads dir based on glibc-2.3/patches/020_linuxthreads.diff
 - [DONE] integrate kfreebsd-sysdeps.dpatch from glibc-2.3.5.diff into sysdeps and linuxthreads dirs
-- [DONE] initial patches dir based on glibc-2.3.5.diff:
-		kfreebsd-fixes.dpatch
-		kfreebsd-scripts.dpatch
-		freebsd-ugly-hacks.dpatch
+- [DONE] initial patches dir based on glibc-2.3.5.diff
 - [DONE] integrate remaining parts of kfreebsd-sysdeps.dpatch
 
 - [DONE] make glibc buildable (at this point, it doesn't have to work, only build)
@@ -50,12 +47,13 @@ roadmap:
 - [DONE] upgrade syscalls.list (from kernel 5.4 or 6.0): 
 - [DONE] port remaining patches from glibc-2.3/patches/
 - [DONE] port remaining patches from web/patches/glibc-2.3.5.diff
+- [DONE] enable TLS
 
 - make glibc functional
 
-- [DONE] enable TLS
-
 - prepare integration into debian glibc package
+
+- prepare amd64 version
 
 
 status:
@@ -81,12 +79,13 @@ problems:
         beware, the test doesn't cover all affected functions
    see also http://h71000.www7.hp.com/doc/73final/6493/6101pro_030.html#unix_thread_cancel
 
-* "make check" fails 
+* "make check" fails, results are same for both tested targets
+		i486-kfreebsd-gnu (with -march=i486 -mtune=i686)
+		i686-kfreebsd-gnu (with -march=i686 -mtune=i686)
 	examine why for each case
 
 make[2]: *** [/build/glibc-2.3-head/build/libio/tst_wprintf2.out] Error 134 [not a regression]
 make[2]: *** [/build/glibc-2.3-head/build/libio/tst-fopenloc.check] Error 1 [not a regression]
-make[2]: *** [/build/glibc-2.3-head/build/posix/tst-regex2.out] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/posix/tst-waitid.out] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/posix/bug-glob2.out] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/misc/tst-error1-mem] Error 1 [not a regression]
@@ -100,6 +99,47 @@ make[2]: [/build/glibc-2.3-head/build/posix/annexc.out] Error 1 (ignored)
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-timer2.o] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-mqueue5.o] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-timer4.o] Error 1
+make[2]: *** [/build/glibc-2.3-head/build/rt/tst-timer5.o] Error 1
+
+
+simplified tst_wprintf2:
+--------------------------------------------------------
+/* gcc -O2 -std=gnu99 -Wall x.c */
+
+#include <errno.h>
+#include <error.h>
+#include <fcntl.h>
+#include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <wchar.h>
+
+int
+main (int argc, char *argv[])
+{
+  FILE *fp;
+
+  setlocale (LC_ALL, "");
+  perror("Here 1");
+  
+  fp = fdopen (dup (STDOUT_FILENO), "a");
+  if (fp == NULL)
+    error (EXIT_FAILURE, errno, "fdopen(,\"a\")");
+    
+  setvbuf (fp, NULL, _IONBF, 0);
+  perror("Here 2");
+  /* fwprintf to unbuffered stream.   */
+  fwprintf (fp, L"hello.\n");
+  perror("Here 3");
+  fclose (fp);
+  perror("Here 4");
+  return 0;
+}
+--------------------------------------------------------
+
+
 
 * directly executing dynamic libraries (same problem with 2.3.0 too)
 
