@@ -1,0 +1,29 @@
+--- elf/dl-load.c.orig	2005-04-06 04:50:10.000000000 +0200
++++ elf/dl-load.c	2006-01-13 20:50:51.000000000 +0100
+@@ -1478,12 +1478,16 @@
+ static int
+ open_verify (const char *name, struct filebuf *fbp)
+ {
++  /* This is the expected ELF OSABI */
++#ifndef ELF_OSABI
++# define ELF_OSABI ELFOSABI_SYSV
++#endif
+   /* This is the expected ELF header.  */
+ #define ELF32_CLASS ELFCLASS32
+ #define ELF64_CLASS ELFCLASS64
+ #ifndef VALID_ELF_HEADER
+ # define VALID_ELF_HEADER(hdr,exp,size)	(memcmp (hdr, exp, size) == 0)
+-# define VALID_ELF_OSABI(osabi)		(osabi == ELFOSABI_SYSV)
++# define VALID_ELF_OSABI(osabi)		(osabi == ELF_OSABI)
+ # define VALID_ELF_ABIVERSION(ver)	(ver == 0)
+ #endif
+   static const unsigned char expected[EI_PAD] =
+@@ -1495,7 +1499,7 @@
+     [EI_CLASS] = ELFW(CLASS),
+     [EI_DATA] = byteorder,
+     [EI_VERSION] = EV_CURRENT,
+-    [EI_OSABI] = ELFOSABI_SYSV,
++    [EI_OSABI] = ELF_OSABI,
+     [EI_ABIVERSION] = 0
+   };
+   static const struct

@@ -29,7 +29,6 @@
 #define VALID_ELF_HEADER(e_ident, expected, size) \
   (memcmp (e_ident, expected, EI_ABIVERSION) == 0			      \
    && memcmp ((const char *) (e_ident) + EI_ABIVERSION, "FreeBSD", 8) == 0)
-#define VALID_ELF_OSABI(osabi) ((osabi) == ELFOSABI_SYSV)
 #define VALID_ELF_ABIVERSION(abi) (memcmp (&(abi), "FreeBSD", 8) == 0)
 
 #include_next "dl-machine.h"
