@@ -33,7 +33,7 @@ __getfsstat (struct statfs *buf, long bufsize, int flags)
     bufsize = 0;
   bufcount = bufsize / sizeof (struct statfs);
   
-  if (bufcount == 0)
+  if ((bufcount == 0) || (buf == NULL))
     tmpbuf = NULL;
   else  
     tmpbuf = alloca(bufcount * sizeof (struct statfs_fbsd5));
