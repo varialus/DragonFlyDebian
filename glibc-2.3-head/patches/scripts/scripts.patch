@@ -5,8 +5,8 @@ diff -urN glibc-2.3.2.orig/abi-tags glibc-2.3.2/abi-tags
  
  .*-sun-solaris2.*	2	2.0.0	# just an arbitrary value
  
--.*-.*-freebsd.*-gnu.*	3	4.0.0	# earliest compatible kernel version
-+.*-.*-kfreebsd.*-gnu.*	3	5.4.0	# earliest compatible kernel version
+-.*-.*-freebsd.*	3	4.0.0	# earliest compatible kernel version
++.*-.*-kfreebsd.*	3	5.4.0	# earliest compatible kernel version
  
  # There is no catch-all default here because every supported OS that uses
  # ELF must have its own unique ABI tag.
@@ -18,7 +18,7 @@ diff -urN glibc-2.3.2.orig/configure glibc-2.3.2/configure
  # Some configurations imply other options.
  case "$host_os" in
 -gnu* | linux* | bsd4.4* | netbsd* | freebsd*)
-+gnu* | linux* | bsd4.4* | netbsd* | freebsd* | k*bsd*-gnu)
++gnu* | linux* | bsd4.4* | netbsd* | freebsd* | k*bsd*)
    # These systems always use GNU tools.
    gnu_ld=yes gnu_as=yes ;;
  esac
@@ -27,7 +27,7 @@ diff -urN glibc-2.3.2.orig/configure glibc-2.3.2/configure
  linux*ecoff* | linux*aout* | gnu*aout* | gnu*ecoff*)
    ;;
 -gnu* | linux* | freebsd* | netbsd* | sysv4* | solaris2* | irix6*)
-+gnu* | linux* | freebsd* | netbsd* | k*bsd*-gnu | sysv4* | solaris2* | irix6*)
++gnu* | linux* | freebsd* | netbsd* | k*bsd* | sysv4* | solaris2* | irix6*)
    # These systems (almost) always use the ELF format.
    elf=yes
    ;;
@@ -36,7 +36,7 @@ diff -urN glibc-2.3.2.orig/configure glibc-2.3.2/configure
  if test -z "$enable_hacker_mode"; then
    case "$machine-$host_os" in
 -  *-linux* | *-gnu* | arm*-none* | powerpc-aix4.3.*)
-+  *-linux* | *-gnu* | *-kfreebsd*-gnu | arm*-none* | powerpc-aix4.3.*)
++  *-linux* | *-gnu* | *-kfreebsd* | arm*-none* | powerpc-aix4.3.*)
      ;;
    *)
      echo "*** The GNU C library is currently not available for this platform."
@@ -45,7 +45,7 @@ diff -urN glibc-2.3.2.orig/configure glibc-2.3.2/configure
  gnu*)
    base_os=mach/hurd ;;
 -netbsd* | 386bsd* | freebsd* | bsdi*)
-+netbsd* | 386bsd* | freebsd* | bsdi* | k*bsd*-gnu)
++netbsd* | 386bsd* | freebsd* | bsdi* | k*bsd*)
    base_os=unix/bsd/bsd4.4 ;;
  osf* | sunos* | ultrix* | newsos* | dynix* | *bsd*)
    base_os=unix/bsd ;;
@@ -57,7 +57,7 @@ diff -urN glibc-2.3.2.orig/configure.in glibc-2.3.2/configure.in
  # Some configurations imply other options.
  case "$host_os" in
 -gnu* | linux* | bsd4.4* | netbsd* | freebsd*)
-+gnu* | linux* | bsd4.4* | netbsd* | freebsd* | k*bsd*-gnu)
++gnu* | linux* | bsd4.4* | netbsd* | freebsd* | k*bsd*)
    # These systems always use GNU tools.
    gnu_ld=yes gnu_as=yes ;;
  esac
@@ -66,7 +66,7 @@ diff -urN glibc-2.3.2.orig/configure.in glibc-2.3.2/configure.in
  linux*ecoff* | linux*aout* | gnu*aout* | gnu*ecoff*)
    ;;
 -gnu* | linux* | freebsd* | netbsd* | sysv4* | solaris2* | irix6*)
-+gnu* | linux* | freebsd* | netbsd* | k*bsd*-gnu | sysv4* | solaris2* | irix6*)
++gnu* | linux* | freebsd* | netbsd* | k*bsd* | sysv4* | solaris2* | irix6*)
    # These systems (almost) always use the ELF format.
    elf=yes
    ;;
@@ -75,7 +75,7 @@ diff -urN glibc-2.3.2.orig/configure.in glibc-2.3.2/configure.in
  if test -z "$enable_hacker_mode"; then
    case "$machine-$host_os" in
 -  *-linux* | *-gnu* | arm*-none* | powerpc-aix4.3.*)
-+  *-linux* | *-gnu* | *-kfreebsd*-gnu | arm*-none* | powerpc-aix4.3.*)
++  *-linux* | *-gnu* | *-kfreebsd* | arm*-none* | powerpc-aix4.3.*)
      ;;
    *)
      echo "*** The GNU C library is currently not available for this platform."
@@ -84,7 +84,7 @@ diff -urN glibc-2.3.2.orig/configure.in glibc-2.3.2/configure.in
  gnu*)
    base_os=mach/hurd ;;
 -netbsd* | 386bsd* | freebsd* | bsdi*)
-+netbsd* | 386bsd* | freebsd* | bsdi* | k*bsd*-gnu)
++netbsd* | 386bsd* | freebsd* | bsdi* | k*bsd*)
    base_os=unix/bsd/bsd4.4 ;;
  osf* | sunos* | ultrix* | newsos* | dynix* | *bsd*)
    base_os=unix/bsd ;;
@@ -95,7 +95,7 @@ diff -urN glibc-2.3.2.orig/shlib-versions glibc-2.3.2/shlib-versions
  x86_64-.*-linux.*       DEFAULT			GLIBC_2.2.5
  powerpc64-.*-linux.*	DEFAULT			GLIBC_2.3
  .*-.*-gnu-gnu.*		DEFAULT			GLIBC_2.2.6
-+.*-.*-kfreebsd.*-gnu	DEFAULT			GLIBC_2.3
++.*-.*-kfreebsd.*	DEFAULT			GLIBC_2.3
  
  # Configuration		Library=version		Earliest symbol set (optional)
  # -------------		---------------		------------------------------
@@ -103,7 +103,7 @@ diff -urN glibc-2.3.2.orig/shlib-versions glibc-2.3.2/shlib-versions
  hppa.*-.*-.*		libm=6			GLIBC_2.2
  .*-.*-linux.*		libm=6
  .*-.*-gnu-gnu.*		libm=6
-+.*-.*-kfreebsd.*-gnu	libm=1
++.*-.*-kfreebsd.*	libm=1
  
  # We provide libc.so.6 for Linux kernel versions 2.0 and later.
  alpha.*-.*-linux.*	libc=6.1
@@ -111,7 +111,7 @@ diff -urN glibc-2.3.2.orig/shlib-versions glibc-2.3.2/shlib-versions
  sparc64-.*-linux.*	libc=6			GLIBC_2.2
  hppa.*-.*-.*		libc=6			GLIBC_2.2
  .*-.*-linux.*		libc=6
-+.*-.*-kfreebsd.*-gnu	libc=0.1
++.*-.*-kfreebsd.*	libc=0.1
  
  # libmachuser.so.1 corresponds to mach/*.defs as of Utah's UK22 release.
  .*-.*-gnu-gnu.*		libmachuser=1
@@ -123,5 +123,5 @@ diff -urN glibc-2.3.2.orig/linuxthreads/shlib-versions glibc-2.3.2/linuxthreads/
  x86_64-.*-linux.*	libpthread=0		GLIBC_2.2.5
  powerpc64-.*-linux.*	libpthread=0		GLIBC_2.3
 -.*-.*-linux.*		libpthread=0
-+.*-.*-kfreebsd.*-gnu.*	libpthread=0		GLIBC_2.3
++.*-.*-kfreebsd.*	libpthread=0		GLIBC_2.3
 +.*-.*-.*		libpthread=0

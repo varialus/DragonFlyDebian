@@ -115,6 +115,36 @@ diff -u glibc-2.3.5/debian/rules.d/build.mk glibc-2.3.5/debian/rules.d/build.mk
  	@echo Making builddir for $(curpass)
  	test -d $(DEB_BUILDDIR) || mkdir $(DEB_BUILDDIR)
  	touch $@
+--- glibc-2.3.5/debian/control.in/opt~	2006-01-12 14:48:52.000000000 +0100
++++ glibc-2.3.5/debian/control.in/opt	2006-01-12 14:49:46.000000000 +0100
+@@ -34,8 +34,8 @@
+  Most notably, IBM's JDK. If you experience problems with such
+  applications, you will need to remove this package.
+ 
+-Package: libc6-i686
+-Architecture: i386
++Package: libc0.1-i686
++Architecture: kfreebsd-i386
+ Section: libs
+ Priority: extra
+ Pre-Depends: @libc@ (= ${Source-Version})
+@@ -45,12 +45,10 @@
+  library and the standard math library, as well as many others.
+  .
+  This set of libraries is optimized for i686 machines, and will only be
+- used if you are running a 2.6 kernel on an i686 class CPU (check the 
+- output of `uname -m').  This includes Pentium Pro, Pentium II/III/IV, 
+- Celeron CPU's and similar class CPU's (including clones such as AMD 
+- Athlon/Opteron, VIA C3 Nehemiah, but not VIA C3 Ezla).  
+- .
+- This package includes support for NPTL.
++ used on an i686 class CPU (check the output of `uname -m').  This includes 
++ Pentium Pro, Pentium II/III/IV, Celeron CPU's and similar class CPU's
++ (including clones such as AMD Athlon/Opteron, VIA C3 Nehemiah, but not VIA 
++ C3 Ezla).  
+  .
+  WARNING: Some third-party binaries may not work well with these libraries.
+  Most notably, IBM's JDK. If you experience problems with such
 diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control.mk
 --- glibc-2.3.5/debian/rules.d/control.mk
 +++ glibc-2.3.5/debian/rules.d/control.mk
@@ -149,10 +179,13 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
  	cat debian/control.in/amd64		>> $@T
 --- glibc-2.3.5.orig/debian/sysdeps/kfreebsd.mk
 +++ glibc-2.3.5/debian/sysdeps/kfreebsd.mk
-@@ -0,0 +1,62 @@
+@@ -0,0 +1,73 @@
 +GLIBC_OVERLAYS ?= $(shell ls glibc-linuxthreads* glibc-ports* glibc-libidn*)
 +MIN_KERNEL_SUPPORTED := 5.4.0
 +libc = libc0.1
++
++GLIBC_PASSES += i686
++DEB_ARCH_REGULAR_PACKAGES += libc0.1-i686
 +
 +# Support multiple makes at once based on number of processors
 +# Common wisdom says parallel make can be up to 2n+1.
@@ -169,8 +202,16 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
 +# Linuxthreads Config
 +threads = yes
 +libc_add-ons = linuxthreads $(add-ons)
-+
 +libc_extra_config_options = $(extra_config_options) --with-tls --with-__thread --disable-compatible-utmp
++
++# We use -march=i686 and glibc's i686 routines use cmov, so require it.
++# A Debian-local glibc patch adds cmov to the search path.
++i686_add-ons = linuxthreads $(add-ons)
++i686_configure_target=i686-kfreebsd
++i686_configure_build=i686-kfreebsd
++i686_extra_cflags = -march=i686 -mtune=i686 -g1 -O3
++i686_LIBDIR = /i686/cmov
++i686_extra_config_options = $(extra_config_options) --disable-profile --with-tls --with-__thread --disable-compatible-utmp
 +
 +ifndef KFREEBSD_SOURCE
 +  KFREEBSD_HEADERS := /usr/include
