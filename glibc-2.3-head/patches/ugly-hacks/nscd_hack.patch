@@ -6,8 +6,8 @@ diff -urN nscd/mem.c.old nscd/mem.c
  			     + db->head->module * sizeof (ref_t)
  			     + new_data_size);
 -
-+#define KFREEBSD_HACK 1
-+#ifndef KFREEBSD_HACK
++#include <_G_config.h>
++#ifdef _G_HAVE_MREMAP
  	  if ((!db->mmap_used || ftruncate (db->wr_fd, newtotal) != 0)
  	      /* Try to resize the mapping.  Note: no MREMAP_MAYMOVE.  */
  	      && mremap (db->head, oldtotal, newtotal, 0) == 0)
