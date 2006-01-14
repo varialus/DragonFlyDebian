@@ -405,7 +405,7 @@ extern int fhstat (__const fhandle_t *__fhp, struct stat *__buf) __THROW;
 #else
 # ifdef __REDIRECT
 extern int __REDIRECT (fhstat,
-		       (__const fhandle_t *__fhp, struct stat *__buf) __THROW,
+		       (__const fhandle_t *__fhp, struct stat *__buf),
 		       fhstat64);
 # else
 #  define fhstat fhstat64
