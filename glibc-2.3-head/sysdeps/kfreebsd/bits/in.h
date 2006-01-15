@@ -68,6 +68,9 @@
 #define	IP_DUMMYNET_FLUSH	62	/* flush dummynet */
 #define	IP_DUMMYNET_GET		64	/* get entire dummynet pipes */
 
+/* To select the IP level.  */
+#define SOL_IP	0
+
 /*
  * Defaults and limits for options
  */
@@ -141,6 +144,10 @@ struct ip_opts
 #define IPV6_DROP_MEMBERSHIP	IPV6_LEAVE_GROUP
 #define IPV6_RXHOPOPTS		IPV6_HOPOPTS
 #define IPV6_RXDSTOPTS		IPV6_DSTOPTS
+
+/* Socket level values for IPv6.  */
+#define SOL_IPV6	41
+#define SOL_ICMPV6	58
 
 /* Routing header options for IPv6.  */
 #define IPV6_RTHDR_LOOSE	0	/* Hop doesn't need to be neighbour. */
