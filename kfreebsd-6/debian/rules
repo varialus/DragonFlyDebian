@@ -11,8 +11,8 @@ major		:= $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 os		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 cpu		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
-config_files	:= $(wildcard debian/arch/$(cpu)/*)
-flavours	:= $(config_files:debian/arch/$(cpu)/%=%)
+config_files	:= $(wildcard debian/arch/$(cpu)/*.config)
+flavours	:= $(config_files:debian/arch/$(cpu)/%.config=%)
 configfile	:= DEBCUSTOM
 abiname		:= 1
 
@@ -89,7 +89,7 @@ build-flavor-%-stamp: src
 	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)-$*"/g' $(FLAVOR_DIR)-$*/sys/conf/newvers.sh 
 
 	# Configure the kernel
-	cp debian/arch/$(cpu)/$* $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/$(configfile)
+	cp debian/arch/$(cpu)/$*.config $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/$(configfile)
 	cd $(FLAVOR_DIR)-$*/sys/$(cpu)/conf \
 		&& config $(configfile)
 
