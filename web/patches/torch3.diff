@@ -1,0 +1,270 @@
+Status: in BTS
+Author: aurel32
+
+diff -u torch3-3.1/Makefile torch3-3.1/Makefile
+--- torch3-3.1/Makefile
++++ torch3-3.1/Makefile
+@@ -1,4 +1,4 @@
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell pwd)
+ include $(CURDIR)/Makefile_options_$(OS)
+ 
+diff -u torch3-3.1/examples/Makefile torch3-3.1/examples/Makefile
+--- torch3-3.1/examples/Makefile
++++ torch3-3.1/examples/Makefile
+@@ -11,7 +11,7 @@
+ # All that follows you can probably keep as is...
+ #
+ 
+-#OS := $(shell uname -s)
++#OS := $(shell uname -s | tr '/' '_')
+ include Makefile_options_Debian
+ 
+ %: %.cc
+diff -u torch3-3.1/debian/changelog torch3-3.1/debian/changelog
+--- torch3-3.1/debian/changelog
++++ torch3-3.1/debian/changelog
+@@ -1,3 +1,9 @@
++torch3 (3.1-1+kbsd) unreleased; urgency=low
++
++  * Added support for GNU/kFreeBSD.
++
++ -- Aurelien Jarno <aurel32@debian.org>  Sat, 10 Dec 2005 18:03:47 +0100
++
+ torch3 (3.1-1) unstable; urgency=low
+ 
+   * Updated packagename and Co. for GCC 4.0 transition
+diff -u torch3-3.1/Makefile.modules torch3-3.1/Makefile.modules
+--- torch3-3.1/Makefile.modules
++++ torch3-3.1/Makefile.modules
+@@ -1,5 +1,5 @@
+ # get user and architecture specific options
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell cd ..; pwd)
+ include ../Makefile_options_$(OS)
+ 
+--- torch3-3.1.orig/core/Makefile
++++ torch3-3.1/core/Makefile
+@@ -1,5 +1,5 @@
+ # get user and architecture specific options
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell cd ..; pwd)
+ include ../Makefile_options_$(OS)
+ 
+--- torch3-3.1.orig/config/Makefile
++++ torch3-3.1/config/Makefile
+@@ -11,7 +11,7 @@
+ # All that follows you can probably keep as is...
+ #
+ 
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ include $(TORCHDIR)/Makefile_options_$(OS)
+ 
+ %: %.cc
+--- torch3-3.1.orig/distributions/Makefile
++++ torch3-3.1/distributions/Makefile
+@@ -1,5 +1,5 @@
+ # get user and architecture specific options
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell cd ..; pwd)
+ include ../Makefile_options_$(OS)
+ 
+--- torch3-3.1.orig/convolutions/Makefile
++++ torch3-3.1/convolutions/Makefile
+@@ -1,5 +1,5 @@
+ # get user and architecture specific options
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell cd ..; pwd)
+ include ../Makefile_options_$(OS)
+ 
+--- torch3-3.1.orig/datasets/Makefile
++++ torch3-3.1/datasets/Makefile
+@@ -1,5 +1,5 @@
+ # get user and architecture specific options
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell cd ..; pwd)
+ include ../Makefile_options_$(OS)
+ 
+--- torch3-3.1.orig/decoder/Makefile
++++ torch3-3.1/decoder/Makefile
+@@ -1,5 +1,5 @@
+ # get user and architecture specific options
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell cd ..; pwd)
+ include ../Makefile_options_$(OS)
+ 
+--- torch3-3.1.orig/nonparametrics/Makefile
++++ torch3-3.1/nonparametrics/Makefile
+@@ -1,5 +1,5 @@
+ # get user and architecture specific options
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell cd ..; pwd)
+ include ../Makefile_options_$(OS)
+ 
+--- torch3-3.1.orig/examples/discriminatives/Makefile
++++ torch3-3.1/examples/discriminatives/Makefile
+@@ -11,7 +11,7 @@
+ # All that follows you can probably keep as is...
+ #
+ 
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ include $(TORCHDIR)/Makefile_options_$(OS)
+ 
+ %: %.cc
+--- torch3-3.1.orig/examples/generatives/Makefile
++++ torch3-3.1/examples/generatives/Makefile
+@@ -11,7 +11,7 @@
+ # All that follows you can probably keep as is...
+ #
+ 
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ include $(TORCHDIR)/Makefile_options_$(OS)
+ 
+ %: %.cc
+--- torch3-3.1.orig/examples/speech/Makefile
++++ torch3-3.1/examples/speech/Makefile
+@@ -11,7 +11,7 @@
+ # All that follows you can probably keep as is...
+ #
+ 
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ include $(TORCHDIR)/Makefile_options_$(OS)
+ 
+ %: %.cc
+--- torch3-3.1.orig/examples/decoder/Makefile
++++ torch3-3.1/examples/decoder/Makefile
+@@ -11,7 +11,7 @@
+ # All that follows you can probably keep as is...
+ #
+ 
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ include $(TORCHDIR)/Makefile_options_$(OS)
+ 
+ %: %.cc
+--- torch3-3.1.orig/gradients/Makefile
++++ torch3-3.1/gradients/Makefile
+@@ -1,5 +1,5 @@
+ # get user and architecture specific options
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell cd ..; pwd)
+ include ../Makefile_options_$(OS)
+ 
+--- torch3-3.1.orig/kernels/Makefile
++++ torch3-3.1/kernels/Makefile
+@@ -1,5 +1,5 @@
+ # get user and architecture specific options
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell cd ..; pwd)
+ include ../Makefile_options_$(OS)
+ 
+--- torch3-3.1.orig/matrix/Makefile
++++ torch3-3.1/matrix/Makefile
+@@ -1,5 +1,5 @@
+ # get user and architecture specific options
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell cd ..; pwd)
+ include ../Makefile_options_$(OS)
+ 
+--- torch3-3.1.orig/speech/Makefile
++++ torch3-3.1/speech/Makefile
+@@ -1,5 +1,5 @@
+ # get user and architecture specific options
+-OS := $(shell uname -s)
++OS := $(shell uname -s | tr '/' '_')
+ TORCHDIR := $(shell cd ..; pwd)
+ include ../Makefile_options_$(OS)
+ 
+--- torch3-3.1.orig/Makefile_options_GNU_kFreeBSD
++++ torch3-3.1/Makefile_options_GNU_kFreeBSD
+@@ -0,0 +1,75 @@
++#
++# What you have to check...
++#
++
++# Packages you want to use
++PACKAGES = convolutions datasets decoder distributions gradients kernels matrix nonparametrics speech
++#PACKAGES =
++
++# Magik key if you have several makefile
++# for the same platform
++MAGIK_KEY = 
++
++# Compiler, linker and archiver
++CC = g++
++CXX = g++
++LD = $(CC)
++AR = ar -rus
++
++# Command for creating dependencies
++DEP = $(CC) -MM
++
++# Your librairies
++# (for example "-lm", but not needed on most systems...)
++MYLIBS = 
++
++# Your includes
++# (for example -I/usr/local/special)
++MYINCS = 
++
++# optimize mode
++DEBUG = OPT
++# debug mode
++#DEBUG = DBG
++
++# double version
++#FLOATING = DOUBLE
++# floating version
++FLOATING = FLOAT
++
++# Debug double mode
++CFLAGS_DBG_DOUBLE = -g -Wall -DUSE_DOUBLE -DDEBUG
++
++# Debug float mode
++CFLAGS_DBG_FLOAT = -g -Wall -DDEBUG
++
++# Optimized double mode
++#CFLAGS_OPT_DOUBLE = -Wall -O2 -ffast-math -mcpu=i686 -march=i686 -malign-double -DUSE_DOUBLE
++CFLAGS_OPT_DOUBLE = -Wall -O2 -ffast-math -DUSE_DOUBLE
++
++# Optimized float mode
++#CFLAGS_OPT_FLOAT = -Wall -O2 -ffast-math -mcpu=i686 -march=i686 -malign-double
++CFLAGS_OPT_FLOAT = -Wall -O2 -ffast-math
++
++#
++#
++# Variables that you may find useful inside your Makefile
++# Do not touch.
++#
++#
++
++MODE = $(DEBUG)_$(FLOATING)
++VERSION_KEY = $(MAGIK_KEY)$(OS)_$(MODE)
++#LIBS_DIR = $(TORCHDIR)/lib/$(VERSION_KEY)
++# Modified by KA for Debian
++LIBS_DIR = $(TORCHDIR)/lib/
++#OBJS_DIR = $(TORCHDIR)/objs/$(VERSION_KEY)
++# Modified by KA for Debian
++OBJS_DIR = $(TORCHDIR)/objs/
++LIBTORCH = $(LIBS_DIR)/libtorch.a
++#LIBSOTORCH = $(LIBS_DIR)/libtorch.so 
++LIBSOTORCH = $(LIBS_DIR)/libtorch.so.3.0.0
++#LIBS = -L$(TORCHDIR)/lib/$(VERSION_KEY) $(LIBTORCH) $(MYLIBS)
++LIBS = -L$(TORCHDIR)/lib/ $(LIBTORCH) $(MYLIBS)
++INCS := -I$(TORCHDIR)/core $(MYINCS)
++INCS += $(foreach f,$(PACKAGES),-I$(TORCHDIR)/$(f))

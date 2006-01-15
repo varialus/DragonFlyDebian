@@ -1,0 +1,84 @@
+diff -u osiris-4.1.8/debian/rules osiris-4.1.8/debian/rules
+--- osiris-4.1.8/debian/rules
++++ osiris-4.1.8/debian/rules
+@@ -25,6 +25,8 @@
+ configure: configure-stamp
+ configure-stamp:
+ 	dh_testdir
++	cp -f /usr/share/config.{guess,sub} ./src/db-4.2.52/dist/
++	cp -f /usr/share/config.{guess,sub} .
+ 	CFLAGS="$(CFLAGS)" ./configure \
+ 		--host=$(DEB_HOST_GNU_TYPE) \
+ 		--build=$(DEB_BUILD_GNU_TYPE) \
+@@ -54,10 +56,7 @@
+ 	-rm -f src/install/osiris
+ 	-rm -f src/install/osirisd
+ 	-rm -f src/install/osirismd
+-	-test -r /usr/share/misc/config.sub && \
+-		cp -f /usr/share/misc/config.sub config.sub
+-	-test -r /usr/share/misc/config.guess && \
+-		cp -f /usr/share/misc/config.guess config.guess
++	rm -f ./src/db-4.2.52/dist/config.{sub,guess} config.{sub,guess}
+ 	dh_clean
+ 
+ install: build
+diff -u osiris-4.1.8/debian/control osiris-4.1.8/debian/control
+--- osiris-4.1.8/debian/control
++++ osiris-4.1.8/debian/control
+@@ -2,7 +2,7 @@
+ Section: admin
+ Priority: optional
+ Maintainer: Jamie Wilkinson <jaq@debian.org>
+-Build-Depends: debhelper (>> 4.0.0), libssl-dev
++Build-Depends: debhelper (>> 4.0.0), libssl-dev, autotools-dev
+ Standards-Version: 3.6.2
+ 
+ Package: osiris
+--- osiris-4.1.8.orig/src/install/install.sh.in
++++ osiris-4.1.8/src/install/install.sh.in
+@@ -60,7 +60,7 @@
+ 
+     echo "==> creating user and group (${USERNAME}, ${GROUP})."
+     case `uname -s`  in
+-Linux|OpenBSD)
++Linux|OpenBSD|GNU/kFreeBSD)
+ 
+     # Add group, must be first.
+     if ! /usr/sbin/groupadd ${GROUP}; then
+@@ -201,7 +201,7 @@
+         echo "==> using existing Osiris user."
+     else
+         case `uname -s`  in
+-        Linux|*BSD|SunOS*|AIX*)
++        Linux|*BSD|SunOS*|AIX*|GNU/kFreeBSD)
+             create_user_and_group ${AGENT_USER} ${AGENT_GROUP} ${OSIRIS_DIR}
+             ;;
+         Darwin)
+@@ -218,7 +218,7 @@
+         echo "==> using existing Osiris management console user."
+     else
+         case `uname -s`  in
+-        Linux|*BSD|SunOS*|AIX*)
++        Linux|*BSD|SunOS*|AIX*|GNU/kFreeBSD)
+             create_user_and_group ${MD_USER} ${MD_GROUP} ${OSIRISMD_DIR}
+             ;;
+             
+@@ -342,7 +342,7 @@
+     USERNAME=$1
+ 
+ case `uname -s`  in
+-Linux)
++Linux|GNU/kFreeBSD)
+ 
+     getent passwd "${USERNAME}" > /dev/null 2>&1
+     RC=$?
+@@ -732,7 +732,7 @@
+ 
+ case `uname -s`  in
+ 
+-Linux)
++Linux|GNU/kFreeBSD)
+ 
+     echo ${RC_DESC}
+ 
+

@@ -1,0 +1,43 @@
+diff -u yiyantang-0.7.0/debian/control yiyantang-0.7.0/debian/control
+--- yiyantang-0.7.0/debian/control
++++ yiyantang-0.7.0/debian/control
+@@ -1,5 +1,5 @@
+ Source: yiyantang
+-Build-Depends: debhelper (>= 2.0.72), libhz-dev (>= 0.3.12-2)
++Build-Depends: debhelper (>= 2.0.72), libhz-dev (>= 0.3.12-2), autotools-dev
+ Section: text
+ Priority: optional
+ Maintainer: Yu Guanghui <ygh@debian.org>
+diff -u yiyantang-0.7.0/debian/rules yiyantang-0.7.0/debian/rules
+--- yiyantang-0.7.0/debian/rules
++++ yiyantang-0.7.0/debian/rules
+@@ -13,6 +13,7 @@
+ 	dh_testdir
+ 	
+ 	# Add here commands to compile the package.
++	cp -f /usr/share/misc/config.{guess,sub} config/
+ 	./configure --prefix=/usr
+ 	$(MAKE)
+ 
+@@ -25,6 +26,7 @@
+ 
+ 	# Add here commands to clean up after the build process.
+ 	-$(MAKE) distclean
++	rm -f config/config.{sub,guess}
+ 
+ 	dh_clean
+ 
+--- yiyantang-0.7.0.orig/src/setty.c
++++ yiyantang-0.7.0/src/setty.c
+@@ -41,6 +41,11 @@
+ 
+ static struct termios save_termios;
+ static int ttysavefd = -1;
++
++#undef RESET
++#undef RAW
++#undef CBREAK
++
+ static enum
+ { RESET, RAW, CBREAK }
+ ttystate = RESET;
