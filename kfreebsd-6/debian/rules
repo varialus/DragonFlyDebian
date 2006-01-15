@@ -30,9 +30,11 @@ PATH		:= /usr/lib/freebsd6:/usr/lib/freebsd:$(PATH)
 control:
 	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
 		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
-	for arch in `ls $(CURDIR)/debian/arch` ; do \
-		for flavor in `ls $(CURDIR)/debian/arch/$$arch/` ; do \
-			sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@arch@/$$arch/g" \
+	for arch in `ls $(CURDIR)/debian/arch/` ; do \
+		for config in `ls $(CURDIR)/debian/arch/$$arch/ | grep \.config` ; do \
+			flavor=$${config/.config/} ; \
+			test -f $(CURDIR)/debian/arch/$$arch/$$flavor.defines && recommends=`awk '/^Recommends: / {print $$2}' $(CURDIR)/debian/arch/$$arch/$$flavor.defines` ; \
+			sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@arch@/$$arch/g" -e "s/@recommends@/$$recommends/g" \
 				$(CURDIR)/debian/control.flavor.in >> $(CURDIR)/debian/control ; \
 		done ; \
 	done

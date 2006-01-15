@@ -1,0 +1,77 @@
+Source: kfreebsd-6
+Section: devel
+Priority: optional
+Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
+Uploaders: Aurelien Jarno <aurel32@debian.org>, Guillem Jover <guillem@debian.org>
+Build-Depends-Indep: debhelper (>= 4.1.0), bzip2, patchutils (>= 0.2.25)
+Build-Depends: debhelper (>= 4.1.0), bzip2, patchutils (>= 0.2.25), dpkg (>= 1.13.9), freebsd6-buildutils (>= 6.0), libdb4.3-dev | libdb-dev, flex-old | flex, gcc-3.4, sharutils
+Standards-Version: 3.6.2
+
+Package: kfreebsd-source-6.0
+Architecture: all
+Section: devel
+Recommends: freebsd6-buildutils (>= 6.0)
+Provides: kfreebsd-source-6, kfreebsd-source
+Replaces: kfreebsd6-source
+Description: source code for kernel of FreeBSD 6.0 with Debian patches
+ This package provides the source code for kernel of FreeBSD 6.0, base of 
+ a GNU/kFreeBSD system.
+
+Package: kfreebsd-headers-6.0-1
+Architecture: kfreebsd-i386
+Section: devel
+Depends: coreutils
+Description: Common architecture-specific header files for kernel of FreeBSD 6.0
+ This package provides the architecture-specific common kernel header files for 
+ kernel of FreeBSD 6.0, generally used for building out-of-tree kernel 
+ modules. To obtain a complete set of headers you also need to install the 
+ kfreebsd-headers-6.0-1-(flavour) package, matching the flavour of the
+ kernel you intend the build for. To obtain such a set for the currently running
+ kernel it is sufficient to run a command
+ .
+ apt-get install kfreebsd-headers-$(uname -r)
+ .
+ and it will be unpacked in /usr/src/kfreebsd-headers-6.0-1-(flavour)
+
+Package: kfreebsd-image-6.0-1-486
+Architecture: kfreebsd-i386
+Section: base
+Depends: freebsd-utils (>= 5), kldutils
+Provides: kfreebsd-image-6, kfreebsd-image
+Conflicts: kfreebsd5, kfreebsd-image
+Replaces: kfreebsd5
+Description: kernel of FreeBSD 6.0 image
+ This package provides the binary image and pre-built loadable modules for 
+ the kernel of FreeBSD 6.0, base of a GNU/kFreeBSD system.
+ .
+ This package is compiled for a 486-class machine.
+
+Package: kfreebsd-image-6-486
+Architecture: kfreebsd-i386
+Section: base
+Depends: kfreebsd-image-6.0-1-486
+Description: kernel of FreeBSD 6 image
+ This package depends on the latest binary image for kernel of FreeBSD 6 on
+ 486-class machines.
+
+Package: kfreebsd-headers-6.0-1-486
+Architecture: kfreebsd-i386
+Section: devel
+Provides: kfreebsd-headers-6
+Depends: kfreebsd-headers-6.0-1 (= ${Source-Version})
+Recommends: 
+Description: header files for kernel of FreeBSD 6.0
+ This package provides the header files for kernel of FreeBSD 6.0, generally 
+ used for building out-of-tree kernel modules. These files are going to be 
+ installed into /usr/src/kfreebsd-headers-6.0-1-486, and can be 
+ used for building modules that load into the kernel provided by the 
+ kfreebsd-image-6.0-1-486 package.
+
+Package: kfreebsd-headers-6-486
+Architecture: kfreebsd-i386
+Section: devel
+Depends: kfreebsd-headers-6.0-1-486
+Description: header files for kernel of FreeBSD 6
+ This package depends on the latest header files for kernel of FreeBSD 6 on
+ 486-class machines.
+  
