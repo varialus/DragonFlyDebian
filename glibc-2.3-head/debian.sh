@@ -1,61 +1,24 @@
 #!/bin/sh
 set -ex
 
-create_dpatch_header()
-{
-  # $1 = filename
-  # $2 = description
-
-  cat << EOF > debian/patches/$1.dpatch
-#! /bin/sh -e
-
-# All lines beginning with \`# DP:' are a description of the patch.
-# DP: Description: $2
-# DP: Related bugs:
-# DP: Upstream status: Not submitted
-# DP: Status Details:
-
-PATCHLEVEL=0
-
-if [ \$# -ne 2 ]; then
-    echo >&2 "\`basename \$0\`: script expects -patch|-unpatch as argument"
-    exit 1
-fi
-case "\$1" in
-    -patch) patch -d "\$2" -f --no-backup-if-mismatch -p\$PATCHLEVEL < \$0;;
-    -unpatch) patch -d "\$2" -f --no-backup-if-mismatch -R -p\$PATCHLEVEL  < \$0;;
-    *)
-        echo >&2 "\`basename \$0\`: script expects -patch|-unpatch as argument"
-        exit 1
-esac
-exit 0
-
-EOF
-
-echo $1 >> debian/patches/00list
-}
-
-pwd=`pwd`
-
 if [ "$1" = "" ] ; then
   echo "Usage: $0 ..../glibc-2.3-head/  (to be run from debian source tree)"
   exit 1
 fi
-
 
 # sysdeps dir
 tmp=`mktemp -d`
 mkdir -p ${tmp}/sysdeps/unix/bsd/bsd4.4 ${tmp}/linuxthreads/sysdeps/unix/bsd/bsd4.4
 cp -a $1/sysdeps/kfreebsd ${tmp}/sysdeps/unix/bsd/bsd4.4/
 cp -a $1/linuxthreads/kfreebsd ${tmp}/linuxthreads/sysdeps/unix/bsd/bsd4.4/
-create_dpatch_header kfreebsd-sysdeps "sysdeps to support GNU/kFreeBSD"
-(cd ${tmp} && diff -x .svn -Nurd null sysdeps/ ) >> debian/patches/kfreebsd-sysdeps.dpatch
-(cd ${tmp} && diff -x .svn -Nurd null linuxthreads/ ) >> debian/patches/kfreebsd-sysdeps.dpatch
+echo "kfreebsd-sysdeps.diff -p0" >> debian/patches/series
+(cd ${tmp} && diff -x .svn -Nurd null sysdeps/ ) > debian/patches/kfreebsd-sysdeps.diff
+(cd ${tmp} && diff -x .svn -Nurd null linuxthreads/ ) >> debian/patches/kfreebsd-sysdeps.diff
 rm -rf ${tmp}
 
 for i in `ls $1/patches` ; do
-  create_dpatch_header kfreebsd-$i
-  cat $1/patches/$i/* >> debian/patches/kfreebsd-$i.dpatch
+  cat $1/patches/$i/* > debian/patches/kfreebsd-$i.diff
+  echo "kfreebsd-$i.diff -p0" >> debian/patches/series
 done
 
 patch -p1 < $0
@@ -72,11 +35,11 @@ diff -u glibc-2.3.5/debian/control.in/main glibc-2.3.5/debian/control.in/main
  Source: @glibc@
  Section: libs
  Priority: required
--Build-Depends: gettext (>= 0.10.37-1), make (>= 3.80-1), dpkg-dev (>= 1.13.5), debianutils (>= 1.13.1), tar (>= 1.13.11), bzip2, texinfo (>= 4.0), linux-kernel-headers (>= 2.6.13+0rc3-2) [!hurd-i386], mig (>= 1.3-2) [hurd-i386], hurd-dev (>= 20020608-1) [hurd-i386], gnumach-dev [hurd-i386], texi2html, file, gcc-4.0 [!powerpc !m68k !hppa !hurd-i386], gcc-3.4 (>= 3.4.4-6) [powerpc], gcc-3.4 [m68k hppa], gcc-3.3 [hurd-i386], autoconf, binutils (>= 2.16.1cvs20051109-1), sed (>= 4.0.5-4), gawk, debhelper (>= 4.1.76), libc6-dev-amd64 [i386], libc6-dev-ppc64 [powerpc]
-+Build-Depends: gettext (>= 0.10.37-1), make (>= 3.80-1), dpkg-dev (>= 1.13.5), debianutils (>= 1.13.1), tar (>= 1.13.11), bzip2, texinfo (>= 4.0), linux-kernel-headers (>= 2.6.13+0rc3-2) [!hurd-i386 !kfreebsd-i386], mig (>= 1.3-2) [hurd-i386], hurd-dev (>= 20020608-1) [hurd-i386], gnumach-dev [hurd-i386], kfreebsd-kernel-headers (>= 0.01) [kfreebsd-i386], texi2html, file, gcc-4.0 [!powerpc !m68k !hppa !hurd-i386], gcc-3.4 (>= 3.4.4-6) [powerpc], gcc-3.4 [m68k hppa], gcc-3.3 [hurd-i386], autoconf, binutils (>= 2.16.1cvs20051109-1), sed (>= 4.0.5-4), gawk, debhelper (>= 4.1.76), libc6-dev-amd64 [i386], libc6-dev-ppc64 [powerpc]
+-Build-Depends: gettext (>= 0.10.37-1), make (>= 3.80-1), dpkg-dev (>= 1.13.5), debianutils (>= 1.13.1), tar (>= 1.13.11), bzip2, texinfo (>= 4.0), linux-kernel-headers (>= 2.6.13+0rc3-2) [!hurd-i386], mig (>= 1.3-2) [hurd-i386], hurd-dev (>= 20020608-1) [hurd-i386], gnumach-dev [hurd-i386], texi2html, file, gcc-4.0 [!powerpc !m68k !hppa !hurd-i386], gcc-3.4 (>= 3.4.4-6) [powerpc], gcc-3.4 [m68k hppa], gcc-3.3 [hurd-i386], autoconf, binutils (>= 2.16.1cvs20051109-1), sed (>= 4.0.5-4), gawk, debhelper (>= 4.1.76), libc6-dev-amd64 [i386], libc6-dev-ppc64 [powerpc], quilt
++Build-Depends: gettext (>= 0.10.37-1), make (>= 3.80-1), dpkg-dev (>= 1.13.5), debianutils (>= 1.13.1), tar (>= 1.13.11), bzip2, texinfo (>= 4.0), linux-kernel-headers (>= 2.6.13+0rc3-2) [!hurd-i386 !kfreebsd-i386], mig (>= 1.3-2) [hurd-i386], hurd-dev (>= 20020608-1) [hurd-i386], gnumach-dev [hurd-i386], kfreebsd-kernel-headers (>= 0.01) [kfreebsd-i386], texi2html, file, gcc-4.0 [!powerpc !m68k !hppa !hurd-i386], gcc-3.4 (>= 3.4.4-6) [powerpc], gcc-3.4 [m68k hppa], gcc-3.3 [hurd-i386], autoconf, binutils (>= 2.16.1cvs20051109-1), sed (>= 4.0.5-4), gawk, debhelper (>= 4.1.76), libc6-dev-amd64 [i386], libc6-dev-ppc64 [powerpc], quilt
  Build-Depends-Indep: perl, po-debconf, po4a
  Maintainer: GNU Libc Maintainers <debian-glibc@lists.debian.org>
- Uploaders: Ben Collins <bcollins@debian.org>, GOTO Masanori <gotom@debian.org>, Philip Blundell <pb@nexus.co.uk>, Jeff Bailey <jbailey@raspberryginger.com>, Daniel Jacobowitz <dan@debian.org>, Clint Adams <schizo@debian.org>
+ Uploaders: Ben Collins <bcollins@debian.org>, GOTO Masanori <gotom@debian.org>, Philip Blundell <pb@nexus.co.uk>, Jeff Bailey <jbailey@raspberryginger.com>, Daniel Jacobowitz <dan@debian.org>, Clint Adams <schizo@debian.org>, Denis Barbier <barbier@debian.org>
 --- glibc-2.3.5/debian/sysdeps/kfreebsd-gnu.mk
 +++ glibc-2.3.5.orig/debian/sysdeps/kfreebsd-gnu.mk
 @@ -1,11 +0,0 @@
