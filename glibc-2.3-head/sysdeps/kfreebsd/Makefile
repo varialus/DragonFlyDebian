@@ -77,6 +77,7 @@ sysdep_routines += sys_readv sys_writev
 sysdep_routines += sys_aio_cancel sys_aio_error sys_aio_read sys_aio_return sys_aio_suspend sys_aio_waitcomplete sys_aio_write sys_lio_listio issetugid modfind modfnext modnext modstat obreak quotactl rfork sysarch undelete yield
 # for INLINE_SYSCALL
 sysdep_routines += sys_fork sys_execve sys_sigaction sys_close sys_fcntl sys_wait4
+sysdep_routines += sys_clock_getres sys_clock_gettime sys_clock_settime
 endif
 
 ifeq ($(subdir),posix)
