@@ -85,6 +85,10 @@ ifeq ($(subdir),posix)
 sysdep_routines += sys_getlogin sys_pread sys_pwrite sys_setlogin sys_read sys_write
 endif
 
+ifeq ($(subdir),inet)
+sysdep_headers += net/ethernet.h net/if_ether.h
+endif
+
 ifeq ($(subdir),time)
 # For <sys/timex.h>.
 sysdep_routines += ntp_adjtime ntp_gettime
