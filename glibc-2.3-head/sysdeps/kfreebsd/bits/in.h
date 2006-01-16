@@ -202,3 +202,48 @@ struct ip_opts
 #define IPV6_RTHDR_STRICT	1	/* Hop must be a neighbour.  */
 
 #define IPV6_RTHDR_TYPE_0	0	/* IPv6 Routing header type 0.  */
+
+/*
+ * Names for IP sysctl objects
+ */
+#define IPV6CTL_FORWARDING	1	/* act as router */
+#define IPV6CTL_SENDREDIRECTS	2	/* may send redirects when forwarding*/
+#define IPV6CTL_DEFHLIM		3	/* default Hop-Limit */
+#define IPV6CTL_FORWSRCRT	5	/* forward source-routed dgrams */
+#define IPV6CTL_STATS		6	/* stats */
+#define IPV6CTL_MRTSTATS	7	/* multicast forwarding stats */
+#define IPV6CTL_MRTPROTO	8	/* multicast routing protocol */
+#define IPV6CTL_MAXFRAGPACKETS	9	/* max packets reassembly queue */
+#define IPV6CTL_SOURCECHECK	10	/* verify source route and intf */
+#define IPV6CTL_SOURCECHECK_LOGINT 11	/* minimume logging interval */
+#define IPV6CTL_ACCEPT_RTADV	12
+#define IPV6CTL_KEEPFAITH	13
+#define IPV6CTL_LOG_INTERVAL	14
+#define IPV6CTL_HDRNESTLIMIT	15
+#define IPV6CTL_DAD_COUNT	16
+#define IPV6CTL_AUTO_FLOWLABEL	17
+#define IPV6CTL_DEFMCASTHLIM	18
+#define IPV6CTL_GIF_HLIM	19	/* default HLIM for gif encap packet */
+#define IPV6CTL_KAME_VERSION	20
+#define IPV6CTL_USE_DEPRECATED	21	/* use deprecated addr (RFC2462 5.5.4) */
+#define IPV6CTL_RR_PRUNE	22	/* walk timer for router renumbering */
+#define IPV6CTL_V6ONLY		24
+#define IPV6CTL_RTEXPIRE	25	/* cloned route expiration time */
+#define IPV6CTL_RTMINEXPIRE	26	/* min value for expiration time */
+#define IPV6CTL_RTMAXCACHE	27	/* trigger level for dynamic expire */
+
+#define IPV6CTL_USETEMPADDR	32	/* use temporary addresses (RFC3041) */
+#define IPV6CTL_TEMPPLTIME	33	/* preferred lifetime for tmpaddrs */
+#define IPV6CTL_TEMPVLTIME	34	/* valid lifetime for tmpaddrs */
+#define IPV6CTL_AUTO_LINKLOCAL	35	/* automatic link-local addr assign */
+#define IPV6CTL_RIP6STATS	36	/* raw_ip6 stats */
+#define IPV6CTL_PREFER_TEMPADDR	37	/* prefer temporary addr as src */
+#define IPV6CTL_ADDRCTLPOLICY	38	/* get/set address selection policy */
+
+#define IPV6CTL_MAXFRAGS	41	/* max fragments */
+
+/* New entries should be added here from current IPV6CTL_MAXID value. */
+/* to define items, should talk with KAME guys first, for *BSD compatibility */
+/* 42-44 is already used in KAME */
+#define IPV6CTL_STEALTH		45
+#define IPV6CTL_MAXID		46
