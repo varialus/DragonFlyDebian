@@ -73,6 +73,29 @@ status:
 problems:
 =========
 
+* update machine context structs (ABI change)
+
+  FreeBSD 5 changed extended context structs (on i386 added support for mmx),
+  we still using FreeBSD 4 structs
+  new version should use added syscalls
+
+  header files:
+	sys/ucontext.h
+	i386/bits/mcontext.h
+	i386/bits/sigcontext.h
+	alpha/bits/mcontext.h
+	alpha/bits/sigcontext.h
+
+  affected libc interfaces:
+	makecontext  
+	getcontext
+	setcontext
+	swapcontext
+
+  only internal change:	
+	sigreturn
+  
+
 * thread cancelation
    cancelable functions are not properly marked in syscalls.list, ...
    informal list of such functions is include in linuxthreads/tst-cancel4.c, nptl/tst-cancel4.c
