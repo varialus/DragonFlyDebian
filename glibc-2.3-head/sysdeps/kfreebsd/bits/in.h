@@ -118,26 +118,60 @@ struct ip_opts
     char ip_opts[40];		/* Actually variable in size.  */
   };
 
-/* IPV6 socket options.  */
-#define IPV6_ADDRFORM		1
-#define IPV6_RXINFO		2
-#define IPV6_HOPOPTS		3
-#define IPV6_DSTOPTS		4
-#define IPV6_RTHDR		5
-#define IPV6_PKTOPTIONS		6
-#define IPV6_CHECKSUM		7
-#define IPV6_HOPLIMIT		8
+/* Options for use with `getsockopt' and `setsockopt' at the IPv6 level.
+   The first word in the comment at the right is the data type used;
+   "bool" means a boolean value stored in an `int'.  */
+#define IPV6_SOCKOPT_RESERVED1	3  /* reserved for future use */
+#define IPV6_UNICAST_HOPS	4  /* int; IP6 hops */
+#define IPV6_MULTICAST_IF	9  /* u_int; set/get IP6 multicast i/f  */
+#define IPV6_MULTICAST_HOPS	10 /* int; set/get IP6 multicast hops */
+#define IPV6_MULTICAST_LOOP	11 /* u_int; set/get IP6 multicast loopback */
+#define IPV6_JOIN_GROUP		12 /* ip6_mreq; join a group membership */
+#define IPV6_LEAVE_GROUP	13 /* ip6_mreq; leave a group membership */
+#define IPV6_PORTRANGE		14 /* int; range to choose for unspec port */
+#define ICMP6_FILTER		18 /* icmp6_filter; icmp6 filter */
 
-#define IPV6_TXINFO		IPV6_RXINFO
-#define SCM_SRCINFO		IPV6_TXINFO
-#define SCM_SRCRT		IPV6_RXSRCRT
+#define IPV6_CHECKSUM		26 /* int; checksum offset for raw socket */
+#define IPV6_V6ONLY		27 /* bool; make AF_INET6 sockets v6 only */
 
-#define IPV6_UNICAST_HOPS	16
-#define IPV6_MULTICAST_IF	17
-#define IPV6_MULTICAST_HOPS	18
-#define IPV6_MULTICAST_LOOP	19
-#define IPV6_JOIN_GROUP		20
-#define IPV6_LEAVE_GROUP	21
+#define IPV6_IPSEC_POLICY	28 /* struct; get/set security policy */
+#define IPV6_FAITH		29 /* bool; accept FAITH'ed connections */
+
+#define IPV6_FW_ADD		30 /* add a firewall rule to chain */
+#define IPV6_FW_DEL		31 /* delete a firewall rule from chain */
+#define IPV6_FW_FLUSH		32 /* flush firewall rule chain */
+#define IPV6_FW_ZERO		33 /* clear single/all firewall counter(s) */
+#define IPV6_FW_GET		34 /* get entire firewall rule chain */
+#define IPV6_RTHDRDSTOPTS	35 /* ip6_dest; send dst option before rthdr */
+
+#define IPV6_RECVPKTINFO	36 /* bool; recv if, dst addr */
+#define IPV6_RECVHOPLIMIT	37 /* bool; recv hop limit */
+#define IPV6_RECVRTHDR		38 /* bool; recv routing header */
+#define IPV6_RECVHOPOPTS	39 /* bool; recv hop-by-hop option */
+#define IPV6_RECVDSTOPTS	40 /* bool; recv dst option after rthdr */
+
+#define IPV6_USE_MIN_MTU	42 /* bool; send packets at the minimum MTU */
+#define IPV6_RECVPATHMTU	43 /* bool; notify an according MTU */
+#define IPV6_PATHMTU		44 /* mtuinfo; get the current path MTU (sopt),
+				      4 bytes int; MTU notification (cmsg) */
+
+#define IPV6_PKTINFO		46 /* in6_pktinfo; send if, src addr */
+#define IPV6_HOPLIMIT		47 /* int; send hop limit */
+#define IPV6_NEXTHOP		48 /* sockaddr; next hop addr */
+#define IPV6_HOPOPTS		49 /* ip6_hbh; send hop-by-hop option */
+#define IPV6_DSTOPTS		50 /* ip6_dest; send dst option befor rthdr */
+#define IPV6_RTHDR		51 /* ip6_rthdr; send routing header */
+
+#define IPV6_RECVTCLASS		57 /* bool; recv traffic class values */
+
+#define IPV6_AUTOFLOWLABEL	59 /* bool; attach flowlabel automagically */
+
+#define IPV6_TCLASS		61 /* int; send traffic class value */
+#define IPV6_DONTFRAG		62 /* bool; disable IPv6 fragmentation */
+
+#define IPV6_PREFER_TEMPADDR	63 /* int; prefer temporary addresses as
+                                    * the source address.
+				    */
 
 /* Obsolete synonyms for the above.  */
 #define IPV6_ADD_MEMBERSHIP	IPV6_JOIN_GROUP
@@ -148,6 +182,20 @@ struct ip_opts
 /* Socket level values for IPv6.  */
 #define SOL_IPV6	41
 #define SOL_ICMPV6	58
+
+/*
+ * Defaults and limits for options
+ */
+#define IPV6_DEFAULT_MULTICAST_HOPS 1   /* normally limit m'casts to 1 hop */
+#define IPV6_DEFAULT_MULTICAST_LOOP 1   /* normally hear sends if a member */
+
+/*
+ * Argument for IPV6_PORTRANGE:
+ * - which range to search when port is unspecified at bind() or connect()
+ */
+#define IPV6_PORTRANGE_DEFAULT  0       /* default range */
+#define IPV6_PORTRANGE_HIGH     1       /* "high" - request firewall bypass */
+#define IPV6_PORTRANGE_LOW      2       /* "low" - vouchsafe security */
 
 /* Routing header options for IPv6.  */
 #define IPV6_RTHDR_LOOSE	0	/* Hop doesn't need to be neighbour. */
