@@ -80,34 +80,30 @@ diff -u glibc-2.3.5/debian/rules.d/build.mk glibc-2.3.5/debian/rules.d/build.mk
  	touch $@
 --- glibc-2.3.5/debian/control.in/opt~	2006-01-12 14:48:52.000000000 +0100
 +++ glibc-2.3.5/debian/control.in/opt	2006-01-12 14:49:46.000000000 +0100
-@@ -34,8 +34,8 @@
+@@ -56,3 +56,23 @@
   Most notably, IBM's JDK. If you experience problems with such
   applications, you will need to remove this package.
  
--Package: libc6-i686
--Architecture: i386
 +Package: libc0.1-i686
 +Architecture: kfreebsd-i386
- Section: libs
- Priority: extra
- Pre-Depends: @libc@ (= ${Source-Version})
-@@ -45,12 +45,10 @@
-  library and the standard math library, as well as many others.
-  .
-  This set of libraries is optimized for i686 machines, and will only be
-- used if you are running a 2.6 kernel on an i686 class CPU (check the 
-- output of `uname -m').  This includes Pentium Pro, Pentium II/III/IV, 
-- Celeron CPU's and similar class CPU's (including clones such as AMD 
-- Athlon/Opteron, VIA C3 Nehemiah, but not VIA C3 Ezla).  
-- .
-- This package includes support for NPTL.
++Section: libs
++Priority: extra
++Pre-Depends: @libc@ (= ${Source-Version})
++Description: GNU C Library: Shared libraries [i686 optimized]
++ Contains the standard libraries that are used by nearly all programs on
++ the system. This package includes shared versions of the standard C
++ library and the standard math library, as well as many others.
++ .
++ This set of libraries is optimized for i686 machines, and will only be
 + used on an i686 class CPU (check the output of `uname -m').  This includes 
 + Pentium Pro, Pentium II/III/IV, Celeron CPU's and similar class CPU's
 + (including clones such as AMD Athlon/Opteron, VIA C3 Nehemiah, but not VIA 
 + C3 Ezla).  
-  .
-  WARNING: Some third-party binaries may not work well with these libraries.
-  Most notably, IBM's JDK. If you experience problems with such
++  .
++ WARNING: Some third-party binaries may not work well with these libraries.
++ Most notably, IBM's JDK. If you experience problems with such
++ applications, you will need to remove this package.
++
 diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control.mk
 --- glibc-2.3.5/debian/rules.d/control.mk
 +++ glibc-2.3.5/debian/rules.d/control.mk
