@@ -68,7 +68,7 @@ struct sigcontext
     int     sc_fpformat;
     int     sc_ownedfp;
     int     sc_spare1[1];
-    int     sc_fpstate[128] __aligned(16);
+    int     sc_fpstate[128] __attribute__((aligned(16)));
     int     sc_spare2[8];
   };
 

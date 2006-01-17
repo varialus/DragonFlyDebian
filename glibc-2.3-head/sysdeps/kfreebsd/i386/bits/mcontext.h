@@ -103,7 +103,7 @@ typedef struct
     /*
      * See <machine/npx.h> for the internals of mc_fpstate[].
      */
-    int mc_fpstate[128] __aligned(16);
+    int mc_fpstate[128] __attribute__((aligned(16)));
     int mc_spare2[8];
   } mcontext_t;
 
