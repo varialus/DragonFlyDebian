@@ -8,11 +8,11 @@ fi
 
 # sysdeps dir
 tmp=`mktemp -d`
-mkdir -p ${tmp}/glibc-ports-2.3.5/sysdeps/unix/bsd/bsd4.4 ${tmp}/linuxthreads/sysdeps/unix/bsd/bsd4.4
-cp -a $1/sysdeps/kfreebsd ${tmp}/glibc-ports-2.3.5/sysdeps/unix/bsd/bsd4.4/
+mkdir -p ${tmp}/sysdeps/unix/bsd/bsd4.4 ${tmp}/linuxthreads/sysdeps/unix/bsd/bsd4.4
+cp -a $1/sysdeps/kfreebsd ${tmp}/sysdeps/unix/bsd/bsd4.4/
 cp -a $1/linuxthreads/kfreebsd ${tmp}/linuxthreads/sysdeps/unix/bsd/bsd4.4/
 echo "kfreebsd-sysdeps.diff -p0" >> debian/patches/series
-(cd ${tmp} && diff -x .svn -Nurd null glibc-ports-2.3.5/ ) > debian/patches/kfreebsd-sysdeps.diff
+(cd ${tmp} && diff -x .svn -Nurd null sysdeps/ ) > debian/patches/kfreebsd-sysdeps.diff
 (cd ${tmp} && diff -x .svn -Nurd null linuxthreads/ ) >> debian/patches/kfreebsd-sysdeps.diff
 rm -rf ${tmp}
 
@@ -138,11 +138,10 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
  	cat debian/control.in/amd64		>> $@T
 --- glibc-2.3.5.orig/debian/sysdeps/kfreebsd.mk
 +++ glibc-2.3.5/debian/sysdeps/kfreebsd.mk
-@@ -0,0 +1,74 @@
+@@ -0,0 +1,73 @@
 +GLIBC_OVERLAYS ?= $(shell ls glibc-linuxthreads* glibc-ports* glibc-libidn*)
 +MIN_KERNEL_SUPPORTED := 5.4.0
 +libc = libc0.1
-+add-ons = glibc-ports-2.3.5
 +
 +GLIBC_PASSES += i686
 +DEB_ARCH_REGULAR_PACKAGES += libc0.1-i686
