@@ -45,15 +45,8 @@ struct sigcontext
     unsigned long sc_fpcr;
     unsigned long sc_fp_control;
     long sc_ownedfp;
-
-    unsigned long sc_ssize;
-    char *sc_sbase;
-
-    unsigned long sc_fp_trap_pc;
-    unsigned long sc_fp_trigger_sum;
-    unsigned long sc_fp_trigger_inst;
-
-    long sc_spare[2];
+    long sc_format;              /* see mcontext_t */
+    long sc_spare[6];            /* XXX */
   };
 
 /* Traditional BSD names for some members.  */

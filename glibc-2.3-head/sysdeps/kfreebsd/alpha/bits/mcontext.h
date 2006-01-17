@@ -40,14 +40,13 @@ typedef struct
     unsigned long mc_fpregs[32];
     unsigned long mc_fpcr;
     unsigned long mc_fp_control;
+#define _MC_FPOWNED_NONE        0       /* FP state not used */
+#define _MC_FPOWNED_FPU         1       /* FP state came from FPU */
+#define _MC_FPOWNED_PCB         2       /* FP state came from PCB */
     long mc_ownedfp;
-
-    unsigned long mc_ssize;
-    char *mc_sbase;
-
-    unsigned long mc_fp_trap_pc;
-    unsigned long mc_fp_trigger_sum;
-    unsigned long mc_fp_trigger_inst;
-
-    long mc_spare[2];
+#define _MC_REV0_SIGFRAME       1       /* context is a signal frame */
+#define _MC_REV0_TRAPFRAME      2       /* context is a trap frame */
+    long    mc_format;
+    long    mc_thrptr;                  /* Thread pointer */
+    long    mc_spare[5];
   } mcontext_t;
