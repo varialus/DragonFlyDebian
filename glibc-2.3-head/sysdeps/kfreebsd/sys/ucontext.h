@@ -40,7 +40,9 @@ typedef struct ucontext
     mcontext_t uc_mcontext;
     struct ucontext *uc_link;
     stack_t uc_stack;
-    int __unused1[8];
+    int     uc_flags;
+#define UCF_SWAPPED     0x00000001      /* Used by swapcontext(3). */
+    int __unused1[4];
   } ucontext_t;
 
 #endif /* sys/ucontext.h */

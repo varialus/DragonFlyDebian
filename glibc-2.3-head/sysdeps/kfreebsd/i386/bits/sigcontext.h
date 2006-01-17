@@ -60,8 +60,16 @@ struct sigcontext
     union { int sc_esp; int esp; };		/* This stack pointer is used.  */
     union { int sc_ss; int ss; };		/* Stack segment register.  */
 
-    int sc_fpregs[28];
-    int sc_spare[17];
+    int     sc_len;                 /* sizeof(mcontext_t) */
+    /*
+     * XXX - See <machine/ucontext.h> and <machine/npx.h> for
+     *       the following fields.
+     */
+    int     sc_fpformat;
+    int     sc_ownedfp;
+    int     sc_spare1[1];
+    int     sc_fpstate[128] __aligned(16);
+    int     sc_spare2[8];
   };
 
 /* Traditional BSD names for some members.  */
