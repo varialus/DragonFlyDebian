@@ -95,7 +95,7 @@ typedef struct {
 	/*
 	 * See <machine/fpu.h> for the internals of mc_fpstate[].
 	 */
-	long	mc_fpstate[64] __aligned(16);
+	long	mc_fpstate[64] __attribute__((aligned(16)));
 	long	mc_spare[8];
 } mcontext_t;
 
