@@ -47,7 +47,7 @@
 									      \
     asm volatile ("syscall"						      \
 		  : "=a" (_result)					      \
-		  : "0" ((unsigned long int) (SYS_sysarch),		      \
+		  : "0" ((unsigned long int) SYS_sysarch),		      \
 		    "D" ((unsigned long int) AMD64_SET_FSBASE),		      \
 		    "S" (&_descr)					      \
 		  : "memory", "cc", "cx", "dx", "r8", "r9", "r10", "r11");    \

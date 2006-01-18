@@ -53,7 +53,7 @@
 ENTRY (__start_thread)
 
         /* Insert the argument onto the new aligned stack.  */
-        andq	$-16 %rsi
+        andq	$-16,%rsi
         subq    $16,%rsi
         movq    %rcx,8(%rsi)
 
@@ -142,7 +142,7 @@ L(complex):
         jnz     L(child)
 
         /* Save the child pid, currently in %rax.  */
-        movl    %rax, 0(%rsp)
+        movq    %rax, 0(%rsp)
 
         /* Restore the previous signal mask.  */
         movq    $SIG_SETMASK, %rdi
@@ -159,7 +159,7 @@ L(pseudo_end):
 L(error_unmask):
 
         /* Save the error code, currently in %rax.  */
-        movl    %rax, 0(%rsp)
+        movq    %rax, 0(%rsp)
 
         /* Restore the previous signal mask.  */
         movq    $SIG_SETMASK, %rdi

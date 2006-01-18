@@ -69,8 +69,8 @@
  * those in mcontext_t.
  */
 struct sigcontext {
-	struct __sigset sc_mask;	/* signal mask to restore */
-	long	sc_onstack;		/* sigstack state to restore */
+	__sigset_t sc_mask;	/* signal mask to restore */
+	long	sc_onstack;	/* sigstack state to restore */
 	long	sc_rdi;		/* machine state (struct trapframe) */
 	long	sc_rsi;
 	long	sc_rdx;
@@ -95,7 +95,7 @@ struct sigcontext {
 	long	sc_rflags;
 	long	sc_rsp;
 	long	sc_ss;
-	long	sc_len;			/* sizeof(mcontext_t) */
+	long	sc_len;		/* sizeof(mcontext_t) */
 	/*
 	 * XXX - See <machine/ucontext.h> and <machine/fpu.h> for
 	 *       the following fields.

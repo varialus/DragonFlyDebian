@@ -50,16 +50,16 @@
     movq %rax, (%rsp);							      \
     movq $SYS_ify (syscall_name), %rax;					      \
     syscall;								      \
-    popq %rdi; cfi_adjust_cfa_offset(-8)				      \
-    pushfq; cfi_adjust_cfa_offset(8)					      \
+    popq %rdi; cfi_adjust_cfa_offset(-8);				      \
+    pushfq; cfi_adjust_cfa_offset(8);					      \
     /* Save %rax since it's the error code from the syscall.  */	      \
     movq %rax, 8(%rsp);							      \
     CDISABLE								      \
-    popfq; cfi_adjust_cfa_offset(-8)                                          \
+    popfq; cfi_adjust_cfa_offset(-8);                                         \
     /* fetch the error code from the syscall.  */              		      \
-    popq %rax; cfi_adjust_cfa_offset(-8)                                      \
+    popq %rax; cfi_adjust_cfa_offset(-8);                                     \
     /* adjust rsp, do not change flags	*/				      \
-    popq %rdx; cfi_adjust_cfa_offset(-8)                                      \
+    popq %rdx; cfi_adjust_cfa_offset(-8);                                     \
     jb SYSCALL_ERROR_LABEL;						      \
   L(pseudo_end):
 
