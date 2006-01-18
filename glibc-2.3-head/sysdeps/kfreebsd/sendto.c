@@ -29,7 +29,7 @@
 extern int __libc_sa_len (sa_family_t __af);
 extern int __libc_sa_len_internal (sa_family_t __af);
 
-extern ssize_t __syscall_sendto (int fd, __const __ptr_t buf, 
+extern ssize_t __syscall_sendto (int fd, __const void * buf, 
 		                 size_t n, int flags, 
 				 __CONST_SOCKADDR_ARG addr, 
 				 socklen_t addrlen);
@@ -37,8 +37,9 @@ extern ssize_t __syscall_sendto (int fd, __const __ptr_t buf,
 /* Send N bytes of BUF on socket FD to peer at address ADDR (which is
  *    ADDR_LEN bytes long).  Returns the number sent, or -1 for errors.  */
 
-int
-__libc_sendto (int fd, __const __ptr_t buf, size_t n, int flags,
+
+ssize_t
+__libc_sendto (int fd, __const void * buf, size_t n, int flags,
 	       __CONST_SOCKADDR_ARG addr, socklen_t addrlen)
 {
   socklen_t new_addrlen;
