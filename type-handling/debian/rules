@@ -6,20 +6,25 @@
 #export DH_VERBOSE=1
 
 DEB_BUILD_ARCH_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU)
+DEB_BUILD_ARCH_OS ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH_OS)
 DEB_BUILD_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_SYSTEM)
-DEB_BUILD_GNU_TYPE = $(DEB_BUILD_ARCH_CPU)-$(DEB_BUILD_GNU_SYSTEM)
+DEB_BUILD_GNU_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
+DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
-cpus := $(shell grep -v ^\# /usr/share/dpkg/cputable | (while read debian gnu regex ; do echo $${debian} ; done))
-systems=$(shell grep -v ^\# /usr/share/dpkg/ostable | (while read debian gnu regex ; do echo $${debian} ; done))
-systems := $(shell echo $(systems) linux-gnu | tr " " "\n" | grep -vx linux | sort | uniq)
+cpus := $(shell grep -v ^\# /usr/share/dpkg/cputable | (while read debian gnu regex ; do echo $${debian} ; echo $${gnu}; done) | sort -u)
+systems := $(shell grep -v ^\# /usr/share/dpkg/ostable | (while read debian gnu regex ; do echo $${debian} ; echo $${gnu}; done) | sort -u)
 
-not_cpus := $(shell echo $(cpus) | tr " " "\n" | grep -vx $(DEB_BUILD_ARCH_CPU))
-not_systems := $(shell echo $(systems) | tr " " "\n" | grep -vx $(DEB_BUILD_GNU_SYSTEM))
+not_cpus := $(shell echo $(cpus) | tr " " "\n" | grep -vx $(DEB_BUILD_ARCH_CPU) | grep -vx $(DEB_BUILD_GNU_CPU))
+not_systems := $(shell echo $(systems) | tr " " "\n" | grep -vx $(DEB_BUILD_ARCH_OS) | grep -vx $(DEB_BUILD_GNU_SYSTEM))
 
 not_cpus := $(shell for cpu in $(not_cpus) ; do echo -n , not+$$cpu ; done)
 not_systems := $(shell for system in $(not_systems) ; do echo -n , not+$$system ; done)
 
-provides = $(DEB_BUILD_ARCH_CPU), $(DEB_BUILD_GNU_SYSTEM), $(DEB_BUILD_GNU_TYPE)$(not_cpus)$(not_systems)
+ifneq (hurd,$(DEB_HOST_ARCH_OS))
+provides = $(DEB_HOST_ARCH_OS),
+endif
+
+provides += $(DEB_BUILD_ARCH_CPU), $(DEB_BUILD_GNU_SYSTEM), $(DEB_BUILD_GNU_TYPE), $(not_cpus), $(not_systems)
 
 clean:
 	dh_testdir
