@@ -21,6 +21,7 @@
 
 .text
 ENTRY(__getcontext)
+        clc	
         movq 0(%rsp), %rsi	/* save the return PC value */
  
         DO_CALL (getcontext, 1)

@@ -1,4 +1,4 @@
-/* Save current context.
+/* swap current context.
    Copyright (C) 2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -20,19 +20,13 @@
 #include <sysdep.h>
 
 .text
-ENTRY(__getcontext)
-        clc  
-        movl 0(%esp), %ecx	/* save the return PC value */
- 
-        DO_CALL (getcontext, 1)
+ENTRY(__swapcontext)
+        clc
+        DO_CALL (swapcontext, 2)
         jb SYSCALL_ERROR_LABEL
-
-        addl $4, %esp		/* remove stale return address */
-        jmp  *%ecx
-
 L(pseudo_end):
 	ret
 
-PSEUDO_END(__getcontext)
+PSEUDO_END(__swapcontext)
 
-weak_alias(__getcontext, getcontext)
+weak_alias(__swapcontext, swapcontext)
