@@ -106,4 +106,9 @@ struct sigcontext {
 	long	sc_spare[8];
 };
 
+/* Traditional BSD names for some members.  */
+#define sc_sp           sc_rsp          /* Stack pointer.  */
+#define sc_fp           sc_rbp          /* Frame pointer.  */
+#define sc_pc           sc_rip          /* Process counter.  */
+
 #endif /* _BITS_SIGCONTEXT_H */
