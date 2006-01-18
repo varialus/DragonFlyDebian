@@ -21,13 +21,13 @@
 
 .text
 ENTRY(__getcontext)
-        movl 0(%rsp), %rcx	/* save the return PC value */
+        movq 0(%rsp), %rsi	/* save the return PC value */
  
         DO_CALL (getcontext, 1)
         jb SYSCALL_ERROR_LABEL
 
         addq $8, %rsp		/* remove stale return address */
-        jmp  *%rcx
+        jmp  *%rsi
 
 L(pseudo_end):
 	ret
