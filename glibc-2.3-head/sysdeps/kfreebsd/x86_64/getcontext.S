@@ -1,6 +1,5 @@
-/* Offsets and other constants needed in the *context() function
-   implementation.
-   Copyright (C) 2001 Free Software Foundation, Inc.
+/* Save current context.
+   Copyright (C) 2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -18,21 +17,21 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* Offsets of the fields in the ucontext_t structure.  */
-#define oSIGMASK	0
-#define oGS		20
-#define oFS		24
-#define oEDI		36
-#define oESI		40
-#define oEBP		44
-#define oEBX		52
-#define oEDX		56
-#define oECX		60
-#define oEAX		64
+#include <sysdep.h>
 
-#define oEIP		76
-#define oESP		88
+.text
+ENTRY(__getcontext)
+        movl 0(%rsp), %rcx	/* save the return PC value */
+ 
+        DO_CALL (getcontext, 1)
+        jb SYSCALL_ERROR_LABEL
 
-#define oLINK		656
-#define oSS_SP		660
-#define oSS_SIZE	664
+        addq $8, %rsp		/* remove stale return address */
+        jmp  *%rcx
+
+L(pseudo_end):
+	ret
+
+PSEUDO_END(__getcontext)
+
+weak_alias(__getcontext, getcontext)
