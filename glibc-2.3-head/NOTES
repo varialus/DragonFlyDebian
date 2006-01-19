@@ -77,31 +77,6 @@ problems:
 
   FreeBSD 5 changed extended context structs (on i386 added support for mmx),
   we still using FreeBSD 4 structs
-  new version should use added syscalls
-
-  header files:
-	sys/ucontext.h
-	i386/bits/mcontext.h
-	i386/bits/sigcontext.h
-	alpha/bits/mcontext.h
-	alpha/bits/sigcontext.h
-
-  affected libc interfaces:
-	makecontext  
-	getcontext
-	setcontext
-	swapcontext
-
-  only internal change:	
-	sigreturn
-
-  The affected source packages are only:
-	gstreamer0.8 [done]
-	lwp [done]
-	pdns [done]
-	pth [done]
-	ruby1.8 [done]
-	ruby1.9 [done]
 
   Transition should be as follows:
 
@@ -109,7 +84,7 @@ problems:
 	2) upload glibc [done]
 	3) binNMU affected packages [done]
 	4) change implementation of ucontext_t related calls
-	   to access added mmx fields in structs, test
+	   to access added mmx fields in structs, test [done]
 	5) upload glibc
 
 
