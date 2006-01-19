@@ -32,7 +32,7 @@ __wait3 (stat_loc, options, usage)
      int options;
      struct rusage *usage;
 {
-  return INLINE_SYSCALL (wait4, 4, WAIT_ANY, stat_loc, options, usage);
+  return __wait4(WAIT_ANY, stat_loc, options, usage);
 }
 
 weak_alias (__wait3, wait3)
