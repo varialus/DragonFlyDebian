@@ -184,6 +184,10 @@
 #define DOARGS_7 DOARGS_6
 #define DOARGS_8 DOARGS_7
 
+#else   /* !__ASSEMBLER__ */
+
+#include <syscalls-inline.h>
+
 #endif	/* __ASSEMBLER__ */
 
 #endif /* _KFREEBSD_X86_64_SYSDEP_H  */

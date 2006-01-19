@@ -1,4 +1,5 @@
-/* Copyright (C) 2006 Free Software Foundation, Inc.
+/* prototypes of generally used "inline syscalls"
+   Copyright (C) 2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,15 +17,23 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <sysdep.h>
+#ifndef KFREEBSD_INLINE_SYSCALLS_H
+#define KFREEBSD_INLINE_SYSCALLS_H
 
-int __syscall_clock_settime(clockid_t clock_id, const struct timespec *tp);
+#include <sys/types.h>
 
-# define SYSDEP_SETTIME \
-  case CLOCK_REALTIME:							      \
-    retval = INLINE_SYSCALL (clock_settime, 2, clock_id, tp);		      \
-    break
-/* We handled the REALTIME clock here.  */
-# define HANDLED_REALTIME	1
+struct iovec;
+struct rusage;
 
-#include <sysdeps/unix/clock_settime.c>
+int __syscall_open(const char *path, int flags, ...);
+int __syscall_close(int fd);
+
+ssize_t __syscall_read(int fd, void *buf, size_t nbyte);
+ssize_t __syscall_write(int fd, const void *buf, size_t nbyte);
+ssize_t __syscall_writev(int fd, const struct iovec *iovp, int iovcnt); 
+
+int __syscall_fcntl(int fd, int cmd, ...);
+int __syscall_fork(void);
+int __syscall_wait4(int pid, int *status, int options, struct rusage *rusage);
+
+#endif

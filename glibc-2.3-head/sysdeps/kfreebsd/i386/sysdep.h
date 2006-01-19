@@ -192,6 +192,8 @@ __i686.get_pc_thunk.reg:						      \
 
 #else	/* !__ASSEMBLER__ */
 
+#include <syscalls-inline.h>
+
 /* Consistency check for position-independent code.  */
 #ifdef __PIC__
 # define check_consistency()						      \

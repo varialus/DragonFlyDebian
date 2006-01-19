@@ -18,6 +18,8 @@
 
 #include <sysdep.h>
 
+int __syscall_clock_gettime(clockid_t clock_id, struct timespec *tp);
+
 # define SYSDEP_GETTIME \
   case CLOCK_REALTIME:							      \
   case CLOCK_MONOTONIC:							      \

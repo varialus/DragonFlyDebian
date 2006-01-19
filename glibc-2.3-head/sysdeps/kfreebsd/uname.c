@@ -20,6 +20,7 @@
 #include <sys/syscall.h>
 #include <sys/utsname.h>
 #include <string.h>
+#include <unistd.h>
 
 #define SYSNAME		"GNU/kFreeBSD"
 #define SYSNAME_LEN	13

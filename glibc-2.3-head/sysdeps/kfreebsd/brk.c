@@ -48,7 +48,4 @@ __brk (addr)
   __curbrk = addr;
   return 0;
 }
-stub_warning (brk)
-
 weak_alias (__brk, brk)
-#include <stub-tag.h>

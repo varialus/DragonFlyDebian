@@ -25,7 +25,6 @@
 #include <sys/time.h>
 #include <sysdep-cancel.h>
 
-extern int __syscall_open (const char *file, int oflag, int mode);
 extern int __futimes (int fd, const struct timeval tvp[2]);
 
 int

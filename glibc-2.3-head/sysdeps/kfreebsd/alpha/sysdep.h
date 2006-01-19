@@ -21,6 +21,8 @@
 
 #ifdef __ASSEMBLER__
 #include <machine/pal.h>		/* get PAL_callsys */
+#else
+#include <syscalls-inline.h>
 #endif
 
 #include <sysdeps/unix/alpha/sysdep.h>

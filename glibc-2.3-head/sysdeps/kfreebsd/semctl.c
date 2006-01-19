@@ -48,6 +48,7 @@
 #include <sys/syscall.h>
 #include <stdarg.h> /* va_list */
 #include <stdlib.h> /* NULL */
+#include <unistd.h>
 
 /* union semun from FreeBSD <sys/sem.h> */
 /*
