@@ -37,11 +37,20 @@
 pid_t
 __libc_waitpid (pid_t pid, int *stat_loc, int options)
 {
-  return __wait4 (pid, (union wait *) stat_loc, options, NULL);
+  if (SINGLE_THREAD_P)
+  {
+      return INLINE_SYSCALL (wait4, 4, pid, stat_loc, options, NULL);
+  }
+
+  int oldtype = LIBC_CANCEL_ASYNC ();
+
+  int result = INLINE_SYSCALL (wait4, 4, pid, stat_loc, options, NULL);
+
+  LIBC_CANCEL_RESET (oldtype);
+
+  return result;
 }
 
 weak_alias (__libc_waitpid, __waitpid)
 libc_hidden_weak (__waitpid)
 weak_alias (__libc_waitpid, waitpid)
-
-LIBC_CANCEL_HANDLED (); /* in __wait4 */
