@@ -38,13 +38,6 @@ ptsname (int fd)
   return __ptsname_r (fd, buffer, sizeof (buffer)) != 0 ? NULL : buffer;
 }
 
-
-/* Check if DEV corresponds to a master pseudo terminal device.  */
-#define MASTER_P(dev) (major (dev) == 6)
-
-/* Check if DEV corresponds to a master pseudo terminal device.  */
-#define SLAVE_P(dev) (major (dev) == 5)
-
 /* The are declared in getpt.c.  */
 extern const char __libc_ptyname1[] attribute_hidden;
 extern const char __libc_ptyname2[] attribute_hidden;
@@ -73,7 +66,7 @@ __ptsname_r (int fd, char *buf, size_t buflen)
     return errno;
 
   /* Check if FD really is a master pseudo terminal.  */
-  if (!(S_ISCHR (st.st_mode) && MASTER_P (st.st_rdev)))
+  if (!(S_ISCHR (st.st_mode)))
     {
       __set_errno (ENOTTY);
       return ENOTTY;
@@ -103,7 +96,7 @@ __ptsname_r (int fd, char *buf, size_t buflen)
 
   /* Check if the pathname we're about to return really corresponds to the
      slave pseudo terminal of the given master pseudo terminal.  */
-  if (!(S_ISCHR (st.st_mode) && SLAVE_P (st.st_rdev)
+  if (!(S_ISCHR (st.st_mode)
 	&& (unsigned int) minor (st.st_rdev) == ptyno))
     {
       /* This really is a configuration problem.  */
