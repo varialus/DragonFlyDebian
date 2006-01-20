@@ -26,6 +26,10 @@
 #define	WNOHANG		1	/* Don't block waiting.  */
 #define	WUNTRACED	2	/* Report status of stopped children.  */
 
+/* Bits in the fourth argument to `waitid'.  */
+#define	WSTOPPED	2	/* Report stopped child (same as WUNTRACED). */
+#define	WCONTINUED	4	/* Report continued child.  */
+
 #define __WCLONE	0x80000000	/* Wait for cloned process.  */
 #ifdef __USE_BSD
 # define WLINUXCLONE	__WCLONE	/* FreeBSD name for __WCLONE.  */
