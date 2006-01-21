@@ -24,77 +24,122 @@
 #ifndef _BITS_SIGCONTEXT_H
 #define _BITS_SIGCONTEXT_H  1
 
-/*-
- * Copyright (c) 2003 Peter Wemm.
- * Copyright (c) 1986, 1989, 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 4. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- *	@(#)signal.h	8.1 (Berkeley) 6/11/93
- * based on $FreeBSD: src/sys/amd64/include/signal.h,v 1.27.2.1 2005/01/30 00:59:13 imp Exp $
- */
+#ifdef __i386__
 
-/*
- * Information pushed on stack when a signal is delivered.
- * This is used by the kernel to restore state following
- * execution of the signal handler.  It is also made available
- * to the handler to allow it to restore state properly if
- * a non-standard exit is performed.
- */
-/*
- * The sequence of the fields/registers in struct sigcontext should match
- * those in mcontext_t.
- */
+/* State of this thread when the signal was taken.
+   The unions below are for compatibility with Linux (whose sigcontext
+   components don't have sc_ prefix) */
+struct sigcontext
+  {
+    __sigset_t sc_mask;		/* Blocked signals to restore.  */
+    int sc_onstack;		/* Nonzero if running on sigstack.  */
+
+    /* Segment registers.  */
+    union { int sc_gs; int gs; };
+    union { int sc_fs; int fs; };
+    union { int sc_es; int es; };
+    union { int sc_ds; int ds; };
+
+    /* "General" registers.  These members are in the order that the i386
+       `pusha' and `popa' instructions use (`popa' ignores %esp).  */
+    union { int sc_edi; int edi; };
+    union { int sc_esi; int esi; };
+    union { int sc_ebp; int ebp; };
+    union { int sc_isp; int isp; };		/* Not used; sc_esp is used instead.  */
+    union { int sc_ebx; int ebx; };
+    union { int sc_edx; int edx; };
+    union { int sc_ecx; int ecx; };
+    union { int sc_eax; int eax; };
+
+    union { int sc_trapno; int trapno; };
+    union { int sc_err; int err; };
+
+    union { int sc_eip; int eip; };		/* Instruction pointer.  */
+    union { int sc_cs; int cs; };		/* Code segment register.  */
+
+    int sc_efl;					/* Processor flags.  */
+
+    union { int sc_esp; int esp; };		/* This stack pointer is used.  */
+    union { int sc_ss; int ss; };		/* Stack segment register.  */
+
+    int     sc_len;                 /* sizeof(mcontext_t) */
+    /*
+     * XXX - See <machine/ucontext.h> and <machine/npx.h> for
+     *       the following fields.
+     */
+    int     sc_fpformat;
+    int     sc_ownedfp;
+    int     sc_spare1[1];
+    int     sc_fpstate[128] __attribute__((aligned(16)));
+    int     sc_spare2[8];
+  };
+
+/* Traditional BSD names for some members.  */
+#define sc_sp		sc_esp		/* Stack pointer.  */
+#define sc_fp		sc_ebp		/* Frame pointer.  */
+#define sc_pc		sc_eip		/* Process counter.  */
+#define sc_ps		sc_efl
+#define sc_eflags	sc_efl
+#define eflags		sc_efl		/* Linux-style name. */
+
+
+/* Codes for SIGFPE.  */
+#define FPE_INTDIV	1 /* integer divide by zero */
+#define FPE_INTOVF	2 /* integer overflow */
+
+#if 1 /* FIXME: These need verification.  */
+
+#define FPE_FLTDIV	3 /* floating divide by zero */
+#define FPE_FLTOVF	4 /* floating overflow */
+#define FPE_FLTUND	5 /* floating underflow */
+#define FPE_FLTINX	6 /* floating loss of precision */
+#define FPE_SUBRNG_FAULT	0x7 /* BOUNDS instruction failed */
+#define FPE_FLTDNR_FAULT	0x8 /* denormalized operand */
+#define FPE_EMERR_FAULT		0xa /* mysterious emulation error 33 */
+#define FPE_EMBND_FAULT		0xb /* emulation BOUNDS instruction failed */
+
+/* Codes for SIGILL.  */
+#define ILL_PRIVIN_FAULT	1
+#define ILL_ALIGN_FAULT		14
+#define ILL_FPOP_FAULT		24
+
+/* Codes for SIGBUS.  */
+#define BUS_PAGE_FAULT		12
+#define BUS_SEGNP_FAULT		26
+#define BUS_STK_FAULT		27
+#define BUS_SEGM_FAULT		29
+
+#endif
+
+#else
+
 struct sigcontext {
 	__sigset_t sc_mask;	/* signal mask to restore */
 	long	sc_onstack;	/* sigstack state to restore */
-	long	sc_rdi;		/* machine state (struct trapframe) */
-	long	sc_rsi;
-	long	sc_rdx;
-	long	sc_rcx;
-	long	sc_r8;
-	long	sc_r9;
-	long	sc_rax;
-	long	sc_rbx;
-	long	sc_rbp;
-	long	sc_r10;
-	long	sc_r11;
-	long	sc_r12;
-	long	sc_r13;
-	long	sc_r14;
-	long	sc_r15;
-	long	sc_trapno;
-	long	sc_addr;
-	long	sc_flags;
-	long	sc_err;
-	long	sc_rip;
-	long	sc_cs;
-	long	sc_rflags;
-	long	sc_rsp;
-	long	sc_ss;
+	union { long	sc_rdi;       long  rdi;};
+	union { long	sc_rsi;	      long  rsi;};
+	union { long	sc_rdx;	      long  rdx;};
+	union { long	sc_rcx;	      long  rcx;};
+	union { long	sc_r8;	      long  r8;};
+	union { long	sc_r9;	      long  r9;};
+	union { long	sc_rax;	      long  rax;};
+	union { long	sc_rbx;	      long  rbx;};
+	union { long	sc_rbp;	      long  rbp;};
+	union { long	sc_r10;	      long  r10;};
+	union { long	sc_r11;	      long  r11;};
+	union { long	sc_r12;	      long  r12;};
+	union { long	sc_r13;	      long  r13;};
+	union { long	sc_r14;	      long  r14;};
+	union { long	sc_r15;	      long  r15;};
+	union { long	sc_trapno;    long  trapno;};
+	union { long	sc_addr;      long  addr;};
+	union { long	sc_flags;     long  flags;};
+	union { long	sc_err;	      long  err;};
+	union { long	sc_rip;	      long  rip;};
+	union { long	sc_cs;	      long  cs;};
+	union { long	sc_rflags;    long  rflags;};
+	union { long	sc_rsp;	      long  rsp;};
+	union { long	sc_ss;	      long  ss;};
 	long	sc_len;		/* sizeof(mcontext_t) */
 	/*
 	 * XXX - See <machine/ucontext.h> and <machine/fpu.h> for
@@ -110,5 +155,7 @@ struct sigcontext {
 #define sc_sp           sc_rsp          /* Stack pointer.  */
 #define sc_fp           sc_rbp          /* Frame pointer.  */
 #define sc_pc           sc_rip          /* Process counter.  */
+
+#endif
 
 #endif /* _BITS_SIGCONTEXT_H */
