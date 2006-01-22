@@ -21,6 +21,7 @@
 #include <sys/sysctl.h>
 #include <errno.h>
 #include <string.h>
+#include <unistd.h>	/* For getdomainname() */
 
 #define SYSNAME                "GNU/kFreeBSD"
 #define SYSNAME_LEN    13
@@ -94,6 +95,13 @@ __uname (struct utsname *name)
         name->machine[len] = '\0';
     }
 
+  /* Fill domainname.  Use getdomainname(). */
+  if (getdomainname(name->domainname, sizeof(name->domainname)) == -1)
+    {
+      if (errno != EINVAL)
+        strncpy (name->domainname, UNAME_DOMAINNAME, sizeof (name->domainname));
+    }
+  
   return 0;
 }
 libc_hidden_def (__uname)
