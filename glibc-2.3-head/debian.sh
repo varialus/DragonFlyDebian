@@ -138,13 +138,10 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
  	cat debian/control.in/amd64		>> $@T
 --- glibc-2.3.5.orig/debian/sysdeps/kfreebsd.mk
 +++ glibc-2.3.5/debian/sysdeps/kfreebsd.mk
-@@ -0,0 +1,73 @@
+@@ -0,0 +1,61 @@
 +GLIBC_OVERLAYS ?= $(shell ls glibc-linuxthreads* glibc-ports* glibc-libidn*)
 +MIN_KERNEL_SUPPORTED := 5.4.0
 +libc = libc0.1
-+
-+GLIBC_PASSES += i686
-+DEB_ARCH_REGULAR_PACKAGES += libc0.1-i686
 +
 +# Support multiple makes at once based on number of processors
 +# Common wisdom says parallel make can be up to 2n+1.
@@ -162,15 +159,6 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
 +threads = yes
 +libc_add-ons = linuxthreads $(add-ons)
 +libc_extra_config_options = $(extra_config_options) --with-tls --with-__thread --disable-compatible-utmp
-+
-+# We use -march=i686 and glibc's i686 routines use cmov, so require it.
-+# A Debian-local glibc patch adds cmov to the search path.
-+i686_add-ons = linuxthreads $(add-ons)
-+i686_configure_target=i686-kfreebsd
-+i686_configure_build=i686-kfreebsd
-+i686_extra_cflags = -march=i686 -mtune=i686 -g1 -O3
-+i686_LIBDIR = /i686/cmov
-+i686_extra_config_options = $(extra_config_options) --disable-profile --with-tls --with-__thread --disable-compatible-utmp
 +
 +ifndef KFREEBSD_SOURCE
 +  KFREEBSD_HEADERS := /usr/include
@@ -212,6 +200,20 @@ diff -u glibc-2.3.5/debian/rules.d/control.mk glibc-2.3.5/debian/rules.d/control
 +fi)
 +endef
 +
+--- glibc-2.3.5.orig/debian/sysdeps/kfreebsd-i386.mk
++++ glibc-2.3.5/debian/sysdeps/kfreebsd-i386.mk
+@@ -0,0 +1,11 @@
++GLIBC_PASSES += i686
++DEB_ARCH_REGULAR_PACKAGES += libc0.1-i686
++
++# We use -march=i686 and glibc's i686 routines use cmov, so require it.
++# A Debian-local glibc patch adds cmov to the search path.
++i686_add-ons = linuxthreads $(add-ons)
++i686_configure_target=i686-kfreebsd
++i686_configure_build=i686-kfreebsd
++i686_extra_cflags = -march=i686 -mtune=i686 -g1 -O3
++i686_LIBDIR = /i686/cmov
++i686_extra_config_options = $(extra_config_options) --disable-profile --with-tls --with-__thread --disable-compatible-utmp
 --- glibc-2.3.5.old/debian/sysdeps/depflags.pl	2005-12-23 00:40:20.000000000 +0100
 +++ glibc-2.3.5/debian/sysdeps/depflags.pl	2005-12-23 00:44:38.000000000 +0100
 @@ -33,6 +33,13 @@
