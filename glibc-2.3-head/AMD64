@@ -5,12 +5,12 @@ TODO:
 	namely not the same as on kfreebsd-i386 (/lib/ld.so.1).
 	See also http://www.linuxbase.org/futures/ideas/multiarch/index.html
 
-	Proposed: /lib/ld-kfreebsd-amd64.so.1
+	Result: /lib/ld-kfreebsd-x86-64.so.1
 
 
 * toolchain (gcc, binutils) support
 	Write config bits for proper
-	ld.so location:		/lib/ld.so.1	/lib/ld-kfreebsd-amd64.so.1
+	ld.so location:		/lib/ld.so.1	/lib/ld-kfreebsd-x86-64.so.1
 	emulation:		elf_i386_fbsd	elf_x86_64_fbsd
 	...
 
@@ -51,4 +51,50 @@ TODO:
 
 * porting machine
 * porting machine admin
+
+
+
+
+binutils:
+---------
+for biarch simply add to debian/rules:
+	ifeq ($(DEB_HOST_ARCH),kfreebsd-i386)
+        	CONFARGS += --enable-targets=x86_64-kfreebsd-gnu
+	endif
+
+gcc-x.y:
+--------
+insert into gcc/config/i386/kfreebsd-gnu.h something like:
+
+***********************************************************************
+/* Provide a LINK_SPEC.  Here we provide support for the special GCC
+   options -static and -shared, which allow us to link things in one
+   of these three modes by applying the appropriate combinations of
+   options at link-time.
+
+   When the -shared link option is used a final link is not being
+   done.  */
+
+#undef  LINK_SPEC
+#if TARGET_64BIT_DEFAULT
+#define LINK_SPEC "%{!m32:-m elf_x86_64_fbsd} %{m32:-m elf_i386_fbsd} \
+  %{shared:-shared} \
+  %{!shared: \
+    %{!static: \
+      %{rdynamic:-export-dynamic} \
+      %{m32:%{!dynamic-linker:-dynamic-linker /lib/ld.so.1}} \
+      %{!m32:%{!dynamic-linker:-dynamic-linker /lib/ld-kfreebsd-x86-64.so.1}}} \
+    %{static:-static}}"
+#else
+#define LINK_SPEC "%{m64:-m elf_x86_64_fbsd} %{!m64:-m elf_i386_fbsd} \
+  %{shared:-shared} \
+  %{!shared: \
+    %{!static: \
+      %{rdynamic:-export-dynamic} \
+      %{!m64:%{!dynamic-linker:-dynamic-linker /lib/ld.so.1}} \
+      %{m64:%{!dynamic-linker:-dynamic-linker /lib/ld-kfreebsd-x86-64.so.1}}} \
+    %{static:-static}}"
+#endif
+
+***********************************************************************
 
