@@ -19,6 +19,9 @@ test build:
 	failures in configure/configure.in ignore
 	failure in nscd/mem.c fix manually
 
+* fix linuxthreads/sysdeps/pthread/bits/libc-tsd.h
+	 #include <bits/libc-tsd.h>  -> #include_next <bits/libc-tsd.h>
+
 * fix malloc/memusage.c
 	unconditionally assumes mremap and uses MREMAP_FIXED
 	it also unconditionally uses __thread :-(
@@ -38,7 +41,7 @@ test build:
 	i386/sysdep.h - drop definition of SETUP_PIC_REG(reg)
 	dl-osinfo.h - add function _dl_setup_stack_chk_guard()
 
-../src/configure --enable-add-ons=linuxthreads --with-tls --without-__thread i486-kfreebsd
+../src/configure --enable-add-ons=linuxthreads --with-tls --with-__thread i486-kfreebsd
 
 "make check" results:
 ---------------------
