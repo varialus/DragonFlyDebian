@@ -32,6 +32,7 @@ __libc_recv (int fd, void *buf, size_t n, int flags)
   return INLINE_SYSCALL (recvfrom, 6, fd, buf, n, flags, NULL, NULL);
 }
 
+weak_alias (__libc_recv, __recv)
 weak_alias (__libc_recv, recv)
 
 LIBC_CANCEL_HANDLED (); /* in __libc_recvfrom */
