@@ -1,0 +1,86 @@
+glibc 2.4 status
+================
+
+linuxthreads are moved from trunk into ports
+	http://sourceware.org/ml/libc-alpha/2005-07/msg00001.html
+
+for short term Daniel Jacobowitz <dan@debian.org> will maintain them 
+	http://sourceware.org/ml/libc-alpha/2005-07/msg00002.html
+
+
+test build:
+-----------
+
+* get glibc-20060123.tar.bz2 + glibc-ports-20060123.tar.bz2
+
+* move linuxthreads & linuxthreads_db from ports into top dir
+
+* try to apply patches
+	failures in configure/configure.in ignore
+	failure in nscd/mem.c fix manually
+
+* fix malloc/memusage.c
+	unconditionally assumes mremap and uses MREMAP_FIXED
+	it also unconditionally uses __thread :-(
+
+* there is no longer sysdeps/generic, files are moved
+	we #include<> some of them, use new location
+	
+* new sysdeps files (based on linux)
+	kernel-posix-cpu-timers.h (empty)
+	check_fds.c ("void __libc_check_standard_fds (void) {;}")
+
+* new sysdeps files (use generic version)
+	sbrk.c	(#include <misc/sbrk.c>)
+	check_pf.c (#include <inet/check_pf.c>)
+
+* changes to sysdeps
+	i386/sysdep.h - drop definition of SETUP_PIC_REG(reg)
+	dl-osinfo.h - add function _dl_setup_stack_chk_guard()
+
+../src/configure --enable-add-ons=linuxthreads --with-tls --without-__thread i486-kfreebsd
+
+"make check" results:
+---------------------
+
+make[2]: *** [/build/g24/build/libio/tst_wprintf2.out] Error 139
+make[2]: *** [/build/g24/build/dirent/tst-fdopendir.o] Error 1
+make[2]: *** [/build/g24/build/posix/tst-waitid.out] Error 1
+
+make[2]: *** [/build/g24/build/io/tst-openat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-unlinkat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-fstatat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-futimesat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-renameat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-fchownat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-fchmodat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-faccessat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-symlinkat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-linkat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-readlinkat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-mkdirat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-mknodat.o] Error 1
+make[2]: *** [/build/g24/build/io/tst-mkfifoat.o] Error 1
+
+make[2]: *** [/build/g24/build/misc/tst-pselect.out] Error 1
+
+make[2]: *** [/build/g24/build/rt/tst-timer2.o] Error 1
+make[2]: *** [/build/g24/build/rt/tst-aio.out] Error 1
+make[2]: *** [/build/g24/build/rt/tst-aio64.out] Error 1
+make[2]: *** [/build/g24/build/rt/tst-aio9.out] Error 1
+make[2]: *** [/build/g24/build/rt/tst-aio10.out] Error 1
+make[2]: *** [/build/g24/build/rt/tst-mqueue5.o] Error 1
+make[2]: *** [/build/g24/build/rt/tst-timer4.o] Error 1
+make[2]: *** [/build/g24/build/rt/tst-timer5.o] Error 1
+make[2]: *** [/build/g24/build/rt/tst-cputimer1.o] Error 1
+make[2]: *** [/build/g24/build/rt/tst-cputimer2.o] Error 1
+make[2]: *** [/build/g24/build/rt/tst-cputimer3.o] Error 1
+
+make[2]: *** [/build/g24/build/elf/tst-stackguard1-static.out] Error 1
+make[2]: *** [/build/g24/build/elf/neededtest.out] Error 14
+make[2]: *** [/build/g24/build/elf/neededtest2.out] Error 14
+make[2]: *** [/build/g24/build/elf/neededtest3.out] Error 17
+make[2]: *** [/build/g24/build/elf/neededtest4.out] Error 2
+make[2]: *** [/build/g24/build/elf/circleload1.out] Error 9
+make[2]: *** [/build/g24/build/elf/tst-stackguard1.out] Error 1
+
