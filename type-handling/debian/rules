@@ -11,7 +11,7 @@ DEB_BUILD_GNU_SYSTEM ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_SYSTEM)
 DEB_BUILD_GNU_CPU ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
 DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
-cpus := $(shell grep -v ^\# /usr/share/dpkg/cputable | (while read debian gnu regex ; do echo $${debian} ; echo $${gnu}; done) | sort -u)
+cpus := $(shell grep -v ^\# /usr/share/dpkg/cputable | (while read debian gnu regex ; do echo $${debian} ; echo $${gnu}; done) | grep -vx x86_64 | sort -u)
 systems := $(shell grep -v ^\# /usr/share/dpkg/ostable | (while read debian gnu regex ; do echo $${debian} ; echo $${gnu}; done) | sort -u)
 
 not_cpus := $(shell echo $(cpus) | tr " " "\n" | grep -vx $(DEB_BUILD_ARCH_CPU) | grep -vx $(DEB_BUILD_GNU_CPU))
