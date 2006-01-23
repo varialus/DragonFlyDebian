@@ -23,49 +23,69 @@
 
 #include <bits/types.h>
 
-/* These are the values for FreeBSD.  Earlier BSD systems have a subset of
+/* Transmute defines to enumerations.  The macro re-definitions are
+   necessary because some programs want to test for operating system
+   features with #ifdef RUSAGE_SELF.  In ISO C the reflexive
+   definition is a no-op. 
+
+   These are the values for FreeBSD.  Earlier BSD systems have a subset of
    these kinds of resource limit.  */
 
 /* Kinds of resource limit.  */
 enum __rlimit_resource
-  {
-    /* Per-process CPU limit, in seconds.  */
-    RLIMIT_CPU,
-#define	RLIMIT_CPU	RLIMIT_CPU
-    /* Largest file that can be created, in bytes.  */
-    RLIMIT_FSIZE,
-#define	RLIMIT_FSIZE	RLIMIT_FSIZE
-    /* Maximum size of data segment, in bytes.  */
-    RLIMIT_DATA,
-#define	RLIMIT_DATA	RLIMIT_DATA
-    /* Maximum size of stack segment, in bytes.  */
-    RLIMIT_STACK,
-#define	RLIMIT_STACK	RLIMIT_STACK
-    /* Largest core file that can be created, in bytes.  */
-    RLIMIT_CORE,
-#define	RLIMIT_CORE	RLIMIT_CORE
-    /* Largest resident set size, in bytes.
-       This affects swapping; processes that are exceeding their
-       resident set size will be more likely to have physical memory
-       taken from them.  */
-    RLIMIT_RSS,
-#define	RLIMIT_RSS	RLIMIT_RSS
-    /* Locked-in-memory address space.  */
-    RLIMIT_MEMLOCK,
-#define	RLIMIT_MEMLOCK	RLIMIT_MEMLOCK
-    /* Number of processes.  */
-    RLIMIT_NPROC,
-#define	RLIMIT_NPROC	RLIMIT_NPROC
-    /* Number of open files.  */
-    RLIMIT_NOFILE,
-#define	RLIMIT_NOFILE	RLIMIT_NOFILE
-    /* Maximum size of all socket buffers.  */
-    RLIMIT_SBSIZE,
-#define RLIMIT_SBSIZE	RLIMIT_SBSIZE
+{
+  /* Per-process CPU limit, in seconds.  */
+  RLIMIT_CPU = 0,
+#define	RLIMIT_CPU RLIMIT_CPU
 
-    RLIMIT_NLIMITS,		/* Number of limit flavors.  */
-    RLIM_NLIMITS = RLIMIT_NLIMITS /* Traditional name for same.  */
-  };
+  /* Largest file that can be created, in bytes.  */
+  RLIMIT_FSIZE = 1,
+#define	RLIMIT_FSIZE RLIMIT_FSIZE
+
+  /* Maximum size of data segment, in bytes.  */
+  RLIMIT_DATA = 2,
+#define	RLIMIT_DATA RLIMIT_DATA
+
+  /* Maximum size of stack segment, in bytes.  */
+  RLIMIT_STACK = 3,
+#define	RLIMIT_STACK RLIMIT_STACK
+
+  /* Largest core file that can be created, in bytes.  */
+  RLIMIT_CORE = 4,
+#define	RLIMIT_CORE RLIMIT_CORE
+
+  /* Largest resident set size, in bytes.
+     This affects swapping; processes that are exceeding their
+     resident set size will be more likely to have physical memory
+     taken from them.  */
+  __RLIMIT_RSS = 5,
+#define	RLIMIT_RSS __RLIMIT_RSS
+
+  /* Locked-in-memory address space.  */
+  __RLIMIT_MEMLOCK = 6,
+#define	RLIMIT_MEMLOCK __RLIMIT_MEMLOCK
+
+  /* Number of processes.  */
+  __RLIMIT_NPROC = 7,
+#define	RLIMIT_NPROC __RLIMIT_NPROC
+
+  /* Number of open files.  */
+  RLIMIT_NOFILE = 8,
+#define	RLIMIT_NOFILE RLIMIT_NOFILE
+
+  /* Maximum size of all socket buffers.  */
+  __RLIMIT_SBSIZE = 9,
+#define RLIMIT_SBSIZE __RLIMIT_SBSIZE
+
+  /* Address space limit.  */
+  RLIMIT_AS = 10,
+#define RLIMIT_AS RLIMIT_AS
+
+  __RLIMIT_NLIMITS = 11,
+  __RLIM_NLIMITS = __RLIMIT_NLIMITS
+#define RLIMIT_NLIMITS __RLIMIT_NLIMITS
+#define RLIM_NLIMITS __RLIM_NLIMITS
+};
 
 /* Value to indicate that there is no limit.  */
 #define RLIM_INFINITY 0x7fffffffffffffffLL
@@ -100,20 +120,18 @@ struct rlimit64
 
 /* Whose usage statistics do you want?  */
 enum __rusage_who
-/* The macro definitions are necessary because some programs want
-   to test for operating system features with #ifdef RUSAGE_SELF.
-   In ISO C the reflexive definition is a no-op.  */
-  {
-    /* The calling process.  */
-    RUSAGE_SELF = 0,
-#define RUSAGE_SELF     RUSAGE_SELF
-    /* All of its terminated child processes.  */
-    RUSAGE_CHILDREN = -1
+{
+  /* The calling process.  */
+  RUSAGE_SELF = 0,
+#define RUSAGE_SELF RUSAGE_SELF
+
+  /* All of its terminated child processes.  */
+  RUSAGE_CHILDREN = -1
 #define RUSAGE_CHILDREN RUSAGE_CHILDREN
-  };
+};
 
 #define __need_timeval
-#include <bits/time.h>           /* For `struct timeval'.  */
+#include <bits/time.h>		/* For `struct timeval'.  */
 
 /* Structure which says how much of each resource has been used.  */
 struct rusage
@@ -159,14 +177,17 @@ struct rusage
   };
 
 /* Priority limits.  */
-#define PRIO_MIN        -20     /* Minimum priority a process can have.  */
-#define PRIO_MAX        20      /* Maximum priority a process can have.  */
+#define PRIO_MIN	-20	/* Minimum priority a process can have.  */
+#define PRIO_MAX	20	/* Maximum priority a process can have.  */
 
 /* The type of the WHICH argument to `getpriority' and `setpriority',
    indicating what flavor of entity the WHO argument specifies.  */
 enum __priority_which
-  {
-    PRIO_PROCESS = 0,           /* WHO is a process ID.  */
-    PRIO_PGRP = 1,              /* WHO is a process group ID.  */
-    PRIO_USER = 2               /* WHO is a user ID.  */
-  };
+{
+  PRIO_PROCESS = 0,		/* WHO is a process ID.  */
+#define PRIO_PROCESS PRIO_PROCESS
+  PRIO_PGRP = 1,		/* WHO is a process group ID.  */
+#define PRIO_PGRP PRIO_PGRP
+  PRIO_USER = 2			/* WHO is a user ID.  */
+#define PRIO_USER PRIO_USER
+};
