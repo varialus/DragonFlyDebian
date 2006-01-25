@@ -276,7 +276,8 @@
 #define			TAB0	0x00000000
 #define			TAB1	0x00000400	/* tty 37 */
 #define			TAB2	0x00000800
-#define		XTABS		0x00000c00	/* expand tabs on output */
+#define			TAB3	0x00000c00
+#define		XTABS		TAB3		/* expand tabs on output */
 #define		CRDELAY		0x00003000	/* \r delay */
 #define			CR0	0x00000000
 #define			CR1	0x00001000	/* tn 300 */
