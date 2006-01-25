@@ -1,3 +1,28 @@
+Roland McGrath wrote:
+> Bruno Haible wrote:
+> > Other than that, FreeBSD has a <sys/queue.h> with some more macros than
+> > glibc's. It seems that glibc's <sys/queue.h> is simply an older version
+> > of the same thing. How about upgrading it?
+> 
+> Ok. I notice that the NetBSD and FreeBSD versions of this file differ,
+> though both claim to be the "8.5 (Berkeley)" version.  I don't even know
+> off hand that we need this file in libc or if anything ever used it,
+> but since we have had it we should make sure we don't break compatibility.
+> If there is a later version of this file from UCB, that is probably what
+> we should use.  Despite the lack of additional copyright notices, if the
+> FreeBSD and NetBSD versions of this file have had additions made by people
+> other than UCB, there may be a copyright issue with using those versions.
+
+(extract from discussion between Bruno and Roland, see
+http://sources.redhat.com/ml/libc-alpha/2002-09/msg00153.html)
+
+I (rmh) don't think there's a copyright issue, but it's a picky decision for
+upstream wether taking the improvements from NetBSD or FreeBSD, since they're
+allegedly very different.
+
+Also, since it's a big change, it could break something.  I would suggest
+waiting untill it's been applied in debian for some time, just in case.
+
 --- misc/sys/queue.h.orig	1999-06-08 23:03:17.000000000 +0200
 +++ misc/sys/queue.h	2005-04-28 22:29:17.000000000 +0200
 @@ -26,50 +26,296 @@
