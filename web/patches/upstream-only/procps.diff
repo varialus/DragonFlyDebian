@@ -1,6 +1,7 @@
 
 Author: rmh
-Status: same as debian patch, plus minimal.c
+Status: minimal.c is normaly not compiled.
+  As for version.c I'm not sure it really affects anything.
 
 diff -ur procps-3.2.5.old/minimal.c procps-3.2.5/minimal.c
 --- procps-3.2.5.old/minimal.c	2004-05-05 02:26:14.000000000 +0200
@@ -28,20 +29,6 @@ diff -ur procps-3.2.5.old/minimal.c procps-3.2.5/minimal.c
  #endif
  
  
-diff -ur procps-3.2.5.old/proc/sig.c procps-3.2.5/proc/sig.c
---- procps-3.2.5.old/proc/sig.c	2003-03-19 01:52:39.000000000 +0100
-+++ procps-3.2.5/proc/sig.c	2005-10-10 18:13:46.000000000 +0200
-@@ -50,6 +50,10 @@
- #  define SIGPWR 29
- #endif
- 
-+#ifndef SIGPOLL
-+#define SIGPOLL SIGIO
-+#endif
-+
- typedef struct mapstruct {
-   const char *name;
-   int num;
 diff -ur procps-3.2.5.old/proc/version.c procps-3.2.5/proc/version.c
 --- procps-3.2.5.old/proc/version.c	2003-01-29 02:11:43.000000000 +0100
 +++ procps-3.2.5/proc/version.c	2005-10-10 18:13:46.000000000 +0200
@@ -62,34 +49,3 @@ diff -ur procps-3.2.5.old/proc/version.c procps-3.2.5/proc/version.c
 +#endif
      linux_version_code = LINUX_VERSION(x, y, z);
  }
-diff -ur procps-3.2.5.old/ps/common.h procps-3.2.5/ps/common.h
---- procps-3.2.5.old/ps/common.h	2004-10-09 05:55:50.000000000 +0200
-+++ procps-3.2.5/ps/common.h	2005-10-10 18:13:53.000000000 +0200
-@@ -14,7 +14,13 @@
- 
- #include "../proc/procps.h"
- #include "../proc/readproc.h"
--#include <asm/page.h>  /* looks safe for glibc, we need PAGE_SIZE */
-+
-+/* looks safe for glibc, we need PAGE_SIZE */
-+#if defined(__linux__)
-+# include <asm/page.h>
-+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+# include <machine/param.h>
-+#endif
- 
- #if 0
- #define trace(args...) printf(## args)
-diff -ur procps-3.2.5.old/top.c procps-3.2.5/top.c
---- procps-3.2.5.old/top.c	2005-01-26 06:15:18.000000000 +0100
-+++ procps-3.2.5/top.c	2005-10-10 18:13:46.000000000 +0200
-@@ -1869,6 +1869,9 @@
-       std_err("failed tty get");
-    newtty = Savedtty;
-    newtty.c_lflag &= ~(ICANON | ECHO);
-+#ifndef TAB3
-+#define TAB3 XTABS
-+#endif
-    newtty.c_oflag &= ~(TAB3);
-    newtty.c_cc[VMIN] = 1;
-    newtty.c_cc[VTIME] = 0;
