@@ -54,6 +54,7 @@
 #define	SIGTTIN		21	/* Background read from tty (POSIX).  */
 #define	SIGTTOU		22	/* Background write to tty (POSIX).  */
 #define	SIGIO		23	/* I/O now possible (4.2 BSD).  */
+#define	SIGPOLL		SIGIO	/* Pollable event occurred (System V).  */
 #define	SIGXCPU		24	/* CPU limit exceeded (4.2 BSD).  */
 #define	SIGXFSZ		25	/* File size limit exceeded (4.2 BSD).  */
 #define	SIGVTALRM	26	/* Virtual alarm clock (4.2 BSD).  */
