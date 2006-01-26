@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 Free Software Foundation, Inc.
+/* Copyright (C) 2002, 2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,8 +16,9 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-/* This structure corresponds to the original FreeBSD 'struct stat'
-   (i.e. _STAT_VER_stat), and is used by the fhstat() system call.  */
+/* This structure corresponds to the standard FreeBSD 'struct stat'
+   (i.e. _STAT_VER_stat), and is used by the stat() system call family. */
+   
 struct stat16
   {
     __dev_t st_dev;		/* Device containing the file.  */
@@ -49,5 +50,10 @@ struct stat16
     __uint32_t st_gen;		/* Generation number.  */
 
     __uint32_t __unused1;
-    __quad_t __unused2[2];
+    
+    long int st_birthtime;	/* Time of file creation.  */
+    long int st_birthtimensec;	/* Nanoseconds of file creation.  */
+
+#define _BIRTH_PADSIZE     (2*(8 - sizeof (long)))
+    char __birth_padding[_BIRTH_PADSIZE];
   };

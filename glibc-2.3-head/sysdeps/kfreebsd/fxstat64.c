@@ -20,22 +20,19 @@
 #include <errno.h>
 #include <stddef.h>
 #include <sys/stat.h>
-#include <bits/stat32.h>
 #include <bp-checks.h>
 
-#include "stat32conv.c"
-
-extern int __syscall_nfstat (int, struct stat32 *__unbounded);
+#include "stat16conv.c"
 
 int
 __fxstat64 (int vers, int fd, struct stat64 *buf)
 {
   if (__builtin_expect (vers == _STAT_VER, 1))
     {
-      struct stat32 buf32;
-      int result = __syscall_nfstat (fd, __ptrvalue (&buf32));
+      struct stat16 buf16;
+      int result = __syscall_fstat (fd, __ptrvalue (&buf16));
       if (result == 0)
-	stat32_to_stat64 (&buf32, buf);
+	stat16_to_stat64 (&buf16, buf);
       return result;
     }
   else

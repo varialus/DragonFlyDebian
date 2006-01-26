@@ -20,29 +20,21 @@
 #include <errno.h>
 #include <stddef.h>
 #include <sys/stat.h>
-#include <bits/stat16.h>
-#include <bits/stat32.h>
 #include <bp-checks.h>
 
-#include "stat32conv.c"
-
-extern int __syscall_stat (const char *__unbounded, struct stat16 *__unbounded);
-extern int __syscall_nstat (const char *__unbounded, struct stat32 *__unbounded);
+#include "stat16conv.c"
 
 int
 __xstat (int vers, const char *file, struct stat *buf)
 {
   if (__builtin_expect (vers == _STAT_VER, 1))
     {
-      struct stat32 buf32;
-      int result = __syscall_nstat (CHECK_STRING (file), __ptrvalue (&buf32));
+      struct stat16 buf16;
+      int result = __syscall_stat (CHECK_STRING (file), __ptrvalue (&buf16));
       if (result == 0)
-	stat32_to_stat (&buf32, buf);
+	stat16_to_stat (&buf16, buf);
       return result;
     }
-  else if (__builtin_expect (vers == _STAT_VER_nstat, 1))
-    return __syscall_nstat (CHECK_STRING (file),
-			    CHECK_1 ((struct stat32 *) buf));
   else if (__builtin_expect (vers == _STAT_VER_stat, 1))
     return __syscall_stat (CHECK_STRING (file),
 			   CHECK_1 ((struct stat16 *) buf));

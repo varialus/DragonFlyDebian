@@ -19,6 +19,14 @@
    02111-1307 USA.  */
 
 #include <string.h>
+#include <sys/mount.h>
+#include <bits/stat16.h>
+
+extern int __syscall_fhstat (const fhandle_t *fhp, struct stat16 *buf);
+extern int __syscall_fstat (int, struct stat16 *__unbounded);
+extern int __syscall_lstat (const char *__unbounded, struct stat16 *__unbounded);
+extern int __syscall_stat (const char *__unbounded, struct stat16 *__unbounded);
+
 
 /* Convert a 'struct stat16' to 'struct stat'.  */
 static inline void
@@ -42,7 +50,9 @@ stat16_to_stat (const struct stat16 *p16, struct stat *q)
   q->st_blksize = p16->st_blksize;
   q->st_flags = p16->st_flags;
   q->st_gen = p16->st_gen;
+#if 0  
   memcpy (q->__unused1, p16->__unused2, sizeof (p16->__unused2));
+#endif  
 }
 
 /* Convert a 'struct stat16' to 'struct stat64'.  */
@@ -67,5 +77,7 @@ stat16_to_stat64 (const struct stat16 *p16, struct stat64 *q)
   q->st_blksize = p16->st_blksize;
   q->st_flags = p16->st_flags;
   q->st_gen = p16->st_gen;
+#if 0  
   memcpy (q->__unused1, p16->__unused2, sizeof (p16->__unused2));
+#endif  
 }

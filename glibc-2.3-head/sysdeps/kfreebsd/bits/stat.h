@@ -30,8 +30,7 @@
 #define _STAT_VER_stat	1	/* 'struct stat' in /usr/src/sys/sys/stat.h */
 #define _STAT_VER_nstat	2	/* 'struct nstat' in /usr/src/sys/sys/stat.h */
 #define _STAT_VER_gstat 3	/* glibc's 'struct stat' without LFS */
-/* By default we use _STAT_VER_gstat, but we support also _STAT_VER_stat and
-   _STAT_VER_nstat.  */
+/* By default we use _STAT_VER_gstat, but we support also _STAT_VER_stat */
 #define _STAT_VER	_STAT_VER_gstat
 
 /* Structure describing file characteristics.  */

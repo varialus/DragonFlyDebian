@@ -19,12 +19,9 @@
 
 #include <sys/mount.h>
 #include <sys/stat.h>
-#include <bits/stat16.h>
 #include <sysdep.h>
 
 #include "stat16conv.c"
-
-extern int __syscall_fhstat (const fhandle_t *fhp, struct stat16 *buf);
 
 int
 fhstat64 (const fhandle_t *fhp, struct stat64 *buf)
