@@ -2,7 +2,7 @@
 
 ifeq ($(subdir),misc)
 sysdep_headers += \
- ../../../../sysv/linux/i386/sys/io.h \
+ sys/io.h \
  sys/perm.h \
  sys/vm86.h
 endif
