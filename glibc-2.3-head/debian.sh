@@ -12,12 +12,12 @@ mkdir -p ${tmp}/sysdeps/unix/bsd/bsd4.4 ${tmp}/linuxthreads/sysdeps/unix/bsd/bsd
 cp -a $1/sysdeps/kfreebsd ${tmp}/sysdeps/unix/bsd/bsd4.4/
 cp -a $1/linuxthreads/kfreebsd ${tmp}/linuxthreads/sysdeps/unix/bsd/bsd4.4/
 echo "kfreebsd-sysdeps.diff -p0" >> debian/patches/series
-(cd ${tmp} && diff -x .svn -x *.disabled -Nurd null sysdeps/ ) > debian/patches/kfreebsd-sysdeps.diff
-(cd ${tmp} && diff -x .svn -x *.disabled -Nurd null linuxthreads/ ) >> debian/patches/kfreebsd-sysdeps.diff
+(cd ${tmp} && diff -x .svn -x -Nurd null sysdeps/ ) > debian/patches/kfreebsd-sysdeps.diff
+(cd ${tmp} && diff -x .svn -x -Nurd null linuxthreads/ ) >> debian/patches/kfreebsd-sysdeps.diff
 rm -rf ${tmp}
 
 for i in `ls $1/patches` ; do
-  cat $1/patches/$i/* > debian/patches/kfreebsd-$i.diff
+  cat $1/patches/$i/*.patch > debian/patches/kfreebsd-$i.diff
   echo "kfreebsd-$i.diff -p0" >> debian/patches/series
 done
 
