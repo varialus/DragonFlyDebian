@@ -3,8 +3,6 @@ Author: rmh
 Status: need to fix some messy things first
 
   - Switch to --with-gc=boehm (see bug #322599)
-  - s/eax/sc_eax/g changes are too frequent and start to be annoying.  Can we
-    change it in the system header?
   - How to mirror a struct declaration from standard headers?  See FIXME below
 
 diff -x configure -ur mono-1.1.8.2.old/configure.in mono-1.1.8.2/configure.in
@@ -54,7 +52,7 @@ diff -x configure -ur mono-1.1.8.2.old/debian/control mono-1.1.8.2/debian/contro
  
  Package: mono-common
 -Architecture: i386 powerpc amd64
-+Architecture: i386 powerpc amd64 kfreebsd-i386
++Architecture: any-i386 any-powerpc any-amd64
  Depends: binfmt-support (>= 1.1.2)
  Description: common files for Mono
   Mono is a platform for running and developing applications based on the
@@ -63,7 +61,7 @@ diff -x configure -ur mono-1.1.8.2.old/debian/control mono-1.1.8.2/debian/contro
  Package: mono-jit
  Provides: cli-virtual-machine
 -Architecture: i386 powerpc amd64
-+Architecture: i386 powerpc amd64 kfreebsd-i386
++Architecture: any-i386 any-powerpc any-amd64
  Depends: mono-common (= ${Source-Version}), mono-classlib-1.0-${mono:upversion}, ${shlibs:Depends}
  Description: fast CLI (.NET) JIT compiler for Mono
   Mono is a platform for running and developing applications based on the
@@ -72,7 +70,7 @@ diff -x configure -ur mono-1.1.8.2.old/debian/control mono-1.1.8.2/debian/contro
  
  Package: mono
 -Architecture: i386 powerpc amd64
-+Architecture: i386 powerpc amd64 kfreebsd-i386
++Architecture: any-i386 any-powerpc any-amd64
  Depends: mono-common (= ${Source-Version}), mono-jit (= ${Source-Version})
  Description: Mono CLI (.NET) runtime
   Mono is a platform for running and developing applications based on the
@@ -81,7 +79,7 @@ diff -x configure -ur mono-1.1.8.2.old/debian/control mono-1.1.8.2/debian/contro
  Package: mono-devel
  Section: devel
 -Architecture: i386 powerpc amd64
-+Architecture: i386 powerpc amd64 kfreebsd-i386
++Architecture:  any-i386 any-powerpc any-amd64
  Depends: mono (= ${Source-Version}), mono-mcs, mono-gac, mono-utils, mono-jay
  Suggests: mono-gmcs
  Description: Mono CLI (.NET) runtime with development tools
@@ -90,7 +88,7 @@ diff -x configure -ur mono-1.1.8.2.old/debian/control mono-1.1.8.2/debian/contro
  Package: mono-utils
  Section: devel
 -Architecture: i386 powerpc amd64
-+Architecture: i386 powerpc amd64 kfreebsd-i386
++Architecture: any-i386 any-powerpc any-amd64
  Replaces: mono-mcs (<= 1.1.6-4)
  Depends: ${shlibs:Depends}, mono-classlib-1.0
  Provides: cil-disassembler
@@ -99,7 +97,7 @@ diff -x configure -ur mono-1.1.8.2.old/debian/control mono-1.1.8.2/debian/contro
  Package: libmono0
  Section: libs
 -Architecture: i386 powerpc amd64
-+Architecture: i386 powerpc amd64 kfreebsd-i386
++Architecture: any-i386 any-powerpc any-amd64
  Replaces: libmono-dev (<= 1.1.6-4)
  Depends:  ${shlibs:Depends}
  Provides: libmono-${mono:upversion}
@@ -108,7 +106,7 @@ diff -x configure -ur mono-1.1.8.2.old/debian/control mono-1.1.8.2/debian/contro
  Package: libmono-dev
  Section: devel
 -Architecture: i386 powerpc amd64
-+Architecture: i386 powerpc amd64 kfreebsd-i386
++Architecture: any-i386 any-powerpc any-amd64
  Depends: libmono0 (= ${Source-Version}), libglib2.0-dev
  Description: libraries for the Mono JIT - Development files
   Header files and static libraries for libmono and libmono-profiler-conv.
@@ -117,7 +115,7 @@ diff -x configure -ur mono-1.1.8.2.old/debian/control mono-1.1.8.2/debian/contro
  Package: mono-jay
  Section: devel
 -Architecture: i386 powerpc amd64
-+Architecture: i386 powerpc amd64 kfreebsd-i386
++Architecture: any-i386 any-powerpc any-amd64
  Depends: ${shlibs:Depends}
  Description: LALR(1) parser generator oriented to Java/.NET
   Mono is a platform for running and developing applications based on the
@@ -152,18 +150,6 @@ diff -x configure -ur mono-1.1.8.2.old/debian/rules mono-1.1.8.2/debian/rules
  	dh_gencontrol -i -- -Vmono:upversion=$(UPVERSION) -Vmono:next-upversion=$(NEXT_UPVERSION)
  	dh_md5sums -i
  	dh_builddeb -i
-diff -x configure -ur mono-1.1.8.2.old/mono/mini/mini-x86.h mono-1.1.8.2/mono/mini/mini-x86.h
---- mono-1.1.8.2.old/mono/mini/mini-x86.h	2005-04-11 16:16:27.000000000 +0200
-+++ mono-1.1.8.2/mono/mini/mini-x86.h	2005-08-04 12:55:25.000000000 +0200
-@@ -131,7 +131,7 @@
- 
- typedef void* MonoCompileArch;
- 
--#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD_kernel__)
- # define SC_EAX sc_eax
- # define SC_EBX sc_ebx
- # define SC_ECX sc_ecx
 diff -x configure -ur mono-1.1.8.2.old/support/sys-statvfs.c mono-1.1.8.2/support/sys-statvfs.c
 --- mono-1.1.8.2.old/support/sys-statvfs.c	2005-06-14 02:39:30.000000000 +0200
 +++ mono-1.1.8.2/support/sys-statvfs.c	2005-08-04 18:09:48.000000000 +0200
