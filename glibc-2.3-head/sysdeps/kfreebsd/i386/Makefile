@@ -14,4 +14,6 @@ ifeq ($(subdir),misc)
 sysdep_routines += i386_get_ioperm i386_set_ioperm iopl
 # For <sys/vm86.h>.
 sysdep_routines += i386_vm86
+# For <machine/sysarch.h>.
+sysdep_routines += i386_get_ldt i386_set_ldt
 endif
