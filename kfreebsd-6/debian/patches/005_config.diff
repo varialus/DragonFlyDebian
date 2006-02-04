@@ -1,0 +1,59 @@
+
+Author: rmh
+Status: gotta uncomment WARNS (see #351366), and find a portable way to add
+  "-lbsd".  after this it can be sent upstream.
+
+diff -ur usr.sbin.old/config/Makefile usr.sbin/config/Makefile
+--- usr.sbin.old/config/Makefile	2005-12-09 07:46:40.000000000 +0100
++++ usr.sbin/config/Makefile	2006-02-04 13:54:08.000000000 +0100
+@@ -6,11 +6,11 @@
+ SRCS=	config.y main.c lang.l mkmakefile.c mkheaders.c \
+ 	mkoptions.c y.tab.h
+ 
+-WARNS?=	6
+-CFLAGS+= -I. -I${.CURDIR}
++#WARNS?=	6
++CFLAGS+= -I. -I${.CURDIR} -D_GNU_SOURCE
+ 
+ DPADD=	${LIBL}
+-LDADD=	-ll
++LDADD=	-ll -lbsd
+ 
+ mkmakefile.o: configvers.h
+ 
+diff -ur usr.sbin.old/config/main.c usr.sbin/config/main.c
+--- usr.sbin.old/config/main.c	2006-01-14 09:12:25.000000000 +0100
++++ usr.sbin/config/main.c	2006-02-04 13:40:37.000000000 +0100
+@@ -45,13 +45,19 @@
+ #include <sys/stat.h>
+ #include <sys/file.h>
+ #include <sys/mman.h>
+-#include <sys/param.h>
++#include <sys/param.h> /* BSD */
++#ifndef BSD
++#include <bsd/bsd.h> /* strlcpy, strlcat */
++#endif
+ #include <ctype.h>
+ #include <err.h>
+ #include <stdio.h>
+ #include <sysexits.h>
+ #include <unistd.h>
+ #include <dirent.h>
++#ifndef _DIRENT_HAVE_D_NAMLEN
++#include <string.h> /* strlen */
++#endif
+ #include "y.tab.h"
+ #include "config.h"
+ #include "configvers.h"
+@@ -474,7 +480,11 @@
+ 	if ((dirp = opendir(p)) == NULL)
+ 		err(EX_OSERR, "opendir %s", p);
+ 	while ((dp = readdir(dirp)) != NULL) {
++#ifdef _DIRENT_HAVE_D_NAMLEN
+ 		i = dp->d_namlen - 2;
++#else
++		i = strlen (dp->d_name) - 2;
++#endif
+ 		/* Skip non-headers */
+ 		if (dp->d_name[i] != '.' || dp->d_name[i + 1] != 'h')
+ 			continue;
