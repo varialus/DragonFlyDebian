@@ -21,6 +21,11 @@
 /* Contrary to most kernels which use ELFOSABI_SYSV aka ELFOSABI_NONE,
    FreeBSD uses ELFOSABI_FREEBSD for the OSABI field. */
 
-#define ELF_OSABI ELFOSABI_FREEBSD
+# define VALID_ELF_OSABI(osabi)		(osabi == ELFOSABI_SYSV)
+# define VALID_ELF_ABIVERSION(ver)	(ver == 0)
+# define VALID_ELF_HEADER(hdr,exp,size) \
+  memcmp (hdr,exp,size-2) == 0 \
+  && VALID_ELF_OSABI (hdr[EI_OSABI]) \
+  && VALID_ELF_ABIVERSION (hdr[EI_ABIVERSION])
 
 #include_next "dl-machine.h"
