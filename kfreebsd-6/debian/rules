@@ -25,7 +25,7 @@ HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
 FLAVOR_DIR	:= flavor-$(version)-$(abiname)
 
 MAKE		:= make MACHINE_ARCH=$(cpu) CC=gcc-3.4 WERROR= 
-PATH		:= /usr/lib/freebsd6:/usr/lib/freebsd:$(PATH)
+PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 
 control:
 	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
@@ -42,7 +42,7 @@ control:
 clean:
 	dh_testdir
 	dh_testroot
-	rm -rf src kfreebsd-source-* flavor-*
+	rm -rf src kfreebsd-source-* flavor-* config
 	rm -f debian/kfreebsd-image-*.{conffiles,preinst,postinst}
 
 	rm -f *-stamp
@@ -81,8 +81,12 @@ install-indep-stamp: build-indep
 
 	touch install-indep-stamp
 
+config: src
+	cp -af src/usr.sbin/config config
+	$(MAKE) -C config
+
 build-arch: $(foreach flavor,$(flavours),build-flavor-$(flavor)-stamp)
-build-flavor-%-stamp: src
+build-flavor-%-stamp: src config
 	cp -af src $(FLAVOR_DIR)-$*
 	
 	# Add the abiname and the flavor to the kernel version
