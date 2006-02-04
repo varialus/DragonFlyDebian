@@ -138,17 +138,6 @@ struct stat64
 
 #ifdef __USE_BSD
 
-__BEGIN_DECLS
-
-/* Set file access permissions for FILE to MODE.
-   Doesn't follow symbolic links if FILE is a symbolic link.
-   This takes an `int' MODE argument because that
-   is what `mode_t's get widened to.  */
-extern int lchmod (__const char *__file, __mode_t __mode) __THROW;
-
-__END_DECLS
-
-
 /* Definitions of flags stored in file flags word.  */
 
 /* Super-user and owner changeable flags.  */
