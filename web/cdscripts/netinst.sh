@@ -7,9 +7,16 @@
 
 set -ex
 
+if [ "$1" = "" ] ; then
+  distribution=Debian
+else
+  distribution="$1"
+fi
+distribution_lowcase=`echo ${distribution} | tr [A-Z] [a-z] | tr " " "_"`
+
 version=`date +%Y%m%d`
 cpu=i386
-cdname=debian-${version}-kfreebsd-${cpu}-install.iso
+cdname=${distribution_lowcase}-${version}-kfreebsd-${cpu}-install.iso
 
 if [ "$UID" != "0" ] ; then
   sudo $0 $@
@@ -17,7 +24,7 @@ if [ "$UID" != "0" ] ; then
 fi
 
 for i in mkisofs ; do
-  if ! dpkg -s ${i} | grep -q "^Status: .* installed$" > /dev/null ; then
+  if ! which mkisofs > /dev/null ; then
     echo Install ${i} and try again
     exit 1
   fi
@@ -32,12 +39,24 @@ if ! test -e mfsroot.gz ; then ./mfsroot.sh ; fi
 # get kernel and loader (this must be before loader.conf, so that it gets overwritten)
 tmp1=`mktemp -d`
 tar -C ${tmp1} -xzf base.tgz
-dpkg --extract ${tmp1}/var/cache/apt/archives/kfreebsd-loader_*_kfreebsd-i386.deb ${tmp}/
-kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-5.*-486_*_kfreebsd-i386.deb`
-dpkg --extract ${kfreebsd_image} ${tmp}/
-kfreebsd_version=`echo ${kfreebsd_image} | sed -e "s,.*/kfreebsd-image-,,g" -e "s,_.*,,g"`
-gzip -9 ${tmp}/boot/kernel/kernel
-rm -rf ${tmp1}
+case ${distribution_lower} in
+  debian)
+    dpkg --extract ${tmp1}/var/cache/apt/archives/kfreebsd-loader_*_kfreebsd-i386.deb ${tmp}/
+    kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-5.*-486_*_kfreebsd-i386.deb`
+    dpkg --extract ${kfreebsd_image} ${tmp}/
+    kfreebsd_version=`echo ${kfreebsd_image} | sed -e "s,.*/kfreebsd-image-,,g" -e "s,_.*,,g"`
+  ;;
+  *)
+    # assume it's already in the tarball
+    cp -a ${tmp1}/boot ${tmp}/
+    echo -n "kfreebsd_version: "
+    read kfreebsd_version
+  ;;
+esac
+rm -rf ${tmp1} &
+if test -e ${tmp}/boot/kernel/kernel ; then
+  gzip -9 ${tmp}/boot/kernel/kernel
+fi
 
 # put mfsroot and other extras
 echo "CD_VERSION = ${kfreebsd_version}" > ${tmp}/cdrom.inf
@@ -47,7 +66,10 @@ mfsroot_type="mfs_root"
 mfsroot_name="/boot/mfsroot"
 loader_color="YES"
 EOF
-cp mfsroot.gz ${tmp}/boot/
+case ${distribution_lowcase} in
+  gentoo) zcat mfsroot.gz | sed -e "s/Debian/Gentoo/g" | gzip -c9 > ${tmp}/boot/mfsroot.gz ;;
+  *) cp mfsroot.gz ${tmp}/boot/ ;;
+esac
 
 # copy our base into it
 mkdir ${tmp}/base/
@@ -61,7 +83,7 @@ ln -sf . ${tmp}/${kfreebsd_version}
 #################################
 # -V argument *must* be 32 char long at most, we have 18 chars for $version + $cpu
 (cd ${tmp} && mkisofs -b boot/cdboot -no-emul-boot \
-  -r -J -V "Debian $version $cpu Bin-1" \
+  -r -J -V "${distribution} ${version} ${cpu} Bin-1" \
   -o ${pwd}/${cdname} .)
 
 rm -rf ${tmp} &
