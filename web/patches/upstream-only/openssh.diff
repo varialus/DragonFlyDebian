@@ -1,0 +1,23 @@
+
+Author: aurel32
+Status: sent to openssh-unix-dev@mindrot.org on 20060205.
+Description: diffed against snapshot from 20060204.
+
+diff -ur openssh.old/configure.ac openssh/configure.ac
+--- openssh.old/configure.ac	2006-02-03 04:11:56.000000000 +0100
++++ openssh/configure.ac	2006-02-05 18:02:40.000000000 +0100
+@@ -310,6 +310,14 @@
+ 	AC_DEFINE(WITH_ABBREV_NO_TTY)
+ 	AC_DEFINE(LOCKED_PASSWD_STRING, "*LK*")
+ 	;;
++*-*-k*bsd*-gnu)
++	check_for_libcrypt_later=1
++	AC_DEFINE(PAM_TTY_KLUDGE)
++	AC_DEFINE(LOCKED_PASSWD_PREFIX, "!")
++	AC_DEFINE(SPT_TYPE,SPT_REUSEARGV)
++	AC_DEFINE(_PATH_BTMP, "/var/log/btmp", [log for bad login attempts])
++	AC_DEFINE(USE_BTMP, 1, [Use btmp to log bad logins])
++	;;
+ *-*-linux*)
+ 	no_dev_ptmx=1
+ 	check_for_libcrypt_later=1
