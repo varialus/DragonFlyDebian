@@ -1,39 +1,39 @@
-Author: aurel32
-Status: in BTS
 
-diff -u openssl-0.9.7g/Configure openssl-0.9.7g/Configure
---- openssl-0.9.7g/Configure
-+++ openssl-0.9.7g/Configure
-@@ -427,6 +427,7 @@
- "debian-sparc","gcc:-DB_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG RC4_CHAR RC4_CHUNK DES_UNROLL BF_PTR::::::::::dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
- "debian-sparc-v8","gcc:-DB_ENDIAN -DTERMIO -O3 -mcpu=v8 -fomit-frame-pointer -Wall -DBN_DIV2W::-D_REENTRANT::-ldl:BN_LLONG RC4_CHAR RC4_CHUNK DES_UNROLL BF_PTR:asm/sparcv8.o:::::::::dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
- "debian-sparc-v9","gcc:-DB_ENDIAN -DTERMIO -O3 -mcpu=v9 -Wa,-Av8plus -fomit-frame-pointer -Wall -DULTRASPARC -DBN_DIV2W::-D_REENTRANT::-ldl:BN_LLONG RC4_CHAR RC4_CHUNK DES_UNROLL BF_PTR:asm/sparcv8plus.o:::asm/md5-sparcv8plus.o::::::dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
-+"debian-kfreebsd-i386","gcc:-DL_ENDIAN -DTERMIOS -O3 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}::::::::::dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
- # The intel boxes :-), It would be worth seeing if bsdi-gcc can use the
- # bn86-elf.o file file since it is hand tweaked assembler.
- "linux-elf",	"gcc:-DL_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -m486 -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
-diff -u openssl-0.9.7g/Makefile openssl-0.9.7g/Makefile
---- openssl-0.9.7g/Makefile
-+++ openssl-0.9.7g/Makefile
-@@ -12,9 +12,9 @@
- SHLIB_MAJOR=0
- SHLIB_MINOR=9.7
- SHLIB_EXT=.so.$(SHLIB_MAJOR).$(SHLIB_MINOR)
--PLATFORM=debian-i386
-+PLATFORM=debian-kfreebsd-i386
- OPTIONS=--prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5 zlib-dynamic no-krb5
--CONFIGURE_ARGS=--prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5 zlib-dynamic debian-i386
-+CONFIGURE_ARGS=--prefix=/usr --openssldir=/usr/lib/ssl no-idea no-mdc2 no-rc5 zlib-dynamic debian-kfreebsd-i386
- SHLIB_TARGET=linux-shared
+Author: rmh
+Status: sent to upstream
+Description: Needed for "./config shared threads".  This is not done in Debian
+  but it is in Gentoo.
+
+diff -ur openssl-0.9.8a.old/Configure openssl-0.9.8a/Configure
+--- openssl-0.9.8a.old/Configure	2005-08-02 10:59:42 +0000
++++ openssl-0.9.8a/Configure	2006-02-05 13:19:27 +0000
+@@ -318,6 +318,7 @@
+ #### IA-32 targets...
+ "linux-ia32-icc",	"icc:-DL_ENDIAN -DTERMIO -O2 -no_cpprt::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-KPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
+ "linux-elf",	"gcc:-DL_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
++"glibc",	"gcc:-DL_ENDIAN -DTERMIOS -O3 -fomit-frame-pointer -Wall::-D_REENTRANT::-ldl:BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_elf_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
+ "linux-aout",	"gcc:-DL_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -march=i486 -Wall::(unknown):::BN_LLONG ${x86_gcc_des} ${x86_gcc_opts}:${x86_out_asm}",
+ ####
+ "linux-generic64","gcc:-DTERMIO -O3 -Wall::-D_REENTRANT::-ldl:SIXTY_FOUR_BIT_LONG RC4_CHAR RC4_CHUNK DES_INT DES_UNROLL BF_PTR:${no_asm}:dlfcn:linux-shared:-fPIC::.so.\$(SHLIB_MAJOR).\$(SHLIB_MINOR)",
+diff -ur openssl-0.9.8a.old/config openssl-0.9.8a/config
+--- openssl-0.9.8a.old/config	2005-09-20 12:16:30 +0000
++++ openssl-0.9.8a/config	2006-02-05 13:19:45 +0000
+@@ -162,6 +162,10 @@
+ 	echo "${MACHINE}-whatever-linux1"; exit 0
+ 	;;
  
- # HERE indicates where this Makefile lives.  This can be used to indicate
-@@ -62,7 +62,7 @@
- #TOP=$(shell pwd)
- CC= gcc
- #CFLAG= -DL_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -m486 -Wall -Wuninitialized -DSHA1_ASM -DMD5_ASM -DRMD160_ASM
--CFLAG= -DZLIB_SHARED -DZLIB -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DOPENSSL_NO_KRB5 -DOPENSSL_NO_IDEA -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC5 -DL_ENDIAN -DTERMIO -O3 -fomit-frame-pointer -Wall
-+CFLAG= -DZLIB_SHARED -DZLIB -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -DOPENSSL_NO_KRB5 -DOPENSSL_NO_IDEA -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC5 -DL_ENDIAN -DTERMIOS -O3 -fomit-frame-pointer -Wall
- DEPFLAG= -DOPENSSL_NO_IDEA -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC5 
- PEX_LIBS= 
- EX_LIBS= -ldl
-
++    GNU/kFreeBSD:*)
++	echo "${MACHINE}-whatever-glibc"; exit 0;
++	;;
++
+     GNU*)
+ 	echo "hurd-x86"; exit 0;
+ 	;;
+@@ -601,6 +605,7 @@
+         fi ;;
+   *-*-linux1) OUT="linux-aout" ;;
+   *-*-linux2) OUT="linux-generic32" ;;
++  *-*-glibc) OUT="glibc" ;;
+   sun4u*-*-solaris2)
+ 	OUT="solaris-sparcv9-$CC"
+ 	ISA64=`(isalist) 2>/dev/null | grep sparcv9`
