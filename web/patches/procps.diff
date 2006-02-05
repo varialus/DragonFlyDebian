@@ -1,0 +1,30 @@
+
+Author: rmh
+Status: sent to BTS and procps-feedback@lists.sf.net
+
+diff -ur procps-3.2.6.old/proc/version.c procps-3.2.6/proc/version.c
+--- procps-3.2.6.old/proc/version.c	2003-01-29 02:11:43.000000000 +0100
++++ procps-3.2.6/proc/version.c	2006-02-05 19:25:50.000000000 +0100
+@@ -35,15 +35,17 @@
+ 
+ static void init_Linux_version(void) __attribute__((constructor));
+ static void init_Linux_version(void) {
+-    static struct utsname uts;
+     int x = 0, y = 0, z = 0;	/* cleared in case sscanf() < 3 */
++    FILE *fp;
+     
+-    if (uname(&uts) == -1)	/* failure implies impending death */
++    fp = fopen ("/proc/version", "r");
++    if (fp == NULL)	/* failure implies impending death */
+ 	exit(1);
+-    if (sscanf(uts.release, "%d.%d.%d", &x, &y, &z) < 3)
++    if (fscanf(fp, "Linux version %d.%d.%d", &x, &y, &z) < 3)
+ 	fprintf(stderr,		/* *very* unlikely to happen by accident */
+ 		"Non-standard uts for running kernel:\n"
+-		"release %s=%d.%d.%d gives version code %d\n",
+-		uts.release, x, y, z, LINUX_VERSION(x,y,z));
++		"release %d.%d.%d gives version code %d\n",
++		x, y, z, LINUX_VERSION(x,y,z));
++    fclose (fp);
+     linux_version_code = LINUX_VERSION(x, y, z);
+ }
