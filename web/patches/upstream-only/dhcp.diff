@@ -1,0 +1,74 @@
+diff -ur dhcp-3.0.4b2.old/Makefile.conf dhcp-3.0.4b2/Makefile.conf
+--- dhcp-3.0.4b2.old/Makefile.conf	2005-06-16 21:39:35.000000000 +0200
++++ dhcp-3.0.4b2/Makefile.conf	2006-02-06 12:15:55.000000000 +0100
+@@ -486,3 +486,22 @@
+ #FFMANEXT = .5
+ #MANINSTALL = install -i -m 444
+ ##--hpux-gcc--
++
++## GNU/kFreeBSD
++##--kfreebsd--
++#CF = cf/kfreebsd.h
++#COPTS = $(BINDDEF) $(CC_OPTIONS)
++#ADMMANDIR = /usr/share/man/man8
++#ADMMANEXT = .8
++#FFMANDIR = /usr/share/man/man5
++#FFMANEXT = .5
++#LIBMANDIR = /usr/share/man/man3
++#LIBMANEXT = .3
++#USRMANDIR = /usr/share/man/man1
++#USRMANEXT = .1
++#MANCAT = man
++#VARRUN = /var/run
++#VARDB = /var/lib/dhcp
++#SCRIPT=kfreebsd
++##--kfreebsd--
++
+Only in dhcp-3.0.4b2/client/scripts: kfreebsd
+diff -ur dhcp-3.0.4b2.old/common/bpf.c dhcp-3.0.4b2/common/bpf.c
+--- dhcp-3.0.4b2.old/common/bpf.c	2004-11-24 18:39:15.000000000 +0100
++++ dhcp-3.0.4b2/common/bpf.c	2006-02-06 12:15:55.000000000 +0100
+@@ -407,7 +407,7 @@
+ 				       interface -> rbuf,
+ 				       (size_t)interface -> rbuf_max);
+ 			if (length <= 0) {
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 				if (errno == ENXIO) {
+ #else
+ 				if (errno == EIO) {
+diff -ur dhcp-3.0.4b2.old/configure dhcp-3.0.4b2/configure
+--- dhcp-3.0.4b2.old/configure	2004-09-10 23:02:30.000000000 +0200
++++ dhcp-3.0.4b2/configure	2006-02-06 12:15:55.000000000 +0100
+@@ -184,6 +184,8 @@
+       sysname=nextstep;;
+     UnixWare)
+       sysname=uw7;;
++    GNU/kFreeBSD)
++      sysname=kfreebsd;
+   esac
+ fi
+ 
+@@ -213,6 +215,7 @@
+     echo "   qnx		QNX 4.2 or higher"
+     echo "   NEXTSTEP     NeXTSTEP"
+     echo "   sco	SCO Open Server"
++    echo "   kfreebsd		GNU/kFreeBSD"
+     exit 1;
+   fi
+ fi
+Only in dhcp-3.0.4b2/includes/cf: kfreebsd.h
+diff -ur dhcp-3.0.4b2.old/includes/osdep.h dhcp-3.0.4b2/includes/osdep.h
+--- dhcp-3.0.4b2.old/includes/osdep.h	2005-09-28 20:58:27.000000000 +0200
++++ dhcp-3.0.4b2/includes/osdep.h	2006-02-06 12:15:55.000000000 +0100
+@@ -133,6 +133,10 @@
+ # endif
+ #endif
+ 
++#if defined(__FreeBSD_kernel__) && defined(__GLIBC__)
++#  include "cf/kfreebsd.h"
++#endif
++
+ /* snprintf/vsnprintf hacks.  for systems with no libc versions only. */
+ #ifdef NO_SNPRINTF
+   extern int isc_print_snprintf(char *, size_t, const char *, ...);
