@@ -1,0 +1,75 @@
+
+Author: rmh
+Status: in BTS
+
+diff -Nur files/inittab.kfreebsd files/inittab.kfreebsd
+--- files/inittab.kfreebsd	1970-01-01 01:00:00.000000000 +0100
++++ files/inittab.kfreebsd	2006-02-06 07:57:43.000000000 +0100
+@@ -0,0 +1,51 @@
++#
++# /etc/inittab:  This file describes how the INIT process should set up
++#                the system in a certain run-level.
++#
++# Author:  Miquel van Smoorenburg, <miquels@cistron.nl>
++# Modified by:  Patrick J. Volkerding, <volkerdi@ftp.cdrom.com>
++# Modified by:  Daniel Robbins, <drobbins@gentoo.org>
++# Modified by:  Martin Schlemmer, <azarah@gentoo.org>
++#
++# $Header: /var/cvsroot/gentoo-x86/sys-apps/sysvinit/files/inittab,v 1.5 2005/12/22 02:03:23 vapier Exp $
++
++# Default runlevel.
++id:3:initdefault:
++
++# System initialization, mount local filesystems, etc.
++si::sysinit:/sbin/rc sysinit
++
++# Further system initialization, brings up the boot runlevel.
++rc::bootwait:/sbin/rc boot
++
++l0:0:wait:/sbin/rc shutdown 
++l1:S1:wait:/sbin/rc single
++l2:2:wait:/sbin/rc nonetwork
++l3:3:wait:/sbin/rc default
++l4:4:wait:/sbin/rc default
++l5:5:wait:/sbin/rc default
++l6:6:wait:/sbin/rc reboot
++#z6:6:respawn:/sbin/sulogin
++
++# TERMINALS
++c1:12345:respawn:/sbin/agetty 38400 ttyv0 cons25
++c2:2345:respawn:/sbin/agetty 38400 ttyv1 cons25
++c3:2345:respawn:/sbin/agetty 38400 ttyv2 cons25
++c4:2345:respawn:/sbin/agetty 38400 ttyv3 cons25
++c5:2345:respawn:/sbin/agetty 38400 ttyv4 cons25
++c6:2345:respawn:/sbin/agetty 38400 ttyv5 cons25
++
++# SERIAL CONSOLES
++#s0:12345:respawn:/sbin/agetty 9600 cuaa0 vt100
++#s1:12345:respawn:/sbin/agetty 9600 cuaa1 vt100
++
++# What to do at the "Three Finger Salute".
++ca:12345:ctrlaltdel:/sbin/shutdown -r now
++
++# Used by /etc/init.d/xdm to control DM startup.
++# Read the comments in /etc/init.d/xdm for more
++# info. Do NOT remove, as this will start nothing
++# extra at boot if /etc/init.d/xdm is not added
++# to the "default" runlevel.
++x:a:once:/etc/X11/startDM.sh
++
+--- sysvinit-2.86-r3.ebuild.old	2006-02-06 07:34:16 +0000
++++ sysvinit-2.86-r3.ebuild	2006-02-06 07:42:06 +0000
+@@ -34,8 +34,12 @@
+ 	use selinux && epatch "${FILESDIR}"/${PV}-selinux.patch
+ 
+ 	# Mung inittab for specific architectures
++	case ${CHOST} in
++	  *-*-linux*)           suffix="linux" ;;
++	  *-*-kfreebsd*)        suffix="kfreebsd" ;;
++	esac
+ 	cd "${WORKDIR}"
+-	cp "${FILESDIR}"/inittab . || die "cp inittab"
++	cp "${FILESDIR}"/inittab.${suffix} inittab || die "cp inittab"
+ 	local insert=""
+ 	if use ibm ; then
+ 		insert="#hvc0:2345:respawn:/sbin/agetty -L 9600 hvc0"$'\n'

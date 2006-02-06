@@ -1,0 +1,51 @@
+
+Author: rmh
+Status: in BTS
+
+diff -Nur shadow.old/securetty.kfreebsd shadow/securetty.kfreebsd
+--- shadow.old/securetty.kfreebsd	1970-01-01 01:00:00.000000000 +0100
++++ shadow/securetty.kfreebsd	2006-02-06 07:57:43.000000000 +0100
+@@ -0,0 +1,18 @@
++# /etc/securetty: list of terminals on which root is allowed to login.
++# See securetty(5) and login(1).
++ttyv0
++ttyv1
++ttyv2
++ttyv3
++ttyv4
++ttyv5
++ttyv6
++ttyv7
++ttyva
++ttyvb
++ttyvc
++ttyvd
++ttyve
++ttyvf
++
++cuaa0
+--- shadow-4.0.14-r1.ebuild.old	2006-02-06 07:09:29 +0000
++++ shadow-4.0.14-r1.ebuild	2006-02-06 07:39:14 +0000
+@@ -72,6 +72,13 @@
+ 
+ 	elibtoolize
+ 	epunt_cxx
++
++	case ${CHOST} in
++	  *-*-linux*)		suffix="linux" ;;
++	  *-*-kfreebsd*)	suffix="kfreebsd" ;;
++	esac
++        cd "${WORKDIR}"
++        cp "${FILESDIR}"/securetty.${suffix} securetty || die "cp securetty"
+ }
+ 
+ src_compile() {
+@@ -122,7 +129,7 @@
+ 	insinto /etc
+ 	# Using a securetty with devfs device names added
+ 	# (compat names kept for non-devfs compatibility)
+-	insopts -m0600 ; doins "${FILESDIR}"/securetty
++	insopts -m0600 ; doins "${WORKDIR}"/securetty
+ 	use pam || { insopts -m0600 ; doins etc/login.access ; }
+ 	use pam || { insopts -m0600 ; doins etc/limits ; }
+ 	# Output arch-specific cruft

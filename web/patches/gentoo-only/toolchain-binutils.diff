@@ -1,0 +1,15 @@
+
+Author: rmh
+Status: in BTS
+
+--- /usr/portage/eclass/toolchain-binutils.eclass.old	2006-02-05 09:17:59 +0000
++++ /usr/portage/eclass/toolchain-binutils.eclass	2006-02-05 09:22:41 +0000
+@@ -183,7 +183,7 @@
+ 	find . -name '*.1' -a -size 0 | xargs rm -f
+ 
+ 	# elf2flt only works on some arches / targets
+-	if [[ -n ${ELF2FLT_VER} ]] && [[ ${CTARGET} == *linux* || ${CTARGET} == *-elf* ]] ; then
++	if [[ -n ${ELF2FLT_VER} ]] && [[ ${CTARGET} == *linux* || ${CTARGET} == *-elf* || ${CTARGET} == *-gnu* ]] ; then
+ 		cd "${WORKDIR}"/elf2flt-${ELF2FLT_VER}
+ 
+ 		local x supported_arches=$(sed -n '/defined(TARGET_/{s:^.*TARGET_::;s:)::;p}' elf2flt.c | sort -u)

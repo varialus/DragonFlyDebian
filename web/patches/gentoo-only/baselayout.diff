@@ -1,0 +1,91 @@
+
+Author: rmh
+Status: in BTS
+
+diff -ur baselayout-1.12.0_pre15.old/sbin/functions.sh baselayout-1.12.0_pre15/sbin/functions.sh
+--- baselayout-1.12.0_pre15.old/sbin/functions.sh	2006-01-13 09:29:00 +0000
++++ baselayout-1.12.0_pre15/sbin/functions.sh	2006-02-06 07:49:57 +0000
+@@ -452,6 +452,26 @@
+ 	return 1
+ }
+ 
++# char *get_SN()
++#
++#    Return the system name.
++#
++_RC_GET_SN_CACHE=""
++get_SN() {
++	[[ -z ${_RC_GET_SN_CACHE} ]] \
++		&& _RC_GET_SN_CACHE=$(uname -s)
++
++	echo "${_RC_GET_SN_CACHE}"
++
++	return $?
++}
++
++case $(get_SN) in
++  Linux) procfs=proc ;;
++  GNU/kFreeBSD) procfs=linprocfs ;;
++  *) procfs=procfs
++esac
++
+ # int get_KV()
+ #
+ #    Return the kernel version (major, minor and micro concated) as an integer.
+diff -ur baselayout-1.12.0_pre15.old/sbin/rc baselayout-1.12.0_pre15/sbin/rc
+--- baselayout-1.12.0_pre15.old/sbin/rc	2006-01-20 09:36:06 +0000
++++ baselayout-1.12.0_pre15/sbin/rc	2006-02-06 07:49:45 +0000
+@@ -188,7 +188,7 @@
+ 	[ -c /dev/console ] && dev_console=1 || dev_console=0
+ 
+ 	echo
+-	echo -e "${GOOD}Gentoo Linux${GENTOO_VERS}; ${BRACKET}http://www.gentoo.org/${NORMAL}"
++	echo -e "${GOOD}Gentoo $(get_SN)${GENTOO_VERS}; ${BRACKET}http://www.gentoo.org/${NORMAL}"
+ 	echo -e " Copyright 1999-2006 Gentoo Foundation; Distributed under the GPLv2"
+ 	echo
+ 	if [[ ${RC_INTERACTIVE} == "yes" ]] ; then
+@@ -197,13 +197,13 @@
+     fi
+ 	check_statedir /proc
+ 
+-	ebegin "Mounting proc at /proc"
++	ebegin "Mounting ${procfs} at /proc"
+ 	if [[ ${RC_USE_FSTAB} = "yes" ]] ; then
+ 		mntcmd=$(get_mount_fstab /proc)
+ 	else
+ 		unset mntcmd
+ 	fi
+-	try mount -n ${mntcmd:--t proc proc /proc}
++	try mount -n ${mntcmd:--t ${procfs} proc /proc}
+ 	eend $?
+ 
+ 	# Read off the kernel commandline to see if there's any special settings
+@@ -211,7 +211,7 @@
+ 	# Note: /proc MUST be mounted
+ 	[ -f /sbin/livecd-functions.sh ] && livecd_read_commandline
+ 
+-	if [ "$(get_KV)" -ge "$(KV_to_int '2.6.0')" ] ; then
++	if [ "$(get_SN)" = "Linux" ] && [ "$(get_KV)" -ge "$(KV_to_int '2.6.0')" ] ; then
+ 		if [[ -d /sys ]] ; then
+ 			ebegin "Mounting sysfs at /sys"
+ 			if [[ ${RC_USE_FSTAB} = "yes" ]] ; then
+@@ -250,6 +250,10 @@
+ 	then
+ 		ebegin "Using existing device nodes in /dev"
+ 		eend 0
++	elif [ "$(get_SN)" = "GNU/kFreeBSD" ]
++	then
++		ebegin "Using kFreeBSD devfs"
++		eend 0
+ 	else
+ 		fellback_to_devfs="no"
+ 		case "${RC_DEVICES}" in
+@@ -320,7 +324,7 @@
+ 	fi
+ 
+ 	# From linux-2.5.68 we need to mount /dev/pts again ...
+-	if [ "$(get_KV)" -ge "$(KV_to_int '2.5.68')" ]
++	if [ "$(get_SN)" = "Linux" ] && [ "$(get_KV)" -ge "$(KV_to_int '2.5.68')" ]
+ 	then
+ 		have_devpts="$(awk '($2 == "devpts") { print "yes"; exit 0 }' /proc/filesystems)"
+ 
