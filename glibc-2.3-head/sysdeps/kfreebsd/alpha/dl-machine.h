@@ -31,4 +31,4 @@
    && memcmp ((const char *) (e_ident) + EI_ABIVERSION, "FreeBSD", 8) == 0)
 #define VALID_ELF_ABIVERSION(abi) (memcmp (&(abi), "FreeBSD", 8) == 0)
 
-#include_next "dl-machine.h"
+#include_next <dl-machine.h>

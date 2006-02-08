@@ -21,7 +21,7 @@
 #include <fcntl.h>
 #include <sys/sysctl.h>
 #include <sys/utsname.h>
-#include "kernel-features.h"
+#include <kernel-features.h>
 
 #ifndef MIN
 # define MIN(a,b) (((a)<(b))?(a):(b))

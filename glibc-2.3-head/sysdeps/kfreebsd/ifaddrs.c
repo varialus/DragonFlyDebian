@@ -27,7 +27,7 @@
 #include <errno.h>
 #include <netinet/in.h>
 
-#include "ifreq.h"
+#include <ifreq.h>
 
 /* Create a linked list of `struct ifaddrs' structures, one for each
    network interface on the host machine.  If successful, store the

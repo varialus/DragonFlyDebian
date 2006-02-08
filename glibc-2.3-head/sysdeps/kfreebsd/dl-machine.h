@@ -28,4 +28,4 @@
   && VALID_ELF_OSABI (hdr[EI_OSABI]) \
   && VALID_ELF_ABIVERSION (hdr[EI_ABIVERSION])
 
-#include_next "dl-machine.h"
+#include_next <dl-machine.h>

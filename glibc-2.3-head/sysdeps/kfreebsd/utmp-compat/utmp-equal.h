@@ -19,7 +19,7 @@
 #include <string.h>
 #include <utmp.h>
 
-#include "utmp-private.h"
+#include <utmp-private.h>
 
 /* Test whether two entries match.  */
 static int
