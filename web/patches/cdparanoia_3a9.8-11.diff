@@ -1,3 +1,6 @@
+Author: FreeBSD + aurel32
+Status: in BTS
+
 diff -u cdparanoia-3a9.8/Makefile.in cdparanoia-3a9.8/Makefile.in
 --- cdparanoia-3a9.8/Makefile.in
 +++ cdparanoia-3a9.8/Makefile.in
@@ -147,7 +150,7 @@ diff -u cdparanoia-3a9.8/interface/scan_devices.c cdparanoia-3a9.8/interface/sca
  cdrom_drive *cdda_identify_cooked(const char *dev, int messagedest,
  				  char **messages){
  
-@@ -275,6 +299,60 @@
+@@ -275,6 +299,61 @@
    return(d);
  }
  
@@ -184,6 +187,7 @@ diff -u cdparanoia-3a9.8/interface/scan_devices.c cdparanoia-3a9.8/interface/sca
 +		goto cdda_identify_cooked_fail;
 +	}
 +
++	d->cdda_device_name = copystring(dev);
 +	d->drive_model = copystring("Generic cooked ioctl CDROM");
 +	d->interface = COOKED_IOCTL;
 +	d->bigendianp = -1;
@@ -208,7 +212,7 @@ diff -u cdparanoia-3a9.8/interface/scan_devices.c cdparanoia-3a9.8/interface/sca
  struct  sg_id {
    long    l1; /* target | lun << 8 | channel << 16 | low_ino << 24 */
    long    l2; /* Unique id */
-@@ -390,6 +468,7 @@
+@@ -390,6 +469,7 @@
    if(dev!=-1)close(dev);
    return(NULL);
  }
@@ -216,7 +220,7 @@ diff -u cdparanoia-3a9.8/interface/scan_devices.c cdparanoia-3a9.8/interface/sca
  
  void strscat(char *a,char *b,int n){
    int i;
-@@ -401,6 +480,7 @@
+@@ -401,6 +481,7 @@
    strcat(a," ");
  }
  
@@ -224,7 +228,7 @@ diff -u cdparanoia-3a9.8/interface/scan_devices.c cdparanoia-3a9.8/interface/sca
  /* At this point, we're going to punt compatability before SG2, and
     allow only SG2 and SG3 */
  static int verify_SG_version(cdrom_drive *d,int messagedest,
-@@ -654,6 +734,88 @@
+@@ -654,6 +735,89 @@
    if(g_fd!=-1)close(g_fd);
    return(NULL);
  }
@@ -276,6 +280,7 @@ diff -u cdparanoia-3a9.8/interface/scan_devices.c cdparanoia-3a9.8/interface/sca
 +		goto cdda_identify_scsi_fail;
 +	}
 +
++	d->cdda_device_name = copystring(devname);
 +	d->ioctl_fd = -1;
 +	d->bigendianp = -1;
 +	d->nsectors = -1;
@@ -317,9 +322,9 @@ diff -u cdparanoia-3a9.8/interface/utils.h cdparanoia-3a9.8/interface/utils.h
 --- cdparanoia-3a9.8/interface/utils.h
 +++ cdparanoia-3a9.8/interface/utils.h
 @@ -1,4 +1,9 @@
-+#ifdef LINUX
++#if defined (__linux__) || defined (__GLIBC__)
  #include <endian.h>
-+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#elif defined(__FreeBSD__)
 +#include <machine/endian.h>
 +#endif
 +
@@ -329,7 +334,15 @@ diff -u cdparanoia-3a9.8/interface/utils.h cdparanoia-3a9.8/interface/utils.h
 diff -u cdparanoia-3a9.8/debian/changelog cdparanoia-3a9.8/debian/changelog
 --- cdparanoia-3a9.8/debian/changelog
 +++ cdparanoia-3a9.8/debian/changelog
-@@ -1,3 +1,9 @@
+@@ -1,3 +1,17 @@
++cdparanoia (3a9.8-11+kbsd.1) unreleased; urgency=low
++
++  * Use cdda_device_name of struct cdrom_drive to expose the path of the
++    device node. Previously this was only present in the Linux version and 
++    is needed for KDE 3.5.1.
++
++ -- Aurelien Jarno <aurel32@debian.org>  Wed,  8 Feb 2006 14:43:21 +0100
++
 +cdparanoia (3a9.8-11+kbsd) unreleased; urgency=low
 +
 +  * Added support for GNU/kFreeBSD 
@@ -370,9 +383,9 @@ diff -u cdparanoia-3a9.8/debian/control cdparanoia-3a9.8/debian/control
 +++ cdparanoia-3a9.8/utils.h
 @@ -1,5 +1,9 @@
  #include <stdlib.h>
-+#if defined (__linux__)
++#if defined (__linux__) || defined(__GLIBC__)
  #include <endian.h>
-+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#elif defined(__FreeBSD__)
 +#include <machine/endian.h>
 +#endif
  #include <stdio.h>
@@ -424,12 +437,11 @@ diff -u cdparanoia-3a9.8/debian/control cdparanoia-3a9.8/debian/control
  #define MAXTRK 100
  
  typedef struct TOC {	/* structure of table of contents */
-@@ -46,14 +51,20 @@
- 
+@@ -47,13 +52,19 @@
    int opened; /* This struct may just represent a candidate for opening */
  
-+#if defined(__linux__)
    char *cdda_device_name;
++#if defined(__linux__)
    char *ioctl_device_name;
  
    int cdda_fd;
@@ -706,12 +718,11 @@ diff -u cdparanoia-3a9.8/debian/control cdparanoia-3a9.8/debian/control
    d->set_speed = cooked_setspeed;
 --- cdparanoia-3a9.8.orig/interface/interface.c
 +++ cdparanoia-3a9.8/interface/interface.c
-@@ -29,12 +29,25 @@
-       d->enable_cdda(d,0);
+@@ -30,11 +30,24 @@
  
      _clean_messages(d);
-+#if defined(__linux__)
      if(d->cdda_device_name)free(d->cdda_device_name);
++#if defined(__linux__)
      if(d->ioctl_device_name)free(d->ioctl_device_name);
      if(d->drive_model)free(d->drive_model);
      if(d->cdda_fd!=-1)close(d->cdda_fd);
