@@ -24,7 +24,9 @@ unpack-stamp:
 	mkdir build-tree
 	tar -C build-tree -xzf src.tar.gz
 	find build-tree -type d -name CVS | xargs rm -rf
-	find build-tree -type f | (while read i ; do sed -i $$i -e "/^__FBSDID/d" -e "s,<sys/queue.h>,<bsd/queue.h>,g" ; done)
+	find build-tree -type f | (while read i ; do sed -i $$i \
+		-e "/^__FBSDID/d" -e "s,<sys/queue.h>,<bsd/queue.h>,g" -e "s/^LDADD=/LDADD+=/g" ; \
+	done)
 	set -e ; cd build-tree && \
 		for i in $(CURDIR)/debian/patches/*.diff ; do \
 		  echo "--- Patch $$i ---" ; \
