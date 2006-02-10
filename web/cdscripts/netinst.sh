@@ -39,7 +39,7 @@ if ! test -e mfsroot.gz ; then ./mfsroot.sh ; fi
 # get kernel and loader (this must be before loader.conf, so that it gets overwritten)
 tmp1=`mktemp -d`
 tar -C ${tmp1} -xzf base.tgz
-case ${distribution_lower} in
+case ${distribution_lowcase} in
   debian)
     dpkg --extract ${tmp1}/var/cache/apt/archives/kfreebsd-loader_*_kfreebsd-i386.deb ${tmp}/
     kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-5.*-486_*_kfreebsd-i386.deb`
