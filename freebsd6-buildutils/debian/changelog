@@ -1,8 +1,29 @@
 freebsd6-buildutils (6.0-0.1) unstable; urgency=low
 
-  * FUCK!!
+  * Fork 6.x branch.
+  * Switch to libbsd.
+    - control (Build-Depends): Add libbsd-dev.
+    - rules: export LDADD=-lbsd
+    - patches/03_glibc.diff:
+      - usr.sbin/config/main.c: Nuke strl{cpy,cat} hack.
+      - usr.sbin/mtree/excludes.c: Nuke fgetln hack.
+      - usr.bin/make/Makefile: Stop adding LDADD=-lbsd (now passed from rules).
+    - patches/11_config_allow_override.diff:
+      - usr.sbin/config/Makefile: s/LDADD=/LDADD+=/g.
+  * Make dash and gcc-3.4 the default "sh" and "cc".
+    - control (Depends): Add gcc-3.4.
+    - links: New.  Setup sh and cc symlinks.
+  * Pass NO_SHARED=NO from debian/rules
+    - rules
+    - patches/01_make_fixes.diff: Nuke part that disables NO_SHARED.
+  * patches/03_glibc.diff:
+    - Remove s,sys/time.h/time.h,g (was it ever needed?)
+    - Nuke LIST_* defines (should be in sys/queue.h, or find another
+    solution, like s,sys/queue.h,bsd/queue.h,g)
+  * rules:
+    - Only apply patches with *.diff suffix.
 
- -- Robert Millan <rmh@aybabtu.com>  Fri, 16 Dec 2005 23:48:41 +0100
+ -- Robert Millan <rmh@aybabtu.com>  Fri, 10 Feb 2006 17:20:42 +0100
 
 freebsd5-buildutils (5.4-3) unstable; urgency=low
 

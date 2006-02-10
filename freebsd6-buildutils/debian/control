@@ -3,12 +3,14 @@ Section: devel
 Priority: extra
 Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>, Guillem Jover <guillem@debian.org>
-Build-Depends: patchutils (>= 0.2.25), debhelper (>= 4.1.0), pmake, flex, bison
+Build-Depends: patchutils (>= 0.2.25), debhelper (>= 4.1.0), pmake, flex, bison, libbsd-dev
 Standards-Version: 3.6.2
 
 Package: freebsd6-buildutils
 Architecture: any
-Depends: ${shlibs:Depends}, freebsd5-buildutils, bsdmainutils, dash, unzip, patchutils
+Depends: ${shlibs:Depends}, bsdmainutils, dash, unzip, patchutils, gcc-3.4
+Conflicts: freebsd5-buildutils, freebsd-buildutils
+Provides: freebsd-buildutils
 Description: Utilities for building FreeBSD 6.x sources
  This package contains the FreeBSD 6.x counterparts of some standard build
  utilities (make, yacc, lex ..)

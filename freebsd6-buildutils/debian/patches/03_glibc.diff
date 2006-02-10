@@ -1,18 +1,6 @@
 
   FIXME:  use libbsd instead (strlcpy, strvis, strunvis ...)
 
-diff -ur ../foo.old/src/usr.bin/make/main.c ./src/usr.bin/make/main.c
---- ../foo.old/src/usr.bin/make/main.c	2005-12-16 23:52:51.000000000 +0100
-+++ ./src/usr.bin/make/main.c	2005-12-16 23:53:18.000000000 +0100
-@@ -64,7 +64,7 @@
- #include <sys/param.h>
- #include <sys/stat.h>
- #include <sys/sysctl.h>
--#include <sys/time.h>
-+#include <time.h>
- #include <sys/queue.h>
- #include <sys/resource.h>
- #include <sys/utsname.h>
 diff -ur ../foo.old/src/usr.sbin/btxld/btx.h ./src/usr.sbin/btxld/btx.h
 --- ../foo.old/src/usr.sbin/btxld/btx.h	1999-08-28 03:15:41.000000000 +0200
 +++ ./src/usr.sbin/btxld/btx.h	2005-12-16 23:52:43.000000000 +0100
@@ -47,89 +35,6 @@ diff -ur ../foo.old/src/usr.sbin/btxld/elfh.h ./src/usr.sbin/btxld/elfh.h
  
  struct elfh {
      Elf32_Ehdr e;		/* ELF header */
-diff -ur ../foo.old/src/usr.sbin/config/main.c ./src/usr.sbin/config/main.c
---- ../foo.old/src/usr.sbin/config/main.c	2005-12-16 23:52:51.000000000 +0100
-+++ ./src/usr.sbin/config/main.c	2005-12-16 23:52:43.000000000 +0100
-@@ -87,6 +87,79 @@
- 	struct hdr_list *h_next;
- } *htab;
- 
-+#ifndef __FreeBSD__
-+/*
-+ * Copy src to string dst of size siz.  At most siz-1 characters
-+ * will be copied.  Always NUL terminates (unless siz == 0).
-+ * Returns strlen(src); if retval >= siz, truncation occurred.
-+ */
-+size_t strlcpy(dst, src, siz)
-+	char *dst;
-+	const char *src;
-+	size_t siz;
-+{
-+	char *d = dst;
-+	const char *s = src;
-+	size_t n = siz;
-+
-+	/* Copy as many bytes as will fit */
-+	if (n != 0 && --n != 0) {
-+		do {
-+			if ((*d++ = *s++) == 0)
-+				break;
-+		} while (--n != 0);
-+	}
-+
-+	/* Not enough room in dst, add NUL and traverse rest of src */
-+	if (n == 0) {
-+		if (siz != 0)
-+			*d = '\0';		/* NUL-terminate dst */
-+		while (*s++)
-+			;
-+	}
-+
-+	return(s - src - 1);	/* count does not include NUL */
-+}
-+
-+/*
-+ * Appends src to string dst of size siz (unlike strncat, siz is the
-+ * full size of dst, not space left).  At most siz-1 characters
-+ * will be copied.  Always NUL terminates (unless siz <= strlen(dst)).
-+ * Returns strlen(src) + MIN(siz, strlen(initial dst)).
-+ * If retval >= siz, truncation occurred.
-+ */
-+size_t
-+strlcat(dst, src, siz)
-+	char *dst;
-+	const char *src;
-+	size_t siz;
-+{
-+	char *d = dst;
-+	const char *s = src;
-+	size_t n = siz;
-+	size_t dlen;
-+
-+	/* Find the end of dst and adjust bytes left but don't go past end */
-+	while (n-- != 0 && *d != '\0')
-+		d++;
-+	dlen = d - dst;
-+	n = siz - dlen;
-+
-+	if (n == 0)
-+		return(dlen + strlen(s));
-+	while (*s != '\0') {
-+		if (n != 1) {
-+			*d++ = *s;
-+			n--;
-+		}
-+		s++;
-+	}
-+	*d = '\0';
-+
-+	return(dlen + (s - src));	/* count does not include NUL */
-+}
-+#endif
-+
- /*
-  * Config builds a set of files for building a UNIX
-  * system given a description of the desired system.
 diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
 --- ../foo.old/src/usr.sbin/mtree/Makefile	2005-03-29 13:44:17.000000000 +0200
 +++ ./src/usr.sbin/mtree/Makefile	2005-12-16 23:53:50.000000000 +0100
@@ -213,59 +118,6 @@ diff -ur ../foo.old/src/usr.sbin/mtree/create.c ./src/usr.sbin/mtree/create.c
  
  	if (iflag || S_ISDIR(p->fts_statp->st_mode))
  		offset = printf("%*s%s", indent, "", escaped_name);
-diff -ur ../foo.old/src/usr.sbin/mtree/excludes.c ./src/usr.sbin/mtree/excludes.c
---- ../foo.old/src/usr.sbin/mtree/excludes.c	2003-10-21 10:27:05.000000000 +0200
-+++ ./src/usr.sbin/mtree/excludes.c	2005-12-16 23:52:43.000000000 +0100
-@@ -27,6 +27,8 @@
-  * SUCH DAMAGE.
-  */
- 
-+#define _GNU_SOURCE /* getline */
-+
- #include <sys/cdefs.h>
- __FBSDID("$FreeBSD: ./src/usr.sbin/mtree/excludes.c,v 1.8 2003/10/21 08:27:05 phk Exp $");
- 
-@@ -43,6 +45,20 @@
- #include "mtree.h"		/* XXX for extern.h */
- #include "extern.h"
- 
-+#ifdef __GLIBC__
-+char *
-+fgetln (FILE *stream, size_t *len)
-+{
-+	char *line=NULL;
-+
-+	getline (&line, len, stream);
-+
-+	(*len)--; /* get rid of the trailing \0, fgetln
-+	does not have it */
-+	return line;
-+}
-+#endif
-+
- /*
-  * We're assuming that there won't be a whole lot of excludes,
-  * so it's OK to use a stupid algorithm.
-@@ -102,6 +118,19 @@
- 	/* fnmatch(3) has a funny return value convention... */
- #define MATCH(g, n) (fnmatch((g), (n), FNM_PATHNAME) == 0)
- 
-+#ifndef LIST_FIRST
-+#define	LIST_FIRST(head)	((head)->lh_first)
-+#endif
-+#ifndef LIST_NEXT
-+#define	LIST_NEXT(elm, field)	((elm)->field.le_next)
-+#endif
-+#ifndef LIST_FOREACH
-+#define	LIST_FOREACH(var, head, field)				\
-+	for ((var) = LIST_FIRST((head));				\
-+	    (var);							\
-+	    (var) = LIST_NEXT((var), field))
-+#endif
-+
- 	LIST_FOREACH(e, &excludes, link) {
- 		if ((e->pathname && MATCH(e->glob, path))
- 		    || MATCH(e->glob, fname))
 diff -ur ../foo.old/src/usr.sbin/mtree/spec.c ./src/usr.sbin/mtree/spec.c
 --- ../foo.old/src/usr.sbin/mtree/spec.c	2005-12-16 23:52:51.000000000 +0100
 +++ ./src/usr.sbin/mtree/spec.c	2005-12-16 23:52:43.000000000 +0100
@@ -314,16 +166,6 @@ diff -ur ../foo.old/src/usr.sbin/mtree/spec.c ./src/usr.sbin/mtree/spec.c
  			break;
  #ifdef ST_MTIM
  		case F_TIME:
---- src/usr.bin/make/Makefile~	2005-12-17 11:53:50.000000000 +0100
-+++ src/usr.bin/make/Makefile	2005-12-17 11:55:56.000000000 +0100
-@@ -4,6 +4,7 @@
- 
- PROG=	make
- CFLAGS+=-I${.CURDIR}
-+LDADD += -lbsd # arc4random
- SRCS=	arch.c buf.c cond.c dir.c for.c hash.c hash_tables.c job.c	\
- 	lst.c main.c make.c parse.c proc.c shell.c str.c suff.c targ.c	\
- 	util.c var.c
 --- src/usr.sbin/mtree/specspec.c~	2005-12-17 11:59:50.000000000 +0100
 +++ src/usr.sbin/mtree/specspec.c	2005-12-17 12:04:11.000000000 +0100
 @@ -83,8 +83,6 @@
@@ -342,19 +184,7 @@ diff -ur ../foo.old/src/usr.sbin/mtree/spec.c ./src/usr.sbin/mtree/spec.c
  
  	fprintf(stderr, "usage: %s [-n count] [-x] [prefix [suffix]]\n",
 -	    getprogname());
-+	    argv[0]);
- 	exit(1);
- }
- 
---- src/usr.bin/file2c/file2c.c~	2005-12-17 12:07:42.000000000 +0100
-+++ src/usr.bin/file2c/file2c.c	2005-12-17 12:10:00.000000000 +0100
-@@ -18,8 +18,7 @@
- usage(void)
- {
- 
--	fprintf(stderr, "usage: %s [-n count] [-x] [prefix [suffix]]\n",
--	    argv[0]);
-+	fprintf(stderr, "usage: file2c [-n count] [-x] [prefix [suffix]]\n");
++	    NULL);
  	exit(1);
  }
  
