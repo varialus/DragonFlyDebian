@@ -2,12 +2,18 @@
 set -e
 
 args=""
+verbose=false
 while [ $# -gt 0 ]; do
   case "$1" in
+    -v) verbose=true ;;
     -e) ;;
     *)  if [ -n "${args}" ] ; then args="${args} $1" ; else args="$1" ; fi ;;
   esac
   shift
 done
 
-exec -a swapon swapon.real ${args} >/dev/null
+if ! ${verbose} ; then
+  exec >/dev/null
+fi
+
+exec -a swapon swapon.real ${args}
