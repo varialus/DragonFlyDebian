@@ -1,6 +1,6 @@
-diff -ur sys.old/conf/files sys/conf/files
---- sys.old/conf/files	2005-10-08 20:00:40.000000000 +0200
-+++ sys/conf/files	2005-12-16 22:56:50.000000000 +0100
+diff -ur ../src.old/sys/conf/files sys/conf/files
+--- ../src.old/sys/conf/files	2006-02-11 13:08:03.000000000 +0000
++++ sys/conf/files	2006-02-11 12:58:15.000000000 +0000
 @@ -240,7 +240,6 @@
  contrib/dev/acpica/utmisc.c	optional acpi
  contrib/dev/acpica/utobject.c	optional acpi
@@ -21,10 +21,10 @@ diff -ur sys.old/conf/files sys/conf/files
  dev/awi/am79c930.c		optional awi
  dev/awi/awi.c			optional awi
  dev/awi/if_awi_pccard.c		optional awi pccard
-diff -ur sys.old/conf/files.i386 sys/conf/files.i386
---- sys.old/conf/files.i386	2005-08-30 16:56:02.000000000 +0200
-+++ sys/conf/files.i386	2005-12-16 23:13:34.000000000 +0100
-@@ -46,15 +46,6 @@
+diff -ur ../src.old/sys/conf/files.i386 sys/conf/files.i386
+--- ../src.old/sys/conf/files.i386	2006-02-11 13:08:03.000000000 +0000
++++ sys/conf/files.i386	2006-02-11 13:08:56.000000000 +0000
+@@ -46,36 +46,12 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -40,10 +40,20 @@ diff -ur sys.old/conf/files.i386 sys/conf/files.i386
  opt_ah.h			optional	ath_hal			\
  	dependency	"$S/contrib/dev/ath/public/i386-elf.opt_ah.h"	\
  	compile-with	"cp $S/contrib/dev/ath/public/i386-elf.opt_ah.h opt_ah.h" \
-@@ -72,10 +63,6 @@
- 	no-implicit-rule no-obj before-depend				\
- 	clean		"os+%DIKED-nve.h"
+ 	no-obj no-implicit-rule before-depend				\
+ 	clean		"opt_ah.h"
  #
+-nvenetlib.o			optional	nve pci			\
+-	dependency	"$S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu"	\
+-	compile-with	"uudecode $S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
+-	no-implicit-rule
+-#
+-os+%DIKED-nve.h		optional	nve pci			\
+-	dependency	"$S/contrib/dev/nve/os.h"			\
+-	compile-with	"sed -e 's/^.*#include.*phy\.h.*$$//' $S/contrib/dev/nve/os.h > os+%DIKED-nve.h" \
+-	no-implicit-rule no-obj before-depend				\
+-	clean		"os+%DIKED-nve.h"
+-#
 -hptmvraid.o			optional	hptmv			\
 -	dependency	"$S/dev/hptmv/i386-elf.raid.o.uu"	\
 -	compile-with	"uudecode < $S/dev/hptmv/i386-elf.raid.o.uu" \
@@ -51,7 +61,7 @@ diff -ur sys.old/conf/files.i386 sys/conf/files.i386
  #
  #
  compat/linux/linux_file.c	optional compat_linux
-@@ -173,11 +160,6 @@
+@@ -173,11 +149,6 @@
  dev/fdc/fdc_isa.c		optional fdc isa
  dev/fdc/fdc_pccard.c		optional fdc pccard
  dev/fe/if_fe_isa.c		optional fe isa
@@ -63,9 +73,17 @@ diff -ur sys.old/conf/files.i386 sys/conf/files.i386
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_pentium.c	optional hwpmc
  dev/hwpmc/hwpmc_piv.c		optional hwpmc
-diff -ur sys.old/conf/kern.pre.mk sys/conf/kern.pre.mk
---- sys.old/conf/kern.pre.mk	2005-10-07 15:55:58.000000000 +0200
-+++ sys/conf/kern.pre.mk	2005-12-16 22:53:46.000000000 +0100
+@@ -198,7 +169,6 @@
+ dev/mem/memutil.c		optional mem
+ dev/mse/mse.c			optional mse
+ dev/mse/mse_isa.c		optional mse isa
+-dev/nve/if_nve.c		optional nve pci
+ dev/ppc/ppc.c			optional ppc
+ dev/ppc/ppc_puc.c		optional ppc puc pci
+ dev/random/nehemiah.c		optional random
+diff -ur ../src.old/sys/conf/kern.pre.mk sys/conf/kern.pre.mk
+--- ../src.old/sys/conf/kern.pre.mk	2006-02-11 13:08:03.000000000 +0000
++++ sys/conf/kern.pre.mk	2006-02-11 12:58:15.000000000 +0000
 @@ -61,9 +61,6 @@
  # ... and the same for pf
  INCLUDES+= -I$S/contrib/pf
@@ -76,10 +94,10 @@ diff -ur sys.old/conf/kern.pre.mk sys/conf/kern.pre.mk
  # ... and the same for the NgATM stuff
  INCLUDES+= -I$S/contrib/ngatm
  
-diff -ur sys.old/i386/conf/GENERIC sys/i386/conf/GENERIC
---- sys.old/i386/conf/GENERIC	2005-10-28 21:22:41.000000000 +0200
-+++ sys/i386/conf/GENERIC	2005-12-16 22:53:46.000000000 +0100
-@@ -118,7 +118,6 @@
+diff -ur ../src.old/sys/i386/conf/GENERIC sys/i386/conf/GENERIC
+--- ../src.old/sys/i386/conf/GENERIC	2006-02-11 13:08:03.000000000 +0000
++++ sys/i386/conf/GENERIC	2006-02-11 13:08:27.000000000 +0000
+@@ -124,7 +124,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -87,9 +105,17 @@ diff -ur sys.old/i386/conf/GENERIC sys/i386/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-diff -ur sys.old/modules/Makefile sys/modules/Makefile
---- sys.old/modules/Makefile	2005-10-07 17:56:30.000000000 +0200
-+++ sys/modules/Makefile	2005-12-16 22:55:52.000000000 +0100
+@@ -200,7 +199,6 @@
+ device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+ device		lge		# Level 1 LXT1001 gigabit Ethernet
+ device		nge		# NatSemi DP83820 gigabit Ethernet
+-device		nve		# nVidia nForce MCP on-board Ethernet Networking
+ device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
+ device		re		# RealTek 8139C+/8169/8169S/8110S
+ device		rl		# RealTek 8129/8139
+diff -ur ../src.old/sys/modules/Makefile sys/modules/Makefile
+--- ../src.old/sys/modules/Makefile	2006-02-11 13:08:03.000000000 +0000
++++ sys/modules/Makefile	2006-02-11 12:58:15.000000000 +0000
 @@ -25,11 +25,6 @@
  	${_arl} \
  	${_asr} \
