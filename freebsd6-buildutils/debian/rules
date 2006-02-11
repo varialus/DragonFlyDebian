@@ -88,8 +88,8 @@ install: build
 		$(PMAKE) install \
 		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/share
 
-	cp -af $(CURDIR)/build-tree/ports \
-		$(CURDIR)/debian/$(package)/usr/share/$(package)
+	cp -af $(CURDIR)/build-tree/ports/Mk \
+		$(CURDIR)/debian/$(package)/usr/share/
 
 	# rename awk
 	mv $(CURDIR)/debian/$(package)/usr/bin/nawk \
@@ -110,10 +110,6 @@ install: build
 		$(CURDIR)/debian/$(package)/usr/bin/freebsd-$$i ; \
 	done
 	rmdir $(CURDIR)/debian/$(package)/usr/sbin
-
-	# make stuff
-	mv $(CURDIR)/debian/$(package)/usr/share/mk \
-		$(CURDIR)/debian/$(package)/usr/share/$(package)/mk
 
 clean:
 	dh_testdir
