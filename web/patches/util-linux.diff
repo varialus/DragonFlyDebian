@@ -1,20 +1,16 @@
-
-Author: guillem (updated by rmh)
-Status: debian part in BTS, upstream part being handled by Guillem
-
-diff -ur util-linux-2.12p.old/debian/patches/00list util-linux-2.12p/debian/patches/00list
---- util-linux-2.12p.old/debian/patches/00list	2005-10-06 18:45:25.000000000 +0200
-+++ util-linux-2.12p/debian/patches/00list	2005-10-06 19:47:00.000000000 +0200
+diff -ur util-linux-2.12r.old/debian/patches/00list util-linux-2.12r/debian/patches/00list
+--- util-linux-2.12r.old/debian/patches/00list	2006-02-08 13:09:52.000000000 +0100
++++ util-linux-2.12r/debian/patches/00list	2006-02-08 13:10:16.000000000 +0100
 @@ -1,4 +1,3 @@
 -10agetty
  10cal-widechar
  10cfdisk
- 10debian
-diff -ur util-linux-2.12p.old/debian/rules util-linux-2.12p/debian/rules
---- util-linux-2.12p.old/debian/rules	2005-10-06 18:45:25.000000000 +0200
-+++ util-linux-2.12p/debian/rules	2005-10-06 19:52:35.000000000 +0200
+ 10cramfs-udebsize
+diff -ur util-linux-2.12r.old/debian/rules util-linux-2.12r/debian/rules
+--- util-linux-2.12r.old/debian/rules	2006-02-08 13:09:52.000000000 +0100
++++ util-linux-2.12r/debian/rules	2006-02-08 13:10:16.000000000 +0100
 @@ -25,7 +25,7 @@
- sparc = $(findstring $(arch),sparc)
+ sparc = $(findstring $(arch),sparc sparc64)
  nohwclock = $(findstring $(arch),s390)
  
 -SUBDIRS=po lib getopt disk-utils login-utils misc-utils mount sys-utils text-utils
@@ -105,9 +101,9 @@ diff -ur util-linux-2.12p.old/debian/rules util-linux-2.12p/debian/rules
  	(cd debian/tmp/sbin ; mv agetty getty)
  	(cd debian/tmp/usr/share/man/man8 ; mv agetty.8 getty.8)
  ifneq ($(arch), $(nohwclock))
-diff -ur util-linux-2.12p.old/disk-utils/Makefile util-linux-2.12p/disk-utils/Makefile
---- util-linux-2.12p.old/disk-utils/Makefile	2004-12-21 18:14:16.000000000 +0100
-+++ util-linux-2.12p/disk-utils/Makefile	2005-10-06 19:17:28.000000000 +0200
+diff -ur util-linux-2.12r.old/disk-utils/Makefile util-linux-2.12r/disk-utils/Makefile
+--- util-linux-2.12r.old/disk-utils/Makefile	2004-12-21 18:14:16.000000000 +0100
++++ util-linux-2.12r/disk-utils/Makefile	2006-02-08 13:10:16.000000000 +0100
 @@ -16,16 +16,19 @@
  
  SBIN= 	mkfs mkswap blockdev elvtune fsck.minix mkfs.minix mkfs.bfs
@@ -132,38 +128,32 @@ diff -ur util-linux-2.12p.old/disk-utils/Makefile util-linux-2.12p/disk-utils/Ma
  
  ifeq "$(HAVE_RAW_H)" "yes"
  USRBIN:=$(USRBIN) raw
-diff -ur util-linux-2.12p.old/disk-utils/fsck.cramfs.c util-linux-2.12p/disk-utils/fsck.cramfs.c
---- util-linux-2.12p.old/disk-utils/fsck.cramfs.c	2005-10-06 18:45:25.000000000 +0200
-+++ util-linux-2.12p/disk-utils/fsck.cramfs.c	2005-10-06 19:13:12.000000000 +0200
-@@ -76,7 +76,11 @@
+diff -ur util-linux-2.12r.old/disk-utils/fsck.cramfs.c util-linux-2.12r/disk-utils/fsck.cramfs.c
+--- util-linux-2.12r.old/disk-utils/fsck.cramfs.c	2004-12-11 15:53:16.000000000 +0100
++++ util-linux-2.12r/disk-utils/fsck.cramfs.c	2006-02-08 13:26:48.000000000 +0100
+@@ -76,7 +76,7 @@
  
  #define PAD_SIZE 512
  
-+#if defined(__linux__)
- #include <asm/page.h>
-+#elif defined(__FreeBSD_kernel__)
-+#include <machine/param.h>
-+#endif
+-#include <asm/page.h>
++#include <sys/user.h>		/* PAGE_SIZE */
  #ifdef PAGE_SIZE
  #define PAGE_CACHE_SIZE ((int) PAGE_SIZE)
  #elif defined __ia64__
-diff -ur util-linux-2.12p.old/login-utils/agetty.c util-linux-2.12p/login-utils/agetty.c
---- util-linux-2.12p.old/login-utils/agetty.c	2002-07-29 09:36:42.000000000 +0200
-+++ util-linux-2.12p/login-utils/agetty.c	2005-10-06 19:57:13.000000000 +0200
-@@ -18,7 +18,12 @@
+diff -ur util-linux-2.12r.old/login-utils/agetty.c util-linux-2.12r/login-utils/agetty.c
+--- util-linux-2.12r.old/login-utils/agetty.c	2002-07-29 09:36:42.000000000 +0200
++++ util-linux-2.12r/login-utils/agetty.c	2006-02-08 13:24:50.000000000 +0100
+@@ -18,7 +18,8 @@
  #include <stdlib.h>
  #include <string.h>
  #include <sys/ioctl.h>
-+#ifdef __linux__
- #include <termio.h>
-+#else
+-#include <termio.h>
 +#include <termios.h>
 +#define termio termios
-+#endif
  #include <signal.h>
  #include <errno.h>
  #include <sys/types.h>
-@@ -33,11 +38,9 @@
+@@ -33,11 +34,9 @@
  #include "xstrncpy.h"
  #include "nls.h"
  
@@ -175,19 +165,7 @@ diff -ur util-linux-2.12p.old/login-utils/agetty.c util-linux-2.12p/login-utils/
  
   /* If USE_SYSLOG is undefined all diagnostics go directly to /dev/console. */
  
-@@ -113,6 +116,11 @@
- #define	TCSETAW	TCSETSW
- #endif
- 
-+/* Linux-specific */
-+#ifndef CBAUD
-+#define CBAUD 0
-+#endif
-+
-  /*
-   * This program tries to not use the standard-i/o library.  This keeps the
-   * executable small on systems that do not have shared libraries (System V
-@@ -299,9 +307,7 @@
+@@ -299,9 +298,7 @@
  
      parse_args(argc, argv, &options);
  
@@ -197,34 +175,34 @@ diff -ur util-linux-2.12p.old/login-utils/agetty.c util-linux-2.12p/login-utils/
  	
      /* Update the utmp file. */
  
-@@ -686,8 +692,13 @@
+@@ -686,8 +683,13 @@
       * 5 seconds seems to be a good value.
       */
  
-+#ifdef __linux__
-     if (ioctl(0, TCGETA, tp) < 0)
- 	error("%s: ioctl: %m", tty);
-+#else
-+    if (tcgetattr (0, tp) < 0)
+-    if (ioctl(0, TCGETA, tp) < 0)
+-	error("%s: ioctl: %m", tty);
++    if (tcgetattr(0, tp) < 0)
 +	error("%s: tcgetattr: %m", tty);
-+#endif
++
++    /*
++     * TIOCSCTTY: steal tty from other process group.
++     */
++    ioctl(0, TIOCSCTTY, 1);
  
      /*
       * It seems to be a terminal. Set proper protections and ownership. Mode
-@@ -723,9 +734,11 @@
+@@ -723,17 +725,18 @@
       * reads will be done in raw mode anyway. Errors will be dealt with
       * lateron.
       */
 -#ifdef __linux__
      /* flush input and output queues, important for modems! */
-+#ifdef __linux__
-     (void) ioctl(0, TCFLSH, TCIOFLUSH);
-+#else
-+    tcflush (0, TCIOFLUSH);
- #endif
+-    (void) ioctl(0, TCFLSH, TCIOFLUSH);
+-#endif
++    tcflush(0, TCIOFLUSH);
  
      tp->c_cflag = CS8 | HUPCL | CREAD | speed;
-@@ -733,7 +746,10 @@
+     if (op->flags & F_LOCAL) {
  	tp->c_cflag |= CLOCAL;
      }
  
@@ -236,76 +214,68 @@ diff -ur util-linux-2.12p.old/login-utils/agetty.c util-linux-2.12p/login-utils/
      tp->c_cc[VMIN] = 1;
      tp->c_cc[VTIME] = 0;
  
-@@ -744,7 +760,11 @@
+@@ -744,7 +747,7 @@
  	tp->c_cflag |= CRTSCTS;
  #endif
  
-+#ifdef __linux__
-     (void) ioctl(0, TCSETA, tp);
-+#else
-+    tcsetattr (0, TCSANOW, tp);
-+#endif
+-    (void) ioctl(0, TCSETA, tp);
++    tcsetattr(0, TCSANOW, tp);
  
      /* go to blocking input even in local mode */
      fcntl(0, F_SETFL, fcntl(0, F_GETFL, 0) & ~O_NONBLOCK);
-@@ -764,6 +784,11 @@
-     char   *bp;
-     int     nread;
- 
-+#ifdef __FreeBSD_kernel__
-+    ioctl (0, TIOCSCTTY, 0);
-+#endif
-+
-+
-     /*
-      * This works only if the modem produces its status code AFTER raising
-      * the DCD line, and if the computer is fast enough to set the proper
-@@ -788,7 +813,11 @@
+@@ -788,7 +791,7 @@
      tp->c_iflag |= ISTRIP;			/* enable 8th-bit stripping */
      vmin = tp->c_cc[VMIN];
      tp->c_cc[VMIN] = 0;				/* don't block if queue empty */
-+#ifdef __linux__
-     (void) ioctl(0, TCSETA, tp);
-+#else
-+    tcsetattr (0, TCSANOW, tp);
-+#endif
+-    (void) ioctl(0, TCSETA, tp);
++    tcsetattr(0, TCSANOW, tp);
  
      /*
       * Wait for a while, then read everything the modem has said so far and
-@@ -812,7 +841,11 @@
+@@ -801,8 +804,7 @@
+ 	for (bp = buf; bp < buf + nread; bp++) {
+ 	    if (isascii(*bp) && isdigit(*bp)) {
+ 		if ((speed = bcode(bp))) {
+-		    tp->c_cflag &= ~CBAUD;
+-		    tp->c_cflag |= speed;
++		    cfsetospeed(tp, speed);
+ 		}
+ 		break;
+ 	    }
+@@ -812,7 +814,7 @@
  
      tp->c_iflag = iflag;
      tp->c_cc[VMIN] = vmin;
-+#if defined(__linux__) && !defined(__GLIBC__)
-     (void) ioctl(0, TCSETA, tp);
-+#else
-+    tcsetattr (0, TCSANOW, tp);
-+#endif
+-    (void) ioctl(0, TCSETA, tp);
++    tcsetattr(0, TCSANOW, tp);
  }
  
  /* do_prompt - show login prompt, optionally preceded by /etc/issue contents */
-@@ -835,8 +868,11 @@
+@@ -835,8 +837,7 @@
      if ((op->flags & F_ISSUE) && (fd = fopen(op->issue, "r"))) {
  	oflag = tp->c_oflag;			/* save current setting */
  	tp->c_oflag |= (ONLCR | OPOST);		/* map NL in output to CR-NL */
-+#ifdef __linux__
- 	(void) ioctl(0, TCSETAW, tp);
+-	(void) ioctl(0, TCSETAW, tp);
 -
-+#else
-+        tcsetattr (0, TCSADRAIN, tp);
-+#endif
++        tcsetattr(0, TCSADRAIN, tp);
  
  	while ((c = getc(fd)) != EOF)
  	{
-@@ -947,18 +983,22 @@
+@@ -915,7 +916,7 @@
+ 			int i;
+ 
+ 			for (i = 0; speedtab[i].speed; i++) {
+-			    if (speedtab[i].code == (tp->c_cflag & CBAUD)) {
++			    if (speedtab[i].code == cfgetospeed(tp)) {
+ 				printf("%ld", speedtab[i].speed);
+ 				break;
+ 			    }
+@@ -947,18 +948,18 @@
  	fflush(stdout);
  
  	tp->c_oflag = oflag;			/* restore settings */
-+#ifdef __linux__
- 	(void) ioctl(0, TCSETAW, tp);		/* wait till output is gone */
-+#else
-+        tcsetattr (0, TCSADRAIN, tp);
-+#endif
+-	(void) ioctl(0, TCSETAW, tp);		/* wait till output is gone */
++        tcsetattr(0, TCSADRAIN, tp);
  	(void) fclose(fd);
      }
  #endif
@@ -322,43 +292,40 @@ diff -ur util-linux-2.12p.old/login-utils/agetty.c util-linux-2.12p/login-utils/
      (void) write(1, LOGIN, sizeof(LOGIN) - 1);	/* always show login prompt */
  }
  
-@@ -973,7 +1013,11 @@
+@@ -971,9 +972,8 @@
+     static int baud_index = FIRST_SPEED;/* current speed index */
+ 
      baud_index = (baud_index + 1) % op->numspeed;
-     tp->c_cflag &= ~CBAUD;
-     tp->c_cflag |= op->speeds[baud_index];
-+#ifdef __linux__
-     (void) ioctl(0, TCSETA, tp);
-+#else
-+    tcsetattr (0, TCSANOW, tp);
-+#endif
+-    tp->c_cflag &= ~CBAUD;
+-    tp->c_cflag |= op->speeds[baud_index];
+-    (void) ioctl(0, TCSETA, tp);
++    cfsetospeed(tp, op->speeds[baud_index]);
++    tcsetattr(0, TCSANOW, tp);
  }
  
  /* get_logname - get user name, establish parity, speed, erase, kill, eol */
-@@ -1003,7 +1047,11 @@
+@@ -1003,7 +1003,7 @@
      /* Flush pending input (esp. after parsing or switching the baud rate). */
  
      (void) sleep(1);
-+#ifdef __linux__
-     (void) ioctl(0, TCFLSH, TCIFLUSH);
-+#else
-+    tcflush (0, TCIFLUSH);
-+#endif
+-    (void) ioctl(0, TCFLSH, TCIFLUSH);
++    tcflush(0, TCIFLUSH);
  
      /* Prompt for and read a login name. */
  
-@@ -1105,9 +1153,9 @@
+@@ -1105,9 +1105,9 @@
      tp->c_cc[VQUIT] = DEF_QUIT;			/* default quit */
      tp->c_cc[VEOF] = DEF_EOF;			/* default EOF character */
      tp->c_cc[VEOL] = DEF_EOL;
 -#ifdef __linux__
-+#if defined(__linux__)
++#if defined(VSWTC)
      tp->c_cc[VSWTC] = DEF_SWITCH;		/* default switch character */
 -#else
 +#elif defined(VSWTCH)
      tp->c_cc[VSWTCH] = DEF_SWITCH;		/* default switch character */
  #endif
  
-@@ -1140,9 +1188,15 @@
+@@ -1140,9 +1140,15 @@
      /* Account for upper case without lower case. */
  
      if (cp->capslock) {
@@ -374,23 +341,20 @@ diff -ur util-linux-2.12p.old/login-utils/agetty.c util-linux-2.12p/login-utils/
      }
      /* Optionally enable hardware flow control */
  
-@@ -1153,8 +1207,13 @@
+@@ -1153,8 +1159,8 @@
  
      /* Finally, make the new settings effective */
  
-+#ifdef __linux__
-     if (ioctl(0, TCSETA, tp) < 0)
- 	error("%s: ioctl: TCSETA: %m", op->tty);
-+#else
-+    if (tcsetattr (0, TCSANOW, tp) < 0)
+-    if (ioctl(0, TCSETA, tp) < 0)
+-	error("%s: ioctl: TCSETA: %m", op->tty);
++    if (tcsetattr(0, TCSANOW, tp) < 0)
 +	error("%s: tcsetattr: %m", op->tty);
-+#endif
  }
  
  /* caps_lock - string contains upper case without lower case */
-diff -ur util-linux-2.12p.old/misc-utils/Makefile util-linux-2.12p/misc-utils/Makefile
---- util-linux-2.12p.old/misc-utils/Makefile	2004-12-05 20:09:12.000000000 +0100
-+++ util-linux-2.12p/misc-utils/Makefile	2005-10-06 19:37:23.000000000 +0200
+diff -ur util-linux-2.12r.old/misc-utils/Makefile util-linux-2.12r/misc-utils/Makefile
+--- util-linux-2.12r.old/misc-utils/Makefile	2004-12-05 20:09:12.000000000 +0100
++++ util-linux-2.12r/misc-utils/Makefile	2006-02-08 13:10:17.000000000 +0100
 @@ -22,7 +22,11 @@
  USRBIN=		cal chkdupexe ddate logger look mcookie \
  		namei rename script whereis
@@ -439,9 +403,9 @@ diff -ur util-linux-2.12p.old/misc-utils/Makefile util-linux-2.12p/misc-utils/Ma
  
  install: all
  	$(INSTALLDIR) $(BINDIR) $(USRBINDIR)
-diff -ur util-linux-2.12p.old/misc-utils/mcookie.c util-linux-2.12p/misc-utils/mcookie.c
---- util-linux-2.12p.old/misc-utils/mcookie.c	2002-03-09 00:00:52.000000000 +0100
-+++ util-linux-2.12p/misc-utils/mcookie.c	2005-10-06 19:34:11.000000000 +0200
+diff -ur util-linux-2.12r.old/misc-utils/mcookie.c util-linux-2.12r/misc-utils/mcookie.c
+--- util-linux-2.12r.old/misc-utils/mcookie.c	2002-03-09 00:00:52.000000000 +0100
++++ util-linux-2.12r/misc-utils/mcookie.c	2006-02-08 13:10:17.000000000 +0100
 @@ -20,7 +20,7 @@
   *
   */
@@ -451,9 +415,9 @@ diff -ur util-linux-2.12p.old/misc-utils/mcookie.c util-linux-2.12p/misc-utils/m
  #define HAVE_GETTIMEOFDAY 1
  #endif
  
-diff -ur util-linux-2.12p.old/misc-utils/script.c util-linux-2.12p/misc-utils/script.c
---- util-linux-2.12p.old/misc-utils/script.c	2004-03-26 18:07:16.000000000 +0100
-+++ util-linux-2.12p/misc-utils/script.c	2005-10-06 19:34:51.000000000 +0200
+diff -ur util-linux-2.12r.old/misc-utils/script.c util-linux-2.12r/misc-utils/script.c
+--- util-linux-2.12r.old/misc-utils/script.c	2004-03-26 18:07:16.000000000 +0100
++++ util-linux-2.12r/misc-utils/script.c	2006-02-08 13:26:48.000000000 +0100
 @@ -54,10 +54,8 @@
  #include <sys/signal.h>
  #include "nls.h"
@@ -465,9 +429,9 @@ diff -ur util-linux-2.12p.old/misc-utils/script.c util-linux-2.12p/misc-utils/sc
  
  #include "../defines.h"
  #ifdef HAVE_openpty
-diff -ur util-linux-2.12p.old/sys-utils/Makefile util-linux-2.12p/sys-utils/Makefile
---- util-linux-2.12p.old/sys-utils/Makefile	2004-11-15 18:47:47.000000000 +0100
-+++ util-linux-2.12p/sys-utils/Makefile	2005-10-06 19:42:31.000000000 +0200
+diff -ur util-linux-2.12r.old/sys-utils/Makefile util-linux-2.12r/sys-utils/Makefile
+--- util-linux-2.12r.old/sys-utils/Makefile	2004-11-15 18:47:47.000000000 +0100
++++ util-linux-2.12r/sys-utils/Makefile	2006-02-08 13:10:17.000000000 +0100
 @@ -17,9 +17,9 @@
  # Where to put binaries?
  # See the "install" rule for the links. . .
@@ -492,25 +456,9 @@ diff -ur util-linux-2.12p.old/sys-utils/Makefile util-linux-2.12p/sys-utils/Make
  CWFLAGS := $(subst -Wmissing-prototypes,,$(CFLAGS))
  
  ifeq "$(HAVE_SLN)" "no"
-diff -ur util-linux-2.12p.old/text-utils/more.c util-linux-2.12p/text-utils/more.c
---- util-linux-2.12p.old/text-utils/more.c	2004-12-22 11:46:25.000000000 +0100
-+++ util-linux-2.12p/text-utils/more.c	2005-10-06 19:45:17.000000000 +0200
-@@ -76,6 +76,15 @@
- 
- #define stty(fd,argp)  tcsetattr(fd,TCSANOW,argp)
- 
-+/* Linux-specific */
-+#ifndef CBAUD
-+#define CBAUD 0
-+#endif
-+
-+#ifndef TABDLY
-+#define TABDLY 0
-+#endif
-+
- /* some function declarations */
- void initterm(void);
- void kill_line(void);
+diff -ur util-linux-2.12r.old/text-utils/more.c util-linux-2.12r/text-utils/more.c
+--- util-linux-2.12r.old/text-utils/more.c	2004-12-22 11:46:25.000000000 +0100
++++ util-linux-2.12r/text-utils/more.c	2006-02-08 13:10:17.000000000 +0100
 @@ -1560,10 +1569,6 @@
      }
      if (feof (file)) {
@@ -522,3 +470,12 @@ diff -ur util-linux-2.12p.old/text-utils/more.c util-linux-2.12p/text-utils/more
  	    Currline = saveln;
  	    Fseek (file, startline);
  	}
+@@ -1804,7 +1809,7 @@
+     no_intty = tcgetattr(fileno(stdin), &otty);
+     tcgetattr(fileno(stderr), &otty);
+     savetty0 = otty;
+-    slow_tty = (otty.c_cflag & CBAUD) < B1200;
++    slow_tty = cfgetospeed(&otty) < B1200;
+     hardtabs = (otty.c_oflag & TABDLY) != XTABS;
+     if (!no_tty) {
+ 	otty.c_lflag &= ~(ICANON|ECHO);
