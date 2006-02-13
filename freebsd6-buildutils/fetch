@@ -1,0 +1,36 @@
+#!/bin/bash
+set -ex
+
+export CVSROOT=freebsdanoncvs@anoncvs.freebsd.org:/home/ncvs
+
+rm -rf src ports
+
+if test -e src.tar.gz ; then
+  tar -xzpf src.tar.gz
+  action="update"
+else
+  action="checkout"
+fi
+
+cvs ${action} -r RELEASE_6_0_0 ports/Mk
+for i in \
+    src/usr.bin/awk src/contrib/one-true-awk \
+    src/share/mk \
+    src/usr.bin/cksum \
+    src/usr.bin/file2c \
+    src/usr.bin/lex \
+    src/usr.bin/make \
+    src/usr.bin/mkdep \
+    src/usr.bin/yacc \
+    src/usr.bin/brandelf \
+    src/usr.sbin/btxld \
+    src/usr.sbin/config \
+    src/usr.sbin/kgzip \
+    src/usr.sbin/mtree \
+  ; do
+  cvs ${action} -r RELENG_6_0_0_RELEASE $i
+done
+
+tar -czpf src.tar.gz src/ ports/
+
+rm -rf src ports
