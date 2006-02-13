@@ -42,12 +42,6 @@ build-stamp:
 	cd build-tree/src/usr.bin/yacc ; \
 		$(PMAKE) $(MAKE_BUILD_FLAGS)
 
-	cd build-tree/src/contrib/one-true-awk ; \
-		$(YACC) -d -o awkgram.c ../../contrib/one-true-awk/awkgram.y
-	cd build-tree/src/usr.bin/awk ; \
-		ln -sf ../../contrib/one-true-awk/awkgram.h ytab.h ; \
-		$(PMAKE) $(MAKE_BUILD_FLAGS)
-
 	cd build-tree/src/usr.bin/cksum ; $(PMAKE) $(MAKE_BUILD_FLAGS)
 
 	cd build-tree/src/usr.bin/lex ; \
@@ -77,7 +71,7 @@ install: build
 	dh_clean -k
 	dh_installdirs
 	
-	for i in awk cksum lex make mkdep yacc file2c brandelf ; do \
+	for i in cksum lex make mkdep yacc file2c brandelf ; do \
 		cd $(CURDIR)/build-tree/src/usr.bin/$$i; \
 		$(PMAKE) install DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/bin ; \
 	done
@@ -91,10 +85,6 @@ install: build
 
 	cp -af $(CURDIR)/build-tree/ports/Mk \
 		$(CURDIR)/debian/$(package)/usr/share/
-
-	# rename awk
-	mv $(CURDIR)/debian/$(package)/usr/bin/nawk \
-		$(CURDIR)/debian/$(package)/usr/bin/awk
 
 	# remove trash
 	rm -rf 	$(CURDIR)/debian/$(package)/usr/include \
