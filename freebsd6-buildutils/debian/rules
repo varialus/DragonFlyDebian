@@ -12,8 +12,8 @@ DEB_BUILD_GNU_CPU	:= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
 DEB_HOST_ARCH_CPU	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 PMAKE=pmake
-CFLAGS=-O2 -g -Wall -DMACHINE_ARCH='\"$(DEB_HOST_ARCH_CPU)\"'
-MAKE_BUILD_FLAGS= COPTS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
+CFLAGS=-O2 -g -Wall -DMACHINE_ARCH='\"$(DEB_HOST_ARCH_CPU)\"' -D_GNU_SOURCE
+MAKE_BUILD_FLAGS= CC=gcc-3.4 COPTS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
 YACC=$(CURDIR)/build-tree/src/usr.bin/yacc/yacc
 export LDADD=-lbsd
 
@@ -25,8 +25,9 @@ unpack-stamp:
 	tar -C build-tree -xzf src.tar.gz
 	find build-tree -type d -name CVS | xargs rm -rf
 	find build-tree -type f | (while read i ; do sed -i $$i \
-		-e "/^__FBSDID/d" -e "s,<sys/queue.h>,<bsd/queue.h>,g" -e "s/^LDADD=/LDADD+=/g" ; \
-	done)
+		-e "/^__FBSDID/d" -e "s,<sys/queue.h>,<bsd/queue.h>,g" -e "s/^LDADD=/LDADD+=/g" \
+		-e "s/getline/bsd_&/g" \
+	; done)
 	set -e ; cd build-tree && \
 		for i in $(CURDIR)/debian/patches/*.diff ; do \
 		  echo "--- Patch $$i ---" ; \

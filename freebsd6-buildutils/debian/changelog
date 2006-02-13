@@ -29,8 +29,17 @@ freebsd6-buildutils (6.0-0.1) unstable; urgency=low
     - rules: Install mk and Mk in /usr/share.
   * patches/000_fix_make_double_free.diff: New.  Patch from upstream
     (1.155:1.158).  Thanks to Petr for spotting this.
+  * Build using gcc 3.4, like upstream.
+    - control (Build-Depends): Add gcc-3.4.
+    - rules: Pass CC=gcc-3.4 to make.
+    - patches/06_ftbfs_gcc-4.0.diff: Remove.
+  * Fixes runtime getopt parsing infin loop.
+    - rules (COPTS): Build with -D_GNU_SOURCE.
+    - rules: Rename internal getline function to avoid collision with the one
+      from Glibc (s/getline/bsd_&/g).
+    - patches/06_ftbfs_gcc-4.0.diff: Remove (it had dirty getopt hacks as well).
 
- -- Robert Millan <rmh@aybabtu.com>  Sun, 12 Feb 2006 17:48:57 +0100
+ -- Robert Millan <rmh@aybabtu.com>  Mon, 13 Feb 2006 09:24:59 +0100
 
 freebsd5-buildutils (5.4-3) unstable; urgency=low
 
