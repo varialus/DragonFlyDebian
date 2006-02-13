@@ -1,12 +1,20 @@
---- src/usr.bin/make/main.c~	2006-02-13 10:59:47.000000000 +0100
-+++ src/usr.bin/make/main.c	2006-02-13 11:00:11.000000000 +0100
-@@ -337,8 +337,7 @@
- 	Boolean	found_dd = FALSE;
+--- src/usr.bin/make/main.c~	2006-02-13 20:44:23.000000000 +0100
++++ src/usr.bin/make/main.c	2006-02-13 20:46:55.000000000 +0100@
+@@ -136,6 +136,8 @@
+ time_t		now;		/* Time at start of make */
+ struct GNode	*DEFAULT;	/* .DEFAULT node */
  
- rearg:
--	optind = 1;	/* since we're called more than once */
--	optreset = 1;
-+	reset_getopt ();
- #define OPTFLAGS "ABC:D:E:I:PSV:Xd:ef:ij:km:nqrstvx:"
- 	for (;;) {
++#include <bsd/getopt.h>		/* optreset */
++
+ /**
+  * Exit with usage message.
+  */
+@@ -358,7 +358,7 @@
  		if ((optind < argc) && strcmp(argv[optind], "--") == 0) {
+ 			found_dd = TRUE;
+ 		}
+-		if ((c = getopt(argc, argv, OPTFLAGS)) == -1) {
++		if ((c = bsd_getopt(argc, argv, OPTFLAGS)) == -1) {
+ 			break;
+ 		}
+ 		switch(c) {
