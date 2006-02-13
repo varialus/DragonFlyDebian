@@ -24,10 +24,20 @@ unpack-stamp:
 	mkdir build-tree
 	tar -C build-tree -xzf src.tar.gz
 	find build-tree -type d -name CVS | xargs rm -rf
-	find build-tree -type f | (while read i ; do sed -i $$i \
+	find build-tree -type f | (set -e ; while read i ; do sed -i $$i \
 		-e "/^__FBSDID/d" -e "s,<sys/queue.h>,<bsd/queue.h>,g" -e "s/^LDADD=/LDADD+=/g" \
 		-e "s/getline/bsd_&/g" \
 	; done)
+	set -e ; for i in \
+		build-tree/ports/Mk/bsd.port.mk \
+		build-tree/ports/Mk/bsd.port.subdir.mk \
+	; do sed -i $$i \
+		-e "s,/usr/bin/,,g" \
+		-e "s,/usr/sbin/,,g" \
+		-e "s,/bin/,,g" \
+		-e "s,/sbin/,,g" \
+		-e "s,/usr/ports,/usr/share/$(package)/ports,g" \
+	; done
 	set -e ; cd build-tree && \
 		for i in $(CURDIR)/debian/patches/*.diff ; do \
 		  echo "--- Patch $$i ---" ; \
