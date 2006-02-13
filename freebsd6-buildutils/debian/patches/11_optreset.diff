@@ -1,0 +1,12 @@
+--- src/usr.bin/make/main.c~	2006-02-13 10:59:47.000000000 +0100
++++ src/usr.bin/make/main.c	2006-02-13 11:00:11.000000000 +0100
+@@ -337,8 +337,7 @@
+ 	Boolean	found_dd = FALSE;
+ 
+ rearg:
+-	optind = 1;	/* since we're called more than once */
+-	optreset = 1;
++	reset_getopt ();
+ #define OPTFLAGS "ABC:D:E:I:PSV:Xd:ef:ij:km:nqrstvx:"
+ 	for (;;) {
+ 		if ((optind < argc) && strcmp(argv[optind], "--") == 0) {
