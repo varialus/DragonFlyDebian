@@ -84,7 +84,6 @@ problems:
 		i686-kfreebsd-gnu (with -march=i686 -mtune=i686)
 	examine why for each case
 
-make[2]: *** [/build/glibc-2.3-head/build/libio/tst_wprintf2.out] Error 134 [not a regression]
 make[2]: *** [/build/glibc-2.3-head/build/posix/tst-waitid.out] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-aio.out] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-aio64.out] Error 1
@@ -97,46 +96,6 @@ make[2]: *** [/build/glibc-2.3-head/build/rt/tst-timer2.o] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-mqueue5.o] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-timer4.o] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-timer5.o] Error 1
-
-
-simplified tst_wprintf2:
---------------------------------------------------------
-/* gcc -O2 -std=gnu99 -Wall x.c */
-
-#include <errno.h>
-#include <error.h>
-#include <fcntl.h>
-#include <locale.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <wchar.h>
-
-int
-main (int argc, char *argv[])
-{
-  FILE *fp;
-
-  setlocale (LC_ALL, "");
-  perror("Here 1");
-  
-  fp = fdopen (dup (STDOUT_FILENO), "a");
-  if (fp == NULL)
-    error (EXIT_FAILURE, errno, "fdopen(,\"a\")");
-    
-  setvbuf (fp, NULL, _IONBF, 0);
-  perror("Here 2");
-  /* fwprintf to unbuffered stream.   */
-  fwprintf (fp, L"hello.\n");
-  perror("Here 3");
-  fclose (fp);
-  perror("Here 4");
-  return 0;
-}
---------------------------------------------------------
-
-
 
 * directly executing dynamic libraries (same problem with 2.3.0 too)
 
