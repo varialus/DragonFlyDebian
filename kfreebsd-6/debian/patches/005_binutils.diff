@@ -1,0 +1,109 @@
+--- sys.old/i386/i386/locore.s.orig	2005-09-05 22:35:16.000000000 +0200
++++ sys/i386/i386/locore.s	2005-09-05 22:35:58.000000000 +0200
+@@ -358,7 +358,7 @@
+ 	pushl	%eax
+ 	testl	$PSL_VM,UC_EFLAGS(%eax)
+ 	jne	1f
+-	movl	UC_GS(%eax),%gs		/* restore %gs */
++	movw	UC_GS(%eax),%gs		/* restore %gs */
+ 1:
+ 	movl	$SYS_sigreturn,%eax
+ 	pushl	%eax			/* junk to fake return addr. */
+@@ -375,7 +375,7 @@
+ 	pushl	%eax
+ 	testl	$PSL_VM,UC4_EFLAGS(%eax)
+ 	jne	1f
+-	movl	UC4_GS(%eax),%gs	/* restore %gs */
++	movw	UC4_GS(%eax),%gs	/* restore %gs */
+ 1:
+ 	movl	$344,%eax		/* 4.x SYS_sigreturn */
+ 	pushl	%eax			/* junk to fake return addr. */
+@@ -393,7 +393,7 @@
+ 	pushl	%eax
+ 	testl	$PSL_VM,SC_PS(%eax)
+ 	jne	9f
+-	movl	SC_GS(%eax),%gs		/* restore %gs */
++	movw	SC_GS(%eax),%gs		/* restore %gs */
+ 9:
+ 	movl	$103,%eax		/* 3.x SYS_sigreturn */
+ 	pushl	%eax			/* junk to fake return addr. */
+--- sys.old/i386/i386/swtch.s	2005-09-06 14:47:02.000000000 +0200
++++ sys/i386/i386/swtch.s	2005-09-06 14:47:33.000000000 +0200
+@@ -111,7 +111,7 @@
+ 	movl	%ebp,PCB_EBP(%edx)
+ 	movl	%esi,PCB_ESI(%edx)
+ 	movl	%edi,PCB_EDI(%edx)
+-	movl	%gs,PCB_GS(%edx)
++	movw	%gs,PCB_GS(%edx)
+ 	pushfl					/* PSL */
+ 	popl	PCB_PSL(%edx)
+ 	/* Check to see if we need to call a switchout function. */
+@@ -279,7 +279,7 @@
+ 	/* This must be done after loading the user LDT. */
+ 	.globl	cpu_switch_load_gs
+ cpu_switch_load_gs:
+-	movl	PCB_GS(%edx),%gs
++	movw	PCB_GS(%edx),%gs
+ 
+ 	/* Test if debug registers should be restored. */
+ 	testl	$PCB_DBREGS,PCB_FLAGS(%edx)
+@@ -348,7 +348,7 @@
+ 	movl	%ebp,PCB_EBP(%ecx)
+ 	movl	%esi,PCB_ESI(%ecx)
+ 	movl	%edi,PCB_EDI(%ecx)
+-	movl	%gs,PCB_GS(%ecx)
++	movw	%gs,PCB_GS(%ecx)
+ 	pushfl
+ 	popl	PCB_PSL(%ecx)
+
+--- sys.old/i386/include/cpufunc.h	2005-09-06 17:32:18.000000000 +0200
++++ sys/i386/include/cpufunc.h	2005-09-06 17:32:42.000000000 +0200
+@@ -456,7 +456,7 @@
+ rgs(void)
+ {
+ 	u_int sel;
+-	__asm __volatile("movl %%gs,%0" : "=rm" (sel));
++	__asm __volatile("mov %%gs,%0" : "=rm" (sel));
+ 	return (sel);
+ }
+ 
+@@ -477,7 +477,7 @@
+ static __inline void
+ load_gs(u_int sel)
+ {
+-	__asm __volatile("movl %0,%%gs" : : "rm" (sel));
++	__asm __volatile("mov %0,%%gs" : : "rm" (sel));
+ }
+ 
+ static __inline void
+--- sys.old/i386/linux/linux_locore.s	2005-09-06 20:28:47.000000000 +0200
++++ sys/i386/linux/linux_locore.s	2005-09-06 20:29:05.000000000 +0200
+@@ -8,7 +8,7 @@
+ NON_GPROF_ENTRY(linux_sigcode)
+ 	call	*LINUX_SIGF_HANDLER(%esp)
+ 	leal	LINUX_SIGF_SC(%esp),%ebx	/* linux scp */
+-	movl	LINUX_SC_GS(%ebx),%gs
++	movw	LINUX_SC_GS(%ebx),%gs
+ 	movl	%esp, %ebx			/* pass sigframe */
+ 	push	%eax				/* fake ret addr */
+ 	movl	$LINUX_SYS_linux_sigreturn,%eax	/* linux_sigreturn() */
+@@ -19,7 +19,7 @@
+ linux_rt_sigcode:
+ 	call	*LINUX_RT_SIGF_HANDLER(%esp)
+ 	leal	LINUX_RT_SIGF_UC(%esp),%ebx	/* linux ucp */
+-	movl	LINUX_SC_GS(%ebx),%gs
++	movw	LINUX_SC_GS(%ebx),%gs
+ 	push	%eax				/* fake ret addr */
+ 	movl	$LINUX_SYS_linux_rt_sigreturn,%eax   /* linux_rt_sigreturn() */
+ 	int	$0x80				/* enter kernel with args */
+--- sys.old/compat/ndis/winx32_wrap.S	2005-09-06 21:47:21.000000000 +0200
++++ sys/compat/ndis/winx32_wrap.S	2005-09-06 21:47:48.000000000 +0200
+@@ -348,7 +348,7 @@
+ 	ret
+ 
+ ENTRY(x86_setfs)
+-	movl	4(%esp),%fs
++	movw	4(%esp),%fs
+ 	ret
+ 
+ ENTRY(x86_gettid)
