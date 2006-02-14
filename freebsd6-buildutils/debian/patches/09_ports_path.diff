@@ -1,15 +1,6 @@
 diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
 --- ports.old/Mk/bsd.port.mk	2006-02-13 14:38:58.000000000 +0100
 +++ ports/Mk/bsd.port.mk	2006-02-13 14:40:38.000000000 +0100
-@@ -1028,7 +1028,7 @@
- 
- # Get the architecture
- .if !defined(ARCH)
--ARCH!=	${UNAME} -p
-+ARCH!= ${UNAME} -m
- .endif
- 
- # Kludge for pre-3.0 systems
 @@ -1913,15 +1913,7 @@
  # Miscellaneous overridable commands:
  GMAKE?=			gmake
@@ -93,15 +84,6 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
 diff -ur ports.old/Mk/bsd.port.subdir.mk ports/Mk/bsd.port.subdir.mk
 --- ports.old/Mk/bsd.port.subdir.mk	2006-02-13 14:38:58.000000000 +0100
 +++ ports/Mk/bsd.port.subdir.mk	2006-02-13 14:39:23.000000000 +0100
-@@ -48,7 +48,7 @@
- 
- .if !defined(NOPRECIOUSMAKEVARS)
- .if !defined(ARCH)
--ARCH!=	uname -p
-+ARCH!=	uname -m
- .endif
- .if !defined(OSREL)
- OSREL!=	uname -r | sed -e 's/[-(].*//'
 @@ -61,7 +61,7 @@
  .endif
  .endif
