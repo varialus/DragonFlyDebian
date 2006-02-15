@@ -1,0 +1,105 @@
+Index: crontab
+===================================================================
+--- crontab	(revision 174)
++++ crontab	(working copy)
+@@ -12,6 +12,6 @@
+ # Run install every 6 hours
+ 0 0-23/6 * * * ftpmaster cd $BIN; ./archive-install
+ 
+-# Run cruft cleaner once a day at 4:05
+-5 4 * * * root cd $BIN; ./archive-clean
++# Re-generate testing, and run cruft cleaner once a day at 4:05
++5 4 * * * root cd $BIN; ./archive-testing; ./archive-clean
+ 
+Index: archive-testing
+===================================================================
+--- archive-testing	(revision 0)
++++ archive-testing	(revision 0)
+@@ -0,0 +1,64 @@
++#!/bin/bash
++#
++# Copyright (C) 2006 Robert Millan
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program; if not, write to the Free Software Foundation,
++# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
++#
++
++#
++# Requires: wget bzip2 quinn-diff grep-dctrl
++#
++
++# Import library
++
++. archive-lib
++
++#
++# Main
++#
++
++set -e
++
++for arch in ${arch_list_testing} ; do
++  unstable=`mktemp`
++  testing_src=`mktemp`
++  empty=`mktemp`
++
++  # get Packages for unstable
++  # FIXME: this should be obtained localy!!
++  wget -c http://kfreebsd-gnu.debian.net/debian/dists/unstable/main/binary-${arch}/Packages -O - \
++    | grep-dctrl -e "Architecture: ${arch}" \
++    > ${unstable}
++
++  wget -c http://ftp.debian.org/dists/testing/main/source/Sources.bz2 -O - \
++    | bunzip2 -c \
++    | grep-dctrl -e "Architecture: any" \
++    > ${testing_src}
++
++  cat > ${empty} << EOF
++Package: dummy-package-to-make-quinn-diff-happy
++Section: games
++Architecture: ${arch}
++Version: 1.0
++EOF
++
++  quinn-diff -i -s ${testing_src} -p ${empty} \
++    | sed -e "s,[^/]*/,,g" -e "s,\.dsc .*,,g" -e "s/_/ /g" \
++    | (while read package version ; do \
++      grep-dctrl -F Package -X ${package} --and -F Version -X ${version} ${unstable} || true
++    done) || true
++
++  rm -f ${unstable} ${testing_src} ${empty}
++done
+
+Property changes on: archive-testing
+___________________________________________________________________
+Name: svn:executable
+   + *
+
+Index: archive.conf
+===================================================================
+--- archive.conf	(revision 174)
++++ archive.conf	(working copy)
+@@ -40,10 +40,11 @@
+ multipool=yes
+ 
+ section_list="main"
+-suite_list="unstable unreleased experimental"
++suite_list="unstable unreleased experimental testing"
+ suite_alias="sid:unstable etch:testing sarge:stable"
+ 
+ arch_list_unstable="kfreebsd-i386 knetbsd-i386"
+ arch_list_unreleased="source hurd-i386 kfreebsd-i386 knetbsd-i386"
+ arch_list_experimental="kfreebsd-i386 knetbsd-i386"
++arch_list_testing="kfreebsd-i386"
+ 
