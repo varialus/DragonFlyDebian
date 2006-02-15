@@ -82,11 +82,13 @@ problems:
 * "make check" fails, results are same for both tested targets
 		i486-kfreebsd-gnu (with -march=i486 -mtune=i686)
 		i686-kfreebsd-gnu (with -march=i686 -mtune=i686)
-	examine why for each case
 
-make[2]: *** [/build/glibc-2.3-head/build/posix/tst-waitid.out] Error 1
+  examine why, maybe due to non-rt behaviour of signals:
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-aio.out] Error 1
 make[2]: *** [/build/glibc-2.3-head/build/rt/tst-aio64.out] Error 1
+
+  kernel doesn't fill enough in siginfo_t for signal handlers:
+make[2]: *** [/build/glibc-2.3-head/build/posix/tst-waitid.out] Error 1
 
   fails also on Linux:
 make[2]: [/build/glibc-2.3-head/build/posix/annexc.out] Error 1 (ignored)
