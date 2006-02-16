@@ -22,6 +22,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
+#include <sys/sysctl.h>
 #include <unistd.h>
 
 
@@ -86,18 +87,19 @@ __ptsname_r (int fd, char *buf, size_t buflen)
     }
 
   /* Construct the slave's pathname.  */
-  p = __mempcpy (buf, _PATH_TTY, sizeof (_PATH_TTY) - 1);
-  p[0] = __libc_ptyname1[ptyno / 32];
-  p[1] = __libc_ptyname2[ptyno % 32];
-  p[2] = '\0';
+  /* instead of strlen(_PATH_DEV) we use (sizeof (_PATH_DEV) - 1)  */
+  p = __mempcpy (buf, _PATH_DEV, sizeof (_PATH_DEV) - 1);
+  buflen -= (sizeof (_PATH_DEV) - 1);
+  if(__sysctlbyname("kern.devname", p, &buflen, &st.st_rdev, sizeof (st.st_rdev)) < 0)
+    return errno;
+  p[0] = 't';
 
   if (__xstat64 (_STAT_VER, buf, &st) < 0)
     return errno;
 
-  /* Check if the pathname we're about to return really corresponds to the
+  /* Check if the pathname we're about to return might be
      slave pseudo terminal of the given master pseudo terminal.  */
-  if (!(S_ISCHR (st.st_mode)
-	&& (unsigned int) minor (st.st_rdev) == ptyno))
+  if (!(S_ISCHR (st.st_mode)))
     {
       /* This really is a configuration problem.  */
       __set_errno (ENOTTY);
