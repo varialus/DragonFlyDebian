@@ -1,0 +1,40 @@
+
+Author: rmh
+Status: in BTS
+
+diff -ur gnome-applets-2.12.3.old/debian/control.in gnome-applets-2.12.3/debian/control.in
+--- gnome-applets-2.12.3.old/debian/control.in	2006-02-16 10:54:52.000000000 +0100
++++ gnome-applets-2.12.3/debian/control.in	2006-02-16 16:31:09.000000000 +0100
+@@ -4,7 +4,7 @@
+ Maintainer: Guilherme de S. Pastore <guilherme.pastore@terra.com.br>
+ Uploaders: @GNOME_TEAM@
+ Standards-Version: 3.6.2.1
+-Build-Depends: cdbs, autotools-dev, debhelper (>= 5.0.13), patchutils, type-handling, libgtop2-dev (>= 2.11.92), intltool, libpanel-applet2-dev (>= 2.10.1-1), liborbit2-dev (>= 1:2.12.1-1), scrollkeeper, libgail-dev (>= 1.8.2-1), libwnck-dev (>= 2.10.0-1), libgconf2-dev (>= 2.10.0-1), libglade2-dev (>= 1:2.5.1-1), libapm-dev | not+linux-gnu, libgnomeui-dev (>= 2.10.0-1), libgnome-keyring-dev (>= 0.4.2-1) , libxklavier-dev (>= 1.14-1), gnome-pkg-tools, xsltproc, docbook-xsl, xlibs-static-dev, sharutils, libgstreamer-plugins0.8-dev (>= 0.8.8) [!hurd-i386], libgnomevfs2-dev (>= 2.10.0-1), libgucharmap4-dev (>= 1:1.4.2-1), system-tools-backends-dev (>= 1.1.3), xlibs-static-dev, libxkbfile-dev, libgnome-desktop-dev (>= 2.11.1), libhal-dev (>= 0.5.3), libdbus-glib-1-dev (>= 0.60), gnome-doc-utils (>= 0.3.2) 
++Build-Depends: cdbs, autotools-dev, debhelper (>= 5.0.13), patchutils, libgtop2-dev (>= 2.11.92), intltool, libpanel-applet2-dev (>= 2.10.1-1), liborbit2-dev (>= 1:2.12.1-1), scrollkeeper, libgail-dev (>= 1.8.2-1), libwnck-dev (>= 2.10.0-1), libgconf2-dev (>= 2.10.0-1), libglade2-dev (>= 1:2.5.1-1), libapm-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libgnomeui-dev (>= 2.10.0-1), libgnome-keyring-dev (>= 0.4.2-1) , libxklavier-dev (>= 1.14-1), gnome-pkg-tools, xsltproc, docbook-xsl, xlibs-static-dev, sharutils, libgstreamer-plugins0.8-dev (>= 0.8.8) [!hurd-i386], libgnomevfs2-dev (>= 2.10.0-1), libgucharmap4-dev (>= 1:1.4.2-1), system-tools-backends-dev (>= 1.1.3), xlibs-static-dev, libxkbfile-dev, libgnome-desktop-dev (>= 2.11.1), libhal-dev (>= 0.5.3) [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libdbus-glib-1-dev (>= 0.60), gnome-doc-utils (>= 0.3.2), libxres-dev
+ 
+ Package: gnome-applets-data
+ Architecture: all
+diff -ur gnome-applets-2.12.3.old/debian/rules gnome-applets-2.12.3/debian/rules
+--- gnome-applets-2.12.3.old/debian/rules	2006-02-16 10:54:51.000000000 +0100
++++ gnome-applets-2.12.3/debian/rules	2006-02-16 11:27:45.000000000 +0100
+@@ -26,6 +26,11 @@
+ 
+ MANPAGES += debian/gnome-keyboard-layout.1 debian/gswitchit-plugins-capplet.1
+ 
++ifeq ($(DEB_HOST_GNU_SYSTEM),linux-gnu)
++sound=alsa
++else
++sound=oss
++endif
+ 
+ build/gnome-applets:: $(MANPAGES)
+ 
+@@ -49,7 +54,7 @@
+ ifeq ($(DEB_BUILD_GNU_SYSTEM),gnu)
+ 	sed -i "s/, @gstreamer@//" debian/control
+ else
+-	sed -i "s/@gstreamer@/gstreamer0.8-alsa | gstreamer0.8-audiosink/" debian/control
++	sed -i "s/@gstreamer@/gstreamer0.8-$(sound) | gstreamer0.8-audiosink/" debian/control
+ endif
+ 	case $$(dpkg-architecture -qDEB_BUILD_ARCH) in \
+ 		i386|ia64|amd64)	sed -i "s/@acpid@/acpid, /" debian/control ;; \
