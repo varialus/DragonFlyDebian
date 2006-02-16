@@ -52,6 +52,17 @@
 #   define TIMER_ABSTIME		1
 #  endif
 
+
+/* Getkerninfo clock information structure */
+struct clockinfo
+  {
+    int hz;		/* clock frequency */
+    int tick;		/* micro-seconds per hz tick */
+    int spare;
+    int stathz;		/* statistics clock frequency */
+    int profhz;		/* profiling clock frequency */
+  };
+
 # endif	/* bits/time.h */
 #endif
 

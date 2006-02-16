@@ -25,7 +25,11 @@ typedef int __sig_atomic_t;
 /* A `sigset_t' has a bit for each signal.  */
 typedef struct
   {
-    unsigned int __sigbits[4];
+    union
+      {
+        unsigned int __sigbits[4];
+        unsigned int __bits[4];
+      };
   } __sigset_t;
 
 #endif	/* ! _SIGSET_H_types */
