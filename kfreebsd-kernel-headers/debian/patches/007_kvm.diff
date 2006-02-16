@@ -1,3 +1,6 @@
+
+FIXME: should migrate to uintXX_t / <stdint.h>
+
 diff -ur sys.orig/sys/blist.h sys/sys/blist.h
 --- sys.orig/sys/blist.h	2004-06-04 06:03:25.000000000 +0200
 +++ sys/sys/blist.h	2004-11-30 01:15:18.000000000 +0100
@@ -10,23 +13,3 @@ diff -ur sys.orig/sys/blist.h sys/sys/blist.h
  typedef	u_int32_t	u_daddr_t;	/* unsigned disk address */
  
  /*
-diff -ur sys.orig/sys/user.h sys/sys/user.h
---- sys.orig/sys/user.h	2004-07-12 06:53:33.000000000 +0200
-+++ sys/sys/user.h	2004-11-30 01:15:18.000000000 +0100
-@@ -42,8 +42,6 @@
- #include <sys/ucred.h>
- #include <sys/uio.h>
- #include <sys/queue.h>
--#include <sys/_lock.h>
--#include <sys/_mutex.h>
- #include <sys/proc.h>
- #include <vm/vm.h>		/* XXX */
- #include <vm/vm_param.h>	/* XXX */
-@@ -178,7 +176,6 @@
- 	char	ki_sparestrings[68];	/* spare string space */
- 	struct	rusage ki_rusage;	/* process rusage statistics */
- 	long	ki_sflag;		/* PS_* flags */
--	struct	priority ki_pri;	/* process priority */
- 	long	ki_tdflags;		/* XXXKSE kthread flag */
- 	struct	pcb *ki_pcb;		/* kernel virtual addr of pcb */
- 	void	*ki_kstack;		/* kernel virtual addr of stack */
