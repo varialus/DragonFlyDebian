@@ -6,7 +6,7 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  # Get the architecture
  .if !defined(ARCH)
 -ARCH!=	${UNAME} -p
-+ARCH!= ${UNAME} -m | sed -e "s/^i[4-9]86$/i386/g"
++ARCH!= ${UNAME} -m | sed -e s/^i[4-9]86$$/i386/g
  .endif
  
  # Kludge for pre-3.0 systems
@@ -98,7 +98,7 @@ diff -ur ports.old/Mk/bsd.port.subdir.mk ports/Mk/bsd.port.subdir.mk
  .if !defined(NOPRECIOUSMAKEVARS)
  .if !defined(ARCH)
 -ARCH!=	uname -p
-+ARCH!=	uname -m | sed -e "s/^i[4-9]86$/i386/g"
++ARCH!=	uname -m | sed -e s/^i[4-9]86$$/i386/g
  .endif
  .if !defined(OSREL)
  OSREL!=	uname -r | sed -e 's/[-(].*//'
