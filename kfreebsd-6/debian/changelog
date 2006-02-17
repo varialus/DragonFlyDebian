@@ -15,8 +15,21 @@ kfreebsd-6 (6.0-0.1) UNRELEASED; urgency=low
     - copyright: Add nve to list of non-free components.
     - patches/903_disable_non-free_drivers.diff: Disable nve.
     - arch/i386/486.config: Ditto.
+  * control.in:
+    - (Build-Depends-Indep): Remove patchutils and sharutils (not really
+    needed).
+    - (Build-Depends): Ditto.  Also update libdb4.4-dev.
+    - (Replaces): Remove kfreebsd@major@-source (it never existed for 6.x).
+  * rules: When obtaining major/version numbers, if this is a preliminar
+    snapshot (e.g. 6.99+20060217), pretend this is the actual release.
+  * autopatch.sh: Merge into rules.  This allows us to use $(major) instead
+    of a hardcoded number.
+  * patches/001_misc.diff: Make this patch more upstream-friendly.
+  * Fix /dev permissions in userland.
+    - control.flavor.in (Depends): Add kfreebsd-common.
+    - patches/900_devfs_perm_fixes.diff: Remove.
 
- -- Robert Millan <rmh@aybabtu.com>  Sat, 11 Feb 2006 09:53:51 +0100
+ -- Robert Millan <rmh@aybabtu.com>  Fri, 17 Feb 2006 19:06:37 +0100
 
 kfreebsd-5 (5.3-6) unstable; urgency=low
 
