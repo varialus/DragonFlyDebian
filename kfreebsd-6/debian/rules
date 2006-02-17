@@ -72,7 +72,8 @@ src:
 	
 	set -e ; for i in $(CURDIR)/debian/patches/*.diff ; do \
 		echo "--- Patch $$i ---" ; \
-		cat $$i | patch -p0 -d src/ ; \
+		patch -p0 -d src/ --dry-run < $$i ; \
+		patch -p0 -d src/ < $$i ; \
 	done
 
 build-indep: build-indep-stamp
