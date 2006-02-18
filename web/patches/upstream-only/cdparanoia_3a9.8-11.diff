@@ -331,37 +331,6 @@ diff -u cdparanoia-3a9.8/interface/utils.h cdparanoia-3a9.8/interface/utils.h
  #include <stdio.h>
  #include <errno.h>
  #include <string.h>
-diff -u cdparanoia-3a9.8/debian/changelog cdparanoia-3a9.8/debian/changelog
---- cdparanoia-3a9.8/debian/changelog
-+++ cdparanoia-3a9.8/debian/changelog
-@@ -1,3 +1,17 @@
-+cdparanoia (3a9.8-11+kbsd.1) unreleased; urgency=low
-+
-+  * Use cdda_device_name of struct cdrom_drive to expose the path of the
-+    device node. Previously this was only present in the Linux version and 
-+    is needed for KDE 3.5.1.
-+
-+ -- Aurelien Jarno <aurel32@debian.org>  Wed,  8 Feb 2006 14:43:21 +0100
-+
-+cdparanoia (3a9.8-11+kbsd) unreleased; urgency=low
-+
-+  * Added support for GNU/kFreeBSD 
-+
-+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 27 Aug 2005 17:35:25 +0200
-+
- cdparanoia (3a9.8-11) unstable; urgency=low
- 
-   * Fix double heartbeat (Closes: #235415)
-diff -u cdparanoia-3a9.8/debian/control cdparanoia-3a9.8/debian/control
---- cdparanoia-3a9.8/debian/control
-+++ cdparanoia-3a9.8/debian/control
-@@ -1,5 +1,5 @@
- Source: cdparanoia
--Build-Depends: debhelper (>> 3.0.0)
-+Build-Depends: debhelper (>> 3.0.0), libcam-dev [kfreebsd-i386]
- Section: sound
- Priority: optional
- Maintainer: Aaron Lehmann <aaronl@vitelus.com>
 --- cdparanoia-3a9.8.orig/configure.in
 +++ cdparanoia-3a9.8/configure.in
 @@ -62,12 +62,14 @@
