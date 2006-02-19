@@ -24,6 +24,7 @@ abiname		:= 1
 SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
 IMAGE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname)
 HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-headers-$(version)-$(abiname)
+NDIS_PACKAGE	:= $(CURDIR)/debian/ndiswrapper-modules-$(version)-$(abiname)
 SRC_TAR		:= kfreebsd-source-$(version).tar.bz2
 SRC_DIR		:= kfreebsd-source-$(version)
 HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
@@ -157,6 +158,11 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	install -p -o root -g root -m 644 \
 		debian/kfreebsd-image.overrides \
 		$(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides/kfreebsd-image-$(version)-$(abiname)-$*
+
+	# move ndis modules to their own package
+	mkdir -p $(NDIS_PACKAGE)-$*/boot/kernel
+	mv $(IMAGE_PACKAGE)-$*/boot/kernel/ndis.ko $(IMAGE_PACKAGE)-$*/boot/kernel/if_ndis.ko \
+		$(NDIS_PACKAGE)-$*/boot/kernel/
 
 	# scripts
 	cp -f debian/kfreebsd-image.conffiles.in \
