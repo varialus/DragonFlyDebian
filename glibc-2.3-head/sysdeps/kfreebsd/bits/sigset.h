@@ -23,6 +23,7 @@
 typedef int __sig_atomic_t;
 
 /* A `sigset_t' has a bit for each signal.  */
+__extension__
 typedef struct
   {
     union
