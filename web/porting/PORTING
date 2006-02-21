@@ -66,6 +66,7 @@ Example for Linux-only package:
   Build-Depends: [...], dpkg-dev (>= 1.13.13), [...]
   Architecture: linux-any
 
+WARNING: please note that this functionality is still not supported by debhelper
 
 Libraries, your beloved enemy
 -----------------------------
@@ -145,16 +146,14 @@ Alternatively, when there are lots of checks, this might be prefered:
 Some notes on version checking stuff. You _may_ assume __FreeBSD__ contains
 major version information, but you must _not_ assume the same for
 __FreeBSD_kernel__. On GNU/kFreeBSD, __FreeBSD_kernel__ will only contain
-major version number after including <osreldate.h>. E.g:
+major version number after including <sys/param.h>. E.g:
 
 #if defined(__FreeBSD__) && ! defined(__FreeBSD_kernel__)
 # define __FreeBSD_kernel__ __FreeBSD__
 #endif
-#ifdef __FreeBSD_kernel__
-# include <osreldate.h>
-#endif
+#include <sys/param.h>
 [...]
-#if __FreeBSD_kernel__ >= 5
+#if __FreeBSD_kernel__ >= 6
 [...]
 #else
 [...]
@@ -167,13 +166,13 @@ similarly:
 # define __FreeBSD_kernel__ __FreeBSD__
 #endif
 #ifdef __FreeBSD_kernel__
-# include <osreldate.h>
+# include <sys/param.h>
 # ifndef __FreeBSD_kernel_version
 # define __FreeBSD_kernel_version __FreeBSD_version
 # endif
 #endif
 [...]
-#if __FreeBSD_kernel_version >= 502010
+#if __FreeBSD_kernel_version >= 602010
 [...]
 #else
 [...]
@@ -188,7 +187,7 @@ Important note on __FreeBSD_*version. Unlike FreeBSD, we ship packages that
 are not part of base _always_ providing binaries. Sometimes it's not important
 for a FreeBSD porter to maintain compatibility with different kernel ABIs
 in runtime, and per might opt for doing it in build time. However, we are
-going to ship two major kernel versions (4.x and 5.x) and our binaries should
+going to ship two major kernel versions (5.x and 6.x) and our binaries should
 run on both. This is why we need to implement runtime detection whenever
 possible. An example, based on the previous one:
 
@@ -207,8 +206,8 @@ get_kfreebsd_version ()
   }
 #endif
 [...]
-#if __FreeBSD_kernel_version >= 502010
-  if (get_kfreebsd_version () >= 502010)
+#if __FreeBSD_kernel_version >= 602010
+  if (get_kfreebsd_version () >= 602010)
     {
 [...]
     }
@@ -247,7 +246,7 @@ other daemons can assume /var is mounted, so this shouldn't be an issue.
 RT signals
 ----------
 
-kFreeBSD doesn't support POSIX RT (realtime) signals.  I hope that this
+kFreeBSD doesn't support POSIX RT (realtime) signals.  We hope that this
 functionality is added someday but for now it's a porting issue for us.
 
 You can detect wether RT signals are available in the system via the SIGRTMIN
