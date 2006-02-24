@@ -1,0 +1,106 @@
+
+Author: rmh
+Status: DO NOT SEND YET.  We need to get consensus on what the ld.so path should be.
+
+diff -Nur gcc-4.0.2.old/gcc/config/i386/kfreebsd-gnu.h gcc-4.0.2/gcc/config/i386/kfreebsd-gnu.h
+--- gcc-4.0.2.old/gcc/config/i386/kfreebsd-gnu.h	2004-06-24 04:56:23.000000000 +0200
++++ gcc-4.0.2/gcc/config/i386/kfreebsd-gnu.h	2002-02-22 18:06:42.369039552 +0100
+@@ -1,5 +1,5 @@
+-/* Definitions for Intel 386 running kFreeBSD-based GNU systems with ELF format
+-   Copyright (C) 2004
++/* Definitions for Intel 386 (and AMD x86-64) running kFreeBSD-based GNU systems with ELF format
++   Copyright (C) 2004, 2006
+    Free Software Foundation, Inc.
+    Contributed by Robert Millan.
+ 
+@@ -22,5 +22,11 @@
+ 
+ #undef LINK_EMULATION
+ #define LINK_EMULATION "elf_i386_fbsd"
++
++#ifdef LINK_EMULATION64
++#undef LINK_EMULATION64
++#define LINK_EMULATION64 "elf_x86_64_fbsd"
++#endif
++
+ #undef REG_NAME
+ #define REG_NAME(reg) sc_ ## reg
+diff -Nur gcc-4.0.2.old/gcc/config/i386/linux64.h gcc-4.0.2/gcc/config/i386/linux64.h
+--- gcc-4.0.2.old/gcc/config/i386/linux64.h	2004-11-27 23:29:34.000000000 +0100
++++ gcc-4.0.2/gcc/config/i386/linux64.h	2002-02-22 18:07:41.220092832 +0100
+@@ -1,5 +1,5 @@
+ /* Definitions for AMD x86-64 running Linux-based GNU systems with ELF format.
+-   Copyright (C) 2001, 2002, 2004 Free Software Foundation, Inc.
++   Copyright (C) 2001, 2002, 2004, 2006 Free Software Foundation, Inc.
+    Contributed by Jan Hubicka <jh@suse.cz>, based on linux.h.
+ 
+ This file is part of GCC.
+@@ -54,14 +54,27 @@
+    When the -shared link option is used a final link is not being
+    done.  */
+ 
++/* These macros may be overridden in i386/k*bsd-gnu.h.  */
++#define LINK_EMULATION		"elf_i386"
++#define LINK_EMULATION64	"elf_x86_64"
++#define DYNAMIC_LINKER		"/lib/ld-linux.so.2"
++#define DYNAMIC_LINKER64	"/lib64/ld-linux-x86-64.so.2"
++
++#undef  SUBTARGET_EXTRA_SPECS
++#define SUBTARGET_EXTRA_SPECS \
++  { "link_emulation", LINK_EMULATION },\
++  { "link_emulation64", LINK_EMULATION64 },\
++  { "dynamic_linker", DYNAMIC_LINKER },\
++  { "dynamic_linker64", DYNAMIC_LINKER64 }
++
+ #undef	LINK_SPEC
+-#define LINK_SPEC "%{!m32:-m elf_x86_64} %{m32:-m elf_i386} \
++#define LINK_SPEC "%{!m32:-m %(link_emulation64)} %{m32:-m %(link_emulation)} \
+   %{shared:-shared} \
+   %{!shared: \
+     %{!static: \
+       %{rdynamic:-export-dynamic} \
+-      %{m32:%{!dynamic-linker:-dynamic-linker /lib/ld-linux.so.2}} \
+-      %{!m32:%{!dynamic-linker:-dynamic-linker /lib64/ld-linux-x86-64.so.2}}} \
++      %{m32:%{!dynamic-linker:-dynamic-linker %(dynamic_linker)}} \
++      %{!m32:%{!dynamic-linker:-dynamic-linker %(dynamic_linker64)}}} \
+     %{static:-static}}"
+ 
+ #define MULTILIB_DEFAULTS { "m64" }
+diff -Nur gcc-4.0.2.old/gcc/config/kfreebsd-gnu.h gcc-4.0.2/gcc/config/kfreebsd-gnu.h
+--- gcc-4.0.2.old/gcc/config/kfreebsd-gnu.h	2004-06-24 04:56:23.000000000 +0200
++++ gcc-4.0.2/gcc/config/kfreebsd-gnu.h	2002-02-22 18:01:48.768673592 +0100
+@@ -34,3 +34,8 @@
+ 
+ #undef DYNAMIC_LINKER
+ #define DYNAMIC_LINKER "/lib/ld.so.1"
++
++#ifdef DYNAMIC_LINKER64
++#undef DYNAMIC_LINKER64
++#define DYNAMIC_LINKER64 "/lib64/ld-kfreebsd-x86-64.so.1"
++#endif
+diff -Nur gcc-4.0.2.old/gcc/config/knetbsd-gnu.h gcc-4.0.2/gcc/config/knetbsd-gnu.h
+--- gcc-4.0.2.old/gcc/config/knetbsd-gnu.h	2004-06-24 04:56:23.000000000 +0200
++++ gcc-4.0.2/gcc/config/knetbsd-gnu.h	2002-02-22 18:02:05.581117712 +0100
+@@ -34,3 +34,8 @@
+ 
+ #undef DYNAMIC_LINKER
+ #define DYNAMIC_LINKER "/lib/ld.so.1"
++
++#ifdef DYNAMIC_LINKER64
++#undef DYNAMIC_LINKER64
++#define DYNAMIC_LINKER64 "/lib64/ld-knetbsd-x86-64.so.1"
++#endif
+diff -Nur gcc-4.0.2.old/gcc/config.gcc gcc-4.0.2/gcc/config.gcc
+--- gcc-4.0.2.old/gcc/config.gcc	2005-08-09 12:57:04.000000000 +0200
++++ gcc-4.0.2/gcc/config.gcc	2002-02-22 18:04:37.990947896 +0100
+@@ -1012,8 +1012,8 @@
+ 	tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h svr4.h linux.h \
+ 		 i386/x86-64.h i386/linux64.h"
+ 	case ${target} in
+-	x86_64-*-kfreebsd*-gnu) tm_file="${tm_file} kfreebsd-gnu.h" ;;
+-	x86_64-*-knetbsd*-gnu) tm_file="${tm_file} knetbsd-gnu.h" ;;
++	x86_64-*-kfreebsd*-gnu) tm_file="${tm_file} kfreebsd-gnu.h i386/kfreebsd-gnu.h" ;;
++	x86_64-*-knetbsd*-gnu) tm_file="${tm_file} knetbsd-gnu.h i386/knetbsd-gnu.h" ;;
+ 	esac
+ 	tmake_file="${tmake_file} i386/t-linux64"
+ 	;;
