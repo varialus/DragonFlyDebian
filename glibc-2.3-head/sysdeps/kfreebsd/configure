@@ -49,6 +49,9 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <osreldate.h>
+#if !defined(__FreeBSD_kernel_version) && defined(__FreeBSD_version)
+#define __FreeBSD_kernel_version __FreeBSD_version
+#endif
 #if !defined __FreeBSD_kernel_version || __FreeBSD_kernel_version <  (5 *10000+ 4 *100+ 0) /* 5.4.0 */
 eat flaming death
 #endif
@@ -139,6 +142,9 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <osreldate.h>
+#if !defined(__FreeBSD_kernel_version) && defined(__FreeBSD_version)
+#define __FreeBSD_kernel_version __FreeBSD_version
+#endif
 #if __FreeBSD_kernel_version < $decnum
 eat flaming death
 #endif
