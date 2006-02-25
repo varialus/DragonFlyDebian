@@ -1,0 +1,16 @@
+
+Obtained from FreeBSD (src/contrib/binutils).  Without this, upstream binutils
+don't work on non-i386 (they set ELFOSABI_SYSV).
+
+diff -ur binutils-2.16.1cvs20060117.old/bfd/elf.c binutils-2.16.1cvs20060117/bfd/elf.c
+--- binutils-2.16.1cvs20060117.old/bfd/elf.c	2006-01-18 03:02:37.000000000 +0100
++++ binutils-2.16.1cvs20060117/bfd/elf.c	2006-02-25 15:39:28.000000000 +0100
+@@ -4802,6 +4802,8 @@
+     bfd_big_endian (abfd) ? ELFDATA2MSB : ELFDATA2LSB;
+   i_ehdrp->e_ident[EI_VERSION] = bed->s->ev_current;
+ 
++  i_ehdrp->e_ident[EI_OSABI] = ELFOSABI_FREEBSD;
++
+   if ((abfd->flags & DYNAMIC) != 0)
+     i_ehdrp->e_type = ET_DYN;
+   else if ((abfd->flags & EXEC_P) != 0)
