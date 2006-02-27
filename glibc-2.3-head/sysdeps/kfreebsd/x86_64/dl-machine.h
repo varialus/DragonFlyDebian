@@ -18,7 +18,9 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#ifndef dl_machine_h
+#ifdef dl_machine_h
+#include_next <dl-machine.h>
+#else
 #include_next <dl-machine.h>
 
 #undef RTLD_START
