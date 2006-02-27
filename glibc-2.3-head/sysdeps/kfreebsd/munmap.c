@@ -23,7 +23,7 @@
 #include <errno.h>
 #include <sysdep.h>
 
-extern void *__syscall_munmap (void *__addr, size_t __len) __THROW;
+extern int __syscall_munmap (void *__addr, size_t __len) __THROW;
 
 int
 __munmap (void *addr, size_t len)
