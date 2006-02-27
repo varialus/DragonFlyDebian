@@ -205,3 +205,78 @@ diff -ur ../src.old/sys/modules/Makefile sys/modules/Makefile
  _safe=		safe
  _scsi_low=	scsi_low
  _smbfs=		smbfs
+diff -ur sys.old/amd64/conf/GENERIC sys/amd64/conf/GENERIC
+--- sys.old/amd64/conf/GENERIC	2006-02-27 10:04:33.000000000 +0100
++++ sys/amd64/conf/GENERIC	2006-02-27 09:57:22.000000000 +0100
+@@ -117,7 +117,6 @@
+ device		arcmsr		# Areca SATA II RAID
+ device		ciss		# Compaq Smart RAID 5*
+ device		dpt		# DPT Smartcache III, IV - See NOTES for options
+-device		hptmv		# Highpoint RocketRAID 182x
+ device		iir		# Intel Integrated RAID
+ device		ips		# IBM (Adaptec) ServeRAID
+ device		mly		# Mylex AcceleRAID/eXtremeRAID
+@@ -184,7 +183,6 @@
+ device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+ device		lge		# Level 1 LXT1001 gigabit Ethernet
+ device		nge		# NatSemi DP83820 gigabit Ethernet
+-device		nve		# nVidia nForce MCP on-board Ethernet Networking
+ device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
+ device		re		# RealTek 8139C+/8169/8169S/8110S
+ device		rl		# RealTek 8129/8139
+diff -ur sys.old/conf/files.amd64 sys/conf/files.amd64
+--- sys.old/conf/files.amd64	2006-02-27 10:04:53.000000000 +0100
++++ sys/conf/files.amd64	2006-02-27 09:56:50.000000000 +0100
+@@ -47,32 +47,6 @@
+ 	no-obj no-implicit-rule before-depend				\
+ 	clean		"ukbdmap.h"
+ #
+-hal.o				optional	ath_hal			\
+-	dependency	"$S/contrib/dev/ath/public/x86_64-elf.hal.o.uu"	\
+-	compile-with	"uudecode < $S/contrib/dev/ath/public/x86_64-elf.hal.o.uu" \
+-	no-implicit-rule
+-opt_ah.h			optional	ath_hal			\
+-	dependency	"$S/contrib/dev/ath/public/x86_64-elf.opt_ah.h"	\
+-	compile-with	"cp $S/contrib/dev/ath/public/x86_64-elf.opt_ah.h opt_ah.h" \
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"opt_ah.h"
+-#
+-nvenetlib.o			optional	nve pci			\
+-	dependency	"$S/contrib/dev/nve/amd64/nvenetlib.o.bz2.uu"	\
+-	compile-with	"uudecode $S/contrib/dev/nve/amd64/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
+- 	no-implicit-rule
+-#
+-os+%DIKED-nve.h		optional	nve pci			\
+-	dependency	"$S/contrib/dev/nve/os.h"			\
+-	compile-with	"sed -e 's/^.*#include.*phy\.h.*$$//' $S/contrib/dev/nve/os.h > os+%DIKED-nve.h" \
+-	no-implicit-rule no-obj before-depend				\
+-	clean		"os+%DIKED-nve.h"
+-#
+-hptmvraid.o			optional	hptmv			\
+-	dependency	"$S/dev/hptmv/amd64-elf.raid.o.uu"	\
+-	compile-with	"uudecode < $S/dev/hptmv/amd64-elf.raid.o.uu" \
+-	no-implicit-rule
+-#
+ amd64/acpica/OsdEnvironment.c	optional	acpi
+ amd64/acpica/acpi_machdep.c	optional	acpi
+ amd64/acpica/acpi_wakeup.c	optional	acpi
+@@ -156,11 +130,6 @@
+ dev/fdc/fdc_acpi.c		optional	fdc
+ dev/fdc/fdc_isa.c		optional	fdc isa
+ dev/fdc/fdc_pccard.c		optional	fdc pccard
+-dev/hptmv/entry.c		optional	hptmv
+-dev/hptmv/mv.c			optional	hptmv
+-dev/hptmv/gui_lib.c		optional	hptmv
+-dev/hptmv/hptproc.c		optional	hptmv
+-dev/hptmv/ioctl.c		optional	hptmv
+ dev/hwpmc/hwpmc_amd.c		optional	hwpmc
+ dev/hwpmc/hwpmc_piv.c		optional	hwpmc
+ dev/hwpmc/hwpmc_x86.c		optional	hwpmc
+@@ -168,7 +137,6 @@
+ dev/kbd/kbd.c			optional	sc
+ dev/kbd/kbd.c			optional	ukbd
+ dev/mem/memutil.c		optional	mem
+-dev/nve/if_nve.c		optional	nve pci
+ dev/ppc/ppc.c			optional	ppc
+ dev/ppc/ppc_puc.c		optional	ppc puc
+ dev/sio/sio.c			optional	sio
