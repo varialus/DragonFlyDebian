@@ -33,7 +33,7 @@ FLAVOR_DIR	:= flavor-$(version)-$(abiname)
 MAKE		:= make MACHINE_ARCH=$(cpu) CC=gcc-3.4 WERROR= 
 PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 
-control:
+control: clean
 	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
 		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
 	for arch in `ls $(CURDIR)/debian/arch/` ; do \
