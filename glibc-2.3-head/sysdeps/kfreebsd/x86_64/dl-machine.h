@@ -19,7 +19,7 @@
    02111-1307 USA.  */
 
 #ifndef dl_machine_h
-#include_next <dl_machine_h>
+#include_next <dl_machine.h>
 
 #undef RTLD_START
 
