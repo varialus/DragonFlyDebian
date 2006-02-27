@@ -1,6 +1,13 @@
 GLIBC_PROVIDES dnl See aclocal.m4 in the top level source directory.
 # Local configure fragment for sysdeps/unix/bsd/bsd4.4/kfreebsd.
 
+case "$machine" in
+  x86_64*)
+	echo "Adding extra sysnames for kfreebsd/x86_64/elf"
+	sysnames="sysdeps/unix/bsd/bsd4.4/kfreebsd/x86_64/elf $sysnames"
+    ;;
+esac
+
 # The kFreeBSD headers can be found in
 #   /usr/src/sys/
 # Check whether this directory is available.
@@ -242,4 +249,3 @@ ${ac_prefix}/include directory out of the way.])
     AC_MSG_RESULT(ok)
   fi
 fi
-
