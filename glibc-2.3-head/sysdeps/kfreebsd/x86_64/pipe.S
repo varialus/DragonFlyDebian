@@ -22,9 +22,8 @@
 ENTRY (__pipe)
 	DO_CALL (pipe, 1)
 	jb SYSCALL_ERROR_LABEL
-	movq 8(%rsp), %rcx
-        movl %eax, 0(%rcx)
-        movl %edx, 4(%rcx)
+        movl %eax, 0(%rdi)
+        movl %edx, 4(%rdi)
         xorq %rax, %rax
 L(pseudo_end):
 	ret
