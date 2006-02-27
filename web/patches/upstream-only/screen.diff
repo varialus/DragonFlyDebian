@@ -1,0 +1,20 @@
+
+Author: rmh
+Status: in upstream BTS
+
+Index: src/misc.c
+===================================================================
+RCS file: /sources/screen/screen/src/misc.c,v
+retrieving revision 1.24
+diff -u -r1.24 misc.c
+--- src/misc.c	19 Dec 2005 20:20:47 -0000	1.24
++++ src/misc.c	27 Feb 2006 19:11:05 -0000
+@@ -613,7 +613,7 @@
+    */
+ # endif /* NEEDSETENV */
+ #else /* USESETENV */
+-# if defined(linux) || defined(__convex__) || (BSD >= 199103) || defined(_AIX)
++# if defined(linux) || defined(__convex__) || (BSD >= 199103) || defined(_AIX) || defined(__GLIBC__)
+   setenv(var, value, 1);
+ # else
+   setenv(var, value);
