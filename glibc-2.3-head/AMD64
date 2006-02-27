@@ -1,33 +1,18 @@
 TODO:
 
-* glibc segfault condition in:
-
-#0  0x00000008006f9610 in pipe () at regex_internal.c:118
-118             build_upper_buffer (pstr);
-
-(affects tar, fixincl, probably make too)
-
 * glibc testsuite failures:
 
-[csu/tst-empty.out] Error 139
 [catgets/de/libc.cat] Error 1
 [catgets/test1.cat] Error 1
 [catgets/test-gencat.out] Error 1
 [stdlib/tst-strtod.out] Error 1
 [stdlib/testmb2.out] Error 1
-[stdio-common/test-popen.out] Error 138
-[stdio-common/xbug.out] Error 138
-[stdio-common/errnobug.out] Error 138
 [stdio-common/tst-swprintf.out] Error 1
 [stdio-common/bug14.out] Error 1
-[stdio-common/tst-popen.out] Error 1
 [libio/tst-widetext.out] Error 1
 [libio/tst-ungetwc2.out] Error 1
 [libio/tst-swscanf.out] Error 1
 [libio/bug-ungetwc2.out] Error 1
-[libio/bug-rewind.o] Error 1
-[libio/bug-rewind2.o] Error 1
-[libio/bug-ungetc.o] Error 1
 [libio/bug-ftell.out] Error 1
 [dlfcn/tststatic.out] Error 139
 [dlfcn/tststatic2.out] Error 139
@@ -47,11 +32,12 @@ TODO:
 [posix/bug-regex20.out] Error 1
 [posix/bug-regex22.out] Error 1
 [posix/tst-rxspencer.out] Error 1
-[posix/tst-vfork1.out] Error 1
-[posix/tst-vfork2.out] Error 1
 [posix/tst-waitid.out] Error 1 (already known, see NOTES)
-[posix/wordexp-test.out] Error 139
+[linuxthreads/tst-clock1.out] Error 1
+[posix/annexc.out] Error 138 (ignored)
 
+In linuxthreads/tst-context, I had to interrupt the tests, because it looked
+stalled.  Might be a deadlock, I don't know.. (will give it more time later)
 
 * decide ld.so location
 	It should be unique between all (at least Debian) ports,
