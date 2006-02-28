@@ -66,10 +66,12 @@ _start:\n\
 	xorl %ebp, %ebp\n\
 	# Call the function to run the initializers.\n\
 	call _dl_init_internal@PLT\n\
-	# Pass our finalizer function to the user in %rdx, as per ELF ABI.\n\
+	# Pass our finalizer function to the user in %rdx, as per ELF ABI draft.\n\
 	leaq _dl_fini(%rip), %rdx\n\
 	# And make sure %rdi points to argc stored on the stack.\n\
 	movq %r13, %rdi\n\
+	# Pass finalizer function also in %rsi, as per C calling convention.\n\
+	movq %rdx, %rsi\n\
 	# Jump to the user's entry point.\n\
 	jmp *%r12\n\
 .previous\n\

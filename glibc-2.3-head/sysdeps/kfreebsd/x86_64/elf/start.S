@@ -39,7 +39,7 @@
 /* This is the canonical entry point, usually the first thing in the text
    segment.  The SVR4/i386 ABI (pages 3-31, 3-32) says that when the entry
    point runs, most registers' values are unspecified, except for a few.
-   Applied on amd64:
+   Blindly applied on amd64:
 
    %rdx		Contains a function pointer to be registered with `atexit'.
 		This is how the dynamic linker arranges to have DT_FINI
@@ -55,10 +55,21 @@
 		...
 					NULL
 
-   On amd64 %rsp also have to be 16-byte aligned,
-   FreeBSD decided to use %edi as pointer to stack and align %rsp,
-   therefore on entry from system, %rsp=%rdi or %rsp=%rdi-8.
-   on entry from ld.so glibc might set up it slightly differently 
+   But on amd64 %rsp also have to be 16-byte aligned, 
+   standard C calling convention already passes arguments in registers.
+
+   FreeBSD uses %edi as pointer to arguments and environment, %rsp is passed aligned.
+   On entry from kernel, %rsp=%rdi or %rsp=%rdi-8,
+   on entry from ld.so, glibc might set up it slightly differently.
+
+   On FreeBSD, we use %rsi for passing function pointer to rtld_fini().
+   On entry from FreeBSD kernel, %rsi is cleared, %rdx is not cleared,
+   on entry from ld.so, glibc sets both %rsi and %rdx to point to rtld_fini().
+
+   Used interface (via %rdi, %rsi) is equal to standard C calling interface for
+
+   void _start(void *arg, void *rtld_fini());
+
 */
 
 #include "bp-sym.h"
@@ -85,7 +96,7 @@ _start:
 	rtld_fini:	%r9
 	stack_end:	stack.	*/
 
-	movq %rdx, %r9		/* Address of the shared library termination
+	movq %rsi, %r9		/* Address of the shared library termination
 				   function.  */
 	movq 0(%rdi), %rsi	/* argument count.  */
 	leaq 8(%rdi), %rdx      /* argv starts just at above argc.  */
