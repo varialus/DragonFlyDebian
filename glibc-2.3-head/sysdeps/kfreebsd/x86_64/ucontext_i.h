@@ -1,4 +1,5 @@
-/* Copyright (C) 1998 Free Software Foundation, Inc.
+/* Offsets  needed in the makecontext() function implementation.
+   Copyright (C) 2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,17 +17,22 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <errno.h>
-#include <ucontext.h>
-#include <string.h>
+/* Offsets of the fields in the ucontext_t structure. */
 
-void
-makecontext (ucontext_t *ucp, void (*func) (void), int argc, ...)
-{
-  __set_errno (ENOSYS);
-  memset(ucp, 0, sizeof(ucontext_t));
-}
+#define oRDI		24
+#define oRSI		32
+#define oRDX		40
+#define oRCX		48
+#define oR8		56
+#define oR9		64
 
+#define oRAX		72
+#define oRBX		80
+#define oRBP		88
 
-stub_warning (makecontext)
-#include <stub-tag.h>
+#define oRIP		176
+#define oRSP		200
+
+#define oLINK		816
+#define oSS_SP		824
+#define oSS_SIZE	832
