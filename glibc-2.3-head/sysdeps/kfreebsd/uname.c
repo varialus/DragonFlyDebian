@@ -84,6 +84,14 @@ __uname (struct utsname *name)
       }
   }
 
+#ifdef __x86_64__
+  /* Check for bounds in pre-processor */
+# if 7 > _UTSNAME_MACHINE_LENGTH
+#  error
+# endif
+  /* Pristine FreeBSD kernel would return "amd64".  Avoid that.  */
+  strcpy (name->machine, "x86_64");
+#else
   /* Fill machine: "uname -m".  Fetch sysctl "hw.machine".  */
   request[0] = CTL_HW;
   request[1] = HW_MACHINE;
@@ -93,6 +101,7 @@ __uname (struct utsname *name)
       if (len < sizeof (name->machine))
         name->machine[len] = '\0';
     }
+#endif
 
   return 0;
 }
