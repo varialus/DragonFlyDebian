@@ -110,3 +110,338 @@ Status: Reported as kern/93331
  	ret
  
  ENTRY(x86_gettid)
+--- sys/amd64/amd64/cpu_switch.S.old	2006-03-01 20:12:04.000000000 +0100
++++ sys/amd64/amd64/cpu_switch.S	2006-03-01 20:04:59.000000000 +0100
+@@ -107,10 +107,10 @@
+ 	jz	1f				/* no, skip over */
+ 
+ 	/* Save segment selector numbers */
+-	movl	%ds,PCB_DS(%r8)
+-	movl	%es,PCB_ES(%r8)
+-	movl	%fs,PCB_FS(%r8)
+-	movl	%gs,PCB_GS(%r8)
++	movw	%ds,PCB_DS(%r8)
++	movw	%es,PCB_ES(%r8)
++	movw	%fs,PCB_FS(%r8)
++	movw	%gs,PCB_GS(%r8)
+ 	jmp	2f
+ 1:
+ 
+@@ -191,14 +191,14 @@
+ 	jz	1f				/* no, skip over */
+ 
+ 	/* Restore segment selector numbers */
+-	movl	PCB_DS(%r8),%ds
+-	movl	PCB_ES(%r8),%es
+-	movl	PCB_FS(%r8),%fs
++	movw	PCB_DS(%r8),%ds
++	movw	PCB_ES(%r8),%es
++	movw	PCB_FS(%r8),%fs
+ 
+ 	/* Restore userland %gs while preserving kernel gsbase */
+ 	movl	$MSR_GSBASE,%ecx
+ 	rdmsr
+-	movl	PCB_GS(%r8),%gs
++	movw	PCB_GS(%r8),%gs
+ 	wrmsr
+ 	jmp	2f
+ 1:
+--- sys/amd64/ia32/ia32_signal.c~	2006-03-01 22:23:22.000000000 +0100
++++ sys/amd64/ia32/ia32_signal.c	2006-03-01 22:44:47.000000000 +0100
+@@ -197,8 +197,8 @@
+ 	sf.sf_uc.uc_mcontext.mc_onstack = (oonstack) ? 1 : 0;
+ 	sf.sf_uc.uc_mcontext.mc_gs = rgs();
+ 	sf.sf_uc.uc_mcontext.mc_fs = rfs();
+-	__asm __volatile("movl %%es,%0" : "=rm" (sf.sf_uc.uc_mcontext.mc_es));
+-	__asm __volatile("movl %%ds,%0" : "=rm" (sf.sf_uc.uc_mcontext.mc_ds));
++	__asm __volatile("mov %%es,%0" : "=rm" (sf.sf_uc.uc_mcontext.mc_es));
++	__asm __volatile("mov %%ds,%0" : "=rm" (sf.sf_uc.uc_mcontext.mc_ds));
+ 	sf.sf_uc.uc_mcontext.mc_edi = regs->tf_rdi;
+ 	sf.sf_uc.uc_mcontext.mc_esi = regs->tf_rsi;
+ 	sf.sf_uc.uc_mcontext.mc_ebp = regs->tf_rbp;
+@@ -309,8 +309,8 @@
+ 	sf.sf_uc.uc_mcontext.mc_onstack = (oonstack) ? 1 : 0;
+ 	sf.sf_uc.uc_mcontext.mc_gs = rgs();
+ 	sf.sf_uc.uc_mcontext.mc_fs = rfs();
+-	__asm __volatile("movl %%es,%0" : "=rm" (sf.sf_uc.uc_mcontext.mc_es));
+-	__asm __volatile("movl %%ds,%0" : "=rm" (sf.sf_uc.uc_mcontext.mc_ds));
++	__asm __volatile("mov %%es,%0" : "=rm" (sf.sf_uc.uc_mcontext.mc_es));
++	__asm __volatile("mov %%ds,%0" : "=rm" (sf.sf_uc.uc_mcontext.mc_ds));
+ 	sf.sf_uc.uc_mcontext.mc_edi = regs->tf_rdi;
+ 	sf.sf_uc.uc_mcontext.mc_esi = regs->tf_rsi;
+ 	sf.sf_uc.uc_mcontext.mc_ebp = regs->tf_rbp;
+--- sys/amd64/include/pcpu.h~	2006-03-01 23:10:56.000000000 +0100
++++ sys/amd64/include/pcpu.h	2006-03-01 23:40:19.000000000 +0100
+@@ -80,7 +80,7 @@
+ #define	__PCPU_PTR(name) __extension__ ({				\
+ 	__pcpu_type(name) *__p;						\
+ 									\
+-	__asm __volatile("movq %%gs:%1,%0; addq %2,%0"			\
++	__asm __volatile("mov %%gs:%1,%0; addq %2,%0"			\
+ 	    : "=r" (__p)						\
+ 	    : "m" (*(struct pcpu *)(__pcpu_offset(pc_prvspace))),	\
+ 	      "i" (__pcpu_offset(name)));				\
+@@ -96,25 +96,25 @@
+ 									\
+ 	if (sizeof(__result) == 1) {					\
+ 		u_char __b;						\
+-		__asm __volatile("movb %%gs:%1,%0"			\
++		__asm __volatile("mov %%gs:%1,%0"			\
+ 		    : "=r" (__b)					\
+ 		    : "m" (*(u_char *)(__pcpu_offset(name))));		\
+ 		__result = *(__pcpu_type(name) *)&__b;			\
+ 	} else if (sizeof(__result) == 2) {				\
+ 		u_short __w;						\
+-		__asm __volatile("movw %%gs:%1,%0"			\
++		__asm __volatile("mov %%gs:%1,%0"			\
+ 		    : "=r" (__w)					\
+ 		    : "m" (*(u_short *)(__pcpu_offset(name))));		\
+ 		__result = *(__pcpu_type(name) *)&__w;			\
+ 	} else if (sizeof(__result) == 4) {				\
+ 		u_int __i;						\
+-		__asm __volatile("movl %%gs:%1,%0"			\
++		__asm __volatile("mov %%gs:%1,%0"			\
+ 		    : "=r" (__i)					\
+ 		    : "m" (*(u_int *)(__pcpu_offset(name))));		\
+ 		__result = *(__pcpu_type(name) *)&__i;			\
+ 	} else if (sizeof(__result) == 8) {				\
+ 		u_long __l;						\
+-		__asm __volatile("movq %%gs:%1,%0"			\
++		__asm __volatile("mov %%gs:%1,%0"			\
+ 		    : "=r" (__l)					\
+ 		    : "m" (*(u_long *)(__pcpu_offset(name))));		\
+ 		__result = *(__pcpu_type(name) *)&__l;			\
+@@ -134,25 +134,25 @@
+ 	if (sizeof(__val) == 1) {					\
+ 		u_char __b;						\
+ 		__b = *(u_char *)&__val;				\
+-		__asm __volatile("movb %1,%%gs:%0"			\
++		__asm __volatile("mov %1,%%gs:%0"			\
+ 		    : "=m" (*(u_char *)(__pcpu_offset(name)))		\
+ 		    : "r" (__b));					\
+ 	} else if (sizeof(__val) == 2) {				\
+ 		u_short __w;						\
+ 		__w = *(u_short *)&__val;				\
+-		__asm __volatile("movw %1,%%gs:%0"			\
++		__asm __volatile("mov %1,%%gs:%0"			\
+ 		    : "=m" (*(u_short *)(__pcpu_offset(name)))		\
+ 		    : "r" (__w));					\
+ 	} else if (sizeof(__val) == 4) {				\
+ 		u_int __i;						\
+ 		__i = *(u_int *)&__val;					\
+-		__asm __volatile("movl %1,%%gs:%0"			\
++		__asm __volatile("mov %1,%%gs:%0"			\
+ 		    : "=m" (*(u_int *)(__pcpu_offset(name)))		\
+ 		    : "r" (__i));					\
+ 	} else if (sizeof(__val) == 8) {				\
+ 		u_long __l;						\
+ 		__l = *(u_long *)&__val;				\
+-		__asm __volatile("movq %1,%%gs:%0"			\
++		__asm __volatile("mov %1,%%gs:%0"			\
+ 		    : "=m" (*(u_long *)(__pcpu_offset(name)))		\
+ 		    : "r" (__l));					\
+ 	} else {							\
+@@ -169,7 +169,7 @@
+ {
+ 	struct thread *td;
+ 
+-	__asm __volatile("movq %%gs:0,%0" : "=r" (td));
++	__asm __volatile("mov %%gs:0,%0" : "=r" (td));
+ 	return (td);
+ }
+ #define	curthread (__curthread())
+--- sys/amd64/include/cpufunc.h~	2006-03-02 00:05:29.000000000 +0100
++++ sys/amd64/include/cpufunc.h	2006-03-02 11:11:34.000000000 +0100
+@@ -482,7 +482,7 @@
+ rfs(void)
+ {
+ 	u_int sel;
+-	__asm __volatile("movl %%fs,%0" : "=rm" (sel));
++	__asm __volatile("mov %%fs,%0" : "=rm" (sel));
+ 	return (sel);
+ }
+ 
+@@ -490,7 +490,7 @@
+ rgs(void)
+ {
+ 	u_int sel;
+-	__asm __volatile("movl %%gs,%0" : "=rm" (sel));
++	__asm __volatile("mov %%gs,%0" : "=rm" (sel));
+ 	return (sel);
+ }
+ 
+@@ -498,20 +498,20 @@
+ rss(void)
+ {
+ 	u_int sel;
+-	__asm __volatile("movl %%ss,%0" : "=rm" (sel));
++	__asm __volatile("mov %%ss,%0" : "=rm" (sel));
+ 	return (sel);
+ }
+ 
+ static __inline void
+ load_ds(u_int sel)
+ {
+-	__asm __volatile("movl %0,%%ds" : : "rm" (sel));
++	__asm __volatile("mov %0,%%ds" : : "rm" (sel));
+ }
+ 
+ static __inline void
+ load_es(u_int sel)
+ {
+-	__asm __volatile("movl %0,%%es" : : "rm" (sel));
++	__asm __volatile("mov %0,%%es" : : "rm" (sel));
+ }
+ 
+ #ifdef _KERNEL
+@@ -526,7 +526,7 @@
+ 
+ 	/* Preserve the fsbase value across the selector load */
+ 	fsbase = MSR_FSBASE;
+-        __asm __volatile("rdmsr; movl %0,%%fs; wrmsr"
++        __asm __volatile("rdmsr; mov %0,%%fs; wrmsr"
+             : : "rm" (sel), "c" (fsbase) : "eax", "edx");
+ }
+ 
+@@ -544,7 +544,7 @@
+ 	 * being trashed happens to be the kernel gsbase at the time.
+ 	 */
+ 	gsbase = MSR_GSBASE;
+-        __asm __volatile("pushfq; cli; rdmsr; movl %0,%%gs; wrmsr; popfq"
++        __asm __volatile("pushfq; cli; rdmsr; mov %0,%%gs; wrmsr; popfq"
+             : : "rm" (sel), "c" (gsbase) : "eax", "edx");
+ }
+ #else
+@@ -552,13 +552,13 @@
+ static __inline void
+ load_fs(u_int sel)
+ {
+-	__asm __volatile("movl %0,%%fs" : : "rm" (sel));
++	__asm __volatile("mov %0,%%fs" : : "rm" (sel));
+ }
+ 
+ static __inline void
+ load_gs(u_int sel)
+ {
+-	__asm __volatile("movl %0,%%gs" : : "rm" (sel));
++	__asm __volatile("mov %0,%%gs" : : "rm" (sel));
+ }
+ #endif
+ 
+--- sys/amd64/linux32/linux32_sysvec.c~	2006-03-02 00:05:31.000000000 +0100
++++ sys/amd64/linux32/linux32_sysvec.c	2006-03-02 11:14:09.000000000 +0100
+@@ -345,9 +345,9 @@
+ 	frame.sf_sc.uc_mcontext.sc_mask   = frame.sf_sc.uc_sigmask.__bits[0];
+         frame.sf_sc.uc_mcontext.sc_gs     = rgs();
+         frame.sf_sc.uc_mcontext.sc_fs     = rfs();
+-        __asm __volatile("movl %%es,%0" :
++        __asm __volatile("mov %%es,%0" :
+ 	    "=rm" (frame.sf_sc.uc_mcontext.sc_es));
+-        __asm __volatile("movl %%ds,%0" :
++        __asm __volatile("mov %%ds,%0" :
+ 	    "=rm" (frame.sf_sc.uc_mcontext.sc_ds));
+ 	frame.sf_sc.uc_mcontext.sc_edi    = regs->tf_rdi;
+ 	frame.sf_sc.uc_mcontext.sc_esi    = regs->tf_rsi;
+@@ -474,8 +474,8 @@
+ 	frame.sf_sc.sc_mask   = lmask.__bits[0];
+         frame.sf_sc.sc_gs     = rgs();
+         frame.sf_sc.sc_fs     = rfs();
+-        __asm __volatile("movl %%es,%0" : "=rm" (frame.sf_sc.sc_es));
+-        __asm __volatile("movl %%ds,%0" : "=rm" (frame.sf_sc.sc_ds));
++        __asm __volatile("mov %%es,%0" : "=rm" (frame.sf_sc.sc_es));
++        __asm __volatile("mov %%ds,%0" : "=rm" (frame.sf_sc.sc_ds));
+ 	frame.sf_sc.sc_edi    = regs->tf_rdi;
+ 	frame.sf_sc.sc_esi    = regs->tf_rsi;
+ 	frame.sf_sc.sc_ebp    = regs->tf_rbp;
+--- sys/i386/include/cpufunc.h~	2006-03-02 00:09:10.000000000 +0100
++++ sys/i386/include/cpufunc.h	2006-03-02 11:16:41.000000000 +0100
+@@ -452,7 +452,7 @@
+ rfs(void)
+ {
+ 	u_int sel;
+-	__asm __volatile("movl %%fs,%0" : "=rm" (sel));
++	__asm __volatile("mov %%fs,%0" : "=rm" (sel));
+ 	return (sel);
+ }
+ 
+@@ -468,14 +468,14 @@
+ rss(void)
+ {
+ 	u_int sel;
+-	__asm __volatile("movl %%ss,%0" : "=rm" (sel));
++	__asm __volatile("mov %%ss,%0" : "=rm" (sel));
+ 	return (sel);
+ }
+ 
+ static __inline void
+ load_fs(u_int sel)
+ {
+-	__asm __volatile("movl %0,%%fs" : : "rm" (sel));
++	__asm __volatile("mov %0,%%fs" : : "rm" (sel));
+ }
+ 
+ static __inline void
+--- sys/amd64/ia32/ia32_sigtramp.S~	2006-03-02 11:21:40.000000000 +0100
++++ sys/amd64/ia32/ia32_sigtramp.S	2006-03-02 11:50:52.000000000 +0100
+@@ -45,10 +45,10 @@
+ 	calll	*IA32_SIGF_HANDLER(%esp)
+ 	leal	IA32_SIGF_UC(%esp),%eax	/* get ucontext */
+ 	pushl	%eax
+-	movl	IA32_UC_GS(%eax),%gs	/* restore %gs */
+-	movl	IA32_UC_FS(%eax),%fs	/* restore %fs */
+-	movl	IA32_UC_ES(%eax),%es	/* restore %es */
+-	movl	IA32_UC_DS(%eax),%ds	/* restore %ds */
++	mov	IA32_UC_GS(%eax),%gs	/* restore %gs */
++	mov	IA32_UC_FS(%eax),%fs	/* restore %fs */
++	mov	IA32_UC_ES(%eax),%es	/* restore %es */
++	mov	IA32_UC_DS(%eax),%ds	/* restore %ds */
+ 	movl	$SYS_sigreturn,%eax
+ 	pushl	%eax			/* junk to fake return addr. */
+ 	int	$0x80			/* enter kernel with args */
+@@ -62,10 +62,10 @@
+ 	calll	*IA32_SIGF_HANDLER(%esp)
+ 	leal	IA32_SIGF_UC4(%esp),%eax/* get ucontext */
+ 	pushl	%eax
+-	movl	IA32_UC4_GS(%eax),%gs	/* restore %gs */
+-	movl	IA32_UC4_FS(%eax),%fs	/* restore %fs */
+-	movl	IA32_UC4_ES(%eax),%es	/* restore %es */
+-	movl	IA32_UC4_DS(%eax),%ds	/* restore %ds */
++	mov	IA32_UC4_GS(%eax),%gs	/* restore %gs */
++	mov	IA32_UC4_FS(%eax),%fs	/* restore %fs */
++	mov	IA32_UC4_ES(%eax),%es	/* restore %es */
++	mov	IA32_UC4_DS(%eax),%ds	/* restore %ds */
+ 	movl	$344,%eax		/* 4.x SYS_sigreturn */
+ 	pushl	%eax			/* junk to fake return addr. */
+ 	int	$0x80			/* enter kernel with args */
+--- sys/amd64/linux32/linux32_locore.s~	2006-03-02 11:21:42.000000000 +0100
++++ sys/amd64/linux32/linux32_locore.s	2006-03-02 11:51:44.000000000 +0100
+@@ -11,10 +11,10 @@
+ NON_GPROF_ENTRY(linux_sigcode)
+ 	call	*LINUX_SIGF_HANDLER(%esp)
+ 	leal	LINUX_SIGF_SC(%esp),%ebx	/* linux scp */
+-	movl	LINUX_SC_GS(%ebx),%gs
+-	movl	LINUX_SC_FS(%ebx),%fs
+-	movl	LINUX_SC_ES(%ebx),%es
+-	movl	LINUX_SC_DS(%ebx),%ds
++	mov	LINUX_SC_GS(%ebx),%gs
++	mov	LINUX_SC_FS(%ebx),%fs
++	mov	LINUX_SC_ES(%ebx),%es
++	mov	LINUX_SC_DS(%ebx),%ds
+ 	movl	%esp, %ebx			/* pass sigframe */
+ 	push	%eax				/* fake ret addr */
+ 	movl	$LINUX_SYS_linux_sigreturn,%eax	/* linux_sigreturn() */
+@@ -25,10 +25,10 @@
+ linux_rt_sigcode:
+ 	call	*LINUX_RT_SIGF_HANDLER(%esp)
+ 	leal	LINUX_RT_SIGF_UC(%esp),%ebx	/* linux ucp */
+-	movl	LINUX_SC_GS(%ebx),%gs
+-	movl	LINUX_SC_FS(%ebx),%fs
+-	movl	LINUX_SC_ES(%ebx),%es
+-	movl	LINUX_SC_DS(%ebx),%ds
++	mov	LINUX_SC_GS(%ebx),%gs
++	mov	LINUX_SC_FS(%ebx),%fs
++	mov	LINUX_SC_ES(%ebx),%es
++	mov	LINUX_SC_DS(%ebx),%ds
+ 	push	%eax				/* fake ret addr */
+ 	movl	$LINUX_SYS_linux_rt_sigreturn,%eax   /* linux_rt_sigreturn() */
+ 	int	$0x80				/* enter kernel with args */
