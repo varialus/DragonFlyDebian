@@ -38,15 +38,21 @@ kfreebsd-6 (6.0-0.1) UNRELEASED; urgency=low
     - patches/*.diff: Add amd64-specific hunks for patches that hack i386 files.
     - arch/amd64/amd64-generic.config: New.  Generic x86_64 config.
     - arch/amd64/amd64-k8.config: New.  K8 config.
+    - arch/amd64/amd64-k8-smp.config: New.  K8 SMP config.
     - arch/amd64/em64t-p4.config: New.  P4 config.
+    - arch/amd64/em64t-p4-smp.config: New.  P4 SMP config.
     - patches/binutils.diff: Add binutils fixes for amd64 code.
-    - rules: Replace all "dh_* -a" with "dh_* -s".  -a should NEVER be
-    used.  See debhelper(7).
+    - rules: Replace all "dh_* -a" with "dh_* -s".  -a should NEVER be used.
+      See debhelper(7).
+  * Simplify/refurbish kernel config files by using the "include" command.
+    - patches/999_config.diff: New.  Incorporate common changes in GENERIC.
+    - debian/rules: Copy all our config files into the tree, then symlink.
+    - debian/arch/*/*.config: Refurbish.
 
   [ Aurelien Jarno ]
   * Fix a remote denial of service in NFS server (FreeBSD-SA-06:10.nfs / CVE-2006-0900).
 
- -- Robert Millan <rmh@aybabtu.com>  Thu,  2 Mar 2006 12:39:08 +0100
+ -- Robert Millan <rmh@aybabtu.com>  Fri,  3 Mar 2006 12:25:40 +0100
 
 kfreebsd-5 (5.3-6) unstable; urgency=low
 

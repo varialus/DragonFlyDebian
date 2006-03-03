@@ -54,7 +54,8 @@ clean:
 	rm -f *-stamp
 	dh_clean
 
-src:
+src: src-stamp
+src-stamp:
 	tar xfj $(CURDIR)/src.tar.bz2
 	
 	set -e ; find src -type f | (while read i ; do \
@@ -76,6 +77,8 @@ src:
 		patch -p0 -d src/ --dry-run < $$i ; \
 		patch -p0 -d src/ < $$i >/dev/null ; \
 	done
+
+	touch src-stamp
 
 build-indep: build-indep-stamp
 build-indep-stamp: src
@@ -110,7 +113,8 @@ build-flavor-%-stamp: src config
 	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)-$*"/g' $(FLAVOR_DIR)-$*/sys/conf/newvers.sh 
 
 	# Configure the kernel
-	cp debian/arch/$(cpu)/$*.config $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/$(configfile)
+	cp debian/arch/$(cpu)/*.config $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/
+	ln -sf $*.config $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/$(configfile)
 	cd $(FLAVOR_DIR)-$*/sys/$(cpu)/conf \
 		&& config $(configfile)
 
