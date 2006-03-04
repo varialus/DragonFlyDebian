@@ -41,9 +41,10 @@ do
   ln ${mnt}/stand/sysinstall ${mnt}/stand/$i
 done
 
-# debian commands
-for i in ld.so.1 libc.so.0.1 libufs.so.2 ; do
-  cp /lib/$i ${mnt}/lib/
+# debian commands.  fsck.ufs is illustrative of the libraries we need, because
+# it drags in libufs.so, libc.so and ld.so
+for i in `which fsck.ufs | xargs ldd | sed -e "s/ (0x[0-f]*)$//g" -e "s/.* //g" -e "s/\t*//g"` ; do
+  cp $i ${mnt}/lib/
 done
 cp `which mkfs.ufs` ${mnt}/stand/newfs
 

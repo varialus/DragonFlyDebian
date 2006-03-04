@@ -32,7 +32,7 @@ done
 if test -e base.tgz ; then
   tar --same-owner -xzpf base.tgz -C ${tmp}
 else
-  /usr/share/crosshurd/makehurddir.sh ${tmp} i486 kfreebsd-gnu
+  /usr/share/crosshurd/makehurddir.sh ${tmp} `dpkg-architecture -qDEB_HOST_GNU_CPU` kfreebsd-gnu
 fi
 
 if test -e native-install ; then

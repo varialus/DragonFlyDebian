@@ -15,7 +15,7 @@ fi
 distribution_lowcase=`echo ${distribution} | tr [A-Z] [a-z] | tr " " "_"`
 
 version=`date +%Y%m%d`
-cpu=i386
+cpu=`dpkg-architecture -qDEB_HOST_ARCH_CPU`
 cdname=${distribution_lowcase}-${version}-kfreebsd-${cpu}-install.iso
 
 if [ "$UID" != "0" ] ; then
@@ -41,8 +41,15 @@ tmp1=`mktemp -d`
 tar -C ${tmp1} -xzf base.tgz
 case ${distribution_lowcase} in
   debian)
-    dpkg --extract ${tmp1}/var/cache/apt/archives/kfreebsd-loader_*_kfreebsd-i386.deb ${tmp}/
-    kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-5.*-486_*_kfreebsd-i386.deb`
+    dpkg --extract ${tmp1}/var/cache/apt/archives/kfreebsd-loader_*_kfreebsd-${cpu}.deb ${tmp}/
+    case ${cpu} in
+      i386)
+        kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-5.*-486_*_kfreebsd-${cpu}.deb`
+      ;;
+      *)
+        kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-6.*-${cpu}-generic_*_kfreebsd-${cpu}.deb`
+      ;;
+    esac
     dpkg --extract ${kfreebsd_image} ${tmp}/
     kfreebsd_version=`echo ${kfreebsd_image} | sed -e "s,.*/kfreebsd-image-,,g" -e "s,_.*,,g"`
   ;;
