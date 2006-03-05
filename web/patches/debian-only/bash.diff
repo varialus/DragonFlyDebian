@@ -1,0 +1,36 @@
+Author: aurel32
+Status: in BTS
+
+diff -u bash-3.1/debian/rules bash-3.1/debian/rules
+--- bash-3.1/debian/rules
++++ bash-3.1/debian/rules
+@@ -8,6 +8,7 @@
+ # architecture dependent variables
+ DEB_BUILD_GNU_TYPE	:= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+ DEB_HOST_ARCH		:= $(shell dpkg-architecture -qDEB_HOST_ARCH)
++DEB_HOST_ARCH_OS	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+ DEB_HOST_GNU_CPU	:= $(shell dpkg-architecture -qDEB_HOST_GNU_CPU)
+ DEB_HOST_GNU_SYSTEM	:= $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
+ DEB_HOST_GNU_TYPE	:= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+@@ -81,7 +82,9 @@
+ 	: # see #327477, needed to have HAVE_DEV_STDIN defined
+ 	(test -d /dev/fd && test -r /dev/stdin < /dev/null) \
+ 	  || (test -d /proc/self/fd && test -r /dev/stdin < /dev/null)
++ifeq (linux,$(DEB_HOST_ARCH_OS))
+ 	$(CC) $(CFLAGS) -o clear_console debian/clear_console.c -lncurses
++endif
+ 
+ # ---------------------------------------------------------------------------
+ # build standard bash
+@@ -241,9 +244,11 @@
+ 	$(ID) debian/skel.bash_profile $(d)/etc/skel/.bash_profile
+ 	$(ID) debian/skel.bash_logout $(d)/etc/skel/.bash_logout
+ 
++ifeq (linux,$(DEB_HOST_ARCH_OS))
+ 	: # clean_console
+ 	$(IX) clear_console $(d)/usr/bin/
+ 	$(ID) debian/clear_console.1 $(d)/usr/share/man/man1/
++endif
+ 
+ 	: # install bash-completion
+ 	$(ID) debian/bash_completion/bash_completion $(d)/etc/.
