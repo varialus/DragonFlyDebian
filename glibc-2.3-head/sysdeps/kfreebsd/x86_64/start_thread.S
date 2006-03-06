@@ -64,7 +64,7 @@ ENTRY (__start_thread)
 	jnz	L(complex)
 
         /* Do the system call.  */
-	movq    $SYS_ify(rfork),%rax
+	movl    $SYS_ify(rfork),%eax
         /* End FDE now, because in the child the unwind info will be
            wrong.  */
         cfi_endproc;
@@ -82,7 +82,7 @@ L(thread_start):
 
         /* Clear the frame pointer.  The ABI suggests this be done, to mark
            the outermost frame obviously.  */
-        xorq    %rbp, %rbp
+        xorl    %ebp, %ebp
 
 L(thread_start2):
 
@@ -111,12 +111,12 @@ L(complex):
         movq    %rsi,8(%rsp)
 
         /* Block all signals.  */
-        movq    $-1, %rax
+        orq     $-1, %rax
         movq    %rax, 16(%rsp)
         movq    %rax, 24(%rsp)
 
         leaq    16(%rsp), %rsi
-        movq    $SIG_SETMASK, %rdi
+        movl    $SIG_SETMASK, %edi
         movq    %rsi,%rdx
         DO_CALL (sigprocmask, 3)
         jb      L(error)
@@ -145,9 +145,9 @@ L(complex):
         movq    %rax, 0(%rsp)
 
         /* Restore the previous signal mask.  */
-        movq    $SIG_SETMASK, %rdi
+        movl    $SIG_SETMASK, %edi
         leaq    16(%rsp), %rsi
-        movq    $0,%rdx
+        xorl    %edx,%edx
         DO_CALL (sigprocmask, 3)
 
         /* Return the child pid, saved on stack.  */
@@ -164,7 +164,7 @@ L(error_unmask):
         /* Restore the previous signal mask.  */
         movq    $SIG_SETMASK, %rdi
         leaq    16(%rsp), %rsi
-        movq    $0,%rdx
+        xorl    %edx,%edx
         DO_CALL (sigprocmask, 3)
 
 	/* load saved error code */
@@ -181,11 +181,11 @@ L(child):/* Here we are in the child thread.  */
 
         /* Clear the frame pointer.  The ABI suggests this be done, to mark
            the outermost frame obviously.  */
-        xorq    %rbp, %rbp
+        xorl    %ebp, %ebp
 
         /* Restore the previous signal mask.  */
         movq    $SIG_SETMASK, %rdi
-        movq    $0,%rdx
+        xorl    %edx,%edx
         DO_CALL (sigprocmask, 3)
 
         addq    $16, %rsp

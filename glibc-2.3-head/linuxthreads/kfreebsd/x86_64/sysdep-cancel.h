@@ -48,11 +48,11 @@
     RESTSTK_##args							      \
     /* The return value from CENABLE is argument for CDISABLE.  */	      \
     movq %rax, (%rsp);							      \
-    movq $SYS_ify (syscall_name), %rax;					      \
+    movl $SYS_ify (syscall_name), %eax;					      \
     syscall;								      \
     popq %rdi; cfi_adjust_cfa_offset(-8);				      \
     pushfq; cfi_adjust_cfa_offset(8);					      \
-    /* Save %rax since it's the error code from the syscall.  */	      \
+    /* Save %rax since it's the return/error code from the syscall.  */	      \
     movq %rax, 8(%rsp);							      \
     CDISABLE								      \
     popfq; cfi_adjust_cfa_offset(-8);                                         \

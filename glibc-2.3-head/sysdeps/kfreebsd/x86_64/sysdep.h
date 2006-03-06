@@ -171,7 +171,7 @@
 #undef	DO_CALL
 #define DO_CALL(syscall_name, args)		\
     DOARGS_##args				\
-    movq $SYS_ify (syscall_name), %rax;		\
+    movl $SYS_ify (syscall_name), %eax;		\
     syscall;
 
 #define DOARGS_0 /* nothing */

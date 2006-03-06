@@ -24,7 +24,7 @@ ENTRY (__pipe)
 	jb SYSCALL_ERROR_LABEL
         movl %eax, 0(%rdi)
         movl %edx, 4(%rdi)
-        xorq %rax, %rax
+        xorl %eax, %eax
 L(pseudo_end):
 	ret
 PSEUDO_END (__pipe)

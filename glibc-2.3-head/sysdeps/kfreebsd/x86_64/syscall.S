@@ -22,7 +22,7 @@
 	.text
 ENTRY (syscall)
 	movq %rcx, %r10
-	movq $SYS_ify (syscall), %rax
+	movl $SYS_ify (syscall), %eax
 	syscall
 	jb SYSCALL_ERROR_LABEL
 L(pseudo_end):
