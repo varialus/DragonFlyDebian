@@ -19,7 +19,7 @@ md=`mdconfig -a -t vnode -f mfsroot`
 mkfs.ufs /dev/${md}
 mount /dev/${md} ${mnt}
 
-mkdir -p ${mnt}/{stand/etc,boot,lib}
+mkdir -p ${mnt}/{boot,dev,etc,lib,stand/etc}
 for i in bin sbin ; do ln -s stand ${mnt}/$i ; done
 
 cp /boot/{boot*,mbr} ${mnt}/boot/
@@ -32,21 +32,19 @@ sed -e "s,Attempting to install all selected distributions\.\.,Press ALT-F3 to p
 > ${mnt}/stand/sysinstall
 chmod 755 ${mnt}/stand/sysinstall
 
-# freebsd commands.  always try to reduce this list!
+# freebsd commands.  most of these will have to be replaced by native debian
+# commands, someday...
 for i in \
   -sh [ arp boot_crunch camcontrol cpio dhclient find fsck_ffs gunzip gzip \
-  hostname ifconfig minigzip mount_nfs ppp pwd rm route rtsol sed sh \
+  hostname ifconfig minigzip mount_nfs newfs ppp pwd rm route rtsol sed sh \
   slattach test tunefs usbd usbdevs zcat
 do
   ln ${mnt}/stand/sysinstall ${mnt}/stand/$i
 done
 
-# debian commands.  fsck.ufs is illustrative of the libraries we need, because
-# it drags in libufs.so, libc.so and ld.so
-for i in `which fsck.ufs | xargs ldd | sed -e "s/ (0x[0-f]*)$//g" -e "s/.* //g" -e "s/\t*//g"` ; do
-  cp $i ${mnt}/lib/
+for i in {stand/,}etc/group ; do
+  echo "operator:*:5:root" > ${mnt}/$i
 done
-cp `which mkfs.ufs` ${mnt}/stand/newfs
 
 umount ${mnt}
 mdconfig -d -u ${md}
