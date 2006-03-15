@@ -4,11 +4,54 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+if test -e /lib/modules/`uname -r` ; then
+  module_dir="/lib/modules/`uname -r`"
+else
+  module_dir="/boot/kernel"
+fi
+
+get_module_description ()
+{
+  if line=`grep "^$1\t" /usr/share/kfreebsd-common/module_descriptions` ; then
+    echo ${line} | sed -e "s/^.*\t/ (/g" -e "s/$/)/g"
+  fi
+  return 0
+}
+
+for i in `ls ${module_dir}/*.ko` ; do
+  case $i in
+    if_*)
+      if [ "${network}" = "" ] ; then
+        network="$i`get_module_description $i`"
+      else
+        network="${network}, $i`get_module_description $i`"
+      fi
+    ;;
+    snd_*)
+      if [ "${sound}" = "" ] ; then
+        sound="$i`get_module_description $i`"
+      else
+        sound="${sound}, $i`get_module_description $i`"
+      fi
+    ;;
+    *)
+      if [ "${other}" = "" ] ; then
+        other="$i`get_module_description $i`"
+      else
+        other="${other}, $i`get_module_description $i`"
+      fi
+    ;;
+  esac
+done
+
+db_subst kfreebsd-config/network choices "$network"
 db_input medium kfreebsd-config/network || true
 db_go
 
+db_subst kfreebsd-config/sound choices "$sound"
 db_input high kfreebsd-config/sound || true
 db_go
 
+db_subst kfreebsd-config/other choices "$other"
 db_input high kfreebsd-config/other || true
 db_go
