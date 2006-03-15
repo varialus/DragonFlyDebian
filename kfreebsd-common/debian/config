@@ -12,14 +12,16 @@ fi
 
 get_module_description ()
 {
-  if line=`grep "^$1\t" /usr/share/kfreebsd-common/module_descriptions` ; then
-    echo ${line} | sed -e "s/^.*\t/ (/g" -e "s/$/)/g"
+  if line=`grep "^$1[[:space:]]" /usr/share/kfreebsd-common/module_descriptions` ; then
+    echo ${line} | sed -e "s/^[^[:space:]]*[[:space:]]*/ (/g" -e "s/$/)/g"
   fi
   return 0
 }
 
-for i in `ls ${module_dir}/*.ko` ; do
+for i in `ls ${module_dir}/*.ko | sed -e "s,.*/,,g" -e "s/\.ko$//g"` ; do
   case $i in
+    # acpi is handler by boot loader, linux/linprocfs are always loaded
+    acpi|linux|linprocfs) ;;
     if_*)
       if [ "${network}" = "" ] ; then
         network="$i`get_module_description $i`"
