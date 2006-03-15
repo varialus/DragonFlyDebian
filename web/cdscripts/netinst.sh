@@ -32,13 +32,13 @@ tmp1=`mktemp -d`
 tar -C ${tmp1} -xzf base.tgz
 case ${distribution_lowcase} in
   debian)
-    dpkg --extract ${tmp1}/var/cache/apt/archives/kfreebsd-loader_*_kfreebsd-${cpu}.deb ${tmp}/
-    case ${cpu} in
+    dpkg --extract ${tmp1}/var/cache/apt/archives/kfreebsd-loader_*_${DEB_HOST_ARCH}.deb ${tmp}/
+    case ${DEB_HOST_ARCH_CPU} in
       i386)
-        kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-5.*-486_*_kfreebsd-${cpu}.deb`
+        kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-5.*-${DEB_HOST_GNU_CPU}_*_${DEB_HOST_ARCH}.deb`
       ;;
       *)
-        kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-6.*-${cpu}-generic_*_kfreebsd-${cpu}.deb`
+        kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-6.*-${DEB_HOST_ARCH_CPU}-generic_*_${DEB_HOST_ARCH}.deb`
       ;;
     esac
     dpkg --extract ${kfreebsd_image} ${tmp}/
@@ -81,7 +81,7 @@ ln -sf . ${tmp}/${kfreebsd_version}
 #################################
 # -V argument *must* be 32 char long at most, we have 18 chars for $version + $cpu
 (cd ${tmp} && mkisofs -b boot/cdboot -no-emul-boot \
-  -r -J -V "${distribution} ${version} ${cpu} Bin-1" \
+  -r -J -V "${distribution} ${version} ${DEB_HOST_ARCH_CPU} Bin-1" \
   -o ${pwd}/${cdname} .)
 
 rm -rf ${tmp} &

@@ -1,10 +1,14 @@
 # stuff you might want to override
-cpu=`dpkg-architecture -qDEB_HOST_GNU_CPU`
+DEB_HOST_ARCH=`dpkg-architecture -qDEB_HOST_ARCH`
 distribution=Debian
 
 # common stuff
+DEB_HOST_ARCH_CPU=`dpkg-architecture -a${DEB_HOST_ARCH} -qDEB_HOST_ARCH_CPU`
+DEB_HOST_ARCH_OS=`dpkg-architecture -a${DEB_HOST_ARCH} -qDEB_HOST_ARCH_OS`
+DEB_HOST_GNU_CPU=`dpkg-architecture -a${DEB_HOST_ARCH} -qDEB_HOST_GNU_CPU`
+DEB_HOST_GNU_SYSTEM=`dpkg-architecture -a${DEB_HOST_ARCH} -qDEB_HOST_GNU_SYSTEM`
 pwd=`pwd`
 export GZIP=--best
 distribution_lowcase=`echo ${distribution} | tr [A-Z] [a-z] | tr " " "_"`
 version=`date +%Y%m%d`
-cdname=${distribution_lowcase}-${version}-kfreebsd-${cpu}-install.iso
+cdname=${distribution_lowcase}-${version}-${DEB_HOST_ARCH}-install.iso
