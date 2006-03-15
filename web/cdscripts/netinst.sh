@@ -35,7 +35,7 @@ case ${distribution_lowcase} in
     dpkg --extract ${tmp1}/var/cache/apt/archives/kfreebsd-loader_*_${DEB_HOST_ARCH}.deb ${tmp}/
     case ${DEB_HOST_ARCH_CPU} in
       i386)
-        kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-5.*-${DEB_HOST_GNU_CPU}_*_${DEB_HOST_ARCH}.deb`
+        kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-5.*-486_*_${DEB_HOST_ARCH}.deb`
       ;;
       *)
         kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-6.*-${DEB_HOST_ARCH_CPU}-generic_*_${DEB_HOST_ARCH}.deb`
