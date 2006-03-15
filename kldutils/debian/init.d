@@ -22,7 +22,7 @@ set -e
 for i in ${modules} ; do
   if ! kldstat -n $i >/dev/null 2>/dev/null ; then
     echo "Loading $i ..."
-    kldload $i
+    kldload $i || true
   else
     echo "Not loading $i (already loaded)"
   fi
