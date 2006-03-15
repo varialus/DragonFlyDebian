@@ -18,9 +18,9 @@ if ! dpkg -s crosshurd > /dev/null ; then
   exit 1
 fi
 
+. config
+
 tmp=`mktemp -d`
-pwd=`pwd`
-export GZIP=--best
 
 for i in dhcp3-client popularity-contest ; do
   if ! grep -qx $i /etc/crosshurd/packages/{common,kfreebsd-gnu} ; then
@@ -32,7 +32,7 @@ done
 if test -e base.tgz ; then
   tar --same-owner -xzpf base.tgz -C ${tmp}
 else
-  /usr/share/crosshurd/makehurddir.sh ${tmp} `dpkg-architecture -qDEB_HOST_GNU_CPU` kfreebsd-gnu
+  /usr/share/crosshurd/makehurddir.sh ${tmp} ${cpu} kfreebsd-gnu
 fi
 
 if test -e native-install ; then

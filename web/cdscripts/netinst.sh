@@ -7,16 +7,7 @@
 
 set -ex
 
-if [ "$1" = "" ] ; then
-  distribution=Debian
-else
-  distribution="$1"
-fi
-distribution_lowcase=`echo ${distribution} | tr [A-Z] [a-z] | tr " " "_"`
-
-version=`date +%Y%m%d`
-cpu=`dpkg-architecture -qDEB_HOST_ARCH_CPU`
-cdname=${distribution_lowcase}-${version}-kfreebsd-${cpu}-install.iso
+. config
 
 if [ "$UID" != "0" ] ; then
   sudo $0 $@
