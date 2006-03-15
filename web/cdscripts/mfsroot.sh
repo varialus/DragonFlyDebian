@@ -27,8 +27,10 @@ cp /boot/{boot*,mbr} ${mnt}/boot/
 # "persuade" sysinstall to tell the user to switch to ttyv2.  This is very tricky.
 # We're editing an ELF file with sed.  Just make sure both strings have exactly
 # the same size, and everything will work.
-sed -e "s,Attempting to install all selected distributions\.\.,Press ALT-F3 to proceed with GNU/kFreeBSD setup...,g" \
-sysinstall > ${mnt}/stand/sysinstall
+sed sysinstall \
+  -e "s,Attempting to install all selected distributions\.\.,Press ALT-F3 to proceed with GNU/kFreeBSD setup...,g" \
+  -e "s,Visit the general configuration menu for a chance to set any last options?,Debian GNU/kFreeBSD installation complete.  Answer \"No\" below and reboot..,g" \
+> ${mnt}/stand/sysinstall
 chmod 755 ${mnt}/stand/sysinstall
 
 # freebsd commands.  most of these will have to be replaced by native debian
