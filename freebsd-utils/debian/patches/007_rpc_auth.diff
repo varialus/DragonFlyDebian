@@ -1,0 +1,22 @@
+--- src/sbin/umount/umount.c.old	2006-03-18 14:29:08.000000000 +0100
++++ src/sbin/umount/umount.c	2006-03-18 14:29:20.000000000 +0100
+@@ -368,7 +369,7 @@
+ 			    clnt_spcreateerror("RPCPROG_MNT"));
+ 			return (1);
+ 		}
+-		clp->cl_auth = authsys_create_default();
++		clp->cl_auth = authunix_create_default();
+ 		try.tv_sec = 20;
+ 		try.tv_usec = 0;
+ 		clnt_stat = clnt_call(clp, RPCMNT_UMOUNT, (xdrproc_t)xdr_dir,
+--- src/usr.sbin/rpc.umntall/rpc.umntall.c~	2006-03-18 14:29:44.000000000 +0100
++++ src/usr.sbin/rpc.umntall/rpc.umntall.c	2006-03-18 14:30:09.000000000 +0100
+@@ -206,7 +206,7 @@
+ 		warnx("%s: %s", hostname, clnt_spcreateerror("RPCPROG_MNT"));
+ 		return (0);
+ 	}
+-	clp->cl_auth = authsys_create_default();
++	clp->cl_auth = authunix_create_default();
+ 	try.tv_sec = 3;
+ 	try.tv_usec = 0;
+ 	clnt_stat = clnt_call(clp, RPCMNT_UMOUNT, (xdrproc_t)xdr_dir, dirp,
