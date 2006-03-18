@@ -12,7 +12,7 @@ package=freebsd-utils
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/$(package)
 PMAKE=make COPTS="-D_GNU_SOURCE" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR)
-export LDADD=-ledit
+export LDADD=-ledit -lbsd
 
 dirs=dmesg mount umount swapon sysctl
 
@@ -21,6 +21,7 @@ build/$(package):: apply-patches
 		-e "/^__FBSDID/d" -e "s,<sys/queue.h>,<bsd/queue.h>,g" -e "s/^LDADD=/LDADD+=/g" \
 		-e "/[ \t]*__dead2[ \t]*/d" \
 		-e "s/getline/bsd_&/g" \
+		-e "s,_PATH_SYSPATH,\"/sbin:/usr/sbin\",g" \
 	; done)
 	set -e ; for i in $(dirs) ; do \
 		$(PMAKE) -C $(DEB_SRCDIR)/sbin/$$i ; \
