@@ -19,3 +19,52 @@
  		case 'f':
  			init_flags |= MNT_FORCE;
  			break;
+--- src/sbin/umount/umount.c~	2006-03-18 14:16:14.000000000 +0100
++++ src/sbin/umount/umount.c	2006-03-18 14:20:51.000000000 +0100
+@@ -94,7 +94,7 @@
+ 	sync();
+ 
+ 	all = errs = 0;
+-	while ((ch = getopt(argc, argv, "AaF:fh:t:v")) != -1)
++	while ((ch = getopt(argc, argv, "Aa:fh:t:v")) != -1)
+ 		switch (ch) {
+ 		case 'A':
+ 			all = 2;
+@@ -102,9 +102,6 @@
+ 		case 'a':
+ 			all = 1;
+ 			break;
+-		case 'F':
+-			setfstab(optarg);
+-			break;
+ 		case 'f':
+ 			fflag = MNT_FORCE;
+ 			break;
+@@ -160,7 +157,7 @@
+ 		break;
+ 	case 1:
+ 		if (setfsent() == 0)
+-			err(1, "%s", getfstab());
++			err(1, "/etc/fstab");
+ 		errs = umountall(typelist);
+ 		break;
+ 	case 0:
+@@ -580,6 +577,6 @@
+ 
+ 	(void)fprintf(stderr, "%s\n%s\n",
+ 	    "usage: umount [-fv] special | node",
+-	    "       umount -a | -A [ -F fstab] [-fv] [-h host] [-t type]");
++	    "       umount -a | -A [-fv] [-h host] [-t type]");
+ 	exit(1);
+ }
+--- src/sbin/mount/mount.c~	2006-03-18 14:16:14.000000000 +0100
++++ src/sbin/mount/mount.c	2006-03-18 14:21:13.000000000 +0100
+@@ -704,7 +704,7 @@
+ 
+ 	(void)fprintf(stderr, "%s\n%s\n%s\n",
+ "usage: mount [-dfpruvw] [-o options] [-t ufs | external_type] special node",
+-"       mount [-adfpruvw] [ -F fstab] [-o options] [-t ufs | external_type]",
++"       mount [-adfpruvw] [-o options] [-t ufs | external_type]",
+ "       mount [-dfpruvw] special | node");
+ 	exit(1);
+ }
