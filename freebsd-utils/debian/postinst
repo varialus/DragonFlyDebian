@@ -1,0 +1,27 @@
+#! /bin/sh
+set -e
+
+case "$1" in
+    configure)
+      if test -e /etc/network/options ; then
+        echo "Removing obsolete (and Linux-specific) /etc/network/options ..."
+        rm -f /etc/network/options
+      fi
+
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0
+
+

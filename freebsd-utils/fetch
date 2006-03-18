@@ -1,0 +1,26 @@
+#!/bin/bash
+set -ex
+
+export CVSROOT=freebsdanoncvs@anoncvs.freebsd.org:/home/ncvs
+
+rm -rf src
+
+if test -e src.tar.gz ; then
+  tar -xzpf src.tar.gz
+  action="update"
+else
+  action="checkout"
+fi
+
+for i in \
+    src/sbin/dmesg \
+    src/sbin/{,u}mount \
+    src/sbin/swapon \
+    src/sbin/sysctl \
+  ; do
+  cvs ${action} -r RELENG_5_4_0_RELEASE $i
+done
+
+rm -f src.tar.gz
+tar -czpf src.tar.gz src
+rm -rf src

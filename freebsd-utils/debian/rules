@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses cdbs.  Originaly written by Robert Millan.
+# This file is public domain.
+  
+DEB_TAR_SRCDIR                  := src
+DEB_AUTO_CLEANUP_RCS            := yes
+
+# Add here any variable or target overrides you need
+
+package=freebsd-utils
+
+PATH:=/usr/lib/freebsd:$(PATH)
+DESTDIR=$(CURDIR)/debian/$(package)
+PMAKE=make DESTDIR=$(DESTDIR)
+
+dirs=dmesg mount umount swapon sysctl
+
+build/$(package):: apply-patches
+	for i in $(dirs) ; do \
+		$(PMAKE) -C $(DEB_SRCDIR)/sbin/$$i ; \
+	done
+
+binary/$(package):: common-install-prehook-arch
+	for i in $(dirs) ; do \
+		$(PMAKE) -C $(DEB_SRCDIR)/sbin/$$i install ; \
+	done
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/tarball.mk
+include /usr/share/cdbs/1/rules/simple-patchsys.mk
