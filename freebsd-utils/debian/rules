@@ -11,17 +11,17 @@ package=freebsd-utils
 
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/$(package)
-PMAKE=make DESTDIR=$(DESTDIR)
+PMAKE=make COPTS="-D_GNU_SOURCE" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR)
 
 dirs=dmesg mount umount swapon sysctl
 
 build/$(package):: apply-patches
-	for i in $(dirs) ; do \
+	set -e ; for i in $(dirs) ; do \
 		$(PMAKE) -C $(DEB_SRCDIR)/sbin/$$i ; \
 	done
 
 binary/$(package):: common-install-prehook-arch
-	for i in $(dirs) ; do \
+	set -e ; for i in $(dirs) ; do \
 		$(PMAKE) -C $(DEB_SRCDIR)/sbin/$$i install ; \
 	done
 
