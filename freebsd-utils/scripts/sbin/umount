@@ -16,7 +16,7 @@ while [ $# -gt 0 ]; do
 done
 
 for i in ${dirs} ; do
-  if ! umount.real ${args} ${i} && ${remount_readonly} ; then
-    mount.real -o ro ${i}
+  if ! /lib/freebsd/umount ${args} ${i} && ${remount_readonly} ; then
+    /lib/freebsd/mount -o ro ${i}
   fi
 done

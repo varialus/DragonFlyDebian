@@ -30,11 +30,6 @@ build/$(package):: apply-patches
 		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
 	done
 
-binary/$(package):: common-install-prehook-arch
-	set -e ; for i in $(dirs) ; do \
-		$(PMAKE) -C $(DEB_SRCDIR)/$$i install ; \
-	done
-
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/tarball.mk
 include /usr/share/cdbs/1/rules/simple-patchsys.mk

@@ -19,13 +19,13 @@ if ${quiet} ; then
     sed /etc/sysctl.conf -e "s/\( \|\t\)*//g" -e "/^#/d" -e "/^$/d" \
     | (while read i ; do sysctl.real ${args} ${i} >/dev/null ; done)
   else
-    sysctl.real ${args} >/dev/null
+    /lib/freebsd/sysctl ${args} >/dev/null
   fi
 else
   if ${use_sysctl_conf} ; then
     sed /etc/sysctl.conf -e "s/\( \|\t\)*//g" -e "/^#/d" -e "/^$/d" \
     | (while read i ; do sysctl.real ${args} ${i} ; done)
   else
-    exec -a sysctl sysctl.real ${args}
+    exec -a sysctl /lib/freebsd/sysctl ${args}
   fi
 fi
