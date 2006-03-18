@@ -1,0 +1,20 @@
+--- src/sbin/sysctl/sysctl.c~	2006-03-18 16:00:32.000000000 +0100
++++ src/sbin/sysctl/sysctl.c	2006-03-18 16:02:57.000000000 +0100
+@@ -319,16 +319,7 @@
+ static int
+ S_loadavg(int l2, void *p)
+ {
+-	struct loadavg *tv = (struct loadavg*)p;
+-
+-	if (l2 != sizeof(*tv)) {
+-		warnx("S_loadavg %d != %d", l2, sizeof(*tv));
+-		return (0);
+-	}
+-	printf(hflag ? "{ %'.2f %'.2f %'.2f }" : "{ %.2f %.2f %.2f }",
+-		(double)tv->ldavg[0]/(double)tv->fscale,
+-		(double)tv->ldavg[1]/(double)tv->fscale,
+-		(double)tv->ldavg[2]/(double)tv->fscale);
++/* bah.. */
+ 	return (0);
+ }
+ 
