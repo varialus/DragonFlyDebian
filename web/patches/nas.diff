@@ -1,0 +1,29 @@
+Author: aurel32
+Status: in BTS
+
+diff -u nas-1.7/server/Imakefile nas-1.7/server/Imakefile
+--- nas-1.7/server/Imakefile
++++ nas-1.7/server/Imakefile
+@@ -99,7 +99,7 @@
+ #endif
+ 
+ 
+-#if defined(i386SVR4Architecture) || defined(__FreeBSD__) || defined(FreeBSDArchitecture) || defined(LinuxArchitecture) || defined(GNUArchitecture) || defined(i386BsdArchitecture) || defined(USLArchitecture) || defined(cygwinArchitecture)
++#if defined(i386SVR4Architecture) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(FreeBSDArchitecture) || defined(LinuxArchitecture) || defined(GNUArchitecture) || defined(i386BsdArchitecture) || defined(USLArchitecture) || defined(cygwinArchitecture)
+ # define CanBuildAuServer	YES
+ 
+ # if defined(LinuxArchitecture) || defined(GNUArchitecture) || defined(GNUMachArchitecture)
+diff -u nas-1.7/debian/rules nas-1.7/debian/rules
+--- nas-1.7/debian/rules
++++ nas-1.7/debian/rules
+@@ -16,10 +16,6 @@
+ endif
+ allpacs=nas-doc
+ 
+-ifneq (, $(filter $(DEB_BUILD_GNU_SYSTEM),kfreebsd-gnu knetbsd-gnu))
+-DEB_BUILD_GNU_TYPE = $(DEB_BUILD_GNU_CPU)-gnu
+-endif
+-
+ build:
+         # Make include symlinks
+ 	( cd include/audio; for file in ../../lib/audio/*.h; do ln -s $$file .; done )
