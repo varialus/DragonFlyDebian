@@ -14,7 +14,11 @@ DESTDIR=$(CURDIR)/debian/$(package)
 PMAKE=make COPTS="-D_GNU_SOURCE" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR)
 export LDADD=-ledit -lbsd
 
-dirs=dmesg mount umount swapon sysctl
+dirs=sbin/dmesg \
+  sbin/mount sbin/umount usr.sbin/rpc.umntall \
+  sbin/swapon \
+  sbin/sysctl \
+  $(NULL)
 
 build/$(package):: apply-patches
 	find $(DEB_SRCDIR) -type f | (set -e ; while read i ; do sed -i $$i \
@@ -23,12 +27,12 @@ build/$(package):: apply-patches
 		-e "s/getline/bsd_&/g" \
 	; done)
 	set -e ; for i in $(dirs) ; do \
-		$(PMAKE) -C $(DEB_SRCDIR)/sbin/$$i ; \
+		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
 	done
 
 binary/$(package):: common-install-prehook-arch
 	set -e ; for i in $(dirs) ; do \
-		$(PMAKE) -C $(DEB_SRCDIR)/sbin/$$i install ; \
+		$(PMAKE) -C $(DEB_SRCDIR)/$$i install ; \
 	done
 
 include /usr/share/cdbs/1/rules/debhelper.mk
