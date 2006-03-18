@@ -21,7 +21,6 @@ build/$(package):: apply-patches
 		-e "/^__FBSDID/d" -e "s,<sys/queue.h>,<bsd/queue.h>,g" -e "s/^LDADD=/LDADD+=/g" \
 		-e "/[ \t]*__dead2[ \t]*/d" \
 		-e "s/getline/bsd_&/g" \
-		-e "s,_PATH_SYSPATH,\"/sbin:/usr/sbin\",g" \
 	; done)
 	set -e ; for i in $(dirs) ; do \
 		$(PMAKE) -C $(DEB_SRCDIR)/sbin/$$i ; \

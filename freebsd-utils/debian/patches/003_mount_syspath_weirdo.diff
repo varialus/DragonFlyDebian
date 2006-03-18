@@ -1,0 +1,15 @@
+--- src/sbin/mount/mount.c~	2006-03-18 14:06:22.000000000 +0100
++++ src/sbin/mount/mount.c	2006-03-18 14:07:15.000000000 +0100
+@@ -461,10 +461,9 @@
+ 
+ 		/* Go find an executable. */
+ 		(void)snprintf(execname, sizeof(execname), "mount_%s", vfstype);
+-		execvP(execname, _PATH_SYSPATH, (char * const *)argv);
++		execvp(execname, (char * const *)argv);
+ 		if (errno == ENOENT) {
+-			warn("exec mount_%s not found in %s", vfstype,
+-			    _PATH_SYSPATH);
++			warn("exec mount_%s not found", vfstype);
+ 		}
+ 		exit(1);
+ 		/* NOTREACHED */

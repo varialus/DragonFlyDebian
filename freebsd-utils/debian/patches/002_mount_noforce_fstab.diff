@@ -1,0 +1,21 @@
+--- src/sbin/mount/mount.c~	2006-03-18 13:58:00.000000000 +0100
++++ src/sbin/mount/mount.c	2006-03-18 14:02:35.000000000 +0100
+@@ -138,7 +138,7 @@
+ 	options = NULL;
+ 	vfslist = NULL;
+ 	vfstype = "ufs";
+-	while ((ch = getopt(argc, argv, "adF:fo:prwt:uv")) != -1)
++	while ((ch = getopt(argc, argv, "ad:fo:prwt:uv")) != -1)
+ 		switch (ch) {
+ 		case 'a':
+ 			all = 1;
+@@ -146,9 +146,6 @@
+ 		case 'd':
+ 			debug = 1;
+ 			break;
+-		case 'F':
+-			setfstab(optarg);
+-			break;
+ 		case 'f':
+ 			init_flags |= MNT_FORCE;
+ 			break;

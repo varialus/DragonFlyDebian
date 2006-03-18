@@ -1,0 +1,30 @@
+--- src/sbin/mount/mount_ufs.c~	2006-03-18 13:51:27.000000000 +0100
++++ src/sbin/mount/mount_ufs.c	2006-03-18 13:52:39.000000000 +0100
+@@ -50,6 +50,8 @@
+ #include <stdlib.h>
+ #include <unistd.h>
+ 
++#include <bsd/getopt.h>
++
+ #include <ufs/ufs/ufsmount.h>
+ 
+ #include "extern.h"
+--- src/sbin/mount/mount_ufs.c.old	2006-03-18 13:54:12.000000000 +0100
++++ src/sbin/mount/mount_ufs.c	2006-03-18 13:57:43.000000000 +0100
+@@ -43,6 +43,7 @@
+ 
+ #include <sys/param.h>
+ #include <sys/mount.h>
++#include <sys/syscall.h>
+ 
+ #include <err.h>
+ #include <errno.h>
+@@ -105,7 +106,7 @@
+ 	else
+ 		args.export.ex_flags = 0;
+ 
+-	if (mount("ufs", fs_name, mntflags, &args) < 0) {
++	if (syscall (SYS_mount, "ufs", fs_name, mntflags, &args) < 0) {
+ 		switch (errno) {
+ 		case EMFILE:
+ 			warnx("%s on %s: mount table full",

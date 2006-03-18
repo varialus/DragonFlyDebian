@@ -1,0 +1,45 @@
+--- src/sbin/mount/mount.c~	2006-03-18 13:50:21.000000000 +0100
++++ src/sbin/mount/mount.c	2006-03-18 13:51:06.000000000 +0100
+@@ -540,11 +540,13 @@
+ 			(void)printf(", reads: sync %ju async %ju",
+ 			    (uintmax_t)sfp->f_syncreads,
+ 			    (uintmax_t)sfp->f_asyncreads);
++#ifdef __FreeBSD__
+ 		if (sfp->f_fsid.val[0] != 0 || sfp->f_fsid.val[1] != 0) {
+ 			printf(", fsid ");
+ 			for (i = 0; i < sizeof(sfp->f_fsid); i++)
+ 				printf("%02x", ((u_char *)&sfp->f_fsid)[i]);
+ 		}
++#endif
+ 	}
+ 	(void)printf(")\n");
+ }
+--- src/sbin/umount/umount.c~	2006-03-18 14:08:59.000000000 +0100
++++ src/sbin/umount/umount.c	2006-03-18 14:11:05.000000000 +0100
+@@ -349,24 +349,12 @@
+ 
+ 	if (!namematch(ai))
+ 		return (1);
+-	/* First try to unmount using the file system ID. */
+-	snprintf(fsidbuf, sizeof(fsidbuf), "FSID:%d:%d", sfs->f_fsid.val[0],
+-	    sfs->f_fsid.val[1]);
+-	if (unmount(fsidbuf, fflag | MNT_BYFSID) != 0) {
+-		/* XXX, non-root users get a zero fsid, so don't warn. */
+-		if (errno != ENOENT || sfs->f_fsid.val[0] != 0 ||
+-		    sfs->f_fsid.val[1] != 0)
+-			warn("unmount of %s failed", sfs->f_mntonname);
+-		if (errno != ENOENT)
+-			return (1);
+-		/* Compatibility for old kernels. */
+-		if (sfs->f_fsid.val[0] != 0 || sfs->f_fsid.val[1] != 0)
+-			warnx("retrying using path instead of file system ID");
++
+ 		if (unmount(sfs->f_mntonname, fflag) != 0) {
+ 			warn("unmount of %s failed", sfs->f_mntonname);
+ 			return (1);
+ 		}
+-	}
++
+ 	/* Mark this this file system as unmounted. */
+ 	getmntentry(NULL, NULL, &sfs->f_fsid, REMOVE);
+ 	if (vflag)
