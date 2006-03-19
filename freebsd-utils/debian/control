@@ -3,12 +3,20 @@ Section: base
 Priority: required
 Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>, Guillem Jover <guillem@debian.org>
-Build-Depends: cdbs, debhelper (>= 4.1.0), freebsd5-buildutils, libkvm-dev, libedit-dev, libbsd-dev
+Build-Depends: cdbs, debhelper (>= 4.1.0), freebsd5-buildutils, libkvm-dev, libbsd-dev
 Standards-Version: 3.6.0
 
 Package: freebsd-utils
 Architecture: kfreebsd-i386 kfreebsd-amd64
 Essential: yes
-Depends: ufsutils, kldutils, freebsd-hackedutils
+Depends: ${shlibs:Depends}, ufsutils, kldutils, freebsd-hackedutils
 Description: FreeBSD utilities needed for GNU/kFreeBSD.
  FreeBSD utilities needed for GNU/kFreeBSD.
+
+Package: kldutils
+Architecture: kfreebsd-i386 kfreebsd-amd64
+Depends: ${shlibs:Depends}
+Replaces: freebsd-utils (<= 5.2.1-16)
+Description: tools for managing kFreeBSD modules
+ This package contains a set of programs for loading, inserting, and
+ removing kernel modules for kFreeBSD.

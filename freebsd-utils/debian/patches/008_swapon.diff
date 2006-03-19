@@ -1,14 +1,5 @@
 --- src/sbin/swapon/swapon.c~	2006-03-18 14:30:31.000000000 +0100
 +++ src/sbin/swapon/swapon.c	2006-03-18 15:57:02.000000000 +0100
-@@ -167,7 +167,7 @@
- static int
- swap_on_off(char *name, int doingall)
- {
--	if ((which_prog == SWAPOFF ? swapoff(name) : swapon(name)) == -1) {
-+	if ((which_prog == SWAPOFF ? syscall (SYS_swapoff, name) : syscall (SYS_swapon, name)) == -1) {
- 		switch (errno) {
- 		case EBUSY:
- 			if (!doingall)
 @@ -209,69 +209,6 @@
  static void
  swaplist(int lflag, int sflag, int hflag)
@@ -80,13 +71,3 @@
 +  fprintf (stderr, "%s\n", strerror (ENOSYS));
  }
  
---- src/sbin/swapon/swapon.c~	2006-03-18 15:57:38.000000000 +0100
-+++ src/sbin/swapon/swapon.c	2006-03-18 15:58:06.000000000 +0100
-@@ -53,6 +53,7 @@
- #include <string.h>
- #include <unistd.h>
- #include <fcntl.h>
-+#include <sys/syscall.h>
- 
- static void usage(void);
- static int swap_on_off(char *name, int ignoreebusy);
