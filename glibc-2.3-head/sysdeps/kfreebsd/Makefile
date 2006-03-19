@@ -56,11 +56,11 @@ sysdep_routines += jail
 # For <sys/ktrace.h>.
 sysdep_routines += ktrace utrace
 # For <sys/linker.h>.
-sysdep_routines += kldfind kldfirstmod kldload kldnext kldstat kldsym kldunload
+sysdep_routines += kldfind kldfirstmod kldload kldnext kldstat kldsym kldunload kldunloadf
 # For <sys/mman.h>.
 sysdep_routines += minherit sys_mmap
 # For <sys/mount.h>.
-sysdep_routines += fhopen sys_fhstat sys_fhstatfs fhstat fhstat64 fhstatfs fhstatfs64 getfh getfsstat getfsstat64 sys_getfsstat getmntinfo getmntinfo64 
+sysdep_routines += fhopen sys_fhstat sys_fhstatfs fhstat fhstat64 fhstatfs fhstatfs64 getfh getfsstat getfsstat64 sys_getfsstat getmntinfo getmntinfo64 mount nmount unmount
 # For <sys/ptrace.h>.
 sysdep_routines += sys_ptrace
 # For <sys/rfork.h>.
@@ -74,7 +74,7 @@ sysdep_routines += sysctl sysctlbyname
 # For <sys/uio.h>.
 sysdep_routines += sys_readv sys_writev
 # Other.
-sysdep_routines += sys_aio_cancel sys_aio_error sys_aio_read sys_aio_return sys_aio_suspend sys_aio_waitcomplete sys_aio_write sys_lio_listio issetugid modfind modfnext modnext modstat obreak quotactl rfork sysarch undelete yield
+sysdep_routines += swapon swapoff sys_aio_cancel sys_aio_error sys_aio_read sys_aio_return sys_aio_suspend sys_aio_waitcomplete sys_aio_write sys_lio_listio issetugid modfind modfnext modnext modstat obreak quotactl rfork sysarch undelete yield
 # for INLINE_SYSCALL
 sysdep_routines += sys_fork sys_execve sys_sigaction sys_close sys_fcntl
 sysdep_routines += sys_clock_getres sys_clock_gettime sys_clock_settime
