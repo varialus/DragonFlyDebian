@@ -1,9 +1,9 @@
---- src/sbin/mount/mount.c~	2006-03-18 14:06:22.000000000 +0100
-+++ src/sbin/mount/mount.c	2006-03-18 14:07:15.000000000 +0100
-@@ -461,10 +461,9 @@
+--- src/sbin/mount/mount.c~	2006-03-19 20:51:12.000000000 +0100
++++ src/sbin/mount/mount.c	2006-03-19 20:52:07.000000000 +0100
+@@ -465,10 +465,9 @@
+ 			exit(mount_ufs(argc, (char * const *) argv));
  
  		/* Go find an executable. */
- 		(void)snprintf(execname, sizeof(execname), "mount_%s", vfstype);
 -		execvP(execname, _PATH_SYSPATH, (char * const *)argv);
 +		execvp(execname, (char * const *)argv);
  		if (errno == ENOENT) {

@@ -16,11 +16,19 @@ for i in \
     src/sbin/dmesg \
     src/sbin/ifconfig src/sbin/route \
     src/sbin/kldconfig src/sbin/kldload src/sbin/kldstat src/sbin/kldunload \
-    src/sbin/mount src/sbin/mount_std src/sbin/umount src/usr.sbin/rpc.umntall \
+    src/sbin/mount_std src/sbin/umount src/usr.sbin/rpc.umntall \
+    src/sbin/mount_{cd9660,ext2fs,hpfs,msdosfs,nfs,nfs4,ntfs,nullfs,udf,umapfs,unionfs} \
     src/sbin/swapon \
     src/sbin/sysctl \
   ; do
   cvs ${action} -r RELENG_5_4_0_RELEASE $i
+  test -e $i
+done
+
+for i in \
+    src/sbin/mount{,_autofs,_reiserfs} \
+  ; do
+  cvs ${action} -r RELENG_6_0_0_RELEASE $i
   test -e $i
 done
 

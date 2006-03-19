@@ -1,15 +1,16 @@
---- src/sbin/mount/mount.c~	2006-03-18 13:58:00.000000000 +0100
-+++ src/sbin/mount/mount.c	2006-03-18 14:02:35.000000000 +0100
-@@ -138,7 +138,7 @@
+diff -ur src.old/sbin/mount/mount.c src/sbin/mount/mount.c
+--- src.old/sbin/mount/mount.c	2006-03-19 20:56:08.000000000 +0100
++++ src/sbin/mount/mount.c	2006-03-19 20:56:47.000000000 +0100
+@@ -137,7 +137,7 @@
  	options = NULL;
  	vfslist = NULL;
  	vfstype = "ufs";
 -	while ((ch = getopt(argc, argv, "adF:fo:prwt:uv")) != -1)
-+	while ((ch = getopt(argc, argv, "ad:fo:prwt:uv")) != -1)
++	while ((ch = getopt(argc, argv, "adfo:prwt:uv")) != -1)
  		switch (ch) {
  		case 'a':
  			all = 1;
-@@ -146,9 +146,6 @@
+@@ -145,9 +145,6 @@
  		case 'd':
  			debug = 1;
  			break;
@@ -19,14 +20,24 @@
  		case 'f':
  			init_flags |= MNT_FORCE;
  			break;
---- src/sbin/umount/umount.c~	2006-03-18 14:16:14.000000000 +0100
-+++ src/sbin/umount/umount.c	2006-03-18 14:20:51.000000000 +0100
+@@ -707,7 +704,7 @@
+ {
+ 
+ 	(void)fprintf(stderr, "%s\n%s\n%s\n",
+-"usage: mount [-adfpruvw] [-F fstab] [-o options] [-t ufs | external_type]",
++"usage: mount [-adfpruvw] [-o options] [-t ufs | external_type]",
+ "       mount [-dfpruvw] special | node",
+ "       mount [-dfpruvw] [-o options] [-t ufs | external_type] special node");
+ 	exit(1);
+diff -ur src.old/sbin/umount/umount.c src/sbin/umount/umount.c
+--- src.old/sbin/umount/umount.c	2006-03-19 20:56:08.000000000 +0100
++++ src/sbin/umount/umount.c	2006-03-19 20:57:21.000000000 +0100
 @@ -94,7 +94,7 @@
  	sync();
  
  	all = errs = 0;
 -	while ((ch = getopt(argc, argv, "AaF:fh:t:v")) != -1)
-+	while ((ch = getopt(argc, argv, "Aa:fh:t:v")) != -1)
++	while ((ch = getopt(argc, argv, "Aafh:t:v")) != -1)
  		switch (ch) {
  		case 'A':
  			all = 2;
@@ -49,22 +60,11 @@
  		errs = umountall(typelist);
  		break;
  	case 0:
-@@ -580,6 +577,6 @@
+@@ -577,6 +574,6 @@
  
  	(void)fprintf(stderr, "%s\n%s\n",
  	    "usage: umount [-fv] special | node",
 -	    "       umount -a | -A [ -F fstab] [-fv] [-h host] [-t type]");
 +	    "       umount -a | -A [-fv] [-h host] [-t type]");
- 	exit(1);
- }
---- src/sbin/mount/mount.c~	2006-03-18 14:16:14.000000000 +0100
-+++ src/sbin/mount/mount.c	2006-03-18 14:21:13.000000000 +0100
-@@ -704,7 +704,7 @@
- 
- 	(void)fprintf(stderr, "%s\n%s\n%s\n",
- "usage: mount [-dfpruvw] [-o options] [-t ufs | external_type] special node",
--"       mount [-adfpruvw] [ -F fstab] [-o options] [-t ufs | external_type]",
-+"       mount [-adfpruvw] [-o options] [-t ufs | external_type]",
- "       mount [-dfpruvw] special | node");
  	exit(1);
  }

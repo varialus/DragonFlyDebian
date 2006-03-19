@@ -3,20 +3,30 @@ Section: base
 Priority: required
 Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>, Guillem Jover <guillem@debian.org>
-Build-Depends: cdbs, debhelper (>= 4.1.0), freebsd5-buildutils, libkvm-dev, libbsd-dev
+Build-Depends: cdbs, debhelper (>= 4.1.0), freebsd5-buildutils, libkvm-dev, libbsd-dev (>= 0.0-1.2+r1367), libc0.1-dev (>= 2.3.6-3+kbsd.r1365)
 Standards-Version: 3.6.0
 
 Package: freebsd-utils
-Architecture: kfreebsd-i386 kfreebsd-amd64
 Essential: yes
-Depends: ${shlibs:Depends}, ufsutils, kldutils, freebsd-hackedutils
+Architecture: kfreebsd-i386 kfreebsd-amd64
+Depends: ${shlibs:Depends}, ufsutils, kldutils, libc0.1 (>= 2.3.6-3+kbsd.r1365), freebsd-hackedutils
 Description: FreeBSD utilities needed for GNU/kFreeBSD.
  FreeBSD utilities needed for GNU/kFreeBSD.
 
 Package: kldutils
 Architecture: kfreebsd-i386 kfreebsd-amd64
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, libc0.1 (>= 2.3.6-3+kbsd.r1365)
 Replaces: freebsd-utils (<= 5.2.1-16)
 Description: tools for managing kFreeBSD modules
  This package contains a set of programs for loading, inserting, and
  removing kernel modules for kFreeBSD.
+
+#Package: net-tools
+#Section: net
+#Priority: important
+#Architecture: kfreebsd-i386 kfreebsd-amd64
+#Depends: ${shlibs:Depends}
+#Replaces: freebsd-utils (<< 5.4), freebsd-hackedutils (<= 5.2.1-26)
+#Description: FreeBSD networking tools
+# This package contains the FreeBSD tools needed to manage networking on
+# GNU/kFreeBSD.
