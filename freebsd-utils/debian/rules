@@ -11,7 +11,7 @@ package=freebsd-utils
 SHELL:=bash
 PATH:=/usr/lib/freebsd:$(PATH)
 PMAKE=make COPTS="-D_GNU_SOURCE" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
-export LDADD=-lbsd
+export LDADD=-lbsd -lfreebsd
 
 build/freebsd-utils:: apply-patches
 	set -e ; for i in sbin/{dmesg,mdconfig,mount,mount_std,umount,swapon,sysctl} usr.sbin/rpc.umntall \
