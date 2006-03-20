@@ -53,7 +53,6 @@ static char sccsid[] = "@(#)nlist.c	8.1 (Berkeley) 6/4/93";
 
 #ifdef _NLIST_DO_ELF
 #include <machine/elf.h>
-#include <elf-hints.h>
 #endif
 
 #define SIZE_T_MAX 0xffffffffU

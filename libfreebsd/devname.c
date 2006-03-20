@@ -29,23 +29,47 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- *	@(#)paths.h	8.1 (Berkeley) 6/2/93
- * $FreeBSD: /repoman/r/ncvs/src/include/paths.h,v 1.25 2004/01/04 17:17:46 iedowse Exp $
  */
 
-#ifndef LIBFREEBSD_PATHS_H
-#define	LIBFREEBSD_PATHS_H
+#include <sys/types.h>
+#include <sys/sysctl.h>
 
-#include <sys/cdefs.h>
-#include <paths.h>
+#include <err.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/param.h>
+#include <sys/stat.h>
 
-/* Locate system binaries */
-#define _PATH_SYSPATH	"/sbin:/usr/sbin"
+char *
+devname_r(dev_t dev, mode_t type, char *buf, int len)
+{
+	int i;
+	size_t j;
+	char *r;
 
-/* How to get the correct name of the kernel. */
-__BEGIN_DECLS
-const char *getbootfile(void);
-__END_DECLS
+	if ((type & S_IFMT) == S_IFCHR) {
+		j = len;
+		i = sysctlbyname("kern.devname", buf, &j, &dev, sizeof (dev));
+		if (i == 0)
+		    return (buf);
+	}
 
-#endif /* !LIBFREEBSD_PATHS_H */
+	/* Finally just format it */
+	if (dev == NODEV)
+		r = "#NODEV";
+	else 
+		r = "#%c:%d:0x%x";
+	snprintf(buf, len, r,
+	    (type & S_IFMT) == S_IFCHR ? 'C' : 'B', major(dev), minor(dev));
+	return (buf);
+}
+
+char *
+devname(dev_t dev, mode_t type)
+{
+	static char buf[SPECNAMELEN + 1];
+
+	return(devname_r(dev, type, buf, sizeof(buf)));
+}

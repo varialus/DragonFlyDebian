@@ -4,7 +4,7 @@
 # $Id: Makefile 905 2005-12-20 20:29:47Z aurel32 $
 #
 
-LIB_SRCS = nlist.c getbootfile.c
+LIB_SRCS = nlist.c getbootfile.c devname.c sysctlnametomib.c sysctlbyname.c
 
 LIB_FREEBSDINCLUDES = include/freebsd/paths.h
 LIB_INCLUDES = include/nlist.h
@@ -66,4 +66,3 @@ clean:
 	rm -f $(LIB_STATIC)
 	rm -f $(LIB_SHARED_OBJS)
 	rm -f $(LIB_SHARED) $(LIB_SONAME) $(LIB_SHARED_SO)
-
