@@ -13,13 +13,15 @@ else
 fi
 
 for i in \
-    src/sbin/dmesg \
-    src/sbin/ifconfig src/sbin/route \
+    src/sbin/dmesg src/sbin/swapon src/sbin/sysctl \
+    src/sbin/ifconfig src/sbin/route src/usr.bin/netstat \
     src/sbin/kldconfig src/sbin/kldload src/sbin/kldstat src/sbin/kldunload \
     src/sbin/mount_std src/sbin/umount src/usr.sbin/rpc.umntall \
     src/sbin/mount_{cd9660,ext2fs,hpfs,msdosfs,nfs,nfs4,ntfs,nullfs,udf,umapfs,unionfs} \
-    src/sbin/swapon \
-    src/sbin/sysctl \
+    src/usr.bin/{ktrace,kdump} src/usr.sbin/jail src/usr.sbin/ppp{,ctl,d} \
+    src/sbin/{fdisk,mdconfig,ccdconfig,bsdlabel,ipfw} \
+    src/{contrib/pf,sbin/pfctl} \
+    src/usr.sbin/kbdcontrol src/share/syscons/keymaps \
   ; do
   cvs ${action} -r RELENG_5_4_0_RELEASE $i
   test -e $i

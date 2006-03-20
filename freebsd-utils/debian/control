@@ -3,7 +3,7 @@ Section: base
 Priority: required
 Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>, Guillem Jover <guillem@debian.org>
-Build-Depends: cdbs, debhelper (>= 4.1.0), freebsd5-buildutils, libkvm-dev, libbsd-dev (>= 0.0-1.2+r1367), libc0.1-dev (>= 2.3.6-3+kbsd.r1365)
+Build-Depends: cdbs, debhelper (>= 4.1.0), freebsd5-buildutils, libkvm-dev, libbsd-dev (>= 0.0-1.2+r1367), libc0.1-dev (>= 2.3.6-3+kbsd.r1365), flex | flex-old, kfreebsd-kernel-headers (>= 0.16)
 Standards-Version: 3.6.0
 
 Package: freebsd-utils
@@ -20,6 +20,22 @@ Replaces: freebsd-utils (<= 5.2.1-16)
 Description: tools for managing kFreeBSD modules
  This package contains a set of programs for loading, inserting, and
  removing kernel modules for kFreeBSD.
+
+Package: kbdcontrol
+Architecture: kfreebsd-i386 kfreebsd-amd64
+Depends: ${shlibs:Depends}
+Description: Command line tool to change keyboard layout
+ Original FreeBSD command to set keyboard layout and the FreeBSD possible
+ keyboards.
+
+# FIXME:
+# - enable net-tools
+# - add ktrace (ktrace, kdump)
+# - add jail
+# - add ppp (ppp, pppctl, pppd)
+# - add ccdconfig (ccdconfig + /etc/ccdconfig.conf)
+# - add pf (pfctl + /etc stuff + init.d script)
+# - add ipfw (???)
 
 #Package: net-tools
 #Section: net
