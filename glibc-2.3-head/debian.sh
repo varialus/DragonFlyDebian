@@ -21,18 +21,5 @@ for i in `ls $1/patches` ; do
   echo "kfreebsd-$i.diff -p0" >> debian/patches/series
 done
 
-patch -p1 < $0
-
 exit 0
 
---- glibc-2.3.6/debian/sysdeps/kfreebsd-amd64.mk~	2006-03-15 21:53:59.000000000 +0100
-+++ glibc-2.3.6/debian/sysdeps/kfreebsd-amd64.mk	2006-03-16 07:47:12.000000000 +0100
-@@ -3,7 +3,7 @@
- libc_rtlddir = /lib64
- 
- # /lib64 and /usr/lib64 are provided by glibc instead base-files: #259302.
--define libc0.1_extra_pkg_install
-+define libc6_extra_pkg_install
- ln -sf /lib debian/$(curpass)/lib64
- ln -sf lib debian/$(curpass)/usr/lib64
- endef
