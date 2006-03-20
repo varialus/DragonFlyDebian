@@ -148,10 +148,8 @@
 #define	ECANCELED	85		/* Operation canceled */
 #define	EILSEQ		86		/* Illegal byte sequence */
 #define	ENOATTR		87		/* Attribute not found */
-#define ENODATA 	ENOATTR
 
 #define EDOOFUS		88		/* Programming error */
-#define EGREGIOUS	EDOOFUS
 
 #define	EBADMSG		89		/* Bad message */
 #define	EMULTIHOP	90		/* Multihop attempted */
