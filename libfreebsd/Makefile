@@ -50,16 +50,16 @@ $(LIB_SHARED): $(LIB_SHARED_OBJS)
 	  -o $@ $^
 
 install: libs
-	mkdir -p $(DESTDIR)/usr/lib/
+	mkdir -p $(DESTDIR)/usr/lib/ $(DESTDIR)/lib/
 	mkdir -p $(DESTDIR)/usr/include/freebsd/
 	mkdir -p $(DESTDIR)/usr/share/man/man3
 	install -m644 $(LIB_STATIC) $(DESTDIR)/usr/lib/
-	install -m644 $(LIB_SHARED) $(DESTDIR)/usr/lib/
+	install -m644 $(LIB_SHARED) $(DESTDIR)/lib/
 	install -m644 $(LIB_INCLUDES) $(DESTDIR)/usr/include/
 	install -m644 $(LIB_FREEBSDINCLUDES) $(DESTDIR)/usr/include/freebsd
 	install -m644 $(LIB_MANS) $(DESTDIR)/usr/share/man/man3
-	cd $(DESTDIR)/usr/lib/ ; ln -fs $(LIB_SHARED) $(LIB_SHARED_SO)
-	cd $(DESTDIR)/usr/lib/ ; ln -fs $(LIB_SHARED) $(LIB_SONAME)
+	ln -sf /lib/$(LIB_SHARED) $(DESTDIR)/usr/lib/$(LIB_SHARED_SO)
+	ln -sf $(LIB_SHARED) $(DESTDIR)/lib/$(LIB_SONAME)
 
 clean:
 	rm -f $(LIB_STATIC_OBJS)

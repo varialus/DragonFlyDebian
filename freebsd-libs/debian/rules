@@ -81,6 +81,8 @@ install-arch:
 	cd $(SRC_DIR)/libcam && $(PMAKE) install
 	cd $(SRC_DIR)/libipx && $(PMAKE) install
 	cd $(SRC_DIR)/libkvm && $(PMAKE) install
+	# move libkvm.so to /lib
+	ln -sf /lib/libkvm.so.0 $(DESTDIR)/usr/lib/libkvm.so
 	cd $(SRC_DIR)/libusbhid && $(PMAKE) install
 
 	dh_install -s --list-missing --sourcedir=debian/tmp
