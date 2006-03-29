@@ -1,0 +1,16 @@
+#!/bin/bash
+set -ex
+
+version="0.3"
+sha1sum="ed57eafa399300c0e90404e7850bf774719765ba"
+
+tarball="bsd-airtools-v${version}.tgz"
+url="http://people.freebsd.org/~seanc/ports/bsd-airtools/${tarball}"
+
+rm -f ${tarball}
+wget -c ${url}
+
+if ! echo "${sha1sum}  bsd-airtools-v0.3.tgz" | sha1sum -c ; then
+  echo "ERROR: hash missmatch, deleting tarball"
+  rm -f ${tarball}
+fi

@@ -1,0 +1,216 @@
+diff -ur bsd-airtools.old/dstumbler/dstumbler.h bsd-airtools/dstumbler/dstumbler.h
+--- bsd-airtools.old/dstumbler/dstumbler.h	2006-03-29 14:39:25.000000000 +0200
++++ bsd-airtools/dstumbler/dstumbler.h	2006-03-29 14:41:16.000000000 +0200
+@@ -47,7 +47,7 @@
+ #include <net/if.h>
+ #include <sys/termios.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+@@ -241,7 +241,7 @@
+ }
+ 
+ /* redefine these for compatibility with freebsd/openbsd */
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #define htole16(x) (x)
+ #define le16toh(x) (x)
+ #define O_SYNC     O_FSYNC
+diff -ur bsd-airtools.old/dweputils/dwepcrack/dwepcrack.h bsd-airtools/dweputils/dwepcrack/dwepcrack.h
+--- bsd-airtools.old/dweputils/dwepcrack/dwepcrack.h	2006-03-29 14:39:25.000000000 +0200
++++ bsd-airtools/dweputils/dwepcrack/dwepcrack.h	2006-03-29 14:41:16.000000000 +0200
+@@ -38,7 +38,7 @@
+ #include <sys/types.h>
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+@@ -76,7 +76,7 @@
+ /*
+  * macros
+  */
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #define le32toh(x) (x)
+ #define htole16(x) (x)
+ #define le16toh(x) (x)
+diff -ur bsd-airtools.old/dweputils/dwepdump/dwepdump.c bsd-airtools/dweputils/dwepdump/dwepdump.c
+--- bsd-airtools.old/dweputils/dwepdump/dwepdump.c	2006-03-29 14:39:25.000000000 +0200
++++ bsd-airtools/dweputils/dwepdump/dwepdump.c	2006-03-29 14:41:16.000000000 +0200
+@@ -47,7 +47,7 @@
+ 
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+@@ -74,7 +74,7 @@
+ /*
+  * macros
+  */
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #define le16toh(x) (x)
+ #else
+ #ifdef __OpenBSD__
+diff -ur bsd-airtools.old/prism2ctl/prism2ctl.c bsd-airtools/prism2ctl/prism2ctl.c
+--- bsd-airtools.old/prism2ctl/prism2ctl.c	2006-03-29 14:39:25.000000000 +0200
++++ bsd-airtools/prism2ctl/prism2ctl.c	2006-03-29 14:41:16.000000000 +0200
+@@ -50,7 +50,7 @@
+ #include <sys/time.h>
+ #include <net/if.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+@@ -64,7 +64,7 @@
+ #include <err.h>
+ 
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #define le16toh(x) (x)
+ #define htole16(x) (x)
+ #else
+diff -ur bsd-airtools.old/prism2dump/decode_80211.c bsd-airtools/prism2dump/decode_80211.c
+--- bsd-airtools.old/prism2dump/decode_80211.c	2006-03-29 14:39:25.000000000 +0200
++++ bsd-airtools/prism2dump/decode_80211.c	2006-03-29 14:41:16.000000000 +0200
+@@ -40,7 +40,7 @@
+ 
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+diff -ur bsd-airtools.old/prism2dump/decode_ctl.c bsd-airtools/prism2dump/decode_ctl.c
+--- bsd-airtools.old/prism2dump/decode_ctl.c	2006-03-29 14:39:25.000000000 +0200
++++ bsd-airtools/prism2dump/decode_ctl.c	2006-03-29 14:41:16.000000000 +0200
+@@ -40,7 +40,7 @@
+ 
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+diff -ur bsd-airtools.old/prism2dump/decode_data.c bsd-airtools/prism2dump/decode_data.c
+--- bsd-airtools.old/prism2dump/decode_data.c	2006-03-29 14:39:25.000000000 +0200
++++ bsd-airtools/prism2dump/decode_data.c	2006-03-29 14:41:16.000000000 +0200
+@@ -40,7 +40,7 @@
+ 
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+diff -ur bsd-airtools.old/prism2dump/decode_mgmt.c bsd-airtools/prism2dump/decode_mgmt.c
+--- bsd-airtools.old/prism2dump/decode_mgmt.c	2006-03-29 14:39:25.000000000 +0200
++++ bsd-airtools/prism2dump/decode_mgmt.c	2006-03-29 14:41:16.000000000 +0200
+@@ -40,7 +40,7 @@
+ 
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+diff -ur bsd-airtools.old/prism2dump/fields_80211.c bsd-airtools/prism2dump/fields_80211.c
+--- bsd-airtools.old/prism2dump/fields_80211.c	2006-03-29 14:39:25.000000000 +0200
++++ bsd-airtools/prism2dump/fields_80211.c	2006-03-29 14:41:16.000000000 +0200
+@@ -40,7 +40,7 @@
+ 
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+diff -ur bsd-airtools.old/prism2dump/fields_data.c bsd-airtools/prism2dump/fields_data.c
+--- bsd-airtools.old/prism2dump/fields_data.c	2006-03-29 14:39:25.000000000 +0200
++++ bsd-airtools/prism2dump/fields_data.c	2006-03-29 14:41:16.000000000 +0200
+@@ -40,7 +40,7 @@
+ 
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+diff -ur bsd-airtools.old/prism2dump/fields_mgmt.c bsd-airtools/prism2dump/fields_mgmt.c
+--- bsd-airtools.old/prism2dump/fields_mgmt.c	2006-03-29 14:39:26.000000000 +0200
++++ bsd-airtools/prism2dump/fields_mgmt.c	2006-03-29 14:41:16.000000000 +0200
+@@ -40,7 +40,7 @@
+ 
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+diff -ur bsd-airtools.old/prism2dump/misc.c bsd-airtools/prism2dump/misc.c
+--- bsd-airtools.old/prism2dump/misc.c	2006-03-29 14:39:26.000000000 +0200
++++ bsd-airtools/prism2dump/misc.c	2006-03-29 14:41:16.000000000 +0200
+@@ -40,7 +40,7 @@
+ 
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+diff -ur bsd-airtools.old/prism2dump/prism2dump.c bsd-airtools/prism2dump/prism2dump.c
+--- bsd-airtools.old/prism2dump/prism2dump.c	2006-03-29 14:39:26.000000000 +0200
++++ bsd-airtools/prism2dump/prism2dump.c	2006-03-29 14:41:16.000000000 +0200
+@@ -52,7 +52,7 @@
+ 
+ #include <pcap.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #else
+ #ifdef __OpenBSD__
+diff -ur bsd-airtools.old/prism2dump/prism2dump.h bsd-airtools/prism2dump/prism2dump.h
+--- bsd-airtools.old/prism2dump/prism2dump.h	2006-03-29 14:39:26.000000000 +0200
++++ bsd-airtools/prism2dump/prism2dump.h	2006-03-29 14:41:16.000000000 +0200
+@@ -45,7 +45,7 @@
+ /*
+  * macros
+  */
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #define le16toh(x) (x)
+ #define le32toh(x) (x)
+ #else
+diff -ur bsd-airtools.old/wnet/libwnet/libwnet.h bsd-airtools/wnet/libwnet/libwnet.h
+--- bsd-airtools.old/wnet/libwnet/libwnet.h	2006-03-29 14:39:26.000000000 +0200
++++ bsd-airtools/wnet/libwnet/libwnet.h	2006-03-29 14:41:16.000000000 +0200
+@@ -44,7 +44,7 @@
+ #include <net/if.h>
+ #include <netinet/if_ether.h>
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #include <dev/wi/if_wavelan_ieee.h>
+ #include <dev/wi/if_wireg.h>
+ #include <net/if_ieee80211.h>

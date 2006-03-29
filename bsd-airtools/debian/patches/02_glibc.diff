@@ -1,0 +1,11 @@
+--- bsd-airtools/prism2dump/prism2dump.c~	2006-03-29 14:43:25.000000000 +0200
++++ bsd-airtools/prism2dump/prism2dump.c	2006-03-29 14:44:18.000000000 +0200
+@@ -41,7 +41,7 @@
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/ioctl.h>
+-#ifndef __FreeBSD__
++#if !defined(__FreeBSD__) && !defined(__GLIBC__)
+ #include <sys/endian.h>
+ #endif
+ #include <netinet/in.h>
