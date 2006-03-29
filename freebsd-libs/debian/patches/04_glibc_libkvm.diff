@@ -19,50 +19,11 @@ diff -Nur lib.old/lib/libkvm/kvm.c lib/libkvm/kvm.c
  #include <string.h>
  #include <unistd.h>
  
-+#include <bsd/bsd.h>
++
 +
  #include "kvm_private.h"
  
  /* from src/lib/libc/gen/nlist.c */
-@@ -80,7 +84,19 @@
- 	return (kd->errbuf);
- }
- 
--#include <stdarg.h>
-+const char *
-+getbootfile(void)
-+{
-+	static char name[MAXPATHLEN];
-+	size_t size = sizeof name;
-+	int mib[2];
-+
-+	mib[0] = CTL_KERN;
-+	mib[1] = KERN_BOOTFILE;
-+	if (sysctl(mib, 2, name, &size, NULL, 0) == -1)
-+		return ("/boot/kernel/kernel");
-+	return (name);
-+}
- 
- /*
-  * Report an error using printf style arguments.  "program" is kd->program
-@@ -235,7 +251,7 @@
- kvm_openfiles(uf, mf, sf, flag, errout)
- 	const char *uf;
- 	const char *mf;
--	const char *sf __unused;
-+	const char *sf;
- 	int flag;
- 	char *errout;
- {
-@@ -254,7 +270,7 @@
- kvm_open(uf, mf, sf, flag, errstr)
- 	const char *uf;
- 	const char *mf;
--	const char *sf __unused;
-+	const char *sf;
- 	int flag;
- 	const char *errstr;
- {
 diff -Nur lib.old/lib/libkvm/kvm_file.c lib/libkvm/kvm_file.c
 --- lib.old/lib/libkvm/kvm_file.c	2003-07-31 23:44:31.000000000 +0200
 +++ lib/libkvm/kvm_file.c	2005-12-20 11:32:50.000000000 +0100
@@ -133,29 +94,6 @@ diff -Nur lib.old/lib/libkvm/kvm_getloadavg.c lib/libkvm/kvm_getloadavg.c
 diff -Nur lib.old/lib/libkvm/kvm_getswapinfo.c lib/libkvm/kvm_getswapinfo.c
 --- lib.old/lib/libkvm/kvm_getswapinfo.c	2004-07-31 20:49:53.000000000 +0200
 +++ lib/libkvm/kvm_getswapinfo.c	2005-12-20 12:00:15.000000000 +0100
-@@ -47,6 +47,8 @@
- #include <unistd.h>
- #include <limits.h>
- 
-+#include <bsd/bsd.h>
-+
- #include "kvm_private.h"
- 
- #define NL_SWAPBLIST	0
-@@ -118,11 +120,13 @@
- 		return -1;
- 
- 	mibi = SWI_MAXMIB - 1;
-+#if 0
- 	if (sysctlnametomib("vm.swap_info", soid, &mibi) == -1) {
- 		_kvm_err(kd, kd->program, "sysctlnametomib failed: %s",
- 		    strerror(errno));
- 		return -1;
- 	}
-+#endif
- 	bzero(&tot, sizeof(tot));
- 	for (unswdev = 0;; unswdev++) {
- 		soid[mibi] = unswdev;
 @@ -151,8 +155,10 @@
  			swap_ary[unswdev].ksw_total = ttl;
  			swap_ary[unswdev].ksw_used = xsd.xsw_used;
@@ -190,15 +128,6 @@ diff -Nur lib.old/lib/libkvm/kvm_private.h lib/libkvm/kvm_private.h
 diff -Nur lib.old/lib/libkvm/kvm_proc.c lib/libkvm/kvm_proc.c
 --- lib.old/lib/libkvm/kvm_proc.c	2005-03-01 10:30:14.000000000 +0100
 +++ lib/libkvm/kvm_proc.c	2005-12-20 12:03:51.000000000 +0100
-@@ -77,6 +77,8 @@
- #include <memory.h>
- #include <paths.h>
- 
-+#include <bsd/bsd.h>
-+
- #include "kvm_private.h"
- 
- #define KREAD(kd, addr, obj) \
 @@ -94,6 +96,7 @@
  	struct kinfo_proc *bp;
  	int maxcnt;

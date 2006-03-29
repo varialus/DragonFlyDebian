@@ -12,8 +12,8 @@ diff -ur lib.old/libcam/Makefile lib/libcam/Makefile
  INCS=		camlib.h
  
 -DPADD=		${LIBSBUF}
--LDADD=		-lsbuf
-+LDADD=		-L../libsbuf/ -lsbuf -lbsd
+-LDADD+=		-lsbuf
++LDADD+=		-L../libsbuf/ -lsbuf
  
  MAN=		cam.3 cam_cdbparse.3
  
@@ -31,34 +31,31 @@ diff -ur lib.old/libcam/Makefile lib/libcam/Makefile
  CFLAGS+=	-I${.CURDIR} -I${SDIR}
  
  .include <bsd.lib.mk>
-diff -ur lib.old/libcam/camlib.c lib/libcam/camlib.c
---- lib.old/libcam/camlib.c	2004-07-29 17:35:45.000000000 +0200
-+++ lib/libcam/camlib.c	2005-08-15 08:23:38.000000000 +0200
-@@ -24,10 +24,12 @@
+--- lib/libcam/camlib.h~	2006-03-29 19:40:09.000000000 +0200
++++ lib/libcam/camlib.h	2006-03-29 19:41:25.000000000 +0200
+@@ -150,13 +150,11 @@
+ /*
+  * Buffer encoding/decoding routines, from the old SCSI library.
   */
- 
- #include <sys/cdefs.h>
--__FBSDID("$FreeBSD: src/lib/libcam/camlib.c,v 1.12 2004/07/29 15:35:45 scottl Exp $");
- 
- #include <sys/types.h>
- #include <sys/param.h>
-+#ifndef __FreeBSD__
-+#include <bsd/bsd.h>		/* strlcpy */
-+#endif
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-diff -ur lib.old/libcam/camlib.h lib/libcam/camlib.h
---- lib.old/libcam/camlib.h	2002-04-24 01:58:20.000000000 +0200
-+++ lib/libcam/camlib.h	2005-08-13 11:06:04.000000000 +0200
-@@ -64,6 +64,10 @@
- #ifndef _CAMLIB_H
- #define _CAMLIB_H
- 
-+#ifndef __FreeBSD__
-+#include <bsd/bsd.h>
-+#endif
-+
- #include <sys/cdefs.h>
- #include <sys/param.h>
- 
+-int csio_decode(struct ccb_scsiio *csio, const char *fmt, ...)
+-		__printflike(2, 3);
++int csio_decode(struct ccb_scsiio *csio, const char *fmt, ...);
+ int csio_decode_visit(struct ccb_scsiio *csio, const char *fmt,
+ 		      void (*arg_put)(void *, int, void *, int, char *),
+ 		      void *puthook);
+-int buff_decode(u_int8_t *buff, size_t len, const char *fmt, ...)
+-		__printflike(3, 4);
++int buff_decode(u_int8_t *buff, size_t len, const char *fmt, ...);
+ int buff_decode_visit(u_int8_t *buff, size_t len, const char *fmt,
+ 		      void (*arg_put)(void *, int, void *, int, char *),
+ 		      void *puthook);
+@@ -168,8 +166,7 @@
+ 		     int timeout, const char *cmd_spec,
+ 		     int (*arg_get)(void *hook, char *field_name),
+ 		     void *gethook);
+-int csio_encode(struct ccb_scsiio *csio, const char *fmt, ...)
+-		__printflike(2, 3);
++int csio_encode(struct ccb_scsiio *csio, const char *fmt, ...);
+ int buff_encode_visit(u_int8_t *buff, size_t len, const char *fmt,
+ 		      int (*arg_get)(void *hook, char *field_name),
+ 		      void *gethook);
