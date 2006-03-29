@@ -12,7 +12,7 @@
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 for i in load stat unload ; do
-  test -x /sbin/kld$i || exit 1
+  which kld$i || exit 1
 done
 modules="`shopt -s nullglob ; cat /etc/modules /etc/modules.d/* \
   | sed -e \"s/#.*//g\" -e \"/^\( \|\t\)*$/d\" | sort | uniq`"
