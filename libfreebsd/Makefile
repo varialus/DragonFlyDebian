@@ -6,7 +6,7 @@
 
 LIB_SRCS = nlist.c getbootfile.c devname.c sysctlnametomib.c sysctlbyname.c
 
-LIB_FREEBSDINCLUDES = include/freebsd/paths.h
+LIB_FREEBSDINCLUDES = include/freebsd/paths.h include/freebsd/stdlib.h
 LIB_INCLUDES = include/nlist.h
 
 LIB_MANS = man/nlist.3 man/getbootfile.3
