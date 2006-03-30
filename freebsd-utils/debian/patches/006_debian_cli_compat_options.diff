@@ -1,6 +1,7 @@
---- src/sbin/dmesg/dmesg.c~	2006-03-30 12:40:23.000000000 +0200
-+++ src/sbin/dmesg/dmesg.c	2006-03-30 12:41:26.000000000 +0200
-@@ -82,7 +82,7 @@
+diff -ur src.old/sbin/dmesg/dmesg.c src/sbin/dmesg/dmesg.c
+--- src.old/sbin/dmesg/dmesg.c	2006-03-30 16:21:03.000000000 +0200
++++ src/sbin/dmesg/dmesg.c	2006-03-30 16:21:15.000000000 +0200
+@@ -83,7 +83,7 @@
  	all = 0;
  	(void) setlocale(LC_CTYPE, "");
  	memf = nlistf = NULL;
@@ -9,7 +10,7 @@
  		switch(ch) {
  		case 'a':
  			all++;
-@@ -93,6 +93,9 @@
+@@ -94,6 +94,9 @@
  		case 'N':
  			nlistf = optarg;
  			break;
@@ -19,22 +20,24 @@
  		case '?':
  		default:
  			usage();
---- src/sbin/swapon/swapon.c~	2006-03-30 12:40:23.000000000 +0200
-+++ src/sbin/swapon/swapon.c	2006-03-30 12:43:08.000000000 +0200
-@@ -80,7 +80,7 @@
+diff -ur src.old/sbin/swapon/swapon.c src/sbin/swapon/swapon.c
+--- src.old/sbin/swapon/swapon.c	2006-03-30 16:21:03.000000000 +0200
++++ src/sbin/swapon/swapon.c	2006-03-30 16:21:34.000000000 +0200
+@@ -79,7 +79,7 @@
  	orig_prog = which_prog;
  	
  	doall = 0;
 -	while ((ch = getopt(argc, argv, "AadlhksU")) != -1) {
-+	while ((ch = getopt(argc, argv, "AadlhksUv")) != -1) {
++	while ((ch = getopt(argc, argv, "AadlhksUve")) != -1) {
  		switch(ch) {
  		case 'A':
  			if (which_prog == SWAPCTL) {
-@@ -122,6 +122,8 @@
+@@ -121,6 +121,9 @@
  				usage();
  			}
  			break;
 +		case 'v':
++		case 'e':
 +			break;
  		case '?':
  		default:
