@@ -31,6 +31,7 @@ sed sysinstall \
   -e "s,Attempting to install all selected distributions\.\.,Press ALT-F3 to proceed with GNU/kFreeBSD setup...,g" \
   -e "s,Visit the general configuration menu for a chance to set,Debian GNU/kFreeBSD installation complete.  Answer \"No\" ,g" \
   -e "s,any last options?,below and reboot.,g" \
+  -e "s,Begin a standard installation (recommended),-------disabled-option-do-not-pick---------,g" \
 > ${mnt}/stand/sysinstall
 chmod 755 ${mnt}/stand/sysinstall
 
