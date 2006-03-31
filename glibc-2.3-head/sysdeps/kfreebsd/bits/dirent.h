@@ -23,7 +23,7 @@
 
 struct dirent
   {
-    unsigned int d_fileno;	/* File serial number.  */
+    unsigned int d_ino;		/* File serial number.  */
     unsigned short int d_reclen; /* Length of the whole `struct dirent'.  */
     unsigned char d_type;	/* File type, possibly unknown.  */
     unsigned char d_namlen;	/* Length of the file name.  */
@@ -35,7 +35,7 @@ struct dirent
 #ifdef __USE_LARGEFILE64
 struct dirent64
   {
-    unsigned int d_fileno;	/* File serial number.  */
+    unsigned int d_ino;		/* File serial number.  */
     unsigned short int d_reclen; /* Length of the whole `struct dirent'.  */
     unsigned char d_type;	/* File type, possibly unknown.  */
     unsigned char d_namlen;	/* Length of the file name.  */
@@ -44,6 +44,8 @@ struct dirent64
     char d_name[1];		/* File name (actually longer).  */
   };
 #endif
+
+#define d_fileno        d_ino   /* Backwards compatibility.  */
 
 #define _DIRENT_HAVE_D_RECLEN 1
 #define _DIRENT_HAVE_D_NAMLEN 1
