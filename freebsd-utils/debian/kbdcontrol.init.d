@@ -18,7 +18,7 @@ which kbdcontrol >/dev/null
 if test -e /etc/kbdcontrol.conf ; then
   echo -n "Loading console keymap..."
   kbdcontrol -l `grep -v ^# /etc/kbdcontrol.conf` < /dev/console
-  echo " done."
+  echo "done."
 fi
 
 exit 0
