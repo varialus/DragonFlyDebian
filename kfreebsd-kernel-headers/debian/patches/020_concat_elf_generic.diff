@@ -1,0 +1,16 @@
+--- sys/elf_generic.h	2006-04-02 16:51:38.000000000 +0200
++++ sys/elf_generic.h	2006-04-02 16:51:38.000000000 +0200
+@@ -50,9 +50,10 @@
+ #error "Unknown byte order"
+ #endif
+ 
+-#define __elfN(x)	__CONCAT(__CONCAT(__CONCAT(elf,__ELF_WORD_SIZE),_),x)
+-#define __ElfN(x)	__CONCAT(__CONCAT(__CONCAT(Elf,__ELF_WORD_SIZE),_),x)
+-#define __ELFN(x)	__CONCAT(__CONCAT(__CONCAT(ELF,__ELF_WORD_SIZE),_),x)
++#define ___CONCAT(a,b)  __CONCAT(a,b)
++#define __elfN(x)	___CONCAT(___CONCAT(___CONCAT(elf,__ELF_WORD_SIZE),_),x)
++#define __ElfN(x)	___CONCAT(___CONCAT(___CONCAT(Elf,__ELF_WORD_SIZE),_),x)
++#define __ELFN(x)	___CONCAT(___CONCAT(___CONCAT(ELF,__ELF_WORD_SIZE),_),x)
+ #define __ElfType(x)	typedef __ElfN(x) __CONCAT(Elf_,x)
+ 
+ __ElfType(Addr);
