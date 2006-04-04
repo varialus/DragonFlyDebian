@@ -63,4 +63,10 @@ done
 
 echo "done."
 
+if test -f /etc/mtab ; then
+  echo "Warning: /etc/mtab is a regular file, replacing with symlink."
+  rm -f /etc/mtab
+fi
+ln -sf /proc/mounts /etc/mtab
+
 exit 0
