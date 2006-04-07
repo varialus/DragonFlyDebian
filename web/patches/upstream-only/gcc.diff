@@ -69,17 +69,6 @@ diff -ur gcc.old/config/i386/knetbsd-gnu.h gcc/config/i386/knetbsd-gnu.h
 +
  #undef REG_NAME
  #define REG_NAME(reg) sc_ ## reg
-diff -ur gcc.old/config/i386/linux.h gcc/config/i386/linux.h
---- gcc.old/config/i386/linux.h	2006-03-02 21:22:05.000000000 +0100
-+++ gcc/config/i386/linux.h	2006-03-03 00:04:02.000000000 +0100
-@@ -99,6 +99,7 @@
- 
- /* If ELF is the default format, we should not use /lib/elf.  */
- 
-+/* These macros may be overridden in k*bsd-gnu.h and i386/k*bsd-gnu.h. */
- #define LINK_EMULATION "elf_i386"
- #define GLIBC_DYNAMIC_LINKER "/lib/ld-linux.so.2"
- 
 diff -ur gcc.old/config/i386/linux64.h gcc/config/i386/linux64.h
 --- gcc.old/config/i386/linux64.h	2006-03-02 21:22:05.000000000 +0100
 +++ gcc/config/i386/linux64.h	2006-03-03 00:03:42.000000000 +0100
@@ -99,47 +88,6 @@ diff -ur gcc.old/config/i386/linux64.h gcc/config/i386/linux64.h
    %{shared:-shared} \
    %{!shared: \
      %{!static: \
-diff -ur gcc.old/config/kfreebsd-gnu.h gcc/config/kfreebsd-gnu.h
---- gcc.old/config/kfreebsd-gnu.h	2006-03-02 21:23:05.000000000 +0100
-+++ gcc/config/kfreebsd-gnu.h	2006-03-03 00:47:03.000000000 +0100
-@@ -1,5 +1,5 @@
- /* Definitions for kFreeBSD-based GNU systems with ELF format
--   Copyright (C) 2004
-+   Copyright (C) 2004, 2006
-    Free Software Foundation, Inc.
-    Contributed by Robert Millan.
- 
-@@ -32,5 +32,7 @@
-     }						\
-   while (0)
- 
--#undef DYNAMIC_LINKER
--#define DYNAMIC_LINKER "/lib/ld.so.1"
-+#ifdef GLIBC_DYNAMIC_LINKER
-+#undef GLIBC_DYNAMIC_LINKER
-+#define GLIBC_DYNAMIC_LINKER "/lib/ld.so.1"
-+#endif
-diff -ur gcc.old/config/knetbsd-gnu.h gcc/config/knetbsd-gnu.h
---- gcc.old/config/knetbsd-gnu.h	2006-03-02 21:23:05.000000000 +0100
-+++ gcc/config/knetbsd-gnu.h	2006-03-03 00:47:09.000000000 +0100
-@@ -1,5 +1,5 @@
- /* Definitions for kNetBSD-based GNU systems with ELF format
--   Copyright (C) 2004
-+   Copyright (C) 2004, 2006
-    Free Software Foundation, Inc.
-    Contributed by Robert Millan.
- 
-@@ -32,5 +32,8 @@
-     }						\
-   while (0)
- 
--#undef DYNAMIC_LINKER
--#define DYNAMIC_LINKER "/lib/ld.so.1"
-+
-+#ifdef GLIBC_DYNAMIC_LINKER
-+#undef GLIBC_DYNAMIC_LINKER
-+#define GLIBC_DYNAMIC_LINKER "/lib/ld.so.1"
-+#endif
 diff -ur gcc.old/config.gcc gcc/config.gcc
 --- gcc.old/config.gcc	2006-03-02 21:23:14.000000000 +0100
 +++ gcc/config.gcc	2006-03-02 23:54:23.000000000 +0100
