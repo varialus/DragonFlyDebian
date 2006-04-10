@@ -29,8 +29,8 @@ __BEGIN_DECLS
 
    Portability note: not all kFreeBSD platforms support this call.  Most
    platforms based on the PC I/O architecture probably will, however. */
-extern int ioperm (unsigned int __from, unsigned int __num, int __turn_on)
-     __THROW;
+extern int ioperm (unsigned long int __from, unsigned long int __num,
+                   int __turn_on) __THROW;
 
 /* Set the I/O privilege level to LEVEL.  If LEVEL>3, permission to
    access any I/O port is granted.  This call requires root
