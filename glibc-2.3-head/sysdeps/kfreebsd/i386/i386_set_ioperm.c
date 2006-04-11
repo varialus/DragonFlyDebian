@@ -20,7 +20,7 @@
 #include <sysarch.h>
 
 int
-i386_set_ioperm (unsigned int from, unsigned int num, int turn_on)
+i386_set_ioperm (unsigned long int from, unsigned long int num, int turn_on)
 {
   struct i386_ioperm_args args;
 
