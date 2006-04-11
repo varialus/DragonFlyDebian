@@ -206,10 +206,10 @@ struct msghdr
     socklen_t msg_namelen;	/* Length of address data.  */
 
     struct iovec *msg_iov;	/* Vector of data to send/receive into.  */
-    size_t msg_iovlen;		/* Number of elements in the vector.  */
+    int msg_iovlen;		/* Number of elements in the vector.  */
 
     void *msg_control;		/* Ancillary data (eg BSD filedesc passing). */
-    size_t msg_controllen;	/* Ancillary data buffer length.  */
+    socklen_t msg_controllen;	/* Ancillary data buffer length.  */
 
     int msg_flags;		/* Flags in received message.  */
   };
@@ -222,16 +222,9 @@ struct cmsghdr
     int cmsg_level;		/* Originating protocol.  */
     int cmsg_type;		/* Protocol specific type.  */
 #if (!defined __STRICT_ANSI__ && __GNUC__ >= 2) || __STDC_VERSION__ >= 199901L
-    __extension__ unsigned char __cmsg_data __flexarr; /* Ancillary data.  */
+    __extension__ unsigned char __cmsg_data  __flexarr __attribute__ ((aligned (__alignof__(size_t)))); /* Ancillary data.  */
 #endif
   };
-
-/* Ancillary data object manipulation macros.  */
-#if (!defined __STRICT_ANSI__ && __GNUC__ >= 2) || __STDC_VERSION__ >= 199901L
-# define CMSG_DATA(cmsg) ((cmsg)->__cmsg_data)
-#else
-# define CMSG_DATA(cmsg) ((unsigned char *) ((struct cmsghdr *) (cmsg) + 1))
-#endif
 
 #define CMSG_NXTHDR(mhdr, cmsg) __cmsg_nxthdr (mhdr, cmsg)
 
@@ -244,6 +237,13 @@ struct cmsghdr
 #define CMSG_SPACE(len) (CMSG_ALIGN (len) \
 			 + CMSG_ALIGN (sizeof (struct cmsghdr)))
 #define CMSG_LEN(len)   (CMSG_ALIGN (sizeof (struct cmsghdr)) + (len))
+
+/* Ancillary data object manipulation macros.  */
+#if (!defined __STRICT_ANSI__ && __GNUC__ >= 2) || __STDC_VERSION__ >= 199901L
+# define CMSG_DATA(cmsg) ((cmsg)->__cmsg_data)
+#else
+# define CMSG_DATA(cmsg) ((unsigned char *) (cmsg) + CMSG_ALIGN(sizeof (struct cmsghdr)))
+#endif
 
 extern struct cmsghdr *__cmsg_nxthdr (struct msghdr *__mhdr,
 				      struct cmsghdr *__cmsg) __THROW;
