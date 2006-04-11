@@ -31,11 +31,11 @@ extern int ioperm (unsigned long int __from, unsigned long int __num,
 /* Change I/O privilege level.  */
 extern int iopl (int __level) __THROW;
 
-extern int i386_set_ioperm (unsigned int __from, unsigned int __num,
+extern int i386_set_ioperm (unsigned long int __from, unsigned long int __num,
 			    int __turn_on) __THROW;
 
 /* Retrieve a contiguous range of port input/output permissions.  */
-extern int i386_get_ioperm (unsigned int __from, unsigned int *__num,
+extern int i386_get_ioperm (unsigned long int __from, unsigned long int *__num,
 			    int *__turned_on) __THROW;
 
 __END_DECLS
