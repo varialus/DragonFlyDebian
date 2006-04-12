@@ -110,7 +110,9 @@ inhibit-glue = yes
 
 # Special ELF hacks.
 ifeq ($(subdir),elf)
-
 sysdep-rtld-routines += dl-brk dl-sbrk
+endif
 
+ifeq ($(subdir),sunrpc)
+sysdep_headers += nfs/nfs.h
 endif
