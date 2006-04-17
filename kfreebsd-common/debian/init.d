@@ -61,6 +61,16 @@ for i in /dev/cuaa[0-9] ; do
   fi
 done
 
+# setup /dev/cdrom symlink
+if ! test -e /dev/cdrom ; then
+  for i in {,a}cd[0-9] ; do
+    if test -e /dev/$i ; then
+      ln -s $i /dev/cdrom
+      break
+    fi
+  done
+fi
+
 echo "done."
 
 if test -f /etc/mtab ; then
