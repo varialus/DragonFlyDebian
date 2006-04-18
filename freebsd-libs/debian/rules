@@ -17,7 +17,7 @@ else
 	CFLAGS += -O2
 endif
 
-SRC_DIR=lib
+SRC_DIR=src
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=make COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR)
@@ -25,8 +25,8 @@ export LDADD=-lbsd -lfreebsd
 
 $(SRC_DIR):
 	tar -xzf $(CURDIR)/src.tar.gz
-	tar -C $(SRC_DIR) -xjf /usr/src/kfreebsd-source-5.4.tar.bz2 kfreebsd-source-5.4/sys/kern/subr_sbuf.c kfreebsd-source-5.4/sys/cam
-	mv $(SRC_DIR)/kfreebsd-source-5.4 $(SRC_DIR)/kernel
+	tar -C $(SRC_DIR)/lib -xjf /usr/src/kfreebsd-source-5.4.tar.bz2 kfreebsd-source-5.4/sys/kern/subr_sbuf.c kfreebsd-source-5.4/sys/cam
+	mv $(SRC_DIR)/lib/kfreebsd-source-5.4 $(SRC_DIR)/lib/kernel
 
 	find $(SRC_DIR) -type f | (set -e ; while read i ; do sed -i $$i \
 		-e "/^__FBSDID/d" \
@@ -39,29 +39,32 @@ $(SRC_DIR):
 	
 	set -e ; for i in $(CURDIR)/debian/patches/*.diff ; do \
 		echo "--- Patch $$i ---" ; \
-		patch -p1 -d $(SRC_DIR) < $$i ; \
+		patch -p1 -d $(SRC_DIR)/lib < $$i ; \
 	done
 
 build: build-arch build-indep
 
 build-arch: build-arch-stamp
-build-arch-stamp: build-cam build-sbuf build-ipx build-kvm build-usbhid
+build-arch-stamp: build-cam build-geom build-sbuf build-ipx build-kvm build-usbhid
 	touch build-arch-stamp
 
 build-cam: build-sbuf $(SRC_DIR)
-	cd $(SRC_DIR)/libcam && $(PMAKE)
+	cd $(SRC_DIR)/lib/libcam && $(PMAKE)
+
+build-geom: build-sbuf $(SRC_DIR)
+	cd $(SRC_DIR)/lib/libgeom && $(PMAKE)
 
 build-ipx: $(SRC_DIR)
-	cd $(SRC_DIR)/libipx && $(PMAKE)
+	cd $(SRC_DIR)/lib/libipx && $(PMAKE)
 
 build-kvm: $(SRC_DIR)
-	cd $(SRC_DIR)/libkvm && $(PMAKE)
+	cd $(SRC_DIR)/lib/libkvm && $(PMAKE)
 
 build-sbuf: $(SRC_DIR)
-	cd $(SRC_DIR)/libsbuf && $(PMAKE)
+	cd $(SRC_DIR)/lib/libsbuf && $(PMAKE)
 
 build-usbhid: $(SRC_DIR)
-	cd $(SRC_DIR)/libusbhid && $(PMAKE)
+	cd $(SRC_DIR)/lib/libusbhid && $(PMAKE)
 
 build-indep: build-indep-stamp
 build-indep-stamp:
@@ -87,13 +90,14 @@ install-arch:
 	dh_installdirs -s
 
 	mkdir -p $(DESTDIR)/usr/{lib,include,share/man/man3}
-	cd $(SRC_DIR)/libsbuf && $(PMAKE) install
-	cd $(SRC_DIR)/libcam && $(PMAKE) install
-	cd $(SRC_DIR)/libipx && $(PMAKE) install
-	cd $(SRC_DIR)/libkvm && $(PMAKE) install
+	cd $(SRC_DIR)/lib/libsbuf && $(PMAKE) install
+	cd $(SRC_DIR)/lib/libcam && $(PMAKE) install
+	cd $(SRC_DIR)/lib/libgeom && $(PMAKE) install
+	cd $(SRC_DIR)/lib/libipx && $(PMAKE) install
+	cd $(SRC_DIR)/lib/libkvm && $(PMAKE) install
 	# move libkvm.so to /lib
 	ln -sf /lib/libkvm.so.0 $(DESTDIR)/usr/lib/libkvm.so
-	cd $(SRC_DIR)/libusbhid && $(PMAKE) install
+	cd $(SRC_DIR)/lib/libusbhid && $(PMAKE) install
 
 	dh_install -s --list-missing --sourcedir=debian/tmp
 

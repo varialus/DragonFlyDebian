@@ -1,0 +1,53 @@
+diff -ur lib.old/libgeom/Makefile lib/libgeom/Makefile
+--- lib.old/libgeom/Makefile	2006-04-18 19:56:50.000000000 +0200
++++ lib/libgeom/Makefile	2006-04-18 19:57:22.000000000 +0200
+@@ -13,7 +13,7 @@
+ WARNS?=	3
+ 
+ DPADD=	${LIBBSDXML} ${LIBSBUF}
+-LDADD+=	-lbsdxml -lsbuf
++LDADD+=	-lexpat -lsbuf
+ 
+ MAN=	libgeom.3
+ 
+diff -ur lib.old/libgeom/geom_ctl.c lib/libgeom/geom_ctl.c
+--- lib.old/libgeom/geom_ctl.c	2006-04-18 19:56:50.000000000 +0200
++++ lib/libgeom/geom_ctl.c	2006-04-18 19:57:22.000000000 +0200
+@@ -158,6 +158,9 @@
+ 	ap->name = strdup(name);
+ 	gctl_check_alloc(req, ap->name);
+ 	ap->nlen = strlen(ap->name) + 1;
++#ifndef __DECONST
++#define __DECONST(type, var)	((type)(uintptr_t)(const void *)(var))
++#endif
+ 	ap->value = __DECONST(void *, value);
+ 	ap->flag = GCTL_PARAM_RD;
+ 	if (len >= 0)
+diff -ur lib.old/libgeom/geom_stats.c lib/libgeom/geom_stats.c
+--- lib.old/libgeom/geom_stats.c	2006-04-18 19:56:50.000000000 +0200
++++ lib/libgeom/geom_stats.c	2006-04-18 19:57:22.000000000 +0200
+@@ -34,11 +34,11 @@
+ #include <fcntl.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <time.h>
+ #include <unistd.h>
+ #include <libgeom.h>
+ 
+ #include <sys/mman.h>
+-#include <sys/time.h>
+ #include <sys/types.h>
+ #include <sys/devicestat.h>
+ 
+diff -ur lib.old/libgeom/geom_xml2tree.c lib/libgeom/geom_xml2tree.c
+--- lib.old/libgeom/geom_xml2tree.c	2006-04-18 19:56:50.000000000 +0200
++++ lib/libgeom/geom_xml2tree.c	2006-04-18 19:57:22.000000000 +0200
+@@ -43,7 +43,7 @@
+ #include <sys/sbuf.h>
+ #include <sys/sysctl.h>
+ #include <err.h>
+-#include <bsdxml.h>
++#include <expat.h>
+ #include <libgeom.h>
+ 
+ struct mystate {

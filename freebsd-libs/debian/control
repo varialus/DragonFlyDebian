@@ -3,7 +3,7 @@ Section: libs
 Priority: optional
 Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>
-Build-Depends: debhelper (>= 4.1.0), kfreebsd-source-5.4, freebsd5-buildutils, libbsd-dev, libfreebsd-dev, libgdbm-dev, kfreebsd-kernel-headers (>= 0.17) [kfreebsd-amd64]
+Build-Depends: debhelper (>= 4.1.0), kfreebsd-source-5.4, freebsd5-buildutils, libbsd-dev, libfreebsd-dev, libgdbm-dev, kfreebsd-kernel-headers (>= 0.17) [kfreebsd-amd64], libexpat-dev
 Standards-Version: 3.6.2
 
 Package: libsbuf0
@@ -34,6 +34,21 @@ Section: libdevel
 Architecture: kfreebsd-i386 kfreebsd-amd64
 Depends: ${shlibs:Depends}, libcam0 (>= ${Source-Version}), libc0.1-dev | libc-dev, libbsd-dev
 Description: Development files for libcam 
+ This package contains the header files and static library needed to
+ compile applications that use libcam.
+
+Package: libgeom0
+Architecture: kfreebsd-i386 kfreebsd-amd64
+Depends: ${shlibs:Depends}
+Description: FreeBSD GEOM library
+ This library provides an interface to GEOM, a modular disk I/O request
+ transformation framework provided by the kernel of FreeBSD.
+
+Package: libgeom-dev
+Section: libdevel
+Architecture: kfreebsd-i386 kfreebsd-amd64
+Depends: ${shlibs:Depends}, libgeom0 (>= ${Source-Version}), libc0.1-dev | libc-dev, libbsd-dev
+Description: Development files for libgeom
  This package contains the header files and static library needed to
  compile applications that use libcam.
 
