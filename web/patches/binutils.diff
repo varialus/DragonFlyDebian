@@ -1,0 +1,41 @@
+
+- biarch enabled binutils for kfreebsd-amd64
+- hack elfosabi - same as in binutils_elfosabi.diff 
+- multiarch - similar as in binutils.diff 
+
+Status: not yet clean
+
+diff -ur binutils-2.16.1cvs20060413.old/bfd/elf.c binutils-2.16.1cvs20060413/bfd/elf.c
+--- binutils-2.16.1cvs20060413.old/bfd/elf.c	2006-04-13 21:31:09.000000000 +0200
++++ binutils-2.16.1cvs20060413/bfd/elf.c	2006-04-18 21:20:46.000000000 +0200
+@@ -4853,6 +4853,8 @@
+     bfd_big_endian (abfd) ? ELFDATA2MSB : ELFDATA2LSB;
+   i_ehdrp->e_ident[EI_VERSION] = bed->s->ev_current;
+ 
++  i_ehdrp->e_ident[EI_OSABI] = ELFOSABI_FREEBSD;
++
+   if ((abfd->flags & DYNAMIC) != 0)
+     i_ehdrp->e_type = ET_DYN;
+   else if ((abfd->flags & EXEC_P) != 0)
+diff -ur binutils-2.16.1cvs20060413.old/debian/rules binutils-2.16.1cvs20060413/debian/rules
+--- binutils-2.16.1cvs20060413.old/debian/rules	2006-04-18 21:11:24.000000000 +0200
++++ binutils-2.16.1cvs20060413/debian/rules	2006-04-18 21:21:22.000000000 +0200
+@@ -69,6 +69,9 @@
+ ifeq ($(DEB_HOST_ARCH),i386)
+ 	CONFARGS += --enable-targets=x86_64-linux-gnu
+ endif
++ifeq ($(DEB_HOST_ARCH),kfreebsd-amd64)
++	CONFARGS += --enable-targets=i486-kfreebsd-gnu x86_64-kfreebsd-gnu
++endif
+ ifeq ($(DEB_HOST_ARCH),mips)
+        CONFARGS += --enable-targets=mips64-linux-gnu
+ endif
+@@ -138,7 +141,7 @@
+ 	mkdir builddir-multi
+ 	cd builddir-multi \
+ 	    && env CC="$(CC)" ../configure $(CONFARGS) \
+-		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux,m32r-linux-gnu
++		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-gnu,i486-linux-gnu,i486-kfreebsd-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux,x86_64-kfreebsd-gnu,m32r-linux-gnu
+ 	$(MAKE) -C builddir-multi configure-host
+ 	touch configure-multi-stamp
+ 
