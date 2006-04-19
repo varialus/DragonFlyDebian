@@ -1,0 +1,99 @@
+
+Status: in BTS
+
+diff -ur -x Makefile.in -x config.guess -x config.sub -x configure -x install-sh -x ltmain.sh -x missing -x mkinstalldirs -x INSTALL -x aclocal.m4 -x config.h.in -x changelog directfb-0.9.24.old/debian/libdirectfb-0.9-24-udeb.install directfb-0.9.24/debian/libdirectfb-0.9-24-udeb.install
+--- directfb-0.9.24.old/debian/libdirectfb-0.9-24-udeb.install	2006-04-19 12:57:49.000000000 +0200
++++ directfb-0.9.24/debian/libdirectfb-0.9-24-udeb.install	2006-04-19 13:20:43.000000000 +0200
+@@ -2,11 +2,5 @@
+ usr/lib/directfb-*/interfaces/IDirectFBFont/lib*_default.so
+ usr/lib/directfb-*/interfaces/IDirectFBFont/lib*_ft2.so
+ usr/lib/directfb-*/interfaces/IDirectFBImageProvider/lib*_png.so
+-usr/lib/directfb-*/gfxdrivers/libdirectfb_*.so
+-usr/lib/directfb-*/inputdrivers/libdirectfb_linux_input.so
+-usr/lib/directfb-*/inputdrivers/libdirectfb_keyboard.so
+-usr/lib/directfb-*/inputdrivers/libdirectfb_ps2mouse.so
+-usr/lib/directfb-*/inputdrivers/libdirectfb_serialmouse.so
+-usr/lib/directfb-*/systems/libdirectfb_fbdev.so
+ usr/lib/directfb-*/wm/libdirectfbwm_*.so
+ usr/share/directfb*/
+diff -ur -x Makefile.in -x config.guess -x config.sub -x configure -x install-sh -x ltmain.sh -x missing -x mkinstalldirs -x INSTALL -x aclocal.m4 -x config.h.in -x changelog directfb-0.9.24.old/debian/libdirectfb-0.9-24.install directfb-0.9.24/debian/libdirectfb-0.9-24.install
+--- directfb-0.9.24.old/debian/libdirectfb-0.9-24.install	2006-04-19 12:57:49.000000000 +0200
++++ directfb-0.9.24/debian/libdirectfb-0.9-24.install	2006-04-19 13:22:39.000000000 +0200
+@@ -2,9 +2,5 @@
+ usr/lib/directfb-*/interfaces/IDirectFBFont/lib*_default.so
+ usr/lib/directfb-*/interfaces/IDirectFBImageProvider/lib*_gif.so
+ usr/lib/directfb-*/interfaces/IDirectFBImageProvider/lib*_mpeg2.so
+-usr/lib/directfb-*/interfaces/IDirectFBVideoProvider/lib*_v4l.so
+-usr/lib/directfb-*/gfxdrivers/libdirectfb_*.so
+-usr/lib/directfb-*/inputdrivers/libdirectfb_*.so
+-usr/lib/directfb-*/systems/libdirectfb_fbdev.so
+ usr/lib/directfb-*/wm/libdirectfbwm_*.so
+ usr/share/directfb-*/
+diff -ur -x Makefile.in -x config.guess -x config.sub -x configure -x install-sh -x ltmain.sh -x missing -x mkinstalldirs -x INSTALL -x aclocal.m4 -x config.h.in -x changelog directfb-0.9.24.old/debian/libdirectfb-dev.install directfb-0.9.24/debian/libdirectfb-dev.install
+--- directfb-0.9.24.old/debian/libdirectfb-dev.install	2006-04-19 12:57:49.000000000 +0200
++++ directfb-0.9.24/debian/libdirectfb-dev.install	2006-04-19 13:31:58.000000000 +0200
+@@ -9,14 +9,6 @@
+ usr/lib/directfb-*/interfaces/IDirectFBFont/lib*.la
+ usr/lib/directfb-*/interfaces/IDirectFBImageProvider/lib*.a
+ usr/lib/directfb-*/interfaces/IDirectFBImageProvider/lib*.la
+-usr/lib/directfb-*/interfaces/IDirectFBVideoProvider/lib*.a
+-usr/lib/directfb-*/interfaces/IDirectFBVideoProvider/lib*.la
+-usr/lib/directfb-*/gfxdrivers/libdirectfb_*.a
+-usr/lib/directfb-*/gfxdrivers/libdirectfb_*.la
+-usr/lib/directfb-*/inputdrivers/libdirectfb_*.a
+-usr/lib/directfb-*/inputdrivers/libdirectfb_*.la
+-usr/lib/directfb-*/systems/libdirectfb_*.a
+-usr/lib/directfb-*/systems/libdirectfb_*.la
+ usr/lib/directfb-*/wm/libdirectfbwm_*.a
+ usr/lib/directfb-*/wm/libdirectfbwm_*.la
+ 
+diff -ur -x Makefile.in -x config.guess -x config.sub -x configure -x install-sh -x ltmain.sh -x missing -x mkinstalldirs -x INSTALL -x aclocal.m4 -x config.h.in -x changelog directfb-0.9.24.old/debian/patches/30_linux_types.patch directfb-0.9.24/debian/patches/30_linux_types.patch
+--- directfb-0.9.24.old/debian/patches/30_linux_types.patch	2006-04-19 12:57:49.000000000 +0200
++++ directfb-0.9.24/debian/patches/30_linux_types.patch	2006-04-19 14:18:25.000000000 +0200
+@@ -2,19 +2,23 @@
+ Status: sent-upstream
+ --- include/dfb_types.h	2005-07-26 22:58:50.000000000 +0200
+ +++ include/dfb_types.h	2006-04-13 21:36:03.000000000 +0200
+-@@ -1,9 +1,10 @@
++@@ -1,10 +1,15 @@
+  #ifndef __DFB_TYPES_H__
+  #define __DFB_TYPES_H__
+  
+--#include <sys/types.h>
+++#ifdef __linux__
+ +#include <asm/types.h>
+++#else
++ #include <sys/types.h>
+++#endif
+  
+  #ifndef USE_KOS
+-+#if 0
+  
+++#ifndef __u8
+  #define __u8  u_int8_t
+  #define __u16 u_int16_t
+-@@ -14,6 +15,7 @@
++ #define __u32 u_int32_t
++@@ -14,9 +19,11 @@
+  #define __s16 int16_t
+  #define __s32 int32_t
+  #define __s64 int64_t
+@@ -22,6 +26,18 @@
+  
+  #else
+  
+++#ifndef __u8
++ #define __u8  uint8
++ #define __u16 uint16
++ #define __u32 uint32
++@@ -26,7 +33,6 @@
++ #define __s16 sint16
++ #define __s32 sint32
++ #define __s64 sint64
++-
++ #endif
++ 
++ #endif
+ --- gfxdrivers/cyber5k/cyber5k.h	2003-12-05 06:01:06.000000000 +0200
+ +++ gfxdrivers/cyber5k/cyber5k.h	2006-01-21 21:26:37.000000000 +0200
+ @@ -28,7 +28,7 @@
