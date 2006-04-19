@@ -1,7 +1,20 @@
-diff -Nur lib.old/lib/libkvm/kvm.c lib/libkvm/kvm.c
---- lib.old/lib/libkvm/kvm.c	2004-06-08 15:08:19.000000000 +0200
-+++ lib/libkvm/kvm.c	2005-12-20 11:20:23.000000000 +0100
-@@ -51,6 +51,7 @@
+diff -ur lib.old/libkvm/Makefile lib/libkvm/Makefile
+--- lib.old/libkvm/Makefile	2006-04-19 09:43:10.000000000 +0200
++++ lib/libkvm/Makefile	2006-04-19 09:42:15.000000000 +0200
+@@ -2,8 +2,7 @@
+ # $FreeBSD: src/lib/libkvm/Makefile,v 1.14 2003/08/18 15:25:38 obrien Exp $
+ 
+ LIB=	kvm
+-SHLIBDIR?= /lib
+-CFLAGS+=-DLIBC_SCCS -I${.CURDIR}
++SHLIBDIR?= /lib
+ SRCS=	kvm.c kvm_${MACHINE_ARCH}.c kvm_file.c kvm_getloadavg.c \
+ 	kvm_getswapinfo.c kvm_proc.c
+ INCS=	kvm.h
+diff -ur lib.old/libkvm/kvm.c lib/libkvm/kvm.c
+--- lib.old/libkvm/kvm.c	2006-04-19 09:43:10.000000000 +0200
++++ lib/libkvm/kvm.c	2006-04-19 09:38:34.000000000 +0200
+@@ -50,6 +50,7 @@
  #include <sys/stat.h>
  #include <sys/sysctl.h>
  #include <sys/linker.h>
@@ -9,7 +22,7 @@ diff -Nur lib.old/lib/libkvm/kvm.c lib/libkvm/kvm.c
  
  #include <vm/vm.h>
  #include <vm/vm_param.h>
-@@ -63,11 +64,14 @@
+@@ -62,11 +63,14 @@
  #include <limits.h>
  #include <nlist.h>
  #include <paths.h>
@@ -24,10 +37,10 @@ diff -Nur lib.old/lib/libkvm/kvm.c lib/libkvm/kvm.c
  #include "kvm_private.h"
  
  /* from src/lib/libc/gen/nlist.c */
-diff -Nur lib.old/lib/libkvm/kvm_file.c lib/libkvm/kvm_file.c
---- lib.old/lib/libkvm/kvm_file.c	2003-07-31 23:44:31.000000000 +0200
-+++ lib/libkvm/kvm_file.c	2005-12-20 11:32:50.000000000 +0100
-@@ -64,7 +64,7 @@
+diff -ur lib.old/libkvm/kvm_file.c lib/libkvm/kvm_file.c
+--- lib.old/libkvm/kvm_file.c	2006-04-19 09:43:10.000000000 +0200
++++ lib/libkvm/kvm_file.c	2006-04-19 09:38:34.000000000 +0200
+@@ -63,7 +63,7 @@
  #include <sys/sysctl.h>
  
  #include <limits.h>
@@ -36,7 +49,7 @@ diff -Nur lib.old/lib/libkvm/kvm_file.c lib/libkvm/kvm_file.c
  #include <paths.h>
  
  #include "kvm_private.h"
-@@ -81,6 +81,7 @@
+@@ -80,6 +80,7 @@
  	int op, arg, nfiles;
  	long filehead_o;
  {
@@ -44,7 +57,7 @@ diff -Nur lib.old/lib/libkvm/kvm_file.c lib/libkvm/kvm_file.c
  	int buflen = kd->arglen, n = 0;
  	struct file *fp;
  	char *where = kd->argspc;
-@@ -118,6 +119,8 @@
+@@ -117,6 +118,8 @@
  		return (0);
  	}
  	return (nfiles);
@@ -53,7 +66,7 @@ diff -Nur lib.old/lib/libkvm/kvm_file.c lib/libkvm/kvm_file.c
  }
  
  char *
-@@ -126,6 +129,7 @@
+@@ -125,6 +128,7 @@
  	int op, arg;
  	int *cnt;
  {
@@ -61,17 +74,17 @@ diff -Nur lib.old/lib/libkvm/kvm_file.c lib/libkvm/kvm_file.c
  	int mib[2], st, nfiles;
  	size_t size;
  	struct file *fp, *fplim;
-@@ -189,4 +193,6 @@
+@@ -188,4 +192,6 @@
  	}
  	*cnt = nfiles;
  	return (kd->argspc);
 +#endif
 +	return 0;
  }
-diff -Nur lib.old/lib/libkvm/kvm_getloadavg.c lib/libkvm/kvm_getloadavg.c
---- lib.old/lib/libkvm/kvm_getloadavg.c	2001-11-20 09:26:37.000000000 +0100
-+++ lib/libkvm/kvm_getloadavg.c	2005-12-20 11:52:23.000000000 +0100
-@@ -48,6 +48,7 @@
+diff -ur lib.old/libkvm/kvm_getloadavg.c lib/libkvm/kvm_getloadavg.c
+--- lib.old/libkvm/kvm_getloadavg.c	2006-04-19 09:43:10.000000000 +0200
++++ lib/libkvm/kvm_getloadavg.c	2006-04-19 09:38:34.000000000 +0200
+@@ -47,6 +47,7 @@
  #include <limits.h>
  #include <nlist.h>
  #include <kvm.h>
@@ -79,7 +92,7 @@ diff -Nur lib.old/lib/libkvm/kvm_getloadavg.c lib/libkvm/kvm_getloadavg.c
  
  #include "kvm_private.h"
  
-@@ -59,6 +60,11 @@
+@@ -58,6 +59,11 @@
  	{ "" },
  };
  
@@ -91,10 +104,10 @@ diff -Nur lib.old/lib/libkvm/kvm_getloadavg.c lib/libkvm/kvm_getloadavg.c
  /*
   * kvm_getloadavg() -- Get system load averages, from live or dead kernels.
   *
-diff -Nur lib.old/lib/libkvm/kvm_getswapinfo.c lib/libkvm/kvm_getswapinfo.c
---- lib.old/lib/libkvm/kvm_getswapinfo.c	2004-07-31 20:49:53.000000000 +0200
-+++ lib/libkvm/kvm_getswapinfo.c	2005-12-20 12:00:15.000000000 +0100
-@@ -151,8 +155,10 @@
+diff -ur lib.old/libkvm/kvm_getswapinfo.c lib/libkvm/kvm_getswapinfo.c
+--- lib.old/libkvm/kvm_getswapinfo.c	2006-04-19 09:43:10.000000000 +0200
++++ lib/libkvm/kvm_getswapinfo.c	2006-04-19 09:38:34.000000000 +0200
+@@ -150,8 +150,10 @@
  			swap_ary[unswdev].ksw_total = ttl;
  			swap_ary[unswdev].ksw_used = xsd.xsw_used;
  			swap_ary[unswdev].ksw_flags = xsd.xsw_flags;
@@ -105,9 +118,9 @@ diff -Nur lib.old/lib/libkvm/kvm_getswapinfo.c lib/libkvm/kvm_getswapinfo.c
  		}
  		tot.ksw_total += ttl;
  		tot.ksw_used += xsd.xsw_used;
-diff -Nur lib.old/lib/libkvm/kvm_private.h lib/libkvm/kvm_private.h
---- lib.old/lib/libkvm/kvm_private.h	2002-03-22 10:18:38.000000000 +0100
-+++ lib/libkvm/kvm_private.h	2005-12-20 11:13:35.000000000 +0100
+diff -ur lib.old/libkvm/kvm_private.h lib/libkvm/kvm_private.h
+--- lib.old/libkvm/kvm_private.h	2006-04-19 09:43:10.000000000 +0200
++++ lib/libkvm/kvm_private.h	2006-04-19 09:38:34.000000000 +0200
 @@ -70,14 +70,12 @@
  /*
   * Functions used internally by kvm, but across kvm modules.
@@ -125,10 +138,10 @@ diff -Nur lib.old/lib/libkvm/kvm_private.h lib/libkvm/kvm_private.h
 -	    __printflike(3, 4);
 +void	 _kvm_syserr (kvm_t *kd, const char *program, const char *fmt, ...);
  int	 _kvm_uvatop(kvm_t *, const struct proc *, u_long, u_long *);
-diff -Nur lib.old/lib/libkvm/kvm_proc.c lib/libkvm/kvm_proc.c
---- lib.old/lib/libkvm/kvm_proc.c	2005-03-01 10:30:14.000000000 +0100
-+++ lib/libkvm/kvm_proc.c	2005-12-20 12:03:51.000000000 +0100
-@@ -94,6 +96,7 @@
+diff -ur lib.old/libkvm/kvm_proc.c lib/libkvm/kvm_proc.c
+--- lib.old/libkvm/kvm_proc.c	2006-04-19 09:43:10.000000000 +0200
++++ lib/libkvm/kvm_proc.c	2006-04-19 09:38:34.000000000 +0200
+@@ -93,6 +93,7 @@
  	struct kinfo_proc *bp;
  	int maxcnt;
  {
@@ -136,7 +149,7 @@ diff -Nur lib.old/lib/libkvm/kvm_proc.c lib/libkvm/kvm_proc.c
  	int cnt = 0;
  	struct kinfo_proc kinfo_proc, *kp;
  	struct pgrp pgrp;
-@@ -414,6 +417,8 @@
+@@ -413,6 +414,8 @@
  		++cnt;
  	}
  	return (cnt);
@@ -145,18 +158,3 @@ diff -Nur lib.old/lib/libkvm/kvm_proc.c lib/libkvm/kvm_proc.c
  }
  
  /*
-diff -Nur lib.old/lib/libkvm/Makefile lib/libkvm/Makefile
---- lib.old/lib/libkvm/Makefile	2003-08-18 17:25:38.000000000 +0200
-+++ lib/libkvm/Makefile	2005-12-20 12:11:11.000000000 +0100
-@@ -2,8 +2,9 @@
- # $FreeBSD: src/lib/libkvm/Makefile,v 1.14 2003/08/18 15:25:38 obrien Exp $
- 
- LIB=	kvm
--SHLIBDIR?= /lib
--CFLAGS+=-DLIBC_SCCS -I${.CURDIR}
-+SHLIB_MAJOR=	0
-+SHLIBDIR?=	/usr/lib
-+LDADD=		-lbsd -lfreebsd
- SRCS=	kvm.c kvm_${MACHINE_ARCH}.c kvm_file.c kvm_getloadavg.c \
- 	kvm_getswapinfo.c kvm_proc.c
- INCS=	kvm.h

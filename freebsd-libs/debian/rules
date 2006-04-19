@@ -22,6 +22,8 @@ PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=make COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR)
 export LDADD=-lbsd -lfreebsd
+export SHLIB_MAJOR=0
+export SHLIBDIR=/usr/lib
 
 $(SRC_DIR):
 	tar -xzf $(CURDIR)/src.tar.gz
@@ -95,8 +97,6 @@ install-arch:
 	cd $(SRC_DIR)/lib/libgeom && $(PMAKE) install
 	cd $(SRC_DIR)/lib/libipx && $(PMAKE) install
 	cd $(SRC_DIR)/lib/libkvm && $(PMAKE) install
-	# move libkvm.so to /lib
-	ln -sf /lib/libkvm.so.0 $(DESTDIR)/usr/lib/libkvm.so
 	cd $(SRC_DIR)/lib/libusbhid && $(PMAKE) install
 
 	dh_install -s --list-missing --sourcedir=debian/tmp
@@ -138,7 +138,7 @@ binary-indep: build-indep install-indep
 
 # Build architecture dependant packages using the common target.
 binary-arch: build-arch install-arch
-	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-s binary-common
 
 binary: binary-arch binary-indep
 .PHONY: build clean binary-indep binary-arch binary install install-indep install-arch configure

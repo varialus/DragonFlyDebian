@@ -1,13 +1,7 @@
 diff -ur lib.old/libcam/Makefile lib/libcam/Makefile
---- lib.old/libcam/Makefile	2004-02-05 23:44:22.000000000 +0100
-+++ lib/libcam/Makefile	2005-08-13 11:29:33.000000000 +0200
-@@ -1,12 +1,12 @@
- # $FreeBSD: src/lib/libcam/Makefile,v 1.12 2004/02/05 22:44:22 ru Exp $
- 
- LIB=		cam
--SHLIBDIR?=	/lib
-+SHLIB_MAJOR=    0
-+SHLIBDIR?=	/usr/lib
+--- lib.old/libcam/Makefile	2006-04-19 09:40:00.000000000 +0200
++++ lib/libcam/Makefile	2006-04-19 09:40:19.000000000 +0200
+@@ -5,8 +5,7 @@
  SRCS=		camlib.c scsi_cmdparse.c scsi_all.c scsi_da.c scsi_sa.c cam.c
  INCS=		camlib.h
  
@@ -17,7 +11,7 @@ diff -ur lib.old/libcam/Makefile lib/libcam/Makefile
  
  MAN=		cam.3 cam_cdbparse.3
  
-@@ -34,9 +34,11 @@
+@@ -34,9 +33,11 @@
  		cam_cdbparse.3 csio_encode_visit.3 \
  		cam_cdbparse.3 buff_encode_visit.3
  
@@ -31,8 +25,9 @@ diff -ur lib.old/libcam/Makefile lib/libcam/Makefile
  CFLAGS+=	-I${.CURDIR} -I${SDIR}
  
  .include <bsd.lib.mk>
---- lib/libcam/camlib.h~	2006-03-29 19:40:09.000000000 +0200
-+++ lib/libcam/camlib.h	2006-03-29 19:41:25.000000000 +0200
+diff -ur lib.old/libcam/camlib.h lib/libcam/camlib.h
+--- lib.old/libcam/camlib.h	2006-04-19 09:40:00.000000000 +0200
++++ lib/libcam/camlib.h	2006-04-19 09:38:34.000000000 +0200
 @@ -150,13 +150,11 @@
  /*
   * Buffer encoding/decoding routines, from the old SCSI library.
