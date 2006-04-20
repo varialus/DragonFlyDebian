@@ -63,6 +63,8 @@ mfsroot_load="YES"
 mfsroot_type="mfs_root"
 mfsroot_name="/boot/mfsroot"
 loader_color="YES"
+# needed for grub to be able of writing MBR
+kern.geom.debugflags=16
 EOF
 case ${distribution_lowcase} in
   gentoo) zcat mfsroot.gz | sed -e "s/Debian/Gentoo/g" | gzip -c9 > ${tmp}/boot/mfsroot.gz ;;
