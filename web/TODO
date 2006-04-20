@@ -28,42 +28,30 @@ I'd be nice if tasks and subtasks were sorted by priority.
   gateway setup.
 
  - Glibc
-	- Merge patchset into upstream and/or debian (see trunk/glibc-2.3-head)
+	- Merge patchset in upstream.
 
  - GCC
 	- Port boehm-gc so we can enable java etc.
 
  - FreeBSD
-	- Merge patches from freebsd-buildutils and kfreebsd into upstream.
+	- Merge patches from our freebsd-derived packages into upstream.
 
-	- freebsd-utils. This is a hacked package built from staticaly-linked
-	  binaries. It'll eventualy be rewriten semi-portably and replaced
-	  (mount, ifconfig, etc). This is a long-term transition.
-
- - libkvm (freebsd-libs) is ported badly.  It still has some dummy stubs that 
-   need replacing with decent code.
+	- freebsd-utils is still incomplete.  The most needed component is
+        net-tools (this is part of the freebsd-utils package, but disabled).
 
  - GRUB
-	- Fix userspace emulator to work on kFreeBSD-based systems (currently
-	fails when attempting to write into the device)
 	- Fix kfreebsd loader so we can boot directly the kernel and not need
-	  the FreeBSD loader.  (The debian package has a patch by Guillem
-	  which does this, but doesn't work reliably enough to merge it yet).
+	  the FreeBSD loader.  The debian package has a patch by Guillem
+	  which does this, but doesn't work reliably enough to merge it yet.
+          Also, there's a bug in Savannah BTS with yet another implementation
+          (looks a bit more complete).
 
- - d-i.
-   Otavio Salvador is preparing for work on it (discussing dessign stuff with
-   the other d-i people).
-
-   Colin Watson has also been working on de-Linuxificating d-i (for the Hurd).
+ - d-i.  Otavio Salvador is preparing for work on it.
 
  - xterm fails to run because it's using unsupported ioctls.
 
  - Package Glibc for the FreeBSD ports collection (this will help integrating
    patches in upstream).
-
- - type-handling is obsolete and deprecated now. There's a pending patch for
-   dpkg that will solve what this tried to solve in a clean way. Please stop
-   using type-handling.
 
  - It'd help if we had a Debian package of ossalsalib (aka libsalsa).  This
    library emulates alsa's libasound so that applications written for alsa can
@@ -110,22 +98,25 @@ I'd be nice if tasks and subtasks were sorted by priority.
 
      http://www.dachb0den.com/projects/bsd-airtools.html
 
+   UPDATE: there's a package in svn (trunk/bsd-airtools), but it isn't yet
+   known to work.
+
  - Help with bugs in Debian BTS:
      http://bugs.debian.org/freebsd5-buildutils
      http://bugs.debian.org/freebsd6-buildutils
      http://bugs.debian.org/kfreebsd-5
      http://bugs.debian.org/kfreebsd-6
      http://bugs.debian.org/ufsutils
+     http://bugs.debian.org/freebsd-manpages
 
  - Find a place to put the ccdcontrol call that initialy we wanted to put in
    sysvinit (see #266385).  This is necessary for CCD (software RAID).
 
- - Package some documentation, like manpages and the FreeBSD handbook.  Some
-   work needs to be done in dicerning which parts are relevant to us and which
-   (userland) parts are not.
+   UPDATE: we now have a clean freebsd-utils package, but it still doesn't
+   provide ccdcontrol.
 
-   Also, some existing Debian documentation needs to be fixed/split as it is
-   Linux specific (e.g. manpages package).
+ - Cleanup freebsd-manpages, make sure there's no missing stuff, integrate
+   them with Linux manpages package, etc.
 
 Social work (dealing with maintainers)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -157,11 +148,3 @@ hacking skills, in the area of dealing with maintainers.
    by looking at the bug log and see what is left to be done.  If the
    maintainer has been unresponsive for some time after we sent the patch (e.g.
    a few months), it might help to send a friendly reminder.
-
-Big beasts
-~~~~~~~~~~
-
-These are presumably somewhere in the libc implementation and are the most
-hard to debug from this list.
-
-Look at the bugs/ directory for test cases.  Good luck!
