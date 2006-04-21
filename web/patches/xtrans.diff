@@ -1,0 +1,38 @@
+
+Author: petr
+Upstream: https://bugs.freedesktop.org/show_bug.cgi?id=4982
+Debian: in BTS
+
+Index: xtrans/Xtranssock.c
+===================================================================
+RCS file: /cvs/xorg/lib/xtrans/Xtranssock.c,v
+retrieving revision 1.11
+diff -u -r1.11 Xtranssock.c
+--- xtrans/Xtranssock.c	8 Nov 2005 06:33:26 -0000	1.11
++++ xtrans/Xtranssock.c	21 Apr 2006 14:35:45 -0000
+@@ -1107,7 +1107,7 @@
+     sockname.sun_len = strlen(sockname.sun_path);
+     namelen = SUN_LEN(&sockname);
+ #else
+-    namelen = strlen(sockname.sun_path) + sizeof(sockname.sun_family);
++    namelen = strlen(sockname.sun_path) + offsetof(struct sockaddr_un, sun_path);
+ #endif
+ 
+     unlink (sockname.sun_path);
+@@ -1997,7 +1997,7 @@
+     sockname.sun_len = strlen (sockname.sun_path);
+     namelen = SUN_LEN (&sockname);
+ #else
+-    namelen = strlen (sockname.sun_path) + sizeof (sockname.sun_family);
++    namelen = strlen (sockname.sun_path) + offsetof(struct sockaddr_un, sun_path);
+ #endif
+ 
+ 
+@@ -2012,6 +2012,7 @@
+     }
+     old_namelen = strlen (old_sockname.sun_path) +
+ 	sizeof (old_sockname.sun_family);
++	offsetof(struct sockaddr_un, sun_path);
+ #endif
+ 
+ 
