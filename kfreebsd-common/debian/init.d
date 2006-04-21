@@ -40,7 +40,7 @@ for i in /dev/fd[0-9] ; do
     chgrp floppy $i
   fi
 done
-for i in /dev/ad[0-9]* /dev/da[0-9]* ; do
+for i in /dev/ata /dev/ad[0-9]* /dev/da[0-9]* ; do
   if test -e $i ; then
     chgrp disk $i
   fi
