@@ -1,14 +1,14 @@
 diff -ur util-linux-2.12r.old/debian/patches/00list util-linux-2.12r/debian/patches/00list
---- util-linux-2.12r.old/debian/patches/00list	2006-02-08 13:09:52.000000000 +0100
-+++ util-linux-2.12r/debian/patches/00list	2006-02-08 13:10:16.000000000 +0100
+--- util-linux-2.12r.old/debian/patches/00list	2006-04-21 18:28:31.000000000 +0200
++++ util-linux-2.12r/debian/patches/00list	2006-04-21 18:28:48.000000000 +0200
 @@ -1,4 +1,3 @@
 -10agetty
  10cal-widechar
  10cfdisk
  10cramfs-udebsize
 diff -ur util-linux-2.12r.old/debian/rules util-linux-2.12r/debian/rules
---- util-linux-2.12r.old/debian/rules	2006-02-08 13:09:52.000000000 +0100
-+++ util-linux-2.12r/debian/rules	2006-02-08 13:10:16.000000000 +0100
+--- util-linux-2.12r.old/debian/rules	2006-04-21 18:28:31.000000000 +0200
++++ util-linux-2.12r/debian/rules	2006-04-21 18:28:48.000000000 +0200
 @@ -25,7 +25,7 @@
  sparc = $(findstring $(arch),sparc sparc64)
  nohwclock = $(findstring $(arch),s390)
@@ -103,7 +103,7 @@ diff -ur util-linux-2.12r.old/debian/rules util-linux-2.12r/debian/rules
  ifneq ($(arch), $(nohwclock))
 diff -ur util-linux-2.12r.old/disk-utils/Makefile util-linux-2.12r/disk-utils/Makefile
 --- util-linux-2.12r.old/disk-utils/Makefile	2004-12-21 18:14:16.000000000 +0100
-+++ util-linux-2.12r/disk-utils/Makefile	2006-02-08 13:10:16.000000000 +0100
++++ util-linux-2.12r/disk-utils/Makefile	2006-04-21 18:28:48.000000000 +0200
 @@ -16,16 +16,19 @@
  
  SBIN= 	mkfs mkswap blockdev elvtune fsck.minix mkfs.minix mkfs.bfs
@@ -130,7 +130,7 @@ diff -ur util-linux-2.12r.old/disk-utils/Makefile util-linux-2.12r/disk-utils/Ma
  USRBIN:=$(USRBIN) raw
 diff -ur util-linux-2.12r.old/disk-utils/fsck.cramfs.c util-linux-2.12r/disk-utils/fsck.cramfs.c
 --- util-linux-2.12r.old/disk-utils/fsck.cramfs.c	2004-12-11 15:53:16.000000000 +0100
-+++ util-linux-2.12r/disk-utils/fsck.cramfs.c	2006-02-08 13:26:48.000000000 +0100
++++ util-linux-2.12r/disk-utils/fsck.cramfs.c	2006-04-21 18:28:48.000000000 +0200
 @@ -76,7 +76,7 @@
  
  #define PAD_SIZE 512
@@ -140,9 +140,20 @@ diff -ur util-linux-2.12r.old/disk-utils/fsck.cramfs.c util-linux-2.12r/disk-uti
  #ifdef PAGE_SIZE
  #define PAGE_CACHE_SIZE ((int) PAGE_SIZE)
  #elif defined __ia64__
+diff -ur util-linux-2.12r.old/login-utils/Makefile util-linux-2.12r/login-utils/Makefile
+--- util-linux-2.12r.old/login-utils/Makefile	2004-11-23 17:06:57.000000000 +0100
++++ util-linux-2.12r/login-utils/Makefile	2006-04-21 18:30:49.000000000 +0200
+@@ -101,6 +101,7 @@
+ wall.o: ttymsg.h $(LIB)/carefulputc.h
+ 
+ agetty: agetty.o $(LIB)/xstrncpy.o
++	$(CC) $(LDFLAGS) -o $@ $^ -lutil
+ chfn: chfn.o islocal.o setpwnam.o $(SELINUXOBJS) $(LIB)/env.o $(LIB)/xstrncpy.o
+ 	$(CC) $(LDFLAGS) -o $@ $^ $(CRYPT) $(PAM) $(SELINUXLLIB)
+ chsh: chsh.o islocal.o setpwnam.o $(SELINUXOBJS) $(LIB)/env.o
 diff -ur util-linux-2.12r.old/login-utils/agetty.c util-linux-2.12r/login-utils/agetty.c
 --- util-linux-2.12r.old/login-utils/agetty.c	2002-07-29 09:36:42.000000000 +0200
-+++ util-linux-2.12r/login-utils/agetty.c	2006-02-08 13:24:50.000000000 +0100
++++ util-linux-2.12r/login-utils/agetty.c	2006-04-21 18:28:48.000000000 +0200
 @@ -18,7 +18,8 @@
  #include <stdlib.h>
  #include <string.h>
@@ -354,7 +365,7 @@ diff -ur util-linux-2.12r.old/login-utils/agetty.c util-linux-2.12r/login-utils/
  /* caps_lock - string contains upper case without lower case */
 diff -ur util-linux-2.12r.old/misc-utils/Makefile util-linux-2.12r/misc-utils/Makefile
 --- util-linux-2.12r.old/misc-utils/Makefile	2004-12-05 20:09:12.000000000 +0100
-+++ util-linux-2.12r/misc-utils/Makefile	2006-02-08 13:10:17.000000000 +0100
++++ util-linux-2.12r/misc-utils/Makefile	2006-04-21 18:28:48.000000000 +0200
 @@ -22,7 +22,11 @@
  USRBIN=		cal chkdupexe ddate logger look mcookie \
  		namei rename script whereis
@@ -405,7 +416,7 @@ diff -ur util-linux-2.12r.old/misc-utils/Makefile util-linux-2.12r/misc-utils/Ma
  	$(INSTALLDIR) $(BINDIR) $(USRBINDIR)
 diff -ur util-linux-2.12r.old/misc-utils/mcookie.c util-linux-2.12r/misc-utils/mcookie.c
 --- util-linux-2.12r.old/misc-utils/mcookie.c	2002-03-09 00:00:52.000000000 +0100
-+++ util-linux-2.12r/misc-utils/mcookie.c	2006-02-08 13:10:17.000000000 +0100
++++ util-linux-2.12r/misc-utils/mcookie.c	2006-04-21 18:28:48.000000000 +0200
 @@ -20,7 +20,7 @@
   *
   */
@@ -417,7 +428,7 @@ diff -ur util-linux-2.12r.old/misc-utils/mcookie.c util-linux-2.12r/misc-utils/m
  
 diff -ur util-linux-2.12r.old/misc-utils/script.c util-linux-2.12r/misc-utils/script.c
 --- util-linux-2.12r.old/misc-utils/script.c	2004-03-26 18:07:16.000000000 +0100
-+++ util-linux-2.12r/misc-utils/script.c	2006-02-08 13:26:48.000000000 +0100
++++ util-linux-2.12r/misc-utils/script.c	2006-04-21 18:28:48.000000000 +0200
 @@ -54,10 +54,8 @@
  #include <sys/signal.h>
  #include "nls.h"
@@ -431,7 +442,7 @@ diff -ur util-linux-2.12r.old/misc-utils/script.c util-linux-2.12r/misc-utils/sc
  #ifdef HAVE_openpty
 diff -ur util-linux-2.12r.old/sys-utils/Makefile util-linux-2.12r/sys-utils/Makefile
 --- util-linux-2.12r.old/sys-utils/Makefile	2004-11-15 18:47:47.000000000 +0100
-+++ util-linux-2.12r/sys-utils/Makefile	2006-02-08 13:10:17.000000000 +0100
++++ util-linux-2.12r/sys-utils/Makefile	2006-04-21 18:28:48.000000000 +0200
 @@ -17,9 +17,9 @@
  # Where to put binaries?
  # See the "install" rule for the links. . .
@@ -458,8 +469,8 @@ diff -ur util-linux-2.12r.old/sys-utils/Makefile util-linux-2.12r/sys-utils/Make
  ifeq "$(HAVE_SLN)" "no"
 diff -ur util-linux-2.12r.old/text-utils/more.c util-linux-2.12r/text-utils/more.c
 --- util-linux-2.12r.old/text-utils/more.c	2004-12-22 11:46:25.000000000 +0100
-+++ util-linux-2.12r/text-utils/more.c	2006-02-08 13:10:17.000000000 +0100
-@@ -1560,10 +1569,6 @@
++++ util-linux-2.12r/text-utils/more.c	2006-04-21 18:28:48.000000000 +0200
+@@ -1560,10 +1560,6 @@
      }
      if (feof (file)) {
  	if (!no_intty) {
@@ -470,7 +481,7 @@ diff -ur util-linux-2.12r.old/text-utils/more.c util-linux-2.12r/text-utils/more
  	    Currline = saveln;
  	    Fseek (file, startline);
  	}
-@@ -1804,7 +1809,7 @@
+@@ -1804,7 +1800,7 @@
      no_intty = tcgetattr(fileno(stdin), &otty);
      tcgetattr(fileno(stderr), &otty);
      savetty0 = otty;
