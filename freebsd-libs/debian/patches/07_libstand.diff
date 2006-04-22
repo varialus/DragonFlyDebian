@@ -1,0 +1,64 @@
+--- lib/libstand/Makefile~	2006-04-22 11:19:04.000000000 +0200
++++ lib/libstand/Makefile	2006-04-22 11:33:55.000000000 +0200
+@@ -138,7 +138,8 @@
+ CLEANFILES+=   _${file} _${file}.orig
+ 
+ _${file}: ${file} ${file}.diff
+-	patch -s -b .orig -o ${.TARGET} < ${.ALLSRC:M*.diff} ${.ALLSRC:M*.[ch]}
++	cp ${.ALLSRC:M*.[ch]} ${.TARGET}
++	patch ${.TARGET} ${.ALLSRC:M*.diff}
+ .endfor
+ 
+ .for file in crctable.c decompress.c huffman.c randtable.c
+@@ -159,7 +160,8 @@
+ CLEANFILES+=	_${file} _${file}.orig
+ 
+ _${file}: ${file} ${file}.diff
+-	patch -s -b .orig -o ${.TARGET} < ${.ALLSRC:M*.diff} ${.ALLSRC:M*.[ch]}
++	cp ${.ALLSRC:M*.[ch]} ${.TARGET}
++	patch ${.TARGET} ${.ALLSRC:M*.diff}
+ .endfor
+ 
+ .for file in infback.c inffast.c inflate.c inftrees.c zutil.c
+--- lib/libstand/assert.c~	2006-04-22 11:34:25.000000000 +0200
++++ lib/libstand/assert.c	2006-04-22 11:47:07.000000000 +0200
+@@ -26,8 +26,6 @@
+ 
+ #include <sys/cdefs.h>
+ 
+-#include <assert.h>
+-
+ #include "stand.h"
+ 
+ void
+--- lib/libstand/assert.c~	2006-04-22 12:04:43.000000000 +0200
++++ lib/libstand/assert.c	2006-04-22 12:15:07.000000000 +0200
+@@ -37,5 +37,5 @@
+ 	else
+ 		printf("Assertion failed: (%s), function %s, file %s, line "
+ 		    "%d.\n", expression, func, file, line);
+-	exit();
++	exit(1);
+ }
+--- lib/libstand/cd9660.c~	2006-04-22 12:15:50.000000000 +0200
++++ lib/libstand/cd9660.c	2006-04-22 12:24:10.000000000 +0200
+@@ -41,7 +41,7 @@
+  */
+ #include <sys/param.h>
+ #include <string.h>
+-#include <sys/dirent.h>
++#include <dirent.h>
+ #include <isofs/cd9660/iso.h>
+ #include <isofs/cd9660/cd9660_rrip.h>
+ 
+--- lib/libstand/stand.h~	2006-04-22 12:15:50.000000000 +0200
++++ lib/libstand/stand.h	2006-04-22 12:24:27.000000000 +0200
+@@ -65,7 +65,7 @@
+ #include <sys/types.h>
+ #include <sys/cdefs.h>
+ #include <sys/stat.h>
+-#include <sys/dirent.h>
++#include <dirent.h>
+ #include <string.h>
+ 
+ #define CHK(fmt, args...)	printf("%s(%d): " fmt "\n", __FUNCTION__, __LINE__ , ##args)
