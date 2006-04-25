@@ -51,6 +51,25 @@ test build:
 	i386/sysdep.h - drop definition of SETUP_PIC_REG(reg)
 	dl-osinfo.h - add function _dl_setup_stack_chk_guard()
 
+* missing SIG_HOLD under FreeBSD (required by POSIX)
+  (triggered only on post 2006/04/23 glibc snapshots)
+
+  workaround:
+--- sysdeps/posix/sigset.c~      2006-04-25 16:37:41.000000000 +0000
++++ sysdeps/posix/sigset.c       2006-04-25 16:37:41.000000000 +0000
+@@ -88,6 +88,10 @@
+   if (__sigprocmask (SIG_UNBLOCK, &set, &oset) < 0)
+     return SIG_ERR;
+ 
++#ifdef SIG_HOLD
+   /* If the signal was already blocked return SIG_HOLD.  */
+   return __sigismember (&oset, sig) ? SIG_HOLD : oact.sa_handler;
++#else
++  return oact.sa_handler;
++#endif
+ }
+
+
 ../src/configure --enable-add-ons=linuxthreads --with-tls --with-__thread i486-kfreebsd --prefix=...
 
 "make check" results:
