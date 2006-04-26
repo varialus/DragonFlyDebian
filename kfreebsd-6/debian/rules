@@ -144,6 +144,8 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	install -o root -g root -m 644 \
 		$(FLAVOR_DIR)-$*/sys/$(cpu)/conf/GENERIC.hints \
 		$(IMAGE_PACKAGE)-$*/boot/device.hints
+
+	# make the install target happy
 	install -o root -g root -m 644 \
 		$(FLAVOR_DIR)-$*/sys/boot/forth/loader.conf \
 		$(IMAGE_PACKAGE)-$*/boot/loader.conf
@@ -156,6 +158,10 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(cpu)/compile/$(configfile) DESTDIR=$(IMAGE_PACKAGE)-$* install
 	chmod 644 $(IMAGE_PACKAGE)-$*/boot/kernel/kernel
 	gzip -9 $(IMAGE_PACKAGE)-$*/boot/kernel/kernel
+
+	# remove loader.conf (part of kfreebsd-loader now)
+	rm -f $(IMAGE_PACKAGE)-$*/boot/loader.conf
+	rm -rf $(IMAGE_PACKAGE)-$*/boot/defaults
 	
 	# override file
 	mkdir -p $(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides
