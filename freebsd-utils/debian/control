@@ -13,10 +13,12 @@ Depends: ${shlibs:Depends}, libc0.1 (>= 2.3.6-3+kbsd.r1365), freebsd-hackedutils
 Description: FreeBSD utilities needed for GNU/kFreeBSD.
  FreeBSD utilities needed for GNU/kFreeBSD.
 
-Package: kldutils
+Package: module-init-tools
 Architecture: kfreebsd-i386 kfreebsd-amd64
 Depends: ${shlibs:Depends}, libc0.1 (>= 2.3.6-3+kbsd.r1365)
-Replaces: freebsd-utils (<= 5.2.1-16)
+Conflicts: kldutils
+Provides: kldutils
+Replaces: kldutils, freebsd-utils (<= 5.2.1-16)
 Description: tools for managing kFreeBSD modules
  This package contains a set of programs for loading, inserting, and
  removing kernel modules for kFreeBSD.
