@@ -54,6 +54,11 @@ kfreebsd-6 (6.0-0.1) UNRELEASED; urgency=low
   * Disable build of modules that are already part of the kernel image.
     This gives the .deb a size loss of ~1600 KB (~4 MB once installed).
     - patches/009_disable_duped_modules.diff
+  * Build 486 and 586* flavors with -Os.  This saves 400 KB, out of
+    which 240 KB are in kernel.gz.  Rationale:
+    - 486 tiny flavor is needed for d-i.
+    - On old hardware, your amount of memory if likely to be utter crap.  So
+    this is preferable to -O2 no matter the benchmarks.
 
   [ Aurelien Jarno ]
   * Fix a remote denial of service in NFS server (FreeBSD-SA-06:10.nfs /
@@ -63,7 +68,7 @@ kfreebsd-6 (6.0-0.1) UNRELEASED; urgency=low
   * Fix an FPU information disclosure on AMD processors (FreeBSD-SA-06:14.fpu /
     CVE-2006-1056).
 
- -- Robert Millan <rmh@aybabtu.com>  Tue, 25 Apr 2006 22:44:45 +0200
+ -- Robert Millan <rmh@aybabtu.com>  Wed, 26 Apr 2006 12:06:11 +0200
 
 kfreebsd-5 (5.3-6) unstable; urgency=low
 
