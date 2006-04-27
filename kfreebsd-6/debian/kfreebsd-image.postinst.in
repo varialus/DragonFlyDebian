@@ -19,11 +19,28 @@ set -e
 
 case "$1" in
     configure)
-	if diff -q /boot/kernel/kernel.gz{,.old} >/dev/null 2>/dev/null ; then
-		rm -f /boot/kernel/kernel.gz.old
+	for i in kernel.gz acpi.ko ; do
+		if test -e /boot/kernel/$i && ! test -L /boot/kernel/$i ; then
+			echo "What happen!! /boot/kernel/$i exists but is not a symlink."
+			exit 1
+		fi
+	done
+
+	if [ "$(readlink -f /boot/kernel/kernel.gz)" != "/boot/kfreebsd-@RELEASE@.gz" ] ; then
+		rm -f /boot/kernel/kernel{,.gz}.old{,.gz}
+		if [ -L /boot/kernel/kernel.gz ] ; then
+			mv /boot/kernel/kernel{,.old}.gz
+		fi
+		ln -s /boot/kfreebsd-@RELEASE@.gz /boot/kernel/kernel.gz
 	fi
-	if [ -e /etc/mtab ] ; then
-		ln -sf /proc/mounts /etc/mtab
+
+	# acpi MUST be within kfreebsd-loader reach
+	if [ "$(readlink -f /boot/kernel/acpi.ko)" != "/lib/modules/@RELEASE@/acpi.ko" ] ; then
+		rm -f /boot/kernel/acpi.ko.old
+		if [ -L /boot/kernel/acpi.ko ] ; then
+			mv /boot/kernel/acpi.ko{,.old}
+		fi
+		ln -s /lib/modules/@RELEASE@/acpi.ko /boot/kernel/acpi.ko
 	fi
     ;;
 

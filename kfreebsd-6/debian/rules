@@ -2,6 +2,8 @@
 # Sample debian/rules that uses debhelper.
 # GNU copyright 1997 to 1999 by Joey Hess.
 
+SHELL = bash
+
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
@@ -49,7 +51,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -rf src kfreebsd-source-* flavor-* config
-	rm -f debian/kfreebsd-image-*.{preinst,postinst}
+	rm -f debian/kfreebsd-image-*.postinst
 
 	rm -f *-stamp
 	dh_clean
@@ -110,7 +112,10 @@ build-flavor-%-stamp: src config
 	cp -af src $(FLAVOR_DIR)-$*
 	
 	# Add the abiname and the flavor to the kernel version
-	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)-$*"/g' $(FLAVOR_DIR)-$*/sys/conf/newvers.sh 
+	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)-$*"/g' $(FLAVOR_DIR)-$*/sys/conf/newvers.sh
+
+	# Set /lib/modules/${RELEASE} as module dir
+	sed -i -e 's,^KODIR?=.*,KODIR="/lib/modules/$(version)-$(abiname)-$*",g' $(FLAVOR_DIR)-$*/sys/conf/kern.pre.mk
 
 	# Configure the kernel
 	cp debian/arch/$(cpu)/*.config $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/
@@ -138,8 +143,9 @@ install-arch: $(foreach flavor,$(flavours),install-flavor-$(flavor)-stamp)
 install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	dh_testdir
 	dh_testroot
+	dh_clean -k -pkfreebsd-image-$(version)-$(abiname)-$*
 
-	mkdir -p $(IMAGE_PACKAGE)-$*/boot/kernel
+	mkdir -p $(IMAGE_PACKAGE)-$*/{boot,lib/modules/$(version)-$(abiname)-$*}
 
 	# make the install target happy
 	install -o root -g root -m 644 \
@@ -155,8 +161,9 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	
 	# now install the kernel
 	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(cpu)/compile/$(configfile) DESTDIR=$(IMAGE_PACKAGE)-$* install
-	chmod 644 $(IMAGE_PACKAGE)-$*/boot/kernel/kernel
-	gzip -9 $(IMAGE_PACKAGE)-$*/boot/kernel/kernel
+	mv $(IMAGE_PACKAGE)-$*/lib/modules/$(version)-$(abiname)-$*/kernel $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
+	chmod 644 $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
+	gzip -9 $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
 
 	# remove loader.conf (part of kfreebsd-loader)
 	rm -f $(IMAGE_PACKAGE)-$*/boot/loader.conf
@@ -172,15 +179,13 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 		$(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides/kfreebsd-image-$(version)-$(abiname)-$*
 
 	# move ndis modules to their own package
-	mkdir -p $(NDIS_PACKAGE)-$*/boot/kernel
-	mv $(IMAGE_PACKAGE)-$*/boot/kernel/ndis.ko $(IMAGE_PACKAGE)-$*/boot/kernel/if_ndis.ko \
-		$(NDIS_PACKAGE)-$*/boot/kernel/
+	mkdir -p $(NDIS_PACKAGE)-$*/lib/modules/$(version)-$(abiname)-$*
+	mv $(IMAGE_PACKAGE)-$*/lib/modules/$(version)-$(abiname)-$*/ndis.ko $(IMAGE_PACKAGE)-$*/lib/modules/$(version)-$(abiname)-$*/if_ndis.ko \
+		$(NDIS_PACKAGE)-$*/lib/modules/$(version)-$(abiname)-$*/
 
 	# scripts
-	cp -f debian/kfreebsd-image.postinst.in \
-		debian/kfreebsd-image-$(version)-$(abiname)-$*.postinst
-	cp -f debian/kfreebsd-image.preinst.in \
-		debian/kfreebsd-image-$(version)-$(abiname)-$*.preinst
+	sed -e "s/@RELEASE@/$(version)-$(abiname)-$*/g" debian/kfreebsd-image.postinst.in \
+		> debian/kfreebsd-image-$(version)-$(abiname)-$*.postinst
 	
 	# headers package
 	mkdir -p $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu)
@@ -221,12 +226,12 @@ binary-arch: build-arch install-arch
 	dh_installdocs -s
 	dh_installchangelogs -s
 	dh_link -s
-	dh_strip -s -X/boot
+	dh_strip -s -X/boot -X/lib/modules
 	dh_compress -s
 	dh_fixperms -s
 	dh_makeshlibs -s
 	dh_installdeb -s
-	dh_shlibdeps -s -X/boot
+	dh_shlibdeps -s -X/boot -X/lib/modules
 	dh_gencontrol -s
 	dh_md5sums -s
 	dh_builddeb -s
