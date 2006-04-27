@@ -143,6 +143,9 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 
 	# make the install target happy
 	install -o root -g root -m 644 \
+		$(FLAVOR_DIR)-$*/sys/$(cpu)/conf/GENERIC.hints \
+		$(IMAGE_PACKAGE)-$*/boot/device.hints
+	install -o root -g root -m 644 \
 		$(FLAVOR_DIR)-$*/sys/boot/forth/loader.conf \
 		$(IMAGE_PACKAGE)-$*/boot/loader.conf
 	mkdir -p $(IMAGE_PACKAGE)-$*/boot/defaults
@@ -155,9 +158,12 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	chmod 644 $(IMAGE_PACKAGE)-$*/boot/kernel/kernel
 	gzip -9 $(IMAGE_PACKAGE)-$*/boot/kernel/kernel
 
-	# remove loader.conf (part of kfreebsd-loader now)
+	# remove loader.conf (part of kfreebsd-loader)
 	rm -f $(IMAGE_PACKAGE)-$*/boot/loader.conf
 	rm -rf $(IMAGE_PACKAGE)-$*/boot/defaults
+	
+	# remove device.hints (built into kernel)
+	rm -f $(IMAGE_PACKAGE)-$*/boot/device.hints
 	
 	# override file
 	mkdir -p $(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides
