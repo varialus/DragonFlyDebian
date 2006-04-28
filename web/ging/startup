@@ -1,7 +1,7 @@
 #!/bin/bash
 # IMPORTANT:
 # don't use <<EOF anywhere in this file.  Bash would attempt to create a
-# tempfile and, since our /tmp is readonly, would fail.
+# tempfile and, since our /tmp is readonly, fail.
 
 ging_msg ()
   {
@@ -12,11 +12,10 @@ ging_msg ()
     echo -en "\x1B[0m"
   }
 
-# if we don't have proper std streams, get some
-if ! ging_msg "@distribution@ @version@ starting" ; then
-  export TERM=cons25
-  exec $0 $@ < /dev/console > /dev/console 2> /dev/console
-fi
+export TERM=cons25
+exec < /dev/console > /dev/console 2> /dev/console
+
+ging_msg "@distribution@ @version@ starting"
 
 # do this as soon as we have stdio
 set -e
