@@ -5,10 +5,9 @@ Things needed for d-i:
     - Integrate our cdboot/mfsroot-based boot process into the cdrom setup.
 
   - UDEBfiscate a few packages:
-    - kfreebsd-udeb: maybe similar to linux-kernel-di-i386-2.6 ?
     - freebsd-utils
       - freebsd-utils itself
-      - kldutils
+      - module-init-tools
       - net-tools: get it to build first :P
     - ufsutils
 
@@ -23,17 +22,21 @@ Things needed for d-i:
       sysdep/linux/pci.c to use libpci.a instead of /proc.  The rest are ok
       with stubs for now (we basicaly only care about PCI nics ;).
 
-  - os-prober: detect GNU/kFreeBSD !
+  - os-prober: detect GNU/kFreeBSD (Guerkan is working on this)
 
   - net-cfg: includes Linux-specific cruft.  teach it to use ifconfig et al
     from an external package?
 
   - partman: Should support bsd disklabels?  I'm not sure how we can do this
-  without needing to severely modify the UI.  Important: libparted port will
-  _only_ support either 5.x or 6.x kernel, not both at the same time!
+    without needing to severely modify the UI.  Important: libparted port will
+    _only_ support either 5.x or 6.x kernel, not both at the same time!
 
   - debootstrap
 
   - grub: (we can use kfreebsd-loader temporarily instead)
     - direct loading (with acpi.ko and initrd support. argh!)
     - proper ufs2 support
+
+ - we need a way to print UTF characters in console.  does the X11-based GUI
+   installer work?  If so, that sounds like the easier way.  Otherwise we could
+   try to fix it, or enable framebuffer in kFreeBSD, whatever is easier.
