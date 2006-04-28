@@ -74,7 +74,7 @@ fi
 echo "done."
 
 # This syctl is (suposedly) correct in kernel, but kfreebsd-loader enjoys messing with it
-sysctl kern.module_path=/lib/modules/`uname -r`:/boot/kernel
+sysctl "kern.module_path=/lib/modules/`uname -r`;/boot/kernel"
 
 if test -f /etc/mtab ; then
   echo "Warning: /etc/mtab is a regular file, replacing with symlink."
