@@ -165,6 +165,9 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	chmod 644 $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
 	gzip -9 $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
 
+	# fix broken perms in module dir
+	chmod 644 $(IMAGE_PACKAGE)-$*/lib/modules/$(version)-$(abiname)-$*/*
+
 	# remove loader.conf (part of kfreebsd-loader)
 	rm -f $(IMAGE_PACKAGE)-$*/boot/loader.conf
 	rm -rf $(IMAGE_PACKAGE)-$*/boot/defaults
