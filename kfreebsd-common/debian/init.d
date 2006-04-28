@@ -62,8 +62,8 @@ for i in /dev/cuaa[0-9] ; do
 done
 
 # setup /dev/cdrom symlink
-if ! test -e /dev/cdrom ; then
-  for i in {,a}cd[0-9] ; do
+if ! test -e /dev/cdrom && ! test -L /dev/cdrom ; then
+  for i in {,a}cd{0,1,2,3,4,5,6,7,8,9} ; do
     if test -e /dev/$i ; then
       ln -s $i /dev/cdrom
       break
