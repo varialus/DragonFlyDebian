@@ -1,6 +1,6 @@
 diff -ur sys.old/amd64/conf/GENERIC sys/amd64/conf/GENERIC
---- sys.old/amd64/conf/GENERIC	2006-04-26 18:06:18.000000000 +0200
-+++ sys/amd64/conf/GENERIC	2006-04-26 18:50:43.000000000 +0200
+--- sys.old/amd64/conf/GENERIC	2006-04-28 11:25:35.000000000 +0200
++++ sys/amd64/conf/GENERIC	2006-04-28 11:36:55.000000000 +0200
 @@ -19,13 +19,9 @@
  # $FreeBSD: src/sys/amd64/conf/GENERIC,v 1.439.2.6.2.1 2005/10/28 19:22:41 jhb Exp $
  
@@ -34,7 +34,7 @@ diff -ur sys.old/amd64/conf/GENERIC sys/amd64/conf/GENERIC
  options 	KTRACE			# ktrace(1) support
  options 	SYSVSHM			# SYSV-style shared memory
  options         SHMMAXPGS=4096
-@@ -73,23 +71,17 @@
+@@ -73,16 +71,10 @@
  # Workarounds for some known-to-be-broken chipsets (nVidia nForce3-Pro150)
  device		atpic			# 8259A compatability
  
@@ -51,39 +51,27 @@ diff -ur sys.old/amd64/conf/GENERIC sys/amd64/conf/GENERIC
  # ATA and ATAPI devices
  device		ata
  device		atadisk		# ATA disk drives
- device		ataraid		# ATA RAID drives
+@@ -90,6 +82,8 @@
  device		atapicd		# ATAPI CDROM drives
--device		atapifd		# ATAPI floppy drives
--device		atapist		# ATAPI tape drives
+ device		atapifd		# ATAPI floppy drives
+ device		atapist		# ATAPI tape drives
 +device		atapicam	# emulate ATAPI devices as SCSI via CAM
 +				# needs CAM to be present (scbus && pass)
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -140,7 +132,6 @@
- # atkbdc0 controls both the keyboard and the PS/2 mouse
- device		atkbdc		# AT keyboard controller
- device		atkbd		# AT keyboard
--device		psm		# PS/2 mouse
- 
- device		vga		# VGA video card driver
- 
-@@ -160,14 +151,6 @@
- # Serial (COM) ports
- device		sio		# 8250, 16[45]50 based serial ports
- 
--# Parallel port
--device		ppc
--device		ppbus		# Parallel port bus (required)
+@@ -163,10 +157,6 @@
+ # Parallel port
+ device		ppc
+ device		ppbus		# Parallel port bus (required)
 -device		lpt		# Printer
 -device		plip		# TCP/IP over parallel
 -device		ppi		# Parallel port interface device
 -#device		vpo		# Requires scbus and da
--
+ 
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
- # line to enable it (connects to the sio and/or ppc drivers):
-@@ -227,13 +210,8 @@
+@@ -227,13 +217,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
@@ -97,7 +85,7 @@ diff -ur sys.old/amd64/conf/GENERIC sys/amd64/conf/GENERIC
  
  # The `bpf' device enables the Berkeley Packet Filter.
  # Be aware of the administrative consequences of enabling this!
-@@ -249,12 +227,8 @@
+@@ -249,12 +234,8 @@
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
@@ -110,7 +98,7 @@ diff -ur sys.old/amd64/conf/GENERIC sys/amd64/conf/GENERIC
  # USB Ethernet, requires miibus
  device		aue		# ADMtek USB Ethernet
  device		axe		# ASIX Electronics USB Ethernet
-@@ -267,3 +241,11 @@
+@@ -267,3 +248,11 @@
  device		firewire	# FireWire bus code
  device		sbp		# SCSI over FireWire (Requires scbus and da)
  device		fwe		# Ethernet over FireWire (non-standard!)
@@ -123,8 +111,8 @@ diff -ur sys.old/amd64/conf/GENERIC sys/amd64/conf/GENERIC
 +options		ALTQ_HFSC	# Hierarchical Packet Scheduler (HFSC)
 +options		ALTQ_PRIQ	# Priority Queuing (PRIQ)
 diff -ur sys.old/i386/conf/GENERIC sys/i386/conf/GENERIC
---- sys.old/i386/conf/GENERIC	2006-04-26 18:06:18.000000000 +0200
-+++ sys/i386/conf/GENERIC	2006-04-26 18:50:52.000000000 +0200
+--- sys.old/i386/conf/GENERIC	2006-04-28 11:25:35.000000000 +0200
++++ sys/i386/conf/GENERIC	2006-04-28 11:36:47.000000000 +0200
 @@ -19,15 +19,9 @@
  # $FreeBSD: src/sys/i386/conf/GENERIC,v 1.429.2.3.2.1 2005/10/28 19:22:41 jhb Exp $
  
@@ -158,7 +146,7 @@ diff -ur sys.old/i386/conf/GENERIC sys/i386/conf/GENERIC
  options 	KTRACE			# ktrace(1) support
  options 	SYSVSHM			# SYSV-style shared memory
  options         SHMMAXPGS=4096
-@@ -75,16 +71,13 @@
+@@ -75,9 +71,6 @@
  device		eisa
  device		pci
  
@@ -168,39 +156,27 @@ diff -ur sys.old/i386/conf/GENERIC sys/i386/conf/GENERIC
  # ATA and ATAPI devices
  device		ata
  device		atadisk		# ATA disk drives
- device		ataraid		# ATA RAID drives
+@@ -85,6 +78,8 @@
  device		atapicd		# ATAPI CDROM drives
--device		atapifd		# ATAPI floppy drives
--device		atapist		# ATAPI tape drives
+ device		atapifd		# ATAPI floppy drives
+ device		atapist		# ATAPI tape drives
 +device		atapicam	# emulate ATAPI devices as SCSI via CAM
 +				# needs CAM to be present (scbus && pass)
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -140,7 +133,6 @@
- # atkbdc0 controls both the keyboard and the PS/2 mouse
- device		atkbdc		# AT keyboard controller
- device		atkbd		# AT keyboard
--device		psm		# PS/2 mouse
- 
- device		vga		# VGA video card driver
- 
-@@ -170,14 +162,6 @@
- # Serial (COM) ports
- device		sio		# 8250, 16[45]50 based serial ports
- 
--# Parallel port
--device		ppc
--device		ppbus		# Parallel port bus (required)
+@@ -173,10 +168,6 @@
+ # Parallel port
+ device		ppc
+ device		ppbus		# Parallel port bus (required)
 -device		lpt		# Printer
 -device		plip		# TCP/IP over parallel
 -device		ppi		# Parallel port interface device
 -#device		vpo		# Requires scbus and da
--
+ 
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
- # line to enable it (connects to the sio and/or ppc drivers):
-@@ -241,13 +225,8 @@
+@@ -241,13 +232,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
@@ -214,7 +190,7 @@ diff -ur sys.old/i386/conf/GENERIC sys/i386/conf/GENERIC
  
  # The `bpf' device enables the Berkeley Packet Filter.
  # Be aware of the administrative consequences of enabling this!
-@@ -263,12 +242,8 @@
+@@ -263,12 +249,8 @@
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
@@ -227,7 +203,7 @@ diff -ur sys.old/i386/conf/GENERIC sys/i386/conf/GENERIC
  # USB Ethernet, requires miibus
  device		aue		# ADMtek USB Ethernet
  device		axe		# ASIX Electronics USB Ethernet
-@@ -281,3 +256,11 @@
+@@ -281,3 +263,11 @@
  device		firewire	# FireWire bus code
  device		sbp		# SCSI over FireWire (Requires scbus and da)
  device		fwe		# Ethernet over FireWire (non-standard!)
