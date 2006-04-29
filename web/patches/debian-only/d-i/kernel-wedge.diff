@@ -1,0 +1,330 @@
+Index: commands/copy-modules
+===================================================================
+--- commands/copy-modules	(revision 36777)
++++ commands/copy-modules	(working copy)
+@@ -56,7 +56,7 @@
+ 			# Prefer modules in the kernel subdir, but failing
+ 			# that search the whole thing, to find third-party,
+ 			# etc modules.
+-			match="$(find $moddir/kernel $moddir \
++			match="$(find `ls -d $moddir/kernel 2>/dev/null` $moddir \
+ 			            -name $module.o -or -name $module.ko \
+ 				| head -n 1 | sed "s!$moddir/!!")"
+ 			
+@@ -78,6 +78,7 @@
+ flavour=$2
+ installedname=$3
+ arch=$(dpkg-architecture -qDEB_HOST_ARCH)
++os=$(dpkg-architecture -qDEB_HOST_ARCH_OS)
+ home=$PWD
+ 
+ trap 'rm -rf $tmpdir' EXIT
+@@ -105,29 +106,31 @@
+ 	modlistdir=modules/$arch
+ fi
+ 
+-if [ ! -e "$moddir/modules.dep" ]; then
+-	echo "no $moddir/modules.dep. This file is required by kernel-wedge" >&2
+-	exit 1
+-fi
++if [ "$os" = "linux" ] ; then
++	if [ ! -e "$moddir/modules.dep" ]; then
++		echo "no $moddir/modules.dep. This file is required by kernel-wedge" >&2
++		exit 1
++	fi
+ 
+-# get module dependencies from modules.dep
+-# sort it by field 2
+-perl -lne '
+-	@words=split(" ");
+-	s!'/lib/modules/$installedname'/!! foreach (@words);
+-	if ($words[0] =~ /:$/) {
+-		$words[0]=~s/:$//;
+-		$module=shift @words;
+-	}
+-	foreach (@words) {
+-		print "$module\t$_" unless $_ eq "\\";
+-	}
+-' $moddir/modules.dep | sort -k 2,2 > $tmpdir/deps
+-
+-if [ ! -s $tmpdir/deps ] && [ ! -e $home/no-modules ]; then
+-	echo "No module interdependencies found. This probably means your modules.dep is broken." >&2
+-	echo "If this is intentional, touch $home/no-modules" >&2
+-	exit 1
++	# get module dependencies from modules.dep
++	# sort it by field 2
++	perl -lne '
++		@words=split(" ");
++		s!'/lib/modules/$installedname'/!! foreach (@words);
++		if ($words[0] =~ /:$/) {
++			$words[0]=~s/:$//;
++			$module=shift @words;
++		}
++		foreach (@words) {
++			print "$module\t$_" unless $_ eq "\\";
++		}
++	' $moddir/modules.dep | sort -k 2,2 > $tmpdir/deps
++	
++	if [ ! -s $tmpdir/deps ] && [ ! -e $home/no-modules ]; then
++		echo "No module interdependencies found. This probably means your modules.dep is broken." >&2
++		echo "If this is intentional, touch $home/no-modules" >&2
++		exit 1
++	fi
+ fi
+ 
+ mkdir $tmpdir/module-deps $tmpdir/module-list
+Index: commands/install-files
+===================================================================
+--- commands/install-files	(revision 36777)
++++ commands/install-files	(working copy)
+@@ -44,11 +44,19 @@
+ 			"$sourcedir/boot/vmlinux-$installedname",
+ 			"debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinux$extraname");
+ 	}
+-	else {
++	elsif (-e "$sourcedir/boot/vmlinuz-$installedname") {
+ 		doit("install", "-D", "-m", 644,
+ 			"$sourcedir/boot/vmlinuz-$installedname",
+ 			"debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinuz$extraname");
+ 	}
++	elsif (-e "$sourcedir/boot/kfreebsd-$installedname.gz") {
++		doit("install", "-D", "-m", 644,
++			"$sourcedir/boot/kfreebsd-$installedname.gz",
++			"debian/kernel-image-$kernelversion-$flavour-di/boot/kfreebsd$extraname.gz");
++	}
++	else {
++		die "could not find kernel image";
++	}
+ 	doit("install", "-D", "-m", 644,
+ 		"$sourcedir/boot/System.map-$installedname",
+ 		"debian/kernel-image-$kernelversion-$flavour-di/boot/System.map$extraname")
+Index: modules/kfreebsd/floppy-modules
+===================================================================
+--- modules/kfreebsd/floppy-modules	(revision 0)
++++ modules/kfreebsd/floppy-modules	(revision 0)
+@@ -0,0 +1,2 @@
++fdc
++atapifd ?
+Index: modules/kfreebsd/loop-modules
+===================================================================
+--- modules/kfreebsd/loop-modules	(revision 0)
++++ modules/kfreebsd/loop-modules	(revision 0)
+@@ -0,0 +1,3 @@
++loop ?
++# aka cloop
++geom_uzip ?
+Index: modules/kfreebsd/nic-modules
+===================================================================
+--- modules/kfreebsd/nic-modules	(revision 0)
++++ modules/kfreebsd/nic-modules	(revision 0)
+@@ -0,0 +1,16 @@
++# Some very common nic modules.
++# 3Com Etherlink III
++if_ep ?
++# RealTek 8129/8139
++if_rl ?
++# Intel PRO/100 Ethernet
++if_fxp ?
++# National Semiconductor
++sis
++# ne2k
++if_ed ?
++#tg3
++# aka "tulip" ?
++if_dc ?
++# Winbond W89C840F
++if_wb ?
+Index: modules/kfreebsd/fat-modules
+===================================================================
+--- modules/kfreebsd/fat-modules	(revision 0)
++++ modules/kfreebsd/fat-modules	(revision 0)
+@@ -0,0 +1,2 @@
++msdosfs
++msdosfs_iconv ?
+Index: modules/kfreebsd/acpi-modules
+===================================================================
+--- modules/kfreebsd/acpi-modules	(revision 0)
++++ modules/kfreebsd/acpi-modules	(revision 0)
+@@ -0,0 +1 @@
++acpi
+Index: modules/kfreebsd/serial-modules
+===================================================================
+--- modules/kfreebsd/serial-modules	(revision 0)
++++ modules/kfreebsd/serial-modules	(revision 0)
+@@ -0,0 +1 @@
++sio ?
+Index: modules/kfreebsd/reiserfs-modules
+===================================================================
+--- modules/kfreebsd/reiserfs-modules	(revision 0)
++++ modules/kfreebsd/reiserfs-modules	(revision 0)
+@@ -0,0 +1,2 @@
++# Not available currently on all kernel versions, so marked optional.
++reiserfs ?
+Index: modules/kfreebsd/ext2-modules
+===================================================================
+--- modules/kfreebsd/ext2-modules	(revision 0)
++++ modules/kfreebsd/ext2-modules	(revision 0)
+@@ -0,0 +1 @@
++ext2fs
+Index: modules/kfreebsd/ipv6-modules
+===================================================================
+--- modules/kfreebsd/ipv6-modules	(revision 0)
++++ modules/kfreebsd/ipv6-modules	(revision 0)
+@@ -0,0 +1,2 @@
++if_gif
++if_faith
+Index: modules/kfreebsd/nfs-modules
+===================================================================
+--- modules/kfreebsd/nfs-modules	(revision 0)
++++ modules/kfreebsd/nfs-modules	(revision 0)
+@@ -0,0 +1 @@
++nfsclient
+Index: modules/kfreebsd/scsi-core-modules
+===================================================================
+--- modules/kfreebsd/scsi-core-modules	(revision 0)
++++ modules/kfreebsd/scsi-core-modules	(revision 0)
+@@ -0,0 +1,4 @@
++scbus ?
++ch ?
++da ?
++sa ?
+Index: modules/kfreebsd/scsi-common-modules
+===================================================================
+--- modules/kfreebsd/scsi-common-modules	(revision 0)
++++ modules/kfreebsd/scsi-common-modules	(revision 0)
+@@ -0,0 +1,4 @@
++aic ?
++aic7xxx ?
++bt ?
++sym ?
+Index: modules/kfreebsd/parport-modules
+===================================================================
+--- modules/kfreebsd/parport-modules	(revision 0)
++++ modules/kfreebsd/parport-modules	(revision 0)
+@@ -0,0 +1,2 @@
++ppc ?
++ppbus ?
+Index: modules/kfreebsd/ide-core-modules
+===================================================================
+--- modules/kfreebsd/ide-core-modules	(revision 0)
++++ modules/kfreebsd/ide-core-modules	(revision 0)
+@@ -0,0 +1 @@
++ata ?
+Index: modules/kfreebsd/usb-modules
+===================================================================
+--- modules/kfreebsd/usb-modules	(revision 0)
++++ modules/kfreebsd/usb-modules	(revision 0)
+@@ -0,0 +1,4 @@
++ohci ?
++uhci ?
++ehci ?
++usb ?
+Index: modules/kfreebsd/cdrom-core-modules
+===================================================================
+--- modules/kfreebsd/cdrom-core-modules	(revision 0)
++++ modules/kfreebsd/cdrom-core-modules	(revision 0)
+@@ -0,0 +1,3 @@
++# SCSI cd
++cd ?
++atapicd ?
+Index: modules/kfreebsd/usb-storage-modules
+===================================================================
+--- modules/kfreebsd/usb-storage-modules	(revision 0)
++++ modules/kfreebsd/usb-storage-modules	(revision 0)
+@@ -0,0 +1 @@
++umass ?
+Index: modules/kfreebsd/pcmcia-modules
+===================================================================
+--- modules/kfreebsd/pcmcia-modules	(revision 0)
++++ modules/kfreebsd/pcmcia-modules	(revision 0)
+@@ -0,0 +1,6 @@
++# cardbus (yenta) bridge
++cbb ?
++# PC Card (16-bit) bus
++pccard ?
++# CardBus (32-bit) bus
++cardbus ?
+Index: modules/kfreebsd/ufs-modules
+===================================================================
+--- modules/kfreebsd/ufs-modules	(revision 0)
++++ modules/kfreebsd/ufs-modules	(revision 0)
+@@ -0,0 +1 @@
++ufs ?
+Index: modules/kfreebsd/ppp-modules
+===================================================================
+--- modules/kfreebsd/ppp-modules	(revision 0)
++++ modules/kfreebsd/ppp-modules	(revision 0)
+@@ -0,0 +1,5 @@
++if_ppp
++ng_ppp
++ng_pppoe
++ng_sppp
++sppp
+Index: modules/kfreebsd/md-modules
+===================================================================
+--- modules/kfreebsd/md-modules	(revision 0)
++++ modules/kfreebsd/md-modules	(revision 0)
+@@ -0,0 +1 @@
++md ?
+Index: modules/kfreebsd/nic-usb-modules
+===================================================================
+--- modules/kfreebsd/nic-usb-modules	(revision 0)
++++ modules/kfreebsd/nic-usb-modules	(revision 0)
+@@ -0,0 +1,12 @@
++# ADMtek USB Ethernet
++aue ?
++# ASIX Electronics USB Ethernet
++axe ?
++# Generic USB over Ethernet
++cdce ?
++# CATC USB Ethernet
++cue ?
++# Kawasaki LSI USB Ethernet
++kue ?
++# RealTek RTL8150 USB Ethernet
++rue ?
+Index: modules/kfreebsd/xfs-modules
+===================================================================
+--- modules/kfreebsd/xfs-modules	(revision 0)
++++ modules/kfreebsd/xfs-modules	(revision 0)
+@@ -0,0 +1,2 @@
++# Not available currently on all kernel versions, so marked optional.
++xfs ?
+Index: modules/kfreebsd/ide-modules
+===================================================================
+--- modules/kfreebsd/ide-modules	(revision 0)
++++ modules/kfreebsd/ide-modules	(revision 0)
+@@ -0,0 +1,4 @@
++atadisk ?
++ataraid ?
++cd9660 ?
++cd9660_iconv ?
+Index: modules/kfreebsd/firewire-core-modules
+===================================================================
+--- modules/kfreebsd/firewire-core-modules	(revision 0)
++++ modules/kfreebsd/firewire-core-modules	(revision 0)
+@@ -0,0 +1,5 @@
++firewire ?
++# SCSI over FireWire (Requires scbus and da)
++sbp ?
++# Ethernet over FireWire (non-standard!)
++fwe ?
+Index: modules/kfreebsd/nic-pcmcia-modules
+===================================================================
+--- modules/kfreebsd/nic-pcmcia-modules	(revision 0)
++++ modules/kfreebsd/nic-pcmcia-modules	(revision 0)
+@@ -0,0 +1,2 @@
++# Common pcmcia nic modules.
++if_ed ?
+Index: modules/kfreebsd/plip-modules
+===================================================================
+--- modules/kfreebsd/plip-modules	(revision 0)
++++ modules/kfreebsd/plip-modules	(revision 0)
+@@ -0,0 +1 @@
++plip
+Index: modules/kfreebsd/isa-pnp-modules
+===================================================================
+--- modules/kfreebsd/isa-pnp-modules	(revision 0)
++++ modules/kfreebsd/isa-pnp-modules	(revision 0)
+@@ -0,0 +1 @@
++isa ?
