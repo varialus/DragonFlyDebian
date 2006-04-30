@@ -1,6 +1,6 @@
-diff -Nur busybox-1.00.old/Makefile busybox-1.00/Makefile
---- busybox-1.00.old/Makefile	2005-08-27 12:30:44.000000000 +0200
-+++ busybox-1.00/Makefile	2005-08-27 12:37:40.000000000 +0200
+diff -Nur busybox-1.01.old/Makefile busybox-1.01/Makefile
+--- busybox-1.01.old/Makefile	2006-04-30 10:05:44.000000000 +0200
++++ busybox-1.01/Makefile	2006-04-29 12:29:01.000000000 +0200
 @@ -39,10 +39,13 @@
  
  -include $(top_builddir)/Rules.mak
@@ -19,30 +19,250 @@ diff -Nur busybox-1.00.old/Makefile busybox-1.00/Makefile
  
  SRC_DIRS:=$(patsubst %,$(top_srcdir)/%,$(DIRS))
  
-diff -Nur busybox-1.00.old/Rules.mak.in busybox-1.00/Rules.mak.in
---- busybox-1.00.old/Rules.mak.in	2005-08-27 12:30:44.000000000 +0200
-+++ busybox-1.00/Rules.mak.in	2005-08-27 12:51:45.000000000 +0200
-@@ -122,15 +122,12 @@
+diff -Nur busybox-1.01.old/Rules.mak.in busybox-1.01/Rules.mak.in
+--- busybox-1.01.old/Rules.mak.in	2006-04-30 10:05:44.000000000 +0200
++++ busybox-1.01/Rules.mak.in	2006-04-29 12:29:01.000000000 +0200
+@@ -133,9 +133,7 @@
  	LIBRARIES:=-lefence
      endif
  endif
 -ifeq ($(host_os),linux-gnu)
 -	CFLAGS += -D_GNU_SOURCE
 -endif
++CFLAGS += -D_GNU_SOURCE
  ifeq ($(strip $(CONFIG_DEBUG)),y)
--    CFLAGS  +=$(WARNINGS) -g
-+    CFLAGS  +=$(WARNINGS) -g -D_GNU_SOURCE
+     CFLAGS  +=$(WARNINGS) -g
      LDFLAGS +=-Wl,-warn-common
-     STRIPCMD:=/bin/true -Not_stripping_since_we_are_debugging
- else
--    CFLAGS+=$(WARNINGS) $(OPTIMIZATIONS) -DNDEBUG
-+    CFLAGS+=$(WARNINGS) $(OPTIMIZATIONS) -D_GNU_SOURCE -DNDEBUG
-     LDFLAGS += -s -Wl,-warn-common
-     STRIPCMD:=$(STRIP) --remove-section=.note --remove-section=.comment
- endif
-diff -Nur busybox-1.00.old/configure.ac busybox-1.00/configure.ac
---- busybox-1.00.old/configure.ac	2005-08-27 12:30:44.000000000 +0200
-+++ busybox-1.00/configure.ac	2005-08-27 12:40:58.000000000 +0200
+diff -Nur busybox-1.01.old/configure busybox-1.01/configure
+--- busybox-1.01.old/configure	2006-04-30 10:05:44.000000000 +0200
++++ busybox-1.01/configure	2006-04-29 12:29:01.000000000 +0200
+@@ -272,7 +272,7 @@
+ PACKAGE_BUGREPORT=
+ 
+ ac_unique_file="Rules.mak.in"
+-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT EGREP RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP host_cpu_unified host_cpu_modutils host_cpu_modutils_biarch host_os_unified LIBOBJS LTLIBOBJS'
++ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT RANLIB ac_ct_RANLIB STRIP ac_ct_STRIP host_cpu_unified host_cpu_modutils host_cpu_modutils_biarch host_os_unified LIBOBJS LTLIBOBJS'
+ ac_subst_files=''
+ 
+ # Initialize some variables set by options.
+@@ -800,11 +800,6 @@
+ 
+   cat <<\_ACEOF
+ 
+-Optional Packages:
+-  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+-  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+-  --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
+-
+ Some influential environment variables:
+   CC          C compiler command
+   CFLAGS      C compiler flags
+@@ -2258,185 +2253,7 @@
+ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+-echo "$as_me:$LINENO: checking for a sed that does not truncate output" >&5
+-echo $ECHO_N "checking for a sed that does not truncate output... $ECHO_C" >&6
+-if test "${lt_cv_path_SED+set}" = set; then
+-  echo $ECHO_N "(cached) $ECHO_C" >&6
+-else
+-  # Loop through the user's path and test for sed and gsed.
+-# Then use that list of sed's as ones to test for truncation.
+-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+-for as_dir in $PATH
+-do
+-  IFS=$as_save_IFS
+-  test -z "$as_dir" && as_dir=.
+-  for lt_ac_prog in sed gsed; do
+-    for ac_exec_ext in '' $ac_executable_extensions; do
+-      if $as_executable_p "$as_dir/$lt_ac_prog$ac_exec_ext"; then
+-        lt_ac_sed_list="$lt_ac_sed_list $as_dir/$lt_ac_prog$ac_exec_ext"
+-      fi
+-    done
+-  done
+-done
+-lt_ac_max=0
+-lt_ac_count=0
+-# Add /usr/xpg4/bin/sed as it is typically found on Solaris
+-# along with /bin/sed that truncates output.
+-for lt_ac_sed in $lt_ac_sed_list /usr/xpg4/bin/sed; do
+-  test ! -f $lt_ac_sed && break
+-  cat /dev/null > conftest.in
+-  lt_ac_count=0
+-  echo $ECHO_N "0123456789$ECHO_C" >conftest.in
+-  # Check for GNU sed and select it if it is found.
+-  if "$lt_ac_sed" --version 2>&1 < /dev/null | grep 'GNU' > /dev/null; then
+-    lt_cv_path_SED=$lt_ac_sed
+-    break
+-  fi
+-  while true; do
+-    cat conftest.in conftest.in >conftest.tmp
+-    mv conftest.tmp conftest.in
+-    cp conftest.in conftest.nl
+-    echo >>conftest.nl
+-    $lt_ac_sed -e 's/a$//' < conftest.nl >conftest.out || break
+-    cmp -s conftest.out conftest.nl || break
+-    # 10000 chars as input seems more than enough
+-    test $lt_ac_count -gt 10 && break
+-    lt_ac_count=`expr $lt_ac_count + 1`
+-    if test $lt_ac_count -gt $lt_ac_max; then
+-      lt_ac_max=$lt_ac_count
+-      lt_cv_path_SED=$lt_ac_sed
+-    fi
+-  done
+-done
+-SED=$lt_cv_path_SED
+-
+-fi
+-
+-echo "$as_me:$LINENO: result: $SED" >&5
+-echo "${ECHO_T}$SED" >&6
+-
+-echo "$as_me:$LINENO: checking for egrep" >&5
+-echo $ECHO_N "checking for egrep... $ECHO_C" >&6
+-if test "${ac_cv_prog_egrep+set}" = set; then
+-  echo $ECHO_N "(cached) $ECHO_C" >&6
+-else
+-  if echo a | (grep -E '(a|b)') >/dev/null 2>&1
+-    then ac_cv_prog_egrep='grep -E'
+-    else ac_cv_prog_egrep='egrep'
+-    fi
+-fi
+-echo "$as_me:$LINENO: result: $ac_cv_prog_egrep" >&5
+-echo "${ECHO_T}$ac_cv_prog_egrep" >&6
+- EGREP=$ac_cv_prog_egrep
+-
+-
+-
+-# Check whether --with-gnu-ld or --without-gnu-ld was given.
+-if test "${with_gnu_ld+set}" = set; then
+-  withval="$with_gnu_ld"
+-  test "$withval" = no || with_gnu_ld=yes
+-else
+-  with_gnu_ld=no
+-fi;
+-ac_prog=ld
+-if test "$GCC" = yes; then
+-  # Check if gcc -print-prog-name=ld gives a path.
+-  echo "$as_me:$LINENO: checking for ld used by $CC" >&5
+-echo $ECHO_N "checking for ld used by $CC... $ECHO_C" >&6
+-  case $host in
+-  *-*-mingw*)
+-    # gcc leaves a trailing carriage return which upsets mingw
+-    ac_prog=`($CC -print-prog-name=ld) 2>&5 | tr -d '\015'` ;;
+-  *)
+-    ac_prog=`($CC -print-prog-name=ld) 2>&5` ;;
+-  esac
+-  case $ac_prog in
+-    # Accept absolute paths.
+-    [\\/]* | ?:[\\/]*)
+-      re_direlt='/[^/][^/]*/\.\./'
+-      # Canonicalize the pathname of ld
+-      ac_prog=`echo $ac_prog| $SED 's%\\\\%/%g'`
+-      while echo $ac_prog | grep "$re_direlt" > /dev/null 2>&1; do
+-	ac_prog=`echo $ac_prog| $SED "s%$re_direlt%/%"`
+-      done
+-      test -z "$LD" && LD="$ac_prog"
+-      ;;
+-  "")
+-    # If it fails, then pretend we aren't using GCC.
+-    ac_prog=ld
+-    ;;
+-  *)
+-    # If it is relative, then search for the first ld in PATH.
+-    with_gnu_ld=unknown
+-    ;;
+-  esac
+-elif test "$with_gnu_ld" = yes; then
+-  echo "$as_me:$LINENO: checking for GNU ld" >&5
+-echo $ECHO_N "checking for GNU ld... $ECHO_C" >&6
+-else
+-  echo "$as_me:$LINENO: checking for non-GNU ld" >&5
+-echo $ECHO_N "checking for non-GNU ld... $ECHO_C" >&6
+-fi
+-if test "${lt_cv_path_LD+set}" = set; then
+-  echo $ECHO_N "(cached) $ECHO_C" >&6
+-else
+-  if test -z "$LD"; then
+-  lt_save_ifs="$IFS"; IFS=$PATH_SEPARATOR
+-  for ac_dir in $PATH; do
+-    IFS="$lt_save_ifs"
+-    test -z "$ac_dir" && ac_dir=.
+-    if test -f "$ac_dir/$ac_prog" || test -f "$ac_dir/$ac_prog$ac_exeext"; then
+-      lt_cv_path_LD="$ac_dir/$ac_prog"
+-      # Check to see if the program is GNU ld.  I'd rather use --version,
+-      # but apparently some GNU ld's only accept -v.
+-      # Break only if it was the GNU/non-GNU ld that we prefer.
+-      case `"$lt_cv_path_LD" -v 2>&1 </dev/null` in
+-      *GNU* | *'with BFD'*)
+-	test "$with_gnu_ld" != no && break
+-	;;
+-      *)
+-	test "$with_gnu_ld" != yes && break
+-	;;
+-      esac
+-    fi
+-  done
+-  IFS="$lt_save_ifs"
+-else
+-  lt_cv_path_LD="$LD" # Let the user override the test with a path.
+-fi
+-fi
+-
+-LD="$lt_cv_path_LD"
+-if test -n "$LD"; then
+-  echo "$as_me:$LINENO: result: $LD" >&5
+-echo "${ECHO_T}$LD" >&6
+-else
+-  echo "$as_me:$LINENO: result: no" >&5
+-echo "${ECHO_T}no" >&6
+-fi
+-test -z "$LD" && { { echo "$as_me:$LINENO: error: no acceptable ld found in \$PATH" >&5
+-echo "$as_me: error: no acceptable ld found in \$PATH" >&2;}
+-   { (exit 1); exit 1; }; }
+-echo "$as_me:$LINENO: checking if the linker ($LD) is GNU ld" >&5
+-echo $ECHO_N "checking if the linker ($LD) is GNU ld... $ECHO_C" >&6
+-if test "${lt_cv_prog_gnu_ld+set}" = set; then
+-  echo $ECHO_N "(cached) $ECHO_C" >&6
+-else
+-  # I'd rather use --version here, but apparently some GNU ld's only accept -v.
+-case `$LD -v 2>&1 </dev/null` in
+-*GNU* | *'with BFD'*)
+-  lt_cv_prog_gnu_ld=yes
+-  ;;
+-*)
+-  lt_cv_prog_gnu_ld=no
+-  ;;
+-esac
+-fi
+-echo "$as_me:$LINENO: result: $lt_cv_prog_gnu_ld" >&5
+-echo "${ECHO_T}$lt_cv_prog_gnu_ld" >&6
+-with_gnu_ld=$lt_cv_prog_gnu_ld
+-
+-
++AC_PROG_LD
+ if test -n "$ac_tool_prefix"; then
+   # Extract the first word of "${ac_tool_prefix}ranlib", so it can be a program name with args.
+ set dummy ${ac_tool_prefix}ranlib; ac_word=$2
+@@ -2629,6 +2446,7 @@
+ 
+ case "$host_os" in
+   linux*)    host_os_unified=linux ;;
++  kfreebsd*-gnu)    host_os_unified=gnu-kfreebsd ;;
+   *)         host_os_unified=$host_os ;;
+ esac
+ 
+@@ -3260,7 +3078,6 @@
+ s,@ac_ct_CC@,$ac_ct_CC,;t t
+ s,@EXEEXT@,$EXEEXT,;t t
+ s,@OBJEXT@,$OBJEXT,;t t
+-s,@EGREP@,$EGREP,;t t
+ s,@RANLIB@,$RANLIB,;t t
+ s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
+ s,@STRIP@,$STRIP,;t t
+diff -Nur busybox-1.01.old/configure.ac busybox-1.01/configure.ac
+--- busybox-1.01.old/configure.ac	2006-04-30 10:05:44.000000000 +0200
++++ busybox-1.01/configure.ac	2006-04-29 12:29:01.000000000 +0200
 @@ -40,6 +40,7 @@
  
  case "$host_os" in
@@ -51,10 +271,1578 @@ diff -Nur busybox-1.00.old/configure.ac busybox-1.00/configure.ac
    *)         host_os_unified=$host_os ;;
  esac
  
-diff -Nur busybox-1.00.old/init/init.c busybox-1.00/init/init.c
---- busybox-1.00.old/init/init.c	2005-06-09 16:10:17.000000000 +0200
-+++ busybox-1.00/init/init.c	2005-08-27 12:37:40.000000000 +0200
-@@ -167,14 +167,28 @@
+diff -Nur busybox-1.01.old/debian/config-deb busybox-1.01/debian/config-deb
+--- busybox-1.01.old/debian/config-deb	2006-04-30 10:05:44.000000000 +0200
++++ busybox-1.01/debian/config-deb	2006-04-29 12:29:01.000000000 +0200
+@@ -178,15 +178,15 @@
+ #
+ # Console Utilities
+ #
+-CONFIG_CHVT=y
+-CONFIG_CLEAR=y
+-CONFIG_DEALLOCVT=y
+-CONFIG_DUMPKMAP=y
+-CONFIG_LOADFONT=y
+-CONFIG_LOADKMAP=y
+-CONFIG_OPENVT=y
+-CONFIG_RESET=y
+-CONFIG_SETKEYCODES=y
++# CONFIG_CHVT is not set
++# CONFIG_CLEAR is not set
++# CONFIG_DEALLOCVT is not set
++# CONFIG_DUMPKMAP is not set
++# CONFIG_LOADFONT is not set
++# CONFIG_LOADKMAP is not set
++# CONFIG_OPENVT is not set
++# CONFIG_RESET is not set
++# CONFIG_SETKEYCODES is not set
+ 
+ #
+ # Debian Utilities
+@@ -273,7 +273,7 @@
+ #
+ # Miscellaneous Utilities
+ #
+-CONFIG_ADJTIMEX=y
++# CONFIG_ADJTIMEX is not set
+ # CONFIG_CROND is not set
+ # CONFIG_CRONTAB is not set
+ CONFIG_DC=y
+@@ -281,7 +281,7 @@
+ CONFIG_LAST=y
+ # CONFIG_HDPARM is not set
+ # CONFIG_MAKEDEVS is not set
+-CONFIG_MT=y
++# CONFIG_MT is not set
+ # CONFIG_RX is not set
+ CONFIG_STRINGS=y
+ CONFIG_TIME=y
+@@ -294,7 +294,7 @@
+ CONFIG_MODUTILS_OBJ=y
+ CONFIG_MODUTILS_OBJ_2_6=y
+ # CONFIG_DEPMOD is not set
+-CONFIG_INSMOD=y
++# CONFIG_INSMOD is not set
+ CONFIG_FEATURE_2_4_MODULES=y
+ CONFIG_FEATURE_2_6_MODULES=y
+ # CONFIG_FEATURE_INSMOD_VERSION_CHECKING is not set
+@@ -309,7 +309,7 @@
+ # Networking Utilities
+ #
+ CONFIG_FEATURE_IPV6=y
+-CONFIG_ARPING=y
++# CONFIG_ARPING is not set
+ CONFIG_FTPGET=y
+ CONFIG_FTPPUT=y
+ CONFIG_HOSTNAME=y
+@@ -322,15 +322,15 @@
+ # CONFIG_FEATURE_HTTPD_CONFIG_WITH_MIME_TYPES is not set
+ # CONFIG_FEATURE_HTTPD_CGI is not set
+ # CONFIG_FEATURE_HTTPD_ENCODE_URL_STR is not set
+-CONFIG_IFCONFIG=y
+-CONFIG_FEATURE_IFCONFIG_STATUS=y
+-CONFIG_FEATURE_IFCONFIG_SLIP=y
+-CONFIG_FEATURE_IFCONFIG_MEMSTART_IOADDR_IRQ=y
+-CONFIG_FEATURE_IFCONFIG_HW=y
+-CONFIG_FEATURE_IFCONFIG_BROADCAST_PLUS=y
++# CONFIG_IFCONFIG is not set
++# CONFIG_FEATURE_IFCONFIG_STATUS is not set
++# CONFIG_FEATURE_IFCONFIG_SLIP is not set
++# CONFIG_FEATURE_IFCONFIG_MEMSTART_IOADDR_IRQ is not set
++# CONFIG_FEATURE_IFCONFIG_HW is not set
++# CONFIG_FEATURE_IFCONFIG_BROADCAST_PLUS is not set
+ # CONFIG_IFUPDOWN is not set
+ # CONFIG_INETD is not set
+-CONFIG_IP=y
++# CONFIG_IP is not set
+ CONFIG_FEATURE_IP_ADDRESS=y
+ 
+ #
+@@ -341,7 +341,7 @@
+ #
+ #   link (forced enabled for iplink)
+ #
+-CONFIG_FEATURE_IP_ROUTE=y
++# CONFIG_FEATURE_IP_ROUTE is not set
+ 
+ #
+ #   route (forced enabled for iproute)
+@@ -353,19 +353,19 @@
+ #
+ CONFIG_IPCALC=y
+ CONFIG_FEATURE_IPCALC_FANCY=y
+-CONFIG_IPADDR=y
+-CONFIG_IPLINK=y
+-CONFIG_IPROUTE=y
+-CONFIG_IPTUNNEL=y
+-CONFIG_NAMEIF=y
++# CONFIG_IPADDR is not set
++# CONFIG_IPLINK is not set
++# CONFIG_IPROUTE is not set
++# CONFIG_IPTUNNEL is not set
++# CONFIG_NAMEIF is not set
+ CONFIG_NC=y
+-CONFIG_NETSTAT=y
++# CONFIG_NETSTAT is not set
+ CONFIG_NSLOOKUP=y
+-CONFIG_PING=y
++# CONFIG_PING is not set
+ CONFIG_FEATURE_FANCY_PING=y
+-CONFIG_PING6=y
++# CONFIG_PING6 is not set
+ CONFIG_FEATURE_FANCY_PING6=y
+-CONFIG_ROUTE=y
++# CONFIG_ROUTE is not set
+ CONFIG_TELNET=y
+ CONFIG_FEATURE_TELNET_TTYPE=y
+ CONFIG_FEATURE_TELNET_AUTOLOGIN=y
+@@ -376,8 +376,8 @@
+ CONFIG_FEATURE_TFTP_PUT=y
+ CONFIG_FEATURE_TFTP_BLOCKSIZE=y
+ CONFIG_FEATURE_TFTP_DEBUG=y
+-CONFIG_TRACEROUTE=y
+-CONFIG_FEATURE_TRACEROUTE_VERBOSE=y
++# CONFIG_TRACEROUTE is not set
++# CONFIG_FEATURE_TRACEROUTE_VERBOSE is not set
+ # CONFIG_VCONFIG is not set
+ CONFIG_WGET=y
+ CONFIG_FEATURE_WGET_STATUSBAR=y
+@@ -387,9 +387,9 @@
+ #
+ # udhcp Server/Client
+ #
+-CONFIG_UDHCPD=y
+-CONFIG_UDHCPC=y
+-CONFIG_DUMPLEASES=y
++# CONFIG_UDHCPD is not set
++# CONFIG_UDHCPC is not set
++# CONFIG_DUMPLEASES is not set
+ CONFIG_FEATURE_UDHCP_SYSLOG=y
+ CONFIG_FEATURE_UDHCP_DEBUG=y
+ 
+@@ -404,7 +404,7 @@
+ CONFIG_RENICE=y
+ CONFIG_TOP=y
+ FEATURE_CPU_USAGE_PERCENTAGE=y
+-CONFIG_UPTIME=y
++# CONFIG_UPTIME is not set
+ # CONFIG_SYSCTL is not set
+ 
+ #
+@@ -449,12 +449,12 @@
+ # System Logging Utilities
+ #
+ # CONFIG_SYSLOGD is not set
+-CONFIG_LOGGER=y
++# CONFIG_LOGGER is not set
+ 
+ #
+ # Linux System Utilities
+ #
+-CONFIG_DMESG=y
++# CONFIG_DMESG is not set
+ # CONFIG_FBSET is not set
+ # CONFIG_FDFLUSH is not set
+ # CONFIG_FDFORMAT is not set
+@@ -466,16 +466,16 @@
+ CONFIG_GETOPT=y
+ CONFIG_HEXDUMP=y
+ # CONFIG_HWCLOCK is not set
+-CONFIG_LOSETUP=y
++# CONFIG_LOSETUP is not set
+ # CONFIG_MKSWAP is not set
+ CONFIG_MORE=y
+ CONFIG_FEATURE_USE_TERMIOS=y
+ # CONFIG_PIVOT_ROOT is not set
+ CONFIG_RDATE=y
+-CONFIG_SWAPONOFF=y
+-CONFIG_MOUNT=y
++# CONFIG_SWAPONOFF is not set
++# CONFIG_MOUNT is not set
+ CONFIG_NFSMOUNT=y
+-CONFIG_UMOUNT=y
++# CONFIG_UMOUNT is not set
+ CONFIG_FEATURE_MOUNT_FORCE=y
+ 
+ #
+diff -Nur busybox-1.01.old/debian/config-deb-linux busybox-1.01/debian/config-deb-linux
+--- busybox-1.01.old/debian/config-deb-linux	1970-01-01 01:00:00.000000000 +0100
++++ busybox-1.01/debian/config-deb-linux	2006-04-29 12:29:01.000000000 +0200
+@@ -0,0 +1,490 @@
++#
++# Automatically generated make config: don't edit
++#
++HAVE_DOT_CONFIG=y
++
++#
++# General Configuration
++#
++# CONFIG_FEATURE_BUFFERS_USE_MALLOC is not set
++CONFIG_FEATURE_BUFFERS_GO_ON_STACK=y
++# CONFIG_FEATURE_BUFFERS_GO_IN_BSS is not set
++CONFIG_FEATURE_VERBOSE_USAGE=y
++CONFIG_FEATURE_INSTALLER=y
++# CONFIG_LOCALE_SUPPORT is not set
++# CONFIG_FEATURE_DEVFS is not set
++CONFIG_FEATURE_DEVPTS=y
++# CONFIG_FEATURE_CLEAN_UP is not set
++CONFIG_FEATURE_SUID=y
++# CONFIG_FEATURE_SUID_CONFIG is not set
++# CONFIG_SELINUX is not set
++
++#
++# Build Options
++#
++# CONFIG_STATIC is not set
++CONFIG_LFS=y
++# USING_CROSS_COMPILER is not set
++EXTRA_CFLAGS_OPTIONS=""
++
++#
++# Installation Options
++#
++# CONFIG_INSTALL_NO_USR is not set
++PREFIX="./_install"
++
++#
++# Archival Utilities
++#
++CONFIG_AR=y
++CONFIG_FEATURE_AR_LONG_FILENAMES=y
++CONFIG_BUNZIP2=y
++CONFIG_CPIO=y
++# CONFIG_DPKG is not set
++# CONFIG_DPKG_DEB is not set
++CONFIG_GUNZIP=y
++CONFIG_FEATURE_GUNZIP_UNCOMPRESS=y
++CONFIG_GZIP=y
++CONFIG_RPM2CPIO=y
++CONFIG_RPM=y
++CONFIG_TAR=y
++CONFIG_FEATURE_TAR_CREATE=y
++CONFIG_FEATURE_TAR_BZIP2=y
++# CONFIG_FEATURE_TAR_FROM is not set
++CONFIG_FEATURE_TAR_GZIP=y
++# CONFIG_FEATURE_TAR_COMPRESS is not set
++# CONFIG_FEATURE_TAR_OLDGNU_COMPATABILITY is not set
++CONFIG_FEATURE_TAR_GNU_EXTENSIONS=y
++# CONFIG_FEATURE_TAR_LONG_OPTIONS is not set
++CONFIG_UNCOMPRESS=y
++CONFIG_UNZIP=y
++
++#
++# Common options for cpio and tar
++#
++CONFIG_FEATURE_UNARCHIVE_TAPE=y
++
++#
++# Coreutils
++#
++CONFIG_BASENAME=y
++CONFIG_CAL=y
++CONFIG_CAT=y
++CONFIG_CHGRP=y
++CONFIG_CHMOD=y
++CONFIG_CHOWN=y
++CONFIG_CHROOT=y
++CONFIG_CMP=y
++CONFIG_CP=y
++CONFIG_CUT=y
++CONFIG_DATE=y
++
++#
++# date (forced enabled for use with watch)
++#
++CONFIG_FEATURE_DATE_ISOFMT=y
++CONFIG_DD=y
++CONFIG_DF=y
++CONFIG_DIRNAME=y
++CONFIG_DOS2UNIX=y
++CONFIG_UNIX2DOS=y
++CONFIG_DU=y
++CONFIG_FEATURE_DU_DEFALT_BLOCKSIZE_1K=y
++CONFIG_ECHO=y
++CONFIG_FEATURE_FANCY_ECHO=y
++CONFIG_ENV=y
++CONFIG_EXPR=y
++CONFIG_FALSE=y
++CONFIG_FOLD=y
++CONFIG_HEAD=y
++CONFIG_FEATURE_FANCY_HEAD=y
++CONFIG_HOSTID=y
++CONFIG_ID=y
++# CONFIG_INSTALL is not set
++CONFIG_LENGTH=y
++CONFIG_LN=y
++CONFIG_LOGNAME=y
++CONFIG_LS=y
++CONFIG_FEATURE_LS_FILETYPES=y
++CONFIG_FEATURE_LS_FOLLOWLINKS=y
++CONFIG_FEATURE_LS_RECURSIVE=y
++CONFIG_FEATURE_LS_SORTFILES=y
++CONFIG_FEATURE_LS_TIMESTAMPS=y
++CONFIG_FEATURE_LS_USERNAME=y
++CONFIG_FEATURE_LS_COLOR=y
++CONFIG_MD5SUM=y
++CONFIG_MKDIR=y
++CONFIG_MKFIFO=y
++CONFIG_MKNOD=y
++CONFIG_MV=y
++CONFIG_OD=y
++CONFIG_PRINTF=y
++CONFIG_PWD=y
++CONFIG_REALPATH=y
++CONFIG_RM=y
++CONFIG_RMDIR=y
++# CONFIG_SEQ is not set
++CONFIG_SHA1SUM=y
++CONFIG_SLEEP=y
++CONFIG_FEATURE_FANCY_SLEEP=y
++CONFIG_SORT=y
++CONFIG_STTY=y
++CONFIG_SYNC=y
++CONFIG_TAIL=y
++CONFIG_FEATURE_FANCY_TAIL=y
++CONFIG_TEE=y
++CONFIG_FEATURE_TEE_USE_BLOCK_IO=y
++CONFIG_TEST=y
++
++#
++# test (forced enabled for use with shell)
++#
++CONFIG_FEATURE_TEST_64=y
++CONFIG_TOUCH=y
++CONFIG_TR=y
++CONFIG_TRUE=y
++CONFIG_TTY=y
++CONFIG_UNAME=y
++CONFIG_UNIQ=y
++CONFIG_USLEEP=y
++CONFIG_UUDECODE=y
++CONFIG_UUENCODE=y
++CONFIG_WATCH=y
++CONFIG_WC=y
++CONFIG_WHO=y
++CONFIG_WHOAMI=y
++CONFIG_YES=y
++
++#
++# Common options for cp and mv
++#
++CONFIG_FEATURE_PRESERVE_HARDLINKS=y
++
++#
++# Common options for ls and more
++#
++CONFIG_FEATURE_AUTOWIDTH=y
++
++#
++# Common options for df, du, ls
++#
++CONFIG_FEATURE_HUMAN_READABLE=y
++
++#
++# Common options for md5sum, sha1sum
++#
++# CONFIG_FEATURE_MD5_SHA1_SUM_CHECK is not set
++
++#
++# Console Utilities
++#
++CONFIG_CHVT=y
++CONFIG_CLEAR=y
++CONFIG_DEALLOCVT=y
++CONFIG_DUMPKMAP=y
++CONFIG_LOADFONT=y
++CONFIG_LOADKMAP=y
++CONFIG_OPENVT=y
++CONFIG_RESET=y
++CONFIG_SETKEYCODES=y
++
++#
++# Debian Utilities
++#
++CONFIG_MKTEMP=y
++# CONFIG_PIPE_PROGRESS is not set
++CONFIG_READLINK=y
++CONFIG_FEATURE_READLINK_FOLLOW=y
++CONFIG_RUN_PARTS=y
++CONFIG_START_STOP_DAEMON=y
++CONFIG_WHICH=y
++
++#
++# Editors
++#
++CONFIG_AWK=y
++CONFIG_FEATURE_AWK_MATH=y
++CONFIG_PATCH=y
++CONFIG_SED=y
++CONFIG_VI=y
++CONFIG_FEATURE_VI_COLON=y
++CONFIG_FEATURE_VI_YANKMARK=y
++CONFIG_FEATURE_VI_SEARCH=y
++CONFIG_FEATURE_VI_USE_SIGNALS=y
++CONFIG_FEATURE_VI_DOT_CMD=y
++CONFIG_FEATURE_VI_READONLY=y
++CONFIG_FEATURE_VI_SETOPTS=y
++CONFIG_FEATURE_VI_SET=y
++CONFIG_FEATURE_VI_WIN_RESIZE=y
++CONFIG_FEATURE_VI_OPTIMIZE_CURSOR=y
++
++#
++# Finding Utilities
++#
++CONFIG_FIND=y
++CONFIG_FEATURE_FIND_MTIME=y
++CONFIG_FEATURE_FIND_PERM=y
++CONFIG_FEATURE_FIND_TYPE=y
++CONFIG_FEATURE_FIND_XDEV=y
++CONFIG_FEATURE_FIND_NEWER=y
++CONFIG_FEATURE_FIND_INUM=y
++CONFIG_GREP=y
++CONFIG_FEATURE_GREP_EGREP_ALIAS=y
++CONFIG_FEATURE_GREP_FGREP_ALIAS=y
++CONFIG_FEATURE_GREP_CONTEXT=y
++CONFIG_XARGS=y
++# CONFIG_FEATURE_XARGS_SUPPORT_CONFIRMATION is not set
++# CONFIG_FEATURE_XARGS_SUPPORT_QUOTES is not set
++# CONFIG_FEATURE_XARGS_SUPPORT_TERMOPT is not set
++# CONFIG_FEATURE_XARGS_SUPPORT_ZERO_TERM is not set
++
++#
++# Init Utilities
++#
++# CONFIG_INIT is not set
++# CONFIG_HALT is not set
++# CONFIG_POWEROFF is not set
++# CONFIG_REBOOT is not set
++# CONFIG_MESG is not set
++
++#
++# Login/Password Management Utilities
++#
++# CONFIG_USE_BB_PWD_GRP is not set
++# CONFIG_ADDGROUP is not set
++# CONFIG_DELGROUP is not set
++# CONFIG_ADDUSER is not set
++# CONFIG_DELUSER is not set
++# CONFIG_GETTY is not set
++CONFIG_FEATURE_UTMP=y
++CONFIG_FEATURE_WTMP=y
++CONFIG_LOGIN=y
++# CONFIG_FEATURE_SECURETTY is not set
++# CONFIG_PASSWD is not set
++# CONFIG_SU is not set
++# CONFIG_SULOGIN is not set
++# CONFIG_VLOCK is not set
++
++#
++# Common options for adduser, deluser, login, su
++#
++# CONFIG_FEATURE_SHADOWPASSWDS is not set
++
++#
++# Miscellaneous Utilities
++#
++CONFIG_ADJTIMEX=y
++# CONFIG_CROND is not set
++# CONFIG_CRONTAB is not set
++CONFIG_DC=y
++# CONFIG_DEVFSD is not set
++CONFIG_LAST=y
++# CONFIG_HDPARM is not set
++# CONFIG_MAKEDEVS is not set
++CONFIG_MT=y
++# CONFIG_RX is not set
++CONFIG_STRINGS=y
++CONFIG_TIME=y
++CONFIG_WATCHDOG=y
++
++#
++# Linux Module Utilities
++#
++CONFIG_MODUTILS=y
++CONFIG_MODUTILS_OBJ=y
++CONFIG_MODUTILS_OBJ_2_6=y
++# CONFIG_DEPMOD is not set
++CONFIG_INSMOD=y
++CONFIG_FEATURE_2_4_MODULES=y
++CONFIG_FEATURE_2_6_MODULES=y
++# CONFIG_FEATURE_INSMOD_VERSION_CHECKING is not set
++# CONFIG_FEATURE_INSMOD_KSYMOOPS_SYMBOLS is not set
++# CONFIG_FEATURE_INSMOD_LOAD_MAP is not set
++# CONFIG_LSMOD is not set
++# CONFIG_MODPROBE is not set
++# CONFIG_RMMOD is not set
++CONFIG_FEATURE_CHECK_TAINTED_MODULE=y
++
++#
++# Networking Utilities
++#
++CONFIG_FEATURE_IPV6=y
++CONFIG_ARPING=y
++CONFIG_FTPGET=y
++CONFIG_FTPPUT=y
++CONFIG_HOSTNAME=y
++CONFIG_HTTPD=y
++# CONFIG_FEATURE_HTTPD_USAGE_FROM_INETD_ONLY is not set
++CONFIG_FEATURE_HTTPD_BASIC_AUTH=y
++# CONFIG_FEATURE_HTTPD_AUTH_MD5 is not set
++# CONFIG_FEATURE_HTTPD_RELOAD_CONFIG_SIGHUP is not set
++# CONFIG_FEATURE_HTTPD_SETUID is not set
++# CONFIG_FEATURE_HTTPD_CONFIG_WITH_MIME_TYPES is not set
++# CONFIG_FEATURE_HTTPD_CGI is not set
++# CONFIG_FEATURE_HTTPD_ENCODE_URL_STR is not set
++CONFIG_IFCONFIG=y
++CONFIG_FEATURE_IFCONFIG_STATUS=y
++CONFIG_FEATURE_IFCONFIG_SLIP=y
++CONFIG_FEATURE_IFCONFIG_MEMSTART_IOADDR_IRQ=y
++CONFIG_FEATURE_IFCONFIG_HW=y
++CONFIG_FEATURE_IFCONFIG_BROADCAST_PLUS=y
++# CONFIG_IFUPDOWN is not set
++# CONFIG_INETD is not set
++CONFIG_IP=y
++CONFIG_FEATURE_IP_ADDRESS=y
++
++#
++#   address (forced enabled for ipaddr)
++#
++CONFIG_FEATURE_IP_LINK=y
++
++#
++#   link (forced enabled for iplink)
++#
++CONFIG_FEATURE_IP_ROUTE=y
++
++#
++#   route (forced enabled for iproute)
++#
++CONFIG_FEATURE_IP_TUNNEL=y
++
++#
++#   tunnel (forced enabled for iptunnel)
++#
++CONFIG_IPCALC=y
++CONFIG_FEATURE_IPCALC_FANCY=y
++CONFIG_IPADDR=y
++CONFIG_IPLINK=y
++CONFIG_IPROUTE=y
++CONFIG_IPTUNNEL=y
++CONFIG_NAMEIF=y
++CONFIG_NC=y
++CONFIG_NETSTAT=y
++CONFIG_NSLOOKUP=y
++CONFIG_PING=y
++CONFIG_FEATURE_FANCY_PING=y
++CONFIG_PING6=y
++CONFIG_FEATURE_FANCY_PING6=y
++CONFIG_ROUTE=y
++CONFIG_TELNET=y
++CONFIG_FEATURE_TELNET_TTYPE=y
++CONFIG_FEATURE_TELNET_AUTOLOGIN=y
++CONFIG_TELNETD=y
++# CONFIG_FEATURE_TELNETD_INETD is not set
++CONFIG_TFTP=y
++CONFIG_FEATURE_TFTP_GET=y
++CONFIG_FEATURE_TFTP_PUT=y
++CONFIG_FEATURE_TFTP_BLOCKSIZE=y
++CONFIG_FEATURE_TFTP_DEBUG=y
++CONFIG_TRACEROUTE=y
++CONFIG_FEATURE_TRACEROUTE_VERBOSE=y
++# CONFIG_VCONFIG is not set
++CONFIG_WGET=y
++CONFIG_FEATURE_WGET_STATUSBAR=y
++CONFIG_FEATURE_WGET_AUTHENTICATION=y
++CONFIG_FEATURE_WGET_IP6_LITERAL=y
++
++#
++# udhcp Server/Client
++#
++CONFIG_UDHCPD=y
++CONFIG_UDHCPC=y
++CONFIG_DUMPLEASES=y
++CONFIG_FEATURE_UDHCP_SYSLOG=y
++CONFIG_FEATURE_UDHCP_DEBUG=y
++
++#
++# Process Utilities
++#
++CONFIG_FREE=y
++CONFIG_KILL=y
++CONFIG_KILLALL=y
++CONFIG_PIDOF=y
++CONFIG_PS=y
++CONFIG_RENICE=y
++CONFIG_TOP=y
++FEATURE_CPU_USAGE_PERCENTAGE=y
++CONFIG_UPTIME=y
++# CONFIG_SYSCTL is not set
++
++#
++# Another Bourne-like Shell
++#
++CONFIG_FEATURE_SH_IS_ASH=y
++# CONFIG_FEATURE_SH_IS_HUSH is not set
++# CONFIG_FEATURE_SH_IS_LASH is not set
++# CONFIG_FEATURE_SH_IS_MSH is not set
++# CONFIG_FEATURE_SH_IS_NONE is not set
++CONFIG_ASH=y
++
++#
++# Ash Shell Options
++#
++CONFIG_ASH_JOB_CONTROL=y
++CONFIG_ASH_ALIAS=y
++CONFIG_ASH_MATH_SUPPORT=y
++CONFIG_ASH_MATH_SUPPORT_64=y
++CONFIG_ASH_GETOPTS=y
++CONFIG_ASH_CMDCMD=y
++CONFIG_ASH_MAIL=y
++CONFIG_ASH_OPTIMIZE_FOR_SIZE=y
++# CONFIG_ASH_RANDOM_SUPPORT is not set
++# CONFIG_HUSH is not set
++# CONFIG_LASH is not set
++# CONFIG_MSH is not set
++
++#
++# Bourne Shell Options
++#
++# CONFIG_FEATURE_SH_EXTRA_QUIET is not set
++CONFIG_FEATURE_SH_STANDALONE_SHELL=y
++CONFIG_FEATURE_COMMAND_EDITING=y
++CONFIG_FEATURE_COMMAND_HISTORY=15
++CONFIG_FEATURE_COMMAND_SAVEHISTORY=y
++CONFIG_FEATURE_COMMAND_TAB_COMPLETION=y
++CONFIG_FEATURE_COMMAND_USERNAME_COMPLETION=y
++CONFIG_FEATURE_SH_FANCY_PROMPT=y
++
++#
++# System Logging Utilities
++#
++# CONFIG_SYSLOGD is not set
++CONFIG_LOGGER=y
++
++#
++# Linux System Utilities
++#
++CONFIG_DMESG=y
++# CONFIG_FBSET is not set
++# CONFIG_FDFLUSH is not set
++# CONFIG_FDFORMAT is not set
++# CONFIG_FDISK is not set
++FDISK_SUPPORT_LARGE_DISKS=y
++# CONFIG_FREERAMDISK is not set
++# CONFIG_FSCK_MINIX is not set
++# CONFIG_MKFS_MINIX is not set
++CONFIG_GETOPT=y
++CONFIG_HEXDUMP=y
++# CONFIG_HWCLOCK is not set
++CONFIG_LOSETUP=y
++# CONFIG_MKSWAP is not set
++CONFIG_MORE=y
++CONFIG_FEATURE_USE_TERMIOS=y
++# CONFIG_PIVOT_ROOT is not set
++CONFIG_RDATE=y
++CONFIG_SWAPONOFF=y
++CONFIG_MOUNT=y
++CONFIG_NFSMOUNT=y
++CONFIG_UMOUNT=y
++CONFIG_FEATURE_MOUNT_FORCE=y
++
++#
++# Common options for mount/umount
++#
++CONFIG_FEATURE_MOUNT_LOOP=y
++# CONFIG_FEATURE_MTAB_SUPPORT is not set
++
++#
++# Debugging Options
++#
++# CONFIG_DEBUG is not set
+diff -Nur busybox-1.01.old/debian/config-static busybox-1.01/debian/config-static
+--- busybox-1.01.old/debian/config-static	2006-04-30 10:05:44.000000000 +0200
++++ busybox-1.01/debian/config-static	2006-04-29 12:29:01.000000000 +0200
+@@ -186,15 +186,15 @@
+ #
+ # Console Utilities
+ #
+-CONFIG_CHVT=y
+-CONFIG_CLEAR=y
+-CONFIG_DEALLOCVT=y
+-CONFIG_DUMPKMAP=y
+-CONFIG_LOADFONT=y
+-CONFIG_LOADKMAP=y
+-CONFIG_OPENVT=y
+-CONFIG_RESET=y
+-CONFIG_SETKEYCODES=y
++# CONFIG_CHVT is not set
++# CONFIG_CLEAR is not set
++# CONFIG_DEALLOCVT is not set
++# CONFIG_DUMPKMAP is not set
++# CONFIG_LOADFONT is not set
++# CONFIG_LOADKMAP is not set
++# CONFIG_OPENVT is not set
++# CONFIG_RESET is not set
++# CONFIG_SETKEYCODES is not set
+ 
+ #
+ # Debian Utilities
+@@ -276,7 +276,7 @@
+ CONFIG_PASSWD=y
+ CONFIG_SU=y
+ CONFIG_SULOGIN=y
+-CONFIG_VLOCK=y
++# CONFIG_VLOCK is not set
+ 
+ #
+ # Common options for adduser, deluser, login, su
+@@ -287,7 +287,7 @@
+ #
+ # Miscellaneous Utilities
+ #
+-CONFIG_ADJTIMEX=y
++# CONFIG_ADJTIMEX is not set
+ CONFIG_CROND=y
+ CONFIG_FEATURE_CROND_CALL_SENDMAIL=y
+ CONFIG_CRONTAB=y
+@@ -296,7 +296,7 @@
+ CONFIG_LAST=y
+ # CONFIG_HDPARM is not set
+ CONFIG_MAKEDEVS=y
+-CONFIG_MT=y
++# CONFIG_MT is not set
+ # CONFIG_RX is not set
+ CONFIG_STRINGS=y
+ CONFIG_TIME=y
+@@ -318,7 +318,7 @@
+ # Networking Utilities
+ #
+ CONFIG_FEATURE_IPV6=y
+-CONFIG_ARPING=y
++# CONFIG_ARPING is not set
+ CONFIG_FTPGET=y
+ CONFIG_FTPPUT=y
+ CONFIG_HOSTNAME=y
+@@ -331,21 +331,21 @@
+ # CONFIG_FEATURE_HTTPD_CONFIG_WITH_MIME_TYPES is not set
+ # CONFIG_FEATURE_HTTPD_CGI is not set
+ # CONFIG_FEATURE_HTTPD_ENCODE_URL_STR is not set
+-CONFIG_IFCONFIG=y
+-CONFIG_FEATURE_IFCONFIG_STATUS=y
+-CONFIG_FEATURE_IFCONFIG_SLIP=y
+-CONFIG_FEATURE_IFCONFIG_MEMSTART_IOADDR_IRQ=y
+-CONFIG_FEATURE_IFCONFIG_HW=y
+-CONFIG_FEATURE_IFCONFIG_BROADCAST_PLUS=y
++# CONFIG_IFCONFIG is not set
++# CONFIG_FEATURE_IFCONFIG_STATUS is not set
++# CONFIG_FEATURE_IFCONFIG_SLIP is not set
++# CONFIG_FEATURE_IFCONFIG_MEMSTART_IOADDR_IRQ is not set
++# CONFIG_FEATURE_IFCONFIG_HW is not set
++# CONFIG_FEATURE_IFCONFIG_BROADCAST_PLUS is not set
+ CONFIG_IFUPDOWN=y
+ # CONFIG_FEATURE_IFUPDOWN_IP is not set
+-CONFIG_FEATURE_IFUPDOWN_IP_BUILTIN=y
++# CONFIG_FEATURE_IFUPDOWN_IP_BUILTIN is not set
+ CONFIG_FEATURE_IFUPDOWN_IPV4=y
+ CONFIG_FEATURE_IFUPDOWN_IPV6=y
+ CONFIG_FEATURE_IFUPDOWN_IPX=y
+ CONFIG_FEATURE_IFUPDOWN_MAPPING=y
+ # CONFIG_INETD is not set
+-CONFIG_IP=y
++# CONFIG_IP is not set
+ CONFIG_FEATURE_IP_ADDRESS=y
+ 
+ #
+@@ -356,7 +356,7 @@
+ #
+ #   link (forced enabled for iplink)
+ #
+-CONFIG_FEATURE_IP_ROUTE=y
++# CONFIG_FEATURE_IP_ROUTE is not set
+ 
+ #
+ #   route (forced enabled for iproute)
+@@ -368,19 +368,19 @@
+ #
+ CONFIG_IPCALC=y
+ CONFIG_FEATURE_IPCALC_FANCY=y
+-CONFIG_IPADDR=y
+-CONFIG_IPLINK=y
+-CONFIG_IPROUTE=y
+-CONFIG_IPTUNNEL=y
+-CONFIG_NAMEIF=y
++# CONFIG_IPADDR is not set
++# CONFIG_IPLINK is not set
++# CONFIG_IPROUTE is not set
++# CONFIG_IPTUNNEL is not set
++# CONFIG_NAMEIF is not set
+ CONFIG_NC=y
+-CONFIG_NETSTAT=y
++# CONFIG_NETSTAT is not set
+ CONFIG_NSLOOKUP=y
+-CONFIG_PING=y
++# CONFIG_PING is not set
+ CONFIG_FEATURE_FANCY_PING=y
+-CONFIG_PING6=y
++# CONFIG_PING6 is not set
+ CONFIG_FEATURE_FANCY_PING6=y
+-CONFIG_ROUTE=y
++# CONFIG_ROUTE is not set
+ CONFIG_TELNET=y
+ CONFIG_FEATURE_TELNET_TTYPE=y
+ CONFIG_FEATURE_TELNET_AUTOLOGIN=y
+@@ -391,8 +391,8 @@
+ CONFIG_FEATURE_TFTP_PUT=y
+ CONFIG_FEATURE_TFTP_BLOCKSIZE=y
+ CONFIG_FEATURE_TFTP_DEBUG=y
+-CONFIG_TRACEROUTE=y
+-CONFIG_FEATURE_TRACEROUTE_VERBOSE=y
++# CONFIG_TRACEROUTE is not set
++# CONFIG_FEATURE_TRACEROUTE_VERBOSE is not set
+ # CONFIG_VCONFIG is not set
+ CONFIG_WGET=y
+ CONFIG_FEATURE_WGET_STATUSBAR=y
+@@ -402,9 +402,9 @@
+ #
+ # udhcp Server/Client
+ #
+-CONFIG_UDHCPD=y
+-CONFIG_UDHCPC=y
+-CONFIG_DUMPLEASES=y
++# CONFIG_UDHCPD is not set
++# CONFIG_UDHCPC is not set
++# CONFIG_DUMPLEASES is not set
+ CONFIG_FEATURE_UDHCP_SYSLOG=y
+ CONFIG_FEATURE_UDHCP_DEBUG=y
+ 
+@@ -419,7 +419,7 @@
+ CONFIG_RENICE=y
+ CONFIG_TOP=y
+ FEATURE_CPU_USAGE_PERCENTAGE=y
+-CONFIG_UPTIME=y
++# CONFIG_UPTIME is not set
+ # CONFIG_SYSCTL is not set
+ 
+ #
+@@ -463,26 +463,26 @@
+ #
+ # System Logging Utilities
+ #
+-CONFIG_SYSLOGD=y
++# CONFIG_SYSLOGD is not set
+ # CONFIG_FEATURE_ROTATE_LOGFILE is not set
+ CONFIG_FEATURE_REMOTE_LOG=y
+ CONFIG_FEATURE_IPC_SYSLOG=y
+ CONFIG_FEATURE_IPC_SYSLOG_BUFFER_SIZE=16
+ CONFIG_LOGREAD=y
+ # CONFIG_FEATURE_LOGREAD_REDUCED_LOCKING is not set
+-CONFIG_KLOGD=y
+-CONFIG_LOGGER=y
++# CONFIG_KLOGD is not set
++# CONFIG_LOGGER is not set
+ 
+ #
+ # Linux System Utilities
+ #
+-CONFIG_DMESG=y
++# CONFIG_DMESG is not set
+ CONFIG_FBSET=y
+ CONFIG_FEATURE_FBSET_FANCY=y
+ CONFIG_FEATURE_FBSET_READMODE=y
+ CONFIG_FDFLUSH=y
+ # CONFIG_FDFORMAT is not set
+-CONFIG_FDISK=y
++# CONFIG_FDISK is not set
+ FDISK_SUPPORT_LARGE_DISKS=y
+ CONFIG_FEATURE_FDISK_WRITABLE=y
+ CONFIG_FEATURE_AIX_LABEL=y
+@@ -502,16 +502,16 @@
+ CONFIG_HEXDUMP=y
+ CONFIG_HWCLOCK=y
+ CONFIG_FEATURE_HWCLOCK_LONGOPTIONS=y
+-CONFIG_LOSETUP=y
++# CONFIG_LOSETUP is not set
+ CONFIG_MKSWAP=y
+ CONFIG_MORE=y
+ CONFIG_FEATURE_USE_TERMIOS=y
+ CONFIG_PIVOT_ROOT=y
+ CONFIG_RDATE=y
+-CONFIG_SWAPONOFF=y
+-CONFIG_MOUNT=y
++# CONFIG_SWAPONOFF is not set
++# CONFIG_MOUNT is not set
+ CONFIG_NFSMOUNT=y
+-CONFIG_UMOUNT=y
++# CONFIG_UMOUNT is not set
+ CONFIG_FEATURE_MOUNT_FORCE=y
+ 
+ #
+diff -Nur busybox-1.01.old/debian/config-static-linux busybox-1.01/debian/config-static-linux
+--- busybox-1.01.old/debian/config-static-linux	1970-01-01 01:00:00.000000000 +0100
++++ busybox-1.01/debian/config-static-linux	2006-04-29 12:29:01.000000000 +0200
+@@ -0,0 +1,526 @@
++#
++# Automatically generated make config: don't edit
++#
++HAVE_DOT_CONFIG=y
++
++#
++# General Configuration
++#
++# CONFIG_FEATURE_BUFFERS_USE_MALLOC is not set
++CONFIG_FEATURE_BUFFERS_GO_ON_STACK=y
++# CONFIG_FEATURE_BUFFERS_GO_IN_BSS is not set
++CONFIG_FEATURE_VERBOSE_USAGE=y
++# CONFIG_FEATURE_INSTALLER is not set
++# CONFIG_LOCALE_SUPPORT is not set
++CONFIG_FEATURE_DEVFS=y
++CONFIG_FEATURE_DEVPTS=y
++# CONFIG_FEATURE_CLEAN_UP is not set
++CONFIG_FEATURE_SUID=y
++CONFIG_FEATURE_SUID_CONFIG=y
++# CONFIG_FEATURE_SUID_CONFIG_QUIET is not set
++# CONFIG_SELINUX is not set
++
++#
++# Build Options
++#
++CONFIG_STATIC=y
++CONFIG_LFS=y
++# USING_CROSS_COMPILER is not set
++EXTRA_CFLAGS_OPTIONS=""
++
++#
++# Installation Options
++#
++# CONFIG_INSTALL_NO_USR is not set
++PREFIX="./_install"
++
++#
++# Archival Utilities
++#
++CONFIG_AR=y
++CONFIG_FEATURE_AR_LONG_FILENAMES=y
++CONFIG_BUNZIP2=y
++CONFIG_CPIO=y
++CONFIG_DPKG=y
++CONFIG_DPKG_DEB=y
++# CONFIG_FEATURE_DPKG_DEB_EXTRACT_ONLY is not set
++CONFIG_GUNZIP=y
++CONFIG_FEATURE_GUNZIP_UNCOMPRESS=y
++CONFIG_GZIP=y
++CONFIG_RPM2CPIO=y
++CONFIG_RPM=y
++CONFIG_TAR=y
++CONFIG_FEATURE_TAR_CREATE=y
++CONFIG_FEATURE_TAR_BZIP2=y
++# CONFIG_FEATURE_TAR_FROM is not set
++CONFIG_FEATURE_TAR_GZIP=y
++# CONFIG_FEATURE_TAR_COMPRESS is not set
++# CONFIG_FEATURE_TAR_OLDGNU_COMPATABILITY is not set
++CONFIG_FEATURE_TAR_GNU_EXTENSIONS=y
++# CONFIG_FEATURE_TAR_LONG_OPTIONS is not set
++CONFIG_UNCOMPRESS=y
++CONFIG_UNZIP=y
++
++#
++# Common options for cpio and tar
++#
++CONFIG_FEATURE_UNARCHIVE_TAPE=y
++
++#
++# Common options for dpkg and dpkg_deb
++#
++CONFIG_FEATURE_DEB_TAR_GZ=y
++CONFIG_FEATURE_DEB_TAR_BZ2=y
++
++#
++# Coreutils
++#
++CONFIG_BASENAME=y
++CONFIG_CAL=y
++CONFIG_CAT=y
++CONFIG_CHGRP=y
++CONFIG_CHMOD=y
++CONFIG_CHOWN=y
++CONFIG_CHROOT=y
++CONFIG_CMP=y
++CONFIG_CP=y
++CONFIG_CUT=y
++CONFIG_DATE=y
++
++#
++# date (forced enabled for use with watch)
++#
++CONFIG_FEATURE_DATE_ISOFMT=y
++CONFIG_DD=y
++CONFIG_DF=y
++CONFIG_DIRNAME=y
++CONFIG_DOS2UNIX=y
++CONFIG_UNIX2DOS=y
++CONFIG_DU=y
++CONFIG_FEATURE_DU_DEFALT_BLOCKSIZE_1K=y
++CONFIG_ECHO=y
++CONFIG_FEATURE_FANCY_ECHO=y
++CONFIG_ENV=y
++CONFIG_EXPR=y
++CONFIG_FALSE=y
++CONFIG_FOLD=y
++CONFIG_HEAD=y
++CONFIG_FEATURE_FANCY_HEAD=y
++CONFIG_HOSTID=y
++CONFIG_ID=y
++# CONFIG_INSTALL is not set
++CONFIG_LENGTH=y
++CONFIG_LN=y
++CONFIG_LOGNAME=y
++CONFIG_LS=y
++CONFIG_FEATURE_LS_FILETYPES=y
++CONFIG_FEATURE_LS_FOLLOWLINKS=y
++CONFIG_FEATURE_LS_RECURSIVE=y
++CONFIG_FEATURE_LS_SORTFILES=y
++CONFIG_FEATURE_LS_TIMESTAMPS=y
++CONFIG_FEATURE_LS_USERNAME=y
++CONFIG_FEATURE_LS_COLOR=y
++CONFIG_MD5SUM=y
++CONFIG_MKDIR=y
++CONFIG_MKFIFO=y
++CONFIG_MKNOD=y
++CONFIG_MV=y
++CONFIG_OD=y
++CONFIG_PRINTF=y
++CONFIG_PWD=y
++CONFIG_REALPATH=y
++CONFIG_RM=y
++CONFIG_RMDIR=y
++# CONFIG_SEQ is not set
++CONFIG_SHA1SUM=y
++CONFIG_SLEEP=y
++CONFIG_FEATURE_FANCY_SLEEP=y
++CONFIG_SORT=y
++CONFIG_STTY=y
++CONFIG_SYNC=y
++CONFIG_TAIL=y
++CONFIG_FEATURE_FANCY_TAIL=y
++CONFIG_TEE=y
++CONFIG_FEATURE_TEE_USE_BLOCK_IO=y
++CONFIG_TEST=y
++
++#
++# test (forced enabled for use with shell)
++#
++CONFIG_FEATURE_TEST_64=y
++CONFIG_TOUCH=y
++CONFIG_TR=y
++CONFIG_TRUE=y
++CONFIG_TTY=y
++CONFIG_UNAME=y
++CONFIG_UNIQ=y
++CONFIG_USLEEP=y
++CONFIG_UUDECODE=y
++CONFIG_UUENCODE=y
++CONFIG_WATCH=y
++CONFIG_WC=y
++CONFIG_WHO=y
++CONFIG_WHOAMI=y
++CONFIG_YES=y
++
++#
++# Common options for cp and mv
++#
++CONFIG_FEATURE_PRESERVE_HARDLINKS=y
++
++#
++# Common options for ls and more
++#
++CONFIG_FEATURE_AUTOWIDTH=y
++
++#
++# Common options for df, du, ls
++#
++CONFIG_FEATURE_HUMAN_READABLE=y
++
++#
++# Common options for md5sum, sha1sum
++#
++# CONFIG_FEATURE_MD5_SHA1_SUM_CHECK is not set
++
++#
++# Console Utilities
++#
++CONFIG_CHVT=y
++CONFIG_CLEAR=y
++CONFIG_DEALLOCVT=y
++CONFIG_DUMPKMAP=y
++CONFIG_LOADFONT=y
++CONFIG_LOADKMAP=y
++CONFIG_OPENVT=y
++CONFIG_RESET=y
++CONFIG_SETKEYCODES=y
++
++#
++# Debian Utilities
++#
++CONFIG_MKTEMP=y
++# CONFIG_PIPE_PROGRESS is not set
++CONFIG_READLINK=y
++CONFIG_FEATURE_READLINK_FOLLOW=y
++CONFIG_RUN_PARTS=y
++CONFIG_START_STOP_DAEMON=y
++CONFIG_WHICH=y
++
++#
++# Editors
++#
++CONFIG_AWK=y
++CONFIG_FEATURE_AWK_MATH=y
++CONFIG_PATCH=y
++CONFIG_SED=y
++CONFIG_VI=y
++CONFIG_FEATURE_VI_COLON=y
++CONFIG_FEATURE_VI_YANKMARK=y
++CONFIG_FEATURE_VI_SEARCH=y
++CONFIG_FEATURE_VI_USE_SIGNALS=y
++CONFIG_FEATURE_VI_DOT_CMD=y
++CONFIG_FEATURE_VI_READONLY=y
++CONFIG_FEATURE_VI_SETOPTS=y
++CONFIG_FEATURE_VI_SET=y
++CONFIG_FEATURE_VI_WIN_RESIZE=y
++CONFIG_FEATURE_VI_OPTIMIZE_CURSOR=y
++
++#
++# Finding Utilities
++#
++CONFIG_FIND=y
++CONFIG_FEATURE_FIND_MTIME=y
++CONFIG_FEATURE_FIND_PERM=y
++CONFIG_FEATURE_FIND_TYPE=y
++CONFIG_FEATURE_FIND_XDEV=y
++CONFIG_FEATURE_FIND_NEWER=y
++CONFIG_FEATURE_FIND_INUM=y
++CONFIG_GREP=y
++CONFIG_FEATURE_GREP_EGREP_ALIAS=y
++CONFIG_FEATURE_GREP_FGREP_ALIAS=y
++CONFIG_FEATURE_GREP_CONTEXT=y
++CONFIG_XARGS=y
++# CONFIG_FEATURE_XARGS_SUPPORT_CONFIRMATION is not set
++# CONFIG_FEATURE_XARGS_SUPPORT_QUOTES is not set
++# CONFIG_FEATURE_XARGS_SUPPORT_TERMOPT is not set
++# CONFIG_FEATURE_XARGS_SUPPORT_ZERO_TERM is not set
++
++#
++# Init Utilities
++#
++CONFIG_INIT=y
++CONFIG_FEATURE_USE_INITTAB=y
++CONFIG_FEATURE_INITRD=y
++# CONFIG_FEATURE_INIT_COREDUMPS is not set
++# CONFIG_FEATURE_INIT_SWAPON is not set
++# CONFIG_FEATURE_EXTRA_QUIET is not set
++CONFIG_HALT=y
++CONFIG_POWEROFF=y
++CONFIG_REBOOT=y
++CONFIG_MESG=y
++
++#
++# Login/Password Management Utilities
++#
++CONFIG_USE_BB_PWD_GRP=y
++CONFIG_ADDGROUP=y
++CONFIG_DELGROUP=y
++CONFIG_ADDUSER=y
++CONFIG_DELUSER=y
++CONFIG_GETTY=y
++CONFIG_FEATURE_UTMP=y
++CONFIG_FEATURE_WTMP=y
++CONFIG_LOGIN=y
++CONFIG_FEATURE_SECURETTY=y
++CONFIG_PASSWD=y
++CONFIG_SU=y
++CONFIG_SULOGIN=y
++CONFIG_VLOCK=y
++
++#
++# Common options for adduser, deluser, login, su
++#
++CONFIG_FEATURE_SHADOWPASSWDS=y
++CONFIG_USE_BB_SHADOW=y
++
++#
++# Miscellaneous Utilities
++#
++CONFIG_ADJTIMEX=y
++CONFIG_CROND=y
++CONFIG_FEATURE_CROND_CALL_SENDMAIL=y
++CONFIG_CRONTAB=y
++CONFIG_DC=y
++# CONFIG_DEVFSD is not set
++CONFIG_LAST=y
++# CONFIG_HDPARM is not set
++CONFIG_MAKEDEVS=y
++CONFIG_MT=y
++# CONFIG_RX is not set
++CONFIG_STRINGS=y
++CONFIG_TIME=y
++CONFIG_WATCHDOG=y
++
++#
++# Linux Module Utilities
++#
++# CONFIG_MODUTILS is not set
++# CONFIG_MODUTILS_OBJ is not set
++# CONFIG_MODUTILS_OBJ_2_6 is not set
++# CONFIG_DEPMOD is not set
++# CONFIG_INSMOD is not set
++# CONFIG_LSMOD is not set
++# CONFIG_MODPROBE is not set
++# CONFIG_RMMOD is not set
++
++#
++# Networking Utilities
++#
++CONFIG_FEATURE_IPV6=y
++CONFIG_ARPING=y
++CONFIG_FTPGET=y
++CONFIG_FTPPUT=y
++CONFIG_HOSTNAME=y
++CONFIG_HTTPD=y
++# CONFIG_FEATURE_HTTPD_USAGE_FROM_INETD_ONLY is not set
++CONFIG_FEATURE_HTTPD_BASIC_AUTH=y
++# CONFIG_FEATURE_HTTPD_AUTH_MD5 is not set
++# CONFIG_FEATURE_HTTPD_RELOAD_CONFIG_SIGHUP is not set
++# CONFIG_FEATURE_HTTPD_SETUID is not set
++# CONFIG_FEATURE_HTTPD_CONFIG_WITH_MIME_TYPES is not set
++# CONFIG_FEATURE_HTTPD_CGI is not set
++# CONFIG_FEATURE_HTTPD_ENCODE_URL_STR is not set
++CONFIG_IFCONFIG=y
++CONFIG_FEATURE_IFCONFIG_STATUS=y
++CONFIG_FEATURE_IFCONFIG_SLIP=y
++CONFIG_FEATURE_IFCONFIG_MEMSTART_IOADDR_IRQ=y
++CONFIG_FEATURE_IFCONFIG_HW=y
++CONFIG_FEATURE_IFCONFIG_BROADCAST_PLUS=y
++CONFIG_IFUPDOWN=y
++# CONFIG_FEATURE_IFUPDOWN_IP is not set
++CONFIG_FEATURE_IFUPDOWN_IP_BUILTIN=y
++CONFIG_FEATURE_IFUPDOWN_IPV4=y
++CONFIG_FEATURE_IFUPDOWN_IPV6=y
++CONFIG_FEATURE_IFUPDOWN_IPX=y
++CONFIG_FEATURE_IFUPDOWN_MAPPING=y
++# CONFIG_INETD is not set
++CONFIG_IP=y
++CONFIG_FEATURE_IP_ADDRESS=y
++
++#
++#   address (forced enabled for ipaddr)
++#
++CONFIG_FEATURE_IP_LINK=y
++
++#
++#   link (forced enabled for iplink)
++#
++CONFIG_FEATURE_IP_ROUTE=y
++
++#
++#   route (forced enabled for iproute)
++#
++CONFIG_FEATURE_IP_TUNNEL=y
++
++#
++#   tunnel (forced enabled for iptunnel)
++#
++CONFIG_IPCALC=y
++CONFIG_FEATURE_IPCALC_FANCY=y
++CONFIG_IPADDR=y
++CONFIG_IPLINK=y
++CONFIG_IPROUTE=y
++CONFIG_IPTUNNEL=y
++CONFIG_NAMEIF=y
++CONFIG_NC=y
++CONFIG_NETSTAT=y
++CONFIG_NSLOOKUP=y
++CONFIG_PING=y
++CONFIG_FEATURE_FANCY_PING=y
++CONFIG_PING6=y
++CONFIG_FEATURE_FANCY_PING6=y
++CONFIG_ROUTE=y
++CONFIG_TELNET=y
++CONFIG_FEATURE_TELNET_TTYPE=y
++CONFIG_FEATURE_TELNET_AUTOLOGIN=y
++CONFIG_TELNETD=y
++# CONFIG_FEATURE_TELNETD_INETD is not set
++CONFIG_TFTP=y
++CONFIG_FEATURE_TFTP_GET=y
++CONFIG_FEATURE_TFTP_PUT=y
++CONFIG_FEATURE_TFTP_BLOCKSIZE=y
++CONFIG_FEATURE_TFTP_DEBUG=y
++CONFIG_TRACEROUTE=y
++CONFIG_FEATURE_TRACEROUTE_VERBOSE=y
++# CONFIG_VCONFIG is not set
++CONFIG_WGET=y
++CONFIG_FEATURE_WGET_STATUSBAR=y
++CONFIG_FEATURE_WGET_AUTHENTICATION=y
++CONFIG_FEATURE_WGET_IP6_LITERAL=y
++
++#
++# udhcp Server/Client
++#
++CONFIG_UDHCPD=y
++CONFIG_UDHCPC=y
++CONFIG_DUMPLEASES=y
++CONFIG_FEATURE_UDHCP_SYSLOG=y
++CONFIG_FEATURE_UDHCP_DEBUG=y
++
++#
++# Process Utilities
++#
++CONFIG_FREE=y
++CONFIG_KILL=y
++CONFIG_KILLALL=y
++CONFIG_PIDOF=y
++CONFIG_PS=y
++CONFIG_RENICE=y
++CONFIG_TOP=y
++FEATURE_CPU_USAGE_PERCENTAGE=y
++CONFIG_UPTIME=y
++# CONFIG_SYSCTL is not set
++
++#
++# Another Bourne-like Shell
++#
++CONFIG_FEATURE_SH_IS_ASH=y
++# CONFIG_FEATURE_SH_IS_HUSH is not set
++# CONFIG_FEATURE_SH_IS_LASH is not set
++# CONFIG_FEATURE_SH_IS_MSH is not set
++# CONFIG_FEATURE_SH_IS_NONE is not set
++CONFIG_ASH=y
++
++#
++# Ash Shell Options
++#
++CONFIG_ASH_JOB_CONTROL=y
++CONFIG_ASH_ALIAS=y
++CONFIG_ASH_MATH_SUPPORT=y
++CONFIG_ASH_MATH_SUPPORT_64=y
++CONFIG_ASH_GETOPTS=y
++CONFIG_ASH_CMDCMD=y
++CONFIG_ASH_MAIL=y
++CONFIG_ASH_OPTIMIZE_FOR_SIZE=y
++# CONFIG_ASH_RANDOM_SUPPORT is not set
++# CONFIG_HUSH is not set
++# CONFIG_LASH is not set
++# CONFIG_MSH is not set
++
++#
++# Bourne Shell Options
++#
++# CONFIG_FEATURE_SH_EXTRA_QUIET is not set
++CONFIG_FEATURE_SH_STANDALONE_SHELL=y
++CONFIG_FEATURE_COMMAND_EDITING=y
++CONFIG_FEATURE_COMMAND_HISTORY=15
++CONFIG_FEATURE_COMMAND_SAVEHISTORY=y
++CONFIG_FEATURE_COMMAND_TAB_COMPLETION=y
++CONFIG_FEATURE_COMMAND_USERNAME_COMPLETION=y
++CONFIG_FEATURE_SH_FANCY_PROMPT=y
++
++#
++# System Logging Utilities
++#
++CONFIG_SYSLOGD=y
++# CONFIG_FEATURE_ROTATE_LOGFILE is not set
++CONFIG_FEATURE_REMOTE_LOG=y
++CONFIG_FEATURE_IPC_SYSLOG=y
++CONFIG_FEATURE_IPC_SYSLOG_BUFFER_SIZE=16
++CONFIG_LOGREAD=y
++# CONFIG_FEATURE_LOGREAD_REDUCED_LOCKING is not set
++CONFIG_KLOGD=y
++CONFIG_LOGGER=y
++
++#
++# Linux System Utilities
++#
++CONFIG_DMESG=y
++CONFIG_FBSET=y
++CONFIG_FEATURE_FBSET_FANCY=y
++CONFIG_FEATURE_FBSET_READMODE=y
++CONFIG_FDFLUSH=y
++# CONFIG_FDFORMAT is not set
++CONFIG_FDISK=y
++FDISK_SUPPORT_LARGE_DISKS=y
++CONFIG_FEATURE_FDISK_WRITABLE=y
++CONFIG_FEATURE_AIX_LABEL=y
++CONFIG_FEATURE_SGI_LABEL=y
++CONFIG_FEATURE_SUN_LABEL=y
++# CONFIG_FEATURE_OSF_LABEL is not set
++CONFIG_FEATURE_FDISK_ADVANCED=y
++CONFIG_FREERAMDISK=y
++CONFIG_FSCK_MINIX=y
++CONFIG_MKFS_MINIX=y
++
++#
++# Minix filesystem support
++#
++CONFIG_FEATURE_MINIX2=y
++CONFIG_GETOPT=y
++CONFIG_HEXDUMP=y
++CONFIG_HWCLOCK=y
++CONFIG_FEATURE_HWCLOCK_LONGOPTIONS=y
++CONFIG_LOSETUP=y
++CONFIG_MKSWAP=y
++CONFIG_MORE=y
++CONFIG_FEATURE_USE_TERMIOS=y
++CONFIG_PIVOT_ROOT=y
++CONFIG_RDATE=y
++CONFIG_SWAPONOFF=y
++CONFIG_MOUNT=y
++CONFIG_NFSMOUNT=y
++CONFIG_UMOUNT=y
++CONFIG_FEATURE_MOUNT_FORCE=y
++
++#
++# Common options for mount/umount
++#
++CONFIG_FEATURE_MOUNT_LOOP=y
++# CONFIG_FEATURE_MTAB_SUPPORT is not set
++
++#
++# Debugging Options
++#
++# CONFIG_DEBUG is not set
+diff -Nur busybox-1.01.old/debian/config-udeb busybox-1.01/debian/config-udeb
+--- busybox-1.01.old/debian/config-udeb	2006-04-30 10:05:44.000000000 +0200
++++ busybox-1.01/debian/config-udeb	2006-04-29 12:29:01.000000000 +0200
+@@ -135,7 +135,8 @@
+ CONFIG_TOUCH=y
+ CONFIG_TR=y
+ CONFIG_TRUE=y
+-# CONFIG_TTY is not set
++# On non-Linux, /proc/self/fd/0 cannot be used as replacement for tty(1)
++CONFIG_TTY=y
+ CONFIG_UNAME=y
+ CONFIG_UNIQ=y
+ # CONFIG_USLEEP is not set
+@@ -282,18 +283,18 @@
+ # CONFIG_FTPPUT is not set
+ # CONFIG_HOSTNAME is not set
+ # CONFIG_HTTPD is not set
+-CONFIG_IFCONFIG=y
+-CONFIG_FEATURE_IFCONFIG_STATUS=y
++# CONFIG_IFCONFIG is not set
++# CONFIG_FEATURE_IFCONFIG_STATUS is not set
+ # CONFIG_FEATURE_IFCONFIG_SLIP is not set
+ # CONFIG_FEATURE_IFCONFIG_MEMSTART_IOADDR_IRQ is not set
+ # CONFIG_FEATURE_IFCONFIG_HW is not set
+ # CONFIG_FEATURE_IFCONFIG_BROADCAST_PLUS is not set
+ # CONFIG_IFUPDOWN is not set
+ # CONFIG_INETD is not set
+-CONFIG_IP=y
++# CONFIG_IP is not set
+ CONFIG_FEATURE_IP_ADDRESS=y
+ CONFIG_FEATURE_IP_LINK=y
+-CONFIG_FEATURE_IP_ROUTE=y
++# CONFIG_FEATURE_IP_ROUTE is not set
+ # CONFIG_FEATURE_IP_TUNNEL is not set
+ # CONFIG_IPCALC is not set
+ # CONFIG_IPADDR is not set
+@@ -305,7 +306,7 @@
+ # CONFIG_NETSTAT is not set
+ # CONFIG_NSLOOKUP is not set
+ # CONFIG_PING is not set
+-CONFIG_ROUTE=y
++# CONFIG_ROUTE is not set
+ # CONFIG_TELNET is not set
+ # CONFIG_TELNETD is not set
+ # CONFIG_TFTP is not set
+@@ -376,17 +377,17 @@
+ #
+ # System Logging Utilities
+ #
+-CONFIG_SYSLOGD=y
++# CONFIG_SYSLOGD is not set
+ # CONFIG_FEATURE_ROTATE_LOGFILE is not set
+ # CONFIG_FEATURE_REMOTE_LOG is not set
+ # CONFIG_FEATURE_IPC_SYSLOG is not set
+-CONFIG_KLOGD=y
+-CONFIG_LOGGER=y
++# CONFIG_KLOGD is not set
++# CONFIG_LOGGER is not set
+ 
+ #
+ # Linux System Utilities
+ #
+-CONFIG_DMESG=y
++# CONFIG_DMESG is not set
+ # CONFIG_FBSET is not set
+ # CONFIG_FDFLUSH is not set
+ # CONFIG_FDFORMAT is not set
+@@ -404,10 +405,10 @@
+ CONFIG_FEATURE_USE_TERMIOS=y
+ CONFIG_PIVOT_ROOT=y
+ # CONFIG_RDATE is not set
+-CONFIG_SWAPONOFF=y
+-CONFIG_MOUNT=y
++# CONFIG_SWAPONOFF is not set
++# CONFIG_MOUNT is not set
+ # CONFIG_NFSMOUNT is not set
+-CONFIG_UMOUNT=y
++# CONFIG_UMOUNT is not set
+ CONFIG_FEATURE_MOUNT_FORCE=y
+ 
+ #
+diff -Nur busybox-1.01.old/include/libbb.h busybox-1.01/include/libbb.h
+--- busybox-1.01.old/include/libbb.h	2005-08-24 18:47:17.000000000 +0200
++++ busybox-1.01/include/libbb.h	2006-04-29 12:56:43.000000000 +0200
+@@ -361,7 +361,26 @@
+ 
+ extern int bb_default_error_retval;
+ 
+-#ifdef CONFIG_FEATURE_DEVFS
++/* The following devices are the same on devfs and non-devfs systems.  */
++#define CURRENT_TTY "/dev/tty"
++#define CONSOLE_DEV "/dev/console"
++
++#if defined(__FreeBSD_kernel__)
++# define CURRENT_VC CURRENT_TTY
++# define VC "/dev/ttyv"
++# define VC_1 VC "0"
++# define VC_2 VC "1"
++# define VC_3 VC "2"
++# define VC_4 VC "3"
++# define VC_5 VC "4"
++# define VC_FORMAT VC "%d"
++# define LOOP_FORMAT "/dev/md%d"
++# define FB_0 "/dev/null"
++# define SC "/dev/cuaa"
++# define SC_0 SC "0"
++# define SC_1 SC "1"
++# define SC_FORMAT SC "%d"
++#elif defined(__linux__) && defined(CONFIG_FEATURE_DEVFS)
+ # define CURRENT_VC "/dev/vc/0"
+ # define VC_1 "/dev/vc/1"
+ # define VC_2 "/dev/vc/2"
+@@ -383,7 +402,7 @@
+ # define VC_FORMAT "/dev/vc/%d"
+ # define LOOP_FORMAT "/dev/loop/%d"
+ # define FB_0 "/dev/fb/0"
+-#else
++#elif defined(__linux__)
+ # define CURRENT_VC "/dev/tty0"
+ # define VC_1 "/dev/tty1"
+ # define VC_2 "/dev/tty2"
+@@ -406,10 +425,6 @@
+ 
+ //#warning put these in .o files
+ 
+-/* The following devices are the same on devfs and non-devfs systems.  */
+-#define CURRENT_TTY "/dev/tty"
+-#define CONSOLE_DEV "/dev/console"
+-
+ int is_in_ino_dev_hashtable(const struct stat *statbuf, char **name);
+ void add_to_ino_dev_hashtable(const struct stat *statbuf, const char *name);
+ void reset_ino_dev_hashtable(void);
+diff -Nur busybox-1.01.old/init/init.c busybox-1.01/init/init.c
+--- busybox-1.01.old/init/init.c	2005-08-24 18:47:17.000000000 +0200
++++ busybox-1.01/init/init.c	2006-04-29 12:29:01.000000000 +0200
+@@ -166,14 +166,28 @@
  #else
  #define MAYBE_CONSOLE	CONSOLE
  #endif
@@ -84,7 +1872,7 @@ diff -Nur busybox-1.00.old/init/init.c busybox-1.00/init/init.c
  
  static const char * const environment[] = {
  	"HOME=/",
-@@ -288,10 +302,19 @@
+@@ -287,10 +301,19 @@
  	tty.c_cc[VSTOP] = 19;	/* C-s */
  	tty.c_cc[VSUSP] = 26;	/* C-z */
  
@@ -120,9 +1908,9 @@ diff -Nur busybox-1.00.old/init/init.c busybox-1.00/init/init.c
 +	return -1;
 +#endif
  }
+ #endif /* CONFIG_FEATURE_INIT_SWAPON */
  
- static void console_init(void)
-@@ -359,10 +386,13 @@
+@@ -360,10 +387,13 @@
  #endif
  	} else {
  		/* 2.2 kernels: identify the real console backend and try to use it */
@@ -137,7 +1925,7 @@ diff -Nur busybox-1.00.old/init/init.c busybox-1.00/init/init.c
  			/* this is linux virtual tty */
  			snprintf(console, sizeof(console) - 1, VC_FORMAT, vt.v_active);
  		} else {
-@@ -387,6 +417,7 @@
+@@ -388,6 +418,7 @@
  	} else {
  		s = getenv("TERM");
  		/* check for serial console */
@@ -145,9 +1933,9 @@ diff -Nur busybox-1.00.old/init/init.c busybox-1.00/init/init.c
  		if (ioctl(fd, TIOCGSERIAL, &sr) == 0) {
  			/* Force the TERM setting to vt102 for serial console --
  			 * if TERM is set to linux (the default) */
-@@ -395,10 +426,16 @@
+@@ -396,10 +427,16 @@
  #ifndef CONFIG_SYSLOGD
- 			log = console;
+ 			log_console = console;
  #endif
 -		} else {
 -			if (s == NULL)
@@ -165,7 +1953,7 @@ diff -Nur busybox-1.00.old/init/init.c busybox-1.00/init/init.c
  		close(fd);
  	}
  	messageD(LOG, "console=%s", console);
-@@ -703,8 +740,10 @@
+@@ -707,8 +744,10 @@
  	sigaddset(&block_signals, SIGTSTP);
  	sigprocmask(SIG_BLOCK, &block_signals, NULL);
  
@@ -176,7 +1964,7 @@ diff -Nur busybox-1.00.old/init/init.c busybox-1.00/init/init.c
  
  	message(CONSOLE | LOG, "The system is going down NOW !!");
  	sync();
-@@ -1105,10 +1144,12 @@
+@@ -1114,10 +1153,12 @@
  	signal(SIGSTOP, stop_handler);
  	signal(SIGTSTP, stop_handler);
  
@@ -189,9 +1977,9 @@ diff -Nur busybox-1.00.old/init/init.c busybox-1.00/init/init.c
  
  	/* Figure out where the default console should be */
  	console_init();
-diff -Nur busybox-1.00.old/libbb/Makefile.in busybox-1.00/libbb/Makefile.in
---- busybox-1.00.old/libbb/Makefile.in	2005-06-09 16:10:17.000000000 +0200
-+++ busybox-1.00/libbb/Makefile.in	2005-08-27 12:37:40.000000000 +0200
+diff -Nur busybox-1.01.old/libbb/Makefile.in busybox-1.01/libbb/Makefile.in
+--- busybox-1.01.old/libbb/Makefile.in	2005-08-24 18:47:17.000000000 +0200
++++ busybox-1.01/libbb/Makefile.in	2006-04-29 12:29:01.000000000 +0200
 @@ -16,6 +16,12 @@
  # along with this program; if not, write to the Free Software
  # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -227,9 +2015,9 @@ diff -Nur busybox-1.00.old/libbb/Makefile.in busybox-1.00/libbb/Makefile.in
  LIBBB_OBJS=$(patsubst %.c,$(LIBBB_DIR)%.o, $(LIBBB_SRC))
  
  LIBBB_MSRC0:=$(srcdir)/messages.c
-diff -Nur busybox-1.00.old/libbb/bb_askpass.c busybox-1.00/libbb/bb_askpass.c
---- busybox-1.00.old/libbb/bb_askpass.c	2004-05-07 15:47:44.000000000 +0200
-+++ busybox-1.00/libbb/bb_askpass.c	2005-08-27 12:37:40.000000000 +0200
+diff -Nur busybox-1.01.old/libbb/bb_askpass.c busybox-1.01/libbb/bb_askpass.c
+--- busybox-1.01.old/libbb/bb_askpass.c	2004-05-07 15:47:44.000000000 +0200
++++ busybox-1.01/libbb/bb_askpass.c	2006-04-29 12:29:01.000000000 +0200
 @@ -53,6 +53,9 @@
  	fflush(stdout);
  
@@ -240,9 +2028,9 @@ diff -Nur busybox-1.00.old/libbb/bb_askpass.c busybox-1.00/libbb/bb_askpass.c
  	new.c_iflag &= ~(IUCLC|IXON|IXOFF|IXANY);
  	new.c_lflag &= ~(ECHO|ECHOE|ECHOK|ECHONL|TOSTOP);
  	tcsetattr(STDIN_FILENO, TCSANOW, &new);
-diff -Nur busybox-1.00.old/libbb/procps.c busybox-1.00/libbb/procps.c
---- busybox-1.00.old/libbb/procps.c	2005-06-09 16:10:17.000000000 +0200
-+++ busybox-1.00/libbb/procps.c	2005-08-27 12:37:41.000000000 +0200
+diff -Nur busybox-1.01.old/libbb/procps.c busybox-1.01/libbb/procps.c
+--- busybox-1.01.old/libbb/procps.c	2005-06-09 16:10:17.000000000 +0200
++++ busybox-1.01/libbb/procps.c	2006-04-29 12:29:01.000000000 +0200
 @@ -12,7 +12,19 @@
  #include <string.h>
  #include <stdlib.h>
@@ -264,12 +2052,12 @@ diff -Nur busybox-1.00.old/libbb/procps.c busybox-1.00/libbb/procps.c
  
  #include "libbb.h"
  
-diff -Nur busybox-1.00.old/libbb/syscalls.c busybox-1.00/libbb/syscalls.c
---- busybox-1.00.old/libbb/syscalls.c	2004-04-02 23:39:15.000000000 +0200
-+++ busybox-1.00/libbb/syscalls.c	2005-08-27 12:37:41.000000000 +0200
+diff -Nur busybox-1.01.old/libbb/syscalls.c busybox-1.01/libbb/syscalls.c
+--- busybox-1.01.old/libbb/syscalls.c	2005-08-24 18:47:17.000000000 +0200
++++ busybox-1.01/libbb/syscalls.c	2006-04-29 12:29:01.000000000 +0200
 @@ -31,7 +31,21 @@
  
- int sysfs( int option, unsigned int fs_index, char * buf)
+ int sysfs(int option, unsigned int fs_index, char * buf)
  {
 -	return(syscall(__NR_sysfs, option, fs_index, buf));
 +#ifndef __NR_sysfs
@@ -290,10 +2078,10 @@ diff -Nur busybox-1.00.old/libbb/syscalls.c busybox-1.00/libbb/syscalls.c
  }
  
  int pivot_root(const char * new_root,const char * put_old)
-diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
---- busybox-1.00.old/loginutils/getty.c	2005-06-09 16:10:17.000000000 +0200
-+++ busybox-1.00/loginutils/getty.c	2005-08-27 12:37:41.000000000 +0200
-@@ -103,11 +103,11 @@
+diff -Nur busybox-1.01.old/loginutils/getty.c busybox-1.01/loginutils/getty.c
+--- busybox-1.01.old/loginutils/getty.c	2005-08-24 18:47:17.000000000 +0200
++++ busybox-1.01/loginutils/getty.c	2006-04-29 12:29:01.000000000 +0200
+@@ -107,11 +107,11 @@
  #undef	TCGETA
  #undef	TCSETA
  #undef	TCSETAW
@@ -306,7 +2094,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
   /*
    * This program tries to not use the standard-i/o library.  This keeps the
-@@ -601,8 +601,8 @@
+@@ -605,8 +605,8 @@
  	 * 5 seconds seems to be a good value.
  	 */
  
@@ -317,7 +2105,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
  	/*
  	 * It seems to be a terminal. Set proper protections and ownership. Mode
-@@ -662,17 +662,18 @@
+@@ -666,17 +666,18 @@
  	 * reads will be done in raw mode anyway. Errors will be dealt with
  	 * lateron.
  	 */
@@ -340,7 +2128,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  	tp->c_cc[VMIN] = 1;
  	tp->c_cc[VTIME] = 0;
  
-@@ -683,7 +684,7 @@
+@@ -687,7 +688,7 @@
  		tp->c_cflag |= CRTSCTS;
  #endif
  
@@ -349,7 +2137,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
  	/* go to blocking input even in local mode */
  	fcntl(0, F_SETFL, fcntl(0, F_GETFL, 0) & ~O_NONBLOCK);
-@@ -725,7 +726,7 @@
+@@ -729,7 +730,7 @@
  	tp->c_iflag |= ISTRIP;		/* enable 8th-bit stripping */
  	vmin = tp->c_cc[VMIN];
  	tp->c_cc[VMIN] = 0;			/* don't block if queue empty */
@@ -358,7 +2146,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
  	/*
  	 * Wait for a while, then read everything the modem has said so far and
-@@ -738,6 +739,9 @@
+@@ -742,6 +743,9 @@
  		for (bp = buf; bp < buf + nread; bp++) {
  			if (isascii(*bp) && isdigit(*bp)) {
  				if ((speed = bcode(bp))) {
@@ -368,7 +2156,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  					tp->c_cflag &= ~CBAUD;
  					tp->c_cflag |= speed;
  				}
-@@ -749,7 +753,7 @@
+@@ -753,7 +757,7 @@
  
  	tp->c_iflag = iflag;
  	tp->c_cc[VMIN] = vmin;
@@ -377,7 +2165,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  }
  
  /* do_prompt - show login prompt, optionally preceded by /etc/issue contents */
-@@ -769,7 +773,7 @@
+@@ -773,7 +777,7 @@
  	baud_index = (baud_index + 1) % op->numspeed;
  	tp->c_cflag &= ~CBAUD;
  	tp->c_cflag |= op->speeds[baud_index];
@@ -386,7 +2174,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  }
  
  /* get_logname - get user name, establish parity, speed, erase, kill, eol */
-@@ -796,7 +800,7 @@
+@@ -800,7 +804,7 @@
  	/* Flush pending input (esp. after parsing or switching the baud rate). */
  
  	(void) sleep(1);
@@ -395,7 +2183,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
  	/* Prompt for and read a login name. */
  
-@@ -895,7 +899,9 @@
+@@ -899,7 +903,9 @@
  	tp->c_cc[VQUIT] = DEF_QUIT;	/* default quit */
  	tp->c_cc[VEOF] = DEF_EOF;	/* default EOF character */
  	tp->c_cc[VEOL] = DEF_EOL;
@@ -405,7 +2193,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  
  	/* Account for special characters seen in input. */
  
-@@ -926,9 +932,15 @@
+@@ -930,9 +936,15 @@
  	/* Account for upper case without lower case. */
  
  	if (cp->capslock) {
@@ -421,7 +2209,7 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  	}
  	/* Optionally enable hardware flow control */
  
-@@ -939,8 +951,8 @@
+@@ -943,8 +955,8 @@
  
  	/* Finally, make the new settings effective */
  
@@ -432,9 +2220,9 @@ diff -Nur busybox-1.00.old/loginutils/getty.c busybox-1.00/loginutils/getty.c
  }
  
  /* caps_lock - string contains upper case without lower case */
-diff -Nur busybox-1.00.old/procps/free.c busybox-1.00/procps/free.c
---- busybox-1.00.old/procps/free.c	2004-04-02 23:39:15.000000000 +0200
-+++ busybox-1.00/procps/free.c	2005-08-27 12:37:41.000000000 +0200
+diff -Nur busybox-1.01.old/procps/free.c busybox-1.01/procps/free.c
+--- busybox-1.01.old/procps/free.c	2004-04-02 23:39:15.000000000 +0200
++++ busybox-1.01/procps/free.c	2006-04-29 12:29:01.000000000 +0200
 @@ -29,6 +29,7 @@
  
  extern int free_main(int argc, char **argv)
@@ -452,9 +2240,9 @@ diff -Nur busybox-1.00.old/procps/free.c busybox-1.00/procps/free.c
 +#endif
  }
  
-diff -Nur busybox-1.00.old/procps/top.c busybox-1.00/procps/top.c
---- busybox-1.00.old/procps/top.c	2005-06-09 16:10:17.000000000 +0200
-+++ busybox-1.00/procps/top.c	2005-08-27 12:37:41.000000000 +0200
+diff -Nur busybox-1.01.old/procps/top.c busybox-1.01/procps/top.c
+--- busybox-1.01.old/procps/top.c	2005-08-24 18:47:17.000000000 +0200
++++ busybox-1.01/procps/top.c	2006-04-29 12:29:01.000000000 +0200
 @@ -33,8 +33,6 @@
  #include <unistd.h>
  #include <string.h>
@@ -464,9 +2252,9 @@ diff -Nur busybox-1.00.old/procps/top.c busybox-1.00/procps/top.c
  #include "busybox.h"
  
  //#define FEATURE_CPU_USAGE_PERCENTAGE  /* + 2k */
-diff -Nur busybox-1.00.old/procps/uptime.c busybox-1.00/procps/uptime.c
---- busybox-1.00.old/procps/uptime.c	2004-04-08 21:59:31.000000000 +0200
-+++ busybox-1.00/procps/uptime.c	2005-08-27 12:37:41.000000000 +0200
+diff -Nur busybox-1.01.old/procps/uptime.c busybox-1.01/procps/uptime.c
+--- busybox-1.01.old/procps/uptime.c	2004-04-08 21:59:31.000000000 +0200
++++ busybox-1.01/procps/uptime.c	2006-04-29 12:29:01.000000000 +0200
 @@ -35,7 +35,9 @@
  #include <stdlib.h>
  #include "busybox.h"
@@ -477,9 +2265,9 @@ diff -Nur busybox-1.00.old/procps/uptime.c busybox-1.00/procps/uptime.c
  #define FIXED_1         (1<<FSHIFT)     /* 1.0 as fixed-point */
  #define LOAD_INT(x) ((x) >> FSHIFT)
  #define LOAD_FRAC(x) LOAD_INT(((x) & (FIXED_1-1)) * 100)
-diff -Nur busybox-1.00.old/sysdeps/gnu-kfreebsd/Config.in busybox-1.00/sysdeps/gnu-kfreebsd/Config.in
---- busybox-1.00.old/sysdeps/gnu-kfreebsd/Config.in	1970-01-01 01:00:00.000000000 +0100
-+++ busybox-1.00/sysdeps/gnu-kfreebsd/Config.in	2005-08-27 12:37:41.000000000 +0200
+diff -Nur busybox-1.01.old/sysdeps/gnu-kfreebsd/Config.in busybox-1.01/sysdeps/gnu-kfreebsd/Config.in
+--- busybox-1.01.old/sysdeps/gnu-kfreebsd/Config.in	1970-01-01 01:00:00.000000000 +0100
++++ busybox-1.01/sysdeps/gnu-kfreebsd/Config.in	2006-04-29 12:29:01.000000000 +0200
 @@ -0,0 +1,294 @@
 +#
 +# For a description of the syntax of this configuration file,
@@ -775,9 +2563,9 @@ diff -Nur busybox-1.00.old/sysdeps/gnu-kfreebsd/Config.in busybox-1.00/sysdeps/g
 +
 +endmenu
 +
-diff -Nur busybox-1.00.old/sysdeps/gnu-kfreebsd/defconfig busybox-1.00/sysdeps/gnu-kfreebsd/defconfig
---- busybox-1.00.old/sysdeps/gnu-kfreebsd/defconfig	1970-01-01 01:00:00.000000000 +0100
-+++ busybox-1.00/sysdeps/gnu-kfreebsd/defconfig	2005-08-27 12:37:41.000000000 +0200
+diff -Nur busybox-1.01.old/sysdeps/gnu-kfreebsd/defconfig busybox-1.01/sysdeps/gnu-kfreebsd/defconfig
+--- busybox-1.01.old/sysdeps/gnu-kfreebsd/defconfig	1970-01-01 01:00:00.000000000 +0100
++++ busybox-1.01/sysdeps/gnu-kfreebsd/defconfig	2006-04-29 12:29:01.000000000 +0200
 @@ -0,0 +1,421 @@
 +#
 +# Automatically generated make config: don't edit
@@ -1200,9 +2988,9 @@ diff -Nur busybox-1.00.old/sysdeps/gnu-kfreebsd/defconfig busybox-1.00/sysdeps/g
 +# Debugging Options
 +#
 +# CONFIG_DEBUG is not set
-diff -Nur busybox-1.00.old/util-linux/mkswap.c busybox-1.00/util-linux/mkswap.c
---- busybox-1.00.old/util-linux/mkswap.c	2005-08-27 12:30:44.000000000 +0200
-+++ busybox-1.00/util-linux/mkswap.c	2005-08-27 12:37:41.000000000 +0200
+diff -Nur busybox-1.01.old/util-linux/mkswap.c busybox-1.01/util-linux/mkswap.c
+--- busybox-1.01.old/util-linux/mkswap.c	2006-04-30 10:05:44.000000000 +0200
++++ busybox-1.01/util-linux/mkswap.c	2006-04-29 12:29:01.000000000 +0200
 @@ -42,8 +42,23 @@
  #include <stdlib.h>
  #include <sys/ioctl.h>			/* for _IO */
@@ -1229,9 +3017,9 @@ diff -Nur busybox-1.00.old/util-linux/mkswap.c busybox-1.00/util-linux/mkswap.c
  #include "busybox.h"
  
  #ifndef _IO
-diff -Nur busybox-1.00.old/util-linux/swaponoff.c busybox-1.00/util-linux/swaponoff.c
---- busybox-1.00.old/util-linux/swaponoff.c	2004-04-02 23:39:15.000000000 +0200
-+++ busybox-1.00/util-linux/swaponoff.c	2005-08-27 12:37:41.000000000 +0200
+diff -Nur busybox-1.01.old/util-linux/swaponoff.c busybox-1.01/util-linux/swaponoff.c
+--- busybox-1.01.old/util-linux/swaponoff.c	2004-04-02 23:39:15.000000000 +0200
++++ busybox-1.01/util-linux/swaponoff.c	2006-04-29 12:29:01.000000000 +0200
 @@ -54,7 +54,11 @@
  	}
  
