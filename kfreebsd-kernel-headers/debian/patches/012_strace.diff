@@ -11,19 +11,6 @@
  	struct	save87	sv_87;
 --- sys/sys/proc.h~	2004-12-07 23:53:09.000000000 +0100
 +++ sys/sys/proc.h	2004-12-08 02:03:24.000000000 +0100
-@@ -61,6 +61,12 @@
- 
- #include <machine/proc.h>		/* Machine-dependent proc substruct. */
- 
-+#ifdef __FreeBSD__
-+#include <sys/types.h>			/* vm_offset_t */
-+#else
-+#include <machine/_types.h>		/* __vm_offset_t */
-+#endif
-+
- /*
-  * One structure allocated per session.
-  *
 @@ -315,10 +321,10 @@
  	struct callout	td_slpcallout;	/* (h) Callout for sleep. */
  	struct trapframe *td_frame;	/* (k) */
