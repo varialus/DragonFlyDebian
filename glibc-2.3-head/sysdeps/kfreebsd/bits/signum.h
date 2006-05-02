@@ -27,9 +27,8 @@
 #define	SIG_DFL	((__sighandler_t) 0) /* Default action.  */
 #define	SIG_IGN	((__sighandler_t) 1) /* Ignore signal.  */
 
-#ifdef __USE_UNIX98
-#define	SIG_HOLD ((__sighandler_t) 2) /* Add signal to hold mask.  */
-#endif
+#define	SIG_CATCH ((__sighandler_t) 2) /* FreeBSD specific ? */
+#define	SIG_HOLD  ((__sighandler_t) 3) /* Add signal to hold mask.  */
 
 /* Signals.  */
 #define	SIGHUP		1	/* Hangup (POSIX).  */
