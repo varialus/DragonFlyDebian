@@ -533,27 +533,6 @@ diff -ur sys.orig/sys/linker.h sys/sys/linker.h
  #endif	/* _KERNEL */
  
  /*
-@@ -268,13 +275,19 @@
-     size_t	size;		/* size in bytes */
- };
- 
-+/* Possible commands for kldsym.  */
-+enum
-+{
-+  KLDSYM_LOOKUP = 1		/* Kernel symbol lookup.  */
-+#define KLDSYM_LOOKUP KLDSYM_LOOKUP
-+};
-+
- struct kld_sym_lookup {
-     int		version;	/* set to sizeof(struct kld_sym_lookup) */
-     char	*symname;	/* Symbol name we are looking up */
-     u_long	symvalue;
-     size_t	symsize;
- };
--#define KLDSYM_LOOKUP	1
- 
- /*
-  * Flags for kldunloadf() and linker_file_unload()
 @@ -287,14 +300,13 @@
  #include <sys/cdefs.h>
  
@@ -618,17 +597,6 @@ diff -ur sys.orig/sys/pciio.h sys/sys/pciio.h
  #include <sys/ioccom.h>
  
  #define PCI_MAXNAMELEN	16
-diff -ur sys.orig/sys/proc.h sys/sys/proc.h
---- sys.orig/sys/proc.h	2004-12-07 23:50:18.000000000 +0100
-+++ sys/sys/proc.h	2004-12-07 23:48:37.000000000 +0100
-@@ -58,6 +58,7 @@
- #endif
- #include <sys/ucontext.h>
- #include <sys/ucred.h>
-+
- #include <machine/proc.h>		/* Machine-dependent proc substruct. */
- 
- /*
 diff -ur sys.orig/sys/procfs.h sys/sys/procfs.h
 --- sys.orig/sys/procfs.h	2004-12-07 23:50:18.000000000 +0100
 +++ sys/sys/procfs.h	2004-12-07 23:48:37.000000000 +0100
