@@ -17,7 +17,15 @@ diff -u net-snmp-5.2.2/debian/control net-snmp-5.2.2/debian/control
 diff -u net-snmp-5.2.2/debian/rules net-snmp-5.2.2/debian/rules
 --- net-snmp-5.2.2/debian/rules
 +++ net-snmp-5.2.2/debian/rules
-@@ -28,13 +28,13 @@
+@@ -21,21 +21,24 @@
+ PERL=/usr/bin/perl
+ endif
+ 
+-ARCH = $(shell dpkg --print-architecture)
++DEB_HOST_ARCH_OS = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+ 
+ CFLAGS = -O2 -D_REENTRANT
+ ifneq "$(findstring debug,$(DEB_BUILD_OPTIONS))" ""
  CFLAGS += -g
  endif
  
@@ -27,20 +35,25 @@ diff -u net-snmp-5.2.2/debian/rules net-snmp-5.2.2/debian/rules
           stamp-h.in include/net-snmp/net-snmp-config.h.in
 -#ifeq "$(ARCH)" "i386"
 -#MIB_MODULES +=  ucd-snmp/lmSensors
-+ifeq "$(ARCH)" "i386"
-+MIB_MODULES +=  ucd-snmp/lmSensors
++ifeq (linux,$(DEB_HOST_ARCH_OS))
++MIB_MODULES += ucd-snmp/diskio ucd-snmp/lmSensors 
  LIBSENSORS = -lsensors
 -#endif
+-
++IPV6 = --enable-ipv6
++else
++IPV6 = --disable-ipv6
 +endif
- 
++	
  build:  build-stamp
  build-stamp: debian/stamp-patched
-@@ -55,7 +55,7 @@
+ 	dh_testdir
+@@ -55,7 +58,7 @@
  	  --enable-ucd-snmp-compatibility \
  	  --enable-shared --with-cflags="$(CFLAGS)" \
  	  --with-perl-modules="INSTALLDIRS=vendor" \
 -	  --enable-ipv6 --with-logfile=none \
-+	  --disable-ipv6 --with-logfile=none \
++	  $(IPV6) --with-logfile=none \
  	  --without-rpm --with-libwrap --with-openssl \
  	  --without-dmalloc --without-efence --without-rsaref \
  	  --with-sys-contact="root" --with-sys-location="Unknown" \
