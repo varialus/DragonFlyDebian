@@ -81,6 +81,32 @@ struct	ether_arp {
 #define	arp_pln	ea_hdr.ar_pln
 #define	arp_op	ea_hdr.ar_op
 
+struct sockaddr_inarp {
+	u_char	sin_len;
+	u_char	sin_family;
+	u_short sin_port;
+	struct	in_addr sin_addr;
+	struct	in_addr sin_srcaddr;
+	u_short	sin_tos;
+	u_short	sin_other;
+#define SIN_PROXY 1
+};
+/*
+ * IP and ethernet specific routing flags
+ */
+#define	RTF_USETRAILERS	RTF_PROTO1	/* use trailers */
+#define RTF_ANNOUNCE	RTF_PROTO2	/* announce new arp entry */
+
+#ifdef	_KERNEL
+extern u_char	ether_ipmulticast_min[ETH_ALEN];
+extern u_char	ether_ipmulticast_max[ETH_ALEN];
+
+int	arpresolve(struct ifnet *ifp, struct rtentry *rt,
+		struct mbuf *m, struct sockaddr *dst, u_char *desten);
+void	arp_ifinit(struct ifnet *, struct ifaddr *);
+void	arp_ifinit2(struct ifnet *, struct ifaddr *, u_char *);
+#endif
+
 /*
  * Macro to map an IP multicast address to an Ethernet multicast address.
  * The high-order 25 bits of the Ethernet address are statically assigned,
@@ -96,6 +122,23 @@ struct	ether_arp {
 	(enaddr)[3] = ((u_int8_t *)ipaddr)[1] & 0x7f; \
 	(enaddr)[4] = ((u_int8_t *)ipaddr)[2]; \
 	(enaddr)[5] = ((u_int8_t *)ipaddr)[3]; \
+}
+
+/*
+ * Macro to map an IP6 multicast address to an Ethernet multicast address.
+ * The high-order 16 bits of the Ethernet address are statically assigned,
+ * and the low-order 32 bits are taken from the low end of the IP6 address.
+ */
+#define ETHER_MAP_IPV6_MULTICAST(ip6addr, enaddr)			\
+/* struct	in6_addr *ip6addr; */					\
+/* u_char	enaddr[ETH_ALEN]; */				\
+{                                                                       \
+	(enaddr)[0] = 0x33;						\
+	(enaddr)[1] = 0x33;						\
+	(enaddr)[2] = ((u_int8_t *)ip6addr)[12];				\
+	(enaddr)[3] = ((u_int8_t *)ip6addr)[13];				\
+	(enaddr)[4] = ((u_int8_t *)ip6addr)[14];				\
+	(enaddr)[5] = ((u_int8_t *)ip6addr)[15];				\
 }
 
 __END_DECLS
