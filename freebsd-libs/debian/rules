@@ -32,7 +32,7 @@ $(SRC_DIR):
 
 	find $(SRC_DIR) -type f | (set -e ; while read i ; do sed -i $$i \
 		-e "/^__FBSDID/d" \
-		-e "s/[ \t]*__\(dead2\|unused\|result\)[ \t]*//g" \
+		-e "s/[ \t]*__\(dead2\|unused\|result\\)[ \t]*//g" \
 		-e "s,<sys/queue\.h>,<bsd/queue.h>,g" \
 		-e "s,<sys/iconv\.h>,<iconv.h>,g" \
 		-e "s/^LDADD=/LDADD+=/g" \
@@ -64,9 +64,6 @@ build-kvm: $(SRC_DIR)
 
 build-sbuf: $(SRC_DIR)
 	cd $(SRC_DIR)/lib/libsbuf && $(PMAKE)
-
-build-stand: $(SRC_DIR)
-	cd $(SRC_DIR)/lib/libstand && $(PMAKE)
 
 build-usbhid: $(SRC_DIR)
 	cd $(SRC_DIR)/lib/libusbhid && $(PMAKE)
