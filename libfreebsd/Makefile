@@ -4,12 +4,12 @@
 # $Id: Makefile 905 2005-12-20 20:29:47Z aurel32 $
 #
 
-LIB_SRCS = nlist.c getbootfile.c devname.c sysctlnametomib.c sysctlbyname.c
+LIB_SRCS = nlist.c getbootfile.c devname.c sysctlnametomib.c sysctlbyname.c linkaddr.c strmode.c
 
 LIB_FREEBSDINCLUDES = include/freebsd/paths.h include/freebsd/stdlib.h
 LIB_INCLUDES = include/nlist.h
 
-LIB_MANS = man/nlist.3 man/getbootfile.3
+LIB_MANS = man/nlist.3 man/getbootfile.3 man/linkaddr.3 man/strmode.3
 
 LIB_STATIC_OBJS = $(LIB_SRCS:%.c=%.o)
 LIB_SHARED_OBJS = $(LIB_SRCS:%.c=%.lo)
