@@ -14,6 +14,15 @@ diff -u net-snmp-5.2.2/debian/control net-snmp-5.2.2/debian/control
  Standards-Version: 3.6.2
  
  Package: snmpd
+@@ -67,7 +67,7 @@
+ Replaces: libsnmp-dev, libsnmp-perl (<<${Source-Version})
+ Provides: libsnmp-dev
+ Conflicts: libsnmp-dev, libsnmp5-dev
+-Depends: libc6-dev, libsnmp9 (=${Source-Version}), libsnmp-perl (=${Source-Version}), libwrap0-dev, libssl-dev, libsensors-dev (>=2.8.5), procps
++Depends: libc6-dev, libsnmp9 (=${Source-Version}), libsnmp-perl (=${Source-Version}), libwrap0-dev, libssl-dev, ${libsensors-dev}, procps
+ Description: NET SNMP (Simple Network Management Protocol) Development Files
+  The Simple Network Management Protocol (SNMP) provides a framework
+  for the exchange of management information between agents (servers)
 diff -u net-snmp-5.2.2/debian/rules net-snmp-5.2.2/debian/rules
 --- net-snmp-5.2.2/debian/rules
 +++ net-snmp-5.2.2/debian/rules
@@ -57,6 +66,18 @@ diff -u net-snmp-5.2.2/debian/rules net-snmp-5.2.2/debian/rules
  	  --without-rpm --with-libwrap --with-openssl \
  	  --without-dmalloc --without-efence --without-rsaref \
  	  --with-sys-contact="root" --with-sys-location="Unknown" \
+@@ -205,7 +208,11 @@
+ 	dh_makeshlibs -plibsnmp-perl
+ 	dh_perl -a
+ 	dh_shlibdeps -a -ldebian/libsnmp$(v)/usr/lib -Llibsnmp$(v)
++ifeq (linux,$(DEB_HOST_ARCH_OS))
++	dh_gencontrol -a -- -Vlibsensors-dev="libsensors-dev (>= 2.8.5)"
++else
+ 	dh_gencontrol -a
++endif
+ 	dh_md5sums -a
+ 	dh_builddeb -a
+ 
 only in patch2:
 unchanged:
 --- net-snmp-5.2.2.orig/agent/mibgroup/ucd_snmp.h
