@@ -1,0 +1,95 @@
+diff -ur src.old/sbin/ifconfig/Makefile src/sbin/ifconfig/Makefile
+--- src.old/sbin/ifconfig/Makefile	2006-05-04 16:40:04.000000000 +0200
++++ src/sbin/ifconfig/Makefile	2006-05-04 16:44:05.000000000 +0200
+@@ -18,18 +18,18 @@
+ CFLAGS+=-DUSE_IEEE80211
+ 
+ #comment out to exclude SIOC[GS]VH support
+-SRCS+=	ifcarp.c
+-CFLAGS+=-DUSE_CARP
++#SRCS+=	ifcarp.c
++#CFLAGS+=-DUSE_CARP
+ 
+ #comment out to exclude MAC support
+-SRCS+=	ifmac.c
+-CFLAGS+=-DUSE_MAC
++#SRCS+=	ifmac.c
++#CFLAGS+=-DUSE_MAC
+ 
+ #comment out to exclude PFSYNC support
+-.if !defined(NO_PF)
+-SRCS+=	ifpfsync.c
+-CFLAGS+=-DUSE_PFSYNC
+-.endif
++#.if !defined(NO_PF)
++#SRCS+=	ifpfsync.c
++#CFLAGS+=-DUSE_PFSYNC
++#.endif
+ 
+ MAN=	ifconfig.8
+ 
+diff -ur src.old/sbin/ifconfig/ifcarp.c src/sbin/ifconfig/ifcarp.c
+--- src.old/sbin/ifconfig/ifcarp.c	2006-05-04 16:40:04.000000000 +0200
++++ src/sbin/ifconfig/ifcarp.c	2006-05-04 16:44:05.000000000 +0200
+@@ -43,6 +43,7 @@
+ #include <ctype.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <bsd/string.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <err.h>
+diff -ur src.old/sbin/ifconfig/ifconfig.c src/sbin/ifconfig/ifconfig.c
+--- src.old/sbin/ifconfig/ifconfig.c	2006-05-04 16:40:04.000000000 +0200
++++ src/sbin/ifconfig/ifconfig.c	2006-05-04 16:44:05.000000000 +0200
+@@ -44,10 +44,14 @@
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
++#include <sys/types.h>
+ #include <sys/sysctl.h>
+-#include <sys/time.h>
++#include <bsd/bsd.h>
+ #include <sys/module.h>
+ #include <sys/linker.h>
++#include <sys/sockio.h>
++#include <bsd/string.h>
++#include <netinet/ether.h>
+ 
+ #include <net/ethernet.h>
+ #include <net/if.h>
+diff -ur src.old/sbin/ifconfig/ifieee80211.c src/sbin/ifconfig/ifieee80211.c
+--- src.old/sbin/ifconfig/ifieee80211.c	2006-05-04 16:40:04.000000000 +0200
++++ src/sbin/ifconfig/ifieee80211.c	2006-05-04 16:44:05.000000000 +0200
+@@ -84,6 +84,7 @@
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <stdio.h>
++#include <stdint.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+diff -ur src.old/sbin/route/route.c src/sbin/route/route.c
+--- src.old/sbin/route/route.c	2006-05-04 16:40:04.000000000 +0200
++++ src/sbin/route/route.c	2006-05-04 16:44:09.000000000 +0200
+@@ -47,6 +47,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/sysctl.h>
+ #include <sys/types.h>
++#include <bsd/bsd.h>
+ 
+ #include <net/if.h>
+ #include <net/route.h>
+@@ -63,10 +64,12 @@
+ #include <paths.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <string.h>
+ #include <sysexits.h>
+ #include <unistd.h>
+ #include <ifaddrs.h>
++#include <time.h>
+ 
+ struct keytab {
+ 	char	*kt_cp;

@@ -3,7 +3,9 @@ Section: base
 Priority: required
 Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>, Guillem Jover <guillem@debian.org>
-Build-Depends: cdbs, debhelper (>= 4.1.0), freebsd5-buildutils, libkvm-dev, libbsd-dev (>= 0.0-1.2+r1367), libc0.1-dev (>= 2.3.6-3+kbsd.r1365), flex | flex-old, kfreebsd-kernel-headers (>= 0.16), libfreebsd-dev (>= 0.0-4)
+Build-Depends: cdbs, debhelper (>= 4.1.0), freebsd5-buildutils, libkvm-dev, libbsd-dev (>= 0.0-1.2+r1367), libc0.1-dev (>= 2.3.6-3+kbsd.r1365), flex | flex-old, kfreebsd-kernel-headers (>= 0.16), libfreebsd-dev (>= 0.0-5), libipx-dev
+# libfreebsd (>= 0.0-5): ifconfig
+# libipx-dev: ifconfig
 Standards-Version: 3.6.0
 
 Package: freebsd-utils
@@ -35,21 +37,21 @@ Description: Command line tool to change keyboard layout
  Original FreeBSD command to set keyboard layout and the FreeBSD possible
  keyboards.
 
+Package: net-tools
+Section: net
+Priority: important
+Architecture: kfreebsd-i386 kfreebsd-amd64
+Depends: ${shlibs:Depends}
+Replaces: freebsd-utils (<< 5.4), freebsd-hackedutils (<= 5.2.1-29)
+Description: FreeBSD networking tools
+ This package contains the FreeBSD tools needed to manage networking on
+ GNU/kFreeBSD.
+
 # FIXME:
-# - enable net-tools
 # - add ktrace (ktrace, kdump)
 # - add jail
 # - add ppp (ppp, pppctl, pppd)
 # - add ccdconfig (ccdconfig + /etc/ccdconfig.conf)
 # - add pf (pfctl + authpf + /etc stuff + init.d script)
 # - add ipfw (???)
-
-#Package: net-tools
-#Section: net
-#Priority: important
-#Architecture: kfreebsd-i386 kfreebsd-amd64
-#Depends: ${shlibs:Depends}
-#Replaces: freebsd-utils (<< 5.4), freebsd-hackedutils (<= 5.2.1-26)
-#Description: FreeBSD networking tools
-# This package contains the FreeBSD tools needed to manage networking on
-# GNU/kFreeBSD.
+# - add devfs
