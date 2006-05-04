@@ -34,7 +34,6 @@ $(SRC_DIR):
 		-e "/^__FBSDID/d" \
 		-e "s/[ \t]*__\(dead2\|unused\|result\\)[ \t]*//g" \
 		-e "s,<sys/queue\.h>,<bsd/queue.h>,g" \
-		-e "s,<sys/iconv\.h>,<iconv.h>,g" \
 		-e "s/^LDADD=/LDADD+=/g" \
 		-e "s/getline/bsd_&/g" \
 	; done)
@@ -47,7 +46,7 @@ $(SRC_DIR):
 build: build-arch build-indep
 
 build-arch: build-arch-stamp
-build-arch-stamp: build-cam build-geom build-sbuf build-ipx build-kvm build-usbhid
+build-arch-stamp: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid
 	touch build-arch-stamp
 
 build-cam: build-sbuf $(SRC_DIR)
@@ -58,6 +57,9 @@ build-geom: build-sbuf $(SRC_DIR)
 
 build-ipx: $(SRC_DIR)
 	cd $(SRC_DIR)/lib/libipx && $(PMAKE)
+
+build-kiconv: $(SRC_DIR)
+	cd $(SRC_DIR)/lib/libkiconv && $(PMAKE)
 
 build-kvm: $(SRC_DIR)
 	cd $(SRC_DIR)/lib/libkvm && $(PMAKE)
@@ -96,6 +98,7 @@ install-arch:
 	cd $(SRC_DIR)/lib/libcam && $(PMAKE) install
 	cd $(SRC_DIR)/lib/libgeom && $(PMAKE) install
 	cd $(SRC_DIR)/lib/libipx && $(PMAKE) install
+	cd $(SRC_DIR)/lib/libkiconv && $(PMAKE) install
 	cd $(SRC_DIR)/lib/libkvm && $(PMAKE) install
 	cd $(SRC_DIR)/lib/libusbhid && $(PMAKE) install
 
