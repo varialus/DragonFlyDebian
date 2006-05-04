@@ -15,11 +15,11 @@ export LDADD=-lbsd -lfreebsd
 
 build/freebsd-utils:: apply-patches
 	set -e ; for i in sbin/{dmesg,mdconfig,mount,mount_std,umount,swapon,sysctl} usr.sbin/rpc.umntall \
-		sbin/mount_{autofs,ext2fs,hpfs,nullfs,reiserfs,unionfs} \
+		sbin/mount_{autofs,cd9660,ext2fs,hpfs,msdosfs,ntfs,nullfs,reiserfs,udf,umapfs,unionfs} \
 	; do \
 		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
 	done
-# FIXME: add mount_{xfs,cd9660,msdosfs,nfs,nfs4,ntfs,udf,umapfs}
+# FIXME: add mount_{xfs,nfs,nfs4}
 
 build/module-init-tools:: apply-patches
 	set -e ; for i in sbin/kld{load,stat,unload} \

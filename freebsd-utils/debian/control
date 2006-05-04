@@ -3,15 +3,19 @@ Section: base
 Priority: required
 Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>, Guillem Jover <guillem@debian.org>
-Build-Depends: cdbs, debhelper (>= 4.1.0), freebsd5-buildutils, libkvm-dev, libbsd-dev (>= 0.0-1.2+r1367), libc0.1-dev (>= 2.3.6-3+kbsd.r1365), flex | flex-old, kfreebsd-kernel-headers (>= 0.16), libfreebsd-dev (>= 0.0-5), libipx-dev
+Build-Depends: cdbs, debhelper (>= 4.1.0), freebsd5-buildutils, libkvm-dev, libbsd-dev (>= 0.0-1.2+r1367), libc0.1-dev (>= 2.3.6-7+kbsd.r1540), flex | flex-old, kfreebsd-kernel-headers (>= 0.16), libfreebsd-dev (>= 0.0-5), libipx-dev, libkiconv-dev
+# libkvm-dev: dmesg
 # libfreebsd (>= 0.0-5): ifconfig
 # libipx-dev: ifconfig
+# libkiconv-dev: mount_*
+# libc0.1-dev (>= 2.3.6-7+kbsd.r1540): ifconfig
 Standards-Version: 3.6.0
 
 Package: freebsd-utils
 Essential: yes
 Architecture: kfreebsd-i386 kfreebsd-amd64
 Depends: ${shlibs:Depends}, libc0.1 (>= 2.3.6-3+kbsd.r1365), freebsd-hackedutils
+Replaces: freebsd-hackedutils (<= 5.2.1-29)
 Description: FreeBSD utilities needed for GNU/kFreeBSD.
  FreeBSD utilities needed for GNU/kFreeBSD.
 
