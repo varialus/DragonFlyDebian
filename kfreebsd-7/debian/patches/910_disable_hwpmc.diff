@@ -1,0 +1,54 @@
+
+  Disabled because of FTBFS.  Needless to say, it should be eventualy reenabled.
+
+diff -ur sys.old/conf/files sys/conf/files
+--- sys.old/conf/files	2006-05-06 10:51:44.000000000 +0200
++++ sys/conf/files	2006-05-06 11:32:40.000000000 +0200
+@@ -626,8 +626,6 @@
+ dev/hme/if_hme.c		optional hme
+ dev/hme/if_hme_pci.c		optional hme pci
+ dev/hme/if_hme_sbus.c		optional hme sbus
+-dev/hwpmc/hwpmc_logging.c	optional hwpmc
+-dev/hwpmc/hwpmc_mod.c		optional hwpmc
+ dev/ichsmb/ichsmb.c		optional ichsmb
+ dev/ichsmb/ichsmb_pci.c		optional ichsmb pci
+ dev/ida/ida.c			optional ida
+diff -ur sys.old/conf/files.amd64 sys/conf/files.amd64
+--- sys.old/conf/files.amd64	2006-05-06 10:51:44.000000000 +0200
++++ sys/conf/files.amd64	2006-05-06 11:32:58.000000000 +0200
+@@ -137,9 +137,6 @@
+ dev/fdc/fdc_acpi.c		optional	fdc
+ dev/fdc/fdc_isa.c		optional	fdc isa
+ dev/fdc/fdc_pccard.c		optional	fdc pccard
+-dev/hwpmc/hwpmc_amd.c		optional	hwpmc
+-dev/hwpmc/hwpmc_piv.c		optional	hwpmc
+-dev/hwpmc/hwpmc_x86.c		optional	hwpmc
+ dev/kbd/kbd.c			optional	atkbd | sc | ukbd
+ dev/mem/memutil.c		optional	mem
+ dev/sio/sio.c			optional	sio
+diff -ur sys.old/conf/files.i386 sys/conf/files.i386
+--- sys.old/conf/files.i386	2006-05-06 10:51:44.000000000 +0200
++++ sys/conf/files.i386	2006-05-06 11:32:40.000000000 +0200
+@@ -142,11 +142,6 @@
+ dev/fdc/fdc_isa.c		optional fdc isa
+ dev/fdc/fdc_pccard.c		optional fdc pccard
+ dev/fe/if_fe_isa.c		optional fe isa
+-dev/hwpmc/hwpmc_amd.c		optional hwpmc
+-dev/hwpmc/hwpmc_pentium.c	optional hwpmc
+-dev/hwpmc/hwpmc_piv.c		optional hwpmc
+-dev/hwpmc/hwpmc_ppro.c		optional hwpmc
+-dev/hwpmc/hwpmc_x86.c		optional hwpmc
+ dev/ichwd/ichwd.c		optional ichwd
+ dev/if_ndis/if_ndis.c		optional ndis
+ dev/if_ndis/if_ndis_pccard.c	optional ndis pccard
+diff -ur sys.old/modules/Makefile sys/modules/Makefile
+--- sys.old/modules/Makefile	2006-05-06 10:51:44.000000000 +0200
++++ sys/modules/Makefile	2006-05-06 11:32:40.000000000 +0200
+@@ -85,7 +85,6 @@
+ 	${_hfa} \
+ 	hifn \
+ 	hme \
+-	hwpmc \
+ 	${_i2c} \
+ 	${_ibcs2} \
+ 	${_ichwd} \

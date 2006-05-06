@@ -1,0 +1,66 @@
+diff -ur sys/dev/sound/pcm/mixer.c sys/dev/sound/pcm/mixer.c
+--- sys/dev/sound/pcm/mixer.c	2004-06-25 18:34:33.000000000 +0200
++++ sys/dev/sound/pcm/mixer.c	2005-08-09 13:56:21.000000000 +0200
+@@ -459,6 +459,9 @@
+ 
+     	if ((cmd & MIXER_READ(0)) == MIXER_READ(0)) {
+ 		switch (j) {
++    		case OSS_GETVERSION:
++			v = SOUND_VERSION;
++			break;
+     		case SOUND_MIXER_DEVMASK:
+     		case SOUND_MIXER_CAPS:
+     		case SOUND_MIXER_STEREODEVS:
+diff -ur sys/sys/soundcard.h sys/sys/soundcard.h
+--- sys/sys/soundcard.h	2005-08-09 13:39:26.000000000 +0200
++++ sys/sys/soundcard.h	2005-08-09 13:53:15.000000000 +0200
+@@ -52,11 +52,14 @@
+   */
+ 
+ /*
+- * SOUND_VERSION is only used by the voxware driver. Hopefully apps
+- * should not depend on it, but rather look at the capabilities
+- * of the driver in the kernel!
++ * OSS interface version. With versions earlier than 3.6 this value is
++ * an integer with value less than 361. In versions 3.6 and later
++ * it's a six digit hexadecimal value. For example value
++ * of 0x030600 represents OSS version 3.6.0.
+  */
+-#define SOUND_VERSION  301
++#define SOUND_VERSION   0x030600
++#define OPEN_SOUND_SYSTEM
++
+ #define VOXWARE		/* does this have any use ? */
+ 
+ /*
+@@ -93,6 +96,7 @@
+ #define SNDCARD_NSS            26
+ #define SNDCARD_UART16550      27
+ #define SNDCARD_OPL            28
++/* Sound card numbers 29 to N are reserved. Don't add more numbers here. */
+ 
+ #include <sys/types.h>
+ #include <machine/endian.h>
+@@ -803,6 +807,8 @@
+     /* Has a coprocessor, sometimes it's a DSP but usually not */
+ #define DSP_CAP_TRIGGER		0x00001000 /* Supports SETTRIGGER */
+ #define DSP_CAP_MMAP 0x00002000 /* Supports mmap() */
++#define DSP_CAP_MULTI		0x00004000 /* Supports multiple open */
++#define DSP_CAP_BIND		0x00008000 /* Channel binding to front/rear/cneter/lfe */
+ 
+ /*
+  * What do these function do ?
+@@ -1088,6 +1094,13 @@
+ #define LEFT_CHN	0
+ #define RIGHT_CHN	1
+ 
++/*  
++ * An ioctl for identifying the driver version. It will return value
++ * of the SOUND_VERSION macro used when compiling the driver.
++ * This call was introduced for compatibility with OSS version 3.6.
++ */
++#define OSS_GETVERSION			_IOR('M', 118, int)
++
+ /*
+  * Level 2 event types for /dev/sequencer
+  */

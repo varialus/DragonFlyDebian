@@ -1,0 +1,217 @@
+diff -ur sys.old/amd64/conf/GENERIC sys/amd64/conf/GENERIC
+--- sys.old/amd64/conf/GENERIC	2006-05-06 10:51:44.000000000 +0200
++++ sys/amd64/conf/GENERIC	2006-05-06 11:35:59.000000000 +0200
+@@ -18,13 +18,8 @@
+ #
+ # $FreeBSD: src/sys/amd64/conf/GENERIC,v 1.455 2006/05/03 18:15:36 sam Exp $
+ 
+-cpu		HAMMER
+-ident		GENERIC
+-
+ # To statically compile in device wiring instead of /boot/device.hints
+-#hints		"GENERIC.hints"		# Default places to look for devices.
+-
+-makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
++hints		"GENERIC.hints"		# Default places to look for devices.
+ 
+ #options 	SCHED_ULE		# ULE scheduler
+ options 	SCHED_4BSD		# 4BSD scheduler
+@@ -43,6 +38,8 @@
+ options 	MSDOSFS			# MSDOS Filesystem
+ options 	CD9660			# ISO 9660 Filesystem
+ options 	PROCFS			# Process filesystem (requires PSEUDOFS)
++options 	LINPROCFS
++options 	COMPAT_LINUX		# Needed by LINPROCFS
+ options 	PSEUDOFS		# Pseudo-filesystem framework
+ options 	GEOM_GPT		# GUID Partition Tables.
+ options 	COMPAT_43		# Needed by COMPAT_LINUX32
+@@ -50,7 +47,7 @@
+ options 	COMPAT_IA32		# Compatible with i386 binaries
+ options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
+ options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
+-options 	SCSI_DELAY=5000		# Delay (in ms) before probing SCSI
++options 	SCSI_DELAY=2000		# Delay (in ms) before probing SCSI
+ options 	KTRACE			# ktrace(1) support
+ options 	SYSVSHM			# SYSV-style shared memory
+ options         SHMMAXPGS=4096
+@@ -80,15 +77,11 @@
+ 
+ # Linux 32-bit ABI support
+ options 	COMPAT_LINUX32		# Compatible with i386 linux binaries 
+-options 	LINPROCFS		# Cannot be a module yet.
+ 
+ # Bus support.
+ device		acpi
+ device		pci
+ 
+-# Floppy drives
+-device		fdc
+-
+ # ATA and ATAPI devices
+ device		ata
+ device		atadisk		# ATA disk drives
+@@ -96,6 +89,8 @@
+ device		atapicd		# ATAPI CDROM drives
+ device		atapifd		# ATAPI floppy drives
+ device		atapist		# ATAPI tape drives
++device		atapicam	# emulate ATAPI devices as SCSI via CAM
++				# needs CAM to be present (scbus && pass)
+ options 	ATA_STATIC_ID	# Static device numbering
+ 
+ # SCSI Controllers
+@@ -177,10 +172,6 @@
+ # Parallel port
+ device		ppc
+ device		ppbus		# Parallel port bus (required)
+-device		lpt		# Printer
+-device		plip		# TCP/IP over parallel
+-device		ppi		# Parallel port interface device
+-#device		vpo		# Requires scbus and da
+ 
+ # If you've got a "dumb" serial or parallel PCI card that is
+ # supported by the puc(4) glue driver, uncomment the following
+@@ -248,13 +239,8 @@
+ device		loop		# Network loopback
+ device		random		# Entropy device
+ device		ether		# Ethernet support
+-device		sl		# Kernel SLIP
+-device		ppp		# Kernel PPP
+-device		tun		# Packet tunnel.
+ device		pty		# Pseudo-ttys (telnet etc)
+ device		md		# Memory "disks"
+-device		gif		# IPv6 and IPv4 tunneling
+-device		faith		# IPv6-to-IPv4 relaying (translation)
+ 
+ # The `bpf' device enables the Berkeley Packet Filter.
+ # Be aware of the administrative consequences of enabling this!
+@@ -270,12 +256,8 @@
+ device		ugen		# Generic
+ device		uhid		# "Human Interface Devices"
+ device		ukbd		# Keyboard
+-device		ulpt		# Printer
+ device		umass		# Disks/Mass storage - Requires scbus and da
+-device		ums		# Mouse
+ device		ural		# Ralink Technology RT2500USB wireless NICs
+-device		urio		# Diamond Rio 500 MP3 player
+-device		uscanner	# Scanners
+ # USB Ethernet, requires miibus
+ device		aue		# ADMtek USB Ethernet
+ device		axe		# ASIX Electronics USB Ethernet
+@@ -288,3 +270,11 @@
+ device		firewire	# FireWire bus code
+ device		sbp		# SCSI over FireWire (Requires scbus and da)
+ device		fwe		# Ethernet over FireWire (non-standard!)
++
++# Alternate queueing
++options		ALTQ
++options		ALTQ_CBQ	# Class Bases Queuing (CBQ)
++options		ALTQ_RED	# Random Early Detection (RED)
++options		ALTQ_RIO	# RED In/Out
++options		ALTQ_HFSC	# Hierarchical Packet Scheduler (HFSC)
++options		ALTQ_PRIQ	# Priority Queuing (PRIQ)
+diff -ur sys.old/i386/conf/GENERIC sys/i386/conf/GENERIC
+--- sys.old/i386/conf/GENERIC	2006-05-06 10:51:44.000000000 +0200
++++ sys/i386/conf/GENERIC	2006-05-06 11:37:03.000000000 +0200
+@@ -18,15 +18,8 @@
+ #
+ # $FreeBSD: src/sys/i386/conf/GENERIC,v 1.444 2006/05/03 18:13:11 sam Exp $
+ 
+-cpu		I486_CPU
+-cpu		I586_CPU
+-cpu		I686_CPU
+-ident		GENERIC
+-
+ # To statically compile in device wiring instead of /boot/device.hints
+-#hints		"GENERIC.hints"		# Default places to look for devices.
+-
+-makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
++hints		"GENERIC.hints"		# Default places to look for devices.
+ 
+ #options 	SCHED_ULE		# ULE scheduler
+ options 	SCHED_4BSD		# 4BSD scheduler
+@@ -44,13 +37,15 @@
+ options 	MSDOSFS			# MSDOS Filesystem
+ options 	CD9660			# ISO 9660 Filesystem
+ options 	PROCFS			# Process filesystem (requires PSEUDOFS)
++options 	LINPROCFS
++options 	COMPAT_LINUX		# Needed by LINPROCFS
+ options 	PSEUDOFS		# Pseudo-filesystem framework
+ options 	GEOM_GPT		# GUID Partition Tables.
+ options 	COMPAT_43		# Compatible with BSD 4.3 [KEEP THIS!]
+ options 	COMPAT_43TTY		# BSD 4.3 TTY compat [KEEP THIS!]
+ options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
+ options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
+-options 	SCSI_DELAY=5000		# Delay (in ms) before probing SCSI
++options 	SCSI_DELAY=2000		# Delay (in ms) before probing SCSI
+ options 	KTRACE			# ktrace(1) support
+ options 	SYSVSHM			# SYSV-style shared memory
+ options         SHMMAXPGS=4096
+@@ -83,9 +78,6 @@
+ device		eisa
+ device		pci
+ 
+-# Floppy drives
+-device		fdc
+-
+ # ATA and ATAPI devices
+ device		ata
+ device		atadisk		# ATA disk drives
+@@ -93,6 +85,8 @@
+ device		atapicd		# ATAPI CDROM drives
+ device		atapifd		# ATAPI floppy drives
+ device		atapist		# ATAPI tape drives
++device		atapicam	# emulate ATAPI devices as SCSI via CAM
++				# needs CAM to be present (scbus && pass)
+ options 	ATA_STATIC_ID	# Static device numbering
+ 
+ # SCSI Controllers
+@@ -189,10 +183,6 @@
+ # Parallel port
+ device		ppc
+ device		ppbus		# Parallel port bus (required)
+-device		lpt		# Printer
+-device		plip		# TCP/IP over parallel
+-device		ppi		# Parallel port interface device
+-#device		vpo		# Requires scbus and da
+ 
+ # If you've got a "dumb" serial or parallel PCI card that is
+ # supported by the puc(4) glue driver, uncomment the following
+@@ -261,13 +251,8 @@
+ device		loop		# Network loopback
+ device		random		# Entropy device
+ device		ether		# Ethernet support
+-device		sl		# Kernel SLIP
+-device		ppp		# Kernel PPP
+-device		tun		# Packet tunnel.
+ device		pty		# Pseudo-ttys (telnet etc)
+ device		md		# Memory "disks"
+-device		gif		# IPv6 and IPv4 tunneling
+-device		faith		# IPv6-to-IPv4 relaying (translation)
+ 
+ # The `bpf' device enables the Berkeley Packet Filter.
+ # Be aware of the administrative consequences of enabling this!
+@@ -283,12 +268,8 @@
+ device		ugen		# Generic
+ device		uhid		# "Human Interface Devices"
+ device		ukbd		# Keyboard
+-device		ulpt		# Printer
+ device		umass		# Disks/Mass storage - Requires scbus and da
+-device		ums		# Mouse
+ device		ural		# Ralink Technology RT2500USB wireless NICs
+-device		urio		# Diamond Rio 500 MP3 player
+-device		uscanner	# Scanners
+ # USB Ethernet, requires miibus
+ device		aue		# ADMtek USB Ethernet
+ device		axe		# ASIX Electronics USB Ethernet
+@@ -301,3 +282,11 @@
+ device		firewire	# FireWire bus code
+ device		sbp		# SCSI over FireWire (Requires scbus and da)
+ device		fwe		# Ethernet over FireWire (non-standard!)
++
++# Alternate queueing
++options		ALTQ
++options		ALTQ_CBQ	# Class Bases Queuing (CBQ)
++options		ALTQ_RED	# Random Early Detection (RED)
++options		ALTQ_RIO	# RED In/Out
++options		ALTQ_HFSC	# Hierarchical Packet Scheduler (HFSC)
++options		ALTQ_PRIQ	# Priority Queuing (PRIQ)

@@ -1,0 +1,350 @@
+diff -ur sys.old/amd64/conf/GENERIC sys/amd64/conf/GENERIC
+--- sys.old/amd64/conf/GENERIC	2006-05-06 12:05:26.000000000 +0200
++++ sys/amd64/conf/GENERIC	2006-05-06 12:15:48.000000000 +0200
+@@ -127,8 +127,6 @@
+ device		arcmsr		# Areca SATA II RAID
+ device		ciss		# Compaq Smart RAID 5*
+ device		dpt		# DPT Smartcache III, IV - See NOTES for options
+-device		hptmv		# Highpoint RocketRAID 182x
+-device		rr232x		# Highpoint RocketRAID 232x
+ device		iir		# Intel Integrated RAID
+ device		ips		# IBM (Adaptec) ServeRAID
+ device		mly		# Mylex AcceleRAID/eXtremeRAID
+@@ -200,7 +198,6 @@
+ device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+ device		lge		# Level 1 LXT1001 gigabit Ethernet
+ device		nge		# NatSemi DP83820 gigabit Ethernet
+-device		nve		# nVidia nForce MCP on-board Ethernet Networking
+ device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
+ device		re		# RealTek 8139C+/8169/8169S/8110S
+ device		rl		# RealTek 8129/8139
+@@ -234,9 +231,6 @@
+ device		wlan_ccmp	# 802.11 CCMP support
+ device		wlan_tkip	# 802.11 TKIP support
+ device		an		# Aironet 4500/4800 802.11 wireless NICs.
+-device		ath		# Atheros pci/cardbus NIC's
+-device		ath_hal		# Atheros HAL (Hardware Access Layer)
+-device		ath_rate_sample	# SampleRate tx rate control for ath
+ device		awi		# BayStack 660 and others
+ device		ral		# Ralink Technology RT2500 wireless NICs.
+ device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
+diff -ur sys.old/conf/files sys/conf/files
+--- sys.old/conf/files	2006-05-06 12:05:39.000000000 +0200
++++ sys/conf/files	2006-05-06 12:15:29.000000000 +0200
+@@ -241,8 +241,6 @@
+ contrib/dev/acpica/utobject.c	optional acpi
+ contrib/dev/acpica/utstate.c	optional acpi
+ contrib/dev/acpica/utxface.c	optional acpi
+-contrib/dev/ath/freebsd/ah_osdep.c optional ath_hal \
+-	compile-with "${NORMAL_C} -I$S/contrib/dev/ath/freebsd"
+ contrib/ipfilter/netinet/fil.c	optional ipfilter inet \
+ 	compile-with "${NORMAL_C} -I$S/contrib/ipfilter"
+ contrib/ipfilter/netinet/ip_auth.c optional ipfilter inet \
+@@ -464,15 +462,6 @@
+ dev/ata/atapi-cd.c		optional atapicd
+ dev/ata/atapi-fd.c		optional atapifd
+ dev/ata/atapi-tape.c		optional atapist
+-dev/ath/ath_rate/amrr/amrr.c	optional ath_rate_amrr
+-dev/ath/ath_rate/onoe/onoe.c	optional ath_rate_onoe \
+-	compile-with "${NORMAL_C} -I$S/contrib/dev/ath/freebsd"
+-dev/ath/ath_rate/sample/sample.c	optional ath_rate_sample \
+-	compile-with "${NORMAL_C} -I$S/contrib/dev/ath/freebsd"
+-dev/ath/if_ath.c		optional ath \
+-	compile-with "${NORMAL_C} -I$S/contrib/dev/ath/freebsd"
+-dev/ath/if_ath_pci.c		optional ath pci \
+-	compile-with "${NORMAL_C} -I$S/contrib/dev/ath/freebsd"
+ dev/awi/am79c930.c		optional awi
+ dev/awi/awi.c			optional awi
+ dev/awi/if_awi_pccard.c		optional awi pccard
+diff -ur sys.old/conf/files.amd64 sys/conf/files.amd64
+--- sys.old/conf/files.amd64	2006-05-06 12:05:39.000000000 +0200
++++ sys/conf/files.amd64	2006-05-06 12:15:29.000000000 +0200
+@@ -47,36 +47,6 @@
+ 	no-obj no-implicit-rule before-depend				\
+ 	clean		"ukbdmap.h"
+ #
+-hal.o				optional	ath_hal			\
+-	dependency	"$S/contrib/dev/ath/public/x86_64-elf.hal.o.uu"	\
+-	compile-with	"uudecode < $S/contrib/dev/ath/public/x86_64-elf.hal.o.uu" \
+-	no-implicit-rule
+-opt_ah.h			optional	ath_hal			\
+-	dependency	"$S/contrib/dev/ath/public/x86_64-elf.opt_ah.h"	\
+-	compile-with	"cp $S/contrib/dev/ath/public/x86_64-elf.opt_ah.h opt_ah.h" \
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"opt_ah.h"
+-#
+-nvenetlib.o			optional	nve pci			\
+-	dependency	"$S/contrib/dev/nve/amd64/nvenetlib.o.bz2.uu"	\
+-	compile-with	"uudecode $S/contrib/dev/nve/amd64/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
+- 	no-implicit-rule
+-#
+-os+%DIKED-nve.h		optional	nve pci			\
+-	dependency	"$S/contrib/dev/nve/os.h"			\
+-	compile-with	"sed -e 's/^.*#include.*phy\.h.*$$//' $S/contrib/dev/nve/os.h > os+%DIKED-nve.h" \
+-	no-implicit-rule no-obj before-depend				\
+-	clean		"os+%DIKED-nve.h"
+-#
+-hptmvraid.o			optional	hptmv			\
+-	dependency	"$S/dev/hptmv/amd64-elf.raid.o.uu"	\
+-	compile-with	"uudecode < $S/dev/hptmv/amd64-elf.raid.o.uu" \
+-	no-implicit-rule
+-rr232x_lib.o		optional	rr232x				\
+-	dependency	"$S/dev/rr232x/amd64-elf.rr232x_lib.o.uu"	\
+-	compile-with	"uudecode < $S/dev/rr232x/amd64-elf.rr232x_lib.o.uu" \
+-	no-implicit-rule
+-#
+ amd64/acpica/OsdEnvironment.c	optional	acpi
+ amd64/acpica/acpi_machdep.c	optional	acpi
+ amd64/acpica/acpi_wakeup.c	optional	acpi
+@@ -167,20 +137,11 @@
+ dev/fdc/fdc_acpi.c		optional	fdc
+ dev/fdc/fdc_isa.c		optional	fdc isa
+ dev/fdc/fdc_pccard.c		optional	fdc pccard
+-dev/hptmv/entry.c		optional	hptmv
+-dev/hptmv/mv.c			optional	hptmv
+-dev/hptmv/gui_lib.c		optional	hptmv
+-dev/hptmv/hptproc.c		optional	hptmv
+-dev/hptmv/ioctl.c		optional	hptmv
+ dev/hwpmc/hwpmc_amd.c		optional	hwpmc
+ dev/hwpmc/hwpmc_piv.c		optional	hwpmc
+ dev/hwpmc/hwpmc_x86.c		optional	hwpmc
+ dev/kbd/kbd.c			optional	atkbd | sc | ukbd
+ dev/mem/memutil.c		optional	mem
+-dev/nve/if_nve.c		optional	nve pci
+-dev/rr232x/os_bsd.c		optional	rr232x
+-dev/rr232x/osm_bsd.c		optional	rr232x
+-dev/rr232x/rr232x_config.c	optional	rr232x
+ dev/sio/sio.c			optional	sio
+ dev/sio/sio_isa.c		optional	sio isa
+ dev/speaker/spkr.c		optional	speaker
+diff -ur sys.old/conf/files.i386 sys/conf/files.i386
+--- sys.old/conf/files.i386	2006-05-06 12:05:39.000000000 +0200
++++ sys/conf/files.i386	2006-05-06 12:15:29.000000000 +0200
+@@ -46,42 +46,12 @@
+ 	no-obj no-implicit-rule before-depend				\
+ 	clean		"ukbdmap.h"
+ #
+-trlld.o				optional	oltr			\
+-	dependency	"$S/contrib/dev/oltr/i386-elf.trlld.o.uu"	\
+-	compile-with	"uudecode < $S/contrib/dev/oltr/i386-elf.trlld.o.uu"	\
+-	no-implicit-rule
+-#
+-hal.o				optional	ath_hal			\
+-	dependency	"$S/contrib/dev/ath/public/i386-elf.hal.o.uu"	\
+-	compile-with	"uudecode < $S/contrib/dev/ath/public/i386-elf.hal.o.uu" \
+-	no-implicit-rule
+ opt_ah.h			optional	ath_hal			\
+ 	dependency	"$S/contrib/dev/ath/public/i386-elf.opt_ah.h"	\
+ 	compile-with	"cp $S/contrib/dev/ath/public/i386-elf.opt_ah.h opt_ah.h" \
+ 	no-obj no-implicit-rule before-depend				\
+ 	clean		"opt_ah.h"
+ #
+-nvenetlib.o			optional	nve pci			\
+-	dependency	"$S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu"	\
+-	compile-with	"uudecode $S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
+-	no-implicit-rule
+-#
+-os+%DIKED-nve.h		optional	nve pci			\
+-	dependency	"$S/contrib/dev/nve/os.h"			\
+-	compile-with	"sed -e 's/^.*#include.*phy\.h.*$$//' $S/contrib/dev/nve/os.h > os+%DIKED-nve.h" \
+-	no-implicit-rule no-obj before-depend				\
+-	clean		"os+%DIKED-nve.h"
+-#
+-hptmvraid.o			optional	hptmv			\
+-	dependency	"$S/dev/hptmv/i386-elf.raid.o.uu"	\
+-	compile-with	"uudecode < $S/dev/hptmv/i386-elf.raid.o.uu" \
+-	no-implicit-rule
+-#
+-rr232x_lib.o			optional	rr232x			\
+-	dependency	"$S/dev/rr232x/i386-elf.rr232x_lib.o.uu"	\
+-	compile-with	"uudecode < $S/dev/rr232x/i386-elf.rr232x_lib.o.uu" \
+-	no-implicit-rule
+-#
+ #
+ compat/linux/linux_file.c	optional compat_linux
+ compat/linux/linux_getcwd.c	optional compat_linux
+@@ -172,11 +142,6 @@
+ dev/fdc/fdc_isa.c		optional fdc isa
+ dev/fdc/fdc_pccard.c		optional fdc pccard
+ dev/fe/if_fe_isa.c		optional fe isa
+-dev/hptmv/entry.c		optional hptmv
+-dev/hptmv/mv.c			optional hptmv
+-dev/hptmv/gui_lib.c		optional hptmv
+-dev/hptmv/hptproc.c		optional hptmv
+-dev/hptmv/ioctl.c		optional hptmv
+ dev/hwpmc/hwpmc_amd.c		optional hwpmc
+ dev/hwpmc/hwpmc_pentium.c	optional hwpmc
+ dev/hwpmc/hwpmc_piv.c		optional hwpmc
+@@ -196,12 +161,8 @@
+ dev/mem/memutil.c		optional mem
+ dev/mse/mse.c			optional mse
+ dev/mse/mse_isa.c		optional mse isa
+-dev/nve/if_nve.c		optional nve pci
+ dev/pcf/pcf_isa.c		optional pcf
+ dev/random/nehemiah.c		optional random
+-dev/rr232x/os_bsd.c		optional rr232x
+-dev/rr232x/osm_bsd.c		optional rr232x
+-dev/rr232x/rr232x_config.c	optional rr232x
+ dev/sbni/if_sbni.c		optional sbni
+ dev/sbni/if_sbni_isa.c		optional sbni isa
+ dev/sbni/if_sbni_pci.c		optional sbni pci
+diff -ur sys.old/conf/kern.pre.mk sys/conf/kern.pre.mk
+--- sys.old/conf/kern.pre.mk	2006-05-06 12:05:40.000000000 +0200
++++ sys/conf/kern.pre.mk	2006-05-06 12:15:29.000000000 +0200
+@@ -52,12 +52,6 @@
+ # include path into contrib'ed source files.
+ INCLUDES+= -I$S/contrib/altq
+ 
+-# ... and the same for Atheros HAL when the author builds it from
+-#     non-distributable sources.
+-.if defined(ATH_BUILDING_FROM_SOURCE)
+-INCLUDES+= -I$S/contrib/dev/ath
+-.endif
+-
+ .if make(depend) || make(kernel-depend)
+ 
+ # ... and the same for ipfilter
+@@ -66,9 +60,6 @@
+ # ... and the same for pf
+ INCLUDES+= -I$S/contrib/pf
+ 
+-# ... and the same for Atheros HAL
+-INCLUDES+= -I$S/contrib/dev/ath/freebsd
+-
+ # ... and the same for the NgATM stuff
+ INCLUDES+= -I$S/contrib/ngatm
+ 
+diff -ur sys.old/i386/conf/GENERIC sys/i386/conf/GENERIC
+--- sys.old/i386/conf/GENERIC	2006-05-06 12:06:32.000000000 +0200
++++ sys/i386/conf/GENERIC	2006-05-06 12:15:40.000000000 +0200
+@@ -130,8 +130,6 @@
+ device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
+ device		ciss		# Compaq Smart RAID 5*
+ device		dpt		# DPT Smartcache III, IV - See NOTES for options
+-device		hptmv		# Highpoint RocketRAID 182x
+-device		rr232x		# Highpoint RocketRAID 232x
+ device		iir		# Intel Integrated RAID
+ device		ips		# IBM (Adaptec) ServeRAID
+ device		mly		# Mylex AcceleRAID/eXtremeRAID
+@@ -212,7 +210,6 @@
+ device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+ device		lge		# Level 1 LXT1001 gigabit Ethernet
+ device		nge		# NatSemi DP83820 gigabit Ethernet
+-device		nve		# nVidia nForce MCP on-board Ethernet Networking
+ device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
+ device		re		# RealTek 8139C+/8169/8169S/8110S
+ device		rl		# RealTek 8129/8139
+@@ -246,9 +243,6 @@
+ device		wlan_ccmp	# 802.11 CCMP support
+ device		wlan_tkip	# 802.11 TKIP support
+ device		an		# Aironet 4500/4800 802.11 wireless NICs.
+-device		ath		# Atheros pci/cardbus NIC's
+-device		ath_hal		# Atheros HAL (Hardware Access Layer)
+-device		ath_rate_sample	# SampleRate tx rate control for ath
+ device		awi		# BayStack 660 and others
+ device		ral		# Ralink Technology RT2500 wireless NICs.
+ device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
+diff -ur sys.old/modules/Makefile sys/modules/Makefile
+--- sys.old/modules/Makefile	2006-05-06 12:06:45.000000000 +0200
++++ sys/modules/Makefile	2006-05-06 12:15:29.000000000 +0200
+@@ -25,11 +25,6 @@
+ 	${_arl} \
+ 	${_asr} \
+ 	ata \
+-	ath \
+-	${_ath_hal} \
+-	ath_rate_amrr \
+-	ath_rate_onoe \
+-	ath_rate_sample \
+ 	aue \
+ 	${_auxio} \
+ 	${_awi} \
+@@ -90,7 +85,6 @@
+ 	${_hfa} \
+ 	hifn \
+ 	hme \
+-	${_hptmv} \
+ 	hwpmc \
+ 	${_i2c} \
+ 	${_ibcs2} \
+@@ -174,9 +168,7 @@
+ 	ntfs \
+ 	ntfs_iconv \
+ 	nullfs \
+-	${_nve} \
+ 	${_nwfs} \
+-	${_oltr} \
+ 	${_osf1} \
+ 	${_padlock} \
+ 	patm \
+@@ -205,7 +197,6 @@
+ 	reiserfs \
+ 	rl \
+ 	rp \
+-	${_rr232x} \
+ 	rue \
+ 	${_s3} \
+ 	${_safe} \
+@@ -331,7 +322,6 @@
+ _apm=		apm
+ _ar=		ar
+ _arcnet=	arcnet
+-_ath_hal=	ath_hal
+ _awi=		awi
+ _bktr=		bktr
+ _cardbus=	cardbus
+@@ -369,7 +359,6 @@
+ .if ${MK_NCP} != "no"
+ _nwfs=		nwfs
+ .endif
+-_oltr=		oltr
+ _pccard=	pccard
+ _pcfclock=	pcfclock
+ _pecoff=	pecoff
+@@ -404,7 +393,6 @@
+ _cx=		cx
+ _dpt=		dpt
+ _ex=		ex
+-_hptmv=		hptmv
+ _ichwd=		ichwd
+ _ida=		ida
+ _idt=		idt
+@@ -414,13 +402,11 @@
+ _ipw=		ipw
+ _iwi=		iwi
+ _mly=		mly
+-_nve=		nve
+ .if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
+ .if exists(${.CURDIR}/../crypto/via)
+ _padlock=	padlock
+ .endif
+ .endif
+-_rr232x=	rr232x
+ _s3=		s3
+ _twa=		twa
+ _vesa=		vesa
+@@ -449,7 +435,6 @@
+ _agp=		agp
+ _an=		an
+ _arcmsr=	arcmsr
+-_ath_hal=	ath_hal
+ _ciss=		ciss
+ _cpufreq=	cpufreq
+ _digi=		digi
+@@ -457,7 +442,6 @@
+ _ed=		ed
+ _em=		em
+ _ext2fs=	ext2fs
+-_hptmv=		hptmv
+ _i2c=		i2c
+ _ichwd=		ichwd
+ _ida=		ida
+@@ -471,8 +455,6 @@
+ #_lnc=		lnc
+ _mly=		mly
+ _ndis=		ndis
+-_nve=		nve
+-_rr232x=	rr232x
+ _safe=		safe
+ _scsi_low=	scsi_low
+ _smbfs=		smbfs

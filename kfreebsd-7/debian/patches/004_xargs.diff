@@ -1,0 +1,33 @@
+
+Status: xargs -J option requested to both upstream and debian.
+
+diff -ur sys.old/conf/kmod.mk sys/conf/kmod.mk
+--- sys.old/conf/kmod.mk	2006-05-06 09:46:13.000000000 +0200
++++ sys/conf/kmod.mk	2006-05-06 09:56:25.000000000 +0200
+@@ -197,7 +197,7 @@
+ 	grep -v '^#' < ${EXPORT_SYMS} > export_syms
+ .endif
+ 	awk -f ${SYSDIR}/conf/kmod_syms.awk ${.TARGET} \
+-	    export_syms | xargs -J% ${OBJCOPY} % ${.TARGET}
++	    export_syms | xargs -I% ${OBJCOPY} % ${.TARGET}
+ .endif
+ .endif
+ .if !defined(DEBUG_FLAGS) && ${MACHINE_ARCH} == amd64
+diff -ur sys.old/contrib/dev/acpica/acpica_prep.sh sys/contrib/dev/acpica/acpica_prep.sh
+--- sys.old/contrib/dev/acpica/acpica_prep.sh	2006-05-06 09:46:15.000000000 +0200
++++ sys/contrib/dev/acpica/acpica_prep.sh	2006-05-06 09:56:49.000000000 +0200
+@@ -56,12 +56,12 @@
+ 
+ echo copying full dirs
+ for i in ${fulldirs}; do
+-    find ${wrk} -name ${i} -type d | xargs -J % mv % ${dst}
++    find ${wrk} -name ${i} -type d | xargs -I % mv % ${dst}
+ done
+ 
+ # move files to destination
+ echo copying flat dirs
+-find ${wrk} -type f | xargs -J % mv % ${dst}
++find ${wrk} -type f | xargs -I % mv % ${dst}
+ mv ${dst}/changes.txt ${dst}/CHANGES.txt
+ 
+ # update src/headers for appropriate paths

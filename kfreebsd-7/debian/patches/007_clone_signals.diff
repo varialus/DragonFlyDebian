@@ -1,0 +1,28 @@
+--- sys/kern/kern_fork.c	2005-04-27 13:32:23.000000000 +0200
++++ sys/kern/kern_fork.c	2005-11-08 17:17:43.000000000 +0100
+@@ -502,7 +502,11 @@
+ 		p2->p_sigacts = newsigacts;
+ 	}
+ 	if (flags & RFLINUXTHPN) 
+-	        p2->p_sigparent = SIGUSR1;
++	{
++		int sig;
++		sig = RFTHPNSIGNUM(flags);
++	        p2->p_sigparent = sig ? sig : SIGUSR1;
++	}
+ 	else
+ 	        p2->p_sigparent = SIGCHLD;
+ 
+--- sys/sys/unistd.h	2005-02-01 00:26:57.000000000 +0100
++++ sys/sys/unistd.h	2005-11-08 17:14:12.000000000 +0100
+@@ -173,6 +173,10 @@
+ #define	RFHIGHPID	(1<<18)	/* use a pid higher then 10 (idleproc) */
+ #define	RFPPWAIT	(1<<31)	/* parent sleeps until child exits (vfork) */
+ #define	RFKERNELONLY	(RFSTOPPED | RFHIGHPID | RFPPWAIT)
++#define RFTHPNSHIFT	24	/* reserve bits 24-30 */
++#define RFTHPNMASK	0x7F    /* for compatibility with linuxthreads/clone()   */
++				/* allow to specify  "clone exit parent notification" signal */
++#define RFTHPNSIGNUM(flags)	(((flags) >> RFTHPNSHIFT) & RFTHPNMASK)
+ 
+ #endif /* __BSD_VISIBLE */
+ 

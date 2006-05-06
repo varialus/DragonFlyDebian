@@ -1,0 +1,49 @@
+Package: kfreebsd-image-@version@-@abiname@-@flavor@
+Architecture: kfreebsd-@arch@
+Section: base
+Depends: freebsd-utils (>= 5), module-init-tools | kldutils, kfreebsd-common (>= 0.2.2)
+Provides: kfreebsd-image-@major@, kfreebsd-image
+Recommends: @recommends@
+Description: kernel of FreeBSD @version@ image
+ This package provides the binary image and pre-built loadable modules for 
+ the kernel of FreeBSD @version@, base of a GNU/kFreeBSD system.
+ .
+ This package is compiled for a @flavor@-class machine.
+
+Package: ndiswrapper-modules-@version@-@abiname@-@flavor@
+Architecture: kfreebsd-@arch@
+Section: contrib/net
+Priority: optional
+Depends: kfreebsd-image-@version@-@abiname@-@flavor@
+Description: Ndiswrapper kFreeBSD module
+ This package contains the ndiswrapper loadable kernel modules for the
+ kfreebsd-image-@version@-@abiname@-@flavor@ package.
+
+Package: kfreebsd-image-@major@-@flavor@
+Architecture: kfreebsd-@arch@
+Section: base
+Depends: kfreebsd-image-@version@-@abiname@-@flavor@
+Description: kernel of FreeBSD @major@ image
+ This package depends on the latest binary image for kernel of FreeBSD @major@ on
+ @flavor@-class machines.
+
+Package: kfreebsd-headers-@version@-@abiname@-@flavor@
+Architecture: kfreebsd-@arch@
+Section: devel
+Provides: kfreebsd-headers-@major@
+Depends: kfreebsd-headers-@version@-@abiname@ (= ${Source-Version})
+Description: header files for kernel of FreeBSD @version@
+ This package provides the header files for kernel of FreeBSD @version@, generally 
+ used for building out-of-tree kernel modules. These files are going to be 
+ installed into /usr/src/kfreebsd-headers-@version@-@abiname@-@flavor@, and can be 
+ used for building modules that load into the kernel provided by the 
+ kfreebsd-image-@version@-@abiname@-@flavor@ package.
+
+Package: kfreebsd-headers-@major@-@flavor@
+Architecture: kfreebsd-@arch@
+Section: devel
+Depends: kfreebsd-headers-@version@-@abiname@-@flavor@
+Description: header files for kernel of FreeBSD @major@
+ This package depends on the latest header files for kernel of FreeBSD @major@ on
+ @flavor@-class machines.
+  

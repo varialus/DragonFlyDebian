@@ -1,0 +1,412 @@
+kfreebsd-7 (6.99+20060506-0.1) unreleased; urgency=low
+
+  * Fork for 7-CURRENT, based on r1560.
+
+ -- Robert Millan <rmh@aybabtu.com>  Sat,  6 May 2006 09:04:52 +0200
+
+kfreebsd-6 (6.0-0.4) unreleased; urgency=low
+
+  * Re-enable atapi{fd,st}, ppc and psm, since they aren't being built
+    as modules (Oh my god! My mouse, printer and/or ultra-weird storage device
+    stopped working!).
+  * Fix broken perms (644) in module dir.
+
+ -- Robert Millan <rmh@aybabtu.com>  Fri, 28 Apr 2006 15:47:45 +0200
+
+kfreebsd-6 (6.0-0.3) unreleased; urgency=low
+
+  * Finaly, multiple kernels can coexist on your system!
+    - Disable /boot/loader.conf (provided in kfreebsd-loader now).
+    - Get rid of /boot/device.hints (now embedded in kernel image).
+    - Move modules to /lib/modules/@RELEASE@.
+    - Move kernel image to /boot/kfreebsd-@RELEASE@.
+  * patches/999_config.diff: Refurbish.  Now builds linprocfs/linux into
+    the kernel (since it's always used), and removes a bunch of non-
+    essential stuff (use kfreebsd-common to load them as modules).
+    Network and storage drivers _are_ still present (untill we port
+    hotplug/discover).  On -486, this saves 544 KB in kernel.gz.
+
+ -- Robert Millan <rmh@aybabtu.com>  Thu, 27 Apr 2006 18:56:22 +0200
+
+kfreebsd-6 (6.0-0.2) unreleased; urgency=low
+
+  * First "normal" upload to unreleased.
+
+ -- Robert Millan <rmh@aybabtu.com>  Wed, 26 Apr 2006 14:55:28 +0200
+
+kfreebsd-6 (6.0-0.1) unreleased; urgency=low
+
+  [ Robert Edmonds ]
+  * New upstream version pulled from RELENG_6 CVSup.
+    - ReiserFS support.  (Closes: #335019)
+  * Disabled the non-compiling hwpmc driver.
+
+  [ Robert Millan ]
+  * Merge 5.x branch changes (from rev 654 to rev 1058)
+  * Add src/usr.sbin/config into the source and build/use it dynamicaly.
+  * Fix IEEE 802.11 buffer overflow (FreeBSD-SA-06:05.80211 / CVE-2006-0226).
+  * Fix local kernel memory disclosure (FreeBSD-SA-06:06.kmem / CVE-2006-0379
+    / CVE-2006-0380).
+  * Fix IP fragment handling panic in pf (FreeBSD-SA-06:07.pf / CVE-2006-0381).
+  * Disable "nve" driver.
+    - copyright: Add nve to list of non-free components.
+    - patches/903_disable_non-free_drivers.diff: Disable nve.
+    - arch/i386/486.config: Ditto.
+  * control.in:
+    - (Build-Depends-Indep): Remove patchutils and sharutils (not really
+    needed).
+    - (Build-Depends): Ditto.  Also update libdb4.4-dev.
+    - (Replaces): Remove kfreebsd@major@-source (it never existed for 6.x).
+  * rules: When obtaining major/version numbers, if this is a preliminar
+    snapshot (e.g. 6.99+20060217), pretend this is the actual release.
+  * autopatch.sh: Merge into rules.  This allows us to use $(major) instead
+    of a hardcoded number.
+  * patches/001_misc.diff: Make this patch more upstream-friendly.
+  * Fix /dev permissions in userland.
+    - control.flavor.in (Depends): Add kfreebsd-common.
+    - patches/900_devfs_perm_fixes.diff: Remove.
+  * rules: Run patch with --dry-run first.  This way if a patch fails
+    the tree isn't left in an inconsistent state.
+  * Add ndiswrapper-modules package.
+    - rules: Install ndis.ko and if_ndis.ko there.
+    - control.flavor.in: Add ndiswrapper-modules flavor.
+  * AMD64 support.
+    - patches/*.diff: Add amd64-specific hunks for patches that hack i386 files.
+    - arch/amd64/amd64-generic.config: New.  Generic x86_64 config.
+    - arch/amd64/amd64-k8.config: New.  K8 config.
+    - arch/amd64/amd64-k8-smp.config: New.  K8 SMP config.
+    - arch/amd64/em64t-p4.config: New.  P4 config.
+    - arch/amd64/em64t-p4-smp.config: New.  P4 SMP config.
+    - patches/binutils.diff: Add binutils fixes for amd64 code.
+    - rules: Replace all "dh_* -a" with "dh_* -s".  -a should NEVER be used.
+      See debhelper(7).
+  * Simplify/refurbish kernel config files by using the "include" command.
+    - patches/999_config.diff: New.  Incorporate common changes in GENERIC.
+    - debian/rules: Copy all our config files into the tree, then symlink.
+    - debian/arch/*/*.config: Refurbish.
+  * Upstream now builds with "-O2 -frename-registers" so let's do that
+    as well.
+    - arch/*/*.config
+  * Disable build of modules that are already part of the kernel image.
+    This gives the .deb a size loss of ~1600 KB (~4 MB once installed).
+    - patches/009_disable_duped_modules.diff
+  * Build 486 and 586* flavors with -Os.  This saves 400 KB, out of
+    which 240 KB are in kernel.gz.  Rationale:
+    - 486 tiny flavor is needed for d-i.
+    - On old hardware, your amount of memory is likely to be utter crap.  So
+    this is preferable to -O2 no matter the benchmarks.
+
+  [ Aurelien Jarno ]
+  * Fix a remote denial of service in NFS server (FreeBSD-SA-06:10.nfs /
+    CVE-2006-0900).
+  * Fix an IPsec replay attack vulnerability (FreeBSD-SA-06:11.ipsec /
+    CVE-2006-0905).
+  * Fix an FPU information disclosure on AMD processors (FreeBSD-SA-06:14.fpu /
+    CVE-2006-1056).
+
+ -- Robert Millan <rmh@aybabtu.com>  Wed, 26 Apr 2006 12:06:11 +0200
+
+kfreebsd-5 (5.3-6) unstable; urgency=low
+
+  * Changed SCSI_DELAY to 2000. Users that need a longer time could
+    change this value in /boot/loader.conf (closes: bug#323155).
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 29 Aug 2005 14:25:44 +0200
+
+kfreebsd-5 (5.3-5) unstable; urgency=low
+
+  * Enabled atapicam driver (closes: bug#323155).
+  * Allow the kernel to execve ET_DYN files. 
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 17 Aug 2005 15:44:18 +0200
+
+kfreebsd-5 (5.3-4) unstable; urgency=low
+
+  * Added OSS_GETVERSION ioctl. Patch from Robert Millan (closes: 
+    bug#322197)
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 10 Aug 2005 00:56:00 +0200
+
+kfreebsd-5 (5.3-3) unstable; urgency=low
+
+  * Fixed the generation of the preinst script.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat,  6 Aug 2005 05:47:11 +0200
+
+kfreebsd-5 (5.3-2) unstable; urgency=low
+
+  [ Aurelien Jarno ]
+  * Provide the kernel sources as /usr/src/kfreebsd-source-5.3.tar.bz2
+  * Change the owner of the files inside kfreebsd-source-5.3.tar.bz2 to
+    root:src.
+  * Build a binary package kfreebsd-image-5.3 containing the kernel.
+  * Build a binary package kfreebsd-headers-5.3 containing the headers.
+  * Don't create kfreebsd.gz in postinst.
+  * Make the kfreebsd-source-5.3 buildable on non GNU/kFreeBSD systems.
+  * Added an abiname field.
+
+  [ Guillem Jover ]
+  * debian/rules:
+    - Use DEB_HOST_ARCH_CPU instead if DEB_HOST_GNU_CPU, fix amd64.
+    - Use SRC_PACKAGE instead of the tarball name.
+    - Use make -C option instead of "cd".
+  * General indentation fixes.
+
+  [ Robert Millan ]
+  * Put some drivers as modules.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat,  6 Aug 2005 00:09:57 +0200
+
+kfreebsd-5 (5.3-1) unstable; urgency=low
+
+  * Match linux kernel naming scheme:
+    - Renamed source package to kfreebsd-5.
+    - Renamed kfreebsd5-source to kfreebsd-source-5.
+  * Fix ipsec vulnerability (FreeBSD-SA-05:19.ipsec /
+  * CAN-2005-2359).
+    - patches/017_ipsec.diff
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 27 Jul 2005 17:44:01 +0200
+
+kfreebsd5-source (5.3-17) unstable; urgency=high
+
+  * Fix devfs ruleset bypass (FreeBSD-SA-05:17.devfs / CAN-2005-2218).
+    - patches/016_devfs.diff
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 20 Jul 2005 23:45:07 +0200
+
+kfreebsd5-source (5.3-16) unstable; urgency=low
+
+  * Fixed path of some patches.
+  * Don't change the build-dependencies at build-time.
+  * Bumped Standard-Version to 3.6.2.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon,  4 Jul 2005 01:18:41 +0200
+
+kfreebsd5-source (5.3-15) unstable; urgency=low
+
+  * Fix TCP denial of service (FreeBSD-SA-05:15.tcp / CAN-2005-0356).
+    - patches/015_tcp_dos.diff: New.  Patch from upstream.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat,  2 Jul 2005 15:29:27 +0200
+
+kfreebsd5-source (5.3-14) unstable; urgency=low
+
+  * Provides kfreebsd-source instead of kernel-source (closes: bug#312524).
+
+ -- Aurelien Jarno <aurel32@debian.org>  Fri, 10 Jun 2005 07:23:46 +0200
+
+kfreebsd5-source (5.3-13) unstable; urgency=low
+
+  * Changed to a team maintained package.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon,  6 Jun 2005 01:45:36 +0200
+
+kfreebsd5-source (5.3-12) unstable; urgency=low
+
+  * New maintainer. Thanks to Robert Millan for his great job.
+  * Added 014_ip_packed.diff to fix the build of MySQL on GNU/kFreeBSD.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Fri,  3 Jun 2005 07:52:08 +0200
+
+kfreebsd5-source (5.3-11) unstable; urgency=low
+
+  * Workaround hyperthreading CPU bug (FreeBSD-SA-05:09.htt / CAN-2005-0109).
+    - patches/013_hyperthreading_wa.diff: New.  Patch from upstream.
+
+ -- Robert Millan <rmh@debian.org>  Fri, 27 May 2005 14:07:37 +0200
+
+kfreebsd5-source (5.3-10) unstable; urgency=high
+
+  * Fix permissions in /dev/iir (FreeBSD-SA-05:06.iir / CAN-2005-1399).
+    - patches/010_iir_perms.diff:  New.  Patch from upstream.
+  * Fix memory leak in i386_get_ldt (FreeBSD-SA-05:07.ldt / CAN-2005-1400).
+    - patches/011_ldt_memleak.diff:  New.  Patch from upstream.
+  * Fix generic memory leak (FreeBSD-SA-05:08.kmem / CAN-2005-1406).
+    - patches/012_kmem_memleak.diff:  New.  Patch from upstream.
+
+ -- Robert Millan <rmh@debian.org>  Mon,  9 May 2005 12:25:31 +0200
+
+kfreebsd5-source (5.3-9) unstable; urgency=low
+
+  * Fix memory leak in ifconf (FreeBSD-SA-05:04.ifconf / Closes: #304766).
+    - patches/009_ifconf_memleak.diff:  New.  Patch from upstream.
+
+ -- Robert Millan <rmh@debian.org>  Fri, 15 Apr 2005 12:59:58 +0200
+
+kfreebsd5-source (5.3-8) unstable; urgency=low
+
+  * First upload to Debian.  (Closes: #267447)
+
+ -- Robert Millan <rmh@debian.org>  Thu,  7 Apr 2005 01:36:59 +0200
+
+kfreebsd5-source (5.3-7) unreleased; urgency=low
+
+  * Fix memory leak in sendfile (FreeBSD-SA-05:02.sendfile / CAN-2005-0708).
+    - patches/008_sendfile_memleak.diff:  New.  Patch from upstream.
+
+ -- Robert Millan <rmh@debian.org>  Tue,  5 Apr 2005 12:32:35 +0200
+
+kfreebsd5-source (5.3-6) unreleased; urgency=low
+
+  * control.in.in:  s/Build-Depends/&-Indep/g.
+  * control.in.in (Section):  Set to "devel".
+
+ -- Robert Millan <rmh@debian.org>  Wed, 23 Mar 2005 23:04:11 +0100
+
+kfreebsd5-source (5.3-5) unreleased; urgency=low
+
+  * patches/007_proc_mounts.diff:  New.  Rename /proc/mtab to /proc/mounts.
+
+ -- Robert Millan <rmh@debian.org>  Sat,  5 Mar 2005 19:56:20 +0100
+
+kfreebsd5-source (5.3-4) unreleased; urgency=low
+
+  * rules:  Use patchsys to test patches on every build.
+
+ -- Robert Millan <rmh@debian.org>  Wed,  2 Mar 2005 21:03:19 +0100
+
+kfreebsd5-source (5.3-3) unreleased; urgency=low
+
+  * Misc cleanup.
+  * patches/007_cpu_class.diff:  New.  Detect i*86 subarches in uname.
+
+ -- Robert Millan <rmh@debian.org>  Thu, 10 Feb 2005 15:25:58 +0100
+
+kfreebsd5-source (5.3-2) unreleased; urgency=low
+
+  * Grow Sysv IPC limits to reasonable values as advised in
+    postgresql documentation (kernel-resources.html#SYSVIPC-PARAMETERS).
+    - patches/906_grow_sysv_ipc_limits.diff
+
+ -- Robert Millan <rmh@debian.org>  Tue,  1 Feb 2005 21:48:07 +0100
+
+kfreebsd5-source (5.3-1) unreleased; urgency=low
+
+  * Package split.  Version rebumped.
+
+ -- Robert Millan <rmh@debian.org>  Tue, 25 Jan 2005 13:37:15 +0100
+
+kfreebsd5 (5.3+1-1) unreleased; urgency=low
+
+  * Add RTC (real time clock) driver implementation.
+    - rtc.tar.gz:  New.
+    - rules:  Build rtc.
+
+ -- Robert Millan <rmh@debian.org>  Tue, 28 Dec 2004 19:33:00 +0100
+
+kfreebsd5 (5.3-3) unreleased; urgency=low
+
+  * Set DEB_STRIP_EXCLUDE=/boot to avoid module inter-dependency problems.
+
+ -- Robert Millan <rmh@debian.org>  Mon, 27 Dec 2004 18:36:30 +0100
+
+kfreebsd5 (5.3-2) unreleased; urgency=low
+
+  * Fix memory leak in procfs (FreeBSD-SA-04:17.procfs / CAN-2004-1066).
+    - patches/006_procfs_memleak.diff:  New.  Patch from upstream.
+
+ -- Robert Millan <rmh@debian.org>  Thu,  2 Dec 2004 01:32:38 +0100
+
+kfreebsd5 (5.3-1) unreleased; urgency=low
+
+  * New upstream release.
+
+ -- Robert Millan <rmh@debian.org>  Fri, 26 Nov 2004 00:42:22 +0100
+
+kfreebsd5 (5.2.1-8) unreleased; urgency=low
+
+  * Bunch of miscellaneous fixes in preparation of 6.x branch split.
+
+ -- Robert Millan <rmh@debian.org>  Tue, 16 Nov 2004 17:13:46 +0100
+
+kfreebsd5 (5.2.1-7) unreleased; urgency=low
+
+  * Fix local memory leak vulnerability (FreeBSD-SA-04:15.syscons /
+    CAN-2004-0919).
+    - patches/000_syscons_vulnerability.diff: New.  Patch from upstream.
+  * Fix wrong permissions in some device files.
+    - patches/900_devfs_perm_fixes.diff: New.  Sync uids/gids of kernel devices
+      with debian base-passwd ones.
+  * Rename some patches to follow the guidelines in README.
+    - README: New.
+    - etc.
+  * Use cdbs debian/control autogen feature.
+    - control.in: Rename to control.in.in and set the @cdbs@ tag.
+    - rules: Set DEB_AUTO_UPDATE_DEBIAN_CONTROL = yes.
+    - mk/build.mk (clean): Generate control.in from control.in.in.
+
+ -- Robert Millan <rmh@debian.org>  Tue,  5 Oct 2004 00:58:50 +0200
+
+kfreebsd5 (5.2.1-6) unreleased; urgency=low
+
+  * Use type-handling to auto-generate kfreebsd-gnu architecture list for dpkg.
+    - control.in
+    - mk/build.mk
+  * Ensure patches/003_config.diff contains a hunk for your CPU.
+    - mk/build.mk
+  * Drop Conflicts on makedev.
+    - control.in
+  * Grow ARG_MAX value to match with Linux' (Fixes FTBFS on a number of
+    packages).
+    - patches/016_grow_arg_max.diff: New.
+
+ -- Robert Millan <rmh@debian.org>  Sat, 21 Aug 2004 18:35:01 +0200
+
+kfreebsd5 (5.2.1-5) unreleased; urgency=low
+
+  * patches/004_version.diff.in: New. Fix version information.
+  * mk/build.mk: Regenerate 004_version.diff with current debian revision.
+
+ -- Robert Millan <rmh@debian.org>  Sat, 17 Jul 2004 02:14:34 +0200
+
+kfreebsd5 (5.2.1-4) unreleased; urgency=low
+
+  * patches/015_dev_full.diff: New. Implement /dev/full.
+  * control (Build-Depends): Allow flex as alternative for flex-old.
+
+ -- Robert Millan <rmh@debian.org>  Mon, 12 Jul 2004 19:14:46 +0200
+
+kfreebsd5 (5.2.1-3) unreleased; urgency=low
+
+  * control: Make it an Essential package.
+
+ -- Robert Millan <rmh@debian.org>  Tue,  6 Jul 2004 01:54:47 +0200
+
+kfreebsd5 (5.2.1-2) unreleased; urgency=low
+
+  * control (Build-Depends): Add flex-old.
+  * control (Depends): Nuke kfreebsd-loader.
+  * control (Conflicts): Add makedev.
+  * mk/build.mk: Add /boot/kfreebsd.gz and dummy /sbin/fsck.cd9660.
+
+ -- Robert Millan <rmh@debian.org>  Wed, 30 Jun 2004 19:25:58 +0200
+
+kfreebsd5 (5.2.1-1) unreleased; urgency=low
+
+  * New upstream release.
+
+ -- Robert Millan <rmh@debian.org>  Tue,  4 May 2004 14:02:40 +0200
+
+freebsd-kernel (5.1-1) unstable; urgency=low
+
+  * New source package structure. Now build-depends on freebsd-source-5.1.
+  * Switched to cdbs.
+  * Updated to version 5.1
+
+ -- Nathan Hawkins <utsl@debian.org>  Tue,  7 Oct 2003 12:43:36 -0500
+
+freebsd-kernel (5.0-2) unstable; urgency=low
+
+  * Set maintainer to glibc-bsd-devel@lists.alioth.debian.org
+  * Added me to Uploaders.
+  * Turn into non-native package.
+  * Added missing package to Build-Depends (freebsd-gcc)
+
+ -- Robert Millan <rmh@debian.org>  Fri, 11 Jul 2003 05:50:58 +0200
+
+freebsd-kernel-5.0 (5.0-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Nathan Hawkins <utsl@debian.org>  Mon,  3 Jul 2003 13:12:00 -0400

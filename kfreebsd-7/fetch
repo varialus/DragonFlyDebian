@@ -1,0 +1,26 @@
+#!/bin/bash
+set -ex
+
+rm -rf src
+
+if test -e src.tar.bz2 ; then
+  tar -xjpf src.tar.bz2
+  action="update"
+else
+  action="checkout"
+fi
+
+for i in src/{sys,usr.sbin/config} ; do
+  cvs -d freebsdanoncvs@anoncvs.freebsd.org:/home/ncvs ${action} -r HEAD $i
+  test -e $i
+done
+
+grep ^src/ debian/copyright | xargs rm -rf
+
+# assert that no non-free objects were left unremoved
+[ "`find src -name \*.o.uu | wc -l`" = "0" ]
+
+rm -f src.tar.bz2
+tar -cjpf src.tar.bz2 src/
+
+rm -rf src
