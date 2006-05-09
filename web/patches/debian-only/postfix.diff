@@ -1,0 +1,65 @@
+
+Previous patch (patches/postfix.diff) obsoleted by 30hurd.patch which is now in
+Debian's postfix source.
+
+Changed a little bit to make IPv6 compile on GNU/kFreeBSD.
+
+
+Robin Elfrink
+
+--- postfix-2.2.10-origineel/debian/patches/30hurd.dpatch	2006-05-09 10:31:53.000000000 +0200
++++ postfix-2.2.10/debian/patches/30hurd.dpatch	2006-05-09 10:56:14.000000000 +0200
+@@ -8,7 +8,7 @@
+ diff -Nur postfix-2.2.9_old/makedefs postfix-2.2.9/makedefs
+ --- postfix-2.2.9_old/makedefs	2006-01-03 22:50:25.000000000 +0100
+ +++ postfix-2.2.9/makedefs	2006-03-11 13:12:49.000000000 +0100
+-@@ -259,6 +259,38 @@
++@@ -259,6 +259,42 @@
+  		2.[0-3].*) CCARGS="$CCARGS -DNO_IPV6";;
+  		esac
+  		;;
+@@ -41,8 +41,12 @@
+ +			}
+ +		    done
+ +		done
+-+		# currently no IPv6 support on Hurd
+-+		CCARGS="$CCARGS -DNO_IPV6"
+++		case "`uname -s`" in
+++		GNU/Hurd)
+++			# currently no IPv6 support on Hurd
+++			CCARGS="$CCARGS -DNO_IPV6"
+++			;;
+++		esac
+ +		;;
+       IRIX*.5.*)	SYSTYPE=IRIX5
+  		# Use the native compiler by default
+@@ -50,7 +54,7 @@
+ diff -Nur postfix-2.2.9_old/src/util/sys_defs.h postfix-2.2.9/src/util/sys_defs.h
+ --- postfix-2.2.9_old/src/util/sys_defs.h	2006-01-03 22:52:17.000000000 +0100
+ +++ postfix-2.2.9/src/util/sys_defs.h	2006-03-11 14:29:44.000000000 +0100
+-@@ -687,6 +687,62 @@
++@@ -687,6 +687,70 @@
+  #endif
+  
+   /*
+@@ -99,10 +103,18 @@
+ +#endif
+ +#define SOCKADDR_SIZE	socklen_t
+ +#define SOCKOPT_SIZE	socklen_t
+++#ifdef __FreeBSD_kernel__
+++# define HAS_DUPLEX_PIPE
+++# define HAS_ISSETUGID
+++#endif
+ +#ifndef NO_IPV6
+ +# define HAS_IPV6
+-+# define HAS_PROCNET_IFINET6
+-+# define _PATH_PROCNET_IFINET6 "/proc/net/if_inet6"
+++# ifdef __FreeBSD_kernel__
+++#  define HAVE_GETIFADDRS
+++# else
+++#  define HAS_PROCNET_IFINET6
+++#  define _PATH_PROCNET_IFINET6 "/proc/net/if_inet6"
+++# endif
+ +#endif
+ +#define CANT_USE_SEND_RECV_MSG
+ +#define DEF_SMTP_CACHE_DEMAND	0
