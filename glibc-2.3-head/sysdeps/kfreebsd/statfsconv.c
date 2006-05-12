@@ -157,7 +157,8 @@ statfs5_to_statvfs (const struct statfs_fbsd5 *pk, struct statvfs *p32)
   p32->f_ffree		= MIN(pk->f_ffree,  ULONG_MAX);
   p32->f_favail		= MIN(pk->f_ffree,  ULONG_MAX); /* Hmm.	 May be filesystem dependent.  */
   
-  p32->f_fsid		= pk->f_fsid;
+  memcpy(&(p32->f_fsid), &(pk->f_fsid), sizeof(__fsid_t));
+  
   p32->f_flag		=
       (pk->f_flags & MNT_RDONLY ? ST_RDONLY : 0)
     | (pk->f_flags & MNT_NOSUID ? ST_NOSUID : 0)
@@ -188,7 +189,8 @@ statfs5_to_statvfs64 (const struct statfs_fbsd5 *pk, struct statvfs64 *p64)
   p64->f_ffree		= pk->f_ffree;
   p64->f_favail		= pk->f_ffree; /* Hmm.	May be filesystem dependent.  */
   
-  p64->f_fsid		= pk->f_fsid;
+  memcpy(&(p64->f_fsid), &(pk->f_fsid), sizeof(__fsid_t));
+  
   p64->f_flag		=
       (pk->f_flags & MNT_RDONLY ? ST_RDONLY : 0)
     | (pk->f_flags & MNT_NOSUID ? ST_NOSUID : 0)
