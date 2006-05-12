@@ -1,0 +1,292 @@
+#! /bin/sh -e
+
+# Description: java support for GNU/k*BSD 
+# Author: Robert Millan, Petr Salinger
+
+dir=
+if [ $# -eq 3 -a "$2" = '-d' ]; then
+    pdir="-d $3"
+    dir="$3/"
+elif [ $# -ne 1 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch)
+        patch $pdir -f --no-backup-if-mismatch -p2 < $0
+        ;;
+    -unpatch)
+        patch $pdir -f --no-backup-if-mismatch -R -p2 < $0
+        ;;
+    *)
+        echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+        exit 1
+esac
+exit 0
+
+# append the patch here and adjust the -p? flag in the patch calls.
+
+diff -ur gcj-4.1-4.1.0/src/boehm-gc/configure gcj-4.1-4.1.0/src/boehm-gc/configure
+--- gcj-4.1-4.1.0/src/boehm-gc/configure	2006-02-28 09:39:11.000000000 +0100
++++ gcj-4.1-4.1.0/src/boehm-gc/configure	2006-05-12 08:34:57.000000000 +0200
+@@ -5434,6 +5423,32 @@
+ 
+ 	THREADLIBS="-lpthread -lrt"
+ 	;;
++      *-*-kfreebsd*-gnu)
++       cat >>confdefs.h <<\_ACEOF
++#define GC_FREEBSD_THREADS 1
++_ACEOF
++
++       INCLUDES="$INCLUDES -pthread"
++       THREADDLLIBS=-pthread
++       cat >>confdefs.h <<\_ACEOF
++#define _REENTRANT 1
++_ACEOF
++
++         if test "${enable_parallel_mark}" = yes; then
++         cat >>confdefs.h <<\_ACEOF
++#define PARALLEL_MARK 1
++_ACEOF
++
++       fi
++       cat >>confdefs.h <<\_ACEOF
++#define THREAD_LOCAL_ALLOC 1
++_ACEOF
++
++       cat >>confdefs.h <<\_ACEOF
++#define USE_COMPILER_TLS 1
++_ACEOF
++
++               ;;
+      *-*-freebsd*)
+ 	{ echo "$as_me:$LINENO: WARNING: \"FreeBSD does not yet fully support threads with Boehm GC.\"" >&5
+ echo "$as_me: WARNING: \"FreeBSD does not yet fully support threads with Boehm GC.\"" >&2;}
+diff -ur gcj-4.1-4.1.0/src/boehm-gc/configure.ac gcj-4.1-4.1.0/src/boehm-gc/configure.ac
+--- gcj-4.1-4.1.0/src/boehm-gc/configure.ac	2006-02-07 02:05:55.000000000 +0100
++++ gcj-4.1-4.1.0/src/boehm-gc/configure.ac	2006-05-12 08:35:43.000000000 +0200
+@@ -150,6 +150,17 @@
+ 	AC_DEFINE(THREAD_LOCAL_ALLOC,1)
+ 	THREADLIBS="-lpthread -lrt"
+ 	;;
++      *-*-kfreebsd*-gnu)
++       AC_DEFINE(GC_FREEBSD_THREADS)
++       INCLUDES="$INCLUDES -pthread"
++       THREADDLLIBS=-pthread
++       AC_DEFINE(_REENTRANT)
++         if test "${enable_parallel_mark}" = yes; then
++         AC_DEFINE(PARALLEL_MARK)
++       fi
++       AC_DEFINE(THREAD_LOCAL_ALLOC)
++       AC_DEFINE(USE_COMPILER_TLS, 1,[use tls for boehm])
++               ;;
+      *-*-freebsd*)
+ 	AC_MSG_WARN("FreeBSD does not yet fully support threads with Boehm GC.")
+ 	AC_DEFINE(GC_FREEBSD_THREADS,1,[support FreeBSD threads])
+diff -ur gcj-4.1-4.1.0/src/boehm-gc/dyn_load.c gcj-4.1-4.1.0/src/boehm-gc/dyn_load.c
+--- gcj-4.1-4.1.0/src/boehm-gc/dyn_load.c	2005-02-26 16:40:07.000000000 +0100
++++ gcj-4.1-4.1.0/src/boehm-gc/dyn_load.c	2006-05-12 08:33:17.000000000 +0200
+@@ -26,7 +26,7 @@
+  * None of this is safe with dlclose and incremental collection.
+  * But then not much of anything is safe in the presence of dlclose.
+  */
+-#if defined(__linux__) && !defined(_GNU_SOURCE)
++#if (defined(__linux__) || defined(__GLIBC__)) && !defined(_GNU_SOURCE)
+     /* Can't test LINUX, since this must be define before other includes */
+ #   define _GNU_SOURCE
+ #endif
+@@ -373,7 +373,7 @@
+ /* For glibc 2.2.4+.  Unfortunately, it doesn't work for older	*/
+ /* versions.  Thanks to Jakub Jelinek for most of the code.	*/
+ 
+-# if defined(LINUX) /* Are others OK here, too? */ \
++# if (defined(LINUX) || defined (__GLIBC__)) /* Are others OK here, too? */ \
+      && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2) \
+          || (__GLIBC__ == 2 && __GLIBC_MINOR__ == 2 && defined(DT_CONFIG))) 
+ 
+diff -ur gcj-4.1-4.1.0/src/boehm-gc/include/gc.h gcj-4.1-4.1.0/src/boehm-gc/include/gc.h
+--- gcj-4.1-4.1.0/src/boehm-gc/include/gc.h	2005-01-02 04:35:57.000000000 +0100
++++ gcj-4.1-4.1.0/src/boehm-gc/include/gc.h	2006-05-12 08:33:17.000000000 +0200
+@@ -497,7 +497,7 @@
+ #   define GC_RETURN_ADDR (GC_word)__return_address
+ #endif
+ 
+-#ifdef __linux__
++#if defined(__linux__) || defined(__GLIBC__)
+ # include <features.h>
+ # if (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 1 || __GLIBC__ > 2) \
+      && !defined(__ia64__)
+diff -ur gcj-4.1-4.1.0/src/boehm-gc/include/gc_config.h.in gcj-4.1-4.1.0/src/boehm-gc/include/gc_config.h.in
+--- gcj-4.1-4.1.0/src/boehm-gc/include/gc_config.h.in	2006-02-07 02:05:55.000000000 +0100
++++ gcj-4.1-4.1.0/src/boehm-gc/include/gc_config.h.in	2006-05-12 08:35:50.000000000 +0200
+@@ -148,6 +148,9 @@
+ /* define GC_local_malloc() & GC_local_malloc_atomic() */
+ #undef THREAD_LOCAL_ALLOC
+ 
++/* use tls for boehm */
++#undef USE_COMPILER_TLS
++
+ /* use MMAP instead of sbrk to get new memory */
+ #undef USE_MMAP
+ 
+diff -ur gcj-4.1-4.1.0/src/boehm-gc/include/private/gcconfig.h gcj-4.1-4.1.0/src/boehm-gc/include/private/gcconfig.h
+--- gcj-4.1-4.1.0/src/boehm-gc/include/private/gcconfig.h	2005-09-06 16:22:01.000000000 +0200
++++ gcj-4.1-4.1.0/src/boehm-gc/include/private/gcconfig.h	2006-05-12 08:34:42.000000000 +0200
+@@ -55,7 +55,7 @@
+ # endif
+ 
+ /* And one for FreeBSD: */
+-# if defined(__FreeBSD__)
++# if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #    define FREEBSD
+ # endif
+ 
+@@ -1223,8 +1223,15 @@
+ #	ifndef GC_FREEBSD_THREADS
+ #	    define MPROTECT_VDB
+ #	endif
+-#	define SIG_SUSPEND SIGUSR1
+-#	define SIG_THR_RESTART SIGUSR2
++#	ifdef __GLIBC__
++#	    define SIG_SUSPEND		(32+6)
++#	    define SIG_THR_RESTART	(32+5)
++	    extern int _end[];
++#	    define DATAEND (_end)
++#	else
++#	    define SIG_SUSPEND SIGUSR1
++#	    define SIG_THR_RESTART SIGUSR2
++#	endif
+ #	define FREEBSD_STACKBOTTOM
+ #	ifdef __ELF__
+ #	    define DYNAMIC_LOADING
+@@ -1923,6 +1930,28 @@
+ #	    define PREFETCH_FOR_WRITE(x) __builtin_prefetch((x), 1)
+ #	endif
+ #   endif
++#   ifdef FREEBSD
++#	define OS_TYPE "FREEBSD"
++#	ifndef GC_FREEBSD_THREADS
++#	    define MPROTECT_VDB
++#	endif
++#	ifdef __GLIBC__
++#	    define SIG_SUSPEND		(32+6)
++#	    define SIG_THR_RESTART	(32+5)
++	    extern int _end[];
++#	    define DATAEND (_end)
++#	else
++#	    define SIG_SUSPEND SIGUSR1
++#	    define SIG_THR_RESTART SIGUSR2
++#	endif
++#	define FREEBSD_STACKBOTTOM
++#	ifdef __ELF__
++#	    define DYNAMIC_LOADING
++#	endif
++	extern char etext[];
++	extern char * GC_FreeBSDGetDataStart();
++#	define DATASTART GC_FreeBSDGetDataStart(0x1000, &etext)
++#   endif
+ #   ifdef NETBSD
+ #	define OS_TYPE "NETBSD"
+ #	ifdef __ELF__
+@@ -1994,7 +2023,7 @@
+ #   define SUNOS5SIGS
+ # endif
+ 
+-# if defined(FREEBSD) && (__FreeBSD__ >= 4)
++# if defined(FREEBSD) && ((__FreeBSD__ >= 4) || (__FreeBSD_kernel__ >= 4))
+ #   define SUNOS5SIGS
+ # endif
+ 
+@@ -2057,7 +2086,7 @@
+ #   define CACHE_LINE_SIZE 32	/* Wild guess	*/
+ # endif
+ 
+-# ifdef LINUX
++# if defined(LINUX) || defined(__GLIBC__)
+ #   define REGISTER_LIBRARIES_EARLY
+     /* We sometimes use dl_iterate_phdr, which may acquire an internal	*/
+     /* lock.  This isn't safe after the world has stopped.  So we must	*/
+@@ -2137,7 +2166,7 @@
+ #if defined(SPARC)
+ # define CAN_SAVE_CALL_ARGS
+ #endif
+-#if (defined(I386) || defined(X86_64)) && defined(LINUX)
++#if (defined(I386) || defined(X86_64)) && (defined(LINUX) || defined(__GLIBC__))
+ 	    /* SAVE_CALL_CHAIN is supported if the code is compiled to save	*/
+ 	    /* frame pointers by default, i.e. no -fomit-frame-pointer flag.	*/
+ # define CAN_SAVE_CALL_ARGS
+diff -ur gcj-4.1-4.1.0/src/libjava/configure gcj-4.1-4.1.0/src/libjava/configure
+--- gcj-4.1-4.1.0/src/libjava/configure	2006-05-12 13:35:06.000000000 +0200
++++ gcj-4.1-4.1.0/src/libjava/configure	2006-05-12 11:00:31.000000000 +0200
+@@ -4351,7 +4341,7 @@
+   ;;
+ 
+ # This must be Linux ELF.
+-linux*)
++linux*|k*bsd*-gnu)
+   version_type=linux
+   need_lib_prefix=no
+   need_version=no
+diff -ur gcj-4.1-4.1.0/src/libjava/libltdl/acinclude.m4 gcj-4.1-4.1.0/src/libjava/libltdl/acinclude.m4
+--- gcj-4.1-4.1.0/src/libjava/libltdl/acinclude.m4	2006-05-12 13:35:07.000000000 +0200
++++ gcj-4.1-4.1.0/src/libjava/libltdl/acinclude.m4	2006-05-12 11:07:03.000000000 +0200
+@@ -1413,7 +1413,7 @@
+   ;;
+ 
+ # This must be Linux ELF.
+-linux*)
++linux*|k*bsd*-gnu)
+   version_type=linux
+   need_lib_prefix=no
+   need_version=no
+diff -ur gcj-4.1-4.1.0/src/libjava/libltdl/configure gcj-4.1-4.1.0/src/libjava/libltdl/configure
+--- gcj-4.1-4.1.0/src/libjava/libltdl/configure	2006-05-12 13:35:21.000000000 +0200
++++ gcj-4.1-4.1.0/src/libjava/libltdl/configure	2006-05-12 11:07:15.000000000 +0200
+@@ -8380,7 +8380,7 @@
+   ;;
+ 
+ # This must be Linux ELF.
+-linux*)
++linux*|k*bsd*-gnu)
+   version_type=linux
+   need_lib_prefix=no
+   need_version=no
+@@ -12021,7 +12021,7 @@
+   ;;
+ 
+ # This must be Linux ELF.
+-linux*)
++linux*|k*bsd*-gnu)
+   version_type=linux
+   need_lib_prefix=no
+   need_version=no
+@@ -15097,7 +15097,7 @@
+   ;;
+ 
+ # This must be Linux ELF.
+-linux*)
++linux*|k*bsd*-gnu)
+   version_type=linux
+   need_lib_prefix=no
+   need_version=no
+@@ -17380,7 +17380,7 @@
+   ;;
+ 
+ # This must be Linux ELF.
+-linux*)
++linux*|k*bsd*-gnu)
+   version_type=linux
+   need_lib_prefix=no
+   need_version=no
+diff -ur gcj-4.1-4.1.0/src/libjava/shlibpath.m4 gcj-4.1-4.1.0/src/libjava/shlibpath.m4
+--- gcj-4.1-4.1.0/src/libjava/shlibpath.m4	2006-01-07 19:14:24.000000000 +0100
++++ gcj-4.1-4.1.0/src/libjava/shlibpath.m4	2006-05-12 08:36:28.000000000 +0200
+@@ -361,7 +361,7 @@
+   ;;
+ 
+ # This must be Linux ELF.
+-linux*)
++linux*|k*bsd*-gnu)
+   version_type=linux
+   need_lib_prefix=no
+   need_version=no

@@ -1,0 +1,152 @@
+
+Author: petr
+Status: works
+	
+	gcj-4.1_kbsd-gnu-java.dpatch is clean, should be put into debian/patches/kbsd-gnu-java.dpatch
+	this file with changes to debian packaging is dirty, help will be appreciated
+
+	packaging have to be adjusted properly, as libgjsmalsa builds only on Linux(libasound2-dev)
+	manipulating with libgjsmalsa should be conditionalized, not deleted
+
+
+Testsuite of 4.1.0-2j:
+
+Native configuration is i486-pc-kfreebsd-gnu
+
+                === libjava tests ===
+
+Running target unix
+FAIL: LargeFile execution - source compiled test
+FAIL: LargeFile execution - gij test
+FAIL: LargeFile execution - bytecode->native test
+FAIL: LargeFile -O3 execution - source compiled test
+FAIL: LargeFile execution - gij test
+FAIL: LargeFile -O3 execution - bytecode->native test
+FAIL: Throw_2 execution - source compiled test
+FAIL: Throw_2 execution - gij test
+FAIL: Throw_2 execution - bytecode->native test
+FAIL: Throw_2 -O3 execution - source compiled test
+FAIL: Throw_2 execution - gij test
+FAIL: Throw_2 -O3 execution - bytecode->native test
+
+                === libjava Summary for unix ===
+
+# of expected passes            4011
+# of unexpected failures        12
+# of expected failures          10
+# of untested testcases         20
+
+*************************************************************************
+
+
+diff -ur std/gcj-4.1-4.1.0/debian/control gcj-4.1-4.1.0/debian/control
+--- std/gcj-4.1-4.1.0/debian/control	2006-05-12 13:27:41.000000000 +0200
++++ gcj-4.1-4.1.0/debian/control	2006-05-12 08:13:53.000000000 +0200
+@@ -4,7 +4,7 @@
+ Maintainer: Debian GCC Maintainers <debian-gcc@lists.debian.org>
+ Uploaders: Matthias Klose <doko@debian.org>
+ Standards-Version: 3.6.2
+-Build-Depends: dpkg-dev (>= 1.13.9), libc6.1-dev (>= 2.3.6-7) [alpha ia64] | libc0.3-dev (>= 2.3.6-7) | libc0.1-dev (>= 2.3.6-7) | libc12-dev (>= 2.3.6-7) | libc6-dev (>= 2.3.6-7), libc6-dev-amd64 [i386], libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], libc6-dev-i386 [amd64], libc6-dev-powerpc [ppc64], libc6-dev-ppc64 [powerpc], lib32gcc1 [amd64 ppc64], lib64gcc1 [i386 powerpc sparc s390], lib64z1-dev [i386 powerpc sparc s390], lib32z1-dev [amd64 ppc64], libunwind7-dev (>= 0.98.5-6) [ia64], libatomic-ops-dev [ia64], m4, autoconf, automake1.9, libtool, autogen, gawk, dejagnu (>= 1.4.3) [!hurd-i386], expect-tcl8.3 [!hurd-i386], bzip2, binutils (>= 2.16.1cvs20051214) | binutils-multiarch (>= 2.16.1cvs20051214), binutils-hppa64 (>= 2.16.1cvs20051214) [hppa], debhelper (>= 5.0), gperf (>= 3.0.1), bison (>= 1:1.875a-1), flex, gettext, texinfo (>= 4.3), zlib1g-dev, libmpfr-dev [!avr], locales [!hurd-i386 !knetbsd-i386 !netbsd-i386], procps [!hurd-i386], sharutils, libasound2-dev [!kfreebsd-i386 !knetbsd-i386 !netbsd-i386], lib32asound2-dev [amd64 ppc64], lib64asound2-dev [i386 powerpc sparc s390], libxtst-dev [!kfreebsd-i386 !knetbsd-i386 !netbsd-i386], libxt-dev [!kfreebsd-i386 !knetbsd-i386 !netbsd-i386], libgtk2.0-dev (>= 2.4.4-2) [!kfreebsd-i386 !knetbsd-i386 !netbsd-i386], libart-2.0-dev [!kfreebsd-i386 !knetbsd-i386 !netbsd-i386], libcairo2-dev [!kfreebsd-i386 !knetbsd-i386 !netbsd-i386], gcc-4.1-source (>= 4.1.0), gcc-4.1-source (<< 4.1.1), realpath (>= 1.9.12), chrpath, lsb-release, dash [hppa]
++Build-Depends: dpkg-dev (>= 1.13.9), libc6.1-dev (>= 2.3.6-7) [alpha ia64] | libc0.3-dev (>= 2.3.6-7) | libc0.1-dev (>= 2.3.6-7) | libc12-dev (>= 2.3.6-7) | libc6-dev (>= 2.3.6-7), libc6-dev-amd64 [i386], libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], libc6-dev-i386 [amd64], libc6-dev-powerpc [ppc64], libc6-dev-ppc64 [powerpc], lib32gcc1 [amd64 ppc64], lib64gcc1 [i386 powerpc sparc s390], lib64z1-dev [i386 powerpc sparc s390], lib32z1-dev [amd64 ppc64], libunwind7-dev (>= 0.98.5-6) [ia64], libatomic-ops-dev [ia64], m4, autoconf, automake1.9, libtool, autogen, gawk, dejagnu (>= 1.4.3) [!hurd-i386], expect-tcl8.3 [!hurd-i386], bzip2, binutils (>= 2.16.1cvs20051214) | binutils-multiarch (>= 2.16.1cvs20051214), binutils-hppa64 (>= 2.16.1cvs20051214) [hppa], debhelper (>= 5.0), gperf (>= 3.0.1), bison (>= 1:1.875a-1), flex, gettext, texinfo (>= 4.3), zlib1g-dev, libmpfr-dev [!avr], locales [!hurd-i386 !knetbsd-i386 !netbsd-i386], procps [!hurd-i386], sharutils, libasound2-dev [!knetbsd-i386 !netbsd-i386 !kfreebsd-i386 !kfreebsd-amd64], lib32asound2-dev [amd64 ppc64], lib64asound2-dev [i386 powerpc sparc s390], libxtst-dev [!knetbsd-i386 !netbsd-i386], libxt-dev [!knetbsd-i386 !netbsd-i386], libgtk2.0-dev (>= 2.4.4-2) [!knetbsd-i386 !netbsd-i386], libart-2.0-dev [!knetbsd-i386 !netbsd-i386], libcairo2-dev [!knetbsd-i386 !netbsd-i386], gcc-4.1-source (>= 4.1.0), gcc-4.1-source (<< 4.1.1), realpath (>= 1.9.12), chrpath, lsb-release, dash [hppa]
+ Build-Depends-Indep: doxygen (>= 1.4.2), graphviz (>= 2.2), gsfonts-x11, gjdoc
+ 
+ Package: gcj-4.1-base
+diff -ur std/gcj-4.1-4.1.0/debian/rules.conf gcj-4.1-4.1.0/debian/rules.conf
+--- std/gcj-4.1-4.1.0/debian/rules.conf	2006-05-12 13:27:41.000000000 +0200
++++ gcj-4.1-4.1.0/debian/rules.conf	2006-05-12 08:13:21.000000000 +0200
+@@ -98,7 +98,7 @@
+ LIBC_BUILD_DEP := libc6.1-dev (>= $(libc_ver)) [alpha ia64] | libc0.3-dev (>= $(libc_ver)) | libc0.1-dev (>= $(libc_ver)) | libc12-dev (>= $(libc_ver)) | libc6-dev (>= $(libc_ver))
+ 
+ ifneq (,$(java_awt_peers))
+-  JAVA_BUILD_DEP := libasound2-dev [java_no_archs],
++  JAVA_BUILD_DEP := libasound2-dev [java_no_archs !hurd-i386 !kfreebsd-i386 !kfreebsd-amd64],
+   JAVA_BUILD_DEP += lib32asound2-dev [amd64 ppc64], lib64asound2-dev [i386 powerpc sparc s390],
+   ifneq (,$(findstring gtk,$(java_awt_peers)))
+     JAVA_BUILD_DEP += libxtst-dev [java_no_archs], libxt-dev [java_no_archs], libgtk2.0-dev (>= 2.4.4-2) [java_no_archs], libart-2.0-dev [java_no_archs], libcairo2-dev [java_no_archs],
+@@ -366,7 +366,7 @@
+ ada_no_archs    := $(strip $(foreach cpu,$(ada_no_cpus),!$(cpu)) \
+ 			!knetbsd-i386 !netbsd-i386 !hurd-i386)
+ java_no_archs   := $(strip $(foreach cpu,$(java_no_cpus),!$(cpu)) \
+-			!kfreebsd-i386 !knetbsd-i386 !netbsd-i386)
++			!knetbsd-i386 !netbsd-i386)
+ pascal_no_archs := $(strip $(foreach cpu,$(pascal_no_cpus),!$(cpu)) \
+ 			!netbsd-i386)
+ fortran_no_archs:= $(strip $(foreach cpu,$(fortran_no_cpus),!$(cpu)) \
+diff -ur std/gcj-4.1-4.1.0/debian/rules.d/binary-java.mk gcj-4.1-4.1.0/debian/rules.d/binary-java.mk
+--- std/gcj-4.1-4.1.0/debian/rules.d/binary-java.mk	2006-05-12 13:27:41.000000000 +0200
++++ gcj-4.1-4.1.0/debian/rules.d/binary-java.mk	2006-05-12 07:48:47.000000000 +0200
+@@ -98,7 +98,6 @@
+ 	$(PF)/$(libdir)
+ 
+ files_jlib = \
+-	$(PF)/$(libdir)/libgjsmalsa.so.* \
+ 	$(PF)/$(libdir)/libgij.so.* \
+ 	$(PF)/$(libdir)/libgcj.so.*
+ 
+@@ -129,7 +128,6 @@
+ 	$(PF)/$(libdir)/libgcj*.{a,la} \
+ 	$(PF)/$(libdir)/{libgcj*.so,libgcj.spec} \
+ 	$(PF)/$(libdir)/pkgconfig/libgcj.pc \
+-	$(PF)/$(libdir)/libgjsmalsa.{la,so} \
+ 	$(PF)/$(libdir)/lib-gnu-*.{a,la} \
+ 	$(PF)/$(libdir)/lib-gnu-*.so
+ 
+@@ -352,8 +350,6 @@
+ 	dh_installdirs -p$(p_jlib)  $(dirs_jlib)
+ 	dh_installdirs -p$(p_jlibx) $(dirs_jlibx)
+ 
+-	mv debian/tmp/$(PF)/$(libdir)/classpath/libgjsmalsa.* \
+-		debian/tmp/$(PF)/$(libdir)/
+ 
+ 	DH_COMPAT=2 dh_movefiles -p$(p_gij)   $(files_gij)
+ 	DH_COMPAT=2 dh_movefiles -p$(p_jlib)  $(files_jlib)
+@@ -362,8 +358,6 @@
+ 	cp -p debian/tmp/$(PF)/$(libdir)/libgcjawt.la \
+ 		debian/tmp/$(PF)/$(libdir)/lib-gnu-java-awt*.la \
+ 		$(d_jlibx)/$(PF)/$(libdir)/gcj$(pkg_ver)/
+-	cp -p debian/tmp/$(PF)/$(libdir)/libgjsmalsa.la \
+-		$(d_jlib)/$(PF)/$(libdir)/gcj$(pkg_ver)/
+ 
+ 	cp -p $(srcdir)/libjava/{NEWS,README,THANKS} \
+ 		$(d_jlib)/usr/share/doc/$(p_jbase)/
+@@ -537,8 +531,6 @@
+ 	  ln -sf $$i.so.$(GCJ_SONAME).0.0 \
+ 	    $(d_jdbg)/usr/lib/debug/usr/lib/$$i.so.$(GCJ_SONAME); \
+ 	done
+-	ln -sf libgjsmalsa.so.0.0.0 \
+-	  $(d_jdbg)/usr/lib/debug/usr/lib/libgjsmalsa.so.0
+ 
+ 	dh_compress -p$(p_jdbg)
+ 	dh_fixperms -p$(p_jdbg)
+@@ -588,8 +580,6 @@
+ 	  ln -sf $$i.so.$(GCJ_SONAME).0.0 \
+ 	    $(d_j32dbg)/usr/lib/debug/$(lib32)/$$i.so.$(GCJ_SONAME); \
+ 	done
+-	ln -sf libgjsmalsa.so.0.0.0 \
+-	  $(d_j32dbg)/usr/lib/debug/$(lib32)/libgjsmalsa.so.0
+ 
+ 	debian/dh_rmemptydirs -p$(p_j32lib)
+ 	debian/dh_rmemptydirs -p$(p_j32dev)
+diff -ur std/gcj-4.1-4.1.0/debian/rules.defs gcj-4.1-4.1.0/debian/rules.defs
+--- std/gcj-4.1-4.1.0/debian/rules.defs	2006-05-12 13:27:41.000000000 +0200
++++ gcj-4.1-4.1.0/debian/rules.defs	2006-05-11 19:48:50.000000000 +0200
+@@ -267,7 +267,7 @@
+ endif
+ 
+ java_no_cpus := #mips mipsel
+-java_no_systems := hurd-i386 kfreebsd-gnu knetbsd-gnu netbsdelf-gnu
++java_no_systems := hurd-i386 knetbsd-gnu netbsdelf-gnu
+ ifneq (, $(filter $(DEB_TARGET_ARCH_CPU),$(java_no_cpus)))
+   with_java := disabled for architecture $(DEB_TARGET_ARCH_CPU)
+ endif
+diff -ur std/gcj-4.1-4.1.0/debian/rules.patch gcj-4.1-4.1.0/debian/rules.patch
+--- std/gcj-4.1-4.1.0/debian/rules.patch	2006-05-12 13:27:41.000000000 +0200
++++ gcj-4.1-4.1.0/debian/rules.patch	2006-05-12 15:15:33.000000000 +0200
+@@ -87,6 +87,7 @@
+ 
+ ifeq ($(DEB_TARGET_ARCH_OS),kfreebsd)
+   debian_patches += kbsd-gnu-ada
++  debian_patches += kbsd-gnu-java
+ endif
+ ifeq ($(DEB_TARGET_ARCH_OS),knetbsd)
+   debian_patches += # kbsd-gnu
