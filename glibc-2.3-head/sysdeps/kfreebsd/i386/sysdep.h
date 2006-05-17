@@ -136,14 +136,20 @@ __i686.get_pc_thunk.reg:						      \
 #  else
 #   define SYSCALL_ERROR_HANDLER					      \
 0:pushl %ebx;								      \
+  cfi_adjust_cfa_offset (4);                                                  \
+  cfi_rel_offset (ebx, 0);                                                    \
   SETUP_PIC_REG (bx);							      \
   addl $_GLOBAL_OFFSET_TABLE_, %ebx;					      \
   pushl %eax;								      \
+  cfi_adjust_cfa_offset (4);                                                  \
   PUSH_ERRNO_LOCATION_RETURN;						      \
   call BP_SYM (__errno_location)@PLT;					      \
   POP_ERRNO_LOCATION_RETURN;						      \
   popl %ecx;								      \
+  cfi_adjust_cfa_offset (-4);                                                 \
   popl %ebx;								      \
+  cfi_adjust_cfa_offset (-4);                                                 \
+  cfi_restore (ebx);                                                          \
   movl %ecx, (%eax);							      \
   orl $-1, %eax;							      \
   jmp L(pseudo_end);

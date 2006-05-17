@@ -61,12 +61,13 @@
 	fork()
 	vfork()
 	rfork()
+	pipe()
    
    none of them is cancelable, therefore
 */
 
-# define PUSHRESULT	pushl %eax; pushfl
-# define POPRESULT	popfl; popl %eax
+# define PUSHRESULT	pushl %eax; cfi_adjust_cfa_offset (4);  pushfl;    cfi_adjust_cfa_offset (4)
+# define POPRESULT	popfl;      cfi_adjust_cfa_offset (-4); popl %eax; cfi_adjust_cfa_offset (-4)
 
 # ifdef IS_IN_libpthread
 #  define CENABLE	call __pthread_enable_asynccancel;
@@ -74,15 +75,23 @@
 # elif defined IS_IN_librt
 #  ifdef PIC
 #   define CENABLE	pushl %ebx; \
+			cfi_adjust_cfa_offset (4); \
+			cfi_rel_offset (ebx, 0); \
 			call __i686.get_pc_thunk.bx; \
 			addl     $_GLOBAL_OFFSET_TABLE_, %ebx; \
 			call __librt_enable_asynccancel@PLT; \
-			popl %ebx;
+			popl %ebx; \
+			cfi_adjust_cfa_offset (-4); \
+			cfi_restore (ebx);
 #   define CDISABLE	pushl %ebx; \
+			cfi_adjust_cfa_offset (4); \
+			cfi_rel_offset (ebx, 0); \
 			call __i686.get_pc_thunk.bx; \
 			addl     $_GLOBAL_OFFSET_TABLE_, %ebx; \
 			call __librt_disable_asynccancel@PLT; \
-			popl %ebx;
+			popl %ebx; \
+			cfi_adjust_cfa_offset (-4); \
+			cfi_restore (ebx);
 #  else
 #   define CENABLE	call __librt_enable_asynccancel;
 #   define CDISABLE	call __librt_disable_asynccancel
