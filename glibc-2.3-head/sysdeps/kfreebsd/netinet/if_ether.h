@@ -81,31 +81,11 @@ struct	ether_arp {
 #define	arp_pln	ea_hdr.ar_pln
 #define	arp_op	ea_hdr.ar_op
 
-struct sockaddr_inarp {
-	u_char	sin_len;
-	u_char	sin_family;
-	u_short sin_port;
-	struct	in_addr sin_addr;
-	struct	in_addr sin_srcaddr;
-	u_short	sin_tos;
-	u_short	sin_other;
-#define SIN_PROXY 1
-};
 /*
  * IP and ethernet specific routing flags
  */
 #define	RTF_USETRAILERS	RTF_PROTO1	/* use trailers */
 #define RTF_ANNOUNCE	RTF_PROTO2	/* announce new arp entry */
-
-#ifdef	_KERNEL
-extern u_char	ether_ipmulticast_min[ETH_ALEN];
-extern u_char	ether_ipmulticast_max[ETH_ALEN];
-
-int	arpresolve(struct ifnet *ifp, struct rtentry *rt,
-		struct mbuf *m, struct sockaddr *dst, u_char *desten);
-void	arp_ifinit(struct ifnet *, struct ifaddr *);
-void	arp_ifinit2(struct ifnet *, struct ifaddr *, u_char *);
-#endif
 
 /*
  * Macro to map an IP multicast address to an Ethernet multicast address.
