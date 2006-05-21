@@ -21,9 +21,11 @@
 	  .text;
 ENTRY (syscall)
 	popl %ecx		/* Pop return address into %ecx.  */
+	cfi_adjust_cfa_offset (-4)
 	movl 0(%esp), %eax	/* Load syscall number into %eax. */
 	int $0x80		/* Do the system call.  */
 	pushl %ecx		/* Push back return address.  */
+	cfi_adjust_cfa_offset (4)
 	jb SYSCALL_ERROR_LABEL;	/* Jump to error handler if error.  */
 
 L(pseudo_end):

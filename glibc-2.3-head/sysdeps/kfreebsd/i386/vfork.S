@@ -27,6 +27,7 @@ ENTRY (__vfork)
 
 	/* Pop the return PC value into ECX.  */
 	popl	%ecx
+	cfi_adjust_cfa_offset(-4)
 
 	/* Perform the system call.  */
 	DO_CALL (vfork, 0)
@@ -45,6 +46,7 @@ ENTRY (__vfork)
 L(error):
 	/* Push back the return PC.  */
 	pushl	%ecx
+	cfi_adjust_cfa_offset(4)
 
 	/* Branch to the error handler, hidden in PSEUDO_END.  */
 	jmp	SYSCALL_ERROR_LABEL
