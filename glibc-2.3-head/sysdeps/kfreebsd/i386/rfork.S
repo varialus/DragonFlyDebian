@@ -33,7 +33,6 @@ ENTRY (__rfork)
 	andl %edx, %eax
 
 	popl %edx
-	cfi_adjust_cfa_offset(-4)
 	jmp  *%ecx
 
 L(pseudo_end):

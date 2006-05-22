@@ -28,10 +28,6 @@
 
 	.text
 ENTRY (__start_thread)
-	/* End FDE now, because in the child the unwind info will be
-	   wrong.  */
-	cfi_endproc
-
 	/* There is a window of a few instructions, right after the rfork
 	   system call, where the handling of a signal would write garbage
 	   into the stack shared by the parent and the child (assuming
@@ -203,5 +199,4 @@ L(error):
 	popl	%ebx
 	popl	%ebp
 	jmp	SYSCALL_ERROR_LABEL
-	cfi_startproc
 PSEUDO_END (__start_thread)

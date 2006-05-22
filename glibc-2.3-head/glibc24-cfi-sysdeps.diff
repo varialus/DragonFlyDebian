@@ -1,0 +1,144 @@
+ patch to kfreebsd sysdeps to enable cfi for glibc 2.4 snapshot
+ see also NOTES-2.4
+
+
+Index: linuxthreads/kfreebsd/i386/sysdep-cancel.h
+===================================================================
+--- linuxthreads/kfreebsd/i386/sysdep-cancel.h	(revision 1568)
++++ linuxthreads/kfreebsd/i386/sysdep-cancel.h	(revision 1570)
+@@ -61,12 +61,13 @@
+ 	fork()
+ 	vfork()
+ 	rfork()
++	pipe()
+    
+    none of them is cancelable, therefore
+ */
+ 
+-# define PUSHRESULT	pushl %eax; pushfl
+-# define POPRESULT	popfl; popl %eax
++# define PUSHRESULT	pushl %eax; cfi_adjust_cfa_offset (4);  pushfl;    cfi_adjust_cfa_offset (4)
++# define POPRESULT	popfl;      cfi_adjust_cfa_offset (-4); popl %eax; cfi_adjust_cfa_offset (-4)
+ 
+ # ifdef IS_IN_libpthread
+ #  define CENABLE	call __pthread_enable_asynccancel;
+@@ -74,15 +75,23 @@
+ # elif defined IS_IN_librt
+ #  ifdef PIC
+ #   define CENABLE	pushl %ebx; \
++			cfi_adjust_cfa_offset (4); \
++			cfi_rel_offset (ebx, 0); \
+ 			call __i686.get_pc_thunk.bx; \
+ 			addl     $_GLOBAL_OFFSET_TABLE_, %ebx; \
+ 			call __librt_enable_asynccancel@PLT; \
+-			popl %ebx;
++			popl %ebx; \
++			cfi_adjust_cfa_offset (-4); \
++			cfi_restore (ebx);
+ #   define CDISABLE	pushl %ebx; \
++			cfi_adjust_cfa_offset (4); \
++			cfi_rel_offset (ebx, 0); \
+ 			call __i686.get_pc_thunk.bx; \
+ 			addl     $_GLOBAL_OFFSET_TABLE_, %ebx; \
+ 			call __librt_disable_asynccancel@PLT; \
+-			popl %ebx;
++			popl %ebx; \
++			cfi_adjust_cfa_offset (-4); \
++			cfi_restore (ebx);
+ #  else
+ #   define CENABLE	call __librt_enable_asynccancel;
+ #   define CDISABLE	call __librt_disable_asynccancel
+Index: sysdeps/kfreebsd/i386/rfork.S
+===================================================================
+--- sysdeps/kfreebsd/i386/rfork.S	(revision 1568)
++++ sysdeps/kfreebsd/i386/rfork.S	(revision 1570)
+@@ -33,6 +33,7 @@
+ 	andl %edx, %eax
+ 
+ 	popl %edx
++	cfi_adjust_cfa_offset(-4)
+ 	jmp  *%ecx
+ 
+ L(pseudo_end):
+Index: sysdeps/kfreebsd/i386/start_thread.S
+===================================================================
+--- sysdeps/kfreebsd/i386/start_thread.S	(revision 1568)
++++ sysdeps/kfreebsd/i386/start_thread.S	(revision 1570)
+@@ -28,6 +28,10 @@
+ 
+ 	.text
+ ENTRY (__start_thread)
++	/* End FDE now, because in the child the unwind info will be
++	   wrong.  */
++	cfi_endproc
++
+ 	/* There is a window of a few instructions, right after the rfork
+ 	   system call, where the handling of a signal would write garbage
+ 	   into the stack shared by the parent and the child (assuming
+@@ -199,4 +203,5 @@
+ 	popl	%ebx
+ 	popl	%ebp
+ 	jmp	SYSCALL_ERROR_LABEL
++	cfi_startproc
+ PSEUDO_END (__start_thread)
+Index: sysdeps/kfreebsd/i386/vfork.S
+===================================================================
+--- sysdeps/kfreebsd/i386/vfork.S	(revision 1568)
++++ sysdeps/kfreebsd/i386/vfork.S	(revision 1570)
+@@ -27,6 +27,7 @@
+ 
+ 	/* Pop the return PC value into ECX.  */
+ 	popl	%ecx
++	cfi_adjust_cfa_offset(-4)
+ 
+ 	/* Perform the system call.  */
+ 	DO_CALL (vfork, 0)
+@@ -45,6 +46,7 @@
+ L(error):
+ 	/* Push back the return PC.  */
+ 	pushl	%ecx
++	cfi_adjust_cfa_offset(4)
+ 
+ 	/* Branch to the error handler, hidden in PSEUDO_END.  */
+ 	jmp	SYSCALL_ERROR_LABEL
+Index: sysdeps/kfreebsd/i386/sysdep.h
+===================================================================
+--- sysdeps/kfreebsd/i386/sysdep.h	(revision 1568)
++++ sysdeps/kfreebsd/i386/sysdep.h	(revision 1570)
+@@ -136,14 +136,20 @@
+ #  else
+ #   define SYSCALL_ERROR_HANDLER					      \
+ 0:pushl %ebx;								      \
++  cfi_adjust_cfa_offset (4);                                                  \
++  cfi_rel_offset (ebx, 0);                                                    \
+   SETUP_PIC_REG (bx);							      \
+   addl $_GLOBAL_OFFSET_TABLE_, %ebx;					      \
+   pushl %eax;								      \
++  cfi_adjust_cfa_offset (4);                                                  \
+   PUSH_ERRNO_LOCATION_RETURN;						      \
+   call BP_SYM (__errno_location)@PLT;					      \
+   POP_ERRNO_LOCATION_RETURN;						      \
+   popl %ecx;								      \
++  cfi_adjust_cfa_offset (-4);                                                 \
+   popl %ebx;								      \
++  cfi_adjust_cfa_offset (-4);                                                 \
++  cfi_restore (ebx);                                                          \
+   movl %ecx, (%eax);							      \
+   orl $-1, %eax;							      \
+   jmp L(pseudo_end);
+Index: sysdeps/kfreebsd/i386/syscall.S
+===================================================================
+--- sysdeps/kfreebsd/i386/syscall.S	(revision 1568)
++++ sysdeps/kfreebsd/i386/syscall.S	(revision 1570)
+@@ -21,9 +21,11 @@
+ 	  .text;
+ ENTRY (syscall)
+ 	popl %ecx		/* Pop return address into %ecx.  */
++	cfi_adjust_cfa_offset (-4)
+ 	movl 0(%esp), %eax	/* Load syscall number into %eax. */
+ 	int $0x80		/* Do the system call.  */
+ 	pushl %ecx		/* Push back return address.  */
++	cfi_adjust_cfa_offset (4)
+ 	jb SYSCALL_ERROR_LABEL;	/* Jump to error handler if error.  */
+ 
+ L(pseudo_end):
