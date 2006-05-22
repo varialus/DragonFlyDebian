@@ -1,6 +1,6 @@
 
 Author: petr
-Status: dirty hack
+Status: dirty hack, needs glibc at least from r1573
 
 diff -u net-snmp-5.2.2/debian/control net-snmp-5.2.2/debian/control
 --- net-snmp-5.2.2/debian/control
@@ -10,7 +10,7 @@ diff -u net-snmp-5.2.2/debian/control net-snmp-5.2.2/debian/control
  Priority: optional
  Maintainer: Jochen Friedrich <jochen@scram.de>
 -Build-Depends: debhelper (>=4.1.16), libtool, libwrap0-dev, libssl-dev (>> 0.9.8), perl (>=5.8), autoconf, automake, debianutils (>=1.13.1), bash (>=2.05), findutils (>=4.1.20), libsensors-dev (>=2.8.5), procps
-+Build-Depends: debhelper (>=4.1.16), libtool, libwrap0-dev, libssl-dev (>> 0.9.8), perl (>=5.8), autoconf, automake, debianutils (>=1.13.1), bash (>=2.05), findutils (>=4.1.20), libkvm-dev [kfreebsd-i386 kfreebsd-amd64], libsensors-dev (>=2.8.5) [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64] ,procps
++Build-Depends: debhelper (>=4.1.16), libtool, libwrap0-dev, libssl-dev (>> 0.9.8), perl (>=5.8), autoconf, automake, debianutils (>=1.13.1), bash (>=2.05), findutils (>=4.1.20), libkvm-dev [kfreebsd-i386 kfreebsd-amd64], libsensors-dev (>=2.8.5) [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64], procps
  Standards-Version: 3.6.2
  
  Package: snmpd
@@ -97,7 +97,7 @@ only in patch2:
 unchanged:
 --- net-snmp-5.2.2.orig/include/net-snmp/system/kfreebsd.h
 +++ net-snmp-5.2.2/include/net-snmp/system/kfreebsd.h
-@@ -0,0 +1,85 @@
+@@ -0,0 +1,71 @@
 +#include "freebsd5.h"
 +#define freebsd5
 +
@@ -119,19 +119,6 @@ unchanged:
 +#include <net/if_arp.h>
 +#include <netinet/in.h>
 +
-+typedef unsigned char u_char;
-+typedef unsigned short u_short;
-+
-+struct sockaddr_inarp {
-+        u_char  sin_len;
-+        u_char  sin_family;
-+        u_short sin_port;
-+        struct  in_addr sin_addr;
-+        struct  in_addr sin_srcaddr;
-+        u_short sin_tos;
-+        u_short sin_other;
-+#define SIN_PROXY 1
-+};
 +/*
 + * Externalized form of struct socket used by the sysctl(3) interface.
 + */
@@ -182,7 +169,6 @@ unchanged:
 +        UIO_SYSSPACE,           /* from system space */
 +        UIO_NOCOPY              /* don't copy, already in object */
 +};
-+
 only in patch2:
 unchanged:
 --- net-snmp-5.2.2.orig/Makefile.in
