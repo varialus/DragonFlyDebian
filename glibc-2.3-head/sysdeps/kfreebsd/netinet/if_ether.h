@@ -59,6 +59,7 @@
 
 #include <net/ethernet.h>
 #include <net/if_arp.h>
+#include <netinet/in.h>
 
 __BEGIN_DECLS
 /*
@@ -81,6 +82,16 @@ struct	ether_arp {
 #define	arp_pln	ea_hdr.ar_pln
 #define	arp_op	ea_hdr.ar_op
 
+struct sockaddr_inarp {
+	__SOCKADDR_COMMON (sin_);
+	in_port_t sin_port;                 /* Port number.  */
+	struct in_addr sin_addr;            /* Internet address.  */
+	struct in_addr sin_srcaddr;
+	unsigned short sin_tos;
+	unsigned short sin_other;
+#define SIN_PROXY 1
+};
+                                                                                                         
 /*
  * IP and ethernet specific routing flags
  */
