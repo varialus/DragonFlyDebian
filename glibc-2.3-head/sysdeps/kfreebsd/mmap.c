@@ -55,6 +55,9 @@ __mmap (void *addr, size_t len, int prot, int flags, int fd, __off_t offset)
     }
 
   /* We pass 7 arguments in 8 words.  */
+  /* for ANON mapping we must pass -1 in place of fd */
+  if (flags & MAP_ANON)
+    return INLINE_SYSCALL (mmap, 7, addr, len, prot, flags, -1, 0, offset);
   result = INLINE_SYSCALL (mmap, 7, addr, len, prot, flags, fd, 0, offset);
 
   if (result != (void *) (-1) && fd >= 0 && len > 0)
