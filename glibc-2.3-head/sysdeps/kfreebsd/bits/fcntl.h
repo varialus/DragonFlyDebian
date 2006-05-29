@@ -41,6 +41,7 @@
 #define	O_SHLOCK	0x0010	/* Open with shared file lock.  */
 #define	O_EXLOCK	0x0020	/* Open with shared exclusive lock.  */
 #define O_NOFOLLOW	0x0100	/* Don't follow symlinks.  */
+#define	O_DIRECT    0x00010000  /* Attempt to bypass buffer cache */
 #endif
 
 /* File status flags for `open' and `fcntl'.  */
