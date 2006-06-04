@@ -1,30 +1,9 @@
-#! /bin/sh -e
 
-# Description: java support for GNU/k*BSD 
-# Author: Robert Millan, Petr Salinger
 
-dir=
-if [ $# -eq 3 -a "$2" = '-d' ]; then
-    pdir="-d $3"
-    dir="$3/"
-elif [ $# -ne 1 ]; then
-    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
-    exit 1
-fi
-case "$1" in
-    -patch)
-        patch $pdir -f --no-backup-if-mismatch -p2 < $0
-        ;;
-    -unpatch)
-        patch $pdir -f --no-backup-if-mismatch -R -p2 < $0
-        ;;
-    *)
-        echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
-        exit 1
-esac
-exit 0
+shlibs changes submitted to http://gcc.gnu.org/ml/java-patches/2006-q2/msg00193.html
+boehm-gc changes submitted to http://www.hpl.hp.com/hosted/linux/mail-archives/gc/2006-May/001308.html
 
-# append the patch here and adjust the -p? flag in the patch calls.
+
 
 diff -ur gcj-4.1-4.1.0/src/boehm-gc/configure gcj-4.1-4.1.0/src/boehm-gc/configure
 --- gcj-4.1-4.1.0/src/boehm-gc/configure	2006-02-28 09:39:11.000000000 +0100
