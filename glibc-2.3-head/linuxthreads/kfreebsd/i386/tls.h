@@ -63,7 +63,7 @@
                 : "0" (SYS_sysarch),     	\
                   "i" (I386_SET_GSBASE),       	\
                   "d" (&base)			\
-                : "cc" );          		\
+                : "memory", "cc" );    		\
   result;                                       \
 })
 
