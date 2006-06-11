@@ -1,14 +1,11 @@
 
 Author: petr
-Status: does not work with debhelper,
-	patch of source should be in xawtv-3.94/dist/,
-	regenerate configure
+Status: in BTS
+Note: also packages ffmpeg, libquicktime, zvbi have patches in BTS
 
-
-
-diff -ur xawtv-3.94/debian/control xawtv-3.94/debian/control
---- xawtv-3.94/debian/control	2006-06-09 22:30:47.000000000 +0200
-+++ xawtv-3.94/debian/control	2006-06-09 22:26:39.000000000 +0200
+diff -u xawtv-3.94/debian/control xawtv-3.94/debian/control
+--- xawtv-3.94/debian/control
++++ xawtv-3.94/debian/control
 @@ -1,14 +1,14 @@
  Source: xawtv
  Section: graphics
@@ -22,7 +19,7 @@ diff -ur xawtv-3.94/debian/control xawtv-3.94/debian/control
  Section: x11
  Architecture: any
 -Depends: ${shlibs:Depends}, v4l-conf, xutils, debconf, scantv, xawtv-plugins (=${Source-Version}), pia
-+Depends: ${shlibs:Depends}, ${v4l-conf}, xutils, debconf, scantv, xawtv-plugins (=${Source-Version}), pia
++Depends: ${shlibs:Depends}, ${videoconf}, xutils, debconf, scantv, xawtv-plugins (=${Source-Version}), pia
  Suggests: xawtv-plugin-qt (=${Source-Version}), tv-fonts
  Description: X11 TV application
   TV application for X11.  Supports video4linux
@@ -31,16 +28,16 @@ diff -ur xawtv-3.94/debian/control xawtv-3.94/debian/control
  
  Package: fbtv
 -Architecture: any
-+Architecture: linux-any
++Architecture: i386 ia64 alpha amd64 armeb arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc 
  Depends: ${shlibs:Depends}, v4l-conf, xawtv-plugins (=${Source-Version})
  Suggests: xawtv
  Description: linux console (fbcon) TV application
-@@ -59,14 +59,14 @@
+@@ -59,15 +59,16 @@
  
  Package: radio
  Section: sound
 -Architecture: any
-+Architecture: linux-any
++Architecture: i386 ia64 alpha amd64 armeb arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc 
  Depends: ${shlibs:Depends}
  Description: ncurses-based radio application
   This is a ncurses-based radio application.  It
@@ -48,14 +45,25 @@ diff -ur xawtv-3.94/debian/control xawtv-3.94/debian/control
  
  Package: v4l-conf
 -Architecture: any
-+Architecture: linux-any
++Architecture: i386 ia64 alpha amd64 armeb arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc 
  Depends: ${shlibs:Depends}
++Replaces: xawtv (<= 3.94-1.2)
  Conflicts: suidmanager (<< 0.50)
  Description: tool to configure video4linux drivers
-diff -ur xawtv-3.94/debian/rules xawtv-3.94/debian/rules
---- xawtv-3.94/debian/rules	2006-06-09 22:30:47.000000000 +0200
-+++ xawtv-3.94/debian/rules	2006-06-09 22:24:50.000000000 +0200
-@@ -31,7 +31,7 @@
+  This is a small tool to configure a video4linux
+diff -u xawtv-3.94/debian/rules xawtv-3.94/debian/rules
+--- xawtv-3.94/debian/rules
++++ xawtv-3.94/debian/rules
+@@ -7,6 +7,8 @@
+ #export DH_VERBOSE=1
+ export DH_COMPAT=4
+ 
++DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
++
+ build: build-it
+ 
+ work:
+@@ -31,7 +33,7 @@
  
  install: build-it
  	(cd $(WORK)/* && make DESTDIR=$(DEST) install)
@@ -64,31 +72,38 @@ diff -ur xawtv-3.94/debian/rules xawtv-3.94/debian/rules
  
  	# fix v4l-conf suid-root lintian warning
  	mkdir -p debian/v4l-conf/usr/share/lintian/overrides
-@@ -63,7 +63,11 @@
- 	dh_installdeb
- #	dh_perl
- 	dh_shlibdeps
+@@ -60,12 +62,16 @@
+ 	dh_compress
+ 	dh_fixperms	-Xv4l-conf
+ #	dh_makeshlibs
+-	dh_installdeb
+-#	dh_perl
+-	dh_shlibdeps
 -	dh_gencontrol
+-	dh_md5sums
+-	dh_builddeb
++	dh_installdeb -s
++#	dh_perl 
++	dh_shlibdeps -s
 +ifeq (linux,$(DEB_HOST_ARCH_OS))
-+	dh_gencontrol -s -- -Vv4l-conf="v4l-conf"
++	dh_gencontrol -s -- -Vvideoconf="v4l-conf"
 +else
 +	dh_gencontrol -s
 +endif
- 	dh_md5sums
- 	dh_builddeb
++	dh_md5sums -s
++	dh_builddeb -s
  
-diff -ur xawtv-3.94/debian/v4l-conf.files xawtv-3.94/debian/v4l-conf.files
---- xawtv-3.94/debian/v4l-conf.files	2006-06-09 22:30:47.000000000 +0200
-+++ xawtv-3.94/debian/v4l-conf.files	2006-06-09 22:22:49.000000000 +0200
-@@ -1,3 +1,5 @@
- usr/bin/v4l-conf
- usr/share/man/man8/v4l-conf.8
- usr/share/man/*/man8/v4l-conf.8
+ binary: binary-indep binary-arch
+ .PHONY: build clean binary-indep binary-arch binary install
+diff -u xawtv-3.94/debian/v4l-conf.files xawtv-3.94/debian/v4l-conf.files
+--- xawtv-3.94/debian/v4l-conf.files
++++ xawtv-3.94/debian/v4l-conf.files
+@@ -3,0 +4,2 @@
 +usr/bin/v4l-info
 +usr/share/man/man1/v4l-info.1
-diff -ur xawtv-3.94/debian/xawtv.files xawtv-3.94/debian/xawtv.files
---- xawtv-3.94/debian/xawtv.files	2006-06-09 22:30:47.000000000 +0200
-+++ xawtv-3.94/debian/xawtv.files	2006-06-09 22:22:15.000000000 +0200
+diff -u xawtv-3.94/debian/xawtv.files xawtv-3.94/debian/xawtv.files
+--- xawtv-3.94/debian/xawtv.files
++++ xawtv-3.94/debian/xawtv.files
 @@ -4,7 +4,6 @@
  /usr/bin/rootv
  /usr/bin/ntsc-cc
@@ -105,49 +120,67 @@ diff -ur xawtv-3.94/debian/xawtv.files xawtv-3.94/debian/xawtv.files
  /usr/share/man/man5/xawtvrc.5
  /usr/share/man/*/man5/xawtvrc.5
  /etc/X11/app-defaults/Xawtv
-diff -ur xawtv-3.94/work/xawtv-3.94/configure.ac xawtv-3.94/work/xawtv-3.94/configure.ac
---- xawtv-3.94/work/xawtv-3.94/configure.ac	2004-08-18 17:48:09.000000000 +0200
-+++ xawtv-3.94/work/xawtv-3.94/configure.ac	2006-06-09 20:25:01.000000000 +0200
-@@ -77,6 +77,9 @@
- 		LDLIBS="$LDLIBS -L/usr/local/lib"
- 		FOUND_OS="bsd"
- 		;;
-+	GNU/kFreeBSD)
-+		FOUND_OS="bsd"
-+		;;
- 	*)
- 		AC_MSG_CHECKING(if xawtv will build on `uname -s`)
- 		AC_MSG_RESULT(maybe)
-diff -ur xawtv-3.94/work/xawtv-3.94/libng/devices.c xawtv-3.94/work/xawtv-3.94/libng/devices.c
---- xawtv-3.94/work/xawtv-3.94/libng/devices.c	2004-03-25 11:35:36.000000000 +0100
-+++ xawtv-3.94/work/xawtv-3.94/libng/devices.c	2006-06-09 19:37:12.000000000 +0200
-@@ -9,7 +9,7 @@
- /*
-  * default devices names
-  */
--#if defined(__OpenBSD__) || defined(__FreeBSD__) || defined(__NetBSD__)
-+#if defined(__OpenBSD__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
- struct ng_device_config ng_dev = {
-     video:  "/dev/bktr0",
-     radio:  NULL,
-diff -ur xawtv-3.94/work/xawtv-3.94/vbistuff/ntsc-cc.c xawtv-3.94/work/xawtv-3.94/vbistuff/ntsc-cc.c
---- xawtv-3.94/work/xawtv-3.94/vbistuff/ntsc-cc.c	2003-02-14 15:14:08.000000000 +0100
-+++ xawtv-3.94/work/xawtv-3.94/vbistuff/ntsc-cc.c	2006-06-09 19:38:23.000000000 +0200
-@@ -461,7 +461,7 @@
- 	return 0;
- }
- 
--static int RAW(int data)
-+static int raw(int data)
- {
- 	int b1, b2;
- 	if (data == -1)
-@@ -687,7 +687,7 @@
- 				  x+1,128-buf[2048 * rawline+x*2+2]/2);
- 		  }
- #endif
--		  RAW(decode(&buf[2048 * rawline]));
-+		  raw(decode(&buf[2048 * rawline]));
- #ifndef X_DISPLAY_MISSING
- 		  if (debugwin) {
- 		    XFlush(dpy);
+only in patch2:
+unchanged:
+--- xawtv-3.94.orig/dist/kfreebsd.diff
++++ xawtv-3.94/dist/kfreebsd.diff
+@@ -0,0 +1,59 @@
++diff -ur xawtv-3.94/configure.ac xawtv-3.94/configure.ac
++--- xawtv-3.94/configure.ac	2004-08-18 17:48:09.000000000 +0200
+++++ xawtv-3.94/configure.ac	2006-06-09 20:25:01.000000000 +0200
++@@ -77,6 +77,9 @@
++ 		LDLIBS="$LDLIBS -L/usr/local/lib"
++ 		FOUND_OS="bsd"
++ 		;;
+++	GNU/kFreeBSD)
+++		FOUND_OS="bsd"
+++		;;
++ 	*)
++ 		AC_MSG_CHECKING(if xawtv will build on `uname -s`)
++ 		AC_MSG_RESULT(maybe)
++diff -ur xawtv-3.94/configure xawtv-3.94/configure
++--- xawtv-3.94/configure	2006-06-11 08:35:56.000000000 +0200
+++++ xawtv-3.94/configure	2006-06-11 08:35:56.000000000 +0200
++@@ -3074,6 +3074,9 @@
++ 		LDLIBS="$LDLIBS -L/usr/local/lib"
++ 		FOUND_OS="bsd"
++ 		;;
+++	GNU/kFreeBSD)
+++		FOUND_OS="bsd"
+++		;;
++ 	*)
++ 		echo "$as_me:$LINENO: checking if xawtv will build on \`uname -s\`" >&5
++ echo $ECHO_N "checking if xawtv will build on \`uname -s\`... $ECHO_C" >&6
++diff -ur xawtv-3.94/libng/devices.c xawtv-3.94/libng/devices.c
++--- xawtv-3.94/libng/devices.c	2004-03-25 11:35:36.000000000 +0100
+++++ xawtv-3.94/libng/devices.c	2006-06-09 19:37:12.000000000 +0200
++@@ -9,7 +9,7 @@
++ /*
++  * default devices names
++  */
++-#if defined(__OpenBSD__) || defined(__FreeBSD__) || defined(__NetBSD__)
+++#if defined(__OpenBSD__) || defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
++ struct ng_device_config ng_dev = {
++     video:  "/dev/bktr0",
++     radio:  NULL,
++diff -ur xawtv-3.94/vbistuff/ntsc-cc.c xawtv-3.94/vbistuff/ntsc-cc.c
++--- xawtv-3.94/vbistuff/ntsc-cc.c	2003-02-14 15:14:08.000000000 +0100
+++++ xawtv-3.94/vbistuff/ntsc-cc.c	2006-06-09 19:38:23.000000000 +0200
++@@ -461,7 +461,7 @@
++ 	return 0;
++ }
++ 
++-static int RAW(int data)
+++static int get_raw(int data)
++ {
++ 	int b1, b2;
++ 	if (data == -1)
++@@ -687,7 +687,7 @@
++ 				  x+1,128-buf[2048 * rawline+x*2+2]/2);
++ 		  }
++ #endif
++-		  RAW(decode(&buf[2048 * rawline]));
+++		  get_raw(decode(&buf[2048 * rawline]));
++ #ifndef X_DISPLAY_MISSING
++ 		  if (debugwin) {
++ 		    XFlush(dpy);
