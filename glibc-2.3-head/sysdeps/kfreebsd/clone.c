@@ -56,7 +56,7 @@ int __clone (int (*fn) (void *), void *child_stack, int flags, void *arg)
 
   /* This implementation of clone() does not support all Linux flags.  */
   if (flags & ~(CSIGNAL | CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND
-		| CLONE_VFORK))
+		| CLONE_VFORK | CLONE_SYSVSEM))
     {
       __set_errno (EINVAL);
       return -1;
@@ -79,6 +79,10 @@ int __clone (int (*fn) (void *), void *child_stack, int flags, void *arg)
     /* Sharing the filesystem related info (umask, cwd, root dir)
        is not supported by rfork.  Ignore this; let's hope programs
        will set their umask and cwd before spawning threads.  */
+    ;
+
+  if (flags & CLONE_SYSVSEM)
+    /* Ignore this; it has been introduced into linuxthreads in post 2.4 glibc */
     ;
 
   if (!(flags & CLONE_FILES))
