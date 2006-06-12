@@ -1,3 +1,6 @@
+
+Note: against 2.3.999.2-6 
+
 --- debian/sysdeps/kfreebsd.mk~	2006-06-12 16:58:52.000000000 +0200
 +++ debian/sysdeps/kfreebsd.mk	2006-06-12 16:58:52.000000000 +0200
 @@ -28,6 +28,7 @@
@@ -8,3 +11,14 @@
  	ln -s $(KFREEBSD_HEADERS)/osreldate.h debian/include
  	ln -s $(KFREEBSD_HEADERS)/sys debian/include
  	ln -s $(KFREEBSD_HEADERS)/vm debian/include
+--- debian/rules.d/build.mk~	2006-06-12 23:21:23.000000000 +0200
++++ debian/rules.d/build.mk	2006-06-12 23:20:43.000000000 +0200
+@@ -84,7 +84,7 @@
+ 	  echo "DEB_BUILD_OPTIONS contains nocheck, skipping tests."; \
+ 	  echo "Tests have been disabled via DEB_BUILD_OPTIONS." > $(log_test) ; \
+ 	elif [ $(call xx,configure_build) != $(call xx,configure_target) ] && \
+-	     ! $(DEB_BUILDDIR)/elf/ld.so >/dev/null 2>&1 ; then \
++	     ! $(DEB_BUILDDIR)/elf/ld.so $(DEB_BUILDDIR)/libc.so >/dev/null 2>&1 ; then \
+ 	  echo "Cross compiling, skipping tests."; \
+ 	  echo "Flavour cross-compiled, tests have been skipped." > $(log_test) ; \
+ 	elif ! $(call kernel_check,$(call xx,MIN_KERNEL_SUPPORTED)); then \
