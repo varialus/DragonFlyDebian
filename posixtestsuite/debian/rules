@@ -1,13 +1,53 @@
 #!/usr/bin/make -f
+#
+# $Id$
+#
 
-DEB_TAR_SRCDIR := posixtestsuite-1.4.3
+include debian/patch.mk
 
-build/posix-testsuite:: apply-patches
-	if test -e /lib/libsem.* ; then \
-		echo "-lsem" >> $(DEB_SRCDIR)/LDFLAGS ; \
-	fi
+build: patch
+	dh_testdir
+	
+	$(MAKE)
 
-include /usr/share/cdbs/1/class/makefile.mk
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/rules/tarball.mk
-include /usr/share/cdbs/1/rules/simple-patchsys.mk
+clean::
+	dh_testdir
+	dh_testroot
+	
+	-$(MAKE) clean
+	
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/posixtestsuite
+
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+#	dh_installexamples
+	dh_installman
+#	dh_installinfo
+	dh_installchangelogs
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary-arch: build install
+	# Nothing to do.
+
+binary: binary-indep binary-arch
+
+.PHONY: build clean binary-indep binary-arch binary install
+
