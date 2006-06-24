@@ -13,7 +13,7 @@ revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 major		:= $(shell dpkg-parsechangelog | grep ^Source: | sed -e 's/^.*-//g')
 ifeq (, $(findstring :$(major)., :$(version)))
 # Preliminar snapshot (e.g. 6.99+20060217).  Pretend this is the actual release.
-version		:= $(major).0
+version		:= $(major).1
 endif
 
 os		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
