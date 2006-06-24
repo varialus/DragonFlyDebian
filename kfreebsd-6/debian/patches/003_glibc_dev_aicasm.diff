@@ -1,6 +1,7 @@
-diff -ur sys/dev/aic7xxx/aicasm.old/Makefile sys/dev/aic7xxx/aicasm/Makefile
---- sys/dev/aic7xxx/aicasm.old/Makefile	2004-12-21 09:47:19.000000000 +0100
-+++ sys/dev/aic7xxx/aicasm/Makefile	2006-02-15 15:53:20.000000000 +0100
+Index: sys/dev/aic7xxx/aicasm/Makefile
+===================================================================
+--- sys/dev/aic7xxx/aicasm/Makefile.orig	2005-12-27 22:35:40.000000000 +0100
++++ sys/dev/aic7xxx/aicasm/Makefile	2006-06-24 17:31:56.000000000 +0200
 @@ -14,7 +14,7 @@
  SRCS=	${GENHDRS} ${CSRCS} ${YSRCS} ${LSRCS}
  CLEANFILES+= ${GENHDRS} ${YSRCS:R:C/(.*)/\1.output/g}
@@ -11,7 +12,7 @@ diff -ur sys/dev/aic7xxx/aicasm.old/Makefile sys/dev/aic7xxx/aicasm/Makefile
  # Correct path for kernel builds
  # Don't rely on the kernel's .depend file
 @@ -23,13 +23,6 @@
- DEPENDFILE=
+ DEPENDFILE=	.depend_aicasm
  .endif
  
 -.if ${CC} == "icc"
@@ -24,9 +25,10 @@ diff -ur sys/dev/aic7xxx/aicasm.old/Makefile sys/dev/aic7xxx/aicasm/Makefile
  .ifdef MAKESRCPATH
  CFLAGS+= -I${MAKESRCPATH}
  .endif
-diff -ur sys/dev/aic7xxx/aicasm.old/aicasm.h sys/dev/aic7xxx/aicasm/aicasm.h
---- sys/dev/aic7xxx/aicasm.old/aicasm.h	2005-01-06 02:42:27.000000000 +0100
-+++ sys/dev/aic7xxx/aicasm/aicasm.h	2006-02-15 15:48:34.000000000 +0100
+Index: sys/dev/aic7xxx/aicasm/aicasm.h
+===================================================================
+--- sys/dev/aic7xxx/aicasm/aicasm.h.orig	2005-01-06 02:42:27.000000000 +0100
++++ sys/dev/aic7xxx/aicasm/aicasm.h	2006-06-24 17:31:56.000000000 +0200
 @@ -42,8 +42,9 @@
   * $FreeBSD: src/sys/dev/aic7xxx/aicasm/aicasm.h,v 1.17 2005/01/06 01:42:27 imp Exp $
   */
@@ -39,9 +41,10 @@ diff -ur sys/dev/aic7xxx/aicasm.old/aicasm.h sys/dev/aic7xxx/aicasm/aicasm.h
  #else
  #include <sys/queue.h>
  #endif
-diff -ur sys/dev/aic7xxx/aicasm.old/aicasm_gram.y sys/dev/aic7xxx/aicasm/aicasm_gram.y
---- sys/dev/aic7xxx/aicasm.old/aicasm_gram.y	2005-01-06 02:42:27.000000000 +0100
-+++ sys/dev/aic7xxx/aicasm/aicasm_gram.y	2006-02-15 15:49:18.000000000 +0100
+Index: sys/dev/aic7xxx/aicasm/aicasm_gram.y
+===================================================================
+--- sys/dev/aic7xxx/aicasm/aicasm_gram.y.orig	2005-01-06 02:42:27.000000000 +0100
++++ sys/dev/aic7xxx/aicasm/aicasm_gram.y	2006-06-24 17:31:56.000000000 +0200
 @@ -52,8 +52,9 @@
  #include <string.h>
  #include <sysexits.h>
@@ -54,9 +57,10 @@ diff -ur sys/dev/aic7xxx/aicasm.old/aicasm_gram.y sys/dev/aic7xxx/aicasm/aicasm_
  #else
  #include <sys/queue.h>
  #endif
-diff -ur sys/dev/aic7xxx/aicasm.old/aicasm_macro_gram.y sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y
---- sys/dev/aic7xxx/aicasm.old/aicasm_macro_gram.y	2005-01-06 02:42:27.000000000 +0100
-+++ sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y	2006-02-15 15:49:28.000000000 +0100
+Index: sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y
+===================================================================
+--- sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y.orig	2005-01-06 02:42:27.000000000 +0100
++++ sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y	2006-06-24 17:31:56.000000000 +0200
 @@ -52,8 +52,9 @@
  #include <string.h>
  #include <sysexits.h>
@@ -69,9 +73,10 @@ diff -ur sys/dev/aic7xxx/aicasm.old/aicasm_macro_gram.y sys/dev/aic7xxx/aicasm/a
  #else
  #include <sys/queue.h>
  #endif
-diff -ur sys/dev/aic7xxx/aicasm.old/aicasm_macro_scan.l sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l
---- sys/dev/aic7xxx/aicasm.old/aicasm_macro_scan.l	2005-01-06 02:42:27.000000000 +0100
-+++ sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l	2006-02-15 15:47:58.000000000 +0100
+Index: sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l
+===================================================================
+--- sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l.orig	2005-01-06 02:42:27.000000000 +0100
++++ sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l	2006-06-24 17:31:56.000000000 +0200
 @@ -51,8 +51,10 @@
  #include <stdio.h>
  #include <string.h>
@@ -85,9 +90,10 @@ diff -ur sys/dev/aic7xxx/aicasm.old/aicasm_macro_scan.l sys/dev/aic7xxx/aicasm/a
  #else
  #include <sys/queue.h>
  #endif
-diff -ur sys/dev/aic7xxx/aicasm.old/aicasm_scan.l sys/dev/aic7xxx/aicasm/aicasm_scan.l
---- sys/dev/aic7xxx/aicasm.old/aicasm_scan.l	2005-01-06 02:42:27.000000000 +0100
-+++ sys/dev/aic7xxx/aicasm/aicasm_scan.l	2006-02-15 15:50:41.000000000 +0100
+Index: sys/dev/aic7xxx/aicasm/aicasm_scan.l
+===================================================================
+--- sys/dev/aic7xxx/aicasm/aicasm_scan.l.orig	2005-01-06 02:42:27.000000000 +0100
++++ sys/dev/aic7xxx/aicasm/aicasm_scan.l	2006-06-24 17:31:56.000000000 +0200
 @@ -51,8 +51,10 @@
  #include <stdio.h>
  #include <string.h>
@@ -101,9 +107,10 @@ diff -ur sys/dev/aic7xxx/aicasm.old/aicasm_scan.l sys/dev/aic7xxx/aicasm/aicasm_
  #else
  #include <sys/queue.h>
  #endif
-diff -ur sys/dev/aic7xxx/aicasm.old/aicasm_symbol.c sys/dev/aic7xxx/aicasm/aicasm_symbol.c
---- sys/dev/aic7xxx/aicasm.old/aicasm_symbol.c	2005-01-06 02:42:27.000000000 +0100
-+++ sys/dev/aic7xxx/aicasm/aicasm_symbol.c	2006-02-15 15:52:13.000000000 +0100
+Index: sys/dev/aic7xxx/aicasm/aicasm_symbol.c
+===================================================================
+--- sys/dev/aic7xxx/aicasm/aicasm_symbol.c.orig	2005-01-06 02:42:27.000000000 +0100
++++ sys/dev/aic7xxx/aicasm/aicasm_symbol.c	2006-06-24 17:31:56.000000000 +0200
 @@ -44,10 +44,11 @@
  
  #include <sys/types.h>
@@ -119,9 +126,10 @@ diff -ur sys/dev/aic7xxx/aicasm.old/aicasm_symbol.c sys/dev/aic7xxx/aicasm/aicas
  #endif
  #include <fcntl.h>
  #include <inttypes.h>
-diff -ur sys/dev/aic7xxx/aicasm.old/aicasm_symbol.h sys/dev/aic7xxx/aicasm/aicasm_symbol.h
---- sys/dev/aic7xxx/aicasm.old/aicasm_symbol.h	2005-01-06 02:42:27.000000000 +0100
-+++ sys/dev/aic7xxx/aicasm/aicasm_symbol.h	2006-02-15 15:52:56.000000000 +0100
+Index: sys/dev/aic7xxx/aicasm/aicasm_symbol.h
+===================================================================
+--- sys/dev/aic7xxx/aicasm/aicasm_symbol.h.orig	2005-01-06 02:42:27.000000000 +0100
++++ sys/dev/aic7xxx/aicasm/aicasm_symbol.h	2006-06-24 17:31:56.000000000 +0200
 @@ -42,8 +42,9 @@
   * $FreeBSD: src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h,v 1.17 2005/01/06 01:42:27 imp Exp $
   */

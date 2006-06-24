@@ -22,10 +22,12 @@ options         SEMMAP=256
     You might also want to configure your kernel to lock shared memory into RAM and prevent it from being paged out to swap. Use the sysctl setting kern.ipc.shm_use_phys. 
 </quote>
 
---- sys/i386/conf/GENERIC~	2005-02-01 21:44:25.000000000 +0100
-+++ sys/i386/conf/GENERIC	2005-02-01 21:47:12.000000000 +0100
-@@ -49,8 +49,14 @@
- options 	SCSI_DELAY=15000	# Delay (in ms) before probing SCSI
+Index: sys/i386/conf/GENERIC
+===================================================================
+--- sys/i386/conf/GENERIC.orig	2006-06-24 17:39:05.000000000 +0200
++++ sys/i386/conf/GENERIC	2006-06-24 17:42:59.000000000 +0200
+@@ -53,8 +53,14 @@
+ options 	SCSI_DELAY=5000		# Delay (in ms) before probing SCSI
  options 	KTRACE			# ktrace(1) support
  options 	SYSVSHM			# SYSV-style shared memory
 +options         SHMMAXPGS=4096
@@ -39,8 +41,10 @@ options         SEMMAP=256
  options 	_KPOSIX_PRIORITY_SCHEDULING # POSIX P1003_1B real-time extensions
  options 	KBD_INSTALL_CDEV	# install a CDEV entry in /dev
  options 	AHC_REG_PRETTY_PRINT	# Print register bitfields in debug
---- sys.old/amd64/conf/GENERIC	2006-02-27 10:18:19.000000000 +0100
-+++ sys/amd64/conf/GENERIC	2006-02-27 10:18:57.000000000 +0100
+Index: sys/amd64/conf/GENERIC
+===================================================================
+--- sys/amd64/conf/GENERIC.orig	2006-06-24 17:41:46.000000000 +0200
++++ sys/amd64/conf/GENERIC	2006-06-24 17:42:59.000000000 +0200
 @@ -54,8 +54,14 @@
  options 	SCSI_DELAY=5000		# Delay (in ms) before probing SCSI
  options 	KTRACE			# ktrace(1) support

@@ -2,9 +2,10 @@
 Status: chflags is BSD-specific.  We could add it to freebsd-utils.
   The rest has been rejected (kern/93502)
 
-diff -ur sys/conf.old/kern.mk sys/conf/kern.mk
---- sys/conf.old/kern.mk	2006-02-17 19:04:05.000000000 +0100
-+++ sys/conf/kern.mk	2006-02-17 19:05:07.000000000 +0100
+Index: sys/conf/kern.mk
+===================================================================
+--- sys/conf/kern.mk.orig	2005-04-01 00:53:58.000000000 +0200
++++ sys/conf/kern.mk	2006-06-24 17:25:17.000000000 +0200
 @@ -1,5 +1,9 @@
  # $FreeBSD: src/sys/conf/kern.mk,v 1.45 2005/03/31 22:53:58 peter Exp $
  
@@ -47,11 +48,12 @@ diff -ur sys/conf.old/kern.mk sys/conf/kern.mk
  INLINE_LIMIT?=	8000
  .endif
  
-diff -ur sys/conf.old/kern.post.mk sys/conf/kern.post.mk
---- sys/conf.old/kern.post.mk	2006-02-17 19:04:05.000000000 +0100
-+++ sys/conf/kern.post.mk	2006-02-17 19:04:12.000000000 +0100
+Index: sys/conf/kern.post.mk
+===================================================================
+--- sys/conf/kern.post.mk.orig	2005-11-16 11:03:02.000000000 +0100
++++ sys/conf/kern.post.mk	2006-06-24 17:25:17.000000000 +0200
 @@ -1,5 +1,15 @@
- # $FreeBSD: src/sys/conf/kern.post.mk,v 1.83 2005/06/09 05:38:18 imp Exp $
+ # $FreeBSD: src/sys/conf/kern.post.mk,v 1.83.2.1 2005/11/16 10:03:02 ru Exp $
  
 +.if !defined(OPSYS)
 +OPSYS!=		uname -s
@@ -66,7 +68,7 @@ diff -ur sys/conf.old/kern.post.mk sys/conf/kern.post.mk
  # Part of a unified Makefile for building kernels.  This part includes all
  # the definitions that need to be after all the % directives except %RULES
  # and ones that act like they are part of %RULES.
-@@ -193,11 +203,9 @@
+@@ -189,11 +199,9 @@
  .if exists(${DESTDIR}${KODIR})
  	-thiskernel=`sysctl -n kern.bootfile` ; \
  	if [ ! "`dirname "$$thiskernel"`" -ef ${DESTDIR}${KODIR} ] ; then \
@@ -78,7 +80,7 @@ diff -ur sys/conf.old/kern.post.mk sys/conf/kern.post.mk
  			rm -rf ${DESTDIR}${KODIR}.old ; \
  		fi ; \
  		mv ${DESTDIR}${KODIR} ${DESTDIR}${KODIR}.old ; \
-@@ -206,17 +214,16 @@
+@@ -202,17 +210,16 @@
  .endif
  	mkdir -p ${DESTDIR}${KODIR}
  .if defined(DEBUG) && defined(INSTALL_DEBUG)

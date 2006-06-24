@@ -1,9 +1,10 @@
 
 Status: in upstream BTS
 
-diff -ur sys/conf.old/Makefile.alpha sys/conf/Makefile.alpha
---- sys/conf.old/Makefile.alpha	2006-04-25 18:41:51.000000000 +0200
-+++ sys/conf/Makefile.alpha	2006-04-25 18:51:49.000000000 +0200
+Index: sys/conf/Makefile.alpha
+===================================================================
+--- sys/conf/Makefile.alpha.orig	2005-10-28 21:04:02.000000000 +0200
++++ sys/conf/Makefile.alpha	2006-06-24 17:33:28.000000000 +0200
 @@ -28,6 +28,8 @@
  .endif
  .include "$S/conf/kern.pre.mk"
@@ -13,9 +14,10 @@ diff -ur sys/conf.old/Makefile.alpha sys/conf/Makefile.alpha
  %BEFORE_DEPEND
  
  %OBJS
-diff -ur sys/conf.old/Makefile.amd64 sys/conf/Makefile.amd64
---- sys/conf.old/Makefile.amd64	2006-04-25 18:41:51.000000000 +0200
-+++ sys/conf/Makefile.amd64	2006-04-25 18:51:49.000000000 +0200
+Index: sys/conf/Makefile.amd64
+===================================================================
+--- sys/conf/Makefile.amd64.orig	2005-10-28 21:04:03.000000000 +0200
++++ sys/conf/Makefile.amd64	2006-06-24 17:33:28.000000000 +0200
 @@ -38,6 +38,8 @@
  
  MKMODULESENV+= MACHINE=amd64
@@ -25,9 +27,10 @@ diff -ur sys/conf.old/Makefile.amd64 sys/conf/Makefile.amd64
  %BEFORE_DEPEND
  
  %OBJS
-diff -ur sys/conf.old/Makefile.arm sys/conf/Makefile.arm
---- sys/conf.old/Makefile.arm	2006-04-25 18:41:51.000000000 +0200
-+++ sys/conf/Makefile.arm	2006-04-25 18:51:49.000000000 +0200
+Index: sys/conf/Makefile.arm
+===================================================================
+--- sys/conf/Makefile.arm.orig	2005-10-28 21:04:03.000000000 +0200
++++ sys/conf/Makefile.arm	2006-06-24 17:33:28.000000000 +0200
 @@ -44,6 +44,9 @@
  .if !defined(DEBUG)
  CFLAGS += -mno-apcs-frame
@@ -38,9 +41,10 @@ diff -ur sys/conf.old/Makefile.arm sys/conf/Makefile.arm
  %BEFORE_DEPEND
  
  %OBJS
-diff -ur sys/conf.old/Makefile.i386 sys/conf/Makefile.i386
---- sys/conf.old/Makefile.i386	2006-04-25 18:41:51.000000000 +0200
-+++ sys/conf/Makefile.i386	2006-04-25 18:51:49.000000000 +0200
+Index: sys/conf/Makefile.i386
+===================================================================
+--- sys/conf/Makefile.i386.orig	2005-10-28 21:04:03.000000000 +0200
++++ sys/conf/Makefile.i386	2006-06-24 17:33:28.000000000 +0200
 @@ -32,6 +32,8 @@
  
  MKMODULESENV+= MACHINE=i386
@@ -50,9 +54,10 @@ diff -ur sys/conf.old/Makefile.i386 sys/conf/Makefile.i386
  %BEFORE_DEPEND
  
  %OBJS
-diff -ur sys/conf.old/Makefile.ia64 sys/conf/Makefile.ia64
---- sys/conf.old/Makefile.ia64	2006-04-25 18:41:51.000000000 +0200
-+++ sys/conf/Makefile.ia64	2006-04-25 18:51:49.000000000 +0200
+Index: sys/conf/Makefile.ia64
+===================================================================
+--- sys/conf/Makefile.ia64.orig	2005-10-28 21:04:03.000000000 +0200
++++ sys/conf/Makefile.ia64	2006-06-24 17:33:28.000000000 +0200
 @@ -38,6 +38,8 @@
  
  ASM_CFLAGS= -x assembler-with-cpp -Wa,-x -DLOCORE ${CFLAGS}
@@ -62,9 +67,10 @@ diff -ur sys/conf.old/Makefile.ia64 sys/conf/Makefile.ia64
  %BEFORE_DEPEND
  
  %OBJS
-diff -ur sys/conf.old/Makefile.pc98 sys/conf/Makefile.pc98
---- sys/conf.old/Makefile.pc98	2006-04-25 18:41:51.000000000 +0200
-+++ sys/conf/Makefile.pc98	2006-04-25 18:51:49.000000000 +0200
+Index: sys/conf/Makefile.pc98
+===================================================================
+--- sys/conf/Makefile.pc98.orig	2005-10-28 21:04:03.000000000 +0200
++++ sys/conf/Makefile.pc98	2006-06-24 17:33:28.000000000 +0200
 @@ -32,6 +32,8 @@
  
  MKMODULESENV+=	MACHINE=pc98
@@ -74,9 +80,10 @@ diff -ur sys/conf.old/Makefile.pc98 sys/conf/Makefile.pc98
  %BEFORE_DEPEND
  
  %OBJS
-diff -ur sys/conf.old/Makefile.powerpc sys/conf/Makefile.powerpc
---- sys/conf.old/Makefile.powerpc	2006-04-25 18:41:51.000000000 +0200
-+++ sys/conf/Makefile.powerpc	2006-04-25 18:51:49.000000000 +0200
+Index: sys/conf/Makefile.powerpc
+===================================================================
+--- sys/conf/Makefile.powerpc.orig	2005-10-28 21:04:03.000000000 +0200
++++ sys/conf/Makefile.powerpc	2006-06-24 17:33:28.000000000 +0200
 @@ -37,6 +37,8 @@
  CFLAGS+=	-fno-omit-frame-pointer
  .endif
@@ -86,9 +93,10 @@ diff -ur sys/conf.old/Makefile.powerpc sys/conf/Makefile.powerpc
  %BEFORE_DEPEND
  
  %OBJS
-diff -ur sys/conf.old/Makefile.sparc64 sys/conf/Makefile.sparc64
---- sys/conf.old/Makefile.sparc64	2006-04-25 18:41:51.000000000 +0200
-+++ sys/conf/Makefile.sparc64	2006-04-25 18:51:49.000000000 +0200
+Index: sys/conf/Makefile.sparc64
+===================================================================
+--- sys/conf/Makefile.sparc64.orig	2005-10-28 21:04:03.000000000 +0200
++++ sys/conf/Makefile.sparc64	2006-06-24 17:33:28.000000000 +0200
 @@ -32,6 +32,8 @@
  
  MDOBJS=	exception.o interrupt.o
@@ -98,9 +106,10 @@ diff -ur sys/conf.old/Makefile.sparc64 sys/conf/Makefile.sparc64
  %BEFORE_DEPEND
  
  %OBJS
-diff -ur usr.sbin/config.old/mkmakefile.c usr.sbin/config/mkmakefile.c
---- usr.sbin/config.old/mkmakefile.c	2006-04-25 18:44:15.000000000 +0200
-+++ usr.sbin/config/mkmakefile.c	2006-04-25 18:51:59.000000000 +0200
+Index: usr.sbin/config/mkmakefile.c
+===================================================================
+--- usr.sbin/config/mkmakefile.c.orig	2004-08-31 01:03:56.000000000 +0200
++++ usr.sbin/config/mkmakefile.c	2006-06-24 17:33:28.000000000 +0200
 @@ -70,6 +70,7 @@
  static void do_rules(FILE *);
  static void do_xxfiles(char *, FILE *);

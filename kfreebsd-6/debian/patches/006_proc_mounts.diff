@@ -1,8 +1,10 @@
 
 Status: Reported as kern/78464.
 
---- sys.old/compat/linprocfs/linprocfs.c	2005-03-03 12:44:21.000000000 +0100
-+++ sys/compat/linprocfs/linprocfs.c	2005-03-05 19:47:40.000000000 +0100
+Index: sys/compat/linprocfs/linprocfs.c
+===================================================================
+--- sys/compat/linprocfs/linprocfs.c.orig	2005-12-14 20:06:48.000000000 +0100
++++ sys/compat/linprocfs/linprocfs.c	2006-06-24 17:33:15.000000000 +0200
 @@ -345,13 +345,11 @@
  #endif /* __i386__ || __amd64__ */
  
@@ -28,7 +30,7 @@ Status: Reported as kern/78464.
  		sbuf_printf(sb, " 0 0\n");
  	}
  	mtx_unlock(&mountlist_mtx);
-@@ -1031,7 +1029,7 @@
+@@ -1032,7 +1030,7 @@
  	pfs_create_file(root, "modules", &linprocfs_domodules,
  	    NULL, NULL, PFS_RD);
  #endif

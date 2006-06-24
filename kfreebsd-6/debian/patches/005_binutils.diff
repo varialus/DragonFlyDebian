@@ -1,8 +1,10 @@
 
 Status: Reported as kern/93331
 
---- sys.old/i386/i386/locore.s.orig	2005-09-05 22:35:16.000000000 +0200
-+++ sys/i386/i386/locore.s	2005-09-05 22:35:58.000000000 +0200
+Index: sys/i386/i386/locore.s
+===================================================================
+--- sys/i386/i386/locore.s.orig	2005-05-16 11:47:53.000000000 +0200
++++ sys/i386/i386/locore.s	2006-06-24 17:32:27.000000000 +0200
 @@ -358,7 +358,7 @@
  	pushl	%eax
  	testl	$PSL_VM,UC_EFLAGS(%eax)
@@ -30,8 +32,10 @@ Status: Reported as kern/93331
  9:
  	movl	$103,%eax		/* 3.x SYS_sigreturn */
  	pushl	%eax			/* junk to fake return addr. */
---- sys.old/i386/i386/swtch.s	2005-09-06 14:47:02.000000000 +0200
-+++ sys/i386/i386/swtch.s	2005-09-06 14:47:33.000000000 +0200
+Index: sys/i386/i386/swtch.s
+===================================================================
+--- sys/i386/i386/swtch.s.orig	2005-04-14 00:57:17.000000000 +0200
++++ sys/i386/i386/swtch.s	2006-06-24 17:32:27.000000000 +0200
 @@ -111,7 +111,7 @@
  	movl	%ebp,PCB_EBP(%edx)
  	movl	%esi,PCB_ESI(%edx)
@@ -58,10 +62,21 @@ Status: Reported as kern/93331
 +	movw	%gs,PCB_GS(%ecx)
  	pushfl
  	popl	PCB_PSL(%ecx)
-
---- sys.old/i386/include/cpufunc.h	2005-09-06 17:32:18.000000000 +0200
-+++ sys/i386/include/cpufunc.h	2005-09-06 17:32:42.000000000 +0200
-@@ -456,7 +456,7 @@
+ 
+Index: sys/i386/include/cpufunc.h
+===================================================================
+--- sys/i386/include/cpufunc.h.orig	2005-05-13 02:05:56.000000000 +0200
++++ sys/i386/include/cpufunc.h	2006-06-24 17:32:27.000000000 +0200
+@@ -452,7 +452,7 @@
+ rfs(void)
+ {
+ 	u_int sel;
+-	__asm __volatile("movl %%fs,%0" : "=rm" (sel));
++	__asm __volatile("mov %%fs,%0" : "=rm" (sel));
+ 	return (sel);
+ }
+ 
+@@ -460,7 +460,7 @@
  rgs(void)
  {
  	u_int sel;
@@ -70,7 +85,22 @@ Status: Reported as kern/93331
  	return (sel);
  }
  
-@@ -477,7 +477,7 @@
+@@ -468,20 +468,20 @@
+ rss(void)
+ {
+ 	u_int sel;
+-	__asm __volatile("movl %%ss,%0" : "=rm" (sel));
++	__asm __volatile("mov %%ss,%0" : "=rm" (sel));
+ 	return (sel);
+ }
+ 
+ static __inline void
+ load_fs(u_int sel)
+ {
+-	__asm __volatile("movl %0,%%fs" : : "rm" (sel));
++	__asm __volatile("mov %0,%%fs" : : "rm" (sel));
+ }
+ 
  static __inline void
  load_gs(u_int sel)
  {
@@ -79,8 +109,10 @@ Status: Reported as kern/93331
  }
  
  static __inline void
---- sys.old/i386/linux/linux_locore.s	2005-09-06 20:28:47.000000000 +0200
-+++ sys/i386/linux/linux_locore.s	2005-09-06 20:29:05.000000000 +0200
+Index: sys/i386/linux/linux_locore.s
+===================================================================
+--- sys/i386/linux/linux_locore.s.orig	2001-02-25 07:29:01.000000000 +0100
++++ sys/i386/linux/linux_locore.s	2006-06-24 17:32:27.000000000 +0200
 @@ -8,7 +8,7 @@
  NON_GPROF_ENTRY(linux_sigcode)
  	call	*LINUX_SIGF_HANDLER(%esp)
@@ -99,9 +131,11 @@ Status: Reported as kern/93331
  	push	%eax				/* fake ret addr */
  	movl	$LINUX_SYS_linux_rt_sigreturn,%eax   /* linux_rt_sigreturn() */
  	int	$0x80				/* enter kernel with args */
---- sys.old/compat/ndis/winx32_wrap.S	2005-09-06 21:47:21.000000000 +0200
-+++ sys/compat/ndis/winx32_wrap.S	2005-09-06 21:47:48.000000000 +0200
-@@ -348,7 +348,7 @@
+Index: sys/compat/ndis/winx32_wrap.S
+===================================================================
+--- sys/compat/ndis/winx32_wrap.S.orig	2005-11-06 04:52:25.000000000 +0100
++++ sys/compat/ndis/winx32_wrap.S	2006-06-24 17:32:27.000000000 +0200
+@@ -364,7 +364,7 @@
  	ret
  
  ENTRY(x86_setfs)
@@ -110,9 +144,11 @@ Status: Reported as kern/93331
  	ret
  
  ENTRY(x86_gettid)
---- sys/amd64/amd64/cpu_switch.S.old	2006-03-01 20:12:04.000000000 +0100
-+++ sys/amd64/amd64/cpu_switch.S	2006-03-01 20:04:59.000000000 +0100
-@@ -107,10 +107,10 @@
+Index: sys/amd64/amd64/cpu_switch.S
+===================================================================
+--- sys/amd64/amd64/cpu_switch.S.orig	2005-11-15 01:25:59.000000000 +0100
++++ sys/amd64/amd64/cpu_switch.S	2006-06-24 17:33:03.000000000 +0200
+@@ -105,10 +105,10 @@
  	jz	1f				/* no, skip over */
  
  	/* Save segment selector numbers */
@@ -124,10 +160,10 @@ Status: Reported as kern/93331
 +	movw	%es,PCB_ES(%r8)
 +	movw	%fs,PCB_FS(%r8)
 +	movw	%gs,PCB_GS(%r8)
- 	jmp	2f
  1:
- 
-@@ -191,14 +191,14 @@
+ 	/* Test if debug registers should be saved. */
+ 	testl	$PCB_DBREGS,PCB_FLAGS(%r8)
+@@ -174,14 +174,14 @@
  	jz	1f				/* no, skip over */
  
  	/* Restore segment selector numbers */
@@ -146,8 +182,10 @@ Status: Reported as kern/93331
  	wrmsr
  	jmp	2f
  1:
---- sys/amd64/ia32/ia32_signal.c~	2006-03-01 22:23:22.000000000 +0100
-+++ sys/amd64/ia32/ia32_signal.c	2006-03-01 22:44:47.000000000 +0100
+Index: sys/amd64/ia32/ia32_signal.c
+===================================================================
+--- sys/amd64/ia32/ia32_signal.c.orig	2004-04-06 01:55:14.000000000 +0200
++++ sys/amd64/ia32/ia32_signal.c	2006-06-24 17:32:27.000000000 +0200
 @@ -197,8 +197,8 @@
  	sf.sf_uc.uc_mcontext.mc_onstack = (oonstack) ? 1 : 0;
  	sf.sf_uc.uc_mcontext.mc_gs = rgs();
@@ -170,8 +208,10 @@ Status: Reported as kern/93331
  	sf.sf_uc.uc_mcontext.mc_edi = regs->tf_rdi;
  	sf.sf_uc.uc_mcontext.mc_esi = regs->tf_rsi;
  	sf.sf_uc.uc_mcontext.mc_ebp = regs->tf_rbp;
---- sys/amd64/include/cpufunc.h~	2006-03-02 00:05:29.000000000 +0100
-+++ sys/amd64/include/cpufunc.h	2006-03-02 11:11:34.000000000 +0100
+Index: sys/amd64/include/cpufunc.h
+===================================================================
+--- sys/amd64/include/cpufunc.h.orig	2005-05-13 02:05:55.000000000 +0200
++++ sys/amd64/include/cpufunc.h	2006-06-24 17:32:27.000000000 +0200
 @@ -482,7 +482,7 @@
  rfs(void)
  {
@@ -248,8 +288,10 @@ Status: Reported as kern/93331
  }
  #endif
  
---- sys/amd64/linux32/linux32_sysvec.c~	2006-03-02 00:05:31.000000000 +0100
-+++ sys/amd64/linux32/linux32_sysvec.c	2006-03-02 11:14:09.000000000 +0100
+Index: sys/amd64/linux32/linux32_sysvec.c
+===================================================================
+--- sys/amd64/linux32/linux32_sysvec.c.orig	2005-12-22 22:25:19.000000000 +0100
++++ sys/amd64/linux32/linux32_sysvec.c	2006-06-24 17:32:27.000000000 +0200
 @@ -345,9 +345,9 @@
  	frame.sf_sc.uc_mcontext.sc_mask   = frame.sf_sc.uc_sigmask.__bits[0];
          frame.sf_sc.uc_mcontext.sc_gs     = rgs();
@@ -273,36 +315,10 @@ Status: Reported as kern/93331
  	frame.sf_sc.sc_edi    = regs->tf_rdi;
  	frame.sf_sc.sc_esi    = regs->tf_rsi;
  	frame.sf_sc.sc_ebp    = regs->tf_rbp;
---- sys/i386/include/cpufunc.h~	2006-03-02 00:09:10.000000000 +0100
-+++ sys/i386/include/cpufunc.h	2006-03-02 11:16:41.000000000 +0100
-@@ -452,7 +452,7 @@
- rfs(void)
- {
- 	u_int sel;
--	__asm __volatile("movl %%fs,%0" : "=rm" (sel));
-+	__asm __volatile("mov %%fs,%0" : "=rm" (sel));
- 	return (sel);
- }
- 
-@@ -468,14 +468,14 @@
- rss(void)
- {
- 	u_int sel;
--	__asm __volatile("movl %%ss,%0" : "=rm" (sel));
-+	__asm __volatile("mov %%ss,%0" : "=rm" (sel));
- 	return (sel);
- }
- 
- static __inline void
- load_fs(u_int sel)
- {
--	__asm __volatile("movl %0,%%fs" : : "rm" (sel));
-+	__asm __volatile("mov %0,%%fs" : : "rm" (sel));
- }
- 
- static __inline void
---- sys/amd64/ia32/ia32_sigtramp.S~	2006-03-02 11:21:40.000000000 +0100
-+++ sys/amd64/ia32/ia32_sigtramp.S	2006-03-02 11:50:52.000000000 +0100
+Index: sys/amd64/ia32/ia32_sigtramp.S
+===================================================================
+--- sys/amd64/ia32/ia32_sigtramp.S.orig	2003-08-23 01:19:02.000000000 +0200
++++ sys/amd64/ia32/ia32_sigtramp.S	2006-06-24 17:32:27.000000000 +0200
 @@ -45,10 +45,10 @@
  	calll	*IA32_SIGF_HANDLER(%esp)
  	leal	IA32_SIGF_UC(%esp),%eax	/* get ucontext */
@@ -333,8 +349,10 @@ Status: Reported as kern/93331
  	movl	$344,%eax		/* 4.x SYS_sigreturn */
  	pushl	%eax			/* junk to fake return addr. */
  	int	$0x80			/* enter kernel with args */
---- sys/amd64/linux32/linux32_locore.s~	2006-03-02 11:21:42.000000000 +0100
-+++ sys/amd64/linux32/linux32_locore.s	2006-03-02 11:51:44.000000000 +0100
+Index: sys/amd64/linux32/linux32_locore.s
+===================================================================
+--- sys/amd64/linux32/linux32_locore.s.orig	2004-08-16 09:55:06.000000000 +0200
++++ sys/amd64/linux32/linux32_locore.s	2006-06-24 17:32:27.000000000 +0200
 @@ -11,10 +11,10 @@
  NON_GPROF_ENTRY(linux_sigcode)
  	call	*LINUX_SIGF_HANDLER(%esp)

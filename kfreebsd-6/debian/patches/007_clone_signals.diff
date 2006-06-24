@@ -1,6 +1,8 @@
---- sys/kern/kern_fork.c	2005-04-27 13:32:23.000000000 +0200
-+++ sys/kern/kern_fork.c	2005-11-08 17:17:43.000000000 +0100
-@@ -502,7 +502,11 @@
+Index: sys/kern/kern_fork.c
+===================================================================
+--- sys/kern/kern_fork.c.orig	2006-03-19 00:37:36.000000000 +0100
++++ sys/kern/kern_fork.c	2006-06-24 17:33:20.000000000 +0200
+@@ -517,7 +517,11 @@
  		p2->p_sigacts = newsigacts;
  	}
  	if (flags & RFLINUXTHPN) 
@@ -13,8 +15,10 @@
  	else
  	        p2->p_sigparent = SIGCHLD;
  
---- sys/sys/unistd.h	2005-02-01 00:26:57.000000000 +0100
-+++ sys/sys/unistd.h	2005-11-08 17:14:12.000000000 +0100
+Index: sys/sys/unistd.h
+===================================================================
+--- sys/sys/unistd.h.orig	2005-01-07 03:29:24.000000000 +0100
++++ sys/sys/unistd.h	2006-06-24 17:33:20.000000000 +0200
 @@ -173,6 +173,10 @@
  #define	RFHIGHPID	(1<<18)	/* use a pid higher then 10 (idleproc) */
  #define	RFPPWAIT	(1<<31)	/* parent sleeps until child exits (vfork) */
