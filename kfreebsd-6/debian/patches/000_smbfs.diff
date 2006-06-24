@@ -1,0 +1,31 @@
+
+Topic:          smbfs chroot escape
+CVE Name:       CVE-2006-2654
+
+# fetch http://security.FreeBSD.org/patches/SA-06:16/smbfs.patch
+
+
+Index: sys/fs/smbfs/smbfs_vnops.c
+===================================================================
+--- sys/fs/smbfs/smbfs_vnops.c.orig	2006-06-24 18:07:45.070269000 +0200
++++ sys/fs/smbfs/smbfs_vnops.c	2006-06-24 18:08:48.000000000 +0200
+@@ -1018,11 +1018,18 @@
+ static int
+ smbfs_pathcheck(struct smbmount *smp, const char *name, int nmlen, int nameiop)
+ {
+-	static const char *badchars = "*/\\:<>;?";
++	static const char *badchars = "*/:<>;?";
+ 	static const char *badchars83 = " +|,[]=";
+ 	const char *cp;
+ 	int i, error;
+ 
++	/*
++	 * Backslash characters, being a path delimiter, are prohibited
++	 * within a path component even for LOOKUP operations.
++	 */
++	if (index(name, '\\') != NULL)
++		return ENOENT;
++
+ 	if (nameiop == LOOKUP)
+ 		return 0;
+ 	error = ENOENT;
