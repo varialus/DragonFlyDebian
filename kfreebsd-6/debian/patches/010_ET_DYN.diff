@@ -1,15 +1,17 @@
 
-Author: aurel32
-Status: Merged in 7-CURRENT.
 
---- sys.orig/kern/imgact_elf.c	2005-08-17 15:29:41.000000000 +0200
-+++ sys/kern/imgact_elf.c	2005-08-17 15:31:08.000000000 +0200
-@@ -655,7 +655,7 @@
- 	/*
- 	 * Do we have a valid ELF header ?
- 	 */
--	if (__elfN(check_header)(hdr) != 0 || hdr->e_type != ET_EXEC)
-+	if (__elfN(check_header)(hdr) != 0 || (hdr->e_type != ET_EXEC && hdr->e_type != ET_DYN))
- 		return (-1);
- 
- 	/*
+Index: sys/kern/imgact_elf.c
+===================================================================
+--- sys/kern/imgact_elf.c.orig	2006-03-16 01:25:31.000000000 +0100
++++ sys/kern/imgact_elf.c	2006-06-24 17:37:23.000000000 +0200
+@@ -649,8 +649,10 @@
+ 		    hdr->e_ident[EI_OSABI]);
+ 		return (ENOEXEC);
+ 	}
++#if 0
+ 	if (hdr->e_type == ET_DYN && brand_info->brand != ELFOSABI_LINUX)
+ 		return (ENOEXEC);
++#endif
+ 	sv = brand_info->sysvec;
+ 	if (interp != NULL && brand_info->interp_newpath != NULL)
+ 		interp = brand_info->interp_newpath;
