@@ -1,7 +1,7 @@
 Index: sys/conf/files
 ===================================================================
---- sys/conf/files.orig	2006-04-12 20:09:27.000000000 +0200
-+++ sys/conf/files	2006-06-24 17:52:40.380469000 +0200
+--- sys/conf/files.orig	2006-06-25 11:13:23.564594000 +0200
++++ sys/conf/files	2006-06-25 11:13:30.000000000 +0200
 @@ -240,7 +240,6 @@
  contrib/dev/acpica/utmisc.c	optional acpi
  contrib/dev/acpica/utobject.c	optional acpi
@@ -24,9 +24,9 @@ Index: sys/conf/files
  dev/awi/if_awi_pccard.c		optional awi pccard
 Index: sys/conf/files.i386
 ===================================================================
---- sys/conf/files.i386.orig	2006-05-01 02:15:12.000000000 +0200
-+++ sys/conf/files.i386	2006-06-24 17:52:40.356469000 +0200
-@@ -46,36 +46,12 @@
+--- sys/conf/files.i386.orig	2006-06-25 11:13:23.586857000 +0200
++++ sys/conf/files.i386	2006-06-25 11:13:30.000000000 +0200
+@@ -46,42 +46,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -39,12 +39,12 @@ Index: sys/conf/files.i386
 -	dependency	"$S/contrib/dev/ath/public/i386-elf.hal.o.uu"	\
 -	compile-with	"uudecode < $S/contrib/dev/ath/public/i386-elf.hal.o.uu" \
 -	no-implicit-rule
- opt_ah.h			optional	ath_hal			\
- 	dependency	"$S/contrib/dev/ath/public/i386-elf.opt_ah.h"	\
- 	compile-with	"cp $S/contrib/dev/ath/public/i386-elf.opt_ah.h opt_ah.h" \
- 	no-obj no-implicit-rule before-depend				\
- 	clean		"opt_ah.h"
- #
+-opt_ah.h			optional	ath_hal			\
+-	dependency	"$S/contrib/dev/ath/public/i386-elf.opt_ah.h"	\
+-	compile-with	"cp $S/contrib/dev/ath/public/i386-elf.opt_ah.h opt_ah.h" \
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"opt_ah.h"
+-#
 -nvenetlib.o			optional	nve pci			\
 -	dependency	"$S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu"	\
 -	compile-with	"uudecode $S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
@@ -60,10 +60,16 @@ Index: sys/conf/files.i386
 -	dependency	"$S/dev/hptmv/i386-elf.raid.o.uu"	\
 -	compile-with	"uudecode < $S/dev/hptmv/i386-elf.raid.o.uu" \
 -	no-implicit-rule
+-#
+-rr232x_lib.o			optional	rr232x			\
+-	dependency	"$S/dev/rr232x/i386-elf.rr232x_lib.o.uu"	\
+-	compile-with	"uudecode < $S/dev/rr232x/i386-elf.rr232x_lib.o.uu" \
+-	no-implicit-rule
+-#
  #
- rr232x_lib.o			optional	rr232x			\
- 	dependency	"$S/dev/rr232x/i386-elf.rr232x_lib.o.uu"	\
-@@ -181,11 +157,6 @@
+ compat/linux/linux_file.c	optional compat_linux
+ compat/linux/linux_getcwd.c	optional compat_linux
+@@ -181,11 +145,6 @@
  dev/fdc/fdc_isa.c		optional fdc isa
  dev/fdc/fdc_pccard.c		optional fdc pccard
  dev/fe/if_fe_isa.c		optional fe isa
@@ -75,7 +81,7 @@ Index: sys/conf/files.i386
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_pentium.c	optional hwpmc
  dev/hwpmc/hwpmc_piv.c		optional hwpmc
-@@ -206,7 +177,6 @@
+@@ -206,13 +165,9 @@
  dev/mem/memutil.c		optional mem
  dev/mse/mse.c			optional mse
  dev/mse/mse_isa.c		optional mse isa
@@ -83,10 +89,16 @@ Index: sys/conf/files.i386
  dev/ppc/ppc.c			optional ppc
  dev/ppc/ppc_puc.c		optional ppc puc pci
  dev/random/nehemiah.c		optional random
+-dev/rr232x/os_bsd.c		optional rr232x
+-dev/rr232x/osm_bsd.c		optional rr232x
+-dev/rr232x/rr232x_config.c	optional rr232x
+ dev/sbni/if_sbni.c		optional sbni
+ dev/sbni/if_sbni_isa.c		optional sbni isa
+ dev/sbni/if_sbni_pci.c		optional sbni pci
 Index: sys/conf/kern.pre.mk
 ===================================================================
---- sys/conf/kern.pre.mk.orig	2005-11-07 10:55:47.000000000 +0100
-+++ sys/conf/kern.pre.mk	2006-06-24 17:39:05.000000000 +0200
+--- sys/conf/kern.pre.mk.orig	2006-06-25 11:13:23.609486000 +0200
++++ sys/conf/kern.pre.mk	2006-06-25 11:13:30.000000000 +0200
 @@ -58,9 +58,6 @@
  # ... and the same for pf
  INCLUDES+= -I$S/contrib/pf
@@ -99,17 +111,18 @@ Index: sys/conf/kern.pre.mk
  
 Index: sys/i386/conf/GENERIC
 ===================================================================
---- sys/i386/conf/GENERIC.orig	2006-05-01 02:15:12.000000000 +0200
-+++ sys/i386/conf/GENERIC	2006-06-24 17:53:28.000000000 +0200
-@@ -118,7 +118,6 @@
+--- sys/i386/conf/GENERIC.orig	2006-06-25 11:13:23.666760000 +0200
++++ sys/i386/conf/GENERIC	2006-06-25 11:16:32.056882000 +0200
+@@ -118,8 +118,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
 -device		hptmv		# Highpoint RocketRAID 182x
- device		rr232x		# Highpoint RocketRAID 232x
+-device		rr232x		# Highpoint RocketRAID 232x
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
-@@ -199,7 +198,6 @@
+ device		mly		# Mylex AcceleRAID/eXtremeRAID
+@@ -199,7 +197,6 @@
  device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
  device		lge		# Level 1 LXT1001 gigabit Ethernet
  device		nge		# NatSemi DP83820 gigabit Ethernet
@@ -119,8 +132,8 @@ Index: sys/i386/conf/GENERIC
  device		rl		# RealTek 8129/8139
 Index: sys/modules/Makefile
 ===================================================================
---- sys/modules/Makefile.orig	2006-04-12 20:09:28.000000000 +0200
-+++ sys/modules/Makefile	2006-06-24 17:52:40.442507000 +0200
+--- sys/modules/Makefile.orig	2006-06-25 11:13:23.693634000 +0200
++++ sys/modules/Makefile	2006-06-25 11:13:30.000000000 +0200
 @@ -26,11 +26,6 @@
  	${_arl} \
  	${_asr} \
@@ -207,17 +220,18 @@ Index: sys/modules/Makefile
  _smbfs=		smbfs
 Index: sys/amd64/conf/GENERIC
 ===================================================================
---- sys/amd64/conf/GENERIC.orig	2006-05-01 02:15:12.000000000 +0200
-+++ sys/amd64/conf/GENERIC	2006-06-24 17:52:55.886830000 +0200
-@@ -117,7 +117,6 @@
+--- sys/amd64/conf/GENERIC.orig	2006-06-25 11:13:23.731156000 +0200
++++ sys/amd64/conf/GENERIC	2006-06-25 11:16:32.094195000 +0200
+@@ -117,8 +117,6 @@
  device		arcmsr		# Areca SATA II RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
 -device		hptmv		# Highpoint RocketRAID 182x
- device		rr232x		# Highpoint RocketRAID 232x
+-device		rr232x		# Highpoint RocketRAID 232x
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
-@@ -189,7 +188,6 @@
+ device		mly		# Mylex AcceleRAID/eXtremeRAID
+@@ -189,7 +187,6 @@
  device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
  device		lge		# Level 1 LXT1001 gigabit Ethernet
  device		nge		# NatSemi DP83820 gigabit Ethernet
@@ -227,9 +241,9 @@ Index: sys/amd64/conf/GENERIC
  device		rl		# RealTek 8129/8139
 Index: sys/conf/files.amd64
 ===================================================================
---- sys/conf/files.amd64.orig	2006-05-01 02:15:11.000000000 +0200
-+++ sys/conf/files.amd64	2006-06-24 17:52:40.407973000 +0200
-@@ -47,31 +47,6 @@
+--- sys/conf/files.amd64.orig	2006-06-25 11:13:23.636572000 +0200
++++ sys/conf/files.amd64	2006-06-25 11:13:30.000000000 +0200
+@@ -47,35 +47,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -258,10 +272,14 @@ Index: sys/conf/files.amd64
 -	dependency	"$S/dev/hptmv/amd64-elf.raid.o.uu"	\
 -	compile-with	"uudecode < $S/dev/hptmv/amd64-elf.raid.o.uu" \
 -	no-implicit-rule
- rr232x_lib.o		optional	rr232x				\
- 	dependency	"$S/dev/rr232x/amd64-elf.rr232x_lib.o.uu"	\
- 	compile-with	"uudecode < $S/dev/rr232x/amd64-elf.rr232x_lib.o.uu" \
-@@ -160,11 +135,6 @@
+-rr232x_lib.o		optional	rr232x				\
+-	dependency	"$S/dev/rr232x/amd64-elf.rr232x_lib.o.uu"	\
+-	compile-with	"uudecode < $S/dev/rr232x/amd64-elf.rr232x_lib.o.uu" \
+-	no-implicit-rule
+ #
+ amd64/acpica/OsdEnvironment.c	optional	acpi
+ amd64/acpica/acpi_machdep.c	optional	acpi
+@@ -160,11 +131,6 @@
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
@@ -273,11 +291,14 @@ Index: sys/conf/files.amd64
  dev/hwpmc/hwpmc_amd.c		optional	hwpmc
  dev/hwpmc/hwpmc_piv.c		optional	hwpmc
  dev/hwpmc/hwpmc_x86.c		optional	hwpmc
-@@ -172,7 +142,6 @@
+@@ -172,10 +138,6 @@
  dev/kbd/kbd.c			optional	sc
  dev/kbd/kbd.c			optional	ukbd
  dev/mem/memutil.c		optional	mem
 -dev/nve/if_nve.c		optional	nve pci
- dev/rr232x/os_bsd.c		optional	rr232x
- dev/rr232x/osm_bsd.c		optional	rr232x
- dev/rr232x/rr232x_config.c	optional	rr232x
+-dev/rr232x/os_bsd.c		optional	rr232x
+-dev/rr232x/osm_bsd.c		optional	rr232x
+-dev/rr232x/rr232x_config.c	optional	rr232x
+ dev/ppc/ppc.c			optional	ppc
+ dev/ppc/ppc_puc.c		optional	ppc puc
+ dev/sio/sio.c			optional	sio
