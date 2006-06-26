@@ -52,7 +52,6 @@ __ptsname_r (int fd, char *buf, size_t buflen)
 {
   int saved_errno = errno;
   struct stat64 st;
-  unsigned int ptyno;
   char *p;
 
   if (buf == NULL)
@@ -68,13 +67,6 @@ __ptsname_r (int fd, char *buf, size_t buflen)
 
   /* Check if FD really is a master pseudo terminal.  */
   if (!(S_ISCHR (st.st_mode)))
-    {
-      __set_errno (ENOTTY);
-      return ENOTTY;
-    }
-
-  ptyno = (unsigned int) minor (st.st_rdev);
-  if (ptyno / 32 >= strlen (__libc_ptyname1))
     {
       __set_errno (ENOTTY);
       return ENOTTY;
