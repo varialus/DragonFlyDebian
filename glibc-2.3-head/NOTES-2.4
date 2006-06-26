@@ -20,7 +20,6 @@ used directories and files:
 	glibc24-ftw.diff
 	glibc25-queue.h
 
-
 	
 test build:
 -----------
@@ -44,7 +43,7 @@ test build:
 
 * io/ftw.c uses unconditionally O_DIRECTORY :-((((((
 	it have to be rewritten correctly 
-	add "enum { O_DIRECTORY = 0 };" into bits/fcnt.h
+	add "enum { O_DIRECTORY = 0 };" into bits/fcntl.h
 	this way it will have value, but will not be #define'd
 	it is used unconditionally also in testsuite :-((
 	(workaround currently in glibc24-extra-sysdeps.diff)
@@ -58,7 +57,7 @@ test build:
 
   details of glibc24-extra-sysdeps.diff:
 
-* add "enum { O_DIRECTORY = 0 };" into bits/fcnt.h
+* add "enum { O_DIRECTORY = 0 };" into bits/fcntl.h
 
 * define MSG_NOSIGNAL
 	enable definition in kfreebsd/bits/socket.h
