@@ -1,5 +1,5 @@
-glibc 2.4 status
-================
+glibc 2.4/2.5 status
+====================
 
 linuxthreads are moved from trunk into ports
 	http://sourceware.org/ml/libc-alpha/2005-07/msg00001.html
@@ -8,22 +8,36 @@ for short term Daniel Jacobowitz <dan@debian.org> will maintain them
 	http://sourceware.org/ml/libc-alpha/2005-07/msg00002.html
 
 
+used directories and files:
+---------------------------
+
+	sysdeps/kfreebsd/
+	linuxthreads/kfreebsd/
+	patches/
+	glibc24-cfi-sysdeps.diff
+	glibc24-extra-sysdeps.diff
+	glibc24-memusage_no_mremap.diff
+	glibc25-queue.h
+
+
+	
 test build:
 -----------
 
 * get main glibc module and linuxthreads module from snapshot or directly from CVS
+	(ftp://sources.redhat.com/pub/glibc/snapshots/)
 
 * move linuxthreads & linuxthreads_db from module linuxthreads into top dir
 
+
 * try to apply patches
+	of course, patches in subdir upstream are already in CVS
 	failures in configure/configure.in ignore
 	failure in nscd/mem.c fix manually
-	of course, patches in subdir upstream are already in CVS
+	failures in misc/sys/queue.h [only in 2.4.9x; queue.h is updated to another *BSD]
+		overwrite misc/sys/queue.h by glibc25-queue.h from this directory
 
-* define MSG_NOSIGNAL
-	enable definition in kfreebsd/bits/socket.h
-
-* fix malloc/memusage.c
+* fix malloc/memusage.c - by glibc24-memusage_no_mremap.diff
 	unconditionally assumes mremap and uses MREMAP_FIXED
 	it also unconditionally uses __thread :-(
 
@@ -32,9 +46,18 @@ test build:
 	add "enum { O_DIRECTORY = 0 };" into bits/fcnt.h
 	this way it will have value, but will not be #define'd
 	it is used unconditionally also in testsuite :-((
+	(workaround currently in glibc24-extra-sysdeps.diff)
 
-* again in io/ftw.c, here is needed openat64_not_cancel_3()
-	temporary hack - use openat64() instead
+* enable mandatory cfi marking - by glibc24-cfi-sysdeps.diff 
+
+* update sysdeps - by glibc24-extra-sysdeps.diff
+
+  details of glibc24-extra-sysdeps.diff:
+
+* add "enum { O_DIRECTORY = 0 };" into bits/fcnt.h
+
+* define MSG_NOSIGNAL
+	enable definition in kfreebsd/bits/socket.h
 
 * many files are moved from sysdeps/generic,
 	we #include<> some of them, use new location
@@ -51,14 +74,11 @@ test build:
 	i386/sysdep.h - drop definition of SETUP_PIC_REG(reg)
 	dl-osinfo.h - add function _dl_setup_stack_chk_guard()
 
-* enable mandatory cfi marking 
-	see glibc24-cfi-sysdeps.diff 
-
 ../src/configure --enable-add-ons=linuxthreads --with-tls --with-__thread i486-kfreebsd --prefix=...
 
 "make check" results:
 ---------------------
-(as of 2006-05-01)
+(as of 2006-06-26)
 
 make[2]: *** [/build/g24/build/dirent/tst-fdopendir.o] Error 1
 make[2]: *** [/build/g24/build/posix/tst-waitid.out] Error 1
