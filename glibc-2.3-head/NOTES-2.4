@@ -17,6 +17,7 @@ used directories and files:
 	glibc24-cfi-sysdeps.diff
 	glibc24-extra-sysdeps.diff
 	glibc24-memusage_no_mremap.diff
+	glibc24-ftw.diff
 	glibc25-queue.h
 
 
@@ -48,6 +49,9 @@ test build:
 	it is used unconditionally also in testsuite :-((
 	(workaround currently in glibc24-extra-sysdeps.diff)
 
+* io/ftw.c uses unconditionally (unimplemented) *at functions
+	revert to previous behaviour - by glibc24-ftw.diff
+	
 * enable mandatory cfi marking - by glibc24-cfi-sysdeps.diff 
 
 * update sysdeps - by glibc24-extra-sysdeps.diff
@@ -83,8 +87,6 @@ test build:
 make[2]: *** [/build/g24/build/dirent/tst-fdopendir.o] Error 1
 make[2]: *** [/build/g24/build/posix/tst-waitid.out] Error 1
 
-make[2]: *** [/build/g24/build/io/bug-ftw2.out] Error 1
-make[2]: *** [/build/g24/build/io/bug-ftw4.out] Error 1
 make[2]: *** [/build/g24/build/io/tst-readlinkat.out] Error 1
 make[2]: *** [/build/g24/build/misc/tst-pselect.out] Error 1
 
