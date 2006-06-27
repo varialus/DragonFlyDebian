@@ -29,7 +29,6 @@ test build:
 
 * move linuxthreads & linuxthreads_db from module linuxthreads into top dir
 
-
 * try to apply patches
 	of course, patches in subdir upstream are already in CVS
 	failures in configure/configure.in ignore
@@ -83,17 +82,20 @@ test build:
 ---------------------
 (as of 2006-06-26)
 
+  requires (and tests) Linux specific O_NOATIME
 make[2]: *** [/build/g24/build/dirent/tst-fdopendir.o] Error 1
+
+  kernel doesn't fill enough in siginfo_t for signal handlers
 make[2]: *** [/build/g24/build/posix/tst-waitid.out] Error 1
 
+  no similar syscall, unimplemented
 make[2]: *** [/build/g24/build/io/tst-readlinkat.out] Error 1
+
+  no similar syscall, emulation hitted by (unavoidable) race condition
 make[2]: *** [/build/g24/build/misc/tst-pselect.out] Error 1
 
+  requires SIGRTMIN
 make[2]: *** [/build/g24/build/rt/tst-timer2.o] Error 1
-make[2]: *** [/build/g24/build/rt/tst-aio.out] Error 1
-make[2]: *** [/build/g24/build/rt/tst-aio64.out] Error 1
-make[2]: *** [/build/g24/build/rt/tst-aio9.out] Error 1
-make[2]: *** [/build/g24/build/rt/tst-aio10.out] Error 1
 make[2]: *** [/build/g24/build/rt/tst-mqueue5.o] Error 1
 make[2]: *** [/build/g24/build/rt/tst-timer4.o] Error 1
 make[2]: *** [/build/g24/build/rt/tst-timer5.o] Error 1
@@ -101,7 +103,13 @@ make[2]: *** [/build/g24/build/rt/tst-cputimer1.o] Error 1
 make[2]: *** [/build/g24/build/rt/tst-cputimer2.o] Error 1
 make[2]: *** [/build/g24/build/rt/tst-cputimer3.o] Error 1
 
-[due to unimplemented readlinkat()]:
+  examine why, maybe due to non-rt behaviour of signals
+make[2]: *** [/build/g24/build/rt/tst-aio.out] Error 1
+make[2]: *** [/build/g24/build/rt/tst-aio64.out] Error 1
+make[2]: *** [/build/g24/build/rt/tst-aio9.out] Error 1
+make[2]: *** [/build/g24/build/rt/tst-aio10.out] Error 1
+
+  due to unimplemented readlinkat()
 make[2]: *** [/build/g24/build/debug/tst-chk1.out] Error 1
 make[2]: *** [/build/g24/build/debug/tst-chk2.out] Error 1
 make[2]: *** [/build/g24/build/debug/tst-chk3.out] Error 1
@@ -109,7 +117,10 @@ make[2]: *** [/build/g24/build/debug/tst-lfschk1.out] Error 1
 make[2]: *** [/build/g24/build/debug/tst-lfschk2.out] Error 1
 make[2]: *** [/build/g24/build/debug/tst-lfschk3.out] Error 1
 
-[dynamic loader is loaded at base addr 0, when executed "normally" all elf tests passed]:
+  kernel problem - dynamic loader is loaded at base addr 0
+  all elf tests passed
+	- when executed "normally"
+	- when tested under kFreeBSD 6.1 with SVN r1622
 make[2]: *** [/build/g24/build/elf/neededtest.out] Error 14
 make[2]: *** [/build/g24/build/elf/neededtest2.out] Error 14
 make[2]: *** [/build/g24/build/elf/neededtest3.out] Error 17
