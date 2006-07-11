@@ -25,7 +25,7 @@
 /* Retrieving the list of mounted filesystems.  */
 
 #include <bits/statfs.h>
-
+#include <rpc/types.h>
 #include <sys/ucred.h>
 #include <sys/queue.h>
 
