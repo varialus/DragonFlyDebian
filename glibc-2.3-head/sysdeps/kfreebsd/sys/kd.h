@@ -20,5 +20,6 @@
 #define _SYS_KD_H	1
 
 #include <sys/consio.h>
+#include <sys/kbio.h>
 
 #endif	/* sys/kd.h */
