@@ -1,142 +1,47 @@
-
-Status: submitted upstream
+Status: in upstream as of 2006/07/24
 	see http://sourceware.org/bugzilla/show_bug.cgi?id=2383
 
-diff -urN linuxthreads/pthread.c linuxthreads/pthread.c
---- linuxthreads/pthread.c	2006-01-17 13:28:26.000000000 +0100
-+++ linuxthreads/pthread.c	2006-01-17 13:26:42.000000000 +0100
-@@ -35,11 +35,7 @@
- #include <tls.h>
- #include <version.h>
+===================================================================
+RCS file: /cvs/glibc/linuxthreads/linuxthreads/pthread.c,v
+retrieving revision 1.140
+retrieving revision 1.141
+diff -u -r1.140 -r1.141
+--- linuxthreads/pthread.c	2006/07/24 15:12:15	1.140
++++ linuxthreads/pthread.c	2006/07/24 19:20:26	1.141
+@@ -37,7 +37,7 @@
  #include <not-cancel.h>
--
--/* Sanity check.  */
+ 
+ /* Sanity check.  */
 -#if !defined __SIGRTMIN || (__SIGRTMAX - __SIGRTMIN) < 3
--# error "This must not happen"
--#endif
-+#include <pthread_sig.h>
- 
- #if !(USE_TLS && HAVE___THREAD)
- /* These variables are used by the setup code.  */
-@@ -176,44 +172,6 @@
- static void pthread_handle_sigrestart(int sig);
- static void pthread_handle_sigdebug(int sig);
- 
--/* Signal numbers used for the communication.
--   In these variables we keep track of the used variables.  If the
--   platform does not support any real-time signals we will define the
--   values to some unreasonable value which will signal failing of all
--   the functions below.  */
--int __pthread_sig_restart = __SIGRTMIN;
--int __pthread_sig_cancel = __SIGRTMIN + 1;
--int __pthread_sig_debug = __SIGRTMIN + 2;
--
--extern int __libc_current_sigrtmin_private (void);
--
--#if !__ASSUME_REALTIME_SIGNALS
--static int rtsigs_initialized;
--
--static void
--init_rtsigs (void)
--{
--  if (rtsigs_initialized)
--    return;
--
--  if (__libc_current_sigrtmin_private () == -1)
--    {
--      __pthread_sig_restart = SIGUSR1;
--      __pthread_sig_cancel = SIGUSR2;
--      __pthread_sig_debug = 0;
--    }
--  else
--    {
--      __pthread_restart = __pthread_restart_new;
--      __pthread_suspend = __pthread_wait_for_restart_signal;
--      __pthread_timedsuspend = __pthread_timedsuspend_new;
--    }
--
--  rtsigs_initialized = 1;
--}
--#endif
--
--
- /* Initialize the pthread library.
-    Initialization is split in two functions:
-    - a constructor function that blocks the __pthread_sig_restart signal
-@@ -548,9 +506,10 @@
-   /* Likewise for the resolver state _res.  */
-   __pthread_initial_thread.p_resp = &_res;
++#if !defined PTHREAD_SIGBASE && (!defined __SIGRTMIN || (__SIGRTMAX - __SIGRTMIN) < 3)
+ # error "This must not happen"
  #endif
--#if !__ASSUME_REALTIME_SIGNALS
-+
-+#ifdef INIT_RTSIGS
-   /* Initialize real-time signals. */
--  init_rtsigs ();
-+  INIT_RTSIGS;
- #endif
-   /* Setup signal handlers for the initial thread.
-      Since signal handlers are shared between threads, these settings
-diff -urN linuxthreads/sysdeps/unix/sysv/linux/pthread_sig.h linuxthreads/sysdeps/unix/sysv/linux/pthread_sig.h
---- linuxthreads/sysdeps/unix/sysv/linux/pthread_sig.h	1970-01-01 01:00:00.000000000 +0100
-+++ linuxthreads/sysdeps/unix/sysv/linux/pthread_sig.h	2006-01-17 13:24:51.000000000 +0100
-@@ -0,0 +1,60 @@
-+/* Linuxthreads - a simple clone()-based implementation of Posix        */
-+/* threads for Linux.                                                   */
-+/* Copyright (C) 1996 Xavier Leroy (Xavier.Leroy@inria.fr)              */
-+/*                                                                      */
-+/* This program is free software; you can redistribute it and/or        */
-+/* modify it under the terms of the GNU Library General Public License  */
-+/* as published by the Free Software Foundation; either version 2       */
-+/* of the License, or (at your option) any later version.               */
-+/*                                                                      */
-+/* This program is distributed in the hope that it will be useful,      */
-+/* but WITHOUT ANY WARRANTY; without even the implied warranty of       */
-+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        */
-+/* GNU Library General Public License for more details.                 */
-+
-+/* Sanity check.  */
-+#if !defined __SIGRTMIN || (__SIGRTMAX - __SIGRTMIN) < 3
-+# error "This must not happen"
+ 
+@@ -181,9 +181,15 @@
+    platform does not support any real-time signals we will define the
+    values to some unreasonable value which will signal failing of all
+    the functions below.  */
++#if defined (PTHREAD_SIGBASE)
++int __pthread_sig_restart = PTHREAD_SIGBASE;
++int __pthread_sig_cancel = PTHREAD_SIGBASE + 1;
++int __pthread_sig_debug = PTHREAD_SIGBASE + 2;
++#else
+ int __pthread_sig_restart = __SIGRTMIN;
+ int __pthread_sig_cancel = __SIGRTMIN + 1;
+ int __pthread_sig_debug = __SIGRTMIN + 2;
 +#endif
-+
-+/* Signal numbers used for the communication.
-+   In these variables we keep track of the used variables.  If the
-+   platform does not support any real-time signals we will define the
-+   values to some unreasonable value which will signal failing of all
-+   the functions below.  */
-+
-+int __pthread_sig_restart = __SIGRTMIN;
-+int __pthread_sig_cancel = __SIGRTMIN + 1;
-+int __pthread_sig_debug = __SIGRTMIN + 2;
-+
-+extern int __libc_current_sigrtmin_private (void);
-+
-+#if !__ASSUME_REALTIME_SIGNALS
-+
-+#define INIT_RTSIGS init_rtsigs()
-+
-+static int rtsigs_initialized;
-+
-+static void
-+init_rtsigs (void)
-+{
-+  if (rtsigs_initialized)
-+    return;
-+
-+  if (__libc_current_sigrtmin_private () == -1)
-+    {
-+      __pthread_sig_restart = SIGUSR1;
-+      __pthread_sig_cancel = SIGUSR2;
-+      __pthread_sig_debug = 0;
-+    }
-+  else
-+    {
-+      __pthread_restart = __pthread_restart_new;
-+      __pthread_suspend = __pthread_wait_for_restart_signal;
-+      __pthread_timedsuspend = __pthread_timedsuspend_new;
-+    }
-+
-+  rtsigs_initialized = 1;
-+}
+ 
+ extern int __libc_current_sigrtmin_private (void);
+ 
+@@ -198,9 +204,11 @@
+ 
+   if (__libc_current_sigrtmin_private () == -1)
+     {
++#ifndef PTHREAD_SIGBASE
+       __pthread_sig_restart = SIGUSR1;
+       __pthread_sig_cancel = SIGUSR2;
+       __pthread_sig_debug = 0;
 +#endif
-+
+     }
+   else
+     {
