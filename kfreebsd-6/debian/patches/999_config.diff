@@ -17,16 +17,15 @@ Index: sys/amd64/conf/GENERIC
  
  #options 	SCHED_ULE		# ULE scheduler
  options 	SCHED_4BSD		# 4BSD scheduler
-@@ -44,6 +40,8 @@
+@@ -44,6 +40,7 @@
  options 	MSDOSFS			# MSDOS Filesystem
  options 	CD9660			# ISO 9660 Filesystem
  options 	PROCFS			# Process filesystem (requires PSEUDOFS)
 +options 	LINPROCFS
-+options 	COMPAT_LINUX		# Needed by LINPROCFS
  options 	PSEUDOFS		# Pseudo-filesystem framework
  options 	GEOM_GPT		# GUID Partition Tables.
  options 	COMPAT_43		# Needed by COMPAT_LINUX32
-@@ -51,7 +49,7 @@
+@@ -51,7 +48,7 @@
  options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_LINUX32		# Compatible with i386 linux binaries 
@@ -34,8 +33,8 @@ Index: sys/amd64/conf/GENERIC
 +options 	SCSI_DELAY=2000		# Delay (in ms) before probing SCSI
  options 	KTRACE			# ktrace(1) support
  options 	SYSVSHM			# SYSV-style shared memory
- options         SHMMAXPGS=4096
-@@ -73,16 +71,10 @@
+ options 	SYSVMSG			# SYSV-style message queues
+@@ -67,16 +64,10 @@
  # Workarounds for some known-to-be-broken chipsets (nVidia nForce3-Pro150)
  device		atpic			# 8259A compatability
  
@@ -52,7 +51,7 @@ Index: sys/amd64/conf/GENERIC
  # ATA and ATAPI devices
  device		ata
  device		atadisk		# ATA disk drives
-@@ -90,6 +82,8 @@
+@@ -84,6 +75,8 @@
  device		atapicd		# ATAPI CDROM drives
  device		atapifd		# ATAPI floppy drives
  device		atapist		# ATAPI tape drives
@@ -61,7 +60,7 @@ Index: sys/amd64/conf/GENERIC
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -167,10 +161,6 @@
+@@ -162,10 +155,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -72,7 +71,7 @@ Index: sys/amd64/conf/GENERIC
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -232,13 +222,8 @@
+@@ -228,13 +217,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
@@ -86,7 +85,7 @@ Index: sys/amd64/conf/GENERIC
  
  # The `bpf' device enables the Berkeley Packet Filter.
  # Be aware of the administrative consequences of enabling this!
-@@ -254,12 +239,8 @@
+@@ -250,12 +234,8 @@
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
@@ -99,7 +98,7 @@ Index: sys/amd64/conf/GENERIC
  # USB Ethernet, requires miibus
  device		aue		# ADMtek USB Ethernet
  device		axe		# ASIX Electronics USB Ethernet
-@@ -272,3 +253,11 @@
+@@ -268,3 +248,11 @@
  device		firewire	# FireWire bus code
  device		sbp		# SCSI over FireWire (Requires scbus and da)
  device		fwe		# Ethernet over FireWire (non-standard!)
