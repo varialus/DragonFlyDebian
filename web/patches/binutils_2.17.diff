@@ -1,3 +1,20 @@
+WARNING: This patch only partly fixes the elfosabi problem. Binaries are 
+         runnable, but have some problems (eg fakeroot does not work on them).
+         Use the smaller hackish patch below instead, until a better fix is 
+	 found.
+
+--- binutils-2.17.orig/bfd/elf.c
++++ binutils-2.17/bfd/elf.c
+@@ -4853,6 +4853,8 @@
+     bfd_big_endian (abfd) ? ELFDATA2MSB : ELFDATA2LSB;
+   i_ehdrp->e_ident[EI_VERSION] = bed->s->ev_current;
+ 
++  i_ehdrp->e_ident[EI_OSABI] = ELFOSABI_FREEBSD;
++
+   if ((abfd->flags & DYNAMIC) != 0)
+     i_ehdrp->e_type = ET_DYN;
+   else if ((abfd->flags & EXEC_P) != 0)
+
 
 - biarch enabled binutils for kfreebsd-amd64 and kfreebsd-i386
 - properly supported elfosabi for kfreebsd-amd64
