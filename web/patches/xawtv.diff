@@ -3,23 +3,23 @@ Author: petr
 Status: in BTS
 Note: also packages ffmpeg, libquicktime, zvbi have patches in BTS
 
-diff -u xawtv-3.94/debian/control xawtv-3.94/debian/control
---- xawtv-3.94/debian/control
-+++ xawtv-3.94/debian/control
+diff -u xawtv-3.95/debian/control xawtv-3.95/debian/control
+--- xawtv-3.95/debian/control
++++ xawtv-3.95/debian/control
 @@ -1,14 +1,14 @@
  Source: xawtv
  Section: graphics
  Priority: extra
--Build-Depends: libjpeg-dev, libncurses5-dev, libx11-dev, libxext-dev, libxinerama-dev, libxmu-dev, libxpm-dev, libxrandr-dev, libxt-dev, libxv-dev, libxxf86dga-dev, libxxf86vm-dev, x-dev, liblircclient-dev, debhelper (>= 4.1.16), xutils, xbase-clients, libaa1-dev, libasound2-dev, libzvbi-dev (>= 0.2.1), libquicktime-dev, libxaw7-dev, xlibmesa-gl-dev, libxft2-dev, po-debconf, libpng-dev, libglib1.2-dev, libfs-dev
-+Build-Depends: libjpeg-dev, libncurses5-dev, libx11-dev, libxext-dev, libxinerama-dev, libxmu-dev, libxpm-dev, libxrandr-dev, libxt-dev, libxv-dev, libxxf86dga-dev, libxxf86vm-dev, x-dev, liblircclient-dev, debhelper (>= 4.1.16), xutils, xbase-clients, libaa1-dev, libasound2-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libzvbi-dev (>= 0.2.1), libquicktime-dev, libxaw7-dev, xlibmesa-gl-dev, libxft2-dev, po-debconf, libpng-dev, libglib1.2-dev, libfs-dev
- Maintainer: Gerd Knorr <kraxel@debian.org>
- Standards-Version: 3.6.1
+-Build-Depends: debhelper (>= 5), dpatch, libjpeg62-dev, libncurses5-dev, libx11-dev, libxext-dev, libxinerama-dev, libxmu-dev, libxpm-dev, libxrandr-dev, libxt-dev, libxv-dev, libxxf86dga-dev, libxxf86vm-dev, x-dev, liblircclient-dev, xutils, xbase-clients, libaa1-dev, libasound2-dev, libzvbi-dev (>= 0.2.1), libquicktime-dev, libxaw7-dev, libgl1-mesa-dev, libxft-dev, po-debconf, libpng12-dev, libglib1.2-dev, libfs-dev
++Build-Depends: debhelper (>= 5), dpatch, libjpeg62-dev, libncurses5-dev, libx11-dev, libxext-dev, libxinerama-dev, libxmu-dev, libxpm-dev, libxrandr-dev, libxt-dev, libxv-dev, libxxf86dga-dev, libxxf86vm-dev, x-dev, liblircclient-dev, xutils, xbase-clients, libaa1-dev, libasound2-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libzvbi-dev (>= 0.2.1), libquicktime-dev, libxaw7-dev, libgl1-mesa-dev, libxft-dev, po-debconf, libpng12-dev, libglib1.2-dev, libfs-dev
+ Maintainer: Debian QA Group <packages@qa.debian.org>
+ Standards-Version: 3.7.2
  
  Package: xawtv
  Section: x11
  Architecture: any
--Depends: ${shlibs:Depends}, v4l-conf, xutils, debconf, scantv, xawtv-plugins (=${Source-Version}), pia
-+Depends: ${shlibs:Depends}, ${videoconf}, xutils, debconf, scantv, xawtv-plugins (=${Source-Version}), pia
+-Depends: ${shlibs:Depends}, ${misc:Depends}, v4l-conf, xutils, scantv, xawtv-plugins (=${Source-Version}), pia
++Depends: ${shlibs:Depends}, ${misc:Depends}, ${videoconf}, xutils, scantv, xawtv-plugins (=${Source-Version}), pia
  Suggests: xawtv-plugin-qt (=${Source-Version}), tv-fonts
  Description: X11 TV application
   TV application for X11.  Supports video4linux
@@ -47,43 +47,58 @@ diff -u xawtv-3.94/debian/control xawtv-3.94/debian/control
 -Architecture: any
 +Architecture: i386 ia64 alpha amd64 armeb arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc 
  Depends: ${shlibs:Depends}
-+Replaces: xawtv (<= 3.94-1.2)
++Replaces: xawtv (<= 3.95-1)
  Conflicts: suidmanager (<< 0.50)
  Description: tool to configure video4linux drivers
   This is a small tool to configure a video4linux
-diff -u xawtv-3.94/debian/rules xawtv-3.94/debian/rules
---- xawtv-3.94/debian/rules
-+++ xawtv-3.94/debian/rules
-@@ -7,6 +7,8 @@
+diff -u xawtv-3.95/debian/patches/00list xawtv-3.95/debian/patches/00list
+--- xawtv-3.95/debian/patches/00list
++++ xawtv-3.95/debian/patches/00list
+@@ -5,0 +6 @@
++06_kfreebsd
+diff -u xawtv-3.95/debian/rules xawtv-3.95/debian/rules
+--- xawtv-3.95/debian/rules
++++ xawtv-3.95/debian/rules
+@@ -1,6 +1,7 @@
+ #!/usr/bin/make -f
+ 
  #export DH_VERBOSE=1
- export DH_COMPAT=4
- 
 +DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+ 
+ export CFLAGS = -Wall -g
+ ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+@@ -25,7 +26,7 @@
+ clean: unpatch
+ 	dh_testdir
+ 	dh_testroot
+-	rm -f build-stamp
++	rm -f build-stamp debian/xawtv-plugins.install.kfreebsd*
+ 
+ 	[ ! -f Makefile ] || $(MAKE) distclean
+ 
+@@ -39,7 +40,11 @@
+ 
+ 	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
+ 
+-	dh_install
++	grep -v v4l debian/xawtv-plugins.install    >  debian/xawtv-plugins.install.kfreebsd-i386
++	echo "debian/tmp/usr/lib/xawtv/drv0-bsd.so" >> debian/xawtv-plugins.install.kfreebsd-i386
++	cp debian/xawtv-plugins.install.kfreebsd-i386 debian/xawtv-plugins.install.kfreebsd-amd64
 +
- build: build-it
- 
- work:
-@@ -31,7 +33,7 @@
- 
- install: build-it
- 	(cd $(WORK)/* && make DESTDIR=$(DEST) install)
--	dh_movefiles
-+	dh_movefiles -s
++	dh_install -s
  
  	# fix v4l-conf suid-root lintian warning
  	mkdir -p debian/v4l-conf/usr/share/lintian/overrides
-@@ -60,12 +62,16 @@
+@@ -59,11 +64,15 @@
+ 	dh_strip
  	dh_compress
- 	dh_fixperms	-Xv4l-conf
- #	dh_makeshlibs
+ 	dh_fixperms -Xv4l-conf
 -	dh_installdeb
--#	dh_perl
 -	dh_shlibdeps
 -	dh_gencontrol
 -	dh_md5sums
 -	dh_builddeb
 +	dh_installdeb -s
-+#	dh_perl 
 +	dh_shlibdeps -s
 +ifeq (linux,$(DEB_HOST_ARCH_OS))
 +	dh_gencontrol -s -- -Vvideoconf="v4l-conf"
@@ -95,65 +110,71 @@ diff -u xawtv-3.94/debian/rules xawtv-3.94/debian/rules
  
  binary: binary-indep binary-arch
  .PHONY: build clean binary-indep binary-arch binary install
-diff -u xawtv-3.94/debian/v4l-conf.files xawtv-3.94/debian/v4l-conf.files
---- xawtv-3.94/debian/v4l-conf.files
-+++ xawtv-3.94/debian/v4l-conf.files
+diff -u xawtv-3.95/debian/v4l-conf.install xawtv-3.95/debian/v4l-conf.install
+--- xawtv-3.95/debian/v4l-conf.install
++++ xawtv-3.95/debian/v4l-conf.install
 @@ -3,0 +4,2 @@
-+usr/bin/v4l-info
-+usr/share/man/man1/v4l-info.1
-diff -u xawtv-3.94/debian/xawtv.files xawtv-3.94/debian/xawtv.files
---- xawtv-3.94/debian/xawtv.files
-+++ xawtv-3.94/debian/xawtv.files
++debian/tmp/usr/bin/v4l-info
++debian/tmp/usr/share/man/man1/v4l-info.1
+diff -u xawtv-3.95/debian/xawtv.install xawtv-3.95/debian/xawtv.install
+--- xawtv-3.95/debian/xawtv.install
++++ xawtv-3.95/debian/xawtv.install
 @@ -4,7 +4,6 @@
- /usr/bin/rootv
- /usr/bin/ntsc-cc
- /usr/bin/subtitles
--/usr/bin/v4l-info
- /usr/share/man/man1/v4lctl.1
- /usr/share/man/*/man1/v4lctl.1
- /usr/share/man/man1/xawtv.1
+ debian/tmp/usr/bin/rootv
+ debian/tmp/usr/bin/ntsc-cc
+ debian/tmp/usr/bin/subtitles
+-debian/tmp/usr/bin/v4l-info
+ debian/tmp/usr/share/man/man1/v4lctl.1
+ debian/tmp/usr/share/man/*/man1/v4lctl.1
+ debian/tmp/usr/share/man/man1/xawtv.1
 @@ -16,7 +15,6 @@
- /usr/share/man/man1/ntsc-cc.1
- /usr/share/man/man1/subtitles.1
- /usr/share/man/*/man1/subtitles.1
--/usr/share/man/man1/v4l-info.1
- /usr/share/man/man5/xawtvrc.5
- /usr/share/man/*/man5/xawtvrc.5
- /etc/X11/app-defaults/Xawtv
+ debian/tmp/usr/share/man/man1/ntsc-cc.1
+ debian/tmp/usr/share/man/man1/subtitles.1
+ debian/tmp/usr/share/man/*/man1/subtitles.1
+-debian/tmp/usr/share/man/man1/v4l-info.1
+ debian/tmp/usr/share/man/man5/xawtvrc.5
+ debian/tmp/usr/share/man/*/man5/xawtvrc.5
+ debian/tmp/etc/X11/app-defaults/Xawtv
 only in patch2:
 unchanged:
---- xawtv-3.94.orig/dist/kfreebsd.diff
-+++ xawtv-3.94/dist/kfreebsd.diff
-@@ -0,0 +1,59 @@
-+diff -ur xawtv-3.94/configure.ac xawtv-3.94/configure.ac
-+--- xawtv-3.94/configure.ac	2004-08-18 17:48:09.000000000 +0200
-++++ xawtv-3.94/configure.ac	2006-06-09 20:25:01.000000000 +0200
+--- xawtv-3.95.orig/debian/patches/06_kfreebsd.dpatch
++++ xawtv-3.95/debian/patches/06_kfreebsd.dpatch
+@@ -0,0 +1,65 @@
++#! /bin/sh /usr/share/dpatch/dpatch-run
++##
++## All lines beginning with `## DP:' are a description of the patch.
++## DP: add support for GNU/kFreeBSD
++
++@DPATCH@
++diff -urN xawtv-3.95/configure.ac xawtv-3.95/configure.ac
++--- xawtv-3.95/configure.ac	2004-08-18 17:48:09.000000000 +0200
+++++ xawtv-3.95/configure.ac	2006-08-21 16:29:26.000000000 +0200
 +@@ -77,6 +77,9 @@
 + 		LDLIBS="$LDLIBS -L/usr/local/lib"
 + 		FOUND_OS="bsd"
 + 		;;
 ++	GNU/kFreeBSD)
 ++		FOUND_OS="bsd"
-++		;;
+++		;;	
 + 	*)
 + 		AC_MSG_CHECKING(if xawtv will build on `uname -s`)
 + 		AC_MSG_RESULT(maybe)
-+diff -ur xawtv-3.94/configure xawtv-3.94/configure
-+--- xawtv-3.94/configure	2006-06-11 08:35:56.000000000 +0200
-++++ xawtv-3.94/configure	2006-06-11 08:35:56.000000000 +0200
-+@@ -3074,6 +3074,9 @@
++diff -urN xawtv-3.95/configure xawtv-3.95/configure
++--- xawtv-3.95/configure	2005-09-30 12:10:03.000000000 +0200
+++++ xawtv-3.95/configure	2006-08-21 16:29:47.000000000 +0200
++@@ -3084,6 +3084,9 @@
 + 		LDLIBS="$LDLIBS -L/usr/local/lib"
 + 		FOUND_OS="bsd"
 + 		;;
 ++	GNU/kFreeBSD)
 ++		FOUND_OS="bsd"
-++		;;
+++		;;	
 + 	*)
 + 		echo "$as_me:$LINENO: checking if xawtv will build on \`uname -s\`" >&5
 + echo $ECHO_N "checking if xawtv will build on \`uname -s\`... $ECHO_C" >&6
-+diff -ur xawtv-3.94/libng/devices.c xawtv-3.94/libng/devices.c
-+--- xawtv-3.94/libng/devices.c	2004-03-25 11:35:36.000000000 +0100
-++++ xawtv-3.94/libng/devices.c	2006-06-09 19:37:12.000000000 +0200
++diff -urN xawtv-3.95/libng/devices.c xawtv-3.95/libng/devices.c
++--- xawtv-3.95/libng/devices.c	2004-03-25 11:35:36.000000000 +0100
+++++ xawtv-3.95/libng/devices.c	2006-08-21 16:30:31.000000000 +0200
 +@@ -9,7 +9,7 @@
 + /*
 +  * default devices names
@@ -163,24 +184,24 @@ unchanged:
 + struct ng_device_config ng_dev = {
 +     video:  "/dev/bktr0",
 +     radio:  NULL,
-+diff -ur xawtv-3.94/vbistuff/ntsc-cc.c xawtv-3.94/vbistuff/ntsc-cc.c
-+--- xawtv-3.94/vbistuff/ntsc-cc.c	2003-02-14 15:14:08.000000000 +0100
-++++ xawtv-3.94/vbistuff/ntsc-cc.c	2006-06-09 19:38:23.000000000 +0200
-+@@ -461,7 +461,7 @@
++diff -urN xawtv-3.95/vbistuff/ntsc-cc.c xawtv-3.95/vbistuff/ntsc-cc.c
++--- xawtv-3.95/vbistuff/ntsc-cc.c	2005-01-10 13:36:13.000000000 +0100
+++++ xawtv-3.95/vbistuff/ntsc-cc.c	2006-08-21 16:33:43.000000000 +0200
++@@ -471,7 +471,7 @@
 + 	return 0;
 + }
 + 
 +-static int RAW(int data)
-++static int get_raw(int data)
+++static int print_raw(int data)
 + {
 + 	int b1, b2;
 + 	if (data == -1)
-+@@ -687,7 +687,7 @@
++@@ -697,7 +697,7 @@
 + 				  x+1,128-buf[2048 * rawline+x*2+2]/2);
 + 		  }
 + #endif
 +-		  RAW(decode(&buf[2048 * rawline]));
-++		  get_raw(decode(&buf[2048 * rawline]));
+++		  print_raw(decode(&buf[2048 * rawline]));
 + #ifndef X_DISPLAY_MISSING
 + 		  if (debugwin) {
 + 		    XFlush(dpy);
