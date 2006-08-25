@@ -1,12 +1,15 @@
 diff -ur sys.orig/sys/syslimits.h sys/sys/syslimits.h
 --- sys.orig/sys/syslimits.h	2004-11-30 01:05:19.000000000 +0100
 +++ sys/sys/syslimits.h	2004-11-30 01:23:49.000000000 +0100
-@@ -33,12 +33,6 @@
+@@ -33,15 +33,6 @@
  #ifndef _SYS_SYSLIMITS_H_
  #define _SYS_SYSLIMITS_H_
  
 -#if !defined(_KERNEL) && !defined(_LIMITS_H_) && !defined(_SYS_PARAM_H_)
--#if defined(__GNUC__) || defined(__INTEL_COMPILER)
+-#ifndef _SYS_CDEFS_H_
+-#error this file needs sys/cdefs.h as a prerequisite
+-#endif
+-#ifdef __CC_SUPPORTS_WARNING
 -#warning "No user-serviceable parts inside."
 -#endif
 -#endif
