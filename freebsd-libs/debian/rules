@@ -18,6 +18,7 @@ else
 endif
 
 SRC_DIR=src
+KERNEL_SRC=kfreebsd-source-6.1
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=make COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR)
@@ -27,8 +28,8 @@ export SHLIBDIR=/usr/lib
 
 $(SRC_DIR):
 	tar -xzf $(CURDIR)/src.tar.gz
-	tar -C $(SRC_DIR)/lib -xjf /usr/src/kfreebsd-source-5.4.tar.bz2 kfreebsd-source-5.4/sys/kern/subr_sbuf.c kfreebsd-source-5.4/sys/cam
-	mv $(SRC_DIR)/lib/kfreebsd-source-5.4 $(SRC_DIR)/lib/kernel
+	tar -C $(SRC_DIR)/lib -xjf /usr/src/$(KERNEL_SRC).tar.bz2 $(KERNEL_SRC)/sys/kern/subr_sbuf.c $(KERNEL_SRC)/sys/cam
+	mv $(SRC_DIR)/lib/$(KERNEL_SRC) $(SRC_DIR)/lib/kernel
 
 	find $(SRC_DIR) -type f | (set -e ; while read i ; do sed -i $$i \
 		-e "/^__FBSDID/d" \

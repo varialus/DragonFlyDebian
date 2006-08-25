@@ -121,22 +121,21 @@ diff -ur lib.old/libkvm/kvm_getswapinfo.c lib/libkvm/kvm_getswapinfo.c
 diff -ur lib.old/libkvm/kvm_private.h lib/libkvm/kvm_private.h
 --- lib.old/libkvm/kvm_private.h	2006-04-19 09:43:10.000000000 +0200
 +++ lib/libkvm/kvm_private.h	2006-04-19 09:38:34.000000000 +0200
-@@ -70,14 +70,12 @@
- /*
+@@ -71,7 +71,7 @@
   * Functions used internally by kvm, but across kvm modules.
   */
--void	 _kvm_err(kvm_t *kd, const char *program, const char *fmt, ...)
+ void	 _kvm_err(kvm_t *kd, const char *program, const char *fmt, ...)
 -	    __printflike(3, 4);
-+void	 _kvm_err(kvm_t *kd, const char *program, const char *fmt, ...);
++	    __attribute__((format(printf,3,4)));
  void	 _kvm_freeprocs(kvm_t *kd);
  void	 _kvm_freevtop(kvm_t *);
  int	 _kvm_initvtop(kvm_t *);
- int	 _kvm_kvatop(kvm_t *, u_long, u_long *);
+@@ -79,5 +79,5 @@
  void	*_kvm_malloc(kvm_t *kd, size_t);
  void	*_kvm_realloc(kvm_t *kd, void *, size_t);
--void	 _kvm_syserr (kvm_t *kd, const char *program, const char *fmt, ...)
+ void	 _kvm_syserr (kvm_t *kd, const char *program, const char *fmt, ...)
 -	    __printflike(3, 4);
-+void	 _kvm_syserr (kvm_t *kd, const char *program, const char *fmt, ...);
++	    __attribute__((format(printf,3,4)));
  int	 _kvm_uvatop(kvm_t *, const struct proc *, u_long, u_long *);
 diff -ur lib.old/libkvm/kvm_proc.c lib/libkvm/kvm_proc.c
 --- lib.old/libkvm/kvm_proc.c	2006-04-19 09:43:10.000000000 +0200
