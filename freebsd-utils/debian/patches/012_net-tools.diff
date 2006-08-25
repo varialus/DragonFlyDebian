@@ -1,33 +1,36 @@
 diff -ur src.old/sbin/ifconfig/Makefile src/sbin/ifconfig/Makefile
 --- src.old/sbin/ifconfig/Makefile	2006-05-04 16:40:04.000000000 +0200
 +++ src/sbin/ifconfig/Makefile	2006-05-04 16:44:05.000000000 +0200
-@@ -18,18 +18,18 @@
- CFLAGS+=-DUSE_IEEE80211
+@@ -12,21 +12,21 @@
+ #     to the registration process so we don't depend on this aspect
+ #     of the toolchain.
+ #
+-SRCS+=	af_link.c		# LLC support
++#SRCS+=	af_link.c		# LLC support
+ SRCS+=	af_inet.c		# IPv4 support
+-SRCS+=	af_inet6.c		# IPv6 support
++#SRCS+=	af_inet6.c		# IPv6 support
+ SRCS+=	af_atalk.c		# AppleTalk support
  
- #comment out to exclude SIOC[GS]VH support
--SRCS+=	ifcarp.c
--CFLAGS+=-DUSE_CARP
-+#SRCS+=	ifcarp.c
-+#CFLAGS+=-DUSE_CARP
+ SRCS+=	ifclone.c		# clone device support
+-SRCS+=	ifmac.c			# MAC support
+-SRCS+=	ifmedia.c		# SIOC[GS]IFMEDIA support
++#SRCS+=	ifmac.c			# MAC support
++#SRCS+=	ifmedia.c		# SIOC[GS]IFMEDIA support
+ SRCS+=	ifvlan.c		# SIOC[GS]ETVLAN support
+-SRCS+=	ifieee80211.c		# SIOC[GS]IEEE80211 support
++#SRCS+=	ifieee80211.c		# SIOC[GS]IEEE80211 support
  
- #comment out to exclude MAC support
--SRCS+=	ifmac.c
--CFLAGS+=-DUSE_MAC
-+#SRCS+=	ifmac.c
-+#CFLAGS+=-DUSE_MAC
+-SRCS+=	ifcarp.c		# SIOC[GS]VH support
+-SRCS+=	ifpfsync.c		# pfsync(4) support
++#SRCS+=	ifcarp.c		# SIOC[GS]VH support
++#SRCS+=	ifpfsync.c		# pfsync(4) support
  
- #comment out to exclude PFSYNC support
--.if !defined(NO_PF)
--SRCS+=	ifpfsync.c
--CFLAGS+=-DUSE_PFSYNC
--.endif
-+#.if !defined(NO_PF)
-+#SRCS+=	ifpfsync.c
-+#CFLAGS+=-DUSE_PFSYNC
-+#.endif
+-SRCS+=	ifbridge.c		# bridge support
++#SRCS+=	ifbridge.c		# bridge support
  
- MAN=	ifconfig.8
- 
+ .if !defined(RELEASE_CRUNCH)
+ SRCS+=	af_ipx.c		# IPX support
 diff -ur src.old/sbin/ifconfig/ifcarp.c src/sbin/ifconfig/ifcarp.c
 --- src.old/sbin/ifconfig/ifcarp.c	2006-05-04 16:40:04.000000000 +0200
 +++ src/sbin/ifconfig/ifcarp.c	2006-05-04 16:44:05.000000000 +0200
