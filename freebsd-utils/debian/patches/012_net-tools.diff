@@ -6,12 +6,10 @@ diff -ur src.old/sbin/ifconfig/Makefile src/sbin/ifconfig/Makefile
  
  SRCS+=	ifclone.c		# clone device support
 -SRCS+=	ifmac.c			# MAC support
--SRCS+=	ifmedia.c		# SIOC[GS]IFMEDIA support
+ SRCS+=	ifmedia.c		# SIOC[GS]IFMEDIA support
 +#SRCS+=	ifmac.c			# MAC support
-+#SRCS+=	ifmedia.c		# SIOC[GS]IFMEDIA support
  SRCS+=	ifvlan.c		# SIOC[GS]ETVLAN support
--SRCS+=	ifieee80211.c		# SIOC[GS]IEEE80211 support
-+#SRCS+=	ifieee80211.c		# SIOC[GS]IEEE80211 support
+ SRCS+=	ifieee80211.c		# SIOC[GS]IEEE80211 support
  
 -SRCS+=	ifcarp.c		# SIOC[GS]VH support
 -SRCS+=	ifpfsync.c		# pfsync(4) support
@@ -98,11 +96,13 @@ diff -u src/sbin/ifconfig/af_link.c src/sbin/ifconfig/af_link.c
 diff -ur src.old/sbin/ifconfig/ifieee80211.c src/sbin/ifconfig/ifieee80211.c
 --- src.old/sbin/ifconfig/ifieee80211.c	2006-05-04 16:40:04.000000000 +0200
 +++ src/sbin/ifconfig/ifieee80211.c	2006-05-04 16:44:05.000000000 +0200
-@@ -84,6 +84,7 @@
+@@ -84,6 +84,9 @@
  #include <errno.h>
  #include <fcntl.h>
  #include <stdio.h>
 +#include <stdint.h>
++#include <netinet/ether.h>
++#include <bsd/string.h>
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
