@@ -1,0 +1,173 @@
+--- sys/net80211/ieee80211.h.orig	2006-04-30 04:21:55.000000000 +0200
++++ sys/net80211/ieee80211.h	2006-04-30 13:28:41.000000000 +0200
+@@ -50,7 +50,7 @@
+ 	u_int8_t	i_service;
+ 	u_int16_t	i_length;
+ 	u_int16_t	i_crc;
+-} __packed;
++} __attribute__ ((packed));
+ 
+ #define IEEE80211_PLCP_SFD      0xF3A0 
+ #define IEEE80211_PLCP_SERVICE  0x00
+@@ -67,7 +67,7 @@
+ 	u_int8_t	i_seq[2];
+ 	/* possibly followed by addr4[IEEE80211_ADDR_LEN]; */
+ 	/* see below */
+-} __packed;
++} __attribute__ ((packed));
+ 
+ struct ieee80211_qosframe {
+ 	u_int8_t	i_fc[2];
+@@ -79,7 +79,7 @@
+ 	u_int8_t	i_qos[2];
+ 	/* possibly followed by addr4[IEEE80211_ADDR_LEN]; */
+ 	/* see below */
+-} __packed;
++} __attribute__ ((packed));
+ 
+ struct ieee80211_qoscntl {
+ 	u_int8_t	i_qos[2];
+@@ -93,7 +93,7 @@
+ 	u_int8_t	i_addr3[IEEE80211_ADDR_LEN];
+ 	u_int8_t	i_seq[2];
+ 	u_int8_t	i_addr4[IEEE80211_ADDR_LEN];
+-} __packed;
++} __attribute__ ((packed));
+ 
+ 
+ struct ieee80211_qosframe_addr4 {
+@@ -105,7 +105,7 @@
+ 	u_int8_t	i_seq[2];
+ 	u_int8_t	i_addr4[IEEE80211_ADDR_LEN];
+ 	u_int8_t	i_qos[2];
+-} __packed;
++} __attribute__ ((packed));
+ 
+ #define	IEEE80211_FC0_VERSION_MASK		0x03
+ #define	IEEE80211_FC0_VERSION_SHIFT		0
+@@ -194,7 +194,7 @@
+ 	u_int8_t	wme_subtype;	/* OUI subtype */
+ 	u_int8_t	wme_version;	/* spec revision */
+ 	u_int8_t	wme_info;	/* QoS info */
+-} __packed;
++} __attribute__ ((packed));
+ 
+ /*
+  * WME/802.11e Tspec Element
+@@ -222,7 +222,7 @@
+ 	u_int8_t	ts_delay[4];
+ 	u_int8_t	ts_surplus[2];
+ 	u_int8_t	ts_medium_time[2];
+-} __packed;
++} __attribute__ ((packed));
+ 
+ /*
+  * WME AC parameter field
+@@ -231,7 +231,7 @@
+ 	u_int8_t	acp_aci_aifsn;
+ 	u_int8_t	acp_logcwminmax;
+ 	u_int16_t	acp_txop;
+-} __packed;
++} __attribute__ ((packed));
+ 
+ #define WME_NUM_AC		4	/* 4 AC categories */
+ 
+@@ -272,7 +272,7 @@
+ #define	WME_QOSINFO_COUNT	0x0f	/* Mask for param count field */
+ 	u_int8_t	param_reserved;
+ 	struct ieee80211_wme_acparams	params_acParams[WME_NUM_AC];
+-} __packed;
++} __attribute__ ((packed));
+ 
+ /*
+  * Management Notification Frame
+@@ -282,7 +282,7 @@
+ 	u_int8_t	mnf_action;
+ 	u_int8_t	mnf_dialog;
+ 	u_int8_t	mnf_status;
+-} __packed;
++} __attribute__ ((packed));
+ #define	MNF_SETUP_REQ	0
+ #define	MNF_SETUP_RESP	1
+ #define	MNF_TEARDOWN	2
+@@ -296,7 +296,7 @@
+ 	u_int8_t	i_addr1[IEEE80211_ADDR_LEN];
+ 	u_int8_t	i_addr2[IEEE80211_ADDR_LEN];
+ 	/* FCS */
+-} __packed;
++} __attribute__ ((packed));
+ 
+ struct ieee80211_frame_rts {
+ 	u_int8_t	i_fc[2];
+@@ -304,21 +304,21 @@
+ 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
+ 	u_int8_t	i_ta[IEEE80211_ADDR_LEN];
+ 	/* FCS */
+-} __packed;
++} __attribute__ ((packed));
+ 
+ struct ieee80211_frame_cts {
+ 	u_int8_t	i_fc[2];
+ 	u_int8_t	i_dur[2];
+ 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
+ 	/* FCS */
+-} __packed;
++} __attribute__ ((packed));
+ 
+ struct ieee80211_frame_ack {
+ 	u_int8_t	i_fc[2];
+ 	u_int8_t	i_dur[2];
+ 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
+ 	/* FCS */
+-} __packed;
++} __attribute__ ((packed));
+ 
+ struct ieee80211_frame_pspoll {
+ 	u_int8_t	i_fc[2];
+@@ -326,7 +326,7 @@
+ 	u_int8_t	i_bssid[IEEE80211_ADDR_LEN];
+ 	u_int8_t	i_ta[IEEE80211_ADDR_LEN];
+ 	/* FCS */
+-} __packed;
++} __attribute__ ((packed));
+ 
+ struct ieee80211_frame_cfend {		/* NB: also CF-End+CF-Ack */
+ 	u_int8_t	i_fc[2];
+@@ -334,7 +334,7 @@
+ 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
+ 	u_int8_t	i_bssid[IEEE80211_ADDR_LEN];
+ 	/* FCS */
+-} __packed;
++} __attribute__ ((packed));
+ 
+ /*
+  * BEACON management packets
+@@ -387,7 +387,7 @@
+ 	u_int16_t	wpa_caps;	/* 802.11i capabilities */
+ 	u_int16_t	wpa_pmkidcnt;	/* 802.11i pmkid count */
+ 	u_int16_t	wpa_pmkids[8];	/* 802.11i pmkids */
+-} __packed;
++} __attribute__ ((packed));
+ 
+ /*
+  * Management information element payloads.
+@@ -419,7 +419,7 @@
+ 	u_int8_t	tim_period;		/* DTIM period */
+ 	u_int8_t	tim_bitctl;		/* bitmap control */
+ 	u_int8_t	tim_bitmap[1];		/* variable-length bitmap */
+-} __packed;
++} __attribute__ ((packed));
+ 
+ struct ieee80211_country_ie {
+ 	u_int8_t	ie;			/* IEEE80211_ELEMID_COUNTRY */
+@@ -429,8 +429,8 @@
+ 		u_int8_t schan;			/* starting channel */
+ 		u_int8_t nchan;			/* number channels */
+ 		u_int8_t maxtxpwr;		/* tx power cap */
+-	} band[4] __packed;			/* up to 4 sub bands */
+-} __packed;
++	} band[4] __attribute__ ((packed));			/* up to 4 sub bands */
++} __attribute__ ((packed));
+ 
+ #define IEEE80211_CHALLENGE_LEN		128
+ 
