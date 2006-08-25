@@ -1,15 +1,7 @@
 diff -ur src.old/sbin/ifconfig/Makefile src/sbin/ifconfig/Makefile
 --- src.old/sbin/ifconfig/Makefile	2006-05-04 16:40:04.000000000 +0200
 +++ src/sbin/ifconfig/Makefile	2006-05-04 16:44:05.000000000 +0200
-@@ -12,21 +12,21 @@
- #     to the registration process so we don't depend on this aspect
- #     of the toolchain.
- #
--SRCS+=	af_link.c		# LLC support
-+#SRCS+=	af_link.c		# LLC support
- SRCS+=	af_inet.c		# IPv4 support
--SRCS+=	af_inet6.c		# IPv6 support
-+#SRCS+=	af_inet6.c		# IPv6 support
+@@ -18,15 +18,15 @@
  SRCS+=	af_atalk.c		# AppleTalk support
  
  SRCS+=	ifclone.c		# clone device support
@@ -61,6 +53,48 @@ diff -ur src.old/sbin/ifconfig/ifconfig.c src/sbin/ifconfig/ifconfig.c
  
  #include <net/ethernet.h>
  #include <net/if.h>
+diff -u src/sbin/ifconfig/af_inet6.c src/sbin/ifconfig/af_inet6.c
+--- src/sbin/ifconfig/af_inet6.c	2005-06-16 21:37:09.000000000 +0200
++++ src/sbin/ifconfig/af_inet6.c	2006-08-25 21:22:49.000000000 +0200
+@@ -43,7 +43,6 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+-#include <ifaddrs.h>
+ 
+ #include <arpa/inet.h>
+ 
+@@ -54,6 +53,8 @@
+ #include <netdb.h>
+ 
+ #include <netinet6/nd6.h>	/* Define ND6_INFINITE_LIFETIME */
++#include <time.h>
++#include <ifaddrs.h>
+ 
+ #include "ifconfig.h"
+ 
+diff -u src/sbin/ifconfig/ifclone.c src/sbin/ifconfig/ifclone.c
+--- src/sbin/ifconfig/ifclone.c	2004-12-08 20:18:07.000000000 +0100
++++ src/sbin/ifconfig/ifclone.c	2006-08-25 21:21:56.000000000 +0200
+@@ -41,6 +41,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <bsd/string.h>
+ #include <unistd.h>
+ 
+ #include "ifconfig.h"
+diff -u src/sbin/ifconfig/af_link.c src/sbin/ifconfig/af_link.c
+--- src/sbin/ifconfig/af_link.c	2004-12-31 20:46:27.000000000 +0100
++++ src/sbin/ifconfig/af_link.c	2006-08-25 21:20:02.000000000 +0200
+@@ -46,6 +46,7 @@
+ #include <net/if_dl.h>
+ #include <net/if_types.h>
+ #include <net/ethernet.h>
++#include <netinet/ether.h>
+ 
+ #include "ifconfig.h"
+ 
 diff -ur src.old/sbin/ifconfig/ifieee80211.c src/sbin/ifconfig/ifieee80211.c
 --- src.old/sbin/ifconfig/ifieee80211.c	2006-05-04 16:40:04.000000000 +0200
 +++ src/sbin/ifconfig/ifieee80211.c	2006-05-04 16:44:05.000000000 +0200
