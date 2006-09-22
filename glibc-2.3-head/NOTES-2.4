@@ -18,7 +18,9 @@ used directories and files:
 	glibc24-extra-sysdeps.diff
 	glibc24-memusage_no_mremap.diff
 	glibc24-ftw.diff
+	glibc25-nocancel-sysdeps.diff
 	glibc25-queue.h
+	glibc25-gai_misc.h
 
 	
 test build:
@@ -76,11 +78,15 @@ test build:
 	i386/sysdep.h - drop definition of SETUP_PIC_REG(reg)
 	dl-osinfo.h - add function _dl_setup_stack_chk_guard()
 
+* add another _not_cancel() functions - by glibc25-nocancel-sysdeps.diff
+
+* add/fix file linuxthreads/sysdeps/pthread/gai_misc.h - by glibc25-gai_misc.h
+
 ../src/configure --enable-add-ons=linuxthreads --with-tls --with-__thread i486-kfreebsd --prefix=...
 
 "make check" results:
 ---------------------
-(as of 2006-06-26)
+(as of 2006-09-18)
 
   requires (and tests) Linux specific O_NOATIME
 make[2]: *** [/build/g24/build/dirent/tst-fdopendir.o] Error 1
