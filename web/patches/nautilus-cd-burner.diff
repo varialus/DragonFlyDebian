@@ -1,0 +1,145 @@
+diff -u nautilus-cd-burner-2.14.3/debian/control nautilus-cd-burner-2.14.3/debian/control
+--- nautilus-cd-burner-2.14.3/debian/control
++++ nautilus-cd-burner-2.14.3/debian/control
+@@ -2,7 +2,7 @@
+ Section: gnome
+ Priority: optional
+ Maintainer: Ross Burton <ross@debian.org>
+-Build-Depends: debhelper (>= 4.1.87), cdbs, gnome-pkg-tools, intltool, autotools-dev, libgnomeui-dev, libnautilus-extension-dev (>= 2.13.1), libhal-dev (>= 0.5.5.1-3), libgtk2.0-dev (>= 2.6.0), libdbus-glib-1-dev (>= 0.60), libeel2-dev (>= 2.13.3)
++Build-Depends: debhelper (>= 4.1.87), cdbs, gnome-pkg-tools, intltool, autotools-dev, libgnomeui-dev, libnautilus-extension-dev (>= 2.13.1), libhal-dev (>= 0.5.5.1-3) [!kfreebsd-i386 !kfreebsd-amd64], libgtk2.0-dev (>= 2.6.0), libdbus-glib-1-dev (>= 0.60), libeel2-dev (>= 2.13.3)
+ Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>, Andrew Lau <netsnipe@users.sourceforge.net>, Clément Stenac <zorglub@debian.org>, Dafydd Harries <daf@debian.org>, Guilherme de S. Pastore <gpastore@debian.org>, Gustavo Franco <stratus@debian.org>, Gustavo Noronha Silva <kov@debian.org>, J.H.M. Dassen (Ray) <jdassen@debian.org>, Jordi Mallach <jordi@debian.org>, Jose Carlos Garcia Sogo <jsogo@debian.org>, Josselin Mouette <joss@debian.org>, Loic Minier <lool@dooz.org>, Marc 'HE' Brockschmidt <he@debian.org>, Marco Cabizza <marco87@gmail.com>, Oystein Gisnas <oystein@gisnas.net>, Ondřej Surý <ondrej@debian.org>, Sebastien Bacher <seb128@debian.org>, Sjoerd Simons <sjoerd@debian.org>
+ Standards-Version: 3.7.2
+ 
+@@ -27,7 +27,7 @@
+ 
+ Package: libnautilus-burn-dev
+ Architecture: any
+-Depends: libnautilus-burn3 (= ${Source-Version}), libglib2.0-dev, libgtk2.0-dev, libhal-dev, libpng12-dev, libfontconfig1-dev, libdbus-glib-1-dev
++Depends: libnautilus-burn3 (= ${Source-Version}), libglib2.0-dev, libgtk2.0-dev, ${libhal-dev}, libpng12-dev, libfontconfig1-dev, libdbus-glib-1-dev
+ Conflicts: nautilus-cd-burner (<< 2.8.3-2)
+ Replaces: nautilus-cd-burner
+ Description: Nautilus Burn Library - development version
+diff -u nautilus-cd-burner-2.14.3/debian/rules nautilus-cd-burner-2.14.3/debian/rules
+--- nautilus-cd-burner-2.14.3/debian/rules
++++ nautilus-cd-burner-2.14.3/debian/rules
+@@ -14,4 +14,9 @@
+ 	find debian/nautilus-cd-burner/usr/lib -name \*.la -exec rm {} \;
+ 
++binary-predeb/libnautilus-burn-dev::
++ifeq (linux,$(DEB_HOST_ARCH_OS))
++            echo "libhal-dev=libhal-dev" >> debian/libnautilus-burn-dev.substvars
++endif
++
+ clean::
+ 	rm -f intltool-update intltool-merge intltool-extract
+diff -u nautilus-cd-burner-2.14.3/debian/changelog nautilus-cd-burner-2.14.3/debian/changelog
+--- nautilus-cd-burner-2.14.3/debian/changelog
++++ nautilus-cd-burner-2.14.3/debian/changelog
+@@ -1,3 +1,9 @@
++nautilus-cd-burner (2.14.3-2+kbsd) unreleased; urgency=low
++
++  * Added support for GNU/kFreeBSD. 
++
++ -- Aurelien Jarno <aurel32@debian.org>  Mon,  2 Oct 2006 22:20:36 +0200
++
+ nautilus-cd-burner (2.14.3-2) unstable; urgency=low
+ 
+   * 04_wodim.patch: use wodim instead of cdrecord.
+diff -u nautilus-cd-burner-2.14.3/debian/control.in nautilus-cd-burner-2.14.3/debian/control.in
+--- nautilus-cd-burner-2.14.3/debian/control.in
++++ nautilus-cd-burner-2.14.3/debian/control.in
+@@ -2,7 +2,7 @@
+ Section: gnome
+ Priority: optional
+ Maintainer: Ross Burton <ross@debian.org>
+-Build-Depends: debhelper (>= 4.1.87), cdbs, gnome-pkg-tools, intltool, autotools-dev, libgnomeui-dev, libnautilus-extension-dev (>= 2.13.1), libhal-dev (>= 0.5.5.1-3), libgtk2.0-dev (>= 2.6.0), libdbus-glib-1-dev (>= 0.60), libeel2-dev (>= 2.13.3)
++Build-Depends: debhelper (>= 4.1.87), cdbs, gnome-pkg-tools, intltool, autotools-dev, libgnomeui-dev, libnautilus-extension-dev (>= 2.13.1), libhal-dev (>= 0.5.5.1-3) [!kfreebsd-i386 !kfreebsd-amd64], libgtk2.0-dev (>= 2.6.0), libdbus-glib-1-dev (>= 0.60), libeel2-dev (>= 2.13.3)
+ Uploaders: @GNOME_TEAM@
+ Standards-Version: 3.7.2
+ 
+@@ -27,7 +27,7 @@
+ 
+ Package: libnautilus-burn-dev
+ Architecture: any
+-Depends: libnautilus-burn3 (= ${Source-Version}), libglib2.0-dev, libgtk2.0-dev, libhal-dev, libpng12-dev, libfontconfig1-dev, libdbus-glib-1-dev
++Depends: libnautilus-burn3 (= ${Source-Version}), libglib2.0-dev, libgtk2.0-dev, ${libhal-dev}, libpng12-dev, libfontconfig1-dev, libdbus-glib-1-dev
+ Conflicts: nautilus-cd-burner (<< 2.8.3-2)
+ Replaces: nautilus-cd-burner
+ Description: Nautilus Burn Library - development version
+only in patch2:
+unchanged:
+--- nautilus-cd-burner-2.14.3.orig/debian/patches/05_kfreebsd-gnu.patch
++++ nautilus-cd-burner-2.14.3/debian/patches/05_kfreebsd-gnu.patch
+@@ -0,0 +1,72 @@
++--- nautilus-cd-burner-2.14.3.orig/nautilus-burn-drive.c
+++++ nautilus-cd-burner-2.14.3/nautilus-burn-drive.c
++@@ -44,7 +44,7 @@
++ #include <scsi/sg.h>
++ #endif /* __linux__ */
++ 
++-#ifdef __FreeBSD__
+++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++ #include <sys/cdio.h>
++ #include <sys/cdrio.h>
++ #include <camlib.h>
++@@ -163,7 +163,7 @@
++ 	}
++ }
++ 
++-#ifdef __FreeBSD__
+++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++ 
++ #define get_ioctl_handle_fd(x) (((struct cam_device *)x)->fd)
++ 
++@@ -687,7 +687,6 @@
++ 	struct cd_toc_entry              entry;
++ 	int                              i;
++ #endif
++-	int                              type;
++ #ifndef CDROM_DATA_TRACK
++ #define CDROM_DATA_TRACK 4
++ #endif
++@@ -2673,7 +2672,7 @@
++ 	return drives_list;
++ }
++ 
++-#elif defined (__FreeBSD__)
+++#elif defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
++ 
++ static GList *
++ freebsd_scan (gboolean recorder_only)
++@@ -2918,7 +2917,7 @@
++ 	if (drives == NULL) {
++ #if defined (__linux__)
++ 		drives = linux_scan (recorder_only);
++-#elif defined (__FreeBSD__)
+++#elif defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
++ 		drives = freebsd_scan (recorder_only);
++ #else
++ 		drives = cdrecord_scan (recorder_only);
++only in patch2:
++unchanged:
++--- nautilus-cd-burner-2.14.3.orig/nautilus-burn-recorder.c
+++++ nautilus-cd-burner-2.14.3/nautilus-burn-recorder.c
++@@ -36,7 +36,7 @@
++ #include <sys/types.h>
++ #include <sys/stat.h>
++ #include <sys/ioctl.h>
++-#ifdef __FreeBSD__
+++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++ #include <sys/uio.h>
++ #endif /* __FreeBSD__ */
++ #include <signal.h>
++only in patch2:
++unchanged:
++--- nautilus-cd-burner-2.14.3.orig/transport.hxx
+++++ nautilus-cd-burner-2.14.3/transport.hxx
++@@ -470,7 +470,7 @@
++     {	return 1;   }
++ };
++ 
++-#elif defined(__FreeBSD__)
+++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++ 
++ #include <sys/ioctl.h>
++ #include <camlib.h>
