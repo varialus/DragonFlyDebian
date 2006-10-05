@@ -1,0 +1,39 @@
+diff -u avahi-0.6.14/debian/control avahi-0.6.14/debian/control
+--- avahi-0.6.14/debian/control
++++ avahi-0.6.14/debian/control
+@@ -42,7 +42,7 @@
+ 
+ Package: avahi-autoipd
+ Section: net
+-Architecture: any
++Architecture: i386 ia64 alpha amd64 armeb arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc
+ Depends: ${shlibs:Depends}, ${misc:Depends}, adduser
+ Recommends: dhclient, iproute
+ Conflicts: zeroconf
+diff -u avahi-0.6.14/debian/rules avahi-0.6.14/debian/rules
+--- avahi-0.6.14/debian/rules
++++ avahi-0.6.14/debian/rules
+@@ -9,6 +9,8 @@
+ include /usr/share/cdbs/1/rules/utils.mk
+ common-binary-post-install-arch:: list-missing
+ 
++DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
++
+ # Ensure at build time that the library has no dependencies on undefined
+ # symbols, and speed up loading.
+ LDFLAGS += -Wl,-z,defs -Wl,-O1
+@@ -16,6 +18,9 @@
+ DEB_CONFIGURE_EXTRA_FLAGS += --enable-compat-libdns_sd --enable-compat-howl \
+                              --disable-mono --disable-monodoc
+ 
++ifneq (linux,$(DEB_HOST_ARCH_OS))
++	DEB_CONFIGURE_EXTRA_FLAGS += --disable-autoipd
++endif
+ 
+ DEB_INSTALL_DOCS_ALL += docs/README docs/NEWS
+ 
+@@ -40,2 +45,4 @@
++ifeq (linux,$(DEB_HOST_ARCH_OS))
+ 	mv $(DEB_DESTDIR)/etc/dhcp3/dhclient-exit-hooks.d/avahi-autoipd \
+ 		$(DEB_DESTDIR)/etc/dhcp3/dhclient-exit-hooks.d/zzz_avahi-autoipd
++endif
