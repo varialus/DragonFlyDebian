@@ -2,9 +2,9 @@
 Author: rmh, petr
 Status: builds fine, needs testing
 
-diff -urN r/xulrunner-1.8.0.5/debian/patches/00list xulrunner-1.8.0.5/debian/patches/00list
---- r/xulrunner-1.8.0.5/debian/patches/00list	2006-09-20 14:16:10.000000000 +0200
-+++ xulrunner-1.8.0.5/debian/patches/00list	2006-09-20 14:11:41.000000000 +0200
+diff -u xulrunner-1.8.0.7/debian/patches/00list xulrunner-1.8.0.7/debian/patches/00list
+--- xulrunner-1.8.0.7/debian/patches/00list
++++ xulrunner-1.8.0.7/debian/patches/00list
 @@ -25,6 +25,7 @@
  15_passwdmgr
  15_pyxpcom_deadcode
@@ -13,15 +13,42 @@ diff -urN r/xulrunner-1.8.0.5/debian/patches/00list xulrunner-1.8.0.5/debian/pat
  18_m68k_xpcom
  20_about:plugins
  20_broken_perl
-@@ -77,4 +78,5 @@
- 85_sidebar
- 85_useragent
+@@ -59,6 +60,7 @@
+ 65_mouse_buttons
+ 65_native_uconv
+ 68_mips_performance
++68_kbsd_nspr
+ 80_install_path
+ 80_javaxpcom
+ 80_libxpcom_hack
+@@ -79,2 +81,3 @@
  85_xpcomglue
 +88_kbsd
  99_configure
-diff -urN r/xulrunner-1.8.0.5/debian/patches/18_kbsd_nsprpub.dpatch xulrunner-1.8.0.5/debian/patches/18_kbsd_nsprpub.dpatch
---- r/xulrunner-1.8.0.5/debian/patches/18_kbsd_nsprpub.dpatch	1970-01-01 01:00:00.000000000 +0100
-+++ xulrunner-1.8.0.5/debian/patches/18_kbsd_nsprpub.dpatch	2006-09-20 14:11:28.000000000 +0200
+diff -u xulrunner-1.8.0.7/debian/patches/80_uname.dpatch xulrunner-1.8.0.7/debian/patches/80_uname.dpatch
+--- xulrunner-1.8.0.7/debian/patches/80_uname.dpatch
++++ xulrunner-1.8.0.7/debian/patches/80_uname.dpatch
+@@ -13,7 +13,7 @@
+ 
+ --- xulrunner/configure.in	2006-08-09 10:26:00.000000000 +0200
+ +++ xulrunner/configure.in	2006-08-09 10:31:25.000000000 +0200
+-@@ -818,10 +818,17 @@
++@@ -818,10 +818,18 @@
+          darwin*)      OS_ARCH=Darwin OS_TARGET=Darwin ;;
+      esac
+  else
+@@ -26,6 +26,7 @@
+ +    OS_TEST="${host_cpu}"
+ +    case "${host_os}" in
+ +        linux*)       OS_ARCH=Linux ;;
+++        kfreebsd*-gnu) OS_ARCH=GNU_kFreeBSD ;;
+ +        solaris*)     OS_ARCH=SunOS OS_RELEASE=5 ;;
+ +        mingw*)       OS_ARCH=WINNT ;;
+ +        wince*)       OS_ARCH=WINCE ;;
+only in patch2:
+unchanged:
+--- xulrunner-1.8.0.7.orig/debian/patches/18_kbsd_nsprpub.dpatch
++++ xulrunner-1.8.0.7/debian/patches/18_kbsd_nsprpub.dpatch
 @@ -0,0 +1,400 @@
 +#! /bin/sh /usr/share/dpatch/dpatch-run
 +## 18_kbsd_nsprpub.dpatch
@@ -423,12 +450,62 @@ diff -urN r/xulrunner-1.8.0.5/debian/patches/18_kbsd_nsprpub.dpatch xulrunner-1.
 +     endif
 + endif
 + 
-diff -urN r/xulrunner-1.8.0.5/debian/patches/88_kbsd.dpatch xulrunner-1.8.0.5/debian/patches/88_kbsd.dpatch
---- r/xulrunner-1.8.0.5/debian/patches/88_kbsd.dpatch	1970-01-01 01:00:00.000000000 +0100
-+++ xulrunner-1.8.0.5/debian/patches/88_kbsd.dpatch	2006-09-20 14:11:29.000000000 +0200
-@@ -0,0 +1,336 @@
+only in patch2:
+unchanged:
+--- xulrunner-1.8.0.7.orig/debian/patches/68_kbsd_nspr.dpatch
++++ xulrunner-1.8.0.7/debian/patches/68_kbsd_nspr.dpatch
+@@ -0,0 +1,44 @@
 +#! /bin/sh /usr/share/dpatch/dpatch-run
-+## 68_kbsd.dpatch
++## 68_kbsd_nspr.dpatch
++##
++## All lines beginning with `## DP:' are a description of the patch.
++## DP: fixes for nsprpub for port kfreebsd-i386
++
++@DPATCH@
++
++only in patch2:
++unchanged:
++--- xulrunner-1.8.0.7.orig/nsprpub/pr/include/md/_linux.cfg
+++++ xulrunner-1.8.0.7/nsprpub/pr/include/md/_linux.cfg
++@@ -51,7 +51,11 @@
++ #define LINUX
++ #endif
++ 
+++#ifdef __FreeBSD_kernel__
+++#define PR_AF_INET6 28  /* same as AF_INET6 */
+++#else
++ #define PR_AF_INET6 10  /* same as AF_INET6 */
+++#endif
++ 
++ #ifdef __powerpc64__
++ 
++only in patch2:
++unchanged:
++--- xulrunner-1.8.0.7.orig/nsprpub/pr/include/md/_linux.h
+++++ xulrunner-1.8.0.7/nsprpub/pr/include/md/_linux.h
++@@ -41,6 +41,15 @@
++ #include "prthread.h"
++ 
++ /*
+++ * This file is used by not only Linux but also other glibc systems
+++ * such as GNU/Hurd and GNU/k*BSD.
+++ */
+++
+++#ifdef __FreeBSD_kernel__
+++#define _PR_HAVE_SOCKADDR_LEN 
+++#endif
+++   
+++/*
++  * Internal configuration macros
++  */
++ 
+only in patch2:
+unchanged:
+--- xulrunner-1.8.0.7.orig/debian/patches/88_kbsd.dpatch
++++ xulrunner-1.8.0.7/debian/patches/88_kbsd.dpatch
+@@ -0,0 +1,362 @@
++#! /bin/sh /usr/share/dpatch/dpatch-run
++## 88_kbsd.dpatch
 +##
 +## All lines beginning with `## DP:' are a description of the patch.
 +## DP: port xulrunner for kfreebsd-i386
@@ -763,9 +840,35 @@ diff -urN r/xulrunner-1.8.0.5/debian/patches/88_kbsd.dpatch xulrunner-1.8.0.5/de
 + 
 + #include <sys/types.h>
 + #include "prtypes.h"
-diff -urN r/xulrunner-1.8.0.5/debian/patches/99_configure.dpatch xulrunner-1.8.0.5/debian/patches/99_configure.dpatch
---- r/xulrunner-1.8.0.5/debian/patches/99_configure.dpatch	2006-09-20 14:16:10.000000000 +0200
-+++ xulrunner-1.8.0.5/debian/patches/99_configure.dpatch	2006-09-20 14:23:35.000000000 +0200
++only in patch2:
++unchanged:
++--- xulrunner-1.8.0.7.orig/xpcom/reflect/xptcall/src/md/unix/xptc_platforms_unixish_x86.h
+++++ xulrunner-1.8.0.7/xpcom/reflect/xptcall/src/md/unix/xptc_platforms_unixish_x86.h
++@@ -67,7 +67,7 @@
++ *
++ */
++ 
++-#if defined(LINUX)
+++#if defined(LINUX) || (defined(__GLIBC__) && defined(__FreeBSD_kernel__))
++ 
++ #if (__GNUC__ == 2) && (__GNUC_MINOR__ <= 7)
++ /* Old gcc 2.7.x.x.  What does gcc 2.8.x do?? */
++only in patch2:
++unchanged:
++--- xulrunner-1.8.0.7.orig/xpcom/reflect/xptcall/src/md/unix/Makefile.in
+++++ xulrunner-1.8.0.7/xpcom/reflect/xptcall/src/md/unix/Makefile.in
++@@ -70,7 +70,7 @@
++ # New code for Linux, et. al., with gcc
++ # Migrate other platforms here after testing
++ #
++-ifneq (,$(filter Linux,$(OS_ARCH)))
+++ifneq (,$(filter Linux GNU_%,$(OS_ARCH)))
++ # Linux/x86-64
++ ifeq (x86_64,$(OS_TEST))
++ CPPSRCS		:= xptcinvoke_x86_64_linux.cpp xptcstubs_x86_64_linux.cpp
+diff -u xulrunner-1.8.0.7/debian/patches/99_configure.dpatch xulrunner-1.8.0.7/debian/patches/99_configure.dpatch
+--- xulrunner-1.8.0.7/debian/patches/99_configure.dpatch
++++ xulrunner-1.8.0.7/debian/patches/99_configure.dpatch
 @@ -37,6 +37,31 @@
       PR_MD_CSRCS=hpux.c
       if test "$OS_TEST" != "ia64"; then
@@ -823,3 +926,20 @@ diff -urN r/xulrunner-1.8.0.5/debian/patches/99_configure.dpatch xulrunner-1.8.0
  @@ -5910,6 +5910,8 @@
       MAKEFILES="$MAKEFILES pr/src/cplus/Makefile pr/src/cplus/tests/Makefile"
   fi
+@@ -1737,7 +1737,7 @@
+  
+  MOZ_COMPONENT_NSPR_LIBS='-L$(DIST)/bin $(NSPR_LIBS)'
+  MOZ_XPCOM_OBSOLETE_LIBS='-L$(DIST)/lib -lxpcom_compat'
+-@@ -5042,10 +4911,17 @@
++@@ -5042,10 +4911,18 @@
+          darwin*)      OS_ARCH=Darwin OS_TARGET=Darwin ;;
+      esac
+  else
+@@ -1750,6 +1750,7 @@
+ +    OS_TEST="${host_cpu}"
+ +    case "${host_os}" in
+ +        linux*)       OS_ARCH=Linux ;;
+++        kfreebsd*-gnu) OS_ARCH=GNU_kFreeBSD ;;
+ +        solaris*)     OS_ARCH=SunOS OS_RELEASE=5 ;;
+ +        mingw*)       OS_ARCH=WINNT ;;
+ +        wince*)       OS_ARCH=WINCE ;;
