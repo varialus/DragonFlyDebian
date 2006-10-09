@@ -1,0 +1,436 @@
+
+Author: rmh, petr
+Recipe:
+  - checkout firefox ("browser" variable)
+  - mkdir build && cd build && ../mozilla/configure --enable-application=browser && make
+
+Status: forward ported from working xulrunner 1.8.0.7
+	https://bugzilla.mozilla.org/show_bug.cgi?id=356011
+
+Index: configure.in
+===================================================================
+RCS file: /cvsroot/mozilla/configure.in,v
+retrieving revision 1.1732
+diff -u -r1.1732 configure.in
+--- configure.in	3 Oct 2006 01:16:27 -0000	1.1732
++++ configure.in	9 Oct 2006 11:21:31 -0000
+@@ -885,6 +885,7 @@
+     OS_TEST="${target_cpu}"
+     case "${target_os}" in
+         linux*)       OS_ARCH=Linux ;;
++        kfreebsd*-gnu) OS_ARCH=GNU_kFreeBSD ;;
+         solaris*)     OS_ARCH=SunOS OS_RELEASE=5 ;;
+         mingw*)       OS_ARCH=WINNT ;;
+         wince*)       OS_ARCH=WINCE ;;
+@@ -1342,7 +1343,7 @@
+     LIBXUL_LIBS='$(XPCOM_FROZEN_LDOPTS) $(LIBXUL_DIST)/bin/XUL -lobjc'
+     ;;
+ 
+-*-linux*)
++*-linux*|*-kfreebsd*-gnu)
+     HOST_CFLAGS="$HOST_CFLAGS -DXP_UNIX"
+     HOST_NSPR_MDCPUCFG='\"md/_linux.cfg\"'
+     HOST_OPTIMIZE_FLAGS="${HOST_OPTIMIZE_FLAGS=-O3}"
+@@ -2316,7 +2317,7 @@
+ dnl = Flags to strip unused symbols from .so components
+ dnl ========================================================
+ case "$target" in
+-    *-linux*)
++    *-linux*|*-kfreebsd*-gnu)
+         MOZ_COMPONENTS_VERSION_SCRIPT_LDFLAGS='-Wl,--version-script -Wl,$(BUILD_TOOLS)/gnu-ld-scripts/components-version-script'
+         ;;
+     *-solaris*)
+@@ -2960,7 +2961,7 @@
+ 			fi
+ 			;;
+ 
+-	    *-*-linux*) 
++	    *-*-linux*|*-*-kfreebsd*-gnu) 
+ 			AC_DEFINE(_REENTRANT) 
+ 			;;
+ 
+Index: directory/c-sdk/ldap/include/portable.h
+===================================================================
+RCS file: /cvsroot/mozilla/directory/c-sdk/ldap/include/portable.h,v
+retrieving revision 5.15
+diff -u -r5.15 portable.h
+--- directory/c-sdk/ldap/include/portable.h	3 Oct 2006 20:43:40 -0000	5.15
++++ directory/c-sdk/ldap/include/portable.h	9 Oct 2006 11:21:57 -0000
+@@ -122,7 +122,7 @@
+  * some systems don't have the BSD re_comp and re_exec routines
+  */
+ #ifndef NEED_BSDREGEX
+-#if ( defined( SYSV ) || defined( NETBSD ) || defined( freebsd ) || defined( linux ) || defined( DARWIN )) && !defined(sgi)
++#if ( defined( SYSV ) || defined( NETBSD ) || defined( freebsd ) || defined( linux ) || defined(__GNU__) || defined(__GLIBC__) || defined( DARWIN )) && !defined(sgi)
+ #define NEED_BSDREGEX
+ #endif
+ #endif
+@@ -151,7 +151,7 @@
+  * Is snprintf() part of the standard C runtime library?
+  */
+ #if !defined(HAVE_SNPRINTF)
+-#if defined(SOLARIS) || defined(LINUX) || defined(HPUX) || defined(AIX)
++#if defined(SOLARIS) || defined(LINUX) || defined(HPUX) || defined(AIX) || defined(__GNU__) || defined(__GLIBC__)
+ #define HAVE_SNPRINTF
+ #endif
+ #if defined(_WINDOWS)
+@@ -175,7 +175,7 @@
+  * for select()
+  */
+ #if !defined(WINSOCK) && !defined(_WINDOWS) && !defined(macintosh) && !defined(XP_OS2)
+-#if defined(hpux) || defined(LINUX) || defined(SUNOS4) || defined(XP_BEOS)
++#if defined(hpux) || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) || defined(SUNOS4) || defined(XP_BEOS)
+ #include <sys/time.h>
+ #else
+ #include <sys/select.h>
+@@ -247,15 +247,14 @@
+ #define HAVE_TIME_R
+ #endif
+ 
+-#if defined(SNI) || defined(LINUX1_2)
++#if defined(SNI) || defined(LINUX1_2) || defined(__GNU__) || defined(__GLIBC__)
+ int strcasecmp(const char *, const char *);
+ #ifdef SNI
+ int strncasecmp(const char *, const char *, int);
+-#endif /* SNI */
+-#ifdef LINUX1_2
++#else /* SNI */
+ int strncasecmp(const char *, const char *, size_t);
+-#endif /* LINUX1_2 */
+-#endif /* SNI || LINUX1_2 */
++#endif
++#endif /* SNI || LINUX1_2 || __GNU__ || __GLIBC__ */
+ 
+ #if defined(_WINDOWS) || defined(macintosh) || defined(XP_OS2) || defined(DARWIN)
+ #define GETHOSTBYNAME( n, r, b, l, e )  gethostbyname( n )
+@@ -295,7 +294,7 @@
+ #elif defined(HPUX10)
+ #define GETHOSTBYNAME_BUF_T struct hostent_data
+ #define GETHOSTBYNAME( n, r, b, l, e )	nsldapi_compat_gethostbyname_r( n, r, (char *)&b, l, e )
+-#elif defined(LINUX)
++#elif defined(LINUX) || defined(__GNU__) || defined(__GLIBC__)
+ typedef char GETHOSTBYNAME_buf_t [NSLDAPI_NETDB_BUF_SIZE];
+ #define GETHOSTBYNAME_BUF_T GETHOSTBYNAME_buf_t
+ #define GETHOSTBYNAME( n, r, b, l, rp, e )  gethostbyname_r( n, r, b, l, rp, e )
+@@ -306,7 +305,7 @@
+ #define GETHOSTBYNAME( n, r, b, l, e )  gethostbyname_r( n, r, b, l, e )
+ #endif
+ #if defined(HPUX9) || defined(LINUX1_2) || defined(LINUX2_0) || \
+-    defined(LINUX2_1) || defined(SUNOS4) || defined(SNI) || \
++    defined(LINUX2_1) || defined(__GNU__) || defined(__GLIBC__) || defined(SUNOS4) || defined(SNI) || \
+     defined(SCOOS) || defined(BSDI) || defined(NCR) || \
+     defined(NEC) || ( defined(HPUX10) && !defined(_REENTRANT)) || \
+     (defined(AIX) && !defined(USE_REENTRANT_LIBC))
+Index: directory/c-sdk/ldap/libraries/libldap/Makefile.in
+===================================================================
+RCS file: /cvsroot/mozilla/directory/c-sdk/ldap/libraries/libldap/Makefile.in,v
+retrieving revision 5.19
+diff -u -r5.19 Makefile.in
+--- directory/c-sdk/ldap/libraries/libldap/Makefile.in	3 Oct 2006 20:43:41 -0000	5.19
++++ directory/c-sdk/ldap/libraries/libldap/Makefile.in	9 Oct 2006 11:21:57 -0000
+@@ -196,7 +196,7 @@
+ EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME) $(OS_LIBS) -lc
+ endif
+ 
+-ifeq ($(OS_ARCH), Linux)
++ifneq (,$(filter Linux GNU GNU_%, $(OS_ARCH)))
+ EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME) $(SASL_LINK)
+ endif
+ 
+@@ -314,7 +314,7 @@
+ ifdef SO_FILES_TO_REMOVE
+ 	-$(RM) $(SO_FILES_TO_REMOVE)
+ endif
+-ifneq (,$(filter AIX Linux HP-UX Darwin BeOS QNX NetBSD OSF1 OpenBSD, $(OS_ARCH)))
++ifneq (,$(filter AIX Linux GNU GNU_% HP-UX Darwin BeOS QNX NetBSD OSF1 OpenBSD, $(OS_ARCH)))
+ 	$(LINK_LIB)
+ else
+ ifeq ($(OS_ARCH),OS2)
+Index: directory/c-sdk/ldap/libraries/libprldap/ldappr-error.c
+===================================================================
+RCS file: /cvsroot/mozilla/directory/c-sdk/ldap/libraries/libprldap/ldappr-error.c,v
+retrieving revision 5.7
+diff -u -r5.7 ldappr-error.c
+--- directory/c-sdk/ldap/libraries/libprldap/ldappr-error.c	15 Mar 2004 06:25:32 -0000	5.7
++++ directory/c-sdk/ldap/libraries/libprldap/ldappr-error.c	9 Oct 2006 11:21:58 -0000
+@@ -233,7 +233,7 @@
+ 
+ #if defined(__hpux) || defined(_AIX) || defined(OSF1) || defined(DARWIN) || \
+   defined(BEOS) || defined(FREEBSD) || defined(BSDI) || defined(VMS) || \
+-  defined(OPENBSD) || defined(NETBSD)
++  defined(OPENBSD) || defined(NETBSD) || defined(__FreeBSD_kernel__)
+ #define EDEADLOCK       -1
+ #endif
+ 
+Index: security/coreconf/Linux.mk
+===================================================================
+RCS file: /cvsroot/mozilla/security/coreconf/Linux.mk,v
+retrieving revision 1.29
+diff -u -r1.29 Linux.mk
+--- security/coreconf/Linux.mk	24 Apr 2006 20:07:15 -0000	1.29
++++ security/coreconf/Linux.mk	9 Oct 2006 11:23:51 -0000
+@@ -52,72 +52,49 @@
+ 
+ DEFAULT_COMPILER = gcc
+ 
+-ifeq ($(OS_TEST),m68k)
+-	OS_REL_CFLAGS	= -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH	= m68k
+-else
++CPU_ARCH      = $(OS_TEST)
++
++ifeq ($(KERNEL),linux)
++	OS_REL_CFLAGS   = -D_XOPEN_SOURCE -DLINUX1_2
++	ARCH            = linux
++else 
++	OS_REL_CFLAGS   = -D_XOPEN_SOURCE
++	ARCH            = gnu
++endif
++
++
+ ifeq ($(OS_TEST),ppc64)
+-	OS_REL_CFLAGS	= -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH	= ppc
+ ifeq ($(USE_64),1)
+ 	ARCHFLAG	= -m64
+ endif
+ else
+-ifeq ($(OS_TEST),ppc)
+-	OS_REL_CFLAGS	= -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH	= ppc
+-else
+ ifeq ($(OS_TEST),alpha)
+-        OS_REL_CFLAGS   = -D_ALPHA_ -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH	= alpha
+-else
+-ifeq ($(OS_TEST),ia64)
+-	OS_REL_CFLAGS	= -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH	= ia64
++        OS_REL_CFLAGS   += -D_ALPHA_
+ else
+ ifeq ($(OS_TEST),x86_64)
+ ifeq ($(USE_64),1)
+-	OS_REL_CFLAGS	= -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH	= x86_64
+ else
+-	OS_REL_CFLAGS	= -DLINUX1_2 -Di386 -D_XOPEN_SOURCE
++	OS_REL_CFLAGS	+= -Di386
+ 	CPU_ARCH	= x86
+ 	ARCHFLAG	= -m32
+ endif
+ else
+-ifeq ($(OS_TEST),sparc)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH        = sparc
+-else
+ ifeq ($(OS_TEST),sparc64)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH        = sparc
+ else
+ ifeq (,$(filter-out arm% sa110,$(OS_TEST)))
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH        = arm
+ else
+ ifeq ($(OS_TEST),parisc)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH        = hppa
+ else
+ ifeq ($(OS_TEST),parisc64)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH        = hppa
+ else
+-ifeq ($(OS_TEST),s390)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH        = s390
+-else
+-ifeq ($(OS_TEST),s390x)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH        = s390x
+-else
+-ifeq ($(OS_TEST),mips)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH        = mips
+-else
+-	OS_REL_CFLAGS	= -DLINUX1_2 -Di386 -D_XOPEN_SOURCE
++ifeq (,$(filter-out i686 i586 i486 i386,$(OS_TEST)))
++	OS_REL_CFLAGS	+= -Di386
+ 	CPU_ARCH	= x86
+ endif
+ endif
+@@ -127,17 +104,11 @@
+ endif
+ endif
+ endif
+-endif
+-endif
+-endif
+-endif
+-endif
+-endif
+ 
+ 
+ LIBC_TAG		= _glibc
+ 
+-ifeq ($(OS_RELEASE),2.0)
++ifeq ($(KERNEL)-$(OS_RELEASE),linux-2.0)
+ 	OS_REL_CFLAGS	+= -DLINUX2_0
+ 	MKSHLIB		= $(CC) -shared -Wl,-soname -Wl,$(@:$(OBJDIR)/%.so=%.so)
+ 	ifdef MAPFILE
+@@ -155,15 +126,17 @@
+ OS_PTHREAD = -lpthread 
+ endif
+ 
+-OS_CFLAGS		= $(DSO_CFLAGS) $(OS_REL_CFLAGS) $(ARCHFLAG) -ansi -Wall -Werror-implicit-function-declaration -pipe -DLINUX -Dlinux -D_POSIX_SOURCE -D_BSD_SOURCE -DHAVE_STRERROR
++OS_CFLAGS		= $(DSO_CFLAGS) $(OS_REL_CFLAGS) $(ARCHFLAG) -ansi -Wall -Werror-implicit-function-declaration -pipe -D_POSIX_SOURCE -D_BSD_SOURCE -DHAVE_STRERROR
+ OS_LIBS			= $(OS_PTHREAD) -ldl -lc
+ 
++ifeq ($(KERNEL),linux)
++	OS_CFLAGS += -DLINUX -Dlinux
++endif
++
+ ifdef USE_PTHREADS
+ 	DEFINES		+= -D_REENTRANT
+ endif
+ 
+-ARCH			= linux
+-
+ DSO_CFLAGS		= -fPIC
+ DSO_LDOPTS		= -shared $(ARCHFLAG) -Wl,-z,defs
+ DSO_LDFLAGS		=
+Index: security/coreconf/Linux2.6.mk
+===================================================================
+RCS file: /cvsroot/mozilla/security/coreconf/Linux2.6.mk,v
+retrieving revision 1.5
+diff -u -r1.5 Linux2.6.mk
+--- security/coreconf/Linux2.6.mk	16 Sep 2005 17:09:23 -0000	1.5
++++ security/coreconf/Linux2.6.mk	9 Oct 2006 11:23:51 -0000
+@@ -37,7 +37,10 @@
+ 
+ include $(CORE_DEPTH)/coreconf/Linux.mk
+ 
++ifeq ($(KERNEL), linux)
+ OS_REL_CFLAGS   += -DLINUX2_1
++endif
++
+ MKSHLIB         = $(CC) $(DSO_LDOPTS) -Wl,-soname -Wl,$(@:$(OBJDIR)/%.so=%.so)
+ 
+ ifdef MAPFILE
+Index: security/coreconf/arch.mk
+===================================================================
+RCS file: /cvsroot/mozilla/security/coreconf/arch.mk,v
+retrieving revision 1.19
+diff -u -r1.19 arch.mk
+--- security/coreconf/arch.mk	7 Jul 2005 16:50:47 -0000	1.19
++++ security/coreconf/arch.mk	9 Oct 2006 11:23:52 -0000
+@@ -155,6 +155,14 @@
+     ifneq ($(words $(OS_RELEASE)),1)
+ 	OS_RELEASE := $(word 1,$(OS_RELEASE)).$(word 2,$(OS_RELEASE))
+     endif
++    KERNEL = linux
++endif
++
++# This check must be last.  Since all uses of OS_ARCH that follow affect only
++# userland, we can merge other Glibc systems with Linux here.
++ifneq (, $(filter GNU GNU_%, $(OS_ARCH)))
++OS_ARCH = Linux
++OS_RELEASE = 2.6
+ endif
+ 
+ #
+Index: security/coreconf/config.mk
+===================================================================
+RCS file: /cvsroot/mozilla/security/coreconf/config.mk,v
+retrieving revision 1.18
+diff -u -r1.18 config.mk
+--- security/coreconf/config.mk	26 Jun 2006 21:16:54 -0000	1.18
++++ security/coreconf/config.mk	9 Oct 2006 11:23:52 -0000
+@@ -63,7 +63,7 @@
+ #######################################################################
+ 
+ TARGET_OSES = FreeBSD BSD_OS NetBSD OpenUNIX OS2 QNX Darwin BeOS OpenBSD \
+-              OpenVMS AIX
++              OpenVMS AIX GNU GNU_%
+ 
+ ifeq (,$(filter-out $(TARGET_OSES),$(OS_TARGET)))
+ include $(CORE_DEPTH)/coreconf/$(OS_TARGET).mk
+Index: security/nss/lib/freebl/unix_rand.c
+===================================================================
+RCS file: /cvsroot/mozilla/security/nss/lib/freebl/unix_rand.c,v
+retrieving revision 1.20
+diff -u -r1.20 unix_rand.c
+--- security/nss/lib/freebl/unix_rand.c	6 Sep 2006 21:07:32 -0000	1.20
++++ security/nss/lib/freebl/unix_rand.c	9 Oct 2006 11:23:58 -0000
+@@ -183,7 +183,8 @@
+ #endif
+ 
+ #if defined(SCO) || defined(UNIXWARE) || defined(BSDI) || defined(FREEBSD) \
+-    || defined(NETBSD) || defined(NTO) || defined(DARWIN) || defined(OPENBSD)
++    || defined(NETBSD) || defined(NTO) || defined(DARWIN) || defined(OPENBSD) \
++    || defined(__FreeBSD_kernel__) || defined(__NetBSD_kernel__)
+ #include <sys/times.h>
+ 
+ #define getdtablesize() sysconf(_SC_OPEN_MAX)
+Index: security/nss/lib/ssl/sslmutex.c
+===================================================================
+RCS file: /cvsroot/mozilla/security/nss/lib/ssl/sslmutex.c,v
+retrieving revision 1.20
+diff -u -r1.20 sslmutex.c
+--- security/nss/lib/ssl/sslmutex.c	7 Jun 2006 18:36:26 -0000	1.20
++++ security/nss/lib/ssl/sslmutex.c	9 Oct 2006 11:24:01 -0000
+@@ -89,7 +89,7 @@
+     return SECSuccess;
+ }
+ 
+-#if defined(LINUX) || defined(AIX) || defined(VMS) || defined(BEOS) || defined(BSDI) || defined(NETBSD) || defined(OPENBSD)
++#if defined(LINUX) || defined(AIX) || defined(VMS) || defined(BEOS) || defined(BSDI) || defined(NETBSD) || defined(OPENBSD) || defined(__GLIBC__)
+ 
+ #include <unistd.h>
+ #include <fcntl.h>
+Index: security/nss/lib/ssl/sslmutex.h
+===================================================================
+RCS file: /cvsroot/mozilla/security/nss/lib/ssl/sslmutex.h,v
+retrieving revision 1.10
+diff -u -r1.10 sslmutex.h
+--- security/nss/lib/ssl/sslmutex.h	27 Apr 2004 23:04:39 -0000	1.10
++++ security/nss/lib/ssl/sslmutex.h	9 Oct 2006 11:24:01 -0000
+@@ -79,7 +79,7 @@
+ 
+ typedef int    sslPID;
+ 
+-#elif defined(LINUX) || defined(AIX) || defined(VMS) || defined(BEOS) || defined(BSDI) || defined(NETBSD) || defined(OPENBSD)
++#elif defined(LINUX) || defined(AIX) || defined(VMS) || defined(BEOS) || defined(BSDI) || defined(NETBSD) || defined(OPENBSD) || defined(__GLIBC__)
+ 
+ #include <sys/types.h>
+ #include "prtypes.h"
+Index: xpcom/reflect/xptcall/src/md/unix/Makefile.in
+===================================================================
+RCS file: /cvsroot/mozilla/xpcom/reflect/xptcall/src/md/unix/Makefile.in,v
+retrieving revision 1.85
+diff -u -r1.85 Makefile.in
+--- xpcom/reflect/xptcall/src/md/unix/Makefile.in	28 Mar 2006 20:03:49 -0000	1.85
++++ xpcom/reflect/xptcall/src/md/unix/Makefile.in	9 Oct 2006 11:24:28 -0000
+@@ -74,7 +74,7 @@
+ # New code for Linux, et. al., with gcc
+ # Migrate other platforms here after testing
+ #
+-ifneq (,$(filter Linux,$(OS_ARCH)))
++ifneq (,$(filter Linux GNU_%,$(OS_ARCH)))
+ # Linux/x86-64
+ ifeq (x86_64,$(OS_TEST))
+ CPPSRCS		:= xptcinvoke_x86_64_linux.cpp xptcstubs_x86_64_linux.cpp
+Index: xpcom/reflect/xptcall/src/md/unix/xptc_platforms_unixish_x86.h
+===================================================================
+RCS file: /cvsroot/mozilla/xpcom/reflect/xptcall/src/md/unix/xptc_platforms_unixish_x86.h,v
+retrieving revision 1.20
+diff -u -r1.20 xptc_platforms_unixish_x86.h
+--- xpcom/reflect/xptcall/src/md/unix/xptc_platforms_unixish_x86.h	28 Mar 2006 20:03:50 -0000	1.20
++++ xpcom/reflect/xptcall/src/md/unix/xptc_platforms_unixish_x86.h	9 Oct 2006 11:24:28 -0000
+@@ -67,7 +67,7 @@
+ *
+ */
+ 
+-#if defined(LINUX)
++#if defined(LINUX) || (defined(__GLIBC__) && defined(__FreeBSD_kernel__))
+ 
+ #if (__GNUC__ == 2) && (__GNUC_MINOR__ <= 7)
+ /* Old gcc 2.7.x.x.  What does gcc 2.8.x do?? */
