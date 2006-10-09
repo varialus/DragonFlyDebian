@@ -1,0 +1,748 @@
+
+* apply this patch
+* update *all* config.sub/config.guess
+* autoconf; cd nsprpub; autoconf
+
+
+diff -u firefox-1.99+2.0b2+dfsg/security/nss/lib/freebl/unix_rand.c firefox-1.99+2.0b2+dfsg/security/nss/lib/freebl/unix_rand.c
+--- firefox-1.99+2.0b2+dfsg/security/nss/lib/freebl/unix_rand.c
++++ firefox-1.99+2.0b2+dfsg/security/nss/lib/freebl/unix_rand.c
+@@ -81,7 +81,8 @@
+ }
+ 
+ #if defined(SCO) || defined(UNIXWARE) || defined(BSDI) || defined(FREEBSD) \
+-    || defined(NETBSD) || defined(NTO) || defined(DARWIN) || defined(OPENBSD)
++    || defined(NETBSD) || defined(NTO) || defined(DARWIN) || defined(OPENBSD) \
++    || defined(__FreeBSD_kernel__) || defined(__NetBSD_kernel__)
+ #include <sys/times.h>
+ 
+ #define getdtablesize() sysconf(_SC_OPEN_MAX)
+diff -u firefox-1.99+2.0b2+dfsg/security/coreconf/Linux.mk firefox-1.99+2.0b2+dfsg/security/coreconf/Linux.mk
+--- firefox-1.99+2.0b2+dfsg/security/coreconf/Linux.mk
++++ firefox-1.99+2.0b2+dfsg/security/coreconf/Linux.mk
+@@ -52,94 +52,65 @@
+ 
+ DEFAULT_COMPILER = gcc
+ 
+-ifeq ($(OS_TEST),m68k)
+-	OS_REL_CFLAGS	= -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH	= m68k
++CPU_ARCH      = $(OS_TEST)                        
++ 
++ifeq ($(KERNEL),linux)      
++       OS_REL_CFLAGS   = -D_XOPEN_SOURCE -DLINUX1_2
++       ARCH            = linux
+ else
++       OS_REL_CFLAGS   = -D_XOPEN_SOURCE
++       ARCH            = gnu
++endif
++
+ ifeq ($(OS_TEST),ppc64)
+-	OS_REL_CFLAGS	= -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH	= ppc
+ ifeq ($(USE_64),1)
+ 	ARCHFLAG	= -m64
+ endif
+ else
+-ifeq ($(OS_TEST),ppc)
+-	OS_REL_CFLAGS	= -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH	= ppc
+-else
+ ifeq ($(OS_TEST),alpha)
+-        OS_REL_CFLAGS   = -D_ALPHA_ -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH	= alpha
+-else
+-ifeq ($(OS_TEST),ia64)
+-	OS_REL_CFLAGS	= -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH	= ia64
++        OS_REL_CFLAGS   += -D_ALPHA_
+ else
+ ifeq ($(OS_TEST),x86_64)
+ ifeq ($(USE_64),1)
+-	OS_REL_CFLAGS	= -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH	= x86_64
+ else
+-	OS_REL_CFLAGS	= -DLINUX1_2 -Di386 -D_XOPEN_SOURCE
++	OS_REL_CFLAGS	+= -Di386
+ 	CPU_ARCH	= x86
+ 	ARCHFLAG	= -m32
+ endif
+ else
+-ifeq ($(OS_TEST),sparc)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH        = sparc
+-else
+ ifeq ($(OS_TEST),sparc64)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH        = sparc
+ else
+ ifeq (,$(filter-out arm% sa110,$(OS_TEST)))
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH        = arm
+ else
+ ifeq ($(OS_TEST),parisc)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH        = hppa
+ else
+ ifeq ($(OS_TEST),parisc64)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH        = hppa
+ else
+-ifeq ($(OS_TEST),s390)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH        = s390
+-else
+-ifeq ($(OS_TEST),s390x)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH        = s390x
+-else
+ ifeq ($(OS_TEST),mips64)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH        = mips
+ else
+ ifeq ($(OS_TEST),mips)
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+ 	CPU_ARCH        = mips
+ else
+ ifeq (,$(filter-out i686 i586 i486 i386,$(OS_TEST)))
+-	OS_REL_CFLAGS	= -DLINUX1_2 -Di386 -D_XOPEN_SOURCE
++	OS_REL_CFLAGS	+= -Di386
+ 	CPU_ARCH	= x86
+-else
+-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
+-	CPU_ARCH	= $(OS_TEST)
+-endif
+-endif
+-endif
+-endif
+-endif
+-endif
+ endif
+ endif
++
+ endif
+ endif
+ endif
++
+ endif
+ endif
++
+ endif
+ endif
+ endif
+@@ -147,7 +118,7 @@
+ 
+ LIBC_TAG		= _glibc
+ 
+-ifeq ($(OS_RELEASE),2.0)
++ifeq ($(KERNEL)-$(OS_RELEASE),linux-2.0)
+ 	OS_REL_CFLAGS	+= -DLINUX2_0
+ 	MKSHLIB		= $(CC) -shared -Wl,-soname -Wl,$(@:$(OBJDIR)/%.so=%.so)
+ 	ifdef MAPFILE
+@@ -165,15 +136,18 @@
+ OS_PTHREAD = -lpthread 
+ endif
+ 
+-OS_CFLAGS		= $(DSO_CFLAGS) $(OS_REL_CFLAGS) $(ARCHFLAG) -ansi -Wall -pipe -DLINUX -Dlinux -D_POSIX_SOURCE -D_BSD_SOURCE -DHAVE_STRERROR
++OS_CFLAGS		= $(DSO_CFLAGS) $(OS_REL_CFLAGS) $(ARCHFLAG) -ansi -Wall -pipe -D_POSIX_SOURCE -D_BSD_SOURCE -DHAVE_STRERROR
+ OS_LIBS			= $(OS_PTHREAD) -ldl -lc
+ 
++ifeq ($(KERNEL),linux)
++       OS_CFLAGS += -DLINUX -Dlinux
++endif
++ 
++
+ ifdef USE_PTHREADS
+ 	DEFINES		+= -D_REENTRANT
+ endif
+ 
+-ARCH			= linux
+-
+ DSO_CFLAGS		= -fPIC
+ DSO_LDOPTS		= -shared $(ARCHFLAG)
+ DSO_LDFLAGS		=
+diff -u firefox-1.99+2.0b2+dfsg/configure.in firefox-1.99+2.0b2+dfsg/configure.in
+--- firefox-1.99+2.0b2+dfsg/configure.in
++++ firefox-1.99+2.0b2+dfsg/configure.in
+@@ -825,6 +825,7 @@
+     OS_TEST="${target_cpu}"
+     case "${target_os}" in
+         linux*)       OS_ARCH=Linux ;;
++        kfreebsd*-gnu) OS_ARCH=GNU_kFreeBSD ;;
+         solaris*)     OS_ARCH=SunOS OS_RELEASE=5 ;;
+         mingw*)       OS_ARCH=WINNT ;;
+         wince*)       OS_ARCH=WINCE ;;
+@@ -837,6 +838,7 @@
+     OS_TEST="${host_cpu}"
+     case "${host_os}" in
+         linux*)       OS_ARCH=Linux ;;
++        kfreebsd*-gnu) OS_ARCH=GNU_kFreeBSD ;;
+         solaris*)     OS_ARCH=SunOS OS_RELEASE=5 ;;
+         mingw*)       OS_ARCH=WINNT ;;
+         wince*)       OS_ARCH=WINCE ;;
+@@ -1291,7 +1293,7 @@
+     LIBXUL_LIBS='$(XPCOM_FROZEN_LDOPTS) $(DIST)/bin/XUL -lobjc'
+     ;;
+ 
+-*-linux*)
++*-linux*|*-kfreebsd*-gnu)
+     HOST_CFLAGS="$HOST_CFLAGS -DXP_UNIX"
+     HOST_NSPR_MDCPUCFG='\"md/_linux.cfg\"'
+     HOST_OPTIMIZE_FLAGS="${HOST_OPTIMIZE_FLAGS=-O3}"
+@@ -2253,7 +2255,7 @@
+ dnl = Flags to strip unused symbols from .so components
+ dnl ========================================================
+ case "$target" in
+-    *-linux*)
++    *-linux*|*-kfreebsd*-gnu)
+         MOZ_COMPONENTS_VERSION_SCRIPT_LDFLAGS='-Wl,--version-script -Wl,$(BUILD_TOOLS)/gnu-ld-scripts/components-version-script'
+         ;;
+     *-solaris*)
+@@ -2886,7 +2888,7 @@
+ 			fi
+ 			;;
+ 
+-	    *-*-linux*) 
++	    *-*-linux*|*-*-kfreebsd*-gnu) 
+ 			AC_DEFINE(_REENTRANT) 
+ 			;;
+ 
+diff -u firefox-1.99+2.0b2+dfsg/xpcom/reflect/xptcall/src/md/unix/Makefile.in firefox-1.99+2.0b2+dfsg/xpcom/reflect/xptcall/src/md/unix/Makefile.in
+--- firefox-1.99+2.0b2+dfsg/xpcom/reflect/xptcall/src/md/unix/Makefile.in
++++ firefox-1.99+2.0b2+dfsg/xpcom/reflect/xptcall/src/md/unix/Makefile.in
+@@ -70,7 +70,7 @@
+ # New code for Linux, et. al., with gcc
+ # Migrate other platforms here after testing
+ #
+-ifneq (,$(filter Linux,$(OS_ARCH)))
++ifneq (,$(filter Linux GNU_%,$(OS_ARCH)))
+ # Linux/x86-64
+ ifeq (x86_64,$(OS_TEST))
+ CPPSRCS		:= xptcinvoke_x86_64_linux.cpp xptcstubs_x86_64_linux.cpp
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/security/nss/lib/ssl/sslmutex.h
++++ firefox-1.99+2.0b2+dfsg/security/nss/lib/ssl/sslmutex.h
+@@ -79,7 +79,7 @@
+ 
+ typedef int    sslPID;
+ 
+-#elif defined(LINUX) || defined(AIX) || defined(VMS) || defined(BEOS) || defined(BSDI) || defined(NETBSD) || defined(OPENBSD)
++#elif defined(LINUX) || defined(AIX) || defined(VMS) || defined(BEOS) || defined(BSDI) || defined(NETBSD) || defined(OPENBSD) || defined(__GLIBC__)
+ 
+ #include <sys/types.h>
+ #include "prtypes.h"
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/security/nss/lib/ssl/sslmutex.c
++++ firefox-1.99+2.0b2+dfsg/security/nss/lib/ssl/sslmutex.c
+@@ -89,7 +89,7 @@
+     return SECSuccess;
+ }
+ 
+-#if defined(LINUX) || defined(AIX) || defined(VMS) || defined(BEOS) || defined(BSDI) || defined(NETBSD) || defined(OPENBSD)
++#if defined(LINUX) || defined(AIX) || defined(VMS) || defined(BEOS) || defined(BSDI) || defined(NETBSD) || defined(OPENBSD) || defined(__GLIBC__)
+ 
+ #include <unistd.h>
+ #include <fcntl.h>
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/security/coreconf/Linux2.6.mk
++++ firefox-1.99+2.0b2+dfsg/security/coreconf/Linux2.6.mk
+@@ -39,7 +39,10 @@
+ 
+ DSO_LDOPTS      += -Wl,-z,defs
+ 
++ifeq ($(KERNEL), linux)
+ OS_REL_CFLAGS   += -DLINUX2_1
++endif
++
+ MKSHLIB         = $(CC) $(DSO_LDOPTS) -Wl,-soname -Wl,$(@:$(OBJDIR)/%.so=%.so)
+ 
+ ifdef MAPFILE
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/security/coreconf/config.mk
++++ firefox-1.99+2.0b2+dfsg/security/coreconf/config.mk
+@@ -63,7 +63,7 @@
+ #######################################################################
+ 
+ TARGET_OSES = FreeBSD BSD_OS NetBSD OpenUNIX OS2 QNX Darwin BeOS OpenBSD \
+-              OpenVMS AIX
++              OpenVMS AIX GNU GNU_%
+ 
+ ifeq (,$(filter-out $(TARGET_OSES),$(OS_TARGET)))
+ include $(CORE_DEPTH)/coreconf/$(OS_TARGET).mk
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/security/coreconf/arch.mk
++++ firefox-1.99+2.0b2+dfsg/security/coreconf/arch.mk
+@@ -155,6 +155,14 @@
+     ifneq ($(words $(OS_RELEASE)),1)
+ 	OS_RELEASE := $(word 1,$(OS_RELEASE)).$(word 2,$(OS_RELEASE))
+     endif
++    KERNEL = linux
++endif
++
++# This check must be last.  Since all uses of OS_ARCH that follow affect only
++# userland, we can merge other Glibc systems with Linux here.
++ifneq (, $(filter GNU GNU_%, $(OS_ARCH)))
++OS_ARCH = Linux
++OS_RELEASE = 2.6
+ endif
+ 
+ #
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/directory/c-sdk/ldap/include/portable.h
++++ firefox-1.99+2.0b2+dfsg/directory/c-sdk/ldap/include/portable.h
+@@ -131,7 +131,7 @@
+  * some systems don't have the BSD re_comp and re_exec routines
+  */
+ #ifndef NEED_BSDREGEX
+-#if ( defined( SYSV ) || defined( NETBSD ) || defined( freebsd ) || defined( linux ) || defined( DARWIN )) && !defined(sgi)
++#if ( defined( SYSV ) || defined( NETBSD ) || defined( freebsd ) || defined( linux ) || defined(__GNU__) || defined(__GLIBC__) || defined( DARWIN )) && !defined(sgi)
+ #define NEED_BSDREGEX
+ #endif
+ #endif
+@@ -160,7 +160,7 @@
+  * Is snprintf() part of the standard C runtime library?
+  */
+ #if !defined(HAVE_SNPRINTF)
+-#if defined(SOLARIS) || defined(LINUX) || defined(HPUX)
++#if defined(SOLARIS) || defined(LINUX) || defined(HPUX) || defined(__GNU__) || defined(__GLIBC__)
+ #define HAVE_SNPRINTF
+ #endif
+ #endif
+@@ -180,7 +180,7 @@
+  * for select()
+  */
+ #if !defined(WINSOCK) && !defined(_WINDOWS) && !defined(macintosh) && !defined(XP_OS2)
+-#if defined(hpux) || defined(LINUX) || defined(SUNOS4) || defined(XP_BEOS)
++#if defined(hpux) || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) || defined(SUNOS4) || defined(XP_BEOS)
+ #include <sys/time.h>
+ #else
+ #include <sys/select.h>
+@@ -267,15 +267,14 @@
+ #define HAVE_GETGRNAM_R
+ #endif
+ 
+-#if defined(SNI) || defined(LINUX1_2)
++#if defined(SNI) || defined(LINUX1_2) || defined(__GNU__) || defined(__GLIBC__)
+ int strcasecmp(const char *, const char *);
+ #ifdef SNI
+ int strncasecmp(const char *, const char *, int);
+-#endif /* SNI */
+-#ifdef LINUX1_2
++#else /* SNI */
+ int strncasecmp(const char *, const char *, size_t);
+-#endif /* LINUX1_2 */
+-#endif /* SNI || LINUX1_2 */
++#endif
++#endif /* SNI || LINUX1_2 || __GNU__ || __GLIBC__ */
+ 
+ #if defined(_WINDOWS) || defined(macintosh) || defined(XP_OS2) || defined(DARWIN)
+ #define GETHOSTBYNAME( n, r, b, l, e )  gethostbyname( n )
+@@ -315,7 +314,7 @@
+ #define GETHOSTBYNAME( n, r, b, l, e )  gethostbyname_r( n, r, b, l, e )
+ #endif
+ #if defined(HPUX9) || defined(LINUX1_2) || defined(LINUX2_0) || \
+-    defined(LINUX2_1) || defined(SUNOS4) || defined(SNI) || \
++    defined(LINUX2_1) || defined(__GNU__) || defined(__GLIBC__) || defined(SUNOS4) || defined(SNI) || \
+     defined(SCOOS) || defined(BSDI) || defined(NCR) || \
+     defined(NEC) || ( defined(HPUX10) && !defined(_REENTRANT)) || \
+     (defined(AIX) && !defined(USE_REENTRANT_LIBC))
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/directory/c-sdk/ldap/libraries/libprldap/ldappr-error.c
++++ firefox-1.99+2.0b2+dfsg/directory/c-sdk/ldap/libraries/libprldap/ldappr-error.c
+@@ -233,7 +233,7 @@
+ 
+ #if defined(__hpux) || defined(_AIX) || defined(OSF1) || defined(DARWIN) || \
+   defined(BEOS) || defined(FREEBSD) || defined(BSDI) || defined(VMS) || \
+-  defined(OPENBSD) || defined(NETBSD)
++  defined(OPENBSD) || defined(NETBSD) || defined(__FreeBSD_kernel__)
+ #define EDEADLOCK       -1
+ #endif
+ 
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/directory/c-sdk/ldap/libraries/libldap/Makefile.in
++++ firefox-1.99+2.0b2+dfsg/directory/c-sdk/ldap/libraries/libldap/Makefile.in
+@@ -184,7 +184,7 @@
+ EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME) $(OS_LIBS) -lc
+ endif
+ 
+-ifeq ($(OS_ARCH), Linux)
++ifneq (,$(filter Linux GNU GNU_%, $(OS_ARCH)))
+ EXTRA_LIBS = -L$(dist_libdir) -l$(LBER_LIBNAME)
+ endif
+ 
+@@ -302,7 +302,7 @@
+ ifdef SO_FILES_TO_REMOVE
+ 	-$(RM) $(SO_FILES_TO_REMOVE)
+ endif
+-ifneq (,$(filter AIX Linux HP-UX Darwin BeOS QNX NetBSD OSF1 OpenBSD, $(OS_ARCH)))
++ifneq (,$(filter AIX Linux GNU GNU_% HP-UX Darwin BeOS QNX NetBSD OSF1 OpenBSD, $(OS_ARCH)))
+ 	$(LINK_LIB) ../liblber/$(OBJDIR_NAME)/*.a
+ else
+ ifeq ($(OS_ARCH),OS2)
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/xpcom/reflect/xptcall/src/md/unix/xptc_platforms_unixish_x86.h
++++ firefox-1.99+2.0b2+dfsg/xpcom/reflect/xptcall/src/md/unix/xptc_platforms_unixish_x86.h
+@@ -67,7 +67,7 @@
+ *
+ */
+ 
+-#if defined(LINUX)
++#if defined(LINUX) || (defined(__GLIBC__) && defined(__FreeBSD_kernel__))
+ 
+ #if (__GNUC__ == 2) && (__GNUC_MINOR__ <= 7)
+ /* Old gcc 2.7.x.x.  What does gcc 2.8.x do?? */
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/configure.in
++++ firefox-1.99+2.0b2+dfsg/nsprpub/configure.in
+@@ -1382,7 +1382,7 @@
+ 	esac
+     ;;
+ 
+-*-linux*)
++*-linux*|*-gnu*|*-k*bsd*-gnu)
+     if test -z "$USE_NSPR_THREADS"; then
+         USE_PTHREADS=1
+         IMPL_STRATEGY=_PTH
+@@ -1390,7 +1390,11 @@
+     AC_DEFINE(XP_UNIX)
+     AC_DEFINE(_GNU_SOURCE)
+     AC_DEFINE(HAVE_FCNTL_FILE_LOCKING)
+-    AC_DEFINE(LINUX)
++    case "${target_os}" in
++     linux*)
++         AC_DEFINE(LINUX)
++         ;;
++     esac
+     CFLAGS="$CFLAGS -Wall"
+     CXXFLAGS="$CXXFLAGS -Wall"
+     MDCPUCFG_H=_linux.cfg
+@@ -2465,7 +2469,7 @@
+             _PTHREAD_LDFLAGS=-pthread
+         fi
+         ;;
+-    *-linux*)
++    *-linux*|*-gnu*|*-k*bsd*-gnu)
+         AC_DEFINE(_REENTRANT)
+         ;;
+     esac
+@@ -2549,7 +2553,7 @@
+         fi
+     fi
+     ;;
+-*-linux*)
++*-linux*|*-gnu*|*-k*bsd*-gnu)
+     if test -n "$USE_NSPR_THREADS"; then
+         AC_DEFINE(_PR_LOCAL_THREADS_ONLY)
+     fi
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/config/nsinstall.c
++++ firefox-1.99+2.0b2+dfsg/nsprpub/config/nsinstall.c
+@@ -98,7 +98,7 @@
+ }
+ #endif /* NEXTSTEP */
+ 
+-#ifdef LINUX
++#if defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) 
+ #include <getopt.h>
+ #endif
+ 
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/include/md/_pth.h
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/include/md/_pth.h
+@@ -143,10 +143,15 @@
+ 	(!memcmp(&(t), &pt_zero_tid, sizeof(pthread_t)))
+ #define _PT_PTHREAD_COPY_THR_HANDLE(st, dt)   (dt) = (st)
+ #elif defined(IRIX) || defined(OSF1) || defined(AIX) || defined(SOLARIS) \
+-	|| defined(HPUX) || defined(LINUX) || defined(FREEBSD) \
++	|| defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) \
++	|| defined(HPUX) || defined(FREEBSD) \
+ 	|| defined(NETBSD) || defined(OPENBSD) || defined(BSDI) \
+ 	|| defined(VMS) || defined(NTO) || defined(DARWIN) \
+ 	|| defined(UNIXWARE) || defined(RISCOS)
++#ifdef __GNU__
++/* Hurd pthreads don't have an invalid value for pthread_t. -- rmh */
++#error Using Hurd pthreads
++#endif
+ #define _PT_PTHREAD_INVALIDATE_THR_HANDLE(t)  (t) = 0
+ #define _PT_PTHREAD_THR_HANDLE_IS_INVALID(t)  (t) == 0
+ #define _PT_PTHREAD_COPY_THR_HANDLE(st, dt)   (dt) = (st)
+@@ -195,7 +200,8 @@
+ /*
+  * These platforms don't have sigtimedwait()
+  */
+-#if (defined(AIX) && !defined(AIX4_3_PLUS)) || defined(LINUX) \
++#if (defined(AIX) && !defined(AIX4_3_PLUS)) \
++	|| defined(LINUX) || defined(__GNU__)|| defined(__GLIBC__) \
+ 	|| defined(FREEBSD) || defined(NETBSD) || defined(OPENBSD) \
+ 	|| defined(BSDI) || defined(VMS) || defined(UNIXWARE) \
+ 	|| defined(DARWIN)
+@@ -235,7 +241,8 @@
+ #define PT_PRIO_MAX            sched_get_priority_max(SCHED_OTHER)
+ #endif /* defined(_PR_DCETHREADS) */
+ 
+-#elif defined(LINUX) || defined(FREEBSD)
++#elif defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) \
++	|| defined(FREEBSD)
+ #define PT_PRIO_MIN            sched_get_priority_min(SCHED_OTHER)
+ #define PT_PRIO_MAX            sched_get_priority_max(SCHED_OTHER)
+ #elif defined(NTO)
+@@ -291,7 +298,8 @@
+ 		onemillisec.tv_nsec = 1000000L;			\
+         nanosleep(&onemillisec,NULL);			\
+     PR_END_MACRO
+-#elif defined(HPUX) || defined(LINUX) || defined(SOLARIS) \
++#elif defined(HPUX) || defined(SOLARIS) \
++	|| defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) \
+ 	|| defined(FREEBSD) || defined(NETBSD) || defined(OPENBSD) \
+ 	|| defined(BSDI) || defined(NTO) || defined(DARWIN) \
+ 	|| defined(UNIXWARE) || defined(RISCOS)
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/include/md/prosdep.h
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/include/md/prosdep.h
+@@ -90,7 +90,7 @@
+ #elif defined(IRIX)
+ #include "md/_irix.h"
+ 
+-#elif defined(LINUX)
++#elif defined(LINUX) || defined(__GNU__) || defined(__GLIBC__)
+ #include "md/_linux.h"
+ 
+ #elif defined(OSF1)
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/include/md/_linux.cfg
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/include/md/_linux.cfg
+@@ -35,6 +35,11 @@
+  *
+  * ***** END LICENSE BLOCK ***** */
+ 
++/*
++ * This file is used by not only Linux but also other glibc systems
++ * such as GNU/Hurd and GNU/k*BSD.
++ */
++
+ #ifndef nspr_cpucfg___
+ #define nspr_cpucfg___
+ 
+@@ -42,11 +47,15 @@
+ #define XP_UNIX
+ #endif
+ 
+-#ifndef LINUX
++#if !defined(LINUX) && defined(__linux__)
+ #define LINUX
+ #endif
+ 
++#ifdef __FreeBSD_kernel__
++#define PR_AF_INET6 28  /* same as AF_INET6 */
++#else
+ #define PR_AF_INET6 10  /* same as AF_INET6 */
++#endif
+ 
+ #ifdef __powerpc64__
+ 
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/include/md/_unixos.h
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/include/md/_unixos.h
+@@ -46,7 +46,8 @@
+  * Linux: FD_SETSIZE is defined in /usr/include/sys/select.h and should
+  * not be redefined.
+  */
+-#if !defined(LINUX) && !defined(DARWIN) && !defined(NEXTSTEP)
++#if !defined(LINUX) && !defined(__GNU__) && !defined(__GLIBC__) \
++    && !defined(DARWIN) && !defined(NEXTSTEP)
+ #ifndef FD_SETSIZE
+ #define FD_SETSIZE  4096
+ #endif
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/include/md/_linux.h
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/include/md/_linux.h
+@@ -41,6 +41,15 @@
+ #include "prthread.h"
+ 
+ /*
++ * This file is used by not only Linux but also other glibc systems
++ * such as GNU/Hurd and GNU/k*BSD.
++ */
++
++#ifdef __FreeBSD_kernel__
++#define _PR_HAVE_SOCKADDR_LEN 
++#endif
++   
++/*
+  * Internal configuration macros
+  */
+ 
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/src/misc/prnetdb.c
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/src/misc/prnetdb.c
+@@ -108,7 +108,7 @@
+ #define _PR_HAVE_GETPROTO_R_INT
+ #endif
+ 
+-#if (defined(LINUX) && defined(__GLIBC__) && __GLIBC__ >= 2)
++#if (defined(__GLIBC__) && __GLIBC__ >= 2)
+ #define _PR_HAVE_GETPROTO_R
+ #define _PR_HAVE_5_ARG_GETPROTO_R
+ #endif
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/src/md/prosdep.c
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/src/md/prosdep.c
+@@ -63,7 +63,8 @@
+ 
+     /* Get page size */
+ #ifdef XP_UNIX
+-#if defined SUNOS4 || defined LINUX || defined BSDI || defined AIX \
++#if defined SUNOS4 || defined BSDI || defined AIX \
++        || defined LINUX || defined __GNU__ || defined __GLIBC__ \
+         || defined FREEBSD || defined NETBSD || defined OPENBSD \
+         || defined DARWIN || defined NEXTSTEP
+     _pr_pageSize = getpagesize();
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/src/md/unix/uxproces.c
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/src/md/unix/uxproces.c
+@@ -92,7 +92,8 @@
+  * that can share the virtual address space and file descriptors.
+  */
+ #if (defined(IRIX) && !defined(_PR_PTHREADS)) \
+-        || (defined(LINUX) && defined(_PR_PTHREADS))
++        || ((defined(LINUX) || defined(__GNU__) || defined(__GLIBC__)) \
++        && defined(_PR_PTHREADS))
+ #define _PR_SHARE_CLONES
+ #endif
+ 
+@@ -106,7 +107,8 @@
+  */
+ 
+ #if defined(_PR_GLOBAL_THREADS_ONLY) \
+-	|| (defined(_PR_PTHREADS) && !defined(LINUX))
++	|| (defined(_PR_PTHREADS) \
++	&& !defined(LINUX) && !defined(__GNU__) && !defined(__GLIBC__))
+ #define _PR_NATIVE_THREADS
+ #endif
+ 
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/src/md/unix/unix.c
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/src/md/unix/unix.c
+@@ -68,7 +68,7 @@
+  * PRInt32* pointer to a _PRSockLen_t* pointer.
+  */
+ #if defined(HAVE_SOCKLEN_T) \
+-    || (defined(LINUX) && defined(__GLIBC__) && __GLIBC__ >= 2)
++    || (defined(__GLIBC__) && __GLIBC__ >= 2)
+ #define _PRSockLen_t socklen_t
+ #elif defined(IRIX) || defined(HPUX) || defined(OSF1) || defined(SOLARIS) \
+     || defined(AIX4_1) || defined(LINUX) || defined(SONY) \
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/src/md/unix/uxrng.c
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/src/md/unix/uxrng.c
+@@ -138,7 +138,8 @@
+     return 0;
+ }
+ 
+-#elif (defined(LINUX) || defined(FREEBSD) || defined(NETBSD) || defined(OPENBSD))
++#elif (defined(LINUX) || defined(FREEBSD) || defined(__FreeBSD_kernel__) \
++    || defined(NETBSD) || defined(__NetBSD_kernel__) || defined(OPENBSD))
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/src/pthreads/ptio.c
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/src/pthreads/ptio.c
+@@ -205,7 +205,8 @@
+ #define _PRSelectFdSetArg_t void *
+ #elif defined(IRIX) || (defined(AIX) && !defined(AIX4_1)) \
+     || defined(OSF1) || defined(SOLARIS) \
+-    || defined(HPUX10_30) || defined(HPUX11) || defined(LINUX) \
++    || defined(HPUX10_30) || defined(HPUX11) \
++    || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) \
+     || defined(FREEBSD) || defined(NETBSD) || defined(OPENBSD) \
+     || defined(BSDI) || defined(VMS) || defined(NTO) || defined(DARWIN) \
+     || defined(UNIXWARE) || defined(RISCOS)
+@@ -289,7 +290,7 @@
+  * most current systems.
+  */
+ #if defined(HAVE_SOCKLEN_T) \
+-    || (defined(LINUX) && defined(__GLIBC__) && __GLIBC__ >= 2)
++    || (defined(__GLIBC__) && __GLIBC__ >= 2)
+ typedef socklen_t pt_SockLen;
+ #elif (defined(AIX) && !defined(AIX4_1)) \
+     || defined(VMS)
+@@ -3230,7 +3231,8 @@
+ };
+ 
+ #if defined(HPUX) || defined(OSF1) || defined(SOLARIS) || defined (IRIX) \
+-    || defined(AIX) || defined(LINUX) || defined(FREEBSD) || defined(NETBSD) \
++    || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) \
++    || defined(AIX) || defined(FREEBSD) || defined(NETBSD) \
+     || defined(OPENBSD) || defined(BSDI) || defined(VMS) || defined(NTO) \
+     || defined(DARWIN) || defined(UNIXWARE) || defined(RISCOS)
+ #define _PR_FCNTL_FLAGS O_NONBLOCK
+@@ -4727,7 +4729,8 @@
+ 
+ #include <sys/types.h>
+ #include <sys/time.h>
+-#if !defined(SUNOS4) && !defined(HPUX) && !defined(LINUX)
++#if !defined(SUNOS4) && !defined(HPUX) \
++    && !defined(LINUX) && !defined(__GNU__) && !defined(__GLIBC__)
+ #include <sys/select.h>
+ #endif
+ 
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/src/linking/prlink.c
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/src/linking/prlink.c
+@@ -1605,7 +1605,8 @@
+ PR_IMPLEMENT(char *)
+ PR_GetLibraryFilePathname(const char *name, PRFuncPtr addr)
+ {
+-#if defined(SOLARIS) || defined(LINUX) || defined(FREEBSD)
++#if defined(SOLARIS) || defined(FREEBSD) \
++        || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__)
+     Dl_info dli;
+     char *result;
+ 
+only in patch2:
+unchanged:
+--- firefox-1.99+2.0b2+dfsg.orig/nsprpub/pr/tests/Makefile.in
++++ firefox-1.99+2.0b2+dfsg/nsprpub/pr/tests/Makefile.in
+@@ -376,14 +376,10 @@
+     EXTRA_LIBS = -lsocket -lnsl -lgen -lresolv
+ endif
+ 
+-ifeq ($(OS_ARCH), Linux)
+-    ifeq ($(OS_RELEASE), 1.2)
+-        EXTRA_LIBS = -ldl
+-    else
+-        LDOPTS += -Xlinker -rpath $(ABSOLUTE_LIB_DIR)
+-        ifeq ($(USE_PTHREADS),1)
+-            EXTRA_LIBS = -lpthread
+-        endif
++ifeq (,$(filter-out Linux GNU GNU_%,$(OS_ARCH)))
++    LDOPTS += -Xlinker -rpath $(ABSOLUTE_LIB_DIR)
++    ifeq ($(USE_PTHREADS),1)
++        EXTRA_LIBS = -lpthread
+     endif
+ endif
+ 
