@@ -90,6 +90,12 @@ build-indep-stamp: src
 
 	touch build-indep-stamp
 
+ifeq ($(os), kfreebsd)
+build: build-arch build-indep
+else
+build: build-indep
+endif
+
 install-indep: install-indep-stamp
 install-indep-stamp: build-indep
 	dh_testdir
