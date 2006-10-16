@@ -1,0 +1,92 @@
+glibc 2.5 status
+================
+
+linuxthreads are moved from trunk into ports
+	http://sourceware.org/ml/libc-alpha/2005-07/msg00001.html
+
+for short term Daniel Jacobowitz <dan@debian.org> will maintain them 
+	http://sourceware.org/ml/libc-alpha/2005-07/msg00002.html
+
+
+As glibc source can be used a post-2.5 snapshot, available from
+ftp://sources.redhat.com/pub/glibc/snapshots/
+
+The main part are new arch specific files, linked into glibc tree:
+
+kfreebsd
+	-> $SRC/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd
+
+Remaining part are miscellaneous kfreebsd changes and hacks,
+stored in dir patches. 
+
+test build:
+-----------
+
+* get main glibc module and linuxthreads module from snapshot or directly from CVS
+	(ftp://sources.redhat.com/pub/glibc/snapshots/)
+
+* move linuxthreads & linuxthreads_db from module linuxthreads into top dir
+
+* install our sysdeps
+  mkdir -p src/ports/sysdeps/unix/bsd/bsd4.4/
+  cp -a kfreebsd src/ports/sysdeps/unix/bsd/bsd4.4/
+
+* apply patches
+
+  cd src 
+  for i in ../patches/*.patch 
+  do
+        patch -p0 < $i
+  done
+  cd ..
+
+* build
+
+  mkdir build ; cd build
+
+  ../src/configure --enable-add-ons=ports,linuxthreads --with-tls --with-__thread i486-kfreebsd --prefix=...
+
+
+
+"make check" results:
+---------------------
+(as of glibc 2.5)
+
+  examime why, needs c++
+make[2]: *** [build/dlfcn/bug-atexit3.out] Error 1
+
+  requires (and tests) Linux specific O_NOATIME
+make[2]: *** [build/dirent/tst-fdopendir.o] Error 1
+
+  kernel doesn't fill enough in siginfo_t for signal handlers
+make[2]: *** [build/posix/tst-waitid.out] Error 1
+
+  no similar syscall, unimplemented
+make[2]: *** [build/io/tst-readlinkat.out] Error 1
+
+  no similar syscall, emulation hitted by (unavoidable) race condition
+make[2]: *** [build/misc/tst-pselect.out] Error 1
+
+  requires SIGRTMIN
+make[2]: *** [build/rt/tst-timer2.o] Error 1
+make[2]: *** [build/rt/tst-mqueue5.o] Error 1
+make[2]: *** [build/rt/tst-timer4.o] Error 1
+make[2]: *** [build/rt/tst-timer5.o] Error 1
+make[2]: *** [build/rt/tst-cputimer1.o] Error 1
+make[2]: *** [build/rt/tst-cputimer2.o] Error 1
+make[2]: *** [build/rt/tst-cputimer3.o] Error 1
+
+  examine why, maybe due to non-rt behaviour of signals
+make[2]: *** [build/rt/tst-aio.out] Error 1
+make[2]: *** [build/rt/tst-aio64.out] Error 1
+make[2]: *** [build/rt/tst-aio9.out] Error 1
+make[2]: *** [build/rt/tst-aio10.out] Error 1
+
+  due to unimplemented readlinkat()
+make[2]: *** [build/debug/tst-chk1.out] Error 1
+make[2]: *** [build/debug/tst-chk2.out] Error 1
+make[2]: *** [build/debug/tst-chk3.out] Error 1
+make[2]: *** [build/debug/tst-lfschk1.out] Error 1
+make[2]: *** [build/debug/tst-lfschk2.out] Error 1
+make[2]: *** [build/debug/tst-lfschk3.out] Error 1
+
