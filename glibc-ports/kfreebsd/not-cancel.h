@@ -74,3 +74,15 @@ extern int __openat64_nocancel (int fd, const char *fname, int oflag,
 /* Uncancelable waitpid.  */
 # define waitpid_not_cancel(pid, stat_loc, options) \
   INLINE_SYSCALL (wait4, 4, pid, stat_loc, options, NULL)
+
+/* Uncancelable pause.  */
+# define pause_not_cancel() \
+  __pause_nocancel ()
+
+/* Uncancelable nanosleep.  */
+# define nanosleep_not_cancel(requested_time, remaining) \
+  INLINE_SYSCALL (nanosleep, 2, requested_time, remaining)
+
+/* Uncancelable sigsuspend.  */
+#define sigsuspend_not_cancel(set) \
+  INLINE_SYSCALL (sigsuspend, 1, set)

@@ -44,6 +44,8 @@
 #define	O_DIRECT    0x00010000  /* Attempt to bypass buffer cache */
 #endif
 
+enum { O_DIRECTORY = 0 };
+
 /* File status flags for `open' and `fcntl'.  */
 #define	O_APPEND	0x0008	/* Writes append to the file.  */
 #define	O_NONBLOCK	0x0004	/* Non-blocking I/O.  */

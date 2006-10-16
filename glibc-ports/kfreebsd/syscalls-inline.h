@@ -21,9 +21,12 @@
 #define KFREEBSD_INLINE_SYSCALLS_H
 
 #include <sys/types.h>
+#define __need_sigset_t
+#include <signal.h>
 
 struct iovec;
 struct rusage;
+struct timespec;
 
 int __syscall_open(const char *path, int flags, ...);
 int __syscall_close(int fd);
@@ -35,5 +38,7 @@ ssize_t __syscall_writev(int fd, const struct iovec *iovp, int iovcnt);
 int __syscall_fcntl(int fd, int cmd, ...);
 int __syscall_fork(void);
 int __syscall_wait4(int pid, int *status, int options, struct rusage *rusage);
+int __syscall_sigsuspend (const sigset_t *set);
+int __syscall_nanosleep (const struct timespec *requested_time, struct timespec *remaining);
 
 #endif

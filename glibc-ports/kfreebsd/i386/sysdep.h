@@ -81,27 +81,6 @@
 # define SYSCALL_ERROR_HANDLER	/* Nothing here; code in sysdep.S is used.  */
 #else
 
-# ifndef HAVE_HIDDEN
-#  define SETUP_PIC_REG(reg) \
-  call 1f;								      \
-  .subsection 1;							      \
-1:movl (%esp), %e##reg;							      \
-  ret;									      \
-  .previous
-# else
-#  define SETUP_PIC_REG(reg) \
-  .section .gnu.linkonce.t.__i686.get_pc_thunk.reg,"ax",@progbits;	      \
-  .globl __i686.get_pc_thunk.reg;					      \
-  .hidden __i686.get_pc_thunk.reg;					      \
-  .type __i686.get_pc_thunk.reg,@function;				      \
-__i686.get_pc_thunk.reg:						      \
-  movl (%esp), %e##reg;							      \
-  ret;									      \
-  .size __i686.get_pc_thunk.reg, . - __i686.get_pc_thunk.reg;		      \
-  .previous;								      \
-  call __i686.get_pc_thunk.reg
-# endif
-
 # if RTLD_PRIVATE_ERRNO
 #  define SYSCALL_ERROR_HANDLER						      \
 0:SETUP_PIC_REG(cx);							      \
@@ -136,14 +115,20 @@ __i686.get_pc_thunk.reg:						      \
 #  else
 #   define SYSCALL_ERROR_HANDLER					      \
 0:pushl %ebx;								      \
+  cfi_adjust_cfa_offset (4);                                                  \
+  cfi_rel_offset (ebx, 0);                                                    \
   SETUP_PIC_REG (bx);							      \
   addl $_GLOBAL_OFFSET_TABLE_, %ebx;					      \
   pushl %eax;								      \
+  cfi_adjust_cfa_offset (4);                                                  \
   PUSH_ERRNO_LOCATION_RETURN;						      \
   call BP_SYM (__errno_location)@PLT;					      \
   POP_ERRNO_LOCATION_RETURN;						      \
   popl %ecx;								      \
+  cfi_adjust_cfa_offset (-4);                                                 \
   popl %ebx;								      \
+  cfi_adjust_cfa_offset (-4);                                                 \
+  cfi_restore (ebx);                                                          \
   movl %ecx, (%eax);							      \
   orl $-1, %eax;							      \
   jmp L(pseudo_end);

@@ -1,0 +1,51 @@
+
+disable usage of unimplemented *at functions
+revert to previous behaviour, inspired by 
+	http://sourceware.org/ml/glibc-cvs/2006-q1/msg00636.html
+	http://sources.redhat.com/cgi-bin/cvsweb.cgi/libc/io/ftw.c.diff?cvsroot=glibc&r1=1.50&r2=1.51
+
+
+--- io/ftw.c~	2006-06-26 19:35:23.000000000 +0200
++++ io/ftw.c	2006-06-26 19:35:23.000000000 +0200
+@@ -338,6 +338,7 @@
+     {
+       assert (data->dirstreams[data->actdir] == NULL);
+ 
++#if 0
+       if (dfdp != NULL && *dfdp != -1)
+ 	{
+ 	  int fd = openat64_not_cancel_3 (*dfdp, data->dirbuf + data->ftw.base,
+@@ -347,6 +348,7 @@
+ 	    close_not_cancel_no_status (fd);
+ 	}
+       else
++#endif      
+ 	{
+ 	  const char *name = ((data->flags & FTW_CHDIR)
+ 			      ? data->dirbuf + data->ftw.base: data->dirbuf);
+@@ -401,10 +403,12 @@
+   *((char *) __mempcpy (data->dirbuf + data->ftw.base, name, namlen)) = '\0';
+ 
+   int statres;
++#if 0  
+   if (dir->streamfd != -1)
+     statres = FXSTATAT (_STAT_VER, dir->streamfd, name, &st,
+ 			(data->flags & FTW_PHYS) ? AT_SYMLINK_NOFOLLOW : 0);
+   else
++#endif  
+     {
+       if ((data->flags & FTW_CHDIR) == 0)
+ 	name = data->dirbuf;
+@@ -424,10 +428,12 @@
+ 	flag = FTW_SLN;
+       else
+ 	{
++#if 0	
+ 	  if (dir->streamfd != -1)
+ 	    statres = FXSTATAT (_STAT_VER, dir->streamfd, name, &st,
+ 				AT_SYMLINK_NOFOLLOW);
+ 	  else
++#endif	  
+ 	    statres = LXSTAT (_STAT_VER, name, &st);
+ 	  if (statres == 0 && S_ISLNK (st.st_mode))
+ 	    flag = FTW_SLN;

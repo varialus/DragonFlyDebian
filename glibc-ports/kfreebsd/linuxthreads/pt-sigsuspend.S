@@ -23,3 +23,7 @@
 PSEUDO_NOERRNO(__pthread_sigsuspend, sigsuspend, 1)
 	ret_NOERRNO
 PSEUDO_END_NOERRNO(__pthread_sigsuspend)
+
+PSEUDO(__syscall_sigsuspend, sigsuspend, 1)
+	ret
+PSEUDO_END(__syscall_sigsuspend)
