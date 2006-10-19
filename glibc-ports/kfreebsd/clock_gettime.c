@@ -17,6 +17,7 @@
    02111-1307 USA.  */
 
 #include <sysdep.h>
+#include "kernel-posix-cpu-timers.h"
 
 int __syscall_clock_gettime(clockid_t clock_id, struct timespec *tp);
 
