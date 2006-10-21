@@ -1,188 +1,385 @@
 
-Author: rmh
-Status: need to fix some messy things first
+Author: petr
+Status: in BTS
 
-  - Switch to --with-gc=boehm (see bug #322599)
-  - How to mirror a struct declaration from standard headers?  See FIXME below
-
-diff -x configure -ur mono-1.1.8.2.old/configure.in mono-1.1.8.2/configure.in
---- mono-1.1.8.2.old/configure.in	2005-07-01 01:34:06.000000000 +0200
-+++ mono-1.1.8.2/configure.in	2005-08-09 11:37:58.000000000 +0200
-@@ -167,7 +167,7 @@
- 		libdl=
- 		libgc_threads=pthreads
- 		;;
--	*-*-linux*)
-+	*-*-linux* | *-*-k*bsd*-gnu)
- 		platform_win32=no
- 		CPPFLAGS="$CPPFLAGS -DGC_LINUX_THREADS -D_GNU_SOURCE -D_REENTRANT"
- 		libmono_cflags="-D_REENTRANT"
-@@ -1523,11 +1523,11 @@
- 	SQLITE3="libsqlite3.0.dylib"
- 	X11="libX11.dylib"
- 	;;
--     *-*-*netbsd*)
-+     *-*-netbsd*)
- 	LIBC="libc.so.12"
- 	INTL="libintl.so.0"
- 	;;
--    *-*-*freebsd*)
-+    *-*-freebsd*)
-     	LIBC="libc.so"
- 	INTL="libintl.so"
- 	;;
-@@ -1535,7 +1535,11 @@
-     	LIBC="libc.so"
- 	INTL="libintl.so"
- 	;;
--    *-*-*linux*)
-+    *-*-*linux* | *-*-k*bsd*-gnu) # Glibc systems
-+	case "$host_os" in
-+		k*bsd*-gnu) LIBC="libc.so.0.1" ;;
-+	esac
-+	INTL="$LIBC"
- 	AC_PATH_X
- 	AC_MSG_CHECKING(for the soname of libX11.so)
- 	for i in $x_libraries /usr/lib /usr/lib64; do
-diff -x configure -ur mono-1.1.8.2.old/debian/control mono-1.1.8.2/debian/control
---- mono-1.1.8.2.old/debian/control	2005-08-03 13:42:53.000000000 +0200
-+++ mono-1.1.8.2/debian/control	2005-08-09 20:10:29.000000000 +0200
-@@ -8,7 +8,7 @@
- Standards-Version: 3.6.1
+diff -u mono-1.1.18/debian/control mono-1.1.18/debian/control
+--- mono-1.1.18/debian/control
++++ mono-1.1.18/debian/control
+@@ -7,7 +7,7 @@
+ Standards-Version: 3.7.2
  
  Package: mono-common
--Architecture: i386 powerpc amd64
-+Architecture: any-i386 any-powerpc any-amd64
- Depends: binfmt-support (>= 1.1.2)
+-Architecture: i386 powerpc amd64 ia64 arm armeb
++Architecture: i386 kfreebsd-i386 powerpc amd64 kfreebsd-amd64 ia64 arm armeb
+ Depends: ${shlibs:Depends}, ${misc:Depends}, binfmt-support (>= 1.1.2)
  Description: common files for Mono
   Mono is a platform for running and developing applications based on the
 @@ -21,7 +21,7 @@
  
+ Package: mono-runtime
+ Provides: cli-runtime
+-Architecture: i386 powerpc amd64 ia64 arm armeb
++Architecture: i386 kfreebsd-i386 powerpc amd64 kfreebsd-amd64 ia64 arm armeb
+ Depends: mono-jit (= ${Source-Version}), mono-gac (= ${source:Version})
+ Description: Mono runtime
+  Mono is a platform for running and developing applications based on the
+@@ -34,7 +34,7 @@
+ 
  Package: mono-jit
  Provides: cli-virtual-machine
--Architecture: i386 powerpc amd64
-+Architecture: any-i386 any-powerpc any-amd64
- Depends: mono-common (= ${Source-Version}), mono-classlib-1.0-${mono:upversion}, ${shlibs:Depends}
- Description: fast CLI (.NET) JIT compiler for Mono
+-Architecture: i386 powerpc amd64 ia64 arm armeb
++Architecture: i386 kfreebsd-i386 powerpc amd64 kfreebsd-amd64 ia64 arm armeb
+ Depends: ${shlibs:Depends}, ${misc:Depends}, mono-common (= ${Source-Version})
+ Description: fast CLI JIT/AOT compiler for Mono
   Mono is a platform for running and developing applications based on the
-@@ -35,7 +35,7 @@
-  only.
+@@ -49,7 +49,7 @@
+  powerpc, amd64 and ia64 architectures.
  
  Package: mono
--Architecture: i386 powerpc amd64
-+Architecture: any-i386 any-powerpc any-amd64
+-Architecture: i386 powerpc amd64 ia64 arm armeb
++Architecture: i386 kfreebsd-i386 powerpc amd64 kfreebsd-amd64 ia64 arm armeb
  Depends: mono-common (= ${Source-Version}), mono-jit (= ${Source-Version})
+ Recommends: libgdiplus, libmono-corlib1.0-cil
  Description: Mono CLI (.NET) runtime
-  Mono is a platform for running and developing applications based on the
-@@ -50,7 +50,7 @@
+@@ -66,7 +66,7 @@
  
  Package: mono-devel
  Section: devel
--Architecture: i386 powerpc amd64
-+Architecture:  any-i386 any-powerpc any-amd64
+-Architecture: i386 powerpc amd64 ia64 arm armeb
++Architecture: i386 kfreebsd-i386 powerpc amd64 kfreebsd-amd64 ia64 arm armeb
  Depends: mono (= ${Source-Version}), mono-mcs, mono-gac, mono-utils, mono-jay
  Suggests: mono-gmcs
- Description: Mono CLI (.NET) runtime with development tools
-@@ -64,7 +64,7 @@
- 
+ Description: Mono CLI runtime with development tools
+@@ -82,7 +82,7 @@
  Package: mono-utils
- Section: devel
--Architecture: i386 powerpc amd64
-+Architecture: any-i386 any-powerpc any-amd64
- Replaces: mono-mcs (<= 1.1.6-4)
- Depends: ${shlibs:Depends}, mono-classlib-1.0
  Provides: cil-disassembler
-@@ -79,7 +79,7 @@
+ Section: devel
+-Architecture: i386 powerpc amd64 ia64 arm armeb
++Architecture: i386 kfreebsd-i386 powerpc amd64 kfreebsd-amd64 ia64 arm armeb
+ Replaces: mono-mcs (<= 1.1.6-4)
+ Depends: ${shlibs:Depends}, ${misc:Depends}, libmono-corlib1.0-cil
+ Suggests: libmono-corlib2.0-cil
+@@ -98,7 +98,7 @@
  
  Package: libmono0
  Section: libs
--Architecture: i386 powerpc amd64
-+Architecture: any-i386 any-powerpc any-amd64
+-Architecture: i386 powerpc amd64 ia64 arm armeb
++Architecture: i386 kfreebsd-i386 powerpc amd64 kfreebsd-amd64 ia64 arm armeb
  Replaces: libmono-dev (<= 1.1.6-4)
- Depends:  ${shlibs:Depends}
- Provides: libmono-${mono:upversion}
-@@ -95,7 +95,7 @@
+ Depends: ${shlibs:Depends}, ${misc:Depends}
+ Description: libraries for the Mono JIT
+@@ -113,7 +113,7 @@
  
  Package: libmono-dev
  Section: devel
--Architecture: i386 powerpc amd64
-+Architecture: any-i386 any-powerpc any-amd64
+-Architecture: i386 powerpc amd64 ia64 arm armeb
++Architecture: i386 kfreebsd-i386 powerpc amd64 kfreebsd-amd64 ia64 arm armeb
  Depends: libmono0 (= ${Source-Version}), libglib2.0-dev
  Description: libraries for the Mono JIT - Development files
   Header files and static libraries for libmono and libmono-profiler-conv.
-@@ -229,7 +229,7 @@
+@@ -917,7 +917,7 @@
  
  Package: mono-jay
  Section: devel
--Architecture: i386 powerpc amd64
-+Architecture: any-i386 any-powerpc any-amd64
- Depends: ${shlibs:Depends}
- Description: LALR(1) parser generator oriented to Java/.NET
+-Architecture: i386 powerpc amd64 ia64 arm armeb
++Architecture: i386 kfreebsd-i386 powerpc amd64 kfreebsd-amd64 ia64 arm armeb
+ Depends: ${shlibs:Depends}, ${misc:Depends}
+ Description: LALR(1) parser generator oriented to Java/CLI
   Mono is a platform for running and developing applications based on the
-diff -x configure -ur mono-1.1.8.2.old/debian/rules mono-1.1.8.2/debian/rules
---- mono-1.1.8.2.old/debian/rules	2005-08-03 13:42:53.000000000 +0200
-+++ mono-1.1.8.2/debian/rules	2005-08-09 15:15:27.000000000 +0200
-@@ -36,7 +36,7 @@
- 	./configure $(confflags) --prefix=/usr \
+diff -u mono-1.1.18/debian/rules mono-1.1.18/debian/rules
+--- mono-1.1.18/debian/rules
++++ mono-1.1.18/debian/rules
+@@ -21,14 +21,14 @@
+ 	confflags += --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+ endif
+ 
++ifeq ($(DEB_BUILD_ARCH_OS), kfreebsd)
++	confflags += --with-tls=__thread
++else
+ ifeq ($(DEB_BUILD_ARCH), amd64)
+ 	confflags += --with-tls=__thread
+ else
+ 	confflags += --with-tls=pthread
+ endif
+-
+-ifeq ($(DEB_BUILD_ARCH_OS), kfreebsd)
+-	confflags += --enable-minimal=aot
+ endif
+ 
+ ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+@@ -47,7 +47,7 @@
+ 	CFLAGS=$(CFLAGS) ./configure $(confflags) --prefix=/usr \
  	  --mandir=\$${prefix}/share/man \
  	  --infodir=\$${prefix}/share/info --sysconfdir=/etc \
--	  --with-sigaltstack=no --with-gc=included \
-+	  --with-sigaltstack=no --with-gc=none \
- 	  --with-jit=yes --with-ikvm-native=no --with-preview=yes
- 	$(MAKE)
- 	touch build-stamp
-@@ -51,6 +51,7 @@
- 	rm -rf $(MONO_SHARED_DIR)/.wapi
- 	-cd debian && \
- 	  rm -f dh_installxsp.1
-+	rm -f Makefile
- 	dh_clean
- 
- install: build
-@@ -107,8 +108,8 @@
- 	dh_compress -i
- 	dh_fixperms -i
- 	dh_installdeb -i
--	dh_makeclilibs -i -m 1.0 internal-mono
--	dh_clideps -i internal-mono
-+	-dh_makeclilibs -i -m 1.0 internal-mono
-+	-dh_clideps -i internal-mono
- 	dh_gencontrol -i -- -Vmono:upversion=$(UPVERSION) -Vmono:next-upversion=$(NEXT_UPVERSION)
- 	dh_md5sums -i
- 	dh_builddeb -i
-diff -x configure -ur mono-1.1.8.2.old/support/sys-statvfs.c mono-1.1.8.2/support/sys-statvfs.c
---- mono-1.1.8.2.old/support/sys-statvfs.c	2005-06-14 02:39:30.000000000 +0200
-+++ mono-1.1.8.2/support/sys-statvfs.c	2005-08-04 18:09:48.000000000 +0200
-@@ -27,6 +27,7 @@
- 
- G_BEGIN_DECLS
- 
-+#ifndef HAVE_SYS_STATVFS_H
- struct Mono_Posix_Statvfs {
- 	guint64         f_bsize;    /* file system block size */
- 	guint64         f_frsize;   /* fragment size */
-@@ -40,8 +41,23 @@
- 	guint64         f_flag;     /* mount flags */
- 	guint64         f_namemax;  /* maximum filename length */
- };
-+#else
-+struct Mono_Posix_Statvfs {
-+/* FIXME: unproperly copied from bits/statvfs.h */
-+  unsigned long int f_bsize;
-+  unsigned long int f_frsize;
-+  fsblkcnt_t f_blocks;
-+  fsblkcnt_t f_bfree;
-+  fsblkcnt_t f_bavail;
-+  fsfilcnt_t f_files;
-+  fsfilcnt_t f_ffree;
-+  fsfilcnt_t f_favail;
-+  fsid_t f_fsid;
-+  unsigned long int f_flag;
-+  unsigned long int f_namemax;
-+  unsigned int f_spare[6];
-+};
- 
--#ifdef HAVE_SYS_STATVFS_H
- static void
- copy_statvfs (struct Mono_Posix_Statvfs *to, struct statvfs *from)
- {
+-	  --with-sigaltstack=no $(GC) \
++	  --with-sigaltstack=no \
+ 	  --with-jit=yes --with-ikvm-native=no --with-preview=yes \
+ 	  --with-libgdiplus=installed --with-x=yes
+ 	LC_ALL=C $(MAKE) EXTERNAL_MCS=false EXTERNAL_MONO=false
+diff -u mono-1.1.18/debian/patches/00list mono-1.1.18/debian/patches/00list
+--- mono-1.1.18/debian/patches/00list
++++ mono-1.1.18/debian/patches/00list
+@@ -3,0 +4 @@
++kfreebsd_support.dpatch
+only in patch2:
+unchanged:
+--- mono-1.1.18.orig/debian/patches/kfreebsd_support.dpatch
++++ mono-1.1.18/debian/patches/kfreebsd_support.dpatch
+@@ -0,0 +1,257 @@
++#! /bin/sh /usr/share/dpatch/dpatch-run
++## 
++##
++## All lines beginning with `## DP:' are a description of the patch.
++## DP: kfreebsd support - mainly backport of gc 6.8
++
++@DPATCH@
++
++only in patch2:
++unchanged:
++--- mono-1.1.18.orig/configure.in
+++++ mono-1.1.18/configure.in
++@@ -88,6 +88,16 @@
++ 		libdl=
++ 		libgc_threads=no
++ 		;;
+++	*-*-kfreebsd*-gnu)
+++		platform_win32=no
+++		CPPFLAGS="$CPPFLAGS -DGC_FREEBSD_THREADS -D_GNU_SOURCE -D_REENTRANT -DUSE_MMAP -DUSE_MUNMAP -DTHREAD_LOCAL_ALLOC -pthread"
+++		libmono_cflags="-D_REENTRANT -DTHREAD_LOCAL_ALLOC -pthread"
+++		libmono_ldflags="-lpthread -pthread"
+++		libdl="-ldl"
+++		libgc_threads=pthreads
+++		need_link_unlink=yes
+++		with_sigaltstack=no
+++		;;
++ # these flags will work for all versions of -STABLE
++ #
++ 	*-*-*freebsd4*)
++@@ -1663,6 +1673,11 @@
++ 	LIBC="libc.so.12"
++ 	INTL="libintl.so.0"
++ 	;;
+++     *-*-kfreebsd*-gnu)
+++	LIBC="libc.so.0.1"
+++	INTL="libc.so.0.1"
+++	X11="libX11.so.6"
+++	;;
++     *-*-*freebsd*)
++     	LIBC="libc.so"
++ 	INTL="libintl.so"
++only in patch2:
++unchanged:
++--- mono-1.1.18.orig/libgc/configure.in
+++++ mono-1.1.18/libgc/configure.in
++@@ -103,6 +103,17 @@
++ 	AC_DEFINE(THREAD_LOCAL_ALLOC)
++ 	THREADDLLIBS="-lpthread -lrt"
++ 	;;
+++      *-*-kfreebsd*-gnu)
+++        AC_DEFINE(GC_FREEBSD_THREADS)
+++        INCLUDES="$INCLUDES -pthread"
+++        THREADDLLIBS=-pthread
+++        AC_DEFINE(_REENTRANT)
+++        if test "${enable_parallel_mark}" = yes; then
+++          AC_DEFINE(PARALLEL_MARK)
+++        fi
+++        AC_DEFINE(THREAD_LOCAL_ALLOC)
+++        AC_DEFINE(USE_COMPILER_TLS)
+++        ;;
++      *-*-freebsd4*)
++ 	AC_MSG_WARN("FreeBSD does not yet fully support threads with Boehm GC.")
++ 	AC_DEFINE(GC_FREEBSD_THREADS)
++only in patch2:
++unchanged:
++--- mono-1.1.18.orig/libgc/dyn_load.c
+++++ mono-1.1.18/libgc/dyn_load.c
++@@ -26,7 +26,7 @@
++  * None of this is safe with dlclose and incremental collection.
++  * But then not much of anything is safe in the presence of dlclose.
++  */
++-#if defined(__linux__) && !defined(_GNU_SOURCE)
+++#if (defined(__linux__) || defined(__GLIBC__)) && !defined(_GNU_SOURCE)
++     /* Can't test LINUX, since this must be define before other includes */
++ #   define _GNU_SOURCE
++ #endif
++@@ -386,7 +386,7 @@
++ /* For glibc 2.2.4+.  Unfortunately, it doesn't work for older	*/
++ /* versions.  Thanks to Jakub Jelinek for most of the code.	*/
++ 
++-# if defined(LINUX) /* Are others OK here, too? */ \
+++# if (defined(LINUX) || defined (__GLIBC__)) /* Are others OK here, too? */ \
++      && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2) \
++          || (__GLIBC__ == 2 && __GLIBC_MINOR__ == 2 && defined(DT_CONFIG))) 
++ 
++only in patch2:
++unchanged:
++--- mono-1.1.18.orig/libgc/include/gc.h
+++++ mono-1.1.18/libgc/include/gc.h
++@@ -484,7 +484,7 @@
++ #   define GC_RETURN_ADDR (GC_word)__return_address
++ #endif
++ 
++-#ifdef __linux__
+++#if defined(__linux__) || defined(__GLIBC__)
++ # include <features.h>
++ # if (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 1 || __GLIBC__ > 2) \
++      && !defined(__ia64__)
++only in patch2:
++unchanged:
++--- mono-1.1.18.orig/libgc/include/private/gcconfig.h
+++++ mono-1.1.18/libgc/include/private/gcconfig.h
++@@ -55,7 +55,7 @@
++ # endif
++ 
++ /* And one for FreeBSD: */
++-# if defined(__FreeBSD__) && !defined(FREEBSD)
+++# if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && !defined(FREEBSD)
++ #    define FREEBSD
++ # endif
++ 
++@@ -1275,8 +1275,15 @@
++ #	ifndef GC_FREEBSD_THREADS
++ #	    define MPROTECT_VDB
++ #	endif
++-#      define SIG_SUSPEND SIGTSTP
++-#      define SIG_THR_RESTART SIGCONT
+++#       ifdef __GLIBC__
+++#           define SIG_SUSPEND          (32+6)
+++#           define SIG_THR_RESTART      (32+5)
+++            extern int _end[];
+++#           define DATAEND (_end)
+++#       else
+++#           define SIG_SUSPEND SIGTSTP
+++#           define SIG_THR_RESTART SIGCONT
+++#       endif
++ #	define FREEBSD_STACKBOTTOM
++ #	ifdef __ELF__
++ #	    define DYNAMIC_LOADING
++@@ -1989,6 +1996,28 @@
++ #	    define PREFETCH_FOR_WRITE(x) __builtin_prefetch((x), 1)
++ #	endif
++ #   endif
+++#   ifdef FREEBSD
+++#	define OS_TYPE "FREEBSD"
+++#	ifndef GC_FREEBSD_THREADS
+++#	    define MPROTECT_VDB
+++#	endif
+++#	ifdef __GLIBC__
+++#	    define SIG_SUSPEND		(32+6)
+++#	    define SIG_THR_RESTART	(32+5)
+++	    extern int _end[];
+++#	    define DATAEND (_end)
+++#	else
+++#	    define SIG_SUSPEND SIGUSR1
+++#	    define SIG_THR_RESTART SIGUSR2
+++#	endif
+++#	define FREEBSD_STACKBOTTOM
+++#	ifdef __ELF__
+++#	    define DYNAMIC_LOADING
+++#	endif
+++	extern char etext[];
+++	extern char * GC_FreeBSDGetDataStart();
+++#	define DATASTART GC_FreeBSDGetDataStart(0x1000, &etext)
+++#   endif
++ #   ifdef NETBSD
++ #	define OS_TYPE "NETBSD"
++ #	ifdef __ELF__
++@@ -2060,7 +2089,7 @@
++ #   define SUNOS5SIGS
++ # endif
++ 
++-# if defined(FREEBSD) && (__FreeBSD__ >= 4)
+++# if defined(FREEBSD) && ((__FreeBSD__ >= 4) || (__FreeBSD_kernel__ >= 4))
++ #   define SUNOS5SIGS
++ # endif
++ 
++@@ -2123,7 +2152,7 @@
++ #   define CACHE_LINE_SIZE 32	/* Wild guess	*/
++ # endif
++ 
++-# ifdef LINUX
+++# if defined(LINUX) || defined(__GLIBC__)
++ #   define REGISTER_LIBRARIES_EARLY
++     /* We sometimes use dl_iterate_phdr, which may acquire an internal	*/
++     /* lock.  This isn't safe after the world has stopped.  So we must	*/
++@@ -2204,7 +2233,7 @@
++ #if defined(SPARC)
++ # define CAN_SAVE_CALL_ARGS
++ #endif
++-#if (defined(I386) || defined(X86_64)) && defined(LINUX)
+++#if (defined(I386) || defined(X86_64)) && (defined(LINUX) || defined(__GLIBC__))
++ 	    /* SAVE_CALL_CHAIN is supported if the code is compiled to save	*/
++ 	    /* frame pointers by default, i.e. no -fomit-frame-pointer flag.	*/
++ # define CAN_SAVE_CALL_ARGS
++
++only in patch2:
++unchanged:
++--- mono-1.1.18.orig/libgc/configure
+++++ mono-1.1.18/libgc/configure
++@@ -3974,6 +4636,32 @@
++ 
++ 	THREADDLLIBS="-lpthread -lrt"
++ 	;;
+++      *-*-kfreebsd*-gnu)
+++        cat >>confdefs.h <<\_ACEOF
+++#define GC_FREEBSD_THREADS 1
+++_ACEOF
+++
+++        INCLUDES="$INCLUDES -pthread"
+++        THREADDLLIBS=-pthread
+++        cat >>confdefs.h <<\_ACEOF
+++#define _REENTRANT 1
+++_ACEOF
+++
+++        if test "${enable_parallel_mark}" = yes; then
+++          cat >>confdefs.h <<\_ACEOF
+++#define PARALLEL_MARK 1
+++_ACEOF
+++
+++        fi
+++        cat >>confdefs.h <<\_ACEOF
+++#define THREAD_LOCAL_ALLOC 1
+++_ACEOF
+++
+++        cat >>confdefs.h <<\_ACEOF
+++#define USE_COMPILER_TLS 1
+++_ACEOF
+++
+++        ;;
++      *-*-freebsd4*)
++ 	{ echo "$as_me:$LINENO: WARNING: \"FreeBSD does not yet fully support threads with Boehm GC.\"" >&5
++ echo "$as_me: WARNING: \"FreeBSD does not yet fully support threads with Boehm GC.\"" >&2;}
++
++only in patch2:
++unchanged:
++--- mono-1.1.18.orig/configure
+++++ mono-1.1.18/configure
++@@ -2245,6 +2828,16 @@
++ 		libdl=
++ 		libgc_threads=no
++ 		;;
+++	*-*-kfreebsd*-gnu)
+++		platform_win32=no
+++		CPPFLAGS="$CPPFLAGS -DGC_FREEBSD_THREADS -D_GNU_SOURCE -D_REENTRANT -DUSE_MMAP -DUSE_MUNMAP -DTHREAD_LOCAL_ALLOC -pthread"
+++		libmono_cflags="-D_REENTRANT -DTHREAD_LOCAL_ALLOC -pthread"
+++		libmono_ldflags="-lpthread -pthread"
+++		libdl="-ldl"
+++		libgc_threads=pthreads
+++		need_link_unlink=yes
+++		with_sigaltstack=no
+++		;;
++ # these flags will work for all versions of -STABLE
++ #
++ 	*-*-*freebsd4*)
++@@ -35603,6 +38772,11 @@
++ 	LIBC="libc.so.12"
++ 	INTL="libintl.so.0"
++ 	;;
+++     *-*-kfreebsd*-gnu)
+++	LIBC="libc.so.0.1"
+++	INTL="libc.so.0.1"
+++	X11="libX11.so.6"
+++	;;
++     *-*-*freebsd*)
++     	LIBC="libc.so"
++ 	INTL="libintl.so"
