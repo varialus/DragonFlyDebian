@@ -116,6 +116,22 @@ diff -u mono-1.1.18/debian/rules mono-1.1.18/debian/rules
  	  --with-jit=yes --with-ikvm-native=no --with-preview=yes \
  	  --with-libgdiplus=installed --with-x=yes
  	LC_ALL=C $(MAKE) EXTERNAL_MCS=false EXTERNAL_MONO=false
+diff -u mono-1.1.18/debian/dh_clideps mono-1.1.18/debian/dh_clideps
+--- mono-1.1.18/debian/dh_clideps
++++ mono-1.1.18/debian/dh_clideps
+@@ -490,9 +490,10 @@
+      $pkgref =~ m/(\S+)(?:\s+(\(\S+\s+\S+\)))?/;
+      my $pkgname = $1;
+      my $ver = $2;
+-     # hack for libc6, for ia64 and alpha the package name is libc6.1
++     # hack for libc6, for ia64 and alpha the package name is libc6.1, for kfreebsd-i386 
++     # and kfreebsd-amd64 it is libc0.1
+      if ($pkgname =~ m/^libc6/) {
+-       $pkg = "libc6 $ver | libc6.1 $ver";
++       $pkg = "libc6 $ver | libc6.1 $ver | libc0.1 $ver";
+      }
+      
+      if (defined($clideps_override{$pkgname})) {
 diff -u mono-1.1.18/debian/patches/00list mono-1.1.18/debian/patches/00list
 --- mono-1.1.18/debian/patches/00list
 +++ mono-1.1.18/debian/patches/00list
