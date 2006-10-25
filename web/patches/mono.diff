@@ -124,10 +124,11 @@ diff -u mono-1.1.18/debian/dh_clideps mono-1.1.18/debian/dh_clideps
       my $pkgname = $1;
       my $ver = $2;
 -     # hack for libc6, for ia64 and alpha the package name is libc6.1
+-     if ($pkgname =~ m/^libc6/) {
+-       $pkg = "libc6 $ver | libc6.1 $ver";
 +     # hack for libc6, for ia64 and alpha the package name is libc6.1, for kfreebsd-i386 
 +     # and kfreebsd-amd64 it is libc0.1
-      if ($pkgname =~ m/^libc6/) {
--       $pkg = "libc6 $ver | libc6.1 $ver";
++     if ($pkgname =~ m/^libc[06]/) {
 +       $pkg = "libc6 $ver | libc6.1 $ver | libc0.1 $ver";
       }
       
