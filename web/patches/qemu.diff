@@ -1,0 +1,107 @@
+* at least on kfreebsd-i386 works, 
+  kfreebsd-amd64 runs inside qemu under kfreebsd-i386
+
+* for build it needs glibc with r1698 (fixes to <bits/sigcontext.h>)
+
+diff -u qemu-0.8.2/debian/control qemu-0.8.2/debian/control
+--- qemu-0.8.2/debian/control
++++ qemu-0.8.2/debian/control
+@@ -6,13 +6,14 @@
+  Guillem Jover <guillem@debian.org>, Elrond <elrond@samba-tng.org>,
+  Josh Triplett <josh@psas.pdx.edu>
+ Build-Depends: debhelper (>= 5), quilt (>= 0.40), binutils (>= 2.16-1), nasm,
+- gcc-3.4, libasound2-dev, libx11-dev, libsdl1.2-dev (>> 1.2.1), zlib1g-dev,
++ gcc-3.4, libasound2-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libx11-dev,
++ libsdl1.2-dev (>> 1.2.1), zlib1g-dev, libfreebsd-dev [kfreebsd-i386 kfreebsd-amd64],
+  texi2html, sharutils, libgpmg1-dev [amd64 i386 powerpc alpha sparc arm s390],
+  iasl
+ Standards-Version: 3.7.2
+ 
+ Package: qemu
+-Architecture: amd64 i386 powerpc alpha sparc arm s390
++Architecture: amd64 i386 powerpc alpha sparc arm s390 kfreebsd-i386 kfreebsd-amd64
+ Depends: ${shlibs:Depends}, vgabios (>= 0.5a-1), bochsbios (>= 2.2.1-1),
+  proll, openhackware
+ Recommends: debootstrap, sharutils, vde
+diff -u qemu-0.8.2/debian/patches/series qemu-0.8.2/debian/patches/series
+--- qemu-0.8.2/debian/patches/series
++++ qemu-0.8.2/debian/patches/series
+@@ -30,0 +31 @@
++65_kfreebsd.patch
+diff -u qemu-0.8.2/debian/rules qemu-0.8.2/debian/rules
+--- qemu-0.8.2/debian/rules
++++ qemu-0.8.2/debian/rules
+@@ -3,6 +3,7 @@
+ # $Id: rules 190 2006-09-20 01:14:03Z guillem $
+ #
+ 
++DEB_HOST_ARCH_OS = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+ CC = gcc-3.4
+ # WARNING: Removing no-strict-aliasing will make qemu insta-segfault.
+ CFLAGS = -Wall -g -fno-strict-aliasing
+@@ -13,6 +14,12 @@
+ 	CFLAGS += -O2
+ endif
+ 
++CONF_FLAGS = --prefix=/usr --enable-iasl --cc=$(CC)
++
++ifeq (linux,$(DEB_HOST_ARCH_OS))
++	CONF_FLAGS += --enable-alsa
++endif
++
+ D = $(CURDIR)/debian/qemu
+ 
+ qemu_bios_files = \
+@@ -34,11 +41,7 @@
+ config-host.mak: configure
+ 	dh_testdir
+ 	
+-	CFLAGS="$(CFLAGS)" ./configure \
+-	  --prefix=/usr \
+-	  --enable-alsa \
+-	  --enable-iasl \
+-	  --cc=$(CC)
++	CFLAGS="$(CFLAGS)" ./configure $(CONF_FLAGS)
+ 
+ build: patch config-host.mak
+ 	dh_testdir
+only in patch2:
+unchanged:
+--- qemu-0.8.2.orig/debian/patches/65_kfreebsd.patch
++++ qemu-0.8.2/debian/patches/65_kfreebsd.patch
+@@ -0,0 +1,35 @@
++--- qemu-0.8.2.orig/configure
+++++ qemu-0.8.2/configure
++@@ -108,6 +108,12 @@
++ MINGW32*)
++ mingw32="yes"
++ ;;
+++GNU/kFreeBSD)
+++oss="yes"
+++if [ "$cpu" = "i386" -o "$cpu" = "x86_64" ] ; then
+++    kqemu="yes"
+++fi
+++;;
++ FreeBSD)
++ bsd="yes"
++ oss="yes"
++--- qemu-0.8.2.orig/vl.c
+++++ qemu-0.8.2/vl.c
++@@ -46,6 +46,8 @@
++ #ifndef __APPLE__
++ #include <libutil.h>
++ #endif
+++#elif defined (__FreeBSD_kernel__)
+++#include <freebsd/stdlib.h>
++ #else
++ #ifndef __sun__
++ #include <linux/if.h>
++@@ -3022,7 +3024,7 @@
++     return s;
++ }
++ 
++-#ifdef _BSD
+++#if defined (_BSD) || defined (__FreeBSD_kernel__)
++ static int tap_open(char *ifname, int ifname_size)
++ {
++     int fd;
