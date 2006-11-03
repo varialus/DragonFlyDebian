@@ -57,7 +57,7 @@ struct sigcontext
     union { int sc_eip; int eip; };		/* Instruction pointer.  */
     union { int sc_cs; int cs; };		/* Code segment register.  */
 
-    int sc_efl;					/* Processor flags.  */
+    union { int sc_efl; int eflags; };		/* Processor flags.  */
 
     union { int sc_esp; int esp; };		/* This stack pointer is used.  */
     union { int sc_ss; int ss; };		/* Stack segment register.  */
@@ -80,7 +80,6 @@ struct sigcontext
 #define sc_pc		sc_eip		/* Process counter.  */
 #define sc_ps		sc_efl
 #define sc_eflags	sc_efl
-#define eflags		sc_efl		/* Linux-style name. */
 
 
 /* Codes for SIGFPE.  */
