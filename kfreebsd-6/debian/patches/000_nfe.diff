@@ -2613,17 +2613,6 @@ diff -Nurd sys/dev/nfe/if_nfevar.h sys/dev/nfe/if_nfevar.h
 +	u_int16_t	dev_id;
 +	char		*name;
 +};
-diff -Nurd sys/i386/conf/GENERIC sys/i386/conf/GENERIC
---- sys/i386/conf/GENERIC	2006-11-03 09:00:17.000000000 +0100
-+++ sys/i386/conf/GENERIC	2006-11-03 08:55:46.000000000 +0100
-@@ -193,6 +193,7 @@
- device		dc		# DEC/Intel 21143 and various workalikes
- device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
- device		lge		# Level 1 LXT1001 gigabit Ethernet
-+device		nfe		# NVidia NForce 3/4
- device		nge		# NatSemi DP83820 gigabit Ethernet
- device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
- device		re		# RealTek 8139C+/8169/8169S/8110S
 diff -Nurd sys/modules/nfe/Makefile sys/modules/nfe/Makefile
 --- sys/modules/nfe/Makefile	1970-01-01 01:00:00.000000000 +0100
 +++ sys/modules/nfe/Makefile	2006-11-03 08:53:03.000000000 +0100
@@ -2634,17 +2623,6 @@ diff -Nurd sys/modules/nfe/Makefile sys/modules/nfe/Makefile
 +SRCS=	if_nfe.c miibus_if.h opt_bdg.h device_if.h bus_if.h pci_if.h
 +
 +.include <bsd.kmod.mk>
-diff -Nurd sys/pc98/conf/GENERIC sys/pc98/conf/GENERIC
---- sys/pc98/conf/GENERIC	2006-11-03 09:00:04.000000000 +0100
-+++ sys/pc98/conf/GENERIC	2006-11-03 08:55:51.000000000 +0100
-@@ -168,6 +168,7 @@
- device		dc		# DEC/Intel 21143 and various workalikes
- device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
- device		lge		# Level 1 LXT1001 gigabit Ethernet
-+device		nfe		# NVIDIA nForce MCP Ethernet
- device		nge		# NatSemi DP83820 gigabit Ethernet
- device		pcn		# AMD Am79C97x PCI 10/100 (precedence over 'lnc')
- device		re		# RealTek 8139C+/8169/8169S/8110S
 diff -Nurd sys/modules/Makefile sys/modules/Makefile 
 --- sys/modules/Makefile	2006-11-03 13:44:50.000000000 +0100
 +++ sys/modules/Makefile	2006-11-03 15:29:22.000000000 +0100
@@ -2656,3 +2634,47 @@ diff -Nurd sys/modules/Makefile sys/modules/Makefile
  	nfsclient \
  	nfsserver \
  	nge \
+diff -Nurd sys/amd64/conf/GENERIC sys/amd64/conf/GENERIC
+--- sys/amd64/conf/GENERIC	2006-11-03 21:20:25.000000000 +0100
++++ sys/amd64/conf/GENERIC	2006-11-03 21:21:04.000000000 +0100
+@@ -181,6 +181,7 @@
+ device		dc		# DEC/Intel 21143 and various workalikes
+ device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+ device		lge		# Level 1 LXT1001 gigabit Ethernet
++device		nfe		# NVIDIA nForce MCP Ethernet
+ device		nge		# NatSemi DP83820 gigabit Ethernet
+ device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
+ device		re		# RealTek 8139C+/8169/8169S/8110S
+diff -Nurd sys/i386/conf/GENERIC sys/i386/conf/GENERIC
+--- sys/i386/conf/GENERIC	2006-11-03 09:00:17.000000000 +0100
++++ sys/i386/conf/GENERIC	2006-11-03 08:55:46.000000000 +0100
+@@ -193,6 +193,7 @@
+ device		dc		# DEC/Intel 21143 and various workalikes
+ device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+ device		lge		# Level 1 LXT1001 gigabit Ethernet
++device		nfe		# NVidia nForce MCP Ethernet
+ device		nge		# NatSemi DP83820 gigabit Ethernet
+ device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
+ device		re		# RealTek 8139C+/8169/8169S/8110S
+diff -Nurd sys/pc98/conf/GENERIC sys/pc98/conf/GENERIC
+--- sys/pc98/conf/GENERIC	2006-11-03 09:00:04.000000000 +0100
++++ sys/pc98/conf/GENERIC	2006-11-03 08:55:51.000000000 +0100
+@@ -168,6 +168,7 @@
+ device		dc		# DEC/Intel 21143 and various workalikes
+ device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+ device		lge		# Level 1 LXT1001 gigabit Ethernet
++device		nfe		# NVIDIA nForce MCP Ethernet
+ device		nge		# NatSemi DP83820 gigabit Ethernet
+ device		pcn		# AMD Am79C97x PCI 10/100 (precedence over 'lnc')
+ device		re		# RealTek 8139C+/8169/8169S/8110S
+diff -Nurd sys/conf/files sys/conf/files
+--- sys/conf/files	2006-11-03 21:26:25.000000000 +0100
++++ sys/conf/files	2006-11-03 21:30:19.000000000 +0100
+@@ -693,6 +693,7 @@
+ dev/my/if_my.c			optional my
+ dev/ncv/ncr53c500.c		optional ncv
+ dev/ncv/ncr53c500_pccard.c	optional ncv pccard
++dev/nfe/if_nfe.c		optional nfe
+ dev/nge/if_nge.c		optional nge
+ dev/nmdm/nmdm.c			optional nmdm
+ dev/nsp/nsp.c			optional nsp
