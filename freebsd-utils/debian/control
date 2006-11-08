@@ -15,8 +15,8 @@ Package: freebsd-utils
 Priority: required
 Essential: yes
 Architecture: kfreebsd-i386 kfreebsd-amd64
-Depends: ${shlibs:Depends}, net-tools | freebsd-hackedutils
-Replaces: freebsd-hackedutils (<= 5.2.1-29)
+Depends: ${shlibs:Depends}, net-tools, freebsd-hackedutils
+Replaces: freebsd-hackedutils (<= 5.2.1-30)
 Description: FreeBSD utilities needed for GNU/kFreeBSD.
  This package contains FreeBSD utilities needed for GNU/kFreeBSD.
 
@@ -45,21 +45,20 @@ Description: Command line tool to change keyboard layout
  Original FreeBSD command to set keyboard layout and the FreeBSD possible
  keyboards.
 
-#Package: net-tools
-#Section: net
-#Priority: important
-#Architecture: kfreebsd-i386 kfreebsd-amd64
-#Depends: ${shlibs:Depends}
-#Replaces: freebsd-utils (<< 5.4), freebsd-hackedutils (<= 5.2.1-29)
-#Description: FreeBSD networking tools
-# This package contains the FreeBSD tools needed to manage networking on
-# GNU/kFreeBSD.
+Package: net-tools
+Section: net
+Priority: important
+Architecture: kfreebsd-i386 kfreebsd-amd64
+Depends: ${shlibs:Depends}
+Replaces: freebsd-utils (<< 5.4), freebsd-hackedutils (<= 5.2.1-30)
+Description: FreeBSD networking tools
+ This package contains the FreeBSD tools needed to manage networking on
+ GNU/kFreeBSD.
 
 # FIXME:
-# - add ktrace (ktrace, kdump)
+# - add kdump
 # - add jail
 # - add ppp (ppp, pppctl, pppd)
-# - add ccdconfig (ccdconfig + /etc/ccdconfig.conf)
 # - add pf (pfctl + authpf + /etc stuff + init.d script)
 # - add ipfw (???)
 # - add devfs

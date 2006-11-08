@@ -14,8 +14,9 @@ PMAKE=make COPTS="-D_GNU_SOURCE" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=
 export LDADD=-lbsd -lfreebsd
 
 build/freebsd-utils:: apply-patches
-	set -e ; for i in sbin/{dmesg,mdconfig,mount,mount_std,umount,swapon,sysctl} usr.sbin/rpc.umntall \
+	set -e ; for i in sbin/{ccdconfig,dmesg,mdconfig,mount,mount_std,umount,swapon,sysctl} usr.sbin/rpc.umntall \
 		sbin/mount_{autofs,cd9660,ext2fs,hpfs,msdosfs,ntfs,nullfs,reiserfs,udf,umapfs,unionfs} \
+		usr.bin/ktrace \
 	; do \
 		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
 	done
