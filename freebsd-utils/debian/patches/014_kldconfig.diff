@@ -1,0 +1,19 @@
+--- src/sbin/kldconfig/kldconfig.c	2006-11-10 23:51:38.000000000 +0100
++++ src/sbin/kldconfig/kldconfig.c	2006-11-10 23:50:44.000000000 +0100
+@@ -39,14 +39,8 @@
+ #include <string.h>
+ #include <unistd.h>
+ 
+-#if defined(__FreeBSD_version)
+-#if __FreeBSD_version < 500000
+-#define NEED_SLASHTERM
+-#endif /* < 500000 */
+-#else  /* defined(__FreeBSD_version) */
+-/* just in case.. */
+-#define NEED_SLASHTERM
+-#endif /* defined(__FreeBSD_version) */
++#include <bsd/string.h>
++extern int sysctlnametomib(const char *name, int *mibp, size_t *sizep);
+ 
+ /* the default sysctl name */
+ #define PATHCTL	"kern.module_path"
