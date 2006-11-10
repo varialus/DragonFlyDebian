@@ -64,7 +64,7 @@ if_iterate (if_fn fn, void *private)
       switch (msg->ifm_type)
 	{
 	case RTM_IFINFO:
-	  if (msg->ifm_flags & IFF_UP)
+	  if (msg->ifm_addrs & RTA_IFP)
 	    {
 	      unsigned int index;
 	      struct sockaddr_dl *sdl;
