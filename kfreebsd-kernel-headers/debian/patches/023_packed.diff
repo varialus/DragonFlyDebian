@@ -170,4 +170,44 @@
 +} __attribute__ ((packed));
  
  #define IEEE80211_CHALLENGE_LEN		128
+
+--- sys/sys/ata.h.ORIG	2006-11-13 14:13:49.000000000 +0100
++++ sys/sys/ata.h	2006-11-13 14:15:39.000000000 +0100
+@@ -157,7 +157,7 @@
+ #define ATA_SUPPORT_FLUSHCACHE48        0x2000
  
+ /*084/087*/ u_int16_t   extension;
+-	} __packed support, enabled;
++	} __attribute__((__packed__)) support, enabled;
+ 
+ /*088*/ u_int16_t       udmamodes;              /* UltraDMA modes */
+ /*089*/ u_int16_t       erase_time;
+@@ -188,7 +188,7 @@
+ /*176*/ u_int16_t       media_serial[30];
+ 	u_int16_t       reserved206[49];
+ /*255*/ u_int16_t       integrity;
+-} __packed;
++} __attribute__((__packed__));
+ 
+ 
+ /* ATA transfer modes */
+@@ -389,7 +389,7 @@
+ 	
+     u_int8_t	specific1;		/* sense key specific */
+     u_int8_t	specific2;		/* sense key specific */
+-} __packed;
++} __attribute__((__packed__));
+ 
+ struct ata_ioc_request {
+     union {
+--- sys/dev/ata/atapi-cd.h~	2006-11-13 14:31:42.000000000 +0100
++++ sys/dev/ata/atapi-cd.h	2006-11-13 14:31:42.000000000 +0100
+@@ -266,7 +266,7 @@
+     u_int8_t    vendor_specific_byte1;
+     u_int8_t    vendor_specific_byte2;
+     u_int8_t    vendor_specific_byte3;
+-} __packed;
++} __attribute__((__packed__));
+ 
+ /* CDROM Read Track Information structure */
+ struct acd_track_info {
