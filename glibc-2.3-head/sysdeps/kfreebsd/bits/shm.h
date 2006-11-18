@@ -59,3 +59,16 @@ struct shmid_ds
     __time_t shm_ctime;			/* time of last change by shmctl() */
     void *__shm_internal;
   };
+
+#ifdef _KERNEL
+
+struct shminfo {
+        int     shmmax,         /* max shared memory segment size (bytes) */
+                shmmin,         /* min shared memory segment size (bytes) */
+                shmmni,         /* max number of shared memory identifiers */
+                shmseg,         /* max shared memory segments per process */
+                shmall;         /* max amount of shared memory (pages) */
+};
+
+#endif
+

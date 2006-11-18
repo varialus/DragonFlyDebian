@@ -68,3 +68,24 @@ struct semid_ds
    incorrect.  One can test the macro _SEM_SEMUN_UNDEFINED to see whether
    one must define the union or not.  */
 #define _SEM_SEMUN_UNDEFINED	1
+
+#ifdef _KERNEL
+
+/*
+ * semaphore info struct
+ */
+struct seminfo {
+        int     semmap,         /* # of entries in semaphore map */
+                semmni,         /* # of semaphore identifiers */
+                semmns,         /* # of semaphores in system */
+                semmnu,         /* # of undo structures in system */
+                semmsl,         /* max # of semaphores per id */
+                semopm,         /* max # of operations per semop call */
+                semume,         /* max # of undo entries per process */
+                semusz,         /* size in bytes of undo structure */
+                semvmx,         /* semaphore maximum value */
+                semaem;         /* adjust on exit max value */
+};
+
+#endif
+
