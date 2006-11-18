@@ -55,7 +55,7 @@ struct msqid_ds
 
 # define msg_cbytes	__msg_cbytes
 
-# if 0 /* XXX No way to use this from user space?  */
+# ifdef _KERNEL
 
 /* buffer for msgctl calls IPC_INFO, MSG_INFO */
 struct msginfo
