@@ -1,0 +1,696 @@
+diff -u libgtop2-2.14.4/debian/control.in libgtop2-2.14.4/debian/control.in
+--- libgtop2-2.14.4/debian/control.in
++++ libgtop2-2.14.4/debian/control.in
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Sebastien Bacher <seb128@debian.org>
+ Uploaders: @GNOME_TEAM@
+-Build-Depends: debhelper (>= 4.0), gettext, pkg-config, libpopt-dev, libxau-dev, libglib2.0-dev (>= 2.6.0), gnome-pkg-tools, cdbs, texinfo, dpkg-dev (>= 1.13.19), libxml-parser-perl
++Build-Depends: debhelper (>= 4.0), gettext, pkg-config, libpopt-dev, libxau-dev, libglib2.0-dev (>= 2.6.0), gnome-pkg-tools, cdbs, texinfo, dpkg-dev (>= 1.13.19), libxml-parser-perl, libkvm-dev [kfreebsd-i386 kfreebsd-amd64]
+ Standards-Version: 3.7.2
+ 
+ Package: libgtop2-7
+@@ -19,7 +19,7 @@
+ Package: libgtop2-dev
+ Architecture: any
+ Section: libdevel
+-Depends: libgtop2-7 (= ${binary:Version}), libglib2.0-dev
++Depends: libgtop2-7 (= ${binary:Version}), libglib2.0-dev, ${libkvm-dev}
+ Description: gtop system monitoring library
+  The gtop library reads information about processes and the state of the
+  system. It is used by the GNOME desktop environment.
+diff -u libgtop2-2.14.4/debian/control libgtop2-2.14.4/debian/control
+--- libgtop2-2.14.4/debian/control
++++ libgtop2-2.14.4/debian/control
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Sebastien Bacher <seb128@debian.org>
+ Uploaders: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>, Andrew Lau <netsnipe@users.sourceforge.net>, Clément Stenac <zorglub@debian.org>, Dafydd Harries <daf@debian.org>, Guilherme de S. Pastore <gpastore@debian.org>, Gustavo Franco <stratus@debian.org>, Gustavo Noronha Silva <kov@debian.org>, J.H.M. Dassen (Ray) <jdassen@debian.org>, Jordi Mallach <jordi@debian.org>, Jose Carlos Garcia Sogo <jsogo@debian.org>, Josselin Mouette <joss@debian.org>, Loic Minier <lool@dooz.org>, Marc 'HE' Brockschmidt <he@debian.org>, Marco Cabizza <marco87@gmail.com>, Oystein Gisnas <oystein@gisnas.net>, Ondřej Surý <ondrej@debian.org>, Ross Burton <ross@debian.org>, Sjoerd Simons <sjoerd@debian.org>
+-Build-Depends: debhelper (>= 4.0), gettext, pkg-config, libpopt-dev, libxau-dev, libglib2.0-dev (>= 2.6.0), gnome-pkg-tools, cdbs, texinfo, dpkg-dev (>= 1.13.19), libxml-parser-perl
++Build-Depends: debhelper (>= 4.0), gettext, pkg-config, libpopt-dev, libxau-dev, libglib2.0-dev (>= 2.6.0), gnome-pkg-tools, cdbs, texinfo, dpkg-dev (>= 1.13.19), libxml-parser-perl, libkvm-dev [kfreebsd-i386 kfreebsd-amd64]
+ Standards-Version: 3.7.2
+ 
+ Package: libgtop2-7
+@@ -19,7 +19,7 @@
+ Package: libgtop2-dev
+ Architecture: any
+ Section: libdevel
+-Depends: libgtop2-7 (= ${binary:Version}), libglib2.0-dev
++Depends: libgtop2-7 (= ${binary:Version}), libglib2.0-dev, ${libkvm-dev}
+ Description: gtop system monitoring library
+  The gtop library reads information about processes and the state of the
+  system. It is used by the GNOME desktop environment.
+diff -u libgtop2-2.14.4/debian/rules libgtop2-2.14.4/debian/rules
+--- libgtop2-2.14.4/debian/rules
++++ libgtop2-2.14.4/debian/rules
+@@ -9,0 +10,5 @@
++
++ifeq (kfreebsd,$(DEB_HOST_ARCH_OS))
++DEB_DH_GENCONTROL_ARGS = -- -Vlibkvm-dev=libkvm-dev
++endif
++
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/sysdeps/freebsd/procsignal.c
++++ libgtop2-2.14.4/sysdeps/freebsd/procsignal.c
+@@ -70,7 +70,7 @@
+ 		return;
+ 	}
+ 
+-#if defined(__FreeBSD__) && (__FreeBSD_version >= 500013)
++#if (defined(__FreeBSD__) && (__FreeBSD_version >= 500013)) || defined(__FreeBSD_kernel__)
+ 
+ #define	PROC_SIGLIST	ki_siglist
+ #define	PROC_SIGMASK	ki_sigmask
+@@ -92,7 +92,7 @@
+ #if defined(__NetBSD__) && (__NetBSD_Version__ >= 105150000)
+ 	buf->signal [0] = pinfo [0].kp_proc.p_sigctx.ps_siglist.__bits[0];
+ #elif (defined(__NetBSD__) && (NSIG > 32)) || \
+-      (defined(__FreeBSD__) && (__FreeBSD_version >= 400011))
++      (defined(__FreeBSD__) && (__FreeBSD_version >= 400011) || defined(__FreeBSD_kernel__))
+ 	buf->signal [0] = pinfo [0].PROC_SIGLIST.__bits[0];
+ #else
+ 	buf->signal [0] = pinfo [0].kp_proc.p_siglist;
+@@ -104,7 +104,7 @@
+ #if defined(__NetBSD__) && (__NetBSD_Version__ >= 105150000)
+ 	buf->blocked [0] = pinfo [0].kp_proc.p_sigctx.ps_sigmask.__bits[0];
+ #elif (defined(__NetBSD__) && (NSIG > 32)) || \
+-      (defined(__FreeBSD__) && (__FreeBSD_version >= 400011))
++      (defined(__FreeBSD__) && (__FreeBSD_version >= 400011) || defined(__FreeBSD_kernel__))
+ 	buf->blocked [0] = pinfo [0].PROC_SIGMASK.__bits[0];
+ #else
+ 	buf->blocked [0] = pinfo [0].kp_proc.p_sigmask;
+@@ -116,7 +116,7 @@
+ #if defined(__NetBSD__) && (__NetBSD_Version__ >= 105150000)
+ 	buf->sigignore [0] = pinfo [0].kp_proc.p_sigctx.ps_sigignore.__bits[0];
+ #elif (defined(__NetBSD__) && (NSIG > 32)) || \
+-      (defined(__FreeBSD__) && (__FreeBSD_version >= 400011))
++      (defined(__FreeBSD__) && (__FreeBSD_version >= 400011) || defined(__FreeBSD_kernel__))
+ 	buf->sigignore [0] = pinfo [0].PROC_SIGIGNORE.__bits[0];
+ #else
+ 	buf->sigignore [0] = pinfo [0].kp_proc.p_sigignore;
+@@ -128,7 +128,7 @@
+ #if defined(__NetBSD__) && (__NetBSD_Version__ >= 105150000)
+ 	buf->sigcatch [0] = pinfo [0].kp_proc.p_sigctx.ps_sigcatch.__bits[0];
+ #elif (defined(__NetBSD__) && (NSIG > 32)) || \
+-      (defined(__FreeBSD__) && (__FreeBSD_version >= 400011))
++      (defined(__FreeBSD__) && (__FreeBSD_version >= 400011) || defined(__FreeBSD_kernel__))
+ 	buf->sigcatch [0] = pinfo [0].PROC_SIGCATCH.__bits[0];
+ #else
+ 	buf->sigcatch [0] = pinfo [0].kp_proc.p_sigcatch;
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/sysdeps/freebsd/mem.c
++++ libgtop2-2.14.4/sysdeps/freebsd/mem.c
+@@ -43,7 +43,7 @@
+ (1L << GLIBTOP_MEM_FREE) +
+ (1L << GLIBTOP_MEM_SHARED) +
+ (1L << GLIBTOP_MEM_BUFFER) +
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ (1L << GLIBTOP_MEM_CACHED) +
+ #endif
+ (1L << GLIBTOP_MEM_USER) + (1L << GLIBTOP_MEM_LOCKED);
+@@ -66,7 +66,7 @@
+ #else
+ #if defined(__bsdi__)
+ 	{ "_bufcachemem" },
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	{ "_bufspace" },
+ #else
+ 	{ "_bufpages" },
+@@ -171,7 +171,7 @@
+ 
+ 	/* convert memory stats to Kbytes */
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	v_total_count = vmm.v_page_count;
+ #else
+ #if defined(__NetBSD__)  && (__NetBSD_Version__ >= 104000000) || defined(__OpenBSD__)
+@@ -198,7 +198,7 @@
+ 	buf->used  = (guint64) pagetok (v_used_count) << LOG1024;
+ 	buf->free  = (guint64) pagetok (v_free_count) << LOG1024;
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	buf->cached = (guint64) pagetok (vmm.v_cache_count) << LOG1024;
+ #endif
+ 
+@@ -210,7 +210,7 @@
+ 
+ 	buf->shared = (guint64) pagetok (vmt.t_rmshr) << LOG1024;
+ 
+-#if __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	buf->buffer = (guint64) bufspace;
+ #else
+ 	buf->buffer = (guint64) pagetok (bufspace) << LOG1024;
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/sysdeps/freebsd/procstate.c
++++ libgtop2-2.14.4/sysdeps/freebsd/procstate.c
+@@ -73,7 +73,7 @@
+ 		return;
+ 	}
+ 
+-#if defined(__FreeBSD__) && (__FreeBSD_version >= 500013)
++#if (defined(__FreeBSD__) && (__FreeBSD_version >= 500013)) || defined(__FreeBSD_kernel__)
+ #define	PROC_COMM	ki_comm
+ #define	PROC_SVUID	ki_svuid
+ #define	PROC_SVGID	ki_svgid
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/sysdeps/freebsd/fsusage.c
++++ libgtop2-2.14.4/sysdeps/freebsd/fsusage.c
+@@ -46,9 +46,9 @@
+ 	if (result == -1) {
+ 		return;
+ 	}
+-
++#if !defined(__FreeBSD_kernel__)
+ 	buf->read = sfs.f_syncreads + sfs.f_asyncreads;
+ 	buf->write = sfs.f_syncwrites + sfs.f_asyncwrites;
+-
++#endif
+ 	buf->flags |= (1 << GLIBTOP_FSUSAGE_READ) | (1 << GLIBTOP_FSUSAGE_WRITE);
+ }
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/sysdeps/freebsd/swap.c
++++ libgtop2-2.14.4/sysdeps/freebsd/swap.c
+@@ -33,13 +33,13 @@
+ (1L << GLIBTOP_SWAP_FREE) + (1L << GLIBTOP_SWAP_PAGEIN) +
+ (1L << GLIBTOP_SWAP_PAGEOUT);
+ 
+-#if defined(__FreeBSD__) || defined(__bsdi__)
++#if defined(__FreeBSD__) || defined(__bsdi__) || defined(__FreeBSD_kernel__)
+ 
+ #include <sys/conf.h>
+ #ifdef __bsdi__
+ #include <vm/swap_pager.h>
+ #else
+-#if __FreeBSD_version < 400005
++#if (__FreeBSD_version < 400005) && !defined(__FreeBSD_kernel__)
+ #include <sys/rlist.h>
+ #endif
+ #endif
+@@ -94,7 +94,7 @@
+ void
+ glibtop_init_swap_p (glibtop *server)
+ {
+-#if defined(__FreeBSD__) || defined(__bsdi__)
++#if defined(__FreeBSD__) || defined(__bsdi__) || defined(__FreeBSD_kernel__)
+ #if __FreeBSD__ < 4 || defined(__bsdi__)
+ 	if (kvm_nlist (server->machine.kd, nlst) < 0) {
+ 		glibtop_warn_io_r (server, "kvm_nlist (swap)");
+@@ -130,9 +130,9 @@
+ void
+ glibtop_get_swap_p (glibtop *server, glibtop_swap *buf)
+ {
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 
+-# if __FreeBSD__ < 4
++# if (__FreeBSD__ < 4) && !defined(__FreeBSD_kernel__)
+ 	char *header;
+ 	int hlen, nswdev, dmmax;
+ 	int div, nfree, npfree;
+@@ -194,7 +194,7 @@
+ 		buf->pagein = 0;
+ 		buf->pageout = 0;
+ 	} else {
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 		buf->pagein = vmm.v_swappgsin - swappgsin;
+ 		buf->pageout = vmm.v_swappgsout - swappgsout;
+ #else
+@@ -208,7 +208,7 @@
+ #endif
+ 	}
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+         swappgsin = vmm.v_swappgsin;
+ 	swappgsout = vmm.v_swappgsout;
+ #else
+@@ -221,9 +221,9 @@
+ #endif
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 
+-#if __FreeBSD__ < 4
++#if (__FreeBSD__ < 4) && !defined(__FreeBSD_kernel__)
+ 
+ 	/* Size of largest swap device. */
+ 
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/sysdeps/freebsd/procmap.c
++++ libgtop2-2.14.4/sysdeps/freebsd/procmap.c
+@@ -41,18 +41,18 @@
+ #else
+ #include <vm/vm_object.h>
+ #include <vm/vm_map.h>
+-#if (__FreeBSD_version >= 400011)
++#if (__FreeBSD_version >= 400011) || defined(__FreeBSD_kernel__)
+ #include <vm/vm.h>
+ #else
+ #include <vm/vm_prot.h>
+ #endif
+ #endif
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #define _KVM_VNODE
+ #endif
+ #include <sys/vnode.h>
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #undef _KVM_VNODE
+ #endif
+ #include <sys/mount.h>
+@@ -109,9 +109,9 @@
+ 	struct vm_object object;
+ #endif
+ 	glibtop_map_entry *maps;
+-#if defined __FreeBSD__
++#if (defined __FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	struct vnode vnode;
+-#if __FreeBSD_version < 500039
++#if (__FreeBSD_version < 500039) && !defined(__FreeBSD_kernel__)
+ 	struct inode inode;
+ #endif
+ #endif
+@@ -137,7 +137,7 @@
+ 	/* Now we get the memory maps. */
+ 
+ 	if (kvm_read (server->machine.kd,
+-#if defined(__FreeBSD__) && (__FreeBSD_version >= 500013)
++#if (defined(__FreeBSD__) && (__FreeBSD_version >= 500013)) || defined(__FreeBSD_kernel__)
+ 		      (unsigned long) pinfo [0].ki_vmspace,
+ #else
+ 		      (unsigned long) pinfo [0].kp_proc.p_vmspace,
+@@ -179,8 +179,8 @@
+ 			update = 1;
+ 		}
+ 
+-#ifdef __FreeBSD__
+-#if __FreeBSD__ >= 4
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#if (__FreeBSD__ >= 4) || defined(__FreeBSD_kernel__)
+ 		if (entry.eflags & (MAP_ENTRY_IS_SUB_MAP))
+ 			continue;
+ #else
+@@ -256,7 +256,7 @@
+ #endif
+ 
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 		/* If the object is of type vnode, add its size */
+ 
+ 		if (object.type != OBJT_VNODE)
+@@ -270,10 +270,10 @@
+ 			      &vnode, sizeof (vnode)) != sizeof (vnode))
+ 			glibtop_error_io_r (server, "kvm_read (vnode)");
+ 
+-#if defined(__FreeBSD__) && (__FreeBSD_version >= 500039)
++#if (defined(__FreeBSD__) && (__FreeBSD_version >= 500039)) || defined(__FreeBSD_kernel__)
+                switch (vnode.v_type) {
+                    case VREG:
+-#if __FreeBSD_version < 600006
++#if (__FreeBSD_version < 600006) && !defined(__FreeBSD_kernel__)
+                        maps [i-1].inode = vnode.v_cachedid;
+                        maps [i-1].device = vnode.v_cachedfs;
+ #endif
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/sysdeps/freebsd/procmem.c
++++ libgtop2-2.14.4/sysdeps/freebsd/procmem.c
+@@ -73,7 +73,7 @@
+ static const unsigned long _glibtop_sysdeps_proc_mem_share =
+ #if defined(__NetBSD__) && (__NetBSD_Version__ >= 104000000)
+ (1L << GLIBTOP_PROC_MEM_SHARE);
+-#elif defined(__FreeBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ (1L << GLIBTOP_PROC_MEM_SHARE);
+ #else
+ 0;
+@@ -126,7 +126,7 @@
+ #else
+ 	struct vm_object object;
+ #endif
+-#if !defined(__FreeBSD__) || (__FreeBSD_version < 500013)
++#if (!defined(__FreeBSD__) || (__FreeBSD_version < 500013)) && !defined(__FreeBSD_kernel__)
+ 	struct plimit plimit;
+ #endif
+ 	int count;
+@@ -147,7 +147,7 @@
+ 		glibtop_warn_io_r (server, "kvm_getprocs (%d)", pid);
+ 		return;
+ 	}
+-#if defined(__FreeBSD__) && (__FreeBSD_version >= 500013)
++#if (defined(__FreeBSD__) && (__FreeBSD_version >= 500013)) || defined(__FreeBSD_kernel__)
+ 
+ #define        PROC_VMSPACE   ki_vmspace
+ 
+@@ -214,8 +214,8 @@
+ 			return;
+ 		}
+ 
+-#ifdef __FreeBSD__
+-#if __FreeBSD__ >= 4
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#if (__FreeBSD__ >= 4) || defined(__FreeBSD_kernel__)
+ 		if (entry.eflags & (MAP_ENTRY_IS_SUB_MAP))
+ 			continue;
+ #else
+@@ -282,7 +282,7 @@
+ #endif /* __NetBSD_Version__ >= 105250000 */
+ #endif
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 		if (object.type != OBJT_VNODE)
+ 			continue;
+ 
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/sysdeps/freebsd/prockernel.c
++++ libgtop2-2.14.4/sysdeps/freebsd/prockernel.c
+@@ -36,7 +36,7 @@
+ #include <sys/user.h>
+ #endif
+ #if !defined(__bsdi__) && !(defined(__FreeBSD__) && defined(__alpha__)) && \
+-    !defined(__NetBSD__)
++    !defined(__NetBSD__) 
+ #include <machine/pcb.h>
+ #endif
+ 
+@@ -94,7 +94,7 @@
+ 			   pid_t pid)
+ {
+ 	struct kinfo_proc *pinfo;
+-#ifndef __FreeBSD__
++#if !(defined(__FreeBSD__) || defined(__FreeBSD_kernel__))
+ 	struct user *u_addr = (struct user *)USRSTACK;
+ 	struct pstats pstats;
+ 	struct pcb pcb;
+@@ -119,7 +119,7 @@
+ 	if ((pinfo == NULL) || (count != 1))
+ 		glibtop_error_io_r (server, "kvm_getprocs (%d)", pid);
+ 
+-#if defined(__FreeBSD__) && (__FreeBSD_version >= 500013)
++#if (defined(__FreeBSD__) && (__FreeBSD_version >= 500013)) || defined(__FreeBSD_kernel__)
+ 
+ #define	PROC_WCHAN	ki_wchan
+ #define	PROC_WMESG	ki_wmesg
+@@ -147,7 +147,7 @@
+ 	}
+ #endif
+ 
+-#ifndef __FreeBSD__
++#if !(defined(__FreeBSD__) || defined(__FreeBSD_kernel__))
+ 
+ 	/* Taken from `saveuser ()' in `/usr/src/bin/ps/ps.c'. */
+ 
+@@ -203,9 +203,9 @@
+ 		       (unsigned long) &u_addr->u_pcb,
+ 		       (char *) &pcb, sizeof (pcb)) == sizeof (pcb))
+ 		{
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ #ifndef __alpha__
+-#if (__FreeBSD_version >= 300003)
++#if (__FreeBSD_version >= 300003) || defined(__FreeBSD_kernel__)
+ 			buf->kstk_esp = (guint64) pcb.pcb_esp;
+ 			buf->kstk_eip = (guint64) pcb.pcb_eip;
+ #else
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/sysdeps/freebsd/procuid.c
++++ libgtop2-2.14.4/sysdeps/freebsd/procuid.c
+@@ -77,7 +77,7 @@
+ 		return;
+ 	}
+ 
+-#if defined(__FreeBSD__) && (__FreeBSD_version >= 500013)
++#if (defined(__FreeBSD__) && (__FreeBSD_version >= 500013)) || defined(__FreeBSD_kernel__)
+ 
+ #define	PROC_RUID	ki_ruid
+ #define	PROC_SVUID	ki_svuid
+@@ -87,12 +87,8 @@
+ #define	PROC_PGID	ki_pgid
+ #define	PROC_TPGID	ki_tpgid
+ #define	PROC_NICE	ki_nice
+-#if __FreeBSD_version >= 500013
+ #define	PROC_PRIORITY	ki_pri.pri_user
+ #else
+-#define	PROC_PRIORITY	ki_priority
+-#endif
+-#else
+ 
+ #define	PROC_RUID	kp_eproc.e_pcred.p_ruid
+ #define	PROC_SVUID	kp_eproc.e_pcred.p_svuid
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/sysdeps/freebsd/proclist.c
++++ libgtop2-2.14.4/sysdeps/freebsd/proclist.c
+@@ -86,7 +86,7 @@
+ 	pids = g_realloc (pids, count * sizeof (unsigned));
+ 	/* Copy the pids over to this chain */
+ 	for (i=j=0; i < count; i++) {
+-#if defined(__FreeBSD__) && (__FreeBSD_version >= 500013)
++#if (defined(__FreeBSD__) && (__FreeBSD_version >= 500013)) || defined(__FreeBSD_kernel__)
+ #define PROC_STAT	ki_stat
+ #define PROC_RUID	ki_ruid
+ #define PROC_PID	ki_pid
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/sysdeps/freebsd/proctime.c
++++ libgtop2-2.14.4/sysdeps/freebsd/proctime.c
+@@ -58,9 +58,8 @@
+  * system, and interrupt time usage.
+  */
+ 
+-#ifndef __FreeBSD__
++#if !(defined(__FreeBSD__) || defined(__FreeBSD_kernel__))
+ 
+-#ifndef __FreeBSD__
+ static void
+ calcru(p, up, sp, ip)
+      struct proc *p;
+@@ -109,8 +108,6 @@
+ 		ip->tv_usec = it % 1000000;
+ 	}
+ }
+-#endif
+-
+ #endif /* !__FreeBSD__ */
+ 
+ /* Provides detailed information about a process. */
+@@ -145,7 +142,7 @@
+ 	if ((pinfo == NULL) || (count != 1))
+ 		glibtop_error_io_r (server, "kvm_getprocs (%d)", pid);
+ 
+-#if defined(__FreeBSD__) && (__FreeBSD_version >= 500013)
++#if (defined(__FreeBSD__) && (__FreeBSD_version >= 500013)) || defined(__FreeBSD_kernel__)
+ 	buf->rtime = pinfo [0].ki_runtime;
+ #elif (defined __FreeBSD__) && (__FreeBSD_version <= 500013)
+ 	buf->rtime = pinfo [0].kp_proc.p_runtime;
+@@ -182,8 +179,8 @@
+ 
+ 	buf->flags |= _glibtop_sysdeps_proc_time_user;
+ #else
+-#if defined(__FreeBSD__) && (__FreeBSD_version >= 500013)
+-#if __FreeBSD_version >= 500016
++#if (defined(__FreeBSD__) && (__FreeBSD_version >= 500013)) || defined(__FreeBSD_kernel__)
++#if (__FreeBSD_version >= 500016) || defined(__FreeBSD_kernel__)
+        if ((pinfo [0].ki_flag & PS_INMEM)) {
+ #else
+        if ((pinfo [0].ki_flag & P_INMEM)) {
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/libgtop-sysdeps.m4
++++ libgtop2-2.14.4/libgtop-sysdeps.m4
+@@ -64,7 +64,7 @@
+ 	  libgtop_have_sysinfo=yes
+ 	  libgtop_need_server=no
+ 	  ;;
+-	freebsd*|netbsd*|openbsd*|bsdi*)
++	freebsd*|netbsd*|openbsd*|bsdi*|kfreebsd*)
+ 	  libgtop_sysdeps_dir=freebsd
+ 	  libgtop_use_machine_h=yes
+ 	  libgtop_need_server=yes
+@@ -122,7 +122,13 @@
+ 
+ 	case "$host_os" in
+ 	*bsd*)
+-	  AC_CHECK_LIB(kvm, kvm_open, KVM_LIBS=-lkvm, KVM_LIBS=)
++		case "$host_os" in
++		*kfreebsd*)
++		AC_CHECK_LIB(kvm, kvm_open, KVM_LIBS="-lkvm -lfreebsd -lbsd", KVM_LIBS=, -lfreebsd -lbsd);;
++		*) 
++	  	AC_CHECK_LIB(kvm, kvm_open, KVM_LIBS=-lkvm, KVM_LIBS=);;
++	  	esac
++	  
+ 	  AC_SUBST(KVM_LIBS)
+ 
+ 	  AC_CHECK_HEADERS(net/if_var.h)
+@@ -141,7 +147,7 @@
+ #include <net/netisr.h>
+ #include <net/route.h>
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__)
++#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__FreeBSD_kernel__)
+ #include <net/if_sppp.h>
+ #else
+ #include <i4b/sppp/if_sppp.h>
+@@ -167,7 +173,7 @@
+ #include <net/netisr.h>
+ #include <net/route.h>
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__)
++#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__FreeBSD_kernel__)
+ #include <net/if_sppp.h>
+ #else
+ #include <i4b/sppp/if_sppp.h>
+only in patch2:
+unchanged:
+--- libgtop2-2.14.4.orig/configure
++++ libgtop2-2.14.4/configure
+@@ -21504,7 +21504,7 @@
+ 	  libgtop_have_sysinfo=yes
+ 	  libgtop_need_server=no
+ 	  ;;
+-	freebsd*|netbsd*|openbsd*|bsdi*)
++	freebsd*|netbsd*|openbsd*|bsdi*|kfreebsd*)
+ 	  libgtop_sysdeps_dir=freebsd
+ 	  libgtop_use_machine_h=yes
+ 	  libgtop_need_server=yes
+@@ -21563,7 +21563,93 @@
+ 
+ 	case "$host_os" in
+ 	*bsd*)
+-	  { echo "$as_me:$LINENO: checking for kvm_open in -lkvm" >&5
++		case "$host_os" in
++		*kfreebsd*)
++		{ echo "$as_me:$LINENO: checking for kvm_open in -lkvm" >&5
++echo $ECHO_N "checking for kvm_open in -lkvm... $ECHO_C" >&6; }
++if test "${ac_cv_lib_kvm_kvm_open+set}" = set; then
++  echo $ECHO_N "(cached) $ECHO_C" >&6
++else
++  ac_check_lib_save_LIBS=$LIBS
++LIBS="-lkvm -lfreebsd -lbsd $LIBS"
++cat >conftest.$ac_ext <<_ACEOF
++/* confdefs.h.  */
++_ACEOF
++cat confdefs.h >>conftest.$ac_ext
++cat >>conftest.$ac_ext <<_ACEOF
++/* end confdefs.h.  */
++
++/* Override any GCC internal prototype to avoid an error.
++   Use char because int might match the return type of a GCC
++   builtin and then its argument prototype would still apply.  */
++#ifdef __cplusplus
++extern "C"
++#endif
++char kvm_open ();
++int
++main ()
++{
++return kvm_open ();
++  ;
++  return 0;
++}
++_ACEOF
++rm -f conftest.$ac_objext conftest$ac_exeext
++if { (ac_try="$ac_link"
++case "(($ac_try" in
++  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
++  *) ac_try_echo=$ac_try;;
++esac
++eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
++  (eval "$ac_link") 2>conftest.er1
++  ac_status=$?
++  grep -v '^ *+' conftest.er1 >conftest.err
++  rm -f conftest.er1
++  cat conftest.err >&5
++  echo "$as_me:$LINENO: \$? = $ac_status" >&5
++  (exit $ac_status); } &&
++	 { ac_try='test -z "$ac_c_werror_flag" || test ! -s conftest.err'
++  { (case "(($ac_try" in
++  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
++  *) ac_try_echo=$ac_try;;
++esac
++eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
++  (eval "$ac_try") 2>&5
++  ac_status=$?
++  echo "$as_me:$LINENO: \$? = $ac_status" >&5
++  (exit $ac_status); }; } &&
++	 { ac_try='test -s conftest$ac_exeext'
++  { (case "(($ac_try" in
++  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
++  *) ac_try_echo=$ac_try;;
++esac
++eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
++  (eval "$ac_try") 2>&5
++  ac_status=$?
++  echo "$as_me:$LINENO: \$? = $ac_status" >&5
++  (exit $ac_status); }; }; then
++  ac_cv_lib_kvm_kvm_open=yes
++else
++  echo "$as_me: failed program was:" >&5
++sed 's/^/| /' conftest.$ac_ext >&5
++
++	ac_cv_lib_kvm_kvm_open=no
++fi
++
++rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
++      conftest$ac_exeext conftest.$ac_ext
++LIBS=$ac_check_lib_save_LIBS
++fi
++{ echo "$as_me:$LINENO: result: $ac_cv_lib_kvm_kvm_open" >&5
++echo "${ECHO_T}$ac_cv_lib_kvm_kvm_open" >&6; }
++if test $ac_cv_lib_kvm_kvm_open = yes; then
++  KVM_LIBS="-lkvm -lfreebsd -lbsd"
++else
++  KVM_LIBS=
++fi
++;;
++		*)
++	  	{ echo "$as_me:$LINENO: checking for kvm_open in -lkvm" >&5
+ echo $ECHO_N "checking for kvm_open in -lkvm... $ECHO_C" >&6; }
+ if test "${ac_cv_lib_kvm_kvm_open+set}" = set; then
+   echo $ECHO_N "(cached) $ECHO_C" >&6
+@@ -21645,6 +21731,8 @@
+ else
+   KVM_LIBS=
+ fi
++;;
++	  	esac
+ 
+ 
+ 
+@@ -21839,7 +21927,7 @@
+ #include <net/netisr.h>
+ #include <net/route.h>
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__)
++#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__FreeBSD_kernel__)
+ #include <net/if_sppp.h>
+ #else
+ #include <i4b/sppp/if_sppp.h>
+@@ -21928,7 +22016,7 @@
+ #include <net/netisr.h>
+ #include <net/route.h>
+ 
+-#if defined(__FreeBSD__) || defined(__NetBSD__)
++#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__FreeBSD_kernel__)
+ #include <net/if_sppp.h>
+ #else
+ #include <i4b/sppp/if_sppp.h>
