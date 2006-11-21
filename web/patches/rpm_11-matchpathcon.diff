@@ -3,240 +3,9 @@ Current 11-matchpathcon.diff breaks non-selinux architectures.
 Revert the current one, replace with this one and reapply.
 After that add 21-kfreebsd.diff
 
-
---- rpm-4.4.1.orig/lib/fsm.c
-+++ rpm-4.4.1/lib/fsm.c
-@@ -634,12 +634,20 @@
-     if (ts != NULL && rpmtsSELinuxEnabled(ts) == 1 &&
- 	!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOCONTEXTS))
-     {
--	rpmsx sx = rpmtsREContext(ts);
-+#ifdef WITH_SELINUX      
-+	security_context_t scon = NULL;
- 
--	if (sx != NULL) {
-+	if ( matchpathcon(fsm->path, st->st_mode, &scon) == 0 && scon != NULL) {
- 	    /* Get file security context from patterns. */
--	    fsm->fcontext = rpmsxFContext(sx, fsm->path, st->st_mode);
--	    sx = rpmsxFree(sx);
-+	    fsm->fcontext = scon;
-+#else
-+        rpmsx sx = rpmtsREContext(ts);
-+ 
-+        if (sx != NULL) {
-+             /* Get file security context from patterns. */
-+             fsm->fcontext = rpmsxFContext(sx, fsm->path, st->st_mode);
-+             sx = rpmsxFree(sx);
-+#endif                     
- 	} else {
- 	    int i = fsm->ix;
- 
---- rpm-4.4.1.orig/lib/rpmfi.c
-+++ rpm-4.4.1/lib/rpmfi.c
-@@ -16,7 +16,11 @@
- #define	_RPMFI_INTERNAL
- #include "rpmfi.h"
- 
-+#ifdef WITH_SELINUX   
-+#include <selinux/selinux.h>
-+#else
- #include "rpmsx.h"
-+#endif
- 
- #define	_RPMTE_INTERNAL	/* relocations */
- #include "rpmte.h"
-@@ -1645,8 +1649,12 @@
- {
-     int scareMem = 0;
-     rpmfi fi = rpmfiNew(NULL, h, RPMTAG_BASENAMES, scareMem);
--    rpmsx sx = NULL;
-     const char ** av = NULL;
-+#ifdef WITH_SELINUX    
-+    const char * myfn = rpmGetPath("%{?__file_context_path}", NULL);
-+#else
-+    rpmsx sx = NULL;
-+#endif    
-     int ac;
-     size_t nb;
-     char * t;
-@@ -1660,8 +1668,11 @@
-     }
- 
-     /* Read security context patterns. */
-+#ifdef WITH_SELINUX     
-+    matchpathcon_init(myfn);
-+#else
-     sx = rpmsxNew(NULL);
--
-+#endif
-     /* Compute size of argv array blob, concatenating file contexts. */
-     nb = ac * sizeof(*fcnb);
-     fcnb = memset(alloca(nb), 0, nb);
-@@ -1671,10 +1682,18 @@
-     while (rpmfiNext(fi) >= 0) {
- 	const char * fn = rpmfiFN(fi);
- 	mode_t fmode = rpmfiFMode(fi);
--	const char * scon;
-+#ifdef WITH_SELINUX	
-+	security_context_t scon;
-+
-+	if (matchpathcon(fn, fmode, &scon) == 0) {
-+#else
-+        const char * scon;
-+        
-+        scon = rpmsxFContext(sx, fn, fmode);
-+        if (scon != NULL) {
-+#endif
-+	
- 
--	scon = rpmsxFContext(sx, fn, fmode);
--	if (scon != NULL) {
- 	    fcnb[ac] = strlen(scon) + 1;
- /*@-branchstate@*/
- 	    if (fcnb[ac] > 0) {
-@@ -1682,6 +1701,9 @@
- 		memcpy(fctxt+fctxtlen, scon, fcnb[ac]);
- 		fctxtlen += fcnb[ac];
- 	    }
-+#ifdef WITH_SELINUX	    
-+            freecon(scon); 
-+#endif            
- /*@=branchstate@*/
- 	}
- 	ac++;
-@@ -1707,7 +1729,11 @@
- 
- exit:
-     fi = rpmfiFree(fi);
-+#ifdef WITH_SELINUX    
-+#else
-     sx = rpmsxFree(sx);
-+#endif
-+    
-     /*@-branchstate@*/
-     if (fcontextp)
- 	*fcontextp = av;
---- rpm-4.4.1.orig/lib/rpminstall.c
-+++ rpm-4.4.1/lib/rpminstall.c
-@@ -310,16 +310,23 @@
- 
-     /* Initialize security context patterns (if not already done). */
-     if (!(ia->transFlags & RPMTRANS_FLAG_NOCONTEXTS)) {
--	rpmsx sx = rpmtsREContext(ts);
--	if (sx == NULL) {
--	    const char *fn = rpmGetPath("%{?_install_file_context_path}", NULL);
--	    if (fn != NULL && *fn != '\0') {
--		sx = rpmsxNew(fn);
--		(void) rpmtsSetREContext(ts, sx);
--	    }
--	    fn = _free(fn);
--	}
--	sx = rpmsxFree(sx);
-+#ifdef WITH_SELINUX    
-+            const char *fn = rpmGetPath("%{?_install_file_context_path}", NULL);
-+            if (fn != NULL && *fn != '\0') {
-+                    matchpathcon_init(fn);
-+            }
-+#else
-+        rpmsx sx = rpmtsREContext(ts);
-+        if (sx == NULL) {
-+            const char *fn = rpmGetPath("%{?_install_file_context_path}", NULL);
-+            if (fn != NULL && *fn != '\0') {
-+                sx = rpmsxNew(fn);
-+                (void) rpmtsSetREContext(ts, sx);
-+            }
-+            fn = _free(fn);
-+        }
-+        sx = rpmsxFree(sx);
-+#endif
-     }
-     (void) rpmtsSetFlags(ts, ia->transFlags);
- 
---- rpm-4.4.1.orig/lib/verify.c
-+++ rpm-4.4.1/lib/verify.c
-@@ -128,20 +128,36 @@
- 	if (rc == -1)
- 	    *res |= (RPMVERIFY_LGETFILECONFAIL|RPMVERIFY_CONTEXTS);
- 	else {
--	    rpmsx sx = rpmtsREContext(ts);
--	    const char * fcontext;
--
--	    if (sx != NULL) {
--		/* Get file security context from patterns. */
--		fcontext = rpmsxFContext(sx, fn, fmode);
--		sx = rpmsxFree(sx);
--	    } else {
-+#ifdef WITH_SELINUX	
-+	    security_context_t fcontext;
-+             
-+	    /* Get file security context from patterns. */
-+	    if (matchpathcon(fn,fmode,&fcontext) != 0)  {
- 		/* Get file security context from package. */
- 		fcontext = rpmfiFContext(fi);
- 	    }
-+
- 	    if (fcontext == NULL || strcmp(fcontext, con))
- 		*res |= RPMVERIFY_CONTEXTS;
- 	    freecon(con);
-+            freecon(fcontext); 
-+#else
-+            rpmsx sx = rpmtsREContext(ts);
-+            const char * fcontext;
-+ 
-+            if (sx != NULL) {
-+                /* Get file security context from patterns. */
-+                fcontext = rpmsxFContext(sx, fn, fmode);
-+                sx = rpmsxFree(sx);
-+            } else {
-+                /* Get file security context from package. */
-+                fcontext = rpmfiFContext(fi);
-+            }
-+            if (fcontext == NULL || strcmp(fcontext, con))
-+                *res |= RPMVERIFY_CONTEXTS;
-+            freecon(con);
-+#endif            
-+
- 	}
-     }
- /*@=branchstate@*/
-@@ -524,16 +540,25 @@
- 
-     /* Initialize security context patterns (if not already done). */
-     if (qva->qva_flags & VERIFY_CONTEXTS) {
--	rpmsx sx = rpmtsREContext(ts);
--	if (sx == NULL) {
--	    arg = rpmGetPath("%{?_verify_file_context_path}", NULL);
--	    if (arg != NULL && *arg != '\0') {
--		sx = rpmsxNew(arg);
--		(void) rpmtsSetREContext(ts, sx);
--	    }
--	    arg = _free(arg);
--	}
--	sx = rpmsxFree(sx);
-+#ifdef WITH_SELINUX    
-+	arg = rpmGetPath("%{?_verify_file_context_path}", NULL);
-+	if (arg != NULL && *arg != '\0') {
-+           matchpathcon_init(arg);	
-+	   }
-+	arg = _free(arg);
-+#else
-+        rpmsx sx = rpmtsREContext(ts);
-+        if (sx == NULL) {
-+            arg = rpmGetPath("%{?_verify_file_context_path}", NULL);
-+            if (arg != NULL && *arg != '\0') {
-+                sx = rpmsxNew(arg);
-+                (void) rpmtsSetREContext(ts, sx);
-+            }
-+            arg = _free(arg);
-+        }
-+        sx = rpmsxFree(sx);
-+#endif
-+	
-     }
- 
-     ovsflags = rpmtsSetVSFlags(ts, vsflags);
---- rpm-4.4.1.orig/build/Makefile.am
-+++ rpm-4.4.1/build/Makefile.am
+diff -wur a/build/Makefile.am b/build/Makefile.am
+--- a/build/Makefile.am	2006-11-21 21:04:26.000000000 +0100
++++ b/build/Makefile.am	2006-11-21 21:02:30.000000000 +0100
 @@ -35,6 +35,7 @@
  	$(top_builddir)/lib/librpm.la \
  	$(top_builddir)/rpmdb/librpmdb.la \
@@ -245,8 +14,9 @@ After that add 21-kfreebsd.diff
  	@WITH_LIBELF_LIB@
  
  rpmfile.h:
---- rpm-4.4.1.orig/build/files.c
-+++ rpm-4.4.1/build/files.c
+diff -wur a/build/files.c b/build/files.c
+--- a/build/files.c	2006-11-21 21:04:26.000000000 +0100
++++ b/build/files.c	2006-11-21 21:02:30.000000000 +0100
 @@ -23,7 +23,11 @@
  #define	_RPMFI_INTERNAL
  #include "rpmfi.h"
@@ -271,35 +41,23 @@ After that add 21-kfreebsd.diff
      const char * sxfn;
      size_t fnlen;
      FileListRec flp;
-@@ -1142,8 +1150,12 @@
+@@ -1142,7 +1150,11 @@
  
      sxfn = rpmGetPath("%{?_build_file_context_path}", NULL);
      if (sxfn != NULL && *sxfn != '\0')
--   	sx = rpmsxNew(sxfn);
--
 +#ifdef WITH_SELINUX    
 +   	matchpathcon_init(sxfn);
 +#else
-+        sx = rpmsxNew(sxfn);
+    	sx = rpmsxNew(sxfn);
 +#endif
-+        
+ 
      for (i = 0, flp = fl->fileList; i < fl->fileListRecsUsed; i++, flp++) {
  	const char *s;
- 
-@@ -1324,18 +1336,31 @@
+@@ -1324,7 +1336,18 @@
  			       &(flp->flags), 1);
  
  	/* Add file security context to package. */
 -/*@-branchstate@*/
--	if (sx != NULL) {
--	    mode_t fmode = (uint_16)flp->fl_mode;
--	    s = rpmsxFContext(sx, flp->fileURL, fmode);
--	    if (s == NULL) s = "";
--	    (void) headerAddOrAppendEntry(h, RPMTAG_FILECONTEXTS, RPM_STRING_ARRAY_TYPE,
--			       &s, 1);
--	}
--/*@=branchstate@*/
--
 +#ifdef WITH_SELINUX 	
 +	mode_t fmode = (uint_16)flp->fl_mode;
 +	int rc = matchpathcon(flp->fileURL, fmode, &scon);
@@ -312,13 +70,15 @@ After that add 21-kfreebsd.diff
 +	    (void) headerAddOrAppendEntry(h, RPMTAG_FILECONTEXTS, RPM_STRING_ARRAY_TYPE, &nocon, 1);
 +        }
 +#else
-+       if (sx != NULL) {
-+           mode_t fmode = (uint_16)flp->fl_mode;
-+           s = rpmsxFContext(sx, flp->fileURL, fmode);
-+           if (s == NULL) s = "";
-+           (void) headerAddOrAppendEntry(h, RPMTAG_FILECONTEXTS, RPM_STRING_ARRAY_TYPE,
-+                              &s, 1);
-+        }                      
+ 	if (sx != NULL) {
+ 	    mode_t fmode = (uint_16)flp->fl_mode;
+ 	    s = rpmsxFContext(sx, flp->fileURL, fmode);
+@@ -1332,10 +1355,12 @@
+ 	    (void) headerAddOrAppendEntry(h, RPMTAG_FILECONTEXTS, RPM_STRING_ARRAY_TYPE,
+ 			       &s, 1);
+ 	}
+-/*@=branchstate@*/
+-
 +#endif
      }
 +#ifdef WITH_SELINUX    
@@ -328,8 +88,188 @@ After that add 21-kfreebsd.diff
      sxfn = _free(sxfn);
  
      (void) headerAddEntry(h, RPMTAG_SIZE, RPM_INT32_TYPE,
---- rpm-4.4.1.orig/python/Makefile.am
-+++ rpm-4.4.1/python/Makefile.am
+diff -wur a/lib/fsm.c b/lib/fsm.c
+--- a/lib/fsm.c	2006-11-21 21:04:26.000000000 +0100
++++ b/lib/fsm.c	2006-11-21 21:02:30.000000000 +0100
+@@ -634,12 +634,20 @@
+     if (ts != NULL && rpmtsSELinuxEnabled(ts) == 1 &&
+ 	!(rpmtsFlags(ts) & RPMTRANS_FLAG_NOCONTEXTS))
+     {
++#ifdef WITH_SELINUX      
++	security_context_t scon = NULL;
++
++	if ( matchpathcon(fsm->path, st->st_mode, &scon) == 0 && scon != NULL) {
++	    /* Get file security context from patterns. */
++	    fsm->fcontext = scon;
++#else
+ 	rpmsx sx = rpmtsREContext(ts);
+ 
+ 	if (sx != NULL) {
+ 	    /* Get file security context from patterns. */
+ 	    fsm->fcontext = rpmsxFContext(sx, fsm->path, st->st_mode);
+ 	    sx = rpmsxFree(sx);
++#endif                     
+ 	} else {
+ 	    int i = fsm->ix;
+ 
+diff -wur a/lib/rpmfi.c b/lib/rpmfi.c
+--- a/lib/rpmfi.c	2006-11-21 21:04:26.000000000 +0100
++++ b/lib/rpmfi.c	2006-11-21 21:08:33.000000000 +0100
+@@ -16,7 +16,11 @@
+ #define	_RPMFI_INTERNAL
+ #include "rpmfi.h"
+ 
++#ifdef WITH_SELINUX   
++#include <selinux/selinux.h>
++#else
+ #include "rpmsx.h"
++#endif
+ 
+ #define	_RPMTE_INTERNAL	/* relocations */
+ #include "rpmte.h"
+@@ -1645,7 +1649,11 @@
+ {
+     int scareMem = 0;
+     rpmfi fi = rpmfiNew(NULL, h, RPMTAG_BASENAMES, scareMem);
++#ifdef WITH_SELINUX    
++    const char * myfn = rpmGetPath("%{?__file_context_path}", NULL);
++#else
+     rpmsx sx = NULL;
++#endif    
+     const char ** av = NULL;
+     int ac;
+     size_t nb;
+@@ -1660,7 +1668,11 @@
+     }
+ 
+     /* Read security context patterns. */
++#ifdef WITH_SELINUX     
++    matchpathcon_init(myfn);
++#else
+     sx = rpmsxNew(NULL);
++#endif
+ 
+     /* Compute size of argv array blob, concatenating file contexts. */
+     nb = ac * sizeof(*fcnb);
+@@ -1671,10 +1683,16 @@
+     while (rpmfiNext(fi) >= 0) {
+ 	const char * fn = rpmfiFN(fi);
+ 	mode_t fmode = rpmfiFMode(fi);
++#ifdef WITH_SELINUX	
++	security_context_t scon;
++
++	if (matchpathcon(fn, fmode, &scon) == 0) {
++#else
+ 	const char * scon;
+ 
+ 	scon = rpmsxFContext(sx, fn, fmode);
+ 	if (scon != NULL) {
++#endif
+ 	    fcnb[ac] = strlen(scon) + 1;
+ /*@-branchstate@*/
+ 	    if (fcnb[ac] > 0) {
+@@ -1682,6 +1700,9 @@
+ 		memcpy(fctxt+fctxtlen, scon, fcnb[ac]);
+ 		fctxtlen += fcnb[ac];
+ 	    }
++#ifdef WITH_SELINUX	    
++            freecon(scon); 
++#endif            
+ /*@=branchstate@*/
+ 	}
+ 	ac++;
+@@ -1707,7 +1728,10 @@
+ 
+ exit:
+     fi = rpmfiFree(fi);
++#ifdef WITH_SELINUX    
++#else
+     sx = rpmsxFree(sx);
++#endif
+     /*@-branchstate@*/
+     if (fcontextp)
+ 	*fcontextp = av;
+diff -wur a/lib/rpminstall.c b/lib/rpminstall.c
+--- a/lib/rpminstall.c	2006-11-21 21:04:26.000000000 +0100
++++ b/lib/rpminstall.c	2006-11-21 21:02:30.000000000 +0100
+@@ -310,6 +310,12 @@
+ 
+     /* Initialize security context patterns (if not already done). */
+     if (!(ia->transFlags & RPMTRANS_FLAG_NOCONTEXTS)) {
++#ifdef WITH_SELINUX    
++            const char *fn = rpmGetPath("%{?_install_file_context_path}", NULL);
++            if (fn != NULL && *fn != '\0') {
++                    matchpathcon_init(fn);
++            }
++#else
+ 	rpmsx sx = rpmtsREContext(ts);
+ 	if (sx == NULL) {
+ 	    const char *fn = rpmGetPath("%{?_install_file_context_path}", NULL);
+@@ -320,6 +326,7 @@
+ 	    fn = _free(fn);
+ 	}
+ 	sx = rpmsxFree(sx);
++#endif
+     }
+     (void) rpmtsSetFlags(ts, ia->transFlags);
+ 
+diff -wur a/lib/verify.c b/lib/verify.c
+--- a/lib/verify.c	2006-11-21 21:04:26.000000000 +0100
++++ b/lib/verify.c	2006-11-21 21:09:05.000000000 +0100
+@@ -128,6 +128,20 @@
+ 	if (rc == -1)
+ 	    *res |= (RPMVERIFY_LGETFILECONFAIL|RPMVERIFY_CONTEXTS);
+ 	else {
++#ifdef WITH_SELINUX	
++	    security_context_t fcontext;
++             
++	    /* Get file security context from patterns. */
++	    if (matchpathcon(fn,fmode,&fcontext) != 0)  {
++		/* Get file security context from package. */
++		fcontext = rpmfiFContext(fi);
++	    }
++
++	    if (fcontext == NULL || strcmp(fcontext, con))
++		*res |= RPMVERIFY_CONTEXTS;
++	    freecon(con);
++	    freecon(fcontext); 
++#else
+ 	    rpmsx sx = rpmtsREContext(ts);
+ 	    const char * fcontext;
+ 
+@@ -142,6 +156,7 @@
+ 	    if (fcontext == NULL || strcmp(fcontext, con))
+ 		*res |= RPMVERIFY_CONTEXTS;
+ 	    freecon(con);
++#endif            
+ 	}
+     }
+ /*@=branchstate@*/
+@@ -524,6 +539,13 @@
+ 
+     /* Initialize security context patterns (if not already done). */
+     if (qva->qva_flags & VERIFY_CONTEXTS) {
++#ifdef WITH_SELINUX    
++	arg = rpmGetPath("%{?_verify_file_context_path}", NULL);
++	if (arg != NULL && *arg != '\0') {
++           matchpathcon_init(arg);	
++	   }
++	arg = _free(arg);
++#else
+ 	rpmsx sx = rpmtsREContext(ts);
+ 	if (sx == NULL) {
+ 	    arg = rpmGetPath("%{?_verify_file_context_path}", NULL);
+@@ -534,6 +556,7 @@
+ 	    arg = _free(arg);
+ 	}
+ 	sx = rpmsxFree(sx);
++#endif
+     }
+ 
+     ovsflags = rpmtsSetVSFlags(ts, vsflags);
+diff -wur a/python/Makefile.am b/python/Makefile.am
+--- a/python/Makefile.am	2006-11-21 21:04:26.000000000 +0100
++++ b/python/Makefile.am	2006-11-21 21:02:30.000000000 +0100
 @@ -34,6 +34,7 @@
  	$(top_builddir)/rpmio/librpmio.la \
  	$(top_builddir)/popt/libpopt.la \
@@ -338,38 +278,27 @@ After that add 21-kfreebsd.diff
  	@WITH_LIBELF_LIB@
  
  LDADD =
---- rpm-4.4.1.orig/python/rpmts-py.c
-+++ rpm-4.4.1/python/rpmts-py.c
-@@ -1182,16 +1182,24 @@
+diff -wur a/python/rpmts-py.c b/python/rpmts-py.c
+--- a/python/rpmts-py.c	2006-11-21 21:04:26.000000000 +0100
++++ b/python/rpmts-py.c	2006-11-21 21:02:30.000000000 +0100
+@@ -1182,6 +1182,13 @@
  
      /* Initialize security context patterns (if not already done). */
      if (!(s->ts->transFlags & RPMTRANS_FLAG_NOCONTEXTS)) {
--	rpmsx sx = rpmtsREContext(s->ts);
--	if (sx == NULL) {
--	    const char *fn = rpmGetPath("%{?_install_file_context_path}", NULL);
--	    if (fn != NULL && *fn != '\0') {
--		sx = rpmsxNew(fn);
--		(void) rpmtsSetREContext(s->ts, sx);
--	    }
--	    fn = _free(fn);
 +#ifdef WITH_SELINUX    
 +	const char *fn = rpmGetPath("%{?_install_file_context_path}", NULL);
 +	if (fn != NULL && *fn != '\0') {
 +                matchpathcon_init(fn);
- 	}
--	sx = rpmsxFree(sx);
++	}
 +	fn = _free(fn);
 +#else
-+        rpmsx sx = rpmtsREContext(s->ts);
-+        if (sx == NULL) {
-+            const char *fn = rpmGetPath("%{?_install_file_context_path}", NULL);
-+            if (fn != NULL && *fn != '\0') {
-+                sx = rpmsxNew(fn);
-+                (void) rpmtsSetREContext(s->ts, sx);
-+            }
-+            fn = _free(fn);
-+        }
-+        sx = rpmsxFree(sx);
+ 	rpmsx sx = rpmtsREContext(s->ts);
+ 	if (sx == NULL) {
+ 	    const char *fn = rpmGetPath("%{?_install_file_context_path}", NULL);
+@@ -1192,6 +1199,7 @@
+ 	    fn = _free(fn);
+ 	}
+ 	sx = rpmsxFree(sx);
 +#endif
      } 
  
