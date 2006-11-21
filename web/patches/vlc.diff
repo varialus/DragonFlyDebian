@@ -1,0 +1,189 @@
+only in patch2:
+unchanged:
+--- vlc-0.8.6-svn20061012.debian.orig/extras/x264/configure
++++ vlc-0.8.6-svn20061012.debian/extras/x264/configure
+@@ -96,6 +96,11 @@
+     CFLAGS="$CFLAGS -DHAVE_MALLOC_H"
+     LDFLAGS="$LDFLAGS -lm"
+     ;;
++  kfreebsd*-gnu)
++    SYS="FREEBSD"
++    CFLAGS="$CFLAGS -DHAVE_MALLOC_H"
++    LDFLAGS="$LDFLAGS -lm"
++    ;;
+   cygwin*)
+     SYS="CYGWIN"
+     CFLAGS="$CFLAGS -mno-cygwin"
+only in patch2:
+unchanged:
+--- vlc-0.8.6-svn20061012.debian.orig/modules/misc/network/ipv6.c
++++ vlc-0.8.6-svn20061012.debian/modules/misc/network/ipv6.c
+@@ -61,6 +61,7 @@
+ # else
+ #  define MCAST_JOIN_SOURCE_GROUP 46
+ # endif
++#if !(defined(__FreeBSD_kernel__) && defined(__GLIBC__))
+ struct group_source_req
+ {
+        uint32_t           gsr_interface;  /* interface index */
+@@ -68,6 +69,7 @@
+        struct sockaddr_storage gsr_source;     /* source address */
+ };
+ #endif
++#endif
+ 
+ /*****************************************************************************
+  * Local prototypes
+diff -u vlc-0.8.6-svn20061012.debian/debian/control vlc-0.8.6-svn20061012.debian/debian/control
+--- vlc-0.8.6-svn20061012.debian/debian/control
++++ vlc-0.8.6-svn20061012.debian/debian/control
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Sam Hocevar (Debian packages) <sam+deb@zoy.org>
+ Uploaders: Clément Stenac <zorglub@debian.org>
+-Build-Depends: debhelper (>= 4.0), dh-buildinfo, quilt, nasm, yasm [amd64], gettext, linux-kernel-headers (>= 2.5.999-test7-bk-7), xulrunner, libxul-dev, xlibmesa-gl-dev, liba52-0.7.4-dev, libaa1-dev, libarts1-dev (>= 1.4.2-1), libasound2-dev (>= 0.9.0beta10a), libaudiofile-dev, libavahi-client-dev, libavcodec-dev (>= 0.cvs20060823-1), libavformat-dev (>= 0.cvs20060823-1), libcaca-dev (>= 0.99.beta4-1), libcdio-dev, libdvbpsi4-dev, libdvdnav-dev, libdvdread-dev (>= 0.9.5), libdts-dev, libesd0-dev, libflac-dev (>= 1.1.2-3), libfreetype6-dev, libfribidi-dev, libggi2-dev, libglib2.0-0, libglide2-dev [i386], libgnutls-dev (>= 1.2.8), libhal-dev (>= 0.5.5.1-3), libid3tag0-dev, libidl0, libimlib2-dev, liblircclient-dev, liblivemedia-dev (>= 2006.03.17), libmad0-dev, libmatroska-dev (>= 0.8.0), libmodplug-dev, libmpcdec-dev, libmpeg2-4-dev, libncurses5-dev, libogg-dev, libpostproc-dev (>= 0.cvs20060823-1), libpng12-dev, libsdl1.2-dev (>= 1.2.7+1.2.8cvs20041007-5.3), libsmbclient-dev, libsvga1-dev [i386], libsysfs-dev, libtar-dev, libtheora-dev, libvcdinfo-dev, libvorbis-dev, libwxgtk2.6-dev, libx11-dev, libxext-dev, libxml2-dev, libxt-dev, libxv-dev, zlib1g-dev, libavc1394-dev, libraw1394-dev, libdc1394-13-dev, libxosd-dev, libtwolame-dev (>= 0.3.8-1), libspeex-dev, libsdl-image1.2-dev, libnotify-dev, libgtk2.0-dev
++Build-Depends: debhelper (>= 4.0), dh-buildinfo, quilt, nasm, yasm [amd64 kfreebsd-amd64], gettext, xulrunner, libxul-dev, xlibmesa-gl-dev, liba52-0.7.4-dev, libaa1-dev, libarts1-dev (>= 1.4.2-1), libasound2-dev (>= 0.9.0beta10a) [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libaudiofile-dev, libavahi-client-dev, libavcodec-dev (>= 0.cvs20060823-1), libavformat-dev (>= 0.cvs20060823-1), libcaca-dev (>= 0.99.beta4-1), libcdio-dev, libdvbpsi4-dev, libdvdnav-dev, libdvdread-dev (>= 0.9.5), libdts-dev, libesd0-dev, libflac-dev (>= 1.1.2-3), libfreetype6-dev, libfribidi-dev, libggi2-dev, libglib2.0-0, libglide2-dev [i386], libgnutls-dev (>= 1.2.8), libhal-dev (>= 0.5.5.1-3) [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libid3tag0-dev, libidl0, libimlib2-dev, liblircclient-dev, liblivemedia-dev (>= 2006.03.17), libmad0-dev, libmatroska-dev (>= 0.8.0), libmodplug-dev, libmpcdec-dev, libmpeg2-4-dev, libncurses5-dev, libogg-dev, libpostproc-dev (>= 0.cvs20060823-1), libpng12-dev, libsdl1.2-dev (>= 1.2.7+1.2.8cvs20041007-5.3), libsmbclient-dev, libsvga1-dev [i386], libsysfs-dev, libtar-dev, libtheora-dev, libvcdinfo-dev, libvorbis-dev, libwxgtk2.6-dev, libx11-dev, libxext-dev, libxml2-dev, libxt-dev, libxv-dev, zlib1g-dev, libavc1394-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libraw1394-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libdc1394-13-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libxosd-dev, libtwolame-dev (>= 0.3.8-1), libspeex-dev, libsdl-image1.2-dev, libnotify-dev, libgtk2.0-dev
+ Standards-Version: 3.7.2
+ XS-Vcs-Svn: svn://svn.videolan.org/pkg-multimedia/unstable/vlc/
+ 
+diff -u vlc-0.8.6-svn20061012.debian/debian/rules vlc-0.8.6-svn20061012.debian/debian/rules
+--- vlc-0.8.6-svn20061012.debian/debian/rules
++++ vlc-0.8.6-svn20061012.debian/debian/rules
+@@ -10,6 +10,8 @@
+ # from having to guess our platform (since we know it already)
+ DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+ DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
++DEB_HOST_ARCH_OS    ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS) 
++
+ confflags = --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) 
+ 
+ #
+@@ -28,7 +30,6 @@
+ 	--disable-qt \
+ 	--enable-mad \
+ 	--enable-arts \
+-	--enable-alsa \
+ 	--enable-lirc \
+ 	--enable-a52 \
+ 	--enable-aa \
+@@ -37,7 +38,6 @@
+ 	--disable-kde \
+ 	--enable-mp4 \
+ 	--enable-dvb \
+-	--enable-dv \
+ 	--disable-satellite \
+ 	--enable-ogg \
+ 	--enable-vorbis \
+@@ -50,8 +50,6 @@
+ 	--enable-skins2 \
+ 	--enable-freetype \
+ 	--enable-mkv \
+-	--enable-v4l \
+-	--enable-pvr \
+ 	--enable-speex \
+ 	--enable-caca \
+ 	--enable-live555 \
+@@ -77,12 +75,16 @@
+ 	--enable-notify \
+ 	$(NULL)
+ 
++ifeq ($(DEB_HOST_ARCH_OS),linux)
++vlc_confflags += --enable-alsa --enable-dv --enable-v4l --enable-pvr
++endif
++
+ # These ones are currently shipped with VLC
+ vlc_confflags += --enable-faad --with-faad-tree=extras/faad2
+ vlc_confflags += --enable-x264 --with-x264-tree=extras/x264
+ 
+-# Glide and svgalib are only for x86
+-ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU),i386)
++# Glide and svgalib are only for x86 on Linux
++ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH),i386)
+ vlc_confflags += --enable-glide
+ vlc_confflags += --enable-svgalib
+ endif
+@@ -158,6 +160,7 @@
+ clean:
+ 	dh_testdir
+ 	dh_testroot
++	cp debian/vlc-nox.install.kfreebsd-i386 debian/vlc-nox.install.kfreebsd-amd64
+ 	rm -f configure-stamp build-stamp
+ 	# Check that we have an x264 tree in here (can be a symlink)
+ 	test -d extras/x264
+@@ -228,7 +231,7 @@
+ 	ln -s vlc debian/vlc-plugin-ggi/usr/share/doc/vlc-plugin-ggi
+ 	ln -s vlc debian/vlc-plugin-arts/usr/share/doc/vlc-plugin-arts
+ 	ln -s vlc debian/mozilla-plugin-vlc/usr/share/doc/mozilla-plugin-vlc
+-ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH_CPU),i386)
++ifeq ($(shell dpkg-architecture -qDEB_BUILD_ARCH),i386)
+ 	ln -s vlc debian/vlc-plugin-glide/usr/share/doc/vlc-plugin-glide
+ 	ln -s vlc debian/vlc-plugin-svgalib/usr/share/doc/vlc-plugin-svgalib
+ endif
+only in patch2:
+unchanged:
+--- vlc-0.8.6-svn20061012.debian.orig/debian/vlc-nox.install.kfreebsd-i386
++++ vlc-0.8.6-svn20061012.debian/debian/vlc-nox.install.kfreebsd-i386
+@@ -0,0 +1,63 @@
++usr/bin/vlc
++usr/share/doc
++usr/share/locale
++usr/share/vlc/http
++usr/share/vlc/osdmenu
++usr/lib/vlc/access/libvcd_plugin.so
++usr/lib/vlc/access/libvcdx_plugin.so
++usr/lib/vlc/access/libaccess_*.so
++usr/lib/vlc/access/libdvdnav_plugin.so
++usr/lib/vlc/access/libdvdread_plugin.so
++usr/lib/vlc/access/libcdda_plugin.so
++usr/lib/vlc/access_filter
++usr/lib/vlc/access_output
++usr/lib/vlc/audio_filter
++usr/lib/vlc/audio_mixer
++usr/lib/vlc/audio_output/libaout_file_plugin.so
++usr/lib/vlc/audio_output/liboss_plugin.so
++usr/lib/vlc/codec/libcmml_plugin.so
++usr/lib/vlc/codec/libffmpeg_plugin.so
++usr/lib/vlc/codec/libspudec_plugin.so
++usr/lib/vlc/codec/liba52_plugin.so
++usr/lib/vlc/codec/libcinepak_plugin.so
++usr/lib/vlc/codec/libdts_plugin.so
++usr/lib/vlc/codec/libflacdec_plugin.so
++usr/lib/vlc/codec/liblpcm_plugin.so
++usr/lib/vlc/codec/libaraw_plugin.so
++usr/lib/vlc/codec/libvorbis_plugin.so
++usr/lib/vlc/codec/libspeex_plugin.so
++usr/lib/vlc/codec/libadpcm_plugin.so
++usr/lib/vlc/codec/libmpeg_audio_plugin.so
++usr/lib/vlc/codec/liblibmpeg2_plugin.so
++usr/lib/vlc/codec/librawvideo_plugin.so
++usr/lib/vlc/codec/libsubsdec_plugin.so
++usr/lib/vlc/codec/libdvbsub_plugin.so
++usr/lib/vlc/codec/libtwolame_plugin.so
++usr/lib/vlc/codec/libpng_plugin.so
++usr/lib/vlc/codec/libsvcdsub_plugin.so
++usr/lib/vlc/codec/libcvdsub_plugin.so
++usr/lib/vlc/codec/libfake_plugin.so
++usr/lib/vlc/control
++usr/lib/vlc/demux
++usr/lib/vlc/gui/libncurses_plugin.so
++usr/lib/vlc/misc/libscreensaver_plugin.so
++usr/lib/vlc/misc/libdummy_plugin.so
++usr/lib/vlc/misc/libmemcpy_plugin.so
++usr/lib/vlc/misc/libipv4_plugin.so
++usr/lib/vlc/misc/libipv6_plugin.so
++usr/lib/vlc/misc/libexport_plugin.so
++usr/lib/vlc/misc/libxtag_plugin.so
++usr/lib/vlc/misc/libxml_plugin.so
++usr/lib/vlc/misc/libfreetype_plugin.so
++usr/lib/vlc/misc/liblogger_plugin.so
++usr/lib/vlc/misc/libvod_rtsp_plugin.so
++usr/lib/vlc/misc/libgnutls_plugin.so
++usr/lib/vlc/misc/libgrowl_plugin.so
++usr/lib/vlc/mux
++usr/lib/vlc/packetizer
++usr/lib/vlc/services_discovery
++usr/lib/vlc/stream_out
++usr/lib/vlc/video_chroma
++usr/lib/vlc/video_filter
++usr/lib/vlc/video_output/libimage_plugin.so
++usr/lib/vlc/visualization/libvisual_plugin.so
