@@ -184,7 +184,7 @@ unchanged:
 +diff -urN mozilla/security/coreconf/Linux.mk mozilla/security/coreconf/Linux.mk
 +--- mozilla/security/coreconf/Linux.mk	2005-02-02 00:39:18.000000000 +0100
 ++++ mozilla/security/coreconf/Linux.mk	2006-11-20 22:16:26.000000000 +0100
-+@@ -52,59 +52,35 @@
++@@ -52,59 +52,34 @@
 + 
 + DEFAULT_COMPILER = gcc
 + 
@@ -251,7 +251,7 @@ unchanged:
 +-	OS_REL_CFLAGS   = -DLINUX1_2 -D_XOPEN_SOURCE
 +-	CPU_ARCH        = mips
 ++ifeq (,$(filter-out i686 i586 i486 i386,$(OS_TEST)))
-+ else
++-else
 +-	OS_REL_CFLAGS	= -DLINUX1_2 -Di386 -D_XOPEN_SOURCE
 ++	OS_REL_CFLAGS	+= -Di386
 + 	CPU_ARCH	= x86
