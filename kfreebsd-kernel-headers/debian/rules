@@ -24,9 +24,10 @@ build-stamp:
 	
 	tar xfj $(SRC_TAR)
 
-	for i in $(CURDIR)/debian/patches/*.diff ; do \
+	set -e ; for i in $(CURDIR)/debian/patches/*.diff ; do \
 		echo "--- Patch $$i ---" ; \
-		cat $$i | patch -p0 -d $(SRC_DIR) ; \
+		patch -p0 -d $(SRC_DIR) --dry-run < $$i ; \
+		patch -p0 -d $(SRC_DIR) < $$i >/dev/null ; \
 	done
 
 	touch build-stamp
