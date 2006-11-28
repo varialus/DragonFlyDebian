@@ -1,0 +1,158 @@
+diff -u vpnc-0.3.3+SVN20051028/debian/control vpnc-0.3.3+SVN20051028/debian/control
+--- vpnc-0.3.3+SVN20051028/debian/control
++++ vpnc-0.3.3+SVN20051028/debian/control
+@@ -7,7 +7,7 @@
+ 
+ Package: vpnc
+ Architecture: any
+-Depends: iproute, ${shlibs:Depends}, ${misc:Depends}
++Depends: iproute | libc0.1, ${shlibs:Depends}, ${misc:Depends}
+ Suggests: resolvconf
+ Description: Cisco-compatible VPN client
+  vpnc is a VPN client compatible with cisco3000 VPN Concentrator (also
+diff -u vpnc-0.3.3+SVN20051028/debian/patches/04_debianitis.dpatch vpnc-0.3.3+SVN20051028/debian/patches/04_debianitis.dpatch
+--- vpnc-0.3.3+SVN20051028/debian/patches/04_debianitis.dpatch
++++ vpnc-0.3.3+SVN20051028/debian/patches/04_debianitis.dpatch
+@@ -213,7 +213,7 @@
+  	if [ -n "$CISCO_BANNER" ]; then
+  		echo "Connect Banner:"
+  		echo "$CISCO_BANNER" | while read LINE ; do echo "|" "$LINE" ; done
+-@@ -222,6 +282,15 @@
++@@ -222,6 +282,19 @@
+  	
+  	do_ifconfig
+  	set_vpngateway_route
+@@ -221,8 +221,12 @@
+ +        # -- Debian specific
+ +        if test "$TARGET_NETWORKS" ; then
+ +            for network in $TARGET_NETWORKS ; do
+-+                ip route del $network 2>/dev/null
+-+                ip route add $network dev $TUNDEV
+++                $IPROUTE route $route_syntax_del $network 2>/dev/null
+++                if [ "$OS" = "Linux" ]; then
+++                    $IPROUTE route add $network dev $TUNDEV
+++                else
+++                    $IPROUTE route add -net $network $route_syntax_gw "$INTERNAL_IP4_ADDRESS"
+++                fi   
+ +            done
+ +        else
+ +
+diff -u vpnc-0.3.3+SVN20051028/debian/patches/00list vpnc-0.3.3+SVN20051028/debian/patches/00list
+--- vpnc-0.3.3+SVN20051028/debian/patches/00list
++++ vpnc-0.3.3+SVN20051028/debian/patches/00list
+@@ -9,0 +10 @@
++09_kbsd
+only in patch2:
+unchanged:
+--- vpnc-0.3.3+SVN20051028.orig/debian/patches/09_kbsd.dpatch
++++ vpnc-0.3.3+SVN20051028/debian/patches/09_kbsd.dpatch
+@@ -0,0 +1,109 @@
++#! /bin/sh /usr/share/dpatch/dpatch-run
++## 09_kbsd.dpatch
++## DP: GNU/kFreeBSD support
++
++@DPATCH@
++only in patch2:
++unchanged:
++--- vpnc-0.3.3+SVN20051028.orig/vpnc-script
+++++ vpnc-0.3.3+SVN20051028/vpnc-script
++@@ -60,6 +60,10 @@
++ 		if [ ! -e /dev/tun ]; then
++ 			kldload if_tun
++ 		fi
+++	elif [ "$OS" = "GNU/kFreeBSD" ]; then
+++		if [ ! -e /dev/tun ]; then
+++			kldload if_tun
+++		fi
++ 	elif [ "$OS" = "NetBSD" ]; then
++ 		:
++ 	elif [ "$OS" = "OpenBSD" ]; then
++@@ -79,18 +83,18 @@
++ 	}
++ 
++ 	set_vpngateway_route() {
++-		$IPROUTE route add `ip route get "$VPNGATEWAY" | fix_ip_get_output`
+++		$IPROUTE route add `$IPROUTE route get "$VPNGATEWAY" | fix_ip_get_output`
++ 		$IPROUTE route flush cache
++ 	}
++ 	
++ 	del_vpngateway_route() {
++-		$IPROUTE route del "$VPNGATEWAY"
+++		$IPROUTE route $route_syntax_del "$VPNGATEWAY"
++ 		$IPROUTE route flush cache
++ 	}
++ 	
++ 	set_default_route() {
++ 		$IPROUTE route | grep '^default' | fix_ip_get_output > "$DEFAULT_ROUTE_FILE"
++-		$IPROUTE route del default
+++		$IPROUTE route $route_syntax_del default
++ 		$IPROUTE route add default dev "$TUNDEV"
++ 		$IPROUTE route flush cache
++ 	}
++@@ -104,7 +108,7 @@
++ 	}
++ 	
++ 	reset_default_route() {
++-		$IPROUTE route del default > /dev/null 2>&1
+++		$IPROUTE route $route_syntax_del default > /dev/null 2>&1
++ 		$IPROUTE route add `cat "$DEFAULT_ROUTE_FILE"`
++ 		$IPROUTE route flush cache
++ 	}
++@@ -115,7 +119,7 @@
++ 		#NETWORK="$1"
++ 		#NETMASK="$2"
++ 		#NETMASKLEN="$3"
++-		#$IPROUTE route del "$NETWORK/$NETMASKLEN" dev "$TUNDEV" 
+++		#$IPROUTE route $route_syntax_del "$NETWORK/$NETMASKLEN" dev "$TUNDEV" 
++ 		#$IPROUTE route flush cache
++ 	}
++ else
++only in patch2:
++unchanged:
++--- vpnc-0.3.3+SVN20051028.orig/sysdep-bsd.c
+++++ vpnc-0.3.3+SVN20051028/sysdep-bsd.c
++@@ -122,12 +122,12 @@
++ 
++ #else
++ 
++-int tun_write(int fd, char *buf, int len)
+++int tun_write(int fd, unsigned char *buf, int len)
++ {
++ 	return write(fd, buf, len);
++ }
++ 
++-int tun_read(int fd, char *buf, int len)
+++int tun_read(int fd, unsigned char *buf, int len)
++ {
++ 	return read(fd, buf, len);
++ }
++@@ -153,6 +153,8 @@
++ 		exit(status);
++ }
++ 
+++#ifndef __GLIBC__
+++
++ int getline(char **line, size_t * length, FILE * stream)
++ {
++ 	char *tmpline;
++@@ -175,3 +177,5 @@
++ 	(*line)[len] = '\0';
++ 	return len;
++ }
+++
+++#endif
++only in patch2:
++unchanged:
++--- vpnc-0.3.3+SVN20051028.orig/Makefile
+++++ vpnc-0.3.3+SVN20051028/Makefile
++@@ -33,6 +33,10 @@
++ CFLAGS += -DSOCKADDR_IN_SIN_LEN -DHAVE_SA_LEN
++ SYSDEP=sysdep-bsd.o
++ endif
+++ifeq ($(shell uname -s), GNU/kFreeBSD)
+++CFLAGS += -DSOCKADDR_IN_SIN_LEN -DHAVE_SA_LEN -D_GNU_SOURCE
+++SYSDEP=sysdep-bsd.o
+++endif
++ ifeq ($(shell uname -s), NetBSD)
++ CFLAGS += -DSOCKADDR_IN_SIN_LEN -DHAVE_SA_LEN
++ SYSDEP=sysdep-bsd.o
