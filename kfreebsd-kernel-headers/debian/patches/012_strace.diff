@@ -9,18 +9,14 @@
  
  union	savefpu {
  	struct	save87	sv_87;
---- sys/sys/proc.h~	2004-12-07 23:53:09.000000000 +0100
-+++ sys/sys/proc.h	2004-12-08 02:03:24.000000000 +0100
-@@ -315,10 +321,10 @@
- 	struct callout	td_slpcallout;	/* (h) Callout for sleep. */
- 	struct trapframe *td_frame;	/* (k) */
- 	struct vm_object *td_kstack_obj;/* (a) Kstack object. */
--	vm_offset_t	td_kstack;	/* (a) Kernel VA of kstack. */
-+	__vm_offset_t	td_kstack;	/* (a) Kernel VA of kstack. */
- 	int		td_kstack_pages; /* (a) Size of the kstack. */
- 	struct vm_object *td_altkstack_obj;/* (a) Alternate kstack object. */
--	vm_offset_t	td_altkstack;	/* (a) Kernel VA of alternate kstack. */
-+	__vm_offset_t	td_altkstack;	/* (a) Kernel VA of alternate kstack. */
- 	int		td_altkstack_pages; /* (a) Size of alternate kstack. */
- 	u_int		td_critnest;	/* (k) Critical section nest level. */
- 	struct mdthread td_md;		/* (k) Any machine-dependent fields. */
+--- sys/amd64/include/fpu.h~	2006-03-01 20:30:51.000000000 +0100
++++ sys/amd64/include/fpu.h	2006-03-29 20:27:45.000000000 +0200
+@@ -71,7 +71,7 @@
+ 	} sv_fp[8];
+ 	struct xmmacc	sv_xmm[16];
+ 	u_char sv_pad[96];
+-} __aligned(16);
++} __attribute__((aligned(16)));
+ 
+ /*
+  * The hardware default control word for i387's and later coprocessors is
