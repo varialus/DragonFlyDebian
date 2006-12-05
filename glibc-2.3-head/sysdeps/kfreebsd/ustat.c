@@ -55,13 +55,9 @@ ustat (dev_t dev, struct ustat *ubuf)
 	      memset (ubuf, '\0', sizeof (struct ustat));
 	      ubuf->f_tfree = mnt->f_bfree;
 	      ubuf->f_tinode = mnt->f_ffree;
-
-	      free (mntlist);
 	      return 0;
 	    }
 	}
-
-      free (mntlist);
     }
 
   /* DEV is not among the mounted devices.  */
