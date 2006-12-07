@@ -1,63 +1,70 @@
 
 Author: petr
-Status: dirty hack, needs glibc at least from r1573
+Status: still dirty hack, intended for net-snmp 5.2.3-4 
+	with kfreebsd-kernel-headers=0.23 and libc0.1-dev=2.3.6.ds1-9
 
-diff -u net-snmp-5.2.2/debian/control net-snmp-5.2.2/debian/control
---- net-snmp-5.2.2/debian/control
-+++ net-snmp-5.2.2/debian/control
-@@ -2,7 +2,7 @@
- Section: net
+
+diff -u net-snmp-5.2.3/debian/control net-snmp-5.2.3/debian/control
+--- net-snmp-5.2.3/debian/control
++++ net-snmp-5.2.3/debian/control
+@@ -3,7 +3,7 @@
  Priority: optional
- Maintainer: Jochen Friedrich <jochen@scram.de>
--Build-Depends: debhelper (>=4.1.16), libtool, libwrap0-dev, libssl-dev (>> 0.9.8), perl (>=5.8), autoconf, automake, debianutils (>=1.13.1), bash (>=2.05), findutils (>=4.1.20), libsensors-dev (>=2.8.5), procps
-+Build-Depends: debhelper (>=4.1.16), libtool, libwrap0-dev, libssl-dev (>> 0.9.8), perl (>=5.8), autoconf, automake, debianutils (>=1.13.1), bash (>=2.05), findutils (>=4.1.20), libkvm-dev [kfreebsd-i386 kfreebsd-amd64], libsensors-dev (>=2.8.5) [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64], procps
- Standards-Version: 3.6.2
+ Maintainer: Net-SNMP Packaging Team <pkg-net-snmp-devel@lists.alioth.debian.org>
+ Uploaders: Jochen Friedrich <jochen@scram.de>, Thomas Anders <tanders@users.sourceforge.net>
+-Build-Depends: debhelper (>=4.1.16), libtool, libwrap0-dev, libssl-dev (>> 0.9.8), perl (>=5.8), autoconf, automake1.9, debianutils (>=1.13.1), bash (>=2.05), findutils (>=4.1.20), libsensors-dev (>=2.8.5), procps
++Build-Depends: debhelper (>=4.1.16), libtool, libwrap0-dev, libssl-dev (>> 0.9.8), perl (>=5.8), autoconf, automake1.9, debianutils (>=1.13.1), bash (>=2.05), findutils (>=4.1.20), procps, libkvm-dev [kfreebsd-i386 kfreebsd-amd64], libsensors-dev (>=2.8.5) [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64]
+ Standards-Version: 3.7.2
  
  Package: snmpd
-@@ -67,7 +67,7 @@
+@@ -68,7 +68,7 @@
  Replaces: libsnmp-dev, libsnmp-perl (<<${Source-Version})
  Provides: libsnmp-dev
  Conflicts: libsnmp-dev, libsnmp5-dev
 -Depends: libc6-dev, libsnmp9 (=${Source-Version}), libsnmp-perl (=${Source-Version}), libwrap0-dev, libssl-dev, libsensors-dev (>=2.8.5), procps
-+Depends: libc6-dev, libsnmp9 (=${Source-Version}), libsnmp-perl (=${Source-Version}), libwrap0-dev, libssl-dev, ${libsensors-dev}, procps
++Depends: libc6-dev, libsnmp9 (=${Source-Version}), libsnmp-perl (=${Source-Version}), libwrap0-dev, libssl-dev, procps, ${os-specific-dev}
  Description: NET SNMP (Simple Network Management Protocol) Development Files
   The Simple Network Management Protocol (SNMP) provides a framework
   for the exchange of management information between agents (servers)
-diff -u net-snmp-5.2.2/debian/rules net-snmp-5.2.2/debian/rules
---- net-snmp-5.2.2/debian/rules
-+++ net-snmp-5.2.2/debian/rules
-@@ -21,21 +21,24 @@
+diff -u net-snmp-5.2.3/debian/rules net-snmp-5.2.3/debian/rules
+--- net-snmp-5.2.3/debian/rules
++++ net-snmp-5.2.3/debian/rules
+@@ -21,21 +21,29 @@
  PERL=/usr/bin/perl
  endif
  
 -ARCH = $(shell dpkg --print-architecture)
 +DEB_HOST_ARCH_OS = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
  
- CFLAGS = -O2 -D_REENTRANT
+ CFLAGS = -O2 -D_REENTRANT -DNETSNMP_USE_INLINE -Wall
  ifneq "$(findstring debug,$(DEB_BUILD_OPTIONS))" ""
  CFLAGS += -g
  endif
  
--MIB_MODULES = host smux ucd-snmp/dlmod ucd-snmp/diskio ucd-snmp/lmSensors
-+MIB_MODULES = host smux ucd-snmp/dlmod
+-MIB_MODULES = host smux ucd-snmp/dlmod ucd-snmp/diskio ucd-snmp/lmSensors \
+-              disman/event-mib
  BACKUP = aclocal.m4 config.guess config.sub configure ltmain.sh stamp-h \
           stamp-h.in include/net-snmp/net-snmp-config.h.in
 -#ifeq "$(ARCH)" "i386"
 -#MIB_MODULES +=  ucd-snmp/lmSensors
++
++MIB_MODULES = host smux ucd-snmp/dlmod disman/event-mib
++
 +ifeq (linux,$(DEB_HOST_ARCH_OS))
-+MIB_MODULES += ucd-snmp/diskio ucd-snmp/lmSensors 
++MIB_MODULES += ucd-snmp/diskio ucd-snmp/lmSensors
++IPV6 = --enable-ipv6
  LIBSENSORS = -lsensors
 -#endif
--
-+IPV6 = --enable-ipv6
++GENCONTROL_ARGS=-- -Vos-specific-dev="libsensors-dev (>= 2.8.5)"
 +else
++ifeq (kfreebsd,$(DEB_HOST_ARCH_OS))
 +IPV6 = --disable-ipv6
++GENCONTROL_ARGS=-- -Vos-specific-dev="libkvm-dev"
 +endif
-+	
++endif
+ 
  build:  build-stamp
  build-stamp: debian/stamp-patched
- 	dh_testdir
-@@ -55,7 +58,7 @@
+@@ -56,7 +64,7 @@
  	  --enable-ucd-snmp-compatibility \
  	  --enable-shared --with-cflags="$(CFLAGS)" \
  	  --with-perl-modules="INSTALLDIRS=vendor" \
@@ -66,122 +73,141 @@ diff -u net-snmp-5.2.2/debian/rules net-snmp-5.2.2/debian/rules
  	  --without-rpm --with-libwrap --with-openssl \
  	  --without-dmalloc --without-efence --without-rsaref \
  	  --with-sys-contact="root" --with-sys-location="Unknown" \
-@@ -205,7 +208,11 @@
+@@ -206,7 +214,7 @@
  	dh_makeshlibs -plibsnmp-perl
  	dh_perl -a
  	dh_shlibdeps -a -ldebian/libsnmp$(v)/usr/lib -Llibsnmp$(v)
-+ifeq (linux,$(DEB_HOST_ARCH_OS))
-+	dh_gencontrol -a -- -Vlibsensors-dev="libsensors-dev (>= 2.8.5)"
-+else
- 	dh_gencontrol -a
-+endif
+-	dh_gencontrol -a
++	dh_gencontrol -a $(GENCONTROL_ARGS)
  	dh_md5sums -a
  	dh_builddeb -a
  
 only in patch2:
 unchanged:
---- net-snmp-5.2.2.orig/agent/mibgroup/ucd_snmp.h
-+++ net-snmp-5.2.2/agent/mibgroup/ucd_snmp.h
-@@ -39,6 +39,10 @@
- config_arch_require(freebsd4, ucd-snmp/memory_freebsd2)
- config_arch_require(freebsd5, ucd-snmp/vmstat_freebsd2)
- config_arch_require(freebsd5, ucd-snmp/memory_freebsd2)
-+config_arch_require(kfreebsd5, ucd-snmp/vmstat_freebsd2)
-+config_arch_require(kfreebsd5, ucd-snmp/memory_freebsd2)
-+config_arch_require(kfreebsd6, ucd-snmp/vmstat_freebsd2)
-+config_arch_require(kfreebsd6, ucd-snmp/memory_freebsd2)
- config_arch_require(netbsd1, ucd-snmp/vmstat_netbsd1)
- config_arch_require(netbsd1, ucd-snmp/memory_netbsd1)
- config_arch_require(netbsd, ucd-snmp/vmstat_netbsd1)
+--- net-snmp-5.2.3.orig/debian/patches/26_kfreebsd.README
++++ net-snmp-5.2.3/debian/patches/26_kfreebsd.README
+@@ -0,0 +1 @@
++Preliminary support for kfreebsd.
 only in patch2:
 unchanged:
---- net-snmp-5.2.2.orig/include/net-snmp/system/kfreebsd.h
-+++ net-snmp-5.2.2/include/net-snmp/system/kfreebsd.h
-@@ -0,0 +1,71 @@
-+#include "freebsd5.h"
-+#define freebsd5
-+
-+#include <osreldate.h>
-+#define __FreeBSD_version __FreeBSD_kernel_version
-+
-+#include <sys/queue.h>
-+#include <sys/_types.h>
-+
-+typedef unsigned int tcp_seq;
-+typedef unsigned int tcp_cc;        
-+#define TCPOPT_SACK_HDR         (TCPOPT_NOP<<24|TCPOPT_NOP<<16|TCPOPT_SACK<<8)
-+#define MAX_SACK_BLKS   6       /* Max # SACK blocks stored at sender side */
-+#define TCP_MAX_SACK    3       /* MAX # SACKs sent in any segment */
-+
-+#include <netinet/tcp_var.h>  
-+
-+#include <net/ethernet.h>
-+#include <net/if_arp.h>
-+#include <netinet/in.h>
-+
-+/*
-+ * Externalized form of struct socket used by the sysctl(3) interface.
-+ */
-+struct xsocket {
-+        size_t  xso_len;        /* length of this structure */
-+        struct  socket *xso_so; /* makes a convenient handle sometimes */
-+        short   so_type;
-+        short   so_options;
-+        short   so_linger;
-+        short   so_state;
-+        caddr_t so_pcb;         /* another convenient handle */
-+        int     xso_protocol;
-+        int     xso_family;
-+        short   so_qlen;
-+        short   so_incqlen;
-+        short   so_qlimit;
-+        short   so_timeo;
-+        u_short so_error;
-+        pid_t   so_pgid;
-+        u_long  so_oobmark;
-+        struct xsockbuf {
-+                u_int   sb_cc;
-+                u_int   sb_hiwat;
-+                u_int   sb_mbcnt;
-+                u_int   sb_mbmax;
-+                int     sb_lowat;
-+                int     sb_timeo;
-+                short   sb_flags;
-+        } so_rcv, so_snd;
-+        uid_t   so_uid;         /* XXX */
-+};
-+typedef     u_quad_t so_gen_t;
-+
-+#define _SYS_SOCKETVAR_H_
-+#include <netinet/in_pcb.h>
-+
-+struct  xtcpcb {
-+        size_t  xt_len;
-+        struct  inpcb   xt_inp;
-+        struct  tcpcb   xt_tp;
-+        struct  xsocket xt_socket;
-+        u_quad_t        xt_alignment_hack;
-+};
-+
-+/* Segment flag values. */
-+enum uio_seg {
-+        UIO_USERSPACE,          /* from user data space */
-+        UIO_SYSSPACE,           /* from system space */
-+        UIO_NOCOPY              /* don't copy, already in object */
-+};
-only in patch2:
-unchanged:
---- net-snmp-5.2.2.orig/Makefile.in
-+++ net-snmp-5.2.2/Makefile.in
-@@ -17,8 +17,8 @@
- INCLUDESUBDIR=system
- INCLUDESUBDIRHEADERS= aix.h bsd.h bsdi3.h bsdi4.h bsdi.h cygwin.h \
- 	darwin.h darwin7.h darwin8.h freebsd5.h freebsd6.h \
--	dynix.h freebsd2.h freebsd3.h freebsd4.h freebsd.h generic.h hpux.h \
--	irix.h linux.h mingw32.h mips.h netbsd.h openbsd.h osf5.h \
-+	dynix.h freebsd2.h freebsd3.h freebsd4.h freebsd.h generic.h kfreebsd.h \
-+	hpux.h irix.h linux.h mingw32.h mips.h netbsd.h openbsd.h osf5.h \
- 	solaris2.6.h solaris2.7.h solaris2.8.h solaris2.9.h solaris2.10.h \
- 	solaris.h sunos.h svr5.h sysv.h ultrix4.h
- INCLUDESUBDIR2=machine
-
+--- net-snmp-5.2.3.orig/debian/patches/26_kfreebsd.patch
++++ net-snmp-5.2.3/debian/patches/26_kfreebsd.patch
+@@ -0,0 +1,118 @@
++only in patch2:
++unchanged:
++--- net-snmp-5.3.1.orig/agent/mibgroup/ucd_snmp.h
+++++ net-snmp-5.3.1/agent/mibgroup/ucd_snmp.h
++@@ -41,6 +41,12 @@
++ config_arch_require(freebsd4, ucd-snmp/memory_freebsd2)
++ config_arch_require(freebsd5, ucd-snmp/vmstat_freebsd2)
++ config_arch_require(freebsd5, ucd-snmp/memory_freebsd2)
+++config_arch_require(kfreebsd5, ucd-snmp/vmstat_freebsd2)
+++config_arch_require(kfreebsd5, ucd-snmp/memory_freebsd2)
+++config_arch_require(kfreebsd6, ucd-snmp/vmstat_freebsd2)
+++config_arch_require(kfreebsd6, ucd-snmp/memory_freebsd2)
+++config_arch_require(kfreebsd7, ucd-snmp/vmstat_freebsd2)
+++config_arch_require(kfreebsd7, ucd-snmp/memory_freebsd2)
++ config_arch_require(netbsd1, ucd-snmp/vmstat_netbsd1)
++ config_arch_require(netbsd1, ucd-snmp/memory_netbsd1)
++ config_arch_require(netbsd, ucd-snmp/vmstat_netbsd1)
++only in patch2:
++unchanged:
++--- net-snmp-5.3.1.orig/Makefile.in
+++++ net-snmp-5.3.1/Makefile.in
++@@ -17,8 +17,8 @@
++ INCLUDESUBDIR=system
++ INCLUDESUBDIRHEADERS= aix.h bsd.h bsdi3.h bsdi4.h bsdi.h cygwin.h \
++ 	darwin.h darwin7.h darwin8.h freebsd5.h freebsd6.h \
++-	dynix.h freebsd2.h freebsd3.h freebsd4.h freebsd.h generic.h hpux.h \
++-	irix.h linux.h mingw32.h mips.h netbsd.h openbsd.h osf5.h \
+++	dynix.h freebsd2.h freebsd3.h freebsd4.h freebsd.h generic.h kfreebsd.h \
+++	hpux.h irix.h linux.h mingw32.h mips.h netbsd.h openbsd.h osf5.h \
++ 	solaris2.6.h solaris2.7.h solaris2.8.h solaris2.9.h solaris2.10.h \
++ 	solaris.h sunos.h svr5.h sysv.h ultrix4.h
++ INCLUDESUBDIR2=machine
++only in patch2:
++unchanged:
++--- net-snmp-5.3.1.orig/include/net-snmp/system/kfreebsd.h
+++++ net-snmp-5.3.1/include/net-snmp/system/kfreebsd.h
++@@ -0,0 +1,65 @@
+++#include "freebsd6.h"
+++#define freebsd6
+++
+++#include <osreldate.h>
+++#define __FreeBSD_version __FreeBSD_kernel_version
+++
+++#include <sys/queue.h>
+++#include <sys/_types.h>
+++
+++typedef unsigned int tcp_seq;
+++typedef unsigned int tcp_cc;        
+++#define TCPOPT_SACK_HDR         (TCPOPT_NOP<<24|TCPOPT_NOP<<16|TCPOPT_SACK<<8)
+++#define MAX_SACK_BLKS   6       /* Max # SACK blocks stored at sender side */
+++#define TCP_MAX_SACK    3       /* MAX # SACKs sent in any segment */
+++
+++#include <netinet/tcp_var.h>  
+++
+++#include <net/ethernet.h>
+++#include <net/if_arp.h>
+++#include <netinet/in.h>
+++
+++/*
+++ * Externalized form of struct socket used by the sysctl(3) interface.
+++ */
+++struct xsocket {
+++        size_t  xso_len;        /* length of this structure */
+++        struct  socket *xso_so; /* makes a convenient handle sometimes */
+++        short   so_type;
+++        short   so_options;
+++        short   so_linger;
+++        short   so_state;
+++        caddr_t so_pcb;         /* another convenient handle */
+++        int     xso_protocol;
+++        int     xso_family;
+++        short   so_qlen;
+++        short   so_incqlen;
+++        short   so_qlimit;
+++        short   so_timeo;
+++        u_short so_error;
+++        pid_t   so_pgid;
+++        u_long  so_oobmark;
+++        struct xsockbuf {
+++                u_int   sb_cc;
+++                u_int   sb_hiwat;
+++                u_int   sb_mbcnt;
+++                u_int   sb_mbmax;
+++                int     sb_lowat;
+++                int     sb_timeo;
+++                short   sb_flags;
+++        } so_rcv, so_snd;
+++        uid_t   so_uid;         /* XXX */
+++};
+++typedef     u_quad_t so_gen_t;
+++
+++#define _SYS_SOCKETVAR_H_
+++#include <netinet/in_pcb.h>
+++
+++struct  xtcpcb {
+++        size_t  xt_len;
+++        struct  inpcb   xt_inp;
+++        struct  tcpcb   xt_tp;
+++        struct  xsocket xt_socket;
+++        u_quad_t        xt_alignment_hack;
+++};
+++
++only in patch2:
++unchanged:
++--- a/agent/mibgroup/ucd-snmp/disk.c	2006-12-07 23:53:16.000000000 +0100
+++++ b/agent/mibgroup/ucd-snmp/disk.c	2006-12-07 23:53:16.000000000 +0100
++@@ -4,6 +4,11 @@
++ 
++ #include <net-snmp/net-snmp-config.h>
++ 
+++#ifdef HAVE_GETMNTENT
+++#undef HAVE_GETMNTENT
+++#define HAVE_GETMNTENT 1 /* previously might be only "#define HAVE_GETMNTENT" */
+++#endif
+++
++ #include <stdio.h>
++ 
++ #if HAVE_STDLIB_H
