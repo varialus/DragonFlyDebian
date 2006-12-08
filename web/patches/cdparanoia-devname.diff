@@ -1,0 +1,63 @@
+diff -u cdparanoia-3.10+debian~pre0/debian/patches/03-kfreebsd.dpatch cdparanoia-3.10+debian~pre0/debian/patches/03-kfreebsd.dpatch
+--- cdparanoia-3.10+debian~pre0/debian/patches/03-kfreebsd.dpatch
++++ cdparanoia-3.10+debian~pre0/debian/patches/03-kfreebsd.dpatch
+@@ -67,12 +67,11 @@
+  #define MAXTRK 100
+  
+  typedef struct TOC {	/* structure of table of contents */
+-@@ -46,14 +51,20 @@
+- 
++@@ -46,13 +51,19 @@
+    int opened; /* This struct may just represent a candidate for opening */
+  
+-+#if defined(__linux__)
+    char *cdda_device_name;
+++#if defined(__linux__)
+    char *ioctl_device_name;
+  
+    int cdda_fd;
+@@ -338,12 +337,11 @@
+ diff -Naur cdparanoia-III-10pre0+debian.orig/interface/interface.c cdparanoia-III-10pre0+debian/interface/interface.c
+ --- cdparanoia-III-10pre0+debian.orig/interface/interface.c	2006-08-29 19:51:10.000000000 +0000
+ +++ cdparanoia-III-10pre0+debian/interface/interface.c	2006-11-17 17:42:39.000000000 +0000
+-@@ -29,12 +29,25 @@
+-       d->enable_cdda(d,0);
++@@ -29,11 +29,24 @@
+  
+      _clean_messages(d);
+-+#if defined(__linux__)
+      if(d->cdda_device_name)free(d->cdda_device_name);
+++#if defined(__linux__)
+      if(d->ioctl_device_name)free(d->ioctl_device_name);
+      if(d->drive_model)free(d->drive_model);
+      if(d->cdda_fd!=-1)close(d->cdda_fd);
+@@ -509,7 +507,7 @@
+ +		idmessage(messagedest, messages, "\t\tDevice %s is not a CDROM", dev);
+ +		goto cdda_identify_cooked_fail;
+ +	}
+-+
+++	d->cdda_device_name = copystring(dev);
+ +	d->drive_model = copystring("Generic cooked ioctl CDROM");
+ +	d->interface = COOKED_IOCTL;
+ +	d->bigendianp = -1;
+@@ -601,7 +599,7 @@
+ +		    "\t\tDevice is neither a CDROM nor a WORM device\n", NULL);
+ +		goto cdda_identify_scsi_fail;
+ +	}
+-+
+++	d->cdda_device_name = copystring(devname);
+ +	d->ioctl_fd = -1;
+ +	d->bigendianp = -1;
+ +	d->nsectors = -1;
+@@ -1874,9 +1872,9 @@
+ --- cdparanoia-III-10pre0+debian.orig/interface/utils.h	2004-06-25 18:14:43.000000000 +0000
+ +++ cdparanoia-III-10pre0+debian/interface/utils.h	2006-11-17 17:42:39.000000000 +0000
+ @@ -1,4 +1,9 @@
+-+#ifdef LINUX
+++#if defined (__linux__) || defined (__GLIBC__)
+  #include <endian.h>
+-+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+++#elif defined(__FreeBSD__)
+ +#include <machine/endian.h>
+ +#endif
+ +
