@@ -16,7 +16,7 @@ Package: freebsd-utils
 Priority: required
 Essential: yes
 Architecture: kfreebsd-i386 kfreebsd-amd64
-Depends: ${shlibs:Depends}, freebsd-hackedutils (>= 5.2.1-31), net-tools
+Depends: ${shlibs:Depends}, freebsd-hackedutils (>= 5.2.1-31)
 Replaces: freebsd-hackedutils (<= 5.2.1-30)
 Description: FreeBSD utilities needed for GNU/kFreeBSD.
  This package contains FreeBSD utilities needed for GNU/kFreeBSD.
@@ -24,7 +24,7 @@ Description: FreeBSD utilities needed for GNU/kFreeBSD.
 Package: module-init-tools
 Priority: important
 Architecture: kfreebsd-i386 kfreebsd-amd64
-Depends: ${shlibs:Depends}
+Depends: ${shlibs:Depends}, debconf, kfreebsd-image
 Replaces: kldutils (<< 6.0-2.really.5.4-0.6), freebsd-utils (<= 5.2.1-16), freebsd-hackedutils (<= 5.2.1-32)
 Description: tools for managing kFreeBSD modules
  This package contains a set of programs for loading, inserting, and
@@ -36,6 +36,15 @@ Architecture: all
 Depends: module-init-tools
 Description: Transitional package to module-init-tools
  Transitional package depending on module-init-tools.
+ .
+ Once installed, this package may be safely removed.
+
+Package: kfreebsd-common
+Priority: extra
+Architecture: all
+Depends: module-init-tools (>= 6.1-6), freebsd-utils (>= 6.1-6)
+Description: Transitional package to module-init-tools and freebsd-utils
+ Transitional package depending on module-init-tools and freebsd-utils.
  .
  Once installed, this package may be safely removed.
 

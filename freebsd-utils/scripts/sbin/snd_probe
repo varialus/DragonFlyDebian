@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+kernel="/lib/modules/`uname -r`"
+
+echo -n "Probing sound devices..."
+cd $kernel && ls snd_*.ko | sed -e "s/\.ko$//g" | grep -v "snd_driver" | (while read i ; do
+  if ! kldstat -n $i >/dev/null 2>/dev/null ; then
+    did_we_load_it="true"
+    kldload $i
+  else
+    did_we_load_it="false"
+  fi
+
+  found_name="`grep \"^pcm[0-9]*: .* kld snd_[^ ]* \" /dev/sndstat | sed -e \"s/.* \(snd_[^ ]*\) .*/\1/g\"`"
+  if [ "$found_name" = "$i" ] ; then
+    found_bool="true"
+  else
+    found_bool="false"
+  fi
+
+  if `$did_we_load_it` ; then
+    if ! kldunload $i ; then
+      echo "warning: failed to unload $i"
+    fi
+  fi
+
+  if `$found_bool` ; then
+    found_list="$found_list $found_name"
+  fi
+done ; echo " ${found_list}")
