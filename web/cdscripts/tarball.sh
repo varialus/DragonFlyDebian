@@ -22,7 +22,7 @@ fi
 
 tmp=`mktemp -d`
 
-for i in dhcp3-client popularity-contest ; do
+for i in dhcp3-client popularity-contest netbase ; do
   if ! grep -qx $i /etc/crosshurd/packages/{common,kfreebsd-gnu} ; then
     echo "Please add $i to /etc/crosshurd/packages/"
     exit 1
@@ -41,6 +41,12 @@ fi
 
 # having dialog pre-installed makes it a bit prettier
 for i in dialog libncursesw5 ; do
+  dpkg --extract ${tmp}/var/cache/apt/archives/${i}_*.deb ${tmp}/
+done
+
+# extract libraries needed by freebsd-utils. Dunno why crosshurd 
+# does not do that itself
+for i in libbsd0 libfreebsd0 ; do
   dpkg --extract ${tmp}/var/cache/apt/archives/${i}_*.deb ${tmp}/
 done
 

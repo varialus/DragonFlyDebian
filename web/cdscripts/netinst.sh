@@ -33,14 +33,7 @@ tar -C ${tmp1} -xzf base.tgz
 case ${distribution_lowcase} in
   debian)
     dpkg --extract ${tmp1}/var/cache/apt/archives/kfreebsd-loader_*_${DEB_HOST_ARCH}.deb ${tmp}/
-    case ${DEB_HOST_ARCH_CPU} in
-      i386)
-        kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-5.*-486_*_${DEB_HOST_ARCH}.deb`
-      ;;
-      *)
-        kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-6.*-${DEB_HOST_ARCH_CPU}-generic_*_${DEB_HOST_ARCH}.deb`
-      ;;
-    esac
+    kfreebsd_image=`echo ${tmp1}/var/cache/apt/archives/kfreebsd-image-6.*-*_${DEB_HOST_ARCH}.deb`
     dpkg --extract ${kfreebsd_image} ${tmp}/
     kfreebsd_version=`echo ${kfreebsd_image} | sed -e "s,.*/kfreebsd-image-,,g" -e "s,_.*,,g"`
   ;;
@@ -52,9 +45,8 @@ case ${distribution_lowcase} in
   ;;
 esac
 rm -rf ${tmp1} &
-if test -e ${tmp}/boot/kernel/kernel ; then
-  gzip -9 ${tmp}/boot/kernel/kernel
-fi
+mv ${tmp}/boot/kfreebsd-${kfreebsd_version}.gz ${tmp}/boot/kernel/kernel.gz
+mv ${tmp}/lib/modules/${kfreebsd_version}/* ${tmp}/boot/kernel/
 
 # put mfsroot and other extras
 echo "CD_VERSION = ${kfreebsd_version}" > ${tmp}/cdrom.inf
