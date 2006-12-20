@@ -177,7 +177,10 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	# remove loader.conf (part of kfreebsd-loader)
 	rm -f $(IMAGE_PACKAGE)-$*/boot/loader.conf
 	rm -rf $(IMAGE_PACKAGE)-$*/boot/defaults
-	
+
+	# create /boot/kernel/ directory
+	mkdir -p $(IMAGE_PACKAGE)-$*/boot/kernel/
+
 	# remove device.hints (built into kernel)
 	rm -f $(IMAGE_PACKAGE)-$*/boot/device.hints
 	
