@@ -38,8 +38,8 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	mkdir -p $(HEADERS_PACKAGE)/usr/include/machine
-	
+	mkdir -p $(HEADERS_PACKAGE)/usr/include
+
 	cd $(SRC_DIR)/sys \
 		&& for file in `cat $(CURDIR)/debian/includes.list` ; do \
 			if [ -d $$file ] ; then \
@@ -49,8 +49,13 @@ install: build
 			fi ;\
 		done
 
+ifneq ($(filter i386 amd64, $(kfreebsd_cpu)),)
+	sh debian/generate-asm.sh $(kfreebsd_cpu) $(SRC_DIR)/sys $(HEADERS_PACKAGE)/usr/include
+else
+	mkdir -p $(HEADERS_PACKAGE)/usr/include/machine
 	cd $(SRC_DIR)/sys/$(kfreebsd_cpu)/include \
 		&& find . -type f -name "*.h" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/include/machine \;
+endif
 
 # Build architecture-independent files here.
 binary-indep: build install
