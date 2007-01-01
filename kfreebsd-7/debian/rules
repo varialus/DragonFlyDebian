@@ -60,6 +60,8 @@ src: src-stamp
 src-stamp:
 	tar xfj $(CURDIR)/src.tar.bz2
 	
+	set -e ; find src -type d -name CVS -exec rm -rf {} \;
+
 	set -e ; find src -type f -name "*.[ch]" | (while read i ; do \
 		sed -i $$i \
 		-e 's/defined\( \|\t\)*(\( \|\t\)*__FreeBSD__\( \|\t\)*)/defined(__FreeBSD_kernel__)/g' \
