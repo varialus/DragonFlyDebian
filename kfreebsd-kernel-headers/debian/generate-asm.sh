@@ -56,7 +56,7 @@ for h in $files; do
 	# common header
 	cat > $file_out << EOF
 /* All machine/ files are generated and point to the corresponding
- * file in $machine_dir_out or $machine_dir_biarch.
+ * file in $machine_dir_out or $machine_dir_out_biarch.
  */
 
 EOF
