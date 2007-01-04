@@ -20,8 +20,8 @@
 
 #define SYSDEP_KNOWN_INTERPRETER_NAMES \
   { "/lib/ld.so.1", FLAG_ELF_LIBC6 },				\
+  { "/lib64/ld-kfreebsd-x86-64.so.1", FLAG_ELF_LIBC6 },		\
   { "/libexec/ld-elf.so.1", FLAG_ELF_LIBC5 },
-
 #define SYSDEP_KNOWN_LIBRARY_NAMES \
   { "libc.so.6", FLAG_ELF_LIBC6 },		/* temporary */	\
   { "libm.so.6", FLAG_ELF_LIBC6 },		/* temporary */	\
