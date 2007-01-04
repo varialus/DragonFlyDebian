@@ -295,6 +295,16 @@ fi
 # One kFreeBSD we use ldconfig.
 use_ldconfig=yes
 
+# We need some extensions to the `ldd' script.
+case "$machine" in
+  x86_64*)
+    ldd_rewrite_script=../ports/sysdeps/unix/bsd/bsd4.4/kfreebsd/x86_64/ldd-rewrite.sed
+    ;;
+  *)
+    ;;
+esac
+
+
 if test $host = $build; then
   # If $prefix/include/{net,scsi} are symlinks, make install will
   # clobber what they're linked to (probably a kernel tree).
