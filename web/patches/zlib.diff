@@ -1,0 +1,121 @@
+diff -u zlib-1.2.3/debian/rules zlib-1.2.3/debian/rules
+--- zlib-1.2.3/debian/rules
++++ zlib-1.2.3/debian/rules
+@@ -34,7 +34,7 @@
+ DOBINARY	:= binary-lib64z1 binary-lib64z1-dev
+ endif
+ 
+-32-ARCHS=amd64 ppc64
++32-ARCHS=amd64 kfreebsd-amd64 ppc64
+ ifneq (,$(findstring $(DEB_HOST_ARCH), $(32-ARCHS)))
+ DOBUILD		+= $(STAMP_DIR)/build-32 $(STAMP_DIR)/build-32-nopic
+ DOBINARY	:= binary-lib32z1 binary-lib32z1-dev
+@@ -111,11 +111,22 @@
+ $(STAMP_DIR)/build-32-nopic: $(STAMP_DIR)/source.make
+ 	dh_testdir
+ 	mkdir -p debian/nopic-tmp
++ifeq ($(DEB_HOST_ARCH), amd64)
+ 	cd $(BUILD_TREE) && CC="$(CC32)" CFLAGS="$(CFLAGS) -D_REENTRANT" ./configure --libdir=\$${prefix}/emul/ia32-linux/usr/lib/
++else
++	cd $(BUILD_TREE) && CC="$(CC32)" CFLAGS="$(CFLAGS) -D_REENTRANT" ./configure --libdir=\$${prefix}/usr/lib32/
++endif
+ 	$(MAKE) -C $(BUILD_TREE) clean
+ 	$(MAKE) -C $(BUILD_TREE) all libz.a $(TESTS)
+ 	$(MAKE) -C $(BUILD_TREE) install prefix=$(CURDIR)/debian/nopic-tmp
++ifeq ($(DEB_HOST_ARCH), amd64)
++	mkdir -p debian/nopic-tmp/emul/ia32-linux/usr/lib/
+ 	install -m 644 $(BUILD_TREE)/libz.a debian/nopic-tmp/emul/ia32-linux/usr/lib/libz.a
++else
++	mkdir -p debian/nopic-tmp/usr/lib32/
++	install -m 644 $(BUILD_TREE)/libz.a debian/nopic-tmp/usr/lib32/libz.a
++endif
++	$(MAKE) -C $(BUILD_TREE) clean
+ 	$(MAKE) -C $(BUILD_TREE) clean
+ 	touch $@
+ 
+@@ -172,18 +183,6 @@
+ 	dh_clean -k $(DH_OPTIONS)
+ 	dh_installdirs $(DH_OPTIONS)
+ 	dh_link $(DH_OPTIONS)
+-ifeq ($(DEB_HOST_ARCH),i386)
+-	echo 'lib64:Depends=libc6-amd64' >> debian/$*.substvars
+-endif
+-ifeq ($(DEB_HOST_ARCH),powerpc)
+-	echo 'lib64:Depends=libc6-ppc64' >> debian/$*.substvars
+-endif
+-ifeq ($(DEB_HOST_ARCH),s390)
+-	echo 'lib64:Depends=libc6-s390x' > debian/$*.substvars
+-endif
+-ifeq ($(DEB_HOST_ARCH),sparc)
+-	echo 'lib64:Depends=libc6-sparc64' > debian/$*.substvars
+-endif
+ 
+ post-binary-%: $(STAMP_DIR)/build
+ 	$(nodocs)if [ "$(manpages1)" != "" ]; then cp $(manpages1) $(tmpdir)/usr/share/man/man1 ; fi
+@@ -276,13 +275,28 @@
+ 	ln -s libz.so.1 $(tmpdir)/usr/lib64/libz.so
+ 
+ middle-binary-lib32z1: $(STAMP_DIR)/build-32
++ifeq ($(DEB_HOST_ARCH), amd64)
++	mkdir -p $(tmpdir)/emul/ia32-linux/usr/lib/
+ 	install -m 644 -s $(BUILD_TREE)/libz.so.$(VERSION) $(tmpdir)/emul/ia32-linux/usr/lib/libz.so.$(VERSION)
+ 	ln -s libz.so.$(VERSION) $(tmpdir)/emul/ia32-linux/usr/lib/libz.so.$(SONAME)
++else
++	mkdir -p $(tmpdir)/usr/lib32
++	install -m 644 -s $(BUILD_TREE)/libz.so.$(VERSION) $(tmpdir)/usr/lib32/libz.so.$(VERSION)
++	ln -s libz.so.$(VERSION) $(tmpdir)/usr/lib32/libz.so.$(SONAME)
++endif
+ 
+ middle-binary-lib32z1-dev: $(STAMP_DIR)/build-32-nopic
++ifeq ($(DEB_HOST_ARCH), amd64)
++	mkdir -p $(tmpdir)/emul/ia32-linux/usr/lib/ 
+ 	install -m 644 debian/nopic-tmp/emul/ia32-linux/usr/lib/libz.a \
+ 		$(tmpdir)/emul/ia32-linux/usr/lib/libz.a
+ 	ln -s libz.so.1 $(tmpdir)/emul/ia32-linux/usr/lib/libz.so
++else
++	mkdir -p $(tmpdir)/usr/lib32
++	install -m 644 debian/nopic-tmp/usr/lib32/libz.a \
++		$(tmpdir)/usr/lib32/libz.a
++	ln -s libz.so.1 $(tmpdir)/usr/lib32/libz.so
++endif
+ 
+ # Below here is fairly generic really
+ 
+diff -u zlib-1.2.3/debian/control zlib-1.2.3/debian/control
+--- zlib-1.2.3/debian/control
++++ zlib-1.2.3/debian/control
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Mark Brown <broonie@debian.org>
+ Standards-Version: 3.6.2
+-Build-Depends: debhelper (>= 4.2), dbs (>= 0.21), libc6-dev-powerpc [ppc64], libc6-dev-i386 [amd64], lib64c-dev [i386 powerpc s390 sparc]
++Build-Depends: debhelper (>= 4.2), dbs (>= 0.21), lib32c-dev [amd64 kfreebsd-amd64 ppc64], lib64c-dev [i386 powerpc s390 sparc]
+ 
+ Package: zlib1g
+ Architecture: any
+@@ -68,7 +68,7 @@
+  files for building 64 bit applications.
+ 
+ Package: lib32z1
+-Architecture: amd64 ppc64
++Architecture: amd64 kfreebsd-amd64 ppc64
+ Depends: ${shlibs:Depends}
+ Replaces: ia32-libs (<< 1.5)
+ Description: compression library - 32 bit runtime
+@@ -78,7 +78,7 @@
+ 
+ Package: lib32z1-dev
+ Section: libdevel
+-Architecture: amd64 ppc64
++Architecture: amd64 kfreebsd-amd64 ppc64
+ Depends: lib32z1 (= ${Source-Version}), zlib1g-dev (= ${Source-Version}), lib32c-dev
+ Provides: lib32z-dev
+ Replaces: ia32-libs-dev (<< 1.5)
+--- zlib-1.2.3/debian/lib32z1.dirs
++++ zlib-1.2.3.orig/debian/lib32z1.dirs
+@@ -1 +0,0 @@
+-emul/ia32-linux/usr/lib/
+--- zlib-1.2.3/debian/lib32z1-dev.dirs
++++ zlib-1.2.3.orig/debian/lib32z1-dev.dirs
+@@ -1 +0,0 @@
+-emul/ia32-linux/usr/lib/
