@@ -20,12 +20,20 @@
 
 #define SYSDEP_KNOWN_INTERPRETER_NAMES \
   { "/lib/ld.so.1", FLAG_ELF_LIBC6 },				\
+  { "/lib/ld-kfreebsd-x86-64.so.1", FLAG_ELF_LIBC6 },		\
   { "/lib64/ld-kfreebsd-x86-64.so.1", FLAG_ELF_LIBC6 },		\
   { "/libexec/ld-elf.so.1", FLAG_ELF_LIBC5 },
+
 #define SYSDEP_KNOWN_LIBRARY_NAMES \
-  { "libc.so.6", FLAG_ELF_LIBC6 },		/* temporary */	\
-  { "libm.so.6", FLAG_ELF_LIBC6 },		/* temporary */	\
+  { "libc.so.0.1", FLAG_ELF_LIBC6 },				\
+  { "libm.so.1", FLAG_ELF_LIBC6 },				\
   { "libc.so.4", FLAG_ELF_LIBC5 },				\
   { "libm.so.4", FLAG_ELF_LIBC5 },				\
   { "libc.so.5", FLAG_ELF_LIBC5 },				\
-  { "libm.so.5", FLAG_ELF_LIBC5 },
+  { "libm.so.5", FLAG_ELF_LIBC5 },				\
+  { "libc.so.6", FLAG_ELF_LIBC5 },				\
+  { "libm.so.6", FLAG_ELF_LIBC5 },				\
+  { "libc.so.7", FLAG_ELF_LIBC5 },				\
+  { "libm.so.7", FLAG_ELF_LIBC5 },				\
+  { "libc.so.8", FLAG_ELF_LIBC5 },				\
+  { "libm.so.8", FLAG_ELF_LIBC5 },
