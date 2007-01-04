@@ -1,52 +1,37 @@
-WARNING: This patch only partly fixes the elfosabi problem. Binaries are 
-         runnable, but have some problems (eg fakeroot does not work on them).
-         Use the smaller hackish patch below instead, until a better fix is 
-	 found.
-
---- binutils-2.17.orig/bfd/elf.c
-+++ binutils-2.17/bfd/elf.c
-@@ -4853,6 +4853,8 @@
-     bfd_big_endian (abfd) ? ELFDATA2MSB : ELFDATA2LSB;
-   i_ehdrp->e_ident[EI_VERSION] = bed->s->ev_current;
- 
-+  i_ehdrp->e_ident[EI_OSABI] = ELFOSABI_FREEBSD;
-+
-   if ((abfd->flags & DYNAMIC) != 0)
-     i_ehdrp->e_type = ET_DYN;
-   else if ((abfd->flags & EXEC_P) != 0)
-
-UPDATE: Merged upstream part is already in experimental binutils 2.17.20061210cvs-1.
-        It looks like above mentioned problems with fakeroot are due to binaries
-        have not been linked against libc/pthread dynamically.
-        glibc should be rebuilded using new binutils or just manually fix OUTPUT_FORMAT
-        in /usr/lib/libc.so and /usr/lib/libpthread.so by 
-
-
-	--- libpthread.so~ 2006-12-27 13:30:55.000000000 +0100
-	+++ libpthread.so  2006-12-27 13:30:55.000000000 +0100
-	@@ -1,5 +1,5 @@
-	 /* GNU ld script
-	    Use the shared library, but some functions are only in
-	    the static library, so try that secondarily.  */
-	-OUTPUT_FORMAT(elf64-x86-64)
-	+OUTPUT_FORMAT(elf64-x86-64-freebsd)
-	 GROUP ( /lib/libpthread.so.0 /usr/lib/libpthread_nonshared.a )
-
-
-- biarch enabled binutils for kfreebsd-amd64 and kfreebsd-i386
-- properly supported elfosabi for kfreebsd-amd64
-- kfreebsd-amd64 enabled in multiarch 
-- kfreebsd-amd64 and kfreebsd-i386 supported in cross-build
-
-Status: in BTS #380373, 
+Status: partly in BTS #380373, 
 	upstream part merged for 2.18, see  http://sourceware.org/ml/binutils-cvs/2006-08/msg00010.html
 	remains biarch fixup in http://sourceware.org/bugzilla/show_bug.cgi?id=3826
+	remains biarch libpath, not yet submitted
 
 diff -u binutils-2.17/debian/patches/00list binutils-2.17/debian/patches/00list
 --- binutils-2.17/debian/patches/00list
 +++ binutils-2.17/debian/patches/00list
 @@ -8,0 +9 @@
 +128_kfreebsd-amd64
+diff -u binutils-2.17/debian/patches/127_x86_64_i386_biarch.dpatch binutils-2.17/debian/patches/127_x86_64_i386_biarch.dpatch
+--- binutils-2.17/debian/patches/127_x86_64_i386_biarch.dpatch
++++ binutils-2.17/debian/patches/127_x86_64_i386_biarch.dpatch
+@@ -34,7 +34,7 @@
+ +# Linux modify the default library search path to first include
+ +# a 32-bit specific directory.
+ +case "$target" in
+-+  x86_64*-linux* | i[3-7]86*-linux*)
+++  x86_64*-linux* | i[3-7]86*-linux* | x86_64*-kfreebsd*-gnu | i[3-7]86*-kfreebsd*-gnu)
+ +    case "$EMULATION_NAME" in
+ +      *i386*) LIBPATH_SUFFIX=32 ;;
+ +    esac
+diff -u binutils-2.17/debian/patches/121_i386_x86_64_biarch.dpatch binutils-2.17/debian/patches/121_i386_x86_64_biarch.dpatch
+--- binutils-2.17/debian/patches/121_i386_x86_64_biarch.dpatch
++++ binutils-2.17/debian/patches/121_i386_x86_64_biarch.dpatch
+@@ -33,7 +33,7 @@
+  # a 64-bit specific directory.
+  case "$target" in
+ -  x86_64*-linux*)
+-+  x86_64*-linux* | i[3-7]86*-linux*)
+++  x86_64*-linux* | i[3-7]86*-linux* | x86_64*-kfreebsd*-gnu | i[3-7]86*-kfreebsd*-gnu)
+      case "$EMULATION_NAME" in
+        *64*) LIBPATH_SUFFIX=64 ;;
+      esac
 diff -u binutils-2.17/debian/rules binutils-2.17/debian/rules
 --- binutils-2.17/debian/rules
 +++ binutils-2.17/debian/rules
@@ -64,8 +49,8 @@ diff -u binutils-2.17/debian/rules binutils-2.17/debian/rules
  	mkdir builddir-multi
  	cd builddir-multi \
  	    && env CC="$(CC)" ../configure $(CONFARGS) \
--		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-kfreebsd-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux,m32r-linux-gnu
-+		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-kfreebsd-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux,x86_64-kfreebsd-gnu,m32r-linux-gnu
+-		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux,m32r-linux-gnu
++	        --enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-kfreebsd-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux,x86_64-kfreebsd-gnu,m32r-linux-gnu
  	$(MAKE) -C builddir-multi configure-host
  	touch configure-multi-stamp
  
@@ -89,11 +74,9 @@ diff -u binutils-2.17/debian/rules binutils-2.17/debian/rules
  ifeq ($(TARGET), mipsel-linux-gnu)
  ADDITIONAL_TARGETS = --enable-targets=mips64el-linux-gnu
  endif
-only in patch2:
-unchanged:
 --- binutils-2.17.orig/debian/patches/128_kfreebsd-amd64.dpatch
 +++ binutils-2.17/debian/patches/128_kfreebsd-amd64.dpatch
-@@ -0,0 +1,173 @@
+@@ -0,0 +1,186 @@
 +#!/bin/sh -e
 +## 128_kfreebsd-amd64.dpatch
 +##
@@ -267,3 +250,17 @@ unchanged:
 +     bfd_elf64_x86_64_vec)	tb="$tb elf64-x86-64.lo elf64.lo $elf"; target_size=64 ;;
 +     bfd_mmo_vec)		tb="$tb mmo.lo" target_size=64 ;;
 +     bfd_powerpc_pe_vec)         tb="$tb pe-ppc.lo peigen.lo cofflink.lo" ;;
++--- binutils-2.17.orig/ld/configure.tgt
+++++ binutils-2.17/ld/configure.tgt
++@@ -200,6 +200,9 @@
++ x86_64-*-freebsd* | x86_64-*-kfreebsd*-gnu)
++ 			targ_emul=elf_x86_64_fbsd
++ 			targ_extra_emuls="elf_i386_fbsd elf_x86_64 elf_i386"
+++			targ_extra_libpath="elf_i386_fbsd"
+++			tdir_elf_i386_fbsd=`echo ${targ_alias} \
+++			    | sed -e 's/x86_64/i386/'`
++ 			tdir_elf_i386=`echo ${targ_alias} \
++ 			    | sed -e 's/x86_64/i386/'` ;;
++ i[3-7]86-*-sysv*)	targ_emul=i386coff ;;
++
+
