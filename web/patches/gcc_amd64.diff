@@ -1,10 +1,8 @@
+http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=406015
 
-Author: rmh, aurel32
-Status: DO NOT SEND YET, see patches/upstream-only/gcc.diff
-
-diff -u gcc-4.1-4.1.1ds2/debian/rules.conf gcc-4.1-4.1.1ds2/debian/rules.conf
---- gcc-4.1-4.1.1ds2/debian/rules.conf
-+++ gcc-4.1-4.1.1ds2/debian/rules.conf
+diff -u gcc-4.1-4.1.1/debian/rules.conf gcc-4.1-4.1.1/debian/rules.conf
+--- gcc-4.1-4.1.1/debian/rules.conf
++++ gcc-4.1-4.1.1/debian/rules.conf
 @@ -83,6 +83,10 @@
      LIBC_BIARCH_DEP := libc6-powerpc$(LS) (>= $(libc_ver))
      LIBC_BIARCH_DEV_DEP := libc6-dev-powerpc$(LS) (>= $(libc_ver))
@@ -34,28 +32,18 @@ diff -u gcc-4.1-4.1.1ds2/debian/rules.conf gcc-4.1-4.1.1ds2/debian/rules.conf
  
  #ifeq ($(PKGSOURCE),gcc-snapshot)
  #  LIBC_BIARCH_BUILD_DEP =
-@@ -405,15 +409,15 @@
+@@ -405,7 +409,7 @@
  else
  # avoid it ...
  ada_no_archs    := $(strip $(foreach cpu,$(ada_no_cpus),!$(cpu)) \
 -			!knetbsd-i386 !netbsd-i386 !hurd-i386)
 +			!kfreebsd-amd64 !knetbsd-i386 !netbsd-i386 !hurd-i386)
  java_no_archs   := $(strip $(foreach cpu,$(java_no_cpus),!$(cpu)) \
--			!knetbsd-i386 !netbsd-i386)
-+			!kfreebsd-amd64 !knetbsd-i386 !netbsd-i386)
+ 			!knetbsd-i386 !netbsd-i386)
  pascal_no_archs := $(strip $(foreach cpu,$(pascal_no_cpus),!$(cpu)) \
- 			!netbsd-i386)
- fortran_no_archs:= $(strip $(foreach cpu,$(fortran_no_cpus),!$(cpu)) \
- 			!avr)
- libgc_no_archs  := $(strip $(foreach cpu,$(libgc_no_cpus),!$(cpu)) \
--			!knetbsd-i386)
-+			!kfreebsd-amd64 !knetbsd-i386)
- check_no_archs  := $(strip $(foreach cpu,$(check_no_cpus),!$(cpu)) \
- 			!hurd-i386)
- locale_no_archs := $(strip $(foreach cpu,$(locale_no_cpus),!$(cpu)) \
-diff -u gcc-4.1-4.1.1ds2/debian/rules.patch gcc-4.1-4.1.1ds2/debian/rules.patch
---- gcc-4.1-4.1.1ds2/debian/rules.patch
-+++ gcc-4.1-4.1.1ds2/debian/rules.patch
+diff -u gcc-4.1-4.1.1/debian/rules.patch gcc-4.1-4.1.1/debian/rules.patch
+--- gcc-4.1-4.1.1/debian/rules.patch
++++ gcc-4.1-4.1.1/debian/rules.patch
 @@ -169,6 +169,7 @@
  endif
  
@@ -74,93 +62,48 @@ diff -u gcc-4.1-4.1.1ds2/debian/rules.patch gcc-4.1-4.1.1ds2/debian/rules.patch
    ifneq ($(with_32bit_check),yes)
      debian_patches += disable-configure-run-check
    endif
-diff -u gcc-4.1-4.1.1ds2/debian/control gcc-4.1-4.1.1ds2/debian/control
---- gcc-4.1-4.1.1ds2/debian/control
-+++ gcc-4.1-4.1.1ds2/debian/control
+diff -u gcc-4.1-4.1.1/debian/control gcc-4.1-4.1.1/debian/control
+--- gcc-4.1-4.1.1/debian/control
++++ gcc-4.1-4.1.1/debian/control
 @@ -4,7 +4,7 @@
  Maintainer: Debian GCC Maintainers <debian-gcc@lists.debian.org>
  Uploaders: Matthias Klose <doko@debian.org>
  Standards-Version: 3.7.2
--Build-Depends: dpkg-dev (>= 1.13.9), libc6.1-dev (>= 2.3.6-7) [alpha ia64] | libc0.3-dev (>= 2.3.6-7) [hurd-i386] | libc0.1-dev (>= 2.3.6-7) [kfreebsd-i386 knetbsd-gnu] | libc12-dev (>= 2.3.6-7) [netbsd-elf-gnu] | libc6-dev (>= 2.3.6-7), libc6-dev-amd64 [i386], libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], libc6-dev-i386 [amd64], libc6-dev-powerpc [ppc64], libc6-dev-ppc64 [powerpc], lib32gcc1 [amd64 ppc64], lib64gcc1 [i386 powerpc sparc s390], lib64z1-dev [i386 powerpc sparc s390], lib32z1-dev [amd64 ppc64], libunwind7-dev (>= 0.98.5-6) [ia64], libatomic-ops-dev [ia64], m4, autoconf, autoconf2.13, automake1.9, libtool, autogen, gawk, dejagnu (>= 1.4.3) [!hurd-i386], expect-tcl8.3 [!hurd-i386], bzip2, binutils (>= 2.16.1cvs20051214) | binutils-multiarch (>= 2.16.1cvs20051214), binutils-hppa64 (>= 2.16.1cvs20051214) [hppa], debhelper (>= 5.0), gperf (>= 3.0.1), bison (>= 1:2.3), flex, gettext, texinfo (>= 4.3), zlib1g-dev, libmpfr-dev [!avr], locales [!hurd-i386 !knetbsd-i386 !netbsd-i386], procps [!hurd-i386], sharutils, realpath (>= 1.9.12), chrpath, lsb-release, make (>= 3.81)
-+Build-Depends: dpkg-dev (>= 1.13.9), libc6.1-dev (>= 2.3.6-7) [alpha ia64] | libc0.3-dev (>= 2.3.6-7) [hurd-i386] | libc0.1-dev (>= 2.3.6-7) [kfreebsd-i386 kfreebsd-amd64 knetbsd-gnu] | libc12-dev (>= 2.3.6-7) [netbsd-elf-gnu] | libc6-dev (>= 2.3.6-7), libc6-dev-amd64 [i386], libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], libc6-dev-i386 [amd64], libc6-dev-powerpc [ppc64], libc6-dev-ppc64 [powerpc], libc0.1-dev-i386 [kfreebsd-amd64], lib32gcc1 [amd64 ppc64 kfreebsd-amd64], lib64gcc1 [i386 powerpc sparc s390], lib64z1-dev [i386 powerpc sparc s390], lib32z1-dev [amd64 ppc64 kfreebsd-amd64], libunwind7-dev (>= 0.98.5-6) [ia64], libatomic-ops-dev [ia64], m4, autoconf, autoconf2.13, automake1.9, libtool, autogen, gawk, dejagnu (>= 1.4.3) [!hurd-i386], expect-tcl8.3 [!hurd-i386], bzip2, binutils (>= 2.16.1cvs20051214) | binutils-multiarch (>= 2.16.1cvs20051214), binutils-hppa64 (>= 2.16.1cvs20051214) [hppa], debhelper (>= 5.0), gperf (>= 3.0.1), bison (>= 1:2.3), flex, gettext, texinfo (>= 4.3), zlib1g-dev, libmpfr-dev [!avr], locales [!hurd-i386 !knetbsd-i386 !netbsd-i386], procps [!hurd-i386], sharutils, realpath (>= 1.9.12), chrpath, lsb-release, make (>= 3.81)
- Build-Depends-Indep: doxygen (>= 1.4.2), graphviz (>= 2.2), gsfonts-x11
+-Build-Depends: dpkg-dev (>= 1.13.9), libc6.1-dev (>= 2.3.6-7) [alpha ia64] | libc0.3-dev (>= 2.3.6-7) [hurd-i386] | libc0.1-dev (>= 2.3.6-7) [kfreebsd-i386 knetbsd-gnu] | libc12-dev (>= 2.3.6-7) [netbsd-elf-gnu] | libc6-dev (>= 2.3.6-7), libc6-dev-amd64 [i386], libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], libc6-dev-i386 [amd64], libc6-dev-powerpc [ppc64], libc6-dev-ppc64 [powerpc], lib32gcc1 [amd64 ppc64], lib64gcc1 [i386 powerpc sparc s390], lib64z1-dev [i386 powerpc sparc s390], lib32z1-dev [amd64 ppc64], libunwind7-dev (>= 0.98.5-6) [ia64], libatomic-ops-dev [ia64], m4, autoconf, autoconf2.13, automake1.9, libtool, autogen, gawk, dejagnu (>= 1.4.3) [!hurd-i386], expect-tcl8.3 [!hurd-i386], bzip2, binutils (>= 2.16.1cvs20051214) | binutils-multiarch (>= 2.16.1cvs20051214), binutils-hppa64 (>= 2.16.1cvs20051214) [hppa], debhelper (>= 5.0), gperf (>= 3.0.1), bison (>= 1:2.3), flex, gettext, texinfo (>= 4.3), zlib1g-dev, libmpfr-dev [!avr], locales [!hurd-i386 !knetbsd-i386 !netbsd-i386], procps [!hurd-i386], sharutils, libasound2-dev [!knetbsd-i386 !netbsd-i386 !hurd-i386 !kfreebsd-i386 !kfreebsd-amd64], lib32asound2-dev [amd64 ppc64], lib64asound2-dev [i386 powerpc sparc s390], libxtst-dev [!knetbsd-i386 !netbsd-i386], libxt-dev [!knetbsd-i386 !netbsd-i386], libgtk2.0-dev (>= 2.4.4-2) [!knetbsd-i386 !netbsd-i386], libart-2.0-dev [!knetbsd-i386 !netbsd-i386], libcairo2-dev [!knetbsd-i386 !netbsd-i386], libgconf2-dev [!knetbsd-i386 !netbsd-i386], libxul-dev [!knetbsd-i386 !netbsd-i386 !kfreebsd-i386 !kfreebsd-amd64], fastjar [!knetbsd-i386 !netbsd-i386], gcc-4.1-source (>= 4.1.1), gcc-4.1-source (<< 4.1.2), gcc-4.1 (>= 4.1.1-12), realpath (>= 1.9.12), chrpath, lsb-release, make (>= 3.81)
++Build-Depends: dpkg-dev (>= 1.13.9), libc6.1-dev (>= 2.3.6-7) [alpha ia64] | libc0.3-dev (>= 2.3.6-7) [hurd-i386] | libc0.1-dev (>= 2.3.6-7) [kfreebsd-i386 kfreebsd-amd64 knetbsd-gnu] | libc12-dev (>= 2.3.6-7) [netbsd-elf-gnu] | libc6-dev (>= 2.3.6-7), libc6-dev-amd64 [i386], libc6-dev-sparc64 [sparc], libc6-dev-s390x [s390], libc6-dev-i386 [amd64], libc6-dev-powerpc [ppc64], libc6-dev-ppc64 [powerpc], libc0.1-dev-i386 [kfreebsd-amd64], lib32gcc1 [amd64 ppc64 kfreebsd-amd64], lib64gcc1 [i386 powerpc sparc s390], lib64z1-dev [i386 powerpc sparc s390], lib32z1-dev [amd64 ppc64 kfreebsd-amd64], libunwind7-dev (>= 0.98.5-6) [ia64], libatomic-ops-dev [ia64], m4, autoconf, autoconf2.13, automake1.9, libtool, autogen, gawk, dejagnu (>= 1.4.3) [!hurd-i386], expect-tcl8.3 [!hurd-i386], bzip2, binutils (>= 2.16.1cvs20051214) | binutils-multiarch (>= 2.16.1cvs20051214), binutils-hppa64 (>= 2.16.1cvs20051214) [hppa], debhelper (>= 5.0), gperf (>= 3.0.1), bison (>= 1:2.3), flex, gettext, texinfo (>= 4.3), zlib1g-dev, libmpfr-dev [!avr], locales [!hurd-i386 !knetbsd-i386 !netbsd-i386], procps [!hurd-i386], sharutils, libasound2-dev [!knetbsd-i386 !netbsd-i386 !hurd-i386 !kfreebsd-i386 !kfreebsd-amd64], lib32asound2-dev [amd64 ppc64], lib64asound2-dev [i386 powerpc sparc s390], libxtst-dev [!knetbsd-i386 !netbsd-i386], libxt-dev [!knetbsd-i386 !netbsd-i386], libgtk2.0-dev (>= 2.4.4-2) [!knetbsd-i386 !netbsd-i386], libart-2.0-dev [!knetbsd-i386 !netbsd-i386], libcairo2-dev [!knetbsd-i386 !netbsd-i386], libgconf2-dev [!knetbsd-i386 !netbsd-i386], libxul-dev [!knetbsd-i386 !netbsd-i386 !kfreebsd-i386 !kfreebsd-amd64], fastjar [!knetbsd-i386 !netbsd-i386], gcc-4.1-source (>= 4.1.1), gcc-4.1-source (<< 4.1.2), gcc-4.1 (>= 4.1.1-12), realpath (>= 1.9.12), chrpath, lsb-release, make (>= 3.81)
+ Build-Depends-Indep: doxygen (>= 1.4.2), graphviz (>= 2.2), gsfonts-x11, gjdoc
  
- Package: gcc-4.1-base
-@@ -57,7 +57,7 @@
-  special needs for some languages.
+ Package: gcj-4.1-base
+@@ -106,7 +106,7 @@
  
- Package: lib32gcc1
--Architecture: amd64 ppc64
-+Architecture: amd64 ppc64 kfreebsd-amd64
- Section: libs
- Priority: optional
- Depends: gcc-4.1-base (= ${gcc:Version}), ${dep:libcbiarch}
-@@ -136,7 +136,7 @@
-  dereferencing operations.
- 
- Package: lib32mudflap0
--Architecture: amd64 ppc64
-+Architecture: amd64 ppc64 kfreebsd-amd64
- Section: libs
- Priority: optional
- Depends: gcc-4.1-base (= ${gcc:Version}), ${dep:libcbiarch}, ${shlibs:Depends}
-@@ -178,7 +178,7 @@
-  stack variables to avoid pointer corruption.
- 
- Package: lib32ssp0
--Architecture: amd64 ppc64
-+Architecture: amd64 ppc64 kfreebsd-amd64
- Section: libs
- Priority: optional
- Depends: gcc-4.1-base (= ${gcc:Version}), ${dep:libcbiarch}, ${shlibs:Depends}
-@@ -249,7 +249,7 @@
- 
- Package: lib32objc1
+ Package: lib32gcj7-0
  Section: libs
 -Architecture: amd64 ppc64
 +Architecture: amd64 ppc64 kfreebsd-amd64
  Priority: optional
- Depends: gcc-4.1-base (>= ${gcc:Version}), ${dep:libcbiarch}, ${shlibs:Depends}
- Description: Runtime library for GNU Objective-C applications (32bit)
-@@ -296,7 +296,7 @@
+ Depends: gcj-4.1-base (= ${gcj:Version}), libgcj-common, lib32stdc++6, lib32z1
+ Suggests: lib32gcj7-dbg
+@@ -134,7 +134,7 @@
  
- Package: lib32gfortran1
- Section: libs
--Architecture: amd64 ppc64
-+Architecture: amd64 ppc64 kfreebsd-amd64
- Priority: optional
- Depends: gcc-4.1-base (= ${gcc:Version}), ${dep:libcbiarch}, ${shlibs:Depends}
- Description: Runtime library for GNU Fortran applications (32bit)
-@@ -325,7 +325,7 @@
- 
- Package: lib32ffi4
- Section: libs
--Architecture: amd64 ppc64
-+Architecture: amd64 ppc64 kfreebsd-amd64
- Priority: optional
- Depends: gcc-4.1-base (= ${gcc:Version}), ${dep:libcbiarch}, ${shlibs:Depends}
- Replaces: libffi4 (<< 4.1)
-@@ -376,7 +376,7 @@
-  in g++-3.0.
- 
- Package: lib32stdc++6
--Architecture: amd64 ppc64
-+Architecture: amd64 ppc64 kfreebsd-amd64
- Section: libs
- Priority: optional
- Depends: gcc-4.1-base (= ${gcc:Version}), lib32gcc1
-@@ -436,7 +436,7 @@
-  debugging symbols.
- 
- Package: lib32stdc++6-4.1-dbg
--Architecture: amd64 ppc64
-+Architecture: amd64 ppc64 kfreebsd-amd64
+ Package: lib32gcj7-dev
  Section: libdevel
+-Architecture: amd64 ppc64
++Architecture: amd64 ppc64 kfreebsd-amd64
+ Priority: optional
+ Depends: gcj-4.1-base (= ${gcj:Version}), libgcj7-dev (= ${gcj:Version}), lib32gcj-bc, lib32z1-dev, ${shlibs:Depends}
+ Description: Java development and static library for use with gcj (32bit)
+@@ -157,7 +157,7 @@
+ 
+ Package: lib32gcj7-dbg
+ Section: libdevel
+-Architecture: amd64 ppc64
++Architecture: amd64 ppc64 kfreebsd-amd64
  Priority: extra
- Depends: gcc-4.1-base (= ${gcc:Version}), lib32stdc++6 (>= ${gcc:Version}), libstdc++6-4.1-dev (= ${gcc:Version})
-diff -u gcc-4.1-4.1.1ds2/debian/rules.defs gcc-4.1-4.1.1ds2/debian/rules.defs
---- gcc-4.1-4.1.1ds2/debian/rules.defs
-+++ gcc-4.1-4.1.1ds2/debian/rules.defs
+ Depends: gcj-4.1-base (= ${gcj:Version}), lib32gcj7-0 (= ${gcj:Version})
+ Recommends: binutils
+diff -u gcc-4.1-4.1.1/debian/rules.defs gcc-4.1-4.1.1/debian/rules.defs
+--- gcc-4.1-4.1.1/debian/rules.defs
++++ gcc-4.1-4.1.1/debian/rules.defs
 @@ -833,7 +833,7 @@
    export TARGET64_MACHINE
  endif
@@ -170,9 +113,21 @@ diff -u gcc-4.1-4.1.1ds2/debian/rules.defs gcc-4.1-4.1.1ds2/debian/rules.defs
  ifeq (biarch, $(findstring biarch,$(WITHOUT_LANG)))
    biarch32_archs :=
  endif
-diff -u gcc-4.1-4.1.1ds2/debian/multiarch.inc gcc-4.1-4.1.1ds2/debian/multiarch.inc
---- gcc-4.1-4.1.1ds2/debian/multiarch.inc
-+++ gcc-4.1-4.1.1ds2/debian/multiarch.inc
+diff -u gcc-4.1-4.1.1/debian/rules2 gcc-4.1-4.1.1/debian/rules2
+--- gcc-4.1-4.1.1/debian/rules2
++++ gcc-4.1-4.1.1/debian/rules2
+@@ -1214,7 +1214,7 @@
+ 	    mandir=/$(PF)/share/man \
+ 		install
+ 
+-ifeq ($(with_java)-$(biarch32)-$(DEB_TARGET_ARCH),yes-yes-amd64)
++ifeq ($(with_java)-$(biarch32),yes-yes)
+ 	rm -rf debian/tmp32
+ 	$(MAKE) -C $(buildlibdir)/32/libjava \
+ 		install DESTDIR=$(PWD)/debian/tmp32
+diff -u gcc-4.1-4.1.1/debian/multiarch.inc gcc-4.1-4.1.1/debian/multiarch.inc
+--- gcc-4.1-4.1.1/debian/multiarch.inc
++++ gcc-4.1-4.1.1/debian/multiarch.inc
 @@ -34,0 +35,6 @@
 +
 +#if defined(__x86_64_kfreebsd_gnu__)
@@ -180,9 +135,9 @@ diff -u gcc-4.1-4.1.1ds2/debian/multiarch.inc gcc-4.1-4.1.1ds2/debian/multiarch.
 +#endif
 +
 +
-diff -u gcc-4.1-4.1.1ds2/debian/patches/kbsd-gnu.dpatch gcc-4.1-4.1.1ds2/debian/patches/kbsd-gnu.dpatch
---- gcc-4.1-4.1.1ds2/debian/patches/kbsd-gnu.dpatch
-+++ gcc-4.1-4.1.1ds2/debian/patches/kbsd-gnu.dpatch
+diff -u gcc-4.1-4.1.1/debian/patches/kbsd-gnu.dpatch gcc-4.1-4.1.1/debian/patches/kbsd-gnu.dpatch
+--- gcc-4.1-4.1.1/debian/patches/kbsd-gnu.dpatch
++++ gcc-4.1-4.1.1/debian/patches/kbsd-gnu.dpatch
 @@ -1,8 +1,9 @@
  #! /bin/sh -e
  
@@ -594,3 +549,46 @@ diff -u gcc-4.1-4.1.1ds2/debian/patches/kbsd-gnu.dpatch gcc-4.1-4.1.1ds2/debian/
 + 	tmake_file="${tmake_file} i386/t-linux64"
 + 	;;
 +
+diff -u gcc-4.1-4.1.1/debian/patches/kbsd-gnu-java.dpatch gcc-4.1-4.1.1/debian/patches/kbsd-gnu-java.dpatch
+--- gcc-4.1-4.1.1/debian/patches/kbsd-gnu-java.dpatch
++++ gcc-4.1-4.1.1/debian/patches/kbsd-gnu-java.dpatch
+@@ -141,6 +141,17 @@
+  #    define FREEBSD
+  # endif
+  
++@@ -334,6 +334,10 @@
++ #   define I386
++ #   define mach_type_known
++ # endif
+++# if defined(FREEBSD) && defined(__x86_64__)
+++#   define X86_64
+++#   define mach_type_known
+++# endif
++ # if defined(__NetBSD__) && (defined(i386) || defined(__i386__))
++ #   define I386
++ #   define mach_type_known
+ @@ -1223,8 +1223,15 @@
+  #	ifndef GC_FREEBSD_THREADS
+  #	    define MPROTECT_VDB
+@@ -304,0 +316,21 @@
++diff -ur gcj-4.1-4.1.0/src/boehm-gc/os_dep.c.orig gcj-4.1-4.1.0/src/boehm-gc/os_dep.c
++--- gcj-4.1-4.1.0/src/boehm-gc/os_dep.c.orig	2006-02-28 09:39:11.000000000 +0100
+++++ gcj-4.1-4.1.0/src/boehm-gc/os_dep.c	2006-05-12 08:34:57.000000000 +0200
++@@ -84,7 +84,7 @@
++ #   define NEED_FIND_LIMIT
++ # endif
++ 
++-#if defined(FREEBSD) && (defined(I386) || defined(powerpc) || defined(__powerpc__))
+++#if defined(FREEBSD) && (defined(I386) || defined(X86_64) || defined(powerpc) || defined(__powerpc__))
++ #  include <machine/trap.h>
++ #  if !defined(PCR)
++ #    define NEED_FIND_LIMIT
++@@ -1392,7 +1392,7 @@
++ }
++ # endif
++ 
++-# if defined(FREEBSD) && (defined(I386) || defined(powerpc) || defined(__powerpc__)) && !defined(PCR)
+++# if defined(FREEBSD) && (defined(I386) || defined(X86_64) || defined(powerpc) || defined(__powerpc__)) && !defined(PCR)
++ /* Its unclear whether this should be identical to the above, or 	*/
++ /* whether it should apply to non-X86 architectures.			*/
++ /* For now we don't assume that there is always an empty page after	*/
