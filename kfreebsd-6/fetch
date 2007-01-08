@@ -1,6 +1,9 @@
 #!/bin/bash
 set -ex
 
+ANONCVS=anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
+RELENG=RELENG_6_1_0_RELEASE
+
 rm -rf src
 
 if test -e src.tar.bz2 ; then
@@ -11,11 +14,14 @@ else
 fi
 
 for i in src/{sys,usr.sbin/config} ; do
-  cvs -d freebsdanoncvs@anoncvs.freebsd.org:/home/ncvs ${action} -r RELENG_6_1_0_RELEASE $i
+  cvs -d $ANONCVS ${action} -r $RELENG $i
   test -e $i
 done
 
 grep ^src/ debian/copyright | xargs rm -rf
+
+# assert that no non-free objects were left unremoved
+[ "`find src -name \*.o.uu | wc -l`" = "0" ]
 
 rm -f src.tar.bz2
 tar -cjpf src.tar.bz2 src/
