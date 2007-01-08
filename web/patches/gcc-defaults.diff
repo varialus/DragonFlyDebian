@@ -1,25 +1,13 @@
-diff -Nru gcc-defaults-1.50.orig/debian/control gcc-defaults-1.50.orig/debian/control
---- gcc-defaults-1.50.orig/debian/control	2007-01-02 13:28:49.000000000 +0100
-+++ gcc-defaults-1.50/debian/control	2007-01-04 22:07:42.000000000 +0100
-@@ -4,7 +4,7 @@
- Maintainer: Debian GCC Maintainers <debian-gcc@lists.debian.org>
- Uploaders: Matthias Klose <doko@debian.org>
- Standards-Version: 3.6.2
--Build-Depends: m4, debhelper (>= 4.2), dpkg-dev (>= 1.13.9), gcc-3.4-base (>= 3.4.6), gcj-4.1-base (>= 4.1.1) [!hurd-i386], gcc-4.1-base (>= 4.1.1), lsb-release
-+Build-Depends: m4, debhelper (>= 4.2), dpkg-dev (>= 1.13.9), gcc-3.4-base (>= 3.4.6), gcj-4.1-base (>= 4.1.1) [!hurd-i386 !kfreebsd-amd64], gcc-4.1-base (>= 4.1.1), lsb-release
- 
- Package: cpp
- Architecture: any
-diff -Nru gcc-defaults-1.50/debian/rules gcc-defaults-1.50.orig/debian/rules
+diff -Nru gcc-defaults-1.50.orig/debian/rules gcc-defaults-1.50/debian/rules
 --- gcc-defaults-1.50.orig/debian/rules	2007-01-02 13:42:03.000000000 +0100
-+++ gcc-defaults-1.50/debian/rules	2007-01-04 22:14:37.000000000 +0100
++++ gcc-defaults-1.50/debian/rules	2007-01-06 14:37:56.000000000 +0100
 @@ -162,6 +162,11 @@
      OS_NAME	:= kFreeBSD
  endif
  
 +ifeq ($(DEB_HOST_ARCH),kfreebsd-amd64)
 +    OS_NAME	:= kFreeBSD
-+    no_packages += gnat gcj gij libgcj-bc
++    no_packages += gnat
 +endif
 +
  ifeq ($(DEB_HOST_ARCH),m32r)
