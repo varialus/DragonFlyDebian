@@ -35,14 +35,22 @@ diff -ur ../foo.old/src/share/mk/bsd.info.mk ./src/share/mk/bsd.info.mk
  INSTALLINFOFLAGS+=--quiet
  INFOSECTION?=   Miscellaneous
  ICOMPRESS_CMD?=	${COMPRESS_CMD}
-@@ -145,10 +145,8 @@
+@@ -145,18 +145,8 @@
  .for x in ${INFO}
  INSTALLINFODIRS+= ${x:S/$/-install/}
  ${x:S/$/-install/}:
+-.if !empty(.MAKEFLAGS:M-j)
+-	lockf -k ${DESTDIR}${INFODIR}/${INFODIRFILE} \
 -	${INSTALLINFO} ${INSTALLINFOFLAGS} \
 -	    --defsection=${INFOSECTION} \
 -	    --defentry=${INFOENTRY_${x}} \
 -	    ${x}.info ${DESTDIR}${INFODIR}/${INFODIRFILE}
+-.else
+-	${INSTALLINFO} ${INSTALLINFOFLAGS} \
+-	    --defsection=${INFOSECTION} \
+-	    --defentry=${INFOENTRY_${x}} \
+-	    ${x}.info ${DESTDIR}${INFODIR}/${INFODIRFILE}
+-.endif
 +	mkdir -p ${DESTDIR}${INFODIR}
 +	install -m 644 ${x}.info ${DESTDIR}${INFODIR}/
  .endfor
