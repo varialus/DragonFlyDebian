@@ -118,6 +118,26 @@ diff -ur lib.old/libkvm/kvm_getswapinfo.c lib/libkvm/kvm_getswapinfo.c
  		}
  		tot.ksw_total += ttl;
  		tot.ksw_used += xsd.xsw_used;
+diff -ur lib.old/libkvm/kvm_minidump_i386.c lib/libkvm/kvm_minidump_i386.c
+--- lib.old/libkvm/kvm_minidump_i386.c	2007-01-12 23:06:57.000000000 +0100
++++ lib/libkvm/kvm_minidump_i386.c	2007-01-12 23:06:57.000000000 +0100
+@@ -100,6 +100,16 @@
+ 	return (-1);
+ }
+ 
++static __inline__ u_int
++bsfl(u_int mask)
++{
++	u_int   result;
++
++	__asm __volatile("bsfl %1,%0" : "=r" (result) : "rm" (mask));
++	return (result);
++}
++                                                
++
+ static int
+ inithash(kvm_t *kd, uint32_t *base, int len, off_t off)
+ {
 diff -ur lib.old/libkvm/kvm_private.h lib/libkvm/kvm_private.h
 --- lib.old/libkvm/kvm_private.h	2006-04-19 09:43:10.000000000 +0200
 +++ lib/libkvm/kvm_private.h	2006-04-19 09:38:34.000000000 +0200
