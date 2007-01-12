@@ -2,9 +2,9 @@ diff -urN src/contrib/pf/authpf/authpf.c src/contrib/pf/authpf/authpf.c
 --- src/contrib/pf/authpf/authpf.c	2007-01-09 11:00:24.000000000 +0100
 +++ src/contrib/pf/authpf/authpf.c	2007-01-09 09:52:19.000000000 +0100
 @@ -44,7 +44,8 @@
-
- #include <err.h>
- #include <errno.h>
+ #ifdef __FreeBSD_kernel__
+ #include <inttypes.h>
+ #endif
 -#include <login_cap.h>
 +//#include <login_cap.h>
 +#include <bsd/string.h>

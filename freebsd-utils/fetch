@@ -18,20 +18,14 @@ for i in \
     src/sbin/kldconfig src/sbin/kldload src/sbin/kldstat src/sbin/kldunload \
     src/sbin/mount_std src/sbin/umount src/usr.sbin/rpc.umntall \
     src/sbin/mount_{cd9660,ext2fs,hpfs,msdosfs,nfs,nfs4,ntfs,nullfs,udf,umapfs,unionfs} \
+    src/sbin/mount{,_autofs,_reiserfs} \
     src/usr.bin/{ktrace,kdump} src/usr.sbin/jail src/usr.sbin/ppp{,ctl,d} \
     src/sbin/{mdconfig,ccdconfig,ipfw} \
     src/{contrib/pf,sbin/pfctl,usr.sbin/authpf} \
     src/usr.sbin/kbdcontrol src/share/syscons/keymaps \
     src/bin/chflags \
   ; do
-  cvs ${action} -r RELENG_6_1_0_RELEASE $i
-  test -e $i
-done
-
-for i in \
-    src/sbin/mount{,_autofs,_reiserfs} \
-  ; do
-  cvs ${action} -r RELENG_6_1_0_RELEASE $i
+  cvs ${action} -r RELENG_6_2_0_RELEASE $i
   test -e $i
 done
 

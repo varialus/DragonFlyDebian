@@ -5,8 +5,8 @@ diff -ur src.old/sbin/mount/mount.c src/sbin/mount/mount.c
  	options = NULL;
  	vfslist = NULL;
  	vfstype = "ufs";
--	while ((ch = getopt(argc, argv, "adF:fo:prwt:uv")) != -1)
-+	while ((ch = getopt(argc, argv, "adfo:prwt:uv")) != -1)
+-	while ((ch = getopt(argc, argv, "adlF:fo:prwt:uv")) != -1)
++	while ((ch = getopt(argc, argv, "adlfo:prwt:uv")) != -1)
  		switch (ch) {
  		case 'a':
  			all = 1;
@@ -20,12 +20,12 @@ diff -ur src.old/sbin/mount/mount.c src/sbin/mount/mount.c
  		case 'f':
  			init_flags |= MNT_FORCE;
  			break;
-@@ -707,7 +704,7 @@
+@@ -716,7 +716,7 @@
  {
  
  	(void)fprintf(stderr, "%s\n%s\n%s\n",
--"usage: mount [-adfpruvw] [-F fstab] [-o options] [-t ufs | external_type]",
-+"usage: mount [-adfpruvw] [-o options] [-t ufs | external_type]",
+-"usage: mount [-adflpruvw] [-F fstab] [-o options] [-t ufs | external_type]",
++"usage: mount [-adflpruvw] [-o options] [-t ufs | external_type]",
  "       mount [-dfpruvw] special | node",
  "       mount [-dfpruvw] [-o options] [-t ufs | external_type] special node");
  	exit(1);
