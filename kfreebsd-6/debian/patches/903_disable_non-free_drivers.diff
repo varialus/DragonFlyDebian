@@ -2,23 +2,22 @@ Index: sys/conf/files
 ===================================================================
 --- sys/conf/files.orig	2006-06-25 11:13:23.564594000 +0200
 +++ sys/conf/files	2006-06-25 11:13:30.000000000 +0200
-@@ -240,7 +240,6 @@
- contrib/dev/acpica/utmisc.c	optional acpi
- contrib/dev/acpica/utobject.c	optional acpi
- contrib/dev/acpica/utxface.c	optional acpi
--contrib/dev/ath/freebsd/ah_osdep.c optional ath_hal
- contrib/ipfilter/netinet/fil.c	optional ipfilter inet
- contrib/ipfilter/netinet/ip_auth.c optional ipfilter inet
- contrib/ipfilter/netinet/ip_fil_freebsd.c optional ipfilter inet
-@@ -431,11 +430,6 @@
+@@ -438,18 +437,6 @@
  dev/ata/atapi-cd.c		optional atapicd
  dev/ata/atapi-fd.c		optional atapifd
  dev/ata/atapi-tape.c		optional atapist
--dev/ath/ath_rate/amrr/amrr.c 	optional ath_rate_amrr
--dev/ath/ath_rate/onoe/onoe.c 	optional ath_rate_onoe
--dev/ath/ath_rate/sample/sample.c 	optional ath_rate_sample
--dev/ath/if_ath.c		optional ath
--dev/ath/if_ath_pci.c		optional ath pci
+-dev/ath/ah_osdep.c optional ath_hal \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/ath_rate/amrr/amrr.c	optional ath_rate_amrr \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/ath_rate/onoe/onoe.c	optional ath_rate_onoe \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/ath_rate/sample/sample.c	optional ath_rate_sample \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/if_ath.c		optional ath \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/if_ath_pci.c		optional ath pci \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
  dev/awi/am79c930.c		optional awi
  dev/awi/awi.c			optional awi
  dev/awi/if_awi_pccard.c		optional awi pccard
@@ -104,7 +103,7 @@ Index: sys/conf/kern.pre.mk
  INCLUDES+= -I$S/contrib/pf
  
 -# ... and the same for Atheros HAL
--INCLUDES+= -I$S/contrib/dev/ath -I$S/contrib/dev/ath/freebsd
+-INCLUDES+= -I$S/dev/ath
 -
  # ... and the same for the NgATM stuff
  INCLUDES+= -I$S/contrib/ngatm
@@ -180,7 +179,7 @@ Index: sys/modules/Makefile
  _pccard=	pccard
  _pcfclock=	pcfclock
  _pecoff=	pecoff
-@@ -398,14 +388,12 @@
+@@ -406,7 +396,6 @@
  _dpt=		dpt
  _el=		el
  _ex=		ex
@@ -188,13 +187,21 @@ Index: sys/modules/Makefile
  _ichwd=		ichwd
  _ida=		ida
  _idt=		idt
- _iir=		iir
- _ips=		ips
+@@ -417,14 +406,12 @@
+ _iwi=		iwi
+ _ixgb=  	ixgb
  _mly=		mly
 -_nve=		nve
  .if !defined(NO_CRYPT) || defined(ALL_MODULES)
  .if exists(${.CURDIR}/../crypto/via)
  _padlock=	padlock
+ .endif
+ .endif
+ _ppc=		ppc
+-_rr232x=	rr232x
+ _s3=		s3
+ _twa=		twa
+ _vesa=		vesa
 @@ -438,14 +426,12 @@
  #_acpi=		acpi		# doesn't work on amd64 yet
  _agp=		agp
@@ -210,11 +217,11 @@ Index: sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -456,7 +442,6 @@
- #_lnc=		lnc
+@@ -476,7 +461,6 @@
  _mly=		mly
  _ndis=		ndis
--_nve=		nve
+ _ppc=		ppc
+-_rr232x=	rr232x
  _safe=		safe
  _scsi_low=	scsi_low
  _smbfs=		smbfs
