@@ -1,19 +1,21 @@
 #DPATCHLEVEL=1
-diff -Naur ufsutils.orig/fsdb.ufs/fsdb.8 ufsutils.new/fsdb.ufs/fsdb.8
---- ufsutils.orig/fsdb.ufs/fsdb.8	2003-08-30 09:49:42.000000000 +0200
-+++ ufsutils.new/fsdb.ufs/fsdb.8	2004-05-13 08:22:41.000000000 +0200
-@@ -242,7 +242,7 @@
- ported it to
- .Fx .
+Index: uf-a/fsdb.ufs/fsdb.8
+===================================================================
+--- uf-a.orig/fsdb.ufs/fsdb.8	2006-09-22 13:20:10.000000000 +0200
++++ uf-a/fsdb.ufs/fsdb.8	2007-01-18 10:41:04.000000000 +0100
+@@ -263,7 +263,7 @@
+ .Nm
+ does not implement.
  .Sh WARNING
 -Use this tool with extreme caution--you can damage an FFS file system
 +Use this tool with extreme caution\-\-you can damage an FFS file system
  beyond what
  .Xr fsck 8
  can repair.
-diff -Naur ufsutils.orig/fsdb.ufs/fsdb.c ufsutils.new/fsdb.ufs/fsdb.c
---- ufsutils.orig/fsdb.ufs/fsdb.c	2003-11-13 20:08:43.000000000 +0100
-+++ ufsutils.new/fsdb.ufs/fsdb.c	2004-05-16 23:07:42.000000000 +0200
+Index: uf-a/fsdb.ufs/fsdb.c
+===================================================================
+--- uf-a.orig/fsdb.ufs/fsdb.c	2006-09-22 13:20:10.000000000 +0200
++++ uf-a/fsdb.ufs/fsdb.c	2007-01-18 11:12:31.000000000 +0100
 @@ -35,13 +35,13 @@
  
  #include <sys/param.h>
@@ -29,7 +31,26 @@ diff -Naur ufsutils.orig/fsdb.ufs/fsdb.c ufsutils.new/fsdb.ufs/fsdb.c
  
  #include <ufs/ufs/dinode.h>
  #include <ufs/ufs/dir.h>
-@@ -200,7 +200,7 @@
+@@ -60,6 +60,18 @@
+ static int find_indirblks32(uint32_t blk, int ind_level, uint32_t *blknum);
+ static int find_indirblks64(uint64_t blk, int ind_level, uint64_t *blknum);
+ 
++static inline int32_t
++_time_to_time32(time_t t)
++{
++    return((int32_t)t);
++}
++
++static inline int64_t
++_time_to_time64(time_t t)
++{
++    return((int64_t)t);
++}    
++
+ static void 
+ usage(void)
+ {
+@@ -211,7 +223,7 @@
  prompt(EditLine *el)
  {
      static char pstring[64];
@@ -38,17 +59,7 @@ diff -Naur ufsutils.orig/fsdb.ufs/fsdb.c ufsutils.new/fsdb.ufs/fsdb.c
      return pstring;
  }
  
-@@ -223,7 +223,9 @@
-     printactive(0);
- 
-     hist = history_init();
-+#if HAVE_BSD_LIBEDIT_H_EVENT
-     history(hist, &he, H_EVENT, 100);	/* 100 elt history buffer */
-+#endif
- 
-     elptr = el_init("fsdb", stdin, stdout, stderr);
-     el_set(elptr, EL_EDITOR, "emacs");
-@@ -286,7 +288,7 @@
+@@ -298,7 +310,7 @@
  
  #define GETINUM(ac,inum)    inum = strtoul(argv[ac], &cp, 0); \
      if (inum < ROOTINO || inum > maxino || cp == argv[ac] || *cp != '\0' ) { \
@@ -57,29 +68,7 @@ diff -Naur ufsutils.orig/fsdb.ufs/fsdb.c ufsutils.new/fsdb.ufs/fsdb.c
  	       inum, ROOTINO, maxino); \
  	return 1; \
      }
-@@ -351,8 +353,8 @@
- {
-     if (!checkactive())
- 	return 1;
--    DIP(curinode, di_nlink) += 1;
--    printf("inode %d link count now %d\n", curinum, DIP(curinode, di_nlink));
-+    DIP_add(curinode, di_nlink, 1);
-+    printf("inode %ld link count now %d\n", curinum, DIP(curinode, di_nlink));
-     inodirty();
-     return 0;
- }
-@@ -361,8 +363,8 @@
- {
-     if (!checkactive())
- 	return 1;
--    DIP(curinode, di_nlink) -= 1;
--    printf("inode %d link count now %d\n", curinum, DIP(curinode, di_nlink));
-+    DIP_add(curinode, di_nlink, -1);
-+    printf("inode %ld link count now %d\n", curinum, DIP(curinode, di_nlink));
-     inodirty();
-     return 0;
- }
-@@ -482,7 +484,7 @@
+@@ -750,7 +762,7 @@
  	return 1;
      rval = makeentry(curinum, inum, argv[2]);
      if (rval)
@@ -88,127 +77,10 @@ diff -Naur ufsutils.orig/fsdb.ufs/fsdb.c ufsutils.new/fsdb.ufs/fsdb.c
      else
  	printf("could not enter name? weird.\n");
      curinode = ginode(curinum);
-@@ -635,8 +637,8 @@
- 	warnx("try one of `file', `dir', `socket', `fifo'");
- 	return 1;
-     }
--    DIP(curinode, di_mode) &= ~IFMT;
--    DIP(curinode, di_mode) |= type;
-+    DIP_and(curinode, di_mode, ~IFMT);
-+    DIP_or(curinode, di_mode, type);
-     inodirty();
-     printactive(0);
-     return 0;
-@@ -657,7 +659,7 @@
- 	return 1;
-     }
-     
--    DIP(curinode, di_size) = len;
-+    DIP_set(curinode, di_size, len);
-     inodirty();
-     printactive(0);
-     return rval;
-@@ -678,8 +680,8 @@
- 	return 1;
-     }
-     
--    DIP(curinode, di_mode) &= ~07777;
--    DIP(curinode, di_mode) |= modebits;
-+    DIP_and(curinode, di_mode, ~07777);
-+    DIP_or(curinode, di_mode, modebits);
-     inodirty();
-     printactive(0);
-     return rval;
-@@ -704,7 +706,7 @@
- 	warnx("flags set beyond 32-bit range of field (%lx)\n", flags);
- 	return(1);
-     }
--    DIP(curinode, di_flags) = flags;
-+    DIP_set(curinode, di_flags, flags);
-     inodirty();
-     printactive(0);
-     return rval;
-@@ -729,7 +731,7 @@
- 	warnx("gen set beyond 32-bit range of field (%lx)\n", gen);
- 	return(1);
-     }
--    DIP(curinode, di_gen) = gen;
-+    DIP_set(curinode, di_gen, gen);
-     inodirty();
-     printactive(0);
-     return rval;
-@@ -754,7 +756,7 @@
- 	return 1;
-     }
-     
--    DIP(curinode, di_nlink) = lcnt;
-+    DIP_set(curinode, di_nlink, lcnt);
-     inodirty();
-     printactive(0);
-     return rval;
-@@ -781,7 +783,7 @@
- 	}
-     }
-     
--    DIP(curinode, di_uid) = uid;
-+    DIP_set(curinode, di_uid, uid);
-     inodirty();
-     printactive(0);
-     return rval;
-@@ -807,7 +809,7 @@
- 	}
-     }
-     
--    DIP(curinode, di_gid) = gid;
-+    DIP_set(curinode, di_gid, gid);
-     inodirty();
-     printactive(0);
-     return rval;
-@@ -874,10 +876,10 @@
-     if (dotime(argv[1], &secs, &nsecs))
- 	return 1;
-     if (sblock.fs_magic == FS_UFS1_MAGIC)
--	curinode->dp1.di_mtime = _time_to_time32(secs);
-+	curinode->dp1.di_mtime = (int32_t)secs;
-     else
--	curinode->dp2.di_mtime = _time_to_time64(secs);
--    DIP(curinode, di_mtimensec) = nsecs;
-+	curinode->dp2.di_mtime = (int64_t)secs;
-+    DIP_set(curinode, di_mtimensec, nsecs);
-     inodirty();
-     printactive(0);
-     return 0;
-@@ -891,10 +893,10 @@
-     if (dotime(argv[1], &secs, &nsecs))
- 	return 1;
-     if (sblock.fs_magic == FS_UFS1_MAGIC)
--	curinode->dp1.di_atime = _time_to_time32(secs);
-+	curinode->dp1.di_atime = (int32_t)secs;
-     else
--	curinode->dp2.di_atime = _time_to_time64(secs);
--    DIP(curinode, di_atimensec) = nsecs;
-+	curinode->dp2.di_atime = (int64_t)secs;
-+    DIP_set(curinode, di_atimensec, nsecs);
-     inodirty();
-     printactive(0);
-     return 0;
-@@ -908,10 +910,10 @@
-     if (dotime(argv[1], &secs, &nsecs))
- 	return 1;
-     if (sblock.fs_magic == FS_UFS1_MAGIC)
--	curinode->dp1.di_ctime = _time_to_time32(secs);
-+	curinode->dp1.di_ctime = (int32_t)secs;
-     else
--	curinode->dp2.di_ctime = _time_to_time64(secs);
--    DIP(curinode, di_ctimensec) = nsecs;
-+	curinode->dp2.di_ctime = (int64_t)secs;
-+    DIP_set(curinode, di_ctimensec, nsecs);
-     inodirty();
-     printactive(0);
-     return 0;
-diff -Naur ufsutils.orig/fsdb.ufs/fsdbutil.c ufsutils.new/fsdb.ufs/fsdbutil.c
---- ufsutils.orig/fsdb.ufs/fsdbutil.c	2003-11-13 20:08:43.000000000 +0100
-+++ ufsutils.new/fsdb.ufs/fsdbutil.c	2004-05-16 20:39:43.000000000 +0200
+Index: uf-a/fsdb.ufs/fsdbutil.c
+===================================================================
+--- uf-a.orig/fsdb.ufs/fsdbutil.c	2006-09-22 13:20:10.000000000 +0200
++++ uf-a/fsdb.ufs/fsdbutil.c	2007-01-18 11:12:19.000000000 +0100
 @@ -41,7 +41,6 @@
  #include <stdint.h>
  #include <string.h>
@@ -217,9 +89,22 @@ diff -Naur ufsutils.orig/fsdb.ufs/fsdbutil.c ufsutils.new/fsdb.ufs/fsdbutil.c
  
  #include <ufs/ufs/dinode.h>
  #include <ufs/ffs/fs.h>
-@@ -157,23 +156,23 @@
-     printf("I=%lu MODE=%o SIZE=%ju", (u_long)inum, DIP(dp, di_mode),
- 	(uintmax_t)DIP(dp, di_size));
+@@ -51,6 +50,12 @@
+ #include "fsdb.h"
+ #include "fsck.h"
+ 
++static inline time_t
++_time64_to_time(int64_t t64)
++{
++    return((time_t)t64);
++}
++    
+ static int charsperline(void);
+ static int printindir(ufs2_daddr_t blk, int level, char *bufp);
+ static void printblocks(ino_t inum, union dinode *dp);
+@@ -163,23 +168,23 @@
+ 	   dp->dp2.di_birthnsec);
+     }
      if (sblock.fs_magic == FS_UFS1_MAGIC)
 -	t = _time32_to_time(dp->dp1.di_mtime);
 +	t = (time_t)dp->dp1.di_mtime;
@@ -247,7 +132,7 @@ diff -Naur ufsutils.orig/fsdb.ufs/fsdbutil.c ufsutils.new/fsdb.ufs/fsdbutil.c
      p = ctime(&t);
      printf("\n\tATIME=%15.15s %4.4s [%d nsec]\n", &p[4], &p[20],
  	   DIP(dp, di_atimensec));
-@@ -285,7 +284,7 @@
+@@ -291,7 +296,7 @@
      long ndb, offset;
      ufs2_daddr_t blkno;
  
@@ -256,7 +141,7 @@ diff -Naur ufsutils.orig/fsdb.ufs/fsdbutil.c ufsutils.new/fsdb.ufs/fsdbutil.c
      printf("Direct blocks:\n");
      ndb = howmany(DIP(dp, di_size), sblock.fs_bsize);
      for (i = 0; i < NDADDR; i++) {
-@@ -335,7 +334,7 @@
+@@ -341,7 +346,7 @@
  	return 0;
      }
      if ((DIP(curinode, di_mode) & IFMT) != IFDIR) {
@@ -265,7 +150,7 @@ diff -Naur ufsutils.orig/fsdb.ufs/fsdbutil.c ufsutils.new/fsdb.ufs/fsdbutil.c
  	return 0;
      }
      return 1;
-@@ -360,10 +359,10 @@
+@@ -366,10 +371,10 @@
  	    printstat("current inode", curinum, curinode);
  	break;
      case 0:
@@ -278,12 +163,13 @@ diff -Naur ufsutils.orig/fsdb.ufs/fsdbutil.c ufsutils.new/fsdb.ufs/fsdbutil.c
  	       curinum, DIP(curinode, di_mode) & IFMT, DIP(curinode, di_mode));
  	break;
      }
-diff -Naur ufsutils.orig/fsdb.ufs/Makefile ufsutils.new/fsdb.ufs/Makefile
---- ufsutils.orig/fsdb.ufs/Makefile	2004-02-05 23:44:23.000000000 +0100
-+++ ufsutils.new/fsdb.ufs/Makefile	2004-05-16 21:37:50.000000000 +0200
-@@ -2,14 +2,14 @@
+Index: uf-a/fsdb.ufs/Makefile
+===================================================================
+--- uf-a.orig/fsdb.ufs/Makefile	2004-10-09 17:56:34.000000000 +0200
++++ uf-a/fsdb.ufs/Makefile	2007-01-18 10:46:15.000000000 +0100
+@@ -2,15 +2,13 @@
  #	@(#)Makefile	8.1 (Berkeley) 6/5/93
- # $FreeBSD: src/sbin/fsdb/Makefile,v 1.17 2004/02/05 22:44:23 ru Exp $
+ # $FreeBSD: src/sbin/fsdb/Makefile,v 1.19 2004/10/09 15:56:34 le Exp $
  
 -PROG=	fsdb
 -MAN=	fsdb.8
@@ -291,6 +177,7 @@ diff -Naur ufsutils.orig/fsdb.ufs/Makefile ufsutils.new/fsdb.ufs/Makefile
 -	dir.c ea.c fsutil.c inode.c pass1.c pass1b.c pass2.c pass3.c pass4.c \
 -	pass5.c setup.c utilities.c ffs_subr.c ffs_tables.c
 -CFLAGS+= -I${.CURDIR}/../fsck_ffs
+-WARNS?= 2
 -LDADD=	-ledit -ltermcap
 -DPADD=	${LIBEDIT} ${LIBTERMCAP}
 -.PATH:	${.CURDIR}/../fsck_ffs ${.CURDIR}/../../sys/ufs/ffs
@@ -298,11 +185,11 @@ diff -Naur ufsutils.orig/fsdb.ufs/Makefile ufsutils.new/fsdb.ufs/Makefile
 +MAN = fsdb.8:fsdb.ufs.8
 +SRCS = fsdb.c fsdbutil.c
 +WARNS = 0
-+
 +LDADD += -ledit -ltermcap -L../libufs -lufs -L../fsck.ufs -lfsck.ufs
 +DPADD += ${LIBEDIT} ${LIBTERMCAP}
 +INCLUDES = -I../fsck.ufs
-+
-+include ../Makefile.common
  
 -.include <bsd.prog.mk>
++include ../Makefile.common
++ 
+\ No newline at end of file

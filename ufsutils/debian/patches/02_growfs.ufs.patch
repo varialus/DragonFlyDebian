@@ -1,8 +1,9 @@
 #DPATCHLEVEL=1
-diff -Naur ufsutils.orig/growfs.ufs/growfs.c ufsutils.new/growfs.ufs/growfs.c
---- ufsutils.orig/growfs.ufs/growfs.c	2004-04-04 06:17:07.000000000 +0200
-+++ ufsutils.new/growfs.ufs/growfs.c	2004-05-16 22:45:14.000000000 +0200
-@@ -56,7 +56,6 @@
+Index: uf-a/growfs.ufs/growfs.c
+===================================================================
+--- uf-a.orig/growfs.ufs/growfs.c	2007-01-18 11:14:06.000000000 +0100
++++ uf-a/growfs.ufs/growfs.c	2007-01-18 11:14:17.000000000 +0100
+@@ -54,7 +54,6 @@
  #include <sys/disklabel.h>
  #include <sys/ioctl.h>
  #include <sys/stat.h>
@@ -10,27 +11,7 @@ diff -Naur ufsutils.orig/growfs.ufs/growfs.c ufsutils.new/growfs.ufs/growfs.c
  
  #include <stdio.h>
  #include <paths.h>
-@@ -110,6 +109,10 @@
- #define	DIP(dp, field) \
- 	((sblock.fs_magic == FS_UFS1_MAGIC) ? \
- 	(uint32_t)(dp)->dp1.field : (dp)->dp2.field)
-+#define	DIP_set(dp, field, value) \
-+	{if (sblock.fs_magic == FS_UFS1_MAGIC) \
-+		(dp)->dp1.field = (uint32_t)(value); \
-+	 else (dp)->dp2.field = (value);}
- static ufs2_daddr_t 	inoblk;			/* inode block address */
- static char		inobuf[MAXBSIZE];	/* inode block */
- ino_t			maxino;			/* last valid inode */
-@@ -1846,7 +1849,7 @@
- 		return NULL;
- 	}
- 	if (inumber < ROOTINO || inumber > maxino)
--		errx(8, "bad inode number %d to ginode", inumber);
-+		errx(8, "bad inode number %ld to ginode", inumber);
- 	if (startinum == 0 ||
- 	    inumber < startinum || inumber >= startinum + INOPB(&sblock)) {
- 		inoblk = fsbtodb(&sblock, ino_to_fsba(&sblock, inumber));
-@@ -1903,10 +1906,12 @@
+@@ -1930,10 +1929,12 @@
     int sectorsize;
     off_t mediasize;
  
@@ -43,7 +24,7 @@ diff -Naur ufsutils.orig/growfs.ufs/growfs.c ufsutils.new/growfs.ufs/growfs.c
  
     if (sectorsize <= 0)
         errx(1, "bogus sectorsize: %d", sectorsize);
-@@ -2262,9 +2267,11 @@
+@@ -2289,9 +2290,11 @@
  		}
  		lp->d_checksum=sum;
  
@@ -55,7 +36,7 @@ diff -Naur ufsutils.orig/growfs.ufs/growfs.c ufsutils.new/growfs.ufs/growfs.c
  	}
  	free(lp);
  
-@@ -2288,8 +2295,10 @@
+@@ -2315,8 +2318,10 @@
  	if (!lab)
  		errx(1, "malloc failed");
  
@@ -66,56 +47,35 @@ diff -Naur ufsutils.orig/growfs.ufs/growfs.c ufsutils.new/growfs.ufs/growfs.c
  
      unlabeled++;
  
-@@ -2420,7 +2429,7 @@
- 		if (iptr == 0)
- 			continue;
- 		if (cond_bl_upd(&iptr, bp, fsi, fso, Nflag)) {
--			DIP(ino, di_db[i]) = iptr;
-+			DIP_set(ino, di_db[i], iptr);
- 			inodeupdated++;
- 		}
- 	}
-@@ -2434,7 +2443,7 @@
- 		if (iptr == 0)
- 			continue;
- 		if (cond_bl_upd(&iptr, bp, fsi, fso, Nflag)) {
--			DIP(ino, di_ib[i]) = iptr;
-+			DIP_set(ino, di_ib[i], iptr);
- 			inodeupdated++;
- 		}
- 		indirchk(blksperindir, lbn, iptr, numblks, bp, fsi, fso, Nflag);
-diff -Naur ufsutils.orig/growfs.ufs/Makefile ufsutils.new/growfs.ufs/Makefile
---- ufsutils.orig/growfs.ufs/Makefile	2004-04-04 01:56:24.000000000 +0200
-+++ ufsutils.new/growfs.ufs/Makefile	2004-05-16 21:37:56.000000000 +0200
-@@ -4,17 +4,21 @@
- # $FreeBSD: src/sbin/growfs/Makefile,v 1.9 2004/04/03 23:56:24 mux Exp $
- #
+Index: uf-a/growfs.ufs/Makefile
+===================================================================
+--- uf-a.orig/growfs.ufs/Makefile	2007-01-18 11:14:06.000000000 +0100
++++ uf-a/growfs.ufs/Makefile	2007-01-18 11:14:17.000000000 +0100
+@@ -6,14 +6,18 @@
  
--#GFSDBG=YES  
-+MAINTAINER=	tomsoft@FreeBSD.ORG, chm@FreeBSD.ORG
+ #GFSDBG=
  
 -PROG=   growfs
--SRCS=   growfs.c
++PROG=   growfs.ufs
+ SRCS=   growfs.c
 -MAN=	growfs.8
-+PROG = growfs.ufs
-+MAN = growfs.8:growfs.ufs.8
-+SRCS = growfs.c
++MAN=	growfs.8:growfs.ufs.8
  
 -WARNS?=	6
 +ifdef GFSDBG
 +SRCS +=  debug.c
 +ALL_CFLAGS = -DFS_DEBUG
 +endif
++ 
++WARNS = 6
++LDADD = -L../libufs -lufs
++INCLUDES =
  
 -.if defined(GFSDBG)
 -SRCS+=  debug.c
--CFLAGS+=-DFS_DEBUG
 -.endif  
-+WARNS = 6
-+
-+LDADD = -L../libufs -lufs
-+INCLUDES =
-+
-+include ../Makefile.common
- 
+-
 -.include <bsd.prog.mk>      
++include ../Makefile.common
++ 
+\ No newline at end of file

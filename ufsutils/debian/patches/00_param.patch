@@ -1,0 +1,62 @@
+#DPATCHLEVEL=1
+Index: a/include/sys/param.h
+===================================================================
+--- a.orig/include/sys/param.h	2006-10-24 17:02:40.000000000 +0200
++++ a/include/sys/param.h	2007-01-18 10:50:17.000000000 +0100
+@@ -38,6 +38,7 @@
+ #ifndef _SYS_PARAM_H_
+ #define _SYS_PARAM_H_
+ 
++#if 0
+ #include <sys/_null.h>
+ 
+ #define	BSD	199506		/* System version (year & month). */
+@@ -71,6 +72,8 @@
+  * MAXLOGNAME should be == UT_NAMESIZE+1 (see <utmp.h>)
+  */
+ #include <sys/syslimits.h>
++#endif
++#include <limits.h>
+ 
+ #define	MAXCOMLEN	19		/* max command name remembered */
+ #define	MAXINTERP	32		/* max interpreter file name length */
+@@ -83,6 +86,7 @@
+ #define MAXHOSTNAMELEN	256		/* max hostname size */
+ #define SPECNAMELEN	63		/* max length of devicename */
+ 
++#if 0
+ /* More types and definitions used throughout the kernel. */
+ #ifdef _KERNEL
+ #include <sys/cdefs.h>
+@@ -106,6 +110,7 @@
+ #ifndef _KERNEL
+ #include <sys/limits.h>
+ #endif
++#endif
+ 
+ #ifndef _NO_NAMESPACE_POLLUTION
+ 
+@@ -183,7 +188,9 @@
+ #define	PCATCH	0x100		/* OR'd with pri for tsleep to check signals */
+ #define	PDROP	0x200	/* OR'd with pri to stop re-entry of interlock mutex */
+ 
++#if 0
+ #define	NZERO	0		/* default "nice" */
++#endif
+ 
+ #define	NBBY	8		/* number of bits in a byte */
+ #define	NBPW	sizeof(int)	/* number of bytes per word (integer) */
+@@ -256,6 +263,7 @@
+ #define	MIN(a,b) (((a)<(b))?(a):(b))
+ #define	MAX(a,b) (((a)>(b))?(a):(b))
+ 
++#if 0
+ #ifdef _KERNEL
+ /*
+  * Basic byte order function prototypes for non-inline functions.
+@@ -319,4 +327,5 @@
+ #define __OpenSolaris_version 20060731
+ #endif
+ 
++#endif
+ #endif	/* _SYS_PARAM_H_ */
