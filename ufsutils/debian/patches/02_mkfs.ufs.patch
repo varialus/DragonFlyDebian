@@ -1,0 +1,149 @@
+#DPATCHLEVEL=1
+diff -Naur ufsutils.orig/mkfs.ufs/mkfs.c ufsutils.new/mkfs.ufs/mkfs.c
+--- ufsutils.orig/mkfs.ufs/mkfs.c	2004-04-09 21:58:33.000000000 +0200
++++ ufsutils.new/mkfs.ufs/mkfs.c	2004-05-13 08:22:41.000000000 +0200
+@@ -53,6 +53,7 @@
+ #include <stdint.h>
+ #include <stdio.h>
+ #include <unistd.h>
++#include <time.h>
+ #include <sys/param.h>
+ #include <sys/time.h>
+ #include <sys/types.h>
+@@ -902,7 +903,7 @@
+ 	sblock.fs_cstotal.cs_nifree--;
+ 	fscs[0].cs_nifree--;
+ 	if (ino >= (unsigned long)sblock.fs_ipg * sblock.fs_ncg) {
+-		printf("fsinit: inode value out of range (%d).\n", ino);
++		printf("fsinit: inode value out of range (%ld).\n", ino);
+ 		exit(32);
+ 	}
+ 	d = fsbtodb(&sblock, ino_to_fsba(&sblock, ino));
+diff -Naur ufsutils.orig/mkfs.ufs/newfs.c ufsutils.new/mkfs.ufs/newfs.c
+--- ufsutils.orig/mkfs.ufs/newfs.c	2004-04-09 21:58:34.000000000 +0200
++++ ufsutils.new/mkfs.ufs/newfs.c	2004-06-29 22:43:50.000000000 +0200
+@@ -55,7 +55,6 @@
+  */
+ #include <sys/param.h>
+ #include <sys/stat.h>
+-#include <sys/disk.h>
+ #include <sys/disklabel.h>
+ #include <sys/file.h>
+ #include <sys/mount.h>
+@@ -137,6 +136,7 @@
+ static char	device[MAXPATHLEN];
+ static char	*disktype;
+ static int	unlabeled;
++static char	*progname;
+ 
+ static struct disklabel *getdisklabel(char *s);
+ static void rewritelabel(char *s, struct disklabel *lp);
+@@ -153,6 +153,8 @@
+ 	int ch, i;
+ 	off_t mediasize;
+ 
++	progname = argv[0];
++
+ 	while ((ch = getopt(argc, argv,
+ 	    "EL:NO:RS:T:Ua:b:c:d:e:f:g:h:i:lm:o:s:")) != -1)
+ 		switch (ch) {
+@@ -286,12 +288,19 @@
+ 	}
+ 	if (fstat(disk.d_fd, &st) < 0)
+ 		err(1, "%s", special);
++/*
+ 	if ((st.st_mode & S_IFMT) != S_IFCHR)
+ 		errx(1, "%s: not a character-special device", special);
++*/
+ 
++#ifdef HAVE_BSD_DISKLABEL
+ 	if (sectorsize == 0)
+ 		ioctl(disk.d_fd, DIOCGSECTORSIZE, &sectorsize);
+-	if (sectorsize && !ioctl(disk.d_fd, DIOCGMEDIASIZE, &mediasize)) {
++#else
++	sectorsize = 512;
++#endif
++	mediasize = get_block_device_size(disk.d_fd);
++	if (sectorsize && mediasize) {
+ 		if (fssize == 0)
+ 			fssize = mediasize / sectorsize;
+ 		else if (fssize > mediasize / sectorsize)
+@@ -364,7 +373,7 @@
+ 			pp->p_size *= secperblk;
+ 	}
+ 	mkfs(pp, special);
+-	if (!unlabeled) {
++	if (!unlabeled && pp != NULL) {
+ 		if (realsectorsize != DEV_BSIZE)
+ 			pp->p_size /= realsectorsize / DEV_BSIZE;
+ 		if (!Nflag && bcmp(pp, &oldpartition, sizeof(oldpartition)))
+@@ -377,6 +386,7 @@
+ struct disklabel *
+ getdisklabel(char *s)
+ {
++#if HAVE_BSD_DISKLABEL
+ 	static struct disklabel lab;
+ 	struct disklabel *lp;
+ 
+@@ -388,6 +398,7 @@
+ 		if (lp != NULL)
+ 			return (lp);
+ 	}
++#endif
+ 	return (NULL);
+ }
+ 
+@@ -398,8 +409,10 @@
+ 		return;
+ 	lp->d_checksum = 0;
+ 	lp->d_checksum = dkcksum(lp);
++#if HAVE_BSD_DISKLABEL
+ 	if (ioctl(disk.d_fd, DIOCWDINFO, (char *)lp) < 0)
+ 		warn("ioctl (WDINFO): %s: can't rewrite disk label", s);
++#endif
+ }
+ 
+ static void
+@@ -407,7 +420,7 @@
+ {
+ 	fprintf(stderr,
+ 	    "usage: %s [ -fsoptions ] special-device%s\n",
+-	    getprogname(),
++	    progname,
+ 	    " [device-type]");
+ 	fprintf(stderr, "where fsoptions are:\n");
+ 	fprintf(stderr, "\t-L volume label to add to superblock\n");
+diff -Naur ufsutils.orig/mkfs.ufs/Makefile ufsutils.new/mkfs.ufs/Makefile
+--- ufsutils.orig/mkfs.ufs/Makefile	2003-02-11 04:06:45.000000000 +0100
++++ ufsutils.new/mkfs.ufs/Makefile	2004-06-29 22:56:48.000000000 +0200
+@@ -1,17 +1,20 @@
+ #	@(#)Makefile	8.2 (Berkeley) 3/27/94
+ # $FreeBSD: src/sbin/newfs/Makefile,v 1.22 2003/02/11 03:06:45 jmallett Exp $
+ 
+-PROG=	newfs
+-DPADD=	${LIBUFS}
+-LDADD=	-lufs
+-SRCS=	newfs.c mkfs.c
+-WARNS?=	2
+-MAN=	newfs.8
++PROG = mkfs.ufs
++SRCS = newfs.c mkfs.c
++WARNS ?= 2
++MAN = newfs.8:mkfs.ufs.8
+ 
+-.include <bsd.prog.mk>
++LDADD = -L../libufs -lufs -L../libdisklabel -ldisklabel -L../libport -lport
++INCLUDES = -I../libufs -include port/string.h -include port/random.h \
++           -include port/blockdev.h
++
++include ../Makefile.common
+ 
+ test:	${PROG}
+-	sh ${.CURDIR}/runtest01.sh 
+-	sh ${.CURDIR}/runtest00.sh | tee _.test
+-	diff --ignore-matching-lines=FreeBSD _.test ${.CURDIR}/ref.test
++	sh ${CURDIR}/runtest01.sh
++	sh ${CURDIR}/runtest00.sh | tee _.test
++	diff --ignore-matching-lines=FreeBSD _.test ${CURDIR}/ref.test
+ 	echo All Tests Passed
++

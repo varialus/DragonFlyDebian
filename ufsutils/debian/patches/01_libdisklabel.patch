@@ -1,0 +1,27 @@
+#DPATCHLEVEL=1
+diff -Naur ufsutils.orig/libdisklabel/Makefile ufsutils.new/libdisklabel/Makefile
+--- ufsutils.orig/libdisklabel/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ ufsutils.new/libdisklabel/Makefile	2004-05-16 21:38:08.000000000 +0200
+@@ -0,0 +1,10 @@
++LIB = disklabel
++LIB_type = static
++LIBSRCS = getdisklabel.c
++
++ALL_CFLAGS = -D_LIBDISKLABEL
++
++INCLUDES =
++
++include ../Makefile.common
++
+diff -Naur ufsutils.orig/libdisklabel/getdisklabel.c ufsutils.new/libdisklabel/getdisklabel.c
+--- ufsutils.orig/libdisklabel/getdisklabel.c	1970-01-01 01:00:00.000000000 +0100
++++ ufsutils.new/libdisklabel/getdisklabel.c	2004-05-03 12:33:48.000000000 +0200
+@@ -0,0 +1,8 @@
++#include <stdlib.h>
++#include <sys/disklabel.h>
++
++struct disklabel *getdiskbyname(const char *name)
++{
++	return NULL;
++}
++

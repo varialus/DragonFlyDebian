@@ -1,0 +1,28 @@
+#DPATCHLEVEL=1
+diff -Naur ufsutils.orig/bsdlabel/Makefile ufsutils.new/bsdlabel/Makefile
+--- ufsutils.orig/ffsinfo/Makefile	2004-04-01 22:31:48.000000000 +0200
++++ ufsutils.new/ffsinfo/Makefile	2004-05-25 10:20:01.000000000 +0200
+@@ -4,16 +4,12 @@
+ # $FreeBSD: src/sbin/ffsinfo/Makefile,v 1.7 2004/04/01 20:31:48 johan Exp $
+ #
+ 
+-GROWFS= ${.CURDIR}/../growfs
+-.PATH: ${GROWFS}
++PROG = ffsinfo
++SRCS = ffsinfo.c ../growfs.ufs/debug.c
++MAN = ffsinfo.8:ffsinfo.8
+ 
+-PROG=	ffsinfo
+-SRCS=	ffsinfo.c debug.c
+-MAN=	ffsinfo.8
++ALL_CFLAGS = -DFS_DEBUG -I../growfs.ufs -I../libufs
++LDADD = -L../libufs -lufs
++
++include ../Makefile.common
+ 
+-WARNS?=	0
+-CFLAGS+=-DFS_DEBUG -I${GROWFS}
+-DPADD=	${LIBUFS}
+-LDADD=	-lufs
+- 
+-.include <bsd.prog.mk>               

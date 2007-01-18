@@ -1,0 +1,23 @@
+#DPATCHLEVEL=1
+diff -Naur ufsutils.orig/badsect.ufs/Makefile ufsutils.new/badsect.ufs/Makefile
+--- ufsutils.orig/badsect.ufs/Makefile	2003-02-22 22:33:42.000000000 +0100
++++ ufsutils.new/badsect.ufs/Makefile	2004-05-16 21:36:51.000000000 +0200
+@@ -1,9 +1,13 @@
+ #	@(#)Makefile	8.1 (Berkeley) 6/5/93
+ # $FreeBSD: src/sbin/badsect/Makefile,v 1.8 2003/02/22 21:33:42 johan Exp $
+ 
+-PROG=	badsect
+-DPADD=	${LIBUFS}
+-LDADD=	-lufs
+-MAN=	badsect.8
++PROG = badsect.ufs
++SRCS = badsect.c
++WARNS = 0
++MAN = badsect.8:badsect.ufs.8
++
++INCLUDES = -I../libufs
++LDADD = -L../libufs -lufs
++
++include ../Makefile.common
+ 
+-.include <bsd.prog.mk>

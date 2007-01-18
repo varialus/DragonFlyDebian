@@ -1,0 +1,99 @@
+ufsutils (0.0+2004.06.26-5) UNRELEASED; urgency=low
+
+  * Fix Subversion repository address.
+  * Added PHONY targets:
+    - debian/patch.mk
+  * Use root gid as a fallback for operator on mkfs.ufs. (Closes: #293411)
+  * Updated upstream tarball creator (debian/upstream.sh).
+  * Now using Standards-Version 3.6.2 (no changes needed).
+  * Upgraded to debhelper compatibility level 5.
+  * Reindent debian/copyright.
+  * Make debian/patch.mk privide an unpatch target. Switch patch to single
+    colong target.
+
+ -- Guillem Jover <guillem@debian.org>  Thu,  3 Feb 2005 08:29:58 +0100
+
+ufsutils (0.0+2004.06.26-4) experimental; urgency=low
+
+  * Fix integer overflow on get_block_device_size on GNU/Linux.
+    - debian/patches/00_libport.patch
+
+ -- Guillem Jover <guillem@debian.org>  Sun,  4 Jul 2004 12:25:17 +0200
+
+ufsutils (0.0+2004.06.26-3) experimental; urgency=low
+
+  * Fix get_block_device_size for real on kFreeBSD, it was returning the
+    whole disk size. And add to it Hurd support.
+    - debian/patches/00_libport.patch
+  * Build with LFS support.
+    - debian/patches/99_makefiles.patch
+
+ -- Guillem Jover <guillem@debian.org>  Wed, 30 Jun 2004 16:02:34 +0200
+
+ufsutils (0.0+2004.06.26-2) experimental; urgency=low
+
+  * Create a portable get_block_device_size to fix mkfs.ufs on all versions
+    of kFreeBSD.
+    - debian/patches/00_port.patch
+    - debian/patches/99_makefiles.patch
+  * Splitted and merged patches, more fine grained:
+    - debian/patches/00_port.patch: Renamed to ...
+    - debian/patches/00_libport.patch: ... this. Moved subdirectory specific
+      patches into their own patch.
+    - debian/patches/99_makefiles.patch: Likewise.
+    - debian/patches/01_libufs.patch: New file. Merge from the two previous
+      patches specific parts.
+    - debian/patches/02_badsect.ufs.patch: Likewise.
+    - debian/patches/02_bsdlabel.ufs.patch: Likewise.
+    - debian/patches/02_dumpfs.ufs.patch: Likewise.
+    - debian/patches/02_dump.ufs.patch: Likewise.
+    - debian/patches/02_ffsinfo.patch: Likewise.
+    - debian/patches/02_fsck.ufs.patch: Likewise.
+    - debian/patches/02_fsdb.ufs.patch: Likewise.
+    - debian/patches/02_growfs.ufs.patch: Likewise.
+    - debian/patches/02_mkfs.ufs.patch: Likewise.
+    - debian/patches/02_tunefs.ufs.patch: Likewise.
+
+ -- Guillem Jover <guillem@debian.org>  Tue, 29 Jun 2004 23:23:53 +0200
+
+ufsutils (0.0+2004.06.26-1) experimental; urgency=low
+
+  * New Upstream Snapshot.
+  * Fix mkfs.ufs not working on block devices, due to being unable to
+    get the device size. (Closes: #256716)
+    - debian/patches/00_port.patch
+  * Added the location of the Subversion repo used for the packages.
+  * Sync patches:
+    - debian/patches/00_port.patch
+  * Enable ffsinfo:
+    - debian/patches/99_makefiles.patch
+
+ -- Guillem Jover <guillem@debian.org>  Tue, 29 Jun 2004 03:27:00 +0200
+
+ufsutils (0.0+2004.05.24-1) experimental; urgency=low
+
+  * New Upstream Snapshot.
+    - Some files switched from BSD four clause license to the three one.
+    - Include upstream files into libport, will be easier to track.
+  * Updated upstream tarball creator (debian/upstream.sh), so it now uses
+    ssh and an european mirror.
+  * Refer to debian/upstream.sh from debian/copyright.
+  * Use new make target "patch":
+    - debian/patch.mk
+    - debian/rules
+  * Move libufs2 to Section libs.
+  * Removed debian/docs file.
+  * Splitted patches:
+    - debian/patches/00_port.patch
+    - debian/patches/01_libdisklabel.patch
+    - debian/patches/99_makefiles.patch
+
+ -- Guillem Jover <guillem@debian.org>  Fri, 21 May 2004 06:29:05 +0200
+
+ufsutils (0.0+2004.05.13-1) experimental; urgency=low
+
+  * Initial Release. (Closes: #240587)
+  * Added fsck.ufs -a support. Thanks to Robert Millan <rmh@debian.org>.
+
+ -- Guillem Jover <guillem@debian.org>  Sun, 16 May 2004 23:37:00 +0200
+
