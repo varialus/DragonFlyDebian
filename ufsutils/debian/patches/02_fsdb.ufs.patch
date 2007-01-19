@@ -50,33 +50,6 @@ Index: uf-a/fsdb.ufs/fsdb.c
  static void 
  usage(void)
  {
-@@ -211,7 +223,7 @@
- prompt(EditLine *el)
- {
-     static char pstring[64];
--    snprintf(pstring, sizeof(pstring), "fsdb (inum: %d)> ", curinum);
-+    snprintf(pstring, sizeof(pstring), "fsdb (inum: %ld)> ", curinum);
-     return pstring;
- }
- 
-@@ -298,7 +310,7 @@
- 
- #define GETINUM(ac,inum)    inum = strtoul(argv[ac], &cp, 0); \
-     if (inum < ROOTINO || inum > maxino || cp == argv[ac] || *cp != '\0' ) { \
--	printf("inode %d out of range; range is [%d,%d]\n", \
-+	printf("inode %ld out of range; range is [%ld,%ld]\n", \
- 	       inum, ROOTINO, maxino); \
- 	return 1; \
-     }
-@@ -750,7 +762,7 @@
- 	return 1;
-     rval = makeentry(curinum, inum, argv[2]);
-     if (rval)
--	printf("Ino %d entered as `%s'\n", inum, argv[2]);
-+	printf("Ino %ld entered as `%s'\n", inum, argv[2]);
-     else
- 	printf("could not enter name? weird.\n");
-     curinode = ginode(curinum);
 Index: uf-a/fsdb.ufs/fsdbutil.c
 ===================================================================
 --- uf-a.orig/fsdb.ufs/fsdbutil.c	2006-09-22 13:20:10.000000000 +0200
@@ -89,7 +62,7 @@ Index: uf-a/fsdb.ufs/fsdbutil.c
  
  #include <ufs/ufs/dinode.h>
  #include <ufs/ffs/fs.h>
-@@ -51,6 +50,12 @@
+@@ -51,6 +50,18 @@
  #include "fsdb.h"
  #include "fsck.h"
  
@@ -99,70 +72,15 @@ Index: uf-a/fsdb.ufs/fsdbutil.c
 +    return((time_t)t64);
 +}
 +    
++static inline time_t
++_time32_to_time(int32_t t32)
++{
++    return((time_t)t32);
++}
++    
  static int charsperline(void);
  static int printindir(ufs2_daddr_t blk, int level, char *bufp);
  static void printblocks(ino_t inum, union dinode *dp);
-@@ -163,23 +168,23 @@
- 	   dp->dp2.di_birthnsec);
-     }
-     if (sblock.fs_magic == FS_UFS1_MAGIC)
--	t = _time32_to_time(dp->dp1.di_mtime);
-+	t = (time_t)dp->dp1.di_mtime;
-     else
--	t = _time64_to_time(dp->dp2.di_mtime);
-+	t = (time_t)dp->dp2.di_mtime;
-     p = ctime(&t);
-     printf("\n\tMTIME=%15.15s %4.4s [%d nsec]", &p[4], &p[20],
- 	   DIP(dp, di_mtimensec));
-     if (sblock.fs_magic == FS_UFS1_MAGIC)
--	t = _time32_to_time(dp->dp1.di_ctime);
-+	t = (time_t)dp->dp1.di_ctime;
-     else
--	t = _time64_to_time(dp->dp2.di_ctime);
-+	t = (time_t)dp->dp2.di_ctime;
-     p = ctime(&t);
-     printf("\n\tCTIME=%15.15s %4.4s [%d nsec]", &p[4], &p[20],
- 	   DIP(dp, di_ctimensec));
-     if (sblock.fs_magic == FS_UFS1_MAGIC)
--	t = _time32_to_time(dp->dp1.di_atime);
-+	t = (time_t)dp->dp1.di_atime;
-     else
--	t = _time64_to_time(dp->dp2.di_atime);
-+	t = (time_t)dp->dp2.di_atime;
-     p = ctime(&t);
-     printf("\n\tATIME=%15.15s %4.4s [%d nsec]\n", &p[4], &p[20],
- 	   DIP(dp, di_atimensec));
-@@ -291,7 +296,7 @@
-     long ndb, offset;
-     ufs2_daddr_t blkno;
- 
--    printf("Blocks for inode %d:\n", inum);
-+    printf("Blocks for inode %ld:\n", inum);
-     printf("Direct blocks:\n");
-     ndb = howmany(DIP(dp, di_size), sblock.fs_bsize);
-     for (i = 0; i < NDADDR; i++) {
-@@ -341,7 +346,7 @@
- 	return 0;
-     }
-     if ((DIP(curinode, di_mode) & IFMT) != IFDIR) {
--	warnx("inode %d not a directory", curinum);
-+	warnx("inode %ld not a directory", curinum);
- 	return 0;
-     }
-     return 1;
-@@ -366,10 +371,10 @@
- 	    printstat("current inode", curinum, curinode);
- 	break;
-     case 0:
--	printf("current inode %d: unallocated inode\n", curinum);
-+	printf("current inode %ld: unallocated inode\n", curinum);
- 	break;
-     default:
--	printf("current inode %d: screwy itype 0%o (mode 0%o)?\n",
-+	printf("current inode %ld: screwy itype 0%o (mode 0%o)?\n",
- 	       curinum, DIP(curinode, di_mode) & IFMT, DIP(curinode, di_mode));
- 	break;
-     }
 Index: uf-a/fsdb.ufs/Makefile
 ===================================================================
 --- uf-a.orig/fsdb.ufs/Makefile	2004-10-09 17:56:34.000000000 +0200
@@ -192,4 +110,3 @@ Index: uf-a/fsdb.ufs/Makefile
 -.include <bsd.prog.mk>
 +include ../Makefile.common
 + 
-\ No newline at end of file

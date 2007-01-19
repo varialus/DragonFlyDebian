@@ -10,15 +10,6 @@ diff -Naur ufsutils.orig/mkfs.ufs/mkfs.c ufsutils.new/mkfs.ufs/mkfs.c
  #include <sys/param.h>
  #include <sys/time.h>
  #include <sys/types.h>
-@@ -902,7 +903,7 @@
- 	sblock.fs_cstotal.cs_nifree--;
- 	fscs[0].cs_nifree--;
- 	if (ino >= (unsigned long)sblock.fs_ipg * sblock.fs_ncg) {
--		printf("fsinit: inode value out of range (%d).\n", ino);
-+		printf("fsinit: inode value out of range (%ld).\n", ino);
- 		exit(32);
- 	}
- 	d = fsbtodb(&sblock, ino_to_fsba(&sblock, ino));
 diff -Naur ufsutils.orig/mkfs.ufs/newfs.c ufsutils.new/mkfs.ufs/newfs.c
 --- ufsutils.orig/mkfs.ufs/newfs.c	2004-04-09 21:58:34.000000000 +0200
 +++ ufsutils.new/mkfs.ufs/newfs.c	2004-06-29 22:43:50.000000000 +0200

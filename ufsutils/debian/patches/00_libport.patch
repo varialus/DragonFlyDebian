@@ -181,22 +181,23 @@ diff -Naur ufsutils.orig/libport/blockdev.c ufsutils.new/libport/blockdev.c
 +
 +static const int sector_size = 512;
 +
-+off_t
++int64_t
 +get_block_device_size(int fd)
 +{
-+	off_t device_size = 0;
-+	struct stat st;
++	int64_t size = 0;
++	struct stat64 st;
 +
 +#if defined(__FreeBSD_kernel__) || defined(__OpenBSD__) || defined(__NetBSD__)
 +	{
 +		struct disklabel disklabel;
++		off_t device_size;
 +
 +		if (!ioctl(fd, DIOCGMEDIASIZE, &device_size))
 +			return device_size;
 +
 +		if (!ioctl(fd, DIOCGDINFO, &disklabel)) {
-+			device_size = (off_t)disklabel.d_secperunit * sector_size;
-+			return device_size;
++			size = ((int64_t)disklabel.d_secperunit) * sector_size;
++			return size;
 +		}
 +	}
 +#elif defined(__linux__)
@@ -204,8 +205,8 @@ diff -Naur ufsutils.orig/libport/blockdev.c ufsutils.new/libport/blockdev.c
 +		long int device_sectors;
 +
 +		if (!ioctl(fd, BLKGETSIZE, &device_sectors)) {
-+			device_size = (off_t)device_sectors * sector_size;
-+			return device_size;
++			size = ((int64_t)device_sectors) * sector_size;
++			return size;
 +		}
 +	}
 +#else
@@ -216,13 +217,12 @@ diff -Naur ufsutils.orig/libport/blockdev.c ufsutils.new/libport/blockdev.c
 +#endif
 +
 +	/* Regular files or devices under the Hurd.  */
-+	if (fstat(fd, &st) == 0) {
++	if (fstat64(fd, &st) == 0) {
 +		return st.st_size;
 +	}
 +
-+	return device_size;
++	return size;
 +}
-+
 diff -Naur ufsutils.orig/include/port/blockdev.h ufsutils.new/include/port/blockdev.h
 --- ufsutils.orig/include/port/blockdev.h	1970-01-01 01:00:00.000000000 +0100
 +++ ufsutils.new/include/port/blockdev.h	2004-06-29 22:17:29.000000000 +0200
@@ -232,7 +232,7 @@ diff -Naur ufsutils.orig/include/port/blockdev.h ufsutils.new/include/port/block
 +
 +#include <sys/types.h>
 +
-+off_t get_block_device_size(int fd);
++int64_t get_block_device_size(int fd);
 +
 +#endif
 +

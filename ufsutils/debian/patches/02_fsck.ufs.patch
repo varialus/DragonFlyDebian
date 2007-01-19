@@ -37,40 +37,6 @@ Index: uf-a/fsck.ufs/fsck_ffs.8
  .Xr fsdb 8 ,
 -.Xr newfs 8 ,
  .Xr reboot 8
-Index: uf-a/fsck.ufs/fsck.h
-===================================================================
---- uf-a.orig/fsck.ufs/fsck.h	2005-03-07 09:42:49.000000000 +0100
-+++ uf-a/fsck.ufs/fsck.h	2007-01-18 10:36:53.000000000 +0100
-@@ -76,6 +76,18 @@
- #define	DIP(dp, field) \
- 	((sblock.fs_magic == FS_UFS1_MAGIC) ? \
- 	(dp)->dp1.field : (dp)->dp2.field)
-+#define	DIP_set(dp, field, value) \
-+	{if (sblock.fs_magic == FS_UFS1_MAGIC) \
-+	(dp)->dp1.field = (value); else (dp)->dp2.field = (value);}
-+#define	DIP_add(dp, field, value) \
-+	{if (sblock.fs_magic == FS_UFS1_MAGIC) \
-+	(dp)->dp1.field += (value); else (dp)->dp2.field += (value);}
-+#define	DIP_and(dp, field, value) \
-+	{if (sblock.fs_magic == FS_UFS1_MAGIC) \
-+	(dp)->dp1.field &= (value); else (dp)->dp2.field &= (value);}
-+#define	DIP_or(dp, field, value) \
-+	{if (sblock.fs_magic == FS_UFS1_MAGIC) \
-+	(dp)->dp1.field |= (value); else (dp)->dp2.field |= (value);}
- 
- #define DIP_SET(dp, field, val) do { \
- 	if (sblock.fs_magic == FS_UFS1_MAGIC) \
-@@ -148,6 +160,10 @@
- #define	IBLK(bp, i) \
- 	((sblock.fs_magic == FS_UFS1_MAGIC) ? \
- 	(bp)->b_un.b_indir1[i] : (bp)->b_un.b_indir2[i])
-+#define	IBLK_set(bp, i, value) \
-+	{if (sblock.fs_magic == FS_UFS1_MAGIC) \
-+	(bp)->b_un.b_indir1[i] = (value); \
-+	else (bp)->b_un.b_indir2[i] = (value);}
- 
- #define IBLK_SET(bp, i, val) do { \
- 	if (sblock.fs_magic == FS_UFS1_MAGIC) \
 Index: uf-a/fsck.ufs/fsutil.c
 ===================================================================
 --- uf-a.orig/fsck.ufs/fsutil.c	2004-10-08 22:44:47.000000000 +0200
@@ -93,15 +59,6 @@ Index: uf-a/fsck.ufs/fsutil.c
  #include <unistd.h>
  
  #include "fsck.h"
-@@ -136,7 +139,7 @@
- 	int iloff;
- 
- 	if (inum > maxino)
--		errx(EEXIT, "inoinfo: inumber %d out of range", inum);
-+		errx(EEXIT, "inoinfo: inumber %ld out of range", inum);
- 	ilp = &inostathead[inum / sblock.fs_ipg];
- 	iloff = inum % sblock.fs_ipg;
- 	if (iloff >= ilp->il_numalloced)
 @@ -277,11 +280,13 @@
  	if (bkgrdflag) {
  		unlink(snapname);
@@ -184,42 +141,6 @@ Index: uf-a/fsck.ufs/inode.c
 +#include <time.h>
  
  #include "fsck.h"
- 
-@@ -285,7 +286,7 @@
- 	ufs2_daddr_t iblk;
- 
- 	if (inumber < ROOTINO || inumber > maxino)
--		errx(EEXIT, "bad inode number %d to ginode", inumber);
-+		errx(EEXIT, "bad inode number %ld to ginode", inumber);
- 	if (startinum == 0 ||
- 	    inumber < startinum || inumber >= startinum + INOPB(&sblock)) {
- 		iblk = ino_to_fsba(&sblock, inumber);
-@@ -317,7 +318,7 @@
- 	static caddr_t nextinop;
- 
- 	if (inumber != nextino++ || inumber > lastvalidinum)
--		errx(EEXIT, "bad inode number %d to nextinode", inumber);
-+		errx(EEXIT, "bad inode number %ld to nextinode", inumber);
- 	if (inumber >= lastinum) {
- 		readcnt++;
- 		dblk = fsbtodb(&sblock, ino_to_fsba(&sblock, lastinum));
-@@ -348,7 +349,7 @@
- {
- 
- 	if (inum % sblock.fs_ipg != 0)
--		errx(EEXIT, "bad inode number %d to setinodebuf", inum);
-+		errx(EEXIT, "bad inode number %ld to setinodebuf", inum);
- 	lastvalidinum = inum + sblock.fs_ipg - 1;
- 	startinum = 0;
- 	nextino = inum;
-@@ -439,7 +440,7 @@
- 			continue;
- 		return (inp);
- 	}
--	errx(EEXIT, "cannot find inode %d", inumber);
-+	errx(EEXIT, "cannot find inode %ld", inumber);
- 	return ((struct inoinfo *)0);
- }
  
 Index: uf-a/fsck.ufs/main.c
 ===================================================================
@@ -392,15 +313,6 @@ Index: uf-a/fsck.ufs/main.c
  		printf("** Phase 1 - Check Blocks and Sizes\n");
  	}
  	pass1();
-@@ -415,7 +446,7 @@
- 	    n_ffree * 100.0 / sblock.fs_dsize);
- 	if (debug) {
- 		if (files < 0)
--			printf("%d inodes missing\n", -files);
-+			printf("%ld inodes missing\n", -files);
- 		if (blks < 0)
- 			printf("%lld blocks missing\n", -(long long)blks);
- 		if (duplist != NULL) {
 @@ -447,8 +478,13 @@
  	/*
  	 * Check to see if the file system is mounted read-write.
@@ -488,19 +400,6 @@ Index: uf-a/fsck.ufs/pass1.c
  		idesc->id_type = ADDR;
  	(void)ckinode(dp, idesc);
  	if (sblock.fs_magic == FS_UFS2_MAGIC && dp->dp2.di_extsize > 0) {
-Index: uf-a/fsck.ufs/pass4.c
-===================================================================
---- uf-a.orig/fsck.ufs/pass4.c	2004-10-08 22:44:47.000000000 +0200
-+++ uf-a/fsck.ufs/pass4.c	2007-01-18 10:36:53.000000000 +0100
-@@ -111,7 +111,7 @@
- 				break;
- 
- 			default:
--				errx(EEXIT, "BAD STATE %d FOR INODE I=%d",
-+				errx(EEXIT, "BAD STATE %d FOR INODE I=%ld",
- 				    inoinfo(inumber)->ino_state, inumber);
- 			}
- 		}
 Index: uf-a/fsck.ufs/setup.c
 ===================================================================
 --- uf-a.orig/fsck.ufs/setup.c	2005-03-07 09:42:49.000000000 +0100
