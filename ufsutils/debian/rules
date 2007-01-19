@@ -13,6 +13,14 @@ DESTDIR = $(CURDIR)/debian/tmp
 
 CFLAGS = -Wall -g
 
+# really only on Linux, as GNU/kFreeBSD already have off_t 64bit
+# on GNU/kFreeBSD it must not be enabled, as it would change size of ino_t
+
+DEB_HOST_ARCH_OS = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+ifeq (linux,$(DEB_HOST_ARCH_OS))
+CFLAGS += -D_FILE_OFFSET_BITS=64
+endif
+
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
 else
