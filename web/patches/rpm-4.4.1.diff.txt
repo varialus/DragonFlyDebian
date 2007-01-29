@@ -1,0 +1,41 @@
+
+* extract rpm 4.4.1-14 somewhere
+* unpack rpm_4.4.1.orig.tar.gz
+* copy debian subdir from rpm 4.4.1-14 into unpacked rpm_4.4.1.orig.tar.gz
+* copy lsb-rpm.1 from rpm 4.4.1-14 into unpacked rpm_4.4.1.orig.tar.gz
+* in debian/patches/20-no-linux-gate.so-dependancy.diff drop whole change of debian/changelog
+* apply this patch (it adds quilt into Build-Depends and uses it in debian/rules)
+* build it
+
+
+diff -ur rpm-4.4.1.std/debian/control rpm-4.4.1/debian/control
+--- rpm-4.4.1.std/debian/control	2007-01-29 23:36:35.000000000 +0100
++++ rpm-4.4.1/debian/control	2007-01-29 23:38:53.000000000 +0100
+@@ -1,7 +1,7 @@
+ Source: rpm
+ Section: admin
+ Priority: optional
+-Build-Depends: debhelper (>= 5.0.37.2), libtool, autoconf, automake1.9, zlib1g-dev, libbz2-dev, libdb3-dev, dpkg-dev (>= 1.9.0), libpopt-dev (>= 1.6.4), python-all-dev, libbeecrypt6-dev, libneon25-dev, libxml2-dev, libreadline5-dev, libselinux1-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libsepol1-dev, libsqlite3-dev, python-central (>= 0.5)
++Build-Depends: debhelper (>= 5.0.37.2), libtool, autoconf, automake1.9, zlib1g-dev, libbz2-dev, libdb3-dev, dpkg-dev (>= 1.9.0), libpopt-dev (>= 1.6.4), python-all-dev, libbeecrypt6-dev, libneon25-dev, libxml2-dev, libreadline5-dev, libselinux1-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libsepol1-dev, libsqlite3-dev, python-central (>= 0.5), quilt
+ Maintainer: Anibal Monsalve Salazar <anibal@debian.org>
+ Uploaders: Anand Kumria <wildfire@progsoc.org>, Víctor Pérez Pereira <vperez@debianvenezuela.org>
+ XS-Python-Version: all
+diff -ur rpm-4.4.1.std/debian/rules rpm-4.4.1/debian/rules
+--- rpm-4.4.1.std/debian/rules	2007-01-29 23:36:35.000000000 +0100
++++ rpm-4.4.1/debian/rules	2007-01-29 23:39:54.000000000 +0100
+@@ -16,6 +16,7 @@
+ endif
+ 
+ makefiles:
++	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
+ 	cd popt && aclocal && libtoolize --copy --force && automake -c -i && autoconf && ./configure
+ 	#cd beecrypt && aclocal-1.7 && libtoolize --copy --force && automake-1.7 -i -a -c -f && autoconf
+ 	#aclocal-1.7
+@@ -75,6 +76,7 @@
+ 		po/cat-id-tbl.c \
+ 		popt/configure popt/ltmain.sh popt/aclocal.m4 Doxytags \
+ 		lsb-rpm po/de.gmo
++	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
+ 
+ binary-indep: build
+ 
