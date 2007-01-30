@@ -7,8 +7,22 @@ Changed a little bit to make IPv6 compile on GNU/kFreeBSD.
 
 Robin Elfrink
 
---- postfix-2.2.10-origineel/debian/patches/30hurd.dpatch	2006-05-09 10:31:53.000000000 +0200
-+++ postfix-2.2.10/debian/patches/30hurd.dpatch	2006-05-09 10:56:14.000000000 +0200
+
+diff -u postfix-2.3.6/debian/rules postfix-2.3.6/debian/rules
+--- postfix-2.3.6/debian/rules
++++ postfix-2.3.6/debian/rules
+@@ -198,7 +198,7 @@
+ 	$(checkdir)
+ 	dh_clean build
+ 	test ! -d ${base} || rm -rf ${base}
+-	$(MAKE) tidy
++	-$(MAKE) tidy
+ 
+ clean: clean-preunpatch unpatch
+ 	rm -rf debian/{files*,vars,*substvars,*.debhelper}
+diff -u postfix-2.3.6/debian/patches/30hurd.dpatch postfix-2.3.6/debian/patches/30hurd.dpatch
+--- postfix-2.3.6/debian/patches/30hurd.dpatch
++++ postfix-2.3.6/debian/patches/30hurd.dpatch
 @@ -8,7 +8,7 @@
  diff -Nur postfix-2.2.9_old/makedefs postfix-2.2.9/makedefs
  --- postfix-2.2.9_old/makedefs	2006-01-03 22:50:25.000000000 +0100
