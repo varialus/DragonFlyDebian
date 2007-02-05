@@ -53,10 +53,10 @@ process_elf_file (const char *file_name, const char *lib, int *flag,
 #undef process_elf_file
 #define process_elf_file process_elf32_file
 #define __ELF_NATIVE_CLASS 32
-#include "sysdeps/generic/readelflib.c"
+#include "elf/readelflib.c"
 
 #undef __ELF_NATIVE_CLASS
 #undef process_elf_file
 #define process_elf_file process_elf64_file
 #define __ELF_NATIVE_CLASS 64
-#include "sysdeps/generic/readelflib.c"
+#include "elf/readelflib.c"
