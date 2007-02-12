@@ -58,6 +58,7 @@
 #define NOGROUP         65535           /* marker for empty group set member */
 #define MAXHOSTNAMELEN  256             /* max hostname size */
 #define SPECNAMELEN     63              /* max length of devicename */
+#define TTY_NAME_MAX	SPECNAMELEN
 
 /* BSD names for some <limits.h> values.  */
 
