@@ -9,18 +9,19 @@
 #
 #
 # Dependencies on Debian packages: (non-exhaustive)
-#  - libterm-readline-perl-perl [or similar?]
-#  - libwww-perl
-#  - libhtml-tree-perl
-#  - libapt-pkg-perl
+#  - libterm-readline-perl-perl [Or other?]
+#  - libwww-perl                [WWW:Mechanize]
+#  - libhtml-tree-perl          [HTML::TreeBuilder]
+#  - libhtml-parser-perl        [HTML::Entities]
+#  - libapt-pkg-perl            [AptPkg::*]
 #  - [to be continued]
 #
 # (maybe) in future versions:
-#  - replace HTML entities
 #  - support several buildd servers query at the same time
 #  - support several versions query at the same time (e.g. using a
 #    coma-separated list)
 #  - support command-line parameters to ease calls from dlog-analyze
+#  - proper copyright header
 
 
 use strict;
@@ -28,6 +29,7 @@ use Term::ReadLine;
 use Data::Dumper;
 use WWW::Mechanize;
 use HTML::TreeBuilder;
+use HTML::Entities;
 
 use AptPkg::Config  '$_config';
 use AptPkg::System  '$_system';
@@ -297,6 +299,9 @@ sub fetch_single_log {
         if ($content !~ /^Built successfully$/ms) {
             $suffix = '_ftbfs';
         }
+
+        # HTML...
+        decode_entities($content);
 
         open my $log, '>', $log_dir.'/'.$stamp.$suffix
             or die "Unable to create $stamp in $log_dir";
