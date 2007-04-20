@@ -5,10 +5,14 @@
 
 include /usr/share/quilt/quilt.make
 
-build: patch
+build-indep: patch
 	dh_testdir
 	
 	$(MAKE)
+
+build-arch:
+
+build: build-indep build-arch
 
 clean: unpatch
 	dh_testdir
@@ -18,13 +22,13 @@ clean: unpatch
 	
 	dh_clean
 
-install: build
+install-indep: build-indep
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
 
-binary-indep: build install
+binary-indep: install-indep
 	dh_testdir
 	dh_testroot
 	dh_installdocs
@@ -42,7 +46,7 @@ binary-indep: build install
 	dh_md5sums
 	dh_builddeb
 
-binary-arch: build install
+binary-arch:
 	# Nothing to do.
 
 binary: binary-indep binary-arch
