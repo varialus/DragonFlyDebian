@@ -1,0 +1,45 @@
+Status: partly in BTS #380373 
+
+diff -u binutils-2.17/debian/rules binutils-2.17/debian/rules
+--- binutils-2.17/debian/rules
++++ binutils-2.17/debian/rules
+@@ -69,6 +69,9 @@
+ ifeq ($(DEB_HOST_ARCH),i386)
+ 	CONFARGS += --enable-targets=x86_64-linux-gnu
+ endif
++ifeq ($(DEB_HOST_ARCH),kfreebsd-i386)
++	CONFARGS += --enable-targets=x86_64-kfreebsd-gnu
++endif
+ ifeq ($(DEB_HOST_ARCH),mips)
+        CONFARGS += --enable-targets=mips64-linux-gnu
+ endif
+@@ -138,7 +141,7 @@
+ 	mkdir builddir-multi
+ 	cd builddir-multi \
+ 	    && env CC="$(CC)" ../configure $(CONFARGS) \
+-		--enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux,m32r-linux-gnu
++	        --enable-targets=alpha-linux-gnu,arm-linux-gnu,hppa-linux-gnu,i486-kfreebsd-gnu,i486-linux-gnu,ia64-linux-gnu,m68k-linux-gnu,m68k-rtems,mips-linux-gnu,mipsel-linux-gnu,mips64-linux-gnu,mips64el-linux-gnu,powerpc-linux-gnu,powerpc64-linux-gnu,s390-linux-gnu,s390x-linux-gnu,sh-linux-gnu,sparc-linux-gnu,sparc64-linux-gnu,x86_64-linux,x86_64-kfreebsd-gnu,m32r-linux-gnu
+ 	$(MAKE) -C builddir-multi configure-host
+ 	touch configure-multi-stamp
+ 
+@@ -474,12 +477,18 @@
+ ifneq ($(filter sparc-linux-gnu powerpc-linux-gnu mips-linux-gnu, $(TARGET)),)
+ ADDITIONAL_TARGETS = --enable-targets=$(TARGET:%-linux-gnu=%64-linux-gnu)
+ endif
+-ifneq ($(filter i386-linux-gnu i486-linux-gnu i586-linux-gnu x86-linux-gnu, $(TARGET)),)
++ifneq ($(filter i386-linux-gnu i486-linux-gnu i586-linux-gnu i686-linux-gnu x86-linux-gnu, $(TARGET)),)
+ ADDITIONAL_TARGETS = --enable-targets=x86_64-linux-gnu
+ endif
++ifneq ($(filter i386-kfreebsd-gnu i486-kfreebsd-gnu i586-kfreebsd-gnu i686-kfreebsd-gnu x86-kfreebsd-gnu, $(TARGET)),)
++ADDITIONAL_TARGETS = --enable-targets=x86_64-kfreebsd-gnu
++endif
+ ifeq ($(TARGET), x86_64-linux-gnu)
+ ADDITIONAL_TARGETS = --enable-targets=i486-linux-gnu
+ endif
++ifeq ($(TARGET), x86_64-kfreebsd-gnu)
++ADDITIONAL_TARGETS = --enable-targets=i486-kfreebsd-gnu
++endif
+ ifeq ($(TARGET), mipsel-linux-gnu)
+ ADDITIONAL_TARGETS = --enable-targets=mips64el-linux-gnu
+ endif
+
