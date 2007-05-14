@@ -1,0 +1,48 @@
+diff -u jack-audio-connection-kit-0.103.0/debian/control jack-audio-connection-kit-0.103.0/debian/control
+--- jack-audio-connection-kit-0.103.0/debian/control
++++ jack-audio-connection-kit-0.103.0/debian/control
+@@ -6,7 +6,8 @@
+ Build-Depends: cdbs (>= 0.4.26-2), type-handling (>= 0.2.5), debhelper (>= 4.1.0), patchutils (>= 0.2.25), dh-buildinfo, 
+  libasound2-dev [i386 ia64 alpha amd64 armeb arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc], libsndfile1-dev, doxygen, 
+  libcap-dev [i386 ia64 alpha amd64 armeb arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc], autotools-dev, libreadline5-dev,
+- libraw1394-dev [i386 ia64 alpha amd64 armeb arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc], libfreebob0-dev, chrpath
++ libraw1394-dev [i386 ia64 alpha amd64 armeb arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc], 
++ libfreebob0-dev [i386 ia64 alpha amd64 armeb arm hppa m32r m68k mips mipsel powerpc ppc64 s390 s390x sh3 sh3eb sh4 sh4eb sparc], chrpath
+ Build-Conflicts: libcap2-dev
+ Standards-Version: 3.7.2
+ 
+only in patch2:
+unchanged:
+--- jack-audio-connection-kit-0.103.0.orig/debian/patches/09_kbsd.patch
++++ jack-audio-connection-kit-0.103.0/debian/patches/09_kbsd.patch
+@@ -0,0 +1,30 @@
++diff -ur config/os/generic/time.h config/os/generic/time.h
++--- config/os/generic/time.h	2006-05-26 04:45:16.000000000 +0200
+++++ config/os/generic/time.h	2007-05-14 23:02:22.000000000 +0200
++@@ -24,7 +24,9 @@
++ 
++ #include <jack/internal.h>
++ 
++-inline jack_time_t
+++extern jack_time_t jack_get_microseconds_from_system();
+++
+++static inline jack_time_t
++ jack_get_microseconds (void) {
++ 	return jack_get_microseconds_from_system ();
++ }
++diff -ur libjack/midiport.c libjack/midiport.c
++--- libjack/midiport.c	2007-01-17 01:48:45.000000000 +0100
+++++ libjack/midiport.c	2007-05-14 22:49:46.000000000 +0200
++@@ -77,8 +77,11 @@
++ 		(jack_midi_port_info_private_t *) port_buffer;
++ 	
++ 	if (event_idx >= info->event_count)
+++#if defined(ENODATA)	
++ 		return ENODATA;
++-	
+++#else
+++		return ENOENT;
+++#endif				
++ 	port_event = (jack_midi_port_internal_event_t *) (info + 1);
++ 	port_event += event_idx;
++ 	event->time = port_event->time;
