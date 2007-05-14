@@ -44,7 +44,7 @@ case "$1" in
 	# No-op
 	;;
   *)
-	echo "Usage: mountall.sh [start|stop]" >&2
+	echo "Usage: $0 [start|stop]" >&2
 	exit 3
 	;;
 esac

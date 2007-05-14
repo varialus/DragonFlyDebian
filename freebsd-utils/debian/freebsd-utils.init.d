@@ -90,7 +90,7 @@ case "$1" in
     ;; 
 
   *)
-      echo "Usage: /etc/init.d/$NAME {start|stop|restart|force-reload}" >&2
+      echo "Usage: $0 {start|stop|restart|force-reload}" >&2
       exit 1
       ;;
 esac

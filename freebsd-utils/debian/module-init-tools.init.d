@@ -28,8 +28,9 @@ do_start() {
 		which kld$i >/dev/null || exit 1
 	done
 	modules="`shopt -s nullglob ; cat /etc/modules /etc/modules.d/* \
-		 | sed -e \"s/#.*//g\" -e \"/^\( \|\t\)*$/d\" | sort | uniq`"
-
+		 | sed -e \"s/#.*//g\" -e \"/^\( \|\t\)*$/d\" `"
+#			in previous line should be output of sed passed 
+#			through  "| sort -u", but sort is located in /usr/bin/ :-(
 	set -e
 
 	for i in ${modules} ; do
@@ -55,7 +56,7 @@ case "$1" in
 	# No-op
 	;;
   *)
-	echo "Usage: mountall.sh [start|stop]" >&2
+	echo "Usage: $0 [start|stop]" >&2
 	exit 3
 	;;
 esac
