@@ -30,7 +30,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp 
-	rm -f "any:linux" "i386:any"
+	rm -f "*:*"
 	dh_clean
 
 build: build-stamp
@@ -40,6 +40,7 @@ build-stamp:
 
 	TYPE_HANDLING_BOOTSTRAP=yes ./type-handling any linux	> "any:linux"
 	TYPE_HANDLING_BOOTSTRAP=yes ./type-handling i386 any	> "i386:any"
+	TYPE_HANDLING_BOOTSTRAP=yes ./type-handling amd64 any	> "amd64:any"
 	
 	touch build-stamp
 
@@ -50,8 +51,7 @@ install: build
 	dh_installdirs
 
 	install -o root -g root -m 755 type-handling $(CURDIR)/debian/type-handling/usr/bin
-	install -o root -g root -m 644 i386:any	$(CURDIR)/debian/type-handling/usr/share/type-handling
-	install -o root -g root -m 644 any:linux $(CURDIR)/debian/type-handling/usr/share/type-handling
+	install -o root -g root -m 644 *:* $(CURDIR)/debian/type-handling/usr/share/type-handling
 
 # Build architecture-independent files here.
 binary-indep: build install
