@@ -57,9 +57,9 @@ static char sccsid[] = "@(#)nlist.c	8.1 (Berkeley) 6/4/93";
 
 #define SIZE_T_MAX 0xffffffffU
 
-int __fdnlist(int, struct nlist *);
-int __aout_fdnlist(int, struct nlist *);
-int __elf_fdnlist(int, struct nlist *);
+static int __fdnlist(int, struct nlist *);
+static int __aout_fdnlist(int, struct nlist *);
+static int __elf_fdnlist(int, struct nlist *);
 
 int
 nlist(name, list)
@@ -87,7 +87,7 @@ static struct nlist_handlers {
 #endif
 };
 
-int
+static int
 __fdnlist(fd, list)
 	int fd;
 	struct nlist *list;
@@ -105,7 +105,7 @@ __fdnlist(fd, list)
 #define	ISLAST(p)	(p->n_un.n_name == 0 || p->n_un.n_name[0] == 0)
 
 #ifdef _NLIST_DO_AOUT
-int
+static int
 __aout_fdnlist(fd, list)
 	int fd;
 	struct nlist *list;
@@ -210,7 +210,7 @@ static void elf_sym_to_nlist(struct nlist *, Elf_Sym *, Elf_Shdr *, int);
  * WARNING:  This is NOT an ELF ABI function and
  * as such its use should be restricted.
  */
-int
+static int
 __elf_is_okay__(ehdr)
 	Elf_Ehdr *ehdr;
 {
@@ -234,7 +234,7 @@ __elf_is_okay__(ehdr)
 	return retval;
 }
 
-int
+static int
 __elf_fdnlist(fd, list)
 	int fd;
 	struct nlist *list;
