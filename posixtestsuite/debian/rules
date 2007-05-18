@@ -27,6 +27,8 @@ install-indep: build-indep
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
+	
+#	$(MAKE) install DESTDIR=$(CURDIR)/debian/posixtestsuite
 
 binary-indep: install-indep
 	dh_testdir
@@ -51,5 +53,6 @@ binary-arch:
 
 binary: binary-indep binary-arch
 
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: clean install
+.PHONY: build build-indep build-arch binary-indep binary-arch binary
 
