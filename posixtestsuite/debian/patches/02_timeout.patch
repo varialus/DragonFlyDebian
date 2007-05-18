@@ -1,0 +1,102 @@
+#DPATCHLEVEL=1
+diff -Nur posixtestsuite-1.4.3.old/timeout posixtestsuite-1.4.3/timeout
+--- posixtestsuite-1.4.3.old/timeout	1970-01-01 01:00:00.000000000 +0100
++++ posixtestsuite-1.4.3/timeout	2004-09-01 19:55:41.000000000 +0200
+@@ -0,0 +1,8 @@
++#!/bin/sh
++if test -e $1 ; then
++  expect << EOF
++set timeout 30
++eval spawn `pwd`/$1 $2
++expect
++EOF
++fi
+diff -Nur posixtestsuite-1.4.3.old/Makefile posixtestsuite-1.4.3/Makefile
+--- posixtestsuite-1.4.3.old/Makefile	2004-07-07 16:19:07.000000000 +0200
++++ posixtestsuite-1.4.3/Makefile	2004-09-01 18:41:01.000000000 +0200
+@@ -46,7 +46,11 @@
+ all: build-tests run-tests 
+ 
+ build-tests: $(BUILD_TESTS:.c=.test)
+-run-tests: $(RUN_TESTS:.test=.run-test)
++run-tests:
++	-chmod 755 timeout
++	for i in $(RUN_TESTS); do \
++		./timeout $$i; \
++	done
+ 
+ functional-tests: functional-make functional-run
+ stress-tests: stress-make stress-run
+diff -Nur posixtestsuite-1.4.3.old/functional/mqueues/run.sh posixtestsuite-1.4.3/functional/mqueues/run.sh
+--- posixtestsuite-1.4.3.old/functional/mqueues/run.sh	2004-07-05 23:49:05.000000000 +0200
++++ posixtestsuite-1.4.3/functional/mqueues/run.sh	2004-09-01 18:40:17.000000000 +0200
+@@ -12,7 +12,7 @@
+ {
+ 	echo "TEST: " $1
+ 	TOTAL=$TOTAL+1
+-	./$1
++	../../timeout $1
+ 	if [ $? == 0 ]; then
+ 		PASS=$PASS+1
+ 		echo -ne "\t\t\t***TEST PASSED***\n\n"
+diff -Nur posixtestsuite-1.4.3.old/functional/semaphores/run.sh posixtestsuite-1.4.3/functional/semaphores/run.sh
+--- posixtestsuite-1.4.3.old/functional/semaphores/run.sh	2004-07-05 23:49:05.000000000 +0200
++++ posixtestsuite-1.4.3/functional/semaphores/run.sh	2004-09-01 18:40:17.000000000 +0200
+@@ -12,7 +12,7 @@
+ {
+ 	echo "TEST: " $1
+ 	TOTAL=$TOTAL+1
+-	./$1
++	../../timeout $1
+ 	if [ $? == 0 ]; then
+ 		PASS=$PASS+1
+ 		echo -ne "\t\t\t***TEST PASSED***\n\n"
+diff -Nur posixtestsuite-1.4.3.old/functional/threads/pi_test/run.sh posixtestsuite-1.4.3/functional/threads/pi_test/run.sh
+--- posixtestsuite-1.4.3.old/functional/threads/pi_test/run.sh	2004-07-05 23:49:05.000000000 +0200
++++ posixtestsuite-1.4.3/functional/threads/pi_test/run.sh	2004-09-01 18:40:17.000000000 +0200
+@@ -21,7 +21,7 @@
+ {
+         echo "TEST: " $1
+         TOTAL=$TOTAL+1
+-        ./$1 > output.$1
++        ../../timeout $1 > output.$1
+         if [ $? == 0 ]; then
+                 PASS=$PASS+1
+                 echo -ne "\t\t\t***TEST PASSED***\n\n"
+diff -Nur posixtestsuite-1.4.3.old/functional/threads/robust_test/run.sh posixtestsuite-1.4.3/functional/threads/robust_test/run.sh
+--- posixtestsuite-1.4.3.old/functional/threads/robust_test/run.sh	2004-07-05 23:49:05.000000000 +0200
++++ posixtestsuite-1.4.3/functional/threads/robust_test/run.sh	2004-09-01 18:40:17.000000000 +0200
+@@ -7,7 +7,7 @@
+ {
+         echo "TEST: " $1
+         TOTAL=$TOTAL+1
+-        ./$1
++        ../../timeout $1
+         if [ $? == 0 ]; then
+                 PASS=$PASS+1
+                 echo -ne "\t\t\t***TEST PASSED***\n\n"
+diff -Nur posixtestsuite-1.4.3.old/stress/mqueues/run.sh posixtestsuite-1.4.3/stress/mqueues/run.sh
+--- posixtestsuite-1.4.3.old/stress/mqueues/run.sh	2004-07-05 23:49:05.000000000 +0200
++++ posixtestsuite-1.4.3/stress/mqueues/run.sh	2004-09-01 18:40:17.000000000 +0200
+@@ -12,7 +12,7 @@
+ {
+ 	echo "TEST: " $1 $2
+ 	TOTAL=$TOTAL+1
+-	./$1 $2
++	../../timeout $1 $2
+ 	if [ $? == 0 ]; then
+ 		PASS=$PASS+1
+ 		echo -ne "\t\t\t***TEST PASSED***\n\n"
+diff -Nur posixtestsuite-1.4.3.old/stress/semaphores/run.sh posixtestsuite-1.4.3/stress/semaphores/run.sh
+--- posixtestsuite-1.4.3.old/stress/semaphores/run.sh	2004-07-05 23:49:05.000000000 +0200
++++ posixtestsuite-1.4.3/stress/semaphores/run.sh	2004-09-01 18:40:17.000000000 +0200
+@@ -12,7 +12,7 @@
+ {
+ 	echo "TEST: " $1 $2
+ 	TOTAL=$TOTAL+1
+-	./$1 $2
++	../../timeout $1 $2
+ 	if [ $? == 0 ]; then
+ 		PASS=$PASS+1
+ 		echo -ne "\t\t\t***TEST PASSED***\n\n"
+
