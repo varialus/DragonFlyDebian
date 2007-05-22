@@ -134,5 +134,12 @@ extern int __local_multiple_threads attribute_hidden;
 
 /* This code should never be used but we define it anyhow.  */
 # define SINGLE_THREAD_P (1)
+# define NO_CANCELLATION 1
 
+#endif
+
+#ifndef __ASSEMBLER__
+# define RTLD_SINGLE_THREAD_P \
+  __builtin_expect (THREAD_GETMEM (THREAD_SELF, \
+                                     p_header.data.multiple_threads) == 0, 1)
 #endif

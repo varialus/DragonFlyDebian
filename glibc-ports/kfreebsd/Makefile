@@ -111,6 +111,7 @@ inhibit-glue = yes
 # Special ELF hacks.
 ifeq ($(subdir),elf)
 sysdep-rtld-routines += dl-brk dl-sbrk
+sysdep_routines += sys_umtx
 endif
 
 ifeq ($(subdir),sunrpc)
