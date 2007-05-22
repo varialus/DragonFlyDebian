@@ -372,6 +372,32 @@
 #define	SYS_thr_suspend	442
 #define	SYS_thr_wake	443
 #define	SYS_kldunloadf	444
-#define	SYS_MAXSYSCALL	445
+#define	SYS_audit	445
+#define	SYS_auditon	446
+#define	SYS_getauid	447
+#define	SYS_setauid	448
+#define	SYS_getaudit	449
+#define	SYS_setaudit	450
+#define	SYS_getaudit_addr	451
+#define	SYS_setaudit_addr	452
+#define	SYS_auditctl	453
+#define	SYS__umtx_op	454
+#define	SYS_thr_new	455
+#define	SYS_sigqueue	456
+#define	SYS_kmq_open	457
+#define	SYS_kmq_setattr	458
+#define	SYS_kmq_timedreceive	459
+#define	SYS_kmq_timedsend	460
+#define	SYS_kmq_notify	461
+#define	SYS_kmq_unlink	462
+#define	SYS_abort2	463
+#define	SYS_thr_set_name	464
+#define	SYS_aio_fsync	465
+#define	SYS_rtprio_thread	466
+#define	SYS_sctp_peeloff	471
+#define	SYS_sctp_generic_sendmsg	472
+#define	SYS_sctp_generic_sendmsg_iov	473
+#define	SYS_sctp_generic_recvmsg	474
+#define	SYS_MAXSYSCALL	475
 
 #endif
