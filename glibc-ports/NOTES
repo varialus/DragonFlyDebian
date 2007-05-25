@@ -90,3 +90,34 @@ make[2]: *** [build/debug/tst-lfschk1.out] Error 1
 make[2]: *** [build/debug/tst-lfschk2.out] Error 1
 make[2]: *** [build/debug/tst-lfschk3.out] Error 1
 
+
+
+regression with glibc 2.6 (glibc 2.5 is OK):
+
+elf/tst-dlmodcount & elf/tst-dlopenrpath
+
+	the main program is not linked with pthread,
+	but dlopen()-ed module is. During dlclose()
+	main program crashes. I.e dlclose of pthread 
+	library does not work correctly.
+
+
+**********************************************************
+/* gcc tst.c -ldl -o tst */
+
+#include <link.h>
+#include <stdlib.h>
+
+int
+main ()
+{
+  void *handle;
+
+  handle = dlopen ("libpthread.so.0", RTLD_LAZY);
+  perror("open");
+  dlclose(handle);
+  perror("close");
+  return 0;
+}
+
+**********************************************************
