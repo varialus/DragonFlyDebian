@@ -24,6 +24,11 @@ ifeq ($(subdir),csu)
 sysdep_routines += errno-loc
 endif
 
+ifeq ($(subdir),assert)
+CFLAGS-assert.c += -DFATAL_PREPARE_INCLUDE='<fatal-prepare.h>'
+CFLAGS-assert-perr.c += -DFATAL_PREPARE_INCLUDE='<fatal-prepare.h>'
+endif
+
 ifeq ($(subdir),io)
 # For <unistd.h>.
 sysdep_routines += sys_getcwd sys_lseek
