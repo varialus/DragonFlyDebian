@@ -28,4 +28,9 @@
 #define minor(dev) ((int)((dev) & 0xffff00ff))
 #define makedev(major, minor) (((major) << 8) | (minor))
 
+/* Access the functions with their new names.  */
+#define gnu_dev_major(dev) major (dev)
+#define gnu_dev_minor(dev) minor (dev)
+#define gnu_dev_makedev(maj, min) makedev (maj, min)
+
 #endif /* sys/sysmacros.h */
