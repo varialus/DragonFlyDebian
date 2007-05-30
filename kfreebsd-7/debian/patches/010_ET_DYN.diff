@@ -1,0 +1,84 @@
+
+
+Index: sys/kern/imgact_elf.c
+===================================================================
+--- sys/kern/imgact_elf.c.orig	2006-03-16 01:25:31.000000000 +0100
++++ sys/kern/imgact_elf.c	2006-06-24 17:37:23.000000000 +0200
+@@ -610,6 +610,8 @@
+ 	char *path;
+ 	struct thread *td = curthread;
+ 	struct sysentvec *sv;
++	u_long rbase = 0;
++
+ 
+ 	/*
+ 	 * Do we have a valid ELF header ?
+@@ -649,10 +651,26 @@
+ 		    hdr->e_ident[EI_OSABI]);
+ 		return (ENOEXEC);
+ 	}
++#if 0
+ 	if (hdr->e_type == ET_DYN && brand_info->brand != ELFOSABI_LINUX)
+ 		return (ENOEXEC);
++#endif
++	if (hdr->e_type == ET_DYN) {
++ 	    for (i = 0; i < hdr->e_phnum; i++) {
++		if (phdr[i].p_type == PT_LOAD) {
++			if (phdr[i].p_vaddr == 0) {
++				/* we have to load at base addr 0, 
++				 * so relocate somewhere (at 512 MB)
++				 */
++				rbase = 512 * 1024 * 1024;
++				break;
++			}		
++		}
++	    }
++	}
++		
+ 	sv = brand_info->sysvec;
+-	if (interp != NULL && brand_info->interp_newpath != NULL)
++	if (interp != NULL && brand_info->interp_newpath != NULL && !strcmp(interp, "/libexec/ld-elf.so.1") != NULL)
+ 		interp = brand_info->interp_newpath;
+ 
+ 	/*
+@@ -693,7 +711,7 @@
+ 
+ 			if ((error = __elfN(load_section)(vmspace,
+ 			    imgp->object, phdr[i].p_offset,
+-			    (caddr_t)(uintptr_t)phdr[i].p_vaddr,
++			    (caddr_t)(uintptr_t)phdr[i].p_vaddr + rbase,
+ 			    phdr[i].p_memsz, phdr[i].p_filesz, prot,
+ 			    sv->sv_pagesize)) != 0)
+ 				return (error);
+@@ -707,11 +725,12 @@
+ 			if (phdr[i].p_offset == 0 &&
+ 			    hdr->e_phoff + hdr->e_phnum * hdr->e_phentsize
+ 				<= phdr[i].p_filesz)
+-				proghdr = phdr[i].p_vaddr + hdr->e_phoff;
++				proghdr = phdr[i].p_vaddr + rbase + hdr->e_phoff;
+ 
+ 			seg_addr = trunc_page(phdr[i].p_vaddr);
+ 			seg_size = round_page(phdr[i].p_memsz +
+ 			    phdr[i].p_vaddr - seg_addr);
++			seg_addr += rbase;
+ 
+ 			/*
+ 			 * Is this .text or .data?  We can't use
+@@ -733,7 +752,7 @@
+ 			    phdr[i].p_memsz)) {
+ 				text_size = seg_size;
+ 				text_addr = seg_addr;
+-				entry = (u_long)hdr->e_entry;
++				entry = (u_long)hdr->e_entry + rbase;
+ 			} else {
+ 				data_size = seg_size;
+ 				data_addr = seg_addr;
+@@ -741,7 +760,7 @@
+ 			total_size += seg_size;
+ 			break;
+ 		case PT_PHDR: 	/* Program header table info */
+-			proghdr = phdr[i].p_vaddr;
++			proghdr = phdr[i].p_vaddr + rbase;
+ 			break;
+ 		default:
+ 			break;
