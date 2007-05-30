@@ -21,7 +21,7 @@ cpu		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 config_files	:= $(wildcard debian/arch/$(cpu)/*.config)
 flavours	:= $(config_files:debian/arch/$(cpu)/%.config=%)
 configfile	:= DEBCUSTOM
-abiname		:= 1
+abiname		:= 0
 
 SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
 IMAGE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname)
@@ -32,7 +32,7 @@ SRC_DIR		:= kfreebsd-source-$(version)
 HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
 FLAVOR_DIR	:= flavor-$(version)-$(abiname)
 
-MAKE		:= make MACHINE_ARCH=$(cpu) CC=gcc-3.4 WERROR= 
+MAKE		:= make MACHINE_ARCH=$(cpu) CC=gcc-4.2 WERROR= 
 PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 
 control: clean
@@ -113,6 +113,7 @@ install-indep-stamp: build-indep
 
 config: src
 	cp -af src/usr.sbin/config config
+	grep -v ^__FBSDID src/sys/kern/subr_sbuf.c > config/sbuf.c
 	$(MAKE) -C config
 
 build-arch: $(foreach flavor,$(flavours),build-flavor-$(flavor)-stamp)
