@@ -5,11 +5,11 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
 
 Index: usr.sbin/config/Makefile
 ===================================================================
---- usr.sbin/config/Makefile.orig	2004-05-11 17:42:44.000000000 +0200
-+++ usr.sbin/config/Makefile	2006-06-24 17:33:24.000000000 +0200
-@@ -6,11 +6,11 @@
- SRCS=	config.y main.c lang.l mkmakefile.c mkheaders.c \
- 	mkoptions.c y.tab.h
+--- usr.sbin/config/Makefile.orig	2007-05-30 17:48:56.000000000 +0200
++++ usr.sbin/config/Makefile	2007-05-30 17:52:41.000000000 +0200
+@@ -9,11 +9,11 @@
+ kernconf.c: kernconf.tmpl
+ 	file2c 'char kernconfstr[] = {' ',0};' < ${.CURDIR}/kernconf.tmpl > kernconf.c
  
 -WARNS?=	6
 -CFLAGS+= -I. -I${.CURDIR}
@@ -17,37 +17,36 @@ Index: usr.sbin/config/Makefile
 +CFLAGS+= -I. -I${.CURDIR} -D_GNU_SOURCE
  
  DPADD=	${LIBL}
--LDADD=	-ll
+-LDADD=	-ll -lsbuf
 +LDADD=	-ll -lbsd
  
- mkmakefile.o: configvers.h
+ CLEANFILES+=	kernconf.c
  
 Index: usr.sbin/config/main.c
 ===================================================================
---- usr.sbin/config/main.c.orig	2005-10-28 21:04:03.000000000 +0200
-+++ usr.sbin/config/main.c	2006-06-24 17:33:24.000000000 +0200
-@@ -45,13 +45,19 @@
+--- usr.sbin/config/main.c.orig	2007-05-30 17:48:56.000000000 +0200
++++ usr.sbin/config/main.c	2007-05-30 17:53:51.000000000 +0200
+@@ -41,12 +41,18 @@
+   "$FreeBSD: src/usr.sbin/config/main.c,v 1.76 2007/05/17 04:53:52 imp Exp $";
+ #endif /* not lint */
+ 
++#include <stdarg.h>
+ #include <sys/types.h>
  #include <sys/stat.h>
+ #include <sys/sbuf.h>
  #include <sys/file.h>
  #include <sys/mman.h>
 -#include <sys/param.h>
 +#include <sys/param.h> /* BSD */
++
 +#ifndef BSD
 +#include <bsd/string.h> /* strlcpy, strlcat */
++#include "sbuf.c"
 +#endif
+ 
+ #include <assert.h>
  #include <ctype.h>
- #include <err.h>
- #include <stdio.h>
- #include <sysexits.h>
- #include <unistd.h>
- #include <dirent.h>
-+#ifndef _DIRENT_HAVE_D_NAMLEN
-+#include <string.h> /* strlen */
-+#endif
- #include "y.tab.h"
- #include "config.h"
- #include "configvers.h"
-@@ -455,7 +461,11 @@
+@@ -588,7 +594,11 @@
  	if ((dirp = opendir(p)) == NULL)
  		err(EX_OSERR, "opendir %s", p);
  	while ((dp = readdir(dirp)) != NULL) {

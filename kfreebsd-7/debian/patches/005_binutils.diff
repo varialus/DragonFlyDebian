@@ -148,39 +148,14 @@ Index: sys/amd64/amd64/cpu_switch.S
 ===================================================================
 --- sys/amd64/amd64/cpu_switch.S.orig	2005-11-15 01:25:59.000000000 +0100
 +++ sys/amd64/amd64/cpu_switch.S	2006-06-24 17:33:03.000000000 +0200
-@@ -105,10 +105,10 @@
- 	jz	1f				/* no, skip over */
- 
- 	/* Save segment selector numbers */
--	movl	%ds,PCB_DS(%r8)
--	movl	%es,PCB_ES(%r8)
--	movl	%fs,PCB_FS(%r8)
--	movl	%gs,PCB_GS(%r8)
-+	movw	%ds,PCB_DS(%r8)
-+	movw	%es,PCB_ES(%r8)
-+	movw	%fs,PCB_FS(%r8)
-+	movw	%gs,PCB_GS(%r8)
- 1:
- 	/* Test if debug registers should be saved. */
- 	testl	$PCB_DBREGS,PCB_FLAGS(%r8)
-@@ -174,14 +174,14 @@
- 	jz	1f				/* no, skip over */
- 
- 	/* Restore segment selector numbers */
--	movl	PCB_DS(%r8),%ds
--	movl	PCB_ES(%r8),%es
--	movl	PCB_FS(%r8),%fs
-+	movw	PCB_DS(%r8),%ds
-+	movw	PCB_ES(%r8),%es
-+	movw	PCB_FS(%r8),%fs
- 
- 	/* Restore userland %gs while preserving kernel gsbase */
+@@ -204,7 +204,7 @@
+ 	movq	%rbx,(%rax)
  	movl	$MSR_GSBASE,%ecx
  	rdmsr
 -	movl	PCB_GS(%r8),%gs
 +	movw	PCB_GS(%r8),%gs
  	wrmsr
- 	jmp	2f
+ 
  1:
 Index: sys/amd64/ia32/ia32_signal.c
 ===================================================================
@@ -319,31 +294,23 @@ Index: sys/amd64/ia32/ia32_sigtramp.S
 ===================================================================
 --- sys/amd64/ia32/ia32_sigtramp.S.orig	2003-08-23 01:19:02.000000000 +0200
 +++ sys/amd64/ia32/ia32_sigtramp.S	2006-06-24 17:32:27.000000000 +0200
-@@ -45,10 +45,10 @@
+@@ -45,8 +45,8 @@
  	calll	*IA32_SIGF_HANDLER(%esp)
  	leal	IA32_SIGF_UC(%esp),%eax	/* get ucontext */
  	pushl	%eax
--	movl	IA32_UC_GS(%eax),%gs	/* restore %gs */
--	movl	IA32_UC_FS(%eax),%fs	/* restore %fs */
 -	movl	IA32_UC_ES(%eax),%es	/* restore %es */
 -	movl	IA32_UC_DS(%eax),%ds	/* restore %ds */
-+	mov	IA32_UC_GS(%eax),%gs	/* restore %gs */
-+	mov	IA32_UC_FS(%eax),%fs	/* restore %fs */
 +	mov	IA32_UC_ES(%eax),%es	/* restore %es */
 +	mov	IA32_UC_DS(%eax),%ds	/* restore %ds */
  	movl	$SYS_sigreturn,%eax
  	pushl	%eax			/* junk to fake return addr. */
  	int	$0x80			/* enter kernel with args */
-@@ -62,10 +62,10 @@
+@@ -60,8 +60,8 @@
  	calll	*IA32_SIGF_HANDLER(%esp)
  	leal	IA32_SIGF_UC4(%esp),%eax/* get ucontext */
  	pushl	%eax
--	movl	IA32_UC4_GS(%eax),%gs	/* restore %gs */
--	movl	IA32_UC4_FS(%eax),%fs	/* restore %fs */
 -	movl	IA32_UC4_ES(%eax),%es	/* restore %es */
 -	movl	IA32_UC4_DS(%eax),%ds	/* restore %ds */
-+	mov	IA32_UC4_GS(%eax),%gs	/* restore %gs */
-+	mov	IA32_UC4_FS(%eax),%fs	/* restore %fs */
 +	mov	IA32_UC4_ES(%eax),%es	/* restore %es */
 +	mov	IA32_UC4_DS(%eax),%ds	/* restore %ds */
  	movl	$344,%eax		/* 4.x SYS_sigreturn */
@@ -353,31 +320,23 @@ Index: sys/amd64/linux32/linux32_locore.s
 ===================================================================
 --- sys/amd64/linux32/linux32_locore.s.orig	2004-08-16 09:55:06.000000000 +0200
 +++ sys/amd64/linux32/linux32_locore.s	2006-06-24 17:32:27.000000000 +0200
-@@ -11,10 +11,10 @@
+@@ -11,8 +11,8 @@
  NON_GPROF_ENTRY(linux_sigcode)
  	call	*LINUX_SIGF_HANDLER(%esp)
  	leal	LINUX_SIGF_SC(%esp),%ebx	/* linux scp */
--	movl	LINUX_SC_GS(%ebx),%gs
--	movl	LINUX_SC_FS(%ebx),%fs
 -	movl	LINUX_SC_ES(%ebx),%es
 -	movl	LINUX_SC_DS(%ebx),%ds
-+	mov	LINUX_SC_GS(%ebx),%gs
-+	mov	LINUX_SC_FS(%ebx),%fs
 +	mov	LINUX_SC_ES(%ebx),%es
 +	mov	LINUX_SC_DS(%ebx),%ds
  	movl	%esp, %ebx			/* pass sigframe */
  	push	%eax				/* fake ret addr */
  	movl	$LINUX_SYS_linux_sigreturn,%eax	/* linux_sigreturn() */
-@@ -25,10 +25,10 @@
+@@ -23,8 +23,8 @@
  linux_rt_sigcode:
  	call	*LINUX_RT_SIGF_HANDLER(%esp)
  	leal	LINUX_RT_SIGF_UC(%esp),%ebx	/* linux ucp */
--	movl	LINUX_SC_GS(%ebx),%gs
--	movl	LINUX_SC_FS(%ebx),%fs
 -	movl	LINUX_SC_ES(%ebx),%es
 -	movl	LINUX_SC_DS(%ebx),%ds
-+	mov	LINUX_SC_GS(%ebx),%gs
-+	mov	LINUX_SC_FS(%ebx),%fs
 +	mov	LINUX_SC_ES(%ebx),%es
 +	mov	LINUX_SC_DS(%ebx),%ds
  	push	%eax				/* fake ret addr */

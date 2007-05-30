@@ -4,10 +4,10 @@ Status: chflags is BSD-specific.  We could add it to freebsd-utils.
 
 Index: sys/conf/kern.mk
 ===================================================================
---- sys/conf/kern.mk.orig	2005-04-01 00:53:58.000000000 +0200
-+++ sys/conf/kern.mk	2006-06-24 17:25:17.000000000 +0200
+--- sys/conf/kern.mk.orig	2007-05-30 12:30:16.000000000 +0200
++++ sys/conf/kern.mk	2007-05-30 12:45:13.000000000 +0200
 @@ -1,5 +1,9 @@
- # $FreeBSD: src/sys/conf/kern.mk,v 1.45 2005/03/31 22:53:58 peter Exp $
+ # $FreeBSD: src/sys/conf/kern.mk,v 1.52 2007/05/24 21:53:42 obrien Exp $
  
 +.if !defined(OPSYS)
 +OPSYS!=		uname -s
@@ -21,39 +21,38 @@ Index: sys/conf/kern.mk
  #CWARNFLAGS=	-w2	# use this if you are terribly bored
  CWARNFLAGS=
 -.else
--CWARNFLAGS?=	-Wall -Wredundant-decls -Wnested-externs -Wstrict-prototypes \
-+.elif !defined(CWARNFLAGS)
-+CWARNFLAGS=	-Wall -Wredundant-decls -Wnested-externs -Wstrict-prototypes \
++elif !defined(CWARNFLAGS)
+ CWARNFLAGS?=	-Wall -Wredundant-decls -Wnested-externs -Wstrict-prototypes \
  		-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual \
--		-fformat-extensions -std=c99
-+		-std=c99
+-		${_wundef} ${_Wno_pointer_sign} -fformat-extensions
++		${_wundef} ${_Wno_pointer_sign}
 +.if ${OPSYS} == "FreeBSD"
 +# FreeBSD extensions, not available in upstream GCC
-+CWARNFLAGS+=	-fformat-extensions
++CWARNFLAGS+=  -fformat-extensions
 +.endif
+ .if !defined(WITH_GCC3)
+ _Wno_pointer_sign=-Wno-pointer-sign
  .endif
- #
- # The following flags are next up for working on:
-@@ -30,8 +38,12 @@
+@@ -36,8 +44,12 @@
  # reserved for user applications.
  #
  .if ${MACHINE_ARCH} == "i386" && ${CC} != "icc"
 -CFLAGS+=	-mno-align-long-strings -mpreferred-stack-boundary=2 \
 +CFLAGS+=	-mpreferred-stack-boundary=2 \
- 		-mno-mmx -mno-3dnow -mno-sse -mno-sse2
+ 		-mno-mmx -mno-3dnow -mno-sse -mno-sse2 -mno-sse3
 +.if ${OPSYS} == "FreeBSD"
 +# FreeBSD extensions, not available in upstream GCC
-+CFLAGS+=	-mno-align-long-strings
++CFLAGS+=      -mno-align-long-strings
 +.endif
  INLINE_LIMIT?=	8000
  .endif
  
 Index: sys/conf/kern.post.mk
 ===================================================================
---- sys/conf/kern.post.mk.orig	2005-11-16 11:03:02.000000000 +0100
-+++ sys/conf/kern.post.mk	2006-06-24 17:25:17.000000000 +0200
+--- sys/conf/kern.post.mk.orig	2007-05-30 12:30:16.000000000 +0200
++++ sys/conf/kern.post.mk	2007-05-30 12:44:43.000000000 +0200
 @@ -1,5 +1,15 @@
- # $FreeBSD: src/sys/conf/kern.post.mk,v 1.83.2.1 2005/11/16 10:03:02 ru Exp $
+ # $FreeBSD: src/sys/conf/kern.post.mk,v 1.100 2007/03/23 21:55:59 imp Exp $
  
 +.if !defined(OPSYS)
 +OPSYS!=		uname -s
@@ -68,7 +67,7 @@ Index: sys/conf/kern.post.mk
  # Part of a unified Makefile for building kernels.  This part includes all
  # the definitions that need to be after all the % directives except %RULES
  # and ones that act like they are part of %RULES.
-@@ -189,11 +199,9 @@
+@@ -208,11 +218,9 @@
  .if exists(${DESTDIR}${KODIR})
  	-thiskernel=`sysctl -n kern.bootfile` ; \
  	if [ ! "`dirname "$$thiskernel"`" -ef ${DESTDIR}${KODIR} ] ; then \
@@ -80,25 +79,30 @@ Index: sys/conf/kern.post.mk
  			rm -rf ${DESTDIR}${KODIR}.old ; \
  		fi ; \
  		mv ${DESTDIR}${KODIR} ${DESTDIR}${KODIR}.old ; \
-@@ -202,17 +210,16 @@
+@@ -220,21 +228,21 @@
+ 	fi
  .endif
  	mkdir -p ${DESTDIR}${KODIR}
- .if defined(DEBUG) && defined(INSTALL_DEBUG)
--	${INSTALL} -p -m 555 -o root -g wheel ${FULLKERNEL} ${DESTDIR}${KODIR}
-+	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${FULLKERNEL} ${DESTDIR}${KODIR}
- .else
 -	${INSTALL} -p -m 555 -o root -g wheel ${KERNEL_KO} ${DESTDIR}${KODIR}
 +	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${KERNEL_KO} ${DESTDIR}${KODIR}
+ .if defined(DEBUG) && !defined(INSTALL_NODEBUG)
+-	${INSTALL} -p -m 555 -o root -g wheel ${KERNEL_KO}.symbols ${DESTDIR}${KODIR}
++	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${KERNEL_KO}.symbols ${DESTDIR}${KODIR}
+ .endif
+ .if defined(KERNEL_EXTRA_INSTALL)
+-	${INSTALL} -p -m 555 -o root -g wheel ${KERNEL_EXTRA_INSTALL} ${DESTDIR}${KODIR}
++	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${KERNEL_EXTRA_INSTALL} ${DESTDIR}${KODIR}
  .endif
  
+ 
+ 
  kernel-reinstall:
--	@-chflags -R noschg ${DESTDIR}${KODIR}
- .if defined(DEBUG) && defined(INSTALL_DEBUG)
--	${INSTALL} -p -m 555 -o root -g wheel ${FULLKERNEL} ${DESTDIR}${KODIR}
-+	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${FULLKERNEL} ${DESTDIR}${KODIR}
- .else
+ 	@-chflags -R noschg ${DESTDIR}${KODIR}
 -	${INSTALL} -p -m 555 -o root -g wheel ${KERNEL_KO} ${DESTDIR}${KODIR}
 +	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${KERNEL_KO} ${DESTDIR}${KODIR}
+ .if defined(DEBUG) && !defined(INSTALL_NODEBUG)
+-	${INSTALL} -p -m 555 -o root -g wheel ${KERNEL_KO}.symbols ${DESTDIR}${KODIR}
++	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${KERNEL_KO}.symbols ${DESTDIR}${KODIR}
  .endif
  
  config.o env.o hints.o vers.o vnode_if.o:

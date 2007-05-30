@@ -1,13 +1,13 @@
 Index: sys/netinet/ip.h
 ===================================================================
---- sys/netinet/ip.h.orig	2005-01-07 02:45:44.000000000 +0100
-+++ sys/netinet/ip.h	2006-06-24 17:38:11.000000000 +0200
-@@ -65,7 +65,7 @@
+--- sys/netinet/ip.h.orig	2007-05-30 12:31:30.000000000 +0200
++++ sys/netinet/ip.h	2007-05-30 13:08:18.000000000 +0200
+@@ -67,7 +67,7 @@
  	u_char	ip_p;			/* protocol */
  	u_short	ip_sum;			/* checksum */
  	struct	in_addr ip_src,ip_dst;	/* source and dest address */
--} __packed;
-+} __attribute__ ((packed));
+-} __packed __aligned(4);
++}  __attribute__((__packed__)) __attribute__((__aligned__(4)));
  
  #ifdef CTASSERT
  CTASSERT(sizeof (struct ip) == 20);

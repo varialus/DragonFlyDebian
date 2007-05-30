@@ -2,8 +2,8 @@
 
 Index: sys/kern/imgact_elf.c
 ===================================================================
---- sys/kern/imgact_elf.c.orig	2006-03-16 01:25:31.000000000 +0100
-+++ sys/kern/imgact_elf.c	2006-06-24 17:37:23.000000000 +0200
+--- sys/kern/imgact_elf.c.orig	2007-05-30 12:31:15.000000000 +0200
++++ sys/kern/imgact_elf.c	2007-05-30 13:05:38.000000000 +0200
 @@ -610,6 +610,8 @@
  	char *path;
  	struct thread *td = curthread;
@@ -13,35 +13,36 @@ Index: sys/kern/imgact_elf.c
  
  	/*
  	 * Do we have a valid ELF header ?
-@@ -649,10 +651,26 @@
+@@ -649,11 +651,27 @@
  		    hdr->e_ident[EI_OSABI]);
  		return (ENOEXEC);
  	}
 +#if 0
- 	if (hdr->e_type == ET_DYN && brand_info->brand != ELFOSABI_LINUX)
+ 	if (hdr->e_type == ET_DYN &&
+ 	    (brand_info->flags & BI_CAN_EXEC_DYN) == 0)
  		return (ENOEXEC);
 +#endif
 +	if (hdr->e_type == ET_DYN) {
 + 	    for (i = 0; i < hdr->e_phnum; i++) {
 +		if (phdr[i].p_type == PT_LOAD) {
 +			if (phdr[i].p_vaddr == 0) {
-+				/* we have to load at base addr 0, 
++				/* we have to load at base addr 0,
 +				 * so relocate somewhere (at 512 MB)
 +				 */
 +				rbase = 512 * 1024 * 1024;
 +				break;
-+			}		
++			}
 +		}
 +	    }
 +	}
-+		
++
  	sv = brand_info->sysvec;
 -	if (interp != NULL && brand_info->interp_newpath != NULL)
 +	if (interp != NULL && brand_info->interp_newpath != NULL && !strcmp(interp, "/libexec/ld-elf.so.1") != NULL)
  		interp = brand_info->interp_newpath;
  
  	/*
-@@ -693,7 +711,7 @@
+@@ -695,7 +713,7 @@
  
  			if ((error = __elfN(load_section)(vmspace,
  			    imgp->object, phdr[i].p_offset,
@@ -50,7 +51,7 @@ Index: sys/kern/imgact_elf.c
  			    phdr[i].p_memsz, phdr[i].p_filesz, prot,
  			    sv->sv_pagesize)) != 0)
  				return (error);
-@@ -707,11 +725,12 @@
+@@ -709,11 +727,12 @@
  			if (phdr[i].p_offset == 0 &&
  			    hdr->e_phoff + hdr->e_phnum * hdr->e_phentsize
  				<= phdr[i].p_filesz)
@@ -64,7 +65,7 @@ Index: sys/kern/imgact_elf.c
  
  			/*
  			 * Is this .text or .data?  We can't use
-@@ -733,7 +752,7 @@
+@@ -735,7 +754,7 @@
  			    phdr[i].p_memsz)) {
  				text_size = seg_size;
  				text_addr = seg_addr;
@@ -73,7 +74,7 @@ Index: sys/kern/imgact_elf.c
  			} else {
  				data_size = seg_size;
  				data_addr = seg_addr;
-@@ -741,7 +760,7 @@
+@@ -743,7 +762,7 @@
  			total_size += seg_size;
  			break;
  		case PT_PHDR: 	/* Program header table info */

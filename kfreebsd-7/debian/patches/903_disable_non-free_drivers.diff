@@ -1,15 +1,14 @@
 Index: sys/conf/files
 ===================================================================
---- sys/conf/files.orig	2006-06-25 11:13:23.564594000 +0200
-+++ sys/conf/files	2006-06-25 11:13:30.000000000 +0200
-@@ -438,18 +437,6 @@
+--- sys/conf/files.orig	2007-05-30 17:46:31.000000000 +0200
++++ sys/conf/files	2007-05-30 17:54:16.000000000 +0200
+@@ -474,17 +474,6 @@
  dev/ata/atapi-cd.c		optional atapicd
  dev/ata/atapi-fd.c		optional atapifd
  dev/ata/atapi-tape.c		optional atapist
 -dev/ath/ah_osdep.c optional ath_hal \
 -	compile-with "${NORMAL_C} -I$S/dev/ath"
--dev/ath/ath_rate/amrr/amrr.c	optional ath_rate_amrr \
--	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/ath_rate/amrr/amrr.c	optional ath_rate_amrr
 -dev/ath/ath_rate/onoe/onoe.c	optional ath_rate_onoe \
 -	compile-with "${NORMAL_C} -I$S/dev/ath"
 -dev/ath/ath_rate/sample/sample.c	optional ath_rate_sample \
@@ -23,8 +22,8 @@ Index: sys/conf/files
  dev/awi/if_awi_pccard.c		optional awi pccard
 Index: sys/conf/files.i386
 ===================================================================
---- sys/conf/files.i386.orig	2006-06-25 11:13:23.586857000 +0200
-+++ sys/conf/files.i386	2006-06-25 11:13:30.000000000 +0200
+--- sys/conf/files.i386.orig	2007-05-30 17:46:31.000000000 +0200
++++ sys/conf/files.i386	2007-05-30 17:54:16.000000000 +0200
 @@ -46,42 +46,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
@@ -40,7 +39,7 @@ Index: sys/conf/files.i386
 -	no-implicit-rule
 -opt_ah.h			optional	ath_hal			\
 -	dependency	"$S/contrib/dev/ath/public/i386-elf.opt_ah.h"	\
--	compile-with	"cp $S/contrib/dev/ath/public/i386-elf.opt_ah.h opt_ah.h" \
+-	compile-with	"rm -f opt_ah.h; cp $S/contrib/dev/ath/public/i386-elf.opt_ah.h opt_ah.h" \
 -	no-obj no-implicit-rule before-depend				\
 -	clean		"opt_ah.h"
 -#
@@ -66,9 +65,9 @@ Index: sys/conf/files.i386
 -	no-implicit-rule
 -#
  #
- compat/linux/linux_file.c	optional compat_linux
- compat/linux/linux_getcwd.c	optional compat_linux
-@@ -181,11 +145,6 @@
+ compat/linprocfs/linprocfs.c	optional linprocfs
+ compat/linsysfs/linsysfs.c	optional linsysfs
+@@ -178,11 +142,6 @@
  dev/fdc/fdc_isa.c		optional fdc isa
  dev/fdc/fdc_pccard.c		optional fdc pccard
  dev/fe/if_fe_isa.c		optional fe isa
@@ -80,13 +79,12 @@ Index: sys/conf/files.i386
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_pentium.c	optional hwpmc
  dev/hwpmc/hwpmc_piv.c		optional hwpmc
-@@ -206,13 +165,9 @@
- dev/mem/memutil.c		optional mem
+@@ -209,12 +168,8 @@
  dev/mse/mse.c			optional mse
  dev/mse/mse_isa.c		optional mse isa
+ dev/nfe/if_nfe.c		optional nfe pci
 -dev/nve/if_nve.c		optional nve pci
- dev/ppc/ppc.c			optional ppc
- dev/ppc/ppc_puc.c		optional ppc puc pci
+ dev/pcf/pcf_isa.c		optional pcf
  dev/random/nehemiah.c		optional random
 -dev/rr232x/os_bsd.c		optional rr232x
 -dev/rr232x/osm_bsd.c		optional rr232x
@@ -96,9 +94,9 @@ Index: sys/conf/files.i386
  dev/sbni/if_sbni_pci.c		optional sbni pci
 Index: sys/conf/kern.pre.mk
 ===================================================================
---- sys/conf/kern.pre.mk.orig	2006-06-25 11:13:23.609486000 +0200
-+++ sys/conf/kern.pre.mk	2006-06-25 11:13:30.000000000 +0200
-@@ -58,9 +58,6 @@
+--- sys/conf/kern.pre.mk.orig	2007-05-30 17:46:31.000000000 +0200
++++ sys/conf/kern.pre.mk	2007-05-30 17:54:16.000000000 +0200
+@@ -67,9 +67,6 @@
  # ... and the same for pf
  INCLUDES+= -I$S/contrib/pf
  
@@ -110,9 +108,9 @@ Index: sys/conf/kern.pre.mk
  
 Index: sys/i386/conf/GENERIC
 ===================================================================
---- sys/i386/conf/GENERIC.orig	2006-06-25 11:13:23.666760000 +0200
-+++ sys/i386/conf/GENERIC	2006-06-25 11:16:32.056882000 +0200
-@@ -118,8 +118,6 @@
+--- sys/i386/conf/GENERIC.orig	2007-05-30 17:47:50.000000000 +0200
++++ sys/i386/conf/GENERIC	2007-05-30 17:54:16.000000000 +0200
+@@ -132,8 +132,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -121,115 +119,177 @@ Index: sys/i386/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -199,7 +197,6 @@
- device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+@@ -211,7 +209,7 @@
  device		lge		# Level 1 LXT1001 gigabit Ethernet
+ device		msk		# Marvell/SysKonnect Yukon II Gigabit Ethernet
  device		nge		# NatSemi DP83820 gigabit Ethernet
 -device		nve		# nVidia nForce MCP on-board Ethernet Networking
- device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
++device		nfe		# nVidia nForce MCP on-board Ethernet Networking
+ device		pcn		# AMD Am79C97x PCI 10/100 (precedence over 'le')
  device		re		# RealTek 8139C+/8169/8169S/8110S
  device		rl		# RealTek 8129/8139
 Index: sys/modules/Makefile
 ===================================================================
---- sys/modules/Makefile.orig	2006-06-25 11:13:23.693634000 +0200
-+++ sys/modules/Makefile	2006-06-25 11:13:30.000000000 +0200
-@@ -26,11 +26,6 @@
+--- sys/modules/Makefile.orig	2007-05-30 17:48:05.000000000 +0200
++++ sys/modules/Makefile	2007-05-30 17:55:09.000000000 +0200
+@@ -25,11 +25,6 @@
  	${_arl} \
  	${_asr} \
  	ata \
--	ath \
+-	${_ath} \
 -	${_ath_hal} \
 -	ath_rate_amrr \
 -	ath_rate_onoe \
--	ath_rate_sample \
+-	${_ath_rate_sample} \
  	aue \
  	${_auxio} \
  	${_awi} \
 @@ -94,7 +89,6 @@
- 	${_hfa} \
  	hifn \
  	hme \
+ 	${_hptiop} \
 -	${_hptmv} \
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -175,9 +169,7 @@
+@@ -185,9 +179,7 @@
  	ntfs \
  	ntfs_iconv \
  	nullfs \
 -	${_nve} \
  	${_nwfs} \
 -	${_oltr} \
- 	${_osf1} \
  	${_padlock} \
  	patm \
-@@ -328,7 +320,6 @@
+ 	${_pccard} \
+@@ -217,7 +209,6 @@
+ 	reiserfs \
+ 	rl \
+ 	rp \
+-	${_rr232x} \
+ 	rue \
+ 	rum \
+ 	${_s3} \
+@@ -305,7 +296,6 @@
+ 	${_xe} \
+ 	xfs \
+ 	xl \
+-	${_zfs} \
+ 	zlib
+ 
+ .if ${MACHINE_ARCH} != "powerpc"
+@@ -349,9 +339,6 @@
  _apm=		apm
  _ar=		ar
  _arcnet=	arcnet
+-_ath=		ath
 -_ath_hal=	ath_hal
+-_ath_rate_sample=ath_rate_sample
  _awi=		awi
  _bktr=		bktr
  _cardbus=	cardbus
-@@ -361,7 +352,6 @@
- _ndis=		ndis
- _nsp=		nsp
+@@ -389,7 +376,6 @@
+ .if ${MK_NCP} != "no"
  _nwfs=		nwfs
+ .endif
 -_oltr=		oltr
  _pccard=	pccard
  _pcfclock=	pcfclock
  _pecoff=	pecoff
-@@ -406,7 +396,6 @@
+@@ -409,9 +395,6 @@
+ _streams=	streams
+ _wi=		wi
+ _xe=		xe
+-.if ${MK_ZFS} != "no" || defined(ALL_MODULES)
+-_zfs=		zfs
+-.endif
+ .if ${MACHINE} == "i386"
+ _aac=		aac
+ _acpi=		acpi
+@@ -427,7 +410,6 @@
  _dpt=		dpt
- _el=		el
  _ex=		ex
+ _hptiop=	hptiop
 -_hptmv=		hptmv
  _ichwd=		ichwd
  _ida=		ida
  _idt=		idt
-@@ -417,14 +406,12 @@
- _iwi=		iwi
- _ixgb=  	ixgb
+@@ -442,13 +424,11 @@
  _mly=		mly
+ _mxge=		mxge
+ _nfe=		nfe
 -_nve=		nve
- .if !defined(NO_CRYPT) || defined(ALL_MODULES)
+ .if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
  .if exists(${.CURDIR}/../crypto/via)
  _padlock=	padlock
  .endif
  .endif
- _ppc=		ppc
 -_rr232x=	rr232x
  _s3=		s3
  _twa=		twa
  _vesa=		vesa
-@@ -438,14 +426,12 @@
- #_acpi=		acpi		# doesn't work on amd64 yet
+@@ -466,9 +446,6 @@
  _agp=		agp
+ _an=		an
  _arcmsr=	arcmsr
+-_ath=		ath
 -_ath_hal=	ath_hal
+-_ath_rate_sample=ath_rate_sample
+ _cardbus=	cardbus
+ _cbb=		cbb
  _ciss=		ciss
- _cpufreq=	cpufreq
- _digi=		digi
- _drm=		drm
- _em=		em
+@@ -480,7 +457,6 @@
+ _exca=		exca
  _ext2fs=	ext2fs
+ _hptiop=	hptiop
 -_hptmv=		hptmv
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -476,7 +461,6 @@
- _mly=		mly
+@@ -499,9 +475,7 @@
+ _mxge=		mxge
  _ndis=		ndis
- _ppc=		ppc
+ _nfe=		nfe
+-_nve=		nve
+ _pccard=	pccard
 -_rr232x=	rr232x
  _safe=		safe
  _scsi_low=	scsi_low
  _smbfs=		smbfs
+@@ -510,9 +484,6 @@
+ _sppp=		sppp
+ _twa=		twa
+ _wi=		wi
+-.if ${MK_ZFS} != "no" || defined(ALL_MODULES)
+-_zfs=		zfs
+-.endif
+ .endif
+ 
+ .if ${MACHINE_ARCH} == "ia64"
+@@ -553,18 +524,12 @@
+ 
+ .if ${MACHINE_ARCH} == "powerpc"
+ _an=		an
+-_ath=		ath
+-_ath_hal=	ath_hal
+-_ath_rate_sample=ath_rate_sample
+ _gem=		gem
+ _powermac_nvram=	powermac_nvram
+ _smbfs=		smbfs
+ .endif
+ 
+ .if ${MACHINE_ARCH} == "sparc64"
+-_ath=		ath
+-_ath_hal=	ath_hal
+-_ath_rate_sample=ath_rate_sample
+ _auxio=		auxio
+ _em=		em
+ _gem=		gem
 Index: sys/amd64/conf/GENERIC
 ===================================================================
---- sys/amd64/conf/GENERIC.orig	2006-06-25 11:13:23.731156000 +0200
-+++ sys/amd64/conf/GENERIC	2006-06-25 11:16:32.094195000 +0200
-@@ -117,8 +117,6 @@
+--- sys/amd64/conf/GENERIC.orig	2007-05-30 17:46:15.000000000 +0200
++++ sys/amd64/conf/GENERIC	2007-05-30 17:54:16.000000000 +0200
+@@ -125,8 +125,6 @@
  device		arcmsr		# Areca SATA II RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -238,18 +298,19 @@ Index: sys/amd64/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -189,7 +187,6 @@
- device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+@@ -200,7 +198,7 @@
  device		lge		# Level 1 LXT1001 gigabit Ethernet
+ device		msk		# Marvell/SysKonnect Yukon II Gigabit Ethernet
  device		nge		# NatSemi DP83820 gigabit Ethernet
 -device		nve		# nVidia nForce MCP on-board Ethernet Networking
- device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
++device		nfe		# nVidia nForce MCP on-board Ethernet Networking
+ device		pcn		# AMD Am79C97x PCI 10/100 (precedence over 'le')
  device		re		# RealTek 8139C+/8169/8169S/8110S
  device		rl		# RealTek 8129/8139
 Index: sys/conf/files.amd64
 ===================================================================
---- sys/conf/files.amd64.orig	2006-06-25 11:13:23.636572000 +0200
-+++ sys/conf/files.amd64	2006-06-25 11:13:30.000000000 +0200
+--- sys/conf/files.amd64.orig	2007-05-30 17:46:31.000000000 +0200
++++ sys/conf/files.amd64	2007-05-30 17:54:16.000000000 +0200
 @@ -47,35 +47,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
@@ -260,7 +321,7 @@ Index: sys/conf/files.amd64
 -	no-implicit-rule
 -opt_ah.h			optional	ath_hal			\
 -	dependency	"$S/contrib/dev/ath/public/x86_64-elf.opt_ah.h"	\
--	compile-with	"cp $S/contrib/dev/ath/public/x86_64-elf.opt_ah.h opt_ah.h" \
+-	compile-with	"rm -f opt_ah.h; cp $S/contrib/dev/ath/public/x86_64-elf.opt_ah.h opt_ah.h" \
 -	no-obj no-implicit-rule before-depend				\
 -	clean		"opt_ah.h"
 -#
@@ -286,7 +347,7 @@ Index: sys/conf/files.amd64
  #
  amd64/acpica/OsdEnvironment.c	optional	acpi
  amd64/acpica/acpi_machdep.c	optional	acpi
-@@ -160,11 +131,6 @@
+@@ -173,21 +144,12 @@
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
@@ -298,14 +359,13 @@ Index: sys/conf/files.amd64
  dev/hwpmc/hwpmc_amd.c		optional	hwpmc
  dev/hwpmc/hwpmc_piv.c		optional	hwpmc
  dev/hwpmc/hwpmc_x86.c		optional	hwpmc
-@@ -172,10 +138,6 @@
- dev/kbd/kbd.c			optional	sc
- dev/kbd/kbd.c			optional	ukbd
+ dev/kbd/kbd.c			optional	atkbd | sc | ukbd
  dev/mem/memutil.c		optional	mem
+ dev/nfe/if_nfe.c		optional	nfe pci
 -dev/nve/if_nve.c		optional	nve pci
 -dev/rr232x/os_bsd.c		optional	rr232x
 -dev/rr232x/osm_bsd.c		optional	rr232x
 -dev/rr232x/rr232x_config.c	optional	rr232x
- dev/ppc/ppc.c			optional	ppc
- dev/ppc/ppc_puc.c		optional	ppc puc
  dev/sio/sio.c			optional	sio
+ dev/sio/sio_isa.c		optional	sio isa
+ dev/sio/sio_pccard.c		optional	sio pccard
