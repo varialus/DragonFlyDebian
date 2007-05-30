@@ -1,48 +1,7 @@
-Index: sys/dev/sound/pcm/mixer.c
-===================================================================
---- sys/dev/sound/pcm/mixer.c.orig	2006-04-04 19:43:48.000000000 +0200
-+++ sys/dev/sound/pcm/mixer.c	2006-06-24 17:38:16.000000000 +0200
-@@ -492,6 +492,9 @@
- 
-     	if ((cmd & MIXER_READ(0)) == MIXER_READ(0)) {
- 		switch (j) {
-+    		case OSS_GETVERSION:
-+			v = SOUND_VERSION;
-+			break;
-     		case SOUND_MIXER_DEVMASK:
-     		case SOUND_MIXER_CAPS:
-     		case SOUND_MIXER_STEREODEVS:
 Index: sys/sys/soundcard.h
 ===================================================================
 --- sys/sys/soundcard.h.orig	2005-12-30 20:55:52.000000000 +0100
 +++ sys/sys/soundcard.h	2006-06-24 17:38:44.000000000 +0200
-@@ -54,11 +54,14 @@
-   */
- 
- /*
-- * SOUND_VERSION is only used by the voxware driver. Hopefully apps
-- * should not depend on it, but rather look at the capabilities
-- * of the driver in the kernel!
-+ * OSS interface version. With versions earlier than 3.6 this value is
-+ * an integer with value less than 361. In versions 3.6 and later
-+ * it's a six digit hexadecimal value. For example value
-+ * of 0x030600 represents OSS version 3.6.0.
-  */
--#define SOUND_VERSION  301
-+#define SOUND_VERSION   0x030600
-+#define OPEN_SOUND_SYSTEM
-+
- #define VOXWARE		/* does this have any use ? */
- 
- /*
-@@ -95,6 +98,7 @@
- #define SNDCARD_NSS            26
- #define SNDCARD_UART16550      27
- #define SNDCARD_OPL            28
-+/* Sound card numbers 29 to N are reserved. Don't add more numbers here. */
- 
- #include <sys/types.h>
- #include <machine/endian.h>
 @@ -809,6 +813,8 @@
      /* Has a coprocessor, sometimes it's a DSP but usually not */
  #define DSP_CAP_TRIGGER		0x00001000 /* Supports SETTRIGGER */
@@ -52,17 +11,3 @@ Index: sys/sys/soundcard.h
  
  /*
   * What do these function do ?
-@@ -1095,6 +1101,13 @@
- #define RIGHT_CHN	1
- 
- /*
-+ * An ioctl for identifying the driver version. It will return value
-+ * of the SOUND_VERSION macro used when compiling the driver.
-+ * This call was introduced for compatibility with OSS version 3.6.
-+ */
-+#define OSS_GETVERSION			_IOR('M', 118, int)
-+
-+/*
-  * Level 2 event types for /dev/sequencer
-  */
- 
