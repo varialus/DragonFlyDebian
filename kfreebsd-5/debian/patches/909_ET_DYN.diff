@@ -1,6 +1,14 @@
 --- sys.orig/kern/imgact_elf.c	2005-08-17 15:29:41.000000000 +0200
 +++ sys/kern/imgact_elf.c	2005-08-17 15:31:08.000000000 +0200
-@@ -655,7 +655,7 @@
+@@ -649,13 +649,15 @@
+ 	char *path;
+ 	struct thread *td = curthread;
+ 	struct sysentvec *sv;
++	u_long rbase = 0;
++
+ 
+ 	GIANT_REQUIRED;
+ 
  	/*
  	 * Do we have a valid ELF header ?
  	 */
@@ -9,3 +17,69 @@
  		return (-1);
  
  	/*
+@@ -698,8 +700,23 @@
+ 		error = ENOEXEC;
+ 		goto fail;
+ 	}
++
++	if (hdr->e_type == ET_DYN) {
++ 	    for (i = 0; i < hdr->e_phnum; i++) {
++		if (phdr[i].p_type == PT_LOAD) {
++			if (phdr[i].p_vaddr == 0) {
++				/* we have to load at base addr 0,
++				 * so relocate somewhere (at 512 MB)
++				 */
++				rbase = 512 * 1024 * 1024;
++				break;
++			}
++		}
++	    }
++	}
++
+ 	sv = brand_info->sysvec;
+-	if (interp != NULL && brand_info->interp_newpath != NULL)
++	if (interp != NULL && brand_info->interp_newpath != NULL && !strcmp(interp, "/libexec/ld-elf.so.1"))
+ 		interp = brand_info->interp_newpath;
+ 
+ 	if ((error = exec_extract_strings(imgp)) != 0)
+@@ -731,7 +748,7 @@
+ 
+ 			if ((error = __elfN(load_section)(imgp->proc, vmspace,
+ 			    imgp->vp, imgp->object, phdr[i].p_offset,
+-			    (caddr_t)(uintptr_t)phdr[i].p_vaddr,
++			    (caddr_t)(uintptr_t)phdr[i].p_vaddr + rbase,
+ 			    phdr[i].p_memsz, phdr[i].p_filesz, prot,
+ 			    sv->sv_pagesize)) != 0)
+   				goto fail;
+@@ -745,11 +762,12 @@
+ 			if (phdr[i].p_offset == 0 &&
+ 			    hdr->e_phoff + hdr->e_phnum * hdr->e_phentsize
+ 				<= phdr[i].p_filesz)
+-				proghdr = phdr[i].p_vaddr + hdr->e_phoff;
++				proghdr = phdr[i].p_vaddr + rbase + hdr->e_phoff;
+ 
+ 			seg_addr = trunc_page(phdr[i].p_vaddr);
+ 			seg_size = round_page(phdr[i].p_memsz +
+ 			    phdr[i].p_vaddr - seg_addr);
++			seg_addr += rbase;
+ 
+ 			/*
+ 			 * Is this .text or .data?  We can't use
+@@ -771,7 +789,7 @@
+ 			    phdr[i].p_memsz)) {
+ 				text_size = seg_size;
+ 				text_addr = seg_addr;
+-				entry = (u_long)hdr->e_entry;
++				entry = (u_long)hdr->e_entry + rbase;
+ 			} else {
+ 				data_size = seg_size;
+ 				data_addr = seg_addr;
+@@ -779,7 +797,7 @@
+ 			total_size += seg_size;
+ 			break;
+ 		case PT_PHDR: 	/* Program header table info */
+-			proghdr = phdr[i].p_vaddr;
++			proghdr = phdr[i].p_vaddr + rbase;
+ 			break;
+ 		default:
+ 			break;
