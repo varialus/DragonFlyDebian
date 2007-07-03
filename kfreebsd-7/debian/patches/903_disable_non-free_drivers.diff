@@ -129,8 +129,8 @@ Index: sys/modules/Makefile
  	ata \
 -	${_ath} \
 -	${_ath_hal} \
--	ath_rate_amrr \
--	ath_rate_onoe \
+-	${_ath_rate_amrr} \
+-	${_ath_rate_onoe} \
 -	${_ath_rate_sample} \
  	aue \
  	${_auxio} \
@@ -143,9 +143,9 @@ Index: sys/modules/Makefile
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -185,9 +179,7 @@
- 	ntfs \
+@@ -186,9 +180,7 @@
  	ntfs_iconv \
+ 	${_nxge} \
  	nullfs \
 -	${_nve} \
  	${_nwfs} \
@@ -153,7 +153,7 @@ Index: sys/modules/Makefile
  	${_padlock} \
  	patm \
  	${_pccard} \
-@@ -217,7 +209,6 @@
+@@ -218,7 +210,6 @@
  	reiserfs \
  	rl \
  	rp \
@@ -161,7 +161,7 @@ Index: sys/modules/Makefile
  	rue \
  	rum \
  	${_s3} \
-@@ -305,7 +296,6 @@
+@@ -309,7 +300,6 @@
  	${_xe} \
  	xfs \
  	xl \
@@ -169,17 +169,19 @@ Index: sys/modules/Makefile
  	zlib
  
  .if ${MACHINE_ARCH} != "powerpc"
-@@ -349,9 +339,6 @@
+@@ -353,11 +343,6 @@
  _apm=		apm
  _ar=		ar
  _arcnet=	arcnet
 -_ath=		ath
 -_ath_hal=	ath_hal
+-_ath_rate_amrr=	ath_rate_amrr
+-_ath_rate_onoe=	ath_rate_onoe
 -_ath_rate_sample=ath_rate_sample
  _awi=		awi
  _bktr=		bktr
  _cardbus=	cardbus
-@@ -389,7 +376,6 @@
+@@ -395,7 +380,6 @@
  .if ${MK_NCP} != "no"
  _nwfs=		nwfs
  .endif
@@ -187,8 +189,8 @@ Index: sys/modules/Makefile
  _pccard=	pccard
  _pcfclock=	pcfclock
  _pecoff=	pecoff
-@@ -409,9 +395,6 @@
- _streams=	streams
+@@ -416,9 +400,6 @@
+ _tmpfs= 	tmpfs
  _wi=		wi
  _xe=		xe
 -.if ${MK_ZFS} != "no" || defined(ALL_MODULES)
@@ -197,7 +199,7 @@ Index: sys/modules/Makefile
  .if ${MACHINE} == "i386"
  _aac=		aac
  _acpi=		acpi
-@@ -427,7 +410,6 @@
+@@ -434,7 +415,6 @@
  _dpt=		dpt
  _ex=		ex
  _hptiop=	hptiop
@@ -205,11 +207,12 @@ Index: sys/modules/Makefile
  _ichwd=		ichwd
  _ida=		ida
  _idt=		idt
-@@ -442,13 +424,11 @@
+@@ -449,14 +429,12 @@
  _mly=		mly
  _mxge=		mxge
  _nfe=		nfe
 -_nve=		nve
+ _nxge=		nxge
  .if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
  .if exists(${.CURDIR}/../crypto/via)
  _padlock=	padlock
@@ -219,17 +222,19 @@ Index: sys/modules/Makefile
  _s3=		s3
  _twa=		twa
  _vesa=		vesa
-@@ -466,9 +446,6 @@
+@@ -474,11 +452,6 @@
  _agp=		agp
  _an=		an
  _arcmsr=	arcmsr
 -_ath=		ath
 -_ath_hal=	ath_hal
+-_ath_rate_amrr=	ath_rate_amrr
+-_ath_rate_onoe=	ath_rate_onoe
 -_ath_rate_sample=ath_rate_sample
  _cardbus=	cardbus
  _cbb=		cbb
  _ciss=		ciss
-@@ -480,7 +457,6 @@
+@@ -490,7 +463,6 @@
  _exca=		exca
  _ext2fs=	ext2fs
  _hptiop=	hptiop
@@ -237,18 +242,19 @@ Index: sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -499,9 +475,7 @@
+@@ -509,10 +481,8 @@
  _mxge=		mxge
  _ndis=		ndis
  _nfe=		nfe
 -_nve=		nve
+ _nxge=		nxge
  _pccard=	pccard
 -_rr232x=	rr232x
  _safe=		safe
  _scsi_low=	scsi_low
  _smbfs=		smbfs
-@@ -510,9 +484,6 @@
- _sppp=		sppp
+@@ -522,9 +492,6 @@
+ _tmpfs= 	tmpfs
  _twa=		twa
  _wi=		wi
 -.if ${MK_ZFS} != "no" || defined(ALL_MODULES)
@@ -257,12 +263,14 @@ Index: sys/modules/Makefile
  .endif
  
  .if ${MACHINE_ARCH} == "ia64"
-@@ -553,18 +524,12 @@
+@@ -565,22 +532,12 @@
  
  .if ${MACHINE_ARCH} == "powerpc"
  _an=		an
 -_ath=		ath
 -_ath_hal=	ath_hal
+-_ath_rate_amrr=	ath_rate_amrr
+-_ath_rate_onoe=	ath_rate_onoe
 -_ath_rate_sample=ath_rate_sample
  _gem=		gem
  _powermac_nvram=	powermac_nvram
@@ -272,6 +280,8 @@ Index: sys/modules/Makefile
  .if ${MACHINE_ARCH} == "sparc64"
 -_ath=		ath
 -_ath_hal=	ath_hal
+-_ath_rate_amrr=	ath_rate_amrr
+-_ath_rate_onoe=	ath_rate_onoe
 -_ath_rate_sample=ath_rate_sample
  _auxio=		auxio
  _em=		em
