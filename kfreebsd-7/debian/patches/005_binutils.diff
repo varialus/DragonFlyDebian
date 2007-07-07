@@ -148,6 +148,15 @@ Index: sys/amd64/amd64/cpu_switch.S
 ===================================================================
 --- sys/amd64/amd64/cpu_switch.S.orig	2005-11-15 01:25:59.000000000 +0100
 +++ sys/amd64/amd64/cpu_switch.S	2006-06-24 17:33:03.000000000 +0200
+@@ -102,7 +102,7 @@
+ 	jz	1f				/* no, skip over */
+ 
+ 	/* Save userland %gs */
+-	movl	%gs,PCB_GS(%r8)
++	movw	%gs,PCB_GS(%r8)
+ 	movq	PCB_GS32P(%r8),%rax
+ 	movq	(%rax),%rax
+ 	movq	%rax,PCB_GS32SD(%r8)
 @@ -204,7 +204,7 @@
  	movq	%rbx,(%rax)
  	movl	$MSR_GSBASE,%ecx
