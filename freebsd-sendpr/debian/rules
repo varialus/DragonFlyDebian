@@ -5,9 +5,11 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+pkgdir := $(CURDIR)/debian/freebsd-sendpr
+
 include /usr/share/quilt/quilt.make
 
-PMAKE := freebsd-make DESTDIR=$(CURDIR)/debian/freebsd-sendpr BINDIR=/usr/bin
+PMAKE := freebsd-make DESTDIR=$(pkgdir) BINDIR=/usr/bin
 
 clean: unpatch
 	dh_testdir
@@ -44,7 +46,7 @@ install: build-indep
 	
 	cd src/gnu/usr.bin/send-pr/ && \
 		$(PMAKE) install etc-gnats-freefall
-	for i in $(CURDIR)/debian/freebsd-sendpr/usr/share/man/man1/*.gz ; do \
+	for i in $(pkgdir)/usr/share/man/man1/*.gz ; do \
 		[ -L $$i ] || gunzip $$i ; \
 	done
 
