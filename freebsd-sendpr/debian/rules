@@ -5,9 +5,11 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+include /usr/share/quilt/quilt.make
+
 PMAKE := freebsd-make DESTDIR=$(CURDIR)/debian/freebsd-sendpr BINDIR=/usr/bin
 
-clean:
+clean: unpatch
 	dh_testdir
 	dh_testroot
 	
@@ -21,11 +23,10 @@ unpack-stamp:
 	dh_testdir
 	
 	tar xfz $(CURDIR)/src.tar.gz
-	cat $(CURDIR)/debian/patches/* | patch -p0
 	
 	touch unpack-stamp
 
-build-indep: unpack
+build-indep: unpack patch
 	dh_testdir
 	
 	cd src/gnu/usr.bin/send-pr/ && \
