@@ -21,29 +21,7 @@
 #define  _RTLD_LOWLEVEL_H 1
 
 #include <atomic.h>
-
-typedef union
-{
-  volatile void *	uv;	/* in fact struct umtx from <sys/umtx.h> */
-  volatile int		iv;
-  volatile long		lv;
-  
-} __rtld_mrlock_t;
-
-#define UMTX_OP_WAIT	2	/*  <sys/umtx.h> */
-#define UMTX_OP_WAKE	3	/*  <sys/umtx.h> */
-
-extern int __syscall__umtx_op(void *, int, long, void*, void*);
-
-static inline void lll_rtld_wake(__rtld_mrlock_t *umtx, int nr_wakeup)
-{
-  __syscall__umtx_op(umtx, UMTX_OP_WAKE, (long) nr_wakeup, NULL, NULL);
-};
-
-static inline void lll_rtld_wait(__rtld_mrlock_t *umtx, int old_val)
-{
-  __syscall__umtx_op(umtx, UMTX_OP_WAIT, (long) old_val, NULL, NULL);
-};
+#include <lowlevellock.h>
 
 /* Special multi-reader lock used in ld.so.  */
 #define __RTLD_MRLOCK_WRITER 1
@@ -93,7 +71,7 @@ static inline void lll_rtld_wait(__rtld_mrlock_t *umtx, int old_val)
 	    atomic_or (&(lock.iv), __RTLD_MRLOCK_RWAIT);			      \
 	    oldval |= __RTLD_MRLOCK_RWAIT;				      \
 	  }								      \
-	lll_rtld_wait (&(lock), oldval);					      \
+	lll_futex_wait (&(lock), oldval);					      \
       }									      \
   out:;									      \
   } while (0)
@@ -107,7 +85,7 @@ static inline void lll_rtld_wait(__rtld_mrlock_t *umtx, int old_val)
 			  == (__RTLD_MRLOCK_INC | __RTLD_MRLOCK_WWAIT), 0))   \
       /* We have to wake all threads since there might be some queued	      \
 	 readers already.  */						      \
-      lll_rtld_wake (&(lock), 0x7fffffff);				      \
+      lll_futex_wake (&(lock), 0x7fffffff);				      \
   } while (0)
 
 
@@ -136,7 +114,7 @@ static inline void lll_rtld_wait(__rtld_mrlock_t *umtx, int old_val)
 	  }								      \
 	atomic_or (&(lock.iv), __RTLD_MRLOCK_WWAIT);			      \
 	oldval |= __RTLD_MRLOCK_WWAIT;					      \
-	lll_rtld_wait (&(lock), oldval);					      \
+	lll_futex_wait (&(lock), oldval);					      \
       }									      \
   out:;									      \
   } while (0)
@@ -146,7 +124,7 @@ static inline void lll_rtld_wait(__rtld_mrlock_t *umtx, int old_val)
   do {				 \
     int oldval = atomic_exchange_and_add (&(lock.iv), -__RTLD_MRLOCK_WRITER);    \
     if (__builtin_expect ((oldval & __RTLD_MRLOCK_RWAIT) != 0, 0))	      \
-      lll_rtld_wake (&(lock), 0x7fffffff);				      \
+      lll_futex_wake (&(lock), 0x7fffffff);				      \
   } while (0)
 
 
