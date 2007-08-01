@@ -7,7 +7,7 @@ FreeBSD futexes are defined as long instead of int in the Linux kernel
        uintptr_t stack_guard;
        uintptr_t pointer_guard;
 +# ifdef __FreeBSD_kernel__
-+      long gscope_flag;
++      union { int gscope_flag; long int gscope_flag_long; };
 +# else
        int gscope_flag;
 +# endif
@@ -19,7 +19,7 @@ FreeBSD futexes are defined as long instead of int in the Linux kernel
  #elif TLS_MULTIPLE_THREADS_IN_TCB
    int p_multiple_threads;
 +# ifdef __FreeBSD_kernel__
-+  long p_gscope_flag;
++  union { int gscope_flag; long int gscope_flag_long; };
 +# else
    int p_gscope_flag;
 +# endif
@@ -33,7 +33,7 @@ FreeBSD futexes are defined as long instead of int in the Linux kernel
    uintptr_t stack_guard;
    uintptr_t pointer_guard;
 +#ifdef __FreeBSD_kernel__
-+  long gscope_flag;
++  union { int gscope_flag; long int gscope_flag_long; };
 +#else
    int gscope_flag;
 +#endif
@@ -48,7 +48,7 @@ FreeBSD futexes are defined as long instead of int in the Linux kernel
    uintptr_t stack_guard;
    uintptr_t pointer_guard;
 +#ifdef __FreeBSD_kernel__
-+  long gscope_flag;
++  union { int gscope_flag; long int gscope_flag_long; };
 +#else
    int gscope_flag;
 +#endif
