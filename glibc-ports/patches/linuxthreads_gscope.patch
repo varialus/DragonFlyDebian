@@ -1,0 +1,57 @@
+FreeBSD futexes are defined as long instead of int in the Linux kernel
+
+--- linuxthreads/descr.h.orig	2007-08-01 13:41:37.000000000 +0200
++++ linuxthreads/descr.h	2007-08-01 13:42:54.000000000 +0200
+@@ -124,7 +124,11 @@
+       uintptr_t sysinfo;
+       uintptr_t stack_guard;
+       uintptr_t pointer_guard;
++# ifdef __FreeBSD_kernel__
++      long gscope_flag;
++# else
+       int gscope_flag;
++# endif
+     } data;
+     void *__padding[16];
+   } p_header;
+@@ -132,7 +136,11 @@
+ # define p_gscope_flag p_header.data.gscope_flag
+ #elif TLS_MULTIPLE_THREADS_IN_TCB
+   int p_multiple_threads;
++# ifdef __FreeBSD_kernel__
++  long p_gscope_flag;
++# else
+   int p_gscope_flag;
++# endif
+ #endif
+ 
+   pthread_descr p_nextlive, p_prevlive;
+--- linuxthreads/sysdeps/i386/tls.h.orig	2007-08-01 13:45:12.000000000 +0200
++++ linuxthreads/sysdeps/i386/tls.h	2007-08-01 13:44:28.000000000 +0200
+@@ -50,7 +50,11 @@
+   uintptr_t sysinfo;
+   uintptr_t stack_guard;
+   uintptr_t pointer_guard;
++#ifdef __FreeBSD_kernel__
++  long gscope_flag;
++#else
+   int gscope_flag;
++#endif
+ } tcbhead_t;
+ 
+ #else /* __ASSEMBLER__ */
+
+--- linuxthreads/sysdeps/x86_64/tls.h.orig	2007-08-01 13:46:12.000000000 +0200
++++ linuxthreads/sysdeps/x86_64/tls.h	2007-08-01 13:44:39.000000000 +0200
+@@ -49,7 +49,11 @@
+   uintptr_t sysinfo;
+   uintptr_t stack_guard;
+   uintptr_t pointer_guard;
++#ifdef __FreeBSD_kernel__
++  long gscope_flag;
++#else
+   int gscope_flag;
++#endif
+ } tcbhead_t;
+ 
+ #else /* __ASSEMBLER__ */
