@@ -34,16 +34,14 @@ typedef union
 
 extern int __syscall__umtx_op(void *, int, long, void*, void*);
 
-#define lll_futex_wake(futexp, nr) \
-  ({									      \
-    __syscall__umtx_op(futexp, UMTX_OP_WAKE,			              \
-		       (long) nr, NULL, NULL);				      \
-  })
+static inline void lll_futex_wake(long *umtx, unsigned int nr_wakeup)
+{
+  __syscall__umtx_op(umtx, UMTX_OP_WAKE, nr_wakeup, NULL, NULL);
+}
 
-#define lll_futex_wait(futexp, val) \
-  ({									      \
-    __syscall__umtx_op(futexp, UMTX_OP_WAIT,				      \
-		       (long) val, NULL, NULL);				      \
-  })
+static inline void lll_futex_wait(long *umtx, unsigned int old_val)
+{
+  __syscall__umtx_op(umtx, UMTX_OP_WAIT, old_val, NULL, NULL);
+}
 
 #endif	/* lowlevellock.h */
