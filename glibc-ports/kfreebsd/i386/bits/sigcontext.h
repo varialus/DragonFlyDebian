@@ -126,21 +126,6 @@ struct sigcontext
 #define sc_eflags	sc_efl
 
 
-/* Codes for SIGFPE.  */
-#define FPE_INTDIV	1 /* integer divide by zero */
-#define FPE_INTOVF	2 /* integer overflow */
-
-#if 1 /* FIXME: These need verification.  */
-
-#define FPE_FLTDIV	3 /* floating divide by zero */
-#define FPE_FLTOVF	4 /* floating overflow */
-#define FPE_FLTUND	5 /* floating underflow */
-#define FPE_FLTINX	6 /* floating loss of precision */
-#define FPE_SUBRNG_FAULT	0x7 /* BOUNDS instruction failed */
-#define FPE_FLTDNR_FAULT	0x8 /* denormalized operand */
-#define FPE_EMERR_FAULT		0xa /* mysterious emulation error 33 */
-#define FPE_EMBND_FAULT		0xb /* emulation BOUNDS instruction failed */
-
 /* Codes for SIGILL.  */
 #define ILL_PRIVIN_FAULT	1
 #define ILL_ALIGN_FAULT		14
