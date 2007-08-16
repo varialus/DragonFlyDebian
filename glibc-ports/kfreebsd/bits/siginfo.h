@@ -96,13 +96,15 @@ enum
 # define ILL_BADSTK	ILL_BADSTK
 };
 
+#endif
+
 /* `si_code' values for SIGFPE signal.  */
 enum
 {
-  FPE_INTDIV = 1,		/* Integer divide by zero.  */
-# define FPE_INTDIV	FPE_INTDIV
-  FPE_INTOVF,			/* Integer overflow.  */
+  FPE_INTOVF = 1,		/* Integer overflow.  */
 # define FPE_INTOVF	FPE_INTOVF
+  FPE_INTDIV,			/* Integer divide by zero.  */
+# define FPE_INTDIV	FPE_INTDIV
   FPE_FLTDIV,			/* Floating point divide by zero.  */
 # define FPE_FLTDIV	FPE_FLTDIV
   FPE_FLTOVF,			/* Floating point overflow.  */
@@ -117,6 +119,7 @@ enum
 # define FPE_FLTSUB	FPE_FLTSUB
 };
 
+#if 0 /* XXX These need verification.  See <bits/sigcontext.h>.  */
 /* `si_code' values for SIGSEGV signal.  */
 enum
 {
