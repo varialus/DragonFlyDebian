@@ -125,6 +125,7 @@ struct sigcontext
 #define sc_ps		sc_efl
 #define sc_eflags	sc_efl
 
+#if 1 /* FIXME: These need verification.  */
 
 /* Codes for SIGILL.  */
 #define ILL_PRIVIN_FAULT	1
