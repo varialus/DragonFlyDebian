@@ -17,13 +17,12 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#ifndef _SIGSET_H_types
-#define _SIGSET_H_types	1
+#ifndef	_SIGSET_H_types
+# define _SIGSET_H_types	1
 
 typedef int __sig_atomic_t;
 
 /* A `sigset_t' has a bit for each signal.  */
-__extension__
 typedef struct
   {
     union
@@ -33,7 +32,8 @@ typedef struct
       };
   } __sigset_t;
 
-#endif	/* ! _SIGSET_H_types */
+#endif
+
 
 /* We only want to define these functions if <signal.h> was actually
    included; otherwise we were included just to define the types.  Since we
@@ -41,14 +41,14 @@ typedef struct
    trouble can be caused by functions being defined (e.g., any global
    register vars declared later will cause compilation errors).  */
 
-#if !defined (_SIGSET_H_fns) && defined (_SIGNAL_H)
-#define _SIGSET_H_fns 1
+#if !defined _SIGSET_H_fns && defined _SIGNAL_H
+# define _SIGSET_H_fns 1
 
 # ifndef _EXTERN_INLINE
-#  define _EXTERN_INLINE extern __inline
+#  define _EXTERN_INLINE __extern_inline
 # endif
 
-/* Return a mask that includes SIG only.  */
+/* Return a mask that includes the bit for SIG only.  */
 # define __sigmask(sig)	((unsigned int) 1 << ((sig) - 1) % 32)
 
 /* Return the word index for SIG.  */
@@ -137,4 +137,4 @@ __sigdelset (__sigset_t *__set, int __sig)
 # endif
 
 
-#endif /* ! _SIGSET_H_fns */
+#endif /* ! _SIGSET_H_fns.  */
