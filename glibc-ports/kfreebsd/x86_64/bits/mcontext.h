@@ -1,6 +1,6 @@
 /* Machine-dependent processor state structure for FreeBSD.
    Copyright (C) 2002 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the GNU C Library.  x86_64 version.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -52,50 +52,116 @@
  * based on $FreeBSD: src/sys/amd64/include/ucontext.h,v 1.18 2003/11/08 04:39:22 peter Exp $
  */
 
-typedef struct {
-	/*
-	 * The first 20 fields must match the definition of
-	 * sigcontext. So that we can support sigcontext
-	 * and ucontext_t at the same time.
-	 */
-	long	mc_onstack;		/* XXX - sigcontext compat. */
-	long	mc_rdi;			/* machine state (struct trapframe) */
-	long	mc_rsi;
-	long	mc_rdx;
-	long	mc_rcx;
-	long	mc_r8;
-	long	mc_r9;
-	long	mc_rax;
-	long	mc_rbx;
-	long	mc_rbp;
-	long	mc_r10;
-	long	mc_r11;
-	long	mc_r12;
-	long	mc_r13;
-	long	mc_r14;
-	long	mc_r15;
-	long	mc_trapno;
-	long	mc_addr;
-	long	mc_flags;
-	long	mc_err;
-	long	mc_rip;
-	long	mc_cs;
-	long	mc_rflags;
-	long	mc_rsp;
-	long	mc_ss;
+#ifdef __i386__
 
-	long	mc_len;			/* sizeof(mcontext_t) */
+/* Whole processor state.  */
+typedef struct
+  {
+    /*
+     * The first 20 fields must match the definition of
+     * sigcontext. So that we can support sigcontext
+     * and ucontext_t at the same time.
+     */
+
+    int mc_onstack;		/* Nonzero if running on sigstack.  */
+
+    /* Segment registers.  */
+    int mc_gs;
+    int mc_fs;
+    int mc_es;
+    int mc_ds;
+
+    /* "General" registers.  These members are in the order that the i386
+       `pusha' and `popa' instructions use (`popa' ignores %esp).  */
+    int mc_edi;
+    int mc_esi;
+    int mc_ebp;
+    int mc_isp;			/* Not used; sc_esp is used instead.  */
+    int mc_ebx;
+    int mc_edx;
+    int mc_ecx;
+    int mc_eax;
+
+    int mc_trapno;
+    int mc_err;
+
+    int mc_eip;			/* Instruction pointer.  */
+    int mc_cs;			/* Code segment register.  */
+
+    int mc_efl;			/* Processor flags.  */
+
+    int mc_esp;			/* This stack pointer is used.  */
+    int mc_ss;			/* Stack segment register.  */
+
+    int mc_len;			/* sizeof(mcontext_t) */
 #define	_MC_FPFMT_NODEV		0x10000	/* device not present or configured */
+#define	_MC_FPFMT_387		0x10001
 #define	_MC_FPFMT_XMM		0x10002
-	long	mc_fpformat;
+    int mc_fpformat;
 #define	_MC_FPOWNED_NONE	0x20000	/* FP state not used */
 #define	_MC_FPOWNED_FPU		0x20001	/* FP state came from FPU */
 #define	_MC_FPOWNED_PCB		0x20002	/* FP state came from PCB */
-	long	mc_ownedfp;
-	/*
-	 * See <machine/fpu.h> for the internals of mc_fpstate[].
-	 */
-	long	mc_fpstate[64] __attribute__((aligned(16)));
-	long	mc_spare[8];
+    int mc_ownedfp;
+    int mc_spare1[1];		/* align next field to 16 bytes */
+    /*
+     * See <machine/npx.h> for the internals of mc_fpstate[].
+     */
+    int mc_fpstate[128] __attribute__((aligned(16)));
+    int mc_spare2[8];
+  } mcontext_t;
+
+#else
+
+/* Whole processor state.  */
+typedef struct
+  {
+    /*
+     * The first 20 fields must match the definition of
+     * sigcontext. So that we can support sigcontext
+     * and ucontext_t at the same time.
+     */
+    long mc_onstack;		/* XXX - sigcontext compat. */
+    long mc_rdi;			/* machine state (struct trapframe) */
+    long mc_rsi;
+    long mc_rdx;
+    long mc_rcx;
+    long mc_r8;
+    long mc_r9;
+    long mc_rax;
+    long mc_rbx;
+    long mc_rbp;
+    long mc_r10;
+    long mc_r11;
+    long mc_r12;
+    long mc_r13;
+    long mc_r14;
+    long mc_r15;
+    long mc_trapno;
+    long mc_addr;
+    long mc_flags;
+    long mc_err;
+    long mc_rip;
+    long mc_cs;
+    long mc_rflags;
+    long mc_rsp;
+    long mc_ss;
+
+    long mc_len;			/* sizeof(mcontext_t) */
+#define	_MC_FPFMT_NODEV		0x10000	/* device not present or configured */
+#define	_MC_FPFMT_XMM		0x10002
+    long mc_fpformat;
+#define	_MC_FPOWNED_NONE	0x20000	/* FP state not used */
+#define	_MC_FPOWNED_FPU		0x20001	/* FP state came from FPU */
+#define	_MC_FPOWNED_PCB		0x20002	/* FP state came from PCB */
+    long mc_ownedfp;
+     /*
+      * See <machine/fpu.h> for the internals of mc_fpstate[].
+      */
+    long mc_fpstate[64] __attribute__((aligned(16)));
+    long mc_spare[8];
 } mcontext_t;
 
+#endif
+
+/* Traditional BSD names for some members.  */
+#define mc_eflags	mc_efl

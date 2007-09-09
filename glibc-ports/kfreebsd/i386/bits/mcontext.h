@@ -1,6 +1,6 @@
-/* Machine-dependent processor state structure for FreeBSD.  i386 version.
+/* Machine-dependent processor state structure for FreeBSD.
    Copyright (C) 2002 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the GNU C Library.  i386 version.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -51,15 +51,15 @@
  * based on $FreeBSD: src/sys/i386/include/ucontext.h,v 1.10 2002/12/02 19:58:55 deischen Exp $
  */
 
-	/*
-	 * The first 20 fields must match the definition of
-	 * sigcontext. So that we can support sigcontext
-	 * and ucontext_t at the same time.
-	 */
-
 /* Whole processor state.  */
 typedef struct
   {
+    /*
+     * The first 20 fields must match the definition of
+     * sigcontext. So that we can support sigcontext
+     * and ucontext_t at the same time.
+     */
+
     int mc_onstack;		/* Nonzero if running on sigstack.  */
 
     /* Segment registers.  */

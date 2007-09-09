@@ -31,8 +31,8 @@
    components don't have sc_ prefix) */
 struct sigcontext
   {
-    __sigset_t sc_mask;		/* Blocked signals to restore.  */
-    int sc_onstack;		/* Nonzero if running on sigstack.  */
+    __sigset_t 	sc_mask;		/* Blocked signals to restore.  */
+    int 	sc_onstack;		/* Nonzero if running on sigstack.  */
 
     /* Segment registers.  */
     union { int sc_gs; int gs; };
@@ -57,7 +57,7 @@ struct sigcontext
     union { int sc_eip; int eip; };		/* Instruction pointer.  */
     union { int sc_cs; int cs; };		/* Code segment register.  */
 
-    union { int sc_efl; int eflags; };		/* Processor flags.  */
+    union { int sc_efl; int eflags; }; 		/* Processor flags.  */
 
     union { int sc_esp; int esp; };		/* This stack pointer is used.  */
     union { int sc_ss; int ss; };		/* Stack segment register.  */
@@ -98,43 +98,44 @@ struct sigcontext
 
 #else
 
-struct sigcontext {
-	__sigset_t sc_mask;	/* signal mask to restore */
-	long	sc_onstack;	/* sigstack state to restore */
-	union { long	sc_rdi;       long  rdi;};
-	union { long	sc_rsi;	      long  rsi;};
-	union { long	sc_rdx;	      long  rdx;};
-	union { long	sc_rcx;	      long  rcx;};
-	union { long	sc_r8;	      long  r8;};
-	union { long	sc_r9;	      long  r9;};
-	union { long	sc_rax;	      long  rax;};
-	union { long	sc_rbx;	      long  rbx;};
-	union { long	sc_rbp;	      long  rbp;};
-	union { long	sc_r10;	      long  r10;};
-	union { long	sc_r11;	      long  r11;};
-	union { long	sc_r12;	      long  r12;};
-	union { long	sc_r13;	      long  r13;};
-	union { long	sc_r14;	      long  r14;};
-	union { long	sc_r15;	      long  r15;};
-	union { long	sc_trapno;    long  trapno;};
-	union { long	sc_addr;      long  addr;};
-	union { long	sc_flags;     long  flags;};
-	union { long	sc_err;	      long  err;};
-	union { long	sc_rip;	      long  rip;};
-	union { long	sc_cs;	      long  cs;};
-	union { long	sc_rflags;    long  rflags;};
-	union { long	sc_rsp;	      long  rsp;};
-	union { long	sc_ss;	      long  ss;};
-	long	sc_len;		/* sizeof(mcontext_t) */
-	/*
-	 * XXX - See <machine/ucontext.h> and <machine/fpu.h> for
-	 *       the following fields.
-	 */
-	long	sc_fpformat;
-	long	sc_ownedfp;
-	long	sc_fpstate[64] __attribute__((aligned(16)));
-	long	sc_spare[8];
-};
+struct sigcontext
+  {
+    __sigset_t 	sc_mask;		/* Blocked signals to restore.  */
+    long 	sc_onstack;		/* Nonzero if running on sigstack.  */
+    union { long sc_rdi; long rdi;};
+    union { long sc_rsi; long rsi;};
+    union { long sc_rdx; long rdx;};
+    union { long sc_rcx; long rcx;};
+    union { long sc_r8; long r8;};
+    union { long sc_r9; long r9;};
+    union { long sc_rax; long rax;};
+    union { long sc_rbx; long rbx;};
+    union { long sc_rbp; long rbp;};
+    union { long sc_r10; long r10;};
+    union { long sc_r11; long r11;};
+    union { long sc_r12; long r12;};
+    union { long sc_r13; long r13;};
+    union { long sc_r14; long r14;};
+    union { long sc_r15; long r15;};
+    union { long sc_trapno; long trapno;};
+    union { long sc_addr; long addr;};
+    union { long sc_flags; long flags;};
+    union { long sc_err; long err;};
+    union { long sc_rip; long rip;};
+    union { long sc_cs; long cs;};
+    union { long sc_rflags; long rflags;};
+    union { long sc_rsp; long rsp;};
+    union { long sc_ss; long ss;};
+    long	sc_len;        /* sizeof(mcontext_t) */
+    /*
+     * XXX - See <machine/ucontext.h> and <machine/fpu.h> for
+     *       the following fields.
+     */
+    long	sc_fpformat;
+    long	sc_ownedfp;
+    long	sc_fpstate[64] __attribute__((aligned(16)));
+    long	sc_spare[8];
+  };
 
 /* Traditional BSD names for some members.  */
 #define sc_sp           sc_rsp          /* Stack pointer.  */
