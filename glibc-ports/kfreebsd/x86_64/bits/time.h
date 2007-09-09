@@ -33,6 +33,12 @@
    XSI-conformant systems. */
 #  define CLOCKS_PER_SEC  1000000l
 
+#  if !defined __STRICT_ANSI__ && !defined __USE_XOPEN2K
+/* Even though CLOCKS_PER_SEC has such a strange value CLK_TCK
+   presents the real value for clock ticks per second for the system.  */
+#   define CLK_TCK 128
+#  endif
+
 #  ifdef __USE_POSIX199309
 /* Identifier for system-wide realtime clock.  */
 #   define CLOCK_REALTIME		0
