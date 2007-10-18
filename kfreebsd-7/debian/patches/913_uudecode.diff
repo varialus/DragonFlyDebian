@@ -1,7 +1,7 @@
 diff -ur sys.orig/modules/cxgb/Makefile sys/modules/cxgb/Makefile
 --- sys.orig/modules/cxgb/Makefile	2007-05-30 18:42:07.000000000 +0200
 +++ sys/modules/cxgb/Makefile	2007-05-30 20:02:23.000000000 +0200
-@@ -16,7 +16,7 @@
+@@ -18,21 +18,21 @@
  .if ${MACHINE_ARCH} != "ia64"
  # ld is broken on ia64
  t3fw-4.7.0.bin: ${CXGB}/t3fw-4.7.0.bin.gz.uu
@@ -9,7 +9,23 @@ diff -ur sys.orig/modules/cxgb/Makefile sys/modules/cxgb/Makefile
 +	uudecode -o- < ${CXGB}/t3fw-4.7.0.bin.gz.uu \
  	| gzip -dc > ${.TARGET}
  
- FIRMWS= t3fw-4.7.0.bin:t3fw400
+ FIRMWS= t3fw-4.7.0.bin:t3fw470
+ CLEANFILES+= t3fw-4.7.0.bin
+ 
+ t3b_protocol_sram-1.1.0.bin: ${CXGB}/t3b_protocol_sram-1.1.0.bin.gz.uu
+-	uudecode -p < ${CXGB}/t3b_protocol_sram-1.1.0.bin.gz.uu \
++	uudecode -o- < ${CXGB}/t3b_protocol_sram-1.1.0.bin.gz.uu \
+ 	| gzip -dc > ${.TARGET}
+ 
+ FIRMWS+= t3b_protocol_sram-1.1.0.bin:t3bps110
+ CLEANFILES+= t3b_protocol_sram-1.1.0.bin
+ 
+ t3b_tp_eeprom-1.1.0.bin: ${CXGB}/t3b_tp_eeprom-1.1.0.bin.gz.uu
+-	uudecode -p < ${CXGB}/t3b_tp_eeprom-1.1.0.bin.gz.uu \
++	uudecode -o- < ${CXGB}/t3b_tp_eeprom-1.1.0.bin.gz.uu \
+ 	| gzip -dc > ${.TARGET}
+ 
+ FIRMWS+= t3b_tp_eeprom-1.1.0.bin:t3btpe110
 diff -ur sys.orig/modules/ipwfw/ipw_bss/Makefile sys/modules/ipwfw/ipw_bss/Makefile
 --- sys.orig/modules/ipwfw/ipw_bss/Makefile	2007-05-30 18:15:13.000000000 +0200
 +++ sys/modules/ipwfw/ipw_bss/Makefile	2007-05-30 20:03:15.000000000 +0200

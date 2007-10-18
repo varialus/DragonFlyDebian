@@ -8,7 +8,7 @@ SHELL = bash
 #export DH_VERBOSE=1
 
 full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
-version		:= $(shell echo $(full_version) | sed -e 's/[+-~].*//g')
+version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 os		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
