@@ -4,12 +4,12 @@ diff -ur sys.orig/modules/cxgb/Makefile sys/modules/cxgb/Makefile
 @@ -16,7 +16,7 @@
  .if ${MACHINE_ARCH} != "ia64"
  # ld is broken on ia64
- t3fw-4.1.0.bin: ${CXGB}/t3fw-4.1.0.bin.gz.uu
--	uudecode -p < ${CXGB}/t3fw-4.1.0.bin.gz.uu \
-+	uudecode -o- < ${CXGB}/t3fw-4.1.0.bin.gz.uu \
+ t3fw-4.7.0.bin: ${CXGB}/t3fw-4.7.0.bin.gz.uu
+-	uudecode -p < ${CXGB}/t3fw-4.7.0.bin.gz.uu \
++	uudecode -o- < ${CXGB}/t3fw-4.7.0.bin.gz.uu \
  	| gzip -dc > ${.TARGET}
  
- FIRMWS= t3fw-4.0.0.bin:t3fw400
+ FIRMWS= t3fw-4.7.0.bin:t3fw400
 diff -ur sys.orig/modules/ipwfw/ipw_bss/Makefile sys/modules/ipwfw/ipw_bss/Makefile
 --- sys.orig/modules/ipwfw/ipw_bss/Makefile	2007-05-30 18:15:13.000000000 +0200
 +++ sys/modules/ipwfw/ipw_bss/Makefile	2007-05-30 20:03:15.000000000 +0200
@@ -82,27 +82,3 @@ diff -ur sys.orig/modules/iwifw/iwi_monitor/Makefile sys/modules/iwifw/iwi_monit
  
  .include <bsd.kmod.mk>
  
-diff -ur sys.orig/modules/mxge/mxge_eth_z8e/Makefile sys/modules/mxge/mxge_eth_z8e/Makefile
---- sys.orig/modules/mxge/mxge_eth_z8e/Makefile	2007-05-30 18:15:15.000000000 +0200
-+++ sys/modules/mxge/mxge_eth_z8e/Makefile	2007-05-30 20:02:39.000000000 +0200
-@@ -7,7 +7,7 @@
- CLEANFILES+= eth_z8e.dat
- 
- eth_z8e.dat: ${MXGE}/eth_z8e.dat.gz.uu
--	uudecode -p < ${MXGE}/eth_z8e.dat.gz.uu \
-+	uudecode -o- < ${MXGE}/eth_z8e.dat.gz.uu \
- 		| gzip -dc > ${.TARGET}
- 
- .include <bsd.kmod.mk>
-diff -ur sys.orig/modules/mxge/mxge_ethp_z8e/Makefile sys/modules/mxge/mxge_ethp_z8e/Makefile
---- sys.orig/modules/mxge/mxge_ethp_z8e/Makefile	2007-05-30 18:15:15.000000000 +0200
-+++ sys/modules/mxge/mxge_ethp_z8e/Makefile	2007-05-30 20:02:48.000000000 +0200
-@@ -7,7 +7,7 @@
- CLEANFILES+= ethp_z8e.dat
- 
- ethp_z8e.dat: ${MXGE}/ethp_z8e.dat.gz.uu
--	uudecode -p < ${MXGE}/ethp_z8e.dat.gz.uu \
-+	uudecode -o- < ${MXGE}/ethp_z8e.dat.gz.uu \
- 		| gzip -dc > ${.TARGET}
- 
- .include <bsd.kmod.mk>

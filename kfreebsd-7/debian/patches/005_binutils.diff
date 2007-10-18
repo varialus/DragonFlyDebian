@@ -85,15 +85,7 @@ Index: sys/i386/include/cpufunc.h
  	return (sel);
  }
  
-@@ -468,20 +468,20 @@
- rss(void)
- {
- 	u_int sel;
--	__asm __volatile("movl %%ss,%0" : "=rm" (sel));
-+	__asm __volatile("mov %%ss,%0" : "=rm" (sel));
- 	return (sel);
- }
- 
+@@ -468,12 +468,12 @@
  static __inline void
  load_fs(u_int sel)
  {
