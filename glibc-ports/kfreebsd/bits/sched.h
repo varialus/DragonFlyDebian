@@ -110,4 +110,11 @@ typedef struct
   ((cpusetp)->__bits[__CPUELT (cpu)] &= ~__CPUMASK (cpu))
 # define __CPU_ISSET(cpu, cpusetp) \
   (((cpusetp)->__bits[__CPUELT (cpu)] & __CPUMASK (cpu)) != 0)
+
+# define __CPU_ALLOC_SIZE(count) \
+    ((((count) + __NCPUBITS - 1) / __NCPUBITS) * 8) 
+# define __CPU_ALLOC(count) __sched_cpualloc (count)
+# define __CPU_FREE(cpuset) __sched_cpufree (cpuset)
+
 #endif
+    
