@@ -1,44 +1,71 @@
 Author: aurel32, petr
-Status: in BTS
+Status: in BTS #438849, #449531
 
-diff -u xine-lib-1.1.2+dfsg/debian/control xine-lib-1.1.2+dfsg/debian/control
---- xine-lib-1.1.2+dfsg/debian/control
-+++ xine-lib-1.1.2+dfsg/debian/control
-@@ -3,7 +3,7 @@
- Priority: optional
- Maintainer: Siggi Langauf <siggi@debian.org>
- Uploaders: Philipp Matthias Hahn <pmhahn@debian.org>, Reinhard Tartler <siretart@tauware.de>
--Build-Depends: debhelper (>= 4.0.4), binutils (>= 2.12.90.0.9), libaa1-dev | aalib1-dev (>= 1.4p5-2), libcaca-dev (>= 0.99.beta4-1), libxinerama-dev | xlibs-static-dev (<< 6.8.0), libxv-dev | xlibs-static-dev (<< 6.8.0), libesd0-dev, zlib1g-dev | libz-dev, libartsc0-dev (>>1.1.0), liblircclient-dev, libogg-dev, libvorbis-dev, libtheora-dev, libasound2-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libflac-dev (>>1.1.0), libmodplug-dev, libgnomevfs2-dev, libsmbclient-dev, libspeex-dev, libmng-dev, libpng12-dev | libpng-dev, libfreetype6-dev, libsdl1.2-dev (>=1.1.5), libmad0-dev, libxvmc-dev | xlibs-dev (<< 6.8.0), w3m, automake1.9, autoconf, libtool, libcdio-dev (>= 0.76-1), sgmltools-lite, libavformat-dev, libpostproc-dev, libavcodec-dev
-+Build-Depends: debhelper (>= 4.0.4), binutils (>= 2.12.90.0.9), libaa1-dev | aalib1-dev (>= 1.4p5-2), libcaca-dev (>= 0.99.beta4-1), libxinerama-dev | xlibs-static-dev (<< 6.8.0), libxv-dev | xlibs-static-dev (<< 6.8.0), libesd0-dev, zlib1g-dev | libz-dev, libartsc0-dev (>>1.1.0), liblircclient-dev, libogg-dev, libvorbis-dev, libtheora-dev, libasound2-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386], libflac-dev (>>1.1.0), libmodplug-dev, libgnomevfs2-dev, libsmbclient-dev, libspeex-dev, libmng-dev, libpng12-dev | libpng-dev, libfreetype6-dev, libsdl1.2-dev (>=1.1.5), libmad0-dev, libxvmc-dev | xlibs-dev (<< 6.8.0), w3m, automake1.9, autoconf, libtool, libcdio-dev (>= 0.76-1), sgmltools-lite, libavformat-dev, libpostproc-dev, libavcodec-dev, libcam-dev [kfreebsd-i386 kfreebsd-amd64]
- Build-Conflicts: libdvdnav-dev, libvcdinfo-dev
- Standards-Version: 3.7.2
- XS-X-Vcs-Bzr: http://siretart.tauware.de/xine.repo/xine-lib.debian.1.1.2/
+diff -u xine-lib-1.1.8/debian/control xine-lib-1.1.8/debian/control
+--- xine-lib-1.1.8/debian/control
++++ xine-lib-1.1.8/debian/control
+@@ -10,6 +10,7 @@
+ 	libxcb-xv0-dev, libxcb-shm0-dev, libxcb-shape0-dev,
+ 	libxinerama-dev, libxv-dev, libxvmc-dev, libxt-dev,
+ 	libasound2-dev [!kfreebsd-i386 !kfreebsd-amd64 !hurd-i386],
++	libcam-dev [kfreebsd-i386 kfreebsd-amd64],
+ 	libaa1-dev, libcaca-dev, libmodplug-dev,
+ 	libmagick9-dev, libpng12-dev, libfreetype6-dev,
+ 	libogg-dev, libvorbis-dev, libtheora-dev,
+diff -u xine-lib-1.1.8/debian/rules xine-lib-1.1.8/debian/rules
+--- xine-lib-1.1.8/debian/rules
++++ xine-lib-1.1.8/debian/rules
+@@ -69,12 +69,12 @@
+ 	dh_testroot
+ 	rm -vf build-stamp configure-stamp install-stamp po/*.gmo po/stamp-po binary-*-stamp all-files-stamp
+ 	[ ! -f Makefile ] || $(MAKE) distclean
+-	rm -vf debian/libxine1.install.i386 config.h config.log
++	rm -vf debian/libxine1.install.i386 debian/libxine*.install.kfreebsd* config.h config.log
+ 	dh_clean
+ 	rm -vf a.out # something in the configure scripts seems to leave this over...
+ 
+ install: build install-stamp
+-install-stamp:
++install-stamp: generate-arch-files
+ 	dh_testdir
+ 	dh_testroot
+ 	dh_clean -k
+@@ -141,16 +141,21 @@
+ 	@echo Comparing installed files from xine-lib Makefiles with files installed in packages:
+ 	-diff -u $^
+ 
+-# if there is a file like debian/libxine1.install.i386.specific, this rule will be triggered
+-debian/%.install.$(DEB_HOST_ARCH): debian/%.install debian/%.install.$(DEB_HOST_ARCH).specific
+-	cat $^ > $@
+-
+-# i386 is special cased! Other archs may follow
+-ifeq ($(DEB_HOST_ARCH),i386)
+-binary-libxine1: debian/libxine1.install debian/libxine1.install.$(DEB_HOST_ARCH)
+-else
+-binary-libxine1: debian/libxine1.install
+-endif
++generate-arch-files:
++# i386 specific plugins are also available for kfreebsd-i386
++	cat debian/libxine1.install debian/libxine1.install.i386.specific > debian/libxine1.install.i386
++	cp -a debian/libxine1.install.i386 debian/libxine1.install.kfreebsd-i386
++# create install files for Debian GNU/kFreeBSD i386/amd64 by dropping
++# everything which is not available on those architectures.
++	grep -v -e dxr3 -e syncfb \
++		debian/libxine1-x.install > debian/libxine1-x.install.kfreebsd-i386
++	cp -p   debian/libxine1-x.install.kfreebsd-i386 debian/libxine1-x.install.kfreebsd-amd64
++	grep -v -e dxr3 -e pvr -e v4l -e alsa \
++		debian/libxine1-misc-plugins.install > debian/libxine1-misc-plugins.install.kfreebsd-i386
++	cp -p   debian/libxine1-misc-plugins.install.kfreebsd-i386 debian/libxine1-misc-plugins.install.kfreebsd-amd64
++	grep -v -e out_fb  \
++		debian/libxine1-console.install > debian/libxine1-console.install.kfreebsd-i386
++	cp -p   debian/libxine1-console.install.kfreebsd-i386 debian/libxine1-console.install.kfreebsd-amd64
+ 
+ # Any other binary targets build just one binary package at a time.
+ binary-%: build install
 only in patch2:
 unchanged:
---- xine-lib-1.1.2+dfsg.orig/configure.ac
-+++ xine-lib-1.1.2+dfsg/configure.ac
-@@ -1059,7 +1059,7 @@
-         enable_vidix="yes"
-         enable_linux="yes"
-         ;;
--      i386-*-freebsd*)
-+      i386-*-freebsd*|i?86-*-kfreebsd*-gnu)
-         enable_vidix="yes"
-         enable_dha_kmod="no"
-         ;;
-@@ -1745,7 +1745,7 @@
-      	    AC_DEFINE([HAVE_WIN32_CDROM], [1], 
-                       [Define 1 if you have MinGW CD-ROM support])
- 	 ;;
--         freebsd4.*)
-+         freebsd4.*|kfreebsd*-gnu)
-      	    AC_DEFINE([HAVE_FREEBSD_CDROM], [1], 
-                       [Define 1 if you have FreeBSD CD-ROM support])
- 	 ;;
-only in patch2:
-unchanged:
---- xine-lib-1.1.2+dfsg.orig/src/video_out/libdha/ports.c
-+++ xine-lib-1.1.2+dfsg/src/video_out/libdha/ports.c
+--- xine-lib-1.1.8.orig/src/video_out/libdha/ports.c
++++ xine-lib-1.1.8/src/video_out/libdha/ports.c
 @@ -69,7 +69,7 @@
  /* OS depended stuff */
  #if defined (linux)
@@ -50,45 +77,93 @@ unchanged:
  #include "sysdep/pci_386bsd.c"
 only in patch2:
 unchanged:
---- xine-lib-1.1.2+dfsg.orig/src/input/input_cdda.c
-+++ xine-lib-1.1.2+dfsg/src/input/input_cdda.c
-@@ -613,7 +613,7 @@
+--- xine-lib-1.1.8.orig/src/input/input_cdda.c
++++ xine-lib-1.1.8/src/input/input_cdda.c
+@@ -614,7 +614,7 @@
    return 0;
  }
  
--#elif defined(__FreeBSD__)
-+#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+-#elif defined(__FreeBSD__) || defined(__NetBSD__)
++#elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__)
  
  #include <sys/cdio.h>
  
-@@ -689,12 +689,12 @@
-   unsigned char *data) {
+@@ -625,7 +625,7 @@
+ static int read_cdrom_toc(int fd, cdrom_toc *toc) {
  
-   int fd = this_gen->fd;
--#if  __FreeBSD_version < 501106
-+#if  (__FreeBSD_version < 501106) && (__FreeBSD_kernel_version < 501106)
-   struct ioc_read_audio cdda;
+   struct ioc_toc_header tochdr;
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+   struct ioc_read_toc_single_entry tocentry;
+ #elif defined(__NetBSD__)
+   struct ioc_read_toc_entry tocentry;
+@@ -656,7 +656,7 @@
+ 
+     memset(&tocentry, 0, sizeof(tocentry));
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+     tocentry.track = i;
+     tocentry.address_format = CD_MSF_FORMAT;
+     if (ioctl(fd, CDIOREADTOCENTRY, &tocentry) == -1) {
+@@ -675,7 +675,7 @@
+     }
  #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+     toc->toc_entries[i-1].track_mode = (tocentry.entry.control & 0x04) ? 1 : 0;
+     toc->toc_entries[i-1].first_frame_minute = tocentry.entry.addr.msf.minute;
+     toc->toc_entries[i-1].first_frame_second = tocentry.entry.addr.msf.second;
+@@ -699,7 +699,7 @@
+   /* fetch the leadout as well */
+   memset(&tocentry, 0, sizeof(tocentry));
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+   tocentry.track = CD_LEADOUT_TRACK;
+   tocentry.address_format = CD_MSF_FORMAT;
+   if (ioctl(fd, CDIOREADTOCENTRY, &tocentry) == -1) {
+@@ -718,7 +718,7 @@
+   }
+ #endif
+ 
+-#if defined(__FreeBSD__)
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+   toc->leadout_track.track_mode = (tocentry.entry.control & 0x04) ? 1 : 0;
+   toc->leadout_track.first_frame_minute = tocentry.entry.addr.msf.minute;
+   toc->leadout_track.first_frame_second = tocentry.entry.addr.msf.second;
+@@ -747,8 +747,8 @@
+   int fd = this_gen->fd;
  
    while( num_frames ) {
+-#if defined(__FreeBSD__)
 -#if  __FreeBSD_version < 501106
-+#if  (__FreeBSD_version < 501106) && (__FreeBSD_kernel_version < 501106)
-     cdda.address_format = CD_MSF_FORMAT;
-     cdda.address.msf.minute = frame / CD_SECONDS_PER_MINUTE / CD_FRAMES_PER_SECOND;
-     cdda.address.msf.second = (frame / CD_FRAMES_PER_SECOND) % CD_SECONDS_PER_MINUTE;
-@@ -703,7 +703,7 @@
-     cdda.buffer = data;
- #endif
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#if (__FreeBSD_version < 501106) && (__FreeBSD_kernel_version < 501106)
+     struct ioc_read_audio cdda;
  
+     cdda.address_format = CD_MSF_FORMAT;
+@@ -757,13 +757,10 @@
+     cdda.address.msf.frame = frame % CD_FRAMES_PER_SECOND;
+     cdda.nframes = 1;
+     cdda.buffer = data;
+-#endif
+-
 -#if  __FreeBSD_version >= 501106
-+#if  (__FreeBSD_version >= 501106) || (__FreeBSD_kernel_version >= 501106)
-     if (pread(fd, data, CD_RAW_FRAME_SIZE, frame * CD_RAW_FRAME_SIZE) != CD_RAW_FRAME_SIZE) {
- #else
+-    if (pread(fd, data, CD_RAW_FRAME_SIZE, frame * CD_RAW_FRAME_SIZE) != CD_RAW_FRAME_SIZE) {
+-#else
      /* read a frame */
+     if(ioctl(fd, CDIOCREADAUDIO, &cdda) < 0) {
++#else
++    if (pread(fd, data, CD_RAW_FRAME_SIZE, frame * CD_RAW_FRAME_SIZE) != CD_RAW_FRAME_SIZE) {
+ #endif
+       perror("CDIOCREADAUDIO");
+       return -1;
 only in patch2:
 unchanged:
---- xine-lib-1.1.2+dfsg.orig/src/input/media_helper.c
-+++ xine-lib-1.1.2+dfsg/src/input/media_helper.c
+--- xine-lib-1.1.8.orig/src/input/media_helper.c
++++ xine-lib-1.1.8/src/input/media_helper.c
 @@ -36,7 +36,7 @@
  #include <unistd.h>
  #include <string.h>
@@ -109,21 +184,46 @@ unchanged:
        xprintf(xine, XINE_VERBOSITY_DEBUG, "ioctl(cdromallow): %s\n", strerror(errno));
 only in patch2:
 unchanged:
---- xine-lib-1.1.2+dfsg.orig/src/input/input_dvd.c
-+++ xine-lib-1.1.2+dfsg/src/input/input_dvd.c
-@@ -64,7 +64,7 @@
- #endif /* WIN32 */
+--- xine-lib-1.1.8.orig/src/input/libdvdnav/dvd_reader.c
++++ xine-lib-1.1.8/src/input/libdvdnav/dvd_reader.c
+@@ -58,7 +58,7 @@
+ #define lseek64 _lseeki64
+ #endif
+  
+-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__)|| defined(__DARWIN__)
++#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__)|| defined(__DARWIN__) || defined (__FreeBSD_kernel__)
+ #define SYS_BSD 1
+ #endif
  
- 
--#if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD__)
-+#if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD__) || defined (__FreeBSD_kernel__)
- #include <sys/dvdio.h>
- #include <sys/cdio.h> /* CDIOCALLOW etc... */
- #elif defined(HAVE_LINUX_CDROM_H)
 only in patch2:
 unchanged:
---- xine-lib-1.1.2+dfsg.orig/src/input/input_vcd.c
-+++ xine-lib-1.1.2+dfsg/src/input/input_vcd.c
+--- xine-lib-1.1.8.orig/src/input/vcd/libcdio/FreeBSD/freebsd.c
++++ xine-lib-1.1.8/src/input/vcd/libcdio/FreeBSD/freebsd.c
+@@ -29,6 +29,7 @@
+ 
+ static const char _rcsid[] = "$Id: freebsd.c,v 1.1 2005/01/01 02:43:57 rockyb Exp $";
+ 
++#include <arpa/inet.h>
+ #include "freebsd.h"
+ 
+ #ifdef HAVE_FREEBSD_CDROM
+only in patch2:
+unchanged:
+--- xine-lib-1.1.8.orig/src/input/vcd/libcdio/FreeBSD/freebsd.h
++++ xine-lib-1.1.8/src/input/vcd/libcdio/FreeBSD/freebsd.h
+@@ -78,7 +78,7 @@
+ #include <sys/ioctl.h>
+ #include <sys/param.h> /* for __FreeBSD_version */
+ 
+-#if __FreeBSD_version < 500000
++#if (__FreeBSD_version < 500000) && (__FreeBSD_kernel_version < 500000)
+ #define DEVICE_POSTFIX "c"
+ #else
+ #define DEVICE_POSTFIX ""
+only in patch2:
+unchanged:
+--- xine-lib-1.1.8.orig/src/input/input_vcd.c
++++ xine-lib-1.1.8/src/input/input_vcd.c
 @@ -40,7 +40,7 @@
  #ifdef HAVE_SYS_CDIO_H
  # include <sys/cdio.h>
@@ -207,40 +307,139 @@ unchanged:
      if (ioctl (this->fd, CDRIOCSETBLOCKSIZE, &bsize) == -1) {
 only in patch2:
 unchanged:
---- xine-lib-1.1.2+dfsg.orig/src/input/vcd/libcdio/FreeBSD/freebsd.h
-+++ xine-lib-1.1.2+dfsg/src/input/vcd/libcdio/FreeBSD/freebsd.h
-@@ -78,7 +78,7 @@
- #include <sys/ioctl.h>
- #include <sys/param.h> /* for __FreeBSD_version */
+--- xine-lib-1.1.8.orig/src/libw32dll/wine/win32.c
++++ xine-lib-1.1.8/src/libw32dll/wine/win32.c
+@@ -894,7 +894,7 @@
+     /* FIXME: better values for the two entries below... */
+     static int cache = 0;
+     static SYSTEM_INFO cachedsi;
+-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__svr4__)
++#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__svr4__) || defined (__FreeBSD_kernel__)
+     unsigned int regs[4];
+ #endif
+     dbgprintf("GetSystemInfo(%p) =>\n", si);
+@@ -958,7 +958,7 @@
  
--#if __FreeBSD_version < 500000
-+#if (__FreeBSD_version < 500000) && (__FreeBSD_kernel_version < 500000)
- #define DEVICE_POSTFIX "c"
+ /* disable cpuid based detection (mplayer's cpudetect.c does this - see above) */
+ #ifndef MPLAYER
+-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__svr4__)
++#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__svr4__) || defined (__FreeBSD_kernel__)
+     do_cpuid(1, regs);
+     switch ((regs[0] >> 8) & 0xf) {			// cpu family
+     case 3: cachedsi.dwProcessorType = PROCESSOR_INTEL_386;
+only in patch2:
+unchanged:
+--- xine-lib-1.1.8.orig/src/libw32dll/wine/ldt_keeper.c
++++ xine-lib-1.1.8/src/libw32dll/wine/ldt_keeper.c
+@@ -81,7 +81,7 @@
+ }
+ #endif
  #else
- #define DEVICE_POSTFIX ""
+-#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
++#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__FreeBSD_kernel__)
+ #include <machine/segments.h>
+ #include <machine/sysarch.h>
+ #endif
+@@ -156,7 +156,7 @@
+ 
+ void Check_FS_Segment(ldt_fs_t *ldt_fs)
+ {
+-#if defined(__FreeBSD__) && defined(LDT_AUTO_ALLOC)
++#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && defined(LDT_AUTO_ALLOC)
+     int fs;
+      __asm__ __volatile__(
+ 	"movw %%fs,%%ax; mov %%eax,%0" : "=r" (fs) :: "%eax"
+@@ -174,7 +174,7 @@
+ #endif
+ }
+ 
+-#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
++#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__FreeBSD_kernel__)
+ static void LDT_EntryToBytes( unsigned long *buffer, const struct modify_ldt_ldt_s *content )
+ {
+     *buffer++ = ((content->base_addr & 0x0000ffff) << 16) |
+@@ -205,12 +205,12 @@
+     }
+ #endif /*linux*/
+ 
+-#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__)
++#if defined(__NetBSD__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__FreeBSD_kernel__)
+     {
+         unsigned long d[2];
+ 
+         LDT_EntryToBytes( d, &array );
+-#if defined(__FreeBSD__) && defined(LDT_AUTO_ALLOC)
++#if (defined(__FreeBSD__) || defined(__FreeBSD_kernel__)) && defined(LDT_AUTO_ALLOC)
+         ret = i386_set_ldt(LDT_AUTO_ALLOC, (union descriptor *)d, 1);
+         array.entry_number = ret;
+         ldt_fs->teb_sel = LDT_SEL(ret);
 only in patch2:
 unchanged:
---- xine-lib-1.1.2+dfsg.orig/src/input/libdvdnav/bswap.h
-+++ xine-lib-1.1.2+dfsg/src/input/libdvdnav/bswap.h
+--- xine-lib-1.1.8.orig/src/xine-engine/xine_interface.c
++++ xine-lib-1.1.8/src/xine-engine/xine_interface.c
 @@ -35,7 +35,7 @@
- #include <sys/param.h>
- #endif
- 
--#if defined(__linux__)
-+#if defined(__linux__) || defined(__GLIBC__)
- #include <byteswap.h>
- #define B2N_16(x) x = bswap_16(x)
- #define B2N_32(x) x = bswap_32(x)
+ #include <stdlib.h>
+ #include <pthread.h>
+ #include <stdarg.h>
+-#if defined (__linux__)
++#if defined (__linux__) || defined (__GLIBC__)
+ #include <endian.h>
+ #elif defined (__FreeBSD__)
+ #include <machine/endian.h>
 only in patch2:
 unchanged:
---- xine-lib-1.1.2+dfsg.orig/src/input/libdvdnav/dvd_reader.c
-+++ xine-lib-1.1.2+dfsg/src/input/libdvdnav/dvd_reader.c
-@@ -49,7 +49,7 @@
- #define lseek64 _lseeki64
- #endif
-  
--#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__)|| defined(__DARWIN__)
-+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__bsdi__)|| defined(__DARWIN__) || defined (__FreeBSD_kernel__)
- #define SYS_BSD 1
- #endif
+--- xine-lib-1.1.8.orig/src/xine-engine/xine.c
++++ xine-lib-1.1.8/src/xine-engine/xine.c
+@@ -37,7 +37,7 @@
+ #include <pthread.h>
+ #include <stdarg.h>
+ #include <stdio.h>
+-#if defined (__linux__)
++#if defined (__linux__) || defined (__GLIBC__)
+ #include <endian.h>
+ #elif defined (__FreeBSD__)
+ #include <machine/endian.h>
+only in patch2:
+unchanged:
+--- xine-lib-1.1.8.orig/configure
++++ xine-lib-1.1.8/configure
+@@ -36996,7 +36996,7 @@
+         enable_vidix="yes"
+         enable_linux="yes"
+         ;;
+-      i?86-*-freebsd* | k?-*-freebsd* | athlon-*-freebsd*)
++      i?86-*-freebsd* | k?-*-freebsd* | athlon-*-freebsd* | i?86-*-kfreebsd*)
+         enable_vidix="yes"
+         enable_dha_kmod="no"
+         ;;
+@@ -44870,7 +44870,7 @@
+ _ACEOF
  
+ 	 ;;
+-         freebsd4.*)
++         freebsd4.*|kfreebsd*-gnu)
+ 
+ cat >>confdefs.h <<\_ACEOF
+ #define HAVE_FREEBSD_CDROM 1
+only in patch2:
+unchanged:
+--- xine-lib-1.1.8.orig/configure.ac
++++ xine-lib-1.1.8/configure.ac
+@@ -1143,7 +1143,7 @@
+         enable_vidix="yes"
+         enable_linux="yes"
+         ;;
+-      i?86-*-freebsd* | k?-*-freebsd* | athlon-*-freebsd*)
++      i?86-*-freebsd* | k?-*-freebsd* | athlon-*-freebsd* | i?86-*-kfreebsd*)
+         enable_vidix="yes"
+         enable_dha_kmod="no"
+         ;;
+@@ -1885,7 +1885,7 @@
+      	    AC_DEFINE([HAVE_WIN32_CDROM], [1], 
+                       [Define 1 if you have MinGW CD-ROM support])
+ 	 ;;
+-         freebsd4.*)
++         freebsd4.*|kfreebsd*-gnu)
+      	    AC_DEFINE([HAVE_FREEBSD_CDROM], [1], 
+                       [Define 1 if you have FreeBSD CD-ROM support])
+ 	 ;;
