@@ -79,11 +79,12 @@ Index: sys/conf/files.i386
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_pentium.c	optional hwpmc
  dev/hwpmc/hwpmc_piv.c		optional hwpmc
-@@ -209,12 +168,8 @@
+@@ -209,13 +168,9 @@
  dev/mse/mse.c			optional mse
  dev/mse/mse_isa.c		optional mse isa
  dev/nfe/if_nfe.c		optional nfe pci
 -dev/nve/if_nve.c		optional nve pci
+ dev/nvram/nvram.c		optional nvram isa
  dev/pcf/pcf_isa.c		optional pcf
  dev/random/nehemiah.c		optional random
 -dev/rr232x/os_bsd.c		optional rr232x
@@ -135,7 +136,7 @@ Index: sys/modules/Makefile
  	aue \
  	${_auxio} \
  	${_awi} \
-@@ -94,7 +89,6 @@
+@@ -95,7 +90,6 @@
  	hifn \
  	hme \
  	${_hptiop} \
@@ -143,17 +144,18 @@ Index: sys/modules/Makefile
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -186,9 +180,7 @@
+@@ -188,10 +182,8 @@
  	ntfs_iconv \
  	${_nxge} \
  	nullfs \
 -	${_nve} \
+ 	${_nvram} \
  	${_nwfs} \
 -	${_oltr} \
  	${_padlock} \
  	patm \
  	${_pccard} \
-@@ -218,7 +210,6 @@
+@@ -220,7 +212,6 @@
  	reiserfs \
  	rl \
  	rp \
@@ -161,15 +163,15 @@ Index: sys/modules/Makefile
  	rue \
  	rum \
  	${_s3} \
-@@ -309,7 +300,6 @@
+@@ -311,7 +302,6 @@
  	${_xe} \
  	xfs \
  	xl \
 -	${_zfs} \
- 	zlib
+ 	zlib \
+ 	zyd
  
- .if ${MACHINE_ARCH} != "powerpc"
-@@ -353,11 +343,6 @@
+@@ -361,11 +351,6 @@
  _apm=		apm
  _ar=		ar
  _arcnet=	arcnet
@@ -181,7 +183,7 @@ Index: sys/modules/Makefile
  _awi=		awi
  _bktr=		bktr
  _cardbus=	cardbus
-@@ -395,7 +380,6 @@
+@@ -404,7 +389,6 @@
  .if ${MK_NCP} != "no"
  _nwfs=		nwfs
  .endif
@@ -189,7 +191,7 @@ Index: sys/modules/Makefile
  _pccard=	pccard
  _pcfclock=	pcfclock
  _pecoff=	pecoff
-@@ -416,9 +400,6 @@
+@@ -425,9 +409,6 @@
  _tmpfs= 	tmpfs
  _wi=		wi
  _xe=		xe
@@ -199,22 +201,23 @@ Index: sys/modules/Makefile
  .if ${MACHINE} == "i386"
  _aac=		aac
  _acpi=		acpi
-@@ -434,7 +415,6 @@
+@@ -444,7 +425,6 @@
  _dpt=		dpt
  _ex=		ex
  _hptiop=	hptiop
 -_hptmv=		hptmv
  _ichwd=		ichwd
  _ida=		ida
- _idt=		idt
-@@ -449,14 +429,12 @@
+ # Disabled due to non-MPSAFEty in 7.0
+@@ -459,7 +439,6 @@
+ _ixgb=   	ixgb
  _mly=		mly
- _mxge=		mxge
  _nfe=		nfe
 -_nve=		nve
+ _nvram=		nvram
  _nxge=		nxge
  .if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
- .if exists(${.CURDIR}/../crypto/via)
+@@ -467,7 +446,6 @@
  _padlock=	padlock
  .endif
  .endif
@@ -222,7 +225,7 @@ Index: sys/modules/Makefile
  _s3=		s3
  _twa=		twa
  _vesa=		vesa
-@@ -474,11 +452,6 @@
+@@ -485,11 +463,6 @@
  _agp=		agp
  _an=		an
  _arcmsr=	arcmsr
@@ -234,7 +237,7 @@ Index: sys/modules/Makefile
  _cardbus=	cardbus
  _cbb=		cbb
  _ciss=		ciss
-@@ -490,7 +463,6 @@
+@@ -502,7 +475,6 @@
  _exca=		exca
  _ext2fs=	ext2fs
  _hptiop=	hptiop
@@ -242,18 +245,19 @@ Index: sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -509,10 +481,8 @@
- _mxge=		mxge
+@@ -520,11 +492,9 @@
+ _mly=		mly
  _ndis=		ndis
  _nfe=		nfe
 -_nve=		nve
+ _nvram=		nvram
  _nxge=		nxge
  _pccard=	pccard
 -_rr232x=	rr232x
  _safe=		safe
  _scsi_low=	scsi_low
  _smbfs=		smbfs
-@@ -522,9 +492,6 @@
+@@ -534,9 +504,6 @@
  _tmpfs= 	tmpfs
  _twa=		twa
  _wi=		wi
@@ -263,7 +267,7 @@ Index: sys/modules/Makefile
  .endif
  
  .if ${MACHINE_ARCH} == "ia64"
-@@ -565,21 +532,11 @@
+@@ -577,21 +544,11 @@
  
  .if ${MACHINE_ARCH} == "powerpc"
  _an=		an
@@ -272,7 +276,7 @@ Index: sys/modules/Makefile
 -_ath_rate_amrr=	ath_rate_amrr
 -_ath_rate_onoe=	ath_rate_onoe
 -_ath_rate_sample=ath_rate_sample
- _powermac_nvram=	powermac_nvram
+ _nvram=		powermac_nvram
  _smbfs=		smbfs
  .endif
  
@@ -338,7 +342,7 @@ Index: sys/conf/files.amd64
  #
  amd64/acpica/OsdEnvironment.c	optional	acpi
  amd64/acpica/acpi_machdep.c	optional	acpi
-@@ -173,21 +144,12 @@
+@@ -173,22 +144,13 @@
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
@@ -354,6 +358,7 @@ Index: sys/conf/files.amd64
  dev/mem/memutil.c		optional	mem
  dev/nfe/if_nfe.c		optional	nfe pci
 -dev/nve/if_nve.c		optional	nve pci
+ dev/nvram/nvram.c		optional	nvram isa
 -dev/rr232x/os_bsd.c		optional	rr232x
 -dev/rr232x/osm_bsd.c		optional	rr232x
 -dev/rr232x/rr232x_config.c	optional	rr232x
