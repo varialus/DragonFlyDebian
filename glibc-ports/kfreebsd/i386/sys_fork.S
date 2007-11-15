@@ -31,3 +31,4 @@ ENTRY (__syscall_fork)
 L(pseudo_end):
 	ret
 PSEUDO_END (__syscall_fork)
+libc_hidden_def (__syscall_fork)

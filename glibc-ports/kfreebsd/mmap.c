@@ -28,9 +28,12 @@
 extern void *__syscall_mmap (void *__addr, size_t __len, int __prot,
 			     int __flags, int __fd, int __unused1,
 			     __off_t __offset) __THROW;
+libc_hidden_proto (__syscall_mmap)
+			     
 extern ssize_t __syscall_pread (int __fd, void *__buf, size_t __nbytes,
                                 int __unused1, __off_t __offset) __THROW;
 
+libc_hidden_proto (__syscall_pread)
 void *
 __mmap (void *addr, size_t len, int prot, int flags, int fd, __off_t offset)
 {

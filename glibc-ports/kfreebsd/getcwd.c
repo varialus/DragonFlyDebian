@@ -30,6 +30,8 @@
 /* The system calls only makes a lookup in the VFS cache, which can easily
    fail.  Therefore we use the generic version as a fallback.  */
 extern int __syscall_getcwd (char *__unbounded buf, unsigned int size);
+libc_hidden_proto (__syscall_getcwd)
+
 static char *generic_getcwd (char *buf, size_t size) internal_function;
 
 char *

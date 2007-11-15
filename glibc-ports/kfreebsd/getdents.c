@@ -28,6 +28,7 @@
 /* Use the 3-argument system call.  */
 
 extern int __syscall_getdents (int fd, char *buf, size_t nbytes);
+libc_hidden_proto (__syscall_getdents)
 
 /* Read directory entries from FD into BUF, reading at most NBYTES.
    Returns the number of bytes read; zero when at end of directory; or

@@ -29,6 +29,7 @@ extern char *__getlogin_cache;
 extern char __getlogin_cache_room[MAXLOGNAME];
 
 extern int __syscall_getlogin (char *__name, size_t __name_len);
+libc_hidden_proto (__syscall_getlogin)
 
 /* Return the login name of the user, or NULL if it can't be determined.
    The returned pointer, if not NULL, is good only until the next call.  */

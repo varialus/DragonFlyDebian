@@ -19,7 +19,7 @@
 #include <sysdep.h>
 
 	  .text;
-ENTRY (syscall)
+ENTRY (__syscall)
 	popl %ecx		/* Pop return address into %ecx.  */
 	cfi_adjust_cfa_offset (-4)
 	movl 0(%esp), %eax	/* Load syscall number into %eax. */
@@ -30,4 +30,5 @@ ENTRY (syscall)
 
 L(pseudo_end):
 	ret			/* Return to caller.  */
-PSEUDO_END (syscall)
+PSEUDO_END (__syscall)
+weak_alias (__syscall, syscall)

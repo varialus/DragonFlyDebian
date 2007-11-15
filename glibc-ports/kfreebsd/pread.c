@@ -26,6 +26,7 @@
    argument.  */
 extern ssize_t __syscall_pread (int __fd, void *__buf, size_t __nbytes,
 				int __unused1, __off_t __offset) __THROW;
+libc_hidden_proto(__syscall_pread)
 
 ssize_t
 __libc_pread (int fd, void *buf, size_t nbytes, __off_t offset)

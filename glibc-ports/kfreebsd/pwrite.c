@@ -26,6 +26,7 @@
    argument.  */
 extern ssize_t __syscall_pwrite (int __fd, const void *__buf, size_t __nbytes,
 				 int __unused1, __off_t __offset) __THROW;
+libc_hidden_proto(__syscall_pwrite)
 
 ssize_t
 __libc_pwrite (int fd, const void *buf, size_t nbytes, __off_t offset)

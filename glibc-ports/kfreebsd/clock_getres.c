@@ -19,6 +19,7 @@
 #include <sysdep.h>
 
 int __syscall_clock_getres(clockid_t clock_id, struct timespec *tp);
+libc_hidden_proto (__syscall_clock_getres)
 
 # define SYSDEP_GETRES \
   case CLOCK_REALTIME:							      \

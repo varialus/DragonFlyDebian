@@ -22,6 +22,7 @@
 #include <signal.h>
 
 extern int __syscall_sigaction (int __sig,  const struct sigaction *__act, struct sigaction *__oact) __THROW;
+libc_hidden_proto (__syscall_sigaction)
 
 int
 __libc_sigaction (sig, act, oact)

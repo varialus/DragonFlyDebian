@@ -29,3 +29,4 @@ L(pseudo_end):
 L(no_error):
 	ret
 PSEUDO_END(__syscall_lseek)
+libc_hidden_def (__syscall_lseek)

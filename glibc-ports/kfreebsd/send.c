@@ -24,6 +24,7 @@ extern ssize_t __syscall_sendto (int fd, __const __ptr_t buf,
 		                 size_t n, int flags, 
 				 __CONST_SOCKADDR_ARG addr, 
 				 socklen_t addrlen);
+libc_hidden_proto (__syscall_sendto)
 
 /* Send N bytes of BUF to socket FD.
    Return the number of bytes sent or -1.  */

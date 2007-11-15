@@ -26,7 +26,10 @@ extern int __syscall_fhstat (const fhandle_t *fhp, struct stat16 *buf);
 extern int __syscall_fstat (int, struct stat16 *__unbounded);
 extern int __syscall_lstat (const char *__unbounded, struct stat16 *__unbounded);
 extern int __syscall_stat (const char *__unbounded, struct stat16 *__unbounded);
-
+libc_hidden_proto (__syscall_fhstat)
+libc_hidden_proto (__syscall_fstat)
+libc_hidden_proto (__syscall_lstat)
+libc_hidden_proto (__syscall_stat)
 
 /* Convert a 'struct stat16' to 'struct stat'.  */
 static inline void

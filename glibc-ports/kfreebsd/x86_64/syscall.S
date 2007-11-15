@@ -20,11 +20,12 @@
 #include <sysdep.h>
 
 	.text
-ENTRY (syscall)
+ENTRY (__syscall)
 	movq %rcx, %r10
 	movl $SYS_ify (syscall), %eax
 	syscall
 	jb SYSCALL_ERROR_LABEL
 L(pseudo_end):
 	ret
-PSEUDO_END (syscall)
+PSEUDO_END (__syscall)
+weak_alias (__syscall, syscall)

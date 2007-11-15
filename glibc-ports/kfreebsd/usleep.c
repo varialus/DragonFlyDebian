@@ -20,9 +20,6 @@
 #include <time.h>
 #include <unistd.h>
 
-extern int __nanosleep (const struct timespec *requested_time,
-			     struct timespec *remaining);
-
 int
 usleep (useconds_t useconds)
 {

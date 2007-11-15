@@ -30,15 +30,25 @@ struct timespec;
 
 int __syscall_open(const char *path, int flags, ...);
 int __syscall_close(int fd);
+libc_hidden_proto (__syscall_open)
+libc_hidden_proto (__syscall_close)
 
 ssize_t __syscall_read(int fd, void *buf, size_t nbyte);
 ssize_t __syscall_write(int fd, const void *buf, size_t nbyte);
 ssize_t __syscall_writev(int fd, const struct iovec *iovp, int iovcnt); 
+libc_hidden_proto (__syscall_read)
+libc_hidden_proto (__syscall_write)
+libc_hidden_proto (__syscall_writev)
 
 int __syscall_fcntl(int fd, int cmd, ...);
 int __syscall_fork(void);
 int __syscall_wait4(int pid, int *status, int options, struct rusage *rusage);
 int __syscall_sigsuspend (const sigset_t *set);
 int __syscall_nanosleep (const struct timespec *requested_time, struct timespec *remaining);
+libc_hidden_proto (__syscall_fcntl)
+libc_hidden_proto (__syscall_fork)
+libc_hidden_proto (__syscall_wait4)
+libc_hidden_proto (__syscall_sigsuspend)
+libc_hidden_proto (__syscall_nanosleep)
 
 #endif

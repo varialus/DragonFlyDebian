@@ -39,7 +39,7 @@ __brk (addr)
   if (addr < &_end)
     return 0;
 
-  if (syscall (SYS_break, addr) == -1)
+  if (__syscall (SYS_break, addr) == -1)
     {
       __set_errno (ENOMEM);
       return -1;

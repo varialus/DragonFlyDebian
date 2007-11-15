@@ -25,6 +25,7 @@
    argument.  */
 extern int __syscall_ftruncate (int __fd, int __unused1,
 				__off_t __length) __THROW;
+libc_hidden_proto (__syscall_ftruncate)
 
 int
 __ftruncate (int fd, __off_t length)

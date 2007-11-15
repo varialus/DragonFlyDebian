@@ -33,6 +33,7 @@ extern ssize_t __syscall_sendto (int fd, __const void * buf,
 		                 size_t n, int flags, 
 				 __CONST_SOCKADDR_ARG addr, 
 				 socklen_t addrlen);
+libc_hidden_proto (__syscall_sendto)
 
 /* Send N bytes of BUF on socket FD to peer at address ADDR (which is
  *    ADDR_LEN bytes long).  Returns the number sent, or -1 for errors.  */

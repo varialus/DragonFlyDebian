@@ -25,6 +25,7 @@
    argument.  */
 extern int __syscall_truncate (const char *__file, int __unused1,
 			       __off_t __length) __THROW;
+libc_hidden_proto (__syscall_truncate)
 
 int
 __truncate (const char *file, __off_t length)

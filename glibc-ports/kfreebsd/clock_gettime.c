@@ -20,6 +20,7 @@
 #include "kernel-posix-cpu-timers.h"
 
 int __syscall_clock_gettime(clockid_t clock_id, struct timespec *tp);
+libc_hidden_proto (__syscall_clock_gettime)
 
 # define SYSDEP_GETTIME \
   case CLOCK_REALTIME:							      \

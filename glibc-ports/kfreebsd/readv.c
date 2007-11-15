@@ -28,6 +28,7 @@
 #include <sysdep-cancel.h>
 
 extern ssize_t __syscall_readv (int, __const struct iovec *__unbounded, int);
+libc_hidden_proto(__syscall_readv)
 
 static ssize_t __atomic_readv_replacement (int, __const struct iovec *,
 					   int) internal_function;

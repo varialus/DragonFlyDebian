@@ -26,6 +26,7 @@
    argument.  */
 extern __off_t __syscall_lseek (int __fd, int __unused1, __off_t __offset,
 				int __whence) __THROW;
+libc_hidden_proto (__syscall_lseek)
 
 __off_t
 __libc_lseek (int fd, __off_t offset, int whence)

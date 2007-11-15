@@ -32,6 +32,7 @@ char *__getlogin_cache;
 char __getlogin_cache_room[MAXLOGNAME];
 
 extern int __syscall_getlogin (char *__name, size_t __name_len);
+libc_hidden_proto (__syscall_getlogin)
 
 /* Return at most NAME_LEN characters of the login name of the user in NAME.
    If it cannot be determined or some other error occurred, return the error

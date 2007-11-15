@@ -24,6 +24,7 @@
 #include <sysdep.h>
 
 extern int __syscall_munmap (void *__addr, size_t __len) __THROW;
+libc_hidden_proto (__syscall_munmap)
 
 int
 __munmap (void *addr, size_t len)

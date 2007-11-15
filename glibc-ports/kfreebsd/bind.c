@@ -30,6 +30,7 @@ extern int __libc_sa_len_internal (sa_family_t __af);
 
 extern int __syscall_bind (int fd, __CONST_SOCKADDR_ARG addr, 
 			   socklen_t addrlen) __THROW;
+libc_hidden_proto (__syscall_bind)
 
 /* Open a connection on socket FD to peer at ADDR (which LEN bytes long).
    For connectionless socket types, just set the default address to send to
