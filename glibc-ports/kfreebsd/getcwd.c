@@ -78,18 +78,12 @@ __getcwd (char *buf, size_t size)
       memcpy (buf, tmpbuf, len);
       return buf;
     }
-#if IS_IN_rtld
-  return NULL;
-#else  
   return generic_getcwd (buf, size);
-#endif  
 }
 
 weak_alias (__getcwd, getcwd)
 
-#if !IS_IN_rtld
 /* Get the code for the generic version.  */
 #define GETCWD_RETURN_TYPE	static char * internal_function
 #define __getcwd		generic_getcwd
 #include <sysdeps/posix/getcwd.c>
-#endif
