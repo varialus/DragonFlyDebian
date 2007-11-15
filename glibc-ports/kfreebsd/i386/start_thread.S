@@ -142,7 +142,7 @@ L(here):
 	addl	$_GLOBAL_OFFSET_TABLE_+[.-L(here)], %ebx
 #endif
 	pushl	%eax
-	call	JUMPTARGET (_exit)
+	call	HIDDEN_JUMPTARGET (_exit)
 
 L(simple):/* Simple case without signal mask handling.  */
 
