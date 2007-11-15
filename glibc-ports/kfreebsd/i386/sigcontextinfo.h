@@ -16,10 +16,20 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#define SIGCONTEXT int _code, struct sigcontext *
-#define SIGCONTEXT_EXTRA_ARGS _code,
-#define GET_PC(ctx)	((void *) (ctx)->sc_eip)
-#define GET_FRAME(ctx)	((void *) (ctx)->sc_ebp)
-#define GET_STACK(ctx)	((void *) (ctx)->sc_esp)
+/*
+native FreeBSD: 
+        sighandler(int signum, int code,       struct sigcontext * sg, void * fault_ip)
+posix like: 
+        sighandler(int signum, siginfo_t * si, struct sigcontext * sg, void * fault_ip)
+*/
+
+#define SIGCONTEXT long _code, struct sigcontext * _sg, void *
+#define SIGCONTEXT_EXTRA_ARGS _code, _sg, 
+
+/* really, really, rest of glibc expects that struct sigcontext is the last argument */
+#define GET_PC(ctx)	((void *) (_sg)->sc_eip)
+#define GET_FRAME(ctx)	((void *) (_sg)->sc_ebp)
+#define GET_STACK(ctx)	((void *) (_sg)->sc_esp)
+
 #define CALL_SIGHANDLER(handler, signo, ctx) \
   (handler)((signo), SIGCONTEXT_EXTRA_ARGS (ctx))
