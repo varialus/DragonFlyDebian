@@ -25,8 +25,6 @@
 #include <sys/time.h>
 #include <sysdep-cancel.h>
 
-extern int futimes (int fd, const struct timeval tvp[2]);
-
 int
 __libc_open (const char *file, int oflag, ...)
 {
@@ -67,7 +65,11 @@ __libc_open (const char *file, int oflag, ...)
 	      tv[0].tv_sec = statbuf.st_atime;
 	      tv[0].tv_usec = 0;
 
+#ifdef NOT_IN_libc
 	      futimes (fd, tv);
+#else
+	      __futimes (fd, tv);
+#endif
 	    }
 	}
       __set_errno (saved_errno);
