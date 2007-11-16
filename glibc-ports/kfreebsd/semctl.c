@@ -82,5 +82,5 @@ semctl (int semid, int semnum, int cmd, ...)
     }
   va_end (ap);
 
-  return syscall (SYS_semctl, semid, semnum, cmd, semun_ptr);
+  return __syscall (SYS_semctl, semid, semnum, cmd, semun_ptr);
 }
