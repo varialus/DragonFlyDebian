@@ -61,6 +61,7 @@ union semun
   unsigned short *array;	/* array for GETALL & SETALL */
 };
 
+int __syscall(int number, ...);
 
 int
 semctl (int semid, int semnum, int cmd, ...)

@@ -28,11 +28,6 @@ struct iovec;
 struct rusage;
 struct timespec;
 
-#if 0
-int __syscall(int number, ...);
-libc_hidden_proto (__syscall)
-#endif
-
 int __syscall_open(const char *path, int flags, ...);
 int __syscall_close(int fd);
 libc_hidden_proto (__syscall_open)

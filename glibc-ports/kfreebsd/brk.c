@@ -25,6 +25,8 @@
 #define SYS_break SYS_obreak
 #endif
 
+int __syscall(int number, ...);
+
 extern void _end;
 
 /* sbrk.c expects this.  */
