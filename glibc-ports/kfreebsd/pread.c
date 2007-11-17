@@ -24,19 +24,19 @@
 
 /* The real system call has a word of padding before the 64-bit off_t
    argument.  */
-extern ssize_t __syscall_pread (int __fd, void *__buf, size_t __nbytes,
+extern ssize_t __syscall_freebsd6_pread (int __fd, void *__buf, size_t __nbytes,
 				int __unused1, __off_t __offset) __THROW;
-libc_hidden_proto(__syscall_pread)
+libc_hidden_proto(__syscall_freebsd6_pread)
 
 ssize_t
 __libc_pread (int fd, void *buf, size_t nbytes, __off_t offset)
 {
   /* We pass 5 arguments in 6 words.  */
   if (SINGLE_THREAD_P)
-    return INLINE_SYSCALL (pread, 5, fd, buf, nbytes, 0, offset);
+    return INLINE_SYSCALL (freebsd6_pread, 5, fd, buf, nbytes, 0, offset);
 
   int oldtype = LIBC_CANCEL_ASYNC ();
-  ssize_t result = INLINE_SYSCALL (pread, 5, fd, buf, nbytes, 0, offset);
+  ssize_t result = INLINE_SYSCALL (freebsd6_pread, 5, fd, buf, nbytes, 0, offset);
   LIBC_CANCEL_RESET (oldtype);
   return result; 
 }

@@ -37,7 +37,7 @@
 #define	SYS_chmod	15
 #define	SYS_chown	16
 #define	SYS_obreak	17
-				/* 18 is old getfsstat */
+#define	SYS_freebsd4_getfsstat	18
 				/* 19 is old lseek */
 #define	SYS_getpid	20
 #define	SYS_mount	21
@@ -169,8 +169,8 @@
 				/* 150 is old getsockname */
 #define	SYS_nfssvc	155
 				/* 156 is old getdirentries */
-				/* 157 is old statfs */
-				/* 158 is old fstatfs */
+#define	SYS_freebsd4_statfs	157
+#define	SYS_freebsd4_fstatfs	158
 #define	SYS_lgetfh	160
 #define	SYS_getfh	161
 #define	SYS_getdomainname	162
@@ -181,8 +181,8 @@
 #define	SYS_semsys	169
 #define	SYS_msgsys	170
 #define	SYS_shmsys	171
-#define	SYS_pread	173
-#define	SYS_pwrite	174
+#define	SYS_freebsd6_pread	173
+#define	SYS_freebsd6_pwrite	174
 #define	SYS_ntp_adjtime	176
 #define	SYS_setgid	181
 #define	SYS_setegid	182
@@ -195,11 +195,11 @@
 #define	SYS_getrlimit	194
 #define	SYS_setrlimit	195
 #define	SYS_getdirentries	196
-#define	SYS_mmap	197
+#define	SYS_freebsd6_mmap	197
 #define	SYS___syscall	198
-#define	SYS_lseek	199
-#define	SYS_truncate	200
-#define	SYS_ftruncate	201
+#define	SYS_freebsd6_lseek	199
+#define	SYS_freebsd6_truncate	200
+#define	SYS_freebsd6_ftruncate	201
 #define	SYS_sysctl	202
 #define	SYS_mlock	203
 #define	SYS_munlock	204
@@ -221,12 +221,21 @@
 #define	SYS_clock_gettime	232
 #define	SYS_clock_settime	233
 #define	SYS_clock_getres	234
+#define	SYS_ktimer_create	235
+#define	SYS_ktimer_delete	236
+#define	SYS_ktimer_settime	237
+#define	SYS_ktimer_gettime	238
+#define	SYS_ktimer_getoverrun	239
 #define	SYS_nanosleep	240
+#define	SYS_ntp_gettime	248
 #define	SYS_minherit	250
 #define	SYS_rfork	251
 #define	SYS_openbsd_poll	252
 #define	SYS_issetugid	253
 #define	SYS_lchown	254
+#define	SYS_aio_read	255
+#define	SYS_aio_write	256
+#define	SYS_lio_listio	257
 #define	SYS_getdents	272
 #define	SYS_lchmod	274
 #define	SYS_netbsd_lchown	275
@@ -237,7 +246,7 @@
 #define	SYS_nlstat	280
 #define	SYS_preadv	289
 #define	SYS_pwritev	290
-				/* 297 is old fhstatfs */
+#define	SYS_freebsd4_fhstatfs	297
 #define	SYS_fhopen	298
 #define	SYS_fhstat	299
 #define	SYS_modnext	300
@@ -258,9 +267,9 @@
 #define	SYS_aio_suspend	315
 #define	SYS_aio_cancel	316
 #define	SYS_aio_error	317
-#define	SYS_aio_read	318
-#define	SYS_aio_write	319
-#define	SYS_lio_listio	320
+#define	SYS_oaio_read	318
+#define	SYS_oaio_write	319
+#define	SYS_olio_listio	320
 #define	SYS_yield	321
 				/* 322 is obsolete thr_sleep */
 				/* 323 is obsolete thr_wakeup */
@@ -276,14 +285,14 @@
 #define	SYS_sched_get_priority_min	333
 #define	SYS_sched_rr_get_interval	334
 #define	SYS_utrace	335
-				/* 336 is old sendfile */
+#define	SYS_freebsd4_sendfile	336
 #define	SYS_kldsym	337
 #define	SYS_jail	338
 #define	SYS_sigprocmask	340
 #define	SYS_sigsuspend	341
-				/* 342 is old sigaction */
+#define	SYS_freebsd4_sigaction	342
 #define	SYS_sigpending	343
-				/* 344 is old sigreturn */
+#define	SYS_freebsd4_sigreturn	344
 #define	SYS_sigtimedwait	345
 #define	SYS_sigwaitinfo	346
 #define	SYS_acl_get_file	347

@@ -23,15 +23,15 @@
 
 /* The real system call has a word of padding before the 64-bit off_t
    argument.  */
-extern int __syscall_truncate (const char *__file, int __unused1,
+extern int __syscall_freebsd6_truncate (const char *__file, int __unused1,
 			       __off_t __length) __THROW;
-libc_hidden_proto (__syscall_truncate)
+libc_hidden_proto (__syscall_freebsd6_truncate)
 
 int
 __truncate (const char *file, __off_t length)
 {
   /* We pass 2 arguments in 4 words.  */
-  return INLINE_SYSCALL (truncate, 2, file, 0, length);
+  return INLINE_SYSCALL (freebsd6_truncate, 2, file, 0, length);
 }
 
 weak_alias (__truncate, truncate)

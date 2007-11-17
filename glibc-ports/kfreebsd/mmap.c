@@ -25,15 +25,15 @@
 
 /* The real system call has a word of padding before the 64-bit off_t
    argument.  */
-extern void *__syscall_mmap (void *__addr, size_t __len, int __prot,
+extern void *__syscall_freebsd6_mmap (void *__addr, size_t __len, int __prot,
 			     int __flags, int __fd, int __unused1,
 			     __off_t __offset) __THROW;
-libc_hidden_proto (__syscall_mmap)
+libc_hidden_proto (__syscall_freebsd6_mmap)
 			     
-extern ssize_t __syscall_pread (int __fd, void *__buf, size_t __nbytes,
+extern ssize_t __syscall_freebsd6_pread (int __fd, void *__buf, size_t __nbytes,
                                 int __unused1, __off_t __offset) __THROW;
 
-libc_hidden_proto (__syscall_pread)
+libc_hidden_proto (__syscall_freebsd6_pread)
 void *
 __mmap (void *addr, size_t len, int prot, int flags, int fd, __off_t offset)
 {
@@ -60,8 +60,8 @@ __mmap (void *addr, size_t len, int prot, int flags, int fd, __off_t offset)
   /* We pass 7 arguments in 8 words.  */
   /* for ANON mapping we must pass -1 in place of fd */
   if (flags & MAP_ANON)
-    return INLINE_SYSCALL (mmap, 7, addr, len, prot, flags, -1, 0, offset);
-  result = INLINE_SYSCALL (mmap, 7, addr, len, prot, flags, fd, 0, offset);
+    return INLINE_SYSCALL (freebsd6_mmap, 7, addr, len, prot, flags, -1, 0, offset);
+  result = INLINE_SYSCALL (freebsd6_mmap, 7, addr, len, prot, flags, fd, 0, offset);
 
   if (result != (void *) (-1) && fd >= 0 && len > 0)
     {
@@ -71,7 +71,7 @@ __mmap (void *addr, size_t len, int prot, int flags, int fd, __off_t offset)
 	 do it here.  */
       char dummy;
 
-      INLINE_SYSCALL (pread, 5, fd, &dummy, 1, 0, offset);
+      INLINE_SYSCALL (freebsd6_pread, 5, fd, &dummy, 1, 0, offset);
     }
 
   return result;

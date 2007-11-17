@@ -24,16 +24,16 @@
 
 /* The real system call has a word of padding before the 64-bit off_t
    argument.  */
-extern __off_t __syscall_lseek (int __fd, int __unused1, __off_t __offset,
+extern __off_t __syscall_freebsd6_lseek (int __fd, int __unused1, __off_t __offset,
 				int __whence) __THROW;
-libc_hidden_proto (__syscall_lseek)
+libc_hidden_proto (__syscall_freebsd6_lseek)
 
 __off_t
 __libc_lseek (int fd, __off_t offset, int whence)
 {
 #if 0 /* If the kernel would work right... */
   /* We pass 3 arguments in 5 words.  */
-  return INLINE_SYSCALL (lseek, 3, fd, 0, offset, whence);
+  return INLINE_SYSCALL (freebsd6_lseek, 3, fd, 0, offset, whence);
 #else
   /* According to POSIX:2001, if the resulting file offset would become
      negative, this function has to return an EINVAL error and leave the
@@ -41,7 +41,7 @@ __libc_lseek (int fd, __off_t offset, int whence)
      so we emulate it.  */
   if (offset >= 0)
     /* No risk that the file offset could become negative.  */
-    return INLINE_SYSCALL (lseek, 3, fd, 0, offset, whence);
+    return INLINE_SYSCALL (freebsd6_lseek, 3, fd, 0, offset, whence);
   else
     {
       /* Test whether the file offset becomes negative.  */
@@ -50,9 +50,9 @@ __libc_lseek (int fd, __off_t offset, int whence)
       int saved_errno;
 
       saved_errno = errno;
-      old_position = INLINE_SYSCALL (lseek, 3, fd, 0, 0, SEEK_CUR);
+      old_position = INLINE_SYSCALL (freebsd6_lseek, 3, fd, 0, 0, SEEK_CUR);
       errno = 0;
-      new_position = INLINE_SYSCALL (lseek, 3, fd, 0, offset, whence);
+      new_position = INLINE_SYSCALL (freebsd6_lseek, 3, fd, 0, offset, whence);
       if (new_position < 0)
 	{
 	  if (errno == 0)
@@ -60,7 +60,7 @@ __libc_lseek (int fd, __off_t offset, int whence)
 	      /* The file offset became negative, and the kernel didn't
 		 notice it.  */
 	      if (old_position >= 0)
-		INLINE_SYSCALL (lseek, 3, fd, 0, old_position, SEEK_SET);
+		INLINE_SYSCALL (freebsd6_lseek, 3, fd, 0, old_position, SEEK_SET);
 	      new_position = -1;
 	      errno = EINVAL;
 	    }
