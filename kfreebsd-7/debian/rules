@@ -45,7 +45,7 @@ control: clean
 clean:
 	dh_testdir
 	dh_testroot
-	rm -rf src kfreebsd-source-* flavor-* config
+	rm -rf .pc src kfreebsd-source-* flavor-* config
 	rm -f debian/kfreebsd-image-*.postinst
 
 	rm -f *-stamp
@@ -71,7 +71,7 @@ src-stamp:
 		-e 's,#\( \|\t\)*include\( \|\t\)*\(<\|"\)pflog.h\(>\|"\),,g' \
 	; done)
 	
-	set -e ; cd $(CURDIR)/src ; QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a ; cd $(CURDIR)
+	set -e ; cd $(CURDIR)/src ; QUILT_PC=$(CURDIR)/.pc QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a ; cd $(CURDIR)
 
 	touch src-stamp
 
