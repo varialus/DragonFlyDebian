@@ -8,7 +8,7 @@ SHELL = bash
 #export DH_VERBOSE=1
 
 full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
-version		:= $(shell echo $(full_version) | sed -e 's/[+-~].*//g')
+version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 
@@ -72,11 +72,7 @@ src-stamp:
 		-e 's,#\( \|\t\)*include\( \|\t\)*\(<\|"\)pflog.h\(>\|"\),,g' \
 	; done)
 	
-	set -e ; for i in $(CURDIR)/debian/patches/*.diff ; do \
-		echo "--- Patch $$i ---" ; \
-		patch -p0 -d src/ --dry-run < $$i ; \
-		patch -p0 -d src/ < $$i >/dev/null ; \
-	done
+	set -e ; cd $(CURDIR)/src ; QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a ; cd $(CURDIR)
 
 	touch src-stamp
 

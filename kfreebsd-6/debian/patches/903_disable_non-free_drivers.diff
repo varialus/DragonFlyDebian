@@ -1,8 +1,8 @@
 Index: sys/conf/files
 ===================================================================
---- sys/conf/files.orig	2006-06-25 11:13:23.564594000 +0200
-+++ sys/conf/files	2006-06-25 11:13:30.000000000 +0200
-@@ -438,18 +437,6 @@
+--- sys/conf/files.orig
++++ sys/conf/files
+@@ -440,18 +440,6 @@
  dev/ata/atapi-cd.c		optional atapicd
  dev/ata/atapi-fd.c		optional atapifd
  dev/ata/atapi-tape.c		optional atapist
@@ -23,8 +23,8 @@ Index: sys/conf/files
  dev/awi/if_awi_pccard.c		optional awi pccard
 Index: sys/conf/files.i386
 ===================================================================
---- sys/conf/files.i386.orig	2006-06-25 11:13:23.586857000 +0200
-+++ sys/conf/files.i386	2006-06-25 11:13:30.000000000 +0200
+--- sys/conf/files.i386.orig
++++ sys/conf/files.i386
 @@ -46,42 +46,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
@@ -68,7 +68,7 @@ Index: sys/conf/files.i386
  #
  compat/linux/linux_file.c	optional compat_linux
  compat/linux/linux_getcwd.c	optional compat_linux
-@@ -181,11 +145,6 @@
+@@ -185,11 +149,6 @@
  dev/fdc/fdc_isa.c		optional fdc isa
  dev/fdc/fdc_pccard.c		optional fdc pccard
  dev/fe/if_fe_isa.c		optional fe isa
@@ -80,10 +80,10 @@ Index: sys/conf/files.i386
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_pentium.c	optional hwpmc
  dev/hwpmc/hwpmc_piv.c		optional hwpmc
-@@ -206,13 +165,9 @@
- dev/mem/memutil.c		optional mem
- dev/mse/mse.c			optional mse
- dev/mse/mse_isa.c		optional mse isa
+@@ -224,13 +183,9 @@
+ dev/mxge/mxge_eth_z8e.c		optional mxge pci
+ dev/mxge/mxge_ethp_z8e.c	optional mxge pci
+ net/zlib.c			optional mxge
 -dev/nve/if_nve.c		optional nve pci
  dev/ppc/ppc.c			optional ppc
  dev/ppc/ppc_puc.c		optional ppc puc pci
@@ -96,8 +96,8 @@ Index: sys/conf/files.i386
  dev/sbni/if_sbni_pci.c		optional sbni pci
 Index: sys/conf/kern.pre.mk
 ===================================================================
---- sys/conf/kern.pre.mk.orig	2006-06-25 11:13:23.609486000 +0200
-+++ sys/conf/kern.pre.mk	2006-06-25 11:13:30.000000000 +0200
+--- sys/conf/kern.pre.mk.orig
++++ sys/conf/kern.pre.mk
 @@ -58,9 +58,6 @@
  # ... and the same for pf
  INCLUDES+= -I$S/contrib/pf
@@ -110,9 +110,9 @@ Index: sys/conf/kern.pre.mk
  
 Index: sys/i386/conf/GENERIC
 ===================================================================
---- sys/i386/conf/GENERIC.orig	2006-06-25 11:13:23.666760000 +0200
-+++ sys/i386/conf/GENERIC	2006-06-25 11:16:32.056882000 +0200
-@@ -118,8 +118,6 @@
+--- sys/i386/conf/GENERIC.orig
++++ sys/i386/conf/GENERIC
+@@ -117,8 +117,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -121,9 +121,9 @@ Index: sys/i386/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -199,7 +197,6 @@
- device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
- device		lge		# Level 1 LXT1001 gigabit Ethernet
+@@ -200,7 +198,6 @@
+ device		msk		# Marvell/SysKonnect Yukon II Gigabit Ethernet
+ device		nfe		# nVidia nForce MCP on-board Ethernet Networking
  device		nge		# NatSemi DP83820 gigabit Ethernet
 -device		nve		# nVidia nForce MCP on-board Ethernet Networking
  device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
@@ -131,8 +131,8 @@ Index: sys/i386/conf/GENERIC
  device		rl		# RealTek 8129/8139
 Index: sys/modules/Makefile
 ===================================================================
---- sys/modules/Makefile.orig	2006-06-25 11:13:23.693634000 +0200
-+++ sys/modules/Makefile	2006-06-25 11:13:30.000000000 +0200
+--- sys/modules/Makefile.orig
++++ sys/modules/Makefile
 @@ -26,11 +26,6 @@
  	${_arl} \
  	${_asr} \
@@ -145,7 +145,7 @@ Index: sys/modules/Makefile
  	aue \
  	${_auxio} \
  	${_awi} \
-@@ -94,7 +89,6 @@
+@@ -96,7 +91,6 @@
  	${_hfa} \
  	hifn \
  	hme \
@@ -153,7 +153,7 @@ Index: sys/modules/Makefile
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -175,9 +169,7 @@
+@@ -185,9 +179,7 @@
  	ntfs \
  	ntfs_iconv \
  	nullfs \
@@ -163,7 +163,7 @@ Index: sys/modules/Makefile
  	${_osf1} \
  	${_padlock} \
  	patm \
-@@ -328,7 +320,6 @@
+@@ -343,7 +335,6 @@
  _apm=		apm
  _ar=		ar
  _arcnet=	arcnet
@@ -171,7 +171,7 @@ Index: sys/modules/Makefile
  _awi=		awi
  _bktr=		bktr
  _cardbus=	cardbus
-@@ -361,7 +352,6 @@
+@@ -377,7 +368,6 @@
  _ndis=		ndis
  _nsp=		nsp
  _nwfs=		nwfs
@@ -179,7 +179,7 @@ Index: sys/modules/Makefile
  _pccard=	pccard
  _pcfclock=	pcfclock
  _pecoff=	pecoff
-@@ -406,7 +396,6 @@
+@@ -415,7 +405,6 @@
  _dpt=		dpt
  _el=		el
  _ex=		ex
@@ -187,10 +187,10 @@ Index: sys/modules/Makefile
  _ichwd=		ichwd
  _ida=		ida
  _idt=		idt
-@@ -417,14 +406,12 @@
- _iwi=		iwi
+@@ -427,14 +416,12 @@
  _ixgb=  	ixgb
  _mly=		mly
+ _mxge=		mxge
 -_nve=		nve
  .if !defined(NO_CRYPT) || defined(ALL_MODULES)
  .if exists(${.CURDIR}/../crypto/via)
@@ -202,14 +202,15 @@ Index: sys/modules/Makefile
  _s3=		s3
  _twa=		twa
  _vesa=		vesa
-@@ -438,14 +426,12 @@
+@@ -461,7 +448,6 @@
  #_acpi=		acpi		# doesn't work on amd64 yet
  _agp=		agp
  _arcmsr=	arcmsr
 -_ath_hal=	ath_hal
  _ciss=		ciss
+ _coretemp=	coretemp
  _cpufreq=	cpufreq
- _digi=		digi
+@@ -469,7 +455,6 @@
  _drm=		drm
  _em=		em
  _ext2fs=	ext2fs
@@ -217,9 +218,9 @@ Index: sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -476,7 +461,6 @@
- _mly=		mly
+@@ -486,7 +471,6 @@
  _ndis=		ndis
+ _nve=		nve
  _ppc=		ppc
 -_rr232x=	rr232x
  _safe=		safe
@@ -227,9 +228,9 @@ Index: sys/modules/Makefile
  _smbfs=		smbfs
 Index: sys/amd64/conf/GENERIC
 ===================================================================
---- sys/amd64/conf/GENERIC.orig	2006-06-25 11:13:23.731156000 +0200
-+++ sys/amd64/conf/GENERIC	2006-06-25 11:16:32.094195000 +0200
-@@ -117,8 +117,6 @@
+--- sys/amd64/conf/GENERIC.orig
++++ sys/amd64/conf/GENERIC
+@@ -116,8 +116,6 @@
  device		arcmsr		# Areca SATA II RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -238,18 +239,18 @@ Index: sys/amd64/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -189,7 +187,6 @@
- device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
- device		lge		# Level 1 LXT1001 gigabit Ethernet
+@@ -191,7 +189,6 @@
+ device		msk		# Marvell/SysKonnect Yukon II Gigabit Ethernet
+ device		nfe		# nVidia nForce MCP on-board Ethernet Networking
  device		nge		# NatSemi DP83820 gigabit Ethernet
 -device		nve		# nVidia nForce MCP on-board Ethernet Networking
- device		pcn		# AMD Am79C97x PCI 10/100(precedence over 'lnc')
+ device		pcn		# AMD Am79C97x PCI 10/100 (precedence over 'le')
  device		re		# RealTek 8139C+/8169/8169S/8110S
  device		rl		# RealTek 8129/8139
 Index: sys/conf/files.amd64
 ===================================================================
---- sys/conf/files.amd64.orig	2006-06-25 11:13:23.636572000 +0200
-+++ sys/conf/files.amd64	2006-06-25 11:13:30.000000000 +0200
+--- sys/conf/files.amd64.orig
++++ sys/conf/files.amd64
 @@ -47,35 +47,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
@@ -286,7 +287,7 @@ Index: sys/conf/files.amd64
  #
  amd64/acpica/OsdEnvironment.c	optional	acpi
  amd64/acpica/acpi_machdep.c	optional	acpi
-@@ -160,11 +131,6 @@
+@@ -172,11 +143,6 @@
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
@@ -298,10 +299,10 @@ Index: sys/conf/files.amd64
  dev/hwpmc/hwpmc_amd.c		optional	hwpmc
  dev/hwpmc/hwpmc_piv.c		optional	hwpmc
  dev/hwpmc/hwpmc_x86.c		optional	hwpmc
-@@ -172,10 +138,6 @@
- dev/kbd/kbd.c			optional	sc
- dev/kbd/kbd.c			optional	ukbd
- dev/mem/memutil.c		optional	mem
+@@ -189,10 +155,6 @@
+ dev/mxge/mxge_eth_z8e.c		optional	mxge pci
+ dev/mxge/mxge_ethp_z8e.c	optional	mxge pci
+ net/zlib.c			optional	mxge
 -dev/nve/if_nve.c		optional	nve pci
 -dev/rr232x/os_bsd.c		optional	rr232x
 -dev/rr232x/osm_bsd.c		optional	rr232x
