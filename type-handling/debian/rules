@@ -36,7 +36,7 @@ clean:
 build: build-stamp
 build-stamp:
 	dh_testdir
-	sed -i -e "s%^Provides: .*%Provides: $(provides)%g" debian/control
+	sed -i -e "s%^Provides: .*%Provides: $(provides)%g" -e "s/_/-/g" debian/control
 
 	TYPE_HANDLING_BOOTSTRAP=yes ./type-handling any linux	> "any:linux"
 	TYPE_HANDLING_BOOTSTRAP=yes ./type-handling i386 any	> "i386:any"
