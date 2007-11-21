@@ -1,0 +1,13 @@
+* see http://sourceware.org/bugzilla/show_bug.cgi?id=5391
+
+--- src/sys/conf/kmod.mk~	2007-11-21 23:29:02.000000000 +0100
++++ src/sys/conf/kmod.mk	2007-11-21 23:29:02.000000000 +0100
+@@ -179,7 +179,7 @@
+ 
+ .if ${MACHINE_ARCH} != amd64
+ ${FULLPROG}: ${KMOD}.kld
+-	${LD} -Bshareable ${LDFLAGS} -o ${.TARGET} ${KMOD}.kld
++	${LD} -Bshareable -u __start_set_modmetadata_set -u __stop_set_modmetadata_set ${LDFLAGS} -o ${.TARGET} ${KMOD}.kld
+ .if !defined(DEBUG_FLAGS)
+ 	${OBJCOPY} --strip-debug ${.TARGET}
+ .endif
