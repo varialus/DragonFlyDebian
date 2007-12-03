@@ -1,15 +1,15 @@
 diff -ur sys.orig/dev/usb/usb.h sys/dev/usb/usb.h
 --- sys.orig/dev/usb/usb.h	2005-03-02 21:21:45.000000000 +0100
 +++ sys/dev/usb/usb.h	2005-03-02 21:26:56.000000000 +0100
-@@ -101,7 +101,7 @@
- #if defined(__FreeBSD_kernel__) && (__FreeBSD_version <= 500014)
- #define UPACKED __attribute__ ((packed))
- #else
--#define UPACKED __packed
-+#define UPACKED __attribute__ ((__packed__))
+@@ -98,7 +98,7 @@
+ #define USETDW(w,v) (*(u_int32_t *)(w) = (v))
  #endif
  
+-#define UPACKED __packed
++#define UPACKED __attribute__ ((__packed__))
+ 
  typedef struct {
+ 	uByte		bmRequestType;
 diff -ur sys.orig/i386/include/cpufunc.h sys/i386/include/cpufunc.h
 --- sys.orig/i386/include/cpufunc.h	2004-04-07 22:46:05.000000000 +0200
 +++ sys/i386/include/cpufunc.h	2005-03-02 21:28:56.000000000 +0100
