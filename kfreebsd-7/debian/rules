@@ -72,6 +72,8 @@ src-stamp:
 	; done)
 	
 	set -e ; cd $(CURDIR)/src ; QUILT_PC=$(CURDIR)/.pc QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a ; cd $(CURDIR)
+	install debian/gen-ld-u-options src/usr.sbin/config
+	grep -v ^__FBSDID src/sys/kern/subr_sbuf.c > src/usr.sbin/config/sbuf.c
 
 	touch src-stamp
 
@@ -104,7 +106,6 @@ install-indep-stamp: build-indep
 
 config: src
 	cp -af src/usr.sbin/config config
-	grep -v ^__FBSDID src/sys/kern/subr_sbuf.c > config/sbuf.c
 	$(MAKE) -C config
 
 build-arch: $(foreach flavor,$(flavours),build-flavor-$(flavor)-stamp)

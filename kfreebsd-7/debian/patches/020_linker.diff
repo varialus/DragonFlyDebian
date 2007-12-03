@@ -1,0 +1,33 @@
+
+  current ld provides magic symbols with names like __start_* and __stop_*
+  only if they are referenced, FreeBSD kernel needs them,
+  for details see http://sourceware.org/bugzilla/show_bug.cgi?id=5391
+
+
+diff -u sys/conf/kern.post.mk sys/conf/kern.post.mk
+--- sys/conf/kern.post.mk
++++ sys/conf/kern.post.mk
+@@ -82,7 +92,9 @@
+ ${FULLKERNEL}: ${SYSTEM_DEP} vers.o
+ 	@rm -f ${.TARGET}
+ 	@echo linking ${.TARGET}
+-	${SYSTEM_LD}
++	${SYSTEM_LD} -o ${.TARGET}.tmp
++	gen-ld-u-options ${.TARGET}.tmp > ${.TARGET}.lopt
++	${SYSTEM_LD} "@${.TARGET}.lopt"
+ .if !defined(DEBUG)
+ 	${OBJCOPY} --strip-debug ${.TARGET}
+ .endif
+diff -u sys/conf/kmod.mk sys/conf/kmod.mk
+--- sys/conf/kmod.mk
++++ sys/conf/kmod.mk
+@@ -179,7 +179,8 @@
+ 
+ .if ${MACHINE_ARCH} != amd64
+ ${FULLPROG}: ${KMOD}.kld
+-	${LD} -Bshareable ${LDFLAGS} -o ${.TARGET} ${KMOD}.kld
++	gen-ld-u-options ${KMOD}.kld > ${KMOD}.lopt
++	${LD} -Bshareable ${LDFLAGS} -o ${.TARGET} ${KMOD}.kld "@${KMOD}.lopt"
+ .if !defined(DEBUG_FLAGS)
+ 	${OBJCOPY} --strip-debug ${.TARGET}
+ .endif
