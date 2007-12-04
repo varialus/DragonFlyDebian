@@ -125,13 +125,18 @@ diff -urN src/contrib/pf/pfctl/pfctl_parser.c src/contrib/pf/pfctl/pfctl_parser.
  #include <netinet/icmp6.h>
  #include <net/pfvar.h>
  #include <arpa/inet.h>
-@@ -58,6 +58,9 @@
+@@ -58,6 +58,14 @@
  #include <err.h>
  #include <ifaddrs.h>
  
 +#include <bsd/ip_icmp.h>
 +#include <bsd/bsd.h>
 +
++/* RFC2292 decls */
++#define ICMP6_MEMBERSHIP_QUERY          130     /* group membership query */
++#define ICMP6_MEMBERSHIP_REPORT         131     /* group membership report */
++#define ICMP6_MEMBERSHIP_REDUCTION      132     /* group membership termination */
++#define ICMP6_DST_UNREACH_NOTNEIGHBOR 2 /* not a neighbor(obsolete) */
  #include "pfctl_parser.h"
  #include "pfctl.h"
  
