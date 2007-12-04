@@ -248,18 +248,6 @@ diff -ur src.old/usr.sbin/mtree/misc.c src/usr.sbin/mtree/misc.c
  	return string;
  }
 +#endif /* __FreeBSD__ */
-diff -ur src.old/usr.sbin/mtree/mtree.c src/usr.sbin/mtree/mtree.c
---- src.old/usr.sbin/mtree/mtree.c	2004-06-04 21:29:28.000000000 +0200
-+++ src/usr.sbin/mtree/mtree.c	2006-02-09 19:27:56.000000000 +0100
-@@ -164,7 +164,7 @@
- 	if (dir && chdir(dir))
- 		err(1, "%s", dir);
- 
--	if ((cflag || sflag) && !getwd(fullpath))
-+	if ((cflag || sflag) && !getcwd(fullpath, MAXPATHLEN))
- 		errx(1, "%s", fullpath);
- 
- 	if (cflag) {
 diff -ur src.old/usr.sbin/mtree/mtree.h src/usr.sbin/mtree/mtree.h
 --- src.old/usr.sbin/mtree/mtree.h	2005-03-29 13:44:17.000000000 +0200
 +++ src/usr.sbin/mtree/mtree.h	2006-02-09 19:27:56.000000000 +0100
