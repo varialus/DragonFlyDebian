@@ -21,12 +21,6 @@ ifeq (linux,$(DEB_HOST_ARCH_OS))
 CFLAGS += -D_FILE_OFFSET_BITS=64
 endif
 
-# on GNU/kFreeBSD every feature should be available
-ifeq (kfreebsd,$(DEB_HOST_ARCH_OS))
-CFLAGS += -DHAVE_BSD_ERRNO -DHAVE_BSD_SIGNALS -DHAVE_BSD_STATFS
-# not yet: -DHAVE_BSD_DISKLABEL -DHAVE_BSD_MOUNT -DHAVE_UFS_SNAPSHOT -DHAVE_BSD_SYSCTL
-endif
-
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
 else

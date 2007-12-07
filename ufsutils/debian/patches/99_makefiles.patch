@@ -1,7 +1,8 @@
 #DPATCHLEVEL=1
-diff -Naur ufsutils.orig/Makefile ufsutils.new/Makefile
---- ufsutils.orig/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ ufsutils.new/Makefile	2004-05-03 12:38:33.000000000 +0200
+Index: ufsutils/Makefile
+===================================================================
+--- /dev/null
++++ ufsutils/Makefile
 @@ -0,0 +1,28 @@
 +#
 +# ufsutils Makefile
@@ -31,10 +32,11 @@ diff -Naur ufsutils.orig/Makefile ufsutils.new/Makefile
 +
 +.PHONY: all clean install $(SUBDIRS) $(clean_targets) $(install_targets)
 +
-diff -Naur ufsutils.orig/Makefile.common ufsutils.new/Makefile.common
---- ufsutils.orig/Makefile.common	1970-01-01 01:00:00.000000000 +0100
-+++ ufsutils.new/Makefile.common	2004-05-16 23:17:22.000000000 +0200
-@@ -0,0 +1,90 @@
+Index: ufsutils/Makefile.common
+===================================================================
+--- /dev/null
++++ ufsutils/Makefile.common
+@@ -0,0 +1,92 @@
 +#
 +# $Id: Makefile.common 45 2004-05-03 11:07:29Z guillem $
 +#
@@ -47,8 +49,10 @@ diff -Naur ufsutils.orig/Makefile.common ufsutils.new/Makefile.common
 +mandir = $(datadir)/man
 +man8dir = $(mandir)/man8
 +
++LDADD += -lbsd -lfreebsd
 +CFLAGS ?= -Wall -g -O2
 +ALL_CFLAGS += -I../include -include port/port.h -D_GNU_SOURCE
++# -DHAVE_BSD_ERRNO -DHAVE_BSD_SIGNALS -DHAVE_BSD_STATFS -DHAVE_BSD_DISKLABEL -DHAVE_BSD_MOUNT -DHAVE_UFS_SNAPSHOT -DHAVE_BSD_SYSCTL
 +
 +INSTALL = install
 +INSTALL_PROG = $(INSTALL)

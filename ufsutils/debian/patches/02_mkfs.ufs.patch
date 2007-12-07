@@ -1,7 +1,8 @@
 #DPATCHLEVEL=1
-diff -Naur ufsutils.orig/mkfs.ufs/mkfs.c ufsutils.new/mkfs.ufs/mkfs.c
---- ufsutils.orig/mkfs.ufs/mkfs.c	2004-04-09 21:58:33.000000000 +0200
-+++ ufsutils.new/mkfs.ufs/mkfs.c	2004-05-13 08:22:41.000000000 +0200
+Index: ufsutils/mkfs.ufs/mkfs.c
+===================================================================
+--- ufsutils.orig/mkfs.ufs/mkfs.c
++++ ufsutils/mkfs.ufs/mkfs.c
 @@ -53,6 +53,7 @@
  #include <stdint.h>
  #include <stdio.h>
@@ -10,9 +11,10 @@ diff -Naur ufsutils.orig/mkfs.ufs/mkfs.c ufsutils.new/mkfs.ufs/mkfs.c
  #include <sys/param.h>
  #include <sys/time.h>
  #include <sys/types.h>
-diff -Naur ufsutils.orig/mkfs.ufs/newfs.c ufsutils.new/mkfs.ufs/newfs.c
---- ufsutils.orig/mkfs.ufs/newfs.c	2004-04-09 21:58:34.000000000 +0200
-+++ ufsutils.new/mkfs.ufs/newfs.c	2004-06-29 22:43:50.000000000 +0200
+Index: ufsutils/mkfs.ufs/newfs.c
+===================================================================
+--- ufsutils.orig/mkfs.ufs/newfs.c
++++ ufsutils/mkfs.ufs/newfs.c
 @@ -55,7 +55,6 @@
   */
  #include <sys/param.h>
@@ -21,7 +23,7 @@ diff -Naur ufsutils.orig/mkfs.ufs/newfs.c ufsutils.new/mkfs.ufs/newfs.c
  #include <sys/disklabel.h>
  #include <sys/file.h>
  #include <sys/mount.h>
-@@ -137,6 +136,7 @@
+@@ -140,6 +139,7 @@
  static char	device[MAXPATHLEN];
  static char	*disktype;
  static int	unlabeled;
@@ -29,16 +31,16 @@ diff -Naur ufsutils.orig/mkfs.ufs/newfs.c ufsutils.new/mkfs.ufs/newfs.c
  
  static struct disklabel *getdisklabel(char *s);
  static void rewritelabel(char *s, struct disklabel *lp);
-@@ -153,6 +153,8 @@
+@@ -156,6 +156,8 @@
  	int ch, i;
  	off_t mediasize;
  
 +	progname = argv[0];
 +
  	while ((ch = getopt(argc, argv,
- 	    "EL:NO:RS:T:Ua:b:c:d:e:f:g:h:i:lm:o:s:")) != -1)
+ 	    "EJL:NO:RS:T:Ua:b:c:d:e:f:g:h:i:lm:no:s:")) != -1)
  		switch (ch) {
-@@ -286,12 +288,19 @@
+@@ -297,12 +299,19 @@
  	}
  	if (fstat(disk.d_fd, &st) < 0)
  		err(1, "%s", special);
@@ -59,7 +61,7 @@ diff -Naur ufsutils.orig/mkfs.ufs/newfs.c ufsutils.new/mkfs.ufs/newfs.c
  		if (fssize == 0)
  			fssize = mediasize / sectorsize;
  		else if (fssize > mediasize / sectorsize)
-@@ -364,7 +373,7 @@
+@@ -375,7 +384,7 @@
  			pp->p_size *= secperblk;
  	}
  	mkfs(pp, special);
@@ -68,7 +70,7 @@ diff -Naur ufsutils.orig/mkfs.ufs/newfs.c ufsutils.new/mkfs.ufs/newfs.c
  		if (realsectorsize != DEV_BSIZE)
  			pp->p_size /= realsectorsize / DEV_BSIZE;
  		if (!Nflag && bcmp(pp, &oldpartition, sizeof(oldpartition)))
-@@ -377,6 +386,7 @@
+@@ -388,6 +397,7 @@
  struct disklabel *
  getdisklabel(char *s)
  {
@@ -76,7 +78,7 @@ diff -Naur ufsutils.orig/mkfs.ufs/newfs.c ufsutils.new/mkfs.ufs/newfs.c
  	static struct disklabel lab;
  	struct disklabel *lp;
  
-@@ -388,6 +398,7 @@
+@@ -399,6 +409,7 @@
  		if (lp != NULL)
  			return (lp);
  	}
@@ -84,7 +86,7 @@ diff -Naur ufsutils.orig/mkfs.ufs/newfs.c ufsutils.new/mkfs.ufs/newfs.c
  	return (NULL);
  }
  
-@@ -398,8 +409,10 @@
+@@ -409,8 +420,10 @@
  		return;
  	lp->d_checksum = 0;
  	lp->d_checksum = dkcksum(lp);
@@ -95,7 +97,7 @@ diff -Naur ufsutils.orig/mkfs.ufs/newfs.c ufsutils.new/mkfs.ufs/newfs.c
  }
  
  static void
-@@ -407,7 +420,7 @@
+@@ -418,7 +431,7 @@
  {
  	fprintf(stderr,
  	    "usage: %s [ -fsoptions ] special-device%s\n",
@@ -103,10 +105,11 @@ diff -Naur ufsutils.orig/mkfs.ufs/newfs.c ufsutils.new/mkfs.ufs/newfs.c
 +	    progname,
  	    " [device-type]");
  	fprintf(stderr, "where fsoptions are:\n");
- 	fprintf(stderr, "\t-L volume label to add to superblock\n");
-diff -Naur ufsutils.orig/mkfs.ufs/Makefile ufsutils.new/mkfs.ufs/Makefile
---- ufsutils.orig/mkfs.ufs/Makefile	2003-02-11 04:06:45.000000000 +0100
-+++ ufsutils.new/mkfs.ufs/Makefile	2004-06-29 22:56:48.000000000 +0200
+ 	fprintf(stderr, "\t-J Enable journaling via gjournal\n");
+Index: ufsutils/mkfs.ufs/Makefile
+===================================================================
+--- ufsutils.orig/mkfs.ufs/Makefile
++++ ufsutils/mkfs.ufs/Makefile
 @@ -1,17 +1,20 @@
  #	@(#)Makefile	8.2 (Berkeley) 3/27/94
  # $FreeBSD: src/sbin/newfs/Makefile,v 1.22 2003/02/11 03:06:45 jmallett Exp $

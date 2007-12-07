@@ -1,7 +1,8 @@
 #DPATCHLEVEL=1
-diff -Naur ufsutils.orig/tunefs.ufs/tunefs.c ufsutils.new/tunefs.ufs/tunefs.c
---- ufsutils.orig/tunefs.ufs/tunefs.c	2004-04-09 21:58:40.000000000 +0200
-+++ ufsutils.new/tunefs.ufs/tunefs.c	2004-05-16 23:15:29.000000000 +0200
+Index: ufsutils/tunefs.ufs/tunefs.c
+===================================================================
+--- ufsutils.orig/tunefs.ufs/tunefs.c
++++ ufsutils/tunefs.ufs/tunefs.c
 @@ -48,8 +48,15 @@
  #include <sys/mount.h>
  #include <sys/disklabel.h>
@@ -31,7 +32,7 @@ diff -Naur ufsutils.orig/tunefs.ufs/tunefs.c ufsutils.new/tunefs.ufs/tunefs.c
  
  	if (argc < 3)
  		usage();
-@@ -228,9 +239,11 @@
+@@ -241,9 +252,11 @@
  		goto err;
  	if (disk.d_name != special) {
  		special = disk.d_name;
@@ -43,7 +44,7 @@ diff -Naur ufsutils.orig/tunefs.ufs/tunefs.c ufsutils.new/tunefs.ufs/tunefs.c
  	}
  
  	if (pflag) {
-@@ -369,6 +382,7 @@
+@@ -402,6 +415,7 @@
  	if (sbwrite(&disk, Aflag) == -1)
  		goto err;
  	ufs_disk_close(&disk);
@@ -51,7 +52,7 @@ diff -Naur ufsutils.orig/tunefs.ufs/tunefs.c ufsutils.new/tunefs.ufs/tunefs.c
  	if (active) {
  		bzero(&args, sizeof(args));
  		if (mount("ufs", on,
-@@ -376,6 +390,7 @@
+@@ -409,6 +423,7 @@
  			err(9, "%s: reload", special);
  		warnx("file system reloaded");
  	}
@@ -59,9 +60,10 @@ diff -Naur ufsutils.orig/tunefs.ufs/tunefs.c ufsutils.new/tunefs.ufs/tunefs.c
  	exit(0);
  err:
  	if (disk.d_error != NULL)
-diff -Naur ufsutils.orig/tunefs.ufs/Makefile ufsutils.new/tunefs.ufs/Makefile
---- ufsutils.orig/tunefs.ufs/Makefile	2003-01-23 09:15:05.000000000 +0100
-+++ ufsutils.new/tunefs.ufs/Makefile	2004-05-16 21:39:19.000000000 +0200
+Index: ufsutils/tunefs.ufs/Makefile
+===================================================================
+--- ufsutils.orig/tunefs.ufs/Makefile
++++ ufsutils/tunefs.ufs/Makefile
 @@ -1,9 +1,12 @@
  #	@(#)Makefile	8.1 (Berkeley) 6/5/93
  # $FreeBSD: src/sbin/tunefs/Makefile,v 1.8 2003/01/23 08:15:05 ru Exp $

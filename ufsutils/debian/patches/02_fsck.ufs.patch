@@ -1,8 +1,8 @@
 #DPATCHLEVEL=1
 Index: ufsutils/fsck.ufs/ea.c
 ===================================================================
---- ufsutils.orig/fsck.ufs/ea.c	2007-12-07 20:12:55.802672000 +0100
-+++ ufsutils/fsck.ufs/ea.c	2007-12-07 20:13:27.000000000 +0100
+--- ufsutils.orig/fsck.ufs/ea.c
++++ ufsutils/fsck.ufs/ea.c
 @@ -38,7 +38,7 @@
  
  #include <sys/param.h>
@@ -14,8 +14,8 @@ Index: ufsutils/fsck.ufs/ea.c
  #include <ufs/ufs/dir.h>
 Index: ufsutils/fsck.ufs/fsck_ffs.8
 ===================================================================
---- ufsutils.orig/fsck.ufs/fsck_ffs.8	2007-12-07 20:12:55.826237000 +0100
-+++ ufsutils/fsck.ufs/fsck_ffs.8	2007-12-07 20:13:27.000000000 +0100
+--- ufsutils.orig/fsck.ufs/fsck_ffs.8
++++ ufsutils/fsck.ufs/fsck_ffs.8
 @@ -30,11 +30,11 @@
  .\" $FreeBSD: src/sbin/fsck_ffs/fsck_ffs.8,v 1.34 2005/09/20 08:02:38 delphij Exp $
  .\"
@@ -39,8 +39,8 @@ Index: ufsutils/fsck.ufs/fsck_ffs.8
  .Xr reboot 8
 Index: ufsutils/fsck.ufs/fsutil.c
 ===================================================================
---- ufsutils.orig/fsck.ufs/fsutil.c	2007-12-07 20:12:55.849909000 +0100
-+++ ufsutils/fsck.ufs/fsutil.c	2007-12-07 20:13:27.000000000 +0100
+--- ufsutils.orig/fsck.ufs/fsutil.c
++++ ufsutils/fsck.ufs/fsutil.c
 @@ -38,7 +38,9 @@
  #include <sys/param.h>
  #include <sys/time.h>
@@ -123,8 +123,8 @@ Index: ufsutils/fsck.ufs/fsutil.c
  }
 Index: ufsutils/fsck.ufs/inode.c
 ===================================================================
---- ufsutils.orig/fsck.ufs/inode.c	2007-12-07 20:12:55.873602000 +0100
-+++ ufsutils/fsck.ufs/inode.c	2007-12-07 20:13:27.000000000 +0100
+--- ufsutils.orig/fsck.ufs/inode.c
++++ ufsutils/fsck.ufs/inode.c
 @@ -36,7 +36,7 @@
  __FBSDID("$FreeBSD: src/sbin/fsck_ffs/inode.c,v 1.38 2006/10/31 22:06:56 pjd Exp $");
  
@@ -144,8 +144,8 @@ Index: ufsutils/fsck.ufs/inode.c
  
 Index: ufsutils/fsck.ufs/main.c
 ===================================================================
---- ufsutils.orig/fsck.ufs/main.c	2007-12-07 20:12:55.898546000 +0100
-+++ ufsutils/fsck.ufs/main.c	2007-12-07 20:14:13.000000000 +0100
+--- ufsutils.orig/fsck.ufs/main.c
++++ ufsutils/fsck.ufs/main.c
 @@ -45,9 +45,16 @@
  #include <sys/stat.h>
  #include <sys/file.h>
@@ -163,13 +163,7 @@ Index: ufsutils/fsck.ufs/main.c
  #include <sys/uio.h>
  #include <sys/disklabel.h>
  
-@@ -58,18 +65,24 @@
- #include <errno.h>
- #include <fstab.h>
- #include <grp.h>
-+#if 0
- #include <mntopts.h>
-+#endif
+@@ -62,14 +69,18 @@
  #include <paths.h>
  #include <stdint.h>
  #include <string.h>
@@ -189,7 +183,7 @@ Index: ufsutils/fsck.ufs/main.c
  
  int
  main(int argc, char *argv[])
-@@ -78,10 +91,11 @@
+@@ -78,10 +89,11 @@
  	struct rlimit rlimit;
  	struct itimerval itimerval;
  	int ret = 0;
@@ -202,7 +196,7 @@ Index: ufsutils/fsck.ufs/main.c
  		switch (ch) {
  		case 'b':
  			skipclean = 0;
-@@ -125,6 +139,7 @@
+@@ -125,6 +137,7 @@
  			yflag = 0;
  			break;
  
@@ -210,7 +204,7 @@ Index: ufsutils/fsck.ufs/main.c
  		case 'p':
  			preen++;
  			break;
-@@ -135,20 +150,22 @@
+@@ -135,20 +148,22 @@
  			break;
  
  		default:
@@ -235,7 +229,7 @@ Index: ufsutils/fsck.ufs/main.c
  	if (bkgrdflag) {
  		signal(SIGALRM, alarmhandler);
  		itimerval.it_interval.tv_sec = 5;
-@@ -195,8 +212,10 @@
+@@ -195,8 +210,10 @@
  	ufs2_daddr_t n_ffree, n_bfree;
  	struct dups *dp;
  	struct statfs *mntp;
@@ -246,7 +240,7 @@ Index: ufsutils/fsck.ufs/main.c
  	ufs2_daddr_t blks;
  	struct iovec *iov;
  	char errmsg[255];
-@@ -218,10 +237,12 @@
+@@ -218,10 +235,12 @@
  	 * if it is listed among the mounted file systems. Failing that
  	 * check to see if it is listed in /etc/fstab.
  	 */
@@ -259,7 +253,7 @@ Index: ufsutils/fsck.ufs/main.c
  		filesys = blockcheck(filesys);
  	/*
  	 * If -F flag specified, check to see whether a background check
-@@ -239,8 +260,10 @@
+@@ -239,8 +258,10 @@
  		if ((sblock.fs_flags & FS_DOSOFTDEP) == 0)
  			exit(5);	/* Not running soft updates */
  		size = MIBSIZE;
@@ -270,7 +264,7 @@ Index: ufsutils/fsck.ufs/main.c
  		if ((mntp == NULL && sblock.fs_clean == 1) ||
  		    (mntp != NULL && (sblock.fs_flags & FS_UNCLEAN) == 0))
  			exit(7);	/* Filesystem clean, report it now */
-@@ -278,6 +301,7 @@
+@@ -278,6 +299,7 @@
  	 *	return created snapshot file
  	 *	if not found, clear bkgrdflag and proceed with normal fsck
  	 */
@@ -278,7 +272,7 @@ Index: ufsutils/fsck.ufs/main.c
  	if (bkgrdflag) {
  		if (mntp == NULL) {
  			bkgrdflag = 0;
-@@ -365,6 +389,7 @@
+@@ -365,6 +387,7 @@
  				filesys = snapname;
  		}
  	}
@@ -286,7 +280,7 @@ Index: ufsutils/fsck.ufs/main.c
  
  	switch (setup(filesys)) {
  	case 0:
-@@ -372,7 +397,9 @@
+@@ -372,7 +395,9 @@
  			pfatal("CAN'T CHECK FILE SYSTEM.");
  		return (0);
  	case -1:
@@ -296,7 +290,7 @@ Index: ufsutils/fsck.ufs/main.c
  		pwarn("clean, %ld free ", (long)(sblock.fs_cstotal.cs_nffree +
  		    sblock.fs_frag * sblock.fs_cstotal.cs_nbfree));
  		printf("(%lld frags, %lld blocks, %.1f%% fragmentation)\n",
-@@ -392,8 +419,10 @@
+@@ -392,8 +417,10 @@
  	 */
  	if (preen == 0) {
  		printf("** Last Mounted on %s\n", sblock.fs_fsmnt);
@@ -307,7 +301,7 @@ Index: ufsutils/fsck.ufs/main.c
  		printf("** Phase 1 - Check Blocks and Sizes\n");
  	}
  	pass1();
-@@ -492,8 +521,13 @@
+@@ -492,8 +519,13 @@
  	/*
  	 * Check to see if the file system is mounted read-write.
  	 */
@@ -321,7 +315,7 @@ Index: ufsutils/fsck.ufs/main.c
  	ckfini(resolved);
  
  	for (cylno = 0; cylno < sblock.fs_ncg; cylno++)
-@@ -536,6 +570,8 @@
+@@ -536,6 +568,8 @@
  	 * it unless it is read-write, so we can continue using it
  	 * as safely as possible.
  	 */
@@ -330,7 +324,7 @@ Index: ufsutils/fsck.ufs/main.c
  	if (mntp->f_flags & MNT_RDONLY) {
  		/*
  		 * XXX: Need to kick out MNT_ROOTFS until we fix
-@@ -558,8 +594,12 @@
+@@ -558,8 +592,12 @@
  		return (1);
  	}
  	return (0);
@@ -343,7 +337,7 @@ Index: ufsutils/fsck.ufs/main.c
  /*
   * Get the mount point information for name.
   */
-@@ -599,13 +639,14 @@
+@@ -599,13 +637,14 @@
  	statfsp = NULL;
  	return (statfsp);
  }
@@ -362,8 +356,8 @@ Index: ufsutils/fsck.ufs/main.c
  }
 Index: ufsutils/fsck.ufs/pass1.c
 ===================================================================
---- ufsutils.orig/fsck.ufs/pass1.c	2007-12-07 20:12:55.922248000 +0100
-+++ ufsutils/fsck.ufs/pass1.c	2007-12-07 20:13:27.000000000 +0100
+--- ufsutils.orig/fsck.ufs/pass1.c
++++ ufsutils/fsck.ufs/pass1.c
 @@ -317,9 +317,11 @@
  	inoinfo(inumber)->ino_type = IFTODT(mode);
  	badblk = dupblk = 0;
@@ -378,8 +372,8 @@ Index: ufsutils/fsck.ufs/pass1.c
  	if (sblock.fs_magic == FS_UFS2_MAGIC && dp->dp2.di_extsize > 0) {
 Index: ufsutils/fsck.ufs/setup.c
 ===================================================================
---- ufsutils.orig/fsck.ufs/setup.c	2007-12-07 20:12:55.945794000 +0100
-+++ ufsutils/fsck.ufs/setup.c	2007-12-07 20:13:27.000000000 +0100
+--- ufsutils.orig/fsck.ufs/setup.c
++++ ufsutils/fsck.ufs/setup.c
 @@ -36,11 +36,14 @@
  __FBSDID("$FreeBSD: src/sbin/fsck_ffs/setup.c,v 1.50 2006/10/31 22:06:56 pjd Exp $");
  
@@ -464,8 +458,8 @@ Index: ufsutils/fsck.ufs/setup.c
  }
 Index: ufsutils/fsck.ufs/utilities.c
 ===================================================================
---- ufsutils.orig/fsck.ufs/utilities.c	2007-12-07 20:12:55.969243000 +0100
-+++ ufsutils/fsck.ufs/utilities.c	2007-12-07 20:13:27.000000000 +0100
+--- ufsutils.orig/fsck.ufs/utilities.c
++++ ufsutils/fsck.ufs/utilities.c
 @@ -108,14 +108,16 @@
  	return (origname);
  }
@@ -487,9 +481,9 @@ Index: ufsutils/fsck.ufs/utilities.c
  }
 Index: ufsutils/fsck.ufs/Makefile
 ===================================================================
---- ufsutils.orig/fsck.ufs/Makefile	2007-12-07 20:12:55.999974000 +0100
-+++ ufsutils/fsck.ufs/Makefile	2007-12-07 20:14:33.000000000 +0100
-@@ -1,19 +1,17 @@
+--- ufsutils.orig/fsck.ufs/Makefile
++++ ufsutils/fsck.ufs/Makefile
+@@ -1,19 +1,18 @@
  # $FreeBSD: src/sbin/fsck_ffs/Makefile,v 1.18 2007/09/19 01:24:19 rodrigc Exp $
  #	@(#)Makefile	8.2 (Berkeley) 4/27/95
  
@@ -512,11 +506,12 @@ Index: ufsutils/fsck.ufs/Makefile
 +MAN = fsck_ffs.8:fsck.ufs.8
 +UFS_SRCS = ../include/ufs/ffs/ffs_subr.c ../include/ufs/ffs/ffs_tables.c
 +LIBSRCS= dir.c ea.c fsutil.c inode.c pass1.c pass1b.c pass2.c pass3.c \
-+	pass4.c pass5.c setup.c utilities.c $(UFS_SRCS) gjournal.c
++	pass4.c pass5.c setup.c utilities.c $(UFS_SRCS) gjournal.c \
++	../mount/getmntopts.c
  
 -.PATH:	${.CURDIR}/../../sys/ufs/ffs ${.CURDIR}/../mount
 +LDADD = -L../libport -lport -L. -l$(LIB) -L../libufs -lufs
-+INCLUDES = -I. -I../libufs
++INCLUDES = -I. -I../libufs -I../mount
 +
 +include ../Makefile.common
  

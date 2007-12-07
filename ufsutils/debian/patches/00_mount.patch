@@ -1,8 +1,8 @@
 #DPATCHLEVEL=1
-Index: ufsutils/include/sys/mount.h
+Index: ufsutils/freebsd/sys/mount.h
 ===================================================================
---- ufsutils.orig/include/sys/mount.h	2007-09-12 18:31:32.000000000 +0200
-+++ ufsutils/include/sys/mount.h	2007-12-07 18:58:42.000000000 +0100
+--- ufsutils.orig/freebsd/sys/mount.h
++++ ufsutils/freebsd/sys/mount.h
 @@ -34,14 +34,11 @@
  #define _SYS_MOUNT_H_
  
@@ -22,7 +22,7 @@ Index: ufsutils/include/sys/mount.h
  
  /*
   * File identifier.
-@@ -60,6 +56,7 @@
+@@ -60,6 +57,7 @@
   */
  #define	MFSNAMELEN	16		/* length of type name including null */
  #define	MNAMELEN	88		/* size of on/from name bufs */
@@ -30,7 +30,7 @@ Index: ufsutils/include/sys/mount.h
  #define	STATFS_VERSION	0x20030518	/* current version number */
  struct statfs {
  	uint32_t f_version;		/* structure version number */
-@@ -209,6 +206,7 @@
+@@ -209,6 +207,7 @@
  } while (0)
  
  #endif /* _KERNEL */
@@ -38,7 +38,7 @@ Index: ufsutils/include/sys/mount.h
  
  /*
   * User specifiable flags.
-@@ -383,6 +381,7 @@
+@@ -383,6 +382,7 @@
  	char		*np_index;	/* Index file */
  };
  
@@ -46,7 +46,7 @@ Index: ufsutils/include/sys/mount.h
  /*
   * Filesystem configuration information. One of these exists for each
   * type of filesystem supported by the kernel. These are searched at
-@@ -420,6 +419,7 @@
+@@ -420,6 +420,7 @@
  	int	vfc_flags;
  };
  #endif
@@ -54,7 +54,7 @@ Index: ufsutils/include/sys/mount.h
  
  /*
   * NB: these flags refer to IMPLEMENTATION properties, not properties of
-@@ -484,6 +484,7 @@
+@@ -484,6 +485,7 @@
  #define VQ_FLAG4000	0x4000	/* placeholder */
  #define VQ_FLAG8000	0x8000	/* placeholder */
  
@@ -62,7 +62,7 @@ Index: ufsutils/include/sys/mount.h
  #ifdef _KERNEL
  /* Point a sysctl request at a vfsidctl's data. */
  #define VCTLTOREQ(vc, req)						\
-@@ -739,5 +740,5 @@
+@@ -739,5 +741,5 @@
  __END_DECLS
  
  #endif /* _KERNEL */

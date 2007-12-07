@@ -1,9 +1,13 @@
 #DPATCHLEVEL=1
-Index: uf-a/growfs.ufs/growfs.c
+Index: ufsutils/growfs.ufs/growfs.c
 ===================================================================
---- uf-a.orig/growfs.ufs/growfs.c	2007-01-18 11:14:06.000000000 +0100
-+++ uf-a/growfs.ufs/growfs.c	2007-01-18 11:14:17.000000000 +0100
-@@ -54,7 +54,6 @@
+--- ufsutils.orig/growfs.ufs/growfs.c
++++ ufsutils/growfs.ufs/growfs.c
+@@ -51,10 +51,10 @@
+ 
+ /* ********************************************************** INCLUDES ***** */
+ #include <sys/param.h>
++#define rounddown(x, y) (((x)/(y))*(y))
  #include <sys/disklabel.h>
  #include <sys/ioctl.h>
  #include <sys/stat.h>
@@ -11,7 +15,7 @@ Index: uf-a/growfs.ufs/growfs.c
  
  #include <stdio.h>
  #include <paths.h>
-@@ -1930,10 +1929,12 @@
+@@ -1929,10 +1929,12 @@
     int sectorsize;
     off_t mediasize;
  
@@ -24,7 +28,7 @@ Index: uf-a/growfs.ufs/growfs.c
  
     if (sectorsize <= 0)
         errx(1, "bogus sectorsize: %d", sectorsize);
-@@ -2289,9 +2290,11 @@
+@@ -2288,9 +2290,11 @@
  		}
  		lp->d_checksum=sum;
  
@@ -36,7 +40,7 @@ Index: uf-a/growfs.ufs/growfs.c
  	}
  	free(lp);
  
-@@ -2315,8 +2318,10 @@
+@@ -2314,8 +2318,10 @@
  	if (!lab)
  		errx(1, "malloc failed");
  
@@ -47,10 +51,10 @@ Index: uf-a/growfs.ufs/growfs.c
  
      unlabeled++;
  
-Index: uf-a/growfs.ufs/Makefile
+Index: ufsutils/growfs.ufs/Makefile
 ===================================================================
---- uf-a.orig/growfs.ufs/Makefile	2007-01-18 11:14:06.000000000 +0100
-+++ uf-a/growfs.ufs/Makefile	2007-01-18 11:14:17.000000000 +0100
+--- ufsutils.orig/growfs.ufs/Makefile
++++ ufsutils/growfs.ufs/Makefile
 @@ -6,14 +6,18 @@
  
  #GFSDBG=

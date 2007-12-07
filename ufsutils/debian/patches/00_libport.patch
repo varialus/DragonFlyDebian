@@ -1,8 +1,9 @@
 #DPATCHLEVEL=1
-diff -Naur ufsutils.orig/include/port/port.h ufsutils.new/include/port/port.h
---- ufsutils.orig/include/port/port.h	1970-01-01 01:00:00.000000000 +0100
-+++ ufsutils.new/include/port/port.h	2004-05-16 21:34:09.000000000 +0200
-@@ -0,0 +1,11 @@
+Index: ufsutils/include/port/port.h
+===================================================================
+--- /dev/null
++++ ufsutils/include/port/port.h
+@@ -0,0 +1,30 @@
 +#ifndef LIBPORT_H
 +#define LIBPORT_H
 +
@@ -12,11 +13,31 @@ diff -Naur ufsutils.orig/include/port/port.h ufsutils.new/include/port/port.h
 +#define __printflike(x,y)
 +#define __FBSDID(x)
 +
++#ifdef __FreeBSD_kernel__
++
++#  include <sys/param.h>
++#  include <sys/disk.h>
++#  include <sys/ioctl.h>
++
++#  define SF_SNAPSHOT   0x00200000
++
++/* all features are available */
++
++#  define HAVE_BSD_DISKLABEL 1
++#  define HAVE_BSD_ERRNO 1
++#  define HAVE_BSD_MOUNT 1
++#  define HAVE_BSD_SIGNALS 1
++#  define HAVE_BSD_STATFS 1
++#  define HAVE_BSD_SYSCTL 1
++#  define HAVE_UFS_SNAPSHOT 1
++
 +#endif
 +
-diff -Naur ufsutils.orig/include/port/random.h ufsutils.new/include/port/random.h
---- ufsutils.orig/include/port/random.h	1970-01-01 01:00:00.000000000 +0100
-+++ ufsutils.new/include/port/random.h	2004-05-16 21:41:03.000000000 +0200
++#endif
+Index: ufsutils/include/port/random.h
+===================================================================
+--- /dev/null
++++ ufsutils/include/port/random.h
 @@ -0,0 +1,11 @@
 +#ifndef LIBPORT_RANDOM_H
 +#define LIBPORT_RANDOM_H
@@ -29,9 +50,10 @@ diff -Naur ufsutils.orig/include/port/random.h ufsutils.new/include/port/random.
 +
 +#endif
 +
-diff -Naur ufsutils.orig/include/port/string.h ufsutils.new/include/port/string.h
---- ufsutils.orig/include/port/string.h	1970-01-01 01:00:00.000000000 +0100
-+++ ufsutils.new/include/port/string.h	2004-05-16 21:29:54.000000000 +0200
+Index: ufsutils/include/port/string.h
+===================================================================
+--- /dev/null
++++ ufsutils/include/port/string.h
 @@ -0,0 +1,10 @@
 +#ifndef LIBPORT_STRING_H
 +#define LIBPORT_STRING_H
@@ -43,40 +65,13 @@ diff -Naur ufsutils.orig/include/port/string.h ufsutils.new/include/port/string.
 +
 +#endif
 +
-diff -Naur ufsutils.orig/include/sys/disklabel.h ufsutils.new/include/sys/disklabel.h
---- ufsutils.orig/include/sys/disklabel.h	2004-04-30 05:41:43.000000000 +0200
-+++ ufsutils.new/include/sys/disklabel.h	2004-05-21 05:12:28.000000000 +0200
-@@ -33,10 +33,11 @@
- #ifndef _SYS_DISKLABEL_H_
- #define	_SYS_DISKLABEL_H_
- 
-+#include <stddef.h>
- #ifndef _KERNEL
- #include <sys/types.h>
- #endif
--#include <sys/ioccom.h>
-+//#include <sys/ioccom.h>
- 
- /*
-  * Disk description table, see disktab(5)
-diff -Naur ufsutils.orig/include/sys/ucred.h ufsutils.new/include/sys/ucred.h
---- ufsutils.orig/include/sys/ucred.h	2004-04-30 05:41:53.000000000 +0200
-+++ ufsutils.new/include/sys/ucred.h	2004-05-20 22:56:03.000000000 +0200
-@@ -33,6 +33,8 @@
- #ifndef _SYS_UCRED_H_
- #define	_SYS_UCRED_H_
- 
-+#include <sys/types.h>
-+
- /*
-  * Credentials.
-  *
-diff -Naur ufsutils.orig/libport/arc4random.c ufsutils.new/libport/arc4random.c
---- ufsutils.orig/libport/arc4random.c	2004-04-30 05:28:37.000000000 +0200
-+++ ufsutils.new/libport/arc4random.c	2004-05-20 22:49:03.000000000 +0200
+Index: ufsutils/libport/arc4random.c
+===================================================================
+--- ufsutils.orig/libport/arc4random.c
++++ ufsutils/libport/arc4random.c
 @@ -26,16 +26,11 @@
  #include <sys/cdefs.h>
- __FBSDID("$FreeBSD: src/lib/libc/gen/arc4random.c,v 1.10 2004/03/24 14:44:57 green Exp $");
+ __FBSDID("$FreeBSD: src/lib/libc/gen/arc4random.c,v 1.12 2007/05/25 10:40:33 delphij Exp $");
  
 -#include "namespace.h"
  #include <sys/types.h>
@@ -114,7 +109,7 @@ diff -Naur ufsutils.orig/libport/arc4random.c ufsutils.new/libport/arc4random.c
  
  static struct arc4_stream rs;
  static int rs_initialized;
-@@ -109,10 +93,10 @@
+@@ -105,10 +89,10 @@
  
  	gettimeofday(&rdat.tv, NULL);
  	rdat.pid = getpid();
@@ -128,10 +123,11 @@ diff -Naur ufsutils.orig/libport/arc4random.c ufsutils.new/libport/arc4random.c
  	} 
  	/* fd < 0?  Ah, what the heck. We'll just take whatever was on the
  	 * stack... */
-diff -Naur ufsutils.orig/libport/blockdev.c ufsutils.new/libport/blockdev.c
---- ufsutils.orig/libport/blockdev.c	1970-01-01 01:00:00.000000000 +0100
-+++ ufsutils.new/libport/blockdev.c	2004-06-30 15:58:31.000000000 +0200
-@@ -0,0 +1,91 @@
+Index: ufsutils/libport/blockdev.c
+===================================================================
+--- /dev/null
++++ ufsutils/libport/blockdev.c
+@@ -0,0 +1,92 @@
 +/*
 + * Copyright (C) 2004 Guillem Jover <guillem@debian.org>
 + * All rights reserved.
@@ -163,6 +159,7 @@ diff -Naur ufsutils.orig/libport/blockdev.c ufsutils.new/libport/blockdev.c
 +#include <sys/types.h>
 +#include <sys/ioctl.h>
 +#if defined(__NetBSD__) || defined(__OpenBSD__) || defined(__FreeBSD_kernel__)
++#include <sys/param.h>
 +#if defined(__FreeBSD_kernel__) && __FreeBSD_kernel_version >= 500000
 +#include <sys/disk.h>
 +#endif
@@ -223,9 +220,10 @@ diff -Naur ufsutils.orig/libport/blockdev.c ufsutils.new/libport/blockdev.c
 +
 +	return size;
 +}
-diff -Naur ufsutils.orig/include/port/blockdev.h ufsutils.new/include/port/blockdev.h
---- ufsutils.orig/include/port/blockdev.h	1970-01-01 01:00:00.000000000 +0100
-+++ ufsutils.new/include/port/blockdev.h	2004-06-29 22:17:29.000000000 +0200
+Index: ufsutils/include/port/blockdev.h
+===================================================================
+--- /dev/null
++++ ufsutils/include/port/blockdev.h
 @@ -0,0 +1,9 @@
 +#ifndef LIBPORT_BLOCKDEV_H
 +#define LIBPORT_BLOCKDEV_H
@@ -236,9 +234,10 @@ diff -Naur ufsutils.orig/include/port/blockdev.h ufsutils.new/include/port/block
 +
 +#endif
 +
-diff -Naur ufsutils.orig/libport/Makefile ufsutils.new/libport/Makefile
---- ufsutils.orig/libport/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ ufsutils.new/libport/Makefile	2004-06-29 22:54:03.000000000 +0200
+Index: ufsutils/libport/Makefile
+===================================================================
+--- /dev/null
++++ ufsutils/libport/Makefile
 @@ -0,0 +1,13 @@
 +LIB = port
 +LIB_type = static

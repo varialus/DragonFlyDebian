@@ -17,14 +17,15 @@ srcs=" \
 	src/sbin/bsdlabel:bsdlabel \
 	src/sbin/sunlabel:sunlabel \
 	src/sbin/ffsinfo:ffsinfo \
+	src/sbin/mount:mount \
 	src/lib/libufs:libufs \
 	src/sys/ufs:include"
 
 include_files=" \
-	src/sys/sys/disklabel.h:include/sys \
-	src/sys/sys/mount.h:include/sys \
-	src/sys/sys/param.h:include/sys \
-	src/sys/sys/ucred.h:include/sys"
+	src/sys/sys/disklabel.h:freebsd/sys \
+	src/sys/sys/mount.h:freebsd/sys \
+	src/sys/sys/param.h:freebsd/sys \
+	src/sys/sys/ucred.h:freebsd/sys"
 	
 libc_files=" \
 	src/lib/libc/gen/arc4random.c:libport \
@@ -64,9 +65,9 @@ repos=`get_cvs_list $srcs $include_files $libc_files`
 
 cvs -z3 -d $ANONCVS co -r $RELENG $repos
 
-rm -rf badsect.ufs bsdlabel dump.ufs dumpfs.ufs ffsinfo fsck.ufs fsdb.ufs growfs.ufs include libufs libport mkfs.ufs sunlabel tunefs.ufs libdisklabel
+rm -rf badsect.ufs bsdlabel dump.ufs dumpfs.ufs ffsinfo freebsd fsck.ufs fsdb.ufs growfs.ufs include libufs libport mkfs.ufs sunlabel tunefs.ufs libdisklabel
 
-mkdir -p include/sys libport
+mkdir -p include libport freebsd/sys
 
 echo "-> Moving upstream sources to the proper place ..."
 move_repo $srcs
