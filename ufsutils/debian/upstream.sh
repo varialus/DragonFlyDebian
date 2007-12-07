@@ -1,8 +1,9 @@
 #!/bin/bash
 
-cvsroot=":ext:anoncvs@anoncvs.fr.freebsd.org:/home/ncvs"
-RELENG=RELENG_6_2_0_RELEASE
-#RELENG=HEAD
+ANONCVS=anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
+RELENG=RELENG_6_3_0_RELEASE
+RELENG=RELENG_6_3
+RELENG=RELENG_7
 
 srcs=" \
 	src/sbin/badsect:badsect.ufs \
@@ -61,7 +62,7 @@ repos=`get_cvs_list $srcs $include_files $libc_files`
 # Note: Does not use co -d because freebsd cvs server has
 #       a fascist connection limit (2)
 
-cvs -z3 -d$cvsroot co -r $RELENG $repos
+cvs -z3 -d $ANONCVS co -r $RELENG $repos
 
 rm -rf badsect.ufs bsdlabel dump.ufs dumpfs.ufs ffsinfo fsck.ufs fsdb.ufs growfs.ufs include libufs libport mkfs.ufs sunlabel tunefs.ufs libdisklabel
 

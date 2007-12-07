@@ -1,7 +1,8 @@
 #DPATCHLEVEL=1
-diff -Naur ufsutils.orig/include/ufs/ffs/fs.h ufsutils.new/include/ufs/ffs/fs.h
---- ufsutils.orig/include/ufs/ffs/fs.h	2004-04-07 05:47:20.000000000 +0200
-+++ ufsutils.new/include/ufs/ffs/fs.h	2004-05-13 08:43:33.000000000 +0200
+Index: ufsutils/include/ufs/ffs/fs.h
+===================================================================
+--- ufsutils.orig/include/ufs/ffs/fs.h	2007-12-07 19:29:33.767834000 +0100
++++ ufsutils/include/ufs/ffs/fs.h	2007-12-07 19:30:02.000000000 +0100
 @@ -33,6 +33,9 @@
  #ifndef _UFS_FFS_FS_H_
  #define _UFS_FFS_FS_H_
@@ -12,10 +13,11 @@ diff -Naur ufsutils.orig/include/ufs/ffs/fs.h ufsutils.new/include/ufs/ffs/fs.h
  /*
   * Each disk drive contains some number of filesystems.
   * A filesystem consists of a number of cylinder groups.
-diff -Naur ufsutils.orig/include/ufs/ufs/dinode.h ufsutils.new/include/ufs/ufs/dinode.h
---- ufsutils.orig/include/ufs/ufs/dinode.h	2002-07-17 00:36:00.000000000 +0200
-+++ ufsutils.new/include/ufs/ufs/dinode.h	2004-05-13 08:15:51.000000000 +0200
-@@ -47,6 +47,8 @@
+Index: ufsutils/include/ufs/ufs/dinode.h
+===================================================================
+--- ufsutils.orig/include/ufs/ufs/dinode.h	2007-12-07 19:29:33.792676000 +0100
++++ ufsutils/include/ufs/ufs/dinode.h	2007-12-07 19:30:02.000000000 +0100
+@@ -68,6 +68,8 @@
  #ifndef _UFS_UFS_DINODE_H_
  #define	_UFS_UFS_DINODE_H_
  
@@ -24,9 +26,10 @@ diff -Naur ufsutils.orig/include/ufs/ufs/dinode.h ufsutils.new/include/ufs/ufs/d
  /*
   * The root inode is the root of the filesystem.  Inode 0 can't be used for
   * normal purposes and historically bad blocks were linked to inode 1, thus
-diff -Naur ufsutils.orig/include/ufs/ufs/dir.h ufsutils.new/include/ufs/ufs/dir.h
---- ufsutils.orig/include/ufs/ufs/dir.h	2004-04-07 05:47:20.000000000 +0200
-+++ ufsutils.new/include/ufs/ufs/dir.h	2004-05-13 08:16:08.000000000 +0200
+Index: ufsutils/include/ufs/ufs/dir.h
+===================================================================
+--- ufsutils.orig/include/ufs/ufs/dir.h	2007-12-07 19:29:33.826139000 +0100
++++ ufsutils/include/ufs/ufs/dir.h	2007-12-07 19:30:02.000000000 +0100
 @@ -38,6 +38,8 @@
  #ifndef _UFS_UFS_DIR_H_
  #define	_UFS_UFS_DIR_H_
@@ -36,40 +39,42 @@ diff -Naur ufsutils.orig/include/ufs/ufs/dir.h ufsutils.new/include/ufs/ufs/dir.
  /*
   * Theoretically, directories can be more than 2Gb in length, however, in
   * practice this seems unlikely. So, we define the type doff_t as a 32-bit
-diff -Naur ufsutils.orig/libufs/Makefile ufsutils.new/libufs/Makefile
---- ufsutils.orig/libufs/Makefile	2003-08-18 17:25:39.000000000 +0200
-+++ ufsutils.new/libufs/Makefile	2004-05-16 21:38:38.000000000 +0200
-@@ -1,20 +1,16 @@
- # $FreeBSD: src/lib/libufs/Makefile,v 1.10 2003/08/18 15:25:39 obrien Exp $
+Index: ufsutils/libufs/Makefile
+===================================================================
+--- ufsutils.orig/libufs/Makefile	2007-12-07 19:29:33.857065000 +0100
++++ ufsutils/libufs/Makefile	2007-12-07 19:30:26.000000000 +0100
+@@ -1,26 +1,15 @@
+ # $FreeBSD: src/lib/libufs/Makefile,v 1.14 2006/10/31 21:21:48 pjd Exp $
  
--LIB=	ufs
+ LIB=	ufs
 -SHLIBDIR?= /lib
++SHLIB_MAJOR= 2
+ 
 -SRCS=	block.c cgroup.c inode.c sblock.c type.c
--INCS=	libufs.h
++LIBSRCS=	block.c cgroup.c inode.c sblock.c type.c ../libport/strlcpy.c
+ INCS=	libufs.h
+ 
 -MAN=	bread.3 cgread.3 libufs.3 sbread.3 ufs_disk_close.3
 -MLINKS+= bread.3 bwrite.3
 -MLINKS+= cgread.3 cgread1.3
+-MLINKS+= cgread.3 cgwrite1.3
 -MLINKS+= sbread.3 sbwrite.3
 -MLINKS+= ufs_disk_close.3 ufs_disk_fillout.3
 -MLINKS+= ufs_disk_close.3 ufs_disk_fillout_blank.3
 -MLINKS+= ufs_disk_close.3 ufs_disk_write.3
--CFLAGS+= -I${.CURDIR} -D_LIBUFS
++ALL_CFLAGS+= -D_LIBUFS
++ifdef LIBUFS_DEBUG
++ALL_CFLAGS+= -D_LIBUFS_DEBUGGING
++endif
++INCLUDES = -I.
+ 
+-WARNS?=	2
+-
+-CFLAGS+= -D_LIBUFS
 -.if defined(LIBUFS_DEBUG)
 -CFLAGS+= -D_LIBUFS_DEBUGGING
 -.endif
--WARNS?=	2
-+LIB = ufs
-+SHLIB_MAJOR = 2
-+LIBSRCS = block.c cgroup.c inode.c sblock.c type.c
-+INCS = libufs.h
-+
-+ALL_CFLAGS = -D_LIBUFS
-+ifdef LIBUFS_DEBUG
-+ALL_CFLAGS += -D_LIBUFS_DEBUGGING
-+endif
-+
-+INCLUDES = -I.
-+
-+include ../Makefile.common
- 
+-CFLAGS+= -I${.CURDIR}
+-
 -.include <bsd.lib.mk>
++include ../Makefile.common
