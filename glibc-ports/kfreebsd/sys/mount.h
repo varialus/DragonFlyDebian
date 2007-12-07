@@ -62,6 +62,7 @@ struct fid {
 #define	MNT_SUIDDIR	0x00100000	/* special handling of SUID on dirs */
 #define	MNT_SOFTDEP	0x00200000	/* soft updates being done */
 #define	MNT_NOSYMFOLLOW	0x00400000	/* do not follow symlinks */
+#define	MNT_GJOURNAL	0x02000000	/* GEOM journal support enabled */
 #define	MNT_JAILDEVFS	0x02000000	/* jail-friendly DEVFS behaviour */
 #define	MNT_MULTILABEL	0x04000000	/* MAC support for individual objects */
 #define	MNT_ACLS	0x08000000	/* ACL support enabled */
@@ -139,11 +140,18 @@ struct fid {
  * with the unmount attempt (used by NFS).
  */
 #define MNTK_UNMOUNTF	0x00000001	/* forced unmount in progress */
+#define MNTK_ASYNC      0x00000002      /* filtered async flag */
+#define MNTK_SOFTDEP    0x00000004      /* async disabled by softdep */
+#define MNTK_NOINSMNTQ  0x00000008      /* insmntque is not allowed */
 #define MNTK_UNMOUNT	0x01000000	/* unmount in progress */
 #define	MNTK_MWAIT	0x02000000	/* waiting for unmount to finish */
 #define MNTK_WANTRDWR	0x04000000	/* upgrade to read/write requested */
+#define MNTK_SUSPEND2   0x04000000      /* block secondary writes */
 #define	MNTK_SUSPEND	0x08000000	/* request write suspension */
 #define	MNTK_SUSPENDED	0x10000000	/* write operations are suspended */
+#define MNTK_MPSAFE     0x20000000      /* Filesystem is MPSAFE. */
+#define MNTK_NOKNOTE    0x80000000      /* Don't send KNOTEs from VOP hooks */
+#define MNTK_LOOKUP_SHARED      0x40000000 /* FS supports shared lock lookups */
 
 /*
  * Sysctl CTL_VFS definitions.
@@ -254,8 +262,9 @@ struct ovfsconf {
 #define VFCF_SYNTHETIC	0x00080000	/* data does not represent real files */
 #define	VFCF_LOOPBACK	0x00100000	/* aliases some other mounted FS */
 #define	VFCF_UNICODE	0x00200000	/* stores file names as Unicode*/
+#define VFCF_JAIL       0x00400000      /* can be mounted from within a jail */
 
-typedef u_int32_t fsctlop_t;
+typedef uint32_t fsctlop_t;
 
 struct vfsidctl {
 	int		vc_vers;	/* should be VFSIDCTL_VERS1 (below) */
