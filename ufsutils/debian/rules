@@ -18,8 +18,15 @@ CFLAGS = -Wall -g
 
 DEB_HOST_ARCH_OS = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 ifeq (linux,$(DEB_HOST_ARCH_OS))
-CFLAGS += -D_FILE_OFFSET_BITS=64
+CFLAGS += -D_FILE_OFFSET_BITS=64 -I$(CURDIR)/freebsd
 endif
+
+# on GNU/kFreeBSD we need additional library
+ifeq (kfreebsd,$(DEB_HOST_ARCH_OS))
+LDADD += -lbsd -lfreebsd
+endif
+
+
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -36,7 +43,7 @@ build-stamp:
 
 	QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a || test $$? = 2
 
-	CFLAGS="$(CFLAGS)" $(MAKE)
+	CFLAGS="$(CFLAGS)" LDADD="$(LDADD)" $(MAKE)
 	
 	touch build-stamp
 

@@ -1,4 +1,23 @@
 #DPATCHLEVEL=1
+Index: ufsutils/fsck.ufs/gjournal.c
+===================================================================
+--- ufsutils.orig/fsck.ufs/gjournal.c
++++ ufsutils/fsck.ufs/gjournal.c
+@@ -54,6 +54,9 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD: src/sbin/fsck_ffs/gjournal.c,v 1.2 2006/11/01 10:56:33 ru Exp $");
+ 
++
++#if HAVE_UFS_SNAPSHOT
++
+ #include <sys/param.h>
+ #include <sys/disklabel.h>
+ #include <sys/mount.h>
+@@ -774,3 +777,4 @@
+ 	/* Write back updated statistics and super-block. */
+ 	putdisk();
+ }
++#endif
 Index: ufsutils/fsck.ufs/ea.c
 ===================================================================
 --- ufsutils.orig/fsck.ufs/ea.c
@@ -146,7 +165,7 @@ Index: ufsutils/fsck.ufs/main.c
 ===================================================================
 --- ufsutils.orig/fsck.ufs/main.c
 +++ ufsutils/fsck.ufs/main.c
-@@ -45,9 +45,16 @@
+@@ -45,9 +45,17 @@
  #include <sys/stat.h>
  #include <sys/file.h>
  #include <sys/time.h>
@@ -155,6 +174,7 @@ Index: ufsutils/fsck.ufs/main.c
 +#else
 +#include <sys/statvfs.h>
 +#define statfs statvfs
++#define f_flags f_flag
 +#endif
  #include <sys/resource.h>
 +#ifdef HAVE_BSD_SYSCTL
@@ -264,6 +284,22 @@ Index: ufsutils/fsck.ufs/main.c
  		if ((mntp == NULL && sblock.fs_clean == 1) ||
  		    (mntp != NULL && (sblock.fs_flags & FS_UNCLEAN) == 0))
  			exit(7);	/* Filesystem clean, report it now */
+@@ -253,6 +275,7 @@
+ 		if ((fsreadfd = open(filesys, O_RDONLY)) < 0 || readsb(0) == 0)
+ 			exit(3);	/* Cannot read superblock */
+ 		close(fsreadfd);
++#if HAVE_UFS_SNAPSHOT
+ 		if ((sblock.fs_flags & FS_GJOURNAL) != 0) {
+ 			//printf("GJournaled file system detected on %s.\n",
+ 			//    filesys);
+@@ -270,6 +293,7 @@
+ 				    "CANNOT RUN FAST FSCK\n");
+ 			}
+ 		}
++#endif
+ 	}
+ 	/*
+ 	 * If we are to do a background check:
 @@ -278,6 +299,7 @@
  	 *	return created snapshot file
  	 *	if not found, clear bkgrdflag and proceed with normal fsck

@@ -1,4 +1,20 @@
 #DPATCHLEVEL=1
+Index: ufsutils/libufs/type.c
+===================================================================
+--- ufsutils.orig/libufs/type.c
++++ ufsutils/libufs/type.c
+@@ -131,8 +131,10 @@
+ 			ERROR(disk, "could not find special device");
+ 			return (-1);
+ 		}
++#if HAVE_BSD_STATFS
+ 		strlcpy(dev, sfs.f_mntfromname, sizeof(dev));
+ 		name = dev;
++#endif		
+ 	} else {
+ 		ERROR(disk, "could not find special device");
+ 		return (-1);
+
 Index: ufsutils/include/ufs/ffs/fs.h
 ===================================================================
 --- ufsutils.orig/include/ufs/ffs/fs.h
