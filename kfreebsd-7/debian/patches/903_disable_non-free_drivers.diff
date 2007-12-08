@@ -1,8 +1,8 @@
 Index: sys/conf/files
 ===================================================================
---- sys/conf/files.orig	2007-05-30 17:46:31.000000000 +0200
-+++ sys/conf/files	2007-05-30 17:54:16.000000000 +0200
-@@ -474,17 +474,6 @@
+--- sys/conf/files.orig
++++ sys/conf/files
+@@ -469,17 +469,6 @@
  dev/ata/atapi-cd.c		optional atapicd
  dev/ata/atapi-fd.c		optional atapifd
  dev/ata/atapi-tape.c		optional atapist
@@ -22,8 +22,8 @@ Index: sys/conf/files
  dev/awi/if_awi_pccard.c		optional awi pccard
 Index: sys/conf/files.i386
 ===================================================================
---- sys/conf/files.i386.orig	2007-05-30 17:46:31.000000000 +0200
-+++ sys/conf/files.i386	2007-05-30 17:54:16.000000000 +0200
+--- sys/conf/files.i386.orig
++++ sys/conf/files.i386
 @@ -46,42 +46,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
@@ -67,7 +67,7 @@ Index: sys/conf/files.i386
  #
  compat/linprocfs/linprocfs.c	optional linprocfs
  compat/linsysfs/linsysfs.c	optional linsysfs
-@@ -178,11 +142,6 @@
+@@ -179,11 +143,6 @@
  dev/fdc/fdc_isa.c		optional fdc isa
  dev/fdc/fdc_pccard.c		optional fdc pccard
  dev/fe/if_fe_isa.c		optional fe isa
@@ -79,7 +79,7 @@ Index: sys/conf/files.i386
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_pentium.c	optional hwpmc
  dev/hwpmc/hwpmc_piv.c		optional hwpmc
-@@ -209,13 +168,9 @@
+@@ -210,13 +169,9 @@
  dev/mse/mse.c			optional mse
  dev/mse/mse_isa.c		optional mse isa
  dev/nfe/if_nfe.c		optional nfe pci
@@ -95,8 +95,8 @@ Index: sys/conf/files.i386
  dev/sbni/if_sbni_pci.c		optional sbni pci
 Index: sys/conf/kern.pre.mk
 ===================================================================
---- sys/conf/kern.pre.mk.orig	2007-05-30 17:46:31.000000000 +0200
-+++ sys/conf/kern.pre.mk	2007-05-30 17:54:16.000000000 +0200
+--- sys/conf/kern.pre.mk.orig
++++ sys/conf/kern.pre.mk
 @@ -67,9 +67,6 @@
  # ... and the same for pf
  INCLUDES+= -I$S/contrib/pf
@@ -109,9 +109,9 @@ Index: sys/conf/kern.pre.mk
  
 Index: sys/i386/conf/GENERIC
 ===================================================================
---- sys/i386/conf/GENERIC.orig	2007-05-30 17:47:50.000000000 +0200
-+++ sys/i386/conf/GENERIC	2007-05-30 17:54:16.000000000 +0200
-@@ -132,8 +132,6 @@
+--- sys/i386/conf/GENERIC.orig
++++ sys/i386/conf/GENERIC
+@@ -128,8 +128,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -122,8 +122,8 @@ Index: sys/i386/conf/GENERIC
  device		mly		# Mylex AcceleRAID/eXtremeRAID
 Index: sys/modules/Makefile
 ===================================================================
---- sys/modules/Makefile.orig	2007-05-30 17:48:05.000000000 +0200
-+++ sys/modules/Makefile	2007-05-30 17:55:09.000000000 +0200
+--- sys/modules/Makefile.orig
++++ sys/modules/Makefile
 @@ -25,11 +25,6 @@
  	${_arl} \
  	${_asr} \
@@ -163,7 +163,7 @@ Index: sys/modules/Makefile
  	rue \
  	rum \
  	${_s3} \
-@@ -311,7 +302,6 @@
+@@ -313,7 +304,6 @@
  	${_xe} \
  	xfs \
  	xl \
@@ -171,7 +171,7 @@ Index: sys/modules/Makefile
  	zlib \
  	zyd
  
-@@ -361,11 +351,6 @@
+@@ -363,11 +353,6 @@
  _apm=		apm
  _ar=		ar
  _arcnet=	arcnet
@@ -183,7 +183,7 @@ Index: sys/modules/Makefile
  _awi=		awi
  _bktr=		bktr
  _cardbus=	cardbus
-@@ -404,7 +389,6 @@
+@@ -406,7 +391,6 @@
  .if ${MK_NCP} != "no"
  _nwfs=		nwfs
  .endif
@@ -191,7 +191,7 @@ Index: sys/modules/Makefile
  _pccard=	pccard
  _pcfclock=	pcfclock
  _pecoff=	pecoff
-@@ -425,9 +409,6 @@
+@@ -427,9 +411,6 @@
  _tmpfs= 	tmpfs
  _wi=		wi
  _xe=		xe
@@ -201,7 +201,7 @@ Index: sys/modules/Makefile
  .if ${MACHINE} == "i386"
  _aac=		aac
  _acpi=		acpi
-@@ -444,7 +425,6 @@
+@@ -446,7 +427,6 @@
  _dpt=		dpt
  _ex=		ex
  _hptiop=	hptiop
@@ -209,15 +209,15 @@ Index: sys/modules/Makefile
  _ichwd=		ichwd
  _ida=		ida
  # Disabled due to non-MPSAFEty in 7.0
-@@ -459,7 +439,6 @@
+@@ -461,7 +441,6 @@
  _ixgb=   	ixgb
  _mly=		mly
  _nfe=		nfe
 -_nve=		nve
  _nvram=		nvram
  _nxge=		nxge
- .if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
-@@ -467,7 +446,6 @@
+ _wpi=		wpi
+@@ -471,7 +450,6 @@
  _padlock=	padlock
  .endif
  .endif
@@ -225,7 +225,7 @@ Index: sys/modules/Makefile
  _s3=		s3
  _twa=		twa
  _vesa=		vesa
-@@ -485,11 +463,6 @@
+@@ -489,11 +467,6 @@
  _agp=		agp
  _an=		an
  _arcmsr=	arcmsr
@@ -237,7 +237,7 @@ Index: sys/modules/Makefile
  _cardbus=	cardbus
  _cbb=		cbb
  _ciss=		ciss
-@@ -502,7 +475,6 @@
+@@ -506,7 +479,6 @@
  _exca=		exca
  _ext2fs=	ext2fs
  _hptiop=	hptiop
@@ -245,7 +245,7 @@ Index: sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -520,11 +492,9 @@
+@@ -524,11 +496,9 @@
  _mly=		mly
  _ndis=		ndis
  _nfe=		nfe
@@ -257,17 +257,17 @@ Index: sys/modules/Makefile
  _safe=		safe
  _scsi_low=	scsi_low
  _smbfs=		smbfs
-@@ -534,9 +504,6 @@
- _tmpfs= 	tmpfs
- _twa=		twa
+@@ -540,9 +510,6 @@
  _wi=		wi
+ _wpi=		wpi
+ _wpifw=		wpifw
 -.if ${MK_ZFS} != "no" || defined(ALL_MODULES)
 -_zfs=		zfs
 -.endif
  .endif
  
  .if ${MACHINE_ARCH} == "ia64"
-@@ -577,21 +544,11 @@
+@@ -583,21 +550,11 @@
  
  .if ${MACHINE_ARCH} == "powerpc"
  _an=		an
@@ -291,9 +291,9 @@ Index: sys/modules/Makefile
  _i2c=		i2c
 Index: sys/amd64/conf/GENERIC
 ===================================================================
---- sys/amd64/conf/GENERIC.orig	2007-05-30 17:46:15.000000000 +0200
-+++ sys/amd64/conf/GENERIC	2007-05-30 17:54:16.000000000 +0200
-@@ -125,8 +125,6 @@
+--- sys/amd64/conf/GENERIC.orig
++++ sys/amd64/conf/GENERIC
+@@ -121,8 +121,6 @@
  device		arcmsr		# Areca SATA II RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -304,8 +304,8 @@ Index: sys/amd64/conf/GENERIC
  device		mly		# Mylex AcceleRAID/eXtremeRAID
 Index: sys/conf/files.amd64
 ===================================================================
---- sys/conf/files.amd64.orig	2007-05-30 17:46:31.000000000 +0200
-+++ sys/conf/files.amd64	2007-05-30 17:54:16.000000000 +0200
+--- sys/conf/files.amd64.orig
++++ sys/conf/files.amd64
 @@ -47,35 +47,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
