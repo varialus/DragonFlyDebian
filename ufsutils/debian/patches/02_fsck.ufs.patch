@@ -260,7 +260,7 @@ Index: ufsutils/fsck.ufs/main.c
  	ufs2_daddr_t blks;
  	struct iovec *iov;
  	char errmsg[255];
-@@ -218,10 +235,12 @@
+@@ -218,10 +235,14 @@
  	 * if it is listed among the mounted file systems. Failing that
  	 * check to see if it is listed in /etc/fstab.
  	 */
@@ -269,6 +269,8 @@ Index: ufsutils/fsck.ufs/main.c
  	if (mntp != NULL)
  		filesys = mntp->f_mntfromname;
  	else
++#else
++	mntp = NULL;
 +#endif
  		filesys = blockcheck(filesys);
  	/*
