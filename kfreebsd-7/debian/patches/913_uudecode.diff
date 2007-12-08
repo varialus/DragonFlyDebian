@@ -98,3 +98,14 @@ diff -ur sys.orig/modules/iwifw/iwi_monitor/Makefile sys/modules/iwifw/iwi_monit
  
  .include <bsd.kmod.mk>
  
+diff -ur sys.orig/modules/wpifw/Makefile sys/modules/wpifw/Makefile
+--- sys.orig/modules/wpifw/Makefile
++++ sys/modules/wpifw/Makefile
+@@ -9,6 +9,6 @@
+ CLEANFILES=	iwlwifi-3945-2.14.4.fw
+ modules/wpifw/Makefile
+ iwlwifi-3945-2.14.4.fw: ${.CURDIR}/../../contrib/dev/wpi/iwlwifi-3945-2.14.4.fw.uu
+-	uudecode -p ${.CURDIR}/../../contrib/dev/wpi/iwlwifi-3945-2.14.4.fw.uu > ${.TARGET}
++	uudecode -o- ${.CURDIR}/../../contrib/dev/wpi/iwlwifi-3945-2.14.4.fw.uu > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>
