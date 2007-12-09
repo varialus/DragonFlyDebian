@@ -2,20 +2,20 @@
 
 Index: sys/modules/hwpmc/Makefile
 ===================================================================
---- sys/modules/hwpmc/Makefile.orig	2006-06-25 11:03:50.000000000 +0200
-+++ sys/modules/hwpmc/Makefile	2006-06-25 11:04:06.000000000 +0200
+--- sys/modules/hwpmc/Makefile.orig	2007-12-09 13:17:58.185267000 +0100
++++ sys/modules/hwpmc/Makefile	2007-12-09 13:24:47.000000000 +0100
 @@ -9,6 +9,7 @@
  SRCS=	hwpmc_mod.c hwpmc_logging.c vnode_if.h
  
  WARNS?=	2
 +NO_WERROR?= 1
  
- .if ${MACHINE_ARCH} == "alpha"
- SRCS+=	hwpmc_alpha.c
+ .if ${MACHINE_ARCH} == "amd64"
+ SRCS+=	hwpmc_amd.c hwpmc_piv.c hwpmc_x86.c
 Index: sys/modules/geom/geom_eli/Makefile
 ===================================================================
---- sys/modules/geom/geom_eli/Makefile	2007-05-30 18:49:24.000000000 +0200
-+++ sys/modules/geom/geom_eli/Makefile	2007-05-30 18:49:24.000000000 +0200
+--- sys/modules/geom/geom_eli/Makefile.orig	2007-12-09 13:17:58.239540000 +0100
++++ sys/modules/geom/geom_eli/Makefile	2007-12-09 13:24:47.000000000 +0100
 @@ -12,5 +12,6 @@
  SRCS+=	pkcs5v2.c
  SRCS+=	vnode_if.h

@@ -1,8 +1,8 @@
 Index: sys/compat/linprocfs/linprocfs.c
 ===================================================================
---- sys/compat/linprocfs/linprocfs.c.orig	2006-06-24 17:33:15.000000000 +0200
-+++ sys/compat/linprocfs/linprocfs.c	2006-06-24 17:43:07.000000000 +0200
-@@ -381,10 +381,6 @@
+--- sys/compat/linprocfs/linprocfs.c.orig	2007-12-09 13:17:58.550924000 +0100
++++ sys/compat/linprocfs/linprocfs.c	2007-12-09 13:24:47.000000000 +0100
+@@ -336,10 +336,6 @@
  
  		/* determine fs type */
  		fstype = mp->mnt_stat.f_fstypename;
@@ -11,5 +11,5 @@ Index: sys/compat/linprocfs/linprocfs.c
 -		else if (strcmp(fstype, "procfs") == 0)
 -			continue;
  
- 		sbuf_printf(sb, "%s %s %s %s", mntfrom, mntto, fstype,
- 		    mp->mnt_stat.f_flags & MNT_RDONLY ? "ro" : "rw");
+ 		if (strcmp(fstype, "linsysfs") == 0) {
+ 			sbuf_printf(sb, "/sys %s sysfs %s", mntto,

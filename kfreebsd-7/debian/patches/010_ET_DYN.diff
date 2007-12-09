@@ -2,10 +2,10 @@
 
 Index: sys/kern/imgact_elf.c
 ===================================================================
---- sys/kern/imgact_elf.c.orig	2007-05-30 12:31:15.000000000 +0200
-+++ sys/kern/imgact_elf.c	2007-05-30 13:05:38.000000000 +0200
-@@ -610,6 +610,8 @@
- 	char *path;
+--- sys/kern/imgact_elf.c.orig	2007-12-09 13:18:00.268757000 +0100
++++ sys/kern/imgact_elf.c	2007-12-09 13:24:47.000000000 +0100
+@@ -619,6 +619,8 @@
+ 	const char *note_name;
  	struct thread *td = curthread;
  	struct sysentvec *sv;
 +	u_long rbase = 0;
@@ -13,7 +13,7 @@ Index: sys/kern/imgact_elf.c
  
  	/*
  	 * Do we have a valid ELF header ?
-@@ -649,11 +651,27 @@
+@@ -660,11 +662,27 @@
  		    hdr->e_ident[EI_OSABI]);
  		return (ENOEXEC);
  	}
@@ -42,7 +42,7 @@ Index: sys/kern/imgact_elf.c
  		interp = brand_info->interp_newpath;
  
  	/*
-@@ -695,7 +713,7 @@
+@@ -706,7 +724,7 @@
  
  			if ((error = __elfN(load_section)(vmspace,
  			    imgp->object, phdr[i].p_offset,
@@ -51,7 +51,7 @@ Index: sys/kern/imgact_elf.c
  			    phdr[i].p_memsz, phdr[i].p_filesz, prot,
  			    sv->sv_pagesize)) != 0)
  				return (error);
-@@ -709,11 +727,12 @@
+@@ -720,11 +738,12 @@
  			if (phdr[i].p_offset == 0 &&
  			    hdr->e_phoff + hdr->e_phnum * hdr->e_phentsize
  				<= phdr[i].p_filesz)
@@ -65,7 +65,7 @@ Index: sys/kern/imgact_elf.c
  
  			/*
  			 * Is this .text or .data?  We can't use
-@@ -735,7 +754,7 @@
+@@ -746,7 +765,7 @@
  			    phdr[i].p_memsz)) {
  				text_size = seg_size;
  				text_addr = seg_addr;
@@ -74,12 +74,12 @@ Index: sys/kern/imgact_elf.c
  			} else {
  				data_size = seg_size;
  				data_addr = seg_addr;
-@@ -743,7 +762,7 @@
+@@ -754,7 +773,7 @@
  			total_size += seg_size;
  			break;
  		case PT_PHDR: 	/* Program header table info */
 -			proghdr = phdr[i].p_vaddr;
 +			proghdr = phdr[i].p_vaddr + rbase;
  			break;
- 		default:
- 			break;
+ 		case PT_NOTE:
+ 			pnote = &phdr[i];

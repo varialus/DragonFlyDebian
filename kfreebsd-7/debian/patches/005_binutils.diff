@@ -3,8 +3,8 @@ Status: Reported as kern/93331
 
 Index: sys/i386/i386/locore.s
 ===================================================================
---- sys/i386/i386/locore.s.orig	2005-05-16 11:47:53.000000000 +0200
-+++ sys/i386/i386/locore.s	2006-06-24 17:32:27.000000000 +0200
+--- sys/i386/i386/locore.s.orig	2007-12-09 13:18:01.102886000 +0100
++++ sys/i386/i386/locore.s	2007-12-09 13:24:46.000000000 +0100
 @@ -358,7 +358,7 @@
  	pushl	%eax
  	testl	$PSL_VM,UC_EFLAGS(%eax)
@@ -34,9 +34,9 @@ Index: sys/i386/i386/locore.s
  	pushl	%eax			/* junk to fake return addr. */
 Index: sys/i386/i386/swtch.s
 ===================================================================
---- sys/i386/i386/swtch.s.orig	2005-04-14 00:57:17.000000000 +0200
-+++ sys/i386/i386/swtch.s	2006-06-24 17:32:27.000000000 +0200
-@@ -111,7 +111,7 @@
+--- sys/i386/i386/swtch.s.orig	2007-12-09 13:18:01.139146000 +0100
++++ sys/i386/i386/swtch.s	2007-12-09 13:24:46.000000000 +0100
+@@ -130,7 +130,7 @@
  	movl	%ebp,PCB_EBP(%edx)
  	movl	%esi,PCB_ESI(%edx)
  	movl	%edi,PCB_EDI(%edx)
@@ -44,8 +44,8 @@ Index: sys/i386/i386/swtch.s
 +	movw	%gs,PCB_GS(%edx)
  	pushfl					/* PSL */
  	popl	PCB_PSL(%edx)
- 	/* Check to see if we need to call a switchout function. */
-@@ -279,7 +279,7 @@
+ 	/* Test if debug registers should be saved. */
+@@ -301,7 +301,7 @@
  	/* This must be done after loading the user LDT. */
  	.globl	cpu_switch_load_gs
  cpu_switch_load_gs:
@@ -54,7 +54,7 @@ Index: sys/i386/i386/swtch.s
  
  	/* Test if debug registers should be restored. */
  	testl	$PCB_DBREGS,PCB_FLAGS(%edx)
-@@ -348,7 +348,7 @@
+@@ -371,7 +371,7 @@
  	movl	%ebp,PCB_EBP(%ecx)
  	movl	%esi,PCB_ESI(%ecx)
  	movl	%edi,PCB_EDI(%ecx)
@@ -65,8 +65,8 @@ Index: sys/i386/i386/swtch.s
  
 Index: sys/i386/include/cpufunc.h
 ===================================================================
---- sys/i386/include/cpufunc.h.orig	2005-05-13 02:05:56.000000000 +0200
-+++ sys/i386/include/cpufunc.h	2006-06-24 17:32:27.000000000 +0200
+--- sys/i386/include/cpufunc.h.orig	2007-12-09 13:18:01.175563000 +0100
++++ sys/i386/include/cpufunc.h	2007-12-09 13:24:46.000000000 +0100
 @@ -452,7 +452,7 @@
  rfs(void)
  {
@@ -76,7 +76,7 @@ Index: sys/i386/include/cpufunc.h
  	return (sel);
  }
  
-@@ -460,7 +460,7 @@
+@@ -468,7 +468,7 @@
  rgs(void)
  {
  	u_int sel;
@@ -85,7 +85,7 @@ Index: sys/i386/include/cpufunc.h
  	return (sel);
  }
  
-@@ -468,12 +468,12 @@
+@@ -507,13 +507,13 @@
  static __inline void
  load_fs(u_int sel)
  {
@@ -103,8 +103,8 @@ Index: sys/i386/include/cpufunc.h
  static __inline void
 Index: sys/i386/linux/linux_locore.s
 ===================================================================
---- sys/i386/linux/linux_locore.s.orig	2001-02-25 07:29:01.000000000 +0100
-+++ sys/i386/linux/linux_locore.s	2006-06-24 17:32:27.000000000 +0200
+--- sys/i386/linux/linux_locore.s.orig	2007-12-09 13:18:01.216859000 +0100
++++ sys/i386/linux/linux_locore.s	2007-12-09 13:24:46.000000000 +0100
 @@ -8,7 +8,7 @@
  NON_GPROF_ENTRY(linux_sigcode)
  	call	*LINUX_SIGF_HANDLER(%esp)
@@ -125,9 +125,9 @@ Index: sys/i386/linux/linux_locore.s
  	int	$0x80				/* enter kernel with args */
 Index: sys/compat/ndis/winx32_wrap.S
 ===================================================================
---- sys/compat/ndis/winx32_wrap.S.orig	2005-11-06 04:52:25.000000000 +0100
-+++ sys/compat/ndis/winx32_wrap.S	2006-06-24 17:32:27.000000000 +0200
-@@ -364,7 +364,7 @@
+--- sys/compat/ndis/winx32_wrap.S.orig	2007-12-09 13:18:01.257978000 +0100
++++ sys/compat/ndis/winx32_wrap.S	2007-12-09 13:24:46.000000000 +0100
+@@ -369,7 +369,7 @@
  	ret
  
  ENTRY(x86_setfs)
@@ -138,9 +138,9 @@ Index: sys/compat/ndis/winx32_wrap.S
  ENTRY(x86_gettid)
 Index: sys/amd64/amd64/cpu_switch.S
 ===================================================================
---- sys/amd64/amd64/cpu_switch.S.orig	2005-11-15 01:25:59.000000000 +0100
-+++ sys/amd64/amd64/cpu_switch.S	2006-06-24 17:33:03.000000000 +0200
-@@ -102,7 +102,7 @@
+--- sys/amd64/amd64/cpu_switch.S.orig	2007-12-09 13:18:01.294602000 +0100
++++ sys/amd64/amd64/cpu_switch.S	2007-12-09 13:24:46.000000000 +0100
+@@ -110,7 +110,7 @@
  	jz	1f				/* no, skip over */
  
  	/* Save userland %gs */
@@ -149,7 +149,7 @@ Index: sys/amd64/amd64/cpu_switch.S
  	movq	PCB_GS32P(%r8),%rax
  	movq	(%rax),%rax
  	movq	%rax,PCB_GS32SD(%r8)
-@@ -204,7 +204,7 @@
+@@ -220,7 +220,7 @@
  	movq	%rbx,(%rax)
  	movl	$MSR_GSBASE,%ecx
  	rdmsr
@@ -160,9 +160,9 @@ Index: sys/amd64/amd64/cpu_switch.S
  1:
 Index: sys/amd64/ia32/ia32_signal.c
 ===================================================================
---- sys/amd64/ia32/ia32_signal.c.orig	2004-04-06 01:55:14.000000000 +0200
-+++ sys/amd64/ia32/ia32_signal.c	2006-06-24 17:32:27.000000000 +0200
-@@ -197,8 +197,8 @@
+--- sys/amd64/ia32/ia32_signal.c.orig	2007-12-09 13:18:01.326931000 +0100
++++ sys/amd64/ia32/ia32_signal.c	2007-12-09 13:24:46.000000000 +0100
+@@ -328,8 +328,8 @@
  	sf.sf_uc.uc_mcontext.mc_onstack = (oonstack) ? 1 : 0;
  	sf.sf_uc.uc_mcontext.mc_gs = rgs();
  	sf.sf_uc.uc_mcontext.mc_fs = rfs();
@@ -173,7 +173,7 @@ Index: sys/amd64/ia32/ia32_signal.c
  	sf.sf_uc.uc_mcontext.mc_edi = regs->tf_rdi;
  	sf.sf_uc.uc_mcontext.mc_esi = regs->tf_rsi;
  	sf.sf_uc.uc_mcontext.mc_ebp = regs->tf_rbp;
-@@ -309,8 +309,8 @@
+@@ -443,8 +443,8 @@
  	sf.sf_uc.uc_mcontext.mc_onstack = (oonstack) ? 1 : 0;
  	sf.sf_uc.uc_mcontext.mc_gs = rgs();
  	sf.sf_uc.uc_mcontext.mc_fs = rfs();
@@ -186,8 +186,8 @@ Index: sys/amd64/ia32/ia32_signal.c
  	sf.sf_uc.uc_mcontext.mc_ebp = regs->tf_rbp;
 Index: sys/amd64/include/cpufunc.h
 ===================================================================
---- sys/amd64/include/cpufunc.h.orig	2005-05-13 02:05:55.000000000 +0200
-+++ sys/amd64/include/cpufunc.h	2006-06-24 17:32:27.000000000 +0200
+--- sys/amd64/include/cpufunc.h.orig	2007-12-09 13:18:01.400151000 +0100
++++ sys/amd64/include/cpufunc.h	2007-12-09 13:24:46.000000000 +0100
 @@ -482,7 +482,7 @@
  rfs(void)
  {
@@ -266,9 +266,9 @@ Index: sys/amd64/include/cpufunc.h
  
 Index: sys/amd64/linux32/linux32_sysvec.c
 ===================================================================
---- sys/amd64/linux32/linux32_sysvec.c.orig	2005-12-22 22:25:19.000000000 +0100
-+++ sys/amd64/linux32/linux32_sysvec.c	2006-06-24 17:32:27.000000000 +0200
-@@ -345,9 +345,9 @@
+--- sys/amd64/linux32/linux32_sysvec.c.orig	2007-12-09 13:18:01.432524000 +0100
++++ sys/amd64/linux32/linux32_sysvec.c	2007-12-09 13:24:46.000000000 +0100
+@@ -355,9 +355,9 @@
  	frame.sf_sc.uc_mcontext.sc_mask   = frame.sf_sc.uc_sigmask.__bits[0];
          frame.sf_sc.uc_mcontext.sc_gs     = rgs();
          frame.sf_sc.uc_mcontext.sc_fs     = rfs();
@@ -280,7 +280,7 @@ Index: sys/amd64/linux32/linux32_sysvec.c
  	    "=rm" (frame.sf_sc.uc_mcontext.sc_ds));
  	frame.sf_sc.uc_mcontext.sc_edi    = regs->tf_rdi;
  	frame.sf_sc.uc_mcontext.sc_esi    = regs->tf_rsi;
-@@ -474,8 +474,8 @@
+@@ -489,8 +489,8 @@
  	frame.sf_sc.sc_mask   = lmask.__bits[0];
          frame.sf_sc.sc_gs     = rgs();
          frame.sf_sc.sc_fs     = rfs();
@@ -293,8 +293,8 @@ Index: sys/amd64/linux32/linux32_sysvec.c
  	frame.sf_sc.sc_ebp    = regs->tf_rbp;
 Index: sys/amd64/ia32/ia32_sigtramp.S
 ===================================================================
---- sys/amd64/ia32/ia32_sigtramp.S.orig	2003-08-23 01:19:02.000000000 +0200
-+++ sys/amd64/ia32/ia32_sigtramp.S	2006-06-24 17:32:27.000000000 +0200
+--- sys/amd64/ia32/ia32_sigtramp.S.orig	2007-12-09 13:18:01.363520000 +0100
++++ sys/amd64/ia32/ia32_sigtramp.S	2007-12-09 13:24:46.000000000 +0100
 @@ -45,8 +45,8 @@
  	calll	*IA32_SIGF_HANDLER(%esp)
  	leal	IA32_SIGF_UC(%esp),%eax	/* get ucontext */
@@ -319,8 +319,8 @@ Index: sys/amd64/ia32/ia32_sigtramp.S
  	int	$0x80			/* enter kernel with args */
 Index: sys/amd64/linux32/linux32_locore.s
 ===================================================================
---- sys/amd64/linux32/linux32_locore.s.orig	2004-08-16 09:55:06.000000000 +0200
-+++ sys/amd64/linux32/linux32_locore.s	2006-06-24 17:32:27.000000000 +0200
+--- sys/amd64/linux32/linux32_locore.s.orig	2007-12-09 13:18:01.482547000 +0100
++++ sys/amd64/linux32/linux32_locore.s	2007-12-09 13:24:46.000000000 +0100
 @@ -11,8 +11,8 @@
  NON_GPROF_ENTRY(linux_sigcode)
  	call	*LINUX_SIGF_HANDLER(%esp)

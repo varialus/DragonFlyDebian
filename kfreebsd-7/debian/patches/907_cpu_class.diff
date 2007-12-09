@@ -3,9 +3,9 @@ Status: Rejected in upstream (kern/77355).
 
 Index: sys/i386/i386/identcpu.c
 ===================================================================
---- sys/i386/i386/identcpu.c.orig	2006-04-24 20:24:30.000000000 +0200
-+++ sys/i386/i386/identcpu.c	2006-06-24 17:43:03.000000000 +0200
-@@ -611,6 +611,7 @@
+--- sys/i386/i386/identcpu.c.orig	2007-12-09 13:17:58.684647000 +0100
++++ sys/i386/i386/identcpu.c	2007-12-09 13:24:47.000000000 +0100
+@@ -643,6 +643,7 @@
  #if defined(I486_CPU)
  	case CPUCLASS_486:
  		printf("486");
@@ -13,7 +13,7 @@ Index: sys/i386/i386/identcpu.c
  		bzero_vector = i486_bzero;
  		break;
  #endif
-@@ -621,6 +622,7 @@
+@@ -653,6 +654,7 @@
  		       (intmax_t)(tsc_freq + 4999) / 1000000,
  		       (u_int)((tsc_freq + 4999) / 10000) % 100);
  		printf("586");
@@ -21,7 +21,7 @@ Index: sys/i386/i386/identcpu.c
  		break;
  #endif
  #if defined(I686_CPU)
-@@ -630,6 +632,7 @@
+@@ -662,6 +664,7 @@
  		       (intmax_t)(tsc_freq + 4999) / 1000000,
  		       (u_int)((tsc_freq + 4999) / 10000) % 100);
  		printf("686");

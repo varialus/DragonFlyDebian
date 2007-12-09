@@ -3,9 +3,9 @@ Status: Rejected in upstream (kern/68961)
 
 Index: sys/dev/null/null.c
 ===================================================================
---- sys/dev/null/null.c.orig	2005-02-27 23:00:45.000000000 +0100
-+++ sys/dev/null/null.c	2006-06-24 17:42:51.000000000 +0200
-@@ -42,13 +42,16 @@
+--- sys/dev/null/null.c.orig	2007-12-09 13:17:59.091708000 +0100
++++ sys/dev/null/null.c	2007-12-09 13:24:47.000000000 +0100
+@@ -43,13 +43,16 @@
  
  /* For use with destroy_dev(9). */
  static struct cdev *null_dev;
@@ -22,7 +22,7 @@ Index: sys/dev/null/null.c
  #define ZERO_MINOR	12
  
  static struct cdevsw null_cdevsw = {
-@@ -59,6 +62,14 @@
+@@ -60,6 +63,14 @@
  	.d_name =	"null",
  };
  
@@ -37,7 +37,7 @@ Index: sys/dev/null/null.c
  static struct cdevsw zero_cdevsw = {
  	.d_version =	D_VERSION,
  	.d_read =	zero_read,
-@@ -80,6 +91,15 @@
+@@ -81,6 +92,15 @@
  
  /* ARGSUSED */
  static int
@@ -53,7 +53,7 @@ Index: sys/dev/null/null.c
  null_ioctl(struct cdev *dev __unused, u_long cmd, caddr_t data __unused,
      int flags __unused, struct thread *td)
  {
-@@ -116,12 +136,15 @@
+@@ -117,12 +137,15 @@
  		zbuf = (void *)malloc(PAGE_SIZE, M_TEMP, M_WAITOK | M_ZERO);
  		null_dev = make_dev(&null_cdevsw, NULL_MINOR, UID_ROOT,
  			GID_WHEEL, 0666, "null");

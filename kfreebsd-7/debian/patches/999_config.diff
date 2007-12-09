@@ -1,10 +1,10 @@
 Index: sys/amd64/conf/GENERIC
 ===================================================================
---- sys/amd64/conf/GENERIC.orig	2007-05-30 13:26:20.000000000 +0200
-+++ sys/amd64/conf/GENERIC	2007-05-30 13:31:16.000000000 +0200
+--- sys/amd64/conf/GENERIC.orig	2007-12-09 13:24:47.000000000 +0100
++++ sys/amd64/conf/GENERIC	2007-12-09 13:24:47.000000000 +0100
 @@ -18,13 +18,8 @@
  #
- # $FreeBSD: src/sys/amd64/conf/GENERIC,v 1.478 2007/05/28 14:38:42 simokawa Exp $
+ # $FreeBSD: src/sys/amd64/conf/GENERIC,v 1.484.2.1 2007/10/11 06:20:26 kensmith Exp $
  
 -cpu		HAMMER
 -ident		GENERIC
@@ -17,7 +17,7 @@ Index: sys/amd64/conf/GENERIC
  
  options 	SCHED_4BSD		# 4BSD scheduler
  options 	PREEMPTION		# Enable kernel thread preemption
-@@ -43,6 +38,8 @@
+@@ -44,6 +39,8 @@
  options 	MSDOSFS			# MSDOS Filesystem
  options 	CD9660			# ISO 9660 Filesystem
  options 	PROCFS			# Process filesystem (requires PSEUDOFS)
@@ -26,7 +26,7 @@ Index: sys/amd64/conf/GENERIC
  options 	PSEUDOFS		# Pseudo-filesystem framework
  options 	GEOM_PART_GPT		# GUID Partition Tables.
  options 	GEOM_LABEL		# Provides labelization
-@@ -51,7 +47,7 @@
+@@ -52,7 +49,7 @@
  options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
@@ -35,7 +35,7 @@ Index: sys/amd64/conf/GENERIC
  options 	KTRACE			# ktrace(1) support
  options 	SYSVSHM			# SYSV-style shared memory
  options         SHMMAXPGS=4096
-@@ -83,9 +79,6 @@
+@@ -79,9 +76,6 @@
  device		acpi
  device		pci
  
@@ -45,7 +45,7 @@ Index: sys/amd64/conf/GENERIC
  # ATA and ATAPI devices
  device		ata
  device		atadisk		# ATA disk drives
-@@ -93,6 +86,8 @@
+@@ -89,6 +83,8 @@
  device		atapicd		# ATAPI CDROM drives
  device		atapifd		# ATAPI floppy drives
  device		atapist		# ATAPI tape drives
@@ -54,7 +54,7 @@ Index: sys/amd64/conf/GENERIC
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -175,10 +170,6 @@
+@@ -171,10 +167,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -65,9 +65,9 @@ Index: sys/amd64/conf/GENERIC
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -237,9 +228,6 @@
- device		wlan_tkip	# 802.11 TKIP support
- device		wlan_amrr	# AMRR transmit rate control algorithm
+@@ -236,9 +228,6 @@
+ device		wlan_scan_ap	# 802.11 AP mode scanning
+ device		wlan_scan_sta	# 802.11 STA mode scanning
  device		an		# Aironet 4500/4800 802.11 wireless NICs.
 -device		ath		# Atheros pci/cardbus NIC's
 -device		ath_hal		# Atheros HAL (Hardware Access Layer)
@@ -75,7 +75,7 @@ Index: sys/amd64/conf/GENERIC
  device		awi		# BayStack 660 and others
  device		ral		# Ralink Technology RT2500 wireless NICs.
  device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
-@@ -248,13 +236,8 @@
+@@ -247,13 +236,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
@@ -89,7 +89,7 @@ Index: sys/amd64/conf/GENERIC
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -271,12 +254,8 @@
+@@ -270,12 +254,8 @@
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
@@ -102,7 +102,7 @@ Index: sys/amd64/conf/GENERIC
  # USB Ethernet, requires miibus
  device		aue		# ADMtek USB Ethernet
  device		axe		# ASIX Electronics USB Ethernet
-@@ -292,3 +271,11 @@
+@@ -291,3 +271,11 @@
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
@@ -116,11 +116,11 @@ Index: sys/amd64/conf/GENERIC
 +options		ALTQ_PRIQ	# Priority Queuing (PRIQ)
 Index: sys/i386/conf/GENERIC
 ===================================================================
---- sys/i386/conf/GENERIC.orig	2007-05-30 13:26:20.000000000 +0200
-+++ sys/i386/conf/GENERIC	2007-05-30 13:35:14.000000000 +0200
+--- sys/i386/conf/GENERIC.orig	2007-12-09 13:24:47.000000000 +0100
++++ sys/i386/conf/GENERIC	2007-12-09 13:24:47.000000000 +0100
 @@ -18,15 +18,8 @@
  #
- # $FreeBSD: src/sys/i386/conf/GENERIC,v 1.468 2007/05/28 14:38:42 simokawa Exp $
+ # $FreeBSD: src/sys/i386/conf/GENERIC,v 1.474.2.1 2007/10/11 06:20:26 kensmith Exp $
  
 -cpu		I486_CPU
 -cpu		I586_CPU
@@ -135,7 +135,7 @@ Index: sys/i386/conf/GENERIC
  
  options 	SCHED_4BSD		# 4BSD scheduler
  options 	PREEMPTION		# Enable kernel thread preemption
-@@ -44,6 +37,8 @@
+@@ -45,6 +38,8 @@
  options 	MSDOSFS			# MSDOS Filesystem
  options 	CD9660			# ISO 9660 Filesystem
  options 	PROCFS			# Process filesystem (requires PSEUDOFS)
@@ -144,7 +144,7 @@ Index: sys/i386/conf/GENERIC
  options 	PSEUDOFS		# Pseudo-filesystem framework
  options 	GEOM_PART_GPT		# GUID Partition Tables.
  options 	GEOM_LABEL		# Provides labelization
-@@ -51,7 +46,7 @@
+@@ -52,7 +47,7 @@
  options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
@@ -153,7 +153,7 @@ Index: sys/i386/conf/GENERIC
  options 	KTRACE			# ktrace(1) support
  options 	SYSVSHM			# SYSV-style shared memory
  options         SHMMAXPGS=4096
-@@ -84,9 +79,6 @@
+@@ -80,9 +75,6 @@
  device		eisa
  device		pci
  
@@ -163,7 +163,7 @@ Index: sys/i386/conf/GENERIC
  # ATA and ATAPI devices
  device		ata
  device		atadisk		# ATA disk drives
-@@ -94,6 +86,8 @@
+@@ -90,6 +82,8 @@
  device		atapicd		# ATAPI CDROM drives
  device		atapifd		# ATAPI floppy drives
  device		atapist		# ATAPI tape drives
@@ -172,7 +172,7 @@ Index: sys/i386/conf/GENERIC
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -186,10 +180,6 @@
+@@ -182,10 +176,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -183,9 +183,9 @@ Index: sys/i386/conf/GENERIC
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -250,9 +240,6 @@
- device		wlan_tkip	# 802.11 TKIP support
- device		wlan_amrr	# AMRR transmit rate control algorithm
+@@ -249,9 +239,6 @@
+ device		wlan_scan_ap	# 802.11 AP mode scanning
+ device		wlan_scan_sta	# 802.11 STA mode scanning
  device		an		# Aironet 4500/4800 802.11 wireless NICs.
 -device		ath		# Atheros pci/cardbus NIC's
 -device		ath_hal		# Atheros HAL (Hardware Access Layer)
@@ -193,7 +193,7 @@ Index: sys/i386/conf/GENERIC
  device		awi		# BayStack 660 and others
  device		ral		# Ralink Technology RT2500 wireless NICs.
  device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
-@@ -262,13 +249,8 @@
+@@ -261,13 +248,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
@@ -207,7 +207,7 @@ Index: sys/i386/conf/GENERIC
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -285,13 +267,9 @@
+@@ -284,13 +266,9 @@
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
@@ -221,7 +221,7 @@ Index: sys/i386/conf/GENERIC
  # USB Ethernet, requires miibus
  device		aue		# ADMtek USB Ethernet
  device		axe		# ASIX Electronics USB Ethernet
-@@ -307,3 +285,11 @@
+@@ -306,3 +284,11 @@
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
