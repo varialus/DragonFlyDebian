@@ -4,10 +4,11 @@
   for details see http://sourceware.org/bugzilla/show_bug.cgi?id=5391
 
 
-diff -u sys/conf/kern.post.mk sys/conf/kern.post.mk
---- sys/conf/kern.post.mk
-+++ sys/conf/kern.post.mk
-@@ -82,7 +92,9 @@
+Index: sys/conf/kern.post.mk
+===================================================================
+--- sys/conf/kern.post.mk.orig	2007-12-09 00:43:15.000000000 +0100
++++ sys/conf/kern.post.mk	2007-12-09 00:43:16.000000000 +0100
+@@ -92,7 +92,9 @@
  ${FULLKERNEL}: ${SYSTEM_DEP} vers.o
  	@rm -f ${.TARGET}
  	@echo linking ${.TARGET}
@@ -18,9 +19,10 @@ diff -u sys/conf/kern.post.mk sys/conf/kern.post.mk
  .if !defined(DEBUG)
  	${OBJCOPY} --strip-debug ${.TARGET}
  .endif
-diff -u sys/conf/kmod.mk sys/conf/kmod.mk
---- sys/conf/kmod.mk
-+++ sys/conf/kmod.mk
+Index: sys/conf/kmod.mk
+===================================================================
+--- sys/conf/kmod.mk.orig	2007-12-09 00:43:15.000000000 +0100
++++ sys/conf/kmod.mk	2007-12-09 00:43:16.000000000 +0100
 @@ -179,7 +179,8 @@
  
  .if ${MACHINE_ARCH} != amd64
