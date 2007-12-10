@@ -407,6 +407,13 @@
 #define	SYS_sctp_generic_sendmsg	472
 #define	SYS_sctp_generic_sendmsg_iov	473
 #define	SYS_sctp_generic_recvmsg	474
-#define	SYS_MAXSYSCALL	475
+#define	SYS_pread	475
+#define	SYS_pwrite	476
+#define	SYS_mmap	477
+#define	SYS_lseek	478
+#define	SYS_truncate	479
+#define	SYS_ftruncate	480
+#define	SYS_thr_kill2	481
+#define	SYS_MAXSYSCALL	482
 
 #endif
