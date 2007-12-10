@@ -89,3 +89,7 @@ strong_alias (__openat, __openat64)
 strong_alias (__openat_nocancel, __openat64_nocancel)
 libc_hidden_weak (__openat64)
 weak_alias (__openat64, openat64)
+
+stub_warning (openat)
+stub_warning (openat64)
+
