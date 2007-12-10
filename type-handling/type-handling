@@ -1,7 +1,8 @@
 #!/bin/sh -e
 
-all_cpus=`grep -v ^# /usr/share/dpkg/cputable | (while read debian gnu regex ; do echo ${debian} ; done)`
-all_systems=`grep -v ^# /usr/share/dpkg/ostable | (while read debian gnu regex ; do echo ${debian} ; done) | cut -f2 -d-  | sort -u`
+all_systems_cpus="`dpkg-architecture -L | sed -e '/^$/d' -e '/.*-.*/!s/^/linux-/'`"
+all_cpus="`echo "$all_systems_cpus" | sed -e "s/.*-//" | sort -u`"
+all_systems="`echo "$all_systems_cpus" | sed -e "s/-.*//" | sort -u`"
 
 if [ "$#" = "0" ] ; then
   echo "Known cpus: `for i in ${all_cpus} ; do echo -n $i\  ; done`"
@@ -30,17 +31,13 @@ while [ $# -gt 0 ]; do
 done
 
 # Some ugly conversions
-systems="`echo ${systems} | sed "s/linux-gnu/linux/g" | sed "s/hurd/gnu/g"`"
-cpus="`echo ${cpus} | sed "s/amd64/x86_64/g"`"
-
-all_cpus="`echo ${all_cpus} | sed "s/amd64/x86_64/g"`"
-all_systems="`echo ${all_systems} | sed "s/hurd/gnu/g"`"
-
+systems="`echo ${systems} | sed "s/linux-gnu/linux/g" | sed "s/\bgnu/hurd/g"`"
+cpus="`echo ${cpus} | sed "s/x86_64/amd64/g" | sed "s/arm\b/arm,armel/g"`"
 
 # check if we have a cached result for this
 if test -e "/usr/share/type-handling/${cpus}:${systems}" \
   && [ ":${TYPE_HANDLING_BOOTSTRAP}" = ":" ] \
-  && [ "${negated}:${reverted}" = "0:0" ] ; then
+  && [ "${negated}:${reverted}" = ":" ] ; then
   cat "/usr/share/type-handling/${cpus}:${systems}"
   exit
 fi
@@ -79,16 +76,16 @@ systems="`echo ${systems} | sed "s/,/ /g"`"
   case "${match}${negated}${reverted}" in
     010|100)
       # make sure it exists..
-      if arch=`dpkg-architecture -f -t${cpu}-${system} -qDEB_HOST_ARCH 2>/dev/null` ; then
-        echo -n " ${arch}"
+      if echo "${all_systems_cpus}" | grep -q "${system}-${cpu}" ; then
+        echo -n " ${system}-${cpu}"
       fi
     ;;
     001|111)
       # make sure it exists..
-      if arch=`dpkg-architecture -f -t${cpu}-${system} -qDEB_HOST_ARCH 2>/dev/null` ; then
-        echo -n " !${arch}"
+      if echo "${all_systems_cpus}" | grep -q "${system}-${cpu}" ; then
+        echo -n " !${system}-${cpu}"
       fi
     ;;
   esac
-done ; done) | cut -c 2-
+done ; done) | cut -c 2- | sed -e "s/linux-//g"
 echo
