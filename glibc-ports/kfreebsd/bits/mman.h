@@ -58,8 +58,8 @@
 #ifdef __USE_BSD
 #define MAP_RENAME	 0x0020 /* Sun: rename private pages to file */
 #define MAP_NORESERVE	 0x0040 /* Sun: don't reserve needed swap area */
-# define MAP_INHERIT	 0x0080	/* Region is retained after exec.  */
-# define MAP_NOEXTEND	 0x0100	/* For MAP_FILE, don't change file size.  */
+#define MAP_RESERVED0080 0x0080	/* previously misimplemented MAP_INHERIT */
+#define MAP_RESERVED0100 0x0100	/* previously unimplemented MAP_NOEXTEND */
 # define MAP_HASSEMPHORE 0x0200	/* Region may contain semaphores.  */
 # define MAP_STACK	 0x0400	/* Region grows down, like a stack.  */
 # define MAP_NOSYNC	 0x0800	/* Try to avoid flushing to the disk.  */
@@ -78,6 +78,7 @@
 # define MADV_AUTOSYNC	 7	/* Use the default flushing strategy.  */
 # define MADV_NOCORE	 8	/* Don't include these pages in a core dump.  */
 # define MADV_CORE	 9	/* Include pages in a core dump (default).  */
+# define MADV_PROTECT	10	/* protect process from pageout kill */
 #endif
 
 /* The POSIX people had to invent similar names for the same things.  */
@@ -106,6 +107,17 @@
 # define INHERIT_NONE	2
 #endif
 
+
+/*
+ * Return bits from mincore
+ */
+#ifdef __USE_MISC
+#define	MINCORE_INCORE	 	 0x1 /* Page is incore */
+#define	MINCORE_REFERENCED	 0x2 /* Page has been referenced by us */
+#define	MINCORE_MODIFIED	 0x4 /* Page has been modified by us */
+#define	MINCORE_REFERENCED_OTHER 0x8 /* Page has been referenced */
+#define	MINCORE_MODIFIED_OTHER	0x10 /* Page has been modified */
+#endif /* Use MISC */
 
 #ifdef __USE_BSD
 
