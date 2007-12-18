@@ -1,0 +1,53 @@
+diff -u lib.old/libdevstat/Makefile lib/libdevstat/Makefile
+--- lib.old/libdevstat/Makefile	2007-12-18 15:47:44.000000000 +0100
++++ lib/libdevstat/Makefile	2007-12-18 16:11:58.000000000 +0100
+@@ -8,7 +8,7 @@
+ INCS=	devstat.h
+ 
+ DPADD=	${LIBKVM}
+-LDADD+=	-lkvm
++LDADD+=	-lrt ../libkvm/libkvm.so.0
+ 
+ MAN=	devstat.3
+ 
+@@ -31,7 +31,7 @@
+ MLINKS+=devstat.3 compute_stats.3
+ MLINKS+=devstat.3 compute_etime.3
+ 
+-CFLAGS+=-I${.CURDIR}
++CFLAGS+=-I. -I../libkvm
+ 
+ WARNS?=	2
+ 
+diff -u lib.old/libdevstat/devstat.c lib/libdevstat/devstat.c
+--- lib.old/libdevstat/devstat.c	2007-12-18 15:47:44.000000000 +0100
++++ lib/libdevstat/devstat.c	2007-12-18 15:57:12.000000000 +0100
+@@ -44,6 +44,7 @@
+ #include <stdarg.h>
+ #include <kvm.h>
+ #include <nlist.h>
++#include <time.h>
+ 
+ #include "devstat.h"
+ 
+@@ -1588,6 +1589,7 @@
+ 	struct devstatlist dhead;
+ 	int num_devs;
+ 	char *rv = NULL;
++	char *oldrv;
+ 
+ 	if ((num_devs = devstat_getnumdevs(kd)) <= 0)
+ 		return(NULL);
+@@ -1616,9 +1618,11 @@
+ 			return(NULL);
+ 		}
+ 		nds = &ds;
+-		rv = (char *)reallocf(rv, sizeof(gen) + 
++		oldrv = rv;
++		rv = (char *)realloc(rv, sizeof(gen) + 
+ 				      sizeof(ds) * (i + 1));
+ 		if (rv == NULL) {
++			free(oldrv);		
+ 			snprintf(devstat_errbuf, sizeof(devstat_errbuf), 
+ 				 "%s: out of memory (malloc failed)",
+ 				 __func__);

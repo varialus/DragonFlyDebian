@@ -21,7 +21,7 @@ SRC_DIR=src
 KERNEL_SRC=kfreebsd-source-6.3
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
-PMAKE=make COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR)
+PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
 export LDADD=-lbsd -lfreebsd
 export SHLIB_MAJOR=0
 export SHLIBDIR=/usr/lib
@@ -47,7 +47,7 @@ $(SRC_DIR):
 build: build-arch build-indep
 
 build-arch: build-arch-stamp
-build-arch-stamp: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid
+build-arch-stamp: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-devstat
 	touch build-arch-stamp
 
 build-cam: build-sbuf $(SRC_DIR)
@@ -64,6 +64,9 @@ build-kiconv: $(SRC_DIR)
 
 build-kvm: $(SRC_DIR)
 	cd $(SRC_DIR)/lib/libkvm && $(PMAKE)
+
+build-devstat: $(SRC_DIR) build-kvm
+	cd $(SRC_DIR)/lib/libdevstat && $(PMAKE)
 
 build-sbuf: $(SRC_DIR)
 	cd $(SRC_DIR)/lib/libsbuf && $(PMAKE)
@@ -101,6 +104,7 @@ install-arch:
 	cd $(SRC_DIR)/lib/libipx && $(PMAKE) install
 	cd $(SRC_DIR)/lib/libkiconv && $(PMAKE) install
 	cd $(SRC_DIR)/lib/libkvm && $(PMAKE) install
+	cd $(SRC_DIR)/lib/libdevstat && $(PMAKE) install
 	cd $(SRC_DIR)/lib/libusbhid && $(PMAKE) install
 
 	dh_install -s --list-missing --sourcedir=debian/tmp
