@@ -25,7 +25,7 @@ Index: sys/conf/files.i386
 ===================================================================
 --- sys/conf/files.i386.orig
 +++ sys/conf/files.i386
-@@ -46,42 +46,6 @@
+@@ -46,47 +46,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -60,6 +60,11 @@ Index: sys/conf/files.i386
 -	compile-with	"uudecode < $S/dev/hptmv/i386-elf.raid.o.uu" \
 -	no-implicit-rule
 -#
+-hptrr_lib.o			optional	hptrr			\
+-	dependency	"$S/dev/hptrr/i386-elf.hptrr_lib.o.uu"		\
+-	compile-with	"uudecode < $S/dev/hptrr/i386-elf.hptrr_lib.o.uu" \
+-	no-implicit-rule
+-#
 -rr232x_lib.o			optional	rr232x			\
 -	dependency	"$S/dev/rr232x/i386-elf.rr232x_lib.o.uu"	\
 -	compile-with	"uudecode < $S/dev/rr232x/i386-elf.rr232x_lib.o.uu" \
@@ -68,7 +73,7 @@ Index: sys/conf/files.i386
  #
  compat/linux/linux_file.c	optional compat_linux
  compat/linux/linux_getcwd.c	optional compat_linux
-@@ -185,11 +149,6 @@
+@@ -190,14 +149,6 @@
  dev/fdc/fdc_isa.c		optional fdc isa
  dev/fdc/fdc_pccard.c		optional fdc pccard
  dev/fe/if_fe_isa.c		optional fe isa
@@ -77,10 +82,13 @@ Index: sys/conf/files.i386
 -dev/hptmv/gui_lib.c		optional hptmv
 -dev/hptmv/hptproc.c		optional hptmv
 -dev/hptmv/ioctl.c		optional hptmv
+-dev/hptrr/hptrr_os_bsd.c	optional hptrr
+-dev/hptrr/hptrr_osm_bsd.c	optional hptrr
+-dev/hptrr/hptrr_config.c	optional hptrr
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_pentium.c	optional hwpmc
  dev/hwpmc/hwpmc_piv.c		optional hwpmc
-@@ -224,13 +183,9 @@
+@@ -232,13 +183,9 @@
  dev/mxge/mxge_eth_z8e.c		optional mxge pci
  dev/mxge/mxge_ethp_z8e.c	optional mxge pci
  net/zlib.c			optional mxge
@@ -112,16 +120,17 @@ Index: sys/i386/conf/GENERIC
 ===================================================================
 --- sys/i386/conf/GENERIC.orig
 +++ sys/i386/conf/GENERIC
-@@ -117,8 +117,6 @@
+@@ -117,9 +117,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
 -device		hptmv		# Highpoint RocketRAID 182x
+-device		hptrr		# Highpoint RocketRAID 17xx, 22xx, 23xx, 25xx
 -device		rr232x		# Highpoint RocketRAID 232x
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -200,7 +198,6 @@
+@@ -201,7 +198,6 @@
  device		msk		# Marvell/SysKonnect Yukon II Gigabit Ethernet
  device		nfe		# nVidia nForce MCP on-board Ethernet Networking
  device		nge		# NatSemi DP83820 gigabit Ethernet
@@ -145,15 +154,16 @@ Index: sys/modules/Makefile
  	aue \
  	${_auxio} \
  	${_awi} \
-@@ -96,7 +91,6 @@
+@@ -96,8 +91,6 @@
  	${_hfa} \
  	hifn \
  	hme \
 -	${_hptmv} \
+-	${_hptrr} \
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -185,9 +179,7 @@
+@@ -186,9 +179,7 @@
  	ntfs \
  	ntfs_iconv \
  	nullfs \
@@ -163,7 +173,7 @@ Index: sys/modules/Makefile
  	${_osf1} \
  	${_padlock} \
  	patm \
-@@ -343,7 +335,6 @@
+@@ -344,7 +335,6 @@
  _apm=		apm
  _ar=		ar
  _arcnet=	arcnet
@@ -171,7 +181,7 @@ Index: sys/modules/Makefile
  _awi=		awi
  _bktr=		bktr
  _cardbus=	cardbus
-@@ -377,7 +368,6 @@
+@@ -378,7 +368,6 @@
  _ndis=		ndis
  _nsp=		nsp
  _nwfs=		nwfs
@@ -179,15 +189,15 @@ Index: sys/modules/Makefile
  _pccard=	pccard
  _pcfclock=	pcfclock
  _pecoff=	pecoff
-@@ -415,7 +405,6 @@
+@@ -416,7 +405,6 @@
  _dpt=		dpt
  _el=		el
  _ex=		ex
--_hptmv=		hptmv
+-_hptrr=		hptrr
  _ichwd=		ichwd
  _ida=		ida
  _idt=		idt
-@@ -427,14 +416,12 @@
+@@ -428,14 +416,12 @@
  _ixgb=  	ixgb
  _mly=		mly
  _mxge=		mxge
@@ -202,7 +212,7 @@ Index: sys/modules/Makefile
  _s3=		s3
  _twa=		twa
  _vesa=		vesa
-@@ -461,7 +448,6 @@
+@@ -462,7 +448,6 @@
  #_acpi=		acpi		# doesn't work on amd64 yet
  _agp=		agp
  _arcmsr=	arcmsr
@@ -210,15 +220,16 @@ Index: sys/modules/Makefile
  _ciss=		ciss
  _coretemp=	coretemp
  _cpufreq=	cpufreq
-@@ -469,7 +455,6 @@
+@@ -470,8 +455,6 @@
  _drm=		drm
  _em=		em
  _ext2fs=	ext2fs
 -_hptmv=		hptmv
+-_hptrr=		hptrr
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -486,7 +471,6 @@
+@@ -488,7 +471,6 @@
  _ndis=		ndis
  _nve=		nve
  _ppc=		ppc
@@ -230,16 +241,17 @@ Index: sys/amd64/conf/GENERIC
 ===================================================================
 --- sys/amd64/conf/GENERIC.orig
 +++ sys/amd64/conf/GENERIC
-@@ -116,8 +116,6 @@
+@@ -116,9 +116,6 @@
  device		arcmsr		# Areca SATA II RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
 -device		hptmv		# Highpoint RocketRAID 182x
+-device		hptrr		# Highpoint RocketRAID 17xx, 22xx, 23xx, 25xx
 -device		rr232x		# Highpoint RocketRAID 232x
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -191,7 +189,6 @@
+@@ -192,7 +189,6 @@
  device		msk		# Marvell/SysKonnect Yukon II Gigabit Ethernet
  device		nfe		# nVidia nForce MCP on-board Ethernet Networking
  device		nge		# NatSemi DP83820 gigabit Ethernet
@@ -251,7 +263,7 @@ Index: sys/conf/files.amd64
 ===================================================================
 --- sys/conf/files.amd64.orig
 +++ sys/conf/files.amd64
-@@ -47,35 +47,6 @@
+@@ -47,41 +47,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -280,6 +292,12 @@ Index: sys/conf/files.amd64
 -	dependency	"$S/dev/hptmv/amd64-elf.raid.o.uu"	\
 -	compile-with	"uudecode < $S/dev/hptmv/amd64-elf.raid.o.uu" \
 -	no-implicit-rule
+-#
+-hptrr_lib.o			optional	hptrr			\
+-	dependency	"$S/dev/hptrr/amd64-elf.hptrr_lib.o.uu"		\
+-	compile-with	"uudecode < $S/dev/hptrr/amd64-elf.hptrr_lib.o.uu" \
+-	no-implicit-rule
+-#
 -rr232x_lib.o		optional	rr232x				\
 -	dependency	"$S/dev/rr232x/amd64-elf.rr232x_lib.o.uu"	\
 -	compile-with	"uudecode < $S/dev/rr232x/amd64-elf.rr232x_lib.o.uu" \
@@ -287,7 +305,7 @@ Index: sys/conf/files.amd64
  #
  amd64/acpica/OsdEnvironment.c	optional	acpi
  amd64/acpica/acpi_machdep.c	optional	acpi
-@@ -172,11 +143,6 @@
+@@ -178,14 +143,6 @@
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
@@ -296,10 +314,13 @@ Index: sys/conf/files.amd64
 -dev/hptmv/gui_lib.c		optional	hptmv
 -dev/hptmv/hptproc.c		optional	hptmv
 -dev/hptmv/ioctl.c		optional	hptmv
+-dev/hptrr/hptrr_os_bsd.c	optional	hptrr
+-dev/hptrr/hptrr_osm_bsd.c	optional	hptrr
+-dev/hptrr/hptrr_config.c	optional	hptrr
  dev/hwpmc/hwpmc_amd.c		optional	hwpmc
  dev/hwpmc/hwpmc_piv.c		optional	hwpmc
  dev/hwpmc/hwpmc_x86.c		optional	hwpmc
-@@ -189,10 +155,6 @@
+@@ -198,10 +155,6 @@
  dev/mxge/mxge_eth_z8e.c		optional	mxge pci
  dev/mxge/mxge_ethp_z8e.c	optional	mxge pci
  net/zlib.c			optional	mxge
