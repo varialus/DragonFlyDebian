@@ -22,7 +22,6 @@ KERNEL_SRC=kfreebsd-source-6.3
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
-export LDADD=-lbsd -lfreebsd
 export SHLIB_MAJOR=0
 export SHLIBDIR=/usr/lib
 
@@ -51,28 +50,28 @@ build-arch-stamp: build-cam build-geom build-sbuf build-ipx build-kiconv build-k
 	touch build-arch-stamp
 
 build-cam: build-sbuf $(SRC_DIR)
-	cd $(SRC_DIR)/lib/libcam && $(PMAKE)
+	LDADD="-lbsd" $(PMAKE) -C $(SRC_DIR)/lib/libcam
 
 build-geom: build-sbuf $(SRC_DIR)
-	cd $(SRC_DIR)/lib/libgeom && $(PMAKE)
+	LDADD="-lfreebsd" $(PMAKE) -C $(SRC_DIR)/lib/libgeom
 
 build-ipx: $(SRC_DIR)
-	cd $(SRC_DIR)/lib/libipx && $(PMAKE)
+	$(PMAKE) -C $(SRC_DIR)/lib/libipx
 
 build-kiconv: $(SRC_DIR)
-	cd $(SRC_DIR)/lib/libkiconv && $(PMAKE)
+	LDADD="-lfreebsd" $(PMAKE) -C $(SRC_DIR)/lib/libkiconv
 
 build-kvm: $(SRC_DIR)
-	cd $(SRC_DIR)/lib/libkvm && $(PMAKE)
+	LDADD="-lbsd -lfreebsd" $(PMAKE) -C $(SRC_DIR)/lib/libkvm
 
 build-devstat: $(SRC_DIR) build-kvm
-	cd $(SRC_DIR)/lib/libdevstat && $(PMAKE)
+	LDADD="-lfreebsd" $(PMAKE) -C $(SRC_DIR)/lib/libdevstat
 
 build-sbuf: $(SRC_DIR)
-	cd $(SRC_DIR)/lib/libsbuf && $(PMAKE)
+	$(PMAKE) -C $(SRC_DIR)/lib/libsbuf
 
 build-usbhid: $(SRC_DIR)
-	cd $(SRC_DIR)/lib/libusbhid && $(PMAKE)
+	LDADD="-lbsd" $(PMAKE) -C $(SRC_DIR)/lib/libusbhid
 
 build-indep: build-indep-stamp
 build-indep-stamp:
@@ -98,14 +97,14 @@ install-arch:
 	dh_installdirs -s
 
 	mkdir -p $(DESTDIR)/usr/{lib,include,share/man/man3}
-	cd $(SRC_DIR)/lib/libsbuf && $(PMAKE) install
-	cd $(SRC_DIR)/lib/libcam && $(PMAKE) install
-	cd $(SRC_DIR)/lib/libgeom && $(PMAKE) install
-	cd $(SRC_DIR)/lib/libipx && $(PMAKE) install
-	cd $(SRC_DIR)/lib/libkiconv && $(PMAKE) install
-	cd $(SRC_DIR)/lib/libkvm && $(PMAKE) install
-	cd $(SRC_DIR)/lib/libdevstat && $(PMAKE) install
-	cd $(SRC_DIR)/lib/libusbhid && $(PMAKE) install
+	$(PMAKE) -C $(SRC_DIR)/lib/libsbuf install
+	$(PMAKE) -C $(SRC_DIR)/lib/libcam install
+	$(PMAKE) -C $(SRC_DIR)/lib/libgeom install
+	$(PMAKE) -C $(SRC_DIR)/lib/libipx install
+	$(PMAKE) -C $(SRC_DIR)/lib/libkiconv install
+	$(PMAKE) -C $(SRC_DIR)/lib/libkvm install
+	$(PMAKE) -C $(SRC_DIR)/lib/libdevstat install
+	$(PMAKE) -C $(SRC_DIR)/lib/libusbhid install
 
 	dh_install -s --list-missing --sourcedir=debian/tmp
 
