@@ -24,7 +24,7 @@ Index: sys/conf/files.i386
 ===================================================================
 --- sys/conf/files.i386.orig
 +++ sys/conf/files.i386
-@@ -46,47 +46,6 @@
+@@ -46,42 +46,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -64,15 +64,10 @@ Index: sys/conf/files.i386
 -	compile-with	"uudecode < $S/dev/hptmv/i386-elf.raid.o.uu" \
 -	no-implicit-rule
 -#
--rr232x_lib.o			optional	rr232x			\
--	dependency	"$S/dev/rr232x/i386-elf.rr232x_lib.o.uu"	\
--	compile-with	"uudecode < $S/dev/rr232x/i386-elf.rr232x_lib.o.uu" \
--	no-implicit-rule
--#
  #
  compat/linprocfs/linprocfs.c	optional linprocfs
  compat/linsysfs/linsysfs.c	optional linsysfs
-@@ -184,14 +143,6 @@
+@@ -179,14 +143,6 @@
  dev/fdc/fdc_isa.c		optional fdc isa
  dev/fdc/fdc_pccard.c		optional fdc pccard
  dev/fe/if_fe_isa.c		optional fe isa
@@ -87,7 +82,7 @@ Index: sys/conf/files.i386
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_pentium.c	optional hwpmc
  dev/hwpmc/hwpmc_piv.c		optional hwpmc
-@@ -218,13 +169,9 @@
+@@ -213,7 +169,6 @@
  dev/mse/mse.c			optional mse
  dev/mse/mse_isa.c		optional mse isa
  dev/nfe/if_nfe.c		optional nfe pci
@@ -95,12 +90,6 @@ Index: sys/conf/files.i386
  dev/nvram/nvram.c		optional nvram isa
  dev/pcf/pcf_isa.c		optional pcf
  dev/random/nehemiah.c		optional random
--dev/rr232x/os_bsd.c		optional rr232x
--dev/rr232x/osm_bsd.c		optional rr232x
--dev/rr232x/rr232x_config.c	optional rr232x
- dev/sbni/if_sbni.c		optional sbni
- dev/sbni/if_sbni_isa.c		optional sbni isa
- dev/sbni/if_sbni_pci.c		optional sbni pci
 Index: sys/conf/kern.pre.mk
 ===================================================================
 --- sys/conf/kern.pre.mk.orig
@@ -119,13 +108,12 @@ Index: sys/i386/conf/GENERIC
 ===================================================================
 --- sys/i386/conf/GENERIC.orig
 +++ sys/i386/conf/GENERIC
-@@ -128,9 +128,6 @@
+@@ -128,8 +128,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
 -device		hptmv		# Highpoint RocketRAID 182x
 -device		hptrr		# Highpoint RocketRAID 17xx, 22xx, 23xx, 25xx
--device		rr232x		# Highpoint RocketRAID 232x
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
@@ -165,15 +153,7 @@ Index: sys/modules/Makefile
  	${_padlock} \
  	patm \
  	${_pccard} \
-@@ -221,7 +212,6 @@
- 	reiserfs \
- 	rl \
- 	rp \
--	${_rr232x} \
- 	rue \
- 	rum \
- 	${_s3} \
-@@ -314,7 +304,6 @@
+@@ -313,7 +304,6 @@
  	${_xe} \
  	xfs \
  	xl \
@@ -181,7 +161,7 @@ Index: sys/modules/Makefile
  	zlib \
  	zyd
  
-@@ -364,11 +353,6 @@
+@@ -363,11 +353,6 @@
  _apm=		apm
  _ar=		ar
  _arcnet=	arcnet
@@ -193,7 +173,7 @@ Index: sys/modules/Makefile
  _awi=		awi
  _bktr=		bktr
  _cardbus=	cardbus
-@@ -407,7 +391,6 @@
+@@ -406,7 +391,6 @@
  .if ${MK_NCP} != "no"
  _nwfs=		nwfs
  .endif
@@ -201,7 +181,7 @@ Index: sys/modules/Makefile
  _pccard=	pccard
  _pcfclock=	pcfclock
  _pecoff=	pecoff
-@@ -428,9 +411,6 @@
+@@ -427,9 +411,6 @@
  _tmpfs= 	tmpfs
  _wi=		wi
  _xe=		xe
@@ -211,7 +191,7 @@ Index: sys/modules/Makefile
  .if ${MACHINE} == "i386"
  _aac=		aac
  _acpi=		acpi
-@@ -447,8 +427,6 @@
+@@ -446,8 +427,6 @@
  _dpt=		dpt
  _ex=		ex
  _hptiop=	hptiop
@@ -220,7 +200,7 @@ Index: sys/modules/Makefile
  _ichwd=		ichwd
  _ida=		ida
  # Disabled due to non-MPSAFEty in 7.0
-@@ -463,7 +441,6 @@
+@@ -462,7 +441,6 @@
  _ixgb=   	ixgb
  _mly=		mly
  _nfe=		nfe
@@ -228,15 +208,7 @@ Index: sys/modules/Makefile
  _nvram=		nvram
  _nxge=		nxge
  _wpi=		wpi
-@@ -473,7 +450,6 @@
- _padlock=	padlock
- .endif
- .endif
--_rr232x=	rr232x
- _s3=		s3
- _twa=		twa
- _vesa=		vesa
-@@ -491,11 +467,6 @@
+@@ -489,11 +467,6 @@
  _agp=		agp
  _an=		an
  _arcmsr=	arcmsr
@@ -248,7 +220,7 @@ Index: sys/modules/Makefile
  _cardbus=	cardbus
  _cbb=		cbb
  _ciss=		ciss
-@@ -508,8 +479,6 @@
+@@ -506,8 +479,6 @@
  _exca=		exca
  _ext2fs=	ext2fs
  _hptiop=	hptiop
@@ -257,7 +229,7 @@ Index: sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -527,11 +496,9 @@
+@@ -525,7 +496,6 @@
  _mly=		mly
  _ndis=		ndis
  _nfe=		nfe
@@ -265,11 +237,7 @@ Index: sys/modules/Makefile
  _nvram=		nvram
  _nxge=		nxge
  _pccard=	pccard
--_rr232x=	rr232x
- _safe=		safe
- _scsi_low=	scsi_low
- _smbfs=		smbfs
-@@ -543,9 +510,6 @@
+@@ -540,9 +510,6 @@
  _wi=		wi
  _wpi=		wpi
  _wpifw=		wpifw
@@ -279,7 +247,7 @@ Index: sys/modules/Makefile
  .endif
  
  .if ${MACHINE_ARCH} == "ia64"
-@@ -586,21 +550,11 @@
+@@ -583,21 +550,11 @@
  
  .if ${MACHINE_ARCH} == "powerpc"
  _an=		an
@@ -305,13 +273,12 @@ Index: sys/amd64/conf/GENERIC
 ===================================================================
 --- sys/amd64/conf/GENERIC.orig
 +++ sys/amd64/conf/GENERIC
-@@ -121,9 +121,6 @@
+@@ -121,8 +121,6 @@
  device		arcmsr		# Areca SATA II RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
 -device		hptmv		# Highpoint RocketRAID 182x
 -device		hptrr		# Highpoint RocketRAID 17xx, 22xx, 23xx, 25xx
--device		rr232x		# Highpoint RocketRAID 232x
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
@@ -319,7 +286,7 @@ Index: sys/conf/files.amd64
 ===================================================================
 --- sys/conf/files.amd64.orig
 +++ sys/conf/files.amd64
-@@ -47,41 +47,6 @@
+@@ -47,37 +47,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -354,14 +321,10 @@ Index: sys/conf/files.amd64
 -	compile-with	"uudecode < $S/dev/hptrr/amd64-elf.hptrr_lib.o.uu" \
 -	no-implicit-rule
 -#
--rr232x_lib.o		optional	rr232x				\
--	dependency	"$S/dev/rr232x/amd64-elf.rr232x_lib.o.uu"	\
--	compile-with	"uudecode < $S/dev/rr232x/amd64-elf.rr232x_lib.o.uu" \
--	no-implicit-rule
  #
  amd64/acpica/OsdEnvironment.c	optional	acpi
  amd64/acpica/acpi_machdep.c	optional	acpi
-@@ -179,25 +144,13 @@
+@@ -175,21 +144,12 @@
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
@@ -381,9 +344,5 @@ Index: sys/conf/files.amd64
  dev/nfe/if_nfe.c		optional	nfe pci
 -dev/nve/if_nve.c		optional	nve pci
  dev/nvram/nvram.c		optional	nvram isa
--dev/rr232x/os_bsd.c		optional	rr232x
--dev/rr232x/osm_bsd.c		optional	rr232x
--dev/rr232x/rr232x_config.c	optional	rr232x
  dev/sio/sio.c			optional	sio
  dev/sio/sio_isa.c		optional	sio isa
- dev/sio/sio_pccard.c		optional	sio pccard
