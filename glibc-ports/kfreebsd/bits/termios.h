@@ -233,6 +233,7 @@ struct termios
 #define	B3000000 3000000
 #define	B3500000 3500000
 #define	B4000000 4000000
+#define	__MAX_BAUD B4000000
 };
 
 #define _IOT_termios /* Hurd ioctl type field.  */ \
