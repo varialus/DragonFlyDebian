@@ -2,7 +2,6 @@
 
 ANONCVS=anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
 RELENG=RELENG_7_0_0_RELEASE
-RELENG=RELENG_7_0
 
 srcs=" \
 	src/sbin/badsect:badsect.ufs \
