@@ -1,24 +1,24 @@
 diff -Nurd sys/amd64/amd64/machdep.c sys/amd64/amd64/machdep.c
---- sys/amd64/amd64/machdep.c	2008-03-06 01:10:06.000000000 +0100
-+++ sys/amd64/amd64/machdep.c	2008-01-19 19:15:01.000000000 +0100
+--- sys/amd64/amd64/machdep.c	2008-01-19 19:15:01.000000000 +0100
++++ sys/amd64/amd64/machdep.c	2008-03-06 01:29:07.000000000 +0100
 @@ -357,7 +357,7 @@
  
  	regs->tf_rsp = (long)sfp;
  	regs->tf_rip = PS_STRINGS - *(p->p_sysent->sv_szsigcode);
--	regs->tf_rflags &= ~(PSL_T | PSL_D);
-+	regs->tf_rflags &= ~PSL_T;
+-	regs->tf_rflags &= ~PSL_T;
++	regs->tf_rflags &= ~(PSL_T | PSL_D);
  	regs->tf_cs = _ucodesel;
  	PROC_LOCK(p);
  	mtx_lock(&psp->ps_mtx);
 diff -Nurd sys/amd64/ia32/ia32_signal.c sys/amd64/ia32/ia32_signal.c
---- sys/amd64/ia32/ia32_signal.c	2008-03-06 01:10:06.000000000 +0100
-+++ sys/amd64/ia32/ia32_signal.c	2006-10-05 03:56:10.000000000 +0200
+--- sys/amd64/ia32/ia32_signal.c	2006-10-05 03:56:10.000000000 +0200
++++ sys/amd64/ia32/ia32_signal.c	2008-03-06 01:29:07.000000000 +0100
 @@ -391,7 +391,7 @@
  
  	regs->tf_rsp = (uintptr_t)sfp;
  	regs->tf_rip = FREEBSD32_PS_STRINGS - sz_freebsd4_ia32_sigcode;
--	regs->tf_rflags &= ~(PSL_T | PSL_D);
-+	regs->tf_rflags &= ~PSL_T;
+-	regs->tf_rflags &= ~PSL_T;
++	regs->tf_rflags &= ~(PSL_T | PSL_D);
  	regs->tf_cs = _ucode32sel;
  	regs->tf_ss = _udatasel;
  	load_ds(_udatasel);
@@ -26,20 +26,20 @@ diff -Nurd sys/amd64/ia32/ia32_signal.c sys/amd64/ia32/ia32_signal.c
  
  	regs->tf_rsp = (uintptr_t)sfp;
  	regs->tf_rip = FREEBSD32_PS_STRINGS - *(p->p_sysent->sv_szsigcode);
--	regs->tf_rflags &= ~(PSL_T | PSL_D);
-+	regs->tf_rflags &= ~PSL_T;
+-	regs->tf_rflags &= ~PSL_T;
++	regs->tf_rflags &= ~(PSL_T | PSL_D);
  	regs->tf_cs = _ucode32sel;
  	regs->tf_ss = _udatasel;
  	load_ds(_udatasel);
 diff -Nurd sys/amd64/linux32/linux32_sysvec.c sys/amd64/linux32/linux32_sysvec.c
---- sys/amd64/linux32/linux32_sysvec.c	2008-03-06 01:10:06.000000000 +0100
-+++ sys/amd64/linux32/linux32_sysvec.c	2007-09-20 15:46:26.000000000 +0200
+--- sys/amd64/linux32/linux32_sysvec.c	2007-09-20 15:46:26.000000000 +0200
++++ sys/amd64/linux32/linux32_sysvec.c	2008-03-06 01:29:07.000000000 +0100
 @@ -402,7 +402,7 @@
  	regs->tf_rsp = PTROUT(fp);
  	regs->tf_rip = LINUX32_PS_STRINGS - *(p->p_sysent->sv_szsigcode) +
  	    linux_sznonrtsigcode;
--	regs->tf_rflags &= ~(PSL_T | PSL_D);
-+	regs->tf_rflags &= ~PSL_T;
+-	regs->tf_rflags &= ~PSL_T;
++	regs->tf_rflags &= ~(PSL_T | PSL_D);
  	regs->tf_cs = _ucode32sel;
  	regs->tf_ss = _udatasel;
  	load_ds(_udatasel);
@@ -47,20 +47,20 @@ diff -Nurd sys/amd64/linux32/linux32_sysvec.c sys/amd64/linux32/linux32_sysvec.c
  	 */
  	regs->tf_rsp = PTROUT(fp);
  	regs->tf_rip = LINUX32_PS_STRINGS - *(p->p_sysent->sv_szsigcode);
--	regs->tf_rflags &= ~(PSL_T | PSL_D);
-+	regs->tf_rflags &= ~PSL_T;
+-	regs->tf_rflags &= ~PSL_T;
++	regs->tf_rflags &= ~(PSL_T | PSL_D);
  	regs->tf_cs = _ucode32sel;
  	regs->tf_ss = _udatasel;
  	load_ds(_udatasel);
 diff -Nurd sys/i386/i386/machdep.c sys/i386/i386/machdep.c
---- sys/i386/i386/machdep.c	2008-03-06 01:10:06.000000000 +0100
-+++ sys/i386/i386/machdep.c	2008-01-19 19:15:03.000000000 +0100
+--- sys/i386/i386/machdep.c	2008-01-19 19:15:03.000000000 +0100
++++ sys/i386/i386/machdep.c	2008-03-06 01:29:07.000000000 +0100
 @@ -416,7 +416,7 @@
  
  	regs->tf_esp = (int)fp;
  	regs->tf_eip = PS_STRINGS - szosigcode;
--	regs->tf_eflags &= ~(PSL_T | PSL_D);
-+	regs->tf_eflags &= ~PSL_T;
+-	regs->tf_eflags &= ~PSL_T;
++	regs->tf_eflags &= ~(PSL_T | PSL_D);
  	regs->tf_cs = _ucodesel;
  	regs->tf_ds = _udatasel;
  	regs->tf_es = _udatasel;
@@ -68,8 +68,8 @@ diff -Nurd sys/i386/i386/machdep.c sys/i386/i386/machdep.c
  
  	regs->tf_esp = (int)sfp;
  	regs->tf_eip = PS_STRINGS - szfreebsd4_sigcode;
--	regs->tf_eflags &= ~(PSL_T | PSL_D);
-+	regs->tf_eflags &= ~PSL_T;
+-	regs->tf_eflags &= ~PSL_T;
++	regs->tf_eflags &= ~(PSL_T | PSL_D);
  	regs->tf_cs = _ucodesel;
  	regs->tf_ds = _udatasel;
  	regs->tf_es = _udatasel;
@@ -77,20 +77,20 @@ diff -Nurd sys/i386/i386/machdep.c sys/i386/i386/machdep.c
  
  	regs->tf_esp = (int)sfp;
  	regs->tf_eip = PS_STRINGS - *(p->p_sysent->sv_szsigcode);
--	regs->tf_eflags &= ~(PSL_T | PSL_D);
-+	regs->tf_eflags &= ~PSL_T;
+-	regs->tf_eflags &= ~PSL_T;
++	regs->tf_eflags &= ~(PSL_T | PSL_D);
  	regs->tf_cs = _ucodesel;
  	regs->tf_ds = _udatasel;
  	regs->tf_es = _udatasel;
 diff -Nurd sys/i386/linux/linux_sysvec.c sys/i386/linux/linux_sysvec.c
---- sys/i386/linux/linux_sysvec.c	2008-03-06 01:10:06.000000000 +0100
-+++ sys/i386/linux/linux_sysvec.c	2007-09-20 15:46:26.000000000 +0200
+--- sys/i386/linux/linux_sysvec.c	2007-09-20 15:46:26.000000000 +0200
++++ sys/i386/linux/linux_sysvec.c	2008-03-06 01:29:07.000000000 +0100
 @@ -389,7 +389,7 @@
  	regs->tf_esp = (int)fp;
  	regs->tf_eip = PS_STRINGS - *(p->p_sysent->sv_szsigcode) +
  	    linux_sznonrtsigcode;
--	regs->tf_eflags &= ~(PSL_T | PSL_VM | PSL_D);
-+	regs->tf_eflags &= ~(PSL_T | PSL_VM);
+-	regs->tf_eflags &= ~(PSL_T | PSL_VM);
++	regs->tf_eflags &= ~(PSL_T | PSL_VM | PSL_D);
  	regs->tf_cs = _ucodesel;
  	regs->tf_ds = _udatasel;
  	regs->tf_es = _udatasel;
@@ -98,39 +98,39 @@ diff -Nurd sys/i386/linux/linux_sysvec.c sys/i386/linux/linux_sysvec.c
  	 */
  	regs->tf_esp = (int)fp;
  	regs->tf_eip = PS_STRINGS - *(p->p_sysent->sv_szsigcode);
--	regs->tf_eflags &= ~(PSL_T | PSL_VM | PSL_D);
-+	regs->tf_eflags &= ~(PSL_T | PSL_VM);
+-	regs->tf_eflags &= ~(PSL_T | PSL_VM);
++	regs->tf_eflags &= ~(PSL_T | PSL_VM | PSL_D);
  	regs->tf_cs = _ucodesel;
  	regs->tf_ds = _udatasel;
  	regs->tf_es = _udatasel;
 diff -Nurd sys/i386/svr4/svr4_machdep.c sys/i386/svr4/svr4_machdep.c
---- sys/i386/svr4/svr4_machdep.c	2008-03-06 01:10:06.000000000 +0100
-+++ sys/i386/svr4/svr4_machdep.c	2005-10-19 16:59:54.000000000 +0200
+--- sys/i386/svr4/svr4_machdep.c	2005-10-19 16:59:54.000000000 +0200
++++ sys/i386/svr4/svr4_machdep.c	2008-03-06 01:29:07.000000000 +0100
 @@ -497,13 +497,13 @@
  	     svr4_szsigcode);
  	tf->tf_cs = GSEL(GUSERLDT_SEL, SEL_UPL);
  
--	tf->tf_eflags &= ~(PSL_T|PSL_VM|PSL_AC|PSL_D);
-+	tf->tf_eflags &= ~(PSL_T|PSL_VM|PSL_AC);
+-	tf->tf_eflags &= ~(PSL_T|PSL_VM|PSL_AC);
++	tf->tf_eflags &= ~(PSL_T|PSL_VM|PSL_AC|PSL_D);
  	tf->tf_esp = (int)fp;
  	tf->tf_ss = GSEL(GUSERLDT_SEL, SEL_UPL);
  #else
  	tf->tf_esp = (int)fp;
  	tf->tf_eip = (int)(((char *)PS_STRINGS) - *(p->p_sysent->sv_szsigcode));
--	tf->tf_eflags &= ~(PSL_T | PSL_D);
-+	tf->tf_eflags &= ~PSL_T;
+-	tf->tf_eflags &= ~PSL_T;
++	tf->tf_eflags &= ~(PSL_T | PSL_D);
  	tf->tf_cs = _ucodesel;
  	tf->tf_ds = _udatasel;
  	tf->tf_es = _udatasel;
 diff -Nurd sys/pc98/pc98/machdep.c sys/pc98/pc98/machdep.c
---- sys/pc98/pc98/machdep.c	2008-03-06 01:10:06.000000000 +0100
-+++ sys/pc98/pc98/machdep.c	2008-01-19 19:15:05.000000000 +0100
+--- sys/pc98/pc98/machdep.c	2008-01-19 19:15:05.000000000 +0100
++++ sys/pc98/pc98/machdep.c	2008-03-06 01:29:07.000000000 +0100
 @@ -388,7 +388,7 @@
  
  	regs->tf_esp = (int)fp;
  	regs->tf_eip = PS_STRINGS - szosigcode;
--	regs->tf_eflags &= ~(PSL_T | PSL_D);
-+	regs->tf_eflags &= ~PSL_T;
+-	regs->tf_eflags &= ~PSL_T;
++	regs->tf_eflags &= ~(PSL_T | PSL_D);
  	regs->tf_cs = _ucodesel;
  	regs->tf_ds = _udatasel;
  	regs->tf_es = _udatasel;
@@ -138,8 +138,8 @@ diff -Nurd sys/pc98/pc98/machdep.c sys/pc98/pc98/machdep.c
  
  	regs->tf_esp = (int)sfp;
  	regs->tf_eip = PS_STRINGS - szfreebsd4_sigcode;
--	regs->tf_eflags &= ~(PSL_T | PSL_D);
-+	regs->tf_eflags &= ~PSL_T;
+-	regs->tf_eflags &= ~PSL_T;
++	regs->tf_eflags &= ~(PSL_T | PSL_D);
  	regs->tf_cs = _ucodesel;
  	regs->tf_ds = _udatasel;
  	regs->tf_es = _udatasel;
@@ -147,8 +147,8 @@ diff -Nurd sys/pc98/pc98/machdep.c sys/pc98/pc98/machdep.c
  
  	regs->tf_esp = (int)sfp;
  	regs->tf_eip = PS_STRINGS - *(p->p_sysent->sv_szsigcode);
--	regs->tf_eflags &= ~(PSL_T | PSL_D);
-+	regs->tf_eflags &= ~PSL_T;
+-	regs->tf_eflags &= ~PSL_T;
++	regs->tf_eflags &= ~(PSL_T | PSL_D);
  	regs->tf_cs = _ucodesel;
  	regs->tf_ds = _udatasel;
  	regs->tf_es = _udatasel;
