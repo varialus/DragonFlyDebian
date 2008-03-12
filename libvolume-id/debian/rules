@@ -20,9 +20,11 @@ endif
 
 packages := $(shell dh_listpackages)
 
+include /usr/share/quilt/quilt.make
+
 build-indep:
 
-build-arch:
+build-arch: patch
 	dh_testdir
 	
 	$(MAKE) CC=gcc E=echo RANLIB=ranlib AR=ar prefix=/usr Q=@
