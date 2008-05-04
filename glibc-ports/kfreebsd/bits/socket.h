@@ -249,7 +249,7 @@ extern struct cmsghdr *__cmsg_nxthdr (struct msghdr *__mhdr,
 				      struct cmsghdr *__cmsg) __THROW;
 #ifdef __USE_EXTERN_INLINES
 # ifndef _EXTERN_INLINE
-#  define _EXTERN_INLINE extern __inline
+#  define _EXTERN_INLINE __extern_inline
 # endif
 _EXTERN_INLINE struct cmsghdr *
 __NTH (__cmsg_nxthdr (struct msghdr *__mhdr, struct cmsghdr *__cmsg))
