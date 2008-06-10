@@ -2,13 +2,14 @@ Index: sys/conf/files
 ===================================================================
 --- sys/conf/files.orig
 +++ sys/conf/files
-@@ -469,17 +469,6 @@
+@@ -472,18 +472,6 @@
  dev/ata/atapi-cd.c		optional atapicd
  dev/ata/atapi-fd.c		optional atapifd
  dev/ata/atapi-tape.c		optional atapist
 -dev/ath/ah_osdep.c optional ath_hal \
 -	compile-with "${NORMAL_C} -I$S/dev/ath"
--dev/ath/ath_rate/amrr/amrr.c	optional ath_rate_amrr
+-dev/ath/ath_rate/amrr/amrr.c	optional ath_rate_amrr \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
 -dev/ath/ath_rate/onoe/onoe.c	optional ath_rate_onoe \
 -	compile-with "${NORMAL_C} -I$S/dev/ath"
 -dev/ath/ath_rate/sample/sample.c	optional ath_rate_sample \
@@ -108,7 +109,7 @@ Index: sys/i386/conf/GENERIC
 ===================================================================
 --- sys/i386/conf/GENERIC.orig
 +++ sys/i386/conf/GENERIC
-@@ -128,8 +128,6 @@
+@@ -130,8 +130,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -133,7 +134,7 @@ Index: sys/modules/Makefile
  	aue \
  	${_auxio} \
  	${_awi} \
-@@ -95,8 +90,6 @@
+@@ -96,8 +91,6 @@
  	hifn \
  	hme \
  	${_hptiop} \
@@ -142,7 +143,7 @@ Index: sys/modules/Makefile
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -189,10 +182,8 @@
+@@ -195,10 +188,8 @@
  	ntfs_iconv \
  	${_nxge} \
  	nullfs \
@@ -153,7 +154,7 @@ Index: sys/modules/Makefile
  	${_padlock} \
  	patm \
  	${_pccard} \
-@@ -313,7 +304,6 @@
+@@ -320,7 +311,6 @@
  	${_xe} \
  	xfs \
  	xl \
@@ -161,7 +162,7 @@ Index: sys/modules/Makefile
  	zlib \
  	zyd
  
-@@ -363,11 +353,6 @@
+@@ -370,11 +360,6 @@
  _apm=		apm
  _ar=		ar
  _arcnet=	arcnet
@@ -173,7 +174,7 @@ Index: sys/modules/Makefile
  _awi=		awi
  _bktr=		bktr
  _cardbus=	cardbus
-@@ -406,7 +391,6 @@
+@@ -414,7 +399,6 @@
  .if ${MK_NCP} != "no"
  _nwfs=		nwfs
  .endif
@@ -181,7 +182,7 @@ Index: sys/modules/Makefile
  _pccard=	pccard
  _pcfclock=	pcfclock
  _pecoff=	pecoff
-@@ -427,9 +411,6 @@
+@@ -435,9 +419,6 @@
  _tmpfs= 	tmpfs
  _wi=		wi
  _xe=		xe
@@ -191,7 +192,7 @@ Index: sys/modules/Makefile
  .if ${MACHINE} == "i386"
  _aac=		aac
  _acpi=		acpi
-@@ -446,8 +427,6 @@
+@@ -455,8 +436,6 @@
  _dpt=		dpt
  _ex=		ex
  _hptiop=	hptiop
@@ -200,7 +201,7 @@ Index: sys/modules/Makefile
  _ichwd=		ichwd
  _ida=		ida
  # Disabled due to non-MPSAFEty in 7.0
-@@ -462,7 +441,6 @@
+@@ -471,7 +450,6 @@
  _ixgb=   	ixgb
  _mly=		mly
  _nfe=		nfe
@@ -208,7 +209,7 @@ Index: sys/modules/Makefile
  _nvram=		nvram
  _nxge=		nxge
  _wpi=		wpi
-@@ -489,11 +467,6 @@
+@@ -498,11 +476,6 @@
  _agp=		agp
  _an=		an
  _arcmsr=	arcmsr
@@ -219,8 +220,8 @@ Index: sys/modules/Makefile
 -_ath_rate_sample=ath_rate_sample
  _cardbus=	cardbus
  _cbb=		cbb
- _ciss=		ciss
-@@ -506,8 +479,6 @@
+ _cmx=		cmx
+@@ -516,8 +489,6 @@
  _exca=		exca
  _ext2fs=	ext2fs
  _hptiop=	hptiop
@@ -229,7 +230,7 @@ Index: sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -525,7 +496,6 @@
+@@ -536,7 +507,6 @@
  _mly=		mly
  _ndis=		ndis
  _nfe=		nfe
@@ -237,7 +238,7 @@ Index: sys/modules/Makefile
  _nvram=		nvram
  _nxge=		nxge
  _pccard=	pccard
-@@ -540,9 +510,6 @@
+@@ -551,9 +521,6 @@
  _wi=		wi
  _wpi=		wpi
  _wpifw=		wpifw
@@ -247,7 +248,7 @@ Index: sys/modules/Makefile
  .endif
  
  .if ${MACHINE_ARCH} == "ia64"
-@@ -583,21 +550,11 @@
+@@ -596,21 +563,11 @@
  
  .if ${MACHINE_ARCH} == "powerpc"
  _an=		an
@@ -273,7 +274,7 @@ Index: sys/amd64/conf/GENERIC
 ===================================================================
 --- sys/amd64/conf/GENERIC.orig
 +++ sys/amd64/conf/GENERIC
-@@ -121,8 +121,6 @@
+@@ -123,8 +123,6 @@
  device		arcmsr		# Areca SATA II RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -324,7 +325,7 @@ Index: sys/conf/files.amd64
  #
  amd64/acpica/OsdEnvironment.c	optional	acpi
  amd64/acpica/acpi_machdep.c	optional	acpi
-@@ -175,21 +144,12 @@
+@@ -176,21 +145,12 @@
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
