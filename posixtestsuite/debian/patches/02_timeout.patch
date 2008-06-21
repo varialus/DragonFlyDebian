@@ -3,8 +3,10 @@ Status: not-sent-upstream
 Description:
  Use expect to set a timeout on tests, to avoid them hanging indefinitely.
 
---- timeout	1970-01-01 01:00:00.000000000 +0100
-+++ timeout	2004-09-01 19:55:41.000000000 +0200
+Index: b/timeout
+===================================================================
+--- /dev/null
++++ b/timeout
 @@ -0,0 +1,8 @@
 +#!/bin/sh
 +if test -e $1 ; then
@@ -14,9 +16,11 @@ Description:
 +expect
 +EOF
 +fi
---- Makefile	2004-07-07 16:19:07.000000000 +0200
-+++ Makefile	2004-09-01 18:41:01.000000000 +0200
-@@ -46,7 +46,11 @@
+Index: b/Makefile
+===================================================================
+--- a/Makefile
++++ b/Makefile
+@@ -46,7 +46,11 @@ TIMEOUT = $(top_builddir)/t0 $(TIMEOUT_V
  all: build-tests run-tests 
  
  build-tests: $(BUILD_TESTS:.c=.test)
@@ -29,9 +33,11 @@ Description:
  
  functional-tests: functional-make functional-run
  stress-tests: stress-make stress-run
---- functional/mqueues/run.sh	2004-07-05 23:49:05.000000000 +0200
-+++ functional/mqueues/run.sh	2004-09-01 18:40:17.000000000 +0200
-@@ -12,7 +12,7 @@
+Index: b/functional/mqueues/run.sh
+===================================================================
+--- a/functional/mqueues/run.sh
++++ b/functional/mqueues/run.sh
+@@ -12,7 +12,7 @@ RunTest()
  {
  	echo "TEST: " $1
  	TOTAL=$TOTAL+1
@@ -40,9 +46,11 @@ Description:
  	if [ $? == 0 ]; then
  		PASS=$PASS+1
  		echo -ne "\t\t\t***TEST PASSED***\n\n"
---- functional/semaphores/run.sh	2004-07-05 23:49:05.000000000 +0200
-+++ functional/semaphores/run.sh	2004-09-01 18:40:17.000000000 +0200
-@@ -12,7 +12,7 @@
+Index: b/functional/semaphores/run.sh
+===================================================================
+--- a/functional/semaphores/run.sh
++++ b/functional/semaphores/run.sh
+@@ -12,7 +12,7 @@ RunTest()
  {
  	echo "TEST: " $1
  	TOTAL=$TOTAL+1
@@ -51,9 +59,11 @@ Description:
  	if [ $? == 0 ]; then
  		PASS=$PASS+1
  		echo -ne "\t\t\t***TEST PASSED***\n\n"
---- functional/threads/pi_test/run.sh	2004-07-05 23:49:05.000000000 +0200
-+++ functional/threads/pi_test/run.sh	2004-09-01 18:40:17.000000000 +0200
-@@ -21,7 +21,7 @@
+Index: b/functional/threads/pi_test/run.sh
+===================================================================
+--- a/functional/threads/pi_test/run.sh
++++ b/functional/threads/pi_test/run.sh
+@@ -21,7 +21,7 @@ Run()
  {
          echo "TEST: " $1
          TOTAL=$TOTAL+1
@@ -62,9 +72,11 @@ Description:
          if [ $? == 0 ]; then
                  PASS=$PASS+1
                  echo -ne "\t\t\t***TEST PASSED***\n\n"
---- functional/threads/robust_test/run.sh	2004-07-05 23:49:05.000000000 +0200
-+++ functional/threads/robust_test/run.sh	2004-09-01 18:40:17.000000000 +0200
-@@ -7,7 +7,7 @@
+Index: b/functional/threads/robust_test/run.sh
+===================================================================
+--- a/functional/threads/robust_test/run.sh
++++ b/functional/threads/robust_test/run.sh
+@@ -7,7 +7,7 @@ Run()
  {
          echo "TEST: " $1
          TOTAL=$TOTAL+1
@@ -73,9 +85,11 @@ Description:
          if [ $? == 0 ]; then
                  PASS=$PASS+1
                  echo -ne "\t\t\t***TEST PASSED***\n\n"
---- stress/mqueues/run.sh	2004-07-05 23:49:05.000000000 +0200
-+++ stress/mqueues/run.sh	2004-09-01 18:40:17.000000000 +0200
-@@ -12,7 +12,7 @@
+Index: b/stress/mqueues/run.sh
+===================================================================
+--- a/stress/mqueues/run.sh
++++ b/stress/mqueues/run.sh
+@@ -12,7 +12,7 @@ RunTest()
  {
  	echo "TEST: " $1 $2
  	TOTAL=$TOTAL+1
@@ -84,9 +98,11 @@ Description:
  	if [ $? == 0 ]; then
  		PASS=$PASS+1
  		echo -ne "\t\t\t***TEST PASSED***\n\n"
---- stress/semaphores/run.sh	2004-07-05 23:49:05.000000000 +0200
-+++ stress/semaphores/run.sh	2004-09-01 18:40:17.000000000 +0200
-@@ -12,7 +12,7 @@
+Index: b/stress/semaphores/run.sh
+===================================================================
+--- a/stress/semaphores/run.sh
++++ b/stress/semaphores/run.sh
+@@ -12,7 +12,7 @@ RunTest()
  {
  	echo "TEST: " $1 $2
  	TOTAL=$TOTAL+1
@@ -95,4 +111,3 @@ Description:
  	if [ $? == 0 ]; then
  		PASS=$PASS+1
  		echo -ne "\t\t\t***TEST PASSED***\n\n"
-
