@@ -1,0 +1,70 @@
+Index: src/sbin/ifconfig/af_inet.c
+===================================================================
+--- src.orig/sbin/ifconfig/af_inet.c	2008-06-23 19:42:20.000000000 +0000
++++ src/sbin/ifconfig/af_inet.c	2008-06-23 21:02:58.000000000 +0000
+@@ -42,7 +42,6 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+-#include <ifaddrs.h>
+ 
+ #include <netinet/in.h>
+ #include <net/if_var.h>		/* for struct ifaddr */
+@@ -51,6 +50,7 @@
+ #include <netdb.h>
+ 
+ #include "ifconfig.h"
++#include <ifaddrs.h>
+ 
+ static struct ifaliasreq in_addreq;
+ static struct ifreq in_ridreq;
+Index: src/sbin/ifconfig/af_ipx.c
+===================================================================
+--- src.orig/sbin/ifconfig/af_ipx.c	2008-06-23 19:42:20.000000000 +0000
++++ src/sbin/ifconfig/af_ipx.c	2008-06-23 21:02:58.000000000 +0000
+@@ -41,9 +41,9 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-#include <ifaddrs.h>
+ 
+ #include <net/if_var.h>
++#include <ifaddrs.h>
+ #define IPTUNNEL
+ #include <netipx/ipx.h>
+ #include <netipx/ipx_if.h>
+Index: src/sbin/mdconfig/Makefile
+===================================================================
+--- src.orig/sbin/mdconfig/Makefile	2006-04-01 16:34:45.000000000 +0000
++++ src/sbin/mdconfig/Makefile	2008-06-23 21:03:22.000000000 +0000
+@@ -5,6 +5,6 @@
+ MLINKS=		mdconfig.8 vnconfig.8
+ 
+ DPADD=	${LIBUTIL} ${LIBGEOM} ${LIBBSDXML} ${LIBSBUF} 
+-LDADD+=	-lutil -lgeom -lbsdxml -lsbuf
++LDADD+=	-lutil -lgeom -lsbuf
+ 
+ .include <bsd.prog.mk>
+Index: src/sbin/mount/mount.c
+===================================================================
+--- src.orig/sbin/mount/mount.c	2008-06-23 19:42:22.000000000 +0000
++++ src/sbin/mount/mount.c	2008-06-23 21:04:53.000000000 +0000
+@@ -208,7 +208,9 @@
+ {
+ 	struct pidfh *pfh;
+ 	pid_t mountdpid; 
+-
++#if 1
++#warning missing pidfile_open(), pidfile_remove()
++#else
+ 	pfh = pidfile_open(_PATH_MOUNTDPID, 0600, &mountdpid);
+ 	if (pfh != NULL) {
+ 		/* Mountd is not running. */
+@@ -222,6 +224,7 @@
+ 	/* We have mountd(8) PID in mountdpid varible, let's signal it. */
+ 	if (kill(mountdpid, SIGHUP) == -1)
+ 		err(1, "signal mountd");
++#endif
+ }
+ 
+ int
