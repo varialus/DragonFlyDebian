@@ -2,17 +2,19 @@
 * revert change from 1.43.2.4 to 1.43.2.5 
   it expects kld_isloaded() and kld_load() in libutil
 
---- src/sbin/mdconfig/mdconfig.c
+Index: src/sbin/mdconfig/mdconfig.c
+===================================================================
+--- src.orig/sbin/mdconfig/mdconfig.c
 +++ src/sbin/mdconfig/mdconfig.c
-@@ -29,6 +29,7 @@
- #include <sys/stat.h>
+@@ -41,6 +41,7 @@
+ static int md_find(char *, const char *);
+ static int md_query(char *name);
+ static int md_list(char *units, int opt);
++static void mdmaybeload(void);
+ static char *geom_config_get(struct gconf *g, char *name);
+ static void md_prthumanval(char *length);
  
- int	 list(const int);
-+void	 mdmaybeload(void);
- int	 query(const int, const int);
- void	 usage(void);
- 
-@@ -238,9 +239,7 @@
+@@ -253,9 +254,7 @@
  	}
  	mdio.md_version = MDIOVERSION;
  
@@ -23,9 +25,9 @@
  	fd = open("/dev/" MDCTL_NAME, O_RDWR, 0);
  	if (fd < 0)
  		err(1, "open(/dev/%s)", MDCTL_NAME);
-@@ -356,3 +355,21 @@
- 
- 	return (0);
+@@ -454,3 +453,21 @@
+ {
+ 	return (md_list(name, OPT_UNIT));
  }
 +
 +void

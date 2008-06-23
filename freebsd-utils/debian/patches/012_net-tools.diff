@@ -1,7 +1,8 @@
-diff -ur src.old/sbin/ifconfig/Makefile src/sbin/ifconfig/Makefile
---- src.old/sbin/ifconfig/Makefile	2006-05-04 16:40:04.000000000 +0200
-+++ src/sbin/ifconfig/Makefile	2006-05-04 16:44:05.000000000 +0200
-@@ -18,16 +18,16 @@
+Index: src/sbin/ifconfig/Makefile
+===================================================================
+--- src.orig/sbin/ifconfig/Makefile
++++ src/sbin/ifconfig/Makefile
+@@ -20,17 +20,17 @@
  SRCS+=	af_atalk.c		# AppleTalk support
  
  SRCS+=	ifclone.c		# clone device support
@@ -12,20 +13,23 @@ diff -ur src.old/sbin/ifconfig/Makefile src/sbin/ifconfig/Makefile
  SRCS+=	ifieee80211.c		# SIOC[GS]IEEE80211 support
  
 -SRCS+=	ifcarp.c		# SIOC[GS]VH support
+-SRCS+=	ifgroup.c		# ...
 -SRCS+=	ifpfsync.c		# pfsync(4) support
 +#SRCS+=	ifcarp.c		# SIOC[GS]VH support
++#SRCS+=	ifgroup.c		# ...
 +#SRCS+=	ifpfsync.c		# pfsync(4) support
  
 -SRCS+=	ifbridge.c		# bridge support
-+#SRCS+=	ifbridge.c		# bridge support
 -SRCS+=	iflagg.c		# lagg support
++#SRCS+=	ifbridge.c		# bridge support
 +#SRCS+=	iflagg.c		# lagg support
  
- .if !defined(RELEASE_CRUNCH)
+ .if ${MK_IPX_SUPPORT} != "no" && !defined(RELEASE_CRUNCH)
  SRCS+=	af_ipx.c		# IPX support
-diff -ur src.old/sbin/ifconfig/ifcarp.c src/sbin/ifconfig/ifcarp.c
---- src.old/sbin/ifconfig/ifcarp.c	2006-05-04 16:40:04.000000000 +0200
-+++ src/sbin/ifconfig/ifcarp.c	2006-05-04 16:44:05.000000000 +0200
+Index: src/sbin/ifconfig/ifcarp.c
+===================================================================
+--- src.orig/sbin/ifconfig/ifcarp.c
++++ src/sbin/ifconfig/ifcarp.c
 @@ -43,6 +43,7 @@
  #include <ctype.h>
  #include <stdio.h>
@@ -34,9 +38,10 @@ diff -ur src.old/sbin/ifconfig/ifcarp.c src/sbin/ifconfig/ifcarp.c
  #include <stdlib.h>
  #include <unistd.h>
  #include <err.h>
-diff -ur src.old/sbin/ifconfig/ifconfig.c src/sbin/ifconfig/ifconfig.c
---- src.old/sbin/ifconfig/ifconfig.c	2006-05-04 16:40:04.000000000 +0200
-+++ src/sbin/ifconfig/ifconfig.c	2006-05-04 16:44:05.000000000 +0200
+Index: src/sbin/ifconfig/ifconfig.c
+===================================================================
+--- src.orig/sbin/ifconfig/ifconfig.c
++++ src/sbin/ifconfig/ifconfig.c
 @@ -44,10 +44,14 @@
  #include <sys/param.h>
  #include <sys/ioctl.h>
@@ -52,10 +57,11 @@ diff -ur src.old/sbin/ifconfig/ifconfig.c src/sbin/ifconfig/ifconfig.c
  
  #include <net/ethernet.h>
  #include <net/if.h>
-diff -u src/sbin/ifconfig/af_inet6.c src/sbin/ifconfig/af_inet6.c
---- src/sbin/ifconfig/af_inet6.c	2005-06-16 21:37:09.000000000 +0200
-+++ src/sbin/ifconfig/af_inet6.c	2006-08-25 21:22:49.000000000 +0200
-@@ -43,7 +43,6 @@
+Index: src/sbin/ifconfig/af_inet6.c
+===================================================================
+--- src.orig/sbin/ifconfig/af_inet6.c
++++ src/sbin/ifconfig/af_inet6.c
+@@ -42,7 +42,6 @@
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
@@ -63,7 +69,7 @@ diff -u src/sbin/ifconfig/af_inet6.c src/sbin/ifconfig/af_inet6.c
  
  #include <arpa/inet.h>
  
-@@ -54,6 +53,8 @@
+@@ -53,6 +52,8 @@
  #include <netdb.h>
  
  #include <netinet6/nd6.h>	/* Define ND6_INFINITE_LIFETIME */
@@ -72,9 +78,10 @@ diff -u src/sbin/ifconfig/af_inet6.c src/sbin/ifconfig/af_inet6.c
  
  #include "ifconfig.h"
  
-diff -u src/sbin/ifconfig/ifclone.c src/sbin/ifconfig/ifclone.c
---- src/sbin/ifconfig/ifclone.c	2004-12-08 20:18:07.000000000 +0100
-+++ src/sbin/ifconfig/ifclone.c	2006-08-25 21:21:56.000000000 +0200
+Index: src/sbin/ifconfig/ifclone.c
+===================================================================
+--- src.orig/sbin/ifconfig/ifclone.c
++++ src/sbin/ifconfig/ifclone.c
 @@ -41,6 +41,7 @@
  #include <stdio.h>
  #include <stdlib.h>
@@ -83,9 +90,10 @@ diff -u src/sbin/ifconfig/ifclone.c src/sbin/ifconfig/ifclone.c
  #include <unistd.h>
  
  #include "ifconfig.h"
-diff -u src/sbin/ifconfig/af_link.c src/sbin/ifconfig/af_link.c
---- src/sbin/ifconfig/af_link.c	2004-12-31 20:46:27.000000000 +0100
-+++ src/sbin/ifconfig/af_link.c	2006-08-25 21:20:02.000000000 +0200
+Index: src/sbin/ifconfig/af_link.c
+===================================================================
+--- src.orig/sbin/ifconfig/af_link.c
++++ src/sbin/ifconfig/af_link.c
 @@ -46,6 +46,7 @@
  #include <net/if_dl.h>
  #include <net/if_types.h>
@@ -94,12 +102,13 @@ diff -u src/sbin/ifconfig/af_link.c src/sbin/ifconfig/af_link.c
  
  #include "ifconfig.h"
  
-diff -ur src.old/sbin/ifconfig/ifieee80211.c src/sbin/ifconfig/ifieee80211.c
---- src.old/sbin/ifconfig/ifieee80211.c	2006-05-04 16:40:04.000000000 +0200
-+++ src/sbin/ifconfig/ifieee80211.c	2006-05-04 16:44:05.000000000 +0200
-@@ -84,6 +84,9 @@
- #include <errno.h>
+Index: src/sbin/ifconfig/ifieee80211.c
+===================================================================
+--- src.orig/sbin/ifconfig/ifieee80211.c
++++ src/sbin/ifconfig/ifieee80211.c
+@@ -87,6 +87,9 @@
  #include <fcntl.h>
+ #include <inttypes.h>
  #include <stdio.h>
 +#include <stdint.h>
 +#include <netinet/ether.h>
@@ -107,10 +116,11 @@ diff -ur src.old/sbin/ifconfig/ifieee80211.c src/sbin/ifconfig/ifieee80211.c
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
-diff -ur src.old/sbin/route/route.c src/sbin/route/route.c
---- src.old/sbin/route/route.c	2006-05-04 16:40:04.000000000 +0200
-+++ src/sbin/route/route.c	2006-05-04 16:44:09.000000000 +0200
-@@ -63,10 +64,12 @@
+Index: src/sbin/route/route.c
+===================================================================
+--- src.orig/sbin/route/route.c
++++ src/sbin/route/route.c
+@@ -63,10 +63,12 @@
  #include <paths.h>
  #include <stdio.h>
  #include <stdlib.h>
@@ -123,12 +133,12 @@ diff -ur src.old/sbin/route/route.c src/sbin/route/route.c
  
  struct keytab {
  	char	*kt_cp;
-@@ -134,7 +134,7 @@
+@@ -134,7 +136,7 @@
  	if (argc < 2)
  		usage((char *)NULL);
  
 -	while ((ch = getopt(argc, argv, "nqdtv")) != -1)
 +	while ((ch = getopt(argc, argv, "+nqdtv")) != -1)
-		switch(ch) {
-		case 'n':
-			nflag = 1;
+ 		switch(ch) {
+ 		case 'n':
+ 			nflag = 1;

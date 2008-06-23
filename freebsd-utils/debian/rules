@@ -21,12 +21,12 @@ include /usr/share/cdbs/1/rules/patchsys-quilt.mk
 
 build/freebsd-utils:: apply-patches
 	set -e ; for i in sbin/{ccdconfig,dmesg,mdconfig,mount,mount_std,umount,swapon,sysctl} usr.sbin/rpc.umntall \
-		sbin/mount_{autofs,cd9660,ext2fs,hpfs,msdosfs,ntfs,nullfs,reiserfs,udf,umapfs,unionfs} \
+		sbin/mount_{autofs,cd9660,ext2fs,hpfs,msdosfs,ntfs,nullfs,reiserfs,udf,unionfs} \
 		usr.bin/ktrace \
 	; do \
 		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
 	done
-# FIXME: add mount_{xfs,nfs,nfs4},chflags
+# FIXME: add mount_{xfs,nfs},chflags
 
 build/module-init-tools:: apply-patches
 	set -e ; for i in sbin/kld{load,stat,unload,config} \
@@ -35,6 +35,7 @@ build/module-init-tools:: apply-patches
 	done
 
 build/net-tools:: apply-patches
+	cp -p debian/pf_ruleset.c build-tree/src/sbin/pfctl/
 	set -e ; for i in sbin/{ifconfig,route,pfctl} usr.sbin/authpf \
 	; do \
 		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \

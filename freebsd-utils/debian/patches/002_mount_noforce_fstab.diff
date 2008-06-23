@@ -1,16 +1,17 @@
-diff -ur src.old/sbin/mount/mount.c src/sbin/mount/mount.c
---- src.old/sbin/mount/mount.c	2006-03-19 20:56:08.000000000 +0100
-+++ src/sbin/mount/mount.c	2006-03-19 20:56:47.000000000 +0100
-@@ -137,7 +137,7 @@
+Index: src/sbin/mount/mount.c
+===================================================================
+--- src.orig/sbin/mount/mount.c
++++ src/sbin/mount/mount.c
+@@ -239,7 +239,7 @@
  	options = NULL;
  	vfslist = NULL;
  	vfstype = "ufs";
--	while ((ch = getopt(argc, argv, "adlF:fo:prwt:uv")) != -1)
-+	while ((ch = getopt(argc, argv, "adlfo:prwt:uv")) != -1)
+-	while ((ch = getopt(argc, argv, "adF:flo:prt:uvw")) != -1)
++	while ((ch = getopt(argc, argv, "adflo:prt:uvw")) != -1)
  		switch (ch) {
  		case 'a':
  			all = 1;
-@@ -145,9 +145,6 @@
+@@ -247,9 +247,6 @@
  		case 'd':
  			debug = 1;
  			break;
@@ -20,7 +21,7 @@ diff -ur src.old/sbin/mount/mount.c src/sbin/mount/mount.c
  		case 'f':
  			init_flags |= MNT_FORCE;
  			break;
-@@ -716,7 +716,7 @@
+@@ -798,7 +795,7 @@
  {
  
  	(void)fprintf(stderr, "%s\n%s\n%s\n",
@@ -29,9 +30,10 @@ diff -ur src.old/sbin/mount/mount.c src/sbin/mount/mount.c
  "       mount [-dfpruvw] special | node",
  "       mount [-dfpruvw] [-o options] [-t ufs | external_type] special node");
  	exit(1);
-diff -ur src.old/sbin/umount/umount.c src/sbin/umount/umount.c
---- src.old/sbin/umount/umount.c	2006-03-19 20:56:08.000000000 +0100
-+++ src/sbin/umount/umount.c	2006-03-19 20:57:21.000000000 +0100
+Index: src/sbin/umount/umount.c
+===================================================================
+--- src.orig/sbin/umount/umount.c
++++ src/sbin/umount/umount.c
 @@ -94,7 +94,7 @@
  	sync();
  
@@ -60,7 +62,7 @@ diff -ur src.old/sbin/umount/umount.c src/sbin/umount/umount.c
  		errs = umountall(typelist);
  		break;
  	case 0:
-@@ -577,6 +574,6 @@
+@@ -592,6 +589,6 @@
  
  	(void)fprintf(stderr, "%s\n%s\n",
  	    "usage: umount [-fv] special | node | fsid",
