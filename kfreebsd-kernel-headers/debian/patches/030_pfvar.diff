@@ -1,8 +1,10 @@
---- sys/contrib/pf/net/pfvar.h	2007-01-11 16:26:28.000000000 +0100
-+++ sys/contrib/pf/net/pfvar.h	2007-01-11 16:26:28.000000000 +0100
-@@ -39,14 +39,17 @@
- #include <sys/queue.h>
- #include <sys/tree.h>
+Index: sys/contrib/pf/net/pfvar.h
+===================================================================
+--- sys/contrib/pf/net/pfvar.h.orig
++++ sys/contrib/pf/net/pfvar.h
+@@ -45,8 +45,10 @@
+ #include <sys/rwlock.h>
+ #endif
  
 +#include <net/if.h>
  #include <net/radix.h>
@@ -10,7 +12,8 @@
 +#ifdef _KERNEL
  #ifdef __FreeBSD_kernel__
  #include <net/if_clone.h>
- #include <vm/uma.h>
+ #include <net/pf_mtag.h>
+@@ -54,6 +56,7 @@
  #else
  
  #endif

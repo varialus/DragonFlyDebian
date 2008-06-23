@@ -1,7 +1,7 @@
 Index: sys/i386/include/segments.h
 ===================================================================
---- sys/i386/include/segments.h.orig	2006-08-25 10:54:25.882289000 +0200
-+++ sys/i386/include/segments.h	2006-08-25 10:56:35.000000000 +0200
+--- sys/i386/include/segments.h.orig
++++ sys/i386/include/segments.h
 @@ -60,7 +60,7 @@
   */
  struct	segment_descriptor	{
@@ -22,9 +22,9 @@ Index: sys/i386/include/segments.h
  /*
 Index: sys/sys/elf32.h
 ===================================================================
---- sys/sys/elf32.h.orig	2006-08-25 10:54:25.903945000 +0200
-+++ sys/sys/elf32.h	2006-08-25 11:05:18.000000000 +0200
-@@ -35,11 +35,8 @@
+--- sys/sys/elf32.h.orig
++++ sys/sys/elf32.h
+@@ -35,11 +35,9 @@
   * ELF definitions common to all 32-bit architectures.
   */
  
@@ -35,10 +35,11 @@ Index: sys/sys/elf32.h
 -typedef uint32_t	Elf32_Word;
 +#include <elf.h>
 +
++
+ typedef uint64_t	Elf32_Lword;
  
  typedef Elf32_Word	Elf32_Hashelt;
- 
-@@ -47,117 +44,4 @@
+@@ -48,198 +46,4 @@
  typedef Elf32_Word	Elf32_Size;
  typedef Elf32_Sword	Elf32_Ssize;
  
@@ -133,6 +134,44 @@ Index: sys/sys/elf32.h
 -#define ELF32_R_INFO(sym, type)	(((sym) << 8) + (unsigned char)(type))
 -
 -/*
+- *	Note entry header
+- */
+-typedef Elf_Note Elf32_Nhdr;
+-
+-/*
+- *	Move entry
+- */
+-typedef struct {
+-	Elf32_Lword	m_value;	/* symbol value */
+-	Elf32_Word 	m_info;		/* size + index */
+-	Elf32_Word	m_poffset;	/* symbol offset */
+-	Elf32_Half	m_repeat;	/* repeat count */
+-	Elf32_Half	m_stride;	/* stride info */
+-} Elf32_Move;
+-
+-/*
+- *	The macros compose and decompose values for Move.r_info
+- *
+- *	sym = ELF32_M_SYM(M.m_info)
+- *	size = ELF32_M_SIZE(M.m_info)
+- *	M.m_info = ELF32_M_INFO(sym, size)
+- */
+-#define	ELF32_M_SYM(info)	((info)>>8)
+-#define	ELF32_M_SIZE(info)	((unsigned char)(info))
+-#define	ELF32_M_INFO(sym, size)	(((sym)<<8)+(unsigned char)(size))
+-
+-/*
+- *	Hardware/Software capabilities entry
+- */
+-typedef struct {
+-	Elf32_Word	c_tag;		/* how to interpret value */
+-	union {
+-		Elf32_Word	c_val;
+-		Elf32_Addr	c_ptr;
+-	} c_un;
+-} Elf32_Cap;
+-
+-/*
 - * Symbol table entries.
 - */
 -
@@ -155,12 +194,55 @@ Index: sys/sys/elf32.h
 -/* Macro for accessing the fields of st_other. */
 -#define ELF32_ST_VISIBILITY(oth)	((oth) & 0x3)
 -
+-/* Structures used by Sun & GNU symbol versioning. */
+-typedef struct
+-{
+-	Elf32_Half	vd_version;
+-	Elf32_Half	vd_flags;
+-	Elf32_Half	vd_ndx;
+-	Elf32_Half	vd_cnt;
+-	Elf32_Word	vd_hash;
+-	Elf32_Word	vd_aux;
+-	Elf32_Word	vd_next;
+-} Elf32_Verdef;
+-
+-typedef struct
+-{
+-	Elf32_Word	vda_name;
+-	Elf32_Word	vda_next;
+-} Elf32_Verdaux;
+-
+-typedef struct
+-{
+-	Elf32_Half	vn_version;
+-	Elf32_Half	vn_cnt;
+-	Elf32_Word	vn_file;
+-	Elf32_Word	vn_aux;
+-	Elf32_Word	vn_next;
+-} Elf32_Verneed;
+-
+-typedef struct
+-{
+-	Elf32_Word	vna_hash;
+-	Elf32_Half	vna_flags;
+-	Elf32_Half	vna_other;
+-	Elf32_Word	vna_name;
+-	Elf32_Word	vna_next;
+-} Elf32_Vernaux;
+-
+-typedef Elf32_Half Elf32_Versym;
+-
+-typedef struct {
+-	Elf32_Half	si_boundto;	/* direct bindings - symbol bound to */
+-	Elf32_Half	si_flags;	/* per symbol flags */
+-} Elf32_Syminfo;
+-
  #endif /* !_SYS_ELF32_H_ */
 Index: sys/sys/elf64.h
 ===================================================================
---- sys/sys/elf64.h.orig	2006-08-25 10:54:25.925997000 +0200
-+++ sys/sys/elf64.h	2006-08-25 11:09:37.000000000 +0200
-@@ -35,13 +35,7 @@
+--- sys/sys/elf64.h.orig
++++ sys/sys/elf64.h
+@@ -35,14 +35,10 @@
   * ELF definitions common to all 64-bit architectures.
   */
  
@@ -170,12 +252,15 @@ Index: sys/sys/elf64.h
 -typedef int32_t		Elf64_Sword;
 -typedef int64_t		Elf64_Sxword;
 -typedef uint32_t	Elf64_Word;
--typedef uint64_t	Elf64_Xword;
 +#include <elf.h>
++
++
+ typedef uint64_t	Elf64_Lword;
+-typedef uint64_t	Elf64_Xword;
  
  /*
   * Types of dynamic symbol hash table bucket and chain elements.
-@@ -60,117 +54,4 @@
+@@ -57,192 +53,4 @@
  typedef Elf64_Xword	Elf64_Size;
  typedef Elf64_Sxword	Elf64_Ssize;
  
@@ -269,6 +354,42 @@ Index: sys/sys/elf64.h
 -/* Macro for constructing r_info from field values. */
 -#define ELF64_R_INFO(sym, type)	(((sym) << 32) + ((type) & 0xffffffffL))
 -
+-#define	ELF64_R_TYPE_DATA(info)	(((Elf64_Xword)(info)<<32)>>40)
+-#define	ELF64_R_TYPE_ID(info)	(((Elf64_Xword)(info)<<56)>>56)
+-#define	ELF64_R_TYPE_INFO(data, type)	\
+-		(((Elf64_Xword)(data)<<8)+(Elf64_Xword)(type))
+-
+-/*
+- *	Note entry header
+- */
+-typedef Elf_Note Elf64_Nhdr;
+-
+-/*
+- *	Move entry
+- */
+-typedef struct {
+-	Elf64_Lword	m_value;	/* symbol value */
+-	Elf64_Xword 	m_info;		/* size + index */
+-	Elf64_Xword	m_poffset;	/* symbol offset */
+-	Elf64_Half	m_repeat;	/* repeat count */
+-	Elf64_Half	m_stride;	/* stride info */
+-} Elf64_Move;
+-
+-#define	ELF64_M_SYM(info)	((info)>>8)
+-#define	ELF64_M_SIZE(info)	((unsigned char)(info))
+-#define	ELF64_M_INFO(sym, size)	(((sym)<<8)+(unsigned char)(size))
+-
+-/*
+- *	Hardware/Software capabilities entry
+- */
+-typedef struct {
+-	Elf64_Xword	c_tag;		/* how to interpret value */
+-	union {
+-		Elf64_Xword	c_val;
+-		Elf64_Addr	c_ptr;
+-	} c_un;
+-} Elf64_Cap;
+-
 -/*
 - * Symbol table entries.
 - */
@@ -292,11 +413,50 @@ Index: sys/sys/elf64.h
 -/* Macro for accessing the fields of st_other. */
 -#define ELF64_ST_VISIBILITY(oth)	((oth) & 0x3)
 -
+-/* Structures used by Sun & GNU-style symbol versioning. */
+-typedef struct {
+-	Elf64_Half	vd_version;
+-	Elf64_Half	vd_flags;
+-	Elf64_Half	vd_ndx;
+-	Elf64_Half	vd_cnt;
+-	Elf64_Word	vd_hash;
+-	Elf64_Word	vd_aux;
+-	Elf64_Word	vd_next;
+-} Elf64_Verdef;
+-
+-typedef struct {
+-	Elf64_Word	vda_name;
+-	Elf64_Word	vda_next;
+-} Elf64_Verdaux;
+-
+-typedef struct {
+-	Elf64_Half	vn_version;
+-	Elf64_Half	vn_cnt;
+-	Elf64_Word	vn_file;
+-	Elf64_Word	vn_aux;
+-	Elf64_Word	vn_next;
+-} Elf64_Verneed;
+-
+-typedef struct {
+-	Elf64_Word	vna_hash;
+-	Elf64_Half	vna_flags;
+-	Elf64_Half	vna_other;
+-	Elf64_Word	vna_name;
+-	Elf64_Word	vna_next;
+-} Elf64_Vernaux;
+-
+-typedef Elf64_Half Elf64_Versym;
+-
+-typedef struct {
+-	Elf64_Half	si_boundto;	/* direct bindings - symbol bound to */
+-	Elf64_Half	si_flags;	/* per symbol flags */
+-} Elf64_Syminfo;
+-
  #endif /* !_SYS_ELF64_H_ */
 Index: sys/sys/elf_common.h
 ===================================================================
---- sys/sys/elf_common.h.orig	2006-08-25 10:54:25.958082000 +0200
-+++ sys/sys/elf_common.h	2006-08-25 10:56:35.000000000 +0200
+--- sys/sys/elf_common.h.orig
++++ sys/sys/elf_common.h
 @@ -29,6 +29,8 @@
  #ifndef _SYS_ELF_COMMON_H_
  #define _SYS_ELF_COMMON_H_ 1
@@ -318,4 +478,4 @@ Index: sys/sys/elf_common.h
 +	uint32_t	n_type;		/* Type of this note. */
  } Elf_Note;
  
- /* Indexes into the e_ident array.  Keep synced with 
+ /* Indexes into the e_ident array.  Keep synced with

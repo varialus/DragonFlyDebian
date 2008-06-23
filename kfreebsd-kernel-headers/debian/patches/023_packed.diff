@@ -1,188 +1,299 @@
---- sys/net80211/ieee80211.h.orig	2006-04-30 04:21:55.000000000 +0200
-+++ sys/net80211/ieee80211.h	2006-04-30 13:28:41.000000000 +0200
-@@ -50,7 +50,7 @@
- 	u_int8_t	i_service;
- 	u_int16_t	i_length;
- 	u_int16_t	i_crc;
+Index: sys/net80211/ieee80211.h
+===================================================================
+--- sys/net80211/ieee80211.h.orig
++++ sys/net80211/ieee80211.h
+@@ -44,7 +44,7 @@
+ 	uint8_t		i_service;
+ 	uint16_t	i_length;
+ 	uint16_t	i_crc;
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  #define IEEE80211_PLCP_SFD      0xF3A0 
  #define IEEE80211_PLCP_SERVICE  0x00
-@@ -67,7 +67,7 @@
- 	u_int8_t	i_seq[2];
+@@ -61,7 +61,7 @@
+ 	uint8_t		i_seq[2];
  	/* possibly followed by addr4[IEEE80211_ADDR_LEN]; */
  	/* see below */
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  struct ieee80211_qosframe {
- 	u_int8_t	i_fc[2];
-@@ -79,7 +79,7 @@
- 	u_int8_t	i_qos[2];
+ 	uint8_t		i_fc[2];
+@@ -73,7 +73,7 @@
+ 	uint8_t		i_qos[2];
  	/* possibly followed by addr4[IEEE80211_ADDR_LEN]; */
  	/* see below */
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  struct ieee80211_qoscntl {
- 	u_int8_t	i_qos[2];
-@@ -93,7 +93,7 @@
- 	u_int8_t	i_addr3[IEEE80211_ADDR_LEN];
- 	u_int8_t	i_seq[2];
- 	u_int8_t	i_addr4[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_qos[2];
+@@ -87,7 +87,7 @@
+ 	uint8_t		i_addr3[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_seq[2];
+ 	uint8_t		i_addr4[IEEE80211_ADDR_LEN];
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  
  struct ieee80211_qosframe_addr4 {
-@@ -105,7 +105,7 @@
- 	u_int8_t	i_seq[2];
- 	u_int8_t	i_addr4[IEEE80211_ADDR_LEN];
- 	u_int8_t	i_qos[2];
+@@ -99,7 +99,7 @@
+ 	uint8_t		i_seq[2];
+ 	uint8_t		i_addr4[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_qos[2];
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  #define	IEEE80211_FC0_VERSION_MASK		0x03
  #define	IEEE80211_FC0_VERSION_SHIFT		0
-@@ -194,7 +194,7 @@
- 	u_int8_t	wme_subtype;	/* OUI subtype */
- 	u_int8_t	wme_version;	/* spec revision */
- 	u_int8_t	wme_info;	/* QoS info */
+@@ -205,7 +205,7 @@
+ 	uint8_t		wme_subtype;	/* OUI subtype */
+ 	uint8_t		wme_version;	/* spec revision */
+ 	uint8_t		wme_info;	/* QoS info */
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  /*
   * WME/802.11e Tspec Element
-@@ -222,7 +222,7 @@
- 	u_int8_t	ts_delay[4];
- 	u_int8_t	ts_surplus[2];
- 	u_int8_t	ts_medium_time[2];
+@@ -233,7 +233,7 @@
+ 	uint8_t		ts_delay[4];
+ 	uint8_t		ts_surplus[2];
+ 	uint8_t		ts_medium_time[2];
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  /*
   * WME AC parameter field
-@@ -231,7 +231,7 @@
- 	u_int8_t	acp_aci_aifsn;
- 	u_int8_t	acp_logcwminmax;
- 	u_int16_t	acp_txop;
+@@ -242,7 +242,7 @@
+ 	uint8_t		acp_aci_aifsn;
+ 	uint8_t		acp_logcwminmax;
+ 	uint16_t	acp_txop;
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  #define WME_NUM_AC		4	/* 4 AC categories */
- 
-@@ -272,7 +272,7 @@
+ #define	WME_NUM_TID		16	/* 16 tids */
+@@ -284,7 +284,7 @@
  #define	WME_QOSINFO_COUNT	0x0f	/* Mask for param count field */
- 	u_int8_t	param_reserved;
+ 	uint8_t		param_reserved;
  	struct ieee80211_wme_acparams	params_acParams[WME_NUM_AC];
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  /*
   * Management Notification Frame
-@@ -282,7 +282,7 @@
- 	u_int8_t	mnf_action;
- 	u_int8_t	mnf_dialog;
- 	u_int8_t	mnf_status;
+@@ -294,7 +294,7 @@
+ 	uint8_t		mnf_action;
+ 	uint8_t		mnf_dialog;
+ 	uint8_t		mnf_status;
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  #define	MNF_SETUP_REQ	0
  #define	MNF_SETUP_RESP	1
  #define	MNF_TEARDOWN	2
-@@ -296,7 +296,7 @@
- 	u_int8_t	i_addr1[IEEE80211_ADDR_LEN];
- 	u_int8_t	i_addr2[IEEE80211_ADDR_LEN];
+@@ -306,7 +306,7 @@
+ struct ieee80211_action {
+ 	uint8_t		ia_category;
+ 	uint8_t		ia_action;
+-} __packed;
++} __attribute__((__packed__));
+ 
+ #define	IEEE80211_ACTION_CAT_QOS	0	/* QoS */
+ #define	IEEE80211_ACTION_CAT_BA		3	/* BA */
+@@ -319,7 +319,7 @@
+ struct ieee80211_action_ht_txchwidth {
+ 	struct ieee80211_action	at_header;
+ 	uint8_t		at_chwidth;	
+-} __packed;
++} __attribute__((__packed__));
+ 
+ #define	IEEE80211_A_HT_TXCHWIDTH_20	0
+ #define	IEEE80211_A_HT_TXCHWIDTH_2040	1
+@@ -328,7 +328,7 @@
+ struct ieee80211_action_ht_mimopowersave {
+ 	struct ieee80211_action am_header;
+ 	uint8_t		am_control;
+-} __packed;
++} __attribute__((__packed__));
+ 
+ #define	IEEE80211_A_HT_MIMOPWRSAVE_ENA		0x01	/* PS enabled */
+ #define	IEEE80211_A_HT_MIMOPWRSAVE_MODE		0x02
+@@ -372,7 +372,7 @@
+ 	uint16_t	rq_baparamset;
+ 	uint16_t	rq_batimeout;		/* in TUs */
+ 	uint16_t	rq_baseqctl;
+-} __packed;
++} __attribute__((__packed__));
+ 
+ /* BA - ADDBA response */
+ struct ieee80211_action_ba_addbaresponse {
+@@ -381,14 +381,14 @@
+ 	uint16_t	rs_statuscode;
+ 	uint16_t	rs_baparamset; 
+ 	uint16_t	rs_batimeout;		/* in TUs */
+-} __packed;
++} __attribute__((__packed__));
+ 
+ /* BA - DELBA */
+ struct ieee80211_action_ba_delba {
+ 	struct ieee80211_action dl_header;
+ 	uint16_t	dl_baparamset;
+ 	uint16_t	dl_reasoncode;
+-} __packed;
++} __attribute__((__packed__));
+ 
+ /* BAR Control */
+ #define	IEEE80211_BAR_TID	0xf000		/* TID */
+@@ -400,7 +400,7 @@
+ struct ieee80211_ba_request {
+ 	uint16_t	rq_barctl;
+ 	uint16_t	rq_barseqctl;
+-} __packed;
++} __attribute__((__packed__));
+ 
+ /*
+  * Control frames.
+@@ -411,7 +411,7 @@
+ 	uint8_t		i_addr1[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_addr2[IEEE80211_ADDR_LEN];
  	/* FCS */
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  struct ieee80211_frame_rts {
- 	u_int8_t	i_fc[2];
-@@ -304,21 +304,21 @@
- 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
- 	u_int8_t	i_ta[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_fc[2];
+@@ -419,21 +419,21 @@
+ 	uint8_t		i_ra[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_ta[IEEE80211_ADDR_LEN];
  	/* FCS */
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  struct ieee80211_frame_cts {
- 	u_int8_t	i_fc[2];
- 	u_int8_t	i_dur[2];
- 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_fc[2];
+ 	uint8_t		i_dur[2];
+ 	uint8_t		i_ra[IEEE80211_ADDR_LEN];
  	/* FCS */
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  struct ieee80211_frame_ack {
- 	u_int8_t	i_fc[2];
- 	u_int8_t	i_dur[2];
- 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_fc[2];
+ 	uint8_t		i_dur[2];
+ 	uint8_t		i_ra[IEEE80211_ADDR_LEN];
  	/* FCS */
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  struct ieee80211_frame_pspoll {
- 	u_int8_t	i_fc[2];
-@@ -326,7 +326,7 @@
- 	u_int8_t	i_bssid[IEEE80211_ADDR_LEN];
- 	u_int8_t	i_ta[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_fc[2];
+@@ -441,7 +441,7 @@
+ 	uint8_t		i_bssid[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_ta[IEEE80211_ADDR_LEN];
  	/* FCS */
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  struct ieee80211_frame_cfend {		/* NB: also CF-End+CF-Ack */
- 	u_int8_t	i_fc[2];
-@@ -334,7 +334,7 @@
- 	u_int8_t	i_ra[IEEE80211_ADDR_LEN];
- 	u_int8_t	i_bssid[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_fc[2];
+@@ -449,7 +449,7 @@
+ 	uint8_t		i_ra[IEEE80211_ADDR_LEN];
+ 	uint8_t		i_bssid[IEEE80211_ADDR_LEN];
  	/* FCS */
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
+ 
+ struct ieee80211_frame_bar {
+ 	uint8_t		i_fc[2];
+@@ -459,7 +459,7 @@
+ 	uint16_t	i_ctl;
+ 	uint16_t	i_seq;
+ 	/* FCS */
+-} __packed;
++} __attribute__((__packed__));
  
  /*
   * BEACON management packets
-@@ -387,7 +387,7 @@
- 	u_int16_t	wpa_caps;	/* 802.11i capabilities */
- 	u_int16_t	wpa_pmkidcnt;	/* 802.11i pmkid count */
- 	u_int16_t	wpa_pmkids[8];	/* 802.11i pmkids */
+@@ -511,7 +511,7 @@
+ 	uint16_t	wpa_caps;	/* 802.11i capabilities */
+ 	uint16_t	wpa_pmkidcnt;	/* 802.11i pmkid count */
+ 	uint16_t	wpa_pmkids[8];	/* 802.11i pmkids */
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
  
  /*
-  * Management information element payloads.
-@@ -419,7 +419,7 @@
- 	u_int8_t	tim_period;		/* DTIM period */
- 	u_int8_t	tim_bitctl;		/* bitmap control */
- 	u_int8_t	tim_bitmap[1];		/* variable-length bitmap */
+  * 802.11n HT Capability IE
+@@ -526,7 +526,7 @@
+ 	uint16_t	hc_extcap;		/* extended HT capabilities */
+ 	uint32_t	hc_txbf;		/* txbf capabilities */
+ 	uint8_t		hc_antenna;		/* antenna capabilities */
 -} __packed;
-+} __attribute__ ((packed));
++} __attribute__((__packed__));
+ 
+ /* HT capability flags (ht_cap) */
+ #define	IEEE80211_HTCAP_LDPC		0x0001	/* LDPC supported */
+@@ -601,7 +601,7 @@
+ 	uint8_t		hi_byte3;		/* ht ie byte 3 */
+ 	uint16_t	hi_byte45;		/* ht ie bytes 4+5 */
+ 	uint8_t 	hi_basicmcsset[16]; 	/* basic MCS set */
+-} __packed;
++} __attribute__((__packed__));
+ 
+ /* byte1 */
+ #define	IEEE80211_HTINFO_2NDCHAN	0x03	/* secondary/ext chan offset */
+@@ -687,7 +687,7 @@
+ 	uint8_t		tim_period;		/* DTIM period */
+ 	uint8_t		tim_bitctl;		/* bitmap control */
+ 	uint8_t		tim_bitmap[1];		/* variable-length bitmap */
+-} __packed;
++} __attribute__((__packed__));
  
  struct ieee80211_country_ie {
- 	u_int8_t	ie;			/* IEEE80211_ELEMID_COUNTRY */
-@@ -429,8 +429,8 @@
- 		u_int8_t schan;			/* starting channel */
- 		u_int8_t nchan;			/* number channels */
- 		u_int8_t maxtxpwr;		/* tx power cap */
--	} band[4] __packed;			/* up to 4 sub bands */
+ 	uint8_t		ie;			/* IEEE80211_ELEMID_COUNTRY */
+@@ -697,8 +697,8 @@
+ 		uint8_t schan;			/* starting channel */
+ 		uint8_t nchan;			/* number channels */
+ 		uint8_t maxtxpwr;		/* tx power cap */
+-	} __packed band[10];			/* sub bands */
 -} __packed;
-+	} band[4] __attribute__ ((packed));			/* up to 4 sub bands */
-+} __attribute__ ((packed));
++	} __attribute__((__packed__)) band[10];			/* sub bands */
++} __attribute__((__packed__));
  
- #define IEEE80211_CHALLENGE_LEN		128
-
---- sys/sys/ata.h.ORIG	2006-11-13 14:13:49.000000000 +0100
-+++ sys/sys/ata.h	2006-11-13 14:15:39.000000000 +0100
-@@ -157,7 +157,7 @@
- #define ATA_SUPPORT_FLUSHCACHE48        0x2000
+ /*
+  * 802.11h Channel Switch Announcement (CSA).
+@@ -709,7 +709,7 @@
+ 	uint8_t		csa_mode;		/* Channel Switch Mode */
+ 	uint8_t		csa_newchan;		/* New Channel Number */
+ 	uint8_t		csa_count;		/* Channel Switch Count */
+-} __packed;
++} __attribute__((__packed__));
  
- /*084/087*/ u_int16_t   extension;
+ /*
+  * Atheros advanced capability information element.
+@@ -731,7 +731,7 @@
+ #define	ATHEROS_CAP_WME			0x40	/* CWMin tuning */
+ #define	ATHEROS_CAP_BOOST		0x80	/* use turbo/!turbo mode */
+ 	uint8_t		ath_defkeyix[2];
+-} __packed;
++} __attribute__((__packed__));
+ 
+ /* rate set entries are in .5 Mb/s units, and potentially marked as basic */
+ #define	IEEE80211_RATE_BASIC		0x80
+Index: sys/sys/ata.h
+===================================================================
+--- sys/sys/ata.h.orig
++++ sys/sys/ata.h
+@@ -167,7 +167,7 @@
+ #define ATA_SUPPORT_WRITEDMAFUAEXT	0x0040
+ #define ATA_SUPPORT_WRITEDMAQFUAEXT	0x0080
+ #define ATA_SUPPORT_64BITWWN		0x0100
 -	} __packed support, enabled;
 +	} __attribute__((__packed__)) support, enabled;
  
  /*088*/ u_int16_t       udmamodes;              /* UltraDMA modes */
  /*089*/ u_int16_t       erase_time;
-@@ -188,7 +188,7 @@
+@@ -198,7 +198,7 @@
  /*176*/ u_int16_t       media_serial[30];
  	u_int16_t       reserved206[49];
  /*255*/ u_int16_t       integrity;
@@ -191,7 +302,7 @@
  
  
  /* ATA transfer modes */
-@@ -389,7 +389,7 @@
+@@ -400,7 +400,7 @@
  	
      u_int8_t	specific1;		/* sense key specific */
      u_int8_t	specific2;		/* sense key specific */
@@ -200,9 +311,11 @@
  
  struct ata_ioc_request {
      union {
---- sys/dev/ata/atapi-cd.h~	2006-11-13 14:31:42.000000000 +0100
-+++ sys/dev/ata/atapi-cd.h	2006-11-13 14:31:42.000000000 +0100
-@@ -266,7 +266,7 @@
+Index: sys/dev/ata/atapi-cd.h
+===================================================================
+--- sys/dev/ata/atapi-cd.h.orig
++++ sys/dev/ata/atapi-cd.h
+@@ -267,7 +267,7 @@
      u_int8_t    vendor_specific_byte1;
      u_int8_t    vendor_specific_byte2;
      u_int8_t    vendor_specific_byte3;
@@ -211,3 +324,61 @@
  
  /* CDROM Read Track Information structure */
  struct acd_track_info {
+Index: sys/i386/include/segments.h
+===================================================================
+--- sys/amd64/include/segments.h.orig
++++ sys/amd64/include/segments.h
+@@ -72,7 +72,7 @@
+ 	u_int64_t sd_def32:1;		/* default 32 vs 16 bit size */
+ 	u_int64_t sd_gran:1;		/* limit granularity (byte/page units)*/
+ 	u_int64_t sd_hibase:8;		/* segment base address  (msb) */
+-} __packed;
++} __attribute__((__packed__));
+ 
+ /*
+  * System segment descriptors (128 bit wide)
+@@ -86,11 +86,11 @@
+ 	u_int64_t sd_hilimit:4;		/* segment extent (msb) */
+ 	u_int64_t sd_xx0:3;		/* unused */
+ 	u_int64_t sd_gran:1;		/* limit granularity (byte/page units)*/
+-	u_int64_t sd_hibase:40 __packed;/* segment base address  (msb) */
++	u_int64_t sd_hibase:40 __attribute__((__packed__));/* segment base address  (msb) */
+ 	u_int64_t sd_xx1:8;
+ 	u_int64_t sd_mbz:5;		/* MUST be zero */
+ 	u_int64_t sd_xx2:19;
+-} __packed;
++} __attribute__((__packed__));
+ 
+ /*
+  * Gate descriptors (e.g. indirect descriptors, trap, interrupt etc. 128 bit)
+@@ -104,9 +104,9 @@
+ 	u_int64_t gd_type:5;		/* segment type */
+ 	u_int64_t gd_dpl:2;		/* segment descriptor priority level */
+ 	u_int64_t gd_p:1;		/* segment descriptor present */
+-	u_int64_t gd_hioffset:48 __packed;	/* gate offset (msb) */
++	u_int64_t gd_hioffset:48 __attribute__((__packed__));	/* gate offset (msb) */
+ 	u_int64_t sd_xx1:32;
+-} __packed;
++} __attribute__((__packed__));
+ 
+ 	/* system segments and gate types */
+ #define	SDT_SYSNULL	 0	/* system null */
+@@ -150,15 +150,15 @@
+ 	unsigned long ssd_long:1;	/* long mode (for %cs) */
+ 	unsigned long ssd_def32:1;	/* default 32 vs 16 bit size */
+ 	unsigned long ssd_gran:1;	/* limit granularity (byte/page units)*/
+-} __packed;
++} __attribute__((__packed__));
+ 
+ /*
+  * region descriptors, used to load gdt/idt tables before segments yet exist.
+  */
+ struct region_descriptor {
+ 	unsigned long rd_limit:16;		/* segment extent */
+-	unsigned long rd_base:64 __packed;	/* base address  */
+-} __packed;
++	unsigned long rd_base:64 __attribute__((__packed__));	/* base address  */
++} __attribute__((__packed__));
+ 
+ /*
+  * Size of IDT table
