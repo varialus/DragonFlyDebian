@@ -18,7 +18,7 @@ else
 endif
 
 SRC_DIR=src
-KERNEL_SRC=kfreebsd-source-6.3
+KERNEL_SRC=kfreebsd-source-7.0
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
@@ -53,7 +53,7 @@ build-cam: build-sbuf $(SRC_DIR)
 	LDADD="-lbsd" $(PMAKE) -C $(SRC_DIR)/lib/libcam
 
 build-geom: build-sbuf $(SRC_DIR)
-	LDADD="-lfreebsd" $(PMAKE) -C $(SRC_DIR)/lib/libgeom
+	LDADD="-lbsd -lfreebsd" $(PMAKE) -C $(SRC_DIR)/lib/libgeom
 
 build-ipx: $(SRC_DIR)
 	$(PMAKE) -C $(SRC_DIR)/lib/libipx

@@ -1,16 +1,14 @@
 diff -ur lib.old/libkvm/Makefile lib/libkvm/Makefile
 --- lib.old/libkvm/Makefile	2006-04-19 09:43:10.000000000 +0200
 +++ lib/libkvm/Makefile	2006-04-19 09:42:15.000000000 +0200
-@@ -2,8 +2,7 @@
- # $FreeBSD: src/lib/libkvm/Makefile,v 1.14 2003/08/18 15:25:38 obrien Exp $
+@@ -3,7 +3,6 @@
  
  LIB=	kvm
--SHLIBDIR?= /lib
+ SHLIBDIR?= /lib
 -CFLAGS+=-DLIBC_SCCS -I${.CURDIR}
-+SHLIBDIR?= /lib
- SRCS=	kvm.c kvm_${MACHINE_ARCH}.c kvm_file.c kvm_getloadavg.c \
- 	kvm_getswapinfo.c kvm_proc.c
- INCS=	kvm.h
+ 
+ .if ${MACHINE} == "sun4v"
+ CFLAGS+=-DSUN4V
 diff -ur lib.old/libkvm/kvm.c lib/libkvm/kvm.c
 --- lib.old/libkvm/kvm.c	2006-04-19 09:43:10.000000000 +0200
 +++ lib/libkvm/kvm.c	2006-04-19 09:38:34.000000000 +0200
@@ -22,7 +20,7 @@ diff -ur lib.old/libkvm/kvm.c lib/libkvm/kvm.c
  
  #include <vm/vm.h>
  #include <vm/vm_param.h>
-@@ -62,11 +63,14 @@
+@@ -62,11 +63,16 @@
  #include <limits.h>
  #include <nlist.h>
  #include <paths.h>
@@ -32,7 +30,9 @@ diff -ur lib.old/libkvm/kvm.c lib/libkvm/kvm.c
  #include <string.h>
  #include <unistd.h>
  
-+
++#ifndef _PATH_FWMEM
++#define _PATH_FWMEM     "/dev/fwmem"
++#endif
 +
  #include "kvm_private.h"
  
