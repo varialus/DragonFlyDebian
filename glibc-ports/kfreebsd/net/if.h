@@ -1,4 +1,4 @@
-/*
+/*-
  * Copyright (c) 1982, 1986, 1989, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)if.h	8.1 (Berkeley) 6/10/93
- * $FreeBSD: src/sys/net/if.h,v 1.88.2.2 2004/09/13 05:11:40 brooks Exp $
+ * $FreeBSD: src/sys/net/if.h,v 1.108 2007/06/11 20:08:11 andre Exp $
  */
 
 #ifndef _NET_IF_H_
@@ -71,8 +71,8 @@ struct if_data {
 	unsigned char	ifi_addrlen;		/* media address length */
 	unsigned char	ifi_hdrlen;		/* media header length */
 	unsigned char	ifi_link_state;		/* current link state */
-	unsigned char	ifi_recvquota;		/* polling quota for receive intrs */
-	unsigned char	ifi_xmitquota;		/* polling quota for xmit intrs */
+	unsigned char	ifi_spare_char1;	/* spare byte */
+	unsigned char	ifi_spare_char2;	/* spare byte */
 	unsigned char	ifi_datalen;		/* length of this data struct */
 	unsigned long	ifi_mtu;		/* maximum transmission unit */
 	unsigned long	ifi_metric;		/* routing metric (external only) */
@@ -89,42 +89,69 @@ struct if_data {
 	unsigned long	ifi_omcasts;		/* packets sent via multicast */
 	unsigned long	ifi_iqdrops;		/* dropped on input, this interface */
 	unsigned long	ifi_noproto;		/* destined for unsupported protocol */
-	unsigned long	ifi_hwassist;		/* HW offload capabilities */
-	time_t	ifi_epoch;		/* time of attach or stat reset */
-#ifdef __alpha__
-	u_int	ifi_timepad;		/* time_t is int, not long on alpha */
-#endif
+	unsigned long	ifi_hwassist;		/* HW offload capabilities, see IFCAP */
+	time_t	ifi_epoch;		/* uptime at attach or stat reset */
 	struct	timeval ifi_lastchange;	/* time of last administrative change */
 };
 
-#define	IFF_UP		0x1		/* interface is up */
-#define	IFF_BROADCAST	0x2		/* broadcast address valid */
-#define	IFF_DEBUG	0x4		/* turn on debugging */
-#define	IFF_LOOPBACK	0x8		/* is a loopback net */
-#define	IFF_POINTOPOINT	0x10		/* interface is point-to-point link */
-#define	IFF_SMART	0x20		/* interface manages own routes */
-#define	IFF_RUNNING	0x40		/* resources allocated */
-#define	IFF_NOARP	0x80		/* no address resolution protocol */
-#define	IFF_PROMISC	0x100		/* receive all packets */
-#define	IFF_ALLMULTI	0x200		/* receive all multicast packets */
-#define	IFF_OACTIVE	0x400		/* transmission in progress */
-#define	IFF_SIMPLEX	0x800		/* can't hear own transmissions */
+/*-
+ * Interface flags are of two types: network stack owned flags, and driver
+ * owned flags.  Historically, these values were stored in the same ifnet
+ * flags field, but with the advent of fine-grained locking, they have been
+ * broken out such that the network stack is responsible for synchronizing
+ * the stack-owned fields, and the device driver the device-owned fields.
+ * Both halves can perform lockless reads of the other half's field, subject
+ * to accepting the involved races.
+ *
+ * Both sets of flags come from the same number space, and should not be
+ * permitted to conflict, as they are exposed to user space via a single
+ * field.
+ *
+ * The following symbols identify read and write requirements for fields:
+ *
+ * (i) if_flags field set by device driver before attach, read-only there
+ *     after.
+ * (n) if_flags field written only by the network stack, read by either the
+ *     stack or driver.
+ * (d) if_drv_flags field written only by the device driver, read by either
+ *     the stack or driver.
+ */
+#define	IFF_UP		0x1		/* (n) interface is up */
+#define	IFF_BROADCAST	0x2		/* (i) broadcast address valid */
+#define	IFF_DEBUG	0x4		/* (n) turn on debugging */
+#define	IFF_LOOPBACK	0x8		/* (i) is a loopback net */
+#define	IFF_POINTOPOINT	0x10		/* (i) is a point-to-point link */
+#define	IFF_SMART	0x20		/* (i) interface manages own routes */
+#define	IFF_DRV_RUNNING	0x40		/* (d) resources allocated */
+#define	IFF_NOARP	0x80		/* (n) no address resolution protocol */
+#define	IFF_PROMISC	0x100		/* (n) receive all packets */
+#define	IFF_ALLMULTI	0x200		/* (n) receive all multicast packets */
+#define	IFF_DRV_OACTIVE	0x400		/* (d) tx hardware queue is full */
+#define	IFF_SIMPLEX	0x800		/* (i) can't hear own transmissions */
 #define	IFF_LINK0	0x1000		/* per link layer defined bit */
 #define	IFF_LINK1	0x2000		/* per link layer defined bit */
 #define	IFF_LINK2	0x4000		/* per link layer defined bit */
 #define	IFF_ALTPHYS	IFF_LINK2	/* use alternate physical connection */
-#define	IFF_MULTICAST	0x8000		/* supports multicast */
-#define	IFF_POLLING	0x10000		/* Interface is in polling mode. */
-#define	IFF_PPROMISC	0x20000		/* user-requested promisc mode */
-#define	IFF_MONITOR	0x40000		/* user-requested monitor mode */
-#define	IFF_STATICARP	0x80000		/* static ARP */
-#define	IFF_NEEDSGIANT	0x100000	/* hold Giant over if_start calls */
+#define	IFF_MULTICAST	0x8000		/* (i) supports multicast */
+/*			0x10000		*/
+#define	IFF_PPROMISC	0x20000		/* (n) user-requested promisc mode */
+#define	IFF_MONITOR	0x40000		/* (n) user-requested monitor mode */
+#define	IFF_STATICARP	0x80000		/* (n) static ARP */
+#define	IFF_NEEDSGIANT	0x100000	/* (i) hold Giant over if_start calls */
+
+/*
+ * Old names for driver flags so that user space tools can continue to use
+ * the old (portable) names.
+ */
+#ifndef _KERNEL
+#define	IFF_RUNNING	IFF_DRV_RUNNING
+#define	IFF_OACTIVE	IFF_DRV_OACTIVE
+#endif
 
 /* flags set internally only: */
 #define	IFF_CANTCHANGE \
-	(IFF_BROADCAST|IFF_POINTOPOINT|IFF_RUNNING|IFF_OACTIVE|\
-	    IFF_SIMPLEX|IFF_MULTICAST|IFF_ALLMULTI|IFF_SMART|IFF_PROMISC|\
-	    IFF_POLLING)
+	(IFF_BROADCAST|IFF_POINTOPOINT|IFF_DRV_RUNNING|IFF_DRV_OACTIVE|\
+	    IFF_SIMPLEX|IFF_MULTICAST|IFF_ALLMULTI|IFF_SMART|IFF_PROMISC)
 
 /*
  * Values for if_link_state.
@@ -141,7 +168,24 @@ struct if_data {
 #define	IF_Mbps(x)	(IF_Kbps((x) * 1000))	/* megabits/sec. */
 #define	IF_Gbps(x)	(IF_Mbps((x) * 1000))	/* gigabits/sec. */
 
-/* Capabilities that interfaces can advertise. */
+/*
+ * Capabilities that interfaces can advertise.
+ *
+ * struct ifnet.if_capabilities
+ *   contains the optional features & capabilities a particular interface
+ *   supports (not only the driver but also the detected hw revision).
+ *   Capabilities are defined by IFCAP_* below.
+ * struct ifnet.if_capenable
+ *   contains the enabled (either by default or through ifconfig) optional
+ *   features & capabilities on this interface.
+ *   Capabilities are defined by IFCAP_* below.
+ * struct if_data.ifi_hwassist in mbuf CSUM_ flag form, controlled by above
+ *   contains the enabled optional feature & capabilites that can be used
+ *   individually per packet and are specified in the mbuf pkthdr.csum_flags
+ *   field.  IFCAP_* and CSUM_* do not match one to one and CSUM_* may be
+ *   more detailed or differenciated than IFCAP_*.
+ *   Hwassist features are defined CSUM_* in sys/mbuf.h
+ */
 #define IFCAP_RXCSUM		0x0001  /* can offload checksum on RX */
 #define IFCAP_TXCSUM		0x0002  /* can offload checksum on TX */
 #define IFCAP_NETCONS		0x0004  /* can be a network console */
@@ -149,8 +193,13 @@ struct if_data {
 #define	IFCAP_VLAN_HWTAGGING	0x0010	/* hardware VLAN tag support */
 #define	IFCAP_JUMBO_MTU		0x0020	/* 9000 byte MTU supported */
 #define	IFCAP_POLLING		0x0040	/* driver supports polling */
+#define	IFCAP_VLAN_HWCSUM	0x0080	/* can do IFCAP_HWCSUM on VLANs */
+#define	IFCAP_TSO4		0x0100	/* can do TCP Segmentation Offload */
+#define	IFCAP_TSO6		0x0200	/* can do TCP6 Segmentation Offload */
+#define	IFCAP_LRO		0x0400	/* can do Large Receive Offload */
 
 #define IFCAP_HWCSUM		(IFCAP_RXCSUM | IFCAP_TXCSUM)
+#define	IFCAP_TSO		(IFCAP_TSO4 | IFCAP_TSO6)
 
 #define	IFQ_MAXLEN	50
 #define	IFNET_SLOWHZ	1		/* granularity is 1 second */
@@ -230,7 +279,7 @@ struct	ifreq {
 		int	ifru_mtu;
 		int	ifru_phys;
 		int	ifru_media;
-		char	*ifru_data;
+		char *	ifru_data;
 		int	ifru_cap[2];
 	} ifr_ifru;
 #define	ifr_addr	ifr_ifru.ifru_addr	/* address */
@@ -271,6 +320,13 @@ struct ifmediareq {
 	int	*ifm_ulist;		/* media words */
 };
 
+struct  ifdrv {
+	char            ifd_name[IFNAMSIZ];     /* if name, e.g. "en0" */
+	unsigned long   ifd_cmd;
+	size_t          ifd_len;
+	void            *ifd_data;
+};
+
 /* 
  * Structure used to retrieve aux status data from interfaces.
  * Kernel suppliers to this interface should respect the formatting
@@ -293,13 +349,53 @@ struct ifstat {
 struct	ifconf {
 	int	ifc_len;		/* size of associated buffer */
 	union {
-		char	*ifcu_buf;
+		char    *ifcu_buf;
 		struct	ifreq *ifcu_req;
 	} ifc_ifcu;
 #define	ifc_buf	ifc_ifcu.ifcu_buf	/* buffer address */
 #define	ifc_req	ifc_ifcu.ifcu_req	/* array of structures returned */
 };
 
+#if defined (__amd64__) || defined (COMPAT_32BIT)
+struct ifconf32 {
+	int	ifc_len;		/* size of associated buffer */
+	union {
+		unsigned int	ifcu_buf;
+		unsigned int	ifcu_req;
+	} ifc_ifcu;
+};
+#endif
+
+/*
+ * interface groups
+ */
+
+#define	IFG_ALL		"all"		/* group contains all interfaces */
+/* XXX: will we implement this? */
+#define	IFG_EGRESS	"egress"	/* if(s) default route(s) point to */
+
+struct ifg_req {
+	union {
+		char			 ifgrqu_group[IFNAMSIZ];
+		char			 ifgrqu_member[IFNAMSIZ];
+	} ifgrq_ifgrqu;
+#define	ifgrq_group	ifgrq_ifgrqu.ifgrqu_group
+#define	ifgrq_member	ifgrq_ifgrqu.ifgrqu_member
+};
+
+/*
+ * Used to lookup groups for an interface
+ */
+struct ifgroupreq {
+	char	ifgr_name[IFNAMSIZ];
+	unsigned int	ifgr_len;
+	union {
+		char	ifgru_group[IFNAMSIZ];
+		struct	ifg_req *ifgru_groups;
+	} ifgr_ifgru;
+#define ifgr_group	ifgr_ifgru.ifgru_group
+#define ifgr_groups	ifgr_ifgru.ifgru_groups
+};
 
 /*
  * Structure for SIOC[AGD]LIFADDR
