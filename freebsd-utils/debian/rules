@@ -12,7 +12,7 @@ package=freebsd-utils
 
 SHELL:=bash
 PATH:=/usr/lib/freebsd:$(PATH)
-PMAKE=make COPTS="-D_GNU_SOURCE" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
+PMAKE=make COPTS="-D_GNU_SOURCE -I$(CURDIR)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
 export LDADD=-lbsd -lfreebsd
 
 include /usr/share/cdbs/1/rules/debhelper.mk
@@ -35,7 +35,7 @@ build/module-init-tools:: apply-patches
 	done
 
 build/net-tools:: apply-patches
-	cp -p debian/pf_ruleset.c build-tree/src/sbin/pfctl/
+	cp -p pf_ruleset.c build-tree/src/sbin/pfctl/
 	set -e ; for i in sbin/{ifconfig,route,pfctl} usr.sbin/authpf \
 	; do \
 		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
