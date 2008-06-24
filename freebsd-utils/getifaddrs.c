@@ -24,13 +24,12 @@
  *
  *	BSDI getifaddrs.c,v 2.12 2000/02/23 14:51:59 dab Exp
  */
-/*
- * NOTE: SIOCGIFCONF case is not LP64 friendly.  it also does not perform
- * try-and-error for region size.
-__FBSDID("$FreeBSD: src/lib/libc/net/getifaddrs.c,v 1.6 2002/07/25 08:08:30 ume Exp $");
- */
 
 #include <sys/cdefs.h>
+
+ /*
+__FBSDID("$FreeBSD: src/lib/libc/net/getifaddrs.c,v 1.6 2002/07/25 08:08:30 ume Exp $");
+ */
 
 #include <sys/types.h>
 #include <sys/ioctl.h>
@@ -97,11 +96,6 @@ getifaddrs(struct ifaddrs **pif)
 	struct ifaddrs *ifa, *ift;
 	u_short idx = 0;
 #else	/* NET_RT_IFLIST */
-	char buf[1024];
-	int m, sock;
-	struct ifconf ifc;
-	struct ifreq *ifr;
-	struct ifreq *lifr;
 #endif	/* NET_RT_IFLIST */
 	int i;
 	size_t len, alen;
@@ -205,32 +199,6 @@ getifaddrs(struct ifaddrs **pif)
 		}
 	}
 #else	/* NET_RT_IFLIST */
-	ifc.ifc_buf = buf;
-	ifc.ifc_len = sizeof(buf);
-
-	if ((sock = _socket(AF_INET, SOCK_STREAM, 0)) < 0)
-		return (-1);
-	i =  _ioctl(sock, SIOCGIFCONF, (char *)&ifc);
-	_close(sock);
-	if (i < 0)
-		return (-1);
-
-	ifr = ifc.ifc_req;
-	lifr = (struct ifreq *)&ifc.ifc_buf[ifc.ifc_len];
-
-	while (ifr < lifr) {
-		struct sockaddr *sa;
-
-		sa = &ifr->ifr_addr;
-		++icnt;
-		dcnt += SA_RLEN(sa);
-		ncnt += sizeof(ifr->ifr_name) + 1;
-		
-		if (SA_LEN(sa) < sizeof(*sa))
-			ifr = (struct ifreq *)(((char *)sa) + sizeof(*sa));
-		else
-			ifr = (struct ifreq *)(((char *)sa) + SA_LEN(sa));
-	}
 #endif	/* NET_RT_IFLIST */
 
 	if (icnt + dcnt + ncnt == 1) {
@@ -367,26 +335,6 @@ getifaddrs(struct ifaddrs **pif)
 
 	free(buf);
 #else	/* NET_RT_IFLIST */
-	ifr = ifc.ifc_req;
-	lifr = (struct ifreq *)&ifc.ifc_buf[ifc.ifc_len];
-
-	while (ifr < lifr) {
-		struct sockaddr *sa;
-
-		ift->ifa_name = names;
-		names[sizeof(ifr->ifr_name)] = 0;
-		strncpy(names, ifr->ifr_name, sizeof(ifr->ifr_name));
-		while (*names++)
-			;
-
-		ift->ifa_addr = (struct sockaddr *)data;
-		sa = &ifr->ifr_addr;
-		memcpy(data, sa, SA_LEN(sa));
-		data += SA_RLEN(sa);
-		
-		ifr = (struct ifreq *)(((char *)sa) + SA_LEN(sa));
-		ift = (ift->ifa_next = ift + 1);
-	}
 #endif	/* NET_RT_IFLIST */
 	if (--ift >= ifa) {
 		ift->ifa_next = NULL;
