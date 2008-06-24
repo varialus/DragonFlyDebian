@@ -24,7 +24,8 @@
 
 /* Retrieving the list of mounted filesystems.  */
 
-#include <bits/statfs.h>
+#include <sys/stat.h>
+#include <sys/statfs.h>
 #include <rpc/types.h>
 #include <sys/ucred.h>
 #include <sys/queue.h>
@@ -179,6 +180,7 @@ struct fid {
 #define MNT_WAIT	1	/* synchronously wait for I/O to complete */
 #define MNT_NOWAIT	2	/* start all I/O, but do not wait for it */
 #define MNT_LAZY	3	/* push data not written by filesystem syncer */
+#define	MNT_SUSPEND	4	/* Suspend file system after sync */
 
 /*
  * Generic file handle
@@ -319,25 +321,11 @@ struct vfsquery {
 struct iovec;
 struct uio;
 
-
-#include <sys/cdefs.h>
-
-struct stat;
-
 __BEGIN_DECLS
 
 /* Mounting and unmounting filesystems.  */
-int	fhopen(const struct fhandle *, int);
-int	fhstat(const struct fhandle *, struct stat *);
-int	fhstatfs(const struct fhandle *, struct statfs *);
-int	fstatfs(int, struct statfs *);
-int	getfh(const char *, fhandle_t *);
-int	getfsstat(struct statfs *, long, int);
-int	getmntinfo(struct statfs **, int);
-int	lgetfh(const char *, fhandle_t *);
 int	mount(const char *, const char *, int, void *);
 int	nmount(struct iovec *, unsigned int, int);
-int	statfs(const char *, struct statfs *);
 int	unmount(const char *, int);
 
 /* C library stuff */
@@ -395,13 +383,15 @@ __END_DECLS
 /* Opening files on specified mounted filesystems.
    These system calls are reserved to the superuser, for security reasons.  */
 
-#include <sys/stat.h>
-
 __BEGIN_DECLS
 
 /* Return in *FHP the file handle corresponding to the file or directory
    PATH.  */
 extern int getfh (__const char *__path, fhandle_t *__fhp) __THROW;
+
+/* Return in *FHP the file handle corresponding to the file or directory
+   PATH.  */
+extern int lgetfh (__const char *__path, fhandle_t *__fhp) __THROW;
 
 /* Open a file handle *FHP, using the open() like FLAGS.  Return the
    new file descriptor.  */
