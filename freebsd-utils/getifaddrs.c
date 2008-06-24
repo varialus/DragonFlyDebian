@@ -159,8 +159,10 @@ getifaddrs(struct ifaddrs **pif)
 		case RTM_NEWADDR:
 			ifam = (struct ifa_msghdr *)(void *)rtm;
 			if (idx && ifam->ifam_index != idx)
-				abort();	/* this cannot happen */
-
+			{
+				errno = EINVAL;		/* this cannot happen */
+				return -1;
+			};
 #define	RTA_MASKS	(RTA_NETMASK | RTA_IFA | RTA_BRD)
 			if (idx == 0 || (ifam->ifam_addrs & RTA_MASKS) == 0)
 				break;
@@ -263,8 +265,10 @@ getifaddrs(struct ifaddrs **pif)
 		case RTM_NEWADDR:
 			ifam = (struct ifa_msghdr *)(void *)rtm;
 			if (idx && ifam->ifam_index != idx)
-				abort();	/* this cannot happen */
-
+			{
+				errno = EINVAL;		/* this cannot happen */
+				return -1;
+			};
 			if (idx == 0 || (ifam->ifam_addrs & RTA_MASKS) == 0)
 				break;
 			ift->ifa_name = cif->ifa_name;
