@@ -42,6 +42,8 @@ __FBSDID("$FreeBSD: src/lib/libc/net/getifaddrs.c,v 1.6 2002/07/25 08:08:30 ume 
 #include <net/route.h>
 #include <sys/sysctl.h>
 #include <net/if_dl.h>
+#else
+#error NET_RT_IFLIST is required
 #endif
 
 #include <errno.h>
