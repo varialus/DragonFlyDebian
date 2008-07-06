@@ -33,7 +33,7 @@ ifeq ($(subdir),io)
 # For <unistd.h>.
 sysdep_routines += sys_getcwd sys_lseek
 # For <fcntl.h>.
-sysdep_routines += sys_open
+sysdep_routines += sys_open open_2
 # For <sys/stat.h>.
 sysdep_routines += sys_fstat sys_lstat sys_mknod sys_nfstat sys_nlstat sys_nstat sys_stat
 # For <sys/statfs.h>.

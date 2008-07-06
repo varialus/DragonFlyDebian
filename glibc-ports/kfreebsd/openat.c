@@ -93,3 +93,18 @@ weak_alias (__openat64, openat64)
 stub_warning (openat)
 stub_warning (openat64)
 
+int
+__openat_2 (fd, file, oflag)
+     int fd;
+     const char *file;
+     int oflag;
+{
+  if (oflag & O_CREAT)
+    __fortify_fail ("invalid openat call: O_CREAT without mode");
+
+  return __openat (file, oflag);
+}
+
+strong_alias (__openat_2, __openat64_2)
+stub_warning (__openat_2)
+stub_warning (__openat64_2)
