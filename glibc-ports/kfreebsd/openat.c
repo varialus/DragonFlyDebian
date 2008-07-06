@@ -102,7 +102,7 @@ __openat_2 (fd, file, oflag)
   if (oflag & O_CREAT)
     __fortify_fail ("invalid openat call: O_CREAT without mode");
 
-  return __openat (file, oflag);
+  return __openat (fd, file, oflag);
 }
 
 strong_alias (__openat_2, __openat64_2)
