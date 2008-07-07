@@ -42,7 +42,7 @@ Index: sys/kern/imgact_elf.c
  		interp = brand_info->interp_newpath;
  
  	/*
-@@ -706,7 +724,7 @@
+@@ -708,7 +726,7 @@
  
  			if ((error = __elfN(load_section)(vmspace,
  			    imgp->object, phdr[i].p_offset,
@@ -51,7 +51,7 @@ Index: sys/kern/imgact_elf.c
  			    phdr[i].p_memsz, phdr[i].p_filesz, prot,
  			    sv->sv_pagesize)) != 0)
  				return (error);
-@@ -720,11 +738,12 @@
+@@ -722,11 +740,12 @@
  			if (phdr[i].p_offset == 0 &&
  			    hdr->e_phoff + hdr->e_phnum * hdr->e_phentsize
  				<= phdr[i].p_filesz)
@@ -65,7 +65,7 @@ Index: sys/kern/imgact_elf.c
  
  			/*
  			 * Is this .text or .data?  We can't use
-@@ -746,7 +765,7 @@
+@@ -748,7 +767,7 @@
  			    phdr[i].p_memsz)) {
  				text_size = seg_size;
  				text_addr = seg_addr;
@@ -74,7 +74,7 @@ Index: sys/kern/imgact_elf.c
  			} else {
  				data_size = seg_size;
  				data_addr = seg_addr;
-@@ -754,7 +773,7 @@
+@@ -756,7 +775,7 @@
  			total_size += seg_size;
  			break;
  		case PT_PHDR: 	/* Program header table info */
