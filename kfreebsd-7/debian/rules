@@ -41,6 +41,15 @@ control: clean
 				$(CURDIR)/debian/control.flavor.in >> $(CURDIR)/debian/control ; \
 		done ; \
 	done
+	# create compat for dropped images
+	for flavor in 586 586-smp ; do \
+		sed -e "s/@major@/$(major)/g" -e "s/@flavor@/$$flavor/g" -e "s/@arch@/i386/g" -e "s/@compatflavor@/486/g" \
+			$(CURDIR)/debian/control.compat.in >> $(CURDIR)/debian/control ; \
+	done
+	for flavor in amd64-generic amd64-k8-smp amd64-k8 em64t-p4-smp em64t-p4 ; do \
+		sed -e "s/@major@/$(major)/g" -e "s/@flavor@/$$flavor/g" -e "s/@arch@/amd64/g" -e "s/@compatflavor@/amd64/g" \
+			$(CURDIR)/debian/control.compat.in >> $(CURDIR)/debian/control ; \
+	done
 
 clean:
 	dh_testdir
