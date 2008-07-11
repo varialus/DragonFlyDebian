@@ -3,8 +3,8 @@ set -ex
 
 ANONCVS=anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
 
-RELENG=RELENG_6_3_0_RELEASE
-RPORTS=RELEASE_6_3_0
+RELENG=RELENG_7_0_0_RELEASE
+RPORTS=RELEASE_7_0_0
 
 rm -rf src ports
 
@@ -29,6 +29,7 @@ for i in \
     src/usr.sbin/config \
     src/usr.sbin/kgzip \
     src/usr.sbin/mtree \
+    src/sys/kern/subr_sbuf.c \
   ; do
   cvs -d $ANONCVS ${action} -r $RELENG $i
   test -e $i

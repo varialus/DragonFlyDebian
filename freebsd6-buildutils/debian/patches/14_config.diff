@@ -1,0 +1,33 @@
+diff -u src/usr.sbin/config/Makefile src/usr.sbin/config/Makefile
+--- src/usr.sbin/config/Makefile
++++ src/usr.sbin/config/Makefile
+@@ -4,7 +4,7 @@
+ PROG=	config
+ MAN=	config.5 config.8
+ SRCS=	config.y main.c lang.l mkmakefile.c mkheaders.c \
+-	mkoptions.c y.tab.h kernconf.c
++	mkoptions.c y.tab.h kernconf.c subr_sbuf.c
+ 
+ kernconf.c: kernconf.tmpl
+ 	file2c 'char kernconfstr[] = {' ',0};' < ${.CURDIR}/kernconf.tmpl > kernconf.c
+@@ -13,7 +13,7 @@
+ CFLAGS+= -I. -I${.CURDIR}
+ 
+ DPADD=	${LIBL} ${LIBSBUF}
+-LDADD+=	-ll -lsbuf
++LDADD+=	-ll
+ 
+ CLEANFILES+=	kernconf.c
+ 
+diff -u src/usr.sbin/config/main.c src/usr.sbin/config/main.c
+--- src/usr.sbin/config/main.c
++++ src/usr.sbin/config/main.c
+@@ -43,6 +43,8 @@
+ 
+ #include <sys/types.h>
+ #include <sys/stat.h>
++#include <bsd/string.h>
++#include <stdarg.h>
+ #include <sys/sbuf.h>
+ #include <sys/file.h>
+ #include <sys/mman.h>

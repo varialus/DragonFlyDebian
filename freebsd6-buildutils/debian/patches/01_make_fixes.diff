@@ -59,47 +59,59 @@ diff -ur ../foo.old/src/share/mk/bsd.info.mk ./src/share/mk/bsd.info.mk
 diff -ur ../foo.old/src/share/mk/bsd.lib.mk ./src/share/mk/bsd.lib.mk
 --- ../foo.old/src/share/mk/bsd.lib.mk	2005-12-17 12:45:38.000000000 +0100
 +++ ./src/share/mk/bsd.lib.mk	2005-12-17 12:49:11.000000000 +0100
-@@ -109,7 +109,7 @@
- lib${LIB}.a: ${OBJS} ${STATICOBJS}
+@@ -124,9 +124,9 @@
  	@${ECHO} building static ${LIB} library
  	@rm -f ${.TARGET}
+ .if !defined(NM)
 -	@${AR} cq ${.TARGET} `lorder ${OBJS} ${STATICOBJS} | tsort -q` ${ARADD}
 +	@${AR} cq ${.TARGET} `lorder ${OBJS} ${STATICOBJS} | tsort` ${ARADD}
+ .else
+-	@${AR} cq ${.TARGET} `NM='${NM}' lorder ${OBJS} ${STATICOBJS} | tsort -q` ${ARADD}
++	@${AR} cq ${.TARGET} `NM='${NM}' lorder ${OBJS} ${STATICOBJS} | tsort` ${ARADD}
+ .endif
  	${RANLIB} ${.TARGET}
  .endif
- 
-@@ -122,7 +122,7 @@
- lib${LIB}_p.a: ${POBJS}
+@@ -141,9 +141,9 @@
  	@${ECHO} building profiled ${LIB} library
  	@rm -f ${.TARGET}
+ .if !defined(NM)
 -	@${AR} cq ${.TARGET} `lorder ${POBJS} | tsort -q` ${ARADD}
 +	@${AR} cq ${.TARGET} `lorder ${POBJS} | tsort` ${ARADD}
+ .else
+-	@${AR} cq ${.TARGET} `NM='${NM}' lorder ${POBJS} | tsort -q` ${ARADD}
++	@${AR} cq ${.TARGET} `NM='${NM}' lorder ${POBJS} | tsort` ${ARADD}
+ .endif
  	${RANLIB} ${.TARGET}
  .endif
- 
-@@ -138,11 +138,11 @@
+@@ -160,16 +160,16 @@
  	@${ECHO} building shared library ${SHLIB_NAME}
  	@rm -f ${.TARGET} ${SHLIB_LINK}
  .if defined(SHLIB_LINK)
 -	@ln -fs ${.TARGET} ${SHLIB_LINK}
 +	@ln -fs ${SHLIBDIR}${.TARGET} ${SHLIB_LINK}
  .endif
+ .if !defined(NM)
  	@${CC} ${LDFLAGS} -shared -Wl,-x \
  	    -o ${.TARGET} -Wl,-soname,${SONAME} \
 -	    `lorder ${SOBJS} | tsort -q` ${LDADD}
 +	    `lorder ${SOBJS} | tsort` ${LDADD}
+ .else
+ 	@${CC} ${LDFLAGS} -shared -Wl,-x \
+ 	    -o ${.TARGET} -Wl,-soname,${SONAME} \
+-	    `NM='${NM}' lorder ${SOBJS} | tsort -q` ${LDADD}
++	    `NM='${NM}' lorder ${SOBJS} | tsort` ${LDADD}
+ .endif
  .endif
  
- .if defined(INSTALL_PIC_ARCHIVE) && defined(LIB) && !empty(LIB)
-@@ -208,11 +208,11 @@
+@@ -236,11 +236,11 @@
  .ORDER: beforeinstall _libinstall
  _libinstall:
- .if defined(LIB) && !empty(LIB) && !defined(NO_INSTALLLIB)
+ .if defined(LIB) && !empty(LIB) && ${MK_INSTALLLIB} != "no"
 -	${INSTALL} -C -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
 +	${INSTALL} -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
  	    ${_INSTALLFLAGS} lib${LIB}.a ${DESTDIR}${LIBDIR}
  .endif
- .if !defined(NO_PROFILE) && defined(LIB) && !empty(LIB)
+ .if ${MK_PROFILE} != "no" && defined(LIB) && !empty(LIB)
 -	${INSTALL} -C -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
 +	${INSTALL} -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
  	    ${_INSTALLFLAGS} lib${LIB}_p.a ${DESTDIR}${LIBDIR}
