@@ -1,3 +1,41 @@
+diff -u src/sys/sys/sbuf.h src/sys/sys/sbuf.h
+--- src/sys/sys/sbuf.h
++++ src/sys/sys/sbuf.h
+@@ -31,7 +31,8 @@
+ #ifndef _SYS_SBUF_H_
+ #define	_SYS_SBUF_H_
+ 
+-#include <sys/_types.h>
++#include <stdarg.h>
++#include <sys/types.h>
+ 
+ /*
+  * Structure definition
+@@ -63,8 +63,8 @@
+ int		 sbuf_bcpy(struct sbuf *, const void *, size_t);
+ int		 sbuf_cat(struct sbuf *, const char *);
+ int		 sbuf_cpy(struct sbuf *, const char *);
+-int		 sbuf_printf(struct sbuf *, const char *, ...) __printflike(2, 3);
+-int		 sbuf_vprintf(struct sbuf *, const char *, __va_list) __printflike(2, 0);
++int		 sbuf_printf(struct sbuf *, const char *, ...);
++int		 sbuf_vprintf(struct sbuf *, const char *, va_list);
+ int		 sbuf_putc(struct sbuf *, int);
+ int		 sbuf_trim(struct sbuf *);
+ int		 sbuf_overflowed(struct sbuf *);
+diff -u src/sys/kern/subr_sbuf.c src/sys/kern/subr_sbuf.c
+--- src/sys/kern/subr_sbuf.c
++++ src/sys/kern/subr_sbuf.c
+@@ -76,8 +76,8 @@
+ #define	SBUF_CLEARFLAG(s, f)	do { (s)->s_flags &= ~(f); } while (0)
+ 
+ #define	SBUF_MINEXTENDSIZE	16		/* Should be power of 2. */
+-#define	SBUF_MAXEXTENDSIZE	PAGE_SIZE
+-#define	SBUF_MAXEXTENDINCR	PAGE_SIZE
++#define	SBUF_MAXEXTENDSIZE	4096
++#define	SBUF_MAXEXTENDINCR	SBUF_MAXEXTENDSIZE
+ 
+ /*
+  * Debugging support
 diff -u src/usr.sbin/config/Makefile src/usr.sbin/config/Makefile
 --- src/usr.sbin/config/Makefile
 +++ src/usr.sbin/config/Makefile
