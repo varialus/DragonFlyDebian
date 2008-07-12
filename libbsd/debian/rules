@@ -15,10 +15,14 @@ lib := libbsd0
 libdbg := $(lib)-dbg
 libdev := libbsd-dev
 
-build:
+build-indep:
+
+build-arch:
 	dh_testdir
 	
 	$(MAKE)
+
+build: build-indep build-arch
 
 clean:
 	dh_testdir
@@ -28,7 +32,7 @@ clean:
 	
 	dh_clean
 
-install: build
+install-arch: build-arch
 	dh_testdir
 	dh_testroot
 	dh_clean -k
@@ -36,10 +40,10 @@ install: build
 	
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 
-binary-indep: build install
+binary-indep:
 # Nothing to do.
 
-binary-arch: build install
+binary-arch: install-arch
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs
@@ -59,5 +63,6 @@ binary-arch: build install
 
 binary: binary-indep binary-arch
 
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: install-arch
+.PHONY: clean build-indep build-arch build binary-indep binary-arch binary
 
