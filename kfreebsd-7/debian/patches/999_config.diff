@@ -4,7 +4,7 @@ Index: sys/amd64/conf/GENERIC
 +++ sys/amd64/conf/GENERIC
 @@ -18,13 +18,8 @@
  #
- # $FreeBSD: src/sys/amd64/conf/GENERIC,v 1.484.2.8 2008/07/04 01:29:12 delphij Exp $
+ # $FreeBSD: src/sys/amd64/conf/GENERIC,v 1.484.2.10 2008/07/16 02:05:40 yongari Exp $
  
 -cpu		HAMMER
 -ident		GENERIC
@@ -35,6 +35,15 @@ Index: sys/amd64/conf/GENERIC
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
+@@ -72,7 +69,7 @@
+ options 	AUDIT			# Security event auditing
+ 
+ # Make an SMP-capable kernel by default
+-options 	SMP			# Symmetric MultiProcessor Kernel
++#options 	SMP			# Symmetric MultiProcessor Kernel
+ 
+ # CPU frequency control
+ device		cpufreq
 @@ -81,9 +78,6 @@
  device		acpi
  device		pci
@@ -65,17 +74,7 @@ Index: sys/amd64/conf/GENERIC
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -239,9 +231,6 @@
- device		wlan_scan_ap	# 802.11 AP mode scanning
- device		wlan_scan_sta	# 802.11 STA mode scanning
- device		an		# Aironet 4500/4800 802.11 wireless NICs.
--device		ath		# Atheros pci/cardbus NIC's
--device		ath_hal		# Atheros HAL (Hardware Access Layer)
--device		ath_rate_sample	# SampleRate tx rate control for ath
- device		awi		# BayStack 660 and others
- device		ral		# Ralink Technology RT2500 wireless NICs.
- device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
-@@ -250,13 +239,8 @@
+@@ -249,13 +241,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
@@ -89,20 +88,20 @@ Index: sys/amd64/conf/GENERIC
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -273,12 +257,8 @@
+@@ -272,12 +259,9 @@
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
 -device		ulpt		# Printer
  device		umass		# Disks/Mass storage - Requires scbus and da
--device		ums		# Mouse
+ device		ums		# Mouse
  device		ural		# Ralink Technology RT2500USB wireless NICs
 -device		urio		# Diamond Rio 500 MP3 player
 -device		uscanner	# Scanners
  # USB Serial devices
  device		ucom		# Generic com ttys
  device		uark		# Technologies ARK3116 based serial adapters
-@@ -305,3 +285,11 @@
+@@ -304,3 +288,11 @@
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
@@ -120,7 +119,7 @@ Index: sys/i386/conf/GENERIC
 +++ sys/i386/conf/GENERIC
 @@ -18,15 +18,8 @@
  #
- # $FreeBSD: src/sys/i386/conf/GENERIC,v 1.474.2.8 2008/07/04 01:29:12 delphij Exp $
+ # $FreeBSD: src/sys/i386/conf/GENERIC,v 1.474.2.10 2008/07/16 02:05:40 yongari Exp $
  
 -cpu		I486_CPU
 -cpu		I586_CPU
@@ -153,6 +152,15 @@ Index: sys/i386/conf/GENERIC
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
+@@ -72,7 +67,7 @@
+ options 	AUDIT			# Security event auditing
+ 
+ # To make an SMP kernel, the next two lines are needed
+-options 	SMP			# Symmetric MultiProcessor Kernel
++#options 	SMP			# Symmetric MultiProcessor Kernel
+ device		apic			# I/O APIC
+ 
+ # CPU frequency control
 @@ -82,9 +77,6 @@
  device		eisa
  device		pci
@@ -183,17 +191,7 @@ Index: sys/i386/conf/GENERIC
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -252,9 +242,6 @@
- device		wlan_scan_ap	# 802.11 AP mode scanning
- device		wlan_scan_sta	# 802.11 STA mode scanning
- device		an		# Aironet 4500/4800 802.11 wireless NICs.
--device		ath		# Atheros pci/cardbus NIC's
--device		ath_hal		# Atheros HAL (Hardware Access Layer)
--device		ath_rate_sample	# SampleRate tx rate control for ath
- device		awi		# BayStack 660 and others
- device		ral		# Ralink Technology RT2500 wireless NICs.
- device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
-@@ -264,13 +251,8 @@
+@@ -263,13 +253,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
@@ -207,13 +205,13 @@ Index: sys/i386/conf/GENERIC
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -287,13 +269,9 @@
+@@ -286,13 +271,10 @@
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
 -device		ulpt		# Printer
  device		umass		# Disks/Mass storage - Requires scbus and da
--device		ums		# Mouse
+ device		ums		# Mouse
  device		ural		# Ralink Technology RT2500USB wireless NICs
  device		rum		# Ralink Technology RT2501USB wireless NICs
 -device		urio		# Diamond Rio 500 MP3 player
@@ -221,7 +219,7 @@ Index: sys/i386/conf/GENERIC
  # USB Serial devices
  device		ucom		# Generic com ttys
  device		uark		# Technologies ARK3116 based serial adapters
-@@ -320,3 +298,11 @@
+@@ -319,3 +301,11 @@
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
