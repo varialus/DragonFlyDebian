@@ -128,7 +128,8 @@ build-flavor-%-stamp: src config
 	sed -i -e 's,^KODIR?=.*,KODIR="/lib/modules/$(version)-$(abiname)-$*",g' $(FLAVOR_DIR)-$*/sys/conf/kern.pre.mk
 
 	# Configure the kernel
-	cp debian/arch/$(cpu)/*.config $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/
+	cp debian/arch/$(cpu)/$*.config $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/
+	cat $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/GENERIC >> $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/$*.config
 	ln -sf $*.config $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/$(configfile)
 	cd $(FLAVOR_DIR)-$*/sys/$(cpu)/conf \
 		&& config $(configfile)
@@ -168,6 +169,11 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	install -o root -g root -m 644 \
 		$(FLAVOR_DIR)-$*/sys/boot/forth/loader.conf \
 		$(IMAGE_PACKAGE)-$*/boot/defaults/loader.conf
+	
+	# install the config file
+	install -o root -g root -m 644 \
+		$(FLAVOR_DIR)-$*/sys/$(cpu)/conf/$*.config \
+		$(IMAGE_PACKAGE)-$*/boot/config-$(version)-$(abiname)-$*
 
 	# now install the kernel
 	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(cpu)/compile/$(configfile) DESTDIR=$(IMAGE_PACKAGE)-$* install

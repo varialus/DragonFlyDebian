@@ -2,22 +2,25 @@ Index: sys/amd64/conf/GENERIC
 ===================================================================
 --- sys/amd64/conf/GENERIC.orig
 +++ sys/amd64/conf/GENERIC
-@@ -18,13 +18,8 @@
+@@ -18,13 +18,13 @@
  #
  # $FreeBSD: src/sys/amd64/conf/GENERIC,v 1.484.2.10 2008/07/16 02:05:40 yongari Exp $
  
 -cpu		HAMMER
 -ident		GENERIC
--
++#cpu		HAMMER
++#dent		GENERIC
+ 
  # To statically compile in device wiring instead of /boot/device.hints
 -#hints		"GENERIC.hints"		# Default places to look for devices.
--
--makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
 +hints		"GENERIC.hints"		# Default places to look for devices.
+ 
+-makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
++#makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
  
  options 	SCHED_ULE		# ULE scheduler
  options 	PREEMPTION		# Enable kernel thread preemption
-@@ -45,6 +40,8 @@
+@@ -45,6 +45,8 @@
  options 	MSDOSFS			# MSDOS Filesystem
  options 	CD9660			# ISO 9660 Filesystem
  options 	PROCFS			# Process filesystem (requires PSEUDOFS)
@@ -26,7 +29,7 @@ Index: sys/amd64/conf/GENERIC
  options 	PSEUDOFS		# Pseudo-filesystem framework
  options 	GEOM_PART_GPT		# GUID Partition Tables.
  options 	GEOM_LABEL		# Provides labelization
-@@ -53,7 +50,7 @@
+@@ -53,7 +55,7 @@
  options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
@@ -35,7 +38,7 @@ Index: sys/amd64/conf/GENERIC
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -72,7 +69,7 @@
+@@ -72,7 +74,7 @@
  options 	AUDIT			# Security event auditing
  
  # Make an SMP-capable kernel by default
@@ -44,7 +47,7 @@ Index: sys/amd64/conf/GENERIC
  
  # CPU frequency control
  device		cpufreq
-@@ -81,9 +78,6 @@
+@@ -81,9 +83,6 @@
  device		acpi
  device		pci
  
@@ -54,7 +57,7 @@ Index: sys/amd64/conf/GENERIC
  # ATA and ATAPI devices
  device		ata
  device		atadisk		# ATA disk drives
-@@ -91,6 +85,8 @@
+@@ -91,6 +90,8 @@
  device		atapicd		# ATAPI CDROM drives
  device		atapifd		# ATAPI floppy drives
  device		atapist		# ATAPI tape drives
@@ -63,7 +66,7 @@ Index: sys/amd64/conf/GENERIC
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -173,10 +169,6 @@
+@@ -173,10 +174,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -74,7 +77,7 @@ Index: sys/amd64/conf/GENERIC
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -249,13 +241,8 @@
+@@ -249,13 +246,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
@@ -88,7 +91,7 @@ Index: sys/amd64/conf/GENERIC
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -272,12 +259,9 @@
+@@ -272,12 +264,9 @@
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
@@ -101,7 +104,7 @@ Index: sys/amd64/conf/GENERIC
  # USB Serial devices
  device		ucom		# Generic com ttys
  device		uark		# Technologies ARK3116 based serial adapters
-@@ -304,3 +288,11 @@
+@@ -304,3 +293,11 @@
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
@@ -117,7 +120,7 @@ Index: sys/i386/conf/GENERIC
 ===================================================================
 --- sys/i386/conf/GENERIC.orig
 +++ sys/i386/conf/GENERIC
-@@ -18,15 +18,8 @@
+@@ -18,15 +18,15 @@
  #
  # $FreeBSD: src/sys/i386/conf/GENERIC,v 1.474.2.10 2008/07/16 02:05:40 yongari Exp $
  
@@ -125,16 +128,21 @@ Index: sys/i386/conf/GENERIC
 -cpu		I586_CPU
 -cpu		I686_CPU
 -ident		GENERIC
--
++#cpu		I486_CPU
++#cpu		I586_CPU
++#cpu		I686_CPU
++#ident		GENERIC
+ 
  # To statically compile in device wiring instead of /boot/device.hints
 -#hints		"GENERIC.hints"		# Default places to look for devices.
--
--makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
 +hints		"GENERIC.hints"		# Default places to look for devices.
+ 
+-makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
++#makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
  
  options 	SCHED_ULE		# ULE scheduler
  options 	PREEMPTION		# Enable kernel thread preemption
-@@ -46,6 +39,8 @@
+@@ -46,6 +46,8 @@
  options 	MSDOSFS			# MSDOS Filesystem
  options 	CD9660			# ISO 9660 Filesystem
  options 	PROCFS			# Process filesystem (requires PSEUDOFS)
@@ -143,7 +151,7 @@ Index: sys/i386/conf/GENERIC
  options 	PSEUDOFS		# Pseudo-filesystem framework
  options 	GEOM_PART_GPT		# GUID Partition Tables.
  options 	GEOM_LABEL		# Provides labelization
-@@ -53,7 +48,7 @@
+@@ -53,7 +55,7 @@
  options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
@@ -152,7 +160,7 @@ Index: sys/i386/conf/GENERIC
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -72,7 +67,7 @@
+@@ -72,7 +74,7 @@
  options 	AUDIT			# Security event auditing
  
  # To make an SMP kernel, the next two lines are needed
@@ -161,7 +169,7 @@ Index: sys/i386/conf/GENERIC
  device		apic			# I/O APIC
  
  # CPU frequency control
-@@ -82,9 +77,6 @@
+@@ -82,9 +84,6 @@
  device		eisa
  device		pci
  
@@ -171,7 +179,7 @@ Index: sys/i386/conf/GENERIC
  # ATA and ATAPI devices
  device		ata
  device		atadisk		# ATA disk drives
-@@ -92,6 +84,8 @@
+@@ -92,6 +91,8 @@
  device		atapicd		# ATAPI CDROM drives
  device		atapifd		# ATAPI floppy drives
  device		atapist		# ATAPI tape drives
@@ -180,7 +188,7 @@ Index: sys/i386/conf/GENERIC
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -184,10 +178,6 @@
+@@ -184,10 +185,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -191,7 +199,7 @@ Index: sys/i386/conf/GENERIC
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -263,13 +253,8 @@
+@@ -263,13 +260,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
@@ -205,7 +213,7 @@ Index: sys/i386/conf/GENERIC
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -286,13 +271,10 @@
+@@ -286,13 +278,10 @@
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
@@ -219,7 +227,7 @@ Index: sys/i386/conf/GENERIC
  # USB Serial devices
  device		ucom		# Generic com ttys
  device		uark		# Technologies ARK3116 based serial adapters
-@@ -319,3 +301,11 @@
+@@ -319,3 +308,11 @@
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
