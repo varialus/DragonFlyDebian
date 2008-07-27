@@ -3,15 +3,9 @@ Index: ufsutils/include/port/port.h
 ===================================================================
 --- /dev/null
 +++ ufsutils/include/port/port.h
-@@ -0,0 +1,28 @@
+@@ -0,0 +1,22 @@
 +#ifndef LIBPORT_H
 +#define LIBPORT_H
-+
-+#define setproctitle(fmt, args...)
-+
-+#define __dead2
-+#define __printflike(x,y)
-+#define __FBSDID(x)
 +
 +#ifdef __FreeBSD_kernel__
 +
@@ -32,95 +26,6 @@ Index: ufsutils/include/port/port.h
 +#endif
 +
 +#endif
-Index: ufsutils/include/port/random.h
-===================================================================
---- /dev/null
-+++ ufsutils/include/port/random.h
-@@ -0,0 +1,11 @@
-+#ifndef LIBPORT_RANDOM_H
-+#define LIBPORT_RANDOM_H
-+
-+#include <sys/types.h>
-+
-+void arc4random_stir();
-+void arc4random_addrandom(u_char *dat, int datlen);
-+u_int32_t arc4random();
-+
-+#endif
-+
-Index: ufsutils/include/port/string.h
-===================================================================
---- /dev/null
-+++ ufsutils/include/port/string.h
-@@ -0,0 +1,10 @@
-+#ifndef LIBPORT_STRING_H
-+#define LIBPORT_STRING_H
-+
-+#include <string.h>
-+
-+size_t strlcat(char *dst, const char *src, size_t siz);
-+size_t strlcpy(char *dst, const char *src, size_t siz);
-+
-+#endif
-+
-Index: ufsutils/libport/arc4random.c
-===================================================================
---- ufsutils.orig/libport/arc4random.c
-+++ ufsutils/libport/arc4random.c
-@@ -26,16 +26,11 @@
- #include <sys/cdefs.h>
- __FBSDID("$FreeBSD: src/lib/libc/gen/arc4random.c,v 1.12 2007/05/25 10:40:33 delphij Exp $");
- 
--#include "namespace.h"
- #include <sys/types.h>
- #include <sys/time.h>
- #include <stdlib.h>
- #include <fcntl.h>
- #include <unistd.h>
--#include <pthread.h>
--
--#include "libc_private.h"
--#include "un-namespace.h"
- 
- struct arc4_stream {
- 	u_int8_t i;
-@@ -43,20 +38,9 @@
- 	u_int8_t s[256];
- };
- 
--static pthread_mutex_t	arc4random_mtx = PTHREAD_MUTEX_INITIALIZER;
--
- #define	RANDOMDEV	"/dev/urandom"
--#define	THREAD_LOCK()						\
--	do {							\
--		if (__isthreaded)				\
--			_pthread_mutex_lock(&arc4random_mtx);	\
--	} while (0)
--
--#define	THREAD_UNLOCK()						\
--	do {							\
--		if (__isthreaded)				\
--			_pthread_mutex_unlock(&arc4random_mtx);	\
--	} while (0)
-+#define	THREAD_LOCK()
-+#define	THREAD_UNLOCK()
- 
- static struct arc4_stream rs;
- static int rs_initialized;
-@@ -105,10 +89,10 @@
- 
- 	gettimeofday(&rdat.tv, NULL);
- 	rdat.pid = getpid();
--	fd = _open(RANDOMDEV, O_RDONLY, 0);
-+	fd = open(RANDOMDEV, O_RDONLY, 0);
- 	if (fd >= 0) {
--		(void) _read(fd, rdat.rnd, sizeof(rdat.rnd));
--		_close(fd);
-+		(void) read(fd, rdat.rnd, sizeof(rdat.rnd));
-+		close(fd);
- 	} 
- 	/* fd < 0?  Ah, what the heck. We'll just take whatever was on the
- 	 * stack... */
 Index: ufsutils/libport/blockdev.c
 ===================================================================
 --- /dev/null
@@ -239,7 +144,7 @@ Index: ufsutils/libport/Makefile
 @@ -0,0 +1,13 @@
 +LIB = port
 +LIB_type = static
-+LIBSRCS = arc4random.c strlcpy.c strlcat.c blockdev.c
++LIBSRCS = blockdev.c
 +
 +ALL_CFLAGS = -D_LIBPORT
 +ifdef LIBPORT_DEBUG
