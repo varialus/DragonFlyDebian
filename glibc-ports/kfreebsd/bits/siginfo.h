@@ -73,8 +73,6 @@ enum
 # define SI_UNDEFINED	SI_UNDEFINED
 };
 
-#if 0 /* XXX These need verification.  See <bits/sigcontext.h>.  */
-
 /* `si_code' values for SIGILL signal.  */
 enum
 {
@@ -95,8 +93,6 @@ enum
   ILL_BADSTK			/* Internal stack error.  */
 # define ILL_BADSTK	ILL_BADSTK
 };
-
-#endif
 
 /* `si_code' values for SIGFPE signal.  */
 enum
@@ -119,7 +115,6 @@ enum
 # define FPE_FLTSUB	FPE_FLTSUB
 };
 
-#if 0 /* XXX These need verification.  See <bits/sigcontext.h>.  */
 /* `si_code' values for SIGSEGV signal.  */
 enum
 {
@@ -149,8 +144,6 @@ enum
 # define TRAP_TRACE	TRAP_TRACE
 };
 
-#endif
-
 /* `si_code' values for SIGCHLD signal.  */
 /* XXX These are only used by the waitid() function, not by the kernel.  */
 enum
@@ -169,8 +162,6 @@ enum
 # define CLD_CONTINUED	CLD_CONTINUED
 };
 
-#if 0 /* XXX These need verification.  See <bits/sigcontext.h>.  */
-
 /* `si_code' values for SIGPOLL signal.  */
 enum
 {
@@ -182,13 +173,10 @@ enum
 # define POLL_MSG	POLL_MSG
   POLL_ERR,			/* I/O error.  */
 # define POLL_ERR	POLL_ERR
-  POLL_PRI,			/* High priority input available.  */
+# define POLL_HUP	POLL_ERR /* Device disconnected.  */
+  POLL_PRI			/* High priority input available.  */
 # define POLL_PRI	POLL_PRI
-  POLL_HUP			/* Device disconnected.  */
-# define POLL_HUP	POLL_HUP
 };
-
-#endif
 
 # undef __need_siginfo_t
 #endif	/* !have siginfo_t && (have _SIGNAL_H || need siginfo_t).  */
