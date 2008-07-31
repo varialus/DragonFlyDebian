@@ -173,9 +173,10 @@ enum
 # define POLL_MSG	POLL_MSG
   POLL_ERR,			/* I/O error.  */
 # define POLL_ERR	POLL_ERR
-# define POLL_HUP	POLL_ERR /* Device disconnected.  */
-  POLL_PRI			/* High priority input available.  */
+  POLL_PRI,			/* High priority input available.  */
 # define POLL_PRI	POLL_PRI
+  POLL_HUP			/* Device disconnected.  */
+# define POLL_HUP	POLL_HUP
 };
 
 # undef __need_siginfo_t
