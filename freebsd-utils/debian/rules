@@ -19,6 +19,18 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/tarball.mk
 include /usr/share/cdbs/1/rules/patchsys-quilt.mk
 
+build/gbde:: apply-patches
+	set -e ; for i in sbin/gbde \
+	; do \
+		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
+	done
+
+build/geli:: apply-patches
+	set -e ; for i in sbin/geom/class/eli \
+	; do \
+		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
+	done
+
 build/freebsd-utils:: apply-patches
 	set -e ; for i in sbin/{ccdconfig,dmesg,mdconfig,mount,mount_std,umount,swapon,sysctl} usr.sbin/rpc.umntall \
 		sbin/mount_{autofs,cd9660,ext2fs,hpfs,msdosfs,ntfs,nullfs,reiserfs,udf,unionfs} \
