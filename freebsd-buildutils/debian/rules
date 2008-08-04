@@ -12,7 +12,7 @@ DEB_BUILD_GNU_CPU	:= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
 DEB_HOST_ARCH_CPU	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 PMAKE=pmake
-CFLAGS=-O2 -g -Wall -DMACHINE_ARCH='"$(DEB_HOST_ARCH_CPU)"' -D_GNU_SOURCE -I$(CURDIR)/build-tree/src/sys
+CFLAGS=-O2 -g -Wall -DMACHINE_ARCH='"$(DEB_HOST_ARCH_CPU)"' -D_GNU_SOURCE --include bsd/string.h --include bsd/random.h -I$(CURDIR)/build-tree/src/sys
 MAKE_BUILD_FLAGS= CC=gcc NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
 YACC=$(CURDIR)/build-tree/src/usr.bin/yacc/yacc
 export LDADD=-lbsd
