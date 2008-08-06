@@ -10,7 +10,16 @@
 # Version:	@(#)skeleton  1.9  26-Feb-2001  miquels@cistron.nl
 #
 
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+### BEGIN INIT INFO
+# Provides:          freebsd-utils
+# Required-Start:    $local_fs 
+# Required-Stop:     
+# Default-Start:     S
+# Default-Stop:      
+# Short-Description: FreeBSD kernel specific setup
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
 set -e
 
 case "$1" in

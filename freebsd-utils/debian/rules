@@ -59,11 +59,11 @@ build/kbdcontrol:: apply-patches
 	; do \
 		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
 	done
-	sed -e "s/@choices@/`cd $(DEB_SRCDIR)/share/syscons/keymaps && echo *.kbd | sed -e \"s/ /, /g\"`/g" \
-	< debian/kbdcontrol.templates.in > debian/kbdcontrol.templates
+	sed -i -e "s/^choices=.*/choices=\"`cd $(DEB_SRCDIR)/share/syscons/keymaps && echo *.kbd | sed -e 's/ /, /g'`\"/g" \
+	debian/kbdcontrol.config
 
 clean::
-	rm -f debian/kbdcontrol.templates debian/stamp-sed
+	rm -f debian/stamp-sed
 
 pre-build:: debian/stamp-sed
 debian/stamp-sed: $(_cdbs_tarball_stamps)
