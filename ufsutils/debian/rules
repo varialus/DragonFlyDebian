@@ -24,7 +24,6 @@ else
 CFLAGS += -D_FILE_OFFSET_BITS=64 -I$(CURDIR)/freebsd
 endif
 
-
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
 else
@@ -101,11 +100,7 @@ binary-arch: build install
 	dh_makeshlibs
 	dh_installdeb
 	dh_shlibdeps -ldebian/$(libufs)/usr/lib -L$(libufs)
-ifeq (kfreebsd,$(DEB_HOST_ARCH_OS))
-	dh_gencontrol -- -DPriority=required
-else
 	dh_gencontrol
-endif
 	dh_md5sums
 	dh_builddeb
 
