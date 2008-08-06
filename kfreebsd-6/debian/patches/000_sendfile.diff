@@ -1,10 +1,10 @@
-Index: sys/kern/kern_descrip.c
+Index: src/sys/kern/kern_descrip.c
 ===================================================================
 RCS file: /home/ncvs/src/sys/kern/kern_descrip.c,v
 retrieving revision 1.313
 diff -u -d -r1.313 kern_descrip.c
---- sys/kern/kern_descrip.c	6 Aug 2007 14:26:00 -0000	1.313
-+++ sys/kern/kern_descrip.c	4 Feb 2008 19:05:42 -0000
+--- src/sys/kern/kern_descrip.c	6 Aug 2007 14:26:00 -0000	1.313
++++ src/sys/kern/kern_descrip.c	4 Feb 2008 19:05:42 -0000
 @@ -2046,7 +2046,7 @@
  	int error;
  
@@ -14,13 +14,13 @@ diff -u -d -r1.313 kern_descrip.c
  		return (error);
  	if (fp->f_vnode == NULL) {
  		error = EINVAL;
-Index: sys/kern/uipc_syscalls.c
+Index: src/sys/kern/uipc_syscalls.c
 ===================================================================
 RCS file: /home/ncvs/src/sys/kern/uipc_syscalls.c,v
 retrieving revision 1.259.2.1
 diff -u -d -r1.259.2.1 uipc_syscalls.c
---- sys/kern/uipc_syscalls.c	1 Feb 2008 22:51:39 -0000	1.259.2.1
-+++ sys/kern/uipc_syscalls.c	4 Feb 2008 19:05:42 -0000
+--- src/sys/kern/uipc_syscalls.c	1 Feb 2008 22:51:39 -0000	1.259.2.1
++++ src/sys/kern/uipc_syscalls.c	4 Feb 2008 19:05:42 -0000
 @@ -1796,20 +1796,23 @@
  		goto out;
  	vfslocked = VFS_LOCK_GIANT(vp->v_mount);
