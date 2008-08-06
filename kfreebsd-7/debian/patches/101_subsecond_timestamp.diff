@@ -17,10 +17,10 @@ The problem seems to be in cooperating between vfs.timestamp_precision
 and utimes/futimes syscalls. Passed NULL to them means "now",
 lets the "now" have precision according to vfs.timestamp_precision.
 
-Index: sys/kern/vfs_syscalls.c
+Index: src/sys/kern/vfs_syscalls.c
 ===================================================================
---- sys/kern/vfs_syscalls.c.orig
-+++ sys/kern/vfs_syscalls.c
+--- src/sys/kern/vfs_syscalls.c.orig
++++ src/sys/kern/vfs_syscalls.c
 @@ -2819,8 +2819,7 @@
  	int error;
  

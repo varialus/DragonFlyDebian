@@ -1,10 +1,10 @@
-Index: sys/netinet/tcp.h
+Index: src/sys/netinet/tcp.h
 ===================================================================
 RCS file: /home/ncvs/src/sys/netinet/tcp.h,v
 retrieving revision 1.40
 diff -p -u -I__FBSDID -I$FreeBSD -r1.40 tcp.h
---- sys/netinet/tcp.h	25 May 2007 21:28:49 -0000	1.40
-+++ sys/netinet/tcp.h	18 Jun 2008 05:36:20 -0000
+--- src/sys/netinet/tcp.h	25 May 2007 21:28:49 -0000	1.40
++++ src/sys/netinet/tcp.h	18 Jun 2008 05:36:20 -0000
 @@ -78,6 +78,8 @@ struct tcphdr {
  
  #define	TCPOPT_EOL		0
@@ -14,13 +14,13 @@ diff -p -u -I__FBSDID -I$FreeBSD -r1.40 tcp.h
  #define	TCPOPT_NOP		1
  #define	   TCPOLEN_NOP			1
  #define	TCPOPT_MAXSEG		2
-Index: sys/netinet/tcp_output.c
+Index: src/sys/netinet/tcp_output.c
 ===================================================================
 RCS file: /home/ncvs/src/sys/netinet/tcp_output.c,v
 retrieving revision 1.141.2.3
 diff -p -u -I__FBSDID -I$FreeBSD -r1.141.2.3 tcp_output.c
---- sys/netinet/tcp_output.c	5 Dec 2007 10:37:17 -0000	1.141.2.3
-+++ sys/netinet/tcp_output.c	18 Jun 2008 05:36:21 -0000
+--- src/sys/netinet/tcp_output.c	5 Dec 2007 10:37:17 -0000	1.141.2.3
++++ src/sys/netinet/tcp_output.c	18 Jun 2008 05:36:21 -0000
 @@ -1280,12 +1280,16 @@ tcp_addoptions(struct tcpopt *to, u_char
  	for (mask = 1; mask < TOF_MAXOPT; mask <<= 1) {
  		if ((to->to_flags & mask) != mask)
