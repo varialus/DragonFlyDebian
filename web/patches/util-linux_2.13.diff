@@ -3,411 +3,9 @@
 
 * do not forget to rerun ./autogen.sh 
 
-
-diff -u util-linux-2.13/debian/rules util-linux-2.13/debian/rules
---- util-linux-2.13/debian/rules
-+++ util-linux-2.13/debian/rules
-@@ -67,7 +67,7 @@
- 	$(MAKE) install DESTDIR=`pwd`/debian/util-linux INSTALL_STRIP_FLAG=""
- 	dh_installdocs -i -s
- 	install -m 644 login-utils/README.modems-with-agetty debian/util-linux/usr/share/doc/util-linux/README.modems-with-getty
--ifeq ($(DEB_HOST_ARCH_OS),linux)
-+ifneq ($(DEB_HOST_ARCH_OS),hurd)
- 	perl -pi.bak -e 's/agetty/getty/g' debian/util-linux/usr/share/man/man8/getty.8 \
- 		  debian/util-linux/usr/share/doc/util-linux/README.*
- 	rm `find debian/util-linux/usr -name \*.bak`
-@@ -80,10 +80,12 @@
- 	dh_movefiles --sourcedir=debian/util-linux -i -s
- 	#
- 	# XXX - push things to where debian has always(?) had them...
-+ifeq ($(DEB_HOST_ARCH_OS),linux)
- 	mv debian/util-linux/usr/sbin/*part* debian/util-linux/usr/bin
-+	mv debian/util-linux/usr/bin/cytune debian/util-linux/usr/sbin
-+endif
- 	mv debian/util-linux/usr/bin/tailf debian/util-linux/bin
- 	mv debian/util-linux/usr/bin/isosize debian/util-linux/sbin
--	mv debian/util-linux/usr/bin/cytune debian/util-linux/usr/sbin
- 	mv debian/util-linux/usr/share/man/man8/linux32.8 debian/util-linux/usr/share/man/man1/linux32.1
- 	mv debian/util-linux/usr/share/man/man8/linux64.8 debian/util-linux/usr/share/man/man1/linux64.1
- 	# the version in bsdmainutils seems newer.
-@@ -126,11 +128,13 @@
- else
- 	cd debian/util-linux && if [ -f sbin/hwclock ] ; then ln -sf hwclock.8.gz usr/share/man/man8/clock.8.gz; fi
- endif
-+	install -m 644 debian/mount.fstab debian/mount/usr/share/doc/mount/examples/fstab
-+endif
-+ifneq ($(DEB_HOST_ARCH_OS),hurd)
- 	cd debian/util-linux/sbin ; mv agetty getty
- 	cd debian/util-linux/usr/share/man/man8 ; mv agetty.8 getty.8
--	install -m 644 debian/mount.fstab debian/mount/usr/share/doc/mount/examples/fstab
- endif
--ifeq ($(DEB_HOST_GNU_SYSTEM),gnu)
-+ifneq ($(DEB_HOST_ARCH_OS),linux)
- 	cd debian/util-linux/sbin ; mv mkswap mkswap.linux
- 	cd debian/util-linux/usr/share/man/man8 ; mv mkswap.8 mkswap.linux.8
- endif
-@@ -158,7 +162,7 @@
- 	dh_makeshlibs -s
- 	dh_installdeb -s
- 	dh_shlibdeps -s
--ifneq ($(DEB_HOST_ARCH_OS),linux)
-+ifeq ($(DEB_HOST_ARCH_OS),hurd)
- 	echo util-linux:Conflicts=getty >> debian/util-linux.substvars
- endif
- 	dh_gencontrol -s -Xbsdutils
-diff -u util-linux-2.13/login-utils/agetty.c util-linux-2.13/login-utils/agetty.c
---- util-linux-2.13/login-utils/agetty.c
-+++ util-linux-2.13/login-utils/agetty.c
-@@ -18,7 +18,7 @@
- #include <stdlib.h>
- #include <string.h>
- #include <sys/ioctl.h>
--#include <termio.h>
-+#include <termios.h>
- #include <signal.h>
- #include <errno.h>
- #include <sys/types.h>
-@@ -36,10 +36,12 @@
- #include "xstrncpy.h"
- #include "nls.h"
- 
--#ifdef __linux__
-+#if 1
- #include "pathnames.h"
- #include <sys/param.h>
- #define USE_SYSLOG
-+#elif defined(__GNU__)
-+#define _PATH_LOGIN "/bin/login"
- #endif
- 
-  /* If USE_SYSLOG is undefined all diagnostics go directly to /dev/console. */
-@@ -116,6 +118,10 @@
- #define	TCSETAW	TCSETSW
- #endif
- 
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+#define termio termios
-+#endif
-+
-  /*
-   * This program tries to not use the standard-i/o library.  This keeps the
-   * executable small on systems that do not have shared libraries (System V
-@@ -312,9 +318,7 @@
- 
-     parse_args(argc, argv, &options);
- 
--#ifdef __linux__
- 	setsid();
--#endif
- 	
-     /* Update the utmp file. */
- 
-@@ -789,7 +793,11 @@
-      * 5 seconds seems to be a good value.
-      */
- 
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+    if (tcgetattr(0, tp) < 0)
-+#else
-     if (ioctl(0, TCGETA, tp) < 0)
-+#endif
- 	error("%s: ioctl: %m", tty);
- 
-     /*
-@@ -826,17 +834,26 @@
-      * reads will be done in raw mode anyway. Errors will be dealt with
-      * lateron.
-      */
--#ifdef __linux__
-+#if defined(__linux__) || defined(__GNU__) || defined(__FreeBSD_kernel__)
-     /* flush input and output queues, important for modems! */
--    (void) ioctl(0, TCFLSH, TCIOFLUSH);
-+    (void) tcflush(0, TCIOFLUSH);
- #endif
- 
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+    tp->c_cflag = CS8 | HUPCL | CREAD;
-+    cfsetispeed(tp, speed);
-+    cfsetospeed(tp, speed);
-+#else
-     tp->c_cflag = CS8 | HUPCL | CREAD | speed;
-+#endif
-     if (op->flags & F_LOCAL) {
- 	tp->c_cflag |= CLOCAL;
-     }
- 
--    tp->c_iflag = tp->c_lflag = tp->c_oflag = tp->c_line = 0;
-+    tp->c_iflag = tp->c_lflag = tp->c_oflag = 0;
-+#if !defined(__GNU__) && !defined(__FreeBSD_kernel__)
-+    tp->c_line = 0;
-+#endif
-     tp->c_cc[VMIN] = 1;
-     tp->c_cc[VTIME] = 0;
- 
-@@ -847,7 +864,11 @@
- 	tp->c_cflag |= CRTSCTS;
- #endif
- 
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+    (void) tcsetattr(0, TCSANOW, tp);
-+#else
-     (void) ioctl(0, TCSETA, tp);
-+#endif
- 
-     /* go to blocking input even in local mode */
-     fcntl(0, F_SETFL, fcntl(0, F_GETFL, 0) & ~O_NONBLOCK);
-@@ -891,7 +912,11 @@
-     tp->c_iflag |= ISTRIP;			/* enable 8th-bit stripping */
-     vmin = tp->c_cc[VMIN];
-     tp->c_cc[VMIN] = 0;				/* don't block if queue empty */
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+    (void) tcsetattr(0, TCSANOW, tp);
-+#else
-     (void) ioctl(0, TCSETA, tp);
-+#endif
- 
-     /*
-      * Wait for a while, then read everything the modem has said so far and
-@@ -904,8 +929,13 @@
- 	for (bp = buf; bp < buf + nread; bp++) {
- 	    if (isascii(*bp) && isdigit(*bp)) {
- 		if ((speed = bcode(bp))) {
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+		    cfsetispeed(tp, speed);
-+		    cfsetospeed(tp, speed);
-+#else
- 		    tp->c_cflag &= ~CBAUD;
- 		    tp->c_cflag |= speed;
-+#endif
- 		}
- 		break;
- 	    }
-@@ -915,7 +945,11 @@
- 
-     tp->c_iflag = iflag;
-     tp->c_cc[VMIN] = vmin;
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+    (void) tcsetattr(0, TCSANOW, tp);
-+#else
-     (void) ioctl(0, TCSETA, tp);
-+#endif
- }
- 
- /* do_prompt - show login prompt, optionally preceded by /etc/issue contents */
-@@ -938,7 +972,11 @@
-     if ((op->flags & F_ISSUE) && (fd = fopen(op->issue, "r"))) {
- 	oflag = tp->c_oflag;			/* save current setting */
- 	tp->c_oflag |= (ONLCR | OPOST);		/* map NL in output to CR-NL */
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+	(void) tcsetattr(0, TCSADRAIN, tp);
-+#else
- 	(void) ioctl(0, TCSETAW, tp);
-+#endif
- 
- 
- 	while ((c = getc(fd)) != EOF)
-@@ -971,7 +1009,7 @@
- 
- 		  case 'o':
- 		   {
--		     char domainname[HOST_NAME_MAX+1];
-+		     char domainname[HOSTNAME_LENGTH+1];
- #ifdef HAVE_GETDOMAINNAME
- 		     if (getdomainname(domainname, sizeof(domainname)))
- #endif
-@@ -984,7 +1022,7 @@
- 		  case 'O':
- 		   {
- 			char *dom = "unknown_domain";
--			char host[HOST_NAME_MAX + 1];
-+			char host[HOSTNAME_LENGTH + 1];
- 			struct addrinfo hints, *info = NULL;
- 
- 			memset(&hints, 0, sizeof(hints));
-@@ -1042,7 +1080,11 @@
- 			int i;
- 
- 			for (i = 0; speedtab[i].speed; i++) {
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+			    if (speedtab[i].code == cfgetispeed(tp)) {
-+#else
- 			    if (speedtab[i].code == (tp->c_cflag & CBAUD)) {
-+#endif
- 				printf("%ld", speedtab[i].speed);
- 				break;
- 			    }
-@@ -1074,12 +1116,16 @@
- 	fflush(stdout);
- 
- 	tp->c_oflag = oflag;			/* restore settings */
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+	(void) tcsetattr(0, TCSADRAIN, tp);
-+#else
- 	(void) ioctl(0, TCSETAW, tp);		/* wait till output is gone */
-+#endif
- 	(void) fclose(fd);
-     }
- #endif
-     {
--	char hn[HOST_NAME_MAX+1];
-+	char hn[HOSTNAME_LENGTH+1];
- 	if (gethostname(hn, sizeof(hn)) == 0)
- 	    write(1, hn, strlen(hn));
-     }
-@@ -1095,9 +1141,15 @@
-     static int baud_index = FIRST_SPEED;/* current speed index */
- 
-     baud_index = (baud_index + 1) % op->numspeed;
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+    cfsetispeed(tp, op->speeds[baud_index]);
-+    cfsetospeed(tp, op->speeds[baud_index]);
-+    (void) tcsetattr(0, TCSANOW, tp);
-+#else
-     tp->c_cflag &= ~CBAUD;
-     tp->c_cflag |= op->speeds[baud_index];
-     (void) ioctl(0, TCSETA, tp);
-+#endif
- }
- 
- /* get_logname - get user name, establish parity, speed, erase, kill, eol */
-@@ -1127,7 +1179,7 @@
-     /* Flush pending input (esp. after parsing or switching the baud rate). */
- 
-     (void) sleep(1);
--    (void) ioctl(0, TCFLSH, TCIFLUSH);
-+    (void) tcflush(0, TCIFLUSH);
- 
-     /* Prompt for and read a login name. */
- 
-@@ -1232,7 +1284,7 @@
-     tp->c_cc[VEOL] = DEF_EOL;
- #ifdef __linux__
-     tp->c_cc[VSWTC] = DEF_SWITCH;		/* default switch character */
--#else
-+#elif defined(VSWTCH)
-     tp->c_cc[VSWTCH] = DEF_SWITCH;		/* default switch character */
- #endif
- 
-@@ -1265,9 +1317,15 @@
-     /* Account for upper case without lower case. */
- 
-     if (cp->capslock) {
-+#ifdef  IUCLC
- 	tp->c_iflag |= IUCLC;
-+#endif	
-+#ifdef XCASE
- 	tp->c_lflag |= XCASE;
-+#endif
-+#ifdef OLCUC
- 	tp->c_oflag |= OLCUC;
-+#endif	
-     }
-     /* Optionally enable hardware flow control */
- 
-@@ -1278,7 +1336,11 @@
- 
-     /* Finally, make the new settings effective */
- 
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+    if (tcsetattr(0, TCSANOW, tp) < 0)
-+#else
-     if (ioctl(0, TCSETA, tp) < 0)
-+#endif
- 	error("%s: ioctl: TCSETA: %m", op->tty);
- }
- 
---- util-linux-2.13/sys-utils/Makefile.am
-+++ util-linux-2.13/sys-utils/Makefile.am
-@@ -1,14 +1,25 @@
- include $(top_srcdir)/config/include-Makefile.am
- 
--bin_PROGRAMS = dmesg
-+bin_PROGRAMS =
-+if LINUX
-+bin_PROGRAMS += dmesg
-+endif
- 
--usrbinexec_PROGRAMS = cytune flock ipcrm ipcs renice setsid setarch
-+usrbinexec_PROGRAMS = flock renice setsid 
-+if LINUX
-+usrbinexec_PROGRAMS += cytune setarch ipcrm ipcs
-+endif
- 
- cytune_SOURCES = cytune.c cyclades.h
- 
-+if LINUX
- sbin_PROGRAMS = ctrlaltdel
-+endif
- 
--usrsbinexec_PROGRAMS = readprofile tunelp rtcwake
-+usrsbinexec_PROGRAMS = readprofile 
-+if LINUX
-+usrsbinexec_PROGRAMS += tunelp rtcwake
-+endif
- 
- tunelp_SOURCES = tunelp.c lp.h
- 
-diff -u util-linux-2.13/fdisk/sfdisk.c util-linux-2.13/fdisk/sfdisk.c
---- util-linux-2.13/fdisk/sfdisk.c
-+++ util-linux-2.13/fdisk/sfdisk.c
-@@ -46,7 +46,6 @@
- #include <sys/ioctl.h>
- #include <sys/stat.h>
- #include <sys/utsname.h>
--#include <linux/unistd.h>	/* _syscall */
- #include "nls.h"
- #include "common.h"
- 
-diff -u util-linux-2.13/text-utils/more.c util-linux-2.13/text-utils/more.c
---- util-linux-2.13/text-utils/more.c
-+++ util-linux-2.13/text-utils/more.c
-@@ -1573,7 +1573,7 @@
-     }
-     if (feof (file)) {
- 	if (!no_intty) {
--#ifndef __linux__
-+#if !defined(__linux__) && !defined(__GLIBC__)
- 				/* No longer in libc 4.5.8. . . */
- 	    file->_flags &= ~STDIO_S_EOF_SEEN; /* why doesn't fseek do this ??!!??! */
- #endif
-@@ -1817,8 +1817,16 @@
-     no_intty = tcgetattr(fileno(stdin), &otty);
-     tcgetattr(fileno(stderr), &otty);
-     savetty0 = otty;
-+#if defined(__GNU__) || defined(__FreeBSD_kernel__)
-+    slow_tty = cfgetispeed(&otty) < B1200;
-+#else
-     slow_tty = (otty.c_cflag & CBAUD) < B1200;
-+#endif
-+#if defined(__FreeBSD_kernel__)
-+    hardtabs = 1;
-+#else
-     hardtabs = (otty.c_oflag & TABDLY) != XTABS;
-+#endif    
-     if (!no_tty) {
- 	otty.c_lflag &= ~(ICANON|ECHO);
- 	otty.c_cc[VMIN] = 1;
-diff -u util-linux-2.13/misc-utils/script.c util-linux-2.13/misc-utils/script.c
---- util-linux-2.13/misc-utils/script.c
-+++ util-linux-2.13/misc-utils/script.c
-@@ -53,12 +53,12 @@
- #include <sys/file.h>
- #include <sys/signal.h>
- #include <errno.h>
-+#include <getopt.h>
-+#include <string.h>
- #include "nls.h"
- 
--#ifdef __linux__
- #include <unistd.h>
- #include <string.h>
--#endif
- 
- #ifdef HAVE_LIBUTIL
- #include <pty.h>
-diff -u util-linux-2.13/configure.ac util-linux-2.13/configure.ac
---- util-linux-2.13/configure.ac
-+++ util-linux-2.13/configure.ac
+diff -Nru util-linux-2.13.1.1/configure.ac util-linux-2.13.1.1/configure.ac
+--- util-linux-2.13.1.1/configure.ac	2008-04-22 00:14:50.000000000 +0200
++++ util-linux-2.13.1.1/configure.ac	2008-08-07 20:37:34.000000000 +0200
 @@ -235,6 +235,14 @@
  [AC_MSG_NOTICE([Your libc thinks that swapon has 1 arg only.])
  ])
@@ -423,63 +21,121 @@ diff -u util-linux-2.13/configure.ac util-linux-2.13/configure.ac
  
  dnl UTIL_SET_ARCH(ARCHNAME, PATTERN)
  dnl ---------------------------------
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/fdisk/fdisksgilabel.c
-+++ util-linux-2.13/fdisk/fdisksgilabel.c
-@@ -19,10 +19,10 @@
- #include <sys/ioctl.h>          /* ioctl */
- #include <sys/stat.h>           /* stat */
- #include <assert.h>             /* assert */
-+#include <stdint.h>		/* uint*_t */
+diff -Nru util-linux-2.13.1.1/debian/changelog util-linux-2.13.1.1/debian/changelog
+--- util-linux-2.13.1.1/debian/changelog	2008-08-07 20:37:27.000000000 +0200
++++ util-linux-2.13.1.1/debian/changelog	2008-08-07 20:37:34.000000000 +0200
+@@ -1,3 +1,9 @@
++util-linux (2.13.1.1-1+kfreebsd) unreleased; urgency=low
++
++  * Add support for GNU/kFreeBSD.
++
++ -- Aurelien Jarno <aurel32@debian.org>  Thu, 07 Aug 2008 20:30:31 +0200
++
+ util-linux (2.13.1.1-1) unstable; urgency=low
  
- #include <endian.h>
+   [Steve Grubb]
+diff -Nru util-linux-2.13.1.1/debian/rules util-linux-2.13.1.1/debian/rules
+--- util-linux-2.13.1.1/debian/rules	2008-08-07 20:37:27.000000000 +0200
++++ util-linux-2.13.1.1/debian/rules	2008-08-07 20:37:34.000000000 +0200
+@@ -75,7 +75,7 @@
+ 	$(MAKE) install DESTDIR=`pwd`/debian/util-linux INSTALL_STRIP_FLAG=""
+ 	dh_installdocs -i -s
+ 	install -m 644 login-utils/README.modems-with-agetty debian/util-linux/usr/share/doc/util-linux/README.modems-with-getty
+-ifeq ($(DEB_HOST_ARCH_OS),linux)
++ifneq ($(DEB_HOST_ARCH_OS),hurd)
+ 	perl -pi.bak -e 's/agetty/getty/g' debian/util-linux/usr/share/man/man8/getty.8 \
+ 		  debian/util-linux/usr/share/doc/util-linux/README.*
+ 	rm `find debian/util-linux/usr -name \*.bak`
+@@ -88,10 +88,12 @@
+ 	dh_movefiles --sourcedir=debian/util-linux -i -s
+ 	#
+ 	# XXX - push things to where debian has always(?) had them...
++ifeq ($(DEB_HOST_ARCH_OS),linux)
+ 	mv debian/util-linux/usr/sbin/*part* debian/util-linux/usr/bin
++	mv debian/util-linux/usr/bin/cytune debian/util-linux/usr/sbin
++endif
+ 	mv debian/util-linux/usr/bin/tailf debian/util-linux/bin
+ 	mv debian/util-linux/usr/bin/isosize debian/util-linux/sbin
+-	mv debian/util-linux/usr/bin/cytune debian/util-linux/usr/sbin
+ 	mv debian/util-linux/usr/share/man/man8/linux32.8 debian/util-linux/usr/share/man/man1/linux32.1
+ 	mv debian/util-linux/usr/share/man/man8/linux64.8 debian/util-linux/usr/share/man/man1/linux64.1
+ 	# the version in bsdmainutils seems newer.
+@@ -135,11 +137,13 @@
+ else
+ 	cd debian/util-linux && if [ -f sbin/hwclock ] ; then ln -sf hwclock.8.gz usr/share/man/man8/clock.8.gz; fi
+ endif
++	install -m 644 debian/mount.fstab debian/mount/usr/share/doc/mount/examples/fstab
++endif
++ifneq ($(DEB_HOST_ARCH_OS),hurd)
+ 	cd debian/util-linux/sbin ; mv agetty getty
+ 	cd debian/util-linux/usr/share/man/man8 ; mv agetty.8 getty.8
+-	install -m 644 debian/mount.fstab debian/mount/usr/share/doc/mount/examples/fstab
+ endif
+-ifeq ($(DEB_HOST_GNU_SYSTEM),gnu)
++ifneq ($(DEB_HOST_ARCH_OS),linux)
+ 	cd debian/util-linux/sbin ; mv mkswap mkswap.linux
+ 	cd debian/util-linux/usr/share/man/man8 ; mv mkswap.8 mkswap.linux.8
+ endif
+@@ -167,7 +171,7 @@
+ 	dh_makeshlibs -s
+ 	dh_installdeb -s
+ 	dh_shlibdeps -s
+-ifneq ($(DEB_HOST_ARCH_OS),linux)
++ifeq ($(DEB_HOST_ARCH_OS),hurd)
+ 	echo util-linux:Conflicts=getty >> debian/util-linux.substvars
+ endif
+ 	dh_gencontrol -s -Xbsdutils
+diff -Nru util-linux-2.13.1.1/disk-utils/Makefile.am util-linux-2.13.1.1/disk-utils/Makefile.am
+--- util-linux-2.13.1.1/disk-utils/Makefile.am	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/disk-utils/Makefile.am	2008-08-07 20:37:34.000000000 +0200
+@@ -1,6 +1,6 @@
+ include $(top_srcdir)/config/include-Makefile.am
+ 
+-man_MANS = blockdev.8 fdformat.8 isosize.8 mkfs.8 mkswap.8 \
++man_MANS = blockdev.8 isosize.8 mkfs.8 mkswap.8 \
+            fsck.minix.8 mkfs.minix.8 mkfs.bfs.8
+ 
+ sbin_PROGRAMS = mkfs mkswap blockdev fsck.minix mkfs.minix mkfs.bfs
+@@ -9,7 +9,12 @@
+ mkfs_bfs_SOURCES = mkfs.bfs.c
+ mkswap_SOURCES = mkswap.c swapheader.h
+ 
+-usrbinexec_PROGRAMS = fdformat isosize
++usrbinexec_PROGRAMS = isosize
++
++if LINUX
++man_MANS += fdformat.8
++usrbinexec_PROGRAMS += fdformat
++endif
+ 
+ if BUILD_ELVTUNE
+ sbin_PROGRAMS += elvtune
+diff -Nru util-linux-2.13.1.1/fdisk/cfdisk.c util-linux-2.13.1.1/fdisk/cfdisk.c
+--- util-linux-2.13.1.1/fdisk/cfdisk.c	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/fdisk/cfdisk.c	2008-08-07 20:37:34.000000000 +0200
+@@ -78,7 +78,6 @@
+ #include <string.h>
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
+-#include <linux/types.h>
+ 
  #include "nls.h"
--#include <linux/major.h>        /* FLOPPY_MAJOR */
+ #include "xstrncpy.h"
+diff -Nru util-linux-2.13.1.1/fdisk/fdiskaixlabel.h util-linux-2.13.1.1/fdisk/fdiskaixlabel.h
+--- util-linux-2.13.1.1/fdisk/fdiskaixlabel.h	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/fdisk/fdiskaixlabel.h	2008-08-07 20:37:34.000000000 +0200
+@@ -1,7 +1,7 @@
+ #ifndef FDISK_AIX_LABEL_H
+ #define FDISK_AIX_LABEL_H
  
- #include "common.h"
- #include "fdisk.h"
-@@ -100,11 +100,11 @@
- 
- static inline unsigned short
- __swap16(unsigned short x) {
--        return (((__u16)(x) & 0xFF) << 8) | (((__u16)(x) & 0xFF00) >> 8);
-+        return (((uint16_t)(x) & 0xFF) << 8) | (((uint16_t)(x) & 0xFF00) >> 8);
- }
- 
--static inline __u32
--__swap32(__u32 x) {
-+static inline uint32_t
-+__swap32(uint32_t x) {
-         return (((x & 0xFF) << 24) |
- 		((x & 0xFF00) << 8) |
- 		((x & 0xFF0000) >> 8) |
-@@ -222,8 +222,8 @@
- 	       w + 1, _("Device"));
- 	for (i = 0 ; i < partitions; i++) {
- 		if (sgi_get_num_sectors(i) || debug) {
--			__u32 start = sgi_get_start_sector(i);
--			__u32 len = sgi_get_num_sectors(i);
-+			uint32_t start = sgi_get_start_sector(i);
-+			uint32_t len = sgi_get_num_sectors(i);
- 			kpi++;		/* only count nonempty partitions */
- 			printf(
- 				"%2d: %s %4s %9ld %9ld %9ld  %2x  %s\n",
-@@ -244,8 +244,8 @@
- 	       sgilabel->boot_file);
- 	for (i = 0 ; i < volumes; i++) {
- 		if (sgilabel->directory[i].vol_file_size) {
--			__u32 start = SSWAP32(sgilabel->directory[i].vol_file_start);
--			__u32 len = SSWAP32(sgilabel->directory[i].vol_file_size);
-+			uint32_t start = SSWAP32(sgilabel->directory[i].vol_file_start);
-+			uint32_t len = SSWAP32(sgilabel->directory[i].vol_file_size);
- 			unsigned char *name = sgilabel->directory[i].vol_file_name;
- 			printf(_("%2d: %-10s sector%5u size%8u\n"),
- 			       i, name, (unsigned int) start,
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/fdisk/fdiskbsdlabel.c
-+++ util-linux-2.13/fdisk/fdiskbsdlabel.c
+-#include <linux/types.h>   /* for __u32 etc */
++#include <stdint.h>   /* for uint32_t etc */
+ /*
+  * Copyright (C) Andreas Neuper, Sep 1998.
+  *	This file may be redistributed under
+diff -Nru util-linux-2.13.1.1/fdisk/fdiskbsdlabel.c util-linux-2.13.1.1/fdisk/fdiskbsdlabel.c
+--- util-linux-2.13.1.1/fdisk/fdiskbsdlabel.c	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/fdisk/fdiskbsdlabel.c	2008-08-07 20:37:34.000000000 +0200
 @@ -62,6 +62,10 @@
  #define DKTYPENAMES
  #include "fdiskbsdlabel.h"
@@ -491,35 +147,9 @@ unchanged:
  static void xbsd_delete_part (void);
  static void xbsd_new_part (void);
  static void xbsd_write_disklabel (void);
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/fdisk/fdisksgilabel.h
-+++ util-linux-2.13/fdisk/fdisksgilabel.h
-@@ -1,7 +1,7 @@
- #ifndef FDISK_SGI_LABEL_H
- #define FDISK_SGI_LABEL_H
- 
--#include <linux/types.h>   /* for __u32 etc */
-+#include <stdint.h>   /* for uint32_t etc */
- /*
-  * Copyright (C) Andreas Neuper, Sep 1998.
-  *	This file may be modified and redistributed under
-@@ -99,9 +99,9 @@
- #define	SGI_INFO_MAGIC		0x00072959
- #define	SGI_INFO_MAGIC_SWAPPED	0x59290700
- #define SSWAP16(x) (other_endian ? __swap16(x) \
--                                 : (__u16)(x))
-+                                 : (uint16_t)(x))
- #define SSWAP32(x) (other_endian ? __swap32(x) \
--                                 : (__u32)(x))
-+                                 : (uint32_t)(x))
- 
- /* fdisk.c */
- #define sgilabel ((sgi_partition *)MBRbuffer)
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/fdisk/fdiskbsdlabel.h
-+++ util-linux-2.13/fdisk/fdiskbsdlabel.h
+diff -Nru util-linux-2.13.1.1/fdisk/fdiskbsdlabel.h util-linux-2.13.1.1/fdisk/fdiskbsdlabel.h
+--- util-linux-2.13.1.1/fdisk/fdiskbsdlabel.h	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/fdisk/fdiskbsdlabel.h	2008-08-07 20:37:34.000000000 +0200
 @@ -34,10 +34,10 @@
   * SUCH DAMAGE.
   */
@@ -628,130 +258,9 @@ unchanged:
  	} d_partitions[BSD_MAXPARTITIONS]; /* actually may be more */
  };
  
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/fdisk/fdiskaixlabel.h
-+++ util-linux-2.13/fdisk/fdiskaixlabel.h
-@@ -1,7 +1,7 @@
- #ifndef FDISK_AIX_LABEL_H
- #define FDISK_AIX_LABEL_H
- 
--#include <linux/types.h>   /* for __u32 etc */
-+#include <stdint.h>   /* for uint32_t etc */
- /*
-  * Copyright (C) Andreas Neuper, Sep 1998.
-  *	This file may be redistributed under
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/fdisk/fdisksunlabel.h
-+++ util-linux-2.13/fdisk/fdisksunlabel.h
-@@ -1,15 +1,15 @@
- #ifndef FDISK_SUN_LABEL_H
- #define FDISK_SUN_LABEL_H
- 
--#include <linux/types.h>   /* for __u16, __u32 */
-+#include <stdint.h>   /* for uint16_t, uint32_t */
- 
- struct sun_partition {
--	__u32	start_cylinder;
--	__u32	num_sectors;
-+	uint32_t	start_cylinder;
-+	uint32_t	num_sectors;
- };
- 
- struct sun_tag_flag {
--	__u16	tag;
-+	uint16_t	tag;
- #define SUN_TAG_UNASSIGNED	0x00	/* Unassigned partition */
- #define SUN_TAG_BOOT		0x01	/* Boot partition	*/
- #define SUN_TAG_ROOT		0x02	/* Root filesystem	*/
-@@ -27,7 +27,7 @@
- #define SUN_TAG_LINUX_LVM	0x8e	/* Linux LVM		*/
- #define SUN_TAG_LINUX_RAID	0xfd	/* LInux RAID		*/
- 
--	__u16	flag;
-+	uint16_t	flag;
- #define SUN_FLAG_UNMNT		0x01	/* Unmountable partition*/
- #define SUN_FLAG_RONLY		0x10	/* Read only		*/
- };
-@@ -43,32 +43,32 @@
- 
- struct sun_disk_label {
- 	char			label_id[SUN_LABEL_ID_SIZE];
--	__u32			version;
-+	uint32_t			version;
- 	char			volume_id[SUN_VOLUME_ID_SIZE];
--	__u16			num_partitions;
-+	uint16_t			num_partitions;
- 	struct sun_tag_flag	part_tags[SUN_NUM_PARTITIONS];
--	__u32			bootinfo[3];
--	__u32			sanity;
--	__u32			resv[10];
--	__u32			part_timestamps[SUN_NUM_PARTITIONS];
--	__u32			write_reinstruct;
--	__u32			read_reinstruct;
--	__u8			pad[148];
--	__u16			rpm;
--	__u16			pcyl;
--	__u16			apc;
--	__u16			resv1;
--	__u16			resv2;
--	__u16			intrlv;
--	__u16			ncyl;
--	__u16			acyl;
--	__u16			nhead;
--	__u16			nsect;
--	__u16			resv3;
--	__u16			resv4;
-+	uint32_t			bootinfo[3];
-+	uint32_t			sanity;
-+	uint32_t			resv[10];
-+	uint32_t			part_timestamps[SUN_NUM_PARTITIONS];
-+	uint32_t			write_reinstruct;
-+	uint32_t			read_reinstruct;
-+	uint8_t			pad[148];
-+	uint16_t			rpm;
-+	uint16_t			pcyl;
-+	uint16_t			apc;
-+	uint16_t			resv1;
-+	uint16_t			resv2;
-+	uint16_t			intrlv;
-+	uint16_t			ncyl;
-+	uint16_t			acyl;
-+	uint16_t			nhead;
-+	uint16_t			nsect;
-+	uint16_t			resv3;
-+	uint16_t			resv4;
- 	struct sun_partition	partitions[SUN_NUM_PARTITIONS];
--	__u16			magic;
--	__u16			cksum;
-+	uint16_t			magic;
-+	uint16_t			cksum;
- };
- 
- #define SUN_LABEL_MAGIC		0xDABE
-@@ -82,7 +82,7 @@
- extern void sun_nolabel(void);
- extern void create_sunlabel(void);
- extern void sun_delete_partition(int i);
--extern int sun_change_sysid(int i, __u16 sys);
-+extern int sun_change_sysid(int i, uint16_t sys);
- extern void sun_list_table(int xtra);
- extern void verify_sun(void);
- extern void add_sun_partition(int n, int sys);
-@@ -93,7 +93,7 @@
- extern void sun_set_ilfact(void);
- extern void sun_set_rspeed(void);
- extern void sun_set_pcylcount(void);
--extern void toggle_sunflags(int i, __u16 mask);
-+extern void toggle_sunflags(int i, uint16_t mask);
- extern int sun_get_sysid(int i);
- 
- #endif /* FDISK_SUN_LABEL_H */
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/fdisk/fdiskmaclabel.h
-+++ util-linux-2.13/fdisk/fdiskmaclabel.h
+diff -Nru util-linux-2.13.1.1/fdisk/fdiskmaclabel.h util-linux-2.13.1.1/fdisk/fdiskmaclabel.h
+--- util-linux-2.13.1.1/fdisk/fdiskmaclabel.h	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/fdisk/fdiskmaclabel.h	2008-08-07 20:37:34.000000000 +0200
 @@ -1,7 +1,7 @@
  #ifndef FDISK_MAC_LABEL_H
  #define FDISK_MAC_LABEL_H
@@ -761,10 +270,85 @@ unchanged:
  /*
   * Copyright (C) Andreas Neuper, Sep 1998.
   *	This file may be redistributed under
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/fdisk/fdisksunlabel.c
-+++ util-linux-2.13/fdisk/fdisksunlabel.c
+diff -Nru util-linux-2.13.1.1/fdisk/fdisksgilabel.c util-linux-2.13.1.1/fdisk/fdisksgilabel.c
+--- util-linux-2.13.1.1/fdisk/fdisksgilabel.c	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/fdisk/fdisksgilabel.c	2008-08-07 20:37:34.000000000 +0200
+@@ -19,10 +19,10 @@
+ #include <sys/ioctl.h>          /* ioctl */
+ #include <sys/stat.h>           /* stat */
+ #include <assert.h>             /* assert */
++#include <stdint.h>		/* uint*_t */
+ 
+ #include <endian.h>
+ #include "nls.h"
+-#include <linux/major.h>        /* FLOPPY_MAJOR */
+ 
+ #include "common.h"
+ #include "fdisk.h"
+@@ -100,11 +100,11 @@
+ 
+ static inline unsigned short
+ __swap16(unsigned short x) {
+-        return (((__u16)(x) & 0xFF) << 8) | (((__u16)(x) & 0xFF00) >> 8);
++        return (((uint16_t)(x) & 0xFF) << 8) | (((uint16_t)(x) & 0xFF00) >> 8);
+ }
+ 
+-static inline __u32
+-__swap32(__u32 x) {
++static inline uint32_t
++__swap32(uint32_t x) {
+         return (((x & 0xFF) << 24) |
+ 		((x & 0xFF00) << 8) |
+ 		((x & 0xFF0000) >> 8) |
+@@ -222,8 +222,8 @@
+ 	       w + 1, _("Device"));
+ 	for (i = 0 ; i < partitions; i++) {
+ 		if (sgi_get_num_sectors(i) || debug) {
+-			__u32 start = sgi_get_start_sector(i);
+-			__u32 len = sgi_get_num_sectors(i);
++			uint32_t start = sgi_get_start_sector(i);
++			uint32_t len = sgi_get_num_sectors(i);
+ 			kpi++;		/* only count nonempty partitions */
+ 			printf(
+ 				"%2d: %s %4s %9ld %9ld %9ld  %2x  %s\n",
+@@ -244,8 +244,8 @@
+ 	       sgilabel->boot_file);
+ 	for (i = 0 ; i < volumes; i++) {
+ 		if (sgilabel->directory[i].vol_file_size) {
+-			__u32 start = SSWAP32(sgilabel->directory[i].vol_file_start);
+-			__u32 len = SSWAP32(sgilabel->directory[i].vol_file_size);
++			uint32_t start = SSWAP32(sgilabel->directory[i].vol_file_start);
++			uint32_t len = SSWAP32(sgilabel->directory[i].vol_file_size);
+ 			unsigned char *name = sgilabel->directory[i].vol_file_name;
+ 			printf(_("%2d: %-10s sector%5u size%8u\n"),
+ 			       i, name, (unsigned int) start,
+diff -Nru util-linux-2.13.1.1/fdisk/fdisksgilabel.h util-linux-2.13.1.1/fdisk/fdisksgilabel.h
+--- util-linux-2.13.1.1/fdisk/fdisksgilabel.h	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/fdisk/fdisksgilabel.h	2008-08-07 20:37:34.000000000 +0200
+@@ -1,7 +1,7 @@
+ #ifndef FDISK_SGI_LABEL_H
+ #define FDISK_SGI_LABEL_H
+ 
+-#include <linux/types.h>   /* for __u32 etc */
++#include <stdint.h>   /* for uint32_t etc */
+ /*
+  * Copyright (C) Andreas Neuper, Sep 1998.
+  *	This file may be modified and redistributed under
+@@ -99,9 +99,9 @@
+ #define	SGI_INFO_MAGIC		0x00072959
+ #define	SGI_INFO_MAGIC_SWAPPED	0x59290700
+ #define SSWAP16(x) (other_endian ? __swap16(x) \
+-                                 : (__u16)(x))
++                                 : (uint16_t)(x))
+ #define SSWAP32(x) (other_endian ? __swap32(x) \
+-                                 : (__u32)(x))
++                                 : (uint32_t)(x))
+ 
+ /* fdisk.c */
+ #define sgilabel ((sgi_partition *)MBRbuffer)
+diff -Nru util-linux-2.13.1.1/fdisk/fdisksunlabel.c util-linux-2.13.1.1/fdisk/fdisksunlabel.c
+--- util-linux-2.13.1.1/fdisk/fdisksunlabel.c	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/fdisk/fdisksunlabel.c	2008-08-07 20:37:34.000000000 +0200
 @@ -17,6 +17,7 @@
  #include <sys/ioctl.h>		/* ioctl */
  #include <sys/stat.h>		/* stat */
@@ -878,108 +462,397 @@ unchanged:
  			printf(
  			    "%s %c%c %9ld %9ld %9ld%c  %2x  %s\n",
  /* device */		  partname(disk_device, i+1, w),
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/fdisk/cfdisk.c
-+++ util-linux-2.13/fdisk/cfdisk.c
-@@ -78,7 +78,6 @@
- #include <string.h>
- #include <sys/stat.h>
+diff -Nru util-linux-2.13.1.1/fdisk/fdisksunlabel.h util-linux-2.13.1.1/fdisk/fdisksunlabel.h
+--- util-linux-2.13.1.1/fdisk/fdisksunlabel.h	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/fdisk/fdisksunlabel.h	2008-08-07 20:37:34.000000000 +0200
+@@ -1,15 +1,15 @@
+ #ifndef FDISK_SUN_LABEL_H
+ #define FDISK_SUN_LABEL_H
+ 
+-#include <linux/types.h>   /* for __u16, __u32 */
++#include <stdint.h>   /* for uint16_t, uint32_t */
+ 
+ struct sun_partition {
+-	__u32	start_cylinder;
+-	__u32	num_sectors;
++	uint32_t	start_cylinder;
++	uint32_t	num_sectors;
+ };
+ 
+ struct sun_tag_flag {
+-	__u16	tag;
++	uint16_t	tag;
+ #define SUN_TAG_UNASSIGNED	0x00	/* Unassigned partition */
+ #define SUN_TAG_BOOT		0x01	/* Boot partition	*/
+ #define SUN_TAG_ROOT		0x02	/* Root filesystem	*/
+@@ -27,7 +27,7 @@
+ #define SUN_TAG_LINUX_LVM	0x8e	/* Linux LVM		*/
+ #define SUN_TAG_LINUX_RAID	0xfd	/* LInux RAID		*/
+ 
+-	__u16	flag;
++	uint16_t	flag;
+ #define SUN_FLAG_UNMNT		0x01	/* Unmountable partition*/
+ #define SUN_FLAG_RONLY		0x10	/* Read only		*/
+ };
+@@ -43,32 +43,32 @@
+ 
+ struct sun_disk_label {
+ 	char			label_id[SUN_LABEL_ID_SIZE];
+-	__u32			version;
++	uint32_t			version;
+ 	char			volume_id[SUN_VOLUME_ID_SIZE];
+-	__u16			num_partitions;
++	uint16_t			num_partitions;
+ 	struct sun_tag_flag	part_tags[SUN_NUM_PARTITIONS];
+-	__u32			bootinfo[3];
+-	__u32			sanity;
+-	__u32			resv[10];
+-	__u32			part_timestamps[SUN_NUM_PARTITIONS];
+-	__u32			write_reinstruct;
+-	__u32			read_reinstruct;
+-	__u8			pad[148];
+-	__u16			rpm;
+-	__u16			pcyl;
+-	__u16			apc;
+-	__u16			resv1;
+-	__u16			resv2;
+-	__u16			intrlv;
+-	__u16			ncyl;
+-	__u16			acyl;
+-	__u16			nhead;
+-	__u16			nsect;
+-	__u16			resv3;
+-	__u16			resv4;
++	uint32_t			bootinfo[3];
++	uint32_t			sanity;
++	uint32_t			resv[10];
++	uint32_t			part_timestamps[SUN_NUM_PARTITIONS];
++	uint32_t			write_reinstruct;
++	uint32_t			read_reinstruct;
++	uint8_t			pad[148];
++	uint16_t			rpm;
++	uint16_t			pcyl;
++	uint16_t			apc;
++	uint16_t			resv1;
++	uint16_t			resv2;
++	uint16_t			intrlv;
++	uint16_t			ncyl;
++	uint16_t			acyl;
++	uint16_t			nhead;
++	uint16_t			nsect;
++	uint16_t			resv3;
++	uint16_t			resv4;
+ 	struct sun_partition	partitions[SUN_NUM_PARTITIONS];
+-	__u16			magic;
+-	__u16			cksum;
++	uint16_t			magic;
++	uint16_t			cksum;
+ };
+ 
+ #define SUN_LABEL_MAGIC		0xDABE
+@@ -82,7 +82,7 @@
+ extern void sun_nolabel(void);
+ extern void create_sunlabel(void);
+ extern void sun_delete_partition(int i);
+-extern int sun_change_sysid(int i, __u16 sys);
++extern int sun_change_sysid(int i, uint16_t sys);
+ extern void sun_list_table(int xtra);
+ extern void verify_sun(void);
+ extern void add_sun_partition(int n, int sys);
+@@ -93,7 +93,7 @@
+ extern void sun_set_ilfact(void);
+ extern void sun_set_rspeed(void);
+ extern void sun_set_pcylcount(void);
+-extern void toggle_sunflags(int i, __u16 mask);
++extern void toggle_sunflags(int i, uint16_t mask);
+ extern int sun_get_sysid(int i);
+ 
+ #endif /* FDISK_SUN_LABEL_H */
+diff -Nru util-linux-2.13.1.1/fdisk/sfdisk.c util-linux-2.13.1.1/fdisk/sfdisk.c
+--- util-linux-2.13.1.1/fdisk/sfdisk.c	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/fdisk/sfdisk.c	2008-08-07 20:37:34.000000000 +0200
+@@ -46,7 +46,6 @@
  #include <sys/ioctl.h>
--#include <linux/types.h>
- 
+ #include <sys/stat.h>
+ #include <sys/utsname.h>
+-#include <linux/unistd.h>	/* _syscall */
  #include "nls.h"
+ #include "common.h"
+ 
+diff -Nru util-linux-2.13.1.1/login-utils/agetty.c util-linux-2.13.1.1/login-utils/agetty.c
+--- util-linux-2.13.1.1/login-utils/agetty.c	2008-08-07 20:37:27.000000000 +0200
++++ util-linux-2.13.1.1/login-utils/agetty.c	2008-08-07 20:37:34.000000000 +0200
+@@ -18,7 +18,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/ioctl.h>
+-#include <termio.h>
++#include <termios.h>
+ #include <signal.h>
+ #include <errno.h>
+ #include <sys/types.h>
+@@ -36,10 +36,12 @@
  #include "xstrncpy.h"
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/sys-utils/rdev.c
-+++ util-linux-2.13/sys-utils/rdev.c
-@@ -94,6 +94,10 @@
- 
- #define DEFAULT_OFFSET 508
- 
-+#ifndef PATH_MAX
-+#define PATH_MAX 4096
-+#endif
-+
- 
- static void
- die(char *msg) {
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/misc-utils/namei.c
-+++ util-linux-2.13/misc-utils/namei.c
-@@ -59,6 +59,10 @@
- #include <sys/param.h>
  #include "nls.h"
  
-+#ifndef MAXPATHLEN
-+#define MAXPATHLEN 4096
-+#endif
-+
- #define ERR	strerror(errno),errno
- 
- int symcount;
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/misc-utils/Makefile.am
-+++ util-linux-2.13/misc-utils/Makefile.am
-@@ -34,8 +34,10 @@
- endif
- 
- if HAVE_NCURSES
-+if LINUX
- usrbinexec_PROGRAMS += setterm
- man_MANS += setterm.1
-+endif
- if HAVE_TINFO
- setterm_LDADD = -ltinfo
- else
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/disk-utils/Makefile.am
-+++ util-linux-2.13/disk-utils/Makefile.am
-@@ -1,6 +1,6 @@
- include $(top_srcdir)/config/include-Makefile.am
- 
--man_MANS = blockdev.8 fdformat.8 isosize.8 mkfs.8 mkswap.8 \
-+man_MANS = blockdev.8 isosize.8 mkfs.8 mkswap.8 \
-            fsck.minix.8 mkfs.minix.8 mkfs.bfs.8
- 
- sbin_PROGRAMS = mkfs mkswap blockdev fsck.minix mkfs.minix mkfs.bfs
-@@ -9,7 +9,12 @@
- mkfs_bfs_SOURCES = mkfs.bfs.c
- mkswap_SOURCES = mkswap.c swapheader.h
- 
--usrbinexec_PROGRAMS = fdformat isosize
-+usrbinexec_PROGRAMS = isosize
-+
-+if LINUX
-+man_MANS += fdformat.8
-+usrbinexec_PROGRAMS += fdformat
-+endif
- 
- if BUILD_ELVTUNE
- sbin_PROGRAMS += elvtune
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/login-utils/wall.c
-+++ util-linux-2.13/login-utils/wall.c
-@@ -63,6 +63,10 @@
+-#ifdef __linux__
++#if 1
  #include "pathnames.h"
- #include "carefulputc.h"
+ #include <sys/param.h>
+ #define USE_SYSLOG
++#elif defined(__GNU__)
++#define _PATH_LOGIN "/bin/login"
+ #endif
  
-+#ifndef MAXHOSTNAMELEN
-+#define MAXHOSTNAMELEN 64
+  /* If USE_SYSLOG is undefined all diagnostics go directly to /dev/console. */
+@@ -116,6 +118,10 @@
+ #define	TCSETAW	TCSETSW
+ #endif
+ 
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++#define termio termios
 +#endif
 +
- void	makemsg __P((char *));
+  /*
+   * This program tries to not use the standard-i/o library.  This keeps the
+   * executable small on systems that do not have shared libraries (System V
+@@ -313,9 +319,7 @@
  
- #define	IGNOREUSER	"sleeper"
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/login-utils/checktty.c
-+++ util-linux-2.13/login-utils/checktty.c
+     parse_args(argc, argv, &options);
+ 
+-#ifdef __linux__
+ 	setsid();
+-#endif
+ 	
+     /* Update the utmp file. */
+ 
+@@ -706,10 +710,21 @@
+      * 5 seconds seems to be a good value.
+      */
+ 
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++    if (tcgetattr(0, tp) < 0)
++#else
+     if (ioctl(0, TCGETA, tp) < 0)
++#endif
+ 	error("%s: ioctl: %m", tty);
+ 
+     /*
++     * login_tty: steal tty from other process group.
++     */
++#if defined(__FreeBSD_kernel__)
++    login_tty (0);	
++#endif
++
++    /*
+      * It seems to be a terminal. Set proper protections and ownership. Mode
+      * 0622 is suitable for SYSV <4 because /bin/login does not change
+      * protections. SunOS 4 login will change the protections to 0620 (write
+@@ -743,17 +758,26 @@
+      * reads will be done in raw mode anyway. Errors will be dealt with
+      * lateron.
+      */
+-#ifdef __linux__
++#if defined(__linux__) || defined(__GNU__) || defined(__FreeBSD_kernel__)
+     /* flush input and output queues, important for modems! */
+-    (void) ioctl(0, TCFLSH, TCIOFLUSH);
++    (void) tcflush(0, TCIOFLUSH);
+ #endif
+ 
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++    tp->c_cflag = CS8 | HUPCL | CREAD;
++    cfsetispeed(tp, speed);
++    cfsetospeed(tp, speed);
++#else
+     tp->c_cflag = CS8 | HUPCL | CREAD | speed;
++#endif
+     if (op->flags & F_LOCAL) {
+ 	tp->c_cflag |= CLOCAL;
+     }
+ 
+-    tp->c_iflag = tp->c_lflag = tp->c_oflag = tp->c_line = 0;
++    tp->c_iflag = tp->c_lflag = tp->c_oflag = 0;
++#if !defined(__GNU__) && !defined(__FreeBSD_kernel__)
++    tp->c_line = 0;
++#endif
+     tp->c_cc[VMIN] = 1;
+     tp->c_cc[VTIME] = 0;
+ 
+@@ -764,7 +788,11 @@
+ 	tp->c_cflag |= CRTSCTS;
+ #endif
+ 
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++    (void) tcsetattr(0, TCSANOW, tp);
++#else
+     (void) ioctl(0, TCSETA, tp);
++#endif
+ 
+     /* go to blocking input even in local mode */
+     fcntl(0, F_SETFL, fcntl(0, F_GETFL, 0) & ~O_NONBLOCK);
+@@ -808,7 +836,11 @@
+     tp->c_iflag |= ISTRIP;			/* enable 8th-bit stripping */
+     vmin = tp->c_cc[VMIN];
+     tp->c_cc[VMIN] = 0;				/* don't block if queue empty */
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++    (void) tcsetattr(0, TCSANOW, tp);
++#else
+     (void) ioctl(0, TCSETA, tp);
++#endif
+ 
+     /*
+      * Wait for a while, then read everything the modem has said so far and
+@@ -821,8 +853,13 @@
+ 	for (bp = buf; bp < buf + nread; bp++) {
+ 	    if (isascii(*bp) && isdigit(*bp)) {
+ 		if ((speed = bcode(bp))) {
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++		    cfsetispeed(tp, speed);
++		    cfsetospeed(tp, speed);
++#else
+ 		    tp->c_cflag &= ~CBAUD;
+ 		    tp->c_cflag |= speed;
++#endif
+ 		}
+ 		break;
+ 	    }
+@@ -832,7 +869,11 @@
+ 
+     tp->c_iflag = iflag;
+     tp->c_cc[VMIN] = vmin;
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++    (void) tcsetattr(0, TCSANOW, tp);
++#else
+     (void) ioctl(0, TCSETA, tp);
++#endif
+ }
+ 
+ /* do_prompt - show login prompt, optionally preceded by /etc/issue contents */
+@@ -855,7 +896,11 @@
+     if ((op->flags & F_ISSUE) && (fd = fopen(op->issue, "r"))) {
+ 	oflag = tp->c_oflag;			/* save current setting */
+ 	tp->c_oflag |= (ONLCR | OPOST);		/* map NL in output to CR-NL */
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++	(void) tcsetattr(0, TCSADRAIN, tp);
++#else
+ 	(void) ioctl(0, TCSETAW, tp);
++#endif
+ 
+ 
+ 	while ((c = getc(fd)) != EOF)
+@@ -888,7 +933,7 @@
+ 
+ 		  case 'o':
+ 		   {
+-		     char domainname[HOST_NAME_MAX+1];
++		     char domainname[HOSTNAME_LENGTH+1];
+ #ifdef HAVE_GETDOMAINNAME
+ 		     if (getdomainname(domainname, sizeof(domainname)))
+ #endif
+@@ -901,7 +946,7 @@
+ 		  case 'O':
+ 		   {
+ 			char *dom = "unknown_domain";
+-			char host[HOST_NAME_MAX + 1];
++			char host[HOSTNAME_LENGTH + 1];
+ 			struct addrinfo hints, *info = NULL;
+ 
+ 			memset(&hints, 0, sizeof(hints));
+@@ -959,7 +1004,11 @@
+ 			int i;
+ 
+ 			for (i = 0; speedtab[i].speed; i++) {
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++			    if (speedtab[i].code == cfgetispeed(tp)) {
++#else
+ 			    if (speedtab[i].code == (tp->c_cflag & CBAUD)) {
++#endif
+ 				printf("%ld", speedtab[i].speed);
+ 				break;
+ 			    }
+@@ -991,12 +1040,16 @@
+ 	fflush(stdout);
+ 
+ 	tp->c_oflag = oflag;			/* restore settings */
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++	(void) tcsetattr(0, TCSADRAIN, tp);
++#else
+ 	(void) ioctl(0, TCSETAW, tp);		/* wait till output is gone */
++#endif
+ 	(void) fclose(fd);
+     }
+ #endif
+     {
+-	char hn[HOST_NAME_MAX+1];
++	char hn[HOSTNAME_LENGTH+1];
+ 	if (gethostname(hn, sizeof(hn)) == 0)
+ 	    write(1, hn, strlen(hn));
+     }
+@@ -1012,9 +1065,15 @@
+     static int baud_index = FIRST_SPEED;/* current speed index */
+ 
+     baud_index = (baud_index + 1) % op->numspeed;
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++    cfsetispeed(tp, op->speeds[baud_index]);
++    cfsetospeed(tp, op->speeds[baud_index]);
++    (void) tcsetattr(0, TCSANOW, tp);
++#else
+     tp->c_cflag &= ~CBAUD;
+     tp->c_cflag |= op->speeds[baud_index];
+     (void) ioctl(0, TCSETA, tp);
++#endif
+ }
+ 
+ /* get_logname - get user name, establish parity, speed, erase, kill, eol */
+@@ -1044,7 +1103,7 @@
+     /* Flush pending input (esp. after parsing or switching the baud rate). */
+ 
+     (void) sleep(1);
+-    (void) ioctl(0, TCFLSH, TCIFLUSH);
++    (void) tcflush(0, TCIFLUSH);
+ 
+     /* Prompt for and read a login name. */
+ 
+@@ -1148,7 +1207,7 @@
+     tp->c_cc[VEOL] = DEF_EOL;
+ #ifdef __linux__
+     tp->c_cc[VSWTC] = DEF_SWITCH;		/* default switch character */
+-#else
++#elif defined(VSWTCH)
+     tp->c_cc[VSWTCH] = DEF_SWITCH;		/* default switch character */
+ #endif
+ 
+@@ -1181,9 +1240,15 @@
+     /* Account for upper case without lower case. */
+ 
+     if (cp->capslock) {
++#ifdef  IUCLC
+ 	tp->c_iflag |= IUCLC;
++#endif	
++#ifdef XCASE
+ 	tp->c_lflag |= XCASE;
++#endif
++#ifdef OLCUC
+ 	tp->c_oflag |= OLCUC;
++#endif	
+     }
+     /* Optionally enable hardware flow control */
+ 
+@@ -1194,7 +1259,11 @@
+ 
+     /* Finally, make the new settings effective */
+ 
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++    if (tcsetattr(0, TCSANOW, tp) < 0)
++#else
+     if (ioctl(0, TCSETA, tp) < 0)
++#endif
+ 	error("%s: ioctl: TCSETA: %m", op->tty);
+ }
+ 
+diff -Nru util-linux-2.13.1.1/login-utils/checktty.c util-linux-2.13.1.1/login-utils/checktty.c
+--- util-linux-2.13.1.1/login-utils/checktty.c	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/login-utils/checktty.c	2008-08-07 20:37:34.000000000 +0200
 @@ -25,7 +25,9 @@
  #include "nls.h"
  
@@ -1006,33 +879,34 @@ unchanged:
      return 0;
  }
  
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/schedutils/Makefile.am
-+++ util-linux-2.13/schedutils/Makefile.am
-@@ -2,12 +2,16 @@
- 
- if BUILD_SCHEDUTILS
- 
--usrbinexec_PROGRAMS = chrt ionice
--man_MANS = chrt.1 ionice.1
-+usrbinexec_PROGRAMS =
-+man_MANS =
- 
-+if LINUX
-+usrbinexec_PROGRAMS += ionice chrt
-+man_MANS += ionice.1  chrt.1
- if HAVE_SCHED_GETAFFINITY
- usrbinexec_PROGRAMS += taskset
- man_MANS += taskset.1
+diff -Nru util-linux-2.13.1.1/login-utils/Makefile.am util-linux-2.13.1.1/login-utils/Makefile.am
+--- util-linux-2.13.1.1/login-utils/Makefile.am	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/login-utils/Makefile.am	2008-08-07 20:37:34.000000000 +0200
+@@ -11,6 +11,7 @@
+ if BUILD_AGETTY
+ sbin_PROGRAMS += agetty
+ man_MANS += agetty.8
++agetty_LDADD = -lutil
  endif
-+endif
  
- endif
-only in patch2:
-unchanged:
---- util-linux-2.13.orig/Makefile.am
-+++ util-linux-2.13/Makefile.am
+ if BUILD_INIT
+diff -Nru util-linux-2.13.1.1/login-utils/wall.c util-linux-2.13.1.1/login-utils/wall.c
+--- util-linux-2.13.1.1/login-utils/wall.c	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/login-utils/wall.c	2008-08-07 20:37:34.000000000 +0200
+@@ -63,6 +63,10 @@
+ #include "pathnames.h"
+ #include "carefulputc.h"
+ 
++#ifndef MAXHOSTNAMELEN
++#define MAXHOSTNAMELEN 64
++#endif
++
+ void	makemsg __P((char *));
+ 
+ #define	IGNOREUSER	"sleeper"
+diff -Nru util-linux-2.13.1.1/Makefile.am util-linux-2.13.1.1/Makefile.am
+--- util-linux-2.13.1.1/Makefile.am	2008-04-21 14:58:42.000000000 +0200
++++ util-linux-2.13.1.1/Makefile.am	2008-08-07 20:37:34.000000000 +0200
 @@ -8,14 +8,19 @@
  	hwclock \
  	login-utils \
@@ -1055,3 +929,146 @@ unchanged:
  ACLOCAL_AMFLAGS = -I m4
  
  EXTRA_DIST = \
+diff -Nru util-linux-2.13.1.1/misc-utils/Makefile.am util-linux-2.13.1.1/misc-utils/Makefile.am
+--- util-linux-2.13.1.1/misc-utils/Makefile.am	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/misc-utils/Makefile.am	2008-08-07 20:37:34.000000000 +0200
+@@ -34,8 +34,10 @@
+ endif
+ 
+ if HAVE_NCURSES
++if LINUX
+ usrbinexec_PROGRAMS += setterm
+ man_MANS += setterm.1
++endif
+ if HAVE_TINFO
+ setterm_LDADD = -ltinfo
+ else
+diff -Nru util-linux-2.13.1.1/misc-utils/namei.c util-linux-2.13.1.1/misc-utils/namei.c
+--- util-linux-2.13.1.1/misc-utils/namei.c	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/misc-utils/namei.c	2008-08-07 20:37:34.000000000 +0200
+@@ -59,6 +59,10 @@
+ #include <sys/param.h>
+ #include "nls.h"
+ 
++#ifndef MAXPATHLEN
++#define MAXPATHLEN 4096
++#endif
++
+ #define ERR	strerror(errno),errno
+ 
+ int symcount;
+diff -Nru util-linux-2.13.1.1/misc-utils/script.c util-linux-2.13.1.1/misc-utils/script.c
+--- util-linux-2.13.1.1/misc-utils/script.c	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/misc-utils/script.c	2008-08-07 20:37:34.000000000 +0200
+@@ -53,12 +53,12 @@
+ #include <sys/file.h>
+ #include <sys/signal.h>
+ #include <errno.h>
++#include <getopt.h>
++#include <string.h>
+ #include "nls.h"
+ 
+-#ifdef __linux__
+ #include <unistd.h>
+ #include <string.h>
+-#endif
+ 
+ #ifdef HAVE_LIBUTIL
+ #include <pty.h>
+diff -Nru util-linux-2.13.1.1/schedutils/Makefile.am util-linux-2.13.1.1/schedutils/Makefile.am
+--- util-linux-2.13.1.1/schedutils/Makefile.am	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/schedutils/Makefile.am	2008-08-07 20:37:34.000000000 +0200
+@@ -2,12 +2,16 @@
+ 
+ if BUILD_SCHEDUTILS
+ 
+-usrbinexec_PROGRAMS = chrt ionice
+-man_MANS = chrt.1 ionice.1
++usrbinexec_PROGRAMS =
++man_MANS =
+ 
++if LINUX
++usrbinexec_PROGRAMS += ionice chrt
++man_MANS += ionice.1  chrt.1
+ if HAVE_SCHED_GETAFFINITY
+ usrbinexec_PROGRAMS += taskset
+ man_MANS += taskset.1
+ endif
++endif
+ 
+ endif
+diff -Nru util-linux-2.13.1.1/sys-utils/Makefile.am util-linux-2.13.1.1/sys-utils/Makefile.am
+--- util-linux-2.13.1.1/sys-utils/Makefile.am	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/sys-utils/Makefile.am	2008-08-07 20:37:34.000000000 +0200
+@@ -1,14 +1,25 @@
+ include $(top_srcdir)/config/include-Makefile.am
+ 
+-bin_PROGRAMS = dmesg
++bin_PROGRAMS =
++if LINUX
++bin_PROGRAMS += dmesg
++endif
+ 
+-usrbinexec_PROGRAMS = cytune flock ipcrm ipcs renice setsid setarch
++usrbinexec_PROGRAMS = flock renice setsid 
++if LINUX
++usrbinexec_PROGRAMS += cytune setarch ipcrm ipcs
++endif
+ 
+ cytune_SOURCES = cytune.c cyclades.h
+ 
++if LINUX
+ sbin_PROGRAMS = ctrlaltdel
++endif
+ 
+-usrsbinexec_PROGRAMS = readprofile tunelp rtcwake
++usrsbinexec_PROGRAMS = readprofile 
++if LINUX
++usrsbinexec_PROGRAMS += tunelp rtcwake
++endif
+ 
+ tunelp_SOURCES = tunelp.c lp.h
+ 
+diff -Nru util-linux-2.13.1.1/sys-utils/rdev.c util-linux-2.13.1.1/sys-utils/rdev.c
+--- util-linux-2.13.1.1/sys-utils/rdev.c	2007-04-25 14:43:38.000000000 +0200
++++ util-linux-2.13.1.1/sys-utils/rdev.c	2008-08-07 20:37:34.000000000 +0200
+@@ -94,6 +94,10 @@
+ 
+ #define DEFAULT_OFFSET 508
+ 
++#ifndef PATH_MAX
++#define PATH_MAX 4096
++#endif
++
+ 
+ static void
+ die(char *msg) {
+diff -Nru util-linux-2.13.1.1/text-utils/more.c util-linux-2.13.1.1/text-utils/more.c
+--- util-linux-2.13.1.1/text-utils/more.c	2008-04-21 14:58:43.000000000 +0200
++++ util-linux-2.13.1.1/text-utils/more.c	2008-08-07 20:37:34.000000000 +0200
+@@ -1573,7 +1573,7 @@
+     }
+     if (feof (file)) {
+ 	if (!no_intty) {
+-#ifndef __linux__
++#if !defined(__linux__) && !defined(__GLIBC__)
+ 				/* No longer in libc 4.5.8. . . */
+ 	    file->_flags &= ~STDIO_S_EOF_SEEN; /* why doesn't fseek do this ??!!??! */
+ #endif
+@@ -1817,8 +1817,16 @@
+     no_intty = tcgetattr(fileno(stdin), &otty);
+     tcgetattr(fileno(stderr), &otty);
+     savetty0 = otty;
++#if defined(__GNU__) || defined(__FreeBSD_kernel__)
++    slow_tty = cfgetispeed(&otty) < B1200;
++#else
+     slow_tty = (otty.c_cflag & CBAUD) < B1200;
++#endif
++#if defined(__FreeBSD_kernel__)
++    hardtabs = 1;
++#else
+     hardtabs = (otty.c_oflag & TABDLY) != XTABS;
++#endif    
+     if (!no_tty) {
+ 	otty.c_lflag &= ~(ICANON|ECHO);
+ 	otty.c_cc[VMIN] = 1;
