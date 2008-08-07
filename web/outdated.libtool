@@ -6,9 +6,35 @@ these packages are able to start building (all Build-depends are available),
 but libtool does not recognize GNU/kFreeBSD
 
 beware, it does not mean libtool is really used (i.e. #493694),
-or libtool update only is sufficient
+or libtool update only is sufficient in all cases
 also libtool might be updated, but there is not yet 
 build-log due to dependencies or time-skew, ...
+
+
+Standard recipe:
+----------------
+
+  libtoolize -c -f
+  aclocal (-Im4 might be needed if there is an "m4" template dir)
+  autoconf
+
+or 
+  
+  autoreconf -vfi
+
+
+KDE recipe:
+-----------
+
+  cp -f /usr/share/libtool/libtool.m4 admin/libtool.m4.in
+  cp -f /usr/share/libtool/ltmain.sh admin/ltmain.sh
+  cp -f /usr/share/misc/config.guess admin/config.guess
+  cp -f /usr/share/misc/config.sub admin/config.sub
+
+  (alternatively you can update the admin/ directory from the latest
+   KDE SVN 3.5 branch instead).
+  
+  make -f admin/Makefile.common
 
 
 already an open submission in BTS:
