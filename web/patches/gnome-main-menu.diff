@@ -1,0 +1,87 @@
+
+
+* hacked patch to avoid need of network-manager ...
+
+* apply and run autoreconf
+
+
+diff -u gnome-main-menu-0.9.8.svn.20070430/debian/control gnome-main-menu-0.9.8.svn.20070430/debian/control
+--- gnome-main-menu-0.9.8.svn.20070430/debian/control
++++ gnome-main-menu-0.9.8.svn.20070430/debian/control
+@@ -3,7 +3,7 @@
+ Priority: optional
+ Maintainer: Riccardo Setti <giskard@debian.org>
+ Uploaders: Clément Stenac <zorglub@debian.org>
+-Build-Depends: debhelper (>= 5), cdbs, quilt, autotools-dev, libgnome-desktop-dev, libpanel-applet2-dev, libgtop2-dev, libdbus-glib-1-dev ,network-manager-dev, libhal-storage-dev, libiw-dev, libgnome-menu-dev, libavahi-core-dev, gtk-doc-tools, librsvg2-dev, libnm-util-dev
++Build-Depends: debhelper (>= 5), cdbs, quilt, autotools-dev, libgnome-desktop-dev, libpanel-applet2-dev, libgtop2-dev, libdbus-glib-1-dev, libhal-storage-dev, libgnome-menu-dev, libavahi-core-dev, gtk-doc-tools, librsvg2-dev
+ Standards-Version: 3.7.2
+ 
+ Package: gnome-main-menu
+only in patch2:
+unchanged:
+--- gnome-main-menu-0.9.8.svn.20070430.orig/configure.in
++++ gnome-main-menu-0.9.8.svn.20070430/configure.in
+@@ -43,16 +43,7 @@
+ AC_SUBST(LIBSLAB_CFLAGS)
+ AC_SUBST(LIBSLAB_LIBS)
+ 
+-PKG_CHECK_MODULES(MAIN_MENU, [ $COMMON_MODULES libpanelapplet-2.0 gnome-desktop-2.0 gconf-2.0 libgtop-2.0 libgnome-2.0 libgnomeui-2.0 dbus-glib-1 NetworkManager hal-storage cairo ])
+-
+-AC_CHECK_HEADERS(iwlib.h, [ AC_CHECK_LIB(iw, iw_sockets_open, have_iwlib=yes, have_iwlib=no)], have_iwlib=no)
+-
+-if test "x$have_iwlib" != "xyes" ; then
+-	AC_ERROR(cannot find iwlib)
+-else
+-	MAIN_MENU_LIBS="$MAIN_MENU_LIBS -liw"
+-	AC_SUBST(MAIN_MENU_LIBS)
+-fi
++PKG_CHECK_MODULES(MAIN_MENU, [ $COMMON_MODULES libpanelapplet-2.0 gnome-desktop-2.0 gconf-2.0 libgtop-2.0 libgnome-2.0 libgnomeui-2.0 dbus-glib-1 hal-storage cairo ])
+ 
+ AC_SUBST(MAIN_MENU_CFLAGS)
+ AC_SUBST(MAIN_MENU_LIBS)
+only in patch2:
+unchanged:
+--- gnome-main-menu-0.9.8.svn.20070430.orig/main-menu/src/main-menu-ui.c
++++ gnome-main-menu-0.9.8.svn.20070430/main-menu/src/main-menu-ui.c
+@@ -42,7 +42,6 @@
+ #include "directory-tile.h"
+ #include "system-tile.h"
+ #include "hard-drive-status-tile.h"
+-#include "network-status-tile.h"
+ 
+ #include "tile-table.h"
+ 
+@@ -694,19 +693,6 @@
+ 	gtk_container_add   (ctnr, tile);
+ 	gtk_widget_show_all (GTK_WIDGET (ctnr));
+ 
+-	ctnr = GTK_CONTAINER (glade_xml_get_widget (
+-		priv->main_menu_xml, "network-status-container"));
+-	tile = network_status_tile_new ();
+-
+-	gtk_widget_set_size_request (tile, 6 * icon_width, -1);
+-
+-	g_signal_connect (
+-		G_OBJECT (tile), "tile-action-triggered",
+-		G_CALLBACK (tile_action_triggered_cb), this);
+-
+-	gtk_container_add   (ctnr, tile);
+-	gtk_widget_show_all (GTK_WIDGET (ctnr));
+-
+ 	priv->status_section = glade_xml_get_widget (
+ 		priv->main_menu_xml, "slab-status-section");
+ }
+only in patch2:
+unchanged:
+--- gnome-main-menu-0.9.8.svn.20070430.orig/main-menu/src/Makefile.am
++++ gnome-main-menu-0.9.8.svn.20070430/main-menu/src/Makefile.am
+@@ -19,9 +19,6 @@
+ 	main-menu-migration.c		main-menu-migration.h		\
+ 	tile-table.c			tile-table.h			\
+ 	hard-drive-status-tile.c	hard-drive-status-tile.h	\
+-	network-status-tile.c		network-status-tile.h		\
+-	network-status-agent.c		network-status-agent.h		\
+-	network-status-info.c		network-status-info.h		\
+ 	tomboykeybinder.c		tomboykeybinder.h		\
+ 	eggaccelerators.c		eggaccelerators.h
+ 
