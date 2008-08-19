@@ -3,9 +3,9 @@ Status: Reported as kern/93331
 
 Index: src/sys/i386/i386/locore.s
 ===================================================================
---- src/sys/i386/i386/locore.s.orig
+--- src.orig/sys/i386/i386/locore.s
 +++ src/sys/i386/i386/locore.s
-@@ -358,7 +358,7 @@
+@@ -338,7 +338,7 @@
  	pushl	%eax
  	testl	$PSL_VM,UC_EFLAGS(%eax)
  	jne	1f
@@ -14,7 +14,7 @@ Index: src/sys/i386/i386/locore.s
  1:
  	movl	$SYS_sigreturn,%eax
  	pushl	%eax			/* junk to fake return addr. */
-@@ -375,7 +375,7 @@
+@@ -355,7 +355,7 @@
  	pushl	%eax
  	testl	$PSL_VM,UC4_EFLAGS(%eax)
  	jne	1f
@@ -23,7 +23,7 @@ Index: src/sys/i386/i386/locore.s
  1:
  	movl	$344,%eax		/* 4.x SYS_sigreturn */
  	pushl	%eax			/* junk to fake return addr. */
-@@ -393,7 +393,7 @@
+@@ -373,7 +373,7 @@
  	pushl	%eax
  	testl	$PSL_VM,SC_PS(%eax)
  	jne	9f
@@ -34,7 +34,7 @@ Index: src/sys/i386/i386/locore.s
  	pushl	%eax			/* junk to fake return addr. */
 Index: src/sys/i386/i386/swtch.s
 ===================================================================
---- src/sys/i386/i386/swtch.s.orig
+--- src.orig/sys/i386/i386/swtch.s
 +++ src/sys/i386/i386/swtch.s
 @@ -130,7 +130,7 @@
  	movl	%ebp,PCB_EBP(%edx)
@@ -65,7 +65,7 @@ Index: src/sys/i386/i386/swtch.s
  
 Index: src/sys/i386/include/cpufunc.h
 ===================================================================
---- src/sys/i386/include/cpufunc.h.orig
+--- src.orig/sys/i386/include/cpufunc.h
 +++ src/sys/i386/include/cpufunc.h
 @@ -452,7 +452,7 @@
  rfs(void)
@@ -103,7 +103,7 @@ Index: src/sys/i386/include/cpufunc.h
  static __inline void
 Index: src/sys/i386/linux/linux_locore.s
 ===================================================================
---- src/sys/i386/linux/linux_locore.s.orig
+--- src.orig/sys/i386/linux/linux_locore.s
 +++ src/sys/i386/linux/linux_locore.s
 @@ -8,7 +8,7 @@
  NON_GPROF_ENTRY(linux_sigcode)
@@ -125,7 +125,7 @@ Index: src/sys/i386/linux/linux_locore.s
  	int	$0x80				/* enter kernel with args */
 Index: src/sys/compat/ndis/winx32_wrap.S
 ===================================================================
---- src/sys/compat/ndis/winx32_wrap.S.orig
+--- src.orig/sys/compat/ndis/winx32_wrap.S
 +++ src/sys/compat/ndis/winx32_wrap.S
 @@ -369,7 +369,7 @@
  	ret
@@ -138,29 +138,44 @@ Index: src/sys/compat/ndis/winx32_wrap.S
  ENTRY(x86_gettid)
 Index: src/sys/amd64/amd64/cpu_switch.S
 ===================================================================
---- src/sys/amd64/amd64/cpu_switch.S.orig
+--- src.orig/sys/amd64/amd64/cpu_switch.S
 +++ src/sys/amd64/amd64/cpu_switch.S
-@@ -110,7 +110,7 @@
- 	jz	1f				/* no, skip over */
+@@ -243,12 +243,12 @@
+ 	jmp	do_tss
  
- 	/* Save userland %gs */
+ store_seg:
 -	movl	%gs,PCB_GS(%r8)
 +	movw	%gs,PCB_GS(%r8)
- 	movq	PCB_GS32P(%r8),%rax
+ 	testl	$PCB_GS32BIT,PCB_FLAGS(%r8)
+ 	jnz	2f
+-1:	movl	%ds,PCB_DS(%r8)
+-	movl	%es,PCB_ES(%r8)
+-	movl	%fs,PCB_FS(%r8)
++1:	movw	%ds,PCB_DS(%r8)
++	movw	%es,PCB_ES(%r8)
++	movw	%fs,PCB_FS(%r8)
+ 	jmp	done_store_seg
+ 2:	movq	PCB_GS32P(%r8),%rax
  	movq	(%rax),%rax
- 	movq	%rax,PCB_GS32SD(%r8)
-@@ -220,7 +220,7 @@
- 	movq	%rbx,(%rax)
- 	movl	$MSR_GSBASE,%ecx
+@@ -260,11 +260,11 @@
+ 	jnz	2f
+ 1:	movl	$MSR_GSBASE,%ecx
  	rdmsr
 -	movl	PCB_GS(%r8),%gs
 +	movw	PCB_GS(%r8),%gs
  	wrmsr
- 
- 1:
+-	movl	PCB_DS(%r8),%ds
+-	movl	PCB_ES(%r8),%es
+-	movl	PCB_FS(%r8),%fs
++	movw	PCB_DS(%r8),%ds
++	movw	PCB_ES(%r8),%es
++	movw	PCB_FS(%r8),%fs
+ 	jmp	done_load_seg
+ 	/* Restore userland %gs while preserving kernel gsbase */
+ 2:	movq	PCB_GS32P(%r8),%rax
 Index: src/sys/amd64/ia32/ia32_signal.c
 ===================================================================
---- src/sys/amd64/ia32/ia32_signal.c.orig
+--- src.orig/sys/amd64/ia32/ia32_signal.c
 +++ src/sys/amd64/ia32/ia32_signal.c
 @@ -328,8 +328,8 @@
  	sf.sf_uc.uc_mcontext.mc_onstack = (oonstack) ? 1 : 0;
@@ -186,7 +201,7 @@ Index: src/sys/amd64/ia32/ia32_signal.c
  	sf.sf_uc.uc_mcontext.mc_ebp = regs->tf_rbp;
 Index: src/sys/amd64/include/cpufunc.h
 ===================================================================
---- src/sys/amd64/include/cpufunc.h.orig
+--- src.orig/sys/amd64/include/cpufunc.h
 +++ src/sys/amd64/include/cpufunc.h
 @@ -482,7 +482,7 @@
  rfs(void)
@@ -266,7 +281,7 @@ Index: src/sys/amd64/include/cpufunc.h
  
 Index: src/sys/amd64/linux32/linux32_sysvec.c
 ===================================================================
---- src/sys/amd64/linux32/linux32_sysvec.c.orig
+--- src.orig/sys/amd64/linux32/linux32_sysvec.c
 +++ src/sys/amd64/linux32/linux32_sysvec.c
 @@ -355,9 +355,9 @@
  	frame.sf_sc.uc_mcontext.sc_mask   = frame.sf_sc.uc_sigmask.__bits[0];
@@ -293,7 +308,7 @@ Index: src/sys/amd64/linux32/linux32_sysvec.c
  	frame.sf_sc.sc_ebp    = regs->tf_rbp;
 Index: src/sys/amd64/ia32/ia32_sigtramp.S
 ===================================================================
---- src/sys/amd64/ia32/ia32_sigtramp.S.orig
+--- src.orig/sys/amd64/ia32/ia32_sigtramp.S
 +++ src/sys/amd64/ia32/ia32_sigtramp.S
 @@ -45,8 +45,8 @@
  	calll	*IA32_SIGF_HANDLER(%esp)
@@ -319,7 +334,7 @@ Index: src/sys/amd64/ia32/ia32_sigtramp.S
  	int	$0x80			/* enter kernel with args */
 Index: src/sys/amd64/linux32/linux32_locore.s
 ===================================================================
---- src/sys/amd64/linux32/linux32_locore.s.orig
+--- src.orig/sys/amd64/linux32/linux32_locore.s
 +++ src/sys/amd64/linux32/linux32_locore.s
 @@ -11,8 +11,8 @@
  NON_GPROF_ENTRY(linux_sigcode)
