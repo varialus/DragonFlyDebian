@@ -4,7 +4,7 @@ Status: chflags is BSD-specific.  We could add it to freebsd-utils.
 
 Index: src/sys/conf/kern.mk
 ===================================================================
---- src/sys/conf/kern.mk.orig
+--- src.orig/sys/conf/kern.mk
 +++ src/sys/conf/kern.mk
 @@ -1,5 +1,9 @@
  # $FreeBSD: src/sys/conf/kern.mk,v 1.52 2007/05/24 21:53:42 obrien Exp $
@@ -49,10 +49,10 @@ Index: src/sys/conf/kern.mk
  
 Index: src/sys/conf/kern.post.mk
 ===================================================================
---- src/sys/conf/kern.post.mk.orig
+--- src.orig/sys/conf/kern.post.mk
 +++ src/sys/conf/kern.post.mk
 @@ -1,5 +1,15 @@
- # $FreeBSD: src/sys/conf/kern.post.mk,v 1.100 2007/03/23 21:55:59 imp Exp $
+ # $FreeBSD: src/sys/conf/kern.post.mk,v 1.100.2.1 2008/08/27 04:41:15 jb Exp $
  
 +.if !defined(OPSYS)
 +OPSYS!=		uname -s
@@ -67,7 +67,7 @@ Index: src/sys/conf/kern.post.mk
  # Part of a unified Makefile for building kernels.  This part includes all
  # the definitions that need to be after all the % directives except %RULES
  # and ones that act like they are part of %RULES.
-@@ -208,11 +218,9 @@
+@@ -211,11 +221,9 @@
  .if exists(${DESTDIR}${KODIR})
  	-thiskernel=`sysctl -n kern.bootfile` ; \
  	if [ ! "`dirname "$$thiskernel"`" -ef ${DESTDIR}${KODIR} ] ; then \
@@ -79,7 +79,7 @@ Index: src/sys/conf/kern.post.mk
  			rm -rf ${DESTDIR}${KODIR}.old ; \
  		fi ; \
  		mv ${DESTDIR}${KODIR} ${DESTDIR}${KODIR}.old ; \
-@@ -220,21 +228,21 @@
+@@ -223,21 +231,21 @@
  	fi
  .endif
  	mkdir -p ${DESTDIR}${KODIR}

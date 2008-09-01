@@ -1,8 +1,8 @@
 Index: src/sys/conf/files
 ===================================================================
---- src/sys/conf/files.orig
+--- src.orig/sys/conf/files
 +++ src/sys/conf/files
-@@ -472,18 +472,6 @@
+@@ -473,18 +473,6 @@
  dev/ata/atapi-cd.c		optional atapicd
  dev/ata/atapi-fd.c		optional atapifd
  dev/ata/atapi-tape.c		optional atapist
@@ -23,7 +23,7 @@ Index: src/sys/conf/files
  dev/awi/if_awi_pccard.c		optional awi pccard
 Index: src/sys/conf/files.i386
 ===================================================================
---- src/sys/conf/files.i386.orig
+--- src.orig/sys/conf/files.i386
 +++ src/sys/conf/files.i386
 @@ -46,42 +46,6 @@
  	no-obj no-implicit-rule before-depend				\
@@ -68,10 +68,10 @@ Index: src/sys/conf/files.i386
  #
  compat/linprocfs/linprocfs.c	optional linprocfs
  compat/linsysfs/linsysfs.c	optional linsysfs
-@@ -179,14 +143,6 @@
- dev/fdc/fdc_isa.c		optional fdc isa
- dev/fdc/fdc_pccard.c		optional fdc pccard
+@@ -181,14 +145,6 @@
  dev/fe/if_fe_isa.c		optional fe isa
+ dev/glxsb/glxsb.c		optional glxsb
+ dev/glxsb/glxsb_hash.c		optional glxsb
 -dev/hptmv/entry.c		optional hptmv
 -dev/hptmv/mv.c			optional hptmv
 -dev/hptmv/gui_lib.c		optional hptmv
@@ -83,7 +83,7 @@ Index: src/sys/conf/files.i386
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_pentium.c	optional hwpmc
  dev/hwpmc/hwpmc_piv.c		optional hwpmc
-@@ -213,7 +169,6 @@
+@@ -215,7 +171,6 @@
  dev/mse/mse.c			optional mse
  dev/mse/mse_isa.c		optional mse isa
  dev/nfe/if_nfe.c		optional nfe pci
@@ -93,7 +93,7 @@ Index: src/sys/conf/files.i386
  dev/random/nehemiah.c		optional random
 Index: src/sys/conf/kern.pre.mk
 ===================================================================
---- src/sys/conf/kern.pre.mk.orig
+--- src.orig/sys/conf/kern.pre.mk
 +++ src/sys/conf/kern.pre.mk
 @@ -67,9 +67,6 @@
  # ... and the same for pf
@@ -107,9 +107,9 @@ Index: src/sys/conf/kern.pre.mk
  
 Index: src/sys/i386/conf/GENERIC
 ===================================================================
---- src/sys/i386/conf/GENERIC.orig
+--- src.orig/sys/i386/conf/GENERIC
 +++ src/sys/i386/conf/GENERIC
-@@ -130,8 +130,6 @@
+@@ -131,8 +131,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -118,7 +118,7 @@ Index: src/sys/i386/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -252,9 +242,6 @@
+@@ -252,9 +250,6 @@
  device		wlan_scan_ap	# 802.11 AP mode scanning
  device		wlan_scan_sta	# 802.11 STA mode scanning
  device		an		# Aironet 4500/4800 802.11 wireless NICs.
@@ -130,9 +130,9 @@ Index: src/sys/i386/conf/GENERIC
  device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
 Index: src/sys/modules/Makefile
 ===================================================================
---- src/sys/modules/Makefile.orig
+--- src.orig/sys/modules/Makefile
 +++ src/sys/modules/Makefile
-@@ -25,11 +25,6 @@
+@@ -26,11 +26,6 @@
  	${_arl} \
  	${_asr} \
  	ata \
@@ -144,7 +144,7 @@ Index: src/sys/modules/Makefile
  	aue \
  	${_auxio} \
  	${_awi} \
-@@ -97,8 +92,6 @@
+@@ -100,8 +95,6 @@
  	hifn \
  	hme \
  	${_hptiop} \
@@ -153,7 +153,7 @@ Index: src/sys/modules/Makefile
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -197,10 +190,8 @@
+@@ -200,11 +193,8 @@
  	ntfs_iconv \
  	${_nxge} \
  	nullfs \
@@ -161,10 +161,11 @@ Index: src/sys/modules/Makefile
  	${_nvram} \
  	${_nwfs} \
 -	${_oltr} \
+-	${_opensolaris} \
  	${_padlock} \
  	patm \
  	${_pccard} \
-@@ -322,7 +313,6 @@
+@@ -327,7 +317,6 @@
  	${_xe} \
  	xfs \
  	xl \
@@ -172,7 +173,7 @@ Index: src/sys/modules/Makefile
  	zlib \
  	zyd
  
-@@ -372,11 +362,6 @@
+@@ -372,11 +361,6 @@
  _apm=		apm
  _ar=		ar
  _arcnet=	arcnet
@@ -184,15 +185,18 @@ Index: src/sys/modules/Makefile
  _awi=		awi
  _bktr=		bktr
  _cardbus=	cardbus
-@@ -417,7 +402,6 @@
+@@ -422,10 +406,6 @@
  .if ${MK_NCP} != "no"
  _nwfs=		nwfs
  .endif
 -_oltr=		oltr
+-.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
+-_opensolaris=	opensolaris
+-.endif
  _pccard=	pccard
  _pcfclock=	pcfclock
  _pecoff=	pecoff
-@@ -438,9 +422,6 @@
+@@ -447,9 +427,6 @@
  _tmpfs= 	tmpfs
  _wi=		wi
  _xe=		xe
@@ -202,7 +206,7 @@ Index: src/sys/modules/Makefile
  .if ${MACHINE} == "i386"
  _aac=		aac
  _acpi=		acpi
-@@ -458,8 +439,6 @@
+@@ -467,8 +444,6 @@
  _dpt=		dpt
  _ex=		ex
  _hptiop=	hptiop
@@ -210,8 +214,8 @@ Index: src/sys/modules/Makefile
 -_hptrr=		hptrr
  _ichwd=		ichwd
  _ida=		ida
- # Disabled due to non-MPSAFEty in 7.0
-@@ -474,7 +453,6 @@
+ _iir=		iir
+@@ -481,7 +456,6 @@
  _ixgb=   	ixgb
  _mly=		mly
  _nfe=		nfe
@@ -219,7 +223,7 @@ Index: src/sys/modules/Makefile
  _nvram=		nvram
  _nxge=		nxge
  _wpi=		wpi
-@@ -501,11 +479,6 @@
+@@ -508,11 +482,6 @@
  _agp=		agp
  _an=		an
  _arcmsr=	arcmsr
@@ -231,7 +235,7 @@ Index: src/sys/modules/Makefile
  _cardbus=	cardbus
  _cbb=		cbb
  _cmx=		cmx
-@@ -520,8 +493,6 @@
+@@ -533,8 +502,6 @@
  _exca=		exca
  _ext2fs=	ext2fs
  _hptiop=	hptiop
@@ -240,15 +244,20 @@ Index: src/sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -541,7 +512,6 @@
+@@ -554,12 +521,8 @@
  _mly=		mly
  _ndis=		ndis
  _nfe=		nfe
 -_nve=		nve
  _nvram=		nvram
  _nxge=		nxge
+-.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
+-_opensolaris=	opensolaris
+-.endif
  _pccard=	pccard
-@@ -556,9 +526,6 @@
+ _rdma=		rdma	
+ _safe=		safe
+@@ -573,9 +536,6 @@
  _wi=		wi
  _wpi=		wpi
  _wpifw=		wpifw
@@ -258,7 +267,7 @@ Index: src/sys/modules/Makefile
  .endif
  
  .if ${MACHINE_ARCH} == "ia64"
-@@ -601,21 +568,11 @@
+@@ -617,22 +577,12 @@
  
  .if ${MACHINE_ARCH} == "powerpc"
  _an=		an
@@ -267,6 +276,7 @@ Index: src/sys/modules/Makefile
 -_ath_rate_amrr=	ath_rate_amrr
 -_ath_rate_onoe=	ath_rate_onoe
 -_ath_rate_sample=ath_rate_sample
+ _bm=		bm
  _nvram=		powermac_nvram
  _smbfs=		smbfs
  .endif
@@ -282,9 +292,9 @@ Index: src/sys/modules/Makefile
  _i2c=		i2c
 Index: src/sys/amd64/conf/GENERIC
 ===================================================================
---- src/sys/amd64/conf/GENERIC.orig
+--- src.orig/sys/amd64/conf/GENERIC
 +++ src/sys/amd64/conf/GENERIC
-@@ -123,8 +123,6 @@
+@@ -125,8 +125,6 @@
  device		arcmsr		# Areca SATA II RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -293,7 +303,7 @@ Index: src/sys/amd64/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -239,9 +231,6 @@
+@@ -240,9 +238,6 @@
  device		wlan_scan_ap	# 802.11 AP mode scanning
  device		wlan_scan_sta	# 802.11 STA mode scanning
  device		an		# Aironet 4500/4800 802.11 wireless NICs.
@@ -305,7 +315,7 @@ Index: src/sys/amd64/conf/GENERIC
  device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
 Index: src/sys/conf/files.amd64
 ===================================================================
---- src/sys/conf/files.amd64.orig
+--- src.orig/sys/conf/files.amd64
 +++ src/sys/conf/files.amd64
 @@ -47,37 +47,6 @@
  	no-obj no-implicit-rule before-depend				\
