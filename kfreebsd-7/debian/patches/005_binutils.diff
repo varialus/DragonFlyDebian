@@ -114,12 +114,12 @@ Index: src/sys/i386/linux/linux_locore.s
  	movl	%esp, %ebx			/* pass sigframe */
  	push	%eax				/* fake ret addr */
  	movl	$LINUX_SYS_linux_sigreturn,%eax	/* linux_sigreturn() */
-@@ -19,7 +19,7 @@
- linux_rt_sigcode:
+@@ -20,7 +20,7 @@
  	call	*LINUX_RT_SIGF_HANDLER(%esp)
  	leal	LINUX_RT_SIGF_UC(%esp),%ebx	/* linux ucp */
--	movl	LINUX_SC_GS(%ebx),%gs
-+	movw	LINUX_SC_GS(%ebx),%gs
+ 	leal	LINUX_RT_SIGF_SC(%ebx),%ecx	/* linux sigcontext */
+-	movl	LINUX_SC_GS(%ecx),%gs
++	movw	LINUX_SC_GS(%ecx),%gs
  	push	%eax				/* fake ret addr */
  	movl	$LINUX_SYS_linux_rt_sigreturn,%eax   /* linux_rt_sigreturn() */
  	int	$0x80				/* enter kernel with args */
@@ -140,7 +140,7 @@ Index: src/sys/amd64/amd64/cpu_switch.S
 ===================================================================
 --- src.orig/sys/amd64/amd64/cpu_switch.S
 +++ src/sys/amd64/amd64/cpu_switch.S
-@@ -243,12 +243,12 @@
+@@ -259,12 +259,12 @@
  	jmp	do_tss
  
  store_seg:
@@ -155,9 +155,9 @@ Index: src/sys/amd64/amd64/cpu_switch.S
 +	movw	%es,PCB_ES(%r8)
 +	movw	%fs,PCB_FS(%r8)
  	jmp	done_store_seg
- 2:	movq	PCB_GS32P(%r8),%rax
+ 2:	movq	PCPU(GS32P),%rax
  	movq	(%rax),%rax
-@@ -260,11 +260,11 @@
+@@ -276,11 +276,11 @@
  	jnz	2f
  1:	movl	$MSR_GSBASE,%ecx
  	rdmsr
@@ -172,7 +172,7 @@ Index: src/sys/amd64/amd64/cpu_switch.S
 +	movw	PCB_FS(%r8),%fs
  	jmp	done_load_seg
  	/* Restore userland %gs while preserving kernel gsbase */
- 2:	movq	PCB_GS32P(%r8),%rax
+ 2:	movq	PCPU(GS32P),%rax
 Index: src/sys/amd64/ia32/ia32_signal.c
 ===================================================================
 --- src.orig/sys/amd64/ia32/ia32_signal.c
@@ -347,14 +347,14 @@ Index: src/sys/amd64/linux32/linux32_locore.s
  	movl	%esp, %ebx			/* pass sigframe */
  	push	%eax				/* fake ret addr */
  	movl	$LINUX_SYS_linux_sigreturn,%eax	/* linux_sigreturn() */
-@@ -23,8 +23,8 @@
- linux_rt_sigcode:
+@@ -24,8 +24,8 @@
  	call	*LINUX_RT_SIGF_HANDLER(%esp)
  	leal	LINUX_RT_SIGF_UC(%esp),%ebx	/* linux ucp */
--	movl	LINUX_SC_ES(%ebx),%es
--	movl	LINUX_SC_DS(%ebx),%ds
-+	mov	LINUX_SC_ES(%ebx),%es
-+	mov	LINUX_SC_DS(%ebx),%ds
+ 	leal	LINUX_RT_SIGF_SC(%ebx),%ecx	/* linux sigcontext */
+-	movl	LINUX_SC_ES(%ecx),%es
+-	movl	LINUX_SC_DS(%ecx),%ds
++	mov	LINUX_SC_ES(%ecx),%es
++	mov	LINUX_SC_DS(%ecx),%ds
  	push	%eax				/* fake ret addr */
  	movl	$LINUX_SYS_linux_rt_sigreturn,%eax   /* linux_rt_sigreturn() */
  	int	$0x80				/* enter kernel with args */
