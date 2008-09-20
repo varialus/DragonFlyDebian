@@ -29,6 +29,7 @@
 /* Bits in the fourth argument to `waitid'.  */
 #define	WSTOPPED	2	/* Report stopped child (same as WUNTRACED). */
 #define	WCONTINUED	4	/* Report continued child.  */
+#define	WNOWAIT		8	/* Poll only. Don't delete the proc entry. */
 
 #define __WCLONE	0x80000000	/* Wait for cloned process.  */
 #ifdef __USE_BSD
