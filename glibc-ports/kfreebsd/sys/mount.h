@@ -26,7 +26,6 @@
 
 #include <sys/stat.h>
 #include <sys/statfs.h>
-#include <rpc/types.h>
 #include <sys/ucred.h>
 #include <sys/queue.h>
 
@@ -266,7 +265,7 @@ struct ovfsconf {
 #define	VFCF_UNICODE	0x00200000	/* stores file names as Unicode*/
 #define VFCF_JAIL       0x00400000      /* can be mounted from within a jail */
 
-typedef uint32_t fsctlop_t;
+typedef u_int32_t fsctlop_t;
 
 struct vfsidctl {
 	int		vc_vers;	/* should be VFSIDCTL_VERS1 (below) */
