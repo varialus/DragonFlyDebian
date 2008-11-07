@@ -39,7 +39,7 @@ Index: src/sys/kern/imgact_elf.c
  	sv = brand_info->sysvec;
 -	if (interp != NULL && brand_info->interp_newpath != NULL)
 +	if (interp != NULL && brand_info->interp_newpath != NULL && !strcmp(interp, "/libexec/ld-elf.so.1"))
- 		interp = brand_info->interp_newpath;
+ 		newinterp = brand_info->interp_newpath;
  
  	/*
 @@ -708,7 +726,7 @@
