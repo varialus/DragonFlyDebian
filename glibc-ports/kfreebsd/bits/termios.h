@@ -70,6 +70,8 @@ struct termios
     cc_t c_cc[NCCS];            /* control characters */
     speed_t c_ispeed;           /* input speed */
     speed_t c_ospeed;           /* output speed */
+#define __ispeed c_ispeed
+#define __ospeed c_ospeed
 #define _HAVE_STRUCT_TERMIOS_C_ISPEED 1
 #define _HAVE_STRUCT_TERMIOS_C_OSPEED 1
 };
@@ -193,7 +195,6 @@ struct termios
 #define	VSTOP	13		/* Stop (X-OFF) character [IXON, IXOFF].  */
 #define VLNEXT	14		/* Literal-next character [IEXTEN].  */
 #define VDISCARD 15		/* Discard character [IEXTEN].  */
-#endif
 #define	VMIN	16		/* Minimum number of bytes read at once [!ICANON].  */
 #define	VTIME	17		/* Time-out value (tenths of a second) [!ICANON].  */
 #ifdef	__USE_BSD

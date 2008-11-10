@@ -21,26 +21,6 @@
 # error "Never use <bits/ioctl-types.h> directly; include <sys/ioctl.h> instead."
 #endif
 
-/* Type of ARG for TIOCGETC and TIOCSETC requests.  */
-/* struct tchars is defined in <sys/ioctl_compat.h> */
-#define	_IOT_tchars	/* Hurd ioctl type field.  */ \
-  _IOT (_IOTS (char), 6, 0, 0, 0, 0)
-
-/* Type of ARG for TIOCGLTC and TIOCSLTC requests.  */
-/* struct ltchars is defined in <sys/ioctl_compat.h> */ 
-#define	_IOT_ltchars	/* Hurd ioctl type field.  */ \
-  _IOT (_IOTS (char), 6, 0, 0, 0, 0)
-
-/* Type of ARG for TIOCGETP and TIOCSETP requests (and gtty and stty).  */
-/* struct sgttyb  is defined in <sys/ioctl_compat.h> */
-#define	_IOT_sgttyb	/* Hurd ioctl type field.  */ \
-  _IOT (_IOTS (char), 6, _IOTS (short int), 1, 0, 0)
-
-/* Type of ARG for TIOCGWINSZ and TIOCSWINSZ requests.  */
-/* struct winsize is defined in <sys/ttycom.h> */
-#define	_IOT_winsize	/* Hurd ioctl type field.  */ \
-  _IOT (_IOTS (unsigned short int), 4, 0, 0, 0, 0)
-
 /* Many systems that have TIOCGWINSZ define TIOCGSIZE for source
    compatibility with Sun; they define `struct ttysize' to have identical
    layout as `struct winsize' and #define TIOCGSIZE to be TIOCGWINSZ

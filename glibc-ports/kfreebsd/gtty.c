@@ -1,3 +1,2 @@
-/* just use internal functions */
-#define ioctl __ioctl
-#include <sysdeps/unix/bsd/gtty.c>
+/* use stub only variant */
+#include <misc/gtty.c>
