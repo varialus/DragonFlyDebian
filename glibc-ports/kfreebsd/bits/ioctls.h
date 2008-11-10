@@ -47,21 +47,4 @@
 
 #include <sys/sockio.h>
 
-#ifndef _SYS_IOCTL_COMPAT_H_
-#ifndef BURN_BRIDGES
-
-#undef		ECHO				/* see bits/termios.h */
-#undef		MDMBUF				/* see bits/termios.h */
-#undef		TOSTOP				/* see bits/termios.h */
-#undef		FLUSHO				/* see bits/termios.h */
-#undef		PENDIN				/* see bits/termios.h */
-#undef		NOFLSH				/* see bits/termios.h */
-
-#include <sys/ioctl_compat.h>
-
-#define		TAB3 XTABS			/* expand tabs on output */
-
-#endif /* !BURN_BRIDGES */
-#endif /* !_SYS_IOCTL_COMPAT_H_ */
-
 #endif /* !_IOCTLS_H_ */

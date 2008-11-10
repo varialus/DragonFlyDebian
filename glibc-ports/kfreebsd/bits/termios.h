@@ -59,10 +59,23 @@ typedef unsigned char cc_t;
 typedef unsigned int speed_t;
 
 /* Terminal control structure.  */
+
+#define NCCS 20
 struct termios
 {
+    tcflag_t c_iflag;           /* input mode flags */
+    tcflag_t c_oflag;           /* output mode flags */
+    tcflag_t c_cflag;           /* control mode flags */
+    tcflag_t c_lflag;           /* local mode flags */
+    cc_t c_cc[NCCS];            /* control characters */
+    speed_t c_ispeed;           /* input speed */
+    speed_t c_ospeed;           /* output speed */
+#define _HAVE_STRUCT_TERMIOS_C_ISPEED 1
+#define _HAVE_STRUCT_TERMIOS_C_OSPEED 1
+};
+
+
   /* Input modes.  */
-  tcflag_t c_iflag;
 #define	IGNBRK	(1 << 0)	/* Ignore break condition.  */
 #define	BRKINT	(1 << 1)	/* Signal interrupt on break.  */
 #define	IGNPAR	(1 << 2)	/* Ignore characters with parity errors.  */
@@ -74,22 +87,30 @@ struct termios
 #define	ICRNL	(1 << 8)	/* Map CR to NL on input.  */
 #define	IXON	(1 << 9)	/* Enable start/stop output control.  */
 #define	IXOFF	(1 << 10)	/* Enable start/stop input control.  */
-#ifdef	__USE_BSD
-# define IXANY	(1 << 11)	/* Any character will restart after stop.  */
-# define IMAXBEL (1 << 13)	/* Ring bell when input queue is full.  */
-#endif
+#define IXANY	(1 << 11)	/* Any character will restart after stop.  */
+#define IMAXBEL (1 << 13)	/* Ring bell when input queue is full.  */
+
 
   /* Output modes.  */
-  tcflag_t c_oflag;
 #define	OPOST	(1 << 0)	/* Perform output processing.  */
+#define	ONLCR	(1 << 1)	/* Map NL to CR-NL on output.  */
+#define	OCRNL	(1 << 8)	/* map CR to NL on output */
+#define	ONOCR	(1 << 9)	/* no CR output at column 0 */
+#define	ONLRET	(1 << 10)	/* NL performs CR function */
 #ifdef	__USE_BSD
-# define ONLCR	(1 << 1)	/* Map NL to CR-NL on output.  */
-# define OXTABS	(1 << 2)	/* Expand tabs to spaces.  */
 # define ONOEOT	(1 << 3)	/* Discard EOT (^D) on output.  */
 #endif
 
+#if defined __USE_MISC || defined __USE_XOPEN
+# define TAB0   0x00000000	/* no tab delay and expansion */
+# define TAB3   0x00000004	/* expand tabs to spaces */
+# define TABDLY	TAB3		/* tab delay mask */
+# define OXTABS	TAB3
+# define XTABS	TAB3
+#endif
+
+
   /* Control modes.  */
-  tcflag_t c_cflag;
 #ifdef	__USE_BSD
 # define CIGNORE	(1 << 0)	/* Ignore these control flags.  */
 #endif
@@ -115,7 +136,6 @@ struct termios
 #endif
 
   /* Local modes.  */
-  tcflag_t c_lflag;
 #ifdef	__USE_BSD
 # define ECHOKE	(1 << 0)	/* Visual erase for KILL.  */
 #endif
@@ -155,16 +175,13 @@ struct termios
   /* Control characters.  */
 #define	VEOF	0		/* End-of-file character [ICANON].  */
 #define	VEOL	1		/* End-of-line character [ICANON].  */
-#ifdef	__USE_BSD
-# define VEOL2	2		/* Second EOL character [ICANON].  */
-#endif
+#define VEOL2	2		/* Second EOL character [ICANON].  */
 #define	VERASE	3		/* Erase character [ICANON].  */
-#ifdef	__USE_BSD
-# define VWERASE 4		/* Word-erase character [ICANON].  */
-#endif
+#define VWERASE 4		/* Word-erase character [ICANON].  */
 #define	VKILL	5		/* Kill-line character [ICANON].  */
-#ifdef	__USE_BSD
-# define VREPRINT 6		/* Reprint-line character [ICANON].  */
+#define VREPRINT 6		/* Reprint-line character [ICANON].  */
+#ifdef __USE_BSD
+# define VERASE2 7		/* [ICANON] */
 #endif
 #define	VINTR	8		/* Interrupt character [ISIG].  */
 #define	VQUIT	9		/* Quit character [ISIG].  */
@@ -174,26 +191,16 @@ struct termios
 #endif
 #define	VSTART	12		/* Start (X-ON) character [IXON, IXOFF].  */
 #define	VSTOP	13		/* Stop (X-OFF) character [IXON, IXOFF].  */
-#ifdef	__USE_BSD
-# define VLNEXT	14		/* Literal-next character [IEXTEN].  */
-# define VDISCARD 15		/* Discard character [IEXTEN].  */
+#define VLNEXT	14		/* Literal-next character [IEXTEN].  */
+#define VDISCARD 15		/* Discard character [IEXTEN].  */
 #endif
 #define	VMIN	16		/* Minimum number of bytes read at once [!ICANON].  */
 #define	VTIME	17		/* Time-out value (tenths of a second) [!ICANON].  */
 #ifdef	__USE_BSD
 # define VSTATUS 18		/* Status character [ICANON].  */
 #endif
-#define	NCCS	20
-  cc_t c_cc[NCCS];
 
   /* Input and output baud rates.  */
-#ifdef __USE_BSD
-  speed_t c_ispeed, c_ospeed;
-# define __ispeed c_ispeed
-# define __ospeed c_ospeed
-#else
-  speed_t __ispeed, __ospeed;
-#endif
 #define	B0	0		/* Hang up.  */
 #define	B50	50		/* 50 baud.  */
 #define	B75	75		/* 75 baud.  */
@@ -234,10 +241,7 @@ struct termios
 #define	B3500000 3500000
 #define	B4000000 4000000
 #define	__MAX_BAUD B4000000
-};
 
-#define _IOT_termios /* Hurd ioctl type field.  */ \
-  _IOT (_IOTS (tcflag_t), 4, _IOTS (cc_t), NCCS, _IOTS (speed_t), 2)
 
 /* Values for the OPTIONAL_ACTIONS argument to `tcsetattr'.  */
 #define	TCSANOW		0	/* Change immediately.  */
@@ -257,3 +261,4 @@ struct termios
 #define	TCOON	2		/* Restart suspended output.  */
 #define	TCIOFF	3		/* Send a STOP character.  */
 #define	TCION	4		/* Send a START character.  */
+
