@@ -96,20 +96,19 @@ struct termios
   /* Output modes.  */
 #define	OPOST	(1 << 0)	/* Perform output processing.  */
 #define	ONLCR	(1 << 1)	/* Map NL to CR-NL on output.  */
-#define	OCRNL	(1 << 8)	/* map CR to NL on output */
-#define	ONOCR	(1 << 9)	/* no CR output at column 0 */
-#define	ONLRET	(1 << 10)	/* NL performs CR function */
-#ifdef	__USE_BSD
-# define ONOEOT	(1 << 3)	/* Discard EOT (^D) on output.  */
-#endif
-
 #if defined __USE_MISC || defined __USE_XOPEN
-# define TAB0   0x00000000	/* no tab delay and expansion */
-# define TAB3   0x00000004	/* expand tabs to spaces */
+# define TAB0   (0 << 2)	/* no tab delay and expansion */
+# define TAB3   (1 << 2)	/* expand tabs to spaces */
 # define TABDLY	TAB3		/* tab delay mask */
 # define OXTABS	TAB3
 # define XTABS	TAB3
 #endif
+#ifdef	__USE_BSD
+# define ONOEOT	(1 << 3)	/* Discard EOT (^D) on output.  */
+#endif
+#define	OCRNL	(1 << 4)	/* map CR to NL on output */
+#define	ONOCR	(1 << 5)	/* no CR output at column 0 */
+#define	ONLRET	(1 << 6)	/* NL performs CR function */
 
 
   /* Control modes.  */
