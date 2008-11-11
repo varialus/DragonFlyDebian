@@ -68,7 +68,7 @@
 
 /* `c_cc' member of 'struct termios' structure can be disabled by
    using the value _POSIX_VDISABLE.  */
-#define	_POSIX_VDISABLE	'\0'
+#define	_POSIX_VDISABLE	((unsigned char)'\377')
 
 /* The LFS interface is available, except for the asynchronous I/O.  */
 #define _LFS_LARGEFILE		1
