@@ -1,0 +1,11 @@
+--- src/sbin/mount/mount.c~
++++ src/sbin/mount/mount.c
+@@ -816,7 +816,7 @@
+ 
+ 	if (strncmp(ent->f_mntfromname, "<below>", 7) == 0 ||
+ 	    strncmp(ent->f_mntfromname, "<above>", 7) == 0) {
+-		strcpy(ent->f_mntfromname, (strnstr(ent->f_mntfromname, ":", 8)
++		strcpy(ent->f_mntfromname, (memchr(ent->f_mntfromname, ':', 8)
+ 		    +1));
+ 	}
+ 

@@ -2,7 +2,7 @@ Index: src/sbin/ifconfig/Makefile
 ===================================================================
 --- src.orig/sbin/ifconfig/Makefile
 +++ src/sbin/ifconfig/Makefile
-@@ -20,17 +20,17 @@
+@@ -20,18 +20,18 @@
  SRCS+=	af_atalk.c		# AppleTalk support
  
  SRCS+=	ifclone.c		# clone device support
@@ -11,6 +11,8 @@ Index: src/sbin/ifconfig/Makefile
  SRCS+=	ifmedia.c		# SIOC[GS]IFMEDIA support
  SRCS+=	ifvlan.c		# SIOC[GS]ETVLAN support
  SRCS+=	ifieee80211.c		# SIOC[GS]IEEE80211 support
+-SRCS+=	ifgre.c			# GRE keys etc
++#SRCS+=	ifgre.c			# GRE keys etc
  
 -SRCS+=	ifcarp.c		# SIOC[GS]VH support
 -SRCS+=	ifgroup.c		# ...
@@ -57,6 +59,20 @@ Index: src/sbin/ifconfig/ifconfig.c
  
  #include <net/ethernet.h>
  #include <net/if.h>
+@@ -78,6 +78,13 @@
+ 
+ #include "ifconfig.h"
+ 
++#ifndef IFCAP_WOL
++#define IFCAP_WOL_UCAST         0x00800 /* wake on any unicast frame */   
++#define IFCAP_WOL_MCAST         0x01000 /* wake on any multicast frame */
++#define IFCAP_WOL_MAGIC         0x02000 /* wake on any Magic Packet */   
++#define IFCAP_WOL       (IFCAP_WOL_UCAST | IFCAP_WOL_MCAST | IFCAP_WOL_MAGIC)
++#endif
++
+ /*
+  * Since "struct ifreq" is composed of various union members, callers
+  * should pay special attention to interprete the value.
 Index: src/sbin/ifconfig/af_inet6.c
 ===================================================================
 --- src.orig/sbin/ifconfig/af_inet6.c
@@ -142,3 +158,12 @@ Index: src/sbin/route/route.c
  		switch(ch) {
  		case 'n':
  			nflag = 1;
+@@ -821,7 +821,7 @@
+ 			else if (IN_CLASSC(addr))
+ 				mask = IN_CLASSC_NET;
+ 			else if (IN_MULTICAST(addr))
+-				mask = IN_CLASSD_NET;
++				mask = 0xf0000000;
+ 			else
+ 				mask = 0xffffffff;
+ 		}
