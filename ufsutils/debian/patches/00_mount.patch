@@ -3,26 +3,26 @@ Index: ufsutils/freebsd/sys/mount.h
 ===================================================================
 --- ufsutils.orig/freebsd/sys/mount.h
 +++ ufsutils/freebsd/sys/mount.h
-@@ -34,14 +34,11 @@
+@@ -34,14 +34,10 @@
  #define _SYS_MOUNT_H_
  
  #include <sys/ucred.h>
 -#include <sys/queue.h>
 -#ifdef _KERNEL
+-#include <sys/lock.h>
 -#include <sys/lockmgr.h>
--#include <sys/_lock.h>
 -#include <sys/_mutex.h>
 -#endif
+-
+-typedef struct fsid { int32_t val[2]; } fsid_t;	/* filesystem id type */
 +#include <stdint.h>
 +#include <sys/vfs.h>
 +#include <sys/types.h>
 +#include <sys/socket.h>
  
--typedef struct fsid { int32_t val[2]; } fsid_t;	/* filesystem id type */
- 
  /*
   * File identifier.
-@@ -60,6 +57,7 @@
+@@ -60,6 +56,7 @@
   */
  #define	MFSNAMELEN	16		/* length of type name including null */
  #define	MNAMELEN	88		/* size of on/from name bufs */
@@ -30,7 +30,7 @@ Index: ufsutils/freebsd/sys/mount.h
  #define	STATFS_VERSION	0x20030518	/* current version number */
  struct statfs {
  	uint32_t f_version;		/* structure version number */
-@@ -209,6 +207,7 @@
+@@ -210,6 +207,7 @@
  } while (0)
  
  #endif /* _KERNEL */
@@ -38,7 +38,7 @@ Index: ufsutils/freebsd/sys/mount.h
  
  /*
   * User specifiable flags.
-@@ -383,6 +382,7 @@
+@@ -384,6 +382,7 @@
  	char		*np_index;	/* Index file */
  };
  
@@ -46,7 +46,7 @@ Index: ufsutils/freebsd/sys/mount.h
  /*
   * Filesystem configuration information. One of these exists for each
   * type of filesystem supported by the kernel. These are searched at
-@@ -420,6 +420,7 @@
+@@ -421,6 +420,7 @@
  	int	vfc_flags;
  };
  #endif
@@ -54,7 +54,7 @@ Index: ufsutils/freebsd/sys/mount.h
  
  /*
   * NB: these flags refer to IMPLEMENTATION properties, not properties of
-@@ -484,6 +485,7 @@
+@@ -485,6 +485,7 @@
  #define VQ_FLAG4000	0x4000	/* placeholder */
  #define VQ_FLAG8000	0x8000	/* placeholder */
  
@@ -62,7 +62,7 @@ Index: ufsutils/freebsd/sys/mount.h
  #ifdef _KERNEL
  /* Point a sysctl request at a vfsidctl's data. */
  #define VCTLTOREQ(vc, req)						\
-@@ -739,5 +741,5 @@
+@@ -741,5 +742,5 @@
  __END_DECLS
  
  #endif /* _KERNEL */
