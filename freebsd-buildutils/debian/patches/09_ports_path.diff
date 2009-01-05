@@ -1,19 +1,6 @@
 diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
 --- ports.old/Mk/bsd.port.mk	2006-02-13 14:38:58.000000000 +0100
 +++ ports/Mk/bsd.port.mk	2006-02-13 14:40:38.000000000 +0100
-@@ -2124,11 +2124,7 @@
- # Miscellaneous overridable commands:
- GMAKE?=			gmake
- XMKMF?=			xmkmf -a
--.if exists(md5)
--MD5?=			md5
--.else
--MD5?=			md5
--.endif
-+MD5?=			md5sum
- .if exists(sha256)
- SHA256?=		sha256
- .elif exists(${LOCALBASE}sha256)
 @@ -3336,7 +3332,7 @@
  .if !defined(DISABLE_VULNERABILITIES) && !defined(PACKAGE_BUILDING)
  	@if [ -f "${AUDITFILE}" ]; then \
