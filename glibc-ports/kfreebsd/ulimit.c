@@ -1,5 +1,2 @@
-/* just use internal functions */
-#define getrlimit __getrlimit
-#define setrlimit __setrlimit
-#define sysconf __sysconf
-#include <sysdeps/unix/bsd/ulimit.c>
+/* just use linux variant */
+#include <sysdeps/unix/sysv/linux/ulimit.c>
