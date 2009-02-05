@@ -1,0 +1,13 @@
+Index: src/sys/netinet/ip.h
+===================================================================
+--- src.orig/sys/netinet/ip.h
++++ src/sys/netinet/ip.h
+@@ -67,7 +67,7 @@
+ 	u_char	ip_p;			/* protocol */
+ 	u_short	ip_sum;			/* checksum */
+ 	struct	in_addr ip_src,ip_dst;	/* source and dest address */
+-} __packed __aligned(4);
++}  __attribute__((__packed__)) __attribute__((__aligned__(4)));
+ 
+ #ifdef CTASSERT
+ CTASSERT(sizeof (struct ip) == 20);
