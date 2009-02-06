@@ -1,71 +1,32 @@
-Index: src/sys/conf/files
-===================================================================
---- src.orig/sys/conf/files
-+++ src/sys/conf/files
-@@ -473,18 +473,6 @@
- dev/ata/atapi-cd.c		optional atapicd
- dev/ata/atapi-fd.c		optional atapifd
- dev/ata/atapi-tape.c		optional atapist
--dev/ath/ah_osdep.c optional ath_hal \
--	compile-with "${NORMAL_C} -I$S/dev/ath"
--dev/ath/ath_rate/amrr/amrr.c	optional ath_rate_amrr \
--	compile-with "${NORMAL_C} -I$S/dev/ath"
--dev/ath/ath_rate/onoe/onoe.c	optional ath_rate_onoe \
--	compile-with "${NORMAL_C} -I$S/dev/ath"
--dev/ath/ath_rate/sample/sample.c	optional ath_rate_sample \
--	compile-with "${NORMAL_C} -I$S/dev/ath"
--dev/ath/if_ath.c		optional ath \
--	compile-with "${NORMAL_C} -I$S/dev/ath"
--dev/ath/if_ath_pci.c		optional ath pci \
--	compile-with "${NORMAL_C} -I$S/dev/ath"
- dev/awi/am79c930.c		optional awi
- dev/awi/awi.c			optional awi
- dev/awi/if_awi_pccard.c		optional awi pccard
 Index: src/sys/conf/files.i386
 ===================================================================
 --- src.orig/sys/conf/files.i386
 +++ src/sys/conf/files.i386
-@@ -46,42 +46,6 @@
+@@ -46,26 +46,5 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
--trlld.o				optional	oltr			\
--	dependency	"$S/contrib/dev/oltr/i386-elf.trlld.o.uu"	\
--	compile-with	"uudecode < $S/contrib/dev/oltr/i386-elf.trlld.o.uu"	\
--	no-implicit-rule
--#
--hal.o				optional	ath_hal			\
--	dependency	"$S/contrib/dev/ath/public/i386-elf.hal.o.uu"	\
--	compile-with	"uudecode < $S/contrib/dev/ath/public/i386-elf.hal.o.uu" \
--	no-implicit-rule
--opt_ah.h			optional	ath_hal			\
--	dependency	"$S/contrib/dev/ath/public/i386-elf.opt_ah.h"	\
--	compile-with	"rm -f opt_ah.h; cp $S/contrib/dev/ath/public/i386-elf.opt_ah.h opt_ah.h" \
--	no-obj no-implicit-rule before-depend				\
--	clean		"opt_ah.h"
--#
 -nvenetlib.o			optional	nve pci			\
 -	dependency	"$S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu"	\
 -	compile-with	"uudecode $S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
 -	no-implicit-rule
 -#
--os+%DIKED-nve.h		optional	nve pci			\
+-os+%DIKED-nve.h		optional	nve pci				\
 -	dependency	"$S/contrib/dev/nve/os.h"			\
 -	compile-with	"sed -e 's/^.*#include.*phy\.h.*$$//' $S/contrib/dev/nve/os.h > os+%DIKED-nve.h" \
 -	no-implicit-rule no-obj before-depend				\
 -	clean		"os+%DIKED-nve.h"
+-#
+-hptmvraid.o			optional	hptmv			\
+-	dependency	"$S/dev/hptmv/i386-elf.raid.o.uu"		\
+-	compile-with	"uudecode < $S/dev/hptmv/i386-elf.raid.o.uu"	\
+-	no-implicit-rule
 -#
 -hptrr_lib.o			optional	hptrr			\
 -	dependency	"$S/dev/hptrr/i386-elf.hptrr_lib.o.uu"		\
 -	compile-with	"uudecode < $S/dev/hptrr/i386-elf.hptrr_lib.o.uu" \
 -	no-implicit-rule
 -#
--hptmvraid.o			optional	hptmv			\
--	dependency	"$S/dev/hptmv/i386-elf.raid.o.uu"	\
--	compile-with	"uudecode < $S/dev/hptmv/i386-elf.raid.o.uu" \
--	no-implicit-rule
--#
- #
  compat/linprocfs/linprocfs.c	optional linprocfs
  compat/linsysfs/linsysfs.c	optional linsysfs
 @@ -181,14 +145,6 @@
@@ -91,20 +52,6 @@ Index: src/sys/conf/files.i386
  dev/nvram/nvram.c		optional nvram isa
  dev/pcf/pcf_isa.c		optional pcf
  dev/random/nehemiah.c		optional random
-Index: src/sys/conf/kern.pre.mk
-===================================================================
---- src.orig/sys/conf/kern.pre.mk
-+++ src/sys/conf/kern.pre.mk
-@@ -67,9 +67,6 @@
- # ... and the same for pf
- INCLUDES+= -I$S/contrib/pf
- 
--# ... and the same for Atheros HAL
--INCLUDES+= -I$S/dev/ath
--
- # ... and the same for the NgATM stuff
- INCLUDES+= -I$S/contrib/ngatm
- 
 Index: src/sys/i386/conf/GENERIC
 ===================================================================
 --- src.orig/sys/i386/conf/GENERIC
@@ -118,32 +65,10 @@ Index: src/sys/i386/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -252,9 +250,6 @@
- device		wlan_scan_ap	# 802.11 AP mode scanning
- device		wlan_scan_sta	# 802.11 STA mode scanning
- device		an		# Aironet 4500/4800 802.11 wireless NICs.
--device		ath		# Atheros pci/cardbus NIC's
--device		ath_hal		# Atheros HAL (Hardware Access Layer)
--device		ath_rate_sample	# SampleRate tx rate control for ath
- device		awi		# BayStack 660 and others
- device		ral		# Ralink Technology RT2500 wireless NICs.
- device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
 Index: src/sys/modules/Makefile
 ===================================================================
 --- src.orig/sys/modules/Makefile
 +++ src/sys/modules/Makefile
-@@ -26,11 +26,6 @@
- 	${_arl} \
- 	${_asr} \
- 	ata \
--	${_ath} \
--	${_ath_hal} \
--	${_ath_rate_amrr} \
--	${_ath_rate_onoe} \
--	${_ath_rate_sample} \
- 	aue \
- 	${_auxio} \
- 	${_awi} \
 @@ -100,8 +95,6 @@
  	hifn \
  	hme \
@@ -153,15 +78,15 @@ Index: src/sys/modules/Makefile
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -200,11 +193,8 @@
+@@ -200,11 +193,9 @@
  	ntfs_iconv \
- 	${_nxge} \
  	nullfs \
 -	${_nve} \
  	${_nvram} \
  	${_nwfs} \
--	${_oltr} \
+ 	${_nxge} \
 -	${_opensolaris} \
+ 	ohci \
  	${_padlock} \
  	patm \
  	${_pccard} \
@@ -173,29 +98,15 @@ Index: src/sys/modules/Makefile
  	zlib \
  	zyd
  
-@@ -372,11 +361,6 @@
- _apm=		apm
- _ar=		ar
- _arcnet=	arcnet
--_ath=		ath
--_ath_hal=	ath_hal
--_ath_rate_amrr=	ath_rate_amrr
--_ath_rate_onoe=	ath_rate_onoe
--_ath_rate_sample=ath_rate_sample
- _awi=		awi
- _bktr=		bktr
- _cardbus=	cardbus
-@@ -422,10 +406,6 @@
+@@ -422,8 +406,5 @@
  .if ${MK_NCP} != "no"
  _nwfs=		nwfs
  .endif
--_oltr=		oltr
 -.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
 -_opensolaris=	opensolaris
 -.endif
  _pccard=	pccard
  _pcfclock=	pcfclock
- _pecoff=	pecoff
 @@ -447,9 +427,6 @@
  _tmpfs= 	tmpfs
  _wi=		wi
@@ -223,18 +134,6 @@ Index: src/sys/modules/Makefile
  _nvram=		nvram
  _nxge=		nxge
  _wpi=		wpi
-@@ -508,11 +482,6 @@
- _agp=		agp
- _an=		an
- _arcmsr=	arcmsr
--_ath=		ath
--_ath_hal=	ath_hal
--_ath_rate_amrr=	ath_rate_amrr
--_ath_rate_onoe=	ath_rate_onoe
--_ath_rate_sample=ath_rate_sample
- _cardbus=	cardbus
- _cbb=		cbb
- _cmx=		cmx
 @@ -533,8 +502,6 @@
  _exca=		exca
  _ext2fs=	ext2fs
@@ -254,9 +153,9 @@ Index: src/sys/modules/Makefile
 -.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
 -_opensolaris=	opensolaris
 -.endif
- _pccard=	pccard
- _rdma=		rdma	
- _safe=		safe
+ .if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
+ .if exists(${.CURDIR}/../crypto/via)
+ _padlock=	padlock
 @@ -573,9 +536,6 @@
  _wi=		wi
  _wpi=		wpi
@@ -267,29 +166,6 @@ Index: src/sys/modules/Makefile
  .endif
  
  .if ${MACHINE_ARCH} == "ia64"
-@@ -617,22 +577,12 @@
- 
- .if ${MACHINE_ARCH} == "powerpc"
- _an=		an
--_ath=		ath
--_ath_hal=	ath_hal
--_ath_rate_amrr=	ath_rate_amrr
--_ath_rate_onoe=	ath_rate_onoe
--_ath_rate_sample=ath_rate_sample
- _bm=		bm
- _nvram=		powermac_nvram
- _smbfs=		smbfs
- .endif
- 
- .if ${MACHINE_ARCH} == "sparc64"
--_ath=		ath
--_ath_hal=	ath_hal
--_ath_rate_amrr=	ath_rate_amrr
--_ath_rate_onoe=	ath_rate_onoe
--_ath_rate_sample=ath_rate_sample
- _auxio=		auxio
- _em=		em
- _i2c=		i2c
 Index: src/sys/amd64/conf/GENERIC
 ===================================================================
 --- src.orig/sys/amd64/conf/GENERIC
@@ -303,38 +179,18 @@ Index: src/sys/amd64/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -240,9 +238,6 @@
- device		wlan_scan_ap	# 802.11 AP mode scanning
- device		wlan_scan_sta	# 802.11 STA mode scanning
- device		an		# Aironet 4500/4800 802.11 wireless NICs.
--device		ath		# Atheros pci/cardbus NIC's
--device		ath_hal		# Atheros HAL (Hardware Access Layer)
--device		ath_rate_sample	# SampleRate tx rate control for ath
- device		awi		# BayStack 660 and others
- device		ral		# Ralink Technology RT2500 wireless NICs.
- device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
 Index: src/sys/conf/files.amd64
 ===================================================================
 --- src.orig/sys/conf/files.amd64
 +++ src/sys/conf/files.amd64
-@@ -47,37 +47,6 @@
+@@ -47,26 +47,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
--hal.o				optional	ath_hal			\
--	dependency	"$S/contrib/dev/ath/public/x86_64-elf.hal.o.uu"	\
--	compile-with	"uudecode < $S/contrib/dev/ath/public/x86_64-elf.hal.o.uu" \
--	no-implicit-rule
--opt_ah.h			optional	ath_hal			\
--	dependency	"$S/contrib/dev/ath/public/x86_64-elf.opt_ah.h"	\
--	compile-with	"rm -f opt_ah.h; cp $S/contrib/dev/ath/public/x86_64-elf.opt_ah.h opt_ah.h" \
--	no-obj no-implicit-rule before-depend				\
--	clean		"opt_ah.h"
--#
 -nvenetlib.o			optional	nve pci			\
 -	dependency	"$S/contrib/dev/nve/amd64/nvenetlib.o.bz2.uu"	\
 -	compile-with	"uudecode $S/contrib/dev/nve/amd64/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
-- 	no-implicit-rule
+-	no-implicit-rule
 -#
 -os+%DIKED-nve.h		optional	nve pci			\
 -	dependency	"$S/contrib/dev/nve/os.h"			\
@@ -346,16 +202,15 @@ Index: src/sys/conf/files.amd64
 -	dependency	"$S/dev/hptmv/amd64-elf.raid.o.uu"	\
 -	compile-with	"uudecode < $S/dev/hptmv/amd64-elf.raid.o.uu" \
 -	no-implicit-rule
--#
 -hptrr_lib.o			optional	hptrr			\
 -	dependency	"$S/dev/hptrr/amd64-elf.hptrr_lib.o.uu"		\
 -	compile-with	"uudecode < $S/dev/hptrr/amd64-elf.hptrr_lib.o.uu" \
 -	no-implicit-rule
 -#
- #
  amd64/acpica/OsdEnvironment.c	optional	acpi
  amd64/acpica/acpi_machdep.c	optional	acpi
-@@ -176,14 +145,6 @@
+ amd64/acpica/acpi_wakeup.c	optional	acpi
+@@ -173,14 +153,6 @@
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
@@ -370,7 +225,7 @@ Index: src/sys/conf/files.amd64
  dev/hwpmc/hwpmc_amd.c		optional	hwpmc
  dev/hwpmc/hwpmc_piv.c		optional	hwpmc
  dev/hwpmc/hwpmc_x86.c		optional	hwpmc
-@@ -191,7 +152,6 @@
+@@ -191,7 +163,6 @@
  dev/kbd/kbd.c			optional	atkbd | sc | ukbd
  dev/mem/memutil.c		optional	mem
  dev/nfe/if_nfe.c		optional	nfe pci

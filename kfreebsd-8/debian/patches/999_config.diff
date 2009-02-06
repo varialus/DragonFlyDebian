@@ -2,9 +2,9 @@ Index: src/sys/amd64/conf/GENERIC
 ===================================================================
 --- src.orig/sys/amd64/conf/GENERIC
 +++ src/sys/amd64/conf/GENERIC
-@@ -18,13 +18,13 @@
+@@ -18,19 +18,19 @@
  #
- # $FreeBSD: src/sys/amd64/conf/GENERIC,v 1.484.2.14 2008/08/29 18:54:35 jhb Exp $
+ # $FreeBSD: src/sys/amd64/conf/GENERIC,v 1.518 2009/01/19 15:33:06 sobomax Exp $
  
 -cpu		HAMMER
 -ident		GENERIC
@@ -14,6 +14,12 @@ Index: src/sys/amd64/conf/GENERIC
  # To statically compile in device wiring instead of /boot/device.hints
 -#hints		"GENERIC.hints"		# Default places to look for devices.
 +hints		"GENERIC.hints"		# Default places to look for devices.
+ 
+ # Use the following to compile in values accessible to the kernel
+ # through getenv() (or kenv(1) in userland). The format of the file
+ # is 'variable=value', see kenv(1)
+ #
+ # env		"GENERIC.env"
  
 -makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
 +#makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
@@ -29,10 +35,11 @@ Index: src/sys/amd64/conf/GENERIC
  options 	PSEUDOFS		# Pseudo-filesystem framework
  options 	GEOM_PART_GPT		# GUID Partition Tables.
  options 	GEOM_LABEL		# Provides labelization
-@@ -53,7 +55,7 @@
+@@ -53,8 +55,8 @@
  options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
+ options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
 -options 	SCSI_DELAY=5000		# Delay (in ms) before probing SCSI
 +options 	SCSI_DELAY=2000		# Delay (in ms) before probing SCSI
  options 	KTRACE			# ktrace(1) support
@@ -77,21 +84,19 @@ Index: src/sys/amd64/conf/GENERIC
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -252,13 +249,8 @@
+@@ -252,11 +249,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
--device		sl		# Kernel SLIP
--device		ppp		# Kernel PPP
 -device		tun		# Packet tunnel.
- device		pty		# Pseudo-ttys (telnet etc)
+ device		pty		# BSD-style compatibility pseudo ttys
  device		md		# Memory "disks"
 -device		gif		# IPv6 and IPv4 tunneling
 -device		faith		# IPv6-to-IPv4 relaying (translation)
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -275,12 +267,9 @@
+@@ -275,13 +267,10 @@
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
@@ -99,6 +104,7 @@ Index: src/sys/amd64/conf/GENERIC
  device		umass		# Disks/Mass storage - Requires scbus and da
  device		ums		# Mouse
  device		ural		# Ralink Technology RT2500USB wireless NICs
+ device		rum		# Ralink Technology RT2501USB wireless NICs
 -device		urio		# Diamond Rio 500 MP3 player
 -device		uscanner	# Scanners
  # USB Serial devices
@@ -120,9 +126,9 @@ Index: src/sys/i386/conf/GENERIC
 ===================================================================
 --- src.orig/sys/i386/conf/GENERIC
 +++ src/sys/i386/conf/GENERIC
-@@ -18,15 +18,15 @@
+@@ -18,21 +18,21 @@
  #
- # $FreeBSD: src/sys/i386/conf/GENERIC,v 1.474.2.14 2008/08/29 18:54:35 jhb Exp $
+ # $FreeBSD: src/sys/i386/conf/GENERIC,v 1.507 2009/01/19 17:20:09 sam Exp $
  
 -cpu		I486_CPU
 -cpu		I586_CPU
@@ -136,6 +142,12 @@ Index: src/sys/i386/conf/GENERIC
  # To statically compile in device wiring instead of /boot/device.hints
 -#hints		"GENERIC.hints"		# Default places to look for devices.
 +hints		"GENERIC.hints"		# Default places to look for devices.
+ 
+ # Use the following to compile in values accessible to the kernel
+ # through getenv() (or kenv(1) in userland). The format of the file
+ # is 'variable=value', see kenv(1)
+ #
+ # env		"GENERIC.env"
  
 -makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
 +#makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
@@ -151,10 +163,11 @@ Index: src/sys/i386/conf/GENERIC
  options 	PSEUDOFS		# Pseudo-filesystem framework
  options 	GEOM_PART_GPT		# GUID Partition Tables.
  options 	GEOM_LABEL		# Provides labelization
-@@ -53,7 +55,7 @@
+@@ -53,8 +55,8 @@
  options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
+ options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
 -options 	SCSI_DELAY=5000		# Delay (in ms) before probing SCSI
 +options 	SCSI_DELAY=2000		# Delay (in ms) before probing SCSI
  options 	KTRACE			# ktrace(1) support
@@ -199,21 +212,19 @@ Index: src/sys/i386/conf/GENERIC
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -265,13 +262,8 @@
+@@ -265,11 +262,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
--device		sl		# Kernel SLIP
--device		ppp		# Kernel PPP
 -device		tun		# Packet tunnel.
- device		pty		# Pseudo-ttys (telnet etc)
+ device		pty		# BSD-style compatibility pseudo ttys
  device		md		# Memory "disks"
 -device		gif		# IPv6 and IPv4 tunneling
 -device		faith		# IPv6-to-IPv4 relaying (translation)
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -288,13 +280,10 @@
+@@ -288,15 +280,12 @@
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
@@ -222,10 +233,12 @@ Index: src/sys/i386/conf/GENERIC
  device		ums		# Mouse
  device		ural		# Ralink Technology RT2500USB wireless NICs
  device		rum		# Ralink Technology RT2501USB wireless NICs
+ device		zyd		# ZyDAS zb1211/zb1211b wireless NICs
 -device		urio		# Diamond Rio 500 MP3 player
 -device		uscanner	# Scanners
  # USB Serial devices
  device		ucom		# Generic com ttys
+ device		u3g		# USB-based 3G modems (Option, Huawei, Sierra)
  device		uark		# Technologies ARK3116 based serial adapters
 @@ -321,3 +310,11 @@
  device		fwip		# IP over FireWire (RFC 2734,3146)

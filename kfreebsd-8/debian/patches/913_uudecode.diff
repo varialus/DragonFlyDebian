@@ -88,3 +88,16 @@ Index: src/sys/modules/wpifw/Makefile
 +	uudecode -o- ${.CURDIR}/../../contrib/dev/wpi/iwlwifi-3945-2.14.4.fw.uu > ${.TARGET}
  
  .include <bsd.kmod.mk>
+
+Index: src/sys/modules/iwnfw/Makefile
+===================================================================
+--- src.orig/sys/modules/iwnfw/Makefile
++++ src/sys/modules/iwnfw/Makefile
+@@ -9,6 +9,6 @@
+ CLEANFILES=	iwlwifi-4965-4.44.17.fw
+ 
+ iwlwifi-4965-4.44.17.fw: ${.CURDIR}/../../contrib/dev/iwn/iwlwifi-4965-4.44.17.fw.uu
+-	uudecode -p ${.CURDIR}/../../contrib/dev/iwn/iwlwifi-4965-4.44.17.fw.uu > ${.TARGET}
++	uudecode -o- ${.CURDIR}/../../contrib/dev/iwn/iwlwifi-4965-4.44.17.fw.uu > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>

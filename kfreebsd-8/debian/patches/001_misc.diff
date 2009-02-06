@@ -7,7 +7,7 @@ Index: src/sys/conf/kern.mk
 --- src.orig/sys/conf/kern.mk
 +++ src/sys/conf/kern.mk
 @@ -1,5 +1,9 @@
- # $FreeBSD: src/sys/conf/kern.mk,v 1.52 2007/05/24 21:53:42 obrien Exp $
+ # $FreeBSD: src/sys/conf/kern.mk,v 1.57 2008/07/23 06:16:34 imp Exp $
  
 +.if !defined(OPSYS)
 +OPSYS!=		uname -s
@@ -33,7 +33,7 @@ Index: src/sys/conf/kern.mk
  .if !defined(WITH_GCC3)
  _Wno_pointer_sign=-Wno-pointer-sign
  .endif
-@@ -36,8 +44,12 @@
+@@ -36,7 +44,11 @@
  # reserved for user applications.
  #
  .if ${MACHINE_ARCH} == "i386" && ${CC} != "icc"
@@ -46,63 +46,3 @@ Index: src/sys/conf/kern.mk
 +.endif
  INLINE_LIMIT?=	8000
  .endif
- 
-Index: src/sys/conf/kern.post.mk
-===================================================================
---- src.orig/sys/conf/kern.post.mk
-+++ src/sys/conf/kern.post.mk
-@@ -1,5 +1,15 @@
- # $FreeBSD: src/sys/conf/kern.post.mk,v 1.100.2.1 2008/08/27 04:41:15 jb Exp $
- 
-+.if !defined(OPSYS)
-+OPSYS!=		uname -s
-+.endif
-+
-+.if ${OPSYS} == "FreeBSD"
-+WHEEL_GROUP?=	wheel
-+.else
-+WHEEL_GROUP?=	root
-+.endif
-+
- # Part of a unified Makefile for building kernels.  This part includes all
- # the definitions that need to be after all the % directives except %RULES
- # and ones that act like they are part of %RULES.
-@@ -211,11 +221,9 @@
- .if exists(${DESTDIR}${KODIR})
- 	-thiskernel=`sysctl -n kern.bootfile` ; \
- 	if [ ! "`dirname "$$thiskernel"`" -ef ${DESTDIR}${KODIR} ] ; then \
--		chflags -R noschg ${DESTDIR}${KODIR} ; \
- 		rm -rf ${DESTDIR}${KODIR} ; \
- 	else \
- 		if [ -d ${DESTDIR}${KODIR}.old ] ; then \
--			chflags -R noschg ${DESTDIR}${KODIR}.old ; \
- 			rm -rf ${DESTDIR}${KODIR}.old ; \
- 		fi ; \
- 		mv ${DESTDIR}${KODIR} ${DESTDIR}${KODIR}.old ; \
-@@ -223,21 +231,21 @@
- 	fi
- .endif
- 	mkdir -p ${DESTDIR}${KODIR}
--	${INSTALL} -p -m 555 -o root -g wheel ${KERNEL_KO} ${DESTDIR}${KODIR}
-+	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${KERNEL_KO} ${DESTDIR}${KODIR}
- .if defined(DEBUG) && !defined(INSTALL_NODEBUG)
--	${INSTALL} -p -m 555 -o root -g wheel ${KERNEL_KO}.symbols ${DESTDIR}${KODIR}
-+	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${KERNEL_KO}.symbols ${DESTDIR}${KODIR}
- .endif
- .if defined(KERNEL_EXTRA_INSTALL)
--	${INSTALL} -p -m 555 -o root -g wheel ${KERNEL_EXTRA_INSTALL} ${DESTDIR}${KODIR}
-+	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${KERNEL_EXTRA_INSTALL} ${DESTDIR}${KODIR}
- .endif
- 
- 
- 
- kernel-reinstall:
- 	@-chflags -R noschg ${DESTDIR}${KODIR}
--	${INSTALL} -p -m 555 -o root -g wheel ${KERNEL_KO} ${DESTDIR}${KODIR}
-+	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${KERNEL_KO} ${DESTDIR}${KODIR}
- .if defined(DEBUG) && !defined(INSTALL_NODEBUG)
--	${INSTALL} -p -m 555 -o root -g wheel ${KERNEL_KO}.symbols ${DESTDIR}${KODIR}
-+	${INSTALL} -p -m 555 -o root -g ${WHEEL_GROUP} ${KERNEL_KO}.symbols ${DESTDIR}${KODIR}
- .endif
- 
- config.o env.o hints.o vers.o vnode_if.o:
