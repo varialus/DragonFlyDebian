@@ -1,10 +1,10 @@
-glibc 2.5/2.6 status
-====================
+glibc 2.5 and above status
+==========================
 
 linuxthreads are moved from trunk into ports
 	http://sourceware.org/ml/libc-alpha/2005-07/msg00001.html
 
-for short term Daniel Jacobowitz <dan@debian.org> maintained them 
+for short term Daniel Jacobowitz <dan@debian.org> maintained them
 	http://sourceware.org/ml/libc-alpha/2005-07/msg00002.html
 
 but since 2.5 release they are completely unmaintained
@@ -20,7 +20,7 @@ kfreebsd
 	-> $SRC/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd
 
 Remaining part are miscellaneous kfreebsd changes and hacks,
-stored in dir patches. 
+stored in dir patches.
 
 test build:
 -----------
@@ -36,8 +36,8 @@ test build:
 
 * apply patches
 
-  cd src 
-  for i in ../patches/*.patch 
+  cd src
+  for i in ../patches/*.patch
   do
         patch -p0 < $i
   done
@@ -53,74 +53,51 @@ test build:
 
 "make check" results:
 ---------------------
-(as of glibc 2.5)
-
-  examime why, needs c++
-make[2]: *** [build/dlfcn/bug-atexit3.out] Error 1
+(as of glibc 2.9 under 7.x kernel)
 
   requires (and tests) Linux specific O_NOATIME
-make[2]: *** [build/dirent/tst-fdopendir.o] Error 1
+tst-fdopendir.o, Error 1
 
   kernel doesn't fill enough in siginfo_t for signal handlers
-make[2]: *** [build/posix/tst-waitid.out] Error 1
+tst-waitid.out, Error 1
 
   no similar syscall, unimplemented
-make[2]: *** [build/io/tst-readlinkat.out] Error 1
+tst-readlinkat.out, Error 1
 
   no similar syscall, emulation hitted by (unavoidable) race condition
-make[2]: *** [build/misc/tst-pselect.out] Error 1
+tst-pselect.out, Error 1
 
   requires SIGRTMIN
-make[2]: *** [build/rt/tst-timer2.o] Error 1
-make[2]: *** [build/rt/tst-mqueue5.o] Error 1
-make[2]: *** [build/rt/tst-timer4.o] Error 1
-make[2]: *** [build/rt/tst-timer5.o] Error 1
-make[2]: *** [build/rt/tst-cputimer1.o] Error 1
-make[2]: *** [build/rt/tst-cputimer2.o] Error 1
-make[2]: *** [build/rt/tst-cputimer3.o] Error 1
+tst-mqueue5.o, Error 1
+tst-timer2.o, Error 1
+tst-timer4.o, Error 1
+tst-timer5.o, Error 1
+tst-cputimer1.o, Error 1
+tst-cputimer2.o, Error 1
+tst-cputimer3.o, Error 1
 
-  examine why, maybe due to non-rt behaviour of signals
-make[2]: *** [build/rt/tst-aio.out] Error 1
-make[2]: *** [build/rt/tst-aio64.out] Error 1
-make[2]: *** [build/rt/tst-aio9.out] Error 1
-make[2]: *** [build/rt/tst-aio10.out] Error 1
+  examine why, maybe due to specific behaviour of signals under linuxthreads add-on
+tst-aio10.out, Error 1
+tst-aio9.out, Error 1
 
   due to unimplemented readlinkat()
-make[2]: *** [build/debug/tst-chk1.out] Error 1
-make[2]: *** [build/debug/tst-chk2.out] Error 1
-make[2]: *** [build/debug/tst-chk3.out] Error 1
-make[2]: *** [build/debug/tst-lfschk1.out] Error 1
-make[2]: *** [build/debug/tst-lfschk2.out] Error 1
-make[2]: *** [build/debug/tst-lfschk3.out] Error 1
+tst-chk1.out, Error 1
+tst-chk2.out, Error 1
+tst-chk3.out, Error 1
+tst-chk4.out, Error 1
+tst-chk5.out, Error 1
+tst-chk6.out, Error 1
+tst-lfschk1.out, Error 1
+tst-lfschk2.out, Error 1
+tst-lfschk3.out, Error 1
+tst-lfschk4.out, Error 1
+tst-lfschk5.out, Error 1
+tst-lfschk6.out, Error 1
 
+  only small set of PLT, do not worry
+check-localplt.out, Error 1
 
-
-regression with glibc 2.6 (looks fixed by patches/linuxthreads26.patch):
-
-elf/tst-dlmodcount & elf/tst-dlopenrpath
-
-	the main program is not linked with pthread,
-	but dlopen()-ed module is. During dlclose()
-	main program crashes. I.e dlclose of pthread 
-	library does not work correctly.
-
-
-**********************************************************
-/* gcc tst.c -ldl -o tst */
-
-#include <link.h>
-#include <stdlib.h>
-
-int
-main ()
-{
-  void *handle;
-
-  handle = dlopen ("libpthread.so.0", RTLD_LAZY);
-  perror("open");
-  dlclose(handle);
-  perror("close");
-  return 0;
-}
+  just different errno value on failure - does not conform to POSIX 
+tst-ttyname_r.out, Error 1
 
 **********************************************************
