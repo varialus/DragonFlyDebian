@@ -26,7 +26,7 @@
 /* Transmute defines to enumerations.  The macro re-definitions are
    necessary because some programs want to test for operating system
    features with #ifdef RUSAGE_SELF.  In ISO C the reflexive
-   definition is a no-op. 
+   definition is a no-op.
 
    These are the values for FreeBSD.  Earlier BSD systems have a subset of
    these kinds of resource limit.  */

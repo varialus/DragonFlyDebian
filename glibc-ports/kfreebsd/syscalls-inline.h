@@ -35,7 +35,7 @@ libc_hidden_proto (__syscall_close)
 
 ssize_t __syscall_read(int fd, void *buf, size_t nbyte);
 ssize_t __syscall_write(int fd, const void *buf, size_t nbyte);
-ssize_t __syscall_writev(int fd, const struct iovec *iovp, int iovcnt); 
+ssize_t __syscall_writev(int fd, const struct iovec *iovp, int iovcnt);
 libc_hidden_proto (__syscall_read)
 libc_hidden_proto (__syscall_write)
 libc_hidden_proto (__syscall_writev)

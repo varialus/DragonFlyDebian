@@ -179,4 +179,4 @@ extern int *__errno_location (void) __THROW __attribute__ ((__const__));
 #define	EILSEQ		86		/* Illegal byte sequence */
 
 #endif /* !_ERRNO_H && __need_Emath */
-      
+

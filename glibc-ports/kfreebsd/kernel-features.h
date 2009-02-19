@@ -24,8 +24,8 @@
 #endif
 
 /* We assume for __KFREEBSD_KERNEL_VERSION the same encoding used in
-   osreldate.h.  I.e., the major, minor, and subminor are all 
-   concatenated, with two digits for each.  This means we can do 
+   osreldate.h.  I.e., the major, minor, and subminor are all
+   concatenated, with two digits for each.  This means we can do
    numeric comparisons.
 
    In the following we will define certain symbols depending on

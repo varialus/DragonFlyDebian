@@ -65,7 +65,7 @@ extern int __openat64_nocancel (int fd, const char *fname, int oflag,
 
 /* Uncancelable writev.  */
 #define writev_not_cancel_no_status(fd, iov, n) \
-  INLINE_SYSCALL (writev, 3, (fd), (iov), (n)) 
+  INLINE_SYSCALL (writev, 3, (fd), (iov), (n))
 
 /* Uncancelable fcntl.  */
 #define fcntl_not_cancel(fd, cmd, val) \

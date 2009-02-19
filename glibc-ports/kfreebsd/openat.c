@@ -39,13 +39,13 @@ __openat_nocancel (fd, file, oflag, mode)
       /* Check FD is associated with a directory.  */
       struct stat64 st;
       if (__fxstat64 (_STAT_VER, fd, &st) != 0)
-	/* errno is already set correctly.  */ 
+	/* errno is already set correctly.  */
         return -1;
 
       if (!S_ISDIR (st.st_mode))
 	__set_errno (ENOTDIR);
       else
-	__set_errno (ENOSYS);	
+	__set_errno (ENOSYS);
       return -1;
     }
   return INLINE_SYSCALL (open, 3, file, oflag, mode);

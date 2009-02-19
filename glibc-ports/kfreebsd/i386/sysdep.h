@@ -147,7 +147,7 @@
 # endif	/* _LIBC_REENTRANT */
 #endif	/* PIC */
 
-/* 
+/*
     FreeBSD expects the system call arguments on the stack,
    syscall number is in %eax.
    return value is in %eax + %edx

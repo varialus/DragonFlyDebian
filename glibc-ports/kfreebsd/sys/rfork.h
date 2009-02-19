@@ -64,7 +64,7 @@
 #define RFNOTEG		(1<<3)  /* UNIMPL create new plan9 `note group' */
 #define RFPROC		(1<<4)  /* change child (else changes curproc) */
 #define RFMEM		(1<<5)  /* share `address space' */
-#define RFNOWAIT	(1<<6)  /* parent need not wait() on child */ 
+#define RFNOWAIT	(1<<6)  /* parent need not wait() on child */
 #define RFCNAMEG	(1<<10) /* UNIMPL zero plan9 `name space' */
 #define RFCENVG		(1<<11) /* UNIMPL zero plan9 `env space' */
 #define RFCFDG		(1<<12) /* zero fd table */

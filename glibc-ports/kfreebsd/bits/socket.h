@@ -193,7 +193,7 @@ enum
 #define MSG_COMPAT MSG_COMPAT
     MSG_NOSIGNAL	= 0x20000 /* do not generate SIGPIPE on EOF */
 #if 0 /* available since FreeBSD 6.0 */
-#define MSG_NOSIGNAL MSG_NOSIGNAL 
+#define MSG_NOSIGNAL MSG_NOSIGNAL
 #endif
   };
 

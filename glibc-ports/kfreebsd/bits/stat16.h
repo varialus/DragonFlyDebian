@@ -18,7 +18,7 @@
 
 /* This structure corresponds to the standard FreeBSD 'struct stat'
    (i.e. _STAT_VER_stat), and is used by the stat() system call family. */
-   
+
 struct stat16
   {
     __dev_t st_dev;		/* Device containing the file.  */
@@ -47,7 +47,7 @@ struct stat16
     __uint32_t st_gen;		/* Generation number.  */
 
     __uint32_t __unused1;
-    
+
     long int st_birthtime;	/* Time of file creation.  */
     long int st_birthtimensec;	/* Nanoseconds of file creation.  */
 

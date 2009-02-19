@@ -23,15 +23,15 @@
 
 /* According to POSIX.1-2004 the len argument specifies the length of
    the sockaddr structure pointed to by the addrarg argument. However
-   the FreeBSD kernel waits the actual length of the address stored 
+   the FreeBSD kernel waits the actual length of the address stored
    there. The code below emulate this behaviour.  */
 
 extern int __libc_sa_len (sa_family_t __af);
 extern int __libc_sa_len_internal (sa_family_t __af);
 
-extern ssize_t __syscall_sendto (int fd, __const void * buf, 
-		                 size_t n, int flags, 
-				 __CONST_SOCKADDR_ARG addr, 
+extern ssize_t __syscall_sendto (int fd, __const void * buf,
+		                 size_t n, int flags,
+				 __CONST_SOCKADDR_ARG addr,
 				 socklen_t addrlen);
 libc_hidden_proto (__syscall_sendto)
 
@@ -55,11 +55,11 @@ __libc_sendto (int fd, __const void * buf, size_t n, int flags,
     stack corruption */
   if (new_addrlen < addrlen)
     addrlen = new_addrlen;
-		
+
   /* We pass 6 arguments.  */
   if (SINGLE_THREAD_P)
     return INLINE_SYSCALL (sendto, 6, fd, buf, n, flags, addr, addrlen);
-  
+
   int oldtype = LIBC_CANCEL_ASYNC ();
   int result = INLINE_SYSCALL (sendto, 6, fd, buf, n, flags, addr, addrlen);
   LIBC_CANCEL_RESET (oldtype);

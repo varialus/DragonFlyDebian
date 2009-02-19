@@ -41,9 +41,9 @@ __msgctl (int msqid, int cmd, struct msqid_ds *buf)
   kmsqid_ds.msg_stime = msqid_ds->msg_stime;
   kmsqid_ds.msg_rtime = msqid_ds->msg_rtime;
   kmsqid_ds.msg_ctime = msqid_ds->msg_ctime;
-  
+
   retval = __syscall_msgctl (msqid, cmd, &kmsqid_ds);
-  
+
   msqid_ds->msg_perm = kmsqid_ds.msg_perm;
   msqid_ds->__msg_first = kmsqid_ds.__msg_first;
   msqid_ds->__msg_last = kmsqid_ds.__msg_last;
@@ -55,7 +55,7 @@ __msgctl (int msqid, int cmd, struct msqid_ds *buf)
   msqid_ds->msg_stime = kmsqid_ds.msg_stime;
   msqid_ds->msg_rtime = kmsqid_ds.msg_rtime;
   msqid_ds->msg_ctime = kmsqid_ds.msg_ctime;
- 
+
   return retval;
 }
 

@@ -20,9 +20,9 @@
 
 .text;
 ENTRY (__rfork)
-	/* save the return PC value into ECX, 
+	/* save the return PC value into ECX,
 	   preserve stack frame with argument  */
-	movl 0(%esp), %ecx; 
+	movl 0(%esp), %ecx;
 	DO_CALL (rfork, 1)
 	jb SYSCALL_ERROR_LABEL;
 	/* R1 is now 0 for the parent and 1 for the child.  Decrement it to

@@ -32,12 +32,12 @@ __getfsstat64 (struct statfs64 *buf, long bufsize, int flags)
   if (bufsize < 0)
     bufsize = 0;
   bufcount = bufsize / sizeof (struct statfs64);
-  
+
   if ((bufcount == 0) || (buf == NULL))
     tmpbuf = NULL;
-  else  
+  else
     tmpbuf = alloca(bufcount * sizeof (struct statfs_fbsd5));
-      
+
   count = __syscall_getfsstat (tmpbuf, bufcount * sizeof (struct statfs_fbsd5), flags);
   if (tmpbuf && count > 0)
     for (i = count - 1; i >= 0; i--)

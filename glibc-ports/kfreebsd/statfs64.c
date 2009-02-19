@@ -27,7 +27,7 @@ int
 statfs64 (const char *file, struct statfs64 *buf)
 {
   struct statfs_fbsd5 kbuf;
- 
+
   if (__syscall_statfs (file, &kbuf) < 0)
     return -1;
 

@@ -142,13 +142,13 @@
 	stack pointer			rsp
 	C preserved			rbx, rbp, r12-r15
 	some input params		rdi, rsi
-	    
+
     destroyed:
 	return value(s)			rax, rdx, eflags
 	return address from syscall	rcx
 	eflags from syscall		r11
 	used internally			r8-r10
-    
+
     Normal function call, including calls to the system call stub
     functions in the libc, get the first six parameters passed in
     registers and the seventh parameter and later on the stack.  The

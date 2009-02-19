@@ -22,10 +22,10 @@
 #ifndef _FREEBSD_PT_MACHINE_H
 #define _FREEBSD_PT_MACHINE_H   1
 
-/* 
-  some parts are common with linux/i386 version 
-  
-  linux specific parts should be in 
+/*
+  some parts are common with linux/i386 version
+
+  linux specific parts should be in
   linuxthreads/sysdeps/unix/sysv/linux/i386/
   but they are included directly in
   linuxthreads/sysdeps/i386/

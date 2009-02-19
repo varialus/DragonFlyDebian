@@ -102,7 +102,7 @@ static inline uintptr_t __attribute__ ((always_inline))
 _dl_setup_stack_chk_guard (void)
 {
   uintptr_t ret;
-#ifdef ENABLE_STACKGUARD_RANDOMIZE 
+#ifdef ENABLE_STACKGUARD_RANDOMIZE
   int fd = __open ("/dev/urandom", O_RDONLY);
   if (fd >= 0)
     {

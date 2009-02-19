@@ -1,4 +1,4 @@
-/* makecontext() for FreeBSD/amd64. 
+/* makecontext() for FreeBSD/amd64.
    Copyright (C) 2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Petr Salinger, 2006.
@@ -21,7 +21,7 @@
 #include <sysdep.h>
 #include <ucontext_i.h>
 
-/* 
+/*
    void makecontext(ucontext_t *ucp, void *func(), int argc, ...);
 
 
@@ -36,13 +36,13 @@
     8(%rsp)	arg4	-> ucp.rcx
    16(%rsp)	arg5	-> ucp.r8
    24(%rsp)	arg6	-> ucp.r9
-   i*8+24(%rsp) arg(6+i)-> future stack	
+   i*8+24(%rsp) arg(6+i)-> future stack
 
 */
-	
+
 ENTRY(__makecontext)
 
-	/* Compute the address of the stack.  
+	/* Compute the address of the stack.
 	   The information comes from us_stack element. */
 	movq	oSS_SP(%rdi), %rax
 	addq	oSS_SIZE(%rdi), %rax
@@ -53,7 +53,7 @@ ENTRY(__makecontext)
 	/* properly align future stack */
 	andq $-16, %rax
 	subq   $8, %rax
-	
+
 	/* Put the next context into preserved ucp.rbx
 	   (from the uc_link element).  */
 	movq	oLINK(%rdi), %rsi

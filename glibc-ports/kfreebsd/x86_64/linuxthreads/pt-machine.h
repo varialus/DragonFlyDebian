@@ -17,12 +17,12 @@
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
-               
+
 #ifndef _FREEBSD_PT_MACHINE_H
 #define _FREEBSD_PT_MACHINE_H   1
 
-/* 
-  almost all parts are common with linux version 
+/*
+  almost all parts are common with linux version
  */
 
 #include <linuxthreads/sysdeps/x86_64/pt-machine.h>

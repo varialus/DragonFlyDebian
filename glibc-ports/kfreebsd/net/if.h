@@ -327,7 +327,7 @@ struct  ifdrv {
 	void            *ifd_data;
 };
 
-/* 
+/*
  * Structure used to retrieve aux status data from interfaces.
  * Kernel suppliers to this interface should respect the formatting
  * needed by ifconfig(8): each line starts with a TAB and ends with

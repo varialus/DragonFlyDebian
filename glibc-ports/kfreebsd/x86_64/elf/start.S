@@ -55,7 +55,7 @@
 		...
 					NULL
 
-   But on amd64 %rsp also have to be 16-byte aligned, 
+   But on amd64 %rsp also have to be 16-byte aligned,
    standard C calling convention already passes arguments in registers.
 
    FreeBSD uses %edi as pointer to arguments and environment, %rsp is passed aligned.

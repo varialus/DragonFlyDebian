@@ -37,7 +37,7 @@ sysdep_routines += sys_open open_2
 # For <sys/stat.h>.
 sysdep_routines += sys_fstat sys_lstat sys_mknod sys_nfstat sys_nlstat sys_nstat sys_stat
 # For <sys/statfs.h>.
-sysdep_routines += fstatfs64 statfs64 sys_fstatfs sys_statfs   
+sysdep_routines += fstatfs64 statfs64 sys_fstatfs sys_statfs
 # Other.
 sysdep_routines += lchmod
 endif

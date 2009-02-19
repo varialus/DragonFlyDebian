@@ -1,2 +1,2 @@
-/* use stub only variant */                                   
-#include <misc/stty.c>                                 
+/* use stub only variant */
+#include <misc/stty.c>

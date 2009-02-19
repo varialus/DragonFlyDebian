@@ -47,7 +47,7 @@ extern int __start_thread (int flags, void *child_stack,
 int __clone (int (*fn) (void *), void *child_stack, int flags, void *arg)
 {
   int rfork_flags = RFPROC;
-  
+
   if (fn == NULL || child_stack == NULL)
     {
       __set_errno (EINVAL);

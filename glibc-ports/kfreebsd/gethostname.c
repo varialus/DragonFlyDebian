@@ -21,7 +21,7 @@
 #include <sys/sysctl.h>
 #include <errno.h>
 
-/* Put the name of the current host in no more than LEN bytes of NAME. 
+/* Put the name of the current host in no more than LEN bytes of NAME.
    The result is null-terminated if LEN is large enough for the full
    name and the terminator.  */
 

@@ -39,13 +39,13 @@ semctl (int semid, int semnum, int cmd, ...)
 {
   int result;
   va_list ap;
-  
+
   union semun semun;
   union semun semun_ptr;
-  
+
   union __kernel_semun ksemun;
-  struct __kernel_semid_ds ksemid_ds; 
-  
+  struct __kernel_semid_ds ksemid_ds;
+
   va_start (ap, cmd);
   if (cmd == GETALL || cmd == SETVAL || cmd == SETALL)
     {
@@ -61,10 +61,10 @@ semctl (int semid, int semnum, int cmd, ...)
       ksemid_ds.sem_nsems = semun.buf->sem_nsems;
       ksemid_ds.sem_otime = semun.buf->sem_otime;
       ksemid_ds.sem_ctime = semun.buf->sem_ctime;
-      
+
       ksemun.buf = &ksemid_ds
       semun_ptr = (semun_ptr *) &ksemun;
-    }	    
+    }
   else
     {
       semun_ptr = NULL;
@@ -81,7 +81,7 @@ semctl (int semid, int semnum, int cmd, ...)
       semun.buf->sem_otime = ksemid_ds.sem_otime;
       semun.buf->sem_ctime = ksemid_ds.sem_ctime;
     }
-  
+
   return result;
 }
 

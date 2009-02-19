@@ -129,7 +129,7 @@ L(complex):
 
         subq    $16,%rsi
         movq    16(%rsp),%rcx
-        movq    24(%rsp),%rdx  
+        movq    24(%rsp),%rdx
         movq    %rcx, 0(%rsi)
         movq    %rdx, 8(%rsi)
 

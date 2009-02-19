@@ -48,21 +48,21 @@
     jb SYSCALL_ERROR_LABEL;						      \
   L(pseudo_end):
 
-/* 
-  on FreeBSD some syscalls return result in pair edx+eax, 
+/*
+  on FreeBSD some syscalls return result in pair edx+eax,
   therefore proper way would be
 
-# define PUSHRESULT	pushl %edx; pushl %eax; pushfl		
+# define PUSHRESULT	pushl %edx; pushl %eax; pushfl
 # define POPRESULT	popfl; popl %eax; popl %edx
- 
+
   for FreeBSD 5.4 affected syscalls are
-  
+
 	lseek()
 	fork()
 	vfork()
 	rfork()
 	pipe()
-   
+
    none of them is cancelable, therefore
 */
 
@@ -163,4 +163,4 @@ extern int __local_multiple_threads
   __builtin_expect (THREAD_GETMEM (THREAD_SELF, \
                                      p_header.data.multiple_threads) == 0, 1)
 #endif
-                                     
+

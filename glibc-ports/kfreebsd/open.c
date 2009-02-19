@@ -38,9 +38,9 @@ __libc_open (const char *file, int oflag, ...)
       mode = va_arg (arg, int);
       va_end (arg);
     }
-  
+
   if (SINGLE_THREAD_P)
-  { 
+  {
     fd = INLINE_SYSCALL (open, 3, file, oflag, mode);
   }
   else

@@ -96,7 +96,7 @@ statfs5_to_statfs(const struct statfs_fbsd5 *pk, struct statfs *p32)
 
   p32->f_namemax	= MIN(pk->f_namemax, USHRT_MAX);
 
-  memcpy(p32->f_fstypename, pk->f_fstypename, sizeof (p32->f_fstypename));	
+  memcpy(p32->f_fstypename, pk->f_fstypename, sizeof (p32->f_fstypename));
   memcpy(p32->f_mntonname,  pk->f_mntonname,  sizeof (p32->f_mntonname));
   memcpy(p32->f_mntfromname,pk->f_mntfromname,sizeof (p32->f_mntfromname));
 }
@@ -133,7 +133,7 @@ statfs5_to_statfs64(const struct statfs_fbsd5 *pk, struct statfs64 *p64)
 
   p64->f_namemax	= MIN(pk->f_namemax, USHRT_MAX);
 
-  memcpy(p64->f_fstypename, pk->f_fstypename, sizeof (p64->f_fstypename));	
+  memcpy(p64->f_fstypename, pk->f_fstypename, sizeof (p64->f_fstypename));
   memcpy(p64->f_mntonname,  pk->f_mntonname,  sizeof (p64->f_mntonname));
   memcpy(p64->f_mntfromname,pk->f_mntfromname,sizeof (p64->f_mntfromname));
 }
@@ -156,9 +156,9 @@ statfs5_to_statvfs (const struct statfs_fbsd5 *pk, struct statvfs *p32)
   p32->f_files		= MIN(pk->f_files,  ULONG_MAX);
   p32->f_ffree		= MIN(pk->f_ffree,  ULONG_MAX);
   p32->f_favail		= MIN(pk->f_ffree,  ULONG_MAX); /* Hmm.	 May be filesystem dependent.  */
-  
+
   memcpy(&(p32->f_fsid), &(pk->f_fsid), sizeof(__fsid_t));
-  
+
   p32->f_flag		=
       (pk->f_flags & MNT_RDONLY ? ST_RDONLY : 0)
     | (pk->f_flags & MNT_NOSUID ? ST_NOSUID : 0)
@@ -188,9 +188,9 @@ statfs5_to_statvfs64 (const struct statfs_fbsd5 *pk, struct statvfs64 *p64)
   p64->f_files		= pk->f_files;
   p64->f_ffree		= pk->f_ffree;
   p64->f_favail		= pk->f_ffree; /* Hmm.	May be filesystem dependent.  */
-  
+
   memcpy(&(p64->f_fsid), &(pk->f_fsid), sizeof(__fsid_t));
-  
+
   p64->f_flag		=
       (pk->f_flags & MNT_RDONLY ? ST_RDONLY : 0)
     | (pk->f_flags & MNT_NOSUID ? ST_NOSUID : 0)

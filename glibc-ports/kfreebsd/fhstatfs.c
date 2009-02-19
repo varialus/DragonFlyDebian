@@ -25,7 +25,7 @@ int
 fhstatfs (const fhandle_t *fhp, struct statfs *buf)
 {
   struct statfs_fbsd5 kbuf;
-   
+
   if (__syscall_fhstatfs (fhp, &kbuf) < 0)
     return -1;
 

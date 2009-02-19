@@ -50,9 +50,9 @@ stat16_to_stat (const struct stat16 *p16, struct stat *q)
   q->st_blksize = p16->st_blksize;
   q->st_flags = p16->st_flags;
   q->st_gen = p16->st_gen;
-#if 0  
+#if 0
   memcpy (q->__unused1, p16->__unused2, sizeof (p16->__unused2));
-#endif  
+#endif
 }
 
 /* Convert a 'struct stat16' to 'struct stat64'.  */
@@ -74,7 +74,7 @@ stat16_to_stat64 (const struct stat16 *p16, struct stat64 *q)
   q->st_blksize = p16->st_blksize;
   q->st_flags = p16->st_flags;
   q->st_gen = p16->st_gen;
-#if 0  
+#if 0
   memcpy (q->__unused1, p16->__unused2, sizeof (p16->__unused2));
-#endif  
+#endif
 }

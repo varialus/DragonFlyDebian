@@ -26,7 +26,7 @@ typedef union
   volatile void *	uv;	/* in fact struct umtx from <sys/umtx.h> */
   volatile int		iv;
   volatile long		lv;
-  
+
 } __rtld_mrlock_t;
 
 #define UMTX_OP_WAIT	2	/*  <sys/umtx.h> */

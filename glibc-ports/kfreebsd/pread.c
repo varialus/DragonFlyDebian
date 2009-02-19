@@ -38,7 +38,7 @@ __libc_pread (int fd, void *buf, size_t nbytes, __off_t offset)
   int oldtype = LIBC_CANCEL_ASYNC ();
   ssize_t result = INLINE_SYSCALL (freebsd6_pread, 5, fd, buf, nbytes, 0, offset);
   LIBC_CANCEL_RESET (oldtype);
-  return result; 
+  return result;
 }
 
 strong_alias (__libc_pread, __pread)

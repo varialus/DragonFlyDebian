@@ -91,7 +91,7 @@ struct sockaddr_inarp {
 	unsigned short sin_other;
 #define SIN_PROXY 1
 };
-                                                                                                         
+
 /*
  * IP and ethernet specific routing flags
  */

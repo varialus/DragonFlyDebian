@@ -24,7 +24,7 @@
 #define __syscall_recvfrom __libc_recvfrom
 ssize_t __libc_recvfrom(int s, void *buf, size_t len, int flags,
                         struct sockaddr *from, socklen_t *fromlen);
-libc_hidden_proto (__libc_recvfrom)                          
+libc_hidden_proto (__libc_recvfrom)
 
 /* Read N bytes into BUF from socket FD.
    Return the number of bytes read or -1 for error.  */

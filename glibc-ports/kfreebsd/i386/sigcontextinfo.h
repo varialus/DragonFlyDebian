@@ -17,14 +17,14 @@
    02111-1307 USA.  */
 
 /*
-native FreeBSD: 
+native FreeBSD:
         sighandler(int signum, int code,       struct sigcontext * sg, void * fault_ip)
-posix like: 
+posix like:
         sighandler(int signum, siginfo_t * si, struct sigcontext * sg, void * fault_ip)
 */
 
 #define SIGCONTEXT long _code, struct sigcontext * _sg, void *
-#define SIGCONTEXT_EXTRA_ARGS _code, _sg, 
+#define SIGCONTEXT_EXTRA_ARGS _code, _sg,
 
 /* really, really, rest of glibc expects that struct sigcontext is the last argument */
 #define GET_PC(ctx)	((void *) (_sg)->sc_eip)

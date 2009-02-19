@@ -1,4 +1,4 @@
-/* Machine-dependent ELF dynamic relocation inline functions. 
+/* Machine-dependent ELF dynamic relocation inline functions.
    FreeBSD i386 specific version of dl_platform_init()
    Copyright (C) 2006 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -79,7 +79,7 @@ dl_platform_kfreebsd_i386_init (void)
 	int val, hwcap;
 
 	val = try_flip_flags(X86_EFLAGS_AC | X86_EFLAGS_ID);
-	
+
 	if (!(val & X86_EFLAGS_AC))
 	{
 		/* 386 */

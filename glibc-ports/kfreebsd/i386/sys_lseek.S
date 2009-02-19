@@ -24,7 +24,7 @@
 PSEUDO_NOERRNO(__syscall_freebsd6_lseek, freebsd6_lseek, 4)
         jnb L(no_error)
 	call SYSCALL_ERROR_LABEL;
-	orl $-1, %edx; 
+	orl $-1, %edx;
 L(pseudo_end):
 L(no_error):
 	ret

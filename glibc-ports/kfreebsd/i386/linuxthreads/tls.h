@@ -2,7 +2,7 @@
    Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Modification for FreeBSD by Petr Salinger, 2005.
-   
+
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
    License as published by the Free Software Foundation; either
@@ -24,7 +24,7 @@
 #include <linuxthreads/sysdeps/i386/tls.h>
 
 /* We can support TLS only if the floating-stack support is available.
-   To avoid bothering with the TLS support code at all, 
+   To avoid bothering with the TLS support code at all,
    use configure --without-tls.
 
    We need USE_TLS to be consistently defined, for ldsodefs.h conditionals.

@@ -18,7 +18,7 @@
    02111-1307 USA.  */
 
 
-/* This header files describe the way that structures using time_t 
+/* This header files describe the way that structures using time_t
    are represented in the kernel */
 
 #ifndef _BITS_KERNEL_TIME_T_H

@@ -39,7 +39,7 @@ __msgctl (int shmid, int cmd, struct shmid_ds *buf)
   kshmid_ds.shm_dtime = shmid_ds->shm_dtime;
   kshmid_ds.shm_ctime = shmid_ds->shm_ctime;
   kshmid_ds.__shm_internal = shmid_ds->__shm_internal;
-  
+
   retval = __syscall_shmctl (shmid, cmd, &kshmid_ds);
 
   shmid_ds->shm_perm = kshmid_ds.shm_perm;
@@ -51,7 +51,7 @@ __msgctl (int shmid, int cmd, struct shmid_ds *buf)
   shmid_ds->shm_dtime = kshmid_ds.shm_dtime;
   shmid_ds->shm_ctime = kshmid_ds.shm_ctime;
   shmid_ds->__shm_internal = kshmid_ds.__shm_internal;
-  
+
   return retval;
 }
 

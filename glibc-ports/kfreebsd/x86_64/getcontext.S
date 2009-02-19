@@ -21,9 +21,9 @@
 
 .text
 ENTRY(__getcontext)
-        clc	
+        clc
         movq 0(%rsp), %rsi	/* save the return PC value */
- 
+
         DO_CALL (getcontext, 1)
         jb SYSCALL_ERROR_LABEL
 

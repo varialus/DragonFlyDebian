@@ -29,7 +29,7 @@ extern void *__syscall_freebsd6_mmap (void *__addr, size_t __len, int __prot,
 			     int __flags, int __fd, int __unused1,
 			     __off_t __offset) __THROW;
 libc_hidden_proto (__syscall_freebsd6_mmap)
-			     
+
 extern ssize_t __syscall_freebsd6_pread (int __fd, void *__buf, size_t __nbytes,
                                 int __unused1, __off_t __offset) __THROW;
 

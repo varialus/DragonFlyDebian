@@ -45,7 +45,7 @@ __libc_readv (int fd, const struct iovec *vector, int count)
     ssize_t result = INLINE_SYSCALL (readv, 3, fd, CHECK_N (vector, count), count);
     LIBC_CANCEL_RESET (oldtype);
     return result;
-    
+
   }
   else
     return __atomic_readv_replacement (fd, vector, count);

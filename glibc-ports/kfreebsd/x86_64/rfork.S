@@ -20,8 +20,8 @@
 
 .text;
 ENTRY (__rfork)
-	/* save the return PC value into RSI */ 
-	movq 0(%rsp), %rsi; 
+	/* save the return PC value into RSI */
+	movq 0(%rsp), %rsi;
 	DO_CALL (rfork, 1)
 	jb SYSCALL_ERROR_LABEL;
 	/* R1 is now 0 for the parent and 1 for the child.  Decrement it to
