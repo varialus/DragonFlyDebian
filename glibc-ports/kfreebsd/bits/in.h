@@ -29,54 +29,107 @@
 #define	IMPLINK_HIGHEXPER	158
 
 
-/* Options for use with `getsockopt' and `setsockopt' at the IP level.
-   The first word in the comment at the right is the data type used;
-   "bool" means a boolean value stored in an `int'.  */
-#define	IP_OPTIONS	1	/* ip_opts; IP per-packet options.  */
-#define	IP_HDRINCL	2	/* int; Header is included with data.  */
-#define	IP_TOS		3	/* int; IP type of service and precedence.  */
-#define	IP_TTL		4	/* int; IP time to live.  */
-#define	IP_RECVOPTS	5	/* bool; Receive all IP options w/datagram.  */
-#define	IP_RECVRETOPTS	6	/* bool; Receive IP options for response.  */
-#define	IP_RECVDSTADDR	7	/* bool; Receive IP dst addr w/datagram.  */
-#define	IP_RETOPTS	8	/* ip_opts; Set/get IP per-packet options.  */
-#define IP_MULTICAST_IF 9	/* in_addr; set/get IP multicast i/f */
-#define IP_MULTICAST_TTL 10	/* u_char; set/get IP multicast ttl */
-#define IP_MULTICAST_LOOP 11	/* i_char; set/get IP multicast loopback */
-#define IP_ADD_MEMBERSHIP 12	/* ip_mreq; add an IP group membership */
-#define IP_DROP_MEMBERSHIP 13	/* ip_mreq; drop an IP group membership */
-#define IP_MULTICAST_VIF 14	/* set/get IP mcast virt. iface */
-#define IP_RSVP_ON	15	/* enable RSVP in kernel */
-#define IP_RSVP_OFF	16	/* disable RSVP in kernel */
-#define IP_RSVP_VIF_ON	17	/* set RSVP per-vif socket */
-#define IP_RSVP_VIF_OFF	18	/* unset RSVP per-vif socket */
-#define IP_PORTRANGE	19	/* int; range to choose for unspec port */
-#define	IP_RECVIF	20	/* bool; receive reception if w/dgram */
-/* for IPSEC */
-#define	IP_IPSEC_POLICY	21	/* int; set/get security policy */
-#define	IP_FAITH	22	/* bool; accept FAITH'ed connections */
-
-#define	IP_FW_ADD    	50	/* add a firewall rule to chain */
-#define	IP_FW_DEL    	51	/* delete a firewall rule from chain */
-#define	IP_FW_FLUSH   	52	/* flush firewall rule chain */
-#define	IP_FW_ZERO    	53	/* clear single/all firewall counter(s) */
-#define	IP_FW_GET     	54	/* get entire firewall rule chain */
-#define	IP_FW_RESETLOG	55	/* reset logging counters */
-
-#define	IP_DUMMYNET_CONFIGURE	60	/* add/configure a dummynet pipe */
-#define	IP_DUMMYNET_DEL		61	/* delete a dummynet pipe from chain */
-#define	IP_DUMMYNET_FLUSH	62	/* flush dummynet */
-#define	IP_DUMMYNET_GET		64	/* get entire dummynet pipes */
-
 /* To select the IP level.  */
 #define SOL_IP	0
+
+/*
+ * Options for use with [gs]etsockopt at the IP level.
+ * First word of comment is data type; bool is stored in int.
+ */
+#define	IP_OPTIONS		1    /* buf/ip_opts; set/get IP options */
+#define	IP_HDRINCL		2    /* int; header is included with data */
+#define	IP_TOS			3    /* int; IP type of service and preced. */
+#define	IP_TTL			4    /* int; IP time to live */
+#define	IP_RECVOPTS		5    /* bool; receive all IP opts w/dgram */
+#define	IP_RECVRETOPTS		6    /* bool; receive IP opts for response */
+#define	IP_RECVDSTADDR		7    /* bool; receive IP dst addr w/dgram */
+#define	IP_SENDSRCADDR		IP_RECVDSTADDR /* cmsg_type to set src addr */
+#define	IP_RETOPTS		8    /* ip_opts; set/get IP options */
+#define	IP_MULTICAST_IF		9    /* struct in_addr *or* struct ip_mreqn;
+				      * set/get IP multicast i/f  */
+#define	IP_MULTICAST_TTL	10   /* u_char; set/get IP multicast ttl */
+#define	IP_MULTICAST_LOOP	11   /* u_char; set/get IP multicast loopback */
+#define	IP_ADD_MEMBERSHIP	12   /* ip_mreq; add an IP group membership */
+#define	IP_DROP_MEMBERSHIP	13   /* ip_mreq; drop an IP group membership */
+#define	IP_MULTICAST_VIF	14   /* set/get IP mcast virt. iface */
+#define	IP_RSVP_ON		15   /* enable RSVP in kernel */
+#define	IP_RSVP_OFF		16   /* disable RSVP in kernel */
+#define	IP_RSVP_VIF_ON		17   /* set RSVP per-vif socket */
+#define	IP_RSVP_VIF_OFF		18   /* unset RSVP per-vif socket */
+#define	IP_PORTRANGE		19   /* int; range to choose for unspec port */
+#define	IP_RECVIF		20   /* bool; receive reception if w/dgram */
+/* for IPSEC */
+#define	IP_IPSEC_POLICY		21   /* int; set/get security policy */
+#define	IP_FAITH		22   /* bool; accept FAITH'ed connections */
+
+#define	IP_ONESBCAST		23   /* bool: send all-ones broadcast */
+#define	IP_NONLOCALOK		24   /* bool: allow bind to spoof non-local addresses;
+					requires kernel compile option IP_NONLOCALBIND */
+
+#define	IP_FW_TABLE_ADD		40   /* add entry */
+#define	IP_FW_TABLE_DEL		41   /* delete entry */
+#define	IP_FW_TABLE_FLUSH	42   /* flush table */
+#define	IP_FW_TABLE_GETSIZE	43   /* get table size */
+#define	IP_FW_TABLE_LIST	44   /* list table contents */
+
+#define	IP_FW_ADD		50   /* add a firewall rule to chain */
+#define	IP_FW_DEL		51   /* delete a firewall rule from chain */
+#define	IP_FW_FLUSH		52   /* flush firewall rule chain */
+#define	IP_FW_ZERO		53   /* clear single/all firewall counter(s) */
+#define	IP_FW_GET		54   /* get entire firewall rule chain */
+#define	IP_FW_RESETLOG		55   /* reset logging counters */
+
+#define IP_FW_NAT_CFG           56   /* add/config a nat rule */
+#define IP_FW_NAT_DEL           57   /* delete a nat rule */
+#define IP_FW_NAT_GET_CONFIG    58   /* get configuration of a nat rule */
+#define IP_FW_NAT_GET_LOG       59   /* get log of a nat rule */
+
+#define	IP_DUMMYNET_CONFIGURE	60   /* add/configure a dummynet pipe */
+#define	IP_DUMMYNET_DEL		61   /* delete a dummynet pipe from chain */
+#define	IP_DUMMYNET_FLUSH	62   /* flush dummynet */
+#define	IP_DUMMYNET_GET		64   /* get entire dummynet pipes */
+
+#define	IP_RECVTTL		65   /* bool; receive IP TTL w/dgram */
+#define	IP_MINTTL		66   /* minimum TTL for packet or drop */
+#define	IP_DONTFRAG		67   /* don't fragment packet */
+
+/* IPv4 Source Filter Multicast API [RFC3678] */
+#define	IP_ADD_SOURCE_MEMBERSHIP	70   /* join a source-specific group */
+#define	IP_DROP_SOURCE_MEMBERSHIP	71   /* drop a single source */
+#define	IP_BLOCK_SOURCE			72   /* block a source */
+#define	IP_UNBLOCK_SOURCE		73   /* unblock a source */
+
+/* The following option is private; do not use it from user applications. */
+#define	IP_MSFILTER			74   /* set/get filter list */
+
+/* Protocol Independent Multicast API [RFC3678] */
+#define	MCAST_JOIN_GROUP		80   /* join an any-source group */
+#define	MCAST_LEAVE_GROUP		81   /* leave all sources for group */
+#define	MCAST_JOIN_SOURCE_GROUP		82   /* join a source-specific group */
+#define	MCAST_LEAVE_SOURCE_GROUP	83   /* leave a single source */
+#define	MCAST_BLOCK_SOURCE		84   /* block a source */
+#define	MCAST_UNBLOCK_SOURCE		85   /* unblock a source */
 
 /*
  * Defaults and limits for options
  */
 #define	IP_DEFAULT_MULTICAST_TTL  1	/* normally limit m'casts to 1 hop  */
 #define	IP_DEFAULT_MULTICAST_LOOP 1	/* normally hear sends if a member  */
-#define	IP_MAX_MEMBERSHIPS	20	/* per socket */
+
+/*
+ * The imo_membership vector for each socket is now dynamically allocated at
+ * run-time, bounded by USHRT_MAX, and is reallocated when needed, sized
+ * according to a power-of-two increment.
+ */
+#define	IP_MIN_MEMBERSHIPS	31
+#define	IP_MAX_MEMBERSHIPS	4095
+#define	IP_MAX_SOURCE_FILTER	1024	/* # of filters per socket, per group */
+
+/*
+ * Filter modes; also used to represent per-socket filter mode internally.
+ */
+#define	MCAST_INCLUDE	1	/* fmode: include these source(s) */
+#define	MCAST_EXCLUDE	2	/* fmode: exclude these source(s) */
 
 /*
  * Argument for IP_PORTRANGE:
@@ -239,11 +292,14 @@ struct ip_opts
 #define IPV6CTL_RIP6STATS	36	/* raw_ip6 stats */
 #define IPV6CTL_PREFER_TEMPADDR	37	/* prefer temporary addr as src */
 #define IPV6CTL_ADDRCTLPOLICY	38	/* get/set address selection policy */
+#define IPV6CTL_USE_DEFAULTZONE	39	/* use default scope zone */
 
 #define IPV6CTL_MAXFRAGS	41	/* max fragments */
+#define IPV6CTL_MCAST_PMTU	44	/* enable pMTU discovery for multicast? */
 
 /* New entries should be added here from current IPV6CTL_MAXID value. */
 /* to define items, should talk with KAME guys first, for *BSD compatibility */
 /* 42-44 is already used in KAME */
 #define IPV6CTL_STEALTH		45
-#define IPV6CTL_MAXID		46
+#define	ICMPV6CTL_ND6_ONLINKNSRFC4861	47
+#define IPV6CTL_MAXID		48

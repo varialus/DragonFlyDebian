@@ -69,7 +69,11 @@ struct semid_ds
    one must define the union or not.  */
 #define _SEM_SEMUN_UNDEFINED	1
 
-#ifdef _KERNEL
+#ifdef __USE_MISC
+
+/* ipcs ctl cmds */
+# define SEM_STAT 10
+# define SEM_INFO 11
 
 /*
  * semaphore info struct
