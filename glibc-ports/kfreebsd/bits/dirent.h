@@ -29,7 +29,7 @@ struct dirent
     unsigned char d_namlen;	/* Length of the file name.  */
 
     /* Only this member is in the POSIX standard.  */
-    char d_name[1];		/* File name (actually longer).  */
+    char d_name[256];		/* File name (actually longer).  */
   };
 
 #ifdef __USE_LARGEFILE64
@@ -41,7 +41,7 @@ struct dirent64
     unsigned char d_namlen;	/* Length of the file name.  */
 
     /* Only this member is in the POSIX standard.  */
-    char d_name[1];		/* File name (actually longer).  */
+    char d_name[256];		/* File name (actually longer).  */
   };
 #endif
 
