@@ -49,51 +49,69 @@
 #endif
 
 
-/* Type of terminal control flag masks.  */
-typedef unsigned int tcflag_t;
-
-/* Type of control characters.  */
-typedef unsigned char cc_t;
-
-/* Type of baud rate specifiers.  */
-typedef unsigned int speed_t;
-
-/* Terminal control structure.  */
+typedef unsigned char	cc_t;
+typedef unsigned int	speed_t;
+typedef unsigned int	tcflag_t;
 
 #define NCCS 20
 struct termios
-{
-    tcflag_t c_iflag;           /* input mode flags */
-    tcflag_t c_oflag;           /* output mode flags */
-    tcflag_t c_cflag;           /* control mode flags */
-    tcflag_t c_lflag;           /* local mode flags */
-    cc_t c_cc[NCCS];            /* control characters */
-    speed_t c_ispeed;           /* input speed */
-    speed_t c_ospeed;           /* output speed */
+  {
+    tcflag_t c_iflag;		/* input mode flags */
+    tcflag_t c_oflag;		/* output mode flags */
+    tcflag_t c_cflag;		/* control mode flags */
+    tcflag_t c_lflag;		/* local mode flags */
+    cc_t c_cc[NCCS];		/* control characters */
+    speed_t c_ispeed;		/* input speed */
+    speed_t c_ospeed;		/* output speed */
 #define __ispeed c_ispeed
 #define __ospeed c_ospeed
 #define _HAVE_STRUCT_TERMIOS_C_ISPEED 1
 #define _HAVE_STRUCT_TERMIOS_C_OSPEED 1
-};
+  };
 
+/* c_cc characters */
+#define VEOF 0
+#define VEOL 1
+#define VEOL2 2
+#define VERASE 3
+#define VWERASE 4
+#define VKILL 5
+#define VREPRINT 6
+#ifdef __USE_BSD
+# define VERASE2 7
+#endif
+#define VINTR 8
+#define VQUIT 9
+#define VSUSP 10
+#ifdef __USE_BSD
+# define VDSUSP 11
+#endif
+#define VSTART 12
+#define VSTOP 13
+#define VLNEXT 14
+#define VDISCARD 15
+#define VMIN 16
+#define VTIME 17
+#ifdef __USE_BSD
+# define VSTATUS 18
+#endif
 
-  /* Input modes.  */
-#define	IGNBRK	(1 << 0)	/* Ignore break condition.  */
-#define	BRKINT	(1 << 1)	/* Signal interrupt on break.  */
-#define	IGNPAR	(1 << 2)	/* Ignore characters with parity errors.  */
-#define	PARMRK	(1 << 3)	/* Mark parity and framing errors.  */
-#define	INPCK	(1 << 4)	/* Enable input parity check.  */
-#define	ISTRIP	(1 << 5)	/* Strip 8th bit off characters.  */
-#define	INLCR	(1 << 6)	/* Map NL to CR on input.  */
-#define	IGNCR	(1 << 7)	/* Ignore CR.  */
-#define	ICRNL	(1 << 8)	/* Map CR to NL on input.  */
-#define	IXON	(1 << 9)	/* Enable start/stop output control.  */
-#define	IXOFF	(1 << 10)	/* Enable start/stop input control.  */
-#define IXANY	(1 << 11)	/* Any character will restart after stop.  */
-#define IMAXBEL (1 << 13)	/* Ring bell when input queue is full.  */
+/* c_iflag bits */
+#define IGNBRK	0000001
+#define BRKINT	0000002
+#define IGNPAR	0000004
+#define PARMRK	0000010
+#define INPCK	0000020
+#define ISTRIP	0000040
+#define INLCR	0000100
+#define IGNCR	0000200
+#define ICRNL	0000400
+#define IXON	0001000
+#define IXOFF	0002000
+#define IXANY	0004000
+#define IMAXBEL	0020000
 
-
-  /* Output modes.  */
+/* c_oflag bits */
 #define	OPOST	(1 << 0)	/* Perform output processing.  */
 #define	ONLCR	(1 << 1)	/* Map NL to CR-NL on output.  */
 #if defined __USE_MISC || defined __USE_XOPEN
@@ -110,8 +128,7 @@ struct termios
 #define	ONOCR	(1 << 5)	/* no CR output at column 0 */
 #define	ONLRET	(1 << 6)	/* NL performs CR function */
 
-
-  /* Control modes.  */
+/* c_cflag bit meaning */
 #ifdef	__USE_BSD
 # define CIGNORE	(1 << 0)	/* Ignore these control flags.  */
 #endif
@@ -136,7 +153,7 @@ struct termios
 # define MDMBUF		(1 << 20)	/* Carrier flow control of output.  */
 #endif
 
-  /* Local modes.  */
+/* c_lflag bits */
 #ifdef	__USE_BSD
 # define ECHOKE	(1 << 0)	/* Visual erase for KILL.  */
 #endif
@@ -172,33 +189,6 @@ struct termios
 #endif
 #define	_NOFLSH	(1 << 31)	/* Disable flush after interrupt.  */
 #define	NOFLSH	_NOFLSH
-
-  /* Control characters.  */
-#define	VEOF	0		/* End-of-file character [ICANON].  */
-#define	VEOL	1		/* End-of-line character [ICANON].  */
-#define VEOL2	2		/* Second EOL character [ICANON].  */
-#define	VERASE	3		/* Erase character [ICANON].  */
-#define VWERASE 4		/* Word-erase character [ICANON].  */
-#define	VKILL	5		/* Kill-line character [ICANON].  */
-#define VREPRINT 6		/* Reprint-line character [ICANON].  */
-#ifdef __USE_BSD
-# define VERASE2 7		/* [ICANON] */
-#endif
-#define	VINTR	8		/* Interrupt character [ISIG].  */
-#define	VQUIT	9		/* Quit character [ISIG].  */
-#define	VSUSP	10		/* Suspend character [ISIG].  */
-#ifdef	__USE_BSD
-# define VDSUSP	11		/* Delayed suspend character [ISIG].  */
-#endif
-#define	VSTART	12		/* Start (X-ON) character [IXON, IXOFF].  */
-#define	VSTOP	13		/* Stop (X-OFF) character [IXON, IXOFF].  */
-#define VLNEXT	14		/* Literal-next character [IEXTEN].  */
-#define VDISCARD 15		/* Discard character [IEXTEN].  */
-#define	VMIN	16		/* Minimum number of bytes read at once [!ICANON].  */
-#define	VTIME	17		/* Time-out value (tenths of a second) [!ICANON].  */
-#ifdef	__USE_BSD
-# define VSTATUS 18		/* Status character [ICANON].  */
-#endif
 
   /* Input and output baud rates.  */
 #define	B0	0		/* Hang up.  */
@@ -242,23 +232,22 @@ struct termios
 #define	B4000000 4000000
 #define	__MAX_BAUD B4000000
 
+/* tcflow() and TCXONC use these */
+#define	TCOOFF		1
+#define	TCOON		2
+#define	TCIOFF		3
+#define	TCION		4
 
-/* Values for the OPTIONAL_ACTIONS argument to `tcsetattr'.  */
-#define	TCSANOW		0	/* Change immediately.  */
-#define	TCSADRAIN	1	/* Change when pending output is written.  */
-#define	TCSAFLUSH	2	/* Flush pending input before changing.  */
+/* tcflush() and TCFLSH use these */
+#define	TCIFLUSH	1
+#define	TCOFLUSH	2
+#define	TCIOFLUSH	3
+
+/* tcsetattr uses these */
+#define	TCSANOW		0
+#define	TCSADRAIN	1
+#define	TCSAFLUSH	2
 #ifdef	__USE_BSD
 # define TCSASOFT	0x10	/* Flag: Don't alter hardware state.  */
 #endif
-
-/* Values for the QUEUE_SELECTOR argument to `tcflush'.  */
-#define	TCIFLUSH	1	/* Discard data received but not yet read.  */
-#define	TCOFLUSH	2	/* Discard data written but not yet sent.  */
-#define	TCIOFLUSH	3	/* Discard all pending data.  */
-
-/* Values for the ACTION argument to `tcflow'.  */
-#define	TCOOFF	1		/* Suspend output.  */
-#define	TCOON	2		/* Restart suspended output.  */
-#define	TCIOFF	3		/* Send a STOP character.  */
-#define	TCION	4		/* Send a START character.  */
 
