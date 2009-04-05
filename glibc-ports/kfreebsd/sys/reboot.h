@@ -31,7 +31,9 @@
  */
 
 #ifndef _SYS_REBOOT_H_
-#define	_SYS_REBOOT_H_
+#define	_SYS_REBOOT_H_	1
+
+#include <features.h>
 
 /*
  * Arguments to reboot system call.  These are passed to
@@ -62,5 +64,12 @@
 #define	RB_MULTIPLE	0x20000000	/* use multiple consoles */
 
 #define	RB_BOOTINFO	0x80000000	/* have `struct bootinfo *' arg */
+
+__BEGIN_DECLS
+
+/* Reboot or halt the system.  */
+extern int reboot (int __howto) __THROW;
+
+__END_DECLS
 
 #endif
