@@ -18,6 +18,8 @@ fi
 # restore f-i's /etc/fstab, and add linprocfs
 mv /etc/fstab.freebsd /etc/fstab
 echo "null			/proc		linprocfs	rw	0	0" >> /etc/fstab
+echo "null			/sys		linsyscfs	rw	0	0" >> /etc/fstab
+echo "null			/dev/fd		fdescfs 	rw	0	0" >> /etc/fstab
 
 # cleanup
 rm -rf /stand /native-install `which $0`
