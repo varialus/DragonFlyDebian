@@ -21,7 +21,8 @@ Package: freebsd-utils
 Priority: required
 Essential: yes
 Architecture: kfreebsd-i386 kfreebsd-amd64
-Depends: ${shlibs:Depends}, freebsd-hackedutils (>= 6.1-1), ufsutils
+Depends: ${shlibs:Depends}, ${misc:Depends}, ufsutils
+Suggests: freebsd-hackedutils (>= 6.1-1)
 Conflicts: inetutils-tools (<= 2:1.4.3+20051212-4)
 Replaces: freebsd-hackedutils (<= 6.1-1)
 Description: FreeBSD utilities needed for GNU/kFreeBSD
@@ -30,7 +31,7 @@ Description: FreeBSD utilities needed for GNU/kFreeBSD
 Package: module-init-tools
 Priority: important
 Architecture: kfreebsd-i386 kfreebsd-amd64
-Depends: ${shlibs:Depends}, debconf, kfreebsd-image
+Depends: ${shlibs:Depends}, ${misc:Depends}, debconf, kfreebsd-image
 Replaces: kldutils (<< 6.0-2.really.5.4-0.6), freebsd-utils (<= 5.2.1-16),
  freebsd-hackedutils (<= 6.1-1), kfreebsd-common (<< 6.1-6)
 Description: tools for managing kFreeBSD modules
@@ -40,7 +41,7 @@ Description: tools for managing kFreeBSD modules
 Package: kldutils
 Priority: extra
 Architecture: all
-Depends: module-init-tools
+Depends: module-init-tools, ${misc:Depends}
 Description: Transitional package to module-init-tools
  Transitional package depending on module-init-tools.
  .
@@ -49,7 +50,7 @@ Description: Transitional package to module-init-tools
 Package: kfreebsd-common
 Priority: extra
 Architecture: all
-Depends: module-init-tools (>= 6.1-6), freebsd-utils (>= 6.1-6)
+Depends: ${misc:Depends}, module-init-tools (>= 6.1-6), freebsd-utils (>= 6.1-6)
 Description: Transitional package to module-init-tools and freebsd-utils
  Transitional package depending on module-init-tools and freebsd-utils.
  .
@@ -57,7 +58,7 @@ Description: Transitional package to module-init-tools and freebsd-utils
 
 Package: kbdcontrol
 Architecture: kfreebsd-i386 kfreebsd-amd64
-Depends: ${shlibs:Depends}, debconf
+Depends: ${shlibs:Depends}, ${misc:Depends}, debconf
 Description: Command line tool to change keyboard layout
  Original FreeBSD command to set keyboard layout and the FreeBSD possible
  keyboards.
@@ -66,8 +67,7 @@ Package: net-tools
 Section: net
 Priority: important
 Architecture: kfreebsd-i386 kfreebsd-amd64
-Depends: ${shlibs:Depends}, libc0.1 (>= 2.7-13)
-# libc0.1 for ifconfig fixed in 2.7-13 (getifaddrs family)
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Replaces: freebsd-utils (<< 5.4), freebsd-hackedutils (<= 6.1-1)
 Description: FreeBSD networking tools
  This package contains the FreeBSD tools needed to manage networking on
