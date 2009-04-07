@@ -79,11 +79,17 @@ build-indep-stamp:
 clean:
 	dh_testdir
 	dh_testroot
+	$(PMAKE) -C $(CURDIR)/lib/libcam clean
+	$(PMAKE) -C $(CURDIR)/lib/libdevstat clean
+	$(PMAKE) -C $(CURDIR)/lib/libgeom clean
+	$(PMAKE) -C $(CURDIR)/lib/libipx clean
+	$(PMAKE) -C $(CURDIR)/lib/libkiconv clean
+	$(PMAKE) -C $(CURDIR)/lib/libkvm clean
+	$(PMAKE) -C $(CURDIR)/lib/libsbuf clean
+	$(PMAKE) -C $(CURDIR)/lib/libusbhid clean
+	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
+	rm -rf .pc
 	rm -f *stamp
-
-	# Add here commands to clean up after the build process.
-	rm -rf patch $(KERN_DIR)
-
 	dh_clean 
 
 install: install-indep install-arch
