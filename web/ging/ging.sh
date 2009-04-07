@@ -40,7 +40,7 @@ sed -i ${tmp}/boot/beastie.4th -e "s/Debian/${distribution}/g"
 
 cat > ${tmp}/boot/loader.conf << EOF
 loader_color="YES"
-hw.ata.atapi_dma=1
+hw.ata.atapi_dma=0 # slower than enabled (1), but working on qemu
 mfsroot_load="YES"
 mfsroot_type="mfs_root"
 mfsroot_name="/boot/mfsroot"
