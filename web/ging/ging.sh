@@ -30,9 +30,6 @@ tmp=`mktemp -d`
 
 # get kernel and loader from cloop image (FIXME: exclude this from cloop!)
 cp -a ${pwd}/tmp/boot ${tmp}/
-if [ "${OPTS}" != "qemu" ] ; then
-  ${gzip} ${tmp}/boot/kernel/kernel
-fi
 
 # shut up silly warning
 if test -e ${tmp}/boot/kernel/linker.hints ; then
