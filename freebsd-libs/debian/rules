@@ -42,39 +42,53 @@ get-orig-source:
 patch: patch-stamp
 patch-stamp:
 	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
-	touch patch-stamp
+	touch $@
 
-build-arch: build-arch-stamp
-build-arch-stamp: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-devstat
-	touch build-arch-stamp
+build-arch: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-devstat
 
-build-cam: build-sbuf patch 
+build-cam: build-cam-stamp
+build-cam-stamp: patch build-sbuf
 	$(PMAKE) -C $(CURDIR)/lib/libcam
+	touch $@
 
-build-geom: build-sbuf patch
+build-geom: build-geom-stamp
+build-geom-stamp: patch build-sbuf
 	$(PMAKE) -C $(CURDIR)/lib/libgeom
+	touch $@
 
-build-ipx: patch
+build-ipx: build-ipx-stamp
+build-ipx-stamp: patch
 	$(PMAKE) -C $(CURDIR)/lib/libipx
+	touch $@
 
-build-kiconv: patch
+build-kiconv: build-kiconv-stamp
+build-kiconv-stamp: patch
 	$(PMAKE) -C $(CURDIR)/lib/libkiconv
+	touch $@
 
-build-kvm: patch
+build-kvm: build-kvm-stamp
+build-kvm-stamp: patch
 	$(PMAKE) -C $(CURDIR)/lib/libkvm
+	touch $@
 
-build-devstat: patch build-kvm
+build-devstat: build-devstat-stamp
+build-devstat-stamp: patch build-kvm
 	$(PMAKE) -C $(CURDIR)/lib/libdevstat
+	touch $@
 
-build-sbuf: patch
+build-sbuf: build-sbuf-stamp
+build-sbuf-stamp: patch
 	$(PMAKE) -C $(CURDIR)/lib/libsbuf
+	touch $@
 
-build-usbhid: patch
+build-usbhid: build-usbhid-stamp
+build-usbhid-stamp: patch
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid
+	touch $@
 
 build-indep: build-indep-stamp
 build-indep-stamp:
-	touch build-indep-stamp
+	touch $@
 
 clean:
 	dh_testdir
