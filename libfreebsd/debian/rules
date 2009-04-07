@@ -19,10 +19,14 @@ endif
 lib := libfreebsd0
 libdbg := $(lib)-dbg
 
-build:
+build-indep:
+
+build-arch:
 	dh_testdir
 	
 	$(MAKE)
+
+build: build-indep build-arch
 
 clean:
 	dh_testdir
@@ -32,7 +36,7 @@ clean:
 	
 	dh_clean
 
-install: build
+install-arch: build-arch
 	dh_testdir
 	dh_testroot
 	dh_prep
@@ -40,10 +44,10 @@ install: build
 	
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 
-binary-indep: build install
+binary-indep:
 # Nothing to do.
 
-binary-arch: build install
+binary-arch: install-arch
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs
