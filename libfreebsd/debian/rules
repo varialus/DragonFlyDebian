@@ -16,6 +16,9 @@ else
 	CFLAGS += -O2
 endif
 
+lib := libfreebsd0
+libdbg := $(lib)-dbg
+
 build:
 	dh_testdir
 	
@@ -48,7 +51,7 @@ binary-arch: build install
 	dh_installexamples
 	dh_install --sourcedir=debian/tmp
 	dh_link
-	dh_strip
+	dh_strip --dbg-package=$(libdbg)
 	dh_compress
 	dh_fixperms
 	dh_makeshlibs
