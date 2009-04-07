@@ -35,9 +35,8 @@ for i in \
   /bin/sh /bin/bash \
     /lib/ld.so.1 /lib/libc.so.0.1 /lib/libncurses.so.5 /lib/libdl.so.2 \
   /sbin/mdconfig \
-    /libexec/ld-elf.so.1 /lib/libc.so.5 \
   /sbin/mount_cd9660 \
-    /lib/libkiconv.so.1 \
+    /usr/lib/libkiconv.so.3 \
   ${NULL}
 do
   mkdir -p ${mnt}/$i
