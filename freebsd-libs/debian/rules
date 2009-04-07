@@ -17,61 +17,60 @@ else
 	CFLAGS += -O2
 endif
 
-SRC_DIR=src
-KERNEL_SRC=kfreebsd-source-7.1
+ANONCVS=anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
+RELENG=RELENG_7_1_0_RELEASE
+VERSION=7.1
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
 export SHLIB_MAJOR=0
 export SHLIBDIR=/usr/lib
 
-$(SRC_DIR):
-	tar -xzf $(CURDIR)/src.tar.gz
-	tar -C $(SRC_DIR)/lib -xjf /usr/src/$(KERNEL_SRC).tar.bz2 $(KERNEL_SRC)/sys/kern/subr_sbuf.c $(KERNEL_SRC)/sys/cam
-	mv $(SRC_DIR)/lib/$(KERNEL_SRC) $(SRC_DIR)/lib/kernel
-
-	find $(SRC_DIR) -type f | (set -e ; while read i ; do sed -i $$i \
-		-e "/^__FBSDID/d" \
-		-e "s/[ \t]*__\(dead2\|unused\|result\\)[ \t]*//g" \
-		-e "s,<sys/queue\.h>,<bsd/queue.h>,g" \
-		-e "s/^LDADD=/LDADD+=/g" \
-		-e "s/getline/bsd_&/g" \
-	; done)
-	
-	set -e ; for i in $(CURDIR)/debian/patches/*.diff ; do \
-		echo "--- Patch $$i ---" ; \
-		patch -p1 -d $(SRC_DIR)/lib < $$i ; \
-	done
-
 build: build-arch build-indep
+
+get-orig-source:
+	rm -rf freebsd-libs-$(VERSION)
+	for i in lib/libcam lib/libdevstat lib/libgeom lib/libipx lib/libkiconv \
+	         lib/libkvm lib/libsbuf lib/libusbhid sys/cam sys/kern/subr_sbuf.c ; do \
+	    cvs -d $(ANONCVS) export -r $(RELENG) -N -d freebsd-libs-$(VERSION) src/$$i ; \
+	done
+	mv freebsd-libs-$(VERSION)/src/* freebsd-libs-$(VERSION)
+	rmdir freebsd-libs-$(VERSION)/src
+	tar -czf ../freebsd-libs_$(VERSION).orig.tar.gz freebsd-libs-$(VERSION)
+	rm -rf freebsd-libs-$(VERSION)
+
+patch: patch-stamp
+patch-stamp:
+	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
+	touch patch-stamp
 
 build-arch: build-arch-stamp
 build-arch-stamp: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-devstat
 	touch build-arch-stamp
 
-build-cam: build-sbuf $(SRC_DIR)
-	LDADD="-lbsd" $(PMAKE) -C $(SRC_DIR)/lib/libcam
+build-cam: build-sbuf patch 
+	$(PMAKE) -C $(CURDIR)/lib/libcam
 
-build-geom: build-sbuf $(SRC_DIR)
-	LDADD="-lbsd -lfreebsd" $(PMAKE) -C $(SRC_DIR)/lib/libgeom
+build-geom: build-sbuf patch
+	$(PMAKE) -C $(CURDIR)/lib/libgeom
 
-build-ipx: $(SRC_DIR)
-	$(PMAKE) -C $(SRC_DIR)/lib/libipx
+build-ipx: patch
+	$(PMAKE) -C $(CURDIR)/lib/libipx
 
-build-kiconv: $(SRC_DIR)
-	LDADD="-lfreebsd" $(PMAKE) -C $(SRC_DIR)/lib/libkiconv
+build-kiconv: patch
+	$(PMAKE) -C $(CURDIR)/lib/libkiconv
 
-build-kvm: $(SRC_DIR)
-	LDADD="-lbsd -lfreebsd" $(PMAKE) -C $(SRC_DIR)/lib/libkvm
+build-kvm: patch
+	$(PMAKE) -C $(CURDIR)/lib/libkvm
 
-build-devstat: $(SRC_DIR) build-kvm
-	LDADD="-lfreebsd" $(PMAKE) -C $(SRC_DIR)/lib/libdevstat
+build-devstat: patch build-kvm
+	$(PMAKE) -C $(CURDIR)/lib/libdevstat
 
-build-sbuf: $(SRC_DIR)
-	$(PMAKE) -C $(SRC_DIR)/lib/libsbuf
+build-sbuf: patch
+	$(PMAKE) -C $(CURDIR)/lib/libsbuf
 
-build-usbhid: $(SRC_DIR)
-	LDADD="-lbsd" $(PMAKE) -C $(SRC_DIR)/lib/libusbhid
+build-usbhid: patch
+	$(PMAKE) -C $(CURDIR)/lib/libusbhid
 
 build-indep: build-indep-stamp
 build-indep-stamp:
@@ -80,10 +79,10 @@ build-indep-stamp:
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-arch-stamp build-indep-stamp
+	rm -f *stamp
 
 	# Add here commands to clean up after the build process.
-	rm -rf $(SRC_DIR) $(KERN_DIR)
+	rm -rf patch $(KERN_DIR)
 
 	dh_clean 
 
@@ -97,14 +96,14 @@ install-arch:
 	dh_installdirs -s
 
 	mkdir -p $(DESTDIR)/usr/{lib,include,share/man/man3}
-	$(PMAKE) -C $(SRC_DIR)/lib/libsbuf install
-	$(PMAKE) -C $(SRC_DIR)/lib/libcam install
-	$(PMAKE) -C $(SRC_DIR)/lib/libgeom install
-	$(PMAKE) -C $(SRC_DIR)/lib/libipx install
-	$(PMAKE) -C $(SRC_DIR)/lib/libkiconv install
-	$(PMAKE) -C $(SRC_DIR)/lib/libkvm install
-	$(PMAKE) -C $(SRC_DIR)/lib/libdevstat install
-	$(PMAKE) -C $(SRC_DIR)/lib/libusbhid install
+	$(PMAKE) -C $(CURDIR)/lib/libsbuf install
+	$(PMAKE) -C $(CURDIR)/lib/libcam install
+	$(PMAKE) -C $(CURDIR)/lib/libgeom install
+	$(PMAKE) -C $(CURDIR)/lib/libipx install
+	$(PMAKE) -C $(CURDIR)/lib/libkiconv install
+	$(PMAKE) -C $(CURDIR)/lib/libkvm install
+	$(PMAKE) -C $(CURDIR)/lib/libdevstat install
+	$(PMAKE) -C $(CURDIR)/lib/libusbhid install
 
 	dh_install -s --list-missing --sourcedir=debian/tmp
 

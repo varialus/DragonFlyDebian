@@ -6,25 +6,11 @@ diff -ur lib.old/libcam/Makefile lib/libcam/Makefile
  INCS=		camlib.h
  
 -DPADD=		${LIBSBUF}
--LDADD+=		-lsbuf
-+LDADD+=		-L../libsbuf/ -lsbuf
+-LDADD=		-lsbuf
++LDADD=		-L../libsbuf/ -lsbuf -lbsd
  
  MAN=		cam.3 cam_cdbparse.3
  
-@@ -34,9 +33,11 @@
- 		cam_cdbparse.3 csio_encode_visit.3 \
- 		cam_cdbparse.3 buff_encode_visit.3
- 
--.PATH:		${.CURDIR}/../../sys/cam/scsi ${.CURDIR}/../../sys/cam
-+KERNEL=		${.CURDIR}/../kernel
- 
--SDIR=		${.CURDIR}/../../sys
-+.PATH:		${KERNEL}/sys/cam/scsi ${KERNEL}/sys/cam
-+
-+SDIR=		${KERNEL}/sys
- CFLAGS+=	-I${.CURDIR} -I${SDIR}
- 
- .include <bsd.lib.mk>
 diff -ur lib.old/libcam/camlib.h lib/libcam/camlib.h
 --- lib.old/libcam/camlib.h	2006-04-19 09:40:00.000000000 +0200
 +++ lib/libcam/camlib.h	2006-04-19 09:38:34.000000000 +0200
@@ -54,3 +40,4 @@ diff -ur lib.old/libcam/camlib.h lib/libcam/camlib.h
  int buff_encode_visit(u_int8_t *buff, size_t len, const char *fmt,
  		      int (*arg_get)(void *hook, char *field_name),
  		      void *gethook);
+

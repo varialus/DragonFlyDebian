@@ -1,6 +1,5 @@
-diff -ur lib.old/kernel/sys/cam/cam.c lib/kernel/sys/cam/cam.c
---- lib.old/kernel/sys/cam/cam.c	2003-06-15 00:17:38.000000000 +0200
-+++ lib/kernel/sys/cam/cam.c	2005-08-15 08:18:42.000000000 +0200
+--- a/sys/cam/cam.c	2003-06-15 00:17:38.000000000 +0200
++++ b/sys/cam/cam.c	2005-08-15 08:18:42.000000000 +0200
 @@ -37,6 +37,7 @@
  #include <sys/sysctl.h>
  #else /* _KERNEL */
@@ -9,9 +8,8 @@ diff -ur lib.old/kernel/sys/cam/cam.c lib/kernel/sys/cam/cam.c
  #include <stdio.h>
  #endif /* _KERNEL */
  
-diff -ur lib.old/kernel/sys/cam/scsi/scsi_all.c lib/kernel/sys/cam/scsi/scsi_all.c
---- lib.old/kernel/sys/cam/scsi/scsi_all.c	2004-08-13 20:45:04.000000000 +0200
-+++ lib/kernel/sys/cam/scsi/scsi_all.c	2005-08-15 08:21:32.000000000 +0200
+--- a/sys/cam/scsi/scsi_all.c	2004-08-13 20:45:04.000000000 +0200
++++ b/sys/cam/scsi/scsi_all.c	2005-08-15 08:21:32.000000000 +0200
 @@ -41,6 +41,7 @@
  #include <sys/sysctl.h>
  #else
@@ -20,9 +18,8 @@ diff -ur lib.old/kernel/sys/cam/scsi/scsi_all.c lib/kernel/sys/cam/scsi/scsi_all
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
-diff -ur lib.old/kernel/sys/cam/scsi/scsi_all.h lib/kernel/sys/cam/scsi/scsi_all.h
---- lib.old/kernel/sys/cam/scsi/scsi_all.h	2003-04-30 02:35:22.000000000 +0200
-+++ lib/kernel/sys/cam/scsi/scsi_all.h	2005-08-15 08:22:30.000000000 +0200
+--- a/sys/cam/scsi/scsi_all.h	2003-04-30 02:35:22.000000000 +0200
++++ b/sys/cam/scsi/scsi_all.h	2005-08-15 08:22:30.000000000 +0200
 @@ -32,6 +32,8 @@
   * bus reset.
   */
@@ -32,3 +29,14 @@ diff -ur lib.old/kernel/sys/cam/scsi/scsi_all.h lib/kernel/sys/cam/scsi/scsi_all
  #endif /* _KERNEL */
  
  /*
+--- a/sys/cam/cam_xpt.c.orig	2009-04-07 11:48:37 +0200
++++ b/sys/cam/cam_xpt.c	2009-04-07 11:48:51 +0200
+@@ -779,7 +779,7 @@
+ static void	 xpt_run_dev_allocq(struct cam_eb *bus);
+ static void	 xpt_run_dev_sendq(struct cam_eb *bus);
+ static timeout_t xpt_release_devq_timeout;
+-static void	 xpt_release_simq_timeout(void *arg) __unused;
++static void	 xpt_release_simq_timeout(void *arg);
+ static void	 xpt_release_bus(struct cam_eb *bus);
+ static void	 xpt_release_devq_device(struct cam_ed *dev, u_int count,
+ 					 int run_queue);

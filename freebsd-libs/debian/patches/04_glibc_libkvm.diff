@@ -196,3 +196,33 @@ diff -ur lib.old/libkvm/kvm_proc.c lib/libkvm/kvm_proc.c
  }
  
  /*
+--- lib/libkvm/kvm.c.orig	2009-04-07 11:40:09 +0200
++++ lib/libkvm/kvm.c	2009-04-07 11:40:32 +0200
+@@ -243,7 +243,7 @@
+ kvm_openfiles(uf, mf, sf, flag, errout)
+ 	const char *uf;
+ 	const char *mf;
+-	const char *sf __unused;
++	const char *sf;
+ 	int flag;
+ 	char *errout;
+ {
+@@ -262,7 +262,7 @@
+ kvm_open(uf, mf, sf, flag, errstr)
+ 	const char *uf;
+ 	const char *mf;
+-	const char *sf __unused;
++	const char *sf;
+ 	int flag;
+ 	const char *errstr;
+ {
+--- lib/libkvm/Makefile.orig	2009-04-07 11:42:07 +0200
++++ lib/libkvm/Makefile	2009-04-07 11:42:27 +0200
+@@ -2,6 +2,7 @@
+ # $FreeBSD: src/lib/libkvm/Makefile,v 1.17.2.2.2.1 2008/11/25 02:59:29 kensmith Exp $
+ 
+ LIB=	kvm
++LDADD= -lbsd -lfreebsd
+ SHLIBDIR?= /lib
+ 
+ .if ${MACHINE} == "sun4v"
