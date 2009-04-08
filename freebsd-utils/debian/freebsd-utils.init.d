@@ -84,7 +84,7 @@ case "$1" in
     
     echo "done."
     
-    # This syctl is (suposedly) correct in kernel, but kfreebsd-loader enjoys messing with it
+    # This syctl is (supposedly) correct in kernel, but kfreebsd-loader enjoys messing with it
     sysctl "kern.module_path=/lib/modules/`uname -r`;/boot/kernel"
     
     if test -f /etc/mtab && ! test -h /etc/mtab ; then
