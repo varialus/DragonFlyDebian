@@ -29,6 +29,9 @@ __BEGIN_DECLS
    This call is restricted to the super-user.  */
 extern int swapon (__const char *__path) __THROW;
 
+/* Stop using block special device PATH for swapping.  */
+extern int swapoff (__const char *__path) __THROW;
+
 __END_DECLS
 
 #endif /* sys/swap.h */
