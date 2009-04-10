@@ -92,7 +92,17 @@ case "$1" in
       rm -f /etc/mtab
     fi
     ln -sf /proc/mounts /etc/mtab
-    
+
+    # Mount /dev/fd, /proc and /sys
+    if ! mount | grep -q "on /proc (linprocfs" ; then
+      mount -t linprocfs proc /proc
+    fi
+    if ! mount | grep -q "on /sys (linsysfs" ; then
+      mount -t linsysfs sys /sys
+    fi
+    if ! mount | grep -q "on /dev/fd (fdescfs" ; then
+      mount -t fdescfs fdescfs /dev/fd
+    fi
     ;;
 
   stop|reload|restart|force-reload)
