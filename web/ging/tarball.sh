@@ -31,7 +31,7 @@ fi
 # crosshurd downloads some packages but doesn't extract them; work
 # around extracting them manually; chroot is needed (or perhaps we can
 # do without it, I don't know)
-chroot ./tmp dpkg --force-depends -i var/cache/apt/archives/libc0.1_2.9-6_kfreebsd-i386.deb
+chroot ./tmp dpkg --force-depends -i var/cache/apt/archives/libc0.1_2.9-7_kfreebsd-i386.deb
 chroot ./tmp dpkg -i var/cache/apt/archives/gcc-4.3-base_4.3.3-5_kfreebsd-i386.deb
 chroot ./tmp dpkg -i var/cache/apt/archives/libgcc1_1%3a4.3.3-5_kfreebsd-i386.deb
 chroot ./tmp dpkg -i var/cache/apt/archives/libfreebsd0_0.0-5_kfreebsd-i386.deb
