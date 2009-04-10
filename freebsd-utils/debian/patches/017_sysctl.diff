@@ -1,0 +1,30 @@
+---
+ sbin/sysctl/sysctl.c |    3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/sbin/sysctl/sysctl.c
++++ b/sbin/sysctl/sysctl.c
+@@ -57,6 +57,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <time.h>
+ 
+ static int	aflag, bflag, dflag, eflag, hflag, Nflag, nflag, oflag;
+ static int	qflag, xflag;
+@@ -338,6 +339,7 @@
+ static int
+ S_loadavg(int l2, void *p)
+ {
++#if 0
+ 	struct loadavg *tv = (struct loadavg*)p;
+ 
+ 	if (l2 != sizeof(*tv)) {
+@@ -348,6 +350,7 @@
+ 		(double)tv->ldavg[0]/(double)tv->fscale,
+ 		(double)tv->ldavg[1]/(double)tv->fscale,
+ 		(double)tv->ldavg[2]/(double)tv->fscale);
++#endif
+ 	return (0);
+ }
+ 

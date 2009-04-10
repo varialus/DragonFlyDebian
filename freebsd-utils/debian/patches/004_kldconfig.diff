@@ -1,0 +1,41 @@
+---
+ sbin/kldconfig/kldconfig.c |   12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
+
+--- a/sbin/kldconfig/kldconfig.c
++++ b/sbin/kldconfig/kldconfig.c
+@@ -40,14 +40,8 @@
+ #include <string.h>
+ #include <unistd.h>
+ 
+-#if defined(__FreeBSD_version)
+-#if __FreeBSD_version < 500000
+-#define NEED_SLASHTERM
+-#endif /* < 500000 */
+-#else  /* defined(__FreeBSD_version) */
+-/* just in case.. */
+-#define NEED_SLASHTERM
+-#endif /* defined(__FreeBSD_version) */
++#include <bsd/string.h>
++extern int sysctlnametomib(const char *name, int *mibp, size_t *sizep);
+ 
+ /* the default sysctl name */
+ #define PATHCTL	"kern.module_path"
+@@ -208,7 +202,7 @@
+ 
+ /* Remove a path component from the module search path */
+ static void
+-rempath(struct pathhead *pathq, char *path, int force, int insert __unused)
++rempath(struct pathhead *pathq, char *path, int force, int insert)
+ {
+ 	char pathbuf[MAXPATHLEN+1];
+ 	struct pathentry *pe;
+--- a/sbin/kldconfig/Makefile
++++ b/sbin/kldconfig/Makefile
+@@ -29,5 +29,6 @@
+ PROG=		kldconfig
+ MAN=		kldconfig.8
+ WARNS?=		5
++LDADD=		-lbsd -lfreebsd
+ 
+ .include <bsd.prog.mk>

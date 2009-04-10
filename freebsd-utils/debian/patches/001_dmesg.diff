@@ -1,0 +1,34 @@
+---
+ sbin/dmesg/dmesg.c |    7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+--- a/sbin/dmesg/dmesg.c
++++ b/sbin/dmesg/dmesg.c
+@@ -68,7 +68,7 @@
+ 	{ NULL, 0, 0, 0, 0 },
+ };
+ 
+-void usage(void) __dead2;
++void usage(void);
+ 
+ #define	KREAD(addr, var) \
+ 	kvm_read(kd, addr, &var, sizeof(var)) != sizeof(var)
+@@ -86,7 +86,7 @@
+ 	all = 0;
+ 	(void) setlocale(LC_CTYPE, "");
+ 	memf = nlistf = NULL;
+-	while ((ch = getopt(argc, argv, "aM:N:")) != -1)
++	while ((ch = getopt(argc, argv, "aM:N:s:n:")) != -1)
+ 		switch(ch) {
+ 		case 'a':
+ 			all++;
+@@ -97,6 +97,9 @@
+ 		case 'N':
+ 			nlistf = optarg;
+ 			break;
++		case 's':
++		case 'n':
++			break;
+ 		case '?':
+ 		default:
+ 			usage();

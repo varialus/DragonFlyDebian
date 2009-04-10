@@ -1,85 +1,210 @@
 #!/usr/bin/make -f
 # Sample debian/rules that uses cdbs.  Originaly written by Robert Millan.
 # This file is public domain.
-  
-DEB_TAR_SRCDIR                  := src
-DEB_AUTO_CLEANUP_RCS            := yes
-DEB_UPDATE_RCD_PARAMS_freebsd-utils	:= "start 20 S ."
-DEB_UPDATE_RCD_PARAMS_module-init-tools	:= "start 20 S ."
-DEB_UPDATE_RCD_PARAMS_kbdcontrol	:= "start 48 S ."
 
-package=freebsd-utils
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
-SHELL:=bash
+CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)='
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+ANONCVS=anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
+RELENG=RELENG_7_1_0_RELEASE
+VERSION=7.1
 PATH:=/usr/lib/freebsd:$(PATH)
-PMAKE=make COPTS="-D_GNU_SOURCE" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
-export LDADD=-lfreebsd -lbsd
+DESTDIR=$(CURDIR)/debian/tmp
+PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+#export LDADD=-lfreebsd -lbsd
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/rules/tarball.mk
-include /usr/share/cdbs/1/rules/patchsys-quilt.mk
+build: build-arch build-indep
 
-build/gbde:: apply-patches
-	set -e ; for i in sbin/gbde \
+get-orig-source:
+	rm -rf freebsd-utils-$(VERSION)
+	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
+		 usr.sbin/jail bin/chflags \
+		 sbin/kldconfig sbin/kldload sbin/kldstat sbin/kldunload \
+		 sbin/ifconfig sbin/route usr.bin/netstat usr.sbin/rpc.umntall \
+	         usr.sbin/ppp usr.sbin/pppctl usr.sbin/pppd \
+		 sbin/ipfw contrib/pf sbin/pfctl usr.sbin/authpf \
+		 sbin/mount_std sbin/umount sbin/mount_autofs sbin/mount_cd9660 \
+		 sbin/mount_ext2fs sbin/mount_msdosfs sbin/mount_nfs sbin/mount_ntfs \
+		 sbin/mount_nullfs sbin/mount_udf sbin/mount_unionfs \
+		 sbin/mount_autofs sbin/mount_reiserfs sbin/mount \
+		 sbin/mdconfig sbin/ccdconfig sbin/swapon \
+	         sbin/gbde sbin/geom \
+		 usr.sbin/kbdcontrol share/syscons/keymaps \
 	; do \
-		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
+	    cvs -d $(ANONCVS) export -r $(RELENG) -N -d freebsd-utils-$(VERSION) src/$$i ; \
 	done
+	mv freebsd-utils-$(VERSION)/src/* freebsd-utils-$(VERSION)
+	rmdir freebsd-utils-$(VERSION)/src
+	tar -czf ../freebsd-utils_$(VERSION).orig.tar.gz freebsd-utils-$(VERSION)
+	rm -rf freebsd-utils-$(VERSION)
 
-build/geli:: apply-patches
-	set -e ; for i in sbin/geom/class/eli \
-	; do \
-		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
-	done
+patch: patch-stamp
+patch-stamp:
+	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
+	touch $@
 
-build/freebsd-utils:: apply-patches
-	set -e ; for i in sbin/{ccdconfig,dmesg,mdconfig,mount,mount_std,umount,swapon,sysctl} usr.sbin/rpc.umntall \
-		sbin/mount_{autofs,cd9660,ext2fs,hpfs,msdosfs,ntfs,nullfs,reiserfs,udf,unionfs} \
-		usr.bin/ktrace \
-	; do \
-		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
-	done
-# FIXME: add mount_{xfs,nfs},chflags
+build-arch: freebsd-utils gbde geli kbdcontrol module-init-tools net-tools
 
-build/module-init-tools:: apply-patches
-	set -e ; for i in sbin/kld{load,stat,unload,config} \
-	; do \
-		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
-	done
+freebsd-utils: freebsd-utils-stamp
+freebsd-utils-stamp: patch-stamp
+#	$(PMAKE) -C bin/chflags
+	$(PMAKE) -C sbin/ccdconfig
+	$(PMAKE) -C sbin/dmesg
+	$(PMAKE) -C sbin/mdconfig
+	$(PMAKE) -C sbin/mount
+	$(PMAKE) -C sbin/mount_autofs
+	$(PMAKE) -C sbin/mount_cd9660
+	$(PMAKE) -C sbin/mount_ext2fs
+	$(PMAKE) -C sbin/mount_hpfs
+	$(PMAKE) -C sbin/mount_msdosfs
+#	$(PMAKE) -C sbin/mount_nfs
+	$(PMAKE) -C sbin/mount_ntfs
+	$(PMAKE) -C sbin/mount_nullfs
+	$(PMAKE) -C sbin/mount_reiserfs
+	$(PMAKE) -C sbin/mount_udf
+	$(PMAKE) -C sbin/mount_unionfs
+	$(PMAKE) -C sbin/mount_std
+	$(PMAKE) -C sbin/swapon
+	$(PMAKE) -C sbin/sysctl 
+	$(PMAKE) -C sbin/umount
+#	$(PMAKE) -C usr.bin/kdump
+	$(PMAKE) -C usr.bin/ktrace
+	$(PMAKE) -C usr.sbin/rpc.umntall
+	touch $@
 
-build/net-tools:: apply-patches
-	cp -p pf_ruleset.c build-tree/src/sbin/pfctl/
-	set -e ; for i in sbin/{ifconfig,route,pfctl} usr.sbin/authpf \
-	; do \
-		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
-	done
-# FIXME: netstat
+gbde: gbde-stamp
+gbde-stamp: patch-stamp
+#	$(PMAKE) -C sbin/gbde
+	touch $@
 
-build/kbdcontrol:: apply-patches
-	set -e ; for i in usr.sbin/kbdcontrol \
-	; do \
-		$(PMAKE) -C $(DEB_SRCDIR)/$$i ; \
-	done
-	sed -i -e "s/^choices=.*/choices=\"`cd $(DEB_SRCDIR)/share/syscons/keymaps && echo *.kbd | sed -e 's/ /, /g'`\"/g" \
+geli: geli-stamp
+geli-stamp: patch-stamp
+#	$(PMAKE) -C sbin/geom/class/eli
+	touch $@
+
+kbdcontrol: kbdcontrol-stamp
+kbdcontrol-stamp: patch-stamp
+	$(PMAKE) -C usr.sbin/kbdcontrol
+	sed -i -e "s/^choices=.*/choices=\"`cd share/syscons/keymaps && echo *.kbd | sed -e 's/ /, /g'`\"/g" \
 	debian/kbdcontrol.config
+	touch $@
 
-clean::
-	rm -f debian/stamp-sed
+module-init-tools: module-init-tools-stamp
+module-init-tools-stamp: patch-stamp
+	$(PMAKE) -C sbin/kldconfig
+	$(PMAKE) -C sbin/kldload
+	$(PMAKE) -C sbin/kldstat
+	$(PMAKE) -C sbin/kldunload
+	touch $@
 
-pre-build:: debian/stamp-sed
-debian/stamp-sed: $(_cdbs_tarball_stamps)
-	find $(DEB_SRCDIR) -name "*.[hcy]" | (set -e ; while read i ; do sed -i $$i \
-		-e "/^__FBSDID/d" \
-		-e "s/[ \t]*__\(dead2\|unused\|result\)[ \t]*/ /g" \
-		-e "s,<sys/queue\.h>,<bsd/queue.h>,g" \
-		-e "s/getline/bsd_&/g" \
-	; done)
-	find $(DEB_SRCDIR) -name Makefile | (set -e ; while read i ; do sed -i $$i \
-		-e "s/^LDADD=/LDADD+=/g" \
-	; done)
-	set -e ; find $(DEB_SRCDIR)/contrib/pf/ -name "*.[hcy]" | (while read i ; do \
-		sed -i $$i \
-		-e 's/defined\( \|\t\)*(\( \|\t\)*__FreeBSD__\( \|\t\)*)/defined(__FreeBSD_kernel__)/g' \
-		-e 's/#\( \|\t\)*ifdef\( \|\t\)*__FreeBSD__/#ifdef __FreeBSD_kernel__/g' \
-		-e 's/#\( \|\t\)*ifndef\( \|\t\)*__FreeBSD__/#ifndef __FreeBSD_kernel__/g' \
-	; done)
-	touch debian/stamp-sed
+net-tools: net-tools-stamp
+net-tools-stamp: patch-stamp
+	$(PMAKE) -C sbin/ifconfig
+	$(PMAKE) -C sbin/pfctl
+	$(PMAKE) -C sbin/route
+#	$(PMAKE) -C usr.bin/netstat
+	$(PMAKE) -C usr.sbin/authpf
+	touch $@
+
+build-indep: build-indep-stamp
+build-indep-stamp:
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+	$(PMAKE) -C bin/chflags clean
+	$(PMAKE) -C sbin/ccdconfig clean
+	$(PMAKE) -C sbin/dmesg clean
+	$(PMAKE) -C sbin/mdconfig clean
+	$(PMAKE) -C sbin/mount clean
+	$(PMAKE) -C sbin/mount_autofs clean
+	$(PMAKE) -C sbin/mount_cd9660 clean
+	$(PMAKE) -C sbin/mount_ext2fs clean
+	$(PMAKE) -C sbin/mount_hpfs clean
+	$(PMAKE) -C sbin/mount_msdosfs clean
+	$(PMAKE) -C sbin/mount_nfs clean
+	$(PMAKE) -C sbin/mount_ntfs clean
+	$(PMAKE) -C sbin/mount_nullfs clean
+	$(PMAKE) -C sbin/mount_reiserfs clean
+	$(PMAKE) -C sbin/mount_udf clean
+	$(PMAKE) -C sbin/mount_unionfs clean
+	$(PMAKE) -C sbin/mount_std clean
+	$(PMAKE) -C sbin/swapon clean
+	$(PMAKE) -C sbin/sysctl  clean
+	$(PMAKE) -C sbin/umount clean
+	$(PMAKE) -C usr.bin/kdump clean
+	$(PMAKE) -C usr.bin/ktrace clean
+	$(PMAKE) -C usr.sbin/rpc.umntall clean
+	$(PMAKE) -C sbin/gbde clean
+	$(PMAKE) -C usr.sbin/kbdcontrol clean
+	$(PMAKE) -C sbin/kldconfig clean
+	$(PMAKE) -C sbin/kldload clean
+	$(PMAKE) -C sbin/kldstat clean
+	$(PMAKE) -C sbin/kldunload clean
+	$(PMAKE) -C sbin/ifconfig clean
+	$(PMAKE) -C sbin/pfctl clean
+	$(PMAKE) -C sbin/route clean
+	$(PMAKE) -C usr.bin/netstat clean
+	$(PMAKE) -C usr.sbin/authpf clean
+	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
+	rm -rf .pc
+	rm -f *stamp
+	dh_clean
+
+install: install-indep install-arch
+install-indep:
+
+install-arch:
+	dh_testdir
+	dh_testroot
+	dh_prep -a
+	dh_installdirs -a
+	dh_install -a
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependant files that arn't kernel modules here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+#	dh_installexamples
+#	dh_installmenu
+	dh_installdebconf
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime
+	dh_installinit -pfreebsd-utils -- start 20 S .
+	dh_installinit -pmodules-init-tools --no-start -- start 20 S .
+	dh_installinit -pkbdcontrol -- start 48 S .
+#	dh_installcron
+#	dh_installinfo
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+#	dh_perl
+#	dh_python
+	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-arch binary-indep
+.PHONY: build clean binary-indep binary-arch binary install install-indep install-arch configure

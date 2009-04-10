@@ -2,10 +2,13 @@
 * revert change from 1.43.2.4 to 1.43.2.5 
   it expects kld_isloaded() and kld_load() in libutil
 
-Index: src/sbin/mdconfig/mdconfig.c
-===================================================================
---- src.orig/sbin/mdconfig/mdconfig.c
-+++ src/sbin/mdconfig/mdconfig.c
+---
+ sbin/mdconfig/Makefile   |    2 +-
+ sbin/mdconfig/mdconfig.c |   23 ++++++++++++++++++++---
+ 2 files changed, 21 insertions(+), 4 deletions(-)
+
+--- a/sbin/mdconfig/mdconfig.c
++++ b/sbin/mdconfig/mdconfig.c
 @@ -41,6 +41,7 @@
  static int md_find(char *, const char *);
  static int md_query(char *name);
@@ -14,7 +17,7 @@ Index: src/sbin/mdconfig/mdconfig.c
  static char *geom_config_get(struct gconf *g, char *name);
  static void md_prthumanval(char *length);
  
-@@ -253,9 +254,7 @@
+@@ -259,9 +260,7 @@
  	}
  	mdio.md_version = MDIOVERSION;
  
@@ -25,7 +28,7 @@ Index: src/sbin/mdconfig/mdconfig.c
  	fd = open("/dev/" MDCTL_NAME, O_RDWR, 0);
  	if (fd < 0)
  		err(1, "open(/dev/%s)", MDCTL_NAME);
-@@ -454,3 +453,21 @@
+@@ -460,3 +459,21 @@
  {
  	return (md_list(name, OPT_UNIT));
  }
@@ -47,3 +50,13 @@ Index: src/sbin/mdconfig/mdconfig.c
 +		}
 +	}
 +}
+--- a/sbin/mdconfig/Makefile
++++ b/sbin/mdconfig/Makefile
+@@ -5,6 +5,6 @@
+ MLINKS=		mdconfig.8 vnconfig.8
+ 
+ DPADD=	${LIBUTIL} ${LIBGEOM} ${LIBBSDXML} ${LIBSBUF} 
+-LDADD=	-lutil -lgeom -lbsdxml -lsbuf
++LDADD=	-lutil -lgeom -lsbuf
+ 
+ .include <bsd.prog.mk>

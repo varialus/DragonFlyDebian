@@ -1,0 +1,74 @@
+
+Get rid of getbsize.  Default in upstream is 512, but we might want to have
+something sane instead...
+
+---
+ sbin/swapon/swapon.c |   13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+--- a/sbin/swapon/swapon.c
++++ b/sbin/swapon/swapon.c
+@@ -41,6 +41,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD: src/sbin/swapon/swapon.c,v 1.22.18.1 2008/11/25 02:59:29 kensmith Exp $");
+ 
++#include <sys/swap.h>
+ #include <sys/stat.h>
+ #include <sys/param.h>
+ #include <sys/sysctl.h>
+@@ -50,7 +51,7 @@
+ #include <errno.h>
+ #include <fstab.h>
+ #include <stdio.h>
+-#include <stdlib.h>
++#include <freebsd/stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+@@ -70,6 +71,8 @@
+ 	int ch, doall;
+ 	int sflag = 0, lflag = 0, hflag = 0;
+ 
++	setprogname (argv[0]);
++
+ 	if ((ptr = strrchr(argv[0], '/')) == NULL)
+ 		ptr = argv[0];
+ 	if (strstr(ptr, "swapon"))
+@@ -79,7 +82,7 @@
+ 	orig_prog = which_prog;
+ 	
+ 	doall = 0;
+-	while ((ch = getopt(argc, argv, "AadlhksU")) != -1) {
++	while ((ch = getopt(argc, argv, "AadlhksUve")) != -1) {
+ 		switch(ch) {
+ 		case 'A':
+ 			if (which_prog == SWAPCTL) {
+@@ -121,6 +124,9 @@
+ 				usage();
+ 			}
+ 			break;
++		case 'v':
++		case 'e':
++			break;
+ 		case '?':
+ 		default:
+ 			usage();
+@@ -228,7 +234,8 @@
+ 	    hlen = 10;
+ 	    break;
+ 	default:
+-	    getbsize(&hlen, &blocksize);
++	    blocksize = 1024 * 1024;
++	    hlen = 10;
+ 	    break;
+ 	}
+
+--- a/sbin/swapon/Makefile
++++ b/sbin/swapon/Makefile
+@@ -7,5 +7,6 @@
+ LINKS+=	${BINDIR}/swapon ${BINDIR}/swapctl
+ MLINKS=	swapon.8 swapoff.8
+ MLINKS+=swapon.8 swapctl.8
++LDADD=	-lbsd -lfreebsd
+ 
+ .include <bsd.prog.mk>	

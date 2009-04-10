@@ -1,0 +1,31 @@
+---
+ sbin/mount_ntfs/mount_ntfs.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/sbin/mount_ntfs/mount_ntfs.c
++++ b/sbin/mount_ntfs/mount_ntfs.c
+@@ -38,6 +38,7 @@
+ #include <sys/mount.h>
+ #include <sys/stat.h>
+ #include <sys/module.h>
++#include <iconv.h>
+ #include <sys/iconv.h>
+ #include <sys/linker.h>
+ #include <fs/ntfs/ntfsmount.h>
+@@ -50,7 +51,6 @@
+ #include <string.h>
+ #include <sysexits.h>
+ #include <unistd.h>
+-#include <libutil.h>
+ 
+ #include "mntopts.h"
+ 
+@@ -64,7 +64,7 @@
+ static gid_t	a_gid(char *);
+ static uid_t	a_uid(char *);
+ static mode_t	a_mask(char *);
+-static void	usage(void) __dead2;
++static void	usage(void);
+ 
+ static int	set_charset(struct ntfs_args *);
+ 

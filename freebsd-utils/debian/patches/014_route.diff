@@ -1,0 +1,56 @@
+---
+ sbin/route/route.c |    8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+--- a/sbin/route/route.c
++++ b/sbin/route/route.c
+@@ -63,10 +63,12 @@
+ #include <paths.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <string.h>
+ #include <sysexits.h>
+ #include <unistd.h>
+ #include <ifaddrs.h>
++#include <time.h>
+ 
+ struct keytab {
+ 	char	*kt_cp;
+@@ -110,7 +112,7 @@
+ int	prefixlen();
+ extern	char *iso_ntoa();
+ 
+-void usage(const char *) __dead2;
++void usage(const char *);
+ 
+ void
+ usage(cp)
+@@ -134,7 +136,7 @@
+ 	if (argc < 2)
+ 		usage((char *)NULL);
+ 
+-	while ((ch = getopt(argc, argv, "nqdtv")) != -1)
++	while ((ch = getopt(argc, argv, "+nqdtv")) != -1)
+ 		switch(ch) {
+ 		case 'n':
+ 			nflag = 1;
+@@ -819,7 +821,7 @@
+ 			else if (IN_CLASSC(addr))
+ 				mask = IN_CLASSC_NET;
+ 			else if (IN_MULTICAST(addr))
+-				mask = IN_CLASSD_NET;
++				mask = 0xf0000000;
+ 			else
+ 				mask = 0xffffffff;
+ 		}
+--- a/sbin/route/Makefile
++++ b/sbin/route/Makefile
+@@ -10,6 +10,7 @@
+ CLEANFILES+=keywords.h _keywords.tmp
+ 
+ CFLAGS+= -DNS
++LDADD+= -lfreebsd
+ 
+ .if ${MK_INET6_SUPPORT} != "no"
+ CFLAGS+= -DINET6

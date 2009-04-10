@@ -1,0 +1,88 @@
+---
+ sbin/umount/umount.c |   30 ++++++------------------------
+ 1 file changed, 6 insertions(+), 24 deletions(-)
+
+--- a/sbin/umount/umount.c
++++ b/sbin/umount/umount.c
+@@ -94,7 +94,7 @@
+ 	sync();
+ 
+ 	all = errs = 0;
+-	while ((ch = getopt(argc, argv, "AaF:fh:t:v")) != -1)
++	while ((ch = getopt(argc, argv, "Aafh:t:v")) != -1)
+ 		switch (ch) {
+ 		case 'A':
+ 			all = 2;
+@@ -102,9 +102,6 @@
+ 		case 'a':
+ 			all = 1;
+ 			break;
+-		case 'F':
+-			setfstab(optarg);
+-			break;
+ 		case 'f':
+ 			fflag = MNT_FORCE;
+ 			break;
+@@ -160,7 +157,7 @@
+ 		break;
+ 	case 1:
+ 		if (setfsent() == 0)
+-			err(1, "%s", getfstab());
++			err(1, "/etc/fstab");
+ 		errs = umountall(typelist);
+ 		break;
+ 	case 0:
+@@ -199,9 +196,6 @@
+ 		    strcmp(fs->fs_type, FSTAB_RO) &&
+ 		    strcmp(fs->fs_type, FSTAB_RQ))
+ 			continue;
+-		/* Ignore unknown file system types. */
+-		if (getvfsbyname(fs->fs_vfstype, &vfc) == -1)
+-			continue;
+ 		if (checkvfsname(fs->fs_vfstype, typelist))
+ 			continue;
+ 
+@@ -351,24 +345,12 @@
+ 
+ 	if (!namematch(ai))
+ 		return (1);
+-	/* First try to unmount using the file system ID. */
+-	snprintf(fsidbuf, sizeof(fsidbuf), "FSID:%d:%d", sfs->f_fsid.val[0],
+-	    sfs->f_fsid.val[1]);
+-	if (unmount(fsidbuf, fflag | MNT_BYFSID) != 0) {
+-		/* XXX, non-root users get a zero fsid, so don't warn. */
+-		if (errno != ENOENT || sfs->f_fsid.val[0] != 0 ||
+-		    sfs->f_fsid.val[1] != 0)
+-			warn("unmount of %s failed", sfs->f_mntonname);
+-		if (errno != ENOENT)
+-			return (1);
+-		/* Compatibility for old kernels. */
+-		if (sfs->f_fsid.val[0] != 0 || sfs->f_fsid.val[1] != 0)
+-			warnx("retrying using path instead of file system ID");
++
+ 		if (unmount(sfs->f_mntonname, fflag) != 0) {
+ 			warn("unmount of %s failed", sfs->f_mntonname);
+ 			return (1);
+ 		}
+-	}
++
+ 	/* Mark this this file system as unmounted. */
+ 	getmntentry(NULL, NULL, &sfs->f_fsid, REMOVE);
+ 	if (vflag)
+@@ -385,7 +367,7 @@
+ 			    clnt_spcreateerror("RPCPROG_MNT"));
+ 			return (1);
+ 		}
+-		clp->cl_auth = authsys_create_default();
++		clp->cl_auth = authunix_create_default();
+ 		try.tv_sec = 20;
+ 		try.tv_usec = 0;
+ 		clnt_stat = clnt_call(clp, RPCMNT_UMOUNT, (xdrproc_t)xdr_dir,
+@@ -592,6 +574,6 @@
+ 
+ 	(void)fprintf(stderr, "%s\n%s\n",
+ 	    "usage: umount [-fv] special | node | fsid",
+-	    "       umount -a | -A [-F fstab] [-fv] [-h host] [-t type]");
++	    "       umount -a | -A [-fv] [-h host] [-t type]");
+ 	exit(1);
+ }
