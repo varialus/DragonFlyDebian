@@ -56,14 +56,6 @@ binary-indep:
 binary-arch: build-arch install
 	dh_testdir
 	dh_testroot
-	
-	# Install files for reportbug
-	for p in $(packages); do \
-	  mkdir -p debian/$$p/usr/share/bug/$$p; \
-	  install -p -m 0644 -o root -g root debian/bug.control \
-	    debian/$$p/usr/share/bug/$$p/control; \
-	done
-	
 	dh_installdocs
 	dh_installexamples
 	dh_installmenu
@@ -71,6 +63,7 @@ binary-arch: build-arch install
 	dh_installman
 	dh_installinfo
 	dh_installchangelogs
+	dh_bugfiles
 	dh_link
 	dh_strip
 	dh_compress
