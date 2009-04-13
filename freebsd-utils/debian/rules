@@ -51,7 +51,7 @@ patch-stamp:
 	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
 	touch $@
 
-build-arch: freebsd-utils gbde geli kbdcontrol module-init-tools net-tools
+build-arch: freebsd-utils gbde geli kbdcontrol kldutils freebsd-net-tools
 
 freebsd-utils: freebsd-utils-stamp
 freebsd-utils-stamp: patch-stamp
@@ -97,16 +97,16 @@ kbdcontrol-stamp: patch-stamp
 	debian/kbdcontrol.config
 	touch $@
 
-module-init-tools: module-init-tools-stamp
-module-init-tools-stamp: patch-stamp
+kldutils: kldutils-stamp
+kldutils: patch-stamp
 	$(PMAKE) -C sbin/kldconfig
 	$(PMAKE) -C sbin/kldload
 	$(PMAKE) -C sbin/kldstat
 	$(PMAKE) -C sbin/kldunload
 	touch $@
 
-net-tools: net-tools-stamp
-net-tools-stamp: patch-stamp
+freebsd-net-tools: freebsd-net-tools-stamp
+freebsd-net-tools-stamp: patch-stamp
 	$(PMAKE) -C sbin/ifconfig
 	$(PMAKE) -C sbin/pfctl
 	$(PMAKE) -C sbin/route
