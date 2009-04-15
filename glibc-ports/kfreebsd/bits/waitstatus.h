@@ -22,9 +22,6 @@
 #endif
 
 
-/* Everything extant so far uses these same bits.  */
-
-
 /* If WIFEXITED(STATUS), the low-order 8 bits of the status.  */
 #define	__WEXITSTATUS(status)	(((status) & 0xff00) >> 8)
 
@@ -42,7 +39,7 @@
   (((signed char) (((status) & 0x7f) + 1) >> 1) > 0)
 
 /* Nonzero if STATUS indicates the child is stopped.  */
-#define	__WIFSTOPPED(status)	(((status) & 0xff) == 0x7f)
+#define	__WIFSTOPPED(status)	(((status) & 0x7f) == 0x7f)
 
 /* Nonzero if STATUS indicates the child continued after a stop.  We only
    define this if <bits/waitflags.h> provides the WCONTINUED flag bit.  */
