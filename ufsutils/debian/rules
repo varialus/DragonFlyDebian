@@ -24,13 +24,13 @@ else
 CFLAGS += -D_FILE_OFFSET_BITS=64 -I$(CURDIR)/freebsd
 endif
 
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
 else
 	CFLAGS += -O2
 endif
 
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
+ifeq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
 	INSTALL_PROGRAM += -s
 endif
 
