@@ -30,20 +30,16 @@ else
 	CFLAGS += -O2
 endif
 
-build: build-stamp
-build-stamp:
+build:
 	dh_testdir
 
 	QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a || test $$? = 2
 
 	CFLAGS="$(CFLAGS)" LDADD="$(LDADD)" $(MAKE)
-	
-	touch build-stamp
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp
 	
 	[ ! -f Makefile ] || $(MAKE) clean
 
@@ -65,11 +61,11 @@ install: build
 	$(MAKE) install DESTDIR=$(DESTDIR) prefix=/usr exec_prefix=/
 
 # Build architecture-independent files here.
-binary-indep: build install
+binary-indep:
 	# Nothing to do.
 
 # Build architecture-dependent files here.
-binary-arch: build install
+binary-arch: install
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs
