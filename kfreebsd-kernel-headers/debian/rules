@@ -33,15 +33,7 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-
-	cd $(SRC_DIR)/sys \
-		&& for file in `cat $(CURDIR)/debian/includes.list` ; do \
-			if [ -d $$file ] ; then \
-				find $$file -type f -name "*.h" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/include \; ; \
-			else \
-				cp --parents $$file $(HEADERS_PACKAGE)/usr/include ; \
-			fi ;\
-		done
+	dh_install --sourcedir=$(SRC_DIR)
 
 ifneq ($(filter i386 amd64, $(kfreebsd_cpu)),)
 	sh debian/generate-asm.sh $(kfreebsd_cpu) $(SRC_DIR)/sys $(HEADERS_PACKAGE)/usr/include
