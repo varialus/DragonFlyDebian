@@ -7,9 +7,7 @@
 #export DH_VERBOSE=1
 
 this = $(MAKE) -f debian/rules
-
-ufsutils = ufsutils
-libufs = libufs2
+lib = libufs2
 
 DESTDIR = $(CURDIR)/debian/tmp
 
@@ -79,7 +77,7 @@ binary-arch: install
 	dh_fixperms
 	dh_makeshlibs
 	dh_installdeb
-	dh_shlibdeps -ldebian/$(libufs)/usr/lib -L$(libufs)
+	dh_shlibdeps -ldebian/$(lib)/usr/lib -L$(lib)
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
