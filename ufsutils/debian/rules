@@ -68,7 +68,6 @@ install: build
 	
 	$(MAKE) install DESTDIR=$(DESTDIR) prefix=/usr exec_prefix=/
 
-
 # Build architecture-independent files here.
 binary-indep: build install
 	# Nothing to do.
@@ -79,24 +78,12 @@ binary-arch: build install
 	dh_testroot
 	dh_installchangelogs
 	dh_installdocs
-#	dh_installexamples
 	dh_install --sourcedir=debian/tmp
-#	dh_installmenu
-#	dh_installdebconf
-#	dh_installlogrotate
-#	dh_installemacsen
-#	dh_installpam
-#	dh_installmime
-#	dh_installinit
-#	dh_installcron
-#	dh_installinfo
 	dh_installman
 	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
-#	dh_perl
-#	dh_python
 	dh_makeshlibs
 	dh_installdeb
 	dh_shlibdeps -ldebian/$(libufs)/usr/lib -L$(libufs)
