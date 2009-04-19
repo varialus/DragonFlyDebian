@@ -53,7 +53,6 @@ static char sccsid[] = "@(#)nlist.c	8.1 (Berkeley) 6/4/93";
 
 #define SIZE_T_MAX 0xffffffffU
 
-static int __fdnlist(int, struct nlist *);
 static int __aout_fdnlist(int, struct nlist *);
 static int __elf_fdnlist(int, struct nlist *);
 
@@ -83,7 +82,11 @@ static struct nlist_handlers {
 #endif
 };
 
-static int
+/* FIXME: This function is used by libkvm0, so we need to export it.
+   It is not declared in the include files though. */
+int __fdnlist(int, struct nlist *);
+
+int
 __fdnlist(fd, list)
 	int fd;
 	struct nlist *list;
