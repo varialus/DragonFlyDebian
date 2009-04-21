@@ -2,21 +2,183 @@ Index: src/sys/conf/files
 ===================================================================
 --- src.orig/sys/conf/files
 +++ src/sys/conf/files
-@@ -473,18 +473,6 @@
+@@ -475,180 +475,6 @@
  dev/ata/atapi-cd.c		optional atapicd
  dev/ata/atapi-fd.c		optional atapifd
  dev/ata/atapi-tape.c		optional atapist
--dev/ath/ah_osdep.c optional ath_hal \
+-#
+-dev/ath/if_ath.c		optional ath \
 -	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/if_ath_pci.c		optional ath pci \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/ah_osdep.c		optional ath \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/ath_hal/ah.c		optional ath \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/ath_hal/ah_eeprom_v1.c	optional ath_hal | ath_ar5210 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/ath_hal/ah_eeprom_v3.c	optional ath_hal | ath_ar5211 | ath_ar5212 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/ath_hal/ah_eeprom_v14.c optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/ath_hal/ah_regdomain.c	optional ath \
+-	compile-with "${NORMAL_C} -I$S/dev/ath"
+-dev/ath/ath_hal/ar5210/ar5210_attach.c		optional ath_hal | ath_ar5210 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5210/ar5210_beacon.c		optional ath_hal | ath_ar5210 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5210/ar5210_interrupts.c	optional ath_hal | ath_ar5210 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5210/ar5210_keycache.c	optional ath_hal | ath_ar5210 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5210/ar5210_misc.c		optional ath_hal | ath_ar5210 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5210/ar5210_phy.c		optional ath_hal | ath_ar5210 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5210/ar5210_power.c		optional ath_hal | ath_ar5210 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5210/ar5210_recv.c		optional ath_hal | ath_ar5210 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5210/ar5210_reset.c		optional ath_hal | ath_ar5210 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5210/ar5210_xmit.c		optional ath_hal | ath_ar5210 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5211/ar5211_attach.c		optional ath_hal | ath_ar5211 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5211/ar5211_beacon.c		optional ath_hal | ath_ar5211 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5211/ar5211_interrupts.c	optional ath_hal | ath_ar5211 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5211/ar5211_keycache.c	optional ath_hal | ath_ar5211 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5211/ar5211_misc.c		optional ath_hal | ath_ar5211 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5211/ar5211_phy.c		optional ath_hal | ath_ar5211 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5211/ar5211_power.c		optional ath_hal | ath_ar5211 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5211/ar5211_recv.c		optional ath_hal | ath_ar5211 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5211/ar5211_reset.c		optional ath_hal | ath_ar5211 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5211/ar5211_xmit.c		optional ath_hal | ath_ar5211 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_ani.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_attach.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_beacon.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_eeprom.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_gpio.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_interrupts.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_keycache.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_misc.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_phy.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_power.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_recv.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_reset.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_rfgain.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5212_xmit.c \
+-	optional ath_hal | ath_ar5212 | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar2316.c	optional ath_rf2316 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar2317.c	optional ath_rf2317 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar2413.c	optional ath_hal | ath_rf2413 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar2425.c	optional ath_hal | ath_rf2425 | ath_rf2417 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5111.c	optional ath_hal | ath_rf5111 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5112.c	optional ath_hal | ath_rf5112 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5212/ar5413.c	optional ath_hal | ath_rf5413 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar2133.c	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_ani.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_attach.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_beacon.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_cal.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_cal_iq.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_cal_adcgain.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_cal_adcdc.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_eeprom.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_gpio.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_interrupts.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_keycache.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_misc.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_phy.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_power.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_recv.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_reset.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar5416_xmit.c \
+-	optional ath_hal | ath_ar5416 | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
+-dev/ath/ath_hal/ar5416/ar9160_attach.c optional ath_hal | ath_ar9160 \
+-	compile-with "${NORMAL_C} -I$S/dev/ath -I$S/dev/ath/ath_hal"
 -dev/ath/ath_rate/amrr/amrr.c	optional ath_rate_amrr \
 -	compile-with "${NORMAL_C} -I$S/dev/ath"
 -dev/ath/ath_rate/onoe/onoe.c	optional ath_rate_onoe \
 -	compile-with "${NORMAL_C} -I$S/dev/ath"
 -dev/ath/ath_rate/sample/sample.c	optional ath_rate_sample \
--	compile-with "${NORMAL_C} -I$S/dev/ath"
--dev/ath/if_ath.c		optional ath \
--	compile-with "${NORMAL_C} -I$S/dev/ath"
--dev/ath/if_ath_pci.c		optional ath pci \
 -	compile-with "${NORMAL_C} -I$S/dev/ath"
  dev/awi/am79c930.c		optional awi
  dev/awi/awi.c			optional awi
@@ -25,7 +187,7 @@ Index: src/sys/conf/files.i386
 ===================================================================
 --- src.orig/sys/conf/files.i386
 +++ src/sys/conf/files.i386
-@@ -46,42 +46,6 @@
+@@ -46,32 +46,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -33,16 +195,6 @@ Index: src/sys/conf/files.i386
 -	dependency	"$S/contrib/dev/oltr/i386-elf.trlld.o.uu"	\
 -	compile-with	"uudecode < $S/contrib/dev/oltr/i386-elf.trlld.o.uu"	\
 -	no-implicit-rule
--#
--hal.o				optional	ath_hal			\
--	dependency	"$S/contrib/dev/ath/public/i386-elf.hal.o.uu"	\
--	compile-with	"uudecode < $S/contrib/dev/ath/public/i386-elf.hal.o.uu" \
--	no-implicit-rule
--opt_ah.h			optional	ath_hal			\
--	dependency	"$S/contrib/dev/ath/public/i386-elf.opt_ah.h"	\
--	compile-with	"rm -f opt_ah.h; cp $S/contrib/dev/ath/public/i386-elf.opt_ah.h opt_ah.h" \
--	no-obj no-implicit-rule before-depend				\
--	clean		"opt_ah.h"
 -#
 -nvenetlib.o			optional	nve pci			\
 -	dependency	"$S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu"	\
@@ -68,7 +220,7 @@ Index: src/sys/conf/files.i386
  #
  compat/linprocfs/linprocfs.c	optional linprocfs
  compat/linsysfs/linsysfs.c	optional linsysfs
-@@ -181,14 +145,6 @@
+@@ -172,14 +146,6 @@
  dev/fe/if_fe_isa.c		optional fe isa
  dev/glxsb/glxsb.c		optional glxsb
  dev/glxsb/glxsb_hash.c		optional glxsb
@@ -83,7 +235,7 @@ Index: src/sys/conf/files.i386
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_pentium.c	optional hwpmc
  dev/hwpmc/hwpmc_piv.c		optional hwpmc
-@@ -215,7 +171,6 @@
+@@ -206,7 +172,6 @@
  dev/mse/mse.c			optional mse
  dev/mse/mse_isa.c		optional mse isa
  dev/nfe/if_nfe.c		optional nfe pci
@@ -95,12 +247,12 @@ Index: src/sys/conf/kern.pre.mk
 ===================================================================
 --- src.orig/sys/conf/kern.pre.mk
 +++ src/sys/conf/kern.pre.mk
-@@ -67,9 +67,6 @@
+@@ -65,9 +65,6 @@
  # ... and the same for pf
  INCLUDES+= -I$S/contrib/pf
  
--# ... and the same for Atheros HAL
--INCLUDES+= -I$S/dev/ath
+-# ... and the same for ath
+-INCLUDES+= -I$S/dev/ath -I$S/dev/ath/ath_hal
 -
  # ... and the same for the NgATM stuff
  INCLUDES+= -I$S/contrib/ngatm
@@ -118,12 +270,13 @@ Index: src/sys/i386/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -252,9 +250,6 @@
+@@ -253,10 +251,6 @@
  device		wlan_scan_ap	# 802.11 AP mode scanning
  device		wlan_scan_sta	# 802.11 STA mode scanning
  device		an		# Aironet 4500/4800 802.11 wireless NICs.
 -device		ath		# Atheros pci/cardbus NIC's
 -device		ath_hal		# Atheros HAL (Hardware Access Layer)
+-options		AH_SUPPORT_AR5416	# enable AR5416 tx/rx descriptors
 -device		ath_rate_sample	# SampleRate tx rate control for ath
  device		awi		# BayStack 660 and others
  device		ral		# Ralink Technology RT2500 wireless NICs.
@@ -132,19 +285,15 @@ Index: src/sys/modules/Makefile
 ===================================================================
 --- src.orig/sys/modules/Makefile
 +++ src/sys/modules/Makefile
-@@ -26,11 +26,6 @@
+@@ -28,7 +28,6 @@
  	${_arl} \
  	${_asr} \
  	ata \
--	${_ath} \
--	${_ath_hal} \
--	${_ath_rate_amrr} \
--	${_ath_rate_onoe} \
--	${_ath_rate_sample} \
+-	ath \
  	aue \
  	${_auxio} \
  	${_awi} \
-@@ -100,8 +95,6 @@
+@@ -100,8 +99,6 @@
  	hifn \
  	hme \
  	${_hptiop} \
@@ -153,7 +302,7 @@ Index: src/sys/modules/Makefile
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -200,11 +193,8 @@
+@@ -202,11 +199,8 @@
  	ntfs_iconv \
  	${_nxge} \
  	nullfs \
@@ -165,7 +314,7 @@ Index: src/sys/modules/Makefile
  	${_padlock} \
  	patm \
  	${_pccard} \
-@@ -327,7 +317,6 @@
+@@ -331,7 +325,6 @@
  	${_xe} \
  	xfs \
  	xl \
@@ -173,19 +322,7 @@ Index: src/sys/modules/Makefile
  	zlib \
  	zyd
  
-@@ -372,11 +361,6 @@
- _apm=		apm
- _ar=		ar
- _arcnet=	arcnet
--_ath=		ath
--_ath_hal=	ath_hal
--_ath_rate_amrr=	ath_rate_amrr
--_ath_rate_onoe=	ath_rate_onoe
--_ath_rate_sample=ath_rate_sample
- _awi=		awi
- _bktr=		bktr
- _cardbus=	cardbus
-@@ -422,10 +406,6 @@
+@@ -423,10 +416,6 @@
  .if ${MK_NCP} != "no"
  _nwfs=		nwfs
  .endif
@@ -196,7 +333,7 @@ Index: src/sys/modules/Makefile
  _pccard=	pccard
  _pcfclock=	pcfclock
  _pecoff=	pecoff
-@@ -447,9 +427,6 @@
+@@ -448,9 +437,6 @@
  _tmpfs= 	tmpfs
  _wi=		wi
  _xe=		xe
@@ -206,7 +343,7 @@ Index: src/sys/modules/Makefile
  .if ${MACHINE} == "i386"
  _aac=		aac
  _acpi=		acpi
-@@ -467,8 +444,6 @@
+@@ -468,8 +454,6 @@
  _dpt=		dpt
  _ex=		ex
  _hptiop=	hptiop
@@ -215,7 +352,7 @@ Index: src/sys/modules/Makefile
  _ichwd=		ichwd
  _ida=		ida
  _iir=		iir
-@@ -481,7 +456,6 @@
+@@ -482,7 +466,6 @@
  _ixgb=   	ixgb
  _mly=		mly
  _nfe=		nfe
@@ -223,19 +360,7 @@ Index: src/sys/modules/Makefile
  _nvram=		nvram
  _nxge=		nxge
  _wpi=		wpi
-@@ -508,11 +482,6 @@
- _agp=		agp
- _an=		an
- _arcmsr=	arcmsr
--_ath=		ath
--_ath_hal=	ath_hal
--_ath_rate_amrr=	ath_rate_amrr
--_ath_rate_onoe=	ath_rate_onoe
--_ath_rate_sample=ath_rate_sample
- _cardbus=	cardbus
- _cbb=		cbb
- _cmx=		cmx
-@@ -533,8 +502,6 @@
+@@ -530,8 +513,6 @@
  _exca=		exca
  _ext2fs=	ext2fs
  _hptiop=	hptiop
@@ -244,7 +369,7 @@ Index: src/sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -554,12 +521,8 @@
+@@ -551,12 +532,8 @@
  _mly=		mly
  _ndis=		ndis
  _nfe=		nfe
@@ -257,7 +382,7 @@ Index: src/sys/modules/Makefile
  _pccard=	pccard
  _rdma=		rdma	
  _safe=		safe
-@@ -573,9 +536,6 @@
+@@ -570,9 +547,6 @@
  _wi=		wi
  _wpi=		wpi
  _wpifw=		wpifw
@@ -267,34 +392,11 @@ Index: src/sys/modules/Makefile
  .endif
  
  .if ${MACHINE_ARCH} == "ia64"
-@@ -617,22 +577,12 @@
- 
- .if ${MACHINE_ARCH} == "powerpc"
- _an=		an
--_ath=		ath
--_ath_hal=	ath_hal
--_ath_rate_amrr=	ath_rate_amrr
--_ath_rate_onoe=	ath_rate_onoe
--_ath_rate_sample=ath_rate_sample
- _bm=		bm
- _nvram=		powermac_nvram
- _smbfs=		smbfs
- .endif
- 
- .if ${MACHINE_ARCH} == "sparc64"
--_ath=		ath
--_ath_hal=	ath_hal
--_ath_rate_amrr=	ath_rate_amrr
--_ath_rate_onoe=	ath_rate_onoe
--_ath_rate_sample=ath_rate_sample
- _auxio=		auxio
- _em=		em
- _i2c=		i2c
 Index: src/sys/amd64/conf/GENERIC
 ===================================================================
 --- src.orig/sys/amd64/conf/GENERIC
 +++ src/sys/amd64/conf/GENERIC
-@@ -125,8 +125,6 @@
+@@ -124,8 +124,6 @@
  device		arcmsr		# Areca SATA II RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -303,12 +405,13 @@ Index: src/sys/amd64/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -240,9 +238,6 @@
+@@ -240,10 +238,6 @@
  device		wlan_scan_ap	# 802.11 AP mode scanning
  device		wlan_scan_sta	# 802.11 STA mode scanning
  device		an		# Aironet 4500/4800 802.11 wireless NICs.
 -device		ath		# Atheros pci/cardbus NIC's
 -device		ath_hal		# Atheros HAL (Hardware Access Layer)
+-options		AH_SUPPORT_AR5416	# enable AR5416 tx/rx descriptors
 -device		ath_rate_sample	# SampleRate tx rate control for ath
  device		awi		# BayStack 660 and others
  device		ral		# Ralink Technology RT2500 wireless NICs.
@@ -317,20 +420,10 @@ Index: src/sys/conf/files.amd64
 ===================================================================
 --- src.orig/sys/conf/files.amd64
 +++ src/sys/conf/files.amd64
-@@ -47,37 +47,6 @@
+@@ -47,27 +47,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
--hal.o				optional	ath_hal			\
--	dependency	"$S/contrib/dev/ath/public/x86_64-elf.hal.o.uu"	\
--	compile-with	"uudecode < $S/contrib/dev/ath/public/x86_64-elf.hal.o.uu" \
--	no-implicit-rule
--opt_ah.h			optional	ath_hal			\
--	dependency	"$S/contrib/dev/ath/public/x86_64-elf.opt_ah.h"	\
--	compile-with	"rm -f opt_ah.h; cp $S/contrib/dev/ath/public/x86_64-elf.opt_ah.h opt_ah.h" \
--	no-obj no-implicit-rule before-depend				\
--	clean		"opt_ah.h"
--#
 -nvenetlib.o			optional	nve pci			\
 -	dependency	"$S/contrib/dev/nve/amd64/nvenetlib.o.bz2.uu"	\
 -	compile-with	"uudecode $S/contrib/dev/nve/amd64/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
@@ -355,7 +448,7 @@ Index: src/sys/conf/files.amd64
  #
  amd64/acpica/OsdEnvironment.c	optional	acpi
  amd64/acpica/acpi_machdep.c	optional	acpi
-@@ -176,14 +145,6 @@
+@@ -167,14 +146,6 @@
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
@@ -370,7 +463,7 @@ Index: src/sys/conf/files.amd64
  dev/hwpmc/hwpmc_amd.c		optional	hwpmc
  dev/hwpmc/hwpmc_piv.c		optional	hwpmc
  dev/hwpmc/hwpmc_x86.c		optional	hwpmc
-@@ -191,7 +152,6 @@
+@@ -182,7 +153,6 @@
  dev/kbd/kbd.c			optional	atkbd | sc | ukbd
  dev/mem/memutil.c		optional	mem
  dev/nfe/if_nfe.c		optional	nfe pci

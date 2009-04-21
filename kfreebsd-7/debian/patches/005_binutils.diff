@@ -140,7 +140,7 @@ Index: src/sys/amd64/amd64/cpu_switch.S
 ===================================================================
 --- src.orig/sys/amd64/amd64/cpu_switch.S
 +++ src/sys/amd64/amd64/cpu_switch.S
-@@ -259,12 +259,12 @@
+@@ -260,12 +260,12 @@
  	jmp	do_tss
  
  store_seg:
@@ -157,7 +157,7 @@ Index: src/sys/amd64/amd64/cpu_switch.S
  	jmp	done_store_seg
  2:	movq	PCPU(GS32P),%rax
  	movq	(%rax),%rax
-@@ -276,11 +276,11 @@
+@@ -277,11 +277,11 @@
  	jnz	2f
  1:	movl	$MSR_GSBASE,%ecx
  	rdmsr
@@ -170,7 +170,7 @@ Index: src/sys/amd64/amd64/cpu_switch.S
 +	movw	PCB_DS(%r8),%ds
 +	movw	PCB_ES(%r8),%es
 +	movw	PCB_FS(%r8),%fs
- 	jmp	done_load_seg
+ 	jmp	restore_fsbase
  	/* Restore userland %gs while preserving kernel gsbase */
  2:	movq	PCPU(GS32P),%rax
 Index: src/sys/amd64/ia32/ia32_signal.c
@@ -283,26 +283,26 @@ Index: src/sys/amd64/linux32/linux32_sysvec.c
 ===================================================================
 --- src.orig/sys/amd64/linux32/linux32_sysvec.c
 +++ src/sys/amd64/linux32/linux32_sysvec.c
-@@ -355,9 +355,9 @@
+@@ -365,9 +365,9 @@
  	frame.sf_sc.uc_mcontext.sc_mask   = frame.sf_sc.uc_sigmask.__bits[0];
-         frame.sf_sc.uc_mcontext.sc_gs     = rgs();
-         frame.sf_sc.uc_mcontext.sc_fs     = rfs();
--        __asm __volatile("movl %%es,%0" :
-+        __asm __volatile("mov %%es,%0" :
+ 	frame.sf_sc.uc_mcontext.sc_gs     = rgs();
+ 	frame.sf_sc.uc_mcontext.sc_fs     = rfs();
+-	__asm __volatile("movl %%es,%0" :
++	__asm __volatile("movw %%es,%0" :
  	    "=rm" (frame.sf_sc.uc_mcontext.sc_es));
--        __asm __volatile("movl %%ds,%0" :
-+        __asm __volatile("mov %%ds,%0" :
+-	__asm __volatile("movl %%ds,%0" :
++	__asm __volatile("movw %%ds,%0" :
  	    "=rm" (frame.sf_sc.uc_mcontext.sc_ds));
  	frame.sf_sc.uc_mcontext.sc_edi    = regs->tf_rdi;
  	frame.sf_sc.uc_mcontext.sc_esi    = regs->tf_rsi;
-@@ -489,8 +489,8 @@
+@@ -499,8 +499,8 @@
  	frame.sf_sc.sc_mask   = lmask.__bits[0];
-         frame.sf_sc.sc_gs     = rgs();
-         frame.sf_sc.sc_fs     = rfs();
--        __asm __volatile("movl %%es,%0" : "=rm" (frame.sf_sc.sc_es));
--        __asm __volatile("movl %%ds,%0" : "=rm" (frame.sf_sc.sc_ds));
-+        __asm __volatile("mov %%es,%0" : "=rm" (frame.sf_sc.sc_es));
-+        __asm __volatile("mov %%ds,%0" : "=rm" (frame.sf_sc.sc_ds));
+ 	frame.sf_sc.sc_gs     = rgs();
+ 	frame.sf_sc.sc_fs     = rfs();
+-	__asm __volatile("movl %%es,%0" : "=rm" (frame.sf_sc.sc_es));
+-	__asm __volatile("movl %%ds,%0" : "=rm" (frame.sf_sc.sc_ds));
++	__asm __volatile("movw %%es,%0" : "=rm" (frame.sf_sc.sc_es));
++	__asm __volatile("movw %%ds,%0" : "=rm" (frame.sf_sc.sc_ds));
  	frame.sf_sc.sc_edi    = regs->tf_rdi;
  	frame.sf_sc.sc_esi    = regs->tf_rsi;
  	frame.sf_sc.sc_ebp    = regs->tf_rbp;

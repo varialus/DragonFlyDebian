@@ -18,9 +18,9 @@ Index: src/sys/conf/Makefile.arm
 ===================================================================
 --- src.orig/sys/conf/Makefile.arm
 +++ src/sys/conf/Makefile.arm
-@@ -109,6 +109,8 @@
- 	rm ${KERNEL_KO}.tmp.gz ${KERNEL_KO}.tramp.noheader opt_kernname.h \
- 	inflate-tramp.o tmphack.S
+@@ -108,6 +108,8 @@
+ 
+ MKMODULESENV+=	MACHINE=${MACHINE}
  
 +%WITHOUT_MODULES
 +
@@ -104,7 +104,7 @@ Index: src/usr.sbin/config/mkmakefile.c
  static void do_before_depend(FILE *);
  static int opteq(const char *, const char *);
  static void read_files(void);
-@@ -142,6 +143,8 @@
+@@ -146,6 +147,8 @@
  		}
  		if (eq(line, "%BEFORE_DEPEND\n"))
  			do_before_depend(ofp);
@@ -113,7 +113,7 @@ Index: src/usr.sbin/config/mkmakefile.c
  		else if (eq(line, "%OBJS\n"))
  			do_objs(ofp);
  		else if (strncmp(line, "%FILES.", 7) == 0)
-@@ -622,6 +625,28 @@
+@@ -626,6 +629,28 @@
  }
  
  static void
