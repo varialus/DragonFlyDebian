@@ -2,7 +2,7 @@ Index: src/sys/conf/files.i386
 ===================================================================
 --- src.orig/sys/conf/files.i386
 +++ src/sys/conf/files.i386
-@@ -46,26 +46,5 @@
+@@ -46,27 +46,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -29,7 +29,8 @@ Index: src/sys/conf/files.i386
 -#
  compat/linprocfs/linprocfs.c	optional linprocfs
  compat/linsysfs/linsysfs.c	optional linsysfs
-@@ -181,14 +145,6 @@
+ compat/linux/linux_emul.c	optional compat_linux
+@@ -165,14 +144,6 @@
  dev/fe/if_fe_isa.c		optional fe isa
  dev/glxsb/glxsb.c		optional glxsb
  dev/glxsb/glxsb_hash.c		optional glxsb
@@ -42,9 +43,9 @@ Index: src/sys/conf/files.i386
 -dev/hptrr/hptrr_osm_bsd.c	optional hptrr
 -dev/hptrr/hptrr_config.c	optional hptrr
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
- dev/hwpmc/hwpmc_pentium.c	optional hwpmc
- dev/hwpmc/hwpmc_piv.c		optional hwpmc
-@@ -215,7 +171,6 @@
+ dev/hwpmc/hwpmc_intel.c		optional hwpmc
+ dev/hwpmc/hwpmc_core.c		optional hwpmc
+@@ -203,7 +174,6 @@
  dev/mse/mse.c			optional mse
  dev/mse/mse_isa.c		optional mse isa
  dev/nfe/if_nfe.c		optional nfe pci
@@ -56,7 +57,7 @@ Index: src/sys/i386/conf/GENERIC
 ===================================================================
 --- src.orig/sys/i386/conf/GENERIC
 +++ src/sys/i386/conf/GENERIC
-@@ -131,8 +131,6 @@
+@@ -148,8 +148,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -69,7 +70,7 @@ Index: src/sys/modules/Makefile
 ===================================================================
 --- src.orig/sys/modules/Makefile
 +++ src/sys/modules/Makefile
-@@ -100,8 +95,6 @@
+@@ -94,8 +94,6 @@
  	hifn \
  	hme \
  	${_hptiop} \
@@ -78,7 +79,8 @@ Index: src/sys/modules/Makefile
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -200,11 +193,9 @@
+@@ -194,11 +192,9 @@
+ 	ntfs \
  	ntfs_iconv \
  	nullfs \
 -	${_nve} \
@@ -86,19 +88,18 @@ Index: src/sys/modules/Makefile
  	${_nwfs} \
  	${_nxge} \
 -	${_opensolaris} \
- 	ohci \
  	${_padlock} \
  	patm \
  	${_pccard} \
-@@ -327,7 +317,6 @@
+@@ -288,7 +284,6 @@
  	${_xe} \
  	xfs \
  	xl \
 -	${_zfs} \
  	zlib \
- 	zyd
  
-@@ -422,8 +406,5 @@
+ .if ${MACHINE_ARCH} != "powerpc"
+@@ -376,9 +371,6 @@
  .if ${MK_NCP} != "no"
  _nwfs=		nwfs
  .endif
@@ -107,8 +108,9 @@ Index: src/sys/modules/Makefile
 -.endif
  _pccard=	pccard
  _pcfclock=	pcfclock
-@@ -447,9 +427,6 @@
- _tmpfs= 	tmpfs
+ _pst=		pst
+@@ -397,9 +389,6 @@
+ _tmpfs=		tmpfs
  _wi=		wi
  _xe=		xe
 -.if ${MK_ZFS} != "no" || defined(ALL_MODULES)
@@ -117,7 +119,7 @@ Index: src/sys/modules/Makefile
  .if ${MACHINE} == "i386"
  _aac=		aac
  _acpi=		acpi
-@@ -467,8 +444,6 @@
+@@ -417,8 +406,6 @@
  _dpt=		dpt
  _ex=		ex
  _hptiop=	hptiop
@@ -126,15 +128,15 @@ Index: src/sys/modules/Makefile
  _ichwd=		ichwd
  _ida=		ida
  _iir=		iir
-@@ -481,7 +456,6 @@
- _ixgb=   	ixgb
+@@ -433,7 +420,6 @@
+ _ixgb=		ixgb
  _mly=		mly
  _nfe=		nfe
 -_nve=		nve
  _nvram=		nvram
  _nxge=		nxge
  _wpi=		wpi
-@@ -533,8 +502,6 @@
+@@ -482,8 +468,6 @@
  _exca=		exca
  _ext2fs=	ext2fs
  _hptiop=	hptiop
@@ -143,7 +145,7 @@ Index: src/sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -554,12 +521,8 @@
+@@ -504,12 +488,8 @@
  _mly=		mly
  _ndis=		ndis
  _nfe=		nfe
@@ -156,7 +158,7 @@ Index: src/sys/modules/Makefile
  .if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
  .if exists(${.CURDIR}/../crypto/via)
  _padlock=	padlock
-@@ -573,9 +536,6 @@
+@@ -528,9 +508,6 @@
  _wi=		wi
  _wpi=		wpi
  _wpifw=		wpifw
@@ -170,8 +172,8 @@ Index: src/sys/amd64/conf/GENERIC
 ===================================================================
 --- src.orig/sys/amd64/conf/GENERIC
 +++ src/sys/amd64/conf/GENERIC
-@@ -125,8 +125,6 @@
- device		arcmsr		# Areca SATA II RAID
+@@ -141,8 +141,6 @@
+ #device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
 -device		hptmv		# Highpoint RocketRAID 182x
@@ -209,8 +211,8 @@ Index: src/sys/conf/files.amd64
 -#
  amd64/acpica/OsdEnvironment.c	optional	acpi
  amd64/acpica/acpi_machdep.c	optional	acpi
- amd64/acpica/acpi_wakeup.c	optional	acpi
-@@ -173,14 +153,6 @@
+ amd64/acpica/acpi_switch.S	optional	acpi
+@@ -188,14 +168,6 @@
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
@@ -223,10 +225,10 @@ Index: src/sys/conf/files.amd64
 -dev/hptrr/hptrr_osm_bsd.c	optional	hptrr
 -dev/hptrr/hptrr_config.c	optional	hptrr
  dev/hwpmc/hwpmc_amd.c		optional	hwpmc
- dev/hwpmc/hwpmc_piv.c		optional	hwpmc
- dev/hwpmc/hwpmc_x86.c		optional	hwpmc
-@@ -191,7 +163,6 @@
- dev/kbd/kbd.c			optional	atkbd | sc | ukbd
+ dev/hwpmc/hwpmc_intel.c		optional	hwpmc
+ dev/hwpmc/hwpmc_core.c		optional	hwpmc
+@@ -205,7 +177,6 @@
+ dev/kbd/kbd.c			optional	atkbd | sc | ukbd | usb2_input_kbd
  dev/mem/memutil.c		optional	mem
  dev/nfe/if_nfe.c		optional	nfe pci
 -dev/nve/if_nve.c		optional	nve pci

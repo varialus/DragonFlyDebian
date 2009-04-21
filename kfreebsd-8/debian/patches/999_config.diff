@@ -2,9 +2,9 @@ Index: src/sys/amd64/conf/GENERIC
 ===================================================================
 --- src.orig/sys/amd64/conf/GENERIC
 +++ src/sys/amd64/conf/GENERIC
-@@ -18,19 +18,19 @@
+@@ -18,11 +18,11 @@
  #
- # $FreeBSD: src/sys/amd64/conf/GENERIC,v 1.518 2009/01/19 15:33:06 sobomax Exp $
+ # $FreeBSD: src/sys/amd64/conf/GENERIC,v 1.523 2009/04/10 00:40:48 jfv Exp $
  
 -cpu		HAMMER
 -ident		GENERIC
@@ -17,7 +17,7 @@ Index: src/sys/amd64/conf/GENERIC
  
  # Use the following to compile in values accessible to the kernel
  # through getenv() (or kenv(1) in userland). The format of the file
- # is 'variable=value', see kenv(1)
+@@ -30,7 +30,7 @@
  #
  # env		"GENERIC.env"
  
@@ -26,7 +26,7 @@ Index: src/sys/amd64/conf/GENERIC
  
  options 	SCHED_ULE		# ULE scheduler
  options 	PREEMPTION		# Enable kernel thread preemption
-@@ -45,6 +45,8 @@
+@@ -50,6 +50,8 @@
  options 	MSDOSFS			# MSDOS Filesystem
  options 	CD9660			# ISO 9660 Filesystem
  options 	PROCFS			# Process filesystem (requires PSEUDOFS)
@@ -35,8 +35,7 @@ Index: src/sys/amd64/conf/GENERIC
  options 	PSEUDOFS		# Pseudo-filesystem framework
  options 	GEOM_PART_GPT		# GUID Partition Tables.
  options 	GEOM_LABEL		# Provides labelization
-@@ -53,8 +55,8 @@
- options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
+@@ -59,7 +61,7 @@
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
  options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
@@ -45,8 +44,8 @@ Index: src/sys/amd64/conf/GENERIC
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -74,7 +76,7 @@
- #options 	KDTRACE_HOOKS		# Kernel DTrace hooks
+@@ -89,7 +91,7 @@
+ options 	WITNESS_SKIPSPIN	# Don't run witness on spinlocks for speed
  
  # Make an SMP-capable kernel by default
 -options 	SMP			# Symmetric MultiProcessor Kernel
@@ -54,7 +53,7 @@ Index: src/sys/amd64/conf/GENERIC
  
  # CPU frequency control
  device		cpufreq
-@@ -83,9 +85,6 @@
+@@ -98,9 +100,6 @@
  device		acpi
  device		pci
  
@@ -64,7 +63,7 @@ Index: src/sys/amd64/conf/GENERIC
  # ATA and ATAPI devices
  device		ata
  device		atadisk		# ATA disk drives
-@@ -93,6 +92,8 @@
+@@ -108,6 +107,8 @@
  device		atapicd		# ATAPI CDROM drives
  device		atapifd		# ATAPI floppy drives
  device		atapist		# ATAPI tape drives
@@ -73,7 +72,7 @@ Index: src/sys/amd64/conf/GENERIC
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -175,10 +176,6 @@
+@@ -190,10 +191,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -84,7 +83,7 @@ Index: src/sys/amd64/conf/GENERIC
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -252,11 +249,8 @@
+@@ -273,11 +270,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
@@ -96,8 +95,8 @@ Index: src/sys/amd64/conf/GENERIC
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -275,13 +267,10 @@
- device		ugen		# Generic
+@@ -293,12 +287,10 @@
+ #device		udbp		# USB Double Bulk Pipe devices
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
 -device		ulpt		# Printer
@@ -106,11 +105,10 @@ Index: src/sys/amd64/conf/GENERIC
  device		ural		# Ralink Technology RT2500USB wireless NICs
  device		rum		# Ralink Technology RT2501USB wireless NICs
 -device		urio		# Diamond Rio 500 MP3 player
--device		uscanner	# Scanners
  # USB Serial devices
- device		ucom		# Generic com ttys
  device		uark		# Technologies ARK3116 based serial adapters
-@@ -307,3 +296,11 @@
+ device		ubsa		# Belkin F5U103 and compatible serial adapters
+@@ -324,3 +316,11 @@
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
@@ -126,9 +124,9 @@ Index: src/sys/i386/conf/GENERIC
 ===================================================================
 --- src.orig/sys/i386/conf/GENERIC
 +++ src/sys/i386/conf/GENERIC
-@@ -18,21 +18,21 @@
+@@ -18,13 +18,13 @@
  #
- # $FreeBSD: src/sys/i386/conf/GENERIC,v 1.507 2009/01/19 17:20:09 sam Exp $
+ # $FreeBSD: src/sys/i386/conf/GENERIC,v 1.511 2009/03/19 20:33:26 thompsa Exp $
  
 -cpu		I486_CPU
 -cpu		I586_CPU
@@ -145,7 +143,7 @@ Index: src/sys/i386/conf/GENERIC
  
  # Use the following to compile in values accessible to the kernel
  # through getenv() (or kenv(1) in userland). The format of the file
- # is 'variable=value', see kenv(1)
+@@ -32,7 +32,7 @@
  #
  # env		"GENERIC.env"
  
@@ -154,7 +152,7 @@ Index: src/sys/i386/conf/GENERIC
  
  options 	SCHED_ULE		# ULE scheduler
  options 	PREEMPTION		# Enable kernel thread preemption
-@@ -46,6 +46,8 @@
+@@ -52,6 +52,8 @@
  options 	MSDOSFS			# MSDOS Filesystem
  options 	CD9660			# ISO 9660 Filesystem
  options 	PROCFS			# Process filesystem (requires PSEUDOFS)
@@ -163,8 +161,7 @@ Index: src/sys/i386/conf/GENERIC
  options 	PSEUDOFS		# Pseudo-filesystem framework
  options 	GEOM_PART_GPT		# GUID Partition Tables.
  options 	GEOM_LABEL		# Provides labelization
-@@ -53,8 +55,8 @@
- options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
+@@ -60,7 +62,7 @@
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
  options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
@@ -173,8 +170,8 @@ Index: src/sys/i386/conf/GENERIC
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -73,7 +75,7 @@
- #options 	KDTRACE_HOOKS		# Kernel DTrace hooks
+@@ -89,7 +91,7 @@
+ options 	WITNESS_SKIPSPIN	# Don't run witness on spinlocks for speed
  
  # To make an SMP kernel, the next two lines are needed
 -options 	SMP			# Symmetric MultiProcessor Kernel
@@ -182,7 +179,7 @@ Index: src/sys/i386/conf/GENERIC
  device		apic			# I/O APIC
  
  # CPU frequency control
-@@ -83,9 +85,6 @@
+@@ -100,9 +102,6 @@
  device		eisa
  device		pci
  
@@ -192,7 +189,7 @@ Index: src/sys/i386/conf/GENERIC
  # ATA and ATAPI devices
  device		ata
  device		atadisk		# ATA disk drives
-@@ -93,6 +92,8 @@
+@@ -110,6 +109,8 @@
  device		atapicd		# ATAPI CDROM drives
  device		atapifd		# ATAPI floppy drives
  device		atapist		# ATAPI tape drives
@@ -201,7 +198,7 @@ Index: src/sys/i386/conf/GENERIC
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -185,10 +186,6 @@
+@@ -201,10 +202,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -212,7 +209,7 @@ Index: src/sys/i386/conf/GENERIC
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -265,11 +262,8 @@
+@@ -286,11 +283,8 @@
  device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
@@ -224,8 +221,8 @@ Index: src/sys/i386/conf/GENERIC
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -288,15 +280,12 @@
- device		ugen		# Generic
+@@ -306,13 +300,11 @@
+ #device		udbp		# USB Double Bulk Pipe devices
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
 -device		ulpt		# Printer
@@ -235,12 +232,10 @@ Index: src/sys/i386/conf/GENERIC
  device		rum		# Ralink Technology RT2501USB wireless NICs
  device		zyd		# ZyDAS zb1211/zb1211b wireless NICs
 -device		urio		# Diamond Rio 500 MP3 player
--device		uscanner	# Scanners
  # USB Serial devices
- device		ucom		# Generic com ttys
  device		u3g		# USB-based 3G modems (Option, Huawei, Sierra)
  device		uark		# Technologies ARK3116 based serial adapters
-@@ -321,3 +310,11 @@
+@@ -339,3 +331,11 @@
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
