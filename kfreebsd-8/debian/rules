@@ -71,7 +71,7 @@ src-stamp:
 		-e 's,#\( \|\t\)*include\( \|\t\)*\(<\|"\)pflog.h\(>\|"\),,g' \
 	; done)
 
-	set -e ; cd $(CURDIR)/src ; QUILT_PC=$(CURDIR)/.pc QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a ; cd $(CURDIR)
+	set -e ; cd $(CURDIR)/src ; QUILT_PC=$(CURDIR)/.pc QUILT_PATCHES=$(CURDIR)/debian/patches quilt --quiltrc /dev/null push -a ; cd $(CURDIR)
 	install debian/gen-ld-u-options src/usr.sbin/config
 	grep -v ^__FBSDID src/sys/kern/subr_sbuf.c > src/usr.sbin/config/sbuf.c
 
