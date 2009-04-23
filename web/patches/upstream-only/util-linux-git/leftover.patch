@@ -1,3 +1,11 @@
+commit fb93f00a0aba9da63104cc6f12d19f527d9120d2
+Author: Aurelien Jarno <aurelien@aurel32.net>
+Date:   Wed Apr 22 09:30:41 2009 +0200
+
+    leftover.patch
+    
+    Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+
 diff --git a/login-utils/Makefile.am b/login-utils/Makefile.am
 index 5ed581b..0386cee 100644
 --- a/login-utils/Makefile.am
@@ -11,7 +19,7 @@ index 5ed581b..0386cee 100644
  
  if BUILD_INIT
 diff --git a/login-utils/agetty.c b/login-utils/agetty.c
-index 29ce149..500d7b3 100644
+index 90a64b3..500d7b3 100644
 --- a/login-utils/agetty.c
 +++ b/login-utils/agetty.c
 @@ -37,7 +37,7 @@
@@ -47,22 +55,6 @@ index 29ce149..500d7b3 100644
      /*
       * It seems to be a terminal. Set proper protections and ownership. Mode
       * 0622 is suitable for SYSV <4 because /bin/login does not change
-@@ -1146,11 +1151,15 @@ termio_final(op, tp, cp)
-     /* Account for upper case without lower case. */
- 
-     if (cp->capslock) {
-+#ifdef IUCLC
- 	tp->c_iflag |= IUCLC;
-+#endif
- #ifdef XCASE	
- 	tp->c_lflag |= XCASE;
- #endif
-+#ifdef OLCUC
- 	tp->c_oflag |= OLCUC;
-+#endif
-     }
-     /* Optionally enable hardware flow control */
- 
 diff --git a/sys-utils/ipcs.c b/sys-utils/ipcs.c
 index 55d5c80..f0243e3 100644
 --- a/sys-utils/ipcs.c
