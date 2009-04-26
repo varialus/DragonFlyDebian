@@ -33,10 +33,10 @@
 #define SHM_RND		020000		/* round attach address to SHMLBA */
 
 /* Commands for `shmctl'.  */
-#if 0 /* FreeBSD does not have these yet.  */
 #define SHM_LOCK	11		/* lock segment (root only) */
 #define SHM_UNLOCK	12		/* unlock segment (root only) */
-#endif
+
+__BEGIN_DECLS
 
 /* Segment low boundary address multiple.  */
 #define SHMLBA		(__getpagesize ())
@@ -60,15 +60,31 @@ struct shmid_ds
     void *__shm_internal;
   };
 
-#ifdef _KERNEL
+#ifdef __USE_MISC
 
-struct shminfo {
+/* ipcs ctl commands */
+# define SHM_STAT 	13
+# define SHM_INFO 	14
+
+struct shminfo
+  {
         int     shmmax,         /* max shared memory segment size (bytes) */
                 shmmin,         /* min shared memory segment size (bytes) */
                 shmmni,         /* max number of shared memory identifiers */
                 shmseg,         /* max shared memory segments per process */
                 shmall;         /* max amount of shared memory (pages) */
-};
+  };
 
-#endif
+struct shm_info
+  {
+    int used_ids;
+    unsigned long int shm_tot;	/* total allocated shm */
+    unsigned long int shm_rss;	/* total resident shm */
+    unsigned long int shm_swp;	/* total swapped shm */
+    unsigned long int swap_attempts;
+    unsigned long int swap_successes;
+  };
 
+#endif /* __USE_MISC */
+
+__END_DECLS
