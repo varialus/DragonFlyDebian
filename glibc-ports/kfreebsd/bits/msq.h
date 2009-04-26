@@ -55,8 +55,6 @@ struct msqid_ds
 
 # define msg_cbytes	__msg_cbytes
 
-# ifdef _KERNEL
-
 /* buffer for msgctl calls IPC_INFO, MSG_INFO */
 struct msginfo
   {
@@ -67,7 +65,5 @@ struct msginfo
     int msgssz;
     int msgseg;
   };
-
-# endif
 
 #endif /* __USE_MISC */
