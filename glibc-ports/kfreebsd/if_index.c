@@ -75,7 +75,15 @@ if_iterate (if_fn fn, void *private)
 	      if (index == 0)
 		abort ();
 
+	      /* FIXME: 'struct if_msghdr' contains a 'struct if_data' which in turns
+	         contains 'unsigned long' values. Their size therefore depends on
+		 the running kernel (32 or 64 bits). This should be fixed in the
+		 compat layer of the kernel. Meanwhile just workaround the bug here/ */
+#if 0
 	      sdl = (struct sockaddr_dl *) (msg + 1);
+#else
+	      sdl = (struct sockaddr_dl *) (p + msg->ifm_msglen - sizeof(struct sockaddr_dl) - 2);
+#endif
 	      namelen = sdl->sdl_nlen;
 	      /* Avoid overflowing namebuf[].  */
 	      if (namelen > IFNAMSIZ)
