@@ -2,6 +2,8 @@
  sbin/route/route.c |    8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
 
+Index: b/sbin/route/route.c
+===================================================================
 --- a/sbin/route/route.c
 +++ b/sbin/route/route.c
 @@ -63,10 +63,12 @@
@@ -35,15 +37,17 @@
  		switch(ch) {
  		case 'n':
  			nflag = 1;
-@@ -819,7 +821,7 @@
- 			else if (IN_CLASSC(addr))
- 				mask = IN_CLASSC_NET;
- 			else if (IN_MULTICAST(addr))
--				mask = IN_CLASSD_NET;
-+				mask = 0xf0000000;
- 			else
- 				mask = 0xffffffff;
- 		}
+@@ -821,7 +823,7 @@
+ 	else if (IN_CLASSC(addr))
+ 		mask = IN_CLASSC_NET;
+ 	else if (IN_MULTICAST(addr))
+-		mask = IN_CLASSD_NET;
++		mask = 0xf0000000;
+ 	else
+ 		mask = 0xffffffff;
+ 
+Index: b/sbin/route/Makefile
+===================================================================
 --- a/sbin/route/Makefile
 +++ b/sbin/route/Makefile
 @@ -10,6 +10,7 @@

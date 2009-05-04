@@ -4,6 +4,8 @@
  sbin/mount/mount_fs.c |    2 +-
  3 files changed, 15 insertions(+), 12 deletions(-)
 
+Index: b/sbin/mount/mount_fs.c
+===================================================================
 --- a/sbin/mount/mount_fs.c
 +++ b/sbin/mount/mount_fs.c
 @@ -52,7 +52,7 @@
@@ -15,9 +17,11 @@
  #include <libgen.h>
  #include <stdio.h>
  #include <stdlib.h>
+Index: b/sbin/mount/mount.c
+===================================================================
 --- a/sbin/mount/mount.c
 +++ b/sbin/mount/mount.c
-@@ -60,6 +60,8 @@
+@@ -58,6 +58,8 @@
  #include <unistd.h>
  #include <libutil.h>
  
@@ -26,31 +30,31 @@
  #include "extern.h"
  #include "mntopts.h"
  #include "pathnames.h"
-@@ -159,10 +161,9 @@
+@@ -168,12 +170,9 @@
  		exit (1);
  	case 0:					/* Child. */
  		/* Go find an executable. */
 -		execvP(execname, _PATH_SYSPATH, argv);
 +		execvp(execname, argv);
  		if (errno == ENOENT) {
--			warn("exec %s not found in %s", execname,
--			    _PATH_SYSPATH);
-+			warn("exec %s not found", execname);
+ 			warn("exec %s not found", execname);
+-			if (execname[0] != '/') {
+-				warnx("in path: %s", _PATH_SYSPATH);
+-			}
  		}
  		exit(1);
  	default:				/* Parent. */
-@@ -209,7 +210,9 @@
+@@ -218,6 +217,9 @@
+ static void
+ restart_mountd(void)
  {
- 	struct pidfh *pfh;
- 	pid_t mountdpid; 
--
 +#if 1
 +#warning missing pidfile_open(), pidfile_remove()
 +#else
- 	pfh = pidfile_open(_PATH_MOUNTDPID, 0600, &mountdpid);
- 	if (pfh != NULL) {
- 		/* Mountd is not running. */
-@@ -223,6 +226,7 @@
+ 	struct pidfh *pfh;
+ 	pid_t mountdpid;
+ 
+@@ -234,6 +236,7 @@
  	/* We have mountd(8) PID in mountdpid varible, let's signal it. */
  	if (kill(mountdpid, SIGHUP) == -1)
  		err(1, "signal mountd");
@@ -58,7 +62,7 @@
  }
  
  int
-@@ -239,7 +243,7 @@
+@@ -250,7 +253,7 @@
  	options = NULL;
  	vfslist = NULL;
  	vfstype = "ufs";
@@ -67,7 +71,7 @@
  		switch (ch) {
  		case 'a':
  			all = 1;
-@@ -247,9 +251,6 @@
+@@ -258,9 +261,6 @@
  		case 'd':
  			debug = 1;
  			break;
@@ -77,7 +81,7 @@
  		case 'f':
  			init_flags |= MNT_FORCE;
  			break;
-@@ -616,11 +617,13 @@
+@@ -642,11 +642,13 @@
  			(void)printf(", reads: sync %ju async %ju",
  			    (uintmax_t)sfp->f_syncreads,
  			    (uintmax_t)sfp->f_asyncreads);
@@ -91,7 +95,7 @@
  	}
  	(void)printf(")\n");
  }
-@@ -798,7 +801,7 @@
+@@ -836,7 +838,7 @@
  {
  
  	(void)fprintf(stderr, "%s\n%s\n%s\n",
@@ -100,7 +104,7 @@
  "       mount [-dfpruvw] special | node",
  "       mount [-dfpruvw] [-o options] [-t ufs | external_type] special node");
  	exit(1);
-@@ -815,7 +818,7 @@
+@@ -853,7 +855,7 @@
  
  	if (strncmp(ent->f_mntfromname, "<below>", 7) == 0 ||
  	    strncmp(ent->f_mntfromname, "<above>", 7) == 0) {
@@ -109,6 +113,8 @@
  		    +1));
  	}
  
+Index: b/sbin/mount/Makefile
+===================================================================
 --- a/sbin/mount/Makefile
 +++ b/sbin/mount/Makefile
 @@ -8,6 +8,6 @@
