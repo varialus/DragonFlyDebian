@@ -2,6 +2,15 @@ Index: ufsutils/libufs/type.c
 ===================================================================
 --- ufsutils.orig/libufs/type.c
 +++ ufsutils/libufs/type.c
+@@ -108,7 +108,7 @@
+ 		 */
+ 		name = oname;
+ 	}
+-	if (ret >= 0 && S_ISCHR(st.st_mode)) {
++	if (ret >= 0 && (S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode) || S_ISREG(st.st_mode))) {
+ 		/* This is what we need, do nothing. */
+ 		;
+ 	} else if ((fs = getfsfile(name)) != NULL) {
 @@ -131,8 +131,10 @@
  			ERROR(disk, "could not find special device");
  			return (-1);
@@ -9,11 +18,10 @@ Index: ufsutils/libufs/type.c
 +#if HAVE_BSD_STATFS
  		strlcpy(dev, sfs.f_mntfromname, sizeof(dev));
  		name = dev;
-+#endif		
++#endif
  	} else {
  		ERROR(disk, "could not find special device");
  		return (-1);
-
 Index: ufsutils/include/ufs/ffs/fs.h
 ===================================================================
 --- ufsutils.orig/include/ufs/ffs/fs.h
@@ -59,7 +67,7 @@ Index: ufsutils/libufs/Makefile
 --- ufsutils.orig/libufs/Makefile
 +++ ufsutils/libufs/Makefile
 @@ -1,26 +1,16 @@
- # $FreeBSD: src/lib/libufs/Makefile,v 1.14 2006/10/31 21:21:48 pjd Exp $
+ # $FreeBSD: src/lib/libufs/Makefile,v 1.14.8.1 2009/04/15 03:14:26 kensmith Exp $
  
  LIB=	ufs
 -SHLIBDIR?= /lib
