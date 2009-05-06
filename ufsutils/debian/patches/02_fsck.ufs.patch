@@ -12,27 +12,7 @@ Index: ufsutils/fsck.ufs/gjournal.c
  #include <sys/param.h>
  #include <sys/disklabel.h>
  #include <sys/mount.h>
-@@ -73,6 +76,19 @@
- 
- #include "fsck.h"
- 
-+
-+/*
-+   the glibc variant is broken,
-+   it have one extra "("
-+   workaround it here
-+ */
-+#undef LIST_FOREACH_SAFE
-+#define	LIST_FOREACH_SAFE(var, head, field, tvar)			\
-+	for ((var) = ((head)->lh_first);				\
-+	    (var) && ((tvar) = ((var)->field.le_next), 1);		\
-+	    (var) = (tvar))
-+
-+
- struct cgchain {
- 	union {
- 		struct cg cgcu_cg;
-@@ -774,3 +790,4 @@
+@@ -774,3 +777,4 @@
  	/* Write back updated statistics and super-block. */
  	putdisk();
  }
