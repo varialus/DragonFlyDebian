@@ -16,9 +16,14 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#ifndef _SYS_UIO_H
+#if !defined _SYS_UIO_H && !defined _FCNTL_H
 # error "Never include <bits/uio.h> directly; use <sys/uio.h> instead."
 #endif
+
+#ifndef _BITS_UIO_H
+#define _BITS_UIO_H     1
+
+#include <sys/types.h>
 
 
 /* `struct iovec' -- Structure describing a section of memory.  */
@@ -47,3 +52,4 @@ enum uio_seg {
 };
 #endif
 
+#endif
