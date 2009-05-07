@@ -1,0 +1,230 @@
+diff -u util-linux-2.15~rc2/debian/rules util-linux-2.15~rc2/debian/rules
+--- util-linux-2.15~rc2/debian/rules
++++ util-linux-2.15~rc2/debian/rules
+@@ -70,11 +70,6 @@
+ 	$(MAKE) install DESTDIR=`pwd`/debian/util-linux INSTALL_STRIP_FLAG=""
+ 	dh_installdocs -i -s
+ 	install -m 644 login-utils/README.modems-with-agetty debian/util-linux/usr/share/doc/util-linux/README.modems-with-getty
+-ifeq ($(DEB_HOST_ARCH_OS),linux)
+-	perl -pi.bak -e 's/agetty/getty/g' debian/util-linux/usr/share/man/man8/getty.8 \
+-		  debian/util-linux/usr/share/doc/util-linux/README.*
+-	rm `find debian/util-linux/usr -name \*.bak`
+-endif
+ 	dh_installexamples -i -s
+ 	dh_installmenu -i -s
+ 	dh_installcron -i -s
+@@ -83,10 +78,12 @@
+ 	dh_movefiles --sourcedir=debian/util-linux -i -s
+ 	#
+ 	# XXX - push things to where debian has always(?) had them...
++ifeq ($(DEB_HOST_ARCH_OS),linux)
+ 	mv debian/util-linux/usr/sbin/*part* debian/util-linux/usr/bin
++	mv debian/util-linux/usr/bin/cytune debian/util-linux/usr/sbin
++endif
+ 	mv debian/util-linux/usr/bin/tailf debian/util-linux/bin
+ 	mv debian/util-linux/usr/bin/isosize debian/util-linux/sbin
+-	mv debian/util-linux/usr/bin/cytune debian/util-linux/usr/sbin
+ 	mv debian/util-linux/usr/share/man/man8/linux32.8 debian/util-linux/usr/share/man/man1/linux32.1
+ 	mv debian/util-linux/usr/share/man/man8/linux64.8 debian/util-linux/usr/share/man/man1/linux64.1
+ 	# the version in bsdmainutils seems newer.
+@@ -125,17 +122,22 @@
+ 	fi
+ 	cd debian/util-linux-locales && find usr/share/locale -type f | while read x; do ln $$x ../cfdisk-udeb/$$x; done
+ ifeq ($(DEB_HOST_ARCH_OS),linux)
++	install -m 644 debian/mount.fstab debian/mount/usr/share/doc/mount/examples/fstab
+ ifeq ($(arch),$(findstring $(arch),powerpc ppc64))
+ 	mv -f debian/util-linux/sbin/fdisk debian/util-linux/sbin/ddisk
+ 	mv -f debian/util-linux/usr/share/man/man8/fdisk.8 debian/util-linux/usr/share/man/man8/ddisk.8
+ else
+ 	cd debian/util-linux && if [ -f sbin/hwclock ] ; then ln -sf hwclock.8.gz usr/share/man/man8/clock.8.gz; fi
+ endif
++endif
++ifneq ($(DEB_HOST_ARCH_OS),hurd)
+ 	cd debian/util-linux/sbin ; mv agetty getty
+ 	cd debian/util-linux/usr/share/man/man8 ; mv agetty.8 getty.8
+-	install -m 644 debian/mount.fstab debian/mount/usr/share/doc/mount/examples/fstab
++	perl -pi.bak -e 's/agetty/getty/g' debian/util-linux/usr/share/man/man8/getty.8 \
++		  debian/util-linux/usr/share/doc/util-linux/README.*
++	rm `find debian/util-linux/usr -name \*.bak`
+ endif
+-ifeq ($(DEB_HOST_GNU_SYSTEM),gnu)
++ifneq ($(DEB_HOST_ARCH_OS),linux)
+ 	cd debian/util-linux/sbin ; mv mkswap mkswap.linux
+ 	cd debian/util-linux/usr/share/man/man8 ; mv mkswap.8 mkswap.linux.8
+ endif
+@@ -163,7 +165,7 @@
+ 	dh_makeshlibs -s
+ 	dh_installdeb -s
+ 	dh_shlibdeps -s
+-ifneq ($(DEB_HOST_ARCH_OS),linux)
++ifeq ($(DEB_HOST_ARCH_OS),hurd)
+ 	echo util-linux:Conflicts=getty >> debian/util-linux.substvars
+ endif
+ 	dh_gencontrol -s -Xbsdutils
+--- util-linux-2.15~rc2/debian/util-linux.conffiles
++++ util-linux-2.15~rc2.orig/debian/util-linux.conffiles
+@@ -1 +0,0 @@
+-/etc/init.d/hwclock.sh
+diff -u util-linux-2.15~rc2/login-utils/Makefile.in util-linux-2.15~rc2/login-utils/Makefile.in
+--- util-linux-2.15~rc2/login-utils/Makefile.in
++++ util-linux-2.15~rc2/login-utils/Makefile.in
+@@ -108,7 +108,7 @@
+ 	$(usrbinexec_PROGRAMS) $(usrsbinexec_PROGRAMS)
+ agetty_SOURCES = agetty.c
+ agetty_OBJECTS = agetty.$(OBJEXT)
+-agetty_LDADD = $(LDADD)
++agetty_DEPENDENCIES =
+ am_checktty_test_OBJECTS = checktty_test-checktty.$(OBJEXT)
+ checktty_test_OBJECTS = $(am_checktty_test_OBJECTS)
+ checktty_test_LDADD = $(LDADD)
+@@ -390,6 +390,7 @@
+ dist_man_MANS = $(am__append_2) $(am__append_4) $(am__append_6) \
+ 	$(am__append_10) $(am__append_26) $(am__append_28)
+ EXTRA_DIST = README.getty  README.modems-with-agetty  README.poeigl
++@BUILD_AGETTY_TRUE@agetty_LDADD = -lutil
+ @BUILD_INIT_TRUE@simpleinit_SOURCES = simpleinit.c my_crypt.h simpleinit.h
+ @BUILD_INIT_TRUE@initctl_SOURCES = initctl.c simpleinit.h
+ @BUILD_INIT_TRUE@@NEED_LIBCRYPT_TRUE@simpleinit_LDADD = -lcrypt
+--- util-linux-2.15~rc2.orig/schedutils/chrt.c
++++ util-linux-2.15~rc2/schedutils/chrt.c
+@@ -34,7 +34,7 @@
+ /* the SCHED_BATCH is supported since Linux 2.6.16
+  *  -- temporary workaround for people with old glibc headers
+  */
+-#ifndef SCHED_BATCH
++#if defined (__linux__) && !defined(SCHED_BATCH)
+ # define SCHED_BATCH 3
+ #endif
+ 
+@@ -42,7 +42,7 @@
+  * commit id 0e6aca43e08a62a48d6770e9a159dbec167bf4c6
+  * -- temporary workaround for people with old glibc headers
+  */
+-#ifndef SCHED_IDLE
++#if defined (__linux__) && !defined(SCHED_IDLE)
+ # define SCHED_IDLE 5
+ #endif
+ 
+@@ -95,15 +95,19 @@
+ 	case SCHED_FIFO:
+ 		printf("SCHED_FIFO\n");
+ 		break;
++#ifdef SCHED_IDLE
+ 	case SCHED_IDLE:
+ 		printf("SCHED_IDLE\n");
+ 		break;
++#endif
+ 	case SCHED_RR:
+ 		printf("SCHED_RR\n");
+ 		break;
++#ifdef SCHED_BATCH
+ 	case SCHED_BATCH:
+ 		printf("SCHED_BATCH\n");
+ 		break;
++#endif
+ 	default:
+ 		printf(_("unknown\n"));
+ 	}
+@@ -119,8 +123,21 @@
+ {
+ 	int i;
+ 	int policies[] = { SCHED_OTHER, SCHED_FIFO, SCHED_RR,
+-			   SCHED_BATCH, SCHED_IDLE };
+-	const char *names[] = { "OTHER", "FIFO", "RR", "BATCH", "IDLE" };
++#ifdef SCHED_BATCH
++			   SCHED_BATCH,
++#endif
++#ifdef SCHED_IDLE
++			   SCHED_IDLE,
++#endif
++			 };
++	const char *names[] = { "OTHER", "FIFO", "RR",
++#ifdef SCHED_BATCH
++				"BATCH",
++#endif
++#ifdef SCHED_IDLE
++				"IDLE",
++#endif
++			      };
+ 
+ 	for (i = 0; i < ARRAY_SIZE(policies); i++) {
+ 		int max = sched_get_priority_max(policies[i]);
+@@ -164,13 +181,17 @@
+ 
+ 		switch (i) {
+ 		case 'b':
++#ifdef SCHED_BATCH
+ 			policy = SCHED_BATCH;
++#endif
+ 			break;
+ 		case 'f':
+ 			policy = SCHED_FIFO;
+ 			break;
+ 		case 'i':
++#ifdef SCHED_IDLE
+ 			policy = SCHED_IDLE;
++#endif
+ 			break;
+ 		case 'm':
+ 			show_min_max();
+--- util-linux-2.15~rc2.orig/sys-utils/ipcs.c
++++ util-linux-2.15~rc2/sys-utils/ipcs.c
+@@ -499,8 +499,10 @@
+ 
+ 	case STATUS:
+ 		printf (_("------ Messages: Status --------\n"));
++#ifndef __FreeBSD_kernel__
+ 		printf (_("allocated queues = %d\n"), msginfo.msgpool);
+ 		printf (_("used headers = %d\n"), msginfo.msgmap);
++#endif
+ 		printf (_("used space = %d bytes\n"), msginfo.msgtql);
+ 		return;
+ 
+--- util-linux-2.15~rc2.orig/login-utils/agetty.c
++++ util-linux-2.15~rc2/login-utils/agetty.c
+@@ -37,7 +37,11 @@
+ #include "nls.h"
+ #include "pathnames.h"
+ 
+-#ifdef __linux__
++#if defined(__FreeBSD_kernel__)
++#include <pty.h>
++#endif
++
++#if defined(__linux__) || defined(__FreeBSD_kernel__)
+ #include <sys/param.h>
+ #define USE_SYSLOG
+ #endif
+@@ -281,7 +285,7 @@
+ 
+     parse_args(argc, argv, &options);
+ 
+-#ifdef __linux__
++#if defined (__linux__) || defined(__FreeBSD_kernel__)
+ 	setsid();
+ #endif
+ 	
+@@ -670,6 +674,13 @@
+     if (tcgetattr(0, tp) < 0)
+ 	error("%s: tcgetattr: %m", tty);
+ 
++     /*
++     * login_tty: steal tty from other process group.
++     */
++#if defined(__FreeBSD_kernel__)
++     login_tty (0);
++#endif
++
+     /*
+      * It seems to be a terminal. Set proper protections and ownership. Mode
+      * 0622 is suitable for SYSV <4 because /bin/login does not change
+--- util-linux-2.15~rc2.orig/login-utils/Makefile.am
++++ util-linux-2.15~rc2/login-utils/Makefile.am
+@@ -11,6 +11,7 @@
+ if BUILD_AGETTY
+ sbin_PROGRAMS += agetty
+ dist_man_MANS += agetty.8
++agetty_LDADD = -lutil
+ endif
+ 
+ if BUILD_INIT
