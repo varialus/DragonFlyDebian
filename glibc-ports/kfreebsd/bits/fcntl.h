@@ -120,6 +120,7 @@ struct flock
     __pid_t l_pid;	/* Process holding the lock.  */
     short int l_type;	/* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK.	*/
     short int l_whence;	/* Where `l_start' is relative to (like `lseek').  */
+    int	__l_sysid;	/* remote system id or zero for local */
   };
 
 #ifdef __USE_LARGEFILE64
@@ -130,6 +131,7 @@ struct flock64
     __pid_t l_pid;	/* Process holding the lock.  */
     short int l_type;	/* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK.	*/
     short int l_whence;	/* Where `l_start' is relative to (like `lseek').  */
+    int	__l_sysid;	/* remote system id or zero for local */
   };
 #endif
 
