@@ -1,16 +1,31 @@
-Status: build, but hald does not work
+Status: build, works, some parts submitted upsteam, other parts a bit hackish
 
-diff -u hal-0.5.11~rc2/debian/control hal-0.5.11~rc2/debian/control
---- hal-0.5.11~rc2/debian/control
-+++ hal-0.5.11~rc2/debian/control
-@@ -68,6 +68,21 @@
-  .
-  This library provides an interface for handling storage devices.
+diff -u hal-0.5.12~git20090406.46dc48/debian/hal.install hal-0.5.12~git20090406.46dc48/debian/hal.install
+--- hal-0.5.12~git20090406.46dc48/debian/hal.install
++++ hal-0.5.12~git20090406.46dc48/debian/hal.install
+@@ -6,5 +6,4 @@
+ debian/tmp/usr/share/hal/fdi/
+ debian/tmp/usr/share/PolicyKit/
+-debian/tmp/lib/udev/rules.d/
+ debian/preferences.fdi  etc/hal/fdi/policy
+ debian/debian-storage-policy-ignore-fixed-crypto-drives.fdi usr/share/hal/fdi/policy/10osvendor
+diff -u hal-0.5.12~git20090406.46dc48/debian/control hal-0.5.12~git20090406.46dc48/debian/control
+--- hal-0.5.12~git20090406.46dc48/debian/control
++++ hal-0.5.12~git20090406.46dc48/debian/control
+@@ -32,7 +32,7 @@
  
+ Package: hal
+ Architecture: any
+-Depends: ${shlibs:Depends}, ${misc:Depends}, adduser, pciutils, usbutils, udev (>= 0.125), dbus (>= 0.61), lsb-base (>= 3.2-14), hal-info (>= 20070402), pm-utils, mount (>= 2.13), policykit (>= 0.7), consolekit (>= 0.3), acl
++Depends: ${shlibs:Depends}, ${misc:Depends}, adduser, pciutils, usbutils, dbus (>= 0.61), lsb-base (>= 3.2-14), hal-info (>= 20070402), freebsd-utils, policykit (>= 0.7), consolekit (>= 0.3), acl
+ Recommends: eject, libsmbios-bin [amd64 i386 lpia]
+ Suggests: gnome-device-manager
+ Description: Hardware Abstraction Layer
+@@ -125,0 +126,15 @@
 +Package: libhald-freebsd-probe0
 +Section: libs
 +Architecture: kfreebsd-i386 kfreebsd-amd64
-+Depends: ${shlibs:Depends}
++Depends: ${shlibs:Depends}, ${misc:Depends}
 +Description: Hardware Abstraction Layer - shared library for device probing
 + HAL provides an abstract view on hardware.
 + .
@@ -22,519 +37,424 @@ diff -u hal-0.5.11~rc2/debian/control hal-0.5.11~rc2/debian/control
 + .
 + This library provides device probing on FreeBSD.
 +
- Package: libhal-dev
- Section: libdevel
- Architecture: any
-diff -u hal-0.5.11~rc2/debian/changelog hal-0.5.11~rc2/debian/changelog
---- hal-0.5.11~rc2/debian/changelog
-+++ hal-0.5.11~rc2/debian/changelog
-@@ -1,3 +1,9 @@
-+hal (0.5.11~rc2-1+kbsd) unreleased; urgency=low
-+
-+  * Add support for GNU/kFreeBSD. 
-+
-+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 18 Mar 2008 15:43:58 +0100
-+
- hal (0.5.11~rc2-1) unstable; urgency=low
+--- hal-0.5.12~git20090406.46dc48.orig/configure
++++ hal-0.5.12~git20090406.46dc48/configure
+@@ -19138,7 +19138,7 @@
+         *-*-solaris*)
+ 		   HALD_BACKEND="solaris"
+ 		   ;;
+-        *-*-freebsd*)
++        *-*-freebsd* | *-*-kfreebsd*-gnu)
+                    HALD_BACKEND="freebsd"
+                    ;;
+ 	*-linux*)
+only in patch2:
+unchanged:
+--- hal-0.5.12~git20090406.46dc48.orig/configure.in
++++ hal-0.5.12~git20090406.46dc48/configure.in
+@@ -488,7 +488,7 @@
+         *-*-solaris*)
+ 		   HALD_BACKEND="solaris"
+ 		   ;;
+-        *-*-freebsd*)
++        *-*-freebsd* | *-*-kfreebsd*-gnu)
+                    HALD_BACKEND="freebsd"
+                    ;;
+ 	*-linux*)
+--- hal-0.5.12~git20090406.46dc48.orig/hald/freebsd/hf-storage.c
++++ hal-0.5.12~git20090406.46dc48/hald/freebsd/hf-storage.c
+@@ -644,7 +644,6 @@
+ hf_storage_device_enable (HalDevice *device)
+ {
+   g_return_if_fail(HAL_IS_DEVICE(device));
+-  g_return_if_fail(devname != NULL);
  
-   * New upstream release candidate
+   hal_device_property_set_string(device, "storage.bus", "platform");
+   hal_device_property_set_string(device, "storage.drive_type", "disk");
+--- hal-0.5.12~git20090406.46dc48.orig/hald/freebsd/bitstring.h
++++ hal-0.5.12~git20090406.46dc48/hald/freebsd/bitstring.h
+@@ -0,0 +1,146 @@
++/*-
++ * Copyright (c) 1989, 1993
++ *	The Regents of the University of California.  All rights reserved.
++ *
++ * This code is derived from software contributed to Berkeley by
++ * Paul Vixie.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ * 4. Neither the name of the University nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ * $FreeBSD: src/sys/sys/bitstring.h,v 1.5.18.1 2008/11/25 02:59:29 kensmith Exp $
++ */
++
++#ifndef _SYS_BITSTRING_H_
++#define	_SYS_BITSTRING_H_
++
++typedef	unsigned char bitstr_t;
++
++/* internal macros */
++				/* byte of the bitstring bit is in */
++#define	_bit_byte(bit) \
++	((bit) >> 3)
++
++				/* mask for the bit within its byte */
++#define	_bit_mask(bit) \
++	(1 << ((bit)&0x7))
++
++/* external macros */
++				/* bytes in a bitstring of nbits bits */
++#define	bitstr_size(nbits) \
++	(((nbits) + 7) >> 3)
++
++				/* allocate a bitstring */
++#define	bit_alloc(nbits) \
++	(bitstr_t *)calloc((size_t)bitstr_size(nbits), sizeof(bitstr_t))
++
++				/* allocate a bitstring on the stack */
++#define	bit_decl(name, nbits) \
++	((name)[bitstr_size(nbits)])
++
++				/* is bit N of bitstring name set? */
++#define	bit_test(name, bit) \
++	((name)[_bit_byte(bit)] & _bit_mask(bit))
++
++				/* set bit N of bitstring name */
++#define	bit_set(name, bit) \
++	((name)[_bit_byte(bit)] |= _bit_mask(bit))
++
++				/* clear bit N of bitstring name */
++#define	bit_clear(name, bit) \
++	((name)[_bit_byte(bit)] &= ~_bit_mask(bit))
++
++				/* clear bits start ... stop in bitstring */
++#define	bit_nclear(name, start, stop) do { \
++	register bitstr_t *_name = (name); \
++	register int _start = (start), _stop = (stop); \
++	register int _startbyte = _bit_byte(_start); \
++	register int _stopbyte = _bit_byte(_stop); \
++	if (_startbyte == _stopbyte) { \
++		_name[_startbyte] &= ((0xff >> (8 - (_start&0x7))) | \
++				      (0xff << ((_stop&0x7) + 1))); \
++	} else { \
++		_name[_startbyte] &= 0xff >> (8 - (_start&0x7)); \
++		while (++_startbyte < _stopbyte) \
++			_name[_startbyte] = 0; \
++		_name[_stopbyte] &= 0xff << ((_stop&0x7) + 1); \
++	} \
++} while (0)
++
++				/* set bits start ... stop in bitstring */
++#define	bit_nset(name, start, stop) do { \
++	register bitstr_t *_name = (name); \
++	register int _start = (start), _stop = (stop); \
++	register int _startbyte = _bit_byte(_start); \
++	register int _stopbyte = _bit_byte(_stop); \
++	if (_startbyte == _stopbyte) { \
++		_name[_startbyte] |= ((0xff << (_start&0x7)) & \
++				    (0xff >> (7 - (_stop&0x7)))); \
++	} else { \
++		_name[_startbyte] |= 0xff << ((_start)&0x7); \
++		while (++_startbyte < _stopbyte) \
++	    		_name[_startbyte] = 0xff; \
++		_name[_stopbyte] |= 0xff >> (7 - (_stop&0x7)); \
++	} \
++} while (0)
++
++				/* find first bit clear in name */
++#define	bit_ffc(name, nbits, value) do { \
++	register bitstr_t *_name = (name); \
++	register int _byte, _nbits = (nbits); \
++	register int _stopbyte = _bit_byte(_nbits - 1), _value = -1; \
++	if (_nbits > 0) \
++		for (_byte = 0; _byte <= _stopbyte; ++_byte) \
++			if (_name[_byte] != 0xff) { \
++				bitstr_t _lb; \
++				_value = _byte << 3; \
++				for (_lb = _name[_byte]; (_lb&0x1); \
++				    ++_value, _lb >>= 1); \
++				break; \
++			} \
++	if (_value >= nbits) \
++		_value = -1; \
++	*(value) = _value; \
++} while (0)
++
++				/* find first bit set in name */
++#define	bit_ffs(name, nbits, value) do { \
++	register bitstr_t *_name = (name); \
++	register int _byte, _nbits = (nbits); \
++	register int _stopbyte = _bit_byte(_nbits - 1), _value = -1; \
++	if (_nbits > 0) \
++		for (_byte = 0; _byte <= _stopbyte; ++_byte) \
++			if (_name[_byte]) { \
++				bitstr_t _lb; \
++				_value = _byte << 3; \
++				for (_lb = _name[_byte]; !(_lb&0x1); \
++				    ++_value, _lb >>= 1); \
++				break; \
++			} \
++	if (_value >= nbits) \
++		_value = -1; \
++	*(value) = _value; \
++} while (0)
++
++#endif /* !_SYS_BITSTRING_H_ */
+--- hal-0.5.12~git20090406.46dc48.orig/hald/freebsd/addons/addon-storage.c
++++ hal-0.5.12~git20090406.46dc48/hald/freebsd/addons/addon-storage.c
+@@ -181,10 +181,12 @@
+ static void
+ update_proc_title (const char *device, boolean polling_enabled)
+ {
++#ifndef __GLIBC__
+   if (polling_enabled)
+     setproctitle("%s", device);
+   else
+     setproctitle("no polling on %s because it is explicitly disabled", device);
++#endif
+ }
+ 
+ static DBusHandlerResult
+--- hal-0.5.12~git20090406.46dc48.orig/hald/freebsd/libprobe/hfp-cdrom.h
++++ hal-0.5.12~git20090406.46dc48/hald/freebsd/libprobe/hfp-cdrom.h
+@@ -28,7 +28,7 @@
+ #  include <config.h>
+ #endif
+ 
+-#include <sys/types.h>
++#include <stdint.h>
+ 
+ #include "hfp.h"
+ 
+@@ -53,8 +53,8 @@
+ typedef struct
+ {
+   /* mode page data header */
+-  u_int16_t   data_length;
+-  u_int8_t    medium_type;
++  uint16_t   data_length;
++  uint8_t    medium_type;
+ #define HFP_CDROM_MST_TYPE_MASK_LOW	0x0f
+ #define HFP_CDROM_MST_FMT_NONE		0x00
+ #define HFP_CDROM_MST_DATA_120		0x01
+@@ -75,17 +75,17 @@
+ #define HFP_CDROM_MST_DOOR_OPEN		0x71
+ #define HFP_CDROM_MST_FMT_ERROR		0x72
+ 
+-  u_int8_t    dev_spec;
+-  u_int16_t   unused;
+-  u_int16_t   blk_desc_len;
++  uint8_t    dev_spec;
++  uint16_t   unused;
++  uint16_t   blk_desc_len;
+ 
+   /* capabilities page */
+-  u_int8_t    page_code;
++  uint8_t    page_code;
+ #define HFP_CDROM_CAP_PAGE		0x2a
+ 
+-  u_int8_t    param_len;
++  uint8_t    param_len;
+ 
+-  u_int16_t   media;
++  uint16_t   media;
+ #define HFP_CDROM_MST_READ_CDR		0x0001
+ #define HFP_CDROM_MST_READ_CDRW		0x0002
+ #define HFP_CDROM_MST_READ_PACKET	0x0004
+@@ -98,7 +98,7 @@
+ #define HFP_CDROM_MST_WRITE_DVDR	0x1000
+ #define HFP_CDROM_MST_WRITE_DVDRAM	0x2000
+ 
+-  u_int16_t   capabilities;
++  uint16_t   capabilities;
+ #define HFP_CDROM_MSTAUDIO_PLAY		0x0001
+ #define HFP_CDROM_MST_COMPOSITE		0x0002
+ #define HFP_CDROM_MST_AUDIO_P1		0x0004
+@@ -115,7 +115,7 @@
+ #define HFP_CDROM_MST_ISRC		0x2000
+ #define HFP_CDROM_MST_UPC		0x4000
+ 
+-  u_int8_t    mechanism;
++  uint8_t    mechanism;
+ #define HFP_CDROM_MST_LOCKABLE		0x01
+ #define HFP_CDROM_MST_LOCKED		0x02
+ #define HFP_CDROM_MST_PREVENT		0x04
+@@ -131,18 +131,18 @@
+ #define HFP_CDROM_MST_SEP_VOL		0x01
+ #define HFP_CDROM_MST_SEP_MUTE		0x02
+ 
+-  u_int16_t   max_read_speed;		/* max raw data rate in bytes/1000 */
+-  u_int16_t   max_vol_levels;		/* number of discrete volume levels */
+-  u_int16_t   buf_size;			/* internal buffer size in bytes/1024 */
+-  u_int16_t   cur_read_speed;		/* current data rate in bytes/1000  */
+-
+-  u_int8_t    reserved3;
+-  u_int8_t    misc;
+-
+-  u_int16_t   max_write_speed;		/* max raw data rate in bytes/1000 */
+-  u_int16_t   cur_write_speed;		/* current data rate in bytes/1000  */
+-  u_int16_t   copy_protect_rev;
+-  u_int16_t   reserved4;
++  uint16_t   max_read_speed;		/* max raw data rate in bytes/1000 */
++  uint16_t   max_vol_levels;		/* number of discrete volume levels */
++  uint16_t   buf_size;			/* internal buffer size in bytes/1024 */
++  uint16_t   cur_read_speed;		/* current data rate in bytes/1000  */
++
++  uint8_t    reserved3;
++  uint8_t    misc;
++
++  uint16_t   max_write_speed;		/* max raw data rate in bytes/1000 */
++  uint16_t   cur_write_speed;		/* current data rate in bytes/1000  */
++  uint16_t   copy_protect_rev;
++  uint16_t   reserved4;
+ } HFPCDROMCapabilities;
+ 
+ HFPCDROM *hfp_cdrom_new (const char *path, const char *parent);
+--- hal-0.5.12~git20090406.46dc48.orig/hald/freebsd/probing/probe-volume.c
++++ hal-0.5.12~git20090406.46dc48/hald/freebsd/probing/probe-volume.c
+@@ -59,7 +59,7 @@
+ };
+ #define ISO_PATH_TABLE_ENTRY_SIZE         8
+ 
+-#if __FreeBSD_version < 600101
++#if (__FreeBSD_version < 600101) && (__FreeBSD_kernel_version < 600101)
+ static uint32_t
+ isonum_731(unsigned char *p)
+ {
+@@ -342,7 +342,9 @@
+     goto end;
+ 
+   /* give a meaningful process title for ps(1) */
++#ifndef __GLIBC__
+   setproctitle("%s", device_file);
++#endif
+ 
+   has_children = hfp_getenv_bool("HF_HAS_CHILDREN");
+   is_swap = hfp_getenv_bool("HF_IS_SWAP");
 only in patch2:
 unchanged:
---- hal-0.5.11~rc2.orig/debian/patches/68-kfreebsd.patch
-+++ hal-0.5.11~rc2/debian/patches/68-kfreebsd.patch
-@@ -0,0 +1,483 @@
-+--- hal-0.5.10+git20080301.orig/configure
-++++ hal-0.5.10+git20080301/configure
-+@@ -23485,7 +23485,7 @@
-+         *-*-solaris*)
-+ 		   HALD_BACKEND="solaris"
-+ 		   ;;
-+-        *-*-freebsd*)
-++        *-*-freebsd* | *-*-kfreebsd*-gnu)
-+                    HALD_BACKEND="freebsd"
-+                    ;;
-+ 	*-linux*)
-+--- hal-0.5.10+git20080301.orig/tools/hal-storage-shared.c
-++++ hal-0.5.10+git20080301/tools/hal-storage-shared.c
-+@@ -31,7 +31,7 @@
-+ #include <string.h>
-+ #include <glib.h>
-+ #include <glib/gstdio.h>
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ #include <fstab.h>
-+ #include <sys/param.h>
-+ #include <sys/ucred.h>
-+@@ -53,7 +53,7 @@
-+ 
-+ #include "hal-storage-shared.h"
-+ 
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ struct mtab_handle
-+ {
-+   struct statfs	*mounts;
-+@@ -66,7 +66,7 @@
-+ gboolean
-+ mtab_open (gpointer *handle)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	struct mtab_handle *mtab;
-+ 
-+ 	mtab = g_new0 (struct mtab_handle, 1);
-+@@ -90,7 +90,7 @@
-+ char *
-+ mtab_next (gpointer handle, char **mount_point)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	struct mtab_handle *mtab = handle;
-+ 
-+ 	if (mtab->iter < mtab->n_mounts) {
-+@@ -131,7 +131,7 @@
-+ void
-+ mtab_close (gpointer handle)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	g_free (handle);
-+ #else
-+ 	fclose (handle);
-+@@ -143,7 +143,7 @@
-+ gboolean
-+ fstab_open (gpointer *handle)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	return setfsent () == 1;
-+ #elif sun
-+ 	*handle = fopen (VFSTAB, "r");
-+@@ -157,7 +157,7 @@
-+ char *
-+ fstab_next (gpointer handle, char **mount_point)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	struct fstab *fstab;
-+ 
-+ 	fstab = getfsent ();
-+@@ -188,14 +188,14 @@
-+ void
-+ fstab_close (gpointer handle)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	endfsent ();
-+ #else
-+ 	fclose (handle);
-+ #endif
-+ }
-+ 
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ #define UMOUNT		"/sbin/umount"
-+ #elif sun
-+ #define UMOUNT		"/sbin/umount"
-+--- hal-0.5.10+git20080301.orig/tools/hal-system-sonypic.c
-++++ hal-0.5.10+git20080301/tools/hal-system-sonypic.c
-+@@ -63,7 +63,7 @@
-+ static int
-+ sonypi_get_lcd_brightness (__u8 *val)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	return FALSE;			/* FIXME implement */
-+ #elif sun
-+ 	return FALSE;			/* FIXME implement */
-+@@ -163,7 +163,7 @@
-+ static int
-+ sonypi_set_lcd_brightness (__u8 val)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	return FALSE;			/* FIXME implement */
-+ #elif sun
-+ 	return FALSE;			/* FIXME implement */
-+@@ -195,7 +195,7 @@
-+ static int
-+ sonypi_set_bluetooth_power (int val)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	return FALSE;			/* FIXME implement */
-+ #elif sun
-+ 	return FALSE;			/* FIXME implement */
-+--- hal-0.5.10+git20080301.orig/tools/hal-storage-unmount.c
-++++ hal-0.5.10+git20080301/tools/hal-storage-unmount.c
-+@@ -31,7 +31,7 @@
-+ #include <string.h>
-+ #include <glib.h>
-+ #include <glib/gstdio.h>
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ #include <fstab.h>
-+ #include <sys/param.h>
-+ #include <sys/ucred.h>
-+--- hal-0.5.10+git20080301.orig/tools/hal-storage-mount.c
-++++ hal-0.5.10+git20080301/tools/hal-storage-mount.c
-+@@ -31,7 +31,7 @@
-+ #include <string.h>
-+ #include <glib.h>
-+ #include <glib/gstdio.h>
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ #include <fstab.h>
-+ #include <sys/param.h>
-+ #include <sys/ucred.h>
-+@@ -54,7 +54,7 @@
-+ 
-+ #include "hal-storage-shared.h"
-+ 
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__)
-+ #define MOUNT		"/sbin/mount"
-+ #define MOUNT_OPTIONS	"noexec,nosuid"
-+ #define MOUNT_TYPE_OPT	"-t"
-+@@ -421,7 +421,7 @@
-+ static const char *
-+ map_fstype (const char *fstype)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	if (! strcmp (fstype, "iso9660"))
-+ 		return "cd9660";
-+ 	else if (! strcmp (fstype, "ext2"))
-+@@ -470,7 +470,7 @@
-+ 	gboolean is_remount;
-+ 	gboolean explicit_mount_point_given;
-+ 	const char *end;
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	struct passwd *pw;
-+ 	uid_t calling_uid;
-+ 	gid_t calling_gid;
-+@@ -829,7 +829,7 @@
-+ 			unknown_error ("Cannot create mount directory");
-+ 		}
-+ 		
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 		calling_uid = (uid_t) strtol (invoked_by_uid, (char **) NULL, 10);
-+ 		pw = getpwuid (calling_uid);
-+ 		if (pw != NULL) {
-+--- hal-0.5.10+git20080301.orig/tools/hal-system-power-pmu.c
-++++ hal-0.5.10+git20080301/tools/hal-system-power-pmu.c
-+@@ -53,7 +53,7 @@
-+ static int
-+ pmac_sleep (void)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	return FALSE;			/* FIXME implement */
-+ #elif sun
-+ 	return FALSE;			/* FIXME implement */
-+@@ -90,7 +90,7 @@
-+ static int
-+ pmac_get_lcd_brightness (int *val)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	return FALSE;			/* FIXME implement */
-+ #elif sun
-+ 	return FALSE;			/* FIXME implement */
-+@@ -127,7 +127,7 @@
-+ static int
-+ pmac_set_lcd_brightness (int val)
-+ {
-+-#ifdef __FreeBSD__
-++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
-+ 	return FALSE;			/* FIXME implement */
-+ #elif sun
-+ 	return FALSE;			/* FIXME implement */
-+--- hal-0.5.10+git20080301.orig/configure.in
-++++ hal-0.5.10+git20080301/configure.in
-+@@ -457,7 +457,7 @@
-+         *-*-solaris*)
-+ 		   HALD_BACKEND="solaris"
-+ 		   ;;
-+-        *-*-freebsd*)
-++        *-*-freebsd* | *-*-kfreebsd*-gnu)
-+                    HALD_BACKEND="freebsd"
-+                    ;;
-+ 	*-linux*)
-+--- hal-0.5.10+git20080301.orig/hald/freebsd/addons/addon-storage.c
-++++ hal-0.5.10+git20080301/hald/freebsd/addons/addon-storage.c
-+@@ -153,10 +153,12 @@
-+ static void
-+ update_proc_title (const char *device, boolean polling_enabled)
-+ {
-++#ifndef __GLIBC__
-+   if (polling_enabled)
-+     setproctitle("%s", device);
-+   else
-+     setproctitle("no polling on %s because it is explicitly disabled", device);
-++#endif
-+ }
-+ 
-+ int
-+--- hal-0.5.10+git20080301.orig/hald/freebsd/hf-storage.c
-++++ hal-0.5.10+git20080301/hald/freebsd/hf-storage.c
-+@@ -644,7 +644,6 @@
-+ hf_storage_device_enable (HalDevice *device)
-+ {
-+   g_return_if_fail(HAL_IS_DEVICE(device));
-+-  g_return_if_fail(devname != NULL);
-+ 
-+   hal_device_property_set_string(device, "storage.bus", "platform");
-+   hal_device_property_set_string(device, "storage.drive_type", "disk");
-+--- hal-0.5.10+git20080301.orig/hald/freebsd/libprobe/hfp-cdrom.h
-++++ hal-0.5.10+git20080301/hald/freebsd/libprobe/hfp-cdrom.h
-+@@ -127,7 +127,7 @@
-+ #define HFP_CDROM_MST_MECH_CHANGER	0x80
-+ #define HFP_CDROM_MST_MECH_CARTRIDGE	0xa0
-+ 
-+-  uint8_t     audio;
-++  u_int8_t     audio;
-+ #define HFP_CDROM_MST_SEP_VOL		0x01
-+ #define HFP_CDROM_MST_SEP_MUTE		0x02
-+ 
-+--- hal-0.5.10+git20080301.orig/hald/freebsd/probing/probe-scsi.c
-++++ hal-0.5.10+git20080301/hald/freebsd/probing/probe-scsi.c
-+@@ -48,7 +48,9 @@
-+     goto end;
-+ 
-+   /* give a meaningful process title for ps(1) */
-++#ifdef __FreeBSD__
-+   setproctitle("%s", device_file);
-++#endif
-+ 
-+   /* cam_open_device() fails unless we use O_RDWR */
-+   cam = cam_open_device(device_file, O_RDWR);
-+--- hal-0.5.10+git20080301.orig/hald/freebsd/probing/probe-storage.c
-++++ hal-0.5.10+git20080301/hald/freebsd/probing/probe-storage.c
-+@@ -192,7 +192,9 @@
-+     goto end;
-+ 
-+   /* give a meaningful process title for ps(1) */
-++#ifdef __FreeBSD__
-+   setproctitle("%s", device_file);
-++#endif
-+ 
-+   has_children = hfp_getenv_bool("HF_HAS_CHILDREN");
-+   only_check_for_media = hfp_getenv_bool("HF_ONLY_CHECK_FOR_MEDIA");
-+--- hal-0.5.10+git20080301.orig/hald/freebsd/probing/probe-hiddev.c
-++++ hal-0.5.10+git20080301/hald/freebsd/probing/probe-hiddev.c
-+@@ -34,6 +34,7 @@
-+ #include <usbhid.h>
-+ 
-+ #include "../libprobe/hfp.h"
-++#include "../../util_helper.h"
-+ 
-+ #define HID_COLLECTION_APPLICATION	1
-+ 
-+@@ -63,7 +64,9 @@
-+     goto end;
-+ 
-+   /* give a meaningful process title for ps(1) */
-++#ifdef __FreeBSD__
-+   setproctitle("%s", device_file);
-++#endif
-+ 
-+   if (ioctl(fd, USB_GET_REPORT_ID, &report_id) < 0)
-+     goto end;
-+--- hal-0.5.10+git20080301.orig/hald/freebsd/probing/probe-volume.c
-++++ hal-0.5.10+git20080301/hald/freebsd/probing/probe-volume.c
-+@@ -342,7 +342,9 @@
-+     goto end;
-+ 
-+   /* give a meaningful process title for ps(1) */
-++#ifdef __FreeBSD__
-+   setproctitle("%s", device_file);
-++#endif
-+ 
-+   has_children = hfp_getenv_bool("HF_HAS_CHILDREN");
-+   is_swap = hfp_getenv_bool("HF_IS_SWAP");
-+--- hal-0.5.10+git20080301.orig/hald/freebsd/hf-pci.c
-++++ hal-0.5.10+git20080301/hald/freebsd/hf-pci.c
-+@@ -27,7 +27,7 @@
-+ 
-+ #include <stdio.h>
-+ #include <string.h>
-+-#include <bitstring.h>
-++#include "bitstring.h"
-+ #include <errno.h>
-+ #include <fcntl.h>
-+ #include <unistd.h>
-+--- hal-0.5.10+git20080301.orig/hald/freebsd/bitstring.h
-++++ hal-0.5.10+git20080301/hald/freebsd/bitstring.h
-+@@ -0,0 +1,146 @@
-++/*-
-++ * Copyright (c) 1989, 1993
-++ *	The Regents of the University of California.  All rights reserved.
-++ *
-++ * This code is derived from software contributed to Berkeley by
-++ * Paul Vixie.
-++ *
-++ * Redistribution and use in source and binary forms, with or without
-++ * modification, are permitted provided that the following conditions
-++ * are met:
-++ * 1. Redistributions of source code must retain the above copyright
-++ *    notice, this list of conditions and the following disclaimer.
-++ * 2. Redistributions in binary form must reproduce the above copyright
-++ *    notice, this list of conditions and the following disclaimer in the
-++ *    documentation and/or other materials provided with the distribution.
-++ * 4. Neither the name of the University nor the names of its contributors
-++ *    may be used to endorse or promote products derived from this software
-++ *    without specific prior written permission.
-++ *
-++ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
-++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
-++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-++ * SUCH DAMAGE.
-++ *
-++ * $FreeBSD: src/sys/sys/bitstring.h,v 1.5 2005/01/07 02:29:23 imp Exp $
-++ */
-++
-++#ifndef _SYS_BITSTRING_H_
-++#define	_SYS_BITSTRING_H_
-++
-++typedef	unsigned char bitstr_t;
-++
-++/* internal macros */
-++				/* byte of the bitstring bit is in */
-++#define	_bit_byte(bit) \
-++	((bit) >> 3)
-++
-++				/* mask for the bit within its byte */
-++#define	_bit_mask(bit) \
-++	(1 << ((bit)&0x7))
-++
-++/* external macros */
-++				/* bytes in a bitstring of nbits bits */
-++#define	bitstr_size(nbits) \
-++	(((nbits) + 7) >> 3)
-++
-++				/* allocate a bitstring */
-++#define	bit_alloc(nbits) \
-++	(bitstr_t *)calloc((size_t)bitstr_size(nbits), sizeof(bitstr_t))
-++
-++				/* allocate a bitstring on the stack */
-++#define	bit_decl(name, nbits) \
-++	((name)[bitstr_size(nbits)])
-++
-++				/* is bit N of bitstring name set? */
-++#define	bit_test(name, bit) \
-++	((name)[_bit_byte(bit)] & _bit_mask(bit))
-++
-++				/* set bit N of bitstring name */
-++#define	bit_set(name, bit) \
-++	((name)[_bit_byte(bit)] |= _bit_mask(bit))
-++
-++				/* clear bit N of bitstring name */
-++#define	bit_clear(name, bit) \
-++	((name)[_bit_byte(bit)] &= ~_bit_mask(bit))
-++
-++				/* clear bits start ... stop in bitstring */
-++#define	bit_nclear(name, start, stop) do { \
-++	register bitstr_t *_name = (name); \
-++	register int _start = (start), _stop = (stop); \
-++	register int _startbyte = _bit_byte(_start); \
-++	register int _stopbyte = _bit_byte(_stop); \
-++	if (_startbyte == _stopbyte) { \
-++		_name[_startbyte] &= ((0xff >> (8 - (_start&0x7))) | \
-++				      (0xff << ((_stop&0x7) + 1))); \
-++	} else { \
-++		_name[_startbyte] &= 0xff >> (8 - (_start&0x7)); \
-++		while (++_startbyte < _stopbyte) \
-++			_name[_startbyte] = 0; \
-++		_name[_stopbyte] &= 0xff << ((_stop&0x7) + 1); \
-++	} \
-++} while (0)
-++
-++				/* set bits start ... stop in bitstring */
-++#define	bit_nset(name, start, stop) do { \
-++	register bitstr_t *_name = (name); \
-++	register int _start = (start), _stop = (stop); \
-++	register int _startbyte = _bit_byte(_start); \
-++	register int _stopbyte = _bit_byte(_stop); \
-++	if (_startbyte == _stopbyte) { \
-++		_name[_startbyte] |= ((0xff << (_start&0x7)) & \
-++				    (0xff >> (7 - (_stop&0x7)))); \
-++	} else { \
-++		_name[_startbyte] |= 0xff << ((_start)&0x7); \
-++		while (++_startbyte < _stopbyte) \
-++	    		_name[_startbyte] = 0xff; \
-++		_name[_stopbyte] |= 0xff >> (7 - (_stop&0x7)); \
-++	} \
-++} while (0)
-++
-++				/* find first bit clear in name */
-++#define	bit_ffc(name, nbits, value) do { \
-++	register bitstr_t *_name = (name); \
-++	register int _byte, _nbits = (nbits); \
-++	register int _stopbyte = _bit_byte(_nbits - 1), _value = -1; \
-++	if (_nbits > 0) \
-++		for (_byte = 0; _byte <= _stopbyte; ++_byte) \
-++			if (_name[_byte] != 0xff) { \
-++				bitstr_t _lb; \
-++				_value = _byte << 3; \
-++				for (_lb = _name[_byte]; (_lb&0x1); \
-++				    ++_value, _lb >>= 1); \
-++				break; \
-++			} \
-++	if (_value >= nbits) \
-++		_value = -1; \
-++	*(value) = _value; \
-++} while (0)
-++
-++				/* find first bit set in name */
-++#define	bit_ffs(name, nbits, value) do { \
-++	register bitstr_t *_name = (name); \
-++	register int _byte, _nbits = (nbits); \
-++	register int _stopbyte = _bit_byte(_nbits - 1), _value = -1; \
-++	if (_nbits > 0) \
-++		for (_byte = 0; _byte <= _stopbyte; ++_byte) \
-++			if (_name[_byte]) { \
-++				bitstr_t _lb; \
-++				_value = _byte << 3; \
-++				for (_lb = _name[_byte]; !(_lb&0x1); \
-++				    ++_value, _lb >>= 1); \
-++				break; \
-++			} \
-++	if (_value >= nbits) \
-++		_value = -1; \
-++	*(value) = _value; \
-++} while (0)
-++
-++#endif /* !_SYS_BITSTRING_H_ */
-+--- hal-0.5.10+git20080301.orig/hald/freebsd/probing/probe-volume.c
-++++ hal-0.5.10+git20080301/hald/freebsd/probing/probe-volume.c
-+@@ -59,7 +59,7 @@
-+ };
-+ #define ISO_PATH_TABLE_ENTRY_SIZE         8
-+ 
-+-#if __FreeBSD_version < 600101
-++#if (__FreeBSD_version < 600101) && (__FreeBSD_kernel_version < 600101)
-+ static uint32_t
-+ isonum_731(unsigned char *p)
-+ {
+--- hal-0.5.12~git20090406.46dc48.orig/hald/freebsd/probing/probe-scsi.c
++++ hal-0.5.12~git20090406.46dc48/hald/freebsd/probing/probe-scsi.c
+@@ -48,7 +48,9 @@
+     goto end;
+ 
+   /* give a meaningful process title for ps(1) */
++#ifndef __GLIBC__
+   setproctitle("%s", device_file);
++#endif
+ 
+   /* cam_open_device() fails unless we use O_RDWR */
+   cam = cam_open_device(device_file, O_RDWR);
+--- hal-0.5.12~git20090406.46dc48.orig/hald/freebsd/probing/probe-hiddev.c
++++ hal-0.5.12~git20090406.46dc48/hald/freebsd/probing/probe-hiddev.c
+@@ -63,8 +63,9 @@
+     goto end;
+ 
+   /* give a meaningful process title for ps(1) */
++#ifndef __GLIBC__
+   setproctitle("%s", device_file);
+-
++#endif
+   if (ioctl(fd, USB_GET_REPORT_ID, &report_id) < 0)
+     goto end;
+ 
 only in patch2:
 unchanged:
---- hal-0.5.11~rc2.orig/debian/libhald-freebsd-probe0.install
-+++ hal-0.5.11~rc2/debian/libhald-freebsd-probe0.install
+--- hal-0.5.12~git20090406.46dc48.orig/hald/freebsd/probing/probe-storage.c
++++ hal-0.5.12~git20090406.46dc48/hald/freebsd/probing/probe-storage.c
+@@ -192,7 +192,9 @@
+     goto end;
+ 
+   /* give a meaningful process title for ps(1) */
++#ifndef __GLIBC__
+   setproctitle("%s", device_file);
++#endif
+ 
+   has_children = hfp_getenv_bool("HF_HAS_CHILDREN");
+   only_check_for_media = hfp_getenv_bool("HF_ONLY_CHECK_FOR_MEDIA");
+--- hal-0.5.12~git20090406.46dc48.orig/tools/hal-system-power-pmu.c
++++ hal-0.5.12~git20090406.46dc48/tools/hal-system-power-pmu.c
+@@ -53,7 +53,7 @@
+ static int
+ pmac_sleep (void)
+ {
+-#ifdef __FreeBSD__
++#if defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	return FALSE;			/* FIXME implement */
+ #elif sun
+ 	return FALSE;			/* FIXME implement */
+@@ -90,7 +90,7 @@
+ static int
+ pmac_get_lcd_brightness (int *val)
+ {
+-#ifdef __FreeBSD__
++#if defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	return FALSE;			/* FIXME implement */
+ #elif sun
+ 	return FALSE;			/* FIXME implement */
+@@ -127,7 +127,7 @@
+ static int
+ pmac_set_lcd_brightness (int val)
+ {
+-#ifdef __FreeBSD__
++#if defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	return FALSE;			/* FIXME implement */
+ #elif sun
+ 	return FALSE;			/* FIXME implement */
+--- hal-0.5.12~git20090406.46dc48.orig/tools/hal-system-sonypic.c
++++ hal-0.5.12~git20090406.46dc48/tools/hal-system-sonypic.c
+@@ -63,7 +63,7 @@
+ static int
+ sonypi_get_lcd_brightness (__u8 *val)
+ {
+-#ifdef __FreeBSD__
++#if defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	return FALSE;			/* FIXME implement */
+ #elif sun
+ 	return FALSE;			/* FIXME implement */
+@@ -163,7 +163,7 @@
+ static int
+ sonypi_set_lcd_brightness (__u8 val)
+ {
+-#ifdef __FreeBSD__
++#if defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	return FALSE;			/* FIXME implement */
+ #elif sun
+ 	return FALSE;			/* FIXME implement */
+@@ -195,7 +195,7 @@
+ static int
+ sonypi_set_bluetooth_power (int val)
+ {
+-#ifdef __FreeBSD__
++#if defined (__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	return FALSE;			/* FIXME implement */
+ #elif sun
+ 	return FALSE;			/* FIXME implement */
+--- hal-0.5.12~git20090406.46dc48.orig/debian/libhald-freebsd-probe0.install
++++ hal-0.5.12~git20090406.46dc48/debian/libhald-freebsd-probe0.install
 @@ -0,0 +1 @@
 +debian/tmp/usr/lib/libhald_freebsd_probe.so.*
-only in patch2:
-unchanged:
---- hal-0.5.11~rc2.orig/debian/libhald-freebsd-probe0.shlibs
-+++ hal-0.5.11~rc2/debian/libhald-freebsd-probe0.shlibs
+--- hal-0.5.12~git20090406.46dc48.orig/debian/libhald-freebsd-probe0.shlibs
++++ hal-0.5.12~git20090406.46dc48/debian/libhald-freebsd-probe0.shlibs
 @@ -0,0 +1 @@
-+libhald_freebsd_probe 0 libhald-freebsd-probe0 (>= 0.5.11~rc2)
++libhald_freebsd_probe 0 libhald-freebsd-probe0 (>= 0.5.12~git20090406.46dc48)
