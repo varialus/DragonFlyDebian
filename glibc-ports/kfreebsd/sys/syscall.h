@@ -414,6 +414,11 @@
 #define	SYS_truncate	479
 #define	SYS_ftruncate	480
 #define	SYS_thr_kill2	481
-#define	SYS_MAXSYSCALL	482
+#define SYS_cpuset      484
+#define SYS_cpuset_setid        485
+#define SYS_cpuset_getid        486
+#define SYS_cpuset_getaffinity  487
+#define SYS_cpuset_setaffinity  488
+#define SYS_MAXSYSCALL  489
 
 #endif

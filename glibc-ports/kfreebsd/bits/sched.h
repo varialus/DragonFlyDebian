@@ -1,6 +1,7 @@
 /* Definitions of constants and data structure for POSIX 1003.1b-1993
    scheduling interface.
-   Copyright (C) 1996, 1997, 2001, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1996-1999,2001-2003,2005,2006,2007,2008
+   Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -83,7 +84,7 @@ struct __sched_param
 #if defined _SCHED_H && !defined __cpu_set_t_defined
 # define __cpu_set_t_defined
 /* Size definition for CPU sets.  */
-# define __CPU_SETSIZE	1024
+# define __CPU_SETSIZE	128
 # define __NCPUBITS	(8 * sizeof (__cpu_mask))
 
 /* Type for array elements in 'cpu_set_t'.  */
@@ -108,26 +109,31 @@ typedef struct
   do {									      \
     size_t __i;								      \
     size_t __imax = (setsize) / sizeof (__cpu_mask);			      \
-    cpu_set_t *__arr = (cpusetp);					      \
+    __cpu_mask *__bits = (cpusetp)->__bits;				      \
     for (__i = 0; __i < __imax; ++__i)					      \
-      __arr->__bits[__i] = 0;						      \
+      __bits[__i] = 0;							      \
   } while (0)
 # endif
 # define __CPU_SET_S(cpu, setsize, cpusetp) \
   (__extension__							      \
    ({ size_t __cpu = (cpu);						      \
       __cpu < 8 * (setsize)						      \
-      ? ((cpusetp)->__bits[__CPUELT (__cpu)] |= __CPUMASK (__cpu)) : 0; }))
+      ? (((__cpu_mask *) ((cpusetp)->__bits))[__CPUELT (__cpu)]		      \
+	 |= __CPUMASK (__cpu))						      \
+      : 0; }))
 # define __CPU_CLR_S(cpu, setsize, cpusetp) \
   (__extension__							      \
    ({ size_t __cpu = (cpu);						      \
       __cpu < 8 * (setsize)						      \
-      ? ((cpusetp)->__bits[__CPUELT (__cpu)] &= ~__CPUMASK (__cpu)) : 0; }))
+      ? (((__cpu_mask *) ((cpusetp)->__bits))[__CPUELT (__cpu)]		      \
+	 &= ~__CPUMASK (__cpu))						      \
+      : 0; }))
 # define __CPU_ISSET_S(cpu, setsize, cpusetp) \
   (__extension__							      \
    ({ size_t __cpu = (cpu);						      \
       __cpu < 8 * (setsize)						      \
-      ? (((cpusetp)->__bits[__CPUELT (__cpu)] & __CPUMASK (__cpu))) != 0      \
+      ? ((((__cpu_mask *) ((cpusetp)->__bits))[__CPUELT (__cpu)]	      \
+	  & __CPUMASK (__cpu))) != 0					      \
       : 0; }))
 
 # define __CPU_COUNT_S(setsize, cpusetp) \
@@ -139,12 +145,12 @@ typedef struct
 # else
 #  define __CPU_EQUAL_S(setsize, cpusetp1, cpusetp2) \
   (__extension__							      \
-   ({ cpu_set_t *__arr1 = (cpusetp1);					      \
-      cpu_set_t *__arr2 = (cpusetp2);					      \
+   ({ __cpu_mask *__arr1 = (cpusetp1)->__bits;				      \
+      __cpu_mask *__arr2 = (cpusetp2)->__bits;				      \
       size_t __imax = (setsize) / sizeof (__cpu_mask);			      \
       size_t __i;							      \
       for (__i = 0; __i < __imax; ++__i)				      \
-	if (__arr1->__bits[__i] != __arr2->__bits[__i])			      \
+	if (__bits[__i] != __bits[__i])					      \
 	  break;							      \
       __i == __imax; }))
 # endif
@@ -152,16 +158,16 @@ typedef struct
 # define __CPU_OP_S(setsize, destset, srcset1, srcset2, op) \
   (__extension__							      \
    ({ cpu_set_t *__dest = (destset);					      \
-      cpu_set_t *__arr1 = (srcset1);					      \
-      cpu_set_t *__arr2 = (srcset2);					      \
+      __cpu_mask *__arr1 = (srcset1)->__bits;				      \
+      __cpu_mask *__arr2 = (srcset2)->__bits;				      \
       size_t __imax = (setsize) / sizeof (__cpu_mask);			      \
       size_t __i;							      \
       for (__i = 0; __i < __imax; ++__i)				      \
-	__dest->__bits[__i] = __arr1->__bits[__i] op __arr2->__bits[__i];     \
+	((__cpu_mask *) __dest->__bits)[__i] = __arr1[__i] op __arr2[__i];    \
       __dest; }))
 
 # define __CPU_ALLOC_SIZE(count) \
-  ((((count) + __NCPUBITS - 1) / __NCPUBITS) * 8)
+  ((((count) + __NCPUBITS - 1) / __NCPUBITS) * sizeof (__cpu_mask))
 # define __CPU_ALLOC(count) __sched_cpualloc (count)
 # define __CPU_FREE(cpuset) __sched_cpufree (cpuset)
 
