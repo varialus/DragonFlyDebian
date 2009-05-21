@@ -65,6 +65,12 @@
 
 #define	RB_BOOTINFO	0x80000000	/* have `struct bootinfo *' arg */
 
+/* 
+ * Compatibility with Linux
+ */
+#define RB_HALT_SYSTEM	RB_HALT
+#define RB_POWER_OFF	RB_POWEROFF
+
 __BEGIN_DECLS
 
 /* Reboot or halt the system.  */
