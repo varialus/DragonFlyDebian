@@ -31,45 +31,8 @@ libc_hidden_proto (__syscall_freebsd6_lseek)
 __off_t
 __libc_lseek (int fd, __off_t offset, int whence)
 {
-#if 0 /* If the kernel would work right... */
   /* We pass 3 arguments in 5 words.  */
   return INLINE_SYSCALL (freebsd6_lseek, 3, fd, 0, offset, whence);
-#else
-  /* According to POSIX:2001, if the resulting file offset would become
-     negative, this function has to return an EINVAL error and leave the
-     file offset unchanged.  But the FreeBSD 4.0 kernel doesn't do this,
-     so we emulate it.  */
-  if (offset >= 0)
-    /* No risk that the file offset could become negative.  */
-    return INLINE_SYSCALL (freebsd6_lseek, 3, fd, 0, offset, whence);
-  else
-    {
-      /* Test whether the file offset becomes negative.  */
-      __off_t old_position;
-      __off_t new_position;
-      int saved_errno;
-
-      saved_errno = errno;
-      old_position = INLINE_SYSCALL (freebsd6_lseek, 3, fd, 0, 0, SEEK_CUR);
-      errno = 0;
-      new_position = INLINE_SYSCALL (freebsd6_lseek, 3, fd, 0, offset, whence);
-      if (new_position < 0)
-	{
-	  if (errno == 0)
-	    {
-	      /* The file offset became negative, and the kernel didn't
-		 notice it.  */
-	      if (old_position >= 0)
-		INLINE_SYSCALL (freebsd6_lseek, 3, fd, 0, old_position, SEEK_SET);
-	      new_position = -1;
-	      errno = EINVAL;
-	    }
-	}
-      else
-	errno = saved_errno;
-      return new_position;
-    }
-#endif
 }
 
 weak_alias (__libc_lseek, __lseek)
