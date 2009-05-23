@@ -63,7 +63,7 @@ sysdep_routines += ktrace utrace
 # For <sys/linker.h>.
 sysdep_routines += kldfind kldfirstmod kldload kldnext kldstat kldsym kldunload kldunloadf
 # For <sys/mman.h>.
-sysdep_routines += minherit sys_mmap
+sysdep_routines += minherit sys_mmap sys_munmap
 # For <sys/mount.h>.
 sysdep_routines += fhopen sys_fhstat sys_fhstatfs fhstat fhstat64 fhstatfs fhstatfs64 getfh getfsstat getfsstat64 sys_getfsstat getmntinfo getmntinfo64 mount nmount unmount
 # For <sys/ptrace.h>.
