@@ -1,0 +1,32 @@
+To be applied to the kfreebsd/ directory for glibc 2.10
+
+--- a/dl-osinfo.h
++++ b/dl-osinfo.h
+@@ -99,7 +99,7 @@
+   } while (0)
+ 
+ static inline uintptr_t __attribute__ ((always_inline))
+-_dl_setup_stack_chk_guard (void *dl_random)
++_dl_setup_stack_chk_guard (void)
+ {
+   uintptr_t ret;
+ #ifdef ENABLE_STACKGUARD_RANDOMIZE
+@@ -118,18 +118,3 @@
+   p[sizeof (ret) - 2] = '\n';
+   return ret;
+ }
+-
+-static inline uintptr_t __attribute__ ((always_inline))
+-_dl_setup_pointer_guard (void *dl_random, uintptr_t stack_chk_guard)
+-{
+-  uintptr_t ret;
+-
+-  ret = stack_chk_guard;
+-# ifndef HP_TIMING_NONAVAIL
+-  hp_timing_t now;
+-  HP_TIMING_NOW (now);
+-  ret ^= now;
+-# endif
+-  return ret;
+-}
+-
