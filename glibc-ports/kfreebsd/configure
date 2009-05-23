@@ -46,7 +46,7 @@ echo "${ECHO_T}$ac_cv_prog_egrep" >&6
 
 echo "$as_me:$LINENO: checking installed kFreeBSD kernel header files" >&5
 echo $ECHO_N "checking installed kFreeBSD kernel header files... $ECHO_C" >&6
-if test "${libc_cv_kfreebsd540+set}" = set; then
+if test "${libc_cv_kfreebsd600+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   cat >conftest.$ac_ext <<_ACEOF
@@ -59,34 +59,34 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !defined(__FreeBSD_kernel_version) && defined(__FreeBSD_version)
 #define __FreeBSD_kernel_version __FreeBSD_version
 #endif
-#if !defined __FreeBSD_kernel_version || __FreeBSD_kernel_version <  (5 *10000+ 4 *100+ 0) /* 5.4.0 */
+#if !defined __FreeBSD_kernel_version || __FreeBSD_kernel_version <  (6 *10000+ 4 *100+ 0) /* 6.0.0 */
 eat flaming death
 #endif
 _ACEOF
 if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
   $EGREP "eat flaming death" >/dev/null 2>&1; then
-  libc_cv_kfreebsd540='TOO OLD!'
+  libc_cv_kfreebsd600='TOO OLD!'
 else
-  libc_cv_kfreebsd540='5.4.0 or later'
+  libc_cv_kfreebsd600='6.0.0 or later'
 fi
 rm -f conftest*
 
 fi
-echo "$as_me:$LINENO: result: $libc_cv_kfreebsd540" >&5
-echo "${ECHO_T}$libc_cv_kfreebsd540" >&6
-if test "$libc_cv_kfreebsd540" != '5.4.0 or later'; then
+echo "$as_me:$LINENO: result: $libc_cv_kfreebsd600" >&5
+echo "${ECHO_T}$libc_cv_kfreebsd600" >&6
+if test "$libc_cv_kfreebsd600" != '6.0.0 or later'; then
   { { echo "$as_me:$LINENO: error: GNU libc requires kernel header files from
-kFreeBSD 5.4.0 or later to be installed before configuring.
+kFreeBSD 6.0.0 or later to be installed before configuring.
 The kernel header files are found usually in /usr/src/sys/; make sure
-these directories use files from kFreeBSD 5.4.0 or later.
+these directories use files from kFreeBSD 6.0.0 or later.
 This check uses <osreldate.h>, so
 make sure that file was built correctly when installing the kernel header
 files.  To use kernel headers not from /usr/src/sys/, use the
 configure option --with-headers." >&5
 echo "$as_me: error: GNU libc requires kernel header files from
-kFreeBSD 5.4.0 or later to be installed before configuring.
+kFreeBSD 6.0.0 or later to be installed before configuring.
 The kernel header files are found usually in /usr/src/sys/; make sure
-these directories use files from kFreeBSD 5.4.0 or later.
+these directories use files from kFreeBSD 6.0.0 or later.
 This check uses <osreldate.h>, so
 make sure that file was built correctly when installing the kernel header
 files.  To use kernel headers not from /usr/src/sys/, use the
@@ -118,13 +118,13 @@ test -n "$arch_minimum_kernel" ||
 case "$machine" in
   i386*)
     libc_cv_gcc_unwind_find_fde=yes
-    arch_minimum_kernel=5.4.0
+    arch_minimum_kernel=6.0.0
     ;;
   x86_64*)
-    arch_minimum_kernel=5.4.0
+    arch_minimum_kernel=6.0.0
     ;;
   *)
-    arch_minimum_kernel=5.4.0
+    arch_minimum_kernel=6.0.0
     ;;
 esac
 if test -n "$minimum_kernel"; then
@@ -138,7 +138,7 @@ echo "$as_me: WARNING: minimum kernel version reset to $arch_minimum_kernel" >&2
     minimum_kernel=$arch_minimum_kernel
   fi
 else
-  if test $arch_minimum_kernel != '5.4.0'; then
+  if test $arch_minimum_kernel != '6.0.0'; then
     minimum_kernel=$arch_minimum_kernel
   fi
 fi
