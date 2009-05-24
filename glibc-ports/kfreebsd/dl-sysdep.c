@@ -23,7 +23,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/utsname.h>
+#include <sys/sysctl.h>
 #include <ldsodefs.h>
 #include <kernel-features.h>
 
@@ -35,44 +35,16 @@ int
 attribute_hidden
 _dl_discover_osversion (void)
 {
-  char bufmem[64];
-  char *buf = bufmem;
-  unsigned int version;
-  int parts;
-  char *cp;
-  struct utsname uts;
+  int request[2] = { CTL_KERN, KERN_OSRELDATE };
+  size_t len;
+  int version;
 
-  /* Try the uname syscall */
-  if (__uname (&uts))
+  len = sizeof(version);
+  if (__sysctl (request, 2, &version, &len, NULL, 0) < 0)
     return -1;
 
-  /* Now convert it into a number.  The string consists of at most
-     three parts.  */
-  version = 0;
-  parts = 0;
-  buf = uts.release;
-  cp = buf;
-  while ((*cp >= '0') && (*cp <= '9'))
-    {
-      unsigned int here = *cp++ - '0';
-
-      while ((*cp >= '0') && (*cp <= '9'))
-	{
-	  here *= 10;
-	  here += *cp++ - '0';
-	}
-
-      ++parts;
-      version <<= 8;
-      version |= here;
-
-      if (*cp++ != '.' || parts == 3)
-	/* Another part following?  */
-	break;
-    }
-
-  if (parts < 3)
-    version <<= 8 * (3 - parts);
-
-  return version;
+  /* Convert to the GLIBC versioning system */
+  return ((version / 100000) << 16)
+	 | (((version % 100000) / 1000) << 8)
+	 | ((version % 1000) / 10);
 }
