@@ -59,7 +59,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !defined(__FreeBSD_kernel_version) && defined(__FreeBSD_version)
 #define __FreeBSD_kernel_version __FreeBSD_version
 #endif
-#if !defined __FreeBSD_kernel_version || __FreeBSD_kernel_version <  (6 *10000+ 4 *100+ 0) /* 6.0.0 */
+#if !defined __FreeBSD_kernel_version || __FreeBSD_kernel_version <  (6 *65536+ 4 *256+ 0) /* 6.0.0 */
 eat flaming death
 #endif
 _ACEOF
@@ -129,8 +129,8 @@ case "$machine" in
 esac
 if test -n "$minimum_kernel"; then
 
-  user_version=$((`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/\1 \* 10000 + \2 \* 100 + \3/'`))
-  arch_version=$((`echo "$arch_minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/\1 \* 10000 + \2 \* 100 + \3/'`))
+  user_version=$((`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/\1 \* 65536 + \2 \* 256 + \3/'`))
+  arch_version=$((`echo "$arch_minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/\1 \* 65536 + \2 \* 256 + \3/'`))
 
   if test $user_version -lt $arch_version; then
     { echo "$as_me:$LINENO: WARNING: minimum kernel version reset to $arch_minimum_kernel" >&5
@@ -146,7 +146,7 @@ fi
 if test -n "$minimum_kernel"; then
   echo "$as_me:$LINENO: checking for kernel header at least $minimum_kernel" >&5
 echo $ECHO_N "checking for kernel header at least $minimum_kernel... $ECHO_C" >&6
-  decnum=`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/(\1 * 10000 + \2 * 100 + \3)/'`;
+  decnum=`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/(\1 * 65536 + \2 * 256 + \3)/'`;
   abinum=`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/\1,\2,\3/'`;
   cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */

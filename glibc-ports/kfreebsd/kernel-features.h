@@ -23,10 +23,10 @@
 # define __KFREEBSD_KERNEL_VERSION	0
 #endif
 
-/* We assume for __KFREEBSD_KERNEL_VERSION the same encoding used in
-   osreldate.h.  I.e., the major, minor, and subminor are all
-   concatenated, with two digits for each.  This means we can do
-   numeric comparisons.
+/* The encoding for __KFREEBSD_KERNEL_VERSION is defined the following
+   way: the major, minor, and subminor all get a byte with the major
+   number being in the highest byte.  This means we can do numeric
+   comparisons.
 
    In the following we will define certain symbols depending on
    whether the describes kernel feature is available in the kernel

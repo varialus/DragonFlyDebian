@@ -39,63 +39,26 @@ dl_fatal (const char *str)
 }
 #endif
 
-
-#define DL_SYSDEP_OSCHECK(FATAL) \
+#define DL_SYSDEP_OSCHECK(FATAL)					      \
   do {									      \
-    /* Test whether the kernel is new enough.  This test is only	      \
-       performed if the library is not compiled to run on all		      \
-       kernels.  */							      \
-    if (__KFREEBSD_KERNEL_VERSION > 0)					      \
+    /* Test whether the kernel is new enough.  This test is only performed    \
+       if the library is not compiled to run on all kernels.  */	      \
+									      \
+    int version = _dl_discover_osversion ();				      \
+    if (__builtin_expect (version >= 0, 1))				      \
       {									      \
-	char bufmem[64];						      \
-	char *buf = bufmem;						      \
-	unsigned int version;						      \
-	int parts;							      \
-	char *cp;							      \
-	struct utsname uts;						      \
+	if (__builtin_expect (GLRO(dl_osversion) == 0, 1)		      \
+	    || GLRO(dl_osversion) > version)				      \
+	  GLRO(dl_osversion) = version;					      \
 									      \
-	/* Try the uname syscall */					      \
-	if (! __uname (&uts))					      	      \
-	  {							      	      \
-	    /* Now convert it into a number.  The string consists of at most  \
-	       three parts.  */						      \
-	    version = 0;						      \
-	    parts = 0;							      \
-            buf = uts.release;						      \
-	    cp = buf;							      \
-	    while ((*cp >= '0') && (*cp <= '9'))			      \
-	      {								      \
-	        unsigned int here = *cp++ - '0';			      \
-									      \
-	        while ((*cp >= '0') && (*cp <= '9'))			      \
-	          {							      \
-		    here *= 10;						      \
-		    here += *cp++ - '0';				      \
-	          }							      \
-									      \
-	        ++parts;						      \
-	        version *= 100;						      \
-	        version |= here;					      \
-									      \
-	        if (*cp++ != '.')					      \
-	          /* Another part following?  */			      \
-	          break;						      \
-	      }								      \
-									      \
-	    if (parts == 2)						      \
-	      version *= 100;						      \
-									      \
-	    if (parts == 1)						      \
-	      version *= 10000;						      \
-									      \
-	    /* Now we can test with the required version.  */		      \
-	    if (version < __KFREEBSD_KERNEL_VERSION)			      \
-	      /* Not sufficent.  */					      \
-	      FATAL ("FATAL: kernel too old\n");			      \
-									      \
-	    GLRO(dl_osversion) = version;				      \
-          }								      \
+	/* Now we can test with the required version.  */		      \
+	if (__KFREEBSD_KERNEL_VERSION > 0 && 				      \
+	    version < __KFREEBSD_KERNEL_VERSION)   			      \
+	  /* Not sufficent.  */						      \
+	  FATAL ("FATAL: kernel too old\n");				      \
       }									      \
+    else if (__KFREEBSD_KERNEL_VERSION > 0)				      \
+      FATAL ("FATAL: cannot determine kernel version\n");		      \
   } while (0)
 
 static inline uintptr_t __attribute__ ((always_inline))

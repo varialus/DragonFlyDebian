@@ -23,9 +23,56 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/utsname.h>
 #include <ldsodefs.h>
 #include <kernel-features.h>
 
 #ifdef SHARED
 # include <elf/dl-sysdep.c>
 #endif
+
+int
+attribute_hidden
+_dl_discover_osversion (void)
+{
+  char bufmem[64];
+  char *buf = bufmem;
+  unsigned int version;
+  int parts;
+  char *cp;
+  struct utsname uts;
+
+  /* Try the uname syscall */
+  if (__uname (&uts))
+    return -1;
+
+  /* Now convert it into a number.  The string consists of at most
+     three parts.  */
+  version = 0;
+  parts = 0;
+  buf = uts.release;
+  cp = buf;
+  while ((*cp >= '0') && (*cp <= '9'))
+    {
+      unsigned int here = *cp++ - '0';
+
+      while ((*cp >= '0') && (*cp <= '9'))
+	{
+	  here *= 10;
+	  here += *cp++ - '0';
+	}
+
+      ++parts;
+      version <<= 8;
+      version |= here;
+
+      if (*cp++ != '.' || parts == 3)
+	/* Another part following?  */
+	break;
+    }
+
+  if (parts < 3)
+    version <<= 8 * (3 - parts);
+
+  return version;
+}
