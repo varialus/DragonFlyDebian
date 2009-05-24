@@ -35,8 +35,10 @@
    introduced.  If somebody cares these values can afterwards be
    corrected.  */
 
-/* No real-time signals in FreeBSD 5.x or 6.x.  */
-#define __ASSUME_REALTIME_SIGNALS	0
+/* Real-time signals introduced in FreeBSD 7.x.  */
+#if __KFREEBSD_KERNEL_VERSION >= 0x70000
+# define __ASSUME_REALTIME_SIGNALS	1
+#endif
 
 /* Use signals #32, #33, #34 for internal linuxthreads communication */
 #define PTHREAD_SIGBASE 32

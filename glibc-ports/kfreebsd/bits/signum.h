@@ -66,6 +66,15 @@
 #define	SIGUSR1		30	/* User-defined signal 1 (POSIX).  */
 #define	SIGUSR2		31	/* User-defined signal 2 (POSIX).  */
 
-#endif	/* <signal.h> included.  */
+#define	_NSIG		129	/* Biggest signal number + 1
+				   (including real-time signals).  */
 
-#define	_NSIG		129	/* Biggest signal number + 1.  */
+#define SIGRTMIN	(__libc_current_sigrtmin ())
+#define SIGRTMAX	(__libc_current_sigrtmax ())
+
+/* These are the hard limits of the kernel.  These values should not be
+   used directly at user level.  */
+#define __SIGRTMIN	32
+#define __SIGRTMAX	(_NSIG - 1)
+
+#endif	/* <signal.h> included.  */
