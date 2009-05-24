@@ -31,7 +31,7 @@ endif
 
 ifeq ($(subdir),io)
 # For <unistd.h>.
-sysdep_routines += sys_getcwd sys_lseek
+sysdep_routines += sys_getcwd sys_lseek sys_freebsd6_lseek
 # For <fcntl.h>.
 sysdep_routines += sys_open open_2
 # For <sys/stat.h>.
@@ -51,7 +51,7 @@ ifeq ($(subdir),misc)
 # For <sched.h>.
 sysdep_routines += clone start_thread
 # For <unistd.h>.
-sysdep_routines += sys_ftruncate sys_truncate
+sysdep_routines += sys_ftruncate sys_freebsd6_ftruncate sys_truncate sys_freebsd6_truncate
 # For <sys/acl.h>.
 sysdep_routines += acl_aclcheck_fd acl_aclcheck_file acl_delete_fd acl_delete_file acl_get_fd acl_get_file acl_set_fd acl_set_file
 # For <sys/extattr.h>.
@@ -63,7 +63,7 @@ sysdep_routines += ktrace utrace
 # For <sys/linker.h>.
 sysdep_routines += kldfind kldfirstmod kldload kldnext kldstat kldsym kldunload kldunloadf
 # For <sys/mman.h>.
-sysdep_routines += minherit sys_mmap sys_munmap
+sysdep_routines += minherit sys_mmap sys_freebsd6_mmap sys_munmap
 # For <sys/mount.h>.
 sysdep_routines += fhopen sys_fhstat sys_fhstatfs fhstat fhstat64 fhstatfs fhstatfs64 getfh getfsstat getfsstat64 sys_getfsstat getmntinfo getmntinfo64 mount nmount unmount
 # For <sys/ptrace.h>.
@@ -87,7 +87,7 @@ endif
 
 ifeq ($(subdir),posix)
 # For <unistd.h>.
-sysdep_routines += sys_getlogin sys_pread sys_pwrite sys_setlogin sys_read sys_write
+sysdep_routines += sys_getlogin sys_pread sys_freebsd6_pread sys_pwrite sys_freebsd6_pwrite sys_setlogin sys_read sys_write
 # for <sched.h>
 sysdep_routines += sys_cpuset_getaffinity sys_cpuset_setaffinity
 endif

@@ -23,56 +23,58 @@
 #include <errno.h>
 #include <sysdep.h>
 
-/* The real system call has a word of padding before the 64-bit off_t
-   argument.  */
+extern void *__syscall_mmap (void *__addr, size_t __len, int __prot,
+			     int __flags, int __fd, __off_t __offset) __THROW;
+libc_hidden_proto (__syscall_mmap)
 extern void *__syscall_freebsd6_mmap (void *__addr, size_t __len, int __prot,
 			     int __flags, int __fd, int __unused1,
 			     __off_t __offset) __THROW;
 libc_hidden_proto (__syscall_freebsd6_mmap)
-
 extern ssize_t __syscall_freebsd6_pread (int __fd, void *__buf, size_t __nbytes,
                                 int __unused1, __off_t __offset) __THROW;
-
 libc_hidden_proto (__syscall_freebsd6_pread)
+
 void *
 __mmap (void *addr, size_t len, int prot, int flags, int fd, __off_t offset)
 {
   void *result;
 
   /* Validity checks not done by the kernel.  */
-  if ((flags & MAP_FIXED) || (offset != 0))
+  if (offset != 0)
     {
       int pagesize = __getpagesize ();
-
-      if (((flags & MAP_FIXED)
-	   && (__builtin_expect (pagesize & (pagesize - 1), 0)
-	       ? (unsigned long) addr % pagesize
-	       : (unsigned long) addr & (pagesize - 1)))
-	  || (__builtin_expect (pagesize & (pagesize - 1), 0)
-	      ? offset % pagesize
-	      : offset & (pagesize - 1)))
+      if ((__builtin_expect (pagesize & (pagesize - 1), 0)
+        ? offset % pagesize
+	: offset & (pagesize - 1)))
 	{
 	  __set_errno (EINVAL);
 	  return (void *) (-1);
 	}
     }
 
-  /* We pass 7 arguments in 8 words.  */
   /* for ANON mapping we must pass -1 in place of fd */
   if (flags & MAP_ANON)
-    return INLINE_SYSCALL (freebsd6_mmap, 7, addr, len, prot, flags, -1, 0, offset);
-  result = INLINE_SYSCALL (freebsd6_mmap, 7, addr, len, prot, flags, fd, 0, offset);
+    fd = -1;
 
-  if (result != (void *) (-1) && fd >= 0 && len > 0)
+  /* First try the new syscall. */
+  result = INLINE_SYSCALL (mmap, 6, addr, len, prot, flags, fd, offset);
+
+#ifndef __ASSUME_MMAP_SYSCALL
+  if (result == (void *) (-1) && errno == ENOSYS)
     {
-      /* Force an update of the atime.  POSIX:2001 mandates that this happens
-	 at some time between the mmap() call and the first page-in.  Since
-	 the FreeBSD 4.0 kernel doesn't update the atime upon a page-in, we
-	 do it here.  */
-      char dummy;
-
-      INLINE_SYSCALL (freebsd6_pread, 5, fd, &dummy, 1, 0, offset);
+      /* New syscall not available, us the old one. */
+      result = INLINE_SYSCALL (freebsd6_mmap, 7, addr, len, prot, flags, fd, 0, offset);
+      if (result != (void *) (-1) && fd >= 0 && len > 0)
+	{
+	  /* Force an update of the atime.  POSIX:2001 mandates that this happens
+	  at some time between the mmap() call and the first page-in.  Since
+	  the FreeBSD 6.0 kernel doesn't update the atime upon a page-in, we
+	  do it here.  */
+	  char dummy;
+	  INLINE_SYSCALL (freebsd6_pread, 5, fd, &dummy, 1, 0, offset);
+	}
     }
+#endif
 
   return result;
 }

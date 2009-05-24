@@ -20,9 +20,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sysdep.h>
+#include <errno.h>
 
-/* The real system call has a word of padding before the 64-bit off_t
-   argument.  */
+extern int __syscall_ftruncate (int __fd, __off_t __length) __THROW;
+libc_hidden_proto (__syscall_ftruncate)
 extern int __syscall_freebsd6_ftruncate (int __fd, int __unused1,
 				__off_t __length) __THROW;
 libc_hidden_proto (__syscall_freebsd6_ftruncate)
@@ -30,8 +31,18 @@ libc_hidden_proto (__syscall_freebsd6_ftruncate)
 int
 __ftruncate (int fd, __off_t length)
 {
-  /* We pass 2 arguments in 4 words.  */
-  return INLINE_SYSCALL (freebsd6_ftruncate, 2, fd, 0, length);
+  int result;
+
+  /* First try the new syscall. */
+  result = INLINE_SYSCALL (ftruncate, 2, fd, length);
+
+#ifndef __ASSUME_FTRUNCATE_SYSCALL
+  if (result == -1 && errno == ENOSYS)
+    /* New syscall not available, us the old one. */
+    result = INLINE_SYSCALL (freebsd6_ftruncate, 3, fd, 0, length);
+#endif
+
+  return result;
 }
 
 weak_alias (__ftruncate, ftruncate)

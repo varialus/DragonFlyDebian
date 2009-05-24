@@ -22,8 +22,8 @@
 #include <sysdep.h>
 #include <errno.h>
 
-/* The real system call has a word of padding before the 64-bit off_t
-   argument.  */
+extern __off_t __syscall_lseek (int __fd, __off_t __offset, int __whence) __THROW;
+libc_hidden_proto (__syscall_lseek)
 extern __off_t __syscall_freebsd6_lseek (int __fd, int __unused1, __off_t __offset,
 				int __whence) __THROW;
 libc_hidden_proto (__syscall_freebsd6_lseek)
@@ -31,8 +31,18 @@ libc_hidden_proto (__syscall_freebsd6_lseek)
 __off_t
 __libc_lseek (int fd, __off_t offset, int whence)
 {
-  /* We pass 3 arguments in 5 words.  */
-  return INLINE_SYSCALL (freebsd6_lseek, 3, fd, 0, offset, whence);
+  __off_t result;
+
+  /* First try the new syscall. */
+  result = INLINE_SYSCALL (lseek, 3, fd, offset, whence);
+
+#ifndef __ASSUME_LSEEK_SYSCALL
+  if (result == -1 && errno == ENOSYS)
+    /* New syscall not available, us the old one. */
+    result = INLINE_SYSCALL (freebsd6_lseek, 4, fd, 0, offset, whence);
+#endif
+
+  return result;
 }
 
 weak_alias (__libc_lseek, __lseek)

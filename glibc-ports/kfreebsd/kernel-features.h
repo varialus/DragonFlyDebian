@@ -41,3 +41,33 @@
 /* Use signals #32, #33, #34 for internal linuxthreads communication */
 #define PTHREAD_SIGBASE 32
 
+/* The `ftruncate' syscall was introduced in kFreeBSD 7.0. */
+#if __KFREEBSD_KERNEL_VERSION >= 0x70000
+# define __ASSUME_FTRUNCATE_SYSCALL	1
+#endif
+
+/* The `lseek' syscall was introduced in kFreeBSD 7.0. */
+#if __KFREEBSD_KERNEL_VERSION >= 0x70000
+# define __ASSUME_LSEEK_SYSCALL		1
+#endif
+
+/* The `mmap' syscall was introduced in kFreeBSD 7.0. */
+#if __KFREEBSD_KERNEL_VERSION >= 0x70000
+# define __ASSUME_MMAP_SYSCALL		1
+#endif
+
+/* The `pread' syscall was introduced in kFreeBSD 7.0. */
+#if __KFREEBSD_KERNEL_VERSION >= 0x70000
+# define __ASSUME_PREAD_SYSCALL		1
+#endif
+
+/* The `pwrite' syscall was introduced in kFreeBSD 7.0. */
+#if __KFREEBSD_KERNEL_VERSION >= 0x70000
+# define __ASSUME_PWRITE_SYSCALL	1
+#endif
+
+/* The `truncate' syscall was introduced in kFreeBSD 7.0. */
+#if __KFREEBSD_KERNEL_VERSION >= 0x70000
+# define __ASSUME_TRUNCATE_SYSCALL	1
+#endif
+

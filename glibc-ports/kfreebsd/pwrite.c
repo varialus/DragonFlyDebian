@@ -21,9 +21,11 @@
 #include <sys/types.h>
 #include <sysdep.h>
 #include <sysdep-cancel.h>
+#include <errno.h>
 
-/* The real system call has a word of padding before the 64-bit off_t
-   argument.  */
+extern ssize_t __syscall_pwrite (int __fd, const void *__buf, size_t __nbytes,
+				 __off_t __offset) __THROW;
+libc_hidden_proto(__syscall_pwrite)
 extern ssize_t __syscall_freebsd6_pwrite (int __fd, const void *__buf, size_t __nbytes,
 				 int __unused1, __off_t __offset) __THROW;
 libc_hidden_proto(__syscall_freebsd6_pwrite)
@@ -31,12 +33,28 @@ libc_hidden_proto(__syscall_freebsd6_pwrite)
 ssize_t
 __libc_pwrite (int fd, const void *buf, size_t nbytes, __off_t offset)
 {
-  /* We pass 5 arguments in 6 words.  */
+  ssize_t result;
+
   if (SINGLE_THREAD_P)
-    return INLINE_SYSCALL (freebsd6_pwrite, 5, fd, buf, nbytes, 0, offset);
+    {
+      /* First try the new syscall. */
+      result = INLINE_SYSCALL (pwrite, 4, fd, buf, nbytes, offset);
+#ifndef __ASSUME_PREAD_SYSCALL
+      if (result == -1 && errno == ENOSYS)
+        /* New syscall not available, us the old one. */
+        result = INLINE_SYSCALL (freebsd6_pwrite, 5, fd, buf, nbytes, 0, offset);
+#endif
+      return result;
+    }
 
   int oldtype = LIBC_CANCEL_ASYNC ();
-  ssize_t result = INLINE_SYSCALL (freebsd6_pwrite, 5, fd, buf, nbytes, 0, offset);
+  /* First try the new syscall. */
+  result = INLINE_SYSCALL (pwrite, 4, fd, buf, nbytes, offset);
+#ifndef __ASSUME_PREAD_SYSCALL
+  if (result == -1 && errno == ENOSYS)
+    /* New syscall not available, us the old one. */
+    result = INLINE_SYSCALL (freebsd6_pwrite, 5, fd, buf, nbytes, 0, offset);
+#endif
   LIBC_CANCEL_RESET (oldtype);
   return result;
 }
