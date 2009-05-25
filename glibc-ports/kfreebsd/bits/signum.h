@@ -74,7 +74,7 @@
 
 /* These are the hard limits of the kernel.  These values should not be
    used directly at user level.  */
-#define __SIGRTMIN	32
-#define __SIGRTMAX	(_NSIG - 1)
+#define __SIGRTMIN	65	/* be in sync with FreeBSD kernel */
+#define __SIGRTMAX	126	/* be in sync with FreeBSD kernel */
 
 #endif	/* <signal.h> included.  */
