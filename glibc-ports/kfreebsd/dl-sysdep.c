@@ -42,9 +42,15 @@ _dl_discover_osversion (void)
   len = sizeof(version);
   if (__sysctl (request, 2, &version, &len, NULL, 0) < 0)
     return -1;
+    
+/*
+ *   scheme is:  <major><two digit minor>Rxx
+ *		'R' is 0 if release branch or x.0-CURRENT before RELENG_*_0
+ *		is created, otherwise 1.
+ */
 
   /* Convert to the GLIBC versioning system */
-  return ((version / 100000) << 16)
-	 | (((version % 100000) / 1000) << 8)
-	 | ((version % 1000) / 10);
+  return ((version / 100000) << 16)		/* major */
+	 | (((version % 100000) / 1000) << 8)   /* minor 	0 -  99 */
+	 | ((version % 1000));			/* subrelease 	0 - 199 */ 
 }
