@@ -21,7 +21,7 @@
 /* lseek returns a 64-bit result in %eax, %edx.  This means that in the
    error case we have to set both %eax and %edx to -1.  */
 
-PSEUDO_NOERRNO(__syscall_freebsd6_lseek, freebsd6_lseek, 3)
+PSEUDO_NOERRNO(__syscall_freebsd6_lseek, freebsd6_lseek, 4)
         jnb L(no_error)
 	call SYSCALL_ERROR_LABEL;
 	orl $-1, %edx;
