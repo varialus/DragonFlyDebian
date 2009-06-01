@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sysdep.h>
+#include <signal.h>
 #include <fpu_control.h>
 #include <sys/param.h>
 #include <sys/types.h>
@@ -66,6 +67,12 @@ init (int argc, char **argv, char **envp)
 #endif
 	__setfpucw (__fpu_control);
     }
+
+  /* By default on kFreeBSD when a call to non existing syscall is
+     made, the program is terminated. As we want to be able to detect
+     missing syscalls and provide a fallback code, we ignore the SIGSYS
+     signal. */
+  signal(SIGSYS, SIG_IGN);
 
   /* Save the command-line arguments.  */
   __libc_argc = argc;
