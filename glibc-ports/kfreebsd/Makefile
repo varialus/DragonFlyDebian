@@ -31,13 +31,17 @@ endif
 
 ifeq ($(subdir),io)
 # For <unistd.h>.
-sysdep_routines += sys_getcwd sys_lseek sys_freebsd6_lseek
+sysdep_routines += sys_fchownat sys_fexecve sys_getcwd sys_linkat sys_lseek sys_freebsd6_lseek sys_readlinkat sys_symlinkat sys_unlinkat
 # For <fcntl.h>.
-sysdep_routines += sys_open open_2
+sysdep_routines += sys_open sys_openat open_2
 # For <sys/stat.h>.
-sysdep_routines += sys_fstat sys_lstat sys_mknod sys_nfstat sys_nlstat sys_nstat sys_stat
+sysdep_routines += sys_fchmodat sys_fstat sys_fstatat sys_lstat sys_mkdirat sys_mkfifoat sys_mknod sys_mknodat sys_nfstat sys_nlstat sys_nstat sys_stat
 # For <sys/statfs.h>.
 sysdep_routines += fstatfs64 statfs64 sys_fstatfs sys_statfs
+# For <stdio.h>
+sysdep_routines += sys_renameat
+# For <sys/times.h>.
+sysdep_routines += sys_futimesat
 # Other.
 sysdep_routines += lchmod
 endif
@@ -51,7 +55,7 @@ ifeq ($(subdir),misc)
 # For <sched.h>.
 sysdep_routines += clone start_thread
 # For <unistd.h>.
-sysdep_routines += sys_ftruncate sys_freebsd6_ftruncate sys_truncate sys_freebsd6_truncate
+sysdep_routines += sys_faccessat sys_ftruncate sys_freebsd6_ftruncate sys_truncate sys_freebsd6_truncate
 # For <sys/acl.h>.
 sysdep_routines += acl_aclcheck_fd acl_aclcheck_file acl_delete_fd acl_delete_file acl_get_fd acl_get_file acl_set_fd acl_set_file
 # For <sys/extattr.h>.

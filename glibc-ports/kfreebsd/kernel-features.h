@@ -73,3 +73,8 @@
 # define __ASSUME_TRUNCATE_SYSCALL	1
 #endif
 
+/* The `*at' syscalls were introduced in kFreeBSD 8.0. */
+#if __KFREEBSD_KERNEL_VERSION >= 0x80000
+# define __ASSUME_ATFCTS        1
+#endif
+
