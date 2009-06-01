@@ -173,9 +173,9 @@
 #define	SYS_freebsd4_fstatfs	158
 #define	SYS_lgetfh	160
 #define	SYS_getfh	161
-#define	SYS_getdomainname	162
-#define	SYS_setdomainname	163
-#define	SYS_uname	164
+#define	SYS_freebsd4_getdomainname	162
+#define	SYS_freebsd4_setdomainname	163
+#define	SYS_freebsd4_uname	164
 #define	SYS_sysarch	165
 #define	SYS_rtprio	166
 #define	SYS_semsys	169
