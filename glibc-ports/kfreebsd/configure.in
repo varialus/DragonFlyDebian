@@ -38,7 +38,7 @@ AC_EGREP_CPP([eat flaming death], [#include <osreldate.h>
 #endif
 #if !defined __FreeBSD_kernel_version || __FreeBSD_kernel_version < ]dnl
 patsubst(LIBC_KFREEBSD_VERSION,[^\([^.]*\)\.\([^.]*\)\.\([^.]*\)$],dnl
-[ (\1 *65536+ \2 *256+ \3) /* \1.\2.\3 */])[
+[ (\1 *100000+ \2 *1000+ \3) /* \1.\2.\3 */])[
 eat flaming death
 #endif],
 	     libc_cv_kfreebsdVER='TOO OLD!',
@@ -102,6 +102,7 @@ fi
 if test -n "$minimum_kernel"; then
   AC_MSG_CHECKING(for kernel header at least $minimum_kernel)
 changequote(,)dnl
+  hdrnum=`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/(\1 * 100000 + \2 * 1000 + \3)/'`;
   decnum=`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/(\1 * 65536 + \2 * 256 + \3)/'`;
   abinum=`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/\1,\2,\3/'`;
 changequote([,])dnl
@@ -109,7 +110,7 @@ changequote([,])dnl
 #if !defined(__FreeBSD_kernel_version) && defined(__FreeBSD_version)
 #define __FreeBSD_kernel_version __FreeBSD_version
 #endif
-#if __FreeBSD_kernel_version < $decnum
+#if __FreeBSD_kernel_version < $hdrnum
 eat flaming death
 #endif], libc_minimum_kernel='too old!', libc_minimum_kernel=ok)
   AC_MSG_RESULT($libc_minimum_kernel)

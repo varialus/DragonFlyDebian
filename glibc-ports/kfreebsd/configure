@@ -59,7 +59,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !defined(__FreeBSD_kernel_version) && defined(__FreeBSD_version)
 #define __FreeBSD_kernel_version __FreeBSD_version
 #endif
-#if !defined __FreeBSD_kernel_version || __FreeBSD_kernel_version <  (6 *65536+ 4 *256+ 0) /* 6.0.0 */
+#if !defined __FreeBSD_kernel_version || __FreeBSD_kernel_version <  (6 *100000+ 0 *1000+ 0) /* 6.0.0 */
 eat flaming death
 #endif
 _ACEOF
@@ -146,6 +146,7 @@ fi
 if test -n "$minimum_kernel"; then
   echo "$as_me:$LINENO: checking for kernel header at least $minimum_kernel" >&5
 echo $ECHO_N "checking for kernel header at least $minimum_kernel... $ECHO_C" >&6
+  hdrnum=`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/(\1 * 100000 + \2 * 1000 + \3)/'`;
   decnum=`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/(\1 * 65536 + \2 * 256 + \3)/'`;
   abinum=`echo "$minimum_kernel.0.0.0" | sed 's/\([0-9]*\)\.\([0-9]*\)\.\([0-9]*\).*/\1,\2,\3/'`;
   cat >conftest.$ac_ext <<_ACEOF
@@ -158,7 +159,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #if !defined(__FreeBSD_kernel_version) && defined(__FreeBSD_version)
 #define __FreeBSD_kernel_version __FreeBSD_version
 #endif
-#if __FreeBSD_kernel_version < $decnum
+#if __FreeBSD_kernel_version < $hdrnum
 eat flaming death
 #endif
 _ACEOF
