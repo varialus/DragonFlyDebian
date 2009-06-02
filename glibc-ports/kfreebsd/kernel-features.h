@@ -35,6 +35,15 @@
    introduced.  If somebody cares these values can afterwards be
    corrected.  */
 
+/*
+   Beware, the __KFREEBSD_KERNEL_VERSION have different value compared to
+   __FreeBSD_version/__FreeBSD_kernel__version. 
+   The transformation is not just prepend 0x to __FreeBSD_kernel_version.
+
+   For changes see i.e.
+   http://www.freebsd.org/doc/en/books/porters-handbook/freebsd-versions.html
+*/
+
 /* Real-time signals introduced in FreeBSD 7.x.  */
 #if __KFREEBSD_KERNEL_VERSION >= 0x70000
 # define __ASSUME_REALTIME_SIGNALS	1
