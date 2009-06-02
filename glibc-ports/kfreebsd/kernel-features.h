@@ -45,7 +45,7 @@
 */
 
 /* Real-time signals introduced in FreeBSD 7.x.  */
-#if __KFREEBSD_KERNEL_VERSION >= 0x70000
+#if __KFREEBSD_KERNEL_VERSION >= 0x70032
 # define __ASSUME_REALTIME_SIGNALS	1
 #endif
 
@@ -53,37 +53,27 @@
 #define PTHREAD_SIGBASE 32
 
 /* The `ftruncate' syscall was introduced in kFreeBSD 7.0. */
-#if __KFREEBSD_KERNEL_VERSION >= 0x70000
-# define __ASSUME_FTRUNCATE_SYSCALL	1
+#if __KFREEBSD_KERNEL_VERSION >= 0x70032
+# define __ASSUME_TRUNCATE_SYSCALL	1
 #endif
 
 /* The `lseek' syscall was introduced in kFreeBSD 7.0. */
-#if __KFREEBSD_KERNEL_VERSION >= 0x70000
+#if __KFREEBSD_KERNEL_VERSION >= 0x70032
 # define __ASSUME_LSEEK_SYSCALL		1
 #endif
 
 /* The `mmap' syscall was introduced in kFreeBSD 7.0. */
-#if __KFREEBSD_KERNEL_VERSION >= 0x70000
+#if __KFREEBSD_KERNEL_VERSION >= 0x70032
 # define __ASSUME_MMAP_SYSCALL		1
 #endif
 
-/* The `pread' syscall was introduced in kFreeBSD 7.0. */
-#if __KFREEBSD_KERNEL_VERSION >= 0x70000
-# define __ASSUME_PREAD_SYSCALL		1
-#endif
-
-/* The `pwrite' syscall was introduced in kFreeBSD 7.0. */
-#if __KFREEBSD_KERNEL_VERSION >= 0x70000
-# define __ASSUME_PWRITE_SYSCALL	1
-#endif
-
-/* The `truncate' syscall was introduced in kFreeBSD 7.0. */
-#if __KFREEBSD_KERNEL_VERSION >= 0x70000
-# define __ASSUME_TRUNCATE_SYSCALL	1
+/* The `pread' and `pwrite' syscalls were introduced in kFreeBSD 7.0. */
+#if __KFREEBSD_KERNEL_VERSION >= 0x70032
+# define __ASSUME_PREAD_PWRITE_SYSCALLS	1
 #endif
 
 /* The `*at' syscalls were introduced in kFreeBSD 8.0. */
-#if __KFREEBSD_KERNEL_VERSION >= 0x80000
+#if __KFREEBSD_KERNEL_VERSION >= 0x8001D
 # define __ASSUME_ATFCTS        1
 #endif
 

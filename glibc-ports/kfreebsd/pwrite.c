@@ -39,7 +39,7 @@ __libc_pwrite (int fd, const void *buf, size_t nbytes, __off_t offset)
     {
       /* First try the new syscall. */
       result = INLINE_SYSCALL (pwrite, 4, fd, buf, nbytes, offset);
-#ifndef __ASSUME_PREAD_SYSCALL
+#ifndef __ASSUME_PREAD_PWRITE_SYSCALLS
       if (result == -1 && errno == ENOSYS)
         /* New syscall not available, us the old one. */
         result = INLINE_SYSCALL (freebsd6_pwrite, 5, fd, buf, nbytes, 0, offset);
@@ -50,7 +50,7 @@ __libc_pwrite (int fd, const void *buf, size_t nbytes, __off_t offset)
   int oldtype = LIBC_CANCEL_ASYNC ();
   /* First try the new syscall. */
   result = INLINE_SYSCALL (pwrite, 4, fd, buf, nbytes, offset);
-#ifndef __ASSUME_PREAD_SYSCALL
+#ifndef __ASSUME_PREAD_PWRITE_SYSCALLS
   if (result == -1 && errno == ENOSYS)
     /* New syscall not available, us the old one. */
     result = INLINE_SYSCALL (freebsd6_pwrite, 5, fd, buf, nbytes, 0, offset);

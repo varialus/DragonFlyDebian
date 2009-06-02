@@ -36,7 +36,7 @@ __ftruncate (int fd, __off_t length)
   /* First try the new syscall. */
   result = INLINE_SYSCALL (ftruncate, 2, fd, length);
 
-#ifndef __ASSUME_FTRUNCATE_SYSCALL
+#ifndef __ASSUME_TRUNCATE_SYSCALL
   if (result == -1 && errno == ENOSYS)
     /* New syscall not available, us the old one. */
     result = INLINE_SYSCALL (freebsd6_ftruncate, 3, fd, 0, length);
