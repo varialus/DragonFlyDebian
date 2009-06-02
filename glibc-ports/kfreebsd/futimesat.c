@@ -45,7 +45,12 @@ futimesat (fd, file, tvp)
   if (__have_atfcts >= 0)
 # endif
     {
-      int result = INLINE_SYSCALL (futimesat, 3, fd, file, tvp);
+      int result;
+
+      if (file == NULL)
+	return __futimes (fd, tvp);
+
+      result = INLINE_SYSCALL (futimesat, 3, fd, file, tvp);
 # ifndef __ASSUME_ATFCTS
       if (result == -1 && errno == ENOSYS)
 	__have_atfcts = -1;
@@ -55,7 +60,7 @@ futimesat (fd, file, tvp)
     }
 
 #ifndef __ASSUME_ATFCTS
-  if (fd != AT_FDCWD && file[0] != '/')
+  if ((file == NULL) || (fd != AT_FDCWD && file[0] != '/'))
     {
       int mib[4];
       size_t kf_len = 0;
@@ -78,7 +83,11 @@ futimesat (fd, file, tvp)
 	  return -1;
 	}
 
-      kf_buf = alloca (kf_len + strlen (file));
+      if (file == NULL)
+	kf_buf = alloca (kf_len);
+      else
+	kf_buf = alloca (kf_len + strlen (file));
+
       if (sysctl (mib, 4, kf_buf, &kf_len, NULL, 0) != 0)
 	{
 	  __set_errno (ENOSYS);
@@ -98,9 +107,11 @@ futimesat (fd, file, tvp)
 		  __set_errno (ENOTDIR);
 		  return -1;
 		}
-
-	      strcat (kf->kf_path, "/");
-	      strcat (kf->kf_path, file);
+	      if (file != NULL)
+		{
+		  strcat (kf->kf_path, "/");
+		  strcat (kf->kf_path, file);
+		}
 	      file = kf->kf_path;
 	      break;
 	    }
