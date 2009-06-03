@@ -72,8 +72,13 @@
 # define __ASSUME_PREAD_PWRITE_SYSCALLS	1
 #endif
 
+/* The `shm_*' syscalls were introduced in kFreeBSD 8.0 */
+#if __KFREEBSD_KERNEL_VERSION >= 0x8000C
+# define __ASSUME_SHMFCTS		1
+#endif
+
 /* The `*at' syscalls were introduced in kFreeBSD 8.0. */
 #if __KFREEBSD_KERNEL_VERSION >= 0x8001D
-# define __ASSUME_ATFCTS        1
+# define __ASSUME_ATFCTS		1
 #endif
 

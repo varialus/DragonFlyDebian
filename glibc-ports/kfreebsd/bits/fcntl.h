@@ -77,6 +77,21 @@ enum { O_NOATIME = 0};          /* Do not set atime.  */
 #define	FWRITE		2
 #endif
 
+/*
+ * We are out of bits in f_flag (which is a short).  However,
+ * the flag bits not set in FMASK are only meaningful in the
+ * initial open syscall.  Those bits can thus be given a
+ * different meaning for fcntl(2).
+ */
+#if __USE_BSD
+/*
+ * Set by shm_open(3) to get automatic MAP_ASYNC behavior
+ * for POSIX shared memory objects (which are otherwise
+ * implemented as plain files).
+ */
+#define FPOSIXSHM	O_NOFOLLOW
+#endif
+
 /* Values for the second argument to `fcntl'.  */
 #define F_DUPFD		0	/* Duplicate file descriptor.  */
 #define F_GETFD		1	/* Get file descriptor flags.  */
