@@ -30,7 +30,7 @@
 #include <kernel-features.h>
 
 extern int __syscall_futimesat (int fd, const char *path,
-				struct timeval *times);
+				const struct timeval *times);
 libc_hidden_proto (__syscall_futimesat)
 
 /* Change the access time of FILE relative to FD to TVP[0] and
