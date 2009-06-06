@@ -1,7 +1,8 @@
 ---
  lib/libcam/Makefile |    3 +--
+ lib/libcam/camlib.c |    1 +
  lib/libcam/camlib.h |    9 +++------
- 2 files changed, 4 insertions(+), 8 deletions(-)
+ 3 files changed, 5 insertions(+), 8 deletions(-)
 
 --- a/lib/libcam/Makefile
 +++ b/lib/libcam/Makefile
@@ -43,3 +44,13 @@
  int buff_encode_visit(u_int8_t *buff, size_t len, const char *fmt,
  		      int (*arg_get)(void *hook, char *field_name),
  		      void *gethook);
+--- a/lib/libcam/camlib.c
++++ b/lib/libcam/camlib.c
+@@ -34,6 +34,7 @@
+ #include <unistd.h>
+ #include <errno.h>
+ #include <ctype.h>
++#include <bsd/string.h>
+ 
+ #include <cam/cam.h>
+ #include <cam/scsi/scsi_all.h>

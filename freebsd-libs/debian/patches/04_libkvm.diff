@@ -1,17 +1,18 @@
 ---
  lib/libkvm/Makefile             |    2 +-
- lib/libkvm/kvm.c                |   10 ++++++++--
+ lib/libkvm/kvm.c                |   16 ++++++++++++----
+ lib/libkvm/kvm_amd64.c          |    9 +++++----
+ lib/libkvm/kvm_cptime.c         |    5 +++--
  lib/libkvm/kvm_file.c           |    8 +++++++-
- lib/libkvm/kvm_getloadavg.c     |    6 ++++++
- lib/libkvm/kvm_getswapinfo.c    |    2 ++
- lib/libkvm/kvm_minidump_amd64.c |    9 +++++++++
+ lib/libkvm/kvm_getloadavg.c     |   14 ++++++++++----
+ lib/libkvm/kvm_getswapinfo.c    |   13 +++++++++----
+ lib/libkvm/kvm_minidump_amd64.c |   10 ++++++++++
  lib/libkvm/kvm_minidump_i386.c  |   10 ++++++++++
+ lib/libkvm/kvm_pcpu.c           |    6 +++---
  lib/libkvm/kvm_private.h        |    4 ++--
- lib/libkvm/kvm_proc.c           |    3 +++
- 9 files changed, 48 insertions(+), 6 deletions(-)
+ lib/libkvm/kvm_proc.c           |   19 +++++++++++--------
+ 12 files changed, 83 insertions(+), 33 deletions(-)
 
-Index: b/lib/libkvm/Makefile
-===================================================================
 --- a/lib/libkvm/Makefile
 +++ b/lib/libkvm/Makefile
 @@ -2,8 +2,8 @@
@@ -24,8 +25,6 @@ Index: b/lib/libkvm/Makefile
  
  .if ${MACHINE} == "sun4v"
  CFLAGS+=-DSUN4V
-Index: b/lib/libkvm/kvm.c
-===================================================================
 --- a/lib/libkvm/kvm.c
 +++ b/lib/libkvm/kvm.c
 @@ -46,6 +46,7 @@
@@ -36,7 +35,7 @@ Index: b/lib/libkvm/kvm.c
  
  #include <vm/vm.h>
  #include <vm/vm_param.h>
-@@ -58,11 +59,16 @@
+@@ -58,10 +59,17 @@
  #include <limits.h>
  #include <nlist.h>
  #include <paths.h>
@@ -45,15 +44,16 @@ Index: b/lib/libkvm/kvm.c
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
- 
++#include <bsd/string.h>
++#include <freebsd/paths.h>
++
 +#ifndef _PATH_FWMEM
 +#define _PATH_FWMEM     "/dev/fwmem"
 +#endif
-+
+ 
  #include "kvm_private.h"
  
- /* from src/lib/libc/gen/nlist.c */
-@@ -237,7 +243,7 @@
+@@ -237,7 +245,7 @@
  kvm_openfiles(uf, mf, sf, flag, errout)
  	const char *uf;
  	const char *mf;
@@ -62,7 +62,7 @@ Index: b/lib/libkvm/kvm.c
  	int flag;
  	char *errout;
  {
-@@ -256,7 +262,7 @@
+@@ -256,7 +264,7 @@
  kvm_open(uf, mf, sf, flag, errstr)
  	const char *uf;
  	const char *mf;
@@ -71,8 +71,18 @@ Index: b/lib/libkvm/kvm.c
  	int flag;
  	const char *errstr;
  {
-Index: b/lib/libkvm/kvm_file.c
-===================================================================
+@@ -322,9 +330,9 @@
+ 	 * and look it up with a kldsym(2) syscall.
+ 	 */
+ 	nvalid = 0;
+-	for (p = nl; p->n_name && p->n_name[0]; ++p) {
++	for (p = nl; p->n_un.n_name && p->n_un.n_name[0]; ++p) {
+ 		lookup.version = sizeof(lookup);
+-		lookup.symname = p->n_name;
++		lookup.symname = p->n_un.n_name;
+ 		lookup.symvalue = 0;
+ 		lookup.symsize = 0;
+ 
 --- a/lib/libkvm/kvm_file.c
 +++ b/lib/libkvm/kvm_file.c
 @@ -59,7 +59,7 @@
@@ -116,11 +126,9 @@ Index: b/lib/libkvm/kvm_file.c
 +#endif
 +	return 0;
  }
-Index: b/lib/libkvm/kvm_getloadavg.c
-===================================================================
 --- a/lib/libkvm/kvm_getloadavg.c
 +++ b/lib/libkvm/kvm_getloadavg.c
-@@ -43,6 +43,7 @@
+@@ -43,15 +43,21 @@
  #include <limits.h>
  #include <nlist.h>
  #include <kvm.h>
@@ -128,23 +136,64 @@ Index: b/lib/libkvm/kvm_getloadavg.c
  
  #include "kvm_private.h"
  
-@@ -54,6 +55,11 @@
- 	{ "" },
- };
- 
+ static struct nlist nl[] = {
+-	{ "_averunnable" },
++	{ { "_averunnable" } },
+ #define	X_AVERUNNABLE	0
+-	{ "_fscale" },
++	{ { "_fscale" } },
+ #define	X_FSCALE	1
+-	{ "" },
++	{ { "" } },
++};
++
 +struct loadavg {
 +	__fixpt_t       ldavg[3];
 +	long            fscale;
-+};
-+
+ };
+ 
  /*
-  * kvm_getloadavg() -- Get system load averages, from live or dead kernels.
-  *
-Index: b/lib/libkvm/kvm_getswapinfo.c
-===================================================================
+@@ -76,7 +82,7 @@
+ 	if (kvm_nlist(kd, nl) != 0) {
+ 		for (p = nl; p->n_type != 0; ++p);
+ 		_kvm_err(kd, kd->program,
+-		    "%s: no such symbol", p->n_name);
++		    "%s: no such symbol", p->n_un.n_name);
+ 		return (-1);
+ 	}
+ 
 --- a/lib/libkvm/kvm_getswapinfo.c
 +++ b/lib/libkvm/kvm_getswapinfo.c
-@@ -209,8 +209,10 @@
+@@ -46,13 +46,16 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <limits.h>
++#include <bsd/string.h>
++
++#include <freebsd/paths.h>
+ 
+ #include "kvm_private.h"
+ 
+ static struct nlist kvm_swap_nl[] = {
+-	{ "_swtailq" },		/* list of swap devices and sizes */
+-	{ "_dmmax" },		/* maximum size of a swap block */
+-	{ NULL }
++	{ { "_swtailq" } },		/* list of swap devices and sizes */
++	{ { "_dmmax" } },		/* maximum size of a swap block */
++	{ { NULL } }
+ };
+ 
+ #define NL_SWTAILQ	0
+@@ -70,7 +73,7 @@
+ #define KREAD(kd, addr, obj) \
+ 	(kvm_read(kd, addr, (char *)(obj), sizeof(*obj)) != sizeof(*obj))
+ #define	KGET(idx, var)							\
+-	KGET2(kvm_swap_nl[(idx)].n_value, var, kvm_swap_nl[(idx)].n_name)
++	KGET2(kvm_swap_nl[(idx)].n_value, var, kvm_swap_nl[(idx)].n_un.n_name)
+ #define KGET2(addr, var, msg)						\
+ 	if (KREAD(kd, (u_long)(addr), (var))) {				\
+ 		_kvm_err(kd, kd->program, "cannot read %s", msg);	\
+@@ -209,8 +212,10 @@
  			swap_ary[unswdev].ksw_total = ttl;
  			swap_ary[unswdev].ksw_used = xsd.xsw_used;
  			swap_ary[unswdev].ksw_flags = xsd.xsw_flags;
@@ -155,11 +204,17 @@ Index: b/lib/libkvm/kvm_getswapinfo.c
  		}
  		tot.ksw_total += ttl;
  		tot.ksw_used += xsd.xsw_used;
-Index: b/lib/libkvm/kvm_minidump_amd64.c
-===================================================================
 --- a/lib/libkvm/kvm_minidump_amd64.c
 +++ b/lib/libkvm/kvm_minidump_amd64.c
-@@ -99,6 +99,15 @@
+@@ -37,6 +37,7 @@
+ #include <sys/fnv_hash.h>
+ #include <stdlib.h>
+ #include <strings.h>
++#include <string.h>
+ #include <unistd.h>
+ #include <nlist.h>
+ #include <kvm.h>
+@@ -99,6 +100,15 @@
  	return (-1);
  }
  
@@ -171,12 +226,10 @@ Index: b/lib/libkvm/kvm_minidump_amd64.c
 +	__asm __volatile("bsfq %1,%0" : "=r" (result) : "rm" (mask));
 +	return (result);
 +}
-+                        
++
  static int
  inithash(kvm_t *kd, uint64_t *base, int len, off_t off)
  {
-Index: b/lib/libkvm/kvm_minidump_i386.c
-===================================================================
 --- a/lib/libkvm/kvm_minidump_i386.c
 +++ b/lib/libkvm/kvm_minidump_i386.c
 @@ -101,6 +101,16 @@
@@ -191,13 +244,11 @@ Index: b/lib/libkvm/kvm_minidump_i386.c
 +	__asm __volatile("bsfl %1,%0" : "=r" (result) : "rm" (mask));
 +	return (result);
 +}
-+                                                
++
 +
  static int
  inithash(kvm_t *kd, uint32_t *base, int len, off_t off)
  {
-Index: b/lib/libkvm/kvm_private.h
-===================================================================
 --- a/lib/libkvm/kvm_private.h
 +++ b/lib/libkvm/kvm_private.h
 @@ -68,7 +68,7 @@
@@ -218,8 +269,6 @@ Index: b/lib/libkvm/kvm_private.h
  int	 _kvm_uvatop(kvm_t *, const struct proc *, u_long, u_long *);
  
  #if defined(__amd64__) || defined(__i386__)
-Index: b/lib/libkvm/kvm_proc.c
-===================================================================
 --- a/lib/libkvm/kvm_proc.c
 +++ b/lib/libkvm/kvm_proc.c
 @@ -53,7 +53,7 @@
@@ -246,5 +295,96 @@ Index: b/lib/libkvm/kvm_proc.c
 +#endif
 +	return -1;
  }
+ 
+ /*
+@@ -540,18 +543,18 @@
+ 	} else {
+ 		struct nlist nl[6], *p;
+ 
+-		nl[0].n_name = "_nprocs";
+-		nl[1].n_name = "_allproc";
+-		nl[2].n_name = "_zombproc";
+-		nl[3].n_name = "_ticks";
+-		nl[4].n_name = "_hz";
+-		nl[5].n_name = 0;
++		nl[0].n_un.n_name = "_nprocs";
++		nl[1].n_un.n_name = "_allproc";
++		nl[2].n_un.n_name = "_zombproc";
++		nl[3].n_un.n_name = "_ticks";
++		nl[4].n_un.n_name = "_hz";
++		nl[5].n_un.n_name = 0;
+ 
+ 		if (kvm_nlist(kd, nl) != 0) {
+ 			for (p = nl; p->n_type != 0; ++p)
+ 				;
+ 			_kvm_err(kd, kd->program,
+-				 "%s: no such symbol", p->n_name);
++				 "%s: no such symbol", p->n_un.n_name);
+ 			return (0);
+ 		}
+ 		if (KREAD(kd, nl[0].n_value, &nprocs)) {
+--- a/lib/libkvm/kvm_amd64.c
++++ b/lib/libkvm/kvm_amd64.c
+@@ -51,6 +51,7 @@
+ #include <sys/mman.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <string.h>
+ #include <nlist.h>
+ #include <kvm.h>
+ 
+@@ -174,8 +175,8 @@
+ 			return (-1);
+ 	}
+ 
+-	nlist[0].n_name = "kernbase";
+-	nlist[1].n_name = 0;
++	nlist[0].n_un.n_name = "kernbase";
++	nlist[1].n_un.n_name = 0;
+ 
+ 	if (kvm_nlist(kd, nlist) != 0) {
+ 		_kvm_err(kd, kd->program, "bad namelist - no kernbase");
+@@ -183,8 +184,8 @@
+ 	}
+ 	kernbase = nlist[0].n_value;
+ 
+-	nlist[0].n_name = "KPML4phys";
+-	nlist[1].n_name = 0;
++	nlist[0].n_un.n_name = "KPML4phys";
++	nlist[1].n_un.n_name = 0;
+ 
+ 	if (kvm_nlist(kd, nlist) != 0) {
+ 		_kvm_err(kd, kd->program, "bad namelist - no KPML4phys");
+--- a/lib/libkvm/kvm_cptime.c
++++ b/lib/libkvm/kvm_cptime.c
+@@ -38,12 +38,13 @@
+ #include <kvm.h>
+ #include <limits.h>
+ #include <stdlib.h>
++#include <string.h>
+ 
+ #include "kvm_private.h"
+ 
+ static struct nlist kvm_cp_time_nl[] = {
+-	{ "_cp_time" },			/* (deprecated) */
+-	{ NULL },
++	{ { "_cp_time" } },			/* (deprecated) */
++	{ { NULL } },
+ };
+ 
+ #define	NL_CP_TIME		0
+--- a/lib/libkvm/kvm_pcpu.c
++++ b/lib/libkvm/kvm_pcpu.c
+@@ -40,9 +40,9 @@
+ #include "kvm_private.h"
+ 
+ static struct nlist kvm_pcpu_nl[] = {
+-	{ "_cpuid_to_pcpu" },
+-	{ "_mp_maxcpus" },
+-	{ NULL },
++	{ { "_cpuid_to_pcpu" } },
++	{ { "_mp_maxcpus" } },
++	{ { NULL } },
+ };
  
  /*

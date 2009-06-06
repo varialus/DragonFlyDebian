@@ -1,7 +1,7 @@
 ---
  lib/libdevstat/Makefile  |    4 ++--
- lib/libdevstat/devstat.c |    6 +++++-
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ lib/libdevstat/devstat.c |   10 +++++++---
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
 --- a/lib/libdevstat/Makefile
 +++ b/lib/libdevstat/Makefile
@@ -33,6 +33,17 @@
  
  #include "devstat.h"
  
+@@ -1562,8 +1563,8 @@
+ {
+ 	struct nlist nl[2];
+ 
+-	nl[0].n_name = (char *)name;
+-	nl[1].n_name = NULL;
++	nl[0].n_un.n_name = (char *)name;
++	nl[1].n_un.n_name = NULL;
+ 
+ 	if (kvm_nlist(kd, nl) == -1) {
+ 		snprintf(devstat_errbuf, sizeof(devstat_errbuf),
 @@ -1588,6 +1589,7 @@
  	struct devstatlist dhead;
  	int num_devs;
