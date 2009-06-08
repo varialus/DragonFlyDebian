@@ -13,6 +13,7 @@ endif
 
 lib := libbsd0
 libdbg := $(lib)-dbg
+libudeb := $(lib)-udeb
 libdev := libbsd-dev
 
 build-indep:
@@ -54,7 +55,7 @@ binary-arch: install-arch
 	dh_strip --dbg-package=$(libdbg)
 	dh_compress
 	dh_fixperms
-	dh_makeshlibs
+	dh_makeshlibs --add-udeb=$(libudeb)
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
