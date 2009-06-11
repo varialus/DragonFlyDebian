@@ -5,7 +5,7 @@ Index: src/sys/conf/kmod.mk
 ===================================================================
 --- src.orig/sys/conf/kmod.mk
 +++ src/sys/conf/kmod.mk
-@@ -204,7 +204,7 @@
+@@ -203,7 +203,7 @@
  	grep -v '^#' < ${EXPORT_SYMS} > export_syms
  .endif
  	awk -f ${SYSDIR}/conf/kmod_syms.awk ${.TARGET} \
@@ -18,18 +18,16 @@ Index: src/sys/contrib/dev/acpica/acpica_prep.sh
 ===================================================================
 --- src.orig/sys/contrib/dev/acpica/acpica_prep.sh
 +++ src/sys/contrib/dev/acpica/acpica_prep.sh
-@@ -55,12 +55,12 @@
- 
+@@ -58,10 +58,10 @@
+ # copy files
  echo copying full dirs
  for i in ${fulldirs}; do
 -	find ${wrk} -name ${i} -type d | xargs -J % mv % ${dst}
 +	find ${wrk} -name ${i} -type d | xargs -I % mv % ${dst}
  done
- 
- # move files to destination
- echo copying flat dirs
+ echo copying remaining files
 -find ${wrk} -type f | xargs -J % mv % ${dst}
 +find ${wrk} -type f | xargs -I % mv % ${dst}
- mv ${dst}/changes.txt ${dst}/CHANGES.txt
  
- # update src/headers for appropriate paths
+ # canonify include paths
+ for H in ${src_headers}; do

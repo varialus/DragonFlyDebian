@@ -8,10 +8,10 @@ Index: src/sys/dev/aic7xxx/aicasm/Makefile
  DPADD=	${LIBL}
 -LDADD=	-ll
 +LDADD=	-ll -ldb
+ WARNS?=	6
  
  # Correct path for kernel builds
- # Don't rely on the kernel's .depend file
-@@ -23,13 +23,6 @@
+@@ -24,13 +24,6 @@
  DEPENDFILE=	.depend_aicasm
  .endif
  
@@ -124,14 +124,14 @@ Index: src/sys/dev/aic7xxx/aicasm/aicasm_symbol.c
 -#include <db.h>
 +#include <db_185.h>		/* Sleepycat 1.85 compat */
  #endif
+ #include <ctype.h>
  #include <fcntl.h>
- #include <inttypes.h>
 Index: src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h
 ===================================================================
 --- src.orig/sys/dev/aic7xxx/aicasm/aicasm_symbol.h
 +++ src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h
 @@ -42,8 +42,9 @@
-  * $FreeBSD: src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h,v 1.17 2005/01/06 01:42:27 imp Exp $
+  * $FreeBSD: src/sys/dev/aic7xxx/aicasm/aicasm_symbol.h,v 1.18 2009/06/01 18:42:16 delphij Exp $
   */
  
 -#ifdef __linux__
