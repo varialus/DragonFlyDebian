@@ -1,3 +1,29 @@
+Index: src/sys/modules/ralfw/Makefile.inc
+===================================================================
+--- src.orig/sys/modules/ralfw/Makefile.inc
++++ src/sys/modules/ralfw/Makefile.inc
+@@ -12,4 +12,4 @@
+ FIRMWS=	${_FIRM}:${KMOD}
+ 
+ ${_FIRM}: ${.CURDIR}/../../../contrib/dev/ral/${_FIRM}.uu
+-	uudecode -p $? > ${.TARGET}
++	uudecode -o- $? > ${.TARGET}
+Index: src/sys/modules/mwlfw/Makefile
+===================================================================
+--- src.orig/sys/modules/mwlfw/Makefile
++++ src/sys/modules/mwlfw/Makefile
+@@ -6,9 +6,9 @@
+ CLEANFILES+= mw88W8363.fw mwlboot.fw
+ 
+ mw88W8363.fw: ${.CURDIR}/../../contrib/dev/mwl/mw88W8363.fw.uu
+-	uudecode -p $? > ${.TARGET}
++	uudecode -o- $? > ${.TARGET}
+ 
+ mwlboot.fw: ${.CURDIR}/../../contrib/dev/mwl/mwlboot.fw.uu
+-	uudecode -p $? > ${.TARGET}
++	uudecode -o- $? > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>
 Index: src/sys/modules/ipwfw/ipw_bss/Makefile
 ===================================================================
 --- src.orig/sys/modules/ipwfw/ipw_bss/Makefile
