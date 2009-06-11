@@ -35,8 +35,16 @@
    introduced.  If somebody cares these values can afterwards be
    corrected.  */
 
-/*
-   Beware, the __KFREEBSD_KERNEL_VERSION have different value compared to
+/* 
+   The used encoding corresponds to the following in elf/dl-load.c:
+
+            osversion = (abi_note[5] & 0xff) * 65536
+                        + (abi_note[6] & 0xff) * 256
+                        + (abi_note[7] & 0xff);
+            if (abi_note[4] != __ABI_TAG_OS
+                || (GLRO(dl_osversion) && GLRO(dl_osversion) < osversion))
+            
+   Therefore, the __KFREEBSD_KERNEL_VERSION have different value compared to
    __FreeBSD_version/__FreeBSD_kernel__version. 
    The transformation is not just prepend 0x to __FreeBSD_kernel_version.
 

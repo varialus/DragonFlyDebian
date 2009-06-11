@@ -52,5 +52,5 @@ _dl_discover_osversion (void)
   /* Convert to the GLIBC versioning system */
   return ((version / 100000) << 16)		/* major */
 	 | (((version % 100000) / 1000) << 8)   /* minor 	0 -  99 */
-	 | ((version % 1000));			/* subrelease 	0 - 199 */ 
+	 | ((version % 200));			/* subrelease 	0 - 199 */
 }
