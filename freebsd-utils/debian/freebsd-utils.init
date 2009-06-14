@@ -98,6 +98,10 @@ case "$1" in
       mount -t linprocfs proc /proc
     fi
     if ! mount | grep -q "on /sys (linsysfs" ; then
+      # Should be done during the installation
+      if [ ! -d /sys ] ; then
+        mkdir /sys
+      fi
       mount -t linsysfs sys /sys
     fi
     if ! mount | grep -q "on /dev/fd (fdescfs" ; then
