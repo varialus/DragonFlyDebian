@@ -13,9 +13,9 @@ else
 	CFLAGS += -O2
 endif
 
-ANONCVS=anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
-RELENG=RELENG_7_2_0_RELEASE
-VERSION=7.2
+VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
+SVN=svn://svn.freebsd.org/base/release/$(VERSION).0
+ORIGDIR=freebsd-utils-$(VERSION)
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
@@ -24,7 +24,7 @@ PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO 
 build: build-arch build-indep
 
 get-orig-source:
-	rm -rf freebsd-utils-$(VERSION)
+	rm -rf $(ORIGDIR)
 	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
 		 usr.sbin/jail bin/chflags \
 		 sbin/kldconfig sbin/kldload sbin/kldstat sbin/kldunload \
@@ -37,14 +37,11 @@ get-orig-source:
 		 sbin/mount_autofs sbin/mount_reiserfs sbin/mount \
 		 sbin/mdconfig sbin/ccdconfig sbin/swapon \
 	         sbin/gbde sbin/geom \
-		 usr.sbin/kbdcontrol share/syscons/keymaps \
-	; do \
-	    cvs -d $(ANONCVS) export -r $(RELENG) -N -d freebsd-utils-$(VERSION) src/$$i ; \
+		 usr.sbin/kbdcontrol share/syscons/keymaps ; do \
+	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
-	mv freebsd-utils-$(VERSION)/src/* freebsd-utils-$(VERSION)
-	rmdir freebsd-utils-$(VERSION)/src
-	tar -czf ../freebsd-utils_$(VERSION).orig.tar.gz freebsd-utils-$(VERSION)
-	rm -rf freebsd-utils-$(VERSION)
+	tar --numeric-owner --owner 0 --group 0 -czf ../freebsd-utils_$(VERSION).orig.tar.gz $(ORIGDIR)
+	rm -rf $(ORIGDIR)
 
 patch: patch-stamp
 patch-stamp:
