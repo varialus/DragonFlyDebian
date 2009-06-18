@@ -189,12 +189,14 @@ enum
 #define MSG_DONTWAIT MSG_DONTWAIT
     MSG_EOF		= 0x100, /* Data completes connection.  */
 #define MSG_EOF MSG_EOF
+    MSG_NOTIFICATION	= 0x2000,/* SCTP notification */
+#define MSG_NOTIFICATION MSG_NOTIFICATION
+    MSG_NBIO		= 0x4000,/*FIONBIO mode, used by fifofs */
+#define MSG_NBIO MSG_NBIO
     MSG_COMPAT		= 0x8000,/* Used in sendit().  */
 #define MSG_COMPAT MSG_COMPAT
     MSG_NOSIGNAL	= 0x20000 /* do not generate SIGPIPE on EOF */
-#if 0 /* available since FreeBSD 6.0 */
 #define MSG_NOSIGNAL MSG_NOSIGNAL
-#endif
   };
 
 
