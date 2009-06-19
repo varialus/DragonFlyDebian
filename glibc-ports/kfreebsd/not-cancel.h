@@ -52,12 +52,10 @@ extern int __openat64_nocancel (int fd, const char *fname, int oflag,
 /* Uncancelable close.  */
 #define close_not_cancel(fd) \
   INLINE_SYSCALL (close, 1, fd)
+
 #define close_not_cancel_no_status(fd) \
-  INLINE_SYSCALL (close, 1, fd)
-/* should be
-  (void) ({ INTERNAL_SYSCALL_DECL (err);				      \
+  (void) ({ INTERNAL_SYSCALL_DECL (err); \
 	    INTERNAL_SYSCALL (close, err, 1, (fd)); })
-*/
 
 /* Uncancelable read.  */
 #define read_not_cancel(fd, buf, n) \
@@ -69,11 +67,8 @@ extern int __openat64_nocancel (int fd, const char *fname, int oflag,
 
 /* Uncancelable writev.  */
 #define writev_not_cancel_no_status(fd, iov, n) \
-  INLINE_SYSCALL (writev, 3, (fd), (iov), (n))
-/* should be
-  (void) ({ INTERNAL_SYSCALL_DECL (err);				      \
+  (void) ({ INTERNAL_SYSCALL_DECL (err); \
 	    INTERNAL_SYSCALL (writev, err, 3, (fd), (iov), (n)); })
-*/
 
 /* Uncancelable fcntl.  */
 #define fcntl_not_cancel(fd, cmd, val) \

@@ -24,6 +24,8 @@
 #define __need_sigset_t
 #include <signal.h>
 
+#include <syscalls-internal.h>
+
 struct iovec;
 struct rusage;
 struct timespec;
@@ -39,6 +41,9 @@ ssize_t __syscall_writev(int fd, const struct iovec *iovp, int iovcnt);
 libc_hidden_proto (__syscall_read)
 libc_hidden_proto (__syscall_write)
 libc_hidden_proto (__syscall_writev)
+
+ssize_t __syscall_readlink(const char *path, char *buf, size_t bufsiz);
+libc_hidden_proto (__syscall_readlink)
 
 int __syscall_fcntl(int fd, int cmd, ...);
 int __syscall_fork(void);
