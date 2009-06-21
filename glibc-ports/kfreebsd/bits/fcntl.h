@@ -83,7 +83,7 @@ enum { O_NOATIME = 0};          /* Do not set atime.  */
  * initial open syscall.  Those bits can thus be given a
  * different meaning for fcntl(2).
  */
-#if __USE_BSD
+#ifdef __USE_BSD
 /*
  * Set by shm_open(3) to get automatic MAP_ASYNC behavior
  * for POSIX shared memory objects (which are otherwise
