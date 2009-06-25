@@ -88,14 +88,14 @@ __xmknodat (int vers, int fd, const char *file, mode_t mode, dev_t * dev)
       mib[2] = KERN_PROC_FILEDESC;
       mib[3] = __getpid ();
 
-      if (sysctl (mib, 4, NULL, &kf_len, NULL, 0) != 0)
+      if (__sysctl (mib, 4, NULL, &kf_len, NULL, 0) != 0)
 	{
 	  __set_errno (ENOSYS);
 	  return -1;
 	}
 
       kf_buf = alloca (kf_len + strlen (file));
-      if (sysctl (mib, 4, kf_buf, &kf_len, NULL, 0) != 0)
+      if (__sysctl (mib, 4, kf_buf, &kf_len, NULL, 0) != 0)
 	{
 	  __set_errno (ENOSYS);
 	  return -1;

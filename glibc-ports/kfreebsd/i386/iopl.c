@@ -32,7 +32,7 @@ iopl (int level)
           if (__iopl_fd != -1)
             return 0;
 
-          __iopl_fd = open ("/dev/io", O_RDWR);
+          __iopl_fd = __open ("/dev/io", O_RDWR);
           if (__iopl_fd == -1)
             {
               if (errno == EACCES)
@@ -43,7 +43,7 @@ iopl (int level)
 
         case 0:
           if (__iopl_fd != -1)
-            if (close (__iopl_fd) == -1)
+            if (__close (__iopl_fd) == -1)
               return 1;
           return 0;
 

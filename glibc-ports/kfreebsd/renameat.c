@@ -72,14 +72,14 @@ int renameat (oldfd, old, newfd, new)
       mib[2] = KERN_PROC_FILEDESC;
       mib[3] = __getpid ();
 
-      if (sysctl (mib, 4, NULL, &kf_len, NULL, 0) != 0)
+      if (__sysctl (mib, 4, NULL, &kf_len, NULL, 0) != 0)
 	{
 	  __set_errno (ENOSYS);
 	  return -1;
 	}
 
       kf_buf = alloca (kf_len);
-      if (sysctl (mib, 4, kf_buf, &kf_len, NULL, 0) != 0)
+      if (__sysctl (mib, 4, kf_buf, &kf_len, NULL, 0) != 0)
 	{
 	  __set_errno (ENOSYS);
 	  return -1;
@@ -156,6 +156,6 @@ int renameat (oldfd, old, newfd, new)
 	}
     }
   
-  return rename (old, new);
+  return __rename (old, new);
 #endif
 }

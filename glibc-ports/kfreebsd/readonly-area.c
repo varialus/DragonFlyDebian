@@ -44,14 +44,14 @@ __readonly_area (const char *ptr, size_t size)
   mib[2] = KERN_PROC_VMMAP;
   mib[3] = __getpid ();
 
-  if (sysctl (mib, 4, NULL, &kve_len, NULL, 0) != 0)
+  if (__sysctl (mib, 4, NULL, &kve_len, NULL, 0) != 0)
     {
       __set_errno (ENOSYS);
       return 1;
     }
 
   kve_buf = alloca (kve_len);
-  if (sysctl (mib, 4, kve_buf, &kve_len, NULL, 0) != 0)
+  if (__sysctl (mib, 4, kve_buf, &kve_len, NULL, 0) != 0)
     {
       __set_errno (ENOSYS);
       return 1;
