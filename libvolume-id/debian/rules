@@ -41,7 +41,7 @@ install: build-arch
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_installdirs
+	dh_installdirs -s
 	
 	$(MAKE) install prefix=/usr libdir=/lib DESTDIR=debian/tmp
 	
@@ -54,24 +54,24 @@ binary-indep:
 binary-arch: build-arch install
 	dh_testdir
 	dh_testroot
-	dh_installdocs
-	dh_installexamples
-	dh_installmenu
-	dh_installcron
-	dh_installman
-	dh_installinfo
-	dh_installchangelogs
-	dh_bugfiles
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_makeshlibs -V
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+	dh_installdocs -s
+	dh_installexamples -s
+	dh_installmenu -s
+	dh_installcron -s
+	dh_installman -s
+	dh_installinfo -s
+	dh_installchangelogs -s
+	dh_bugfiles -s
+	dh_link -s
+	dh_strip -s
+	dh_compress -s
+	dh_fixperms -s
+	dh_makeshlibs -s -V
+	dh_installdeb -s
+	dh_shlibdeps -s
+	dh_gencontrol -s
+	dh_md5sums -s
+	dh_builddeb -s
 
 binary: binary-indep binary-arch
 
