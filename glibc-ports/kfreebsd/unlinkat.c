@@ -32,6 +32,8 @@
 extern int __syscall_unlinkat (int fd, const char *file, int flag);
 libc_hidden_proto (__syscall_unlinkat)
 
+libc_hidden_proto (__unlink)
+
 /* Remove the link named NAME.  */
 int
 unlinkat (fd, file, flag)

@@ -25,6 +25,8 @@
 extern int __syscall_shm_unlink (const char *name);
 libc_hidden_proto (__syscall_shm_unlink)
 
+libc_hidden_proto (__unlink)
+
 /* Unlink a shared memory object.  */
 int
 shm_unlink (const char *name)
@@ -35,7 +37,11 @@ shm_unlink (const char *name)
 #ifndef __ASSUME_POSIXSHM_SYSCALL
   /* New syscall not available, simply unlink the file. */
   if (result == -1 && errno == ENOSYS)
-    result = __unlink (name);
+# ifdef NOT_IN_libc
+    return unlink (name);
+# else
+    return __unlink (name);
+# endif
 #endif
 
   return result;
