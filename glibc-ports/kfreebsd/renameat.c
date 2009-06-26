@@ -29,6 +29,8 @@
 #include <sys/user.h>
 #include <kernel-features.h>
 
+libc_hidden_proto (rename)
+
 extern int __syscall_renameat (int oldfd, const char *old, int newfd,
 			       const char *new);
 libc_hidden_proto (__syscall_renameat)
@@ -155,7 +157,8 @@ int renameat (oldfd, old, newfd, new)
 	    }
 	}
     }
-  
+
+#define __rename rename /* there is no __rename */
   return __rename (old, new);
 #endif
 }
