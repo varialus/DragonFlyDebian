@@ -23,17 +23,41 @@
 #include <features.h>
 
 /* Function that can be used as first argument to 'sysarch'.  */
+enum
+  {
+    I386_GET_LDT = 0,
+#define I386_GET_LDT I386_GET_LDT
+    I386_SET_LDT = 1,
+#define I386_SET_LDT I386_SET_LDT
+    I386_GET_IOPERM = 3,
+#define I386_GET_IOPERM I386_GET_IOPERM
+    I386_SET_IOPERM = 4,
+#define I386_SET_IOPERM I386_SET_IOPERM
+    I386_GET_FSBASE = 7,
+#define I386_GET_FSBASE I386_GET_FSBASE
+    I386_SET_FSBASE = 8,
+#define I386_SET_FSBASE I386_SET_FSBASE
+    I386_GET_GSBASE = 9,
+#define I386_GET_GSBASE I386_GET_GSBASE
+    I386_SET_GSBASE = 10,
+#define I386_SET_GSBASE I386_SET_GSBASE
+    AMD64_GET_FSBASE = 128,
+#define	AMD64_GET_FSBASE AMD64_GET_FSBASE
+    AMD64_SET_FSBASE = 129,
+#define	AMD64_SET_FSBASE AMD64_SET_FSBASE
+    AMD64_GET_GSBASE = 130,
+#define	AMD64_GET_GSBASE AMD64_GET_GSBASE
+    AMD64_SET_GSBASE = 131
+#define	AMD64_SET_GSBASE AMD64_SET_GSBASE
+  };
 
-#define	I386_GET_FSBASE		7
-#define	I386_SET_FSBASE		8
-#define	I386_GET_GSBASE		9
-#define	I386_SET_GSBASE		10
-
-/* Leave space for 0-127 for to avoid translating syscalls */
-#define	AMD64_GET_FSBASE	128
-#define	AMD64_SET_FSBASE	129
-#define	AMD64_GET_GSBASE	130
-#define	AMD64_SET_GSBASE	131
+/* Argument struct for I386_GET_IOPERM and I386_SET_IOPERM.  */
+struct i386_ioperm_args
+  {
+    unsigned int start;
+    unsigned int length;
+    int enable;
+  };
 
 __BEGIN_DECLS
 
