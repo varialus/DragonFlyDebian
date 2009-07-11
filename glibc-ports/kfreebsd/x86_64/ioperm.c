@@ -1,4 +1,4 @@
-/* Copyright (C) 1996, 1999, 2002 Free Software Foundation, Inc.
+/* Copyright (C) 2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,21 +16,17 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#ifndef _SYS_PERM_H
-#define _SYS_PERM_H	1
+#include <sys/perm.h>
+#include <sysarch.h>
 
-#include <features.h>
+int
+ioperm (unsigned long int from, unsigned long int num, int turn_on)
+{
+  struct i386_ioperm_args args;
 
-__BEGIN_DECLS
+  args.start = from;
+  args.length = num;
+  args.enable = turn_on;
 
-/* Set port input/output permissions.  */
-extern int ioperm (unsigned long int __from, unsigned long int __num,
-		   int __turn_on) __THROW;
-
-
-/* Change I/O privilege level.  */
-extern int iopl (int __level) __THROW;
-
-__END_DECLS
-
-#endif	/* _SYS_PERM_H */
+  return __sysarch (I386_SET_IOPERM, &args);
+}

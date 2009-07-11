@@ -13,5 +13,5 @@ endif
 
 ifeq ($(subdir),misc)
 # For <sys/io.h> and <sys/perm.h>.
-sysdep_routines += iopl
+sysdep_routines += iopl ioperm
 endif
