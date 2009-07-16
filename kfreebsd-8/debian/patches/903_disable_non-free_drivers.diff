@@ -1,11 +1,54 @@
-Index: src/sys/conf/files.i386
-===================================================================
---- src.orig/sys/conf/files.i386
-+++ src/sys/conf/files.i386
-@@ -46,27 +46,6 @@
- 	no-obj no-implicit-rule before-depend				\
- 	clean		"ukbdmap.h"
- #
+--- kfreebsd-8-8.0~cvs20090715.orig/sys/conf/files.i386
++++ /dev/null
+@@ -1,380 +0,0 @@
+-# This file tells config what files go into building a kernel,
+-# files marked standard are always included.
+-#
+-# $FreeBSD: src/sys/conf/files.i386,v 1.625 2009/06/23 13:17:25 rpaulo Exp $
+-#
+-# The long compile-with and dependency lines are required because of
+-# limitations in config: backslash-newline doesn't work in strings, and
+-# dependency lines other than the first are silently ignored.
+-#
+-linux_genassym.o		optional	compat_linux		\
+-	dependency 	"$S/i386/linux/linux_genassym.c"		\
+-	compile-with	"${CC} ${CFLAGS:N-fno-common} -c ${.IMPSRC}"	\
+-	no-obj no-implicit-rule						\
+-	clean		"linux_genassym.o"
+-#
+-linux_assym.h			optional	compat_linux		\
+-	dependency 	"$S/kern/genassym.sh linux_genassym.o"		\
+-	compile-with	"sh $S/kern/genassym.sh linux_genassym.o > ${.TARGET}" \
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"linux_assym.h"
+-#
+-svr4_genassym.o			optional	compat_svr4		\
+-	dependency 	"$S/i386/svr4/svr4_genassym.c"			\
+-	compile-with	"${CC} ${CFLAGS:N-fno-common} -c ${.IMPSRC}"	\
+-	no-obj no-implicit-rule						\
+-	clean		"svr4_genassym.o"
+-#
+-svr4_assym.h			optional	compat_svr4		\
+-	dependency 	"$S/kern/genassym.sh svr4_genassym.o"	   	\
+-	compile-with	"sh $S/kern/genassym.sh svr4_genassym.o > ${.TARGET}" \
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"svr4_assym.h"
+-#
+-font.h				optional	sc_dflt_font		\
+-	compile-with	"uudecode < /usr/share/syscons/fonts/${SC_DFLT_FONT}-8x16.fnt && file2c 'static u_char dflt_font_16[16*256] = {' '};' < ${SC_DFLT_FONT}-8x16 > font.h && uudecode < /usr/share/syscons/fonts/${SC_DFLT_FONT}-8x14.fnt && file2c 'static u_char dflt_font_14[14*256] = {' '};' < ${SC_DFLT_FONT}-8x14 >> font.h && uudecode < /usr/share/syscons/fonts/${SC_DFLT_FONT}-8x8.fnt && file2c 'static u_char dflt_font_8[8*256] = {' '};' < ${SC_DFLT_FONT}-8x8 >> font.h"										\
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"font.h ${SC_DFLT_FONT}-8x14 ${SC_DFLT_FONT}-8x16 ${SC_DFLT_FONT}-8x8"
+-#
+-atkbdmap.h			optional	atkbd_dflt_keymap	\
+-	compile-with	"/usr/sbin/kbdcontrol -L ${ATKBD_DFLT_KEYMAP} | sed -e 's/^static keymap_t.* = /static keymap_t key_map = /' -e 's/^static accentmap_t.* = /static accentmap_t accent_map = /' > atkbdmap.h"			\
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"atkbdmap.h"
+-#
+-ukbdmap.h			optional	ukbd_dflt_keymap	\
+-	compile-with	"/usr/sbin/kbdcontrol -L ${UKBD_DFLT_KEYMAP} | sed -e 's/^static keymap_t.* = /static keymap_t key_map = /' -e 's/^static accentmap_t.* = /static accentmap_t accent_map = /' > ukbdmap.h"			\
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"ukbdmap.h"
+-#
 -nvenetlib.o			optional	nve pci			\
 -	dependency	"$S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu"	\
 -	compile-with	"uudecode $S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
@@ -27,13 +70,103 @@ Index: src/sys/conf/files.i386
 -	compile-with	"uudecode < $S/dev/hptrr/i386-elf.hptrr_lib.o.uu" \
 -	no-implicit-rule
 -#
- compat/linprocfs/linprocfs.c	optional linprocfs
- compat/linsysfs/linsysfs.c	optional linsysfs
- compat/linux/linux_emul.c	optional compat_linux
-@@ -165,14 +144,6 @@
- dev/fe/if_fe_isa.c		optional fe isa
- dev/glxsb/glxsb.c		optional glxsb
- dev/glxsb/glxsb_hash.c		optional glxsb
+-compat/linprocfs/linprocfs.c	optional linprocfs
+-compat/linsysfs/linsysfs.c	optional linsysfs
+-compat/linux/linux_emul.c	optional compat_linux
+-compat/linux/linux_file.c	optional compat_linux
+-compat/linux/linux_futex.c	optional compat_linux
+-compat/linux/linux_getcwd.c	optional compat_linux
+-compat/linux/linux_ioctl.c	optional compat_linux
+-compat/linux/linux_ipc.c	optional compat_linux
+-compat/linux/linux_mib.c	optional compat_linux
+-compat/linux/linux_misc.c	optional compat_linux
+-compat/linux/linux_signal.c	optional compat_linux
+-compat/linux/linux_socket.c	optional compat_linux
+-compat/linux/linux_stats.c	optional compat_linux
+-compat/linux/linux_sysctl.c	optional compat_linux
+-compat/linux/linux_time.c	optional compat_linux
+-compat/linux/linux_uid16.c	optional compat_linux
+-compat/linux/linux_util.c	optional compat_linux
+-compat/ndis/kern_ndis.c		optional ndisapi pci
+-compat/ndis/kern_windrv.c	optional ndisapi pci
+-compat/ndis/subr_hal.c		optional ndisapi pci
+-compat/ndis/subr_ndis.c		optional ndisapi pci
+-compat/ndis/subr_ntoskrnl.c	optional ndisapi pci
+-compat/ndis/subr_pe.c		optional ndisapi pci
+-compat/ndis/subr_usbd.c		optional ndisapi pci
+-compat/ndis/winx32_wrap.S	optional ndisapi pci
+-compat/svr4/imgact_svr4.c	optional compat_svr4
+-compat/svr4/svr4_fcntl.c	optional compat_svr4
+-compat/svr4/svr4_filio.c	optional compat_svr4
+-compat/svr4/svr4_ioctl.c	optional compat_svr4
+-compat/svr4/svr4_ipc.c		optional compat_svr4
+-compat/svr4/svr4_misc.c		optional compat_svr4
+-compat/svr4/svr4_resource.c	optional compat_svr4
+-compat/svr4/svr4_signal.c	optional compat_svr4
+-compat/svr4/svr4_socket.c	optional compat_svr4
+-compat/svr4/svr4_sockio.c	optional compat_svr4
+-compat/svr4/svr4_stat.c		optional compat_svr4
+-compat/svr4/svr4_stream.c	optional compat_svr4
+-compat/svr4/svr4_syscallnames.c	optional compat_svr4
+-compat/svr4/svr4_sysent.c	optional compat_svr4
+-compat/svr4/svr4_sysvec.c	optional compat_svr4
+-compat/svr4/svr4_termios.c	optional compat_svr4
+-bf_enc.o			optional crypto | ipsec	\
+-	dependency	"$S/crypto/blowfish/arch/i386/bf_enc.S $S/crypto/blowfish/arch/i386/bf_enc_586.S $S/crypto/blowfish/arch/i386/bf_enc_686.S" \
+-	compile-with	"${CC} -c -I$S/crypto/blowfish/arch/i386 ${ASM_CFLAGS} ${WERROR} ${.IMPSRC}" \
+-	no-implicit-rule
+-crypto/des/arch/i386/des_enc.S	optional crypto | ipsec | netsmb
+-crypto/via/padlock.c		optional padlock
+-crypto/via/padlock_cipher.c	optional padlock
+-crypto/via/padlock_hash.c	optional padlock
+-dev/advansys/adv_isa.c		optional adv isa
+-dev/agp/agp_ali.c		optional agp
+-dev/agp/agp_amd.c		optional agp
+-dev/agp/agp_amd64.c		optional agp
+-dev/agp/agp_ati.c		optional agp
+-dev/agp/agp_i810.c		optional agp
+-dev/agp/agp_intel.c		optional agp
+-dev/agp/agp_nvidia.c		optional agp
+-dev/agp/agp_sis.c		optional agp
+-dev/agp/agp_via.c		optional agp
+-dev/aic/aic_isa.c		optional aic isa
+-dev/amdtemp/amdtemp.c		optional amdtemp
+-dev/arcmsr/arcmsr.c		optional arcmsr pci
+-dev/asmc/asmc.c			optional asmc isa
+-dev/atkbdc/atkbd.c		optional atkbd atkbdc
+-dev/atkbdc/atkbd_atkbdc.c	optional atkbd atkbdc
+-dev/atkbdc/atkbdc.c		optional atkbdc
+-dev/atkbdc/atkbdc_isa.c		optional atkbdc isa
+-dev/atkbdc/atkbdc_subr.c	optional atkbdc
+-dev/atkbdc/psm.c		optional psm atkbdc
+-dev/ce/ceddk.c			optional ce
+-dev/ce/if_ce.c			optional ce
+-dev/ce/tau32-ddk.c		optional ce
+-dev/cm/if_cm_isa.c		optional cm isa
+-dev/coretemp/coretemp.c		optional coretemp
+-dev/cp/cpddk.c			optional cp
+-dev/cp/if_cp.c			optional cp
+-dev/cpuctl/cpuctl.c		optional cpuctl
+-dev/ctau/ctau.c			optional ctau
+-dev/ctau/ctddk.c		optional ctau
+-dev/ctau/if_ct.c		optional ctau
+-dev/cx/csigma.c			optional cx
+-dev/cx/cxddk.c			optional cx
+-dev/cx/if_cx.c			optional cx
+-dev/ed/if_ed_3c503.c		optional ed isa ed_3c503
+-dev/ed/if_ed_isa.c		optional ed isa
+-dev/ed/if_ed_wd80x3.c		optional ed isa
+-dev/ed/if_ed_hpp.c		optional ed isa ed_hpp
+-dev/ed/if_ed_sic.c		optional ed isa ed_sic
+-dev/fb/fb.c			optional fb | vga
+-dev/fb/vga.c			optional vga
+-dev/fdc/fdc.c			optional fdc
+-dev/fdc/fdc_acpi.c		optional fdc
+-dev/fdc/fdc_isa.c		optional fdc isa
+-dev/fdc/fdc_pccard.c		optional fdc pccard
+-dev/fe/if_fe_isa.c		optional fe isa
+-dev/glxsb/glxsb.c		optional glxsb
+-dev/glxsb/glxsb_hash.c		optional glxsb
 -dev/hptmv/entry.c		optional hptmv
 -dev/hptmv/mv.c			optional hptmv
 -dev/hptmv/gui_lib.c		optional hptmv
@@ -42,22 +175,215 @@ Index: src/sys/conf/files.i386
 -dev/hptrr/hptrr_os_bsd.c	optional hptrr
 -dev/hptrr/hptrr_osm_bsd.c	optional hptrr
 -dev/hptrr/hptrr_config.c	optional hptrr
- dev/hwpmc/hwpmc_amd.c		optional hwpmc
- dev/hwpmc/hwpmc_intel.c		optional hwpmc
- dev/hwpmc/hwpmc_core.c		optional hwpmc
-@@ -203,7 +174,6 @@
- dev/mse/mse.c			optional mse
- dev/mse/mse_isa.c		optional mse isa
- dev/nfe/if_nfe.c		optional nfe pci
+-dev/hwpmc/hwpmc_amd.c		optional hwpmc
+-dev/hwpmc/hwpmc_intel.c		optional hwpmc
+-dev/hwpmc/hwpmc_core.c		optional hwpmc
+-dev/hwpmc/hwpmc_pentium.c	optional hwpmc
+-dev/hwpmc/hwpmc_piv.c		optional hwpmc
+-dev/hwpmc/hwpmc_ppro.c		optional hwpmc
+-dev/hwpmc/hwpmc_tsc.c		optional hwpmc
+-dev/hwpmc/hwpmc_x86.c		optional hwpmc
+-dev/ichwd/ichwd.c		optional ichwd
+-dev/if_ndis/if_ndis.c		optional ndis
+-dev/if_ndis/if_ndis_pccard.c	optional ndis pccard
+-dev/if_ndis/if_ndis_pci.c	optional ndis cardbus | ndis pci
+-dev/if_ndis/if_ndis_usb.c	optional ndis usb
+-dev/io/iodev.c			optional io
+-dev/ipmi/ipmi.c			optional ipmi
+-dev/ipmi/ipmi_acpi.c		optional ipmi acpi
+-dev/ipmi/ipmi_isa.c		optional ipmi isa
+-dev/ipmi/ipmi_kcs.c		optional ipmi
+-dev/ipmi/ipmi_smic.c		optional ipmi
+-dev/ipmi/ipmi_smbus.c		optional ipmi smbus
+-dev/ipmi/ipmi_smbios.c		optional ipmi
+-dev/ipmi/ipmi_ssif.c		optional ipmi smbus
+-dev/ipmi/ipmi_pci.c		optional ipmi pci
+-dev/ipmi/ipmi_linux.c		optional ipmi compat_linux
+-dev/kbd/kbd.c			optional atkbd | sc | ukbd | usb2_input_kbd
+-dev/le/if_le_isa.c		optional le isa
+-dev/mem/memutil.c		optional mem
+-dev/mse/mse.c			optional mse
+-dev/mse/mse_isa.c		optional mse isa
+-dev/nfe/if_nfe.c		optional nfe pci
 -dev/nve/if_nve.c		optional nve pci
- dev/nvram/nvram.c		optional nvram isa
- dev/pcf/pcf_isa.c		optional pcf
- dev/random/nehemiah.c		optional random
-Index: src/sys/i386/conf/GENERIC
-===================================================================
---- src.orig/sys/i386/conf/GENERIC
-+++ src/sys/i386/conf/GENERIC
-@@ -148,8 +148,6 @@
+-dev/nvram/nvram.c		optional nvram isa
+-dev/pcf/pcf_isa.c		optional pcf
+-dev/random/nehemiah.c		optional random
+-dev/sbni/if_sbni.c		optional sbni
+-dev/sbni/if_sbni_isa.c		optional sbni isa
+-dev/sbni/if_sbni_pci.c		optional sbni pci
+-dev/sio/sio.c			optional sio
+-dev/sio/sio_isa.c		optional sio isa
+-dev/sio/sio_pccard.c		optional sio pccard
+-dev/sio/sio_pci.c		optional sio pci
+-dev/sio/sio_puc.c		optional sio puc
+-dev/speaker/spkr.c		optional speaker
+-dev/syscons/apm/apm_saver.c	optional apm_saver apm
+-dev/syscons/scterm-teken.c	optional sc
+-dev/syscons/scvesactl.c		optional sc vga vesa
+-dev/syscons/scvgarndr.c		optional sc vga
+-dev/syscons/scvtb.c		optional sc
+-dev/syscons/teken/teken.c	optional sc
+-dev/uart/uart_cpu_i386.c	optional uart
+-dev/acpica/acpi_if.m		standard
+-dev/acpi_support/acpi_wmi_if.m	standard
+-dev/wpi/if_wpi.c		optional wpi
+-i386/acpica/OsdEnvironment.c	optional acpi
+-i386/acpica/acpi_machdep.c	optional acpi
+-i386/acpica/acpi_wakeup.c	optional acpi
+-acpi_wakecode.h			optional acpi			\
+-	dependency 	"$S/i386/acpica/acpi_wakecode.S assym.s"	\
+-	compile-with	"${MAKE} -f $S/i386/acpica/Makefile MAKESRCPATH=$S/i386/acpica"	\
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"acpi_wakecode.h acpi_wakecode.o acpi_wakecode.bin"
+-#
+-i386/acpica/madt.c		optional acpi apic
+-i386/bios/apm.c			optional apm
+-i386/bios/mca_machdep.c		optional mca
+-i386/bios/smapi.c		optional smapi
+-i386/bios/smapi_bios.S		optional smapi
+-i386/bios/smbios.c		optional smbios
+-i386/bios/vpd.c			optional vpd
+-i386/cpufreq/est.c		optional cpufreq
+-i386/cpufreq/hwpstate.c		optional cpufreq
+-i386/cpufreq/p4tcc.c		optional cpufreq
+-i386/cpufreq/powernow.c		optional cpufreq
+-i386/cpufreq/smist.c		optional cpufreq
+-#i386/i386/apic_vector.s		optional apic
+-i386/i386/atomic.c		standard		\
+-	compile-with	"${CC} -c ${CFLAGS} ${DEFINED_PROF:S/^$/-fomit-frame-pointer/} ${.IMPSRC}"
+-i386/i386/autoconf.c		standard
+-i386/i386/bios.c		optional native
+-i386/i386/bioscall.s		optional native
+-i386/i386/bpf_jit_machdep.c	optional bpf_jitter
+-i386/i386/busdma_machdep.c	standard
+-i386/i386/db_disasm.c		optional ddb
+-i386/i386/db_interface.c	optional ddb
+-i386/i386/db_trace.c		optional ddb
+-i386/i386/dump_machdep.c	standard
+-i386/i386/elan-mmcr.c		optional cpu_elan | cpu_soekris
+-i386/i386/elf_machdep.c		standard
+-i386/i386/exception.s		optional native
+-i386/xen/exception.s		optional xen
+-i386/i386/gdb_machdep.c		optional gdb
+-i386/i386/geode.c		optional cpu_geode
+-i386/i386/i686_mem.c		optional mem
+-i386/i386/identcpu.c		standard
+-i386/i386/in_cksum.c		optional inet
+-i386/i386/initcpu.c		standard
+-i386/i386/intr_machdep.c	standard
+-i386/i386/io.c			optional io
+-i386/i386/io_apic.c		optional apic
+-i386/i386/k6_mem.c		optional mem
+-i386/i386/legacy.c		optional native
+-i386/i386/local_apic.c		optional apic
+-i386/i386/locore.s		optional native	no-obj
+-i386/xen/locore.s		optional xen	no-obj
+-i386/i386/longrun.c		optional cpu_enable_longrun
+-i386/i386/machdep.c		standard
+-i386/xen/xen_machdep.c		optional xen
+-i386/i386/mca.c			standard
+-i386/i386/mem.c			optional mem
+-i386/i386/minidump_machdep.c	standard
+-i386/i386/mp_clock.c		optional smp
+-i386/i386/mp_machdep.c		optional native smp
+-i386/xen/mp_machdep.c		optional xen smp
+-i386/i386/mp_watchdog.c		optional mp_watchdog smp
+-i386/i386/mpboot.s		optional smp native
+-i386/i386/mptable.c		optional apic native
+-i386/xen/mptable.c		optional apic xen
+-i386/i386/mptable_pci.c		optional apic pci
+-i386/i386/msi.c			optional apic pci
+-i386/i386/nexus.c		standard
+-i386/i386/perfmon.c		optional perfmon
+-i386/i386/pmap.c		optional native
+-i386/xen/pmap.c			optional xen
+-i386/i386/ptrace_machdep.c	standard
+-i386/i386/stack_machdep.c	optional ddb | stack
+-i386/i386/support.s		standard
+-i386/i386/swtch.s		standard
+-i386/i386/sys_machdep.c		standard
+-i386/i386/trap.c		standard
+-i386/i386/tsc.c			standard
+-i386/i386/uio_machdep.c		standard
+-i386/i386/vm86.c		standard
+-i386/i386/vm_machdep.c		standard
+-i386/ibcs2/ibcs2_errno.c	optional ibcs2
+-i386/ibcs2/ibcs2_fcntl.c	optional ibcs2
+-i386/ibcs2/ibcs2_ioctl.c	optional ibcs2
+-i386/ibcs2/ibcs2_ipc.c		optional ibcs2
+-i386/ibcs2/ibcs2_isc.c		optional ibcs2
+-i386/ibcs2/ibcs2_isc_sysent.c	optional ibcs2
+-i386/ibcs2/ibcs2_misc.c		optional ibcs2
+-i386/ibcs2/ibcs2_msg.c		optional ibcs2
+-i386/ibcs2/ibcs2_other.c	optional ibcs2
+-i386/ibcs2/ibcs2_signal.c	optional ibcs2
+-i386/ibcs2/ibcs2_socksys.c	optional ibcs2
+-i386/ibcs2/ibcs2_stat.c		optional ibcs2
+-i386/ibcs2/ibcs2_sysent.c	optional ibcs2
+-i386/ibcs2/ibcs2_sysi86.c	optional ibcs2
+-i386/ibcs2/ibcs2_sysvec.c	optional ibcs2
+-i386/ibcs2/ibcs2_util.c		optional ibcs2
+-i386/ibcs2/ibcs2_xenix.c	optional ibcs2
+-i386/ibcs2/ibcs2_xenix_sysent.c	optional ibcs2
+-i386/ibcs2/imgact_coff.c	optional ibcs2
+-i386/isa/atpic.c		optional atpic	
+-#i386/isa/atpic_vector.s		standard
+-i386/isa/clock.c		optional native
+-i386/xen/clock.c		optional xen
+-i386/xen/xen_clock_util.c	optional xen
+-i386/xen/xen_rtc.c		optional xen
+-i386/isa/dpms.c			optional dpms
+-i386/isa/elcr.c			standard
+-i386/isa/elink.c		optional ep | ie
+-i386/isa/isa.c			optional isa
+-i386/isa/isa_dma.c		optional isa
+-i386/isa/nmi.c			standard
+-i386/isa/npx.c			optional npx
+-i386/isa/pmtimer.c		optional pmtimer
+-i386/isa/prof_machdep.c		optional profiling-routine
+-i386/isa/spic.c			optional spic
+-i386/isa/vesa.c			optional vga vesa
+-i386/linux/imgact_linux.c	optional compat_linux
+-i386/linux/linux_dummy.c	optional compat_linux
+-i386/linux/linux_locore.s	optional compat_linux	\
+-	dependency 	"linux_assym.h"
+-i386/linux/linux_machdep.c	optional compat_linux
+-i386/linux/linux_ptrace.c	optional compat_linux
+-i386/linux/linux_support.s	optional compat_linux	\
+-	dependency 	"linux_assym.h"
+-i386/linux/linux_sysent.c	optional compat_linux
+-i386/linux/linux_sysvec.c	optional compat_linux
+-i386/pci/pci_bus.c		optional pci
+-i386/pci/pci_cfgreg.c		optional pci
+-i386/pci/pci_pir.c		optional pci 
+-i386/svr4/svr4_locore.s		optional compat_svr4	\
+-	dependency	"svr4_assym.h"	\
+-	warning "COMPAT_SVR4 is broken and should be avoided"
+-i386/svr4/svr4_machdep.c	optional compat_svr4
+-#
+-isa/atrtc.c			optional atpic
+-isa/syscons_isa.c		optional sc
+-isa/vga_isa.c			optional vga
+-kern/imgact_aout.c		optional compat_aout
+-kern/imgact_gzip.c		optional gzip
+-libkern/divdi3.c		standard
+-libkern/ffsl.c			standard
+-libkern/flsl.c			standard
+-libkern/memmove.c		standard
+-libkern/memset.c		standard
+-libkern/moddi3.c		standard
+-libkern/qdivrem.c		standard
+-libkern/ucmpdi2.c		standard
+-libkern/udivdi3.c		standard
+-libkern/umoddi3.c		standard
+-i386/xbox/xbox.c		optional xbox
+-i386/xbox/xboxfb.c		optional xboxfb
+-dev/fb/boot_font.c		optional xboxfb
+-i386/xbox/pic16l.s		optional xbox
+--- kfreebsd-8-8.0~cvs20090715.orig/sys/i386/conf/GENERIC
++++ kfreebsd-8-8.0~cvs20090715/sys/i386/conf/GENERIC
+@@ -152,8 +152,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -66,113 +392,629 @@ Index: src/sys/i386/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-Index: src/sys/modules/Makefile
-===================================================================
---- src.orig/sys/modules/Makefile
-+++ src/sys/modules/Makefile
-@@ -94,8 +94,6 @@
- 	hifn \
- 	hme \
- 	${_hptiop} \
+--- kfreebsd-8-8.0~cvs20090715.orig/sys/modules/Makefile
++++ /dev/null
+@@ -1,617 +0,0 @@
+-# $FreeBSD: src/sys/modules/Makefile,v 1.621 2009/07/10 08:18:08 scottl Exp $
+-
+-.include <bsd.own.mk>
+-
+-SUBDIR=	${_3dfx} \
+-	${_3dfx_linux} \
+-	${_aac} \
+-	accf_data \
+-	accf_dns \
+-	accf_http \
+-	${_acpi} \
+-	ae \
+-	age \
+-	${_agp} \
+-	aha \
+-	${_ahb} \
+-	ahci \
+-	${_aic} \
+-	aic7xxx \
+-	aio \
+-	${_amd} \
+-	${_amdtemp} \
+-	alc \
+-	ale \
+-	amr \
+-	${_an} \
+-	${_aout} \
+-	${_apm} \
+-	${_arcmsr} \
+-	${_arcnet} \
+-	${_asmc} \
+-	${_asr} \
+-	ata \
+-	ath \
+-	${_auxio} \
+-	bce \
+-	bfe \
+-	bge \
+-	${_bios} \
+-	${_bktr} \
+-	${_bm} \
+-	bridgestp \
+-	cam \
+-	${_canbepm} \
+-	${_canbus} \
+-	${_cardbus} \
+-	cas \
+-	${_cbb} \
+-	cd9660 \
+-	cd9660_iconv \
+-	${_ce} \
+-	${_ciss} \
+-	${_cm} \
+-	${_cmx} \
+-	coda \
+-	coda5 \
+-	${_coff} \
+-	${_coretemp} \
+-	${_cp} \
+-	${_cpuctl} \
+-	${_cpufreq} \
+-	${_crypto} \
+-	${_cryptodev} \
+-	${_cs} \
+-	${_ctau} \
+-	cxgb \
+-	${_cyclic} \
+-	dc \
+-	dcons \
+-	dcons_crom \
+-	de \
+-	${_dpms} \
+-	${_dpt} \
+-	${_drm} \
+-	${_dtrace} \
+-	dummynet \
+-	${_ed} \
+-	${_elink} \
+-	${_em} \
+-	en \
+-	${_ep} \
+-	${_et} \
+-	${_ex} \
+-	${_exca} \
+-	${_ext2fs} \
+-	fatm \
+-	fdc \
+-	fdescfs \
+-	${_fe} \
+-	firewire \
+-	firmware \
+-	fxp \
+-	gem \
+-	geom \
+-	${_glxsb} \
+-	hatm \
+-	hifn \
+-	hme \
+-	${_hptiop} \
 -	${_hptmv} \
 -	${_hptrr} \
- 	hwpmc \
- 	${_i2c} \
- 	${_ibcs2} \
-@@ -194,11 +192,9 @@
- 	ntfs \
- 	ntfs_iconv \
- 	nullfs \
+-	hwpmc \
+-	${_i2c} \
+-	${_ibcs2} \
+-	${_ichwd} \
+-	${_ida} \
+-	${_ie} \
+-	if_bridge \
+-	if_disc \
+-	if_edsc \
+-	if_ef \
+-	if_faith \
+-	if_gif \
+-	if_gre \
+-	if_lagg \
+-	${_if_ndis} \
+-	if_stf \
+-	if_tap \
+-	if_tun \
+-	if_vlan \
+-	${_igb} \
+-	${_iir} \
+-	${_io} \
+-	ipdivert \
+-	${_ipfilter} \
+-	ipfw \
+-	ipfw_nat \
+-	${_ipmi} \
+-	ip_mroute_mod \
+-	${_ips} \
+-	${_ipw} \
+-	${_ipwfw} \
+-	iscsi \
+-	isp \
+-	ispfw \
+-	${_iwi} \
+-	${_iwifw} \
+-	${_iwn} \
+-	${_iwnfw} \
+-	${_ixgb} \
+-	jme \
+-	joy \
+-	kbdmux \
+-	krpc \
+-	ksyms \
+-	le \
+-	lge \
+-	libalias \
+-	libiconv \
+-	libmbpool \
+-	libmchain \
+-	${_linprocfs} \
+-	${_linsysfs} \
+-	${_linux} \
+-	lmc \
+-	lpt \
+-	mac_biba \
+-	mac_bsdextended \
+-	mac_ifoff \
+-	mac_lomac \
+-	mac_mls \
+-	mac_none \
+-	mac_partition \
+-	mac_portacl \
+-	mac_seeotheruids \
+-	mac_stub \
+-	mac_test \
+-	malo \
+-	mcd \
+-	md \
+-	mem \
+-	mfi \
+-	mii \
+-	mlx \
+-	${_mly} \
+-	mmc \
+-	mmcsd \
+-	mpt \
+-	mqueue \
+-	msdosfs \
+-	msdosfs_iconv \
+-	${_mse} \
+-	msk \
+-	mwl \
+-	mxge \
+-	my \
+-	${_ncp} \
+-	${_ncv} \
+-	${_ndis} \
+-	netgraph \
+-	${_nfe} \
+-	nfscl \
+-	nfsclient \
+-	nfscommon \
+-	nfsd \
+-	nfslockd \
+-	nfsserver \
+-	nfssvc \
+-	nge \
+-	nmdm \
+-	${_nsp} \
+-	ntfs \
+-	ntfs_iconv \
+-	nullfs \
 -	${_nve} \
- 	${_nvram} \
- 	${_nwfs} \
- 	${_nxge} \
+-	${_nvram} \
+-	${_nwfs} \
+-	${_nxge} \
 -	${_opensolaris} \
- 	${_padlock} \
- 	patm \
- 	${_pccard} \
-@@ -288,7 +284,6 @@
- 	${_xe} \
- 	xfs \
- 	xl \
+-	${_padlock} \
+-	patm \
+-	${_pccard} \
+-	${_pcfclock} \
+-	pcn \
+-	${_pf} \
+-	${_pflog} \
+-	plip \
+-	${_pmc} \
+-	portalfs \
+-	ppbus \
+-	ppc \
+-	ppi \
+-	pps \
+-	procfs \
+-	pseudofs \
+-	${_pst} \
+-	puc \
+-	ral \
+-	ralfw \
+-	${_random} \
+-	rc4 \
+-	${_rdma} \
+-	re \
+-	reiserfs \
+-	rl \
+-	${_s3} \
+-	${_safe} \
+-	${_sbni} \
+-	scc \
+-	scd \
+-	${_scsi_low} \
+-	sdhci \
+-	sem \
+-	sf \
+-	sis \
+-	sk \
+-	${_smbfs} \
+-	sn \
+-	${_snc} \
+-	snp \
+-	${_sound} \
+-	${_speaker} \
+-	${_splash} \
+-	${_sppp} \
+-	ste \
+-	${_stg} \
+-	stge \
+-	${_streams} \
+-	${_svr4} \
+-	sym \
+-	${_syscons} \
+-	sysvipc \
+-	ti \
+-	tl \
+-	${_tmpfs} \
+-	trm \
+-	${_twa} \
+-	twe \
+-	tx \
+-	txp \
+-	uart \
+-	ubsec \
+-	udf \
+-	udf_iconv \
+-	ufs \
+-	unionfs \
+-	usb \
+-	utopia \
+-	${_vesa} \
+-	vge \
+-	vkbd \
+-	${_vpo} \
+-	vr \
+-	vx \
+-	wb \
+-	${_wi} \
+-	wlan \
+-	wlan_acl \
+-	wlan_amrr \
+-	wlan_ccmp \
+-	wlan_rssadapt \
+-	wlan_tkip \
+-	wlan_wep \
+-	wlan_xauth \
+-	${_wpi} \
+-	${_wpifw} \
+-	${_xe} \
+-	xfs \
+-	xl \
 -	${_zfs} \
- 	zlib \
- 
- .if ${MACHINE_ARCH} != "powerpc"
-@@ -376,9 +371,6 @@
- .if ${MK_NCP} != "no"
- _nwfs=		nwfs
- .endif
+-	zlib \
+-
+-.if ${MACHINE_ARCH} != "powerpc"
+-_syscons=	syscons
+-_vpo=		vpo
+-.endif
+-
+-.if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
+-.if exists(${.CURDIR}/../opencrypto)
+-_crypto=	crypto
+-_cryptodev=	cryptodev
+-.endif
+-.if exists(${.CURDIR}/../crypto)
+-_random=	random
+-.endif
+-.endif
+-
+-.if ${MK_IPFILTER} != "no" || defined(ALL_MODULES)
+-_ipfilter=	ipfilter
+-.endif
+-
+-.if ${MK_PF} != "no" || defined(ALL_MODULES)
+-_pf=		pf
+-_pflog=		pflog
+-.endif
+-
+-.if ${MACHINE_ARCH} == "i386"
+-# XXX some of these can move to the general case when de-i386'ed
+-# XXX some of these can move now, but are untested on other architectures.
+-_3dfx=		3dfx
+-_3dfx_linux=	3dfx_linux
+-_agp=		agp
+-_aic=		aic
+-_amd=		amd
+-_an=		an
+-_aout=		aout
+-_apm=		apm
+-_arcnet=	arcnet
+-_bktr=		bktr
+-_cardbus=	cardbus
+-_cbb=		cbb
+-_ce=		ce
+-_coff=		coff
+-_cp=		cp
+-_cpuctl=	cpuctl
+-_cpufreq=	cpufreq
+-_cs=		cs
+-.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
+-_cyclic=	cyclic
+-.endif
+-_dpms=		dpms
+-_drm=		drm
+-.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
+-_dtrace=	dtrace
+-.endif
+-_ed=		ed
+-_elink=		elink
+-_em=		em
+-_ep=		ep
+-_et=		et
+-_exca=		exca
+-_ext2fs=	ext2fs
+-_fe=		fe
+-_glxsb=		glxsb
+-_i2c=		i2c
+-_ibcs2=		ibcs2
+-_ie=		ie
+-_if_ndis=	if_ndis
+-_igb=		igb
+-_io=		io
+-_linprocfs=	linprocfs
+-_linsysfs=	linsysfs
+-_linux=		linux
+-_mse=		mse
+-.if ${MK_NCP} != "no"
+-_ncp=		ncp
+-.endif
+-_ncv=		ncv
+-_ndis=		ndis
+-_nsp=		nsp
+-.if ${MK_NCP} != "no"
+-_nwfs=		nwfs
+-.endif
 -.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
 -_opensolaris=	opensolaris
 -.endif
- _pccard=	pccard
- _pcfclock=	pcfclock
- _pst=		pst
-@@ -397,9 +389,6 @@
- _tmpfs=		tmpfs
- _wi=		wi
- _xe=		xe
+-_pccard=	pccard
+-_pcfclock=	pcfclock
+-_pst=		pst
+-_rdma=		rdma
+-_safe=		safe
+-_sbni=		sbni
+-_scsi_low=	scsi_low
+-_smbfs=		smbfs
+-_sound=		sound
+-_speaker=	speaker
+-_splash=	splash
+-_sppp=		sppp
+-_stg=		stg
+-_streams=	streams
+-_svr4=		svr4
+-_tmpfs=		tmpfs
+-_wi=		wi
+-_xe=		xe
 -.if ${MK_ZFS} != "no" || defined(ALL_MODULES)
 -_zfs=		zfs
 -.endif
- .if ${MACHINE} == "i386"
- _aac=		aac
- _acpi=		acpi
-@@ -417,8 +406,6 @@
- _dpt=		dpt
- _ex=		ex
- _hptiop=	hptiop
+-.if ${MACHINE} == "i386"
+-_aac=		aac
+-_acpi=		acpi
+-_ahb=		ahb
+-_amdtemp=	amdtemp
+-_arcmsr=	arcmsr
+-_asmc=		asmc
+-_asr=		asr
+-_bios=		bios
+-_ciss=		ciss
+-_cm=		cm
+-_cmx=		cmx
+-_coretemp=	coretemp
+-_ctau=		ctau
+-_dpt=		dpt
+-_ex=		ex
+-_hptiop=	hptiop
 -_hptmv=		hptmv
 -_hptrr=		hptrr
- _ichwd=		ichwd
- _ida=		ida
- _iir=		iir
-@@ -433,7 +420,6 @@
- _ixgb=		ixgb
- _mly=		mly
- _nfe=		nfe
+-_ichwd=		ichwd
+-_ida=		ida
+-_iir=		iir
+-_ipmi=		ipmi
+-_ips=		ips
+-_ipw=		ipw
+-_ipwfw=		ipwfw
+-_iwi=		iwi
+-_iwifw=		iwifw
+-_iwn=		iwn
+-_iwnfw=		iwnfw
+-_ixgb=		ixgb
+-_mly=		mly
+-_nfe=		nfe
 -_nve=		nve
- _nvram=		nvram
- _nxge=		nxge
- _wpi=		wpi
-@@ -482,8 +468,6 @@
- _exca=		exca
- _ext2fs=	ext2fs
- _hptiop=	hptiop
+-_nvram=		nvram
+-_nxge=		nxge
+-_wpi=		wpi
+-_wpifw=		wpifw
+-.if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
+-.if exists(${.CURDIR}/../crypto/via)
+-_padlock=	padlock
+-.endif
+-.endif
+-_s3=		s3
+-_twa=		twa
+-_vesa=		vesa
+-.elif ${MACHINE} == "pc98"
+-_canbepm=	canbepm
+-_canbus=	canbus
+-_pmc=		pmc
+-_snc=		snc
+-.endif
+-.endif
+-
+-.if ${MACHINE_ARCH} == "amd64"
+-_aac=		aac
+-_acpi=		acpi
+-_agp=		agp
+-_an=		an
+-_amdtemp=	amdtemp
+-_arcmsr=	arcmsr
+-_asmc=		asmc
+-_cardbus=	cardbus
+-_cbb=		cbb
+-_cmx=		cmx
+-_ciss=		ciss
+-_coretemp=	coretemp
+-_cpuctl=	cpuctl
+-_cpufreq=	cpufreq
+-.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
+-_cyclic=	cyclic
+-.endif
+-_drm=		drm
+-.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
+-_dtrace=	dtrace
+-.endif
+-_ed=		ed
+-_et=		et
+-_em=		em
+-_exca=		exca
+-_ext2fs=	ext2fs
+-_hptiop=	hptiop
 -_hptmv=		hptmv
 -_hptrr=		hptrr
- _i2c=		i2c
- _ichwd=		ichwd
- _ida=		ida
-@@ -504,12 +488,8 @@
- _mly=		mly
- _ndis=		ndis
- _nfe=		nfe
+-_i2c=		i2c
+-_ichwd=		ichwd
+-_ida=		ida
+-_if_ndis=	if_ndis
+-_igb=		igb
+-_iir=		iir
+-_io=		io
+-_ipmi=		ipmi
+-_ips=		ips
+-_ipw=		ipw
+-_ipwfw=		ipwfw
+-_iwn=		iwn
+-_iwnfw=		iwnfw
+-_ixgb=		ixgb
+-_linprocfs=	linprocfs
+-_linsysfs=	linsysfs
+-_linux=		linux
+-_mly=		mly
+-_ndis=		ndis
+-_nfe=		nfe
 -_nve=		nve
- _nvram=		nvram
- _nxge=		nxge
+-_nvram=		nvram
+-_nxge=		nxge
 -.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
 -_opensolaris=	opensolaris
 -.endif
- .if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
- .if exists(${.CURDIR}/../crypto/via)
- _padlock=	padlock
-@@ -528,9 +508,6 @@
- _wi=		wi
- _wpi=		wpi
- _wpifw=		wpifw
+-.if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
+-.if exists(${.CURDIR}/../crypto/via)
+-_padlock=	padlock
+-.endif
+-.endif
+-_pccard=	pccard
+-_rdma=		rdma	
+-_safe=		safe
+-_scsi_low=	scsi_low
+-_smbfs=		smbfs
+-_sound=		sound
+-_speaker=	speaker
+-_sppp=		sppp
+-_tmpfs=		tmpfs
+-_twa=		twa
+-_wi=		wi
+-_wpi=		wpi
+-_wpifw=		wpifw
 -.if ${MK_ZFS} != "no" || defined(ALL_MODULES)
 -_zfs=		zfs
 -.endif
- .endif
- 
- .if ${MACHINE_ARCH} == "ia64"
-Index: src/sys/amd64/conf/GENERIC
-===================================================================
---- src.orig/sys/amd64/conf/GENERIC
-+++ src/sys/amd64/conf/GENERIC
-@@ -141,8 +141,6 @@
+-.endif
+-
+-.if ${MACHINE_ARCH} == "ia64"
+-# Modules not enabled on ia64 (as compared to i386) include:
+-#	aac acpi aout apm atspeaker drm ibcs2 linprocfs linux ncv
+-#	nsp s3 sbni stg vesa
+-# acpi is not enabled because it is broken as a module on ia64
+-_aic=		aic
+-_an=		an
+-_arcnet=	arcnet
+-_asr=		asr
+-_bktr=		bktr
+-_cardbus=	cardbus
+-_cbb=		cbb
+-_ciss=		ciss
+-_cm=		cm
+-_cmx=		cmx
+-_coff=		coff
+-_cpufreq=	cpufreq
+-_em=		em
+-_ep=		ep
+-_exca=		exca
+-_fe=		fe
+-_igb=		igb
+-_iir=		iir
+-_mly=		mly
+-_pccard=	pccard
+-_scsi_low=	scsi_low
+-_smbfs=		smbfs
+-_sound=		sound
+-_splash=	splash
+-_sppp=		sppp
+-_streams=	streams
+-_wi=		wi
+-_xe=		xe
+-.endif
+-
+-.if ${MACHINE_ARCH} == "powerpc"
+-_an=		an
+-_bm=		bm
+-_cpufreq=	cpufreq
+-_nvram=		powermac_nvram
+-_smbfs=		smbfs
+-_sound=		sound
+-.endif
+-
+-.if ${MACHINE_ARCH} == "sparc64"
+-_auxio=		auxio
+-_em=		em
+-_i2c=		i2c
+-_igb=		igb
+-.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
+-_opensolaris=	opensolaris
+-.endif
+-_sound=		sound
+-.if ${MK_ZFS} != "no" || defined(ALL_MODULES)
+-_zfs=		zfs
+-.endif
+-.endif
+-
+-.if defined(MODULES_OVERRIDE) && !defined(ALL_MODULES)
+-SUBDIR=${MODULES_OVERRIDE}
+-.endif
+-
+-.for reject in ${WITHOUT_MODULES}
+-SUBDIR:= ${SUBDIR:N${reject}}
+-.endfor
+-
+-# Calling kldxref(8) for each module is expensive.
+-.if !defined(NO_XREF)
+-.MAKEFLAGS+=	-DNO_XREF
+-afterinstall:
+-	@if type kldxref >/dev/null 2>&1; then \
+-		${ECHO} kldxref ${DESTDIR}${KMODDIR}; \
+-		kldxref ${DESTDIR}${KMODDIR}; \
+-	fi
+-.endif
+-
+-.include <bsd.subdir.mk>
+--- kfreebsd-8-8.0~cvs20090715.orig/sys/amd64/conf/GENERIC
++++ kfreebsd-8-8.0~cvs20090715/sys/amd64/conf/GENERIC
+@@ -145,8 +145,6 @@
  #device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -181,14 +1023,58 @@ Index: src/sys/amd64/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-Index: src/sys/conf/files.amd64
-===================================================================
---- src.orig/sys/conf/files.amd64
-+++ src/sys/conf/files.amd64
-@@ -47,26 +47,6 @@
- 	no-obj no-implicit-rule before-depend				\
- 	clean		"ukbdmap.h"
- #
+--- kfreebsd-8-8.0~cvs20090715.orig/sys/conf/files.amd64
++++ /dev/null
+@@ -1,293 +0,0 @@
+-# This file tells config what files go into building a kernel,
+-# files marked standard are always included.
+-#
+-# $FreeBSD: src/sys/conf/files.amd64,v 1.139 2009/06/23 13:17:25 rpaulo Exp $
+-#
+-# The long compile-with and dependency lines are required because of
+-# limitations in config: backslash-newline doesn't work in strings, and
+-# dependency lines other than the first are silently ignored.
+-#
+-#
+-linux32_genassym.o		optional	compat_linux32		\
+-	dependency 	"$S/amd64/linux32/linux32_genassym.c"		\
+-	compile-with	"${CC} ${CFLAGS:N-fno-common} -c ${.IMPSRC}"	\
+-	no-obj no-implicit-rule						\
+-	clean		"linux32_genassym.o"
+-#
+-linux32_assym.h			optional	compat_linux32		\
+-	dependency 	"$S/kern/genassym.sh linux32_genassym.o"	\
+-	compile-with	"sh $S/kern/genassym.sh linux32_genassym.o > ${.TARGET}" \
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"linux32_assym.h"
+-#
+-ia32_genassym.o			standard				\
+-	dependency 	"$S/compat/ia32/ia32_genassym.c"		\
+-	compile-with	"${CC} ${CFLAGS:N-fno-common} -c ${.IMPSRC}"	\
+-	no-obj no-implicit-rule						\
+-	clean		"ia32_genassym.o"
+-#
+-ia32_assym.h			standard				\
+-	dependency 	"$S/kern/genassym.sh ia32_genassym.o"		\
+-	compile-with	"env NM='${NM}' sh $S/kern/genassym.sh ia32_genassym.o > ${.TARGET}" \
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"ia32_assym.h"
+-#
+-font.h				optional	sc_dflt_font		\
+-	compile-with	"uudecode < /usr/share/syscons/fonts/${SC_DFLT_FONT}-8x16.fnt && file2c 'static u_char dflt_font_16[16*256] = {' '};' < ${SC_DFLT_FONT}-8x16 > font.h && uudecode < /usr/share/syscons/fonts/${SC_DFLT_FONT}-8x14.fnt && file2c 'static u_char dflt_font_14[14*256] = {' '};' < ${SC_DFLT_FONT}-8x14 >> font.h && uudecode < /usr/share/syscons/fonts/${SC_DFLT_FONT}-8x8.fnt && file2c 'static u_char dflt_font_8[8*256] = {' '};' < ${SC_DFLT_FONT}-8x8 >> font.h"									\
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"font.h ${SC_DFLT_FONT}-8x14 ${SC_DFLT_FONT}-8x16 ${SC_DFLT_FONT}-8x8"
+-#
+-atkbdmap.h			optional	atkbd_dflt_keymap	\
+-	compile-with	"/usr/sbin/kbdcontrol -L ${ATKBD_DFLT_KEYMAP} | sed -e 's/^static keymap_t.* = /static keymap_t key_map = /' -e 's/^static accentmap_t.* = /static accentmap_t accent_map = /' > atkbdmap.h"			\
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"atkbdmap.h"
+-#
+-ukbdmap.h			optional	ukbd_dflt_keymap	\
+-	compile-with	"/usr/sbin/kbdcontrol -L ${UKBD_DFLT_KEYMAP} | sed -e 's/^static keymap_t.* = /static keymap_t key_map = /' -e 's/^static accentmap_t.* = /static accentmap_t accent_map = /' > ukbdmap.h"			\
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"ukbdmap.h"
+-#
 -nvenetlib.o			optional	nve pci			\
 -	dependency	"$S/contrib/dev/nve/amd64/nvenetlib.o.bz2.uu"	\
 -	compile-with	"uudecode $S/contrib/dev/nve/amd64/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
@@ -209,13 +1095,129 @@ Index: src/sys/conf/files.amd64
 -	compile-with	"uudecode < $S/dev/hptrr/amd64-elf.hptrr_lib.o.uu" \
 -	no-implicit-rule
 -#
- amd64/acpica/OsdEnvironment.c	optional	acpi
- amd64/acpica/acpi_machdep.c	optional	acpi
- amd64/acpica/acpi_switch.S	optional	acpi
-@@ -188,14 +168,6 @@
- dev/fdc/fdc_acpi.c		optional	fdc
- dev/fdc/fdc_isa.c		optional	fdc isa
- dev/fdc/fdc_pccard.c		optional	fdc pccard
+-amd64/acpica/OsdEnvironment.c	optional	acpi
+-amd64/acpica/acpi_machdep.c	optional	acpi
+-amd64/acpica/acpi_switch.S	optional	acpi
+-acpi_wakecode.h			optional acpi		\
+-	dependency 	"$S/amd64/acpica/acpi_wakecode.S assym.s"	\
+-	compile-with	"${MAKE} -f $S/amd64/acpica/Makefile ${.TARGET} MAKESRCPATH=$S/amd64/acpica"	\
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"acpi_wakecode.h acpi_wakecode.o acpi_wakecode.bin"
+-#
+-acpi_wakedata.h			optional acpi		\
+-	dependency 	"$S/amd64/acpica/acpi_wakecode.S assym.s"	\
+-	compile-with	"${MAKE} -f $S/amd64/acpica/Makefile ${.TARGET} MAKESRCPATH=$S/amd64/acpica"	\
+-	no-obj no-implicit-rule before-depend				\
+-	clean		"acpi_wakedata.h acpi_wakecode.o acpi_wakecode.bin"
+-#
+-amd64/acpica/acpi_wakeup.c	optional	acpi
+-amd64/acpica/madt.c		optional	acpi
+-amd64/amd64/amd64_mem.c		optional	mem
+-#amd64/amd64/apic_vector.S	standard
+-amd64/amd64/atomic.c		standard
+-amd64/amd64/autoconf.c		standard
+-amd64/amd64/bios.c		standard
+-amd64/amd64/bpf_jit_machdep.c	optional	bpf_jitter
+-amd64/amd64/busdma_machdep.c	standard
+-amd64/amd64/cpu_switch.S	standard
+-amd64/amd64/db_disasm.c		optional	ddb
+-amd64/amd64/db_interface.c	optional	ddb
+-amd64/amd64/db_trace.c		optional	ddb
+-amd64/amd64/dump_machdep.c	standard
+-amd64/amd64/elf_machdep.c	standard
+-amd64/amd64/exception.S		standard
+-amd64/amd64/fpu.c		standard
+-amd64/amd64/gdb_machdep.c	optional	gdb
+-amd64/amd64/identcpu.c		standard
+-amd64/amd64/in_cksum.c		optional	inet
+-amd64/amd64/initcpu.c		standard
+-amd64/amd64/intr_machdep.c	standard
+-amd64/amd64/io.c		optional	io
+-amd64/amd64/io_apic.c		standard
+-amd64/amd64/legacy.c		standard
+-amd64/amd64/local_apic.c	standard
+-amd64/amd64/locore.S		standard	no-obj
+-amd64/amd64/machdep.c		standard
+-amd64/amd64/mca.c		standard
+-amd64/amd64/mem.c		optional	mem
+-amd64/amd64/minidump_machdep.c	standard
+-amd64/amd64/mp_machdep.c	optional	smp
+-amd64/amd64/mp_watchdog.c	optional	mp_watchdog smp
+-amd64/amd64/mpboot.S		optional	smp
+-amd64/amd64/mptable.c		optional	mptable
+-amd64/amd64/mptable_pci.c	optional	mptable pci
+-amd64/amd64/msi.c		optional	pci
+-amd64/amd64/nexus.c		standard
+-amd64/amd64/pmap.c		standard
+-amd64/amd64/prof_machdep.c	optional	profiling-routine
+-amd64/amd64/sigtramp.S		standard
+-amd64/amd64/stack_machdep.c	optional	ddb | stack
+-amd64/amd64/support.S		standard
+-amd64/amd64/sys_machdep.c	standard
+-amd64/amd64/trap.c		standard
+-amd64/amd64/tsc.c		standard
+-amd64/amd64/uio_machdep.c	standard
+-amd64/amd64/uma_machdep.c	standard
+-amd64/amd64/vm_machdep.c	standard
+-amd64/isa/atpic.c		optional	atpic isa
+-#amd64/isa/atpic_vector.S	optional	atpic isa
+-amd64/isa/clock.c		standard
+-amd64/isa/elcr.c		standard
+-amd64/isa/isa.c			standard
+-amd64/isa/isa_dma.c		standard
+-amd64/isa/nmi.c			standard
+-amd64/pci/pci_bus.c		optional	pci
+-amd64/pci/pci_cfgreg.c		optional	pci
+-crypto/blowfish/bf_enc.c	optional	crypto | ipsec 
+-crypto/des/des_enc.c		optional	crypto | ipsec | netsmb
+-crypto/via/padlock.c		optional	padlock
+-crypto/via/padlock_cipher.c	optional	padlock
+-crypto/via/padlock_hash.c	optional	padlock
+-dev/acpica/acpi_if.m		standard
+-dev/acpi_support/acpi_wmi_if.m	standard
+-dev/agp/agp_amd64.c		optional	agp
+-dev/agp/agp_i810.c		optional	agp
+-dev/agp/agp_intel.c		optional	agp
+-dev/agp/agp_via.c		optional	agp
+-dev/amdtemp/amdtemp.c		optional	amdtemp
+-dev/arcmsr/arcmsr.c		optional	arcmsr pci
+-dev/asmc/asmc.c			optional	asmc isa
+-dev/atkbdc/atkbd.c		optional	atkbd atkbdc
+-dev/atkbdc/atkbd_atkbdc.c	optional	atkbd atkbdc
+-dev/atkbdc/atkbdc.c		optional	atkbdc
+-dev/atkbdc/atkbdc_isa.c		optional	atkbdc isa
+-dev/atkbdc/atkbdc_subr.c	optional	atkbdc
+-dev/atkbdc/psm.c		optional	psm atkbdc
+-dev/coretemp/coretemp.c		optional	coretemp
+-dev/cpuctl/cpuctl.c		optional	cpuctl
+-# There are no systems with isa slots, so all ed isa entries should go..
+-dev/ed/if_ed_3c503.c		optional	ed isa ed_3c503
+-dev/ed/if_ed_isa.c		optional	ed isa
+-dev/ed/if_ed_wd80x3.c		optional	ed isa
+-dev/ed/if_ed_hpp.c		optional	ed isa ed_hpp
+-dev/ed/if_ed_sic.c		optional	ed isa ed_sic
+-dev/fb/fb.c			optional	fb | vga
+-dev/fb/vga.c			optional	vga
+-dev/ichwd/ichwd.c		optional	ichwd
+-dev/if_ndis/if_ndis.c		optional	ndis
+-dev/if_ndis/if_ndis_pccard.c	optional	ndis pccard
+-dev/if_ndis/if_ndis_pci.c	optional	ndis cardbus | ndis pci
+-dev/if_ndis/if_ndis_usb.c	optional	ndis usb
+-dev/io/iodev.c			optional	io
+-dev/ipmi/ipmi.c			optional	ipmi
+-dev/ipmi/ipmi_acpi.c		optional	ipmi acpi
+-dev/ipmi/ipmi_isa.c		optional	ipmi isa
+-dev/ipmi/ipmi_kcs.c		optional	ipmi
+-dev/ipmi/ipmi_smic.c		optional	ipmi
+-dev/ipmi/ipmi_smbus.c		optional	ipmi smbus
+-dev/ipmi/ipmi_smbios.c		optional	ipmi
+-dev/ipmi/ipmi_ssif.c		optional	ipmi smbus
+-dev/ipmi/ipmi_pci.c		optional	ipmi pci
+-dev/ipmi/ipmi_linux.c		optional	ipmi compat_linux32
+-dev/fdc/fdc.c			optional	fdc
+-dev/fdc/fdc_acpi.c		optional	fdc
+-dev/fdc/fdc_isa.c		optional	fdc isa
+-dev/fdc/fdc_pccard.c		optional	fdc pccard
 -dev/hptmv/entry.c		optional	hptmv
 -dev/hptmv/mv.c			optional	hptmv
 -dev/hptmv/gui_lib.c		optional	hptmv
@@ -224,14 +1226,96 @@ Index: src/sys/conf/files.amd64
 -dev/hptrr/hptrr_os_bsd.c	optional	hptrr
 -dev/hptrr/hptrr_osm_bsd.c	optional	hptrr
 -dev/hptrr/hptrr_config.c	optional	hptrr
- dev/hwpmc/hwpmc_amd.c		optional	hwpmc
- dev/hwpmc/hwpmc_intel.c		optional	hwpmc
- dev/hwpmc/hwpmc_core.c		optional	hwpmc
-@@ -205,7 +177,6 @@
- dev/kbd/kbd.c			optional	atkbd | sc | ukbd | usb2_input_kbd
- dev/mem/memutil.c		optional	mem
- dev/nfe/if_nfe.c		optional	nfe pci
+-dev/hwpmc/hwpmc_amd.c		optional	hwpmc
+-dev/hwpmc/hwpmc_intel.c		optional	hwpmc
+-dev/hwpmc/hwpmc_core.c		optional	hwpmc
+-dev/hwpmc/hwpmc_piv.c		optional	hwpmc
+-dev/hwpmc/hwpmc_tsc.c		optional	hwpmc
+-dev/hwpmc/hwpmc_x86.c		optional	hwpmc
+-dev/kbd/kbd.c			optional	atkbd | sc | ukbd | usb2_input_kbd
+-dev/mem/memutil.c		optional	mem
+-dev/nfe/if_nfe.c		optional	nfe pci
 -dev/nve/if_nve.c		optional	nve pci
- dev/nvram/nvram.c		optional	nvram isa
- dev/sio/sio.c			optional	sio
- dev/sio/sio_isa.c		optional	sio isa
+-dev/nvram/nvram.c		optional	nvram isa
+-dev/sio/sio.c			optional	sio
+-dev/sio/sio_isa.c		optional	sio isa
+-dev/sio/sio_pccard.c		optional	sio pccard
+-dev/sio/sio_pci.c		optional	sio pci
+-dev/sio/sio_puc.c		optional	sio puc
+-dev/speaker/spkr.c		optional	speaker
+-dev/syscons/apm/apm_saver.c	optional	apm_saver apm
+-dev/syscons/scterm-teken.c	optional	sc
+-dev/syscons/scvgarndr.c		optional	sc vga
+-dev/syscons/scvtb.c		optional	sc
+-dev/syscons/teken/teken.c	optional sc
+-dev/uart/uart_cpu_amd64.c	optional	uart
+-dev/wpi/if_wpi.c		optional	wpi
+-isa/atrtc.c			standard
+-isa/syscons_isa.c		optional	sc
+-isa/vga_isa.c			optional	vga
+-kern/link_elf_obj.c		standard
+-#
+-# IA32 binary support
+-#
+-#amd64/ia32/ia32_exception.S	optional	compat_ia32
+-amd64/ia32/ia32_reg.c		optional	compat_ia32
+-amd64/ia32/ia32_signal.c	optional	compat_ia32
+-amd64/ia32/ia32_sigtramp.S	optional	compat_ia32
+-amd64/ia32/ia32_syscall.c	optional	compat_ia32
+-amd64/ia32/ia32_misc.c		optional	compat_ia32
+-compat/freebsd32/freebsd32_ioctl.c	optional	compat_ia32
+-compat/freebsd32/freebsd32_misc.c	optional	compat_ia32
+-compat/freebsd32/freebsd32_syscalls.c	optional	compat_ia32
+-compat/freebsd32/freebsd32_sysent.c	optional	compat_ia32
+-compat/ia32/ia32_sysvec.c	optional	compat_ia32
+-compat/linprocfs/linprocfs.c	optional	linprocfs
+-compat/linsysfs/linsysfs.c	optional	linsysfs
+-kern/imgact_elf32.c		optional	compat_ia32
+-#
+-# Linux/i386 binary support
+-#
+-amd64/linux32/linux32_dummy.c	optional	compat_linux32
+-amd64/linux32/linux32_locore.s	optional	compat_linux32		\
+-	dependency 	"linux32_assym.h"
+-amd64/linux32/linux32_machdep.c	optional	compat_linux32
+-amd64/linux32/linux32_support.s	optional	compat_linux32		\
+-	dependency 	"linux32_assym.h"
+-amd64/linux32/linux32_sysent.c	optional	compat_linux32
+-amd64/linux32/linux32_sysvec.c	optional	compat_linux32
+-compat/linux/linux_emul.c	optional	compat_linux32
+-compat/linux/linux_file.c	optional	compat_linux32
+-compat/linux/linux_futex.c	optional	compat_linux32
+-compat/linux/linux_getcwd.c	optional	compat_linux32
+-compat/linux/linux_ioctl.c	optional	compat_linux32
+-compat/linux/linux_ipc.c	optional	compat_linux32
+-compat/linux/linux_mib.c	optional	compat_linux32
+-compat/linux/linux_misc.c	optional	compat_linux32
+-compat/linux/linux_signal.c	optional	compat_linux32
+-compat/linux/linux_socket.c	optional	compat_linux32
+-compat/linux/linux_stats.c	optional	compat_linux32
+-compat/linux/linux_sysctl.c	optional	compat_linux32
+-compat/linux/linux_time.c	optional	compat_linux32
+-compat/linux/linux_uid16.c	optional	compat_linux32
+-compat/linux/linux_util.c	optional	compat_linux32
+-dev/amr/amr_linux.c		optional	compat_linux32 amr
+-dev/mfi/mfi_linux.c		optional	compat_linux32 mfi
+-#
+-# Windows NDIS driver support
+-#
+-compat/ndis/kern_ndis.c		optional	ndisapi pci
+-compat/ndis/kern_windrv.c	optional	ndisapi pci
+-compat/ndis/subr_hal.c		optional	ndisapi pci
+-compat/ndis/subr_ndis.c		optional	ndisapi pci
+-compat/ndis/subr_ntoskrnl.c	optional	ndisapi pci
+-compat/ndis/subr_pe.c		optional	ndisapi pci
+-compat/ndis/subr_usbd.c		optional	ndisapi pci
+-compat/ndis/winx64_wrap.S	optional	ndisapi pci
+-i386/bios/smbios.c		optional	smbios
+-i386/bios/vpd.c			optional	vpd
+-i386/cpufreq/powernow.c		optional	cpufreq
+-i386/cpufreq/est.c		optional	cpufreq
+-i386/cpufreq/hwpstate.c		optional	cpufreq
+-i386/cpufreq/p4tcc.c		optional	cpufreq
+-#
+-libkern/memmove.c		standard
+-libkern/memset.c		standard

@@ -17,11 +17,9 @@ The problem seems to be in cooperating between vfs.timestamp_precision
 and utimes/futimes syscalls. Passed NULL to them means "now",
 lets the "now" have precision according to vfs.timestamp_precision.
 
-Index: src/sys/kern/vfs_syscalls.c
-===================================================================
 --- src.orig/sys/kern/vfs_syscalls.c
 +++ src/sys/kern/vfs_syscalls.c
-@@ -2831,8 +2831,7 @@
+@@ -3140,8 +3140,7 @@
  	int error;
  
  	if (usrtvp == NULL) {
