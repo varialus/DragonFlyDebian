@@ -1,175 +1,108 @@
---- kfreebsd-8-8.0~cvs20090715.orig/sys/modules/ralfw/Makefile.inc
-+++ /dev/null
-@@ -1,15 +0,0 @@
--# $FreeBSD: src/sys/modules/ralfw/Makefile.inc,v 1.1 2008/04/20 20:35:40 sam Exp $
--
--#
--# Common rules for building firmware.  Note this gets auto-included
--# by the subdir Makefile's as a consequence of included bsd.kmod.mk.
--#
--KMOD=	${IMG}fw
--_FIRM=	${IMG}.fw
--
--CLEANFILES+=	${_FIRM}
--
--FIRMWS=	${_FIRM}:${KMOD}
--
--${_FIRM}: ${.CURDIR}/../../../contrib/dev/ral/${_FIRM}.uu
+--- src.orig/sys/modules/ralfw/Makefile.inc
++++ src/sys/modules/ralfw/Makefile.inc
+@@ -12,4 +12,4 @@
+ FIRMWS=	${_FIRM}:${KMOD}
+ 
+ ${_FIRM}: ${.CURDIR}/../../../contrib/dev/ral/${_FIRM}.uu
 -	uudecode -p $? > ${.TARGET}
---- kfreebsd-8-8.0~cvs20090715.orig/sys/modules/mwlfw/Makefile
-+++ /dev/null
-@@ -1,14 +0,0 @@
--# $FreeBSD: src/sys/modules/mwlfw/Makefile,v 1.1 2009/06/01 18:07:01 sam Exp $
--
--KMOD=	mw88W8363fw
--FIRMWS=	mw88W8363.fw:mw88W8363fw mwlboot.fw:mwlboot
--
--CLEANFILES+= mw88W8363.fw mwlboot.fw
--
--mw88W8363.fw: ${.CURDIR}/../../contrib/dev/mwl/mw88W8363.fw.uu
++	uudecode -o- $? > ${.TARGET}
+--- src.orig/sys/modules/mwlfw/Makefile
++++ src/sys/modules/mwlfw/Makefile
+@@ -6,9 +6,9 @@
+ CLEANFILES+= mw88W8363.fw mwlboot.fw
+ 
+ mw88W8363.fw: ${.CURDIR}/../../contrib/dev/mwl/mw88W8363.fw.uu
 -	uudecode -p $? > ${.TARGET}
--
--mwlboot.fw: ${.CURDIR}/../../contrib/dev/mwl/mwlboot.fw.uu
++	uudecode -o- $? > ${.TARGET}
+ 
+ mwlboot.fw: ${.CURDIR}/../../contrib/dev/mwl/mwlboot.fw.uu
 -	uudecode -p $? > ${.TARGET}
--
--.include <bsd.kmod.mk>
---- kfreebsd-8-8.0~cvs20090715.orig/sys/modules/ipwfw/ipw_bss/Makefile
-+++ /dev/null
-@@ -1,15 +0,0 @@
--# $FreeBSD: src/sys/modules/ipwfw/ipw_bss/Makefile,v 1.1 2007/03/02 11:42:55 flz Exp $
--
--.PATH: ${.CURDIR}/../../../contrib/dev/ipw
--
--KMOD=	ipw_bss
--FIRMWS=	ipw_bss:ipw_bss:130
--FIRMWARE_LICENSE=	intel_ipw
--
--CLEANFILES=	ipw_bss
--
--ipw_bss: ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3.fw.uu
++	uudecode -o- $? > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>
+--- src.orig/sys/modules/ipwfw/ipw_bss/Makefile
++++ src/sys/modules/ipwfw/ipw_bss/Makefile
+@@ -9,7 +9,7 @@
+ CLEANFILES=	ipw_bss
+ 
+ ipw_bss: ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3.fw.uu
 -	uudecode -p ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3.fw.uu > ${.TARGET}
--
--.include <bsd.kmod.mk>
--
---- kfreebsd-8-8.0~cvs20090715.orig/sys/modules/ipwfw/ipw_ibss/Makefile
-+++ /dev/null
-@@ -1,15 +0,0 @@
--# $FreeBSD: src/sys/modules/ipwfw/ipw_ibss/Makefile,v 1.1 2007/03/02 11:42:55 flz Exp $
--
--.PATH: ${.CURDIR}/../../../contrib/dev/ipw
--
--KMOD=	ipw_ibss
--FIRMWS=	ipw_ibss:ipw_ibss:130
--FIRMWARE_LICENSE=	intel_ipw
--
--CLEANFILES=	ipw_ibss
--
--ipw_ibss: ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3-i.fw.uu
++	uudecode -o- ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3.fw.uu > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>
+ 
+--- src.orig/sys/modules/ipwfw/ipw_ibss/Makefile
++++ src/sys/modules/ipwfw/ipw_ibss/Makefile
+@@ -9,7 +9,7 @@
+ CLEANFILES=	ipw_ibss
+ 
+ ipw_ibss: ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3-i.fw.uu
 -	uudecode -p ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3-i.fw.uu > ${.TARGET}
--
--.include <bsd.kmod.mk>
--
---- kfreebsd-8-8.0~cvs20090715.orig/sys/modules/ipwfw/ipw_monitor/Makefile
-+++ /dev/null
-@@ -1,15 +0,0 @@
--# $FreeBSD: src/sys/modules/ipwfw/ipw_monitor/Makefile,v 1.1 2007/03/02 11:42:55 flz Exp $
--
--.PATH: ${.CURDIR}/../../../contrib/dev/ipw
--
--KMOD=	ipw_monitor
--FIRMWS=	ipw_monitor:ipw_monitor:130
--FIRMWARE_LICENSE=	intel_ipw
--
--CLEANFILES=	ipw_monitor
--
--ipw_monitor: ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3-p.fw.uu
++	uudecode -o- ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3-i.fw.uu > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>
+ 
+--- src.orig/sys/modules/ipwfw/ipw_monitor/Makefile
++++ src/sys/modules/ipwfw/ipw_monitor/Makefile
+@@ -9,7 +9,7 @@
+ CLEANFILES=	ipw_monitor
+ 
+ ipw_monitor: ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3-p.fw.uu
 -	uudecode -p ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3-p.fw.uu > ${.TARGET}
--
--.include <bsd.kmod.mk>
--
---- kfreebsd-8-8.0~cvs20090715.orig/sys/modules/iwifw/iwi_bss/Makefile
-+++ /dev/null
-@@ -1,15 +0,0 @@
--# $FreeBSD: src/sys/modules/iwifw/iwi_bss/Makefile,v 1.1 2007/03/02 11:42:55 flz Exp $
--
--.PATH: ${.CURDIR}/../../../contrib/dev/iwi
--
--KMOD=	iwi_bss
--FIRMWS=	iwi_bss:iwi_bss:300
--FIRMWARE_LICENSE=	intel_iwi
--
--CLEANFILES=	iwi_bss
--
--iwi_bss: ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-bss.fw.uu
++	uudecode -o- ${.CURDIR}/../../../contrib/dev/ipw/ipw2100-1.3-p.fw.uu > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>
+ 
+--- src.orig/sys/modules/iwifw/iwi_bss/Makefile
++++ src/sys/modules/iwifw/iwi_bss/Makefile
+@@ -9,7 +9,7 @@
+ CLEANFILES=	iwi_bss
+ 
+ iwi_bss: ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-bss.fw.uu
 -	uudecode -p ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-bss.fw.uu > ${.TARGET}
--
--.include <bsd.kmod.mk>
--
---- kfreebsd-8-8.0~cvs20090715.orig/sys/modules/iwifw/iwi_ibss/Makefile
-+++ /dev/null
-@@ -1,15 +0,0 @@
--# $FreeBSD: src/sys/modules/iwifw/iwi_ibss/Makefile,v 1.1 2007/03/02 11:42:55 flz Exp $
--
--.PATH: ${.CURDIR}/../../../contrib/dev/iwi
--
--KMOD=	iwi_ibss
--FIRMWS=	iwi_ibss:iwi_ibss:300
--FIRMWARE_LICENSE=	intel_iwi
--
--CLEANFILES=	iwi_fw
--
--iwi_ibss: ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-ibss.fw.uu
++	uudecode -o- ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-bss.fw.uu > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>
+ 
+--- src.orig/sys/modules/iwifw/iwi_ibss/Makefile
++++ src/sys/modules/iwifw/iwi_ibss/Makefile
+@@ -9,7 +9,7 @@
+ CLEANFILES=	iwi_fw
+ 
+ iwi_ibss: ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-ibss.fw.uu
 -	uudecode -p ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-ibss.fw.uu > ${.TARGET}
--
--.include <bsd.kmod.mk>
--
---- kfreebsd-8-8.0~cvs20090715.orig/sys/modules/iwifw/iwi_monitor/Makefile
-+++ /dev/null
-@@ -1,15 +0,0 @@
--# $FreeBSD: src/sys/modules/iwifw/iwi_monitor/Makefile,v 1.1 2007/03/02 11:42:56 flz Exp $
--
--.PATH: ${.CURDIR}/../../../contrib/dev/iwi
--
--KMOD=	iwi_monitor
--FIRMWS=	iwi_monitor:iwi_monitor:300
--FIRMWARE_LICENSE=	intel_iwi
--
--CLEANFILES=	iwi_monitor
--
--iwi_monitor: ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-sniffer.fw.uu
++	uudecode -o- ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-ibss.fw.uu > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>
+ 
+--- src.orig/sys/modules/iwifw/iwi_monitor/Makefile
++++ src/sys/modules/iwifw/iwi_monitor/Makefile
+@@ -9,7 +9,7 @@
+ CLEANFILES=	iwi_monitor
+ 
+ iwi_monitor: ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-sniffer.fw.uu
 -	uudecode -p ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-sniffer.fw.uu > ${.TARGET}
--
--.include <bsd.kmod.mk>
--
---- kfreebsd-8-8.0~cvs20090715.orig/sys/modules/wpifw/Makefile
-+++ /dev/null
-@@ -1,13 +0,0 @@
--# $FreeBSD: src/sys/modules/wpifw/Makefile,v 1.2 2008/10/07 19:42:56 sam Exp $
--
--.PATH: ${.CURDIR}/../../contrib/dev/wpi
--
--KMOD=	wpifw
--FIRMWS=	iwlwifi-3945-2.14.4.fw:wpifw:2144
--
--CLEANFILES=	iwlwifi-3945-2.14.4.fw
--
--iwlwifi-3945-2.14.4.fw: ${.CURDIR}/../../contrib/dev/wpi/iwlwifi-3945-2.14.4.fw.uu
++	uudecode -o- ${.CURDIR}/../../../contrib/dev/iwi/ipw2200-sniffer.fw.uu > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>
+ 
+--- src.orig/sys/modules/wpifw/Makefile
++++ src/sys/modules/wpifw/Makefile
+@@ -8,6 +8,6 @@
+ CLEANFILES=	iwlwifi-3945-2.14.4.fw
+ 
+ iwlwifi-3945-2.14.4.fw: ${.CURDIR}/../../contrib/dev/wpi/iwlwifi-3945-2.14.4.fw.uu
 -	uudecode -p ${.CURDIR}/../../contrib/dev/wpi/iwlwifi-3945-2.14.4.fw.uu > ${.TARGET}
--
--.include <bsd.kmod.mk>
---- kfreebsd-8-8.0~cvs20090715.orig/sys/modules/iwnfw/Makefile
-+++ /dev/null
-@@ -1,13 +0,0 @@
--# $FreeBSD: src/sys/modules/iwnfw/Makefile,v 1.2 2009/01/09 22:35:25 sam Exp $
--
--.PATH: ${.CURDIR}/../../contrib/dev/iwn
--
--KMOD=	iwnfw
--FIRMWS=	iwlwifi-4965-4.44.17.fw:iwnfw:44417
--
--CLEANFILES=	iwlwifi-4965-4.44.17.fw
--
--iwlwifi-4965-4.44.17.fw: ${.CURDIR}/../../contrib/dev/iwn/iwlwifi-4965-4.44.17.fw.uu
++	uudecode -o- ${.CURDIR}/../../contrib/dev/wpi/iwlwifi-3945-2.14.4.fw.uu > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>
+--- src.orig/sys/modules/iwnfw/Makefile
++++ src/sys/modules/iwnfw/Makefile
+@@ -8,6 +8,6 @@
+ CLEANFILES=	iwlwifi-4965-4.44.17.fw
+ 
+ iwlwifi-4965-4.44.17.fw: ${.CURDIR}/../../contrib/dev/iwn/iwlwifi-4965-4.44.17.fw.uu
 -	uudecode -p ${.CURDIR}/../../contrib/dev/iwn/iwlwifi-4965-4.44.17.fw.uu > ${.TARGET}
--
--.include <bsd.kmod.mk>
++	uudecode -o- ${.CURDIR}/../../contrib/dev/iwn/iwlwifi-4965-4.44.17.fw.uu > ${.TARGET}
+ 
+ .include <bsd.kmod.mk>
