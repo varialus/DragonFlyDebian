@@ -31,7 +31,7 @@ endif
 
 ifeq ($(subdir),io)
 # For <unistd.h>.
-sysdep_routines += sys_fchownat sys_fexecve sys_getcwd sys_linkat sys_lseek sys_freebsd6_lseek sys_readlinkat sys_symlinkat sys_unlinkat
+sysdep_routines += sys_access sys_fchownat sys_fexecve sys_getcwd sys_linkat sys_lseek sys_freebsd6_lseek sys_readlinkat sys_symlinkat sys_unlinkat
 # For <fcntl.h>.
 sysdep_routines += sys_open sys_openat open_2
 # For <sys/stat.h>.
@@ -55,7 +55,7 @@ ifeq ($(subdir),misc)
 # For <sched.h>.
 sysdep_routines += clone start_thread
 # For <unistd.h>.
-sysdep_routines += sys_faccessat sys_ftruncate sys_freebsd6_ftruncate sys_truncate sys_freebsd6_truncate
+sysdep_routines += sys_ftruncate sys_freebsd6_ftruncate sys_truncate sys_freebsd6_truncate
 # For <sys/acl.h>.
 sysdep_routines += acl_aclcheck_fd acl_aclcheck_file acl_delete_fd acl_delete_file acl_get_fd acl_get_file acl_set_fd acl_set_file
 # For <sys/extattr.h>.
@@ -92,7 +92,7 @@ endif
 
 ifeq ($(subdir),posix)
 # For <unistd.h>.
-sysdep_routines += sys_getlogin sys_pread sys_freebsd6_pread sys_pwrite sys_freebsd6_pwrite sys_setlogin sys_read sys_write
+sysdep_routines += sys_access sys_getlogin sys_pread sys_freebsd6_pread sys_pwrite sys_freebsd6_pwrite sys_setlogin sys_read sys_write
 # for <sched.h>
 sysdep_routines += sys_cpuset_getaffinity sys_cpuset_setaffinity
 endif
