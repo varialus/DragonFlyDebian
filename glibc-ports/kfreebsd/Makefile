@@ -92,7 +92,7 @@ endif
 
 ifeq ($(subdir),posix)
 # For <unistd.h>.
-sysdep_routines += sys_access sys_getlogin sys_pread sys_freebsd6_pread sys_pwrite sys_freebsd6_pwrite sys_setlogin sys_read sys_write
+sysdep_routines += sys_getlogin sys_pread sys_freebsd6_pread sys_pwrite sys_freebsd6_pwrite sys_setlogin sys_read sys_write
 # for <sched.h>
 sysdep_routines += sys_cpuset_getaffinity sys_cpuset_setaffinity
 endif
