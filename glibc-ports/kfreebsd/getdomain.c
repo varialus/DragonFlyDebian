@@ -48,4 +48,4 @@ __getdomainname (char *name, size_t len)
   return 0;
 }
 
-weak_alias (__getdomainname getdomainname)
+weak_alias (__getdomainname, getdomainname)
