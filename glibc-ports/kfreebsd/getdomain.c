@@ -25,7 +25,7 @@
    name and the terminator.  */
 
 int
-__getdomainname (char *name, size_t len)
+getdomainname (char *name, size_t len)
 {
   /* Fetch the "kern.domainname" sysctl value.  */
   int request[2] = { CTL_KERN, KERN_NISDOMAINNAME };
@@ -47,5 +47,4 @@ __getdomainname (char *name, size_t len)
   name[result_len] = '\0';
   return 0;
 }
-
-weak_alias (__getdomainname, getdomainname)
+libc_hidden_def (getdomainname)
