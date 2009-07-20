@@ -31,7 +31,7 @@ endif
 
 ifeq ($(subdir),io)
 # For <unistd.h>.
-sysdep_routines += sys_access sys_fchownat sys_fexecve sys_getcwd sys_linkat sys_lseek sys_freebsd6_lseek sys_readlinkat sys_symlinkat sys_unlinkat
+sysdep_routines += sys_access sys_faccessat sys_fchownat sys_fexecve sys_getcwd sys_linkat sys_lseek sys_freebsd6_lseek sys_readlinkat sys_symlinkat sys_unlinkat
 # For <fcntl.h>.
 sysdep_routines += sys_open sys_openat open_2
 # For <sys/stat.h>.

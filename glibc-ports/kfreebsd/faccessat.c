@@ -29,8 +29,7 @@
 #include <kernel-features.h>
 #include <sysdep.h>
 
-extern int __syscall_faccessat (int fd, const char *path, mode_t mode,
-				int flag);
+extern int __syscall_faccessat (int fd, const char *path, int mode, int flag);
 libc_hidden_proto (__syscall_faccessat)
 
 int

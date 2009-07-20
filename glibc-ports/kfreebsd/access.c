@@ -37,46 +37,28 @@
    discouraged. This wrapper implements the recommended behaviour.
  */
 
-extern int __syscall_access (const char *path, mode_t mode);
+extern int __syscall_access (const char *path, int mode);
 libc_hidden_proto (__syscall_access)
 
 int
-__access (path, mode)
-     const char *path;
-     int mode;
+__access (const char *path, int mode)
 {
-  uid_t uid;
   struct stat64 stats;
 
-  uid = __getuid();
-
-  if (uid != 0)
+  if ((__getuid() != 0) || !(mode & X_OK))
     return __syscall_access (path, mode);
 
+  /* Althought the super-user can read and write any file, 
+     the file-system might be i.e. read-only. Do the check. */
+     
+  if (__syscall_access (path, mode))
+    return -1;
+    
   if (stat64 (path, &stats))
     return -1;
 
-  mode &= (X_OK | W_OK | R_OK);	/* Clear any bogus bits. */
-#if R_OK != S_IROTH || W_OK != S_IWOTH || X_OK != S_IXOTH
-# error Oops, portability assumptions incorrect.
-#endif
-
-  if (mode == F_OK)
-    return 0;			/* The file exists. */
-
-  /* The super-user can read and write any file, and execute any file
-     that anyone can execute. */
-  if ((mode & X_OK) == 0 || (stats.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)))
-    return 0;
-
-  int granted = (uid == stats.st_uid
-		 ? (unsigned int) (stats.st_mode & (mode << 6)) >> 6
-		 : (stats.st_gid == (__getgid ())
-		    || __group_member (stats.st_gid))
-		 ? (unsigned int) (stats.st_mode & (mode << 3)) >> 3
-		 : (stats.st_mode & mode));
-
-  if (granted == mode)
+  /* The super-user can execute any file that anyone can execute. */
+  if (stats.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
     return 0;
 
   __set_errno (EACCES);
