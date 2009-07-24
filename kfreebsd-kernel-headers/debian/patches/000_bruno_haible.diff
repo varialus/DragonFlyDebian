@@ -596,7 +596,7 @@ Index: src/sys/sys/sysctl.h
  #define	KERN_VNODE		13	/* struct: vnode structures */
  #define	KERN_PROC		14	/* struct: process entries */
  #define	KERN_FILE		15	/* struct: file entries */
-@@ -676,13 +772,19 @@
+@@ -676,13 +772,21 @@
  int	sysctl_wire_old_buffer(struct sysctl_req *req, size_t len);
  
  #else	/* !_KERNEL */
@@ -610,10 +610,12 @@ Index: src/sys/sys/sysctl.h
 -int	sysctlnametomib(const char *, int *, size_t *);
 +extern int	sysctl(int *, u_int, void *, size_t *, void *, size_t) __THROW;
 +extern int	sysctlbyname(const char *, void *, size_t *, void *, size_t) __THROW;
++extern int	sysctlnametomib(const char *, int *, size_t *) __THROW;
 +#ifdef _LIBC
 +extern int __sysctlbyname (const char *__name,
 +			   void *__oldval, size_t *__oldlenp,
 +			   void *__newval, size_t __newlen) __THROW;
++extern int __sysctlnametomib (const char *__name, int *mibp, size_t *sizep) __THROW;
 +#endif
  __END_DECLS
 +
