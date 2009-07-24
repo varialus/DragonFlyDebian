@@ -1,6 +1,5 @@
-/* Copyright (C) 2002 Free Software Foundation, Inc.
+/* Copyright (C) 2009 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-   Contributed by Bruno Haible <bruno@clisp.org>, 2002.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -17,22 +16,22 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+#include <sys/types.h>
 #include <sys/sysctl.h>
 #include <string.h>
 
-/* Read or write system parameters.  */
 int
-__sysctlbyname (const char *name, void *oldval, size_t *oldlenp, void *newval, size_t newlen)
+__sysctlnametomib (const char *name, int *mibp, size_t *sizep)
 {
   int request[CTL_MAXNAME];
   size_t requestlen = sizeof (request);
 
-  if (__sysctlnametomib(name, request, &requestlen) < 0)
-    return -1;
-
-  /* Now call sysctl using the binary encoded request.  */
-  return __sysctl (request, requestlen / sizeof (int),
-		   oldval, oldlenp, newval, newlen);
+  /* Convert the string NAME to a binary encoded request.  The kernel
+     contains a routine for doing this, called "name2oid".  But the way
+     to call it is a little bit strange.  */
+  int name2oid_request[2] = { 0, 3 };
+  return __sysctl (name2oid_request, 2, mibp, sizep, (void *) name, 
+		   strlen (name));
 }
 
-weak_alias (__sysctlbyname, sysctlbyname)
+weak_alias (__sysctlnametomib, sysctlnametomib)

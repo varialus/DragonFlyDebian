@@ -79,7 +79,7 @@ sysdep_routines += rtprio
 # For <sys/socket.h>.
 sysdep_routines += bsd_sendfile
 # For <sys/sysctl.h>.
-sysdep_routines += sysctl sysctlbyname
+sysdep_routines += sysctl sysctlbyname sysctlnametomib
 # For <sys/uio.h>.
 sysdep_routines += sys_readv sys_writev
 # Other.
