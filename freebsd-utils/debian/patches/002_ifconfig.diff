@@ -380,3 +380,14 @@
  #include "ifconfig.h"
  
  #ifndef lint
+--- a/sbin/ifconfig/ifconfig.c
+--- b/sbin/ifconfig/ifconfig.c
+@@ -154,7 +154,7 @@
+ 	all = downonly = uponly = namesonly = noload = verbose = 0;
+ 
+ 	/* Parse leading line options */
+-	strlcpy(options, "adklmnuv", sizeof(options));
++	strlcpy(options, "+adklmnuv", sizeof(options));
+ 	for (p = opts; p != NULL; p = p->next)
+ 		strlcat(options, p->opt, sizeof(options));
+ 	while ((c = getopt(argc, argv, options)) != -1) {
