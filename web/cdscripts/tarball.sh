@@ -39,6 +39,11 @@ if test -e native-install ; then
   cp native-install ${tmp}/
 fi
 
+# copy localdebs into the directory tree
+if test -d localdebs ; then
+  cp localdebs/* ${tmp}/var/cache/apt/archives/
+fi
+
 # having dialog pre-installed makes it a bit prettier
 for i in dialog libncursesw5 ; do
   dpkg --extract ${tmp}/var/cache/apt/archives/${i}_*.deb ${tmp}/
