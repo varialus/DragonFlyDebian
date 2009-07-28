@@ -27,10 +27,7 @@ do_start() {
 	for i in load stat unload ; do
 		which kld$i >/dev/null || exit 1
 	done
-	modules="`shopt -s nullglob ; cat /etc/modules /etc/modules.d/* \
-		 | sed -e \"s/#.*//g\" -e \"/^\( \|\t\)*$/d\" `"
-#			in previous line should be output of sed passed 
-#			through  "| sort -u", but sort is located in /usr/bin/ :-(
+	modules="`sed -e 's/#.*//g' -e '/^\( \|\t\)*$/d' /etc/modules /etc/modules.d/*`"
 	set -e
 
 	for i in ${modules} ; do
