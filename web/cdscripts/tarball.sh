@@ -55,6 +55,9 @@ for i in libbsd0 libfreebsd0 ; do
   dpkg --extract ${tmp}/var/cache/apt/archives/${i}_*.deb ${tmp}/
 done
 
+# Remove the root passwd
+sed -i -e 's#^root:\*:0*#root::0#g' ${tmp}/usr/share/base-passwd/passwd.master
+
 # this command is called by f-i after untarring, let's exploit that
 cp startup ${tmp}/bin/mtree
 chmod +x ${tmp}/bin/mtree
