@@ -15,10 +15,9 @@ CFLAGS = -Wall -g
 
 DEB_HOST_ARCH_OS = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
-# on GNU/kFreeBSD we need additional library
-ifeq (kfreebsd,$(DEB_HOST_ARCH_OS))
-LDADD += -lfreebsd
-else
+# GNU/kFreeBSD already have off_t 64bit. It must not be enabled,
+# as it would change size of ino_t
+ifneq (kfreebsd,$(DEB_HOST_ARCH_OS))
 # really only on other systems, as GNU/kFreeBSD already have off_t 64bit
 # on GNU/kFreeBSD it must not be enabled, as it would change size of ino_t
 CFLAGS += -D_FILE_OFFSET_BITS=64 -I$(CURDIR)/freebsd
