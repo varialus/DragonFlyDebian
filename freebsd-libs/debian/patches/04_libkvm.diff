@@ -13,10 +13,12 @@
  lib/libkvm/kvm_proc.c           |   19 +++++++++++--------
  12 files changed, 83 insertions(+), 33 deletions(-)
 
+Index: b/lib/libkvm/Makefile
+===================================================================
 --- a/lib/libkvm/Makefile
 +++ b/lib/libkvm/Makefile
 @@ -2,8 +2,8 @@
- # $FreeBSD: src/lib/libkvm/Makefile,v 1.17.2.2.4.1 2009/04/15 03:14:26 kensmith Exp $
+ # $FreeBSD$
  
  LIB=	kvm
 +LDADD= -lbsd -lfreebsd
@@ -25,9 +27,11 @@
  
  .if ${MACHINE} == "sun4v"
  CFLAGS+=-DSUN4V
+Index: b/lib/libkvm/kvm.c
+===================================================================
 --- a/lib/libkvm/kvm.c
 +++ b/lib/libkvm/kvm.c
-@@ -46,6 +46,7 @@
+@@ -47,6 +47,7 @@
  #include <sys/stat.h>
  #include <sys/sysctl.h>
  #include <sys/linker.h>
@@ -35,7 +39,7 @@
  
  #include <vm/vm.h>
  #include <vm/vm_param.h>
-@@ -58,10 +59,17 @@
+@@ -59,10 +60,16 @@
  #include <limits.h>
  #include <nlist.h>
  #include <paths.h>
@@ -45,7 +49,6 @@
  #include <string.h>
  #include <unistd.h>
 +#include <bsd/string.h>
-+#include <freebsd/paths.h>
 +
 +#ifndef _PATH_FWMEM
 +#define _PATH_FWMEM     "/dev/fwmem"
@@ -53,7 +56,35 @@
  
  #include "kvm_private.h"
  
-@@ -237,7 +245,7 @@
+@@ -145,6 +152,7 @@
+ 	char *errout;
+ {
+ 	struct stat st;
++	static char name[MAXPATHLEN];
+ 
+ 	kd->vmfd = -1;
+ 	kd->pmfd = -1;
+@@ -154,8 +162,17 @@
+ 	kd->argspc = 0;
+ 	kd->argv = 0;
+ 
+-	if (uf == 0)
+-		uf = getbootfile();
++	if (uf == 0) {
++		size_t size = sizeof(name);
++		int mib[2];
++
++		mib[0] = CTL_KERN;
++		mib[1] = KERN_BOOTFILE;
++		if (sysctl(mib, 2, name, &size, NULL, 0) == -1)
++			strcpy(name, "/boot/kernel/kernel");
++
++		uf = name;
++	}
+ 	else if (strlen(uf) >= MAXPATHLEN) {
+ 		_kvm_err(kd, kd->program, "exec file name too long");
+ 		goto failed;
+@@ -238,7 +255,7 @@
  kvm_openfiles(uf, mf, sf, flag, errout)
  	const char *uf;
  	const char *mf;
@@ -62,7 +93,7 @@
  	int flag;
  	char *errout;
  {
-@@ -256,7 +264,7 @@
+@@ -257,7 +274,7 @@
  kvm_open(uf, mf, sf, flag, errstr)
  	const char *uf;
  	const char *mf;
@@ -71,9 +102,11 @@
  	int flag;
  	const char *errstr;
  {
+Index: b/lib/libkvm/kvm_file.c
+===================================================================
 --- a/lib/libkvm/kvm_file.c
 +++ b/lib/libkvm/kvm_file.c
-@@ -59,7 +59,7 @@
+@@ -60,7 +60,7 @@
  #include <sys/sysctl.h>
  
  #include <limits.h>
@@ -82,7 +115,7 @@
  #include <paths.h>
  
  #include "kvm_private.h"
-@@ -76,6 +76,7 @@
+@@ -77,6 +77,7 @@
  	int op, arg, nfiles;
  	long filehead_o;
  {
@@ -90,7 +123,7 @@
  	int buflen = kd->arglen, n = 0;
  	struct file *fp;
  	char *where = kd->argspc;
-@@ -113,6 +114,8 @@
+@@ -114,6 +115,8 @@
  		return (0);
  	}
  	return (nfiles);
@@ -99,7 +132,7 @@
  }
  
  char *
-@@ -121,6 +124,7 @@
+@@ -122,6 +125,7 @@
  	int op, arg;
  	int *cnt;
  {
@@ -107,16 +140,18 @@
  	int mib[2], st, nfiles;
  	size_t size;
  	struct file *fp, *fplim;
-@@ -184,4 +188,6 @@
+@@ -185,4 +189,6 @@
  	}
  	*cnt = nfiles;
  	return (kd->argspc);
 +#endif
 +	return 0;
  }
+Index: b/lib/libkvm/kvm_getloadavg.c
+===================================================================
 --- a/lib/libkvm/kvm_getloadavg.c
 +++ b/lib/libkvm/kvm_getloadavg.c
-@@ -43,15 +43,21 @@
+@@ -44,15 +44,21 @@
  #include <limits.h>
  #include <nlist.h>
  #include <kvm.h>
@@ -141,9 +176,11 @@
  };
  
  /*
+Index: b/lib/libkvm/kvm_getswapinfo.c
+===================================================================
 --- a/lib/libkvm/kvm_getswapinfo.c
 +++ b/lib/libkvm/kvm_getswapinfo.c
-@@ -46,13 +46,16 @@
+@@ -47,13 +47,16 @@
  #include <string.h>
  #include <unistd.h>
  #include <limits.h>
@@ -163,7 +200,7 @@
  };
  
  #define NL_SWTAILQ	0
-@@ -209,8 +212,10 @@
+@@ -210,8 +213,10 @@
  			swap_ary[unswdev].ksw_total = ttl;
  			swap_ary[unswdev].ksw_used = xsd.xsw_used;
  			swap_ary[unswdev].ksw_flags = xsd.xsw_flags;
@@ -174,9 +211,11 @@
  		}
  		tot.ksw_total += ttl;
  		tot.ksw_used += xsd.xsw_used;
+Index: b/lib/libkvm/kvm_minidump_amd64.c
+===================================================================
 --- a/lib/libkvm/kvm_minidump_amd64.c
 +++ b/lib/libkvm/kvm_minidump_amd64.c
-@@ -37,6 +37,7 @@
+@@ -38,6 +38,7 @@
  #include <sys/fnv_hash.h>
  #include <stdlib.h>
  #include <strings.h>
@@ -184,7 +223,7 @@
  #include <unistd.h>
  #include <nlist.h>
  #include <kvm.h>
-@@ -99,6 +100,15 @@
+@@ -100,6 +101,15 @@
  	return (-1);
  }
  
@@ -200,9 +239,11 @@
  static int
  inithash(kvm_t *kd, uint64_t *base, int len, off_t off)
  {
+Index: b/lib/libkvm/kvm_minidump_i386.c
+===================================================================
 --- a/lib/libkvm/kvm_minidump_i386.c
 +++ b/lib/libkvm/kvm_minidump_i386.c
-@@ -101,6 +101,16 @@
+@@ -102,6 +102,16 @@
  	return (-1);
  }
  
@@ -219,6 +260,8 @@
  static int
  inithash(kvm_t *kd, uint32_t *base, int len, off_t off)
  {
+Index: b/lib/libkvm/kvm_private.h
+===================================================================
 --- a/lib/libkvm/kvm_private.h
 +++ b/lib/libkvm/kvm_private.h
 @@ -68,7 +68,7 @@
@@ -239,9 +282,11 @@
  int	 _kvm_uvatop(kvm_t *, const struct proc *, u_long, u_long *);
  
  #if defined(__amd64__) || defined(__i386__)
+Index: b/lib/libkvm/kvm_proc.c
+===================================================================
 --- a/lib/libkvm/kvm_proc.c
 +++ b/lib/libkvm/kvm_proc.c
-@@ -53,7 +53,7 @@
+@@ -54,7 +54,7 @@
  #include <sys/_lock.h>
  #include <sys/_mutex.h>
  #include <sys/_task.h>
@@ -250,7 +295,7 @@
  #include <sys/user.h>
  #include <sys/proc.h>
  #define	_WANT_PRISON	/* make jail.h give us 'struct prison' */
-@@ -100,6 +100,7 @@
+@@ -101,6 +101,7 @@
  	struct kinfo_proc *bp;
  	int maxcnt;
  {
@@ -258,7 +303,7 @@
  	int cnt = 0;
  	struct kinfo_proc kinfo_proc, *kp;
  	struct pgrp pgrp;
-@@ -419,6 +420,8 @@
+@@ -420,6 +421,8 @@
  		++cnt;
  	}
  	return (cnt);
@@ -267,9 +312,11 @@
  }
  
  /*
+Index: b/lib/libkvm/kvm_amd64.c
+===================================================================
 --- a/lib/libkvm/kvm_amd64.c
 +++ b/lib/libkvm/kvm_amd64.c
-@@ -51,6 +51,7 @@
+@@ -52,6 +52,7 @@
  #include <sys/mman.h>
  #include <stdlib.h>
  #include <unistd.h>
@@ -277,9 +324,11 @@
  #include <nlist.h>
  #include <kvm.h>
  
+Index: b/lib/libkvm/kvm_cptime.c
+===================================================================
 --- a/lib/libkvm/kvm_cptime.c
 +++ b/lib/libkvm/kvm_cptime.c
-@@ -38,12 +38,13 @@
+@@ -39,12 +39,13 @@
  #include <kvm.h>
  #include <limits.h>
  #include <stdlib.h>
@@ -295,9 +344,11 @@
  };
  
  #define	NL_CP_TIME		0
+Index: b/lib/libkvm/kvm_pcpu.c
+===================================================================
 --- a/lib/libkvm/kvm_pcpu.c
 +++ b/lib/libkvm/kvm_pcpu.c
-@@ -40,9 +40,9 @@
+@@ -41,9 +41,9 @@
  #include "kvm_private.h"
  
  static struct nlist kvm_pcpu_nl[] = {
