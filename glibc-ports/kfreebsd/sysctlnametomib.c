@@ -23,15 +23,16 @@
 int
 __sysctlnametomib (const char *name, int *mibp, size_t *sizep)
 {
-  int request[CTL_MAXNAME];
-  size_t requestlen = sizeof (request);
-
   /* Convert the string NAME to a binary encoded request.  The kernel
      contains a routine for doing this, called "name2oid".  But the way
      to call it is a little bit strange.  */
   int name2oid_request[2] = { 0, 3 };
-  return __sysctl (name2oid_request, 2, mibp, sizep, (void *) name, 
-		   strlen (name));
+  int retval;
+  
+  *sizep *= sizeof (int);
+  retval = __sysctl (name2oid_request, 2, mibp, sizep, (void *) name, strlen (name));
+  *sizep /= sizeof (int);
+  return retval;
 }
 
 weak_alias (__sysctlnametomib, sysctlnametomib)

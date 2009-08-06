@@ -24,14 +24,14 @@
 int
 __sysctlbyname (const char *name, void *oldval, size_t *oldlenp, void *newval, size_t newlen)
 {
-  int request[CTL_MAXNAME];
-  size_t requestlen = sizeof (request);
+  int request[CTL_MAXNAME+2];
+  size_t requestlen = CTL_MAXNAME+2;
 
   if (__sysctlnametomib(name, request, &requestlen) < 0)
     return -1;
 
   /* Now call sysctl using the binary encoded request.  */
-  return __sysctl (request, requestlen / sizeof (int),
+  return __sysctl (request, requestlen,
 		   oldval, oldlenp, newval, newlen);
 }
 

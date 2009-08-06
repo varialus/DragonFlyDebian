@@ -38,7 +38,7 @@ __devname_r(dev_t dev, mode_t type, char *buf, int len)
 {
 	int i;
 	size_t j;
-	char *r;
+	const char *r;
 
 	if ((type & S_IFMT) == S_IFCHR) {
 		j = len;
