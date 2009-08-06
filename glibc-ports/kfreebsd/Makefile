@@ -78,6 +78,8 @@ sysdep_routines += rfork
 sysdep_routines += rtprio
 # For <sys/socket.h>.
 sysdep_routines += bsd_sendfile
+# For <sys/stat.h>.
+sysdep_routines += devname
 # For <sys/sysctl.h>.
 sysdep_routines += sysctl sysctlbyname sysctlnametomib
 # For <sys/uio.h>.

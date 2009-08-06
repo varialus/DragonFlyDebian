@@ -194,6 +194,10 @@ extern int chflags (__const char *__file, unsigned long int __flags) __THROW;
 /* Set file flags of the file referred to by FD to FLAGS.  */
 extern int fchflags (int __fd, unsigned long int __flags) __THROW;
 
+
+extern char *devname_r(dev_t dev, mode_t type, char *buf, int len) __THROW;
+extern char *devname(dev_t dev, mode_t type) __THROW;
+                                                                                                                                                                                                         
 __END_DECLS
 
 #endif /* __USE_BSD */
