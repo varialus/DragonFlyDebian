@@ -26,9 +26,14 @@ set -e
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
 do_start() {
-	for i in load stat unload ; do
-		which kld${i} >/dev/null || exit 1
+	for i in sysctl kldload kldstat kldunload ; do
+		which ${i} >/dev/null || exit 1
 	done
+
+	# This syctl is (supposedly) correct in kernel, but kfreebsd-loader enjoys messing with it
+	sysctl "kern.module_path=/lib/modules/`uname -r`;/boot/kernel"
+
+	# Load modules
 	for file in /etc/modules /etc/modules.d/* ; do
 		if ! test -f ${file} ; then
 			continue
