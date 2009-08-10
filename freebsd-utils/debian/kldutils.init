@@ -21,23 +21,28 @@
 # Version:	@(#)skeleton  1.9  26-Feb-2001  miquels@cistron.nl
 #
 
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+set -e
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
 do_start() {
 	for i in load stat unload ; do
-		which kld$i >/dev/null || exit 1
+		which kld${i} >/dev/null || exit 1
 	done
-	modules="`sed -e 's/#.*//g' -e '/^\( \|\t\)*$/d' /etc/modules /etc/modules.d/*`"
-	set -e
-
-	for i in ${modules} ; do
-		if ! kldstat -n $i >/dev/null 2>/dev/null ; then
-			echo "Loading $i ..."
-			kldload $i || true
-			echo "... done."
-		else
-			echo "Not loading $i (already loaded)"
+	for file in /etc/modules /etc/modules.d/* ; do
+		if ! test -f ${file} ; then
+			continue
 		fi
+		modules="`sed -e 's/#.*//g' -e '/^\( \|\t\)*$/d' ${file}`"
+		for module in ${modules} ; do
+			if ! kldstat -n ${module} >/dev/null 2>/dev/null ; then
+				echo "Loading ${module} ..."
+				kldload ${module} || true
+				echo "... done."
+			else
+				echo "Not loading ${module} (already loaded)"
+			fi
+		done
 	done
 }
 
