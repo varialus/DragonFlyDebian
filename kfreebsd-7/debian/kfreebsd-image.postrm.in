@@ -24,13 +24,16 @@ RELEASE="@RELEASE@"
 VERSION="@VERSION@"
 
 case "$1" in
-    purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    remove)
         # Run postrm hook if defined
-        postrm_hook=$(sed '/^\s*postrm_hook/!d;s/.*=//g' $KERNEL_IMG_CONF 2>/dev/null)
+        postrm_hook=$(sed '/^\s*postrm_hook/!d;s/.*=//g' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$postrm_hook" ] ; then
             echo "Running postrm hook script $script." 1>&2 
             $postrm_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"
         fi
+    ;;
+    
+    purge|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
     ;;
 
     *)

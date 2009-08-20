@@ -54,7 +54,7 @@ case "$1" in
         fi
     
         # Run postinst hook if defined
-        postinst_hook=$(sed '/^\s*postinst_hook/!d;s/.*=//g' $KERNEL_IMG_CONF 2>/dev/null)
+        postinst_hook=$(sed '/^\s*postinst_hook/!d;s/.*=//g' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$postinst_hook" ] ; then
             echo "Running postinst hook script $script." 1>&2 
             $postinst_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"

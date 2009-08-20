@@ -22,16 +22,16 @@ RELEASE="@RELEASE@"
 VERSION="@VERSION@"
 
 case "$1" in
-    remove|upgrade|deconfigure)
+    remove)
         # Run prerm hook if defined
-        prerm_hook=$(sed '/^\s*prerm_hook/!d;s/.*=//g' $KERNEL_IMG_CONF 2>/dev/null)
+        prerm_hook=$(sed '/^\s*prerm_hook/!d;s/.*=//g' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$prerm_hook" ] ; then
             echo "Running prerm hook script $script." 1>&2 
             $prerm_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"
         fi
     ;;
 
-    failed-upgrade)
+    failed-upgrade|upgrade|deconfigure)
     ;;
 
     *)

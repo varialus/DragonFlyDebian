@@ -21,7 +21,7 @@ VERSION="@VERSION@"
 case "$1" in
     install|upgrade)
         # Run preinst hook if defined
-        preinst_hook=$(sed '/^\s*preinst_hook/!d;s/.*=//g' $KERNEL_IMG_CONF 2>/dev/null)
+        preinst_hook=$(sed '/^\s*preinst_hook/!d;s/.*=//g' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$preinst_hook" ] ; then
             echo "Running preinst hook script $script." 1>&2 
             $preinst_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"
