@@ -40,7 +40,7 @@ do_start() {
 		fi
 		modules="`sed -e 's/#.*//g' -e '/^\( \|\t\)*$/d' ${file}`"
 		for module in ${modules} ; do
-			if ! kldstat -n ${module} >/dev/null 2>/dev/null ; then
+			if ! kldstat -q -m ${module} 2>/dev/null ; then
 				echo "Loading ${module} ..."
 				kldload ${module} || true
 				echo "... done."
