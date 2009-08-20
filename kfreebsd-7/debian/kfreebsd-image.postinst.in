@@ -42,7 +42,7 @@ case "$1" in
             fi
     
             # on i386 acpi MUST be within kfreebsd-loader reach
-            if echo $RELEASE | grep -q -- '-[46]86' ; then
+            if [ "${RELEASE%%-[456]86}" != "${RELEASE}" ] ; then
                 if [ "$(readlink -f /boot/kernel/acpi.ko)" != "/lib/modules/$RELEASE/acpi.ko" ] ; then
                     rm -f /boot/kernel/acpi.ko.old
                     if [ -L /boot/kernel/acpi.ko ] ; then
