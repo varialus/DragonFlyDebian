@@ -26,7 +26,7 @@ VERSION="@VERSION@"
 case "$1" in
     remove)
         # Run postrm hook if defined
-        postrm_hook=$(sed '/^\s*postrm_hook/!d;s/.*=//g' $KERNEL_IMG_CONF 2>/dev/null || true)
+        postrm_hook=$(sed '/^\s*postrm_hook/!d;s/.*=\s*//' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$postrm_hook" ] ; then
             echo "Running postrm hook script $postrm_hook." 1>&2 
             $postrm_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"
