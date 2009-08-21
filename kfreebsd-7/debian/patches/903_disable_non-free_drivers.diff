@@ -302,7 +302,7 @@ Index: src/sys/modules/Makefile
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -202,11 +199,8 @@
+@@ -202,10 +199,8 @@
  	ntfs_iconv \
  	${_nxge} \
  	nullfs \
@@ -310,21 +310,9 @@ Index: src/sys/modules/Makefile
  	${_nvram} \
  	${_nwfs} \
 -	${_oltr} \
--	${_opensolaris} \
+ 	${_opensolaris} \
  	${_padlock} \
  	patm \
- 	${_pccard} \
-@@ -423,10 +416,6 @@
- .if ${MK_NCP} != "no"
- _nwfs=		nwfs
- .endif
--_oltr=		oltr
--.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
--_opensolaris=	opensolaris
--.endif
- _pccard=	pccard
- _pcfclock=	pcfclock
- _pecoff=	pecoff
 @@ -468,8 +454,6 @@
  _dpt=		dpt
  _ex=		ex
@@ -351,29 +339,14 @@ Index: src/sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -551,12 +532,8 @@
+@@ -551,7 +532,6 @@
  _mly=		mly
  _ndis=		ndis
  _nfe=		nfe
 -_nve=		nve
  _nvram=		nvram
  _nxge=		nxge
--.if ${MK_CDDL} != "no" || defined(ALL_MODULES)
--_opensolaris=	opensolaris
--.endif
- _pccard=	pccard
- _rdma=		rdma	
- _safe=		safe
-@@ -570,9 +547,6 @@
- _wi=		wi
- _wpi=		wpi
- _wpifw=		wpifw
--.if ${MK_ZFS} != "no" || defined(ALL_MODULES)
--_zfs=		zfs
--.endif
- .endif
- 
- .if ${MACHINE_ARCH} == "ia64"
+ .if ${MK_CDDL} != "no" || defined(ALL_MODULES)
 Index: src/sys/amd64/conf/GENERIC
 ===================================================================
 --- src.orig/sys/amd64/conf/GENERIC
