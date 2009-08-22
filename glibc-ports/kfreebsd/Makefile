@@ -52,6 +52,8 @@ sysdep_routines += sys_getdents sys_getdirentries getdirentries getdirentries64
 endif
 
 ifeq ($(subdir),misc)
+# For <kenv.h>.
+sysdep_routines += kenv
 # For <sched.h>.
 sysdep_routines += clone start_thread
 # For <unistd.h>.
