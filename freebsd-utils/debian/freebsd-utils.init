@@ -29,7 +29,7 @@ case "$1" in
 
     # only do this during boot, to avoid messing up ttys
     if [ "$RUNLEVEL" = "S" ] ; then
-      chown root:root /dev/*
+      chown root:root /dev/* 2> /dev/null
     fi
     
     for i in /dev/dsp{,[0-9]} /dev/mixer{,[0-9]} /dev/audio{,ctl,[0-9]} ; do
@@ -84,18 +84,18 @@ case "$1" in
     fi
     
     echo "done."
-    
-    if test -f /etc/mtab && ! test -h /etc/mtab ; then
-      echo "Warning: /etc/mtab is a regular file, replacing with symlink."
+   
+    if [ $(readlink /etc/mtab) != "/proc/mounts" ] ; then
+      echo "Warning: replacing /etc/mtab by a symlink to /proc/mounts."
       rm -f /etc/mtab
+      ln -f /proc/mounts /etc/mtab
     fi
-    ln -sf /proc/mounts /etc/mtab
 
     # Mount /dev/fd, /proc and /sys
-    if ! mount | grep -q "on /proc (linprocfs" ; then
+    if ! test -f /proc/cmdline ; then
       mount -t linprocfs proc /proc
     fi
-    if ! mount | grep -q "on /sys (linsysfs" ; then
+    if ! test -d /sys/devices ; then
       # Should be done during the installation
       if [ ! -d /sys ] ; then
         mkdir /sys
