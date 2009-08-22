@@ -53,6 +53,7 @@ build-arch: freebsd-utils gbde geli kbdcontrol kldutils freebsd-net-tools
 freebsd-utils: freebsd-utils-stamp
 freebsd-utils-stamp: patch-stamp
 #	$(PMAKE) -C bin/chflags
+	$(PMAKE) -C bin/kenv
 	$(PMAKE) -C sbin/ccdconfig
 	$(PMAKE) -C sbin/dmesg
 	$(PMAKE) -C sbin/mdconfig
@@ -119,6 +120,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	$(PMAKE) -C bin/chflags clean
+	[ ! -f bin/kenv/Makefile ] || $(PMAKE) -C bin/kenv clean
 	$(PMAKE) -C sbin/ccdconfig clean
 	$(PMAKE) -C sbin/dmesg clean
 	$(PMAKE) -C sbin/mdconfig clean

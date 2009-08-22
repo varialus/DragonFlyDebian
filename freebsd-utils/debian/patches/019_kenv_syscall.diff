@@ -1,0 +1,21 @@
+This patch is there to workaround a missing syscall in the glibc that
+will appear with version 2.10. It can be dropped when this version is
+available.
+
+--- a/bin/kenv/kenv.c
++++ b/bin/kenv/kenv.c
+@@ -45,6 +45,14 @@
+ static int qflag = 0;
+ static int uflag = 0;
+
++#if (GLIBC_MINOR <= 9)
++#include <sys/syscall.h>
++int kenv(int action, const char *name, char *value, int len)
++{
++	syscall(SYS_kenv, action, name, value, len); 
++}
++#endif
++
+ static void
+ usage(void)
+ {
