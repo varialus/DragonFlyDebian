@@ -7,6 +7,7 @@ SHELL = bash
 
 ifeq ($(subdir),misc)
 sysdep_headers += \
+ kenv.h \
  sys/mount.h \
  sys/kd.h \
  sys/rfork.h
