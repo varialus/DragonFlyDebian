@@ -62,14 +62,17 @@ int __clone (int (*fn) (void *), void *child_stack, int flags, void *arg)
       return -1;
     }
 
-  if ((flags & CSIGNAL) != 0 && (flags & CSIGNAL) != SIGCHLD)
+  if ((flags & CSIGNAL) != SIGCHLD)
     {
       if ((flags & CSIGNAL) & ~RFTHPNMASK)
 	{
 	  __set_errno (EINVAL);
 	  return -1;
 	}
-      rfork_flags |= (RFLINUXTHPN | ((flags & CSIGNAL) <<  RFTHPNSHIFT));
+      if ((flags & CSIGNAL) == 0)
+        rfork_flags |= (RFLINUXTHPN | ((SIGCHLD) <<  RFTHPNSHIFT));
+      else
+        rfork_flags |= (RFLINUXTHPN | ((flags & CSIGNAL) <<  RFTHPNSHIFT));
     }
 
   if (flags & CLONE_VM)

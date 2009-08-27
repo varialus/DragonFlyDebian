@@ -1,6 +1,6 @@
 --- src.orig/sys/kern/kern_fork.c
 +++ src/sys/kern/kern_fork.c
-@@ -561,7 +561,11 @@
+@@ -561,7 +561,13 @@
  		p2->p_sigacts = newsigacts;
  	}
  	if (flags & RFLINUXTHPN) 
@@ -8,7 +8,9 @@
 +	{
 +		int sig;
 +		sig = RFTHPNSIGNUM(flags);
-+	        p2->p_sigparent = sig ? sig : SIGUSR1;
++	        if (sig == 0) sig = SIGUSR1;
++	        if (sig == SIGCHLD) sig = 0;
++	        p2->p_sigparent = sig;
 +	}
  	else
  	        p2->p_sigparent = SIGCHLD;
