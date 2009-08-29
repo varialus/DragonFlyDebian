@@ -1,0 +1,17 @@
+
+ disable ssp for now ...
+ at least under QEMU it panics, might be due to 
+   - QEMU
+   - newer gcc compared to plain FreeBSD
+   - different init order 
+   - ...
+
+--- src.orig/sys/conf/kern.mk
++++ src/sys/conf/kern.mk
+@@ -113,5 +125,5 @@
+ #
+ .if ${MK_SSP} != "no" && ${CC} != "icc" && ${MACHINE_ARCH} != "ia64" && \
+ 	${MACHINE_ARCH} != "arm" && ${MACHINE_ARCH} != "mips"
+-CFLAGS+=	-fstack-protector
++CFLAGS+=	-fno-stack-protector
+ .endif
