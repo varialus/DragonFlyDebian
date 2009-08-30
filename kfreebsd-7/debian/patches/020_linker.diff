@@ -23,13 +23,14 @@ Index: src/sys/conf/kmod.mk
 ===================================================================
 --- src.orig/sys/conf/kmod.mk
 +++ src/sys/conf/kmod.mk
-@@ -177,7 +177,8 @@
+@@ -177,7 +177,9 @@
  
  .if ${MACHINE_ARCH} != amd64
  ${FULLPROG}: ${KMOD}.kld
 -	${LD} -Bshareable ${LDFLAGS} -o ${.TARGET} ${KMOD}.kld
 +	gen-ld-u-options ${KMOD}.kld > ${KMOD}.lopt
 +	${LD} -Bshareable ${LDFLAGS} -o ${.TARGET} ${KMOD}.kld "@${KMOD}.lopt"
++	${OBJCOPY} --remove-section=.comment ${.TARGET}
  .if !defined(DEBUG_FLAGS)
  	${OBJCOPY} --strip-debug ${.TARGET}
  .endif
