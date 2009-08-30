@@ -1,0 +1,75 @@
+This patch fixes PS/2 mouse support with xserver-xorg-input-mouse 1.4.0.
+It is a revert of upstream commit r18970:
+
+| Teach psm about O_ASYNC
+| 
+| This makes Xorg happy if you aren't using moused.
+
+--- src.orig/sys/dev/atkbdc/psm.c
++++ src/sys/dev/atkbdc/psm.c
+@@ -70,10 +70,7 @@
+ #include <sys/module.h>
+ #include <sys/bus.h>
+ #include <sys/conf.h>
+-#include <sys/filio.h>
+ #include <sys/poll.h>
+-#include <sys/sigio.h>
+-#include <sys/signalvar.h>
+ #include <sys/syslog.h>
+ #include <machine/bus.h>
+ #include <sys/rman.h>
+@@ -215,7 +212,6 @@
+ 	struct cdev	*bdev;
+ 	int		lasterr;
+ 	int		cmdcount;
+-	struct sigio	*async;		/* Processes waiting for SIGIO */
+ };
+ static devclass_t psm_devclass;
+ #define	PSM_SOFTC(unit)	\
+@@ -1387,7 +1383,6 @@
+ 	sc->mode.level = sc->dflt_mode.level;
+ 	sc->mode.protocol = sc->dflt_mode.protocol;
+ 	sc->watchdog = FALSE;
+-	sc->async = NULL;
+ 
+ 	/* flush the event queue */
+ 	sc->queue.count = 0;
+@@ -1527,12 +1522,6 @@
+ 	/* remove anything left in the output buffer */
+ 	empty_aux_buffer(sc->kbdc, 10);
+ 
+-	/* clean up and sigio requests */
+-	if (sc->async != NULL) {
+-		funsetown(&sc->async);
+-		sc->async = NULL;
+-	}
+-
+ 	/* close is almost always successful */
+ 	sc->state &= ~PSM_OPEN;
+ 	kbdc_lock(sc->kbdc, FALSE);
+@@ -2094,15 +2083,6 @@
+ 		break;
+ #endif /* MOUSE_GETHWID */
+ 
+-	case FIONBIO:
+-	case FIOASYNC:
+-		break;
+-	case FIOSETOWN:
+-		error = fsetown(*(int *)addr, &sc->async);
+-		break;
+-	case FIOGETOWN:
+-		*(int *) addr = fgetown(&sc->async);
+-		break;
+ 	default:
+ 		return (ENOTTY);
+ 	}
+@@ -2992,9 +2972,6 @@
+ 		wakeup(sc);
+ 	}
+ 	selwakeuppri(&sc->rsel, PZERO);
+-	if (sc->async != NULL) {
+-		pgsigio(&sc->async, SIGIO, 0);
+-	}
+ 	sc->state &= ~PSM_SOFTARMED;
+ 	splx(s);
+ }

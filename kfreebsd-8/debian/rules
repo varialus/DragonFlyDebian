@@ -45,7 +45,10 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -rf .pc src kfreebsd-source-* flavor-* config
+	rm -f debian/kfreebsd-image-*.preinst
+	rm -f debian/kfreebsd-image-*.prerm
 	rm -f debian/kfreebsd-image-*.postinst
+	rm -f debian/kfreebsd-image-*.postrm
 
 	rm -f *-stamp
 	dh_clean
@@ -184,6 +187,12 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	# remove device.hints (built into kernel)
 	rm -f $(IMAGE_PACKAGE)-$*/boot/device.hints
 
+	# README file
+	mkdir -p $(IMAGE_PACKAGE)-$*/usr/share/doc/$(IMAGE_PACKAGE)-$*
+	install -p -o root -g root -m 644 \
+		debian/kfreebsd-image.README.Debian \
+		$(IMAGE_PACKAGE)-$*/usr/share/doc/$(IMAGE_PACKAGE)-$*/README.Debian
+
 	# override file
 	mkdir -p $(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides
 	install -p -o root -g root -m 644 \
@@ -191,8 +200,12 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 		$(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides/kfreebsd-image-$(version)-$(abiname)-$*
 
 	# scripts
-	sed -e "s/@RELEASE@/$(version)-$(abiname)-$*/g" debian/kfreebsd-image.postinst.in \
-		> debian/kfreebsd-image-$(version)-$(abiname)-$*.postinst
+	for script in preinst prerm postinst postrm ; do \
+		sed -e "s/@VERSION@/$(version)/g" \
+		    -e "s/@RELEASE@/$(version)-$(abiname)-$*/g" \
+		    debian/kfreebsd-image.$$script.in \
+			> debian/kfreebsd-image-$(version)-$(abiname)-$*.$$script ; \
+	done
 
 	# headers package
 	mkdir -p $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu)

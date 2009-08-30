@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 # postinst script
 #
 # see: dh_installdeb(1)
@@ -17,35 +17,51 @@ set -e
 # the debian-policy package
 #
 
+PATH="/sbin:/bin:/usr/sbin:/usr/bin"
+KERNEL_IMG_CONF="/etc/kernel-img.conf"
+RELEASE="@RELEASE@"
+VERSION="@VERSION@"
+
 case "$1" in
     configure)
-	for i in kernel.gz acpi.ko ; do
-		if test -e /boot/kernel/$i && ! test -L /boot/kernel/$i ; then
-			echo "What happen!! /boot/kernel/$i exists but is not a symlink."
-			exit 1
-		fi
-	done
-
-	if [ "$(readlink -f /boot/kernel/kernel.gz)" != "/boot/kfreebsd-@RELEASE@.gz" ] ; then
-		rm -f /boot/kernel/kernel{,.gz}.old{,.gz}
-		if [ -L /boot/kernel/kernel.gz ] ; then
-			mv /boot/kernel/kernel{,.old}.gz
-		fi
-		ln -s /boot/kfreebsd-@RELEASE@.gz /boot/kernel/kernel.gz
-	fi
-
-	# acpi MUST be within kfreebsd-loader reach
-	if [ "$(readlink -f /boot/kernel/acpi.ko)" != "/lib/modules/@RELEASE@/acpi.ko" ] ; then
-		rm -f /boot/kernel/acpi.ko.old
-		if [ -L /boot/kernel/acpi.ko ] ; then
-			mv /boot/kernel/acpi.ko{,.old}
-		fi
-		ln -s /lib/modules/@RELEASE@/acpi.ko /boot/kernel/acpi.ko
-	fi
+        # Don't do symlinks if explicitely disabled
+        if [ -z "$(sed -e '/^\s*do_symlinks\s*=\s*\(no\|false\|0\)\s*$/!d' $KERNEL_IMG_CONF 2>/dev/null)" ] ; then
+            for i in kernel.gz acpi.ko ; do
+                if test -e /boot/kernel/$i && ! test -L /boot/kernel/$i ; then
+                    echo "What happen!! /boot/kernel/$i exists but is not a symlink."
+                    exit 1
+                fi
+            done
+    
+            if [ "$(readlink -f /boot/kernel/kernel.gz)" != "/boot/kfreebsd-$RELEASE.gz" ] ; then
+                rm -f /boot/kernel/kernel.old.gz
+                if [ -L /boot/kernel/kernel.gz ] ; then
+                    mv /boot/kernel/kernel.gz /boot/kernel/kernel.old.gz
+                fi
+                ln -s /boot/kfreebsd-$RELEASE.gz /boot/kernel/kernel.gz
+            fi
+    
+            # on i386 acpi MUST be within kfreebsd-loader reach
+            if [ "${RELEASE%%-[456]86}" != "${RELEASE}" ] ; then
+                if [ "$(readlink -f /boot/kernel/acpi.ko)" != "/lib/modules/$RELEASE/acpi.ko" ] ; then
+                    rm -f /boot/kernel/acpi.ko.old
+                    if [ -L /boot/kernel/acpi.ko ] ; then
+                        mv /boot/kernel/acpi.ko /boot/kernel/acpi.ko.old
+                    fi
+                    ln -s /lib/modules/$RELEASE/acpi.ko /boot/kernel/acpi.ko
+                fi    
+            fi
+        fi
+    
+        # Run postinst hook if defined
+        postinst_hook=$(sed '/^\s*postinst_hook/!d;s/.*=\s*//' $KERNEL_IMG_CONF 2>/dev/null || true)
+        if [ -n "$postinst_hook" ] ; then
+            echo "Running postinst hook script $postinst_hook." 1>&2 
+            $postinst_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"
+        fi
     ;;
-
+    
     abort-upgrade|abort-remove|abort-deconfigure)
-
     ;;
 
     *)
