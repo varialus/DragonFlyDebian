@@ -29,7 +29,7 @@ Index: src/sys/conf/kmod.mk
  ${FULLPROG}: ${KMOD}.kld
 -	${LD} -Bshareable ${LDFLAGS} -o ${.TARGET} ${KMOD}.kld
 +	gen-ld-u-options ${KMOD}.kld > ${KMOD}.lopt
-+	${LD} -Bshareable ${LDFLAGS} -o ${.TARGET} ${KMOD}.kld "@${KMOD}.lopt"
++	${LD} -Bshareable -z common-page-size=8192 ${LDFLAGS} -o ${.TARGET} ${KMOD}.kld "@${KMOD}.lopt"
 +	${OBJCOPY} --remove-section=.comment ${.TARGET}
  .if !defined(DEBUG_FLAGS)
  	${OBJCOPY} --strip-debug ${.TARGET}
