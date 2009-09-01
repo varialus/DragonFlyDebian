@@ -52,6 +52,7 @@
 #define _NETINET_TCP_H	1
 
 #include <features.h>
+#include <sys/queue.h>
 
 /*
  * User-settable options (used with setsockopt).
@@ -64,9 +65,14 @@
 #ifdef __USE_MISC
 # include <sys/types.h>
 
-# ifdef __FAVOR_BSD
 typedef	u_int32_t tcp_seq;
 typedef	u_int32_t tcp_cc;	/* connection count, per RFC 1644 */
+
+/* Miscellaneous constants */
+#define MAX_SACK_BLKS   6       /* Max # SACK blocks stored at receiver side */   
+#define TCP_MAX_SACK    4       /* MAX # SACKs sent in any segment */
+
+# ifdef __FAVOR_BSD
 /*
  * TCP header.
  * Per RFC 793, September, 1981.
