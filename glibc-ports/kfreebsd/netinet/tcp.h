@@ -61,6 +61,9 @@
 #define	TCP_MAXSEG	 2	/* Set maximum segment size  */
 #define TCP_NOPUSH	 4	/* Don't push last block of write  */
 #define TCP_NOOPT	 8	/* Don't use TCP options  */
+#define TCP_MD5SIG	16	/* use MD5 digests (RFC2385) */
+#define TCP_INFO	32	/* retrieve tcp_info structure */
+#define TCP_CONGESTION  64	/* get/set congestion control algorithm */
 
 #ifdef __USE_MISC
 # include <sys/types.h>
