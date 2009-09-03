@@ -142,3 +142,4 @@ __fxstatat64 (int vers, int fd, const char *file, struct stat64 *st, int flag)
 }
 
 libc_hidden_def (__fxstatat64)
+stub_warning(fstatat64)

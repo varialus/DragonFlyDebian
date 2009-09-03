@@ -116,3 +116,4 @@ mkdirat (fd, file, mode)
   return __mkdir (file, mode);
 #endif
 }
+stub_warning(mkdirat)

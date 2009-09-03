@@ -125,3 +125,4 @@ unlinkat (fd, file, flag)
     return __unlink (file);
 #endif
 }
+stub_warning(unlinkat)

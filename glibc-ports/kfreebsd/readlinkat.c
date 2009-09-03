@@ -120,3 +120,4 @@ readlinkat (fd, path, buf, len)
 }
 
 libc_hidden_def (readlinkat)
+stub_warning(readlinkat)

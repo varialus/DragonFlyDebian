@@ -116,3 +116,4 @@ symlinkat (from, tofd, to)
   return __symlink (from, to);
 #endif
 }
+stub_warning(symlinkat)

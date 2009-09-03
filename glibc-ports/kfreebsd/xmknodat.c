@@ -135,3 +135,4 @@ __xmknodat (int vers, int fd, const char *file, mode_t mode, dev_t * dev)
 }
 
 libc_hidden_def (__xmknodat)
+stub_warning(xmknodat)

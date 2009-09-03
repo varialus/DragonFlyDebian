@@ -169,3 +169,4 @@ linkat (fromfd, from, tofd, to, flags)
   return __link (from, to);
 #endif
 }
+stub_warning(linkat)

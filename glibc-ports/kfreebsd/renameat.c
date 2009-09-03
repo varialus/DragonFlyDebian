@@ -162,3 +162,4 @@ int renameat (oldfd, old, newfd, new)
   return __rename (old, new);
 #endif
 }
+stub_warning(renameat)
