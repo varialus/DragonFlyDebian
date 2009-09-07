@@ -29,7 +29,7 @@
 /* State of this thread when the signal was taken.
    The unions below are for compatibility with Linux (whose sigcontext
    components don't have sc_ prefix) */
-struct sigcontext
+__extension__ struct sigcontext
   {
     __sigset_t 	sc_mask;		/* Blocked signals to restore.  */
     int 	sc_onstack;		/* Nonzero if running on sigstack.  */
@@ -98,7 +98,7 @@ struct sigcontext
 
 #else
 
-struct sigcontext
+__extension__ struct sigcontext
   {
     __sigset_t 	sc_mask;		/* Blocked signals to restore.  */
     long 	sc_onstack;		/* Nonzero if running on sigstack.  */
