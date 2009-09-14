@@ -181,17 +181,14 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	rm -f $(IMAGE_PACKAGE)-$*/boot/loader.conf
 	rm -rf $(IMAGE_PACKAGE)-$*/boot/defaults
 
-	# create /boot/kernel/ directory
-	mkdir -p $(IMAGE_PACKAGE)-$*/boot/kernel/
-
 	# remove device.hints (built into kernel)
 	rm -f $(IMAGE_PACKAGE)-$*/boot/device.hints
 
 	# README file
-	mkdir -p $(IMAGE_PACKAGE)-$*/usr/share/doc/$(IMAGE_PACKAGE)-$*
+	mkdir -p $(IMAGE_PACKAGE)-$*/usr/share/doc/kfreebsd-image-$(version)-$(abiname)-$*
 	install -p -o root -g root -m 644 \
 		debian/kfreebsd-image.README.Debian \
-		$(IMAGE_PACKAGE)-$*/usr/share/doc/$(IMAGE_PACKAGE)-$*/README.Debian
+		$(IMAGE_PACKAGE)-$*/usr/share/doc/kfreebsd-image-$(version)-$(abiname)-$*/README.Debian
 
 	# override file
 	mkdir -p $(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides

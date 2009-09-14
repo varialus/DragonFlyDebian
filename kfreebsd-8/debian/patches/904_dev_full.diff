@@ -1,5 +1,6 @@
 
-Status: Rejected in upstream (kern/68961)
+Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
+	/dev/full already rejected in upstream (kern/68961)
 
 --- src.orig/sys/dev/null/null.c
 +++ src/sys/dev/null/null.c
@@ -35,7 +36,7 @@ Status: Rejected in upstream (kern/68961)
  static struct cdevsw zero_cdevsw = {
  	.d_version =	D_VERSION,
  	.d_read =	zero_read,
-@@ -81,6 +92,15 @@
+@@ -81,11 +92,25 @@
  
  /* ARGSUSED */
  static int
@@ -46,11 +47,21 @@ Status: Rejected in upstream (kern/68961)
 +	return (ENOSPC);
 +}
 +
++#include <sys/filio.h>
 +/* ARGSUSED */
 +static int
  null_ioctl(struct cdev *dev __unused, u_long cmd, caddr_t data __unused,
      int flags __unused, struct thread *td)
  {
+ 	int error;
+ 
++	if (cmd == FIONBIO)
++		return 0;
++	if ((cmd == FIOASYNC) && ((*(int *)data) == 0))
++		return 0;
+ 	if (cmd != DIOCSKERNELDUMP)
+ 		return (ENOIOCTL);
+ 	error = priv_check(td, PRIV_SETDUMPER);
 @@ -117,12 +137,15 @@
  		zbuf = (void *)malloc(PAGE_SIZE, M_TEMP, M_WAITOK | M_ZERO);
  		null_dev = make_dev(&null_cdevsw, NULL_MINOR, UID_ROOT,
