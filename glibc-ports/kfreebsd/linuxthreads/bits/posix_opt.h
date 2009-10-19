@@ -31,25 +31,25 @@
 #define	_POSIX_SAVED_IDS	1
 
 /* Priority scheduling is supported.  */
-#define	_POSIX_PRIORITY_SCHEDULING	200112L
+#define	_POSIX_PRIORITY_SCHEDULING	200809L
 
 /* Synchronizing file data is supported.  */
-#define	_POSIX_SYNCHRONIZED_IO	200112L
+#define	_POSIX_SYNCHRONIZED_IO	200809L
 
 /* The fsync function is present.  */
-#define	_POSIX_FSYNC	200112L
+#define	_POSIX_FSYNC	200809L
 
 /* Mapping of files to memory is supported.  */
-#define	_POSIX_MAPPED_FILES	200112L
+#define	_POSIX_MAPPED_FILES	200809L
 
 /* Locking of all memory is supported.  */
-#define	_POSIX_MEMLOCK	200112L
+#define	_POSIX_MEMLOCK	200809L
 
 /* Locking of ranges of memory is supported.  */
-#define	_POSIX_MEMLOCK_RANGE	200112L
+#define	_POSIX_MEMLOCK_RANGE	200809L
 
 /* Setting of memory protections is supported.  */
-#define	_POSIX_MEMORY_PROTECTION	200112L
+#define	_POSIX_MEMORY_PROTECTION	200809L
 
 /* Only root can change owner of file.  */
 #define	_POSIX_CHOWN_RESTRICTED	1
@@ -76,29 +76,29 @@
 #define	_XOPEN_SHM	1
 
 /* Tell we have POSIX threads.  */
-#define _POSIX_THREADS	200112L
+#define _POSIX_THREADS	200809L
 
 /* We have the reentrant functions described in POSIX.  */
 #define _POSIX_REENTRANT_FUNCTIONS	1
-#define _POSIX_THREAD_SAFE_FUNCTIONS	200112L
+#define _POSIX_THREAD_SAFE_FUNCTIONS	200809L
 
 /* We provide priority scheduling for threads.  */
-#define _POSIX_THREAD_PRIORITY_SCHEDULING	200112L
+#define _POSIX_THREAD_PRIORITY_SCHEDULING	200809L
 
 /* We support user-defined stack sizes.  */
-#define _POSIX_THREAD_ATTR_STACKSIZE	200112L
+#define _POSIX_THREAD_ATTR_STACKSIZE	200809L
 
 /* We support user-defined stacks.  */
-#define _POSIX_THREAD_ATTR_STACKADDR	200112L
+#define _POSIX_THREAD_ATTR_STACKADDR	200809L
 
 /* We support POSIX.1b semaphores, but only the non-shared form for now.  */
-#define _POSIX_SEMAPHORES	200112L
+#define _POSIX_SEMAPHORES	200809L
 
 /* Real-time signals are not available.  */
 #define _POSIX_REALTIME_SIGNALS	-1
 
 /* We support asynchronous I/O.  */
-#define _POSIX_ASYNCHRONOUS_IO	200112L
+#define _POSIX_ASYNCHRONOUS_IO	200809L
 #define _POSIX_ASYNC_IO		1
 /* Alternative name for Unix98.  */
 #define _LFS_ASYNCHRONOUS_IO	1
@@ -114,7 +114,7 @@
 #define _LFS64_STDIO		1
 
 /* POSIX shared memory objects are implemented.  */
-#define _POSIX_SHARED_MEMORY_OBJECTS	200112L
+#define _POSIX_SHARED_MEMORY_OBJECTS	200809L
 
 /* CPU-time clocks somewhere supported.  */
 #define _POSIX_CPUTIME	0
@@ -126,25 +126,25 @@
 #define _POSIX_REGEXP	1
 
 /* Reader/Writer locks are available.  */
-#define _POSIX_READER_WRITER_LOCKS	200112L
+#define _POSIX_READER_WRITER_LOCKS	200809L
 
 /* We have a POSIX shell.  */
 #define _POSIX_SHELL	1
 
 /* We support the Timeouts option.  */
-#define _POSIX_TIMEOUTS	200112L
+#define _POSIX_TIMEOUTS	200809L
 
 /* We support spinlocks.  */
-#define _POSIX_SPIN_LOCKS	200112L
+#define _POSIX_SPIN_LOCKS	200809L
 
 /* The `spawn' function family is supported.  */
-#define _POSIX_SPAWN	200112L
+#define _POSIX_SPAWN	200809L
 
 /* We have POSIX timers.  */
-#define _POSIX_TIMERS	200112L
+#define _POSIX_TIMERS	200809L
 
 /* The barrier functions are available.  */
-#define _POSIX_BARRIERS	200112L
+#define _POSIX_BARRIERS	200809L
 
 /* POSIX message queues are not available.  */
 #define _POSIX_MESSAGE_PASSING	-1
@@ -153,7 +153,7 @@
 #define _POSIX_THREAD_PROCESS_SHARED	-1
 
 /* The monotonic clock is available.  */
-#define _POSIX_MONOTONIC_CLOCK	200112L
+#define _POSIX_MONOTONIC_CLOCK	200809L
 
 /* The clock selection interfaces are not available.  */
 #define _POSIX_CLOCK_SELECTION	-1
@@ -162,13 +162,13 @@
 #define _POSIX_ADVISORY_INFO	-1
 
 /* IPv6 support is available.  */
-#define _POSIX_IPV6	200112L
+#define _POSIX_IPV6	200809L
 
 /* Raw socket support is available.  */
-#define _POSIX_RAW_SOCKETS	200112L
+#define _POSIX_RAW_SOCKETS	200809L
 
 /* We have at least one terminal.  */
-#define _POSIX2_CHAR_TERM	200112L
+#define _POSIX2_CHAR_TERM	200809L
 
 /* Neither process nor thread sporadic server interfaces is available.  */
 #define _POSIX_SPORADIC_SERVER	-1

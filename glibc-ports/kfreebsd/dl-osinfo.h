@@ -62,7 +62,7 @@ dl_fatal (const char *str)
   } while (0)
 
 static inline uintptr_t __attribute__ ((always_inline))
-_dl_setup_stack_chk_guard (void)
+_dl_setup_stack_chk_guard (void *dl_random)
 {
   uintptr_t ret;
 #ifdef ENABLE_STACKGUARD_RANDOMIZE
@@ -81,3 +81,18 @@ _dl_setup_stack_chk_guard (void)
   p[sizeof (ret) - 2] = '\n';
   return ret;
 }
+
+static inline uintptr_t __attribute__ ((always_inline))
+_dl_setup_pointer_guard (void *dl_random, uintptr_t stack_chk_guard)
+{
+  uintptr_t ret;
+
+  ret = stack_chk_guard;
+# ifndef HP_TIMING_NONAVAIL
+  hp_timing_t now;
+  HP_TIMING_NOW (now);
+  ret ^= now;
+# endif
+  return ret;
+}
+

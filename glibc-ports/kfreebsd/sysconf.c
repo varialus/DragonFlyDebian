@@ -36,7 +36,7 @@ __sysconf (int name)
 #if HP_TIMING_AVAIL
       // XXX We can add  here test for machines which cannot support a
       // XXX usable TSC.
-      return 200112L;
+      return 200809L;
 #else
       return -1;
 #endif
