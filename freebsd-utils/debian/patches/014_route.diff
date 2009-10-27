@@ -6,7 +6,7 @@ Index: b/sbin/route/route.c
 ===================================================================
 --- a/sbin/route/route.c
 +++ b/sbin/route/route.c
-@@ -63,10 +63,12 @@
+@@ -63,10 +63,13 @@
  #include <paths.h>
  #include <stdio.h>
  #include <stdlib.h>
@@ -16,7 +16,8 @@ Index: b/sbin/route/route.c
  #include <unistd.h>
  #include <ifaddrs.h>
 +#include <time.h>
- 
++#include "../../lib/linkaddr.h"
+
  struct keytab {
  	char	*kt_cp;
 @@ -110,7 +112,7 @@
@@ -45,16 +46,14 @@ Index: b/sbin/route/route.c
 +		mask = 0xf0000000;
  	else
  		mask = 0xffffffff;
- 
-Index: b/sbin/route/Makefile
-===================================================================
+
 --- a/sbin/route/Makefile
 +++ b/sbin/route/Makefile
-@@ -10,6 +10,7 @@
+@@ -7,6 +7,7 @@
+ MAN=	route.8
+ SRCS=	route.c keywords.h
+ WARNS?=	0
++LDADD= ../../lib/linkaddr.o
  CLEANFILES+=keywords.h _keywords.tmp
  
  CFLAGS+= -DNS
-+LDADD+= -lfreebsd
- 
- .if ${MK_INET6_SUPPORT} != "no"
- CFLAGS+= -DINET6

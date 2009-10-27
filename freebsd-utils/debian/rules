@@ -19,7 +19,6 @@ ORIGDIR=freebsd-utils-$(VERSION)
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
-#export LDADD=-lfreebsd -lbsd
 
 build: build-arch build-indep
 
@@ -46,6 +45,11 @@ get-orig-source:
 patch: patch-stamp
 patch-stamp:
 	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
+	touch $@
+
+lib: lib-stamp
+lib-stamp: patch-stamp
+	$(MAKE) -C lib
 	touch $@
 
 build-arch: freebsd-utils gbde geli kbdcontrol kldutils freebsd-net-tools
@@ -104,7 +108,7 @@ kldutils-stamp: patch-stamp
 	touch $@
 
 freebsd-net-tools: freebsd-net-tools-stamp
-freebsd-net-tools-stamp: patch-stamp
+freebsd-net-tools-stamp: patch-stamp lib-stamp
 	$(PMAKE) -C sbin/ifconfig
 	$(PMAKE) -C sbin/pfctl
 	$(PMAKE) -C sbin/route
@@ -119,6 +123,7 @@ build-indep-stamp:
 clean:
 	dh_testdir
 	dh_testroot
+	[ ! -f lib/Makefile ] || $(MAKE) -C lib clean
 	$(PMAKE) -C bin/chflags clean
 	[ ! -f bin/kenv/Makefile ] || $(PMAKE) -C bin/kenv clean
 	$(PMAKE) -C sbin/ccdconfig clean

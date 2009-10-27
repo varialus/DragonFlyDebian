@@ -45,7 +45,7 @@
  MAN=	ifconfig.8
  
  CFLAGS+= -Wall -Wmissing-prototypes -Wcast-qual -Wwrite-strings -Wnested-externs
-+LDADD+= -lbsd -lfreebsd
++LDADD+= -lbsd ../../lib/linkaddr.o
  WARNS?=	0
  
  .include <bsd.prog.mk>
@@ -254,11 +254,12 @@
  	exit(0);
 --- a/sbin/ifconfig/af_link.c
 +++ b/sbin/ifconfig/af_link.c
-@@ -46,13 +46,14 @@
+@@ -46,13 +46,15 @@
  #include <net/if_dl.h>
  #include <net/if_types.h>
  #include <net/ethernet.h>
 +#include <netinet/ether.h>
++#include "../../lib/linkaddr.h"
  
  #include "ifconfig.h"
  
@@ -272,13 +273,14 @@
  	struct sockaddr_dl *sdl = (struct sockaddr_dl *) ifa->ifa_addr;
 --- a/sbin/ifconfig/ifieee80211.c
 +++ b/sbin/ifconfig/ifieee80211.c
-@@ -87,6 +87,9 @@
+@@ -87,6 +87,10 @@
  #include <fcntl.h>
  #include <inttypes.h>
  #include <stdio.h>
 +#include <stdint.h>
 +#include <netinet/ether.h>
 +#include <bsd/string.h>
++#include "../../lib/linkaddr.h"
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
