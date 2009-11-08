@@ -132,7 +132,7 @@ typedef struct
   (__extension__							      \
    ({ size_t __cpu = (cpu);						      \
       __cpu < 8 * (setsize)						      \
-      ? ((((__cpu_mask *) ((cpusetp)->__bits))[__CPUELT (__cpu)]	      \
+      ? ((((const __cpu_mask *) ((cpusetp)->__bits))[__CPUELT (__cpu)]	      \
 	  & __CPUMASK (__cpu))) != 0					      \
       : 0; }))
 
