@@ -61,10 +61,18 @@ readlinkat (fd, path, buf, len)
       int mib[4];
       size_t kf_len = 0;
       char *kf_buf, *kf_bufp;
+      size_t pathlen;
 
       if (fd < 0)
 	{
 	  __set_errno (EBADF);
+	  return -1;
+	}
+
+      pathlen = strlen (path);
+      if (__builtin_expect (pathlen == 0, 0))
+	{
+	  __set_errno (ENOENT);
 	  return -1;
 	}
 
@@ -79,7 +87,7 @@ readlinkat (fd, path, buf, len)
 	  return -1;
 	}
 
-      kf_buf = alloca (kf_len + strlen (path));
+      kf_buf = alloca (kf_len + pathlen);
       if (__sysctl (mib, 4, kf_buf, &kf_len, NULL, 0) != 0)
 	{
 	  __set_errno (ENOSYS);

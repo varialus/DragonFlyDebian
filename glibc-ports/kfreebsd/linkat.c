@@ -70,10 +70,20 @@ linkat (fromfd, from, tofd, to, flags)
       int mib[4];
       size_t kf_len = 0;
       char *kf_buf, *kf_bufp;
+      size_t fromlen, tolen;
 
       if ((fromfd < 0) || (tofd < 0))
 	{
 	  __set_errno (EBADF);
+	  return -1;
+	}
+
+      fromlen = strlen (from);
+      tolen = strlen (to);
+      if (__builtin_expect (fromlen == 0, 0)
+	  || __builtin_expect (tolen == 0, 0))
+	{
+	  __set_errno (ENOENT);
 	  return -1;
 	}
 
@@ -113,7 +123,7 @@ linkat (fromfd, from, tofd, to, flags)
 		      return -1;
 		    }
 
-		  buf = alloca (strlen (kf->kf_path) + strlen (from) + 2);
+		  buf = alloca (strlen (kf->kf_path) + fromlen + 2);
 		  strcpy(buf, kf->kf_path);
 		  strcat (buf, "/");
 		  strcat (buf, from);
@@ -148,7 +158,7 @@ linkat (fromfd, from, tofd, to, flags)
 		      return -1;
 		    }
 
-		  buf = alloca (strlen (kf->kf_path) + strlen (to) + 2);
+		  buf = alloca (strlen (kf->kf_path) + tolen + 2);
 		  strcpy(buf, kf->kf_path);
 		  strcat (buf, "/");
 		  strcat (buf, to);

@@ -67,10 +67,18 @@ __openat_nocancel (fd, file, oflag, mode)
       int mib[4];
       size_t kf_len = 0;
       char *kf_buf, *kf_bufp;
+      size_t filelen;
 
       if (fd < 0)
 	{
 	  __set_errno (EBADF);
+	  return -1;
+	}
+
+      filelen = strlen (file);
+      if (__builtin_expect (filelen == 0, 0))
+	{
+	  __set_errno (ENOENT);
 	  return -1;
 	}
 
@@ -85,7 +93,7 @@ __openat_nocancel (fd, file, oflag, mode)
 	  return -1;
 	}
 
-      kf_buf = alloca (kf_len + strlen (file));
+      kf_buf = alloca (kf_len + filelen);
       if (__sysctl (mib, 4, kf_buf, &kf_len, NULL, 0) != 0)
 	{
 	  __set_errno (ENOSYS);
@@ -175,10 +183,18 @@ __openat (fd, file, oflag)
 	  int mib[4];
 	  size_t kf_len = 0;
 	  char *kf_buf, *kf_bufp;
+	  size_t filelen;
 
 	  if (fd < 0)
 	    {
 	      __set_errno (EBADF);
+	      return -1;
+	    }
+
+	  filelen = strlen (file);
+	  if (__builtin_expect (filelen == 0, 0))
+	    {
+	      __set_errno (ENOENT);
 	      return -1;
 	    }
 
@@ -193,7 +209,7 @@ __openat (fd, file, oflag)
 	      return -1;
 	    }
 
-	  kf_buf = alloca (kf_len + strlen (file));
+	  kf_buf = alloca (kf_len + filelen);
 	  if (__sysctl (mib, 4, kf_buf, &kf_len, NULL, 0) != 0)
 	    {
 	      __set_errno (ENOSYS);

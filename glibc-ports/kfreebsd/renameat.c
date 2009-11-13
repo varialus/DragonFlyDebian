@@ -62,10 +62,19 @@ int renameat (oldfd, old, newfd, new)
       int mib[4];
       size_t kf_len = 0;
       char *kf_buf, *kf_bufp;
+      size_t old_filelen, new_filelen;
 
       if ((oldfd < 0) || (newfd < 0))
 	{
 	  __set_errno (EBADF);
+	  return -1;
+	}
+
+      old_filelen = strlen (old);
+      if (__builtin_expect (old_filelen == 0, 0)
+	  || __builtin_expect (new_filelen == 0, 0))
+	{
+	  __set_errno (ENOENT);
 	  return -1;
 	}
 
@@ -105,7 +114,7 @@ int renameat (oldfd, old, newfd, new)
 		      return -1;
 		    }
 
-		  buf = alloca (strlen (kf->kf_path) + strlen (old) + 2);
+		  buf = alloca (strlen (kf->kf_path) + old_filelen + 2);
 		  strcpy(buf, kf->kf_path);
 		  strcat (buf, "/");
 		  strcat (buf, old);
@@ -140,7 +149,7 @@ int renameat (oldfd, old, newfd, new)
 		      return -1;
 		    }
 
-		  buf = alloca (strlen (kf->kf_path) + strlen (new) + 2);
+		  buf = alloca (strlen (kf->kf_path) + new_filelen + 2);
 		  strcpy(buf, kf->kf_path);
 		  strcat (buf, "/");
 		  strcat (buf, new);
