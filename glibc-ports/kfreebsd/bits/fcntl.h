@@ -77,6 +77,18 @@ enum { O_NOATIME = 0};          /* Do not set atime.  */
 #define	FWRITE		2
 #endif
 
+#ifdef __USE_ATFILE
+# define AT_FDCWD		-100	/* Special value used to indicate
+					   the *at functions should use the
+					   current working directory. */
+# define AT_EACCESS		0x100	/* Test access permitted for
+					   effective IDs, not real IDs.  */
+# define AT_SYMLINK_NOFOLLOW	0x200	/* Do not follow symbolic links.  */
+# define AT_SYMLINK_FOLLOW	0x400	/* Follow symbolic links.  */
+# define AT_REMOVEDIR		0x800	/* Remove directory instead of
+					   unlinking file.  */
+#endif
+
 /*
  * We are out of bits in f_flag (which is a short).  However,
  * the flag bits not set in FMASK are only meaningful in the
