@@ -1,8 +1,8 @@
-Index: src/sys/i386/include/segments.h
+Index: kfreebsd-source-8.0/sys/i386/include/segments.h
 ===================================================================
---- src/sys/i386/include/segments.h.orig
-+++ src/sys/i386/include/segments.h
-@@ -60,7 +60,7 @@
+--- kfreebsd-source-8.0.orig/sys/i386/include/segments.h	2009-11-12 15:48:49.000000000 +0000
++++ kfreebsd-source-8.0/sys/i386/include/segments.h	2009-11-12 16:29:14.000000000 +0000
+@@ -64,7 +64,7 @@
   */
  struct	segment_descriptor	{
  	unsigned sd_lolimit:16 ;	/* segment extent (lsb) */
@@ -11,7 +11,7 @@ Index: src/sys/i386/include/segments.h
  	unsigned sd_type:5 ;		/* segment type */
  	unsigned sd_dpl:2 ;		/* segment descriptor priority level */
  	unsigned sd_p:1 ;		/* segment descriptor present */
-@@ -152,7 +152,7 @@
+@@ -156,7 +156,7 @@
   */
  struct region_descriptor {
  	unsigned rd_limit:16;		/* segment extent */
@@ -20,10 +20,10 @@ Index: src/sys/i386/include/segments.h
  };
  
  /*
-Index: src/sys/sys/elf32.h
+Index: kfreebsd-source-8.0/sys/sys/elf32.h
 ===================================================================
---- src/sys/sys/elf32.h.orig
-+++ src/sys/sys/elf32.h
+--- kfreebsd-source-8.0.orig/sys/sys/elf32.h	2009-11-12 15:49:02.000000000 +0000
++++ kfreebsd-source-8.0/sys/sys/elf32.h	2009-11-12 16:29:14.000000000 +0000
 @@ -35,11 +35,9 @@
   * ELF definitions common to all 32-bit architectures.
   */
@@ -238,10 +238,10 @@ Index: src/sys/sys/elf32.h
 -} Elf32_Syminfo;
 -
  #endif /* !_SYS_ELF32_H_ */
-Index: src/sys/sys/elf64.h
+Index: kfreebsd-source-8.0/sys/sys/elf64.h
 ===================================================================
---- src/sys/sys/elf64.h.orig
-+++ src/sys/sys/elf64.h
+--- kfreebsd-source-8.0.orig/sys/sys/elf64.h	2009-11-12 15:49:02.000000000 +0000
++++ kfreebsd-source-8.0/sys/sys/elf64.h	2009-11-12 16:30:35.000000000 +0000
 @@ -35,14 +35,10 @@
   * ELF definitions common to all 64-bit architectures.
   */
@@ -348,16 +348,16 @@ Index: src/sys/sys/elf64.h
 -} Elf64_Rela;
 -
 -/* Macros for accessing the fields of r_info. */
--#define ELF64_R_SYM(info)	((info) >> 32)
--#define ELF64_R_TYPE(info)	((info) & 0xffffffffL)
+-#define	ELF64_R_SYM(info)	((info) >> 32)
+-#define	ELF64_R_TYPE(info)	((info) & 0xffffffffL)
 -
 -/* Macro for constructing r_info from field values. */
--#define ELF64_R_INFO(sym, type)	(((sym) << 32) + ((type) & 0xffffffffL))
+-#define	ELF64_R_INFO(sym, type)	(((sym) << 32) + ((type) & 0xffffffffL))
 -
 -#define	ELF64_R_TYPE_DATA(info)	(((Elf64_Xword)(info)<<32)>>40)
 -#define	ELF64_R_TYPE_ID(info)	(((Elf64_Xword)(info)<<56)>>56)
 -#define	ELF64_R_TYPE_INFO(data, type)	\
--		(((Elf64_Xword)(data)<<8)+(Elf64_Xword)(type))
+-				(((Elf64_Xword)(data)<<8)+(Elf64_Xword)(type))
 -
 -/*
 - *	Note entry header
@@ -404,14 +404,14 @@ Index: src/sys/sys/elf64.h
 -} Elf64_Sym;
 -
 -/* Macros for accessing the fields of st_info. */
--#define ELF64_ST_BIND(info)		((info) >> 4)
--#define ELF64_ST_TYPE(info)		((info) & 0xf)
+-#define	ELF64_ST_BIND(info)		((info) >> 4)
+-#define	ELF64_ST_TYPE(info)		((info) & 0xf)
 -
 -/* Macro for constructing st_info from field values. */
--#define ELF64_ST_INFO(bind, type)	(((bind) << 4) + ((type) & 0xf))
+-#define	ELF64_ST_INFO(bind, type)	(((bind) << 4) + ((type) & 0xf))
 -
 -/* Macro for accessing the fields of st_other. */
--#define ELF64_ST_VISIBILITY(oth)	((oth) & 0x3)
+-#define	ELF64_ST_VISIBILITY(oth)	((oth) & 0x3)
 -
 -/* Structures used by Sun & GNU-style symbol versioning. */
 -typedef struct {
@@ -453,13 +453,13 @@ Index: src/sys/sys/elf64.h
 -} Elf64_Syminfo;
 -
  #endif /* !_SYS_ELF64_H_ */
-Index: src/sys/sys/elf_common.h
+Index: kfreebsd-source-8.0/sys/sys/elf_common.h
 ===================================================================
---- src/sys/sys/elf_common.h.orig
-+++ src/sys/sys/elf_common.h
+--- kfreebsd-source-8.0.orig/sys/sys/elf_common.h	2009-11-12 15:49:02.000000000 +0000
++++ kfreebsd-source-8.0/sys/sys/elf_common.h	2009-11-12 16:29:14.000000000 +0000
 @@ -29,6 +29,8 @@
  #ifndef _SYS_ELF_COMMON_H_
- #define _SYS_ELF_COMMON_H_ 1
+ #define	_SYS_ELF_COMMON_H_ 1
  
 +#include <stdint.h>
 +
@@ -478,4 +478,4 @@ Index: src/sys/sys/elf_common.h
 +	uint32_t	n_type;		/* Type of this note. */
  } Elf_Note;
  
- /* Indexes into the e_ident array.  Keep synced with
+ /*

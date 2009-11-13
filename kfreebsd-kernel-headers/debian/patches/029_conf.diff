@@ -1,7 +1,7 @@
-Index: src/sys/sys/conf.h
+Index: kfreebsd-source-8.0/sys/sys/conf.h
 ===================================================================
---- src/sys/sys/conf.h.orig
-+++ src/sys/sys/conf.h
+--- kfreebsd-source-8.0.orig/sys/sys/conf.h	2009-11-12 15:49:02.000000000 +0000
++++ kfreebsd-source-8.0/sys/sys/conf.h	2009-11-12 16:43:24.000000000 +0000
 @@ -43,6 +43,7 @@
  #ifdef _KERNEL
  #include <sys/eventhandler.h>
@@ -10,25 +10,25 @@ Index: src/sys/sys/conf.h
  #include <sys/queue.h>
  #endif
  
-@@ -263,17 +264,17 @@
+@@ -259,17 +260,17 @@
  void	dev_rel(struct cdev *dev);
  void	dev_strategy(struct cdev *dev, struct buf *bp);
- struct cdev *make_dev(struct cdevsw *_devsw, int _minor, uid_t _uid, gid_t _gid,
+ struct cdev *make_dev(struct cdevsw *_devsw, int _unit, uid_t _uid, gid_t _gid,
 -		int _perms, const char *_fmt, ...) __printflike(6, 7);
 +		int _perms, const char *_fmt, ...);
- struct cdev *make_dev_cred(struct cdevsw *_devsw, int _minor,
+ struct cdev *make_dev_cred(struct cdevsw *_devsw, int _unit,
  		struct ucred *_cr, uid_t _uid, gid_t _gid, int _perms,
 -		const char *_fmt, ...) __printflike(7, 8);
 +		const char *_fmt, ...);
  #define MAKEDEV_REF     0x1
  #define MAKEDEV_WHTOUT	0x2
  struct cdev *make_dev_credf(int _flags,
- 		struct cdevsw *_devsw, int _minornr,
+ 		struct cdevsw *_devsw, int _unit,
  		struct ucred *_cr, uid_t _uid, gid_t _gid, int _mode,
 -		const char *_fmt, ...) __printflike(8, 9);
 -struct cdev *make_dev_alias(struct cdev *_pdev, const char *_fmt, ...) __printflike(2, 3);
 +		const char *_fmt, ...);
 +struct cdev *make_dev_alias(struct cdev *_pdev, const char *_fmt, ...);
- int	dev2unit(struct cdev *_dev);
  void	dev_lock(void);
  void	dev_unlock(void);
+ void	setconf(void);

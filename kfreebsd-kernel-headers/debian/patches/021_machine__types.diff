@@ -1,7 +1,7 @@
-Index: src/sys/i386/include/_types.h
+Index: kfreebsd-source-8.0/sys/i386/include/_types.h
 ===================================================================
---- src/sys/i386/include/_types.h.orig	2006-08-25 12:18:54.091511000 +0200
-+++ src/sys/i386/include/_types.h	2006-08-25 12:25:31.000000000 +0200
+--- kfreebsd-source-8.0.orig/sys/i386/include/_types.h	2009-11-12 15:48:49.000000000 +0000
++++ kfreebsd-source-8.0/sys/i386/include/_types.h	2009-11-12 16:39:23.000000000 +0000
 @@ -39,12 +39,15 @@
  #ifndef _MACHINE__TYPES_H_
  #define	_MACHINE__TYPES_H_
@@ -19,20 +19,20 @@ Index: src/sys/i386/include/_types.h
  /*
   * Basic types upon which most other types are built.
   */
-@@ -69,18 +72,20 @@
+@@ -69,18 +72,19 @@
  /* LONGLONG */
  typedef	unsigned long long	__uint64_t;
  #endif
+-
 +#endif /* __GLIBC__ */
- 
  /*
   * Standard type definitions.
   */
 -typedef	unsigned long	__clock_t;		/* clock()... */
  typedef	unsigned int	__cpumask_t;
  typedef	__int32_t	__critical_t;
- typedef	double		__double_t;
- typedef	double		__float_t;
+ typedef	long double	__double_t;
+ typedef	long double	__float_t;
  typedef	__int32_t	__intfptr_t;
  typedef	__int64_t	__intmax_t;
 +#ifndef __GLIBC__
@@ -41,7 +41,7 @@ Index: src/sys/i386/include/_types.h
  typedef	__int32_t	__int_fast8_t;
  typedef	__int32_t	__int_fast16_t;
  typedef	__int32_t	__int_fast32_t;
-@@ -92,9 +97,11 @@
+@@ -92,9 +96,11 @@
  typedef	__int32_t	__ptrdiff_t;		/* ptr1 - ptr2 */
  typedef	__int32_t	__register_t;
  typedef	__int32_t	__segsz_t;		/* segment size (in pages) */
@@ -53,10 +53,10 @@ Index: src/sys/i386/include/_types.h
  typedef	__uint32_t	__uintfptr_t;
  typedef	__uint64_t	__uintmax_t;
  typedef	__uint32_t	__uintptr_t;
-Index: src/sys/amd64/include/_types.h
+Index: kfreebsd-source-8.0/sys/amd64/include/_types.h
 ===================================================================
---- src/sys/amd64/include/_types.h.orig	2006-08-25 12:18:54.127268000 +0200
-+++ src/sys/amd64/include/_types.h	2006-08-25 12:26:12.000000000 +0200
+--- kfreebsd-source-8.0.orig/sys/amd64/include/_types.h	2009-11-12 15:48:23.000000000 +0000
++++ kfreebsd-source-8.0/sys/amd64/include/_types.h	2009-11-12 16:40:19.000000000 +0000
 @@ -39,12 +39,15 @@
  #ifndef _MACHINE__TYPES_H_
  #define	_MACHINE__TYPES_H_
@@ -74,7 +74,7 @@ Index: src/sys/amd64/include/_types.h
  /*
   * Basic types upon which most other types are built.
   */
-@@ -56,18 +59,20 @@
+@@ -56,16 +59,18 @@
  typedef	unsigned int		__uint32_t;
  typedef	long			__int64_t;
  typedef	unsigned long		__uint64_t;
@@ -87,15 +87,13 @@ Index: src/sys/amd64/include/_types.h
  typedef	unsigned int	__cpumask_t;
  typedef	__int64_t	__critical_t;
  typedef	double		__double_t;
- typedef	double		__float_t;
- typedef	__int64_t	__intfptr_t;
- typedef	__int64_t	__intmax_t;
+ typedef	float		__float_t;
 +#ifndef __GLIBC__
- typedef	__int64_t	__intptr_t;
+ typedef	__int64_t	__intfptr_t;
 +#endif
+ typedef	__int64_t	__intmax_t;
+ typedef	__int64_t	__intptr_t;
  typedef	__int32_t	__int_fast8_t;
- typedef	__int32_t	__int_fast16_t;
- typedef	__int32_t	__int_fast32_t;
 @@ -79,9 +84,11 @@
  typedef	__int64_t	__ptrdiff_t;		/* ptr1 - ptr2 */
  typedef	__int64_t	__register_t;

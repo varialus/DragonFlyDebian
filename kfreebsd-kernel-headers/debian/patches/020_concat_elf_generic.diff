@@ -1,16 +1,18 @@
---- src/sys/sys/elf_generic.h	2006-04-02 16:51:38.000000000 +0200
-+++ src/sys/sys/elf_generic.h	2006-04-02 16:51:38.000000000 +0200
+Index: kfreebsd-source-8.0/sys/sys/elf_generic.h
+===================================================================
+--- kfreebsd-source-8.0.orig/sys/sys/elf_generic.h	2009-11-12 15:49:02.000000000 +0000
++++ kfreebsd-source-8.0/sys/sys/elf_generic.h	2009-11-12 16:36:05.000000000 +0000
 @@ -50,9 +50,10 @@
  #error "Unknown byte order"
  #endif
  
--#define __elfN(x)	__CONCAT(__CONCAT(__CONCAT(elf,__ELF_WORD_SIZE),_),x)
--#define __ElfN(x)	__CONCAT(__CONCAT(__CONCAT(Elf,__ELF_WORD_SIZE),_),x)
--#define __ELFN(x)	__CONCAT(__CONCAT(__CONCAT(ELF,__ELF_WORD_SIZE),_),x)
+-#define	__elfN(x)	__CONCAT(__CONCAT(__CONCAT(elf,__ELF_WORD_SIZE),_),x)
+-#define	__ElfN(x)	__CONCAT(__CONCAT(__CONCAT(Elf,__ELF_WORD_SIZE),_),x)
+-#define	__ELFN(x)	__CONCAT(__CONCAT(__CONCAT(ELF,__ELF_WORD_SIZE),_),x)
 +#define ___CONCAT(a,b)  __CONCAT(a,b)
-+#define __elfN(x)	___CONCAT(___CONCAT(___CONCAT(elf,__ELF_WORD_SIZE),_),x)
-+#define __ElfN(x)	___CONCAT(___CONCAT(___CONCAT(Elf,__ELF_WORD_SIZE),_),x)
-+#define __ELFN(x)	___CONCAT(___CONCAT(___CONCAT(ELF,__ELF_WORD_SIZE),_),x)
- #define __ElfType(x)	typedef __ElfN(x) __CONCAT(Elf_,x)
++#define __elfN(x)     ___CONCAT(___CONCAT(___CONCAT(elf,__ELF_WORD_SIZE),_),x)
++#define __ElfN(x)     ___CONCAT(___CONCAT(___CONCAT(Elf,__ELF_WORD_SIZE),_),x)
++#define __ELFN(x)     ___CONCAT(___CONCAT(___CONCAT(ELF,__ELF_WORD_SIZE),_),x)
+ #define	__ElfType(x)	typedef __ElfN(x) __CONCAT(Elf_,x)
  
  __ElfType(Addr);
