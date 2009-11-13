@@ -40,6 +40,7 @@
 
 /* Some inet code expects that this file defines the 'u_int32_t' type.  */
 #include <sys/types.h>
+#include <stdint.h>
 
 /*
  * Machine-independent constants (some used in following include files).
