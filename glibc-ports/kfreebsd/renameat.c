@@ -71,6 +71,7 @@ int renameat (oldfd, old, newfd, new)
 	}
 
       old_filelen = strlen (old);
+      new_filelen = strlen (new);
       if (__builtin_expect (old_filelen == 0, 0)
 	  || __builtin_expect (new_filelen == 0, 0))
 	{
