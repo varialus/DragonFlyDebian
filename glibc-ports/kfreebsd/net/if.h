@@ -138,6 +138,7 @@ struct if_data {
 #define	IFF_MONITOR	0x40000		/* (n) user-requested monitor mode */
 #define	IFF_STATICARP	0x80000		/* (n) static ARP */
 #define	IFF_NEEDSGIANT	0x100000	/* (i) hold Giant over if_start calls */
+#define IFF_DYING       0x200000        /* (n) interface is winding down */
 
 /*
  * Old names for driver flags so that user space tools can continue to use
@@ -203,6 +204,7 @@ struct if_data {
 #define	IFCAP_TOE4		0x04000	/* interface can offload TCP */
 #define	IFCAP_TOE6		0x08000	/* interface can offload TCP6 */
 #define	IFCAP_VLAN_HWFILTER	0x10000 /* interface hw can filter vlan tag */
+#define IFCAP_POLLING_NOCOUNT   0x20000 /* polling ticks cannot be fragmented */
 
 #define	IFCAP_HWCSUM		(IFCAP_RXCSUM | IFCAP_TXCSUM)
 #define	IFCAP_TSO		(IFCAP_TSO4 | IFCAP_TSO6)
@@ -283,6 +285,7 @@ struct	ifreq {
 		struct	sockaddr ifru_netmask;
 		short	ifru_flags[2];
 		short	ifru_index;
+		int	ifru_jid;
 		int	ifru_metric;
 		int	ifru_mtu;
 		int	ifru_phys;
@@ -296,6 +299,7 @@ struct	ifreq {
 #define	ifr_netmask	ifr_ifru.ifru_netmask	/* interface net mask */
 #define	ifr_flags	ifr_ifru.ifru_flags[0]	/* flags (low 16 bits) */
 #define	ifr_flagshigh	ifr_ifru.ifru_flags[1]	/* flags (high 16 bits) */
+#define ifr_jid         ifr_ifru.ifru_jid       /* jail/vnet */
 #define	ifr_metric	ifr_ifru.ifru_metric	/* metric */
 #define	ifr_mtu		ifr_ifru.ifru_mtu	/* mtu */
 #define ifr_phys	ifr_ifru.ifru_phys	/* physical wire */

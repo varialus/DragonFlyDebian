@@ -128,6 +128,8 @@
 /*
  * Filter modes; also used to represent per-socket filter mode internally.
  */
+ 
+#define MCAST_UNDEFINED 0       /* fmode: not yet defined */
 #define	MCAST_INCLUDE	1	/* fmode: include these source(s) */
 #define	MCAST_EXCLUDE	2	/* fmode: exclude these source(s) */
 
