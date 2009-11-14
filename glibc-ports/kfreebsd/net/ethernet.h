@@ -32,7 +32,7 @@ __BEGIN_DECLS
    systems.  */
 struct ether_addr
 {
-  u_int8_t ether_addr_octet[ETH_ALEN];
+  u_int8_t octet[ETH_ALEN];
 } __attribute__ ((__packed__));
 
 /* 10Mb/s ethernet header */
