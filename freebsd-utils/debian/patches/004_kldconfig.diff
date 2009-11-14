@@ -2,8 +2,10 @@
  sbin/kldconfig/kldconfig.c |   12 +++---------
  1 file changed, 3 insertions(+), 9 deletions(-)
 
---- a/sbin/kldconfig/kldconfig.c
-+++ b/sbin/kldconfig/kldconfig.c
+Index: freebsd-utils/sbin/kldconfig/kldconfig.c
+===================================================================
+--- freebsd-utils.orig/sbin/kldconfig/kldconfig.c	2009-11-14 10:43:32.000000000 +0000
++++ freebsd-utils/sbin/kldconfig/kldconfig.c	2009-11-14 10:44:33.000000000 +0000
 @@ -40,14 +40,8 @@
  #include <string.h>
  #include <unistd.h>
@@ -30,12 +32,37 @@
  {
  	char pathbuf[MAXPATHLEN+1];
  	struct pathentry *pe;
---- a/sbin/kldconfig/Makefile
-+++ b/sbin/kldconfig/Makefile
+Index: freebsd-utils/sbin/kldconfig/Makefile
+===================================================================
+--- freebsd-utils.orig/sbin/kldconfig/Makefile	2009-11-14 10:43:32.000000000 +0000
++++ freebsd-utils/sbin/kldconfig/Makefile	2009-11-14 10:44:33.000000000 +0000
 @@ -29,5 +29,6 @@
  PROG=		kldconfig
  MAN=		kldconfig.8
  WARNS?=		5
 +LDADD=		-lbsd
+ 
+ .include <bsd.prog.mk>
+Index: freebsd-utils/sbin/kldload/Makefile
+===================================================================
+--- freebsd-utils.orig/sbin/kldload/Makefile	2009-11-14 10:44:52.000000000 +0000
++++ freebsd-utils/sbin/kldload/Makefile	2009-11-14 10:45:23.000000000 +0000
+@@ -29,5 +29,6 @@
+ PROG=	kldload
+ MAN=	kldload.8
+ WARNS?=	5
++LDADD=         -lbsd
+ 
+ .include <bsd.prog.mk>
+Index: freebsd-utils/sbin/kldunload/Makefile
+===================================================================
+--- freebsd-utils.orig/sbin/kldunload/Makefile	2009-11-14 10:45:00.000000000 +0000
++++ freebsd-utils/sbin/kldunload/Makefile	2009-11-14 10:45:33.000000000 +0000
+@@ -28,6 +28,7 @@
+ 
+ PROG=	kldunload
+ MAN=	kldunload.8
++LDADD=         -lbsd
+ WARNS?=	6
  
  .include <bsd.prog.mk>

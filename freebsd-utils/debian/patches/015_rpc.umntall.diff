@@ -2,31 +2,33 @@
  usr.sbin/rpc.umntall/rpc.umntall.c |    8 +++-----
  1 file changed, 3 insertions(+), 5 deletions(-)
 
---- a/usr.sbin/rpc.umntall/rpc.umntall.c
-+++ b/usr.sbin/rpc.umntall/rpc.umntall.c
+Index: freebsd-utils/usr.sbin/rpc.umntall/rpc.umntall.c
+===================================================================
+--- freebsd-utils.orig/usr.sbin/rpc.umntall/rpc.umntall.c	2009-11-14 10:36:50.000000000 +0000
++++ freebsd-utils/usr.sbin/rpc.umntall/rpc.umntall.c	2009-11-14 10:42:56.000000000 +0000
 @@ -176,8 +176,7 @@
  
  	try.tv_sec = 3;
  	try.tv_usec = 0;
--	clp = clnt_create_timed(hostname, RPCPROG_MNT, RPCMNT_VER1, "udp",
+-	clp = clnt_create_timed(hostname, MOUNTPROG, MOUNTVERS, "udp",
 -	    &try);
-+	clp = clnt_create(hostname, RPCPROG_MNT, RPCMNT_VER1, "udp");
++	clp = clnt_create(hostname, MOUNTPROG, MOUNTVERS, "udp");
  	if (clp == NULL) {
- 		warnx("%s: %s", hostname, clnt_spcreateerror("RPCPROG_MNT"));
+ 		warnx("%s: %s", hostname, clnt_spcreateerror("MOUNTPROG"));
  		return (0);
 @@ -204,13 +203,12 @@
  
  	try.tv_sec = 3;
  	try.tv_usec = 0;
--	clp = clnt_create_timed(hostname, RPCPROG_MNT, RPCMNT_VER1, "udp",
+-	clp = clnt_create_timed(hostname, MOUNTPROG, MOUNTVERS, "udp",
 -	    &try);
-+	clp = clnt_create(hostname, RPCPROG_MNT, RPCMNT_VER1, "udp");
++	clp = clnt_create(hostname, MOUNTPROG, MOUNTVERS, "udp");
  	if (clp  == NULL) {
- 		warnx("%s: %s", hostname, clnt_spcreateerror("RPCPROG_MNT"));
+ 		warnx("%s: %s", hostname, clnt_spcreateerror("MOUNTPROG"));
  		return (0);
  	}
 -	clp->cl_auth = authsys_create_default();
 +	clp->cl_auth = authunix_create_default();
- 	clnt_stat = clnt_call(clp, RPCMNT_UMOUNT, (xdrproc_t)xdr_dir, dirp,
+ 	clnt_stat = clnt_call(clp, MOUNTPROC_UMNT, (xdrproc_t)xdr_dir, dirp,
  	    (xdrproc_t)xdr_void, (caddr_t)0, try);
  	if (clnt_stat != RPC_SUCCESS)

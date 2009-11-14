@@ -6,35 +6,37 @@ something sane instead...
  sbin/swapon/swapon.c |   13 ++++++++++---
  1 file changed, 10 insertions(+), 3 deletions(-)
 
---- a/sbin/swapon/swapon.c
-+++ b/sbin/swapon/swapon.c
+Index: freebsd-utils/sbin/swapon/swapon.c
+===================================================================
+--- freebsd-utils.orig/sbin/swapon/swapon.c	2009-11-14 13:35:38.000000000 +0000
++++ freebsd-utils/sbin/swapon/swapon.c	2009-11-14 13:40:51.000000000 +0000
 @@ -41,6 +41,7 @@
  #include <sys/cdefs.h>
- __FBSDID("$FreeBSD: src/sbin/swapon/swapon.c,v 1.22.18.1 2008/11/25 02:59:29 kensmith Exp $");
+ __FBSDID("$FreeBSD$");
  
 +#include <sys/swap.h>
  #include <sys/stat.h>
  #include <sys/param.h>
  #include <sys/sysctl.h>
-@@ -70,6 +71,8 @@
+@@ -71,6 +72,8 @@
  	int ch, doall;
- 	int sflag = 0, lflag = 0, hflag = 0;
+ 	int sflag = 0, lflag = 0, hflag = 0, qflag = 0;
  
 +	setprogname (argv[0]);
 +
  	if ((ptr = strrchr(argv[0], '/')) == NULL)
  		ptr = argv[0];
  	if (strstr(ptr, "swapon"))
-@@ -79,7 +82,7 @@
+@@ -80,7 +83,7 @@
  	orig_prog = which_prog;
  	
  	doall = 0;
--	while ((ch = getopt(argc, argv, "AadlhksU")) != -1) {
-+	while ((ch = getopt(argc, argv, "AadlhksUve")) != -1) {
+-	while ((ch = getopt(argc, argv, "AadghklmqsU")) != -1) {
++	while ((ch = getopt(argc, argv, "AadghklmqsUve")) != -1) {
  		switch(ch) {
  		case 'A':
  			if (which_prog == SWAPCTL) {
-@@ -121,6 +124,9 @@
+@@ -132,6 +135,9 @@
  				usage();
  			}
  			break;
@@ -44,22 +46,25 @@ something sane instead...
  		case '?':
  		default:
  			usage();
-@@ -228,7 +234,8 @@
+@@ -271,7 +277,8 @@
  	    hlen = 10;
  	    break;
  	default:
 -	    getbsize(&hlen, &blocksize);
 +	    blocksize = 1024 * 1024;
 +	    hlen = 10;
+ 	    snprintf(buf, sizeof(buf), "%ld-blocks", blocksize);
  	    break;
  	}
-
---- a/sbin/swapon/Makefile
-+++ b/sbin/swapon/Makefile
-@@ -7,5 +7,6 @@
- LINKS+=	${BINDIR}/swapon ${BINDIR}/swapctl
- MLINKS=	swapon.8 swapoff.8
+Index: freebsd-utils/sbin/swapon/Makefile
+===================================================================
+--- freebsd-utils.orig/sbin/swapon/Makefile	2009-11-14 13:35:38.000000000 +0000
++++ freebsd-utils/sbin/swapon/Makefile	2009-11-14 13:36:03.000000000 +0000
+@@ -9,6 +9,6 @@
  MLINKS+=swapon.8 swapctl.8
-+LDADD=	-lbsd
  
- .include <bsd.prog.mk>	
+ DPADD=	${LIBUTIL}
+-LDADD=	-lutil
++LDADD=	-lbsd -lutil
+ 
+ .include <bsd.prog.mk>

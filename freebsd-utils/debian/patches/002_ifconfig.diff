@@ -13,9 +13,11 @@
  sbin/ifconfig/ifvlan.c      |    2 ++
  12 files changed, 53 insertions(+), 32 deletions(-)
 
---- a/sbin/ifconfig/Makefile
-+++ b/sbin/ifconfig/Makefile
-@@ -20,18 +20,18 @@
+Index: freebsd-utils/sbin/ifconfig/Makefile
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/Makefile	2009-11-14 13:34:56.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/Makefile	2009-11-14 13:35:34.000000000 +0000
+@@ -20,22 +20,22 @@
  SRCS+=	af_atalk.c		# AppleTalk support
  
  SRCS+=	ifclone.c		# clone device support
@@ -23,13 +25,21 @@
 +#SRCS+=	ifmac.c			# MAC support
  SRCS+=	ifmedia.c		# SIOC[GS]IFMEDIA support
  SRCS+=	ifvlan.c		# SIOC[GS]ETVLAN support
- SRCS+=	ifieee80211.c		# SIOC[GS]IEEE80211 support
 -SRCS+=	ifgre.c			# GRE keys etc
 +#SRCS+=	ifgre.c			# GRE keys etc
+ SRCS+=	ifgif.c			# GIF reversed header workaround
  
+-SRCS+=	ifieee80211.c regdomain.c # SIOC[GS]IEEE80211 support
+-DPADD+=	${LIBBSDXML} ${LIBSBUF} ${LIBJAIL}
+-LDADD+=	-lbsdxml -ljail -lsbuf
+-
 -SRCS+=	ifcarp.c		# SIOC[GS]VH support
 -SRCS+=	ifgroup.c		# ...
 -SRCS+=	ifpfsync.c		# pfsync(4) support
++#SRCS+=	ifieee80211.c regdomain.c # SIOC[GS]IEEE80211 support
++#DPADD+=	${LIBBSDXML} ${LIBSBUF} ${LIBJAIL}
++#LDADD+=	-lbsdxml -ljail -lsbuf
++
 +#SRCS+=	ifcarp.c		# SIOC[GS]VH support
 +#SRCS+=	ifgroup.c		# ...
 +#SRCS+=	ifpfsync.c		# pfsync(4) support
@@ -41,7 +51,7 @@
  
  .if ${MK_IPX_SUPPORT} != "no" && !defined(RELEASE_CRUNCH)
  SRCS+=	af_ipx.c		# IPX support
-@@ -42,6 +42,7 @@
+@@ -46,6 +46,7 @@
  MAN=	ifconfig.8
  
  CFLAGS+= -Wall -Wmissing-prototypes -Wcast-qual -Wwrite-strings -Wnested-externs
@@ -49,8 +59,10 @@
  WARNS?=	0
  
  .include <bsd.prog.mk>
---- a/sbin/ifconfig/ifcarp.c
-+++ b/sbin/ifconfig/ifcarp.c
+Index: freebsd-utils/sbin/ifconfig/ifcarp.c
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/ifcarp.c	2009-11-14 13:34:57.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/ifcarp.c	2009-11-14 13:34:57.000000000 +0000
 @@ -43,6 +43,7 @@
  #include <ctype.h>
  #include <stdio.h>
@@ -59,8 +71,10 @@
  #include <stdlib.h>
  #include <unistd.h>
  #include <err.h>
---- a/sbin/ifconfig/ifconfig.c
-+++ b/sbin/ifconfig/ifconfig.c
+Index: freebsd-utils/sbin/ifconfig/ifconfig.c
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/ifconfig.c	2009-11-14 13:34:57.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/ifconfig.c	2009-11-14 13:34:57.000000000 +0000
 @@ -44,10 +44,14 @@
  #include <sys/param.h>
  #include <sys/ioctl.h>
@@ -76,7 +90,16 @@
  
  #include <net/ethernet.h>
  #include <net/if.h>
-@@ -74,6 +78,13 @@
+@@ -67,7 +71,7 @@
+ #include <err.h>
+ #include <errno.h>
+ #include <fcntl.h>
+-#include <jail.h>
++#include <sys/jail.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -75,6 +79,13 @@
  
  #include "ifconfig.h"
  
@@ -90,16 +113,49 @@
  /*
   * Since "struct ifreq" is composed of various union members, callers
   * should pay special attention to interprete the value.
-@@ -618,7 +629,7 @@
+@@ -155,7 +166,7 @@
+ 	all = downonly = uponly = namesonly = noload = verbose = 0;
+ 
+ 	/* Parse leading line options */
+-	strlcpy(options, "adklmnuv", sizeof(options));
++	strlcpy(options, "+adklmnuv", sizeof(options));
+ 	for (p = opts; p != NULL; p = p->next)
+ 		strlcat(options, p->opt, sizeof(options));
+ 	while ((c = getopt(argc, argv, options)) != -1) {
+@@ -641,9 +652,10 @@
+ 	if (ioctl(s, SIOCDIFPHYADDR, &ifr) < 0)
+ 		err(1, "SIOCDIFPHYADDR");
+ }
++#if 0
+ 
+ static void
+-setifvnet(const char *jname, int dummy __unused, int s,
++setifvnet(const char *jname, int dummy, int s,
+     const struct afswtch *afp)
+ {
+ 	struct ifreq my_ifr;
+@@ -657,7 +669,7 @@
  }
  
+ static void
+-setifrvnet(const char *jname, int dummy __unused, int s,
++setifrvnet(const char *jname, int dummy, int s,
+     const struct afswtch *afp)
+ {
+ 	struct ifreq my_ifr;
+@@ -670,8 +682,10 @@
+ 		err(1, "SIOCSIFRVNET(%d, %s)", my_ifr.ifr_jid, my_ifr.ifr_name);
+ }
+ 
++#endif
++
  static void
 -setifnetmask(const char *addr, int dummy __unused, int s,
 +setifnetmask(const char *addr, int dummy, int s,
      const struct afswtch *afp)
  {
  	if (afp->af_getaddr != NULL) {
-@@ -628,7 +639,7 @@
+@@ -681,7 +695,7 @@
  }
  
  static void
@@ -108,7 +164,7 @@
      const struct afswtch *afp)
  {
  	if (afp->af_getaddr != NULL)
-@@ -636,7 +647,7 @@
+@@ -689,7 +703,7 @@
  }
  
  static void
@@ -117,7 +173,7 @@
      const struct afswtch *afp)
  {
  	const struct afswtch *inet;
-@@ -669,7 +680,7 @@
+@@ -722,7 +736,7 @@
  
  /*ARGSUSED*/
  static void
@@ -126,7 +182,7 @@
      const struct afswtch *afp)
  {
  	if (afp->af_getaddr != NULL)
-@@ -729,7 +740,7 @@
+@@ -782,7 +796,7 @@
  }
  
  static void
@@ -135,7 +191,7 @@
      const struct afswtch *afp)
  {
  	strncpy(ifr.ifr_name, name, sizeof (ifr.ifr_name));
-@@ -739,7 +750,7 @@
+@@ -792,7 +806,7 @@
  }
  
  static void
@@ -144,7 +200,7 @@
      const struct afswtch *afp)
  {
  	strncpy(ifr.ifr_name, name, sizeof (ifr.ifr_name));
-@@ -749,7 +760,7 @@
+@@ -802,7 +816,7 @@
  }
  
  static void
@@ -153,8 +209,21 @@
      const struct afswtch *afp)
  {
  	char *newname;
---- a/sbin/ifconfig/af_inet6.c
-+++ b/sbin/ifconfig/af_inet6.c
+@@ -1054,8 +1068,10 @@
+ 	DEF_CMD_ARG2("tunnel",			settunnel),
+ 	DEF_CMD("-tunnel", 0,			deletetunnel),
+ 	DEF_CMD("deletetunnel", 0,		deletetunnel),
++#if 0
+ 	DEF_CMD_ARG("vnet",			setifvnet),
+ 	DEF_CMD_ARG("-vnet",			setifrvnet),
++#endif
+ 	DEF_CMD("link0",	IFF_LINK0,	setifflags),
+ 	DEF_CMD("-link0",	-IFF_LINK0,	setifflags),
+ 	DEF_CMD("link1",	IFF_LINK1,	setifflags),
+Index: freebsd-utils/sbin/ifconfig/af_inet6.c
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/af_inet6.c	2009-11-14 13:34:57.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/af_inet6.c	2009-11-14 13:34:57.000000000 +0000
 @@ -42,7 +42,6 @@
  #include <stdlib.h>
  #include <string.h>
@@ -172,7 +241,7 @@
  
  #include "ifconfig.h"
  
-@@ -74,7 +75,7 @@
+@@ -70,7 +71,7 @@
  static	char addr_buf[MAXHOSTNAMELEN *2 + 1];	/*for getnameinfo()*/
  
  static void
@@ -181,7 +250,7 @@
      const struct afswtch *afp)
  {
          if (afp->af_getprefix != NULL)
-@@ -83,7 +84,7 @@
+@@ -79,7 +80,7 @@
  }
  
  static void
@@ -190,7 +259,7 @@
      const struct afswtch *afp)
  {
  	if (afp->af_af != AF_INET6)
-@@ -118,21 +119,21 @@
+@@ -114,21 +115,21 @@
  }
  
  static void
@@ -215,7 +284,7 @@
      const struct afswtch *afp)
  {
  	struct ifaddrs *ifap, *ifa;
-@@ -178,7 +179,7 @@
+@@ -174,7 +175,7 @@
  }
  
  static void
@@ -224,7 +293,7 @@
  {
  	struct sockaddr_in6 *sin, null_sin;
  	struct in6_ifreq ifr6;
-@@ -518,7 +519,7 @@
+@@ -514,7 +515,7 @@
  };
  
  static void
@@ -233,9 +302,11 @@
  {
  	ip6lifetime++;	/* print IPv6 address lifetime */
  }
---- a/sbin/ifconfig/ifclone.c
-+++ b/sbin/ifconfig/ifclone.c
-@@ -41,6 +41,7 @@
+Index: freebsd-utils/sbin/ifconfig/ifclone.c
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/ifclone.c	2009-11-14 13:34:57.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/ifclone.c	2009-11-14 13:34:57.000000000 +0000
+@@ -42,6 +42,7 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
@@ -243,7 +314,7 @@
  #include <unistd.h>
  
  #include "ifconfig.h"
-@@ -150,7 +151,7 @@
+@@ -174,7 +175,7 @@
  };
  
  static void
@@ -252,8 +323,10 @@
  {
  	list_cloners();
  	exit(0);
---- a/sbin/ifconfig/af_link.c
-+++ b/sbin/ifconfig/af_link.c
+Index: freebsd-utils/sbin/ifconfig/af_link.c
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/af_link.c	2009-11-14 13:34:57.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/af_link.c	2009-11-14 13:34:57.000000000 +0000
 @@ -46,13 +46,15 @@
  #include <net/if_dl.h>
  #include <net/if_types.h>
@@ -271,9 +344,11 @@
  {
  	/* XXX no const 'cuz LLADDR is defined wrong */
  	struct sockaddr_dl *sdl = (struct sockaddr_dl *) ifa->ifa_addr;
---- a/sbin/ifconfig/ifieee80211.c
-+++ b/sbin/ifconfig/ifieee80211.c
-@@ -87,6 +87,10 @@
+Index: freebsd-utils/sbin/ifconfig/ifieee80211.c
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/ifieee80211.c	2009-11-14 13:34:57.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/ifieee80211.c	2009-11-14 13:34:57.000000000 +0000
+@@ -90,6 +90,10 @@
  #include <fcntl.h>
  #include <inttypes.h>
  #include <stdio.h>
@@ -284,8 +359,10 @@
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
---- a/sbin/ifconfig/af_atalk.c
-+++ b/sbin/ifconfig/af_atalk.c
+Index: freebsd-utils/sbin/ifconfig/af_atalk.c
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/af_atalk.c	2009-11-14 13:34:57.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/af_atalk.c	2009-11-14 13:34:57.000000000 +0000
 @@ -55,7 +55,7 @@
  
  /* XXX  FIXME -- should use strtoul for better parsing. */
@@ -313,9 +390,11 @@
  {
  	struct sockaddr_at *sat, null_sat;
  	struct netrange *nr;
---- a/sbin/ifconfig/af_inet.c
-+++ b/sbin/ifconfig/af_inet.c
-@@ -42,7 +42,6 @@
+Index: freebsd-utils/sbin/ifconfig/af_inet.c
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/af_inet.c	2009-11-14 13:34:57.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/af_inet.c	2009-11-14 13:34:57.000000000 +0000
+@@ -42,13 +42,13 @@
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
@@ -323,13 +402,14 @@
  
  #include <netinet/in.h>
  #include <net/if_var.h>		/* for struct ifaddr */
-@@ -51,12 +50,13 @@
+ #include <netinet/in_var.h>
+ #include <arpa/inet.h>
  #include <netdb.h>
- 
- #include "ifconfig.h"
 +#include <ifaddrs.h>
  
- static struct ifaliasreq in_addreq;
+ #include "ifconfig.h"
+ 
+@@ -56,7 +56,7 @@
  static struct ifreq in_ridreq;
  
  static void
@@ -338,8 +418,10 @@
  {
  	struct sockaddr_in *sin, null_sin;
  	
---- a/sbin/ifconfig/af_ipx.c
-+++ b/sbin/ifconfig/af_ipx.c
+Index: freebsd-utils/sbin/ifconfig/af_ipx.c
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/af_ipx.c	2009-11-14 13:34:57.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/af_ipx.c	2009-11-14 13:34:57.000000000 +0000
 @@ -41,9 +41,9 @@
  #include <stdio.h>
  #include <stdlib.h>
@@ -360,8 +442,10 @@
  {
  	struct sockaddr_ipx *sipx, null_sipx;
  
---- a/sbin/ifconfig/ifgre.c
-+++ b/sbin/ifconfig/ifgre.c
+Index: freebsd-utils/sbin/ifconfig/ifgre.c
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/ifgre.c	2009-11-14 13:34:57.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/ifgre.c	2009-11-14 13:34:57.000000000 +0000
 @@ -65,7 +65,7 @@
  }
  
@@ -371,8 +455,10 @@
      const struct afswtch *afp)
  {
  	uint32_t grekey = atol(val);
---- a/sbin/ifconfig/ifvlan.c
-+++ b/sbin/ifconfig/ifvlan.c
+Index: freebsd-utils/sbin/ifconfig/ifvlan.c
+===================================================================
+--- freebsd-utils.orig/sbin/ifconfig/ifvlan.c	2009-11-14 13:34:57.000000000 +0000
++++ freebsd-utils/sbin/ifconfig/ifvlan.c	2009-11-14 13:34:57.000000000 +0000
 @@ -52,6 +52,8 @@
  #include <err.h>
  #include <errno.h>
@@ -382,14 +468,3 @@
  #include "ifconfig.h"
  
  #ifndef lint
---- a/sbin/ifconfig/ifconfig.c
---- b/sbin/ifconfig/ifconfig.c
-@@ -154,7 +154,7 @@
- 	all = downonly = uponly = namesonly = noload = verbose = 0;
- 
- 	/* Parse leading line options */
--	strlcpy(options, "adklmnuv", sizeof(options));
-+	strlcpy(options, "+adklmnuv", sizeof(options));
- 	for (p = opts; p != NULL; p = p->next)
- 		strlcat(options, p->opt, sizeof(options));
- 	while ((c = getopt(argc, argv, options)) != -1) {

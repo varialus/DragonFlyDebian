@@ -2,10 +2,10 @@
  sbin/route/route.c |    8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
 
-Index: b/sbin/route/route.c
+Index: freebsd-utils/sbin/route/route.c
 ===================================================================
---- a/sbin/route/route.c
-+++ b/sbin/route/route.c
+--- freebsd-utils.orig/sbin/route/route.c	2009-04-14 23:05:36.000000000 +0000
++++ freebsd-utils/sbin/route/route.c	2009-11-14 10:24:14.000000000 +0000
 @@ -63,10 +63,13 @@
  #include <paths.h>
  #include <stdio.h>
@@ -17,10 +17,10 @@ Index: b/sbin/route/route.c
  #include <ifaddrs.h>
 +#include <time.h>
 +#include "../../lib/linkaddr.h"
-
+ 
  struct keytab {
  	char	*kt_cp;
-@@ -110,7 +112,7 @@
+@@ -110,7 +113,7 @@
  int	prefixlen();
  extern	char *iso_ntoa();
  
@@ -29,7 +29,7 @@ Index: b/sbin/route/route.c
  
  void
  usage(cp)
-@@ -134,7 +136,7 @@
+@@ -134,7 +137,7 @@
  	if (argc < 2)
  		usage((char *)NULL);
  
@@ -38,17 +38,10 @@ Index: b/sbin/route/route.c
  		switch(ch) {
  		case 'n':
  			nflag = 1;
-@@ -821,7 +823,7 @@
- 	else if (IN_CLASSC(addr))
- 		mask = IN_CLASSC_NET;
- 	else if (IN_MULTICAST(addr))
--		mask = IN_CLASSD_NET;
-+		mask = 0xf0000000;
- 	else
- 		mask = 0xffffffff;
-
---- a/sbin/route/Makefile
-+++ b/sbin/route/Makefile
+Index: freebsd-utils/sbin/route/Makefile
+===================================================================
+--- freebsd-utils.orig/sbin/route/Makefile	2006-07-27 13:26:29.000000000 +0000
++++ freebsd-utils/sbin/route/Makefile	2009-11-14 10:24:14.000000000 +0000
 @@ -7,6 +7,7 @@
  MAN=	route.8
  SRCS=	route.c keywords.h
