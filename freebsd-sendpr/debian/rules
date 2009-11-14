@@ -7,11 +7,9 @@
 
 pkgdir := $(CURDIR)/debian/freebsd-sendpr
 
-include /usr/share/quilt/quilt.make
-
 PMAKE := freebsd-make DESTDIR=$(pkgdir) BINDIR=/usr/bin
 
-clean: unpatch
+clean:
 	dh_testdir
 	dh_testroot
 	
@@ -19,7 +17,7 @@ clean: unpatch
 	
 	dh_clean
 
-build-indep: patch
+build-indep:
 	dh_testdir
 	
 	$(PMAKE)
