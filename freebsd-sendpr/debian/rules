@@ -15,24 +15,14 @@ clean: unpatch
 	dh_testdir
 	dh_testroot
 	
-	rm -rf src
 	rm -f *-stamp
 	
 	dh_clean
 
-unpack: unpack-stamp
-unpack-stamp:
+build-indep: patch
 	dh_testdir
 	
-	tar xfz $(CURDIR)/src.tar.gz
-	
-	touch unpack-stamp
-
-build-indep: unpack patch
-	dh_testdir
-	
-	cd src/gnu/usr.bin/send-pr/ && \
-		$(PMAKE)
+	$(PMAKE)
 
 build-arch:
 
@@ -44,8 +34,7 @@ install: build-indep
 	dh_prep
 	dh_installdirs
 	
-	cd src/gnu/usr.bin/send-pr/ && \
-		$(PMAKE) install etc-gnats-freefall
+	$(PMAKE) install etc-gnats-freefall
 	for i in $(pkgdir)/usr/share/man/man1/*.gz ; do \
 		[ -L $$i ] || gunzip $$i ; \
 	done
