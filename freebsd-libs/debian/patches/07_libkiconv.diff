@@ -3,8 +3,10 @@
  lib/libkiconv/quirks.h |    1 +
  2 files changed, 2 insertions(+)
 
---- a/lib/libkiconv/Makefile
-+++ b/lib/libkiconv/Makefile
+Index: freebsd-libs/lib/libkiconv/Makefile
+===================================================================
+--- freebsd-libs.orig/lib/libkiconv/Makefile	2009-11-13 13:54:47.000000000 +0000
++++ freebsd-libs/lib/libkiconv/Makefile	2009-11-13 13:54:52.000000000 +0000
 @@ -14,5 +14,6 @@
  		kiconv.3 kiconv_add_xlat16_table.3
  
@@ -12,13 +14,67 @@
 +LDADD=	-ldl
  
  .include <bsd.lib.mk>
---- a/lib/libkiconv/quirks.h
-+++ b/lib/libkiconv/quirks.h
+Index: freebsd-libs/lib/libkiconv/quirks.h
+===================================================================
+--- freebsd-libs.orig/lib/libkiconv/quirks.h	2009-11-13 13:54:47.000000000 +0000
++++ freebsd-libs/lib/libkiconv/quirks.h	2009-11-13 13:54:52.000000000 +0000
 @@ -25,6 +25,7 @@
   *
-  * $FreeBSD: src/lib/libkiconv/quirks.h,v 1.1.30.1 2009/04/15 03:14:26 kensmith Exp $
+  * $FreeBSD$
   */
 +#include <stdint.h>
  
  #ifndef _KICONV_QUIRKS_H_
  #define _KICONV_QUIRKS_H_
+Index: freebsd-libs/lib/libkiconv/xlat16_iconv.c
+===================================================================
+--- freebsd-libs.orig/lib/libkiconv/xlat16_iconv.c	2009-11-13 13:54:47.000000000 +0000
++++ freebsd-libs/lib/libkiconv/xlat16_iconv.c	2009-11-13 13:54:52.000000000 +0000
+@@ -426,8 +426,8 @@
+ #include <errno.h>
+ 
+ int
+-kiconv_add_xlat16_cspair(const char *tocode __unused, const char *fromcode __unused,
+-    int flag __unused)
++kiconv_add_xlat16_cspair(const char *tocode, const char *fromcode,
++    int flag)
+ {
+ 
+ 	errno = EINVAL;
+@@ -435,7 +435,7 @@
+ }
+ 
+ int
+-kiconv_add_xlat16_cspairs(const char *tocode __unused, const char *fromcode __unused)
++kiconv_add_xlat16_cspairs(const char *tocode, const char *fromcode)
+ {
+ 	errno = EINVAL;
+ 	return (-1);
+Index: freebsd-libs/lib/libkiconv/quirks.c
+===================================================================
+--- freebsd-libs.orig/lib/libkiconv/quirks.c	2009-11-13 13:55:56.000000000 +0000
++++ freebsd-libs/lib/libkiconv/quirks.c	2009-11-13 13:56:19.000000000 +0000
+@@ -187,7 +187,7 @@
+ #include <sys/iconv.h>
+ 
+ const char *
+-kiconv_quirkcs(const char* base __unused, int vendor __unused)
++kiconv_quirkcs(const char* base, int vendor)
+ {
+ 
+ 	return (base);
+Index: freebsd-libs/lib/libkiconv/xlat16_sysctl.c
+===================================================================
+--- freebsd-libs.orig/lib/libkiconv/xlat16_sysctl.c	2009-11-13 13:55:56.000000000 +0000
++++ freebsd-libs/lib/libkiconv/xlat16_sysctl.c	2009-11-13 13:56:43.000000000 +0000
+@@ -75,8 +75,8 @@
+ #include <errno.h>
+ 
+ int
+-kiconv_add_xlat16_table(const char *to __unused, const char *from __unused,
+-    const void *data __unused, int datalen __unused)
++kiconv_add_xlat16_table(const char *to, const char *from,
++    const void *data, int datalen)
+ {
+ 
+ 	return (EINVAL);
