@@ -1,13 +1,15 @@
-Index: b/src/gnu/usr.bin/send-pr/send-pr.sh
-===================================================================
---- a/src/gnu/usr.bin/send-pr/send-pr.sh	2008-06-08 23:54:19.000000000 +0300
-+++ b/src/gnu/usr.bin/send-pr/send-pr.sh	2008-06-08 23:54:22.000000000 +0300
+---
+ send-pr.sh |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/send-pr.sh
++++ b/send-pr.sh
 @@ -277,7 +277,7 @@ TEMP=`mktemp -t pf.XXXXXX` || exit 1
  # Catch some signals. ($xs kludge needed by Sun /bin/sh)
  xs=0
  trap 'rm -f $REF $TEMP; exit $xs' 0
--trap 'echo "$COMMAND: Aborting ... saving unfinished PR into /tmp/pr.$$"; rm -f $REF ; mv $TEMP /tmp/pr.$$; xs=1; exit' 1 2 3 13 15
-+trap 'echo "$COMMAND: Aborting ... saving unfinished PR into /tmp/pr.$$"; rm -f $REF ; mv $TEMP /tmp/pr.$$; xs=1; exit' SIGHUP SIGINT SIGQUIT SIGPIPE SIGTERM
+-trap 'SAV=`mktemp -t pr`;echo "$COMMAND: Aborting ... saving unfinished PR into $SAV"; rm -f $REF ; mv $TEMP $SAV; xs=1; exit' 1 2 3 13 15
++trap 'SAV=`mktemp -t pr`;echo "$COMMAND: Aborting ... saving unfinished PR into $SAV"; rm -f $REF ; mv $TEMP $SAV; xs=1; exit' SIGHUP SIGINT SIGQUIT SIGPIPE SIGTERM
  
  # If they told us to use a specific file, then do so.
  if [ -n "$IN_FILE" ]; then
