@@ -1,7 +1,9 @@
-Index: b/send-pr.sh
-===================================================================
---- a/send-pr.sh	2008-06-08 23:53:34.000000000 +0300
-+++ b/send-pr.sh	2008-06-08 23:54:19.000000000 +0300
+---
+ send-pr.sh |   31 +++++++++++++++++++++++--------
+ 1 file changed, 23 insertions(+), 8 deletions(-)
+
+--- a/send-pr.sh
++++ b/send-pr.sh
 @@ -88,10 +88,12 @@ fi
  # Find out the name of the originator of this PR.
  if [ -n "$NAME" ]; then
@@ -59,7 +61,7 @@ Index: b/send-pr.sh
  # Catch some signals. ($xs kludge needed by Sun /bin/sh)
  xs=0
  trap 'rm -f $REF $TEMP; exit $xs' 0
-@@ -492,7 +507,7 @@ while true; do
+@@ -494,7 +509,7 @@ while true; do
      case "$input" in
        a*)
  	if [ -z "$BATCH" ]; then
@@ -68,12 +70,12 @@ Index: b/send-pr.sh
  	  echo "$COMMAND: the problem report remains in $BAD and is not sent."
  	  mv $TEMP $BAD
          else
-@@ -574,7 +589,7 @@ if $MAIL_AGENT < $REF; then
+@@ -576,7 +591,7 @@ if $MAIL_AGENT < $REF; then
  else
    echo "$COMMAND: mysterious mail failure."
    if [ -z "$BATCH" ]; then
 -    BAD=`mktemp -t pbad`
 +    BAD=`mktemp -t pbad.XXXXXX`
      echo "$COMMAND: the problem report remains in $BAD and is not sent."
-     mv $REF $BAD
+     mv $TEMP $BAD
    else
