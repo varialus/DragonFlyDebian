@@ -1,0 +1,92 @@
+Index: freebsd-libs/lib/libmemstat/memstat_internal.h
+===================================================================
+--- freebsd-libs.orig/lib/libmemstat/memstat_internal.h	2009-11-16 16:54:58.000000000 +0000
++++ freebsd-libs/lib/libmemstat/memstat_internal.h	2009-11-16 16:58:21.000000000 +0000
+@@ -29,7 +29,7 @@
+ #ifndef _MEMSTAT_INTERNAL_H_
+ #define	_MEMSTAT_INTERNAL_H_
+ 
+-
++#include <sys/queue.h>
+ 
+ /*
+  * memstat maintains its own internal notion of statistics on each memory
+Index: freebsd-libs/lib/libmemstat/memstat.h
+===================================================================
+--- freebsd-libs.orig/lib/libmemstat/memstat.h	2009-11-16 16:54:58.000000000 +0000
++++ freebsd-libs/lib/libmemstat/memstat.h	2009-11-16 16:58:21.000000000 +0000
+@@ -29,6 +29,8 @@
+ #ifndef _MEMSTAT_H_
+ #define	_MEMSTAT_H_
+ 
++#include <stdint.h>
++
+ /*
+  * Number of CPU slots in library-internal data structures.  This should be
+  * at least the value of MAXCPU from param.h.
+Index: freebsd-libs/lib/libmemstat/memstat_malloc.c
+===================================================================
+--- freebsd-libs.orig/lib/libmemstat/memstat_malloc.c	2009-11-16 16:54:58.000000000 +0000
++++ freebsd-libs/lib/libmemstat/memstat_malloc.c	2009-11-16 16:58:21.000000000 +0000
+@@ -44,10 +44,10 @@
+ 
+ static struct nlist namelist[] = {
+ #define	X_KMEMSTATISTICS	0
+-	{ .n_name = "_kmemstatistics" },
++	{{ .n_name = "_kmemstatistics" }},
+ #define	X_MP_MAXCPUS		1
+-	{ .n_name = "_mp_maxcpus" },
+-	{ .n_name = "" },
++	{{ .n_name = "_mp_maxcpus" }},
++	{{ .n_name = "" }},
+ };
+ 
+ /*
+@@ -253,6 +253,10 @@
+ 	return (0);
+ }
+ 
++#ifndef __DECONST
++#define __DECONST(type, var)  ((type)(uintptr_t)(const void *)(var))
++#endif
++
+ static int
+ kread_string(kvm_t *kvm, const void *kvm_pointer, char *buffer, int buflen)
+ {
+Index: freebsd-libs/lib/libmemstat/memstat_uma.c
+===================================================================
+--- freebsd-libs.orig/lib/libmemstat/memstat_uma.c	2009-11-16 16:54:58.000000000 +0000
++++ freebsd-libs/lib/libmemstat/memstat_uma.c	2009-11-16 16:58:21.000000000 +0000
+@@ -50,12 +50,12 @@
+ 
+ static struct nlist namelist[] = {
+ #define	X_UMA_KEGS	0
+-	{ .n_name = "_uma_kegs" },
++	{{ .n_name = "_uma_kegs" }},
+ #define	X_MP_MAXID	1
+-	{ .n_name = "_mp_maxid" },
++	{{ .n_name = "_mp_maxid" }},
+ #define	X_ALL_CPUS	2
+-	{ .n_name = "_all_cpus" },
+-	{ .n_name = "" },
++	{{ .n_name = "_all_cpus" }},
++	{{ .n_name = "" }},
+ };
+ 
+ /*
+Index: freebsd-libs/lib/libmemstat/Makefile
+===================================================================
+--- freebsd-libs.orig/lib/libmemstat/Makefile	2009-11-16 16:59:54.000000000 +0000
++++ freebsd-libs/lib/libmemstat/Makefile	2009-11-16 17:00:59.000000000 +0000
+@@ -3,8 +3,9 @@
+ WARNS?=		3
+ LIB=		memstat
+ SHLIB_MAJOR=	3
+-DPADD=		${LIBKVM}
+-LDADD=		-lkvm
++LDADD=		-lbsd ../libkvm/libkvm.so.0
++CFLAGS+=-I. -I../libkvm
++
+ SRCS+=		memstat.c
+ SRCS+=		memstat_all.c
+ SRCS+=		memstat_malloc.c
