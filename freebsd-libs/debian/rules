@@ -31,8 +31,10 @@ build: build-arch build-indep
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
-	for i in lib/libcam lib/libdevstat lib/libgeom lib/libipx lib/libkiconv \
-	         lib/libkvm lib/libmemstat lib/libsbuf lib/libusb lib/libusbhid sys/cam ; do \
+	for i in lib/libcam lib/libdevstat lib/libgeom lib/libipx \
+	         lib/libkiconv lib/libnetgraph \
+	         lib/libkvm lib/libmemstat lib/libsbuf lib/libusb \
+	         lib/libusbhid sys/cam ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
 	mkdir -p freebsd-libs-$(VERSION)/sys/kern ; \
@@ -49,7 +51,7 @@ patch-stamp:
 	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
 	touch $@
 
-build-arch: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-devstat build-memstat
+build-arch: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-devstat build-memstat build-netgraph
 
 build-cam: build-cam-stamp
 build-cam-stamp: patch build-sbuf
@@ -59,6 +61,11 @@ build-cam-stamp: patch build-sbuf
 build-geom: build-geom-stamp
 build-geom-stamp: patch build-sbuf
 	$(PMAKE) -C $(CURDIR)/lib/libgeom
+	touch $@
+
+build-netgraph: build-netgraph-stamp
+build-netgraph-stamp: patch
+	$(PMAKE) -C $(CURDIR)/lib/libnetgraph
 	touch $@
 
 build-ipx: build-ipx-stamp
@@ -104,6 +111,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	$(PMAKE) -C $(CURDIR)/lib/libcam clean
+	$(PMAKE) -C $(CURDIR)/lib/libnetgraph clean
 	$(PMAKE) -C $(CURDIR)/lib/libdevstat clean
 	$(PMAKE) -C $(CURDIR)/lib/libmemstat clean
 	$(PMAKE) -C $(CURDIR)/lib/libgeom clean
@@ -135,6 +143,7 @@ install-arch:
 	$(PMAKE) -C $(CURDIR)/lib/libkvm install
 	$(PMAKE) -C $(CURDIR)/lib/libdevstat install
 	$(PMAKE) -C $(CURDIR)/lib/libmemstat install
+	$(PMAKE) -C $(CURDIR)/lib/libnetgraph install
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid install
 
 	dh_install -s --list-missing --sourcedir=debian/tmp
