@@ -52,10 +52,19 @@
 #   ifdef __USE_BSD
 #    define CLOCK_VIRTUAL		1
 #    define CLOCK_PROF			2
+#    define CLOCK_UPTIME    5               /* FreeBSD-specific. */
+#    define CLOCK_UPTIME_PRECISE    7       /* FreeBSD-specific. */
+#    define CLOCK_UPTIME_FAST       8       /* FreeBSD-specific. */
+#    define CLOCK_REALTIME_PRECISE  9       /* FreeBSD-specific. */
+#    define CLOCK_REALTIME_FAST     10      /* FreeBSD-specific. */
+#    define CLOCK_MONOTONIC_PRECISE 11      /* FreeBSD-specific. */
+#    define CLOCK_MONOTONIC_FAST    12      /* FreeBSD-specific. */
+#    define CLOCK_SECOND    13              /* FreeBSD-specific. */
 #   endif
 
 /* Flag to indicate time is absolute.  */
-#   define TIMER_ABSTIME		1
+#   define TIMER_RELTIME	0   /* relative timer */
+#   define TIMER_ABSTIME	1   /* absolute timer */
 #  endif
 
 
