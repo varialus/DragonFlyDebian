@@ -1,0 +1,28 @@
+
+http://lists.freebsd.org/pipermail/svn-src-all/2009-November/015448.html
+
+Log:
+  When rename("a", "b/.") is performed, target namei() call returns
+  dvp == vp. Rename syscall does not check for the case, and at least
+  ufs_rename() cannot deal with it. POSIX explicitely requires that both
+  rename(2) and rmdir(2) return EINVAL when any of the pathes end in "/.".
+  
+  Detect the slashdot lookup for RENAME or REMOVE in lookup(), and return
+  EINVAL.
+
+
+--- head/sys/kern/vfs_lookup.c	2009/07/29 07:44:43	195939
++++ head/sys/kern/vfs_lookup.c	2009/11/10 11:50:37	199137
+@@ -552,6 +552,12 @@
+ 	else
+ 		cnp->cn_flags &= ~ISLASTCN;
+ 
++	if ((cnp->cn_flags & ISLASTCN) != 0 &&
++	    cnp->cn_namelen == 1 && cnp->cn_nameptr[0] == '.' &&
++	    (cnp->cn_nameiop == DELETE || cnp->cn_nameiop == RENAME)) {
++		error = EINVAL;
++		goto bad;
++	}
+ 
+ 	/*
+ 	 * Check for degenerate name (e.g. / or "")
