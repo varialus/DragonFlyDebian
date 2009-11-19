@@ -1,0 +1,230 @@
+--- freebsd-utils-8.0.orig/usr.bin/netstat/netgraph.c
++++ freebsd-utils-8.0/usr.bin/netstat/netgraph.c
+@@ -76,8 +76,8 @@
+ 		const char *const modname = "ng_socket.ko";
+ /* XXX We should get "mpath" from "sysctl kern.module_path" */
+ 		const char *mpath[] = { "/", "/boot/", "/modules/", NULL };
+-		struct nlist sym[] = { { .n_name = "_ngsocklist" },
+-				       { .n_name = NULL } };
++		struct nlist sym[] = { {{ .n_name = "_ngsocklist" }},
++				       {{ .n_name = NULL }} };
+ 		const char **pre;
+ 		struct kld_file_stat ks;
+ 		int fileid;
+--- freebsd-utils-8.0.orig/usr.bin/netstat/mroute6.c
++++ freebsd-utils-8.0/usr.bin/netstat/mroute6.c
+@@ -89,6 +89,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ 
++#include <netinet/icmp6.h>
+ #define	KERNEL 1
+ #include <netinet6/ip6_mroute.h>
+ #undef KERNEL
+--- freebsd-utils-8.0.orig/usr.bin/netstat/main.c
++++ freebsd-utils-8.0/usr.bin/netstat/main.c
+@@ -75,116 +75,116 @@
+ 
+ static struct nlist nl[] = {
+ #define	N_IFNET		0
+-	{ .n_name = "_ifnet" },
++	{ {.n_name = "_ifnet" } },
+ #define	N_RTSTAT	1
+-	{ .n_name = "_rtstat" },
++	{ {.n_name = "_rtstat" } },
+ #define	N_RTREE		2
+-	{ .n_name = "_rt_tables"},
++	{ {.n_name = "_rt_tables"} },
+ #define	N_MRTSTAT	3
+-	{ .n_name = "_mrtstat" },
++	{ {.n_name = "_mrtstat" } },
+ #define	N_MFCHASHTBL	4
+-	{ .n_name = "_mfchashtbl" },
++	{ {.n_name = "_mfchashtbl" } },
+ #define	N_VIFTABLE	5
+-	{ .n_name = "_viftable" },
++	{ {.n_name = "_viftable" } },
+ #define	N_IPX		6
+-	{ .n_name = "_ipxpcb_list"},
++	{ {.n_name = "_ipxpcb_list"} },
+ #define	N_IPXSTAT	7
+-	{ .n_name = "_ipxstat"},
++	{ {.n_name = "_ipxstat"} },
+ #define	N_SPXSTAT	8
+-	{ .n_name = "_spx_istat"},
++	{ {.n_name = "_spx_istat"} },
+ #define	N_DDPSTAT	9
+-	{ .n_name = "_ddpstat"},
++	{ {.n_name = "_ddpstat"} },
+ #define	N_DDPCB		10
+-	{ .n_name = "_ddpcb"},
++	{ {.n_name = "_ddpcb"} },
+ #define	N_NGSOCKS	11
+-	{ .n_name = "_ngsocklist"},
++	{ {.n_name = "_ngsocklist"} },
+ #define	N_IP6STAT	12
+-	{ .n_name = "_ip6stat" },
++	{ {.n_name = "_ip6stat" } },
+ #define	N_ICMP6STAT	13
+-	{ .n_name = "_icmp6stat" },
++	{ {.n_name = "_icmp6stat" } },
+ #define	N_IPSECSTAT	14
+-	{ .n_name = "_ipsec4stat" },
++	{ {.n_name = "_ipsec4stat" } },
+ #define	N_IPSEC6STAT	15
+-	{ .n_name = "_ipsec6stat" },
++	{ {.n_name = "_ipsec6stat" } },
+ #define	N_PIM6STAT	16
+-	{ .n_name = "_pim6stat" },
++	{ {.n_name = "_pim6stat" } },
+ #define	N_MRT6STAT	17
+-	{ .n_name = "_mrt6stat" },
++	{ {.n_name = "_mrt6stat" } },
+ #define	N_MF6CTABLE	18
+-	{ .n_name = "_mf6ctable" },
++	{ {.n_name = "_mf6ctable" } },
+ #define	N_MIF6TABLE	19
+-	{ .n_name = "_mif6table" },
++	{ {.n_name = "_mif6table" } },
+ #define	N_PFKEYSTAT	20
+-	{ .n_name = "_pfkeystat" },
++	{ {.n_name = "_pfkeystat" } },
+ #define	N_MBSTAT	21
+-	{ .n_name = "_mbstat" },
++	{ {.n_name = "_mbstat" } },
+ #define	N_MBTYPES	22
+-	{ .n_name = "_mbtypes" },
++	{ {.n_name = "_mbtypes" } },
+ #define	N_NMBCLUSTERS	23
+-	{ .n_name = "_nmbclusters" },
++	{ {.n_name = "_nmbclusters" } },
+ #define	N_NMBUFS	24
+-	{ .n_name = "_nmbufs" },
++	{ {.n_name = "_nmbufs" } },
+ #define	N_MBHI		25
+-	{ .n_name = "_mbuf_hiwm" },
++	{ {.n_name = "_mbuf_hiwm" } },
+ #define	N_CLHI		26
+-	{ .n_name = "_clust_hiwm" },
++	{ {.n_name = "_clust_hiwm" } },
+ #define	N_NCPUS		27
+-	{ .n_name = "_smp_cpus" },
++	{ {.n_name = "_smp_cpus" } },
+ #define	N_PAGESZ	28
+-	{ .n_name = "_pagesize" },
++	{ {.n_name = "_pagesize" } },
+ #define	N_MBPSTAT	29
+-	{ .n_name = "_mb_statpcpu" },
++	{ {.n_name = "_mb_statpcpu" } },
+ #define	N_RTTRASH	30
+-	{ .n_name = "_rttrash" },
++	{ {.n_name = "_rttrash" } },
+ #define	N_MBLO		31
+-	{ .n_name = "_mbuf_lowm" },
++	{ {.n_name = "_mbuf_lowm" } },
+ #define	N_CLLO		32
+-	{ .n_name = "_clust_lowm" },
++	{ {.n_name = "_clust_lowm" } },
+ #define	N_CARPSTAT	33
+-	{ .n_name = "_carpstats" },
++	{ {.n_name = "_carpstats" } },
+ #define	N_PFSYNCSTAT	34
+-	{ .n_name = "_pfsyncstats" },
++	{ {.n_name = "_pfsyncstats" } },
+ #define	N_AHSTAT	35
+-	{ .n_name = "_ahstat" },
++	{ {.n_name = "_ahstat" } },
+ #define	N_ESPSTAT	36
+-	{ .n_name = "_espstat" },
++	{ {.n_name = "_espstat" } },
+ #define	N_IPCOMPSTAT	37
+-	{ .n_name = "_ipcompstat" },
++	{ {.n_name = "_ipcompstat" } },
+ #define	N_TCPSTAT	38
+-	{ .n_name = "_tcpstat" },
++	{ {.n_name = "_tcpstat" } },
+ #define	N_UDPSTAT	39
+-	{ .n_name = "_udpstat" },
++	{ {.n_name = "_udpstat" } },
+ #define	N_IPSTAT	40
+-	{ .n_name = "_ipstat" },
++	{ {.n_name = "_ipstat" } },
+ #define	N_ICMPSTAT	41
+-	{ .n_name = "_icmpstat" },
++	{ {.n_name = "_icmpstat" } },
+ #define	N_IGMPSTAT	42
+-	{ .n_name = "_igmpstat" },
++	{ {.n_name = "_igmpstat" } },
+ #define	N_PIMSTAT	43
+-	{ .n_name = "_pimstat" },
++	{ {.n_name = "_pimstat" } },
+ #define	N_TCBINFO	44
+-	{ .n_name = "_tcbinfo" },
++	{ {.n_name = "_tcbinfo" } },
+ #define	N_UDBINFO	45
+-	{ .n_name = "_udbinfo" },
++	{ {.n_name = "_udbinfo" } },
+ #define	N_DIVCBINFO	46
+-	{ .n_name = "_divcbinfo" },
++	{ {.n_name = "_divcbinfo" } },
+ #define	N_RIPCBINFO	47
+-	{ .n_name = "_ripcbinfo" },
++	{ {.n_name = "_ripcbinfo" } },
+ #define	N_UNP_COUNT	48
+-	{ .n_name = "_unp_count" },
++	{ {.n_name = "_unp_count" } },
+ #define	N_UNP_GENCNT	49
+-	{ .n_name = "_unp_gencnt" },
++	{ {.n_name = "_unp_gencnt" } },
+ #define	N_UNP_DHEAD	50
+-	{ .n_name = "_unp_dhead" },
++	{ {.n_name = "_unp_dhead" } },
+ #define	N_UNP_SHEAD	51
+-	{ .n_name = "_unp_shead" },
++	{ {.n_name = "_unp_shead" } },
+ #define	N_RIP6STAT	52
+-	{ .n_name = "_rip6stat" },
++	{ {.n_name = "_rip6stat" } },
+ #define	N_SCTPSTAT	53
+-	{ .n_name = "_sctpstat" },
++	{ {.n_name = "_sctpstat" } },
+ #define	N_MFCTABLESIZE	54
+-	{ .n_name = "_mfctablesize" },
+-	{ .n_name = NULL },
++	{ {.n_name = "_mfctablesize" } },
++	{ {.n_name = NULL } },
+ };
+ 
+ struct protox {
+--- freebsd-utils-8.0.orig/usr.bin/netstat/netstat.h
++++ freebsd-utils-8.0/usr.bin/netstat/netstat.h
+@@ -35,6 +35,19 @@
+  */
+ 
+ #include <sys/cdefs.h>
++#include <netinet/ether.h>
++#include <netinet/in.h>
++#include <bsd/string.h>
++#include <time.h>
++#define __unused /* */
++
++/* Only used internally, so can be outside the range of valid IP protocols. */
++#define IPPROTO_DIVERT          258             /* divert pseudo-protocol */
++
++extern void trimdomain(char *fullhost, int hostsize);
++extern void link_addr(const char *addr, struct sockaddr_dl *sdl);
++extern char *link_ntoa(const struct sockaddr_dl *sdl);
++
+ 
+ extern int	Aflag;	/* show addresses of protocol control block */
+ extern int	aflag;	/* show all sockets (including servers) */
+--- freebsd-utils-8.0.orig/usr.bin/netstat/Makefile
++++ freebsd-utils-8.0/usr.bin/netstat/Makefile
+@@ -22,6 +22,7 @@
+ BINMODE=2555
+ DPADD=	${LIBKVM} ${LIBMEMSTAT} ${LIBUTIL}
+ LDADD=	-lkvm -lmemstat -lutil
++LDADD+= -lrt -lbsd ../../lib/linkaddr.o ../../lib/trimdomain.o
+ 
+ .if ${MK_NETGRAPH_SUPPORT} != "no"
+ SRCS+=	netgraph.c
