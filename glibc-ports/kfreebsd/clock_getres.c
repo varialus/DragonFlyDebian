@@ -22,8 +22,18 @@ int __syscall_clock_getres(clockid_t clock_id, struct timespec *tp);
 libc_hidden_proto (__syscall_clock_getres)
 
 # define SYSDEP_GETRES \
-  case CLOCK_REALTIME:							      \
-  case CLOCK_MONOTONIC:							      \
+	case CLOCK_REALTIME:		\
+	case CLOCK_MONOTONIC:		\
+	case CLOCK_REALTIME_FAST:	\
+	case CLOCK_REALTIME_PRECISE:	\
+	case CLOCK_MONOTONIC_FAST:	\
+	case CLOCK_MONOTONIC_PRECISE:	\
+	case CLOCK_UPTIME:		\
+	case CLOCK_UPTIME_FAST:		\
+	case CLOCK_UPTIME_PRECISE:	\
+	case CLOCK_VIRTUAL:		\
+	case CLOCK_PROF:		\
+	case CLOCK_SECOND:		\
     retval = INLINE_SYSCALL (clock_getres, 2, clock_id, res);		      \
     break
 
