@@ -33,6 +33,7 @@ __BEGIN_DECLS
 struct ether_addr
 {
   u_int8_t octet[ETH_ALEN];
+#define ether_addr_octet octet  
 } __attribute__ ((__packed__));
 
 /* 10Mb/s ethernet header */
