@@ -33,7 +33,6 @@ libc_hidden_proto (__syscall_clock_gettime)
 	case CLOCK_UPTIME_FAST:		\
 	case CLOCK_UPTIME_PRECISE:	\
 	case CLOCK_VIRTUAL:		\
-	case CLOCK_PROF:		\
 	case CLOCK_SECOND:		\
     retval = INLINE_SYSCALL (clock_gettime, 2, clock_id, tp);		      \
     break
