@@ -443,21 +443,14 @@ Index: kfreebsd-source-8.0/sys/sys/signalvar.h
  /*
   * Logical process signal actions and state, needed only within the process
   * The mapping between sigacts and proc structures is 1:1 except for rfork()
-@@ -95,10 +98,14 @@
+@@ -95,6 +98,7 @@
  typedef void __osiginfohandler_t(int, osiginfo_t *, void *);
  #endif /* _KERNEL && COMPAT_43 */
  
 +#if 0
-+#endif
  /* additional signal action values, used only temporarily/internally */
  #define	SIG_CATCH	((__sighandler_t *)2)
  #define SIG_HOLD        ((__sighandler_t *)3)
- 
-+#if 0
-+
- /*
-  * get signal action for process and signal; currently only for current process
-  */
 @@ -181,7 +188,7 @@
  	int i;
  
