@@ -386,4 +386,140 @@ struct nd_opt_home_agent_info
     uint16_t  nd_opt_home_agent_info_lifetime;
   };
 
+/*-
+ * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the project nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+/*-
+ * Copyright (c) 1982, 1986, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *	@(#)ip_icmp.h	8.1 (Berkeley) 6/10/93
+ */
+
+/*
+ * IP6 route structure
+ */
+
+struct route_in6 {
+        struct  rtentry *ro_rt;
+        struct  llentry *ro_lle;
+        struct  sockaddr_in6 ro_dst;
+};
+
+/*
+ * Variables related to this implementation
+ * of the internet control message protocol version 6.
+ */
+struct icmp6errstat {
+	u_quad_t icp6errs_dst_unreach_noroute;
+	u_quad_t icp6errs_dst_unreach_admin;
+	u_quad_t icp6errs_dst_unreach_beyondscope;
+	u_quad_t icp6errs_dst_unreach_addr;
+	u_quad_t icp6errs_dst_unreach_noport;
+	u_quad_t icp6errs_packet_too_big;
+	u_quad_t icp6errs_time_exceed_transit;
+	u_quad_t icp6errs_time_exceed_reassembly;
+	u_quad_t icp6errs_paramprob_header;
+	u_quad_t icp6errs_paramprob_nextheader;
+	u_quad_t icp6errs_paramprob_option;
+	u_quad_t icp6errs_redirect; /* we regard redirect as an error here */
+	u_quad_t icp6errs_unknown;
+};
+
+struct icmp6stat {
+/* statistics related to icmp6 packets generated */
+	u_quad_t icp6s_error;		/* # of calls to icmp6_error */
+	u_quad_t icp6s_canterror;	/* no error 'cuz old was icmp */
+	u_quad_t icp6s_toofreq;		/* no error 'cuz rate limitation */
+	u_quad_t icp6s_outhist[256];
+/* statistics related to input message processed */
+	u_quad_t icp6s_badcode;		/* icmp6_code out of range */
+	u_quad_t icp6s_tooshort;	/* packet < sizeof(struct icmp6_hdr) */
+	u_quad_t icp6s_checksum;	/* bad checksum */
+	u_quad_t icp6s_badlen;		/* calculated bound mismatch */
+	/*
+	 * number of responses: this member is inherited from netinet code, but
+	 * for netinet6 code, it is already available in icp6s_outhist[].
+	 */
+	u_quad_t icp6s_reflect;
+	u_quad_t icp6s_inhist[256];	
+	u_quad_t icp6s_nd_toomanyopt;	/* too many ND options */
+	struct icmp6errstat icp6s_outerrhist;
+#define icp6s_odst_unreach_noroute \
+	icp6s_outerrhist.icp6errs_dst_unreach_noroute
+#define icp6s_odst_unreach_admin icp6s_outerrhist.icp6errs_dst_unreach_admin
+#define icp6s_odst_unreach_beyondscope \
+	icp6s_outerrhist.icp6errs_dst_unreach_beyondscope
+#define icp6s_odst_unreach_addr icp6s_outerrhist.icp6errs_dst_unreach_addr
+#define icp6s_odst_unreach_noport icp6s_outerrhist.icp6errs_dst_unreach_noport
+#define icp6s_opacket_too_big icp6s_outerrhist.icp6errs_packet_too_big
+#define icp6s_otime_exceed_transit \
+	icp6s_outerrhist.icp6errs_time_exceed_transit
+#define icp6s_otime_exceed_reassembly \
+	icp6s_outerrhist.icp6errs_time_exceed_reassembly
+#define icp6s_oparamprob_header icp6s_outerrhist.icp6errs_paramprob_header
+#define icp6s_oparamprob_nextheader \
+	icp6s_outerrhist.icp6errs_paramprob_nextheader
+#define icp6s_oparamprob_option icp6s_outerrhist.icp6errs_paramprob_option
+#define icp6s_oredirect icp6s_outerrhist.icp6errs_redirect
+#define icp6s_ounknown icp6s_outerrhist.icp6errs_unknown
+	u_quad_t icp6s_pmtuchg;		/* path MTU changes */
+	u_quad_t icp6s_nd_badopt;	/* bad ND options */
+	u_quad_t icp6s_badns;		/* bad neighbor solicitation */
+	u_quad_t icp6s_badna;		/* bad neighbor advertisement */
+	u_quad_t icp6s_badrs;		/* bad router advertisement */
+	u_quad_t icp6s_badra;		/* bad router advertisement */
+	u_quad_t icp6s_badredirect;	/* bad redirect message */
+};
+
 #endif /* netinet/icmpv6.h */
