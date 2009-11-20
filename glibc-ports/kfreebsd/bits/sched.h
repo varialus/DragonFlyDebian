@@ -132,7 +132,7 @@ typedef struct
   (__extension__							      \
    ({ size_t __cpu = (cpu);						      \
       __cpu < 8 * (setsize)						      \
-      ? ((((const __cpu_mask *) ((cpusetp)->__bits))[__CPUELT (__cpu)]	      \
+      ? ((((__const __cpu_mask *) ((cpusetp)->__bits))[__CPUELT (__cpu)]	      \
 	  & __CPUMASK (__cpu))) != 0					      \
       : 0; }))
 
@@ -145,8 +145,8 @@ typedef struct
 # else
 #  define __CPU_EQUAL_S(setsize, cpusetp1, cpusetp2) \
   (__extension__							      \
-   ({ __cpu_mask *__arr1 = (cpusetp1)->__bits;				      \
-      __cpu_mask *__arr2 = (cpusetp2)->__bits;				      \
+   ({ __const __cpu_mask *__arr1 = (cpusetp1)->__bits;				      \
+      __const __cpu_mask *__arr2 = (cpusetp2)->__bits;				      \
       size_t __imax = (setsize) / sizeof (__cpu_mask);			      \
       size_t __i;							      \
       for (__i = 0; __i < __imax; ++__i)				      \
@@ -158,8 +158,8 @@ typedef struct
 # define __CPU_OP_S(setsize, destset, srcset1, srcset2, op) \
   (__extension__							      \
    ({ cpu_set_t *__dest = (destset);					      \
-      __cpu_mask *__arr1 = (srcset1)->__bits;				      \
-      __cpu_mask *__arr2 = (srcset2)->__bits;				      \
+      __const __cpu_mask *__arr1 = (srcset1)->__bits;				      \
+      __const __cpu_mask *__arr2 = (srcset2)->__bits;				      \
       size_t __imax = (setsize) / sizeof (__cpu_mask);			      \
       size_t __i;							      \
       for (__i = 0; __i < __imax; ++__i)				      \
