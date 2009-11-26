@@ -2,8 +2,8 @@
 Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
 	/dev/full already rejected in upstream (kern/68961)
 
---- src.orig/sys/dev/null/null.c
-+++ src/sys/dev/null/null.c
+--- a/sys/dev/null/null.c
++++ b/sys/dev/null/null.c
 @@ -43,13 +43,16 @@
  
  /* For use with destroy_dev(9). */
@@ -62,7 +62,7 @@ Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
  	if (cmd != DIOCSKERNELDUMP)
  		return (ENOIOCTL);
  	error = priv_check(td, PRIV_SETDUMPER);
-@@ -117,12 +137,15 @@
+@@ -117,12 +142,15 @@
  		zbuf = (void *)malloc(PAGE_SIZE, M_TEMP, M_WAITOK | M_ZERO);
  		null_dev = make_dev(&null_cdevsw, NULL_MINOR, UID_ROOT,
  			GID_WHEEL, 0666, "null");

@@ -5,8 +5,8 @@ It is a revert of upstream commit r18970:
 | 
 | This makes Xorg happy if you aren't using moused.
 
---- src.orig/sys/dev/atkbdc/psm.c
-+++ src/sys/dev/atkbdc/psm.c
+--- a/sys/dev/atkbdc/psm.c
++++ b/sys/dev/atkbdc/psm.c
 @@ -70,10 +70,7 @@
  #include <sys/module.h>
  #include <sys/bus.h>
@@ -18,7 +18,7 @@ It is a revert of upstream commit r18970:
  #include <sys/syslog.h>
  #include <machine/bus.h>
  #include <sys/rman.h>
-@@ -215,7 +212,6 @@
+@@ -302,7 +299,6 @@
  	struct cdev	*bdev;
  	int		lasterr;
  	int		cmdcount;
@@ -26,7 +26,7 @@ It is a revert of upstream commit r18970:
  };
  static devclass_t psm_devclass;
  #define	PSM_SOFTC(unit)	\
-@@ -1387,7 +1383,6 @@
+@@ -1494,7 +1490,6 @@
  	sc->mode.level = sc->dflt_mode.level;
  	sc->mode.protocol = sc->dflt_mode.protocol;
  	sc->watchdog = FALSE;
@@ -34,7 +34,7 @@ It is a revert of upstream commit r18970:
  
  	/* flush the event queue */
  	sc->queue.count = 0;
-@@ -1527,12 +1522,6 @@
+@@ -1634,12 +1629,6 @@
  	/* remove anything left in the output buffer */
  	empty_aux_buffer(sc->kbdc, 10);
  
@@ -47,7 +47,7 @@ It is a revert of upstream commit r18970:
  	/* close is almost always successful */
  	sc->state &= ~PSM_OPEN;
  	kbdc_lock(sc->kbdc, FALSE);
-@@ -2094,15 +2083,6 @@
+@@ -2201,15 +2190,6 @@
  		break;
  #endif /* MOUSE_GETHWID */
  
@@ -63,7 +63,7 @@ It is a revert of upstream commit r18970:
  	default:
  		return (ENOTTY);
  	}
-@@ -2992,9 +2972,6 @@
+@@ -3474,9 +3454,6 @@
  		wakeup(sc);
  	}
  	selwakeuppri(&sc->rsel, PZERO);
