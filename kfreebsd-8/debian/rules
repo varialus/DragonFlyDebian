@@ -7,6 +7,8 @@ SHELL = bash
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+SVN=http://svn.freebsd.org/base/release/8.0.0/
+
 full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
 version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
@@ -18,6 +20,7 @@ flavours	:= $(config_files:debian/arch/$(cpu)/%.config=%)
 configfile	:= DEBCUSTOM
 abiname		:= 1
 
+SVN		:= svn://svn.freebsd.org/base/release/$(version).0
 SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
 IMAGE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname)
 HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-headers-$(version)-$(abiname)
@@ -25,9 +28,20 @@ SRC_TAR		:= kfreebsd-source-$(version).tar.bz2
 SRC_DIR		:= kfreebsd-source-$(version)
 HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
 FLAVOR_DIR	:= flavor-$(version)-$(abiname)
-
+ORIG_DIR	:= kfreebsd-$(major)-$(version)
+ORIG_TAR	:= kfreebsd-$(major)_$(version).orig.tar.gz
 MAKE		:= make MACHINE_ARCH=$(cpu) CC=gcc-4.3 WERROR=
 PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
+
+include /usr/share/quilt/quilt.make
+
+get-orig-source:
+	rm -rf $(ORIG_DIR)
+	for i in sys usr.sbin/config ; do \
+		svn export $(SVN)/$$i $(ORIG_DIR)/$$i ; \
+	done
+	tar --numeric-owner --owner 0 --group 0 -czf ../$(ORIG_TAR) $(ORIG_DIR)
+	rm -rf $(ORIG_DIR)
 
 control: clean
 	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
@@ -41,10 +55,10 @@ control: clean
 		done ; \
 	done
 
-clean:
+clean: unpatch
 	dh_testdir
 	dh_testroot
-	rm -rf .pc src kfreebsd-source-* flavor-* config
+	rm -rf src kfreebsd-source-* flavor-* config
 	rm -f debian/kfreebsd-image-*.preinst
 	rm -f debian/kfreebsd-image-*.prerm
 	rm -f debian/kfreebsd-image-*.postinst
@@ -55,9 +69,10 @@ clean:
 
 src: src-stamp
 src-stamp:
-	tar xfj $(CURDIR)/src.tar.bz2
+	QUILT_PATCHES=$(QUILT_PATCH_DIR) quilt --quiltrc /dev/null push -a || test $$? = 2
 
-	set -e ; find src -type d -name CVS | xargs rm -rf
+	mkdir $(CURDIR)/src
+	cp -af $(CURDIR)/sys $(CURDIR)/usr.sbin $(CURDIR)/src
 
 	set -e ; find src -type f | (while read i ; do \
 		sed -i $$i \
@@ -73,7 +88,6 @@ src-stamp:
 		-e 's,#\( \|\t\)*include\( \|\t\)*\(<\|"\)pflog.h\(>\|"\),,g' \
 	; done)
 
-	set -e ; cd $(CURDIR)/src ; QUILT_PC=$(CURDIR)/.pc QUILT_PATCHES=$(CURDIR)/debian/patches quilt --quiltrc /dev/null push -a ; cd $(CURDIR)
 	install debian/gen-ld-u-options src/usr.sbin/config
 	grep -v ^__FBSDID src/sys/kern/subr_sbuf.c > src/usr.sbin/config/sbuf.c
 
