@@ -1,0 +1,21 @@
+ 
+ add some backward compatibility with previous USB stack
+
+
+Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
+===================================================================
+--- kfreebsd-source-8.0.orig/sys/dev/usb/usb.h
++++ kfreebsd-source-8.0/sys/dev/usb/usb.h
+@@ -727,4 +727,12 @@
+ 	USB_STATE_CONFIGURED,
+ };
+ #define	USB_STATE_MAX	(USB_STATE_CONFIGURED+1)
++
++#include <dev/usb/usb_ioctl.h>
++
++struct usb_ctl_report {
++       int     ucr_report;
++       u_char  ucr_data[1024]; /* filled data size will vary */
++};
++
+ #endif					/* _USB_STANDARD_H_ */
