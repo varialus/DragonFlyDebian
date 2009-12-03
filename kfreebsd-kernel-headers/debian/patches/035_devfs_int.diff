@@ -1,0 +1,12 @@
+--- kfreebsd-source-8.0.orig/sys/fs/devfs/devfs_int.h
++++ kfreebsd-source-8.0/sys/fs/devfs/devfs_int.h
+@@ -68,6 +68,9 @@
+ 	LIST_HEAD(, cdev_privdata) cdp_fdpriv;
+ };
+ 
++#define member2struct(s, m, x)		\
++	((struct s *)(void *)((char *)(x) - offsetof(struct s, m)))      
++              
+ #define	cdev2priv(c)	member2struct(cdev_priv, cdp_c, c)
+ 
+ struct cdev *devfs_alloc(void);
