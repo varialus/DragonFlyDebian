@@ -50,7 +50,7 @@ patch-stamp:
 	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
 	touch $@
 
-build-arch: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-devstat build-memstat build-netgraph
+build-arch: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-usb build-devstat build-memstat build-netgraph
 
 build-cam: build-cam-stamp
 build-cam-stamp: patch build-sbuf
@@ -102,6 +102,11 @@ build-usbhid-stamp: patch
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid
 	touch $@
 
+build-usb: build-usb-stamp
+build-usb-stamp: patch
+	$(PMAKE) -C $(CURDIR)/lib/libusb
+	touch $@
+
 build-indep: build-indep-stamp
 build-indep-stamp:
 	touch $@
@@ -119,6 +124,7 @@ clean:
 	$(PMAKE) -C $(CURDIR)/lib/libkvm clean
 	$(PMAKE) -C $(CURDIR)/lib/libsbuf clean
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid clean
+	$(PMAKE) -C $(CURDIR)/lib/libusb clean
 	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
 	rm -rf .pc
 	rm -f *stamp
@@ -144,6 +150,7 @@ install-arch:
 	$(PMAKE) -C $(CURDIR)/lib/libmemstat install
 	$(PMAKE) -C $(CURDIR)/lib/libnetgraph install
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid install
+	$(PMAKE) -C $(CURDIR)/lib/libusb install
 
 	dh_install -s --list-missing --sourcedir=debian/tmp
 

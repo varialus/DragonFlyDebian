@@ -1,0 +1,23 @@
+--- a/lib/libusb/usb.h
++++ b/lib/libusb/usb.h
+@@ -27,8 +27,8 @@
+ #ifndef _LIBUSB20_COMPAT_01_H_
+ #define	_LIBUSB20_COMPAT_01_H_
+ 
+-#include <sys/stdint.h>
+-#include <sys/endian.h>
++#include <stdint.h>
++#include <endian.h>
+ #include <sys/types.h>
+ #include <sys/param.h>
+ 
+--- a/lib/libusb/Makefile
++++ b/lib/libusb/Makefile
+@@ -15,6 +15,7 @@
+ MAN=		libusb.3 libusb20.3
+ MKLINT=		no
+ NOGCCERROR=
++LDADD+=		-lpthread -lrt -lbsd
+ 
+ MLINKS+=	libusb.3 usb.3
+ 
