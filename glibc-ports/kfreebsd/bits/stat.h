@@ -195,8 +195,8 @@ extern int chflags (__const char *__file, unsigned long int __flags) __THROW;
 extern int fchflags (int __fd, unsigned long int __flags) __THROW;
 
 
-extern char *devname_r(dev_t dev, mode_t type, char *buf, int len) __THROW;
-extern char *devname(dev_t dev, mode_t type) __THROW;
+extern char *devname_r(__dev_t dev, __mode_t type, char *buf, int len) __THROW;
+extern char *devname(__dev_t dev, __mode_t type) __THROW;
                                                                                                                                                                                                          
 __END_DECLS
 
