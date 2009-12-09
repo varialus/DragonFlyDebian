@@ -85,10 +85,10 @@ case "$1" in
     
     echo "done."
    
-    if [ $(readlink /etc/mtab) != "/proc/mounts" ] ; then
+    if [ "$(readlink /etc/mtab)" != "/proc/mounts" ] ; then
       echo "Warning: replacing /etc/mtab by a symlink to /proc/mounts."
       rm -f /etc/mtab
-      ln -f /proc/mounts /etc/mtab
+      ln -sf /proc/mounts /etc/mtab
     fi
 
     # Mount /dev/fd, /proc and /sys
