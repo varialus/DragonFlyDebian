@@ -1,131 +1,112 @@
-/* `ptrace' debugger support interface.  FreeBSD version.
-   Copyright (C) 1996-1999, 2000, 2002 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
-
+/*-
+ * Copyright (c) 1984, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *	@(#)ptrace.h	8.2 (Berkeley) 1/4/94
+ * $FreeBSD: src/sys/sys/ptrace.h,v 1.28.10.1.2.1 2009/10/25 01:10:29 kensmith Exp $
+ */
+ 
 #ifndef _SYS_PTRACE_H
 #define _SYS_PTRACE_H	1
 
 #include <features.h>
+#include <sys/types.h>
 
 __BEGIN_DECLS
 
-/* Type of the REQUEST argument to `ptrace.'  */
-enum __ptrace_request
-{
-  /* Indicate that the process making this request should be traced.
-     All signals received by this process can be intercepted by its
-     parent, and its parent can use the other `ptrace' requests.  */
-  PTRACE_TRACEME = 0,
-#define PT_TRACE_ME PTRACE_TRACEME
+#define	PT_TRACE_ME	0	/* child declares it's being traced */
+#define	PT_READ_I	1	/* read word in child's I space */
+#define	PT_READ_D	2	/* read word in child's D space */
+/* was	PT_READ_U	3	 * read word in child's user structure */
+#define	PT_WRITE_I	4	/* write word in child's I space */
+#define	PT_WRITE_D	5	/* write word in child's D space */
+/* was	PT_WRITE_U	6	 * write word in child's user structure */
+#define	PT_CONTINUE	7	/* continue the child */
+#define	PT_KILL		8	/* kill the child process */
+#define	PT_STEP		9	/* single step the child */
 
-  /* Return the word in the process's text space at address ADDR.  */
-  PTRACE_PEEKTEXT = 1,
-#define PT_READ_I PTRACE_PEEKTEXT
+#define	PT_ATTACH	10	/* trace some running process */
+#define	PT_DETACH	11	/* stop tracing a process */
+#define PT_IO		12	/* do I/O to/from stopped process. */
 
-  /* Return the word in the process's data space at address ADDR.  */
-  PTRACE_PEEKDATA = 2,
-#define PT_READ_D PTRACE_PEEKDATA
-
-#if 1 /* NB: removed in FreeBSD 4.6 */
-  /* Return the word in the process's user area at offset ADDR.  */
-  PTRACE_PEEKUSER = 3,
-#define PT_READ_U PTRACE_PEEKUSER
+#if 0				/* our threading libray is different */
+#define	PT_LWPINFO	13	/* Info about the LWP that stopped. */
+#define PT_GETNUMLWPS	14	/* get total number of threads */
+#define PT_GETLWPLIST	15	/* get thread list */
 #endif
 
-  /* Write the word DATA into the process's text space at address ADDR.  */
-  PTRACE_POKETEXT = 4,
-#define PT_WRITE_I PTRACE_POKETEXT
+#define PT_CLEARSTEP	16	/* turn off single step */
+#define PT_SETSTEP	17	/* turn on single step */
+#define PT_SUSPEND	18	/* suspend a thread */
+#define PT_RESUME	19	/* resume a thread */
 
-  /* Write the word DATA into the process's data space at address ADDR.  */
-  PTRACE_POKEDATA = 5,
-#define PT_WRITE_D PTRACE_POKEDATA
+#define	PT_TO_SCE	20
+#define	PT_TO_SCX	21
+#define	PT_SYSCALL	22
 
-#if 1 /* NB: removed in FreeBSD 4.6 */
-  /* Write the word DATA into the process's user area at offset ADDR.  */
-  PTRACE_POKEUSER = 6,
-#define PT_WRITE_U PTRACE_POKEUSER
-#endif
+#define PT_GETREGS      33	/* get general-purpose registers */
+#define PT_SETREGS      34	/* set general-purpose registers */
+#define PT_GETFPREGS    35	/* get floating-point registers */
+#define PT_SETFPREGS    36	/* set floating-point registers */
+#define PT_GETDBREGS    37	/* get debugging registers */
+#define PT_SETDBREGS    38	/* set debugging registers */
+#define PT_FIRSTMACH    64	/* for machine-specific requests */
 
-  /* Continue the process.  */
-  PTRACE_CONT = 7,
-#define PT_CONTINUE PTRACE_CONT
-
-  /* Kill the process.  */
-  PTRACE_KILL = 8,
-#define PT_KILL PTRACE_KILL
-
-  /* Single step the process.
-     This is not supported on all machines.  */
-  PTRACE_SINGLESTEP = 9,
-#define PT_STEP PTRACE_SINGLESTEP
-
-  /* Attach to a process that is already running. */
-  PTRACE_ATTACH = 10,
-#define PT_ATTACH PTRACE_ATTACH
-
-  /* Detach from a process attached to with PTRACE_ATTACH.  */
-  PTRACE_DETACH = 11,
-#define PT_DETACH PTRACE_DETACH
-
-  /* CPU specific requests start here.  */
-  __PTRACE_FIRSTMACH = 32,
-
-  /* Get all general purpose registers used by a processes.
-     This is not supported on all machines.  */
-   PTRACE_GETREGS,
-#define PT_GETREGS PTRACE_GETREGS
-
-  /* Set all general purpose registers used by a processes.
-     This is not supported on all machines.  */
-   PTRACE_SETREGS,
-#define PT_SETREGS PTRACE_SETREGS
-
-  /* Get all floating point registers used by a processes.
-     This is not supported on all machines.  */
-   PTRACE_GETFPREGS,
-#define PT_GETFPREGS PTRACE_GETFPREGS
-
-  /* Set all floating point registers used by a processes.
-     This is not supported on all machines.  */
-   PTRACE_SETFPREGS,
-#define PT_SETFPREGS PTRACE_SETFPREGS
-
-  /* Get all debug registers used by a processes.
-     This is not supported on all machines.  */
-   PTRACE_GETDBREGS,
-#define PT_GETDBREGS PTRACE_GETDBREGS
-
-  /* Set all debug registers used by a processes.
-     This is not supported on all machines.  */
-   PTRACE_SETDBREGS
-#define PT_SETDBREGS PTRACE_SETDBREGS
+struct ptrace_io_desc {
+	int	piod_op;	/* I/O operation */
+	void	*piod_offs;	/* child offset */
+	void	*piod_addr;	/* parent offset */
+	size_t	piod_len;	/* request length */
 };
 
-/* Perform process tracing functions.  REQUEST is one of the values
-   above, and determines the action to be taken.
-   For all requests except PTRACE_TRACEME, PID specifies the process to be
-   traced.
+/*
+ * Operations in piod_op.
+ */
+#define PIOD_READ_D	1	/* Read from D space */
+#define PIOD_WRITE_D	2	/* Write to D space */
+#define PIOD_READ_I	3	/* Read from I space */
+#define PIOD_WRITE_I	4	/* Write to I space */
 
-   PID and the other arguments described above for the various requests should
-   appear (those that are used for the particular request) as:
-     pid_t PID, void *ADDR, int DATA, void *ADDR2
-   after REQUEST.  */
-extern int ptrace (enum __ptrace_request __request, ...) __THROW;
+#if 0
+/* Argument structure for PT_LWPINFO. */
+struct ptrace_lwpinfo {
+	lwpid_t	pl_lwpid;	/* LWP described. */
+	int	pl_event;	/* Event that stopped the LWP. */
+#define	PL_EVENT_NONE	0
+#define	PL_EVENT_SIGNAL	1
+	int	pl_flags;	/* LWP flags. */
+#define	PL_FLAG_SA	0x01	/* M:N thread */
+#define	PL_FLAG_BOUND	0x02	/* M:N bound thread */
+	sigset_t	pl_sigmask;	/* LWP signal mask */
+	sigset_t	pl_siglist;	/* LWP pending signal */
+};
+#endif
+
+extern int ptrace(int _request, pid_t _pid, caddr_t _addr, int _data) __THROW;
 
 __END_DECLS
 
