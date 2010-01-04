@@ -43,8 +43,10 @@ struct stat
     __ino64_t st_ino;		/* File serial number.	*/
 #endif
 
-    __uint32_t st_mode;		/* File mode.  */
-    __uint32_t st_nlink;	/* Link count.  */
+    __mode_t st_mode;		/* File mode.  */
+    __mode_t __pad_mode;	/* __mode_t is 16 bit, fill to 32 bit to retain previous ABI */
+    __nlink_t st_nlink;		/* Link count.  */
+    __nlink_t __pad_nlink;	/* __nlink_t is 16 bit, fill to 32 bit to retain previous ABI */
 
     __uid_t st_uid;		/* User ID of the file's owner.  */
     __gid_t st_gid;		/* Group ID of the file's group.  */
@@ -93,8 +95,10 @@ struct stat64
     __dev_t st_dev;		/* Device containing the file.  */
     __ino64_t st_ino;		/* File serial number.	*/
 
-    __uint32_t st_mode;		/* File mode.  */
-    __uint32_t st_nlink;	/* Link count.  */
+    __mode_t st_mode;		/* File mode.  */
+    __mode_t __pad_mode;	/* __mode_t is 16 bit, fill to 32 bit to retain previous ABI */
+    __nlink_t st_nlink;		/* Link count.  */
+    __nlink_t __pad_nlink;	/* __nlink_t is 16 bit, fill to 32 bit to retain previous ABI */
 
     __uid_t st_uid;		/* User ID of the file's owner.  */
     __gid_t st_gid;		/* Group ID of the file's group.  */

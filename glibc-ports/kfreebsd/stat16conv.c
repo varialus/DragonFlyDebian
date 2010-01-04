@@ -38,7 +38,9 @@ stat16_to_stat (const struct stat16 *p16, struct stat *q)
   q->st_dev = p16->st_dev;
   q->st_ino = p16->st_ino;
   q->st_mode = p16->st_mode;
+  q->__pad_mode = 0;
   q->st_nlink = p16->st_nlink;
+  q->__pad_nlink = 0;
   q->st_uid = p16->st_uid;
   q->st_gid = p16->st_gid;
   q->st_rdev = p16->st_rdev;
@@ -62,7 +64,9 @@ stat16_to_stat64 (const struct stat16 *p16, struct stat64 *q)
   q->st_dev = p16->st_dev;
   q->st_ino = p16->st_ino;
   q->st_mode = p16->st_mode;
+  q->__pad_mode = 0;
   q->st_nlink = p16->st_nlink;
+  q->__pad_nlink = 0;
   q->st_uid = p16->st_uid;
   q->st_gid = p16->st_gid;
   q->st_rdev = p16->st_rdev;
