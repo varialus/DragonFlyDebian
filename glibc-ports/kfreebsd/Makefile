@@ -73,8 +73,6 @@ sysdep_routines += kldfind kldfirstmod kldload kldnext kldstat kldsym kldunload 
 sysdep_routines += minherit sys_mmap sys_freebsd6_mmap sys_munmap
 # For <sys/mount.h>.
 sysdep_routines += fhopen sys_fhstat sys_fhstatfs fhstat fhstat64 fhstatfs fhstatfs64 getfh getfsstat getfsstat64 sys_getfsstat getmntinfo getmntinfo64 mount nmount unmount
-# For <sys/ptrace.h>.
-sysdep_routines += sys_ptrace
 # For <sys/rfork.h>.
 sysdep_routines += rfork
 # For <sys/rtprio.h>.
