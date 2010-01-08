@@ -26,8 +26,6 @@ PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO 
 export SHLIB_MAJOR=0
 export SHLIBDIR=/usr/lib
 
-build: build-arch build-indep
-
 get-orig-source:
 	rm -rf $(ORIGDIR)
 	for i in lib/libcam lib/libdevstat lib/libgeom lib/libipx \
@@ -50,7 +48,7 @@ patch-stamp:
 	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
 	touch $@
 
-build-arch: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-usb build-devstat build-memstat build-netgraph
+build: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-usb build-devstat build-memstat build-netgraph
 
 build-cam: build-cam-stamp
 build-cam-stamp: patch build-sbuf
@@ -107,10 +105,6 @@ build-usb-stamp: patch
 	$(PMAKE) -C $(CURDIR)/lib/libusb
 	touch $@
 
-build-indep: build-indep-stamp
-build-indep-stamp:
-	touch $@
-
 clean:
 	dh_testdir
 	dh_testroot
@@ -130,10 +124,7 @@ clean:
 	rm -f *stamp
 	dh_clean
 
-install: install-indep install-arch
-install-indep:
-
-install-arch:
+install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k -s
@@ -159,44 +150,34 @@ install-arch:
 
 	dh_install -s --list-missing --sourcedir=debian/tmp
 
-# Must not depend on anything. This is to be called by
-# binary-arch/binary-indep
-# in another 'make' thread.
-binary-common:
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs
-	dh_installdocs
+	dh_installchangelogs -a
+	dh_installdocs -a
 #	dh_installexamples
-#	dh_installmenu
-#	dh_installdebconf
-#	dh_installlogrotate
-#	dh_installemacsen
-#	dh_installpam
-#	dh_installmime
 #	dh_installinit
 #	dh_installcron
 #	dh_installinfo
 #	dh_installman
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
+	dh_link -a
+	dh_strip -a
+	dh_compress -a
+	dh_fixperms -a
 #	dh_perl
 #	dh_python
-	dh_makeshlibs
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-# Build architecture independant packages using the common target.
-binary-indep: build-indep install-indep
-#	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
-
-# Build architecture dependant packages using the common target.
-binary-arch: build-arch install-arch
-	$(MAKE) -f debian/rules DH_OPTIONS=-s binary-common
+	dh_makeshlibs -a
+	dh_makeshlibs -plibusb2 --add-udeb=libusb2-udeb
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
 
 binary: binary-arch binary-indep
-.PHONY: build clean binary-indep binary-arch binary install install-indep install-arch configure
+.PHONY: build clean binary-indep binary-arch binary install configure
