@@ -29,6 +29,11 @@
 #include <dl-sysdep.h>
 #include <tls.h>
 
+#if defined __i686 && defined __ASSEMBLER__
+#undef __i686
+#define __i686 __i686
+#endif
+
 #ifdef __ASSEMBLER__
 
 /* We don't want the label for the error handle to be global when we define
