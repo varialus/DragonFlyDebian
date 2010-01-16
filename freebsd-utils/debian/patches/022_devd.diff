@@ -1,0 +1,37 @@
+--- freebsd-utils-8.0.orig/sbin/devd/parse.y	(revision 200600)
++++ freebsd-utils-8.0/sbin/devd/parse.y	(working copy)
+@@ -29,9 +29,9 @@
+  * $FreeBSD$
+  */
+ 
+-#include "devd.h"
+ #include <stdio.h>
+ #include <string.h>
++#include "devd.h"
+ 
+ %}
+ 
+--- freebsd-utils-8.0.orig/sbin/devd/devd.cc	(revision 200600)
++++ freebsd-utils-8.0/sbin/devd/devd.cc	(working copy)
+@@ -55,6 +55,8 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <bsd/stdlib.h>
++#include <bsd/string.h>
+ 
+ #include <algorithm>
+ #include <map>
+--- freebsd-utils-8.0.orig/sbin/devd/Makefile	(revision 200600)
++++ freebsd-utils-8.0/sbin/devd/Makefile	(working copy)
+@@ -10,7 +10,7 @@
+ NO_SHARED?=YES
+ 
+ DPADD=	${LIBL} ${LIBUTIL}
+-LDADD=	-ll -lutil
++LDADD=	-ll -lutil -lbsd
+ 
+ YFLAGS+=-v
+ CFLAGS+=-I. -I${.CURDIR}
+
+

@@ -6,11 +6,14 @@
 #export DH_VERBOSE=1
 
 CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)='
+CXXFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)='
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
+	CXXFLAGS += -O0
 else
 	CFLAGS += -O2
+	CXXFLAGS += -O2
 endif
 
 VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
@@ -25,7 +28,7 @@ build: build-arch build-indep
 get-orig-source:
 	rm -rf $(ORIGDIR)
 	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
-		 usr.sbin/jail bin/chflags \
+		 usr.sbin/jail bin/chflags sbin/devd usr.sbin/acpi/acpiconf \
 		 sbin/kldconfig sbin/kldload sbin/kldstat sbin/kldunload \
 		 sbin/ifconfig sbin/route usr.bin/netstat usr.sbin/rpc.umntall \
 	         usr.sbin/ppp usr.sbin/pppctl usr.sbin/pppd \
@@ -59,6 +62,7 @@ freebsd-utils-stamp: patch-stamp
 #	$(PMAKE) -C bin/chflags
 	$(PMAKE) -C bin/kenv
 	$(PMAKE) -C sbin/ccdconfig
+	$(PMAKE) -C sbin/devd
 	$(PMAKE) -C sbin/dmesg
 	$(PMAKE) -C sbin/mdconfig
 	$(PMAKE) -C sbin/mount
@@ -79,6 +83,7 @@ freebsd-utils-stamp: patch-stamp
 	$(PMAKE) -C sbin/umount
 #	$(PMAKE) -C usr.bin/kdump
 	$(PMAKE) -C usr.bin/ktrace
+	$(PMAKE) -C usr.sbin/acpi/acpiconf
 	$(PMAKE) -C usr.sbin/rpc.umntall
 	touch $@
 
@@ -123,10 +128,13 @@ build-indep-stamp:
 clean:
 	dh_testdir
 	dh_testroot
+
 	[ ! -f lib/Makefile ] || $(MAKE) -C lib clean
+
 	$(PMAKE) -C bin/chflags clean
-	[ ! -f bin/kenv/Makefile ] || $(PMAKE) -C bin/kenv clean
+	$(PMAKE) -C bin/kenv clean
 	$(PMAKE) -C sbin/ccdconfig clean
+	! [ -f sbin/devd/Makefile ] ||  $(PMAKE) -C sbin/devd clean
 	$(PMAKE) -C sbin/dmesg clean
 	$(PMAKE) -C sbin/mdconfig clean
 	$(PMAKE) -C sbin/mount clean
@@ -147,18 +155,24 @@ clean:
 	$(PMAKE) -C sbin/umount clean
 	$(PMAKE) -C usr.bin/kdump clean
 	$(PMAKE) -C usr.bin/ktrace clean
+	! [ -d usr.sbin/acpi/acpiconf ] || $(PMAKE) -C usr.sbin/acpi/acpiconf clean
 	$(PMAKE) -C usr.sbin/rpc.umntall clean
+
 	$(PMAKE) -C sbin/gbde clean
+
 	$(PMAKE) -C usr.sbin/kbdcontrol clean
+
 	$(PMAKE) -C sbin/kldconfig clean
 	$(PMAKE) -C sbin/kldload clean
 	$(PMAKE) -C sbin/kldstat clean
 	$(PMAKE) -C sbin/kldunload clean
+
 	$(PMAKE) -C sbin/ifconfig clean
 	$(PMAKE) -C sbin/pfctl clean
 	$(PMAKE) -C sbin/route clean
 	$(PMAKE) -C usr.bin/netstat clean
 	$(PMAKE) -C usr.sbin/authpf clean
+
 	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
 	rm -rf .pc
 	rm -f *stamp

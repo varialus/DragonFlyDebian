@@ -1,0 +1,2157 @@
+# This patch should be removed when a new tarball is created
+
+diff -Nurd a/sbin/devd/devd.8 b/sbin/devd/devd.8
+--- a/sbin/devd/devd.8	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devd/devd.8	2006-09-18 00:49:26.000000000 +0200
+@@ -0,0 +1,147 @@
++.\"
++.\" Copyright (c) 2002 M. Warner Losh.
++.\" All rights reserved.
++.\"
++.\" Redistribution and use in source and binary forms, with or without
++.\" modification, are permitted provided that the following conditions
++.\" are met:
++.\" 1. Redistributions of source code must retain the above copyright
++.\"    notice, this list of conditions and the following disclaimer.
++.\" 2. Redistributions in binary form must reproduce the above copyright
++.\"    notice, this list of conditions and the following disclaimer in the
++.\"    documentation and/or other materials provided with the distribution.
++.\"
++.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++.\" SUCH DAMAGE.
++.\"
++.\" $FreeBSD$
++.\"
++.Dd November 24, 2005
++.Dt DEVD 8
++.Os
++.Sh NAME
++.Nm devd
++.Nd "device state change daemon"
++.Sh SYNOPSIS
++.Nm
++.Op Fl Ddn
++.Op Fl f Ar file
++.Sh DESCRIPTION
++The
++.Nm
++daemon provides a way to have userland programs run when certain
++kernel events happen.
++.Pp
++The following options are accepted.
++.Bl -tag -width ".Fl f Ar file"
++.It Fl D
++Enable debugging messages.
++.It Fl d
++Run in the foreground instead of becoming a daemon.
++.It Fl f Ar file
++Use configuration file
++.Ar file
++instead of the default
++.Pa /etc/devd.conf .
++If option
++.Fl f
++is specified more than once, the last file specified is used.
++.It Fl n
++Do not process all pending events before becoming a daemon.
++Instead, call daemon right away.
++.El
++.Sh IMPLEMENTATION NOTES
++The
++.Nm
++utility
++is a system daemon that runs in the background all the time.
++Whenever a device is added to or removed from the device tree,
++.Nm
++will execute actions specified in
++.Xr devd.conf 5 .
++For example,
++.Nm
++might execute
++.Xr dhclient 8
++when an Ethernet adapter is added to the system, and kill the
++.Xr dhclient 8
++instance when the same adapter is removed.
++Another example would be for
++.Nm
++to use a table to locate and load via
++.Xr kldload 8
++the proper driver for an unrecognized device that is added to the system.
++.Pp
++The
++.Nm
++utility
++hooks into the
++.Xr devctl 4
++device driver.
++This device driver has hooks into the device configuration system.
++When nodes are added or deleted from the tree, this device will
++deliver information about the event to
++.Nm .
++Once
++.Nm
++has parsed the message, it will search its action list for that kind
++of event and perform the action with the highest matching value.
++For most mundane uses, the default handlers are adequate.
++However, for more advanced users, the power is present to tweak every
++aspect of what happens.
++.Pp
++The
++.Nm
++utility
++reads
++.Pa /etc/devd.conf
++or the alternate configuration file specified with a
++.Fl f
++option and uses that file to drive the rest of the process.
++While the format of this file is described in
++.Xr devd.conf 5 ,
++some basics are covered here.
++In the
++.Ic options
++section, one can define multiple directories to search
++for config files.
++All files in these directories whose names match the pattern
++.Pa *.conf
++are parsed.
++These files are intended to be installed by third party vendors that
++wish to hook into the
++.Nm
++system without modifying the user's other
++config files.
++.Pp
++All messages that
++.Nm
++receives are forwarded to the
++.Ux
++domain socket at
++.Pa /var/run/devd.pipe .
++.Sh FILES
++.Bl -tag -width ".Pa /var/run/devd.pipe" -compact
++.It Pa /etc/devd.conf
++The default
++.Nm
++configuration file.
++.It Pa /var/run/devd.pipe
++The socket used by
++.Nm
++to communicate with its clients.
++.El
++.Sh SEE ALSO
++.Xr devctl 4 ,
++.Xr devd.conf 5
++.Sh AUTHORS
++.An M. Warner Losh
+diff -Nurd a/sbin/devd/devd.cc b/sbin/devd/devd.cc
+--- a/sbin/devd/devd.cc	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devd/devd.cc	2008-12-14 12:48:51.000000000 +0100
+@@ -0,0 +1,965 @@
++/*-
++ * Copyright (c) 2002-2003 M. Warner Losh.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++
++/*
++ * DEVD control daemon.
++ */
++
++// TODO list:
++//	o devd.conf and devd man pages need a lot of help:
++//	  - devd needs to document the unix domain socket
++//	  - devd.conf needs more details on the supported statements.
++
++#include <sys/cdefs.h>
++__FBSDID("$FreeBSD$");
++
++#include <sys/param.h>
++#include <sys/socket.h>
++#include <sys/stat.h>
++#include <sys/sysctl.h>
++#include <sys/types.h>
++#include <sys/un.h>
++
++#include <ctype.h>
++#include <dirent.h>
++#include <errno.h>
++#include <err.h>
++#include <fcntl.h>
++#include <libutil.h>
++#include <regex.h>
++#include <signal.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <unistd.h>
++
++#include <algorithm>
++#include <map>
++#include <string>
++#include <list>
++#include <vector>
++
++#include "devd.h"		/* C compatible definitions */
++#include "devd.hh"		/* C++ class definitions */
++
++#define PIPE "/var/run/devd.pipe"
++#define CF "/etc/devd.conf"
++#define SYSCTL "hw.bus.devctl_disable"
++
++using namespace std;
++
++extern FILE *yyin;
++extern int lineno;
++
++static const char notify = '!';
++static const char nomatch = '?';
++static const char attach = '+';
++static const char detach = '-';
++
++static struct pidfh *pfh;
++
++int Dflag;
++int dflag;
++int nflag;
++int romeo_must_die = 0;
++
++static const char *configfile = CF;
++
++static void event_loop(void);
++static void usage(void);
++
++template <class T> void
++delete_and_clear(vector<T *> &v)
++{
++	typename vector<T *>::const_iterator i;
++
++	for (i = v.begin(); i != v.end(); i++)
++		delete *i;
++	v.clear();
++}
++
++config cfg;
++
++event_proc::event_proc() : _prio(-1)
++{
++	// nothing
++}
++
++event_proc::~event_proc()
++{
++	delete_and_clear(_epsvec);
++}
++
++void
++event_proc::add(eps *eps)
++{
++	_epsvec.push_back(eps);
++}
++
++bool
++event_proc::matches(config &c)
++{
++	vector<eps *>::const_iterator i;
++
++	for (i = _epsvec.begin(); i != _epsvec.end(); i++)
++		if (!(*i)->do_match(c))
++			return (false);
++	return (true);
++}
++
++bool
++event_proc::run(config &c)
++{
++	vector<eps *>::const_iterator i;
++		
++	for (i = _epsvec.begin(); i != _epsvec.end(); i++)
++		if (!(*i)->do_action(c))
++			return (false);
++	return (true);
++}
++
++action::action(const char *cmd)
++	: _cmd(cmd) 
++{
++	// nothing
++}
++
++action::~action()
++{
++	// nothing
++}
++
++bool
++action::do_action(config &c)
++{
++	string s = c.expand_string(_cmd);
++	if (Dflag)
++		fprintf(stderr, "Executing '%s'\n", s.c_str());
++	::system(s.c_str());
++	return (true);
++}
++
++match::match(config &c, const char *var, const char *re)
++	: _var(var)
++{
++	string pattern = re;
++	_re = "^";
++	_re.append(c.expand_string(string(re)));
++	_re.append("$");
++	regcomp(&_regex, _re.c_str(), REG_EXTENDED | REG_NOSUB | REG_ICASE);
++}
++
++match::~match()
++{
++	regfree(&_regex);
++}
++
++bool
++match::do_match(config &c)
++{
++	string value = c.get_variable(_var);
++	bool retval;
++
++	if (Dflag)
++		fprintf(stderr, "Testing %s=%s against %s\n", _var.c_str(),
++		    value.c_str(), _re.c_str());
++
++	retval = (regexec(&_regex, value.c_str(), 0, NULL, 0) == 0);
++	return retval;
++}
++
++#include <sys/sockio.h>
++#include <net/if.h>
++#include <net/if_media.h>
++
++media::media(config &, const char *var, const char *type)
++	: _var(var), _type(-1)
++{
++	static struct ifmedia_description media_types[] = {
++		{ IFM_ETHER,		"Ethernet" },
++		{ IFM_TOKEN,		"Tokenring" },
++		{ IFM_FDDI,		"FDDI" },
++		{ IFM_IEEE80211,	"802.11" },
++		{ IFM_ATM,		"ATM" },
++		{ IFM_CARP,		"CARP" },
++		{ -1,			"unknown" },
++		{ 0, NULL },
++	};
++	for (int i = 0; media_types[i].ifmt_string != NULL; i++)
++		if (strcasecmp(type, media_types[i].ifmt_string) == 0) {
++			_type = media_types[i].ifmt_word;
++			break;
++		}
++}
++
++media::~media()
++{
++}
++
++bool
++media::do_match(config &c)
++{
++	string value;
++	struct ifmediareq ifmr;
++	bool retval;
++	int s;
++
++	// Since we can be called from both a device attach/detach
++	// context where device-name is defined and what we want,
++	// as well as from a link status context, where subsystem is
++	// the name of interest, first try device-name and fall back
++	// to subsystem if none exists.
++	value = c.get_variable("device-name");
++	if (value.length() == 0)
++		value = c.get_variable("subsystem");
++	if (Dflag)
++		fprintf(stderr, "Testing media type of %s against 0x%x\n",
++		    value.c_str(), _type);
++
++	retval = false;
++
++	s = socket(PF_INET, SOCK_DGRAM, 0);
++	if (s >= 0) {
++		memset(&ifmr, 0, sizeof(ifmr));
++		strncpy(ifmr.ifm_name, value.c_str(), sizeof(ifmr.ifm_name));
++
++		if (ioctl(s, SIOCGIFMEDIA, (caddr_t)&ifmr) >= 0 &&
++		    ifmr.ifm_status & IFM_AVALID) {
++			if (Dflag)
++				fprintf(stderr, "%s has media type 0x%x\n", 
++				    value.c_str(), IFM_TYPE(ifmr.ifm_active));
++			retval = (IFM_TYPE(ifmr.ifm_active) == _type);
++		} else if (_type == -1) {
++			if (Dflag)
++				fprintf(stderr, "%s has unknown media type\n", 
++				    value.c_str());
++			retval = true;
++		}
++		close(s);
++	}
++
++	return retval;
++}
++
++const string var_list::bogus = "_$_$_$_$_B_O_G_U_S_$_$_$_$_";
++const string var_list::nothing = "";
++
++const string &
++var_list::get_variable(const string &var) const
++{
++	map<string, string>::const_iterator i;
++
++	i = _vars.find(var);
++	if (i == _vars.end())
++		return (var_list::bogus);
++	return (i->second);
++}
++
++bool
++var_list::is_set(const string &var) const
++{
++	return (_vars.find(var) != _vars.end());
++}
++
++void
++var_list::set_variable(const string &var, const string &val)
++{
++	if (Dflag)
++		fprintf(stderr, "setting %s=%s\n", var.c_str(), val.c_str());
++	_vars[var] = val;
++}
++
++void
++config::reset(void)
++{
++	_dir_list.clear();
++	delete_and_clear(_var_list_table);
++	delete_and_clear(_attach_list);
++	delete_and_clear(_detach_list);
++	delete_and_clear(_nomatch_list);
++	delete_and_clear(_notify_list);
++}
++
++void
++config::parse_one_file(const char *fn)
++{
++	if (Dflag)
++		fprintf(stderr, "Parsing %s\n", fn);
++	yyin = fopen(fn, "r");
++	if (yyin == NULL)
++		err(1, "Cannot open config file %s", fn);
++	lineno = 1;
++	if (yyparse() != 0)
++		errx(1, "Cannot parse %s at line %d", fn, lineno);
++	fclose(yyin);
++}
++
++void
++config::parse_files_in_dir(const char *dirname)
++{
++	DIR *dirp;
++	struct dirent *dp;
++	char path[PATH_MAX];
++
++	if (Dflag)
++		fprintf(stderr, "Parsing files in %s\n", dirname);
++	dirp = opendir(dirname);
++	if (dirp == NULL)
++		return;
++	readdir(dirp);		/* Skip . */
++	readdir(dirp);		/* Skip .. */
++	while ((dp = readdir(dirp)) != NULL) {
++		if (strcmp(dp->d_name + dp->d_namlen - 5, ".conf") == 0) {
++			snprintf(path, sizeof(path), "%s/%s",
++			    dirname, dp->d_name);
++			parse_one_file(path);
++		}
++	}
++}
++
++class epv_greater {
++public:
++	int operator()(event_proc *const&l1, event_proc *const&l2)
++	{
++		return (l1->get_priority() > l2->get_priority());
++	}
++};
++
++void
++config::sort_vector(vector<event_proc *> &v)
++{
++	sort(v.begin(), v.end(), epv_greater());
++}
++
++void
++config::parse(void)
++{
++	vector<string>::const_iterator i;
++
++	parse_one_file(configfile);
++	for (i = _dir_list.begin(); i != _dir_list.end(); i++)
++		parse_files_in_dir((*i).c_str());
++	sort_vector(_attach_list);
++	sort_vector(_detach_list);
++	sort_vector(_nomatch_list);
++	sort_vector(_notify_list);
++}
++
++void
++config::open_pidfile()
++{
++	pid_t otherpid;
++	
++	if (_pidfile == "")
++		return;
++	pfh = pidfile_open(_pidfile.c_str(), 0600, &otherpid);
++	if (pfh == NULL) {
++		if (errno == EEXIST)
++			errx(1, "devd already running, pid: %d", (int)otherpid);
++		warn("cannot open pid file");
++	}
++}
++
++void
++config::write_pidfile()
++{
++	
++	pidfile_write(pfh);
++}
++
++void
++config::remove_pidfile()
++{
++	
++	pidfile_remove(pfh);
++}
++
++void
++config::add_attach(int prio, event_proc *p)
++{
++	p->set_priority(prio);
++	_attach_list.push_back(p);
++}
++
++void
++config::add_detach(int prio, event_proc *p)
++{
++	p->set_priority(prio);
++	_detach_list.push_back(p);
++}
++
++void
++config::add_directory(const char *dir)
++{
++	_dir_list.push_back(string(dir));
++}
++
++void
++config::add_nomatch(int prio, event_proc *p)
++{
++	p->set_priority(prio);
++	_nomatch_list.push_back(p);
++}
++
++void
++config::add_notify(int prio, event_proc *p)
++{
++	p->set_priority(prio);
++	_notify_list.push_back(p);
++}
++
++void
++config::set_pidfile(const char *fn)
++{
++	_pidfile = string(fn);
++}
++
++void
++config::push_var_table()
++{
++	var_list *vl;
++	
++	vl = new var_list();
++	_var_list_table.push_back(vl);
++	if (Dflag)
++		fprintf(stderr, "Pushing table\n");
++}
++
++void
++config::pop_var_table()
++{
++	delete _var_list_table.back();
++	_var_list_table.pop_back();
++	if (Dflag)
++		fprintf(stderr, "Popping table\n");
++}
++
++void
++config::set_variable(const char *var, const char *val)
++{
++	_var_list_table.back()->set_variable(var, val);
++}
++
++const string &
++config::get_variable(const string &var)
++{
++	vector<var_list *>::reverse_iterator i;
++
++	for (i = _var_list_table.rbegin(); i != _var_list_table.rend(); i++) {
++		if ((*i)->is_set(var))
++			return ((*i)->get_variable(var));
++	}
++	return (var_list::nothing);
++}
++
++bool
++config::is_id_char(char ch)
++{
++	return (ch != '\0' && (isalpha(ch) || isdigit(ch) || ch == '_' || 
++	    ch == '-'));
++}
++
++void
++config::expand_one(const char *&src, string &dst)
++{
++	int count;
++	string buffer, varstr;
++
++	src++;
++	// $$ -> $
++	if (*src == '$') {
++		dst.append(src++, 1);
++		return;
++	}
++		
++	// $(foo) -> $(foo)
++	// Not sure if I want to support this or not, so for now we just pass
++	// it through.
++	if (*src == '(') {
++		dst.append("$");
++		count = 1;
++		/* If the string ends before ) is matched , return. */
++		while (count > 0 && *src) {
++			if (*src == ')')
++				count--;
++			else if (*src == '(')
++				count++;
++			dst.append(src++, 1);
++		}
++		return;
++	}
++	
++	// ${^A-Za-z] -> $\1
++	if (!isalpha(*src)) {
++		dst.append("$");
++		dst.append(src++, 1);
++		return;
++	}
++
++	// $var -> replace with value
++	do {
++		buffer.append(src++, 1);
++	} while (is_id_char(*src));
++	buffer.append("", 1);
++	varstr = get_variable(buffer.c_str());
++	dst.append(varstr);
++}
++
++const string
++config::expand_string(const string &s)
++{
++	const char *src;
++	string dst;
++
++	src = s.c_str();
++	while (*src) {
++		if (*src == '$')
++			expand_one(src, dst);
++		else
++			dst.append(src++, 1);
++	}
++	dst.append("", 1);
++
++	return (dst);
++}
++
++bool
++config::chop_var(char *&buffer, char *&lhs, char *&rhs)
++{
++	char *walker;
++	
++	if (*buffer == '\0')
++		return (false);
++	walker = lhs = buffer;
++	while (is_id_char(*walker))
++		walker++;
++	if (*walker != '=')
++		return (false);
++	walker++;		// skip =
++	if (*walker == '"') {
++		walker++;	// skip "
++		rhs = walker;
++		while (*walker && *walker != '"')
++			walker++;
++		if (*walker != '"')
++			return (false);
++		rhs[-2] = '\0';
++		*walker++ = '\0';
++	} else {
++		rhs = walker;
++		while (*walker && !isspace(*walker))
++			walker++;
++		if (*walker != '\0')
++			*walker++ = '\0';
++		rhs[-1] = '\0';
++	}
++	while (isspace(*walker))
++		walker++;
++	buffer = walker;
++	return (true);
++}
++
++
++char *
++config::set_vars(char *buffer)
++{
++	char *lhs;
++	char *rhs;
++
++	while (1) {
++		if (!chop_var(buffer, lhs, rhs))
++			break;
++		set_variable(lhs, rhs);
++	}
++	return (buffer);
++}
++
++void
++config::find_and_execute(char type)
++{
++	vector<event_proc *> *l;
++	vector<event_proc *>::const_iterator i;
++	const char *s;
++
++	switch (type) {
++	default:
++		return;
++	case notify:
++		l = &_notify_list;
++		s = "notify";
++		break;
++	case nomatch:
++		l = &_nomatch_list;
++		s = "nomatch";
++		break;
++	case attach:
++		l = &_attach_list;
++		s = "attach";
++		break;
++	case detach:
++		l = &_detach_list;
++		s = "detach";
++		break;
++	}
++	if (Dflag)
++		fprintf(stderr, "Processing %s event\n", s);
++	for (i = l->begin(); i != l->end(); i++) {
++		if ((*i)->matches(*this)) {
++			(*i)->run(*this);
++			break;
++		}
++	}
++
++}
++
++
++static void
++process_event(char *buffer)
++{
++	char type;
++	char *sp;
++
++	sp = buffer + 1;
++	if (Dflag)
++		fprintf(stderr, "Processing event '%s'\n", buffer);
++	type = *buffer++;
++	cfg.push_var_table();
++	// No match doesn't have a device, and the format is a little
++	// different, so handle it separately.
++	switch (type) {
++	case notify:
++		sp = cfg.set_vars(sp);
++		break;
++	case nomatch:
++		//? at location pnp-info on bus
++		sp = strchr(sp, ' ');
++		if (sp == NULL)
++			return;	/* Can't happen? */
++		*sp++ = '\0';
++		if (strncmp(sp, "at ", 3) == 0)
++			sp += 3;
++		sp = cfg.set_vars(sp);
++		if (strncmp(sp, "on ", 3) == 0)
++			cfg.set_variable("bus", sp + 3);
++		break;
++	case attach:	/*FALLTHROUGH*/
++	case detach:
++		sp = strchr(sp, ' ');
++		if (sp == NULL)
++			return;	/* Can't happen? */
++		*sp++ = '\0';
++		cfg.set_variable("device-name", buffer);
++		if (strncmp(sp, "at ", 3) == 0)
++			sp += 3;
++		sp = cfg.set_vars(sp);
++		if (strncmp(sp, "on ", 3) == 0)
++			cfg.set_variable("bus", sp + 3);
++		break;
++	}
++	
++	cfg.find_and_execute(type);
++	cfg.pop_var_table();
++}
++
++int
++create_socket(const char *name)
++{
++	int fd, slen;
++	struct sockaddr_un sun;
++
++	if ((fd = socket(PF_LOCAL, SOCK_STREAM, 0)) < 0)
++		err(1, "socket");
++	bzero(&sun, sizeof(sun));
++	sun.sun_family = AF_UNIX;
++	strlcpy(sun.sun_path, name, sizeof(sun.sun_path));
++	slen = SUN_LEN(&sun);
++	unlink(name);
++	if (fcntl(fd, F_SETFL, O_NONBLOCK) < 0)
++	    	err(1, "fcntl");
++	if (bind(fd, (struct sockaddr *) & sun, slen) < 0)
++		err(1, "bind");
++	listen(fd, 4);
++	chown(name, 0, 0);	/* XXX - root.wheel */
++	chmod(name, 0666);
++	return (fd);
++}
++
++list<int> clients;
++
++void
++notify_clients(const char *data, int len)
++{
++	list<int> bad;
++	list<int>::const_iterator i;
++
++	for (i = clients.begin(); i != clients.end(); i++) {
++		if (write(*i, data, len) <= 0) {
++			bad.push_back(*i);
++			close(*i);
++		}
++	}
++
++	for (i = bad.begin(); i != bad.end(); i++)
++		clients.erase(find(clients.begin(), clients.end(), *i));
++}
++
++void
++new_client(int fd)
++{
++	int s;
++
++	s = accept(fd, NULL, NULL);
++	if (s != -1)
++		clients.push_back(s);
++}
++
++static void
++event_loop(void)
++{
++	int rv;
++	int fd;
++	char buffer[DEVCTL_MAXBUF];
++	int once = 0;
++	int server_fd, max_fd;
++	timeval tv;
++	fd_set fds;
++
++	fd = open(PATH_DEVCTL, O_RDONLY);
++	if (fd == -1)
++		err(1, "Can't open devctl device %s", PATH_DEVCTL);
++	if (fcntl(fd, F_SETFD, FD_CLOEXEC) != 0)
++		err(1, "Can't set close-on-exec flag on devctl");
++	server_fd = create_socket(PIPE);
++	max_fd = max(fd, server_fd) + 1;
++	while (1) {
++		if (romeo_must_die)
++			break;
++		if (!once && !dflag && !nflag) {
++			// Check to see if we have any events pending.
++			tv.tv_sec = 0;
++			tv.tv_usec = 0;
++			FD_ZERO(&fds);
++			FD_SET(fd, &fds);
++			rv = select(fd + 1, &fds, &fds, &fds, &tv);
++			// No events -> we've processed all pending events
++			if (rv == 0) {
++				if (Dflag)
++					fprintf(stderr, "Calling daemon\n");
++				cfg.remove_pidfile();
++				cfg.open_pidfile();
++				daemon(0, 0);
++				cfg.write_pidfile();
++				once++;
++			}
++		}
++		FD_ZERO(&fds);
++		FD_SET(fd, &fds);
++		FD_SET(server_fd, &fds);
++		rv = select(max_fd, &fds, NULL, NULL, NULL);
++		if (rv == -1) {
++			if (errno == EINTR)
++				continue;
++			err(1, "select");
++		}
++		if (FD_ISSET(fd, &fds)) {
++			rv = read(fd, buffer, sizeof(buffer) - 1);
++			if (rv > 0) {
++				notify_clients(buffer, rv);
++				buffer[rv] = '\0';
++				while (buffer[--rv] == '\n')
++					buffer[rv] = '\0';
++				process_event(buffer);
++			} else if (rv < 0) {
++				if (errno != EINTR)
++					break;
++			} else {
++				/* EOF */
++				break;
++			}
++		}
++		if (FD_ISSET(server_fd, &fds))
++			new_client(server_fd);
++	}
++	close(fd);
++}
++
++/*
++ * functions that the parser uses.
++ */
++void
++add_attach(int prio, event_proc *p)
++{
++	cfg.add_attach(prio, p);
++}
++
++void
++add_detach(int prio, event_proc *p)
++{
++	cfg.add_detach(prio, p);
++}
++
++void
++add_directory(const char *dir)
++{
++	cfg.add_directory(dir);
++	free(const_cast<char *>(dir));
++}
++
++void
++add_nomatch(int prio, event_proc *p)
++{
++	cfg.add_nomatch(prio, p);
++}
++
++void
++add_notify(int prio, event_proc *p)
++{
++	cfg.add_notify(prio, p);
++}
++
++event_proc *
++add_to_event_proc(event_proc *ep, eps *eps)
++{
++	if (ep == NULL)
++		ep = new event_proc();
++	ep->add(eps);
++	return (ep);
++}
++
++eps *
++new_action(const char *cmd)
++{
++	eps *e = new action(cmd);
++	free(const_cast<char *>(cmd));
++	return (e);
++}
++
++eps *
++new_match(const char *var, const char *re)
++{
++	eps *e = new match(cfg, var, re);
++	free(const_cast<char *>(var));
++	free(const_cast<char *>(re));
++	return (e);
++}
++
++eps *
++new_media(const char *var, const char *re)
++{
++	eps *e = new media(cfg, var, re);
++	free(const_cast<char *>(var));
++	free(const_cast<char *>(re));
++	return (e);
++}
++
++void
++set_pidfile(const char *name)
++{
++	cfg.set_pidfile(name);
++	free(const_cast<char *>(name));
++}
++
++void
++set_variable(const char *var, const char *val)
++{
++	cfg.set_variable(var, val);
++	free(const_cast<char *>(var));
++	free(const_cast<char *>(val));
++}
++
++
++
++static void
++gensighand(int)
++{
++	romeo_must_die++;
++	_exit(0);
++}
++
++static void
++usage()
++{
++	fprintf(stderr, "usage: %s [-Ddn] [-f file]\n", getprogname());
++	exit(1);
++}
++
++static void
++check_devd_enabled()
++{
++	int val = 0;
++	size_t len;
++
++	len = sizeof(val);
++	if (sysctlbyname(SYSCTL, &val, &len, NULL, 0) != 0)
++		errx(1, "devctl sysctl missing from kernel!");
++	if (val) {
++		warnx("Setting " SYSCTL " to 0");
++		val = 0;
++		sysctlbyname(SYSCTL, NULL, NULL, &val, sizeof(val));
++	}
++}
++
++/*
++ * main
++ */
++int
++main(int argc, char **argv)
++{
++	int ch;
++
++	check_devd_enabled();
++	while ((ch = getopt(argc, argv, "Ddf:n")) != -1) {
++		switch (ch) {
++		case 'D':
++			Dflag++;
++			break;
++		case 'd':
++			dflag++;
++			break;
++		case 'f':
++			configfile = optarg;
++			break;
++		case 'n':
++			nflag++;
++			break;
++		default:
++			usage();
++		}
++	}
++
++	cfg.parse();
++	if (!dflag && nflag) {
++		cfg.open_pidfile();
++		daemon(0, 0);
++		cfg.write_pidfile();
++	}
++	signal(SIGPIPE, SIG_IGN);
++	signal(SIGHUP, gensighand);
++	signal(SIGINT, gensighand);
++	signal(SIGTERM, gensighand);
++	event_loop();
++	return (0);
++}
+diff -Nurd a/sbin/devd/devd.conf.5 b/sbin/devd/devd.conf.5
+--- a/sbin/devd/devd.conf.5	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devd/devd.conf.5	2009-03-08 19:02:30.000000000 +0100
+@@ -0,0 +1,488 @@
++.\"
++.\" Copyright (c) 2002 M. Warner Losh
++.\" All rights reserved.
++.\"
++.\" Redistribution and use in source and binary forms, with or without
++.\" modification, are permitted provided that the following conditions
++.\" are met:
++.\" 1. Redistributions of source code must retain the above copyright
++.\"    notice, this list of conditions and the following disclaimer.
++.\" 2. The name of the author may not be used to endorse or promote products
++.\"    derived from this software without specific prior written permission.
++.\"
++.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++.\" SUCH DAMAGE.
++.\"
++.\" $FreeBSD$
++.\"
++.\" The section on comments was taken from named.conf.5, which has the
++.\" following copyright:
++.\" Copyright (c) 1999-2000 by Internet Software Consortium
++.\"
++.\" Permission to use, copy, modify, and distribute this software for any
++.\" purpose with or without fee is hereby granted, provided that the above
++.\" copyright notice and this permission notice appear in all copies.
++.\"
++.\" THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
++.\" ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
++.\" OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
++.\" CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
++.\" DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
++.\" PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
++.\" ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
++.\" SOFTWARE.
++.\"
++.Dd March 8, 2009
++.Dt DEVD.CONF 5
++.Os
++.Sh NAME
++.Nm devd.conf
++.Nd configuration file for
++.Xr devd 8
++.Sh DESCRIPTION
++.Ss General Syntax
++A
++.Xr devd 8
++configuration consists of two general features, statements
++and comments.
++All statements end with a semicolon.
++Many statements can contain substatements, which are also
++terminated with a semicolon.
++.Pp
++The following statements are supported:
++.Bl -tag -width ".Ic options"
++.It Ic attach
++Specifies various matching criteria and actions to perform when
++a newly attached device matches said criteria.
++.It Ic detach
++Specifies various matching criteria and actions to perform when
++a newly detached device matches said criteria.
++.It Ic nomatch
++Specifies various matching criteria and actions to perform when
++no device driver currently loaded in the kernel claims a (new)
++device.
++.It Ic notify
++Specifies various matching criteria and actions to perform when the kernel
++sends an event notification to userland.
++.It Ic options
++Specifies various options and parameters for the operation of
++.Xr devd 8 .
++.El
++.Pp
++Statements may occur in any order in the configuration file, and may be
++repeated as often as required.
++Further details on the syntax and meaning of each statement and their
++substatements are explained below.
++.Pp
++Each statement, except
++.Ic options
++has a priority (an arbitrary number) associated with it, where
++.Ql 0
++is defined as the lowest priority.
++If two statements match the same event, only the action of the statement with
++highest priority will be executed.
++In this way generic statements can be overridden for devices or
++notifications that require special attention.
++.Pp
++The general syntax of a statement is:
++.Pp
++.Bd -literal -offset indent
++statement priority {
++	substatement "value";
++	...
++	substatement "value";
++};
++.Ed
++.Ss Sub-statements
++The following sub-statements are supported within the
++.Ic options
++statement.
++.Bl -tag -width ".Ic directory"
++.It Ic directory Qq Ar /some/path ;
++Adds the given directory to the list of directories from which
++.Xr devd 8
++will read all files named "*.conf" as further
++configuration files.
++Any number of
++.Ic directory
++statements can be used.
++.It Ic pid-file Qq Pa /var/run/devd.pid ;
++Specifies PID file.
++.It Ic set Ar regexp-name Qq Ar (some|regexp) ;
++Creates a regular expression and assigns it to the variable
++.Ar regexp-name .
++The variable is available throughout the rest of
++the configuration file.
++All regular expressions have an implicit
++.Ql ^$
++around them.
++.El
++.Pp
++The following sub-statements are supported within the
++.Ic attach
++and
++.Ic detach
++statements.
++.Bl -tag -width ".Ic directory"
++.It Ic action Qq Ar command ;
++Command to execute upon a successful match.
++Example
++.Dq Li "/etc/pccard_ether $device-name start" .
++.It Ic class Qq Ar string ;
++This is shorthand for
++.Dq Ic match Qo Li class Qc Qq Ar string .
++.It Ic device-name Qq string ;
++This is shorthand for
++.Dq Ic match Qo Li device-name Qc Qq Ar string .
++This matches a device named
++.Ar string ,
++which is allowed to be a regular expression or a variable previously created
++containing a regular expression.
++The
++.Dq Li device-name
++variable
++is available for later use with the
++.Ic action
++statement.
++.It Ic match Qo Ar variable Qc Qq Ar value ;
++Matches the content of
++.Ar value
++against
++.Ar variable ;
++the content of
++.Ar value
++may be a regular expression.
++Not required during
++.Ic attach
++nor
++.Ic detach
++events since the
++.Ic device-name
++statement takes care of all device matching.
++For a partial list of variables, see below.
++.It Ic media-type Qq Ar string ;
++For network devices,
++.Ic media-type
++will match devices that have the given media type.
++Valid media types are:
++.Dq Li Ethernet ,
++.Dq Li Tokenring ,
++.Dq Li FDDI ,
++.Dq Li 802.11 ,
++.Dq Li ATM ,
++and
++.Dq Li CARP .
++.It Ic subdevice Qq Ar string ;
++This is shorthand for
++.Dq Ic match Qo Li subdevice Qc Qq Ar string .
++.El
++.Pp
++The following sub-statements are supported within the
++.Ic nomatch
++statement.
++.Bl -tag -width ".Ic directory"
++.It Ic action Qq Ar command ;
++Same as above.
++.It Ic match Qo Ar variable Qc Qq Ar value ;
++Matches the content of
++.Ar value
++against
++.Ar variable ;
++the content of
++.Ar value
++may be a regular expression.
++For a partial list of variables, see below.
++.El
++.Pp
++The following sub-statements are supported within the
++.Ic notify
++statement.
++The
++.Dq Li notify
++variable is available inside this statement and contains, a value, depending
++on which system and subsystem that delivered the event.
++.Bl -tag -width ".Ic directory"
++.It Ic action Qq Ar command ;
++Command to execute upon a successful match.
++Example
++.Dq Li "/etc/rc.d/power_profile $notify" .
++.It Ic match Qo Ar system | subsystem | type | notify Qc Qq Ar value ;
++Any number of
++.Ic match
++statements can exist within a
++.Ic notify
++statement;
++.Ar value
++can be either a fixed string or a regular expression.
++Below is a list of available systems, subsystems, and types.
++.It Ic media-type Qq Ar string ;
++See above.
++.El
++.Ss Variables that can be used with the match statement
++A partial list of variables and their possible values that can be used together
++with the
++.Ic match
++statement.
++.Pp
++.Bl -tag -width ".Li manufacturer" -compact
++.It Ic Variable
++.Ic Description
++.It Li bus
++Device name of parent bus.
++.It Li cdev
++Device node path if one is created by the
++.Xr devfs 5
++filesystem.
++.It Li cisproduct
++CIS-product.
++.It Li cisvendor
++CIS-vendor.
++.It Li class
++Device class.
++.It Li device
++Device ID.
++.It Li device-name
++Name of attached/detached device.
++.It Li function
++Card functions.
++.It Li manufacturer
++Manufacturer ID (pccard).
++.It Li notify
++Match the value of the
++.Dq Li notify
++variable.
++.It Li product
++Product ID (pccard).
++.It Li serial
++Serial Number (USB).
++.It Li slot
++Card slot.
++.It Li subvendor
++Sub-vendor ID.
++.It Li subdevice
++Sub-device ID.
++.It Li subsystem
++Matches a subsystem of a system, see below.
++.It Li system
++Matches a system type, see below.
++.It Li type
++Type of notification, see below.
++.It Li vendor
++Vendor ID.
++.El
++.Ss Notify matching
++A partial list of systems, subsystems, and types used within the
++.Ic notify
++mechanism.
++.Pp
++.Bl -tag -width ".Li coretemp" -compact
++.It Sy System
++.It Li ACPI
++Events related to the ACPI subsystem.
++.Bl -tag -width ".Sy Subsystem" -compact
++.It Sy Subsystem
++.It Li ACAD
++AC line state ($notify=0x00 is offline, 0x01 is online).
++.It Li Button
++Button state ($notify=0x00 is power, 0x01 is sleep).
++.It Li CMBAT
++Battery events.
++.It Li Lid
++Lid state ($notify=0x00 is closed, 0x01 is open).
++.It Li Thermal
++Thermal zone events.
++.El
++.Pp
++.It Li IFNET
++Events related to the network subsystem.
++.Bl -tag -width ".Sy Subsystem" -compact
++.It Sy Subsystem
++.It Ar interface
++The
++.Dq subsystem
++is the actual name of the network interface on which the event
++took place.
++.Bl -tag -width ".Li LINK_DOWN" -compact
++.It Sy Type
++.It Li LINK_UP
++Carrier status changed to UP.
++.It Li LINK_DOWN
++Carrier status changed to DOWN.
++.It Li ATTACH
++The network interface is attached to the system.
++.It Li DETACH
++The network interface is detached from the system.
++.El
++.El
++.It Li DEVFS
++Events related to the
++.Xr devfs 5
++filesystem.
++.Bl -tag -width ".Sy Subsystem" -compact
++.It Sy Subsystem
++.It Li CDEV
++.Bl -tag -width ".Li DESTROY" -compact
++.It Sy Type
++.It Li CREATE
++The
++.Xr devfs 5
++node is created.
++.It Li DESTROY
++The
++.Xr devfs 5
++node is destroyed.
++.El
++.El
++.It Li coretemp
++Events related to the
++.Xr coretemp 4
++device.
++.Bl -tag -width ".Sy Subsystem" -compact
++.It Sy Subsystem
++.It Li Thermal
++Notification that the CPU core has reached critical temperature.
++.Bl -tag -width ".Ar temperature" -compact
++.It Sy Type
++.It Ar temperature
++String containing the temperature of the core that has become too hot.
++.El
++.El
++.It Li kern
++Events related to the kernel.
++.Bl -tag -width ".Sy Subsystem" -compact
++.It Sy Subsystem
++.It Li power
++Information about the state of the system.
++.Bl -tag -width ".li resume" -compact
++.It Sy Type
++.It Li resume
++Notification that the system has woken from the suspended state.
++.El
++.El
++.El
++.Pp
++A link state change to UP on the interface
++.Dq Li fxp0
++would result in the following notify event:
++.Bd -literal -offset indent
++system=IFNET, subsystem=fxp0, type=LINK_UP
++.Ed
++.Pp
++An AC line state change to
++.Dq offline
++would result in the following event:
++.Bd -literal -offset indent
++system=ACPI, subsystem=ACAD, notify=0x00
++.Ed
++.Ss Comments
++Comments may appear anywhere that whitespace may appear in a
++configuration file.
++To appeal to programmers of all kinds, they can
++be written in C, C++, or shell/Perl constructs.
++.Pp
++C-style comments start with the two characters
++.Ql /*
++(slash, star) and end with
++.Ql */
++(star, slash).
++Because they are completely delimited with these characters,
++they can be used to comment only a portion of a line or to span
++multiple lines.
++.Pp
++C-style comments cannot be nested.
++For example, the following is
++not valid because the entire comment ends with the first
++.Ql */ :
++.Bd -literal -offset indent
++/* This is the start of a comment.
++   This is still part of the comment.
++/* This is an incorrect attempt at nesting a comment. */
++   This is no longer in any comment. */
++.Ed
++.Pp
++C++-style comments start with the two characters
++.Ql //
++(slash, slash) and continue to the end of the physical line.
++They cannot be continued across multiple physical lines; to have
++one logical comment span multiple lines, each line must use the
++.Ql //
++pair.
++For example:
++.Bd -literal -offset indent
++// This is the start of a comment.  The next line
++// is a new comment, even though it is logically
++// part of the previous comment.
++.Ed
++.Sh FILES
++.Bl -tag -width ".Pa /etc/devd.conf" -compact
++.It Pa /etc/devd.conf
++The
++.Xr devd 8
++configuration file.
++.El
++.Sh EXAMPLES
++.Bd -literal
++#
++# This will catch link down events on the interfaces fxp0 and ath0
++#
++notify 0 {
++	match "system"			"IFNET";
++	match "subsystem"		"(fxp0|ath0)";
++	match "type"			"LINK_DOWN";
++	action "logger $subsystem is DOWN";
++};
++
++#
++# Match lid open/close events
++# These can be combined to a single event, by passing the
++# value of $notify to the external script.
++#
++notify 0 {
++	match "system"			"ACPI";
++	match "subsystem"		"Lid";
++	match "notify"			"0x00";
++	action "logger Lid closed, we can sleep now!";
++};
++
++notify 0 {
++	match "system"			"ACPI";
++	match "subsystem"		"Lid";
++	match "notify"			"0x01";
++	action "logger Lid opened, the sleeper must awaken!";
++};
++
++#
++# Try to configure ath and wi devices with pccard_ether
++# as they are attached.
++#
++attach 0 {
++        device-name "(ath|wi)[0-9]+";
++        action "/etc/pccard_ether $device-name start";
++};
++
++#
++# Stop ath and wi devices as they are detached from
++# the system.
++#
++detach 0 {
++        device-name "(ath|wi)[0-9]+";
++        action "/etc/pccard_ether $device-name stop";
++};
++.Ed
++.Pp
++The installed
++.Pa /etc/devd.conf
++has many additional examples.
++.Sh SEE ALSO
++.Xr coretemp 4 ,
++.Xr devfs 5 ,
++.Xr devd 8
+diff -Nurd a/sbin/devd/devd.h b/sbin/devd/devd.h
+--- a/sbin/devd/devd.h	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devd/devd.h	2005-07-10 05:37:15.000000000 +0200
+@@ -0,0 +1,58 @@
++/*-
++ * DEVD (Device action daemon)
++ *
++ * Copyright (c) 2002 M. Warner Losh <imp@freebsd.org>.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ * $FreeBSD$
++ */
++
++#ifndef DEVD_H
++#define DEVD_H
++
++/** @warning This file needs to be purely 'C' compatible.
++ */
++struct event_proc;
++struct eps;
++__BEGIN_DECLS
++void add_attach(int, struct event_proc *);
++void add_detach(int, struct event_proc *);
++void add_directory(const char *);
++void add_nomatch(int, struct event_proc *);
++void add_notify(int, struct event_proc *);
++struct event_proc *add_to_event_proc(struct event_proc *, struct eps *);
++struct eps *new_match(const char *, const char *);
++struct eps *new_media(const char *, const char *);
++struct eps *new_action(const char *);
++void set_pidfile(const char *);
++void set_variable(const char *, const char *);
++void yyerror(const char *s);
++int  yylex(void);
++int  yyparse(void);
++__END_DECLS
++
++#define PATH_DEVCTL	"/dev/devctl"
++#define DEVCTL_MAXBUF	1025
++
++#endif /* DEVD_H */
+diff -Nurd a/sbin/devd/devd.hh b/sbin/devd/devd.hh
+--- a/sbin/devd/devd.hh	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devd/devd.hh	2007-12-21 02:00:04.000000000 +0100
+@@ -0,0 +1,183 @@
++/*-
++ * Copyright (c) 2002-2003 M. Warner Losh.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ * $FreeBSD$
++ */
++
++#ifndef DEVD_HH
++#define DEVD_HH
++
++class config;
++
++/**
++ * var_list is a collection of variables.  These collections of variables
++ * are stacked up and popped down for each event that we have to process.
++ * We have multiple levels so that we can push variables that are unique
++ * to the event in question, in addition to having global variables.  This
++ * allows for future flexibility.
++ */
++class var_list
++{
++public:
++	var_list() {}
++	virtual ~var_list() {}
++	/** Set a variable in this var list.
++	 */
++	void set_variable(const std::string &var, const std::string &val);
++	/** Get the variable out of this, and no other, var_list.  If
++	 * no variable of %var is set, then %bogus will be returned.
++	 */
++	const std::string &get_variable(const std::string &var) const;
++	/** Is there a variable of %var set in thi stable?
++	 */
++	bool is_set(const std::string &var) const;
++	/** A completely bogus string.
++	 */
++	static const std::string bogus;
++	static const std::string nothing;
++private:
++	std::map<std::string, std::string> _vars;
++};
++
++/**
++ * eps is short for event_proc_single.  It is a single entry in an
++ * event_proc.  Each keyword needs its own subclass from eps.
++ */
++class eps
++{
++public:
++	eps() {}
++	virtual ~eps() {}
++	/** Does this eps match the current config?
++	 */
++	virtual bool do_match(config &) = 0;
++	/** Perform some action for this eps.
++	 */
++	virtual bool do_action(config &) = 0;
++};
++
++/**
++ * match is the subclass used to match an individual variable.  Its
++ * actions are nops.
++ */
++class match : public eps
++{
++public:
++	match(config &, const char *var, const char *re);
++	virtual ~match();
++	virtual bool do_match(config &);
++	virtual bool do_action(config &) { return true; }
++private:
++	std::string _var;
++	std::string _re;
++	regex_t _regex;
++};
++
++/**
++ * media is the subclass used to match an individual variable.  Its
++ * actions are nops.
++ */
++class media : public eps
++{
++public:
++	media(config &, const char *var, const char *type);
++	virtual ~media();
++	virtual bool do_match(config &);
++	virtual bool do_action(config &) { return true; }
++private:
++	std::string _var;
++	int _type;
++};
++
++/**
++ * action is used to fork a process.  It matches everything.
++ */
++class action : public eps
++{
++public:
++	action(const char *cmd);
++	virtual ~action();
++	virtual bool do_match(config &) { return true; }
++	virtual bool do_action(config &);
++private:
++	std::string _cmd;
++};
++
++class event_proc
++{
++public:
++	event_proc();
++	virtual ~event_proc();
++	int get_priority() const { return (_prio); }
++	void set_priority(int prio) { _prio = prio; }
++	void add(eps *);
++	bool matches(config &);
++	bool run(config &);
++private:
++	int _prio;
++	std::vector<eps *> _epsvec;
++};
++
++class config
++{
++public:
++	config() { _pidfile = ""; push_var_table(); }
++	virtual ~config() { reset(); }
++	void add_attach(int, event_proc *);
++	void add_detach(int, event_proc *);
++	void add_directory(const char *);
++	void add_nomatch(int, event_proc *);
++	void add_notify(int, event_proc *);
++	void set_pidfile(const char *);
++	void reset();
++	void parse();
++	void open_pidfile();
++	void write_pidfile();
++	void remove_pidfile();
++	void push_var_table();
++	void pop_var_table();
++	void set_variable(const char *var, const char *val);
++	const std::string &get_variable(const std::string &var);
++	const std::string expand_string(const std::string &var);
++	char *set_vars(char *);
++	void find_and_execute(char);
++protected:
++	void sort_vector(std::vector<event_proc *> &);
++	void parse_one_file(const char *fn);
++	void parse_files_in_dir(const char *dirname);
++	void expand_one(const char *&src, std::string &dst);
++	bool is_id_char(char);
++	bool chop_var(char *&buffer, char *&lhs, char *&rhs);
++private:
++	std::vector<std::string> _dir_list;
++	std::string _pidfile;
++	std::vector<var_list *> _var_list_table;
++	std::vector<event_proc *> _attach_list;
++	std::vector<event_proc *> _detach_list;
++	std::vector<event_proc *> _nomatch_list;
++	std::vector<event_proc *> _notify_list;
++};
++
++#endif /* DEVD_HH */
+diff -Nurd a/sbin/devd/Makefile b/sbin/devd/Makefile
+--- a/sbin/devd/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devd/Makefile	2007-11-19 01:19:01.000000000 +0100
+@@ -0,0 +1,20 @@
++# $FreeBSD$
++
++PROG_CXX=devd
++SRCS=	devd.cc token.l parse.y y.tab.h
++MAN=	devd.8 devd.conf.5
++
++WARNS=	0
++#WARNS?=	4
++
++NO_SHARED?=YES
++
++DPADD=	${LIBL} ${LIBUTIL}
++LDADD=	-ll -lutil
++
++YFLAGS+=-v
++CFLAGS+=-I. -I${.CURDIR}
++
++CLEANFILES= y.output
++
++.include <bsd.prog.mk>
+diff -Nurd a/sbin/devd/parse.y b/sbin/devd/parse.y
+--- a/sbin/devd/parse.y	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devd/parse.y	2005-07-10 05:37:15.000000000 +0200
+@@ -0,0 +1,152 @@
++%{
++/*-
++ * DEVD (Device action daemon)
++ *
++ * Copyright (c) 2002 M. Warner Losh <imp@freebsd.org>.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ * $FreeBSD$
++ */
++
++#include "devd.h"
++#include <stdio.h>
++#include <string.h>
++
++%}
++
++%union {
++	char *str;
++	int i;
++	struct eps *eps;	/* EventProcStatement */
++	struct event_proc *eventproc;
++}
++
++%token SEMICOLON BEGINBLOCK ENDBLOCK COMMA
++%token <i> NUMBER
++%token <str> STRING
++%token <str> ID
++%token OPTIONS SET DIRECTORY PID_FILE DEVICE_NAME ACTION MATCH
++%token ATTACH DETACH NOMATCH NOTIFY MEDIA_TYPE CLASS SUBDEVICE
++
++%type <eventproc> match_or_action_list
++%type <eps> match_or_action match action
++
++%%
++
++config_file
++	: config_list
++	|
++	;
++
++config_list
++	: config
++	| config_list config
++	;
++
++config
++	: option_block
++	| attach_block
++	| detach_block
++	| nomatch_block
++	| notify_block
++	;
++
++option_block
++	: OPTIONS BEGINBLOCK options ENDBLOCK SEMICOLON
++	;
++
++options
++	: option
++	| options option
++
++option
++	: directory_option
++	| pid_file_option
++	| set_option
++	;
++
++directory_option
++	: DIRECTORY STRING SEMICOLON { add_directory($2); }
++	;
++
++pid_file_option
++	: PID_FILE STRING SEMICOLON { set_pidfile($2); }
++	;
++
++set_option
++	: SET ID STRING SEMICOLON { set_variable($2, $3); }
++	;
++
++attach_block
++	: ATTACH NUMBER BEGINBLOCK match_or_action_list ENDBLOCK SEMICOLON
++		{ add_attach($2, $4); }
++	| ATTACH NUMBER BEGINBLOCK ENDBLOCK SEMICOLON
++	;
++
++detach_block
++	: DETACH NUMBER BEGINBLOCK match_or_action_list ENDBLOCK SEMICOLON
++		{ add_detach($2, $4); }
++	| DETACH NUMBER BEGINBLOCK ENDBLOCK SEMICOLON
++	;
++
++nomatch_block
++	: NOMATCH NUMBER BEGINBLOCK match_or_action_list ENDBLOCK SEMICOLON
++		{ add_nomatch($2, $4); }
++	| NOMATCH NUMBER BEGINBLOCK ENDBLOCK SEMICOLON
++	;
++
++notify_block
++	: NOTIFY NUMBER BEGINBLOCK match_or_action_list ENDBLOCK SEMICOLON
++		{ add_notify($2, $4); }
++	| NOTIFY NUMBER BEGINBLOCK ENDBLOCK SEMICOLON
++	;
++
++match_or_action_list
++	: match_or_action { $$ = add_to_event_proc( NULL, $1); }
++	| match_or_action_list match_or_action
++			{ $$ = add_to_event_proc($1, $2); }
++	;
++
++match_or_action
++	: match
++	| action
++	;
++
++match
++	: MATCH STRING STRING SEMICOLON	{ $$ = new_match($2, $3); }
++	| DEVICE_NAME STRING SEMICOLON
++		{ $$ = new_match(strdup("device-name"), $2); }
++	| MEDIA_TYPE STRING SEMICOLON
++		{ $$ = new_media(strdup("media-type"), $2); }
++	| CLASS STRING SEMICOLON
++		{ $$ = new_match(strdup("class"), $2); }
++	| SUBDEVICE STRING SEMICOLON
++		{ $$ = new_match(strdup("subdevice"), $2); }
++	;
++
++action
++	: ACTION STRING SEMICOLON	{ $$ = new_action($2); }
++	;
++
++%%
+diff -Nurd a/sbin/devd/token.l b/sbin/devd/token.l
+--- a/sbin/devd/token.l	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devd/token.l	2008-03-21 21:38:28.000000000 +0100
+@@ -0,0 +1,110 @@
++%{
++/*-
++ * DEVD (Device action daemon)
++ *
++ * Copyright (c) 2002 M. Warner Losh <imp@freebsd.org>.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ * $FreeBSD$
++ */
++
++#include <ctype.h>
++#include <stdlib.h>
++#include <string.h>
++#include <syslog.h>
++#include "devd.h"
++#include "y.tab.h"
++
++int lineno = 1;
++#define YY_NO_UNPUT
++
++static void
++update_lineno(const char *cp)
++{
++	while (*cp)	
++		if (*cp++ == '\n')
++			lineno++;
++}
++
++%}
++
++%%
++
++[ \t]+			;
++\n			lineno++;
++;			{ return SEMICOLON; }
++#.*$			;
++\/\/.*$			;
++\/\*([^*]|(\*+([^*\/])))*\*+\/ { update_lineno(yytext); }
++\{			{ return BEGINBLOCK; }
++\}			{ return ENDBLOCK; }
++[0-9]+			{ yylval.i = atoi(yytext); return NUMBER; }
++\"[^"]+\"		{
++				int len = strlen(yytext) - 2;
++				char *walker;
++				int i;
++				update_lineno(yytext);
++				if ((yylval.str = (char *) malloc(len + 1)) == NULL)
++					goto out;
++				walker = yylval.str;
++				for (i = 1; i <= len; i++) {
++					if (yytext[i] == '\\' && 
++					    yytext[i + 1] == '\n') {
++						i += 2;
++						while(isspace(yytext[i]))
++							i++;
++					}
++					*walker++ = yytext[i];
++				}
++				*walker++ = '\0';
++			out:;
++				return STRING;
++			}
++
++
++options			{ return OPTIONS; }
++set			{ return SET; }
++directory		{ return DIRECTORY; }
++pid-file		{ return PID_FILE; }
++attach			{ return ATTACH; }
++detach			{ return DETACH; }
++device-name		{ return DEVICE_NAME; }
++media-type		{ return MEDIA_TYPE; }
++class			{ return CLASS; }
++subdevice		{ return SUBDEVICE; }
++action			{ return ACTION; }
++match			{ return MATCH; }
++nomatch			{ return NOMATCH; }
++notify			{ return NOTIFY; }
++[A-Za-z][A-Za-z0-9_-]*	{
++				yylval.str = strdup(yytext);
++				return ID;
++			}
++%%
++
++void
++yyerror(const char *s)
++{
++	syslog(LOG_ERR, "line %d: %s%s %s.\n", lineno, yytext, yytext?":":"", s);
++}
