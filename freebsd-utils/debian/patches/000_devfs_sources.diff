@@ -1,0 +1,1149 @@
+diff -Nurd a/sbin/devfs/devfs.8 b/sbin/devfs/devfs.8
+--- a/sbin/devfs/devfs.8	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devfs/devfs.8	2008-06-27 11:09:50.000000000 +0200
+@@ -0,0 +1,371 @@
++.\"
++.\" Copyright (c) 2002 Dima Dorfman.
++.\" All rights reserved.
++.\"
++.\" Redistribution and use in source and binary forms, with or without
++.\" modification, are permitted provided that the following conditions
++.\" are met:
++.\" 1. Redistributions of source code must retain the above copyright
++.\"    notice, this list of conditions and the following disclaimer.
++.\" 2. Redistributions in binary form must reproduce the above copyright
++.\"    notice, this list of conditions and the following disclaimer in the
++.\"    documentation and/or other materials provided with the distribution.
++.\"
++.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++.\" SUCH DAMAGE.
++.\"
++.\" $FreeBSD$
++.\"
++.Dd June 27, 2008
++.Dt DEVFS 8
++.Os
++.Sh NAME
++.Nm devfs
++.Nd "DEVFS control"
++.Sh SYNOPSIS
++.Nm
++.Op Fl m Ar mount-point
++.Ar keyword
++.Ar argument ...
++.Sh DESCRIPTION
++The
++.Nm
++utility provides an interface to manipulate properties of
++.Xr devfs 5
++mounts.
++.Pp
++The
++.Ar keyword
++argument determines the context for
++the rest of the arguments.
++For example,
++most of the commands related to the rule subsystem must be preceded by the
++.Cm rule
++keyword.
++The following flags are common to all keywords:
++.Bl -tag -offset indent
++.It Fl m Ar mount-point
++Operate on
++.Ar mount-point ,
++which is expected to be a
++.Xr devfs 5
++mount.
++If this option is not specified,
++.Nm
++operates on
++.Pa /dev .
++.El
++.Ss Rule Subsystem
++The
++.Xr devfs 5
++rule subsystem provides a way for the administrator of a system to control
++the attributes of DEVFS nodes.
++.\" XXX devfs node?  entry?  what?
++Each DEVFS mount-point has a
++.Dq ruleset ,
++or a list of rules,
++associated with it.
++When a device driver creates a new node,
++all the rules in the ruleset associated with each mount-point are applied
++(see below) before the node becomes visible to the userland.
++This permits the administrator to change the properties,
++including the visibility,
++of certain nodes.
++For example, one might want to hide all disk nodes in a
++.Xr jail 2 Ns 's
++.Pa /dev .
++.Ss Rule Manipulation
++Rule manipulation commands follow the
++.Cm rule
++keyword.
++The following flags are common to all of the rule manipulation commands:
++.Bl -tag -offset indent
++.It Fl s Ar ruleset
++Operate on the ruleset with the number
++.Ar ruleset .
++If this is not specified,
++the commands operate on the ruleset currently associated with the
++specified mount-point.
++.El
++.Pp
++The following commands are recognized:
++.Bl -tag -offset indent
++.It Cm rule add Oo Ar rulenum Oc Ar rulespec
++Add the rule described by
++.Ar rulespec
++(defined below)
++to the ruleset.
++The rule has the number
++.Ar rulenum
++if it is explicitly specified;
++otherwise, the rule number is automatically determined by the kernel.
++.It Cm rule apply Ar rulenum | rulespec
++Apply rule number
++.Ar rulenum
++or the rule described by
++.Ar rulespec
++to the mount-point.
++Rules that are
++.Dq applied
++have their conditions checked against all nodes
++in the mount-point and the actions taken if they match.
++.It Cm rule applyset
++Apply all the rules in the ruleset to the mount-point
++(see above for the definition of
++.Dq apply ) .
++.It Cm rule del Ar rulenum
++Delete rule number
++.Ar rulenum
++from the ruleset.
++.It Cm rule delset
++Delete all rules from the ruleset.
++.It Cm rule show Op Ar rulenum
++Display the rule number
++.Ar rulenum ,
++or all the rules in the ruleset.
++The output lines (one line per rule) are expected to be valid
++.Ar rulespec Ns s .
++.It Cm rule showsets
++Report the numbers of existing rulesets.
++.It Cm ruleset Ar ruleset
++Set ruleset number
++.Ar ruleset
++as the current ruleset for the mount-point.
++.El
++.Ss Rule Specification
++Rules have two parts: the conditions and the actions.
++The conditions determine which DEVFS nodes the rule matches
++and the actions determine what should be done when a rule matches a node.
++For example, a rule can be written that sets the GID to
++.Dq Li operator
++for all devices of type tape.
++If the first token of a rule specification is a single dash
++.Pq Sq Fl ,
++rules are read from the standard input and the rest of the specification
++is ignored.
++.Pp
++The following conditions are recognized.
++Conditions are ANDed together when matching a device;
++if OR is desired, multiple rules can be written.
++.Bl -tag -offset indent
++.It Cm path Ar pattern
++Matches any node with a path that matches
++.Ar pattern ,
++which is interpreted as a
++.Xr glob 3 Ns -style
++pattern.
++.It Cm type Ar devtype
++Matches any node that is of type
++.Ar devtype .
++Valid types are
++.Cm disk , mem , tape
++and
++.Cm tty .
++.El
++.Pp
++The following actions are recognized.
++Although there is no explicit delimiter between conditions and actions,
++they may not be intermixed.
++.Bl -tag -offset indent
++.It Cm group Ar gid
++Set the GID of the node to
++.Ar gid ,
++which may be a group name
++(looked up in
++.Pa /etc/group )
++or number.
++.It Cm hide
++Hide the node.
++Nodes may later be revived manually with
++.Xr mknod 8
++or with the
++.Cm unhide
++action.
++.It Cm include Ar ruleset
++Apply all the rules in ruleset number
++.Ar ruleset
++to the node.
++This does not necessarily result in any changes to the node
++(e.g., if none of the rules in the included ruleset match).
++.It Cm mode Ar filemode
++Set the file mode to
++.Ar filemode ,
++which is interpreted as in
++.Xr chmod 1 .
++.It Cm user Ar uid
++Set the UID to
++.Ar uid ,
++which may be a user name
++(looked up in
++.Pa /etc/passwd )
++or number.
++.It Cm unhide
++Unhide the node.
++.El
++.Sh IMPLEMENTATION NOTES
++Rulesets are created by the kernel at the first reference
++and destroyed when the last reference disappears.
++E.g., a ruleset is created when a rule is added to it or when it is set
++as the current ruleset for a mount-point, and
++a ruleset is destroyed when the last rule in it is deleted
++and no other references to it exist
++(i.e., it is not included by any rules and it is not the current ruleset
++for any mount-point).
++.Pp
++Ruleset number 0 is the default ruleset for all new mount-points.
++It is always empty, cannot be modified or deleted, and does not show up
++in the output of
++.Cm showsets .
++.Pp
++Rules and rulesets are unique to the entire system,
++not a particular mount-point.
++I.e., a
++.Cm showsets
++will return the same information regardless of the mount-point specified with
++.Fl m .
++The mount-point is only relevant when changing what its current ruleset is
++or when using one of the apply commands.
++.Sh FILES
++.Bl -tag -compact
++.It Pa /etc/defaults/devfs.rules
++Default
++.Nm
++configuration file.
++.It Pa /etc/devfs.rules
++Local
++.Nm
++configuration file.
++.It Pa /etc/devfs.conf
++Boot-time
++.Nm
++configuration file.
++.It Pa /usr/share/examples/etc/devfs.conf
++Example boot-time
++.Nm
++configuration file.
++.El
++.Sh EXAMPLES
++When the system boots,
++the only ruleset that exists is ruleset number 0;
++since the latter may not be modified, we have to create another ruleset
++before adding rules.
++Note that since most of the following examples do not specify
++.Fl m ,
++the operations are performed on
++.Pa /dev
++(this only matters for things that might change the properties of nodes).
++.Pp
++.Dl "devfs ruleset 10"
++.Pp
++Specify that ruleset 10 should be the current ruleset for
++.Pa /dev
++(if it does not already exist, it is created).
++.Pp
++.Dl "devfs rule add path speaker mode 666"
++.Pp
++Add a rule that causes all nodes that have a path that matches
++.Dq Li speaker
++(this is only
++.Pa /dev/speaker )
++to have the file mode 666 (read and write for all).
++Note that if any such nodes already exist, their mode will not be changed
++unless this rule (or ruleset) is explicitly applied (see below).
++The mode
++.Em will
++be changed if the node is created
++.Em after
++the rule is added
++(e.g., the
++.Pa atspeaker
++module is loaded after the above rule is added).
++.Pp
++.Dl "devfs rule applyset"
++.Pp
++Apply all the rules in the current ruleset to all the existing nodes.
++E.g., if the above rule was added after
++.Pa /dev/speaker
++was created,
++this command will cause its file mode to be changed to 666
++as prescribed by the rule.
++.Pp
++.Dl devfs rule add path "snp*" mode 660 group snoopers
++.Pp
++(Quoting the argument to
++.Cm path
++is often necessary to disable the shell's globbing features.)
++For all devices with a path that matches
++.Dq Li snp* ,
++set the file mode to 660 and the GID to
++.Dq Li snoopers .
++This permits users in the
++.Dq Li snoopers
++group to use the
++.Xr snp 4
++devices.
++.Pp
++.Dl "devfs rule -s 20 add type disk group wheel"
++.Pp
++Add a rule to ruleset number 20.
++Since this ruleset is not the current ruleset for any mount-points,
++this rule is never applied automatically (unless ruleset 20 becomes
++a current ruleset for some mount-point at a later time).
++However, it can be applied explicitly, as such:
++.Pp
++.Dl "devfs -m /my/jail/dev rule -s 20 applyset"
++.Pp
++This will apply all rules in ruleset number 20 to the DEVFS mount on
++.Pa /my/jail/dev .
++It does not matter that ruleset 20 is not the current ruleset for that
++mount-point; the rules are still applied.
++.Pp
++.Dl "devfs rule apply hide"
++.Pp
++Since this rule has no conditions, the action
++.Pq Cm hide
++will be applied to all nodes.
++Since hiding all nodes is not very useful, we can undo it:
++.Pp
++.Dl "devfs rule apply unhide"
++.Pp
++which applies
++.Cm unhide
++to all the nodes,
++causing them to reappear.
++.Pp
++.Dl "devfs rule -s 10 add - < my_rules"
++.Pp
++Add all the rules from the file
++.Pa my_rules
++to ruleset 10.
++.Pp
++.Dl "devfs rule -s 20 show | devfs rule -s 10 add -"
++.Pp
++Since
++.Cm show
++outputs valid rules,
++this feature can be used to copy rulesets.
++The above copies all the rules from ruleset 20 into ruleset 10.
++The rule numbers are preserved,
++but ruleset 10 may already have rules with non-conflicting numbers
++(these will be preserved).
++.Sh SEE ALSO
++.Xr chmod 1 ,
++.Xr jail 2 ,
++.Xr glob 3 ,
++.Xr devfs 5 ,
++.Xr devfs.conf 5 ,
++.Xr devfs.rules 5 ,
++.Xr chown 8 ,
++.Xr jail 8 ,
++.Xr mknod 8
++.Sh AUTHORS
++.An Dima Dorfman
+diff -Nurd a/sbin/devfs/devfs.c b/sbin/devfs/devfs.c
+--- a/sbin/devfs/devfs.c	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devfs/devfs.c	2006-06-14 17:09:52.000000000 +0200
+@@ -0,0 +1,230 @@
++/*-
++ * Copyright (c) 2001, 2002 Dima Dorfman.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++
++/*
++ * DEVFS control.
++ */
++
++#include <sys/cdefs.h>
++__FBSDID("$FreeBSD$");
++
++#include <sys/param.h>
++#include <sys/queue.h>
++
++#include <assert.h>
++#include <err.h>
++#include <fcntl.h>
++#include <paths.h>
++#include <stdio.h>
++#include <stdint.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++
++#include "extern.h"
++
++int mpfd;
++
++static ctbl_t ctbl_main = {
++	{ "rule",		rule_main },
++	{ "ruleset",		ruleset_main },
++	{ NULL,			NULL }
++};
++
++int
++main(int ac, char **av)
++{
++	const char *mountpt;
++	struct cmd *c;
++	int ch;
++
++	mountpt = NULL;
++	while ((ch = getopt(ac, av, "m:")) != -1)
++		switch (ch) {
++		case 'm':
++			mountpt = optarg;
++			break;
++		default:
++			usage();
++		}
++	ac -= optind;
++	av += optind;
++	if (ac < 1)
++		usage();
++
++	if (mountpt == NULL)
++		mountpt = _PATH_DEV;
++	mpfd = open(mountpt, O_RDONLY);
++	if (mpfd == -1)
++		err(1, "open: %s", mountpt);
++
++	for (c = ctbl_main; c->name != NULL; ++c)
++		if (strcmp(c->name, av[0]) == 0)
++			exit((*c->handler)(ac, av));
++	errx(1, "unknown command: %s", av[0]);
++}
++
++/*
++ * Convert an integer to a "number" (ruleset numbers and rule numbers
++ * are 16-bit).  If the conversion is successful, num contains the
++ * integer representation of s and 1 is returned; otherwise, 0 is
++ * returned and num is unchanged.
++ */
++int
++atonum(const char *s, uint16_t *num)
++{
++	unsigned long ul;
++	char *cp;
++
++	ul = strtoul(s, &cp, 10);
++	if (ul > UINT16_MAX || *cp != '\0')
++		return (0);
++	*num = (uint16_t)ul;
++	return (1);
++}
++
++/*
++ * Convert user input in ASCII to an integer.
++ */
++int
++eatoi(const char *s)
++{
++	char *cp;
++	long l;
++
++	l = strtol(s, &cp, 10);
++	if (l > INT_MAX || *cp != '\0')
++		errx(1, "error converting to integer: %s", s);
++	return ((int)l);
++}
++
++/*
++ * As atonum(), but the result of failure is death.
++ */
++uint16_t
++eatonum(const char *s)
++{
++	uint16_t num;
++
++	if (!atonum(s, &num))
++		errx(1, "error converting to number: %s", s); /* XXX clarify */
++	return (num);
++}
++
++/*
++ * Read a line from a /FILE/.  If the return value isn't 0, it is the
++ * length of the line, a pointer to which exists in /line/.  It is the
++ * caller's responsibility to free(3) it.  If the return value is 0,
++ * there was an error or we reached EOF, and /line/ is undefined (so,
++ * obviously, the caller shouldn't try to free(3) it).
++ */
++size_t
++efgetln(FILE *fp, char **line)
++{
++	size_t rv;
++	char *cp;
++
++	cp = fgetln(fp, &rv);
++	if (cp == NULL) {
++		*line = NULL;
++		return (rv);
++	}
++	if (cp[rv - 1] == '\n') {
++		cp[rv - 1] = '\0';
++		*line = strdup(cp);
++		if (*line == NULL)
++			errx(1, "cannot allocate memory");
++		--rv;
++	} else {
++		*line = malloc(rv + 1);
++		if (*line == NULL)
++			errx(1, "cannot allocate memory");
++		memcpy(*line, cp, rv);
++		(*line)[rv] = '\0';
++	}
++	assert(rv == strlen(*line));
++	return (rv);
++}
++
++struct ptrstq {
++	STAILQ_ENTRY(ptrstq)	 tq;
++	void			*ptr;
++};
++
++/*
++ * Create an argument vector from /line/.  The caller must free(3)
++ * /avp/, and /avp[0]/ when the argument vector is no longer
++ * needed unless /acp/ is 0, in which case /avp/ is undefined.
++ * /avp/ is NULL-terminated, so it is actually one longer than /acp/.
++ */
++void
++tokenize(const char *line, int *acp, char ***avp)
++{
++	static const char *delims = " \t\n";
++	struct ptrstq *pt;
++	STAILQ_HEAD(, ptrstq) plist;
++	char **ap, *cp, *wline, *xcp;
++
++	line += strspn(line, delims);
++	wline = strdup(line);
++	if (wline == NULL)
++		errx(1, "cannot allocate memory");
++
++	STAILQ_INIT(&plist);
++	for (xcp = wline, *acp = 0;
++	     (cp = strsep(&xcp, delims)) != NULL;)
++		if (*cp != '\0') {
++			pt = calloc(1, sizeof(*pt));
++			if (pt == NULL)
++				errx(1, "cannot allocate memory");
++			pt->ptr = cp;
++			STAILQ_INSERT_TAIL(&plist, pt, tq);
++			++*acp;
++		}
++	if (*acp == 0)
++		return;
++	assert(STAILQ_FIRST(&plist)->ptr == wline);
++	*avp = malloc(sizeof(**avp) * (*acp + 1));
++	if (*avp == NULL)
++		errx(1, "cannot allocate memory");
++	for (ap = *avp; !STAILQ_EMPTY(&plist);) {
++		pt = STAILQ_FIRST(&plist);
++		*ap = pt->ptr;
++		++ap;
++		assert(ap <= *avp + (*acp));
++		STAILQ_REMOVE_HEAD(&plist, tq);
++		free(pt);
++	}
++	*ap = NULL;
++}
++
++void
++usage(void)
++{
++
++	fprintf(stderr, "usage: devfs rule|ruleset arguments\n");
++	exit(1);
++}
+diff -Nurd a/sbin/devfs/extern.h b/sbin/devfs/extern.h
+--- a/sbin/devfs/extern.h	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devfs/extern.h	2004-06-03 01:02:31.000000000 +0200
+@@ -0,0 +1,57 @@
++/*-
++ * Copyright (c) 2002 Dima Dorfman.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ *
++ * $FreeBSD$
++ */
++
++#ifndef __DEVFS_H__
++#define	__DEVFS_H__
++
++#include <fs/devfs/devfs.h>
++
++struct intstr {
++	const char *s;
++	int i;
++};
++
++typedef int (command_t)(int, char **);
++struct cmd {
++	const char *name;
++	command_t *handler;
++};
++typedef struct cmd ctbl_t[];
++
++command_t rule_main, ruleset_main;
++
++int atonum(const char *, uint16_t *);
++int eatoi(const char *);
++uint16_t eatonum(const char *);
++size_t efgetln(FILE *, char **);
++void tokenize(const char *, int *, char ***);
++void usage(void) __dead2;
++
++extern int mpfd;		/* Mount-point file descriptor. */
++
++#endif /* !__DEVFS_H__ */
+diff -Nurd a/sbin/devfs/Makefile b/sbin/devfs/Makefile
+--- a/sbin/devfs/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devfs/Makefile	2002-07-28 08:52:47.000000000 +0200
+@@ -0,0 +1,8 @@
++# $FreeBSD$
++
++PROG=	devfs
++SRCS=	devfs.c rule.c
++MAN=	devfs.8
++WARNS?=	5
++
++.include <bsd.prog.mk>
+diff -Nurd a/sbin/devfs/rule.c b/sbin/devfs/rule.c
+--- a/sbin/devfs/rule.c	1970-01-01 01:00:00.000000000 +0100
++++ b/sbin/devfs/rule.c	2006-01-05 14:37:07.000000000 +0100
+@@ -0,0 +1,462 @@
++/*-
++ * Copyright (c) 2002 Dima Dorfman.
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++
++/*
++ * Rule subsystem manipulation.
++ */
++
++#include <sys/cdefs.h>
++__FBSDID("$FreeBSD$");
++
++#include <sys/param.h>
++#include <sys/conf.h>
++#include <sys/ioctl.h>
++
++#include <assert.h>
++#include <err.h>
++#include <errno.h>
++#include <grp.h>
++#include <pwd.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++
++#include "extern.h"
++
++static void rulespec_infp(FILE *fp, unsigned long reqest, devfs_rsnum rsnum);
++static void rulespec_instr(struct devfs_rule *dr, const char *str,
++    devfs_rsnum rsnum);
++static void rulespec_intok(struct devfs_rule *dr, int ac, char **av,
++    devfs_rsnum rsnum);
++static void rulespec_outfp(FILE *fp, struct devfs_rule *dr);
++
++static command_t rule_add, rule_apply, rule_applyset;
++static command_t rule_del, rule_delset, rule_show, rule_showsets;
++
++static ctbl_t ctbl_rule = {
++	{ "add",		rule_add },
++	{ "apply",		rule_apply },
++	{ "applyset",		rule_applyset },
++	{ "del",		rule_del },
++	{ "delset",		rule_delset },
++	{ "show",		rule_show },
++	{ "showsets",		rule_showsets },
++	{ NULL,			NULL }
++};
++
++static struct intstr ist_type[] = {
++	{ "disk",		D_DISK },
++	{ "mem",		D_MEM },
++	{ "tape",		D_TAPE },
++	{ "tty",		D_TTY },
++	{ NULL,			-1 }
++};
++
++devfs_rsnum in_rsnum;
++
++int
++rule_main(int ac, char **av)
++{
++	struct cmd *c;
++	int ch;
++
++	setprogname("devfs rule");
++	optreset = optind = 1;
++	while ((ch = getopt(ac, av, "s:")) != -1)
++		switch (ch) {
++		case 's':
++			in_rsnum = eatonum(optarg);
++			break;
++		default:
++			usage();
++		}
++	ac -= optind;
++	av += optind;
++	if (ac < 1)
++		usage();
++
++	for (c = ctbl_rule; c->name != NULL; ++c)
++		if (strcmp(c->name, av[0]) == 0)
++			exit((*c->handler)(ac, av));
++	errx(1, "unknown command: %s", av[0]);
++}
++
++static int
++rule_add(int ac, char **av)
++{
++	struct devfs_rule dr;
++	int rv;
++
++	if (ac < 2)
++		usage();
++	if (strcmp(av[1], "-") == 0)
++		rulespec_infp(stdin, DEVFSIO_RADD, in_rsnum);
++	else {
++		rulespec_intok(&dr, ac - 1, av + 1, in_rsnum);
++		rv = ioctl(mpfd, DEVFSIO_RADD, &dr);
++		if (rv == -1)
++			err(1, "ioctl DEVFSIO_RADD");
++	}
++	return (0);
++}
++
++static int
++rule_apply(int ac __unused, char **av __unused)
++{
++	struct devfs_rule dr;
++	devfs_rnum rnum;
++	devfs_rid rid;
++	int rv;
++
++	if (ac < 2)
++		usage();
++	if (!atonum(av[1], &rnum)) {
++		if (strcmp(av[1], "-") == 0)
++			rulespec_infp(stdin, DEVFSIO_RAPPLY, in_rsnum);
++		else {
++			rulespec_intok(&dr, ac - 1, av + 1, in_rsnum);
++			rv = ioctl(mpfd, DEVFSIO_RAPPLY, &dr);
++			if (rv == -1)
++				err(1, "ioctl DEVFSIO_RAPPLY");
++		}
++	} else {
++		rid = mkrid(in_rsnum, rnum);
++		rv = ioctl(mpfd, DEVFSIO_RAPPLYID, &rid);
++		if (rv == -1)
++			err(1, "ioctl DEVFSIO_RAPPLYID");
++	}
++	return (0);
++}
++
++static int
++rule_applyset(int ac, char **av __unused)
++{
++	int rv;
++
++	if (ac != 1)
++		usage();
++	rv = ioctl(mpfd, DEVFSIO_SAPPLY, &in_rsnum);
++	if (rv == -1)
++		err(1, "ioctl DEVFSIO_SAPPLY");
++	return (0);
++}
++
++static int
++rule_del(int ac __unused, char **av)
++{
++	devfs_rid rid;
++	int rv;
++
++	if (av[1] == NULL)
++		usage();
++	rid = mkrid(in_rsnum, eatoi(av[1]));
++	rv = ioctl(mpfd, DEVFSIO_RDEL, &rid);
++	if (rv == -1)
++		err(1, "ioctl DEVFSIO_RDEL");
++	return (0);
++}
++
++static int
++rule_delset(int ac, char **av __unused)
++{
++	struct devfs_rule dr;
++	int rv;
++
++	if (ac != 1)
++		usage();
++	memset(&dr, '\0', sizeof(dr));
++	dr.dr_magic = DEVFS_MAGIC;
++	dr.dr_id = mkrid(in_rsnum, 0);
++	while (ioctl(mpfd, DEVFSIO_RGETNEXT, &dr) != -1) {
++		rv = ioctl(mpfd, DEVFSIO_RDEL, &dr.dr_id);
++		if (rv == -1)
++			err(1, "ioctl DEVFSIO_RDEL");
++	}
++	if (errno != ENOENT)
++		err(1, "ioctl DEVFSIO_RGETNEXT");
++	return (0);
++}
++
++static int
++rule_show(int ac __unused, char **av)
++{
++	struct devfs_rule dr;
++	devfs_rnum rnum;
++	int rv;
++
++	memset(&dr, '\0', sizeof(dr));
++	dr.dr_magic = DEVFS_MAGIC;
++	if (av[1] != NULL) {
++		rnum = eatoi(av[1]);
++		dr.dr_id = mkrid(in_rsnum, rnum - 1);
++		rv = ioctl(mpfd, DEVFSIO_RGETNEXT, &dr);
++		if (rv == -1)
++			err(1, "ioctl DEVFSIO_RGETNEXT");
++		if (rid2rn(dr.dr_id) == rnum)
++			rulespec_outfp(stdout, &dr);
++	} else {
++		dr.dr_id = mkrid(in_rsnum, 0);
++		while (ioctl(mpfd, DEVFSIO_RGETNEXT, &dr) != -1)
++			rulespec_outfp(stdout, &dr);
++		if (errno != ENOENT)
++			err(1, "ioctl DEVFSIO_RGETNEXT");
++	}
++	return (0);
++}
++
++static int
++rule_showsets(int ac, char **av __unused)
++{
++	devfs_rsnum rsnum;
++
++	if (ac != 1)
++		usage();
++	rsnum = 0;
++	while (ioctl(mpfd, DEVFSIO_SGETNEXT, &rsnum) != -1)
++		printf("%d\n", rsnum);
++	if (errno != ENOENT)
++		err(1, "ioctl DEVFSIO_SGETNEXT");
++	return (0);
++}
++
++int
++ruleset_main(int ac, char **av)
++{
++	devfs_rsnum rsnum;
++	int rv;
++
++	setprogname("devfs ruleset");
++	if (ac < 2)
++		usage();
++	rsnum = eatonum(av[1]);
++	rv = ioctl(mpfd, DEVFSIO_SUSE, &rsnum);
++	if (rv == -1)
++		err(1, "ioctl DEVFSIO_SUSE");
++	return (0);
++}
++
++
++/*
++ * Input rules from a file (probably the standard input).  This
++ * differs from the other rulespec_in*() routines in that it also
++ * calls ioctl() for the rules, since it is impractical (and not very
++ * useful) to return a list (or array) of rules, just so the caller
++ * can call call ioctl() for each of them.
++ */
++static void
++rulespec_infp(FILE *fp, unsigned long request, devfs_rsnum rsnum)
++{
++	struct devfs_rule dr;
++	char *line;
++	int rv;
++
++	assert(fp == stdin);	/* XXX: De-hardcode "stdin" from error msg. */
++	while (efgetln(fp, &line)) {
++		rulespec_instr(&dr, line, rsnum);
++		rv = ioctl(mpfd, request, &dr);
++		if (rv == -1)
++			err(1, "ioctl");
++		free(line);	/* efgetln() always malloc()s. */
++	}
++	if (ferror(stdin))
++		err(1, "stdin");
++}
++
++/*
++ * Construct a /struct devfs_rule/ from a string.
++ */
++static void
++rulespec_instr(struct devfs_rule *dr, const char *str, devfs_rsnum rsnum)
++{
++	char **av;
++	int ac;
++
++	tokenize(str, &ac, &av);
++	if (ac == 0)
++		errx(1, "unexpected end of rulespec");
++	rulespec_intok(dr, ac, av, rsnum);
++	free(av[0]);
++	free(av);
++}
++
++/*
++ * Construct a /struct devfs_rule/ from ac and av.
++ */
++static void
++rulespec_intok(struct devfs_rule *dr, int ac __unused, char **av,
++    devfs_rsnum rsnum)
++{
++	struct intstr *is;
++	struct passwd *pw;
++	struct group *gr;
++	devfs_rnum rnum;
++	void *set;
++
++	memset(dr, '\0', sizeof(*dr));
++
++	/*
++	 * We don't maintain ac hereinafter.
++	 */
++	if (av[0] == NULL)
++		errx(1, "unexpected end of rulespec");
++
++	/* If the first argument is an integer, treat it as a rule number. */
++	if (!atonum(av[0], &rnum))
++		rnum = 0;		/* auto-number */
++	else
++		++av;
++
++	/*
++	 * These aren't table-driven since that would result in more
++	 * tiny functions than I care to deal with.
++	 */
++	for (;;) {
++		if (av[0] == NULL)
++			break;
++		else if (strcmp(av[0], "type") == 0) {
++			if (av[1] == NULL)
++				errx(1, "expecting argument for type");
++			for (is = ist_type; is->s != NULL; ++is)
++				if (strcmp(av[1], is->s) == 0) {
++					dr->dr_dswflags |= is->i;
++					break;
++				}
++			if (is->s == NULL)
++				errx(1, "unknown type: %s", av[1]);
++			dr->dr_icond |= DRC_DSWFLAGS;
++			av += 2;
++		} else if (strcmp(av[0], "path") == 0) {
++			if (av[1] == NULL)
++				errx(1, "expecting argument for path");
++			if (strlcpy(dr->dr_pathptrn, av[1], DEVFS_MAXPTRNLEN)
++			    >= DEVFS_MAXPTRNLEN)
++				warnx("pattern specified too long; truncated");
++			dr->dr_icond |= DRC_PATHPTRN;
++			av += 2;
++		} else
++			break;
++	}
++	while (av[0] != NULL) {
++		if (strcmp(av[0], "hide") == 0) {
++			dr->dr_iacts |= DRA_BACTS;
++			dr->dr_bacts |= DRB_HIDE;
++			++av;
++		} else if (strcmp(av[0], "unhide") == 0) {
++			dr->dr_iacts |= DRA_BACTS;
++			dr->dr_bacts |= DRB_UNHIDE;
++			++av;
++		} else if (strcmp(av[0], "user") == 0) {
++			if (av[1] == NULL)
++				errx(1, "expecting argument for user");
++			dr->dr_iacts |= DRA_UID;
++			pw = getpwnam(av[1]);
++			if (pw != NULL)
++				dr->dr_uid = pw->pw_uid;
++			else
++				dr->dr_uid = eatoi(av[1]); /* XXX overflow */
++			av += 2;
++		} else if (strcmp(av[0], "group") == 0) {
++			if (av[1] == NULL)
++				errx(1, "expecting argument for group");
++			dr->dr_iacts |= DRA_GID;
++			gr = getgrnam(av[1]);
++			if (gr != NULL)
++				dr->dr_gid = gr->gr_gid;
++			else
++				dr->dr_gid = eatoi(av[1]); /* XXX overflow */
++			av += 2;
++		} else if (strcmp(av[0], "mode") == 0) {
++			if (av[1] == NULL)
++				errx(1, "expecting argument for mode");
++			dr->dr_iacts |= DRA_MODE;
++			set = setmode(av[1]);
++			if (set == NULL)
++				errx(1, "invalid mode: %s", av[1]);
++			dr->dr_mode = getmode(set, 0);
++			av += 2;
++		} else if (strcmp(av[0], "include") == 0) {
++			if (av[1] == NULL)
++				errx(1, "expecting argument for include");
++			dr->dr_iacts |= DRA_INCSET;
++			dr->dr_incset = eatonum(av[1]);
++			av += 2;
++		} else
++			errx(1, "unknown argument: %s", av[0]);
++	}
++
++	dr->dr_id = mkrid(rsnum, rnum);
++	dr->dr_magic = DEVFS_MAGIC;
++}
++
++/*
++ * Write a human-readable (and machine-parsable, by rulespec_in*())
++ * representation of dr to bufp.  *bufp should be free(3)'d when the
++ * caller is finished with it.
++ */
++static void
++rulespec_outfp(FILE *fp, struct devfs_rule *dr)
++{
++	struct intstr *is;
++	struct passwd *pw;
++	struct group *gr;
++
++	fprintf(fp, "%d", rid2rn(dr->dr_id));
++
++	if (dr->dr_icond & DRC_DSWFLAGS)
++		for (is = ist_type; is->s != NULL; ++is)
++			if (dr->dr_dswflags & is->i)
++				fprintf(fp, " type %s", is->s);
++	if (dr->dr_icond & DRC_PATHPTRN)
++		fprintf(fp, " path %s", dr->dr_pathptrn);
++
++	if (dr->dr_iacts & DRA_BACTS) {
++		if (dr->dr_bacts & DRB_HIDE)
++			fprintf(fp, " hide");
++		if (dr->dr_bacts & DRB_UNHIDE)
++			fprintf(fp, " unhide");
++	}
++	if (dr->dr_iacts & DRA_UID) {
++		pw = getpwuid(dr->dr_uid);
++		if (pw == NULL)
++			fprintf(fp, " user %d", dr->dr_uid);
++		else
++			fprintf(fp, " user %s", pw->pw_name);
++	}
++	if (dr->dr_iacts & DRA_GID) {
++		gr = getgrgid(dr->dr_gid);
++		if (gr == NULL)
++			fprintf(fp, " group %d", dr->dr_gid);
++		else
++			fprintf(fp, " group %s", gr->gr_name);
++	}
++	if (dr->dr_iacts & DRA_MODE)
++		fprintf(fp, " mode %o", dr->dr_mode);
++	if (dr->dr_iacts & DRA_INCSET)
++		fprintf(fp, " include %d", dr->dr_incset);
++
++	fprintf(fp, "\n");
++}
+
