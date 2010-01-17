@@ -1,0 +1,40 @@
+#
+# This file defines the default owner and permissions of /dev nodes
+#
+
+# default for all nodes
+		user root	group root			unhide
+
+# audio nodes
+path audio*	user root	group audio	mode 0600
+path dsp*	user root	group audio	mode 0660
+path mixer*	user root	group audio	mode 0660
+
+# cdrom nodes
+path *cd*	user root	group cdrom	mode 0660
+
+# serial port nodes
+path cua* 	user root	group dialout	mode 0660
+
+# disk nodes
+path ata	user root	group disk	mode 0640
+path ad*	user root	group disk	mode 0660
+path da*	user root	group disk	mode 0660
+path geom*	user root	group disk	mode 0640
+path pass*	user root	group disk	mode 0660
+
+# floppy nodes
+path fd[0-9]*	user root	group floppy	mode 0660
+
+# memory nodes
+type mem	user root	group kmem	mode 0640
+path audit	user root	group kmem	mode 0640
+
+# parallel port node
+path ppi*	user root	group lp	mode 0660
+
+# tape nodes
+type tape	user root	group tape	mode 0660
+
+# tty nodes
+type tty			group tty

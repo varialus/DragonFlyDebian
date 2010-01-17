@@ -20,59 +20,30 @@
 # Short-Description: FreeBSD kernel specific setup
 ### END INIT INFO
 
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
 set -e
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+. /lib/lsb/init-functions
 
 case "$1" in
   start)
-    echo -n "Setting up /dev permissions..."
-
-    # only do this during boot, to avoid messing up ttys
-    if [ "$RUNLEVEL" = "S" ] ; then
-      chown root:root /dev/* 2> /dev/null
+    if [ "$(readlink /etc/mtab)" != "/proc/mounts" ] ; then
+      log_warning_msg "Warning: replacing /etc/mtab by a symlink to /proc/mounts."
+      rm -f /etc/mtab
+      ln -sf /proc/mounts /etc/mtab
     fi
-    
-    for i in /dev/dsp{,[0-9]} /dev/mixer{,[0-9]} /dev/audio{,ctl,[0-9]} ; do
-      if test -e $i ; then
-        chgrp audio $i
-      fi
+
+    log_action_begin_msg "Loading devfs rules"
+    RULESET=1 	# Use ruleset 1 for the default settings
+    devfs rule -s $RULESET delset
+    for rule in /etc/devfs.d/*.rules ; do
+      egrep -v '^[[:space:]]*(#|$)' $rule | devfs rule -s $RULESET add -
     done
-    for i in /dev/{,a}cd[0-9] ; do
-      if test -e $i ; then
-        chgrp cdrom $i
-      fi
-    done
-    for i in /dev/console /dev/ptyp[0-9] ; do
-      if test -e $i ; then
-        chgrp tty $i
-      fi
-    done
-    for i in /dev/fd[0-9] ; do
-      if test -e $i ; then
-        chgrp floppy $i
-      fi
-    done
-    for i in /dev/ata /dev/ad[0-9]* /dev/da[0-9]* ; do
-      if test -e $i ; then
-        chgrp disk $i
-      fi
-    done
-    for i in /dev/{,k}mem ; do
-      if test -e $i ; then
-        chgrp kmem $i
-      fi
-    done
-    for i in /dev/lpt[0-9]* ; do
-      if test -e $i ; then
-        chgrp lp $i
-      fi
-    done
-    for i in /dev/cuaa[0-9] ; do
-      if test -e $i ; then
-        chgrp dialout $i
-      fi
-    done
-    
+    devfs rule -s $RULESET applyset
+    log_action_end_msg $?
+
+    log_action_begin_msg "Setting up /dev links"
     # setup /dev/cdrom symlink
     if ! test -e /dev/cdrom && ! test -L /dev/cdrom ; then
       for i in {,a}cd{0,1,2,3,4,5,6,7,8,9} ; do
@@ -82,15 +53,9 @@ case "$1" in
         fi
       done
     fi
-    
-    echo "done."
+    log_action_end_msg 0
    
-    if [ "$(readlink /etc/mtab)" != "/proc/mounts" ] ; then
-      echo "Warning: replacing /etc/mtab by a symlink to /proc/mounts."
-      rm -f /etc/mtab
-      ln -sf /proc/mounts /etc/mtab
-    fi
-
+    log_action_begin_msg "Mounting kernel filesystems"
     # Mount /dev/fd, /proc and /sys
     if ! test -f /proc/cmdline ; then
       mount -t linprocfs proc /proc
@@ -105,6 +70,7 @@ case "$1" in
     if ! mount | grep -q "on /dev/fd (fdescfs" ; then
       mount -t fdescfs fdescfs /dev/fd
     fi
+    log_action_end_msg 0
     ;;
 
   stop|reload|restart|force-reload)
