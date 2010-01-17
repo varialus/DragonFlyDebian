@@ -35,12 +35,12 @@ case "$1" in
     fi
 
     log_action_begin_msg "Loading devfs rules"
-    RULESET=1 	# Use ruleset 1 for the default settings
-    devfs rule -s $RULESET delset
+    devfs ruleset 1
+    devfs rule delset
     for rule in /etc/devfs.d/*.rules ; do
-      egrep -v '^[[:space:]]*(#|$)' $rule | devfs rule -s $RULESET add -
+      egrep -v '^[[:space:]]*(#|$)' $rule | devfs rule add -
     done
-    devfs rule -s $RULESET applyset
+    devfs rule applyset
     log_action_end_msg $?
 
     log_action_begin_msg "Setting up /dev links"
