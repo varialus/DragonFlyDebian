@@ -10,7 +10,7 @@
  extern int mpfd;		/* Mount-point file descriptor. */
  
 --- a/sbin/devfs/Makefile
-+++ b/sbin/devfs/Makefile	
++++ b/sbin/devfs/Makefile
 @@ -4,5 +4,6 @@
  SRCS=	devfs.c rule.c
  MAN=	devfs.8
@@ -29,15 +29,17 @@
  
  #include "extern.h"
  
-@@ -85,7 +87,7 @@
+@@ -85,8 +87,8 @@
  	int ch;
  
  	setprogname("devfs rule");
 -	optreset = optind = 1;
+-	while ((ch = getopt(ac, av, "s:")) != -1)
 +	optind = 1;
- 	while ((ch = getopt(ac, av, "s:")) != -1)
++	while ((ch = getopt(ac, av, "+s:")) != -1)
  		switch (ch) {
  		case 's':
+ 			in_rsnum = eatonum(optarg);
 @@ -125,7 +127,7 @@
  }
  
@@ -101,3 +103,14 @@
      devfs_rsnum rsnum)
  {
  	struct intstr *is;
+--- a/sbin/devfs/devfs.c
++++ b/sbin/devfs/devfs.c
+@@ -62,7 +62,7 @@
+ 	int ch;
+ 
+ 	mountpt = NULL;
+-	while ((ch = getopt(ac, av, "m:")) != -1)
++	while ((ch = getopt(ac, av, "+m:")) != -1)
+ 		switch (ch) {
+ 		case 'm':
+ 			mountpt = optarg;
