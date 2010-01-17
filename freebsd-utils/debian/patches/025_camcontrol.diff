@@ -1,0 +1,82 @@
+--- a/sbin/camcontrol/camcontrol.c
++++ b/sbin/camcontrol/camcontrol.c
+@@ -30,7 +30,7 @@
+ __FBSDID("$FreeBSD$");
+ 
+ #include <sys/ioctl.h>
+-#include <sys/stdint.h>
++#include <stdint.h>
+ #include <sys/types.h>
+ #include <sys/endian.h>
+ 
+@@ -120,9 +120,9 @@
+ };
+ 
+ #ifndef MINIMALISTIC
+-static const char scsicmd_opts[] = "a:c:i:o:r";
+-static const char readdefect_opts[] = "f:GP";
+-static const char negotiate_opts[] = "acD:O:qR:T:UW:";
++static const char scsicmd_opts[] = "+a:c:i:o:r";
++static const char readdefect_opts[] = "+f:GP";
++static const char negotiate_opts[] = "+acD:O:qR:T:UW:";
+ #endif
+ 
+ struct camcontrol_opts option_table[] = {
+@@ -4431,7 +4431,6 @@
+ 	 * the arguments again.
+ 	 */
+ 	optind = optstart;
+-	optreset = 1;
+ 
+ 	sitch(cmdlist) {
+ #ifndef MINIMALISTIC
+--- a/sbin/camcontrol/modeedit.c
++++ b/sbin/camcontrol/modeedit.c
+@@ -140,7 +140,7 @@
+ 
+ 
+ static void
+-editentry_create(void *hook __unused, int letter, void *arg, int count,
++editentry_create(void *hook, int letter, void *arg, int count,
+ 		 char *name)
+ {
+ 	struct editentry *newentry;	/* Buffer to hold new entry. */
+@@ -162,7 +162,7 @@
+ }
+ 
+ static void
+-editentry_update(void *hook __unused, int letter, void *arg, int count,
++editentry_update(void *hook, int letter, void *arg, int count,
+ 		 char *name)
+ {
+ 	struct editentry *dest;		/* Buffer to hold entry to update. */
+@@ -190,7 +190,7 @@
+ }
+ 
+ static int
+-editentry_save(void *hook __unused, char *name)
++editentry_save(void *hook, char *name)
+ {
+ 	struct editentry *src;		/* Entry value to save. */
+ 
+--- a/sbin/camcontrol/util.c
++++ b/sbin/camcontrol/util.c
+@@ -46,7 +46,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
+-#include <sys/stdint.h>
++#include <stdint.h>
+ #include <sys/types.h>
+ 
+ #include <stdlib.h>
+@@ -107,7 +107,7 @@
+ /* arg_put: "put argument" callback
+  */
+ void
+-arg_put(void *hook __unused, int letter, void *arg, int count, char *name)
++arg_put(void *hook, int letter, void *arg, int count, char *name)
+ {
+ 	if (verbose && name && *name)
+ 		printf("%s:  ", name);
+Les fichiers binaires camcontrol.orig/util.o et camcontrol/util.o sont différents.

@@ -1,0 +1,1020 @@
+# This patch should be removed when a new tarball is created
+
+--- a/sbin/atacontrol/atacontrol.8
++++ b/sbin/atacontrol/atacontrol.8
+@@ -0,0 +1,379 @@
++.\"
++.\" Copyright (c) 2000,2001,2002 Søren Schmidt <sos@FreeBSD.org>
++.\" All rights reserved.
++.\"
++.\" Redistribution and use in source and binary forms, with or without
++.\" modification, are permitted provided that the following conditions
++.\" are met:
++.\" 1. Redistributions of source code must retain the above copyright
++.\"    notice, this list of conditions and the following disclaimer.
++.\" 2. Redistributions in binary form must reproduce the above copyright
++.\"    notice, this list of conditions and the following disclaimer in the
++.\"    documentation and/or other materials provided with the distribution.
++.\"
++.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
++.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
++.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++.\" SUCH DAMAGE.
++.\"
++.\" $FreeBSD$
++.\"
++.Dd February 21, 2009
++.Dt ATACONTROL 8
++.Os
++.Sh NAME
++.Nm atacontrol
++.Nd ATA device driver control program
++.Sh SYNOPSIS
++.Nm
++.Aq Ar command
++.Ar args
++.Pp
++.Nm
++.Ic attach
++.Ar channel
++.Nm
++.Ic detach
++.Ar channel
++.Nm
++.Ic reinit
++.Ar channel
++.Nm
++.Ic create
++.Ar type Oo Ar interleave Oc Ar disk0 ... diskN
++.Nm
++.Ic delete
++.Ar raid
++.Nm
++.Ic addspare
++.Ar raid disk
++.Nm
++.Ic rebuild
++.Ar raid
++.Nm
++.Ic status
++.Ar raid
++.Nm
++.Ic mode
++.Ar device
++.Op Ar mode
++.Nm
++.Ic info
++.Ar channel
++.Nm
++.Ic cap
++.Ar device
++.Nm
++.Ic spindown
++.Ar device
++.Op Ar seconds
++.Nm
++.Ic list
++.Sh DESCRIPTION
++The
++.Nm
++utility is a control program that provides the user access and control to the
++.Fx
++.Xr ata 4
++subsystem.
++.Pp
++The
++.Nm
++utility
++can cause severe system crashes and loss of data if used improperly.
++Please
++exercise caution when using this command!
++.Pp
++The
++.Ar channel
++argument is the ATA channel device (e.g., ata0) on which to operate.
++The following commands are supported:
++.Bl -tag -width ".Ic addspare"
++.It Ic attach
++Attach an ATA
++.Ar channel .
++Devices on the channel are probed and attached as
++is done on boot.
++.It Ic detach
++Detach an ATA
++.Ar channel .
++Devices on the channel are removed from the kernel,
++and all outstanding transfers etc.\& are returned back to the system marked
++as failed.
++.It Ic reinit
++Reinitialize an ATA
++.Ar channel .
++Both devices on the channel are reset and
++initialized to the parameters the ATA driver has stored internally.
++Devices that have gone bad and no longer respond to the probe, or devices
++that have physically been removed, are removed from the kernel.
++Likewise are devices that show up during a reset, probed and attached.
++.It Ic create
++Create a
++.Ar type
++ATA RAID.
++The type can be
++.Cm RAID0
++(stripe),
++.Cm RAID1
++(mirror),
++.Cm RAID0+1 ,
++.Cm SPAN
++or
++.Cm JBOD .
++In case the RAID has a
++.Cm RAID0
++component,
++the
++.Ar interleave
++must be specified in number of sectors.
++The RAID will be created
++of the individual disks named
++.Bk -words
++.Ar disk0 ... diskN .
++.Ek
++.Pp
++Although the ATA driver allows for creating an ATA RAID on disks with any
++controller, there are restrictions.
++It is only possible to boot on
++an array if it is either located on a
++.Dq real
++ATA RAID controller like
++the Promise or Highpoint controllers, or if the RAID declared is of
++.Cm RAID1
++or
++.Cm SPAN
++type; in case of a
++.Cm SPAN ,
++the partition to boot must
++reside on the first disk in the SPAN.
++.It Ic delete
++Delete a RAID array on a RAID capable ATA controller.
++.It Ic addspare
++Add a spare disk to an existing RAID.
++.It Ic rebuild
++Rebuild a RAID1 array on a RAID capable ATA controller.
++.It Ic status
++Get the status of an ATA RAID.
++.It Ic mode
++Without the
++.Ar mode
++argument, the current transfer mode of the
++device are printed.
++If the
++.Ar mode
++argument is given, the ATA driver
++is asked to change the transfer mode to the one given.
++The ATA driver
++will reject modes that are not supported by the hardware.
++Modes are given like
++.Dq Li PIO3 ,
++.Dq Li udma2 ,
++.Dq Li udma100 ,
++case does not matter.
++.Pp
++Currently supported modes are:
++.Cm BIOSPIO , PIO0 , PIO1 , PIO2 , PIO3 , PIO4 , WDMA2 , UDMA2
++(alias
++.Cm UDMA33 ) ,
++.Cm UDMA4
++(alias
++.Cm UDMA66 ) ,
++.Cm UDMA5
++(alias
++.Cm UDMA100 ) ,
++.Cm UDMA6
++(alias
++.Cm UDMA133 ) ,
++.Cm SATA150 , SATA300 , USB , USB1 , USB2
++and
++.Cm BIOSDMA .
++.It Ic cap
++Show detailed info about the device on
++.Ar device .
++.It Ic spindown
++Set or report timeout after which the
++.Ar device
++will be spun down.
++To arm the timeout the device needs at least one more request after
++setting the timeout.
++To disable spindown, set the timeout to zero.
++No further actions are needed in this case.
++.It Ic info
++Show info about the attached devices on the
++.Ar channel .
++The device name and manufacture/version strings are shown.
++.It Ic list
++Show info about all attached devices on all active controllers.
++.El
++.Sh EXAMPLES
++To get information on devices attached to a channel,
++use the command line:
++.Pp
++.Dl "atacontrol info ata0"
++.Pp
++To see the devices' current access modes, use the command line:
++.Pp
++.Dl "atacontrol mode ad0"
++.Pp
++which results in the modes of the devices being displayed as a string
++like this:
++.Pp
++.Dl "current mode = UDMA100"
++.Pp
++You can set the mode with
++.Nm
++and a string like the above,
++for example:
++.Pp
++.Dl "atacontrol mode ad0 PIO4"
++.Pp
++The new modes are set as soon as the
++.Nm
++command returns.
++.Pp
++The atacontrol command can also be used to create purely software
++RAID arrays in systems that do NOT have a "real" hardware RAID card
++such as a Highpoint or Promise card.
++A common scenario is a 1U server such as the HP DL320 G4 or G5.
++These servers contain a SATA controller that has 2 channels that can
++contain 2 disks per channel, but the servers are wired to only place
++a single SATA drive on each channel.
++These servers do have a "pseudo" RAID BIOS but it uses a proprietary
++format that is not compatible with the ata driver, and thus their
++RAID bios must be switched off.
++Another common scenario would be a Promise UDMA100 controller card
++that did not contain the Fasttrack RAID BIOS, but did contain 2
++UDMA channels.
++1 disk would be attached to one channel and the other disk would be
++attached to the other channel.
++It is NOT recommended to create such arrays on a primary/secondary
++pair on a SINGLE channel since the throughput of the mirror would be
++severely compromised, the ability to rebuild the array in the event
++of a disk failure would be greatly complicated, and if a disk
++controller electronics failed it could wedge the channel and take
++both disks in the mirror offline.
++(which would defeat the purpose of having a mirror in the first place)
++.Pp
++A quick and dirty way to create such a mirrored array on a new
++system is to boot off the FreeBSD install CD, do a minimal scratch
++install, abort out of the post install questions, and at the command
++line issue the command:
++.Pp
++.Dl "atacontrol create RAID1 ad4 ad6"
++.Pp
++then immediately issue a reboot and boot from the installation CD
++again, and during the installation, you will now see "ar0" listed
++as a disk to install on, and install on that instead of ad4, ad6, etc.
++.Pp
++To get information about the status of a RAID array in the system
++use the command line:
++.Pp
++.Dl "atacontrol status ar0"
++.Pp
++A typical output showing good health on a RAID array might be as
++follows:
++.Pp
++.Dl "ar0: ATA RAID1 subdisks: ad4 ad6 status: READY"
++.Pp
++If a disk drive in a RAID1 array dies the system will mark the disk
++in a DOWN state and change the array status to DEGRADED.
++This can ALSO happen in rare instances due to a power fluctuation or
++other event causing the system to not shutdown properly.
++In that case the output will look like the following:
++.Pp
++.Dl "ar0: ATA RAID1 subdisks: ad4 DOWN status: DEGRADED"
++.Pp
++For a mirrored RAID1 system the server WILL ALLOW you to remove a
++dead SATA disk drive (if the drive is in a hot-swap tray) without
++freezing up the system, so you can remove the disk and while you are
++obtaining a replacement the server can run from the active disk.
++The only caveat is that if the active disk is ad6, the system most
++likely will NOT be able to be rebooted since most systems only
++support booting from the first disk drive.
++.Pp
++To deactivate the DOWN disk ad6 to allow for it to be ejected, use
++the following:
++.Pp
++.Dl "atacontrol detach ata3"
++.Pp
++then eject or remove the disk.
++Note that this only works if the 2 disks in the mirror are on separate
++channels (which is the standard setup for 1-U servers like the HP DL320).
++When the new disk drive is obtained, make sure it is blank, then shut
++the system down.
++At this point, if the system has a RAID array card like a Highpoint or
++Promise controller, you may then boot it into the BIOS of the card and use
++the manufacturers RAID array rebuild utilities to rebuild the array.
++.Pp
++If the system has a pure software array and is not using a "real" ATA
++RAID controller, then shut the system down, make sure that the disk
++that was still working is moved to the bootable position (channel 0
++or whatever the BIOS allows the system to boot from) and the blank disk
++is placed in the secondary position, then boot the system into
++single-user mode and issue the command:
++.Pp
++.Dl "atacontrol addspare ar0 ad6"
++.Dl "atacontrol rebuild ar0"
++.Pp
++If the disk drive did NOT fail and the RAID array became unmirrored due
++to a software glitch or improper shutdown, then a slightly different
++process must be followed.
++Begin by issuing the detach command (this shows the detach for disk ad6,
++the primary master on channel 3):
++.Pp
++.Dl "atacontrol detach ata3"
++.Pp
++then reboot the system into single-user mode.
++(don't just init the system, reboot it so that both disks get probed)
++You will probably see TWO mirrored RAID arrays appear during the boot
++messages, ar0 and ar1.
++Issue the command:
++.Pp
++.Dl "atacontrol delete ar1"
++.Dl "atacontrol addspare ar0 ad6"
++.Pp
++Now a status command will show the array rebuilding.
++.Pp
++To spin down a disk after 30 minutes run
++.Pp
++.Dl "atacontrol spindown ad6 1800"
++.Dl "dd if=/dev/ad6 of=/dev/null count=1"
++.Pp
++While any IO on the disk will arm the timer, using
++.Xr dd 1
++on the raw device will work in all cases, as when the disk is not
++opened at all.
++You can check the current setting with
++.Pp
++.Dl "atacontrol spindown ad6"
++.Pp
++You should not set a spindown timeout on a disk with
++.Pa /
++or syslog logging on it as the disk will be worn out spinning down and
++up all the time.
++.Sh SEE ALSO
++.Xr ata 4
++.Sh HISTORY
++The
++.Nm
++utility first appeared in
++.Fx 4.6 .
++.Sh AUTHORS
++.An -nosplit
++The
++.Nm
++utility was written by
++.An S\(/oren Schmidt
++.Aq sos@FreeBSD.org .
++.Pp
++This manual page was written by
++.An S\(/oren Schmidt
++.Aq sos@FreeBSD.org .
+--- a/sbin/atacontrol/atacontrol.c
++++ b/sbin/atacontrol/atacontrol.c
+@@ -0,0 +1,622 @@
++/*-
++ * Copyright (c) 2000 - 2006 Søren Schmidt <sos@FreeBSD.org>
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer,
++ *    without modification, immediately at the beginning of the file.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
++ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
++ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
++ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
++ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
++ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
++ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ *
++ * $FreeBSD$
++ */
++
++#include <sys/types.h>
++#include <sys/ata.h>
++
++#include <err.h>
++#include <errno.h>
++#include <fcntl.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sysexits.h>
++#include <unistd.h>
++
++static const char *
++mode2str(int mode)
++{
++	switch (mode) {
++	case ATA_PIO: return "BIOSPIO";
++	case ATA_PIO0: return "PIO0";
++	case ATA_PIO1: return "PIO1";
++	case ATA_PIO2: return "PIO2";
++	case ATA_PIO3: return "PIO3";
++	case ATA_PIO4: return "PIO4";
++	case ATA_WDMA2: return "WDMA2";
++	case ATA_UDMA2: return "UDMA33";
++	case ATA_UDMA4: return "UDMA66";
++	case ATA_UDMA5: return "UDMA100";
++	case ATA_UDMA6: return "UDMA133";
++	case ATA_SA150: return "SATA150";
++	case ATA_SA300: return "SATA300";
++	case ATA_USB: return "USB";
++	case ATA_USB1: return "USB1";
++	case ATA_USB2: return "USB2";
++	case ATA_DMA: return "BIOSDMA";
++	default: return "???";
++	}
++}
++
++static int
++str2mode(char *str)
++{
++	if (!strcasecmp(str, "BIOSPIO")) return ATA_PIO;
++	if (!strcasecmp(str, "PIO0")) return ATA_PIO0;
++	if (!strcasecmp(str, "PIO1")) return ATA_PIO1;
++	if (!strcasecmp(str, "PIO2")) return ATA_PIO2;
++	if (!strcasecmp(str, "PIO3")) return ATA_PIO3;
++	if (!strcasecmp(str, "PIO4")) return ATA_PIO4;
++	if (!strcasecmp(str, "WDMA2")) return ATA_WDMA2;
++	if (!strcasecmp(str, "UDMA2")) return ATA_UDMA2;
++	if (!strcasecmp(str, "UDMA33")) return ATA_UDMA2;
++	if (!strcasecmp(str, "UDMA4")) return ATA_UDMA4;
++	if (!strcasecmp(str, "UDMA66")) return ATA_UDMA4;
++	if (!strcasecmp(str, "UDMA5")) return ATA_UDMA5;
++	if (!strcasecmp(str, "UDMA100")) return ATA_UDMA5;
++	if (!strcasecmp(str, "UDMA6")) return ATA_UDMA6;
++	if (!strcasecmp(str, "UDMA133")) return ATA_UDMA6;
++	if (!strcasecmp(str, "SATA150")) return ATA_SA150;
++	if (!strcasecmp(str, "SATA300")) return ATA_SA300;
++	if (!strcasecmp(str, "USB")) return ATA_USB;
++	if (!strcasecmp(str, "USB1")) return ATA_USB1;
++	if (!strcasecmp(str, "USB2")) return ATA_USB2;
++	if (!strcasecmp(str, "BIOSDMA")) return ATA_DMA;
++	return -1;
++}
++
++static void
++usage(void)
++{
++	fprintf(stderr,
++		"usage:  atacontrol <command> args:\n"
++		"        atacontrol list\n"
++		"        atacontrol info channel\n"
++		"        atacontrol attach channel\n"
++		"        atacontrol detach channel\n"
++		"        atacontrol reinit channel\n"
++		"        atacontrol create type [interleave] disk0 ... diskN\n"
++		"        atacontrol delete array\n"
++		"        atacontrol addspare array disk\n"
++		"        atacontrol rebuild array\n"
++		"        atacontrol status array\n"
++		"        atacontrol mode device [mode]\n"
++		"        atacontrol cap device\n"
++		"        atacontrol spindown device [seconds]\n"
++	);
++	exit(EX_USAGE);
++}
++
++static int
++version(int ver)
++{
++	int bit;
++
++	if (ver == 0xffff)
++		return 0;
++	for (bit = 15; bit >= 0; bit--)
++		if (ver & (1<<bit))
++			return bit;
++	return 0;
++}
++
++static void
++param_print(struct ata_params *parm)
++{
++	printf("<%.40s/%.8s> ", parm->model, parm->revision);
++	if (parm->satacapabilities && parm->satacapabilities != 0xffff) {
++		if (parm->satacapabilities & ATA_SATA_GEN2)
++			printf("SATA revision 2.x\n");
++		else if (parm->satacapabilities & ATA_SATA_GEN1)
++			printf("SATA revision 1.x\n");
++		else
++			printf("Unknown SATA revision\n");
++	}
++	else
++		printf("ATA/ATAPI revision %d\n", version(parm->version_major));
++}
++
++static void
++cap_print(struct ata_params *parm)
++{
++	u_int32_t lbasize = (u_int32_t)parm->lba_size_1 |
++				((u_int32_t)parm->lba_size_2 << 16);
++
++	u_int64_t lbasize48 = ((u_int64_t)parm->lba_size48_1) |
++				((u_int64_t)parm->lba_size48_2 << 16) |
++				((u_int64_t)parm->lba_size48_3 << 32) |
++				((u_int64_t)parm->lba_size48_4 << 48);
++
++	printf("\n");
++	printf("Protocol              ");
++	if (parm->satacapabilities && parm->satacapabilities != 0xffff) {
++		if (parm->satacapabilities & ATA_SATA_GEN2)
++			printf("SATA revision 2.x\n");
++		else if (parm->satacapabilities & ATA_SATA_GEN1)
++			printf("SATA revision 1.x\n");
++		else
++			printf("Unknown SATA revision\n");
++	}
++	else
++		printf("ATA/ATAPI revision %d\n", version(parm->version_major));
++	printf("device model          %.40s\n", parm->model);
++	printf("serial number         %.20s\n", parm->serial);
++	printf("firmware revision     %.8s\n", parm->revision);
++
++	printf("cylinders             %d\n", parm->cylinders);
++	printf("heads                 %d\n", parm->heads);
++	printf("sectors/track         %d\n", parm->sectors);
++
++	if (parm->config == ATA_PROTO_CFA ||
++	    (parm->support.command2 & ATA_SUPPORT_CFA))
++		printf("CFA supported\n");
++
++	printf("lba%ssupported         ",
++		parm->capabilities1 & ATA_SUPPORT_LBA ? " " : " not ");
++	if (lbasize)
++		printf("%d sectors\n", lbasize);
++	else
++		printf("\n");
++
++	printf("lba48%ssupported       ",
++		parm->support.command2 & ATA_SUPPORT_ADDRESS48 ? " " : " not ");
++	if (lbasize48)
++		printf("%ju sectors\n", (uintmax_t)lbasize48);
++	else
++		printf("\n");
++
++	printf("dma%ssupported\n",
++		parm->capabilities1 & ATA_SUPPORT_DMA ? " " : " not ");
++
++	printf("overlap%ssupported\n",
++		parm->capabilities1 & ATA_SUPPORT_OVERLAP ? " " : " not ");
++
++	printf("\nFeature                      "
++		"Support  Enable    Value           Vendor\n");
++
++	printf("write cache                    %s	%s\n",
++		parm->support.command1 & ATA_SUPPORT_WRITECACHE ? "yes" : "no",
++		parm->enabled.command1 & ATA_SUPPORT_WRITECACHE ? "yes" : "no");
++
++	printf("read ahead                     %s	%s\n",
++		parm->support.command1 & ATA_SUPPORT_LOOKAHEAD ? "yes" : "no",
++		parm->enabled.command1 & ATA_SUPPORT_LOOKAHEAD ? "yes" : "no");
++
++	if (parm->satacapabilities && parm->satacapabilities != 0xffff) {
++		printf("Native Command Queuing (NCQ)   %s	%s"
++			"	%d/0x%02X\n",
++			parm->satacapabilities & ATA_SUPPORT_NCQ ?
++				"yes" : "no", " -",
++			(parm->satacapabilities & ATA_SUPPORT_NCQ) ?
++				ATA_QUEUE_LEN(parm->queue) : 0,
++			(parm->satacapabilities & ATA_SUPPORT_NCQ) ?
++				ATA_QUEUE_LEN(parm->queue) : 0);
++	}
++	printf("Tagged Command Queuing (TCQ)   %s	%s	%d/0x%02X\n",
++		parm->support.command2 & ATA_SUPPORT_QUEUED ? "yes" : "no",
++		parm->enabled.command2 & ATA_SUPPORT_QUEUED ? "yes" : "no",
++		ATA_QUEUE_LEN(parm->queue), ATA_QUEUE_LEN(parm->queue));
++
++	printf("SMART                          %s	%s\n",
++		parm->support.command1 & ATA_SUPPORT_SMART ? "yes" : "no",
++		parm->enabled.command1 & ATA_SUPPORT_SMART ? "yes" : "no");
++
++	printf("microcode download             %s	%s\n",
++		parm->support.command2 & ATA_SUPPORT_MICROCODE ? "yes" : "no",
++		parm->enabled.command2 & ATA_SUPPORT_MICROCODE ? "yes" : "no");
++
++	printf("security                       %s	%s\n",
++		parm->support.command1 & ATA_SUPPORT_SECURITY ? "yes" : "no",
++		parm->enabled.command1 & ATA_SUPPORT_SECURITY ? "yes" : "no");
++
++	printf("power management               %s	%s\n",
++		parm->support.command1 & ATA_SUPPORT_POWERMGT ? "yes" : "no",
++		parm->enabled.command1 & ATA_SUPPORT_POWERMGT ? "yes" : "no");
++
++	printf("advanced power management      %s	%s	%d/0x%02X\n",
++		parm->support.command2 & ATA_SUPPORT_APM ? "yes" : "no",
++		parm->enabled.command2 & ATA_SUPPORT_APM ? "yes" : "no",
++		parm->apm_value, parm->apm_value);
++
++	printf("automatic acoustic management  %s	%s	"
++		"%d/0x%02X	%d/0x%02X\n",
++		parm->support.command2 & ATA_SUPPORT_AUTOACOUSTIC ? "yes" :"no",
++		parm->enabled.command2 & ATA_SUPPORT_AUTOACOUSTIC ? "yes" :"no",
++		ATA_ACOUSTIC_CURRENT(parm->acoustic),
++		ATA_ACOUSTIC_CURRENT(parm->acoustic),
++		ATA_ACOUSTIC_VENDOR(parm->acoustic),
++		ATA_ACOUSTIC_VENDOR(parm->acoustic));
++}
++
++static void
++ata_cap_print(int fd)
++{
++	struct ata_params params;
++
++	if (ioctl(fd, IOCATAGPARM, &params) < 0)
++		err(1, "ioctl(IOCATAGPARM)");
++	cap_print(&params);
++}
++
++static void
++info_print(int fd, int channel, int prchan)
++{
++	struct ata_ioc_devices devices;
++
++	devices.channel = channel;
++
++	if (ioctl(fd, IOCATADEVICES, &devices) < 0) {
++		if (!prchan)
++			err(1, "ioctl(IOCATADEVICES)");
++		return;
++	}
++	if (prchan)
++		printf("ATA channel %d:\n", channel);
++	printf("%sMaster: ", prchan ? "    " : "");
++	if (*devices.name[0]) {
++		printf("%4.4s ", devices.name[0]);
++		param_print(&devices.params[0]);
++	}
++	else
++		printf("     no device present\n");
++	printf("%sSlave:  ", prchan ? "    " : "");
++	if (*devices.name[1]) {
++		printf("%4.4s ", devices.name[1]);
++		param_print(&devices.params[1]);
++	}
++	else
++		printf("     no device present\n");
++}
++
++static void
++ata_spindown(int fd, const char *dev, const char *arg)
++{
++	int tmo;
++
++	if (arg != NULL) {
++		tmo = strtoul(arg, NULL, 0);
++		if (ioctl(fd, IOCATASSPINDOWN, &tmo) < 0)
++			err(1, "ioctl(IOCATASSPINDOWN)");
++	} else {
++		if (ioctl(fd, IOCATAGSPINDOWN, &tmo) < 0)
++			err(1, "ioctl(IOCATAGSPINDOWN)");
++		if (tmo == 0)
++			printf("%s: idle spin down disabled\n", dev);
++		else
++			printf("%s: spin down after %d seconds idle\n",
++			    dev, tmo);
++	}
++}
++
++static int
++open_dev(const char *arg, int mode)
++{
++	int disk, fd;
++	char device[64];
++
++	if (!(sscanf(arg, "ad%d", &disk) == 1 ||
++	      sscanf(arg, "acd%d", &disk) == 1 ||
++	      sscanf(arg, "afd%d", &disk) == 1 ||
++	      sscanf(arg, "ast%d", &disk) == 1)) {
++		fprintf(stderr, "atacontrol: Invalid device %s\n", arg);
++		exit(EX_USAGE);
++	}
++	sprintf(device, "/dev/%s", arg);
++	if ((fd = open(device, mode)) < 0)
++		err(1, "device not found");
++	return (fd);
++}
++
++static int
++ar_arg(const char *arg)
++{
++	int array;
++
++	if (!(sscanf(arg, "ar%d", &array) == 1)) {
++		fprintf(stderr, "atacontrol: Invalid array %s\n", arg);
++		exit(EX_USAGE);
++	}
++	return (array);
++}
++
++static int
++ata_arg(const char *arg)
++{
++	int channel;
++
++	if (!(sscanf(arg, "ata%d", &channel) == 1)) {
++		fprintf(stderr, "atacontrol: Invalid channel %s\n", arg);
++		exit(EX_USAGE);
++	}
++	return (channel);
++}
++
++int
++main(int argc, char **argv)
++{
++	int fd, mode, channel, array;
++
++	if (argc < 2)
++		usage();
++
++	if (!strcmp(argv[1], "mode") && (argc == 3 || argc == 4)) {
++		fd = open_dev(argv[2], O_RDONLY);
++		if (argc == 4) {
++			mode = str2mode(argv[3]);
++			if (mode == -1)
++				errx(1, "unknown mode");
++			if (ioctl(fd, IOCATASMODE, &mode) < 0)
++				warn("ioctl(IOCATASMODE)");
++		}
++		if (argc == 3 || argc == 4) {
++			if (ioctl(fd, IOCATAGMODE, &mode) < 0)
++				err(1, "ioctl(IOCATAGMODE)");
++			printf("current mode = %s\n", mode2str(mode));
++		}
++		exit(EX_OK);
++	}
++	if (!strcmp(argv[1], "cap") && argc == 3) {
++		fd = open_dev(argv[2], O_RDONLY);
++		ata_cap_print(fd);
++		exit(EX_OK);
++	}
++
++	if (!strcmp(argv[1], "spindown") && (argc == 3 || argc == 4)) {
++		fd = open_dev(argv[2], O_RDONLY);
++		ata_spindown(fd, argv[2], argv[3]);
++		exit(EX_OK);
++	}
++
++	if ((fd = open("/dev/ata", O_RDWR)) < 0)
++		err(1, "control device not found");
++
++	if (!strcmp(argv[1], "list") && argc == 2) {
++		int maxchannel;
++
++		if (ioctl(fd, IOCATAGMAXCHANNEL, &maxchannel) < 0)
++			err(1, "ioctl(IOCATAGMAXCHANNEL)");
++		for (channel = 0; channel < maxchannel; channel++)
++			info_print(fd, channel, 1);
++		exit(EX_OK);
++	}
++	if (!strcmp(argv[1], "info") && argc == 3) {
++		channel = ata_arg(argv[2]);
++		info_print(fd, channel, 0);
++		exit(EX_OK);
++	}
++	if (!strcmp(argv[1], "detach") && argc == 3) {
++		channel = ata_arg(argv[2]);
++		if (ioctl(fd, IOCATADETACH, &channel) < 0)
++			err(1, "ioctl(IOCATADETACH)");
++		exit(EX_OK);
++	}
++	if (!strcmp(argv[1], "attach") && argc == 3) {
++		channel = ata_arg(argv[2]);
++		if (ioctl(fd, IOCATAATTACH, &channel) < 0)
++			err(1, "ioctl(IOCATAATTACH)");
++		info_print(fd, channel, 0);
++		exit(EX_OK);
++	}
++	if (!strcmp(argv[1], "reinit") && argc == 3) {
++		channel = ata_arg(argv[2]);
++		if (ioctl(fd, IOCATAREINIT, &channel) < 0)
++			warn("ioctl(IOCATAREINIT)");
++		info_print(fd, channel, 0);
++		exit(EX_OK);
++	}
++	if (!strcmp(argv[1], "create")) {
++		int disk, dev, offset;
++		struct ata_ioc_raid_config config;
++
++		bzero(&config, sizeof(config));
++		if (argc > 2) {
++			if (!strcasecmp(argv[2], "RAID0") ||
++			    !strcasecmp(argv[2], "stripe"))
++				config.type = AR_RAID0;
++			if (!strcasecmp(argv[2], "RAID1") ||
++			    !strcasecmp(argv[2],"mirror"))
++				config.type = AR_RAID1;
++			if (!strcasecmp(argv[2], "RAID0+1") ||
++			    !strcasecmp(argv[2],"RAID10"))
++				config.type = AR_RAID01;
++			if (!strcasecmp(argv[2], "RAID5"))
++				config.type = AR_RAID5;
++			if (!strcasecmp(argv[2], "SPAN"))
++				config.type = AR_SPAN;
++			if (!strcasecmp(argv[2], "JBOD"))
++				config.type = AR_JBOD;
++		}
++		if (!config.type) {
++			fprintf(stderr, "atacontrol: Invalid RAID type %s\n",
++				argv[2]);
++			fprintf(stderr, "atacontrol: Valid RAID types: \n");
++			fprintf(stderr, "            stripe | mirror | "
++					"RAID0 | RAID1 | RAID0+1 | RAID5 | "
++					"SPAN | JBOD\n");
++			exit(EX_USAGE);
++		}
++
++		if (config.type == AR_RAID0 ||
++		    config.type == AR_RAID01 ||
++		    config.type == AR_RAID5) {
++			if (argc < 4 ||
++			    !sscanf(argv[3], "%d", &config.interleave) == 1) {
++				fprintf(stderr,
++					"atacontrol: Invalid interleave %s\n",
++					argv[3]);
++				exit(EX_USAGE);
++			}
++			offset = 4;
++		}
++		else
++			offset = 3;
++
++		for (disk = 0; disk < 16 && (offset + disk) < argc; disk++) {
++			if (!(sscanf(argv[offset + disk], "ad%d", &dev) == 1)) {
++				fprintf(stderr,
++					"atacontrol: Invalid disk %s\n",
++					argv[offset + disk]);
++				exit(EX_USAGE);
++			}
++			config.disks[disk] = dev;
++		}
++
++		if ((config.type == AR_RAID1 || config.type == AR_RAID01) &&
++		    disk < 2) {
++			fprintf(stderr, "atacontrol: At least 2 disks must be "
++				"specified\n");
++			exit(EX_USAGE);
++		}
++
++		config.total_disks = disk;
++		if (ioctl(fd, IOCATARAIDCREATE, &config) < 0)
++			err(1, "ioctl(IOCATARAIDCREATE)");
++		else
++			printf("ar%d created\n", config.lun);
++		exit(EX_OK);
++	}
++	if (!strcmp(argv[1], "delete") && argc == 3) {
++		array = ar_arg(argv[2]);
++		if (ioctl(fd, IOCATARAIDDELETE, &array) < 0)
++			warn("ioctl(IOCATARAIDDELETE)");
++		exit(EX_OK);
++	}
++	if (!strcmp(argv[1], "addspare") && argc == 4) {
++		struct ata_ioc_raid_config config;
++
++		config.lun = ar_arg(argv[2]);
++		if (!(sscanf(argv[3], "ad%d", &config.disks[0]) == 1)) {
++			fprintf(stderr,
++				"atacontrol: Invalid disk %s\n", argv[3]);
++			usage();
++		}
++		if (ioctl(fd, IOCATARAIDADDSPARE, &config) < 0)
++			warn("ioctl(IOCATARAIDADDSPARE)");
++		exit(EX_OK);
++	}
++	if (!strcmp(argv[1], "rebuild") && argc == 3) {
++		array = ar_arg(argv[2]);
++		if (ioctl(fd, IOCATARAIDREBUILD, &array) < 0)
++			warn("ioctl(IOCATARAIDREBUILD)");
++		else {
++			char device[64];
++			char *buffer;
++			ssize_t len;
++			int arfd;
++
++			if (daemon(0, 1) == -1)
++				err(1, "daemon");
++			nice(20);
++			snprintf(device, sizeof(device), "/dev/ar%d",
++			    array);
++			if ((arfd = open(device, O_RDONLY)) == -1)
++				err(1, "open %s", device);
++			if ((buffer = malloc(1024 * 1024)) == NULL)
++				err(1, "malloc");
++			while ((len = read(arfd, buffer, 1024 * 1024)) > 0)
++				;
++			if (len == -1)
++				err(1, "read");
++			else
++				fprintf(stderr,
++				    "atacontrol: ar%d rebuild completed\n",
++				    array);
++			free(buffer);
++			close(arfd);
++		}
++		exit(EX_OK);
++	}
++	if (!strcmp(argv[1], "status") && argc == 3) {
++		struct ata_ioc_raid_status status;
++		int i, lun, state;
++
++		status.lun = ar_arg(argv[2]);
++		if (ioctl(fd, IOCATARAIDSTATUS, &status) < 0)
++			err(1, "ioctl(IOCATARAIDSTATUS)");
++
++		printf("ar%d: ATA ", status.lun);
++		switch (status.type) {
++		case AR_RAID0:
++			printf("RAID0 stripesize=%d", status.interleave);
++			break;
++		case AR_RAID1:
++			printf("RAID1");
++			break;
++		case AR_RAID01:
++			printf("RAID0+1 stripesize=%d", status.interleave);
++			break;
++		case AR_RAID5:
++			printf("RAID5 stripesize=%d", status.interleave);
++			break;
++		case AR_JBOD:
++			printf("JBOD");
++			break;
++		case AR_SPAN:
++			printf("SPAN");
++			break;
++		}
++		printf(" status: ");
++		switch (status.status) {
++		case AR_READY:
++			printf("READY\n");
++			break;
++		case AR_READY | AR_DEGRADED:
++			printf("DEGRADED\n");
++			break;
++		case AR_READY | AR_DEGRADED | AR_REBUILDING:
++			printf("REBUILDING %d%% completed\n",
++				status.progress);
++			break;
++		default:
++			printf("BROKEN\n");
++		}
++		printf(" subdisks:\n");
++		for (i = 0; i < status.total_disks; i++) {
++			printf("  %2d ", i);
++			lun = status.disks[i].lun;
++			state = status.disks[i].state;
++			if (lun < 0)
++				printf("---- ");
++			else
++				printf("ad%-2d ", lun);
++			if (state & AR_DISK_ONLINE)
++				printf("ONLINE");
++			else if (state & AR_DISK_SPARE)
++				printf("SPARE");
++			else if (state & AR_DISK_PRESENT)
++				printf("OFFLINE");
++			else
++				printf("MISSING");
++			printf("\n");
++		}
++		exit(EX_OK);
++	}
++	usage();
++	exit(EX_OK);
++}
+--- a/sbin/atacontrol/Makefile
++++ b/sbin/atacontrol/Makefile
+@@ -0,0 +1,7 @@
++#$FreeBSD$
++
++PROG=	atacontrol
++MAN=	atacontrol.8
++WARNS?=	6
++
++.include <bsd.prog.mk>
+

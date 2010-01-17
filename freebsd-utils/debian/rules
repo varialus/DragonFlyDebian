@@ -37,7 +37,7 @@ get-orig-source:
 		 sbin/mount_ext2fs sbin/mount_hpfs sbin/mount_msdosfs sbin/mount_nfs \
 		 sbin/mount_ntfs sbin/mount_nullfs sbin/mount_udf sbin/mount_unionfs \
 		 sbin/mount_reiserfs sbin/mount \
-		 sbin/mdconfig sbin/ccdconfig sbin/swapon \
+		 sbin/mdconfig sbin/ccdconfig sbin/swapon sbin/atacontrol sbin/camcontrol \
 	         sbin/gbde sbin/geom bin/kenv \
 		 usr.sbin/kbdcontrol share/syscons/keymaps ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
@@ -61,6 +61,8 @@ freebsd-utils: freebsd-utils-stamp
 freebsd-utils-stamp: patch-stamp
 #	$(PMAKE) -C bin/chflags
 	$(PMAKE) -C bin/kenv
+	$(PMAKE) -C sbin/atacontrol
+	$(PMAKE) -C sbin/camcontrol
 	$(PMAKE) -C sbin/ccdconfig
 	$(PMAKE) -C sbin/devd
 	$(PMAKE) -C sbin/devfs
@@ -135,6 +137,8 @@ clean:
 	$(PMAKE) -C bin/chflags clean
 	$(PMAKE) -C bin/kenv clean
 	$(PMAKE) -C sbin/ccdconfig clean
+	! [ -f sbin/atacontrol/Makefile ] ||  $(PMAKE) -C sbin/atacontrol clean
+	! [ -f sbin/camcontrol/Makefile ] ||  $(PMAKE) -C sbin/camcontrol clean
 	! [ -f sbin/devd/Makefile ] ||  $(PMAKE) -C sbin/devd clean
 	! [ -f sbin/devfs/Makefile ] ||  $(PMAKE) -C sbin/devfs clean
 	$(PMAKE) -C sbin/dmesg clean
