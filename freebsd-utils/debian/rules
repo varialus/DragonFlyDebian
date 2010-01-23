@@ -27,6 +27,7 @@ build: build-arch build-indep
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
+	mkdir -p $(ORIGDIR)/sys/kern
 	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
 		 usr.sbin/jail bin/chflags sbin/devd usr.sbin/acpi/acpiconf \
 		 sbin/kldconfig sbin/kldload sbin/kldstat sbin/kldunload \
@@ -39,7 +40,8 @@ get-orig-source:
 		 sbin/mount_reiserfs sbin/mount \
 		 sbin/mdconfig sbin/ccdconfig sbin/swapon sbin/atacontrol sbin/camcontrol \
 	         sbin/gbde sbin/geom bin/kenv \
-		 usr.sbin/kbdcontrol share/syscons/keymaps ; do \
+		 usr.sbin/kbdcontrol share/syscons/keymaps \
+		 sys/kern/syscalls.c ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
 	tar --numeric-owner --owner 0 --group 0 -czf ../freebsd-utils_$(VERSION).orig.tar.gz $(ORIGDIR)
@@ -84,7 +86,7 @@ freebsd-utils-stamp: patch-stamp
 	$(PMAKE) -C sbin/swapon
 	$(PMAKE) -C sbin/sysctl 
 	$(PMAKE) -C sbin/umount
-#	$(PMAKE) -C usr.bin/kdump
+	$(PMAKE) -C usr.bin/kdump
 	$(PMAKE) -C usr.bin/ktrace
 	$(PMAKE) -C usr.sbin/acpi/acpiconf
 	$(PMAKE) -C usr.sbin/rpc.umntall

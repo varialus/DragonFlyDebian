@@ -1,0 +1,321 @@
+--- a/usr.bin/kdump/kdump.c
++++ b/usr.bin/kdump/kdump.c
+@@ -45,20 +45,18 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
+-#define _KERNEL
+-extern int errno;
+ #include <sys/errno.h>
+-#undef _KERNEL
++#define ERESTART        (-1)            /* restart syscall */
++#define EJUSTRETURN     (-2)            /* don't modify regs, just return */
+ #include <sys/param.h>
+ #include <sys/errno.h>
+-#define _KERNEL
+ #include <sys/time.h>
+-#undef _KERNEL
+ #include <sys/uio.h>
+ #include <sys/ktrace.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ #include <sys/stat.h>
++#include "stat16.h"
+ #include <sys/un.h>
+ #ifdef IPX
+ #include <sys/types.h>
+@@ -71,6 +69,8 @@
+ #include <netinet/in.h>
+ #include <ctype.h>
+ #include <dlfcn.h>
++#define RTLD_MODEMASK   0x3
++#define RTLD_TRACE      0x200   /* Trace loaded objects and exit. */
+ #include <err.h>
+ #include <grp.h>
+ #include <inttypes.h>
+@@ -79,6 +79,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <bsd/string.h>
+ #include <time.h>
+ #include <unistd.h>
+ #include <vis.h>
+@@ -97,7 +98,7 @@
+ void ktrcsw(struct ktr_csw *);
+ void ktruser(int, unsigned char *);
+ void ktrsockaddr(struct sockaddr *);
+-void ktrstat(struct stat *);
++void ktrstat(struct stat16 *);
+ void ktrstruct(char *, size_t);
+ void usage(void);
+ void sockfamilyname(int);
+@@ -111,6 +112,9 @@
+ #define TIME_FORMAT	"%b %e %T %Y"
+ #define eqs(s1, s2)	(strcmp((s1), (s2)) == 0)
+ 
++timevaladd(struct timeval *t1, const struct timeval *t2);
++timevalsub(struct timeval *t1, const struct timeval *t2);
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -650,7 +654,7 @@
+ 				ip++;
+ 				narg--;
+ 				c = ',';
+-			} else if (ktr->ktr_code == SYS___semctl) {
++			} else if (ktr->ktr_code == SYS_semctl) {
+ 				print_number(ip,narg,c);
+ 				print_number(ip,narg,c);
+ 				(void)putchar(',');
+@@ -742,18 +746,18 @@
+ 				ip++;
+ 				narg--;
+ 				c = ',';
+-			} else if (ktr->ktr_code == SYS___acl_get_file ||
+-				   ktr->ktr_code == SYS___acl_set_file ||
+-				   ktr->ktr_code == SYS___acl_get_fd ||
+-				   ktr->ktr_code == SYS___acl_set_fd ||
+-				   ktr->ktr_code == SYS___acl_delete_file ||
+-				   ktr->ktr_code == SYS___acl_delete_fd ||
+-				   ktr->ktr_code == SYS___acl_aclcheck_file ||
+-				   ktr->ktr_code == SYS___acl_aclcheck_fd ||
+-				   ktr->ktr_code == SYS___acl_get_link ||
+-				   ktr->ktr_code == SYS___acl_set_link ||
+-				   ktr->ktr_code == SYS___acl_delete_link ||
+-				   ktr->ktr_code == SYS___acl_aclcheck_link) {
++			} else if (ktr->ktr_code == SYS_acl_get_file ||
++				   ktr->ktr_code == SYS_acl_set_file ||
++				   ktr->ktr_code == SYS_acl_get_fd ||
++				   ktr->ktr_code == SYS_acl_set_fd ||
++				   ktr->ktr_code == SYS_acl_delete_file ||
++				   ktr->ktr_code == SYS_acl_delete_fd ||
++				   ktr->ktr_code == SYS_acl_aclcheck_file ||
++				   ktr->ktr_code == SYS_acl_aclcheck_fd ||
++				   ktr->ktr_code == SYS_acl_get_link ||
++				   ktr->ktr_code == SYS_acl_set_link ||
++				   ktr->ktr_code == SYS_acl_delete_link ||
++				   ktr->ktr_code == SYS_acl_aclcheck_link) {
+ 				print_number(ip,narg,c);
+ 				(void)putchar(',');
+ 				acltypename((int)*ip);
+@@ -1243,7 +1247,7 @@
+ }
+ 
+ void
+-ktrstat(struct stat *statp)
++ktrstat(struct stat16 *statp)
+ {
+ 	char mode[12], timestr[PATH_MAX + 4];
+ 	struct passwd *pwd;
+@@ -1348,7 +1352,7 @@
+ 	if (strcmp(name, "stat") == 0) {
+ 		if (datalen != sizeof(struct stat))
+ 			goto invalid;
+-		ktrstat((struct stat *)data);
++		ktrstat((struct stat16 *)data);
+ 	} else if (strcmp(name, "sockaddr") == 0) {
+ 		if (datalen < sizeof(struct sockaddr) ||
+ 		    datalen != ((struct sockaddr *)(data))->sa_len)
+--- a/usr.bin/kdump/Makefile
++++ b/usr.bin/kdump/Makefile
+@@ -6,13 +6,14 @@
+ PROG=		kdump
+ SRCS=		kdump.c ioctl.c kdump_subr.c subr.c
+ CFLAGS+=	-I${.CURDIR}/../ktrace -I${.CURDIR} -I${.CURDIR}/../..
++LDADD+=		-lbsd
+ 
+ CLEANFILES=	ioctl.c kdump_subr.c
+ 
+ ioctl.c: mkioctls
+-	sh ${.CURDIR}/mkioctls ${DESTDIR}/usr/include > ${.TARGET}
++	sh ${.CURDIR}/mkioctls /usr/include > ${.TARGET}
+ 
+ kdump_subr.c: mksubr
+-	sh ${.CURDIR}/mksubr ${DESTDIR}/usr/include > ${.TARGET}
++	sh ${.CURDIR}/mksubr /usr/include > ${.TARGET}
+ 
+ .include <bsd.prog.mk>
+--- a/usr.bin/kdump/mksubr
++++ b/usr.bin/kdump/mksubr
+@@ -56,7 +56,9 @@
+ 		if ($i ~ /define/) \
+ 			break; \
+ 		++i; \
+-		printf "\tif(!((arg>0)^((%s)>0)))\n\t\tif_print_or(arg, %s, or);\n", $i, $i }'
++		n = $i ; \
++		sub("__", "", n); \
++		printf "\tif(!((arg>0)^((%s)>0)))\n\t\tif_print_or(arg, %s, or);\n", $i, n }'
+ cat <<_EOF_
+ 	if (or == 0)
+ 		(void)printf("<invalid>%ld", (long)arg);
+@@ -135,6 +137,7 @@
+ #include <sys/fcntl.h>
+ #include <sys/stat.h>
+ #include <sys/unistd.h>
++#include <sys/rfork.h>
+ #include <sys/mman.h>
+ #include <sys/wait.h>
+ #define _KERNEL
+@@ -148,9 +151,6 @@
+ #include <sys/reboot.h>
+ #include <sched.h>
+ #include <sys/linker.h>
+-#define _KERNEL
+-#include <sys/thr.h>
+-#undef _KERNEL
+ #include <sys/extattr.h>
+ #include <sys/acl.h>
+ #include <aio.h>
+@@ -158,11 +158,14 @@
+ #include <sys/ipc.h>
+ #include <sys/rtprio.h>
+ #include <sys/shm.h>
+-#include <nfsserver/nfs.h>
+ #include <ufs/ufs/quota.h>
+ 
+ #include "kdump_subr.h"
+ 
++#ifndef S_IFWHT
++#define S_IFWHT __S_IFWHT
++#endif
++
+ /*
+  * These are simple support macros. print_or utilizes a variable
+  * defined in the calling function to track whether or not it should
+@@ -304,43 +307,43 @@
+ 
+ _EOF_
+ 
+-auto_or_type "modename" "S_[A-Z]+[[:space:]]+[0-6]{7}" "sys/stat.h"
+-auto_or_type "flagsname" "O_[A-Z]+[[:space:]]+0x[0-9A-Fa-f]+" "sys/fcntl.h"
+-auto_or_type "accessmodename" "[A-Z]_OK[[:space:]]+0?x?[0-9A-Fa-f]+" "sys/unistd.h"
+-auto_or_type "mmapprotname" "PROT_[A-Z]+[[:space:]]+0x[0-9A-Fa-f]+" "sys/mman.h"
+-auto_or_type "mmapflagsname" "MAP_[A-Z]+[[:space:]]+0x[0-9A-Fa-f]+" "sys/mman.h"
+-auto_or_type "wait4optname" "W[A-Z]+[[:space:]]+[0-9]+" "sys/wait.h"
++auto_or_type "modename" "__S_[A-Z]+[[:space:]]+[0-6]{7}" "bits/stat.h"
++auto_or_type "flagsname" "O_[A-Z]+[[:space:]]+[0-9]+" "bits/fcntl.h"
++auto_or_type "accessmodename" "[A-Z]_OK[[:space:]]+[0-9]+" "fcntl.h"
++auto_or_type "mmapprotname" "PROT_[A-Z]+[[:space:]]+0x[0-9A-Fa-f]+" "bits/mman.h"
++auto_or_type "mmapflagsname" "MAP_[A-Z]+[[:space:]]+0x[0-9A-Fa-f]+" "bits/mman.h"
++auto_or_type "wait4optname" "W[A-Z]+[[:space:]]+[0-9]+" "bits/waitflags.h"
+ auto_or_type "getfsstatflagsname" "MNT_[A-Z]+[[:space:]]+[1-9][0-9]*" "sys/mount.h"
+ auto_or_type "mountflagsname" "MNT_[A-Z]+[[:space:]]+0x[0-9]+" "sys/mount.h"
+ auto_or_type "rebootoptname" "RB_[A-Z]+[[:space:]]+0x[0-9]+" "sys/reboot.h"
+-auto_or_type "flockname" "LOCK_[A-Z]+[[:space:]]+0x[0-9]+" "sys/fcntl.h"
++auto_or_type "flockname" "LOCK_[A-Z]+[[:space:]]+[0-9]+" "bits/fcntl.h"
+ auto_or_type "thrcreateflagsname" "THR_[A-Z]+[[:space:]]+0x[0-9]+" "sys/thr.h"
+-auto_or_type "mlockallname" "MCL_[A-Z]+[[:space:]]+0x[0-9]+" "sys/mman.h"
+-auto_or_type "shmatname" "SHM_[A-Z]+[[:space:]]+[0-9]{6}+" "sys/shm.h"
+-auto_or_type "rforkname" "RF[A-Z]+[[:space:]]+\([0-9]+<<[0-9]+\)" "sys/unistd.h"
++auto_or_type "mlockallname" "MCL_[A-Z]+[[:space:]]+[0-9]+" "bits/mman.h"
++auto_or_type "shmatname" "SHM_[A-Z]+[[:space:]]+[0-9]{6}+" "bits/shm.h"
++auto_or_type "rforkname" "RF[A-Z]+[[:space:]]+\([0-9]+<<[0-9]+\)" "sys/rfork.h"
+ auto_or_type "nfssvcname" "NFSSVC_[A-Z]+[[:space:]]+0x[0-9]+" "nfsserver/nfs.h"
+ 
+-auto_switch_type "whencename" "SEEK_[A-Z]+[[:space:]]+[0-9]+" "sys/unistd.h"
+-auto_switch_type "rlimitname" "RLIMIT_[A-Z]+[[:space:]]+[0-9]+" "sys/resource.h"
+-auto_switch_type "shutdownhowname" "SHUT_[A-Z]+[[:space:]]+0x[0-9]+" "sys/socket.h"
+-auto_switch_type "prioname" "PRIO_[A-Z]+[[:space:]]+[0-9]" "sys/resource.h"
+-auto_switch_type "madvisebehavname" "_?MADV_[A-Z]+[[:space:]]+[0-9]+" "sys/mman.h"
+-auto_switch_type "msyncflagsname" "MS_[A-Z]+[[:space:]]+0x[0-9]+" "sys/mman.h"
++auto_switch_type "whencename" "SEEK_[A-Z]+[[:space:]]+[0-9]+" "stdio.h"
++auto_switch_type "rlimitname" "RLIMIT_[A-Z]++[[:space:]]" "bits/resource.h"
++auto_switch_type "shutdownhowname" "SHUT_[A-Z]+[[:space:]]" "sys/socket.h"
++auto_switch_type "prioname" "PRIO_[A-Z]+[[:space:]]+" "bits/resource.h"
++auto_switch_type "madvisebehavname" "_?MADV_[A-Z]+[[:space:]]+[0-9]+" "bits/mman.h"
++auto_switch_type "msyncflagsname" "MS_[A-Z]+[[:space:]]+[0-9]+" "bits/mman.h"
+ auto_switch_type "schedpolicyname" "SCHED_[A-Z]+[[:space:]]+[0-9]+" "sched.h"
+ auto_switch_type "kldunloadfflagsname" "LINKER_UNLOAD_[A-Z]+[[:space:]]+[0-9]+" "sys/linker.h"
+ auto_switch_type "extattrctlname" "EXTATTR_NAMESPACE_[A-Z]+[[:space:]]+0x[0-9]+" "sys/extattr.h"
+ auto_switch_type "kldsymcmdname" "KLDSYM_[A-Z]+[[:space:]]+[0-9]+" "sys/linker.h"
+ auto_switch_type "sendfileflagsname" "SF_[A-Z]+[[:space:]]+[0-9]+" "sys/socket.h"
+-auto_switch_type "acltypename" "ACL_TYPE_[A-Z]+[[:space:]]+0x[0-9]+" "sys/acl.h"
+-auto_switch_type "sigprocmaskhowname" "SIG_[A-Z]+[[:space:]]+[0-9]+" "sys/signal.h"
+-auto_switch_type "lio_listioname" "LIO_(NO)?WAIT[[:space:]]+[0-9]+" "aio.h"
+-auto_switch_type "minheritname" "INHERIT_[A-Z]+[[:space:]]+[0-9]+" "sys/mman.h"
++auto_switch_type "acltypename" "ACL_TYPE_[A-Z]+[[:space:]]+\(0x[0-9]+\)" "sys/acl.h"
++auto_switch_type "sigprocmaskhowname" "SIG_[A-Z]+[[:space:]]+[0-9]+" "bits/sigaction.h"
++auto_switch_type "lio_listioname" "LIO_(NO)?WAIT[[:space:]]+" "aio.h"
++auto_switch_type "minheritname" "INHERIT_[A-Z]+[[:space:]]+[0-9]+" "bits/mman.h"
+ auto_switch_type "quotactlname" "Q_[A-Z]+[[:space:]]+0x[0-9]+" "ufs/ufs/quota.h"
+-auto_if_type "sockdomainname" "PF_[[:alnum:]]+[[:space:]]+" "sys/socket.h"
+-auto_if_type "sockfamilyname" "AF_[[:alnum:]]+[[:space:]]+" "sys/socket.h"
++auto_if_type "sockdomainname" "PF_[[:alnum:]]+[[:space:]]+" "bits/socket.h"
++auto_if_type "sockfamilyname" "AF_[[:alnum:]]+[[:space:]]+" "bits/socket.h"
+ auto_if_type "sockipprotoname" "IPPROTO_[[:alnum:]]+[[:space:]]+" "netinet/in.h"
+-auto_switch_type "sockoptname" "SO_[A-Z]+[[:space:]]+0x[0-9]+" "sys/socket.h"
+-auto_switch_type "socktypename" "SOCK_[A-Z]+[[:space:]]+[1-9]+[0-9]*" "sys/socket.h"
++auto_switch_type "sockoptname" "SO_[A-Z]+[[:space:]]+0x[0-9]+" "bits/socket.h"
++auto_switch_type "socktypename" "SOCK_[A-Z]+[[:space:]]+" "bits/socket.h"
+ auto_switch_type "ptraceopname" "PT_[[:alnum:]]+[[:space:]]+[0-9]+" "sys/ptrace.h"
+ 
+ cat <<_EOF_
+@@ -433,7 +436,7 @@
+ 		return;
+ 	}
+ _EOF_
+-egrep "^#[[:space:]]*define[[:space:]]+MSG_[A-Z]+[[:space:]]+0x[0-9]+[[:space:]]*" $include_dir/sys/socket.h | \
++egrep "^#[[:space:]]*define[[:space:]]+MSG_[A-Z]*" $include_dir/bits/socket.h | \
+ 	awk '{ for (i = 1; i <= NF; i++) \
+ 		if ($i ~ /define/) \
+ 			break; \
+--- a/usr.bin/kdump/stat16.h
++++ b/usr.bin/kdump/stat16.h
+@@ -0,0 +1,55 @@
++/* Copyright (C) 2002, 2006 Free Software Foundation, Inc.
++   This file is part of the GNU C Library.
++
++   The GNU C Library is free software; you can redistribute it and/or
++   modify it under the terms of the GNU Lesser General Public
++   License as published by the Free Software Foundation; either
++   version 2.1 of the License, or (at your option) any later version.
++
++   The GNU C Library is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++   Lesser General Public License for more details.
++
++   You should have received a copy of the GNU Lesser General Public
++   License along with the GNU C Library; if not, write to the Free
++   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
++   02111-1307 USA.  */
++
++/* This structure corresponds to the standard FreeBSD 'struct stat'
++   (i.e. _STAT_VER_stat), and is used by the stat() system call family. */
++
++struct stat16
++  {
++    __dev_t st_dev;		/* Device containing the file.  */
++    __ino_t st_ino;		/* File serial number.  */
++
++    __uint16_t st_mode;		/* File mode.  */
++    __uint16_t st_nlink;	/* Link count.  */
++
++    __uid_t st_uid;		/* User ID of the file's owner.  */
++    __gid_t st_gid;		/* Group ID of the file's group.  */
++
++    __dev_t st_rdev;		/* Device number, if device.  */
++
++    struct  timespec st_atimespec;  /* time of last access */
++    struct  timespec st_mtimespec;  /* time of last data modification */
++    struct  timespec st_ctimespec;  /* time of last file status change */
++
++    __off_t st_size;		/* Size of file, in bytes.  */
++
++    __blkcnt_t st_blocks;	/* Number of 512-byte blocks allocated.  */
++
++    __blksize_t st_blksize;	/* Optimal block size for I/O.  */
++
++    __uint32_t st_flags;	/* User defined flags.  */
++
++    __uint32_t st_gen;		/* Generation number.  */
++
++    __uint32_t __unused1;
++
++    struct timespec st_birthtimespec; /* time of file creation */
++
++#define _BIRTH_PADSIZE     (2*(8 - sizeof (long)))
++    char __birth_padding[_BIRTH_PADSIZE];
++  };
