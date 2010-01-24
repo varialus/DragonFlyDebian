@@ -16,85 +16,17 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#include <errno.h>
-#include <limits.h>
 #include <stddef.h>
-#include <dirent.h>
 #include <sys/types.h>
-#include <sys/stat.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
 
-char *__ttyname;
+/* Static buffer in `ttyname'.  */
+libc_freeres_ptr (static char *ttyname_buf);
 
-static char *getttyname (int fd, dev_t mydev, ino_t myino,
-			 int save, int *dostat) internal_function;
-
-
-libc_freeres_ptr (static char *getttyname_name);
-
-static char *
-internal_function
-getttyname (fd, mydev, myino, save, dostat)
-     int fd;
-     dev_t mydev;
-     ino_t myino;
-     int save;
-     int *dostat;
-{
-  static const char dev[] = "/dev";
-  static size_t namelen;
-  struct stat st;
-  DIR *dirstream;
-  struct dirent *d;
-
-  dirstream = __opendir (dev);
-  if (dirstream == NULL)
-    {
-      *dostat = -1;
-      return NULL;
-    }
-
-  while ((d = __readdir (dirstream)) != NULL)
-    if (((ino_t) d->d_fileno == myino || *dostat)
-	&& strcmp (d->d_name, "stdin")
-	&& strcmp (d->d_name, "stdout")
-	&& strcmp (d->d_name, "stderr"))
-      {
-	size_t dlen = _D_ALLOC_NAMLEN (d);
-	if (sizeof (dev) + dlen > namelen)
-	  {
-	    free (getttyname_name);
-	    namelen = 2 * (sizeof (dev) + dlen); /* Big enough.  */
-	    getttyname_name = malloc (namelen);
-	    if (! getttyname_name)
-	      {
-		*dostat = -1;
-		/* Perhaps it helps to free the directory stream buffer.  */
-		(void) __closedir (dirstream);
-		return NULL;
-	      }
-	    *((char *) __mempcpy (getttyname_name, dev, sizeof (dev) - 1))
-	      = '/';
-	  }
-	(void) __mempcpy (&getttyname_name[sizeof (dev)], d->d_name, dlen);
-	if (stat (getttyname_name, &st) == 0
-	    && (ino_t) d->d_fileno == myino
-	    && (S_ISCHR (st.st_mode) || st.st_dev == mydev)
-	   )
-	  {
-	    (void) __closedir (dirstream);
-	    __ttyname = getttyname_name;
-	    __set_errno (save);
-	    return getttyname_name;
-	  }
-      }
-
-  (void) __closedir (dirstream);
-  __set_errno (save);
-  return NULL;
-}
+static const char dev[] = "/dev";
 
 /* Return the pathname of the terminal FD is open on, or NULL on errors.
    The returned storage is good only until the next call to this function.  */
@@ -102,24 +34,34 @@ char *
 ttyname (fd)
      int fd;
 {
-  struct stat st;
-  int dostat = 0;
-  char *name;
-  int save = errno;
+  static size_t buflen;
+  struct fiodgname_arg fgn;
 
   if (!__isatty (fd))
     return NULL;
 
-  if (fstat (fd, &st) < 0)
-    return NULL;
-
-  name = getttyname (fd, st.st_dev, st.st_ino, save, &dostat);
-
-  if (!name && dostat != -1)
+  if (buflen == 0)
     {
-      dostat = 1;
-      name = getttyname (fd, st.st_dev, st.st_ino, save, &dostat);
+      buflen = 4095;
+      ttyname_buf = (char *) malloc (buflen + 1);
+      if (ttyname_buf == NULL)
+	{
+	  buflen = 0;
+	  return NULL;
+	}
     }
 
-  return name;
+  /* Prepare the result buffer.  */
+  memcpy (ttyname_buf, dev, sizeof (dev) - 1);
+  ttyname_buf[sizeof (dev) - 1] = '/';
+
+  fgn.buf = ttyname_buf + sizeof (dev);
+  fgn.len = buflen - sizeof (dev);
+
+  if (__ioctl(fd, FIODGNAME, &fgn) == -1)
+    {
+      return NULL; 
+    }
+
+  return ttyname_buf;
 }
