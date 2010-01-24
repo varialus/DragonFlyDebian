@@ -1,0 +1,21 @@
+--- a/usr.sbin/pppctl.orig/Makefile
++++ b/usr.sbin/pppctl/Makefile
+@@ -4,6 +4,6 @@
+ MAN=	pppctl.8
+ 
+ DPADD=	${LIBPTHREAD} ${LIBEDIT} ${LIBTERMCAP}
+-LDADD=	-lpthread -ledit -ltermcap
++LDADD=	-lpthread -ledit -ltermcap -lbsd
+ 
+ .include <bsd.prog.mk>
+--- a/usr.sbin/pppctl.orig/pppctl.c
++++ b/usr.sbin/pppctl/pppctl.c
+@@ -48,6 +48,7 @@
+ #include <string.h>
+ #include <time.h>
+ #include <unistd.h>
++#include <bsd/unistd.h>
+ 
+ #define LINELEN 2048
+ 
+Les fichiers binaires usr.sbin/pppctl.orig/pppctl.o et usr.sbin/pppctl/pppctl.o sont différents.

@@ -124,6 +124,7 @@ freebsd-net-tools-stamp: patch-stamp lib-stamp
 	$(PMAKE) -C sbin/route
 	$(PMAKE) -C usr.bin/netstat
 	$(PMAKE) -C usr.sbin/authpf
+	$(PMAKE) -C usr.sbin/pppctl
 	touch $@
 
 build-indep: build-indep-stamp
@@ -180,6 +181,7 @@ clean:
 	$(PMAKE) -C sbin/route clean
 	$(PMAKE) -C usr.bin/netstat clean
 	$(PMAKE) -C usr.sbin/authpf clean
+	$(PMAKE) -C usr.sbin/pppctl clean
 
 	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
 	rm -rf .pc
