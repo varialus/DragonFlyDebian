@@ -158,7 +158,7 @@
  #include <sys/mman.h>
  #include <sys/wait.h>
  #define _KERNEL
-@@ -148,9 +151,6 @@
+@@ -148,21 +151,30 @@
  #include <sys/reboot.h>
  #include <sched.h>
  #include <sys/linker.h>
@@ -166,9 +166,9 @@
 -#include <sys/thr.h>
 -#undef _KERNEL
  #include <sys/extattr.h>
- #include <sys/acl.h>
+-#include <sys/acl.h>
  #include <aio.h>
-@@ -158,11 +158,14 @@
+ #include <sys/sem.h>
  #include <sys/ipc.h>
  #include <sys/rtprio.h>
  #include <sys/shm.h>
@@ -181,10 +181,20 @@
 +#define S_IFWHT __S_IFWHT
 +#endif
 +
++#ifndef PT_LWPINFO
++#define PT_LWPINFO      13      /* Info about the LWP that stopped. */
++#endif
++#ifndef PT_GETNUMLWPS
++#define PT_GETNUMLWPS   14      /* get total number of threads */
++#endif
++#ifndef PT_GETLWPLIST
++#define PT_GETLWPLIST   15      /* get thread list */
++#endif
++
  /*
   * These are simple support macros. print_or utilizes a variable
   * defined in the calling function to track whether or not it should
-@@ -304,43 +307,43 @@
+@@ -304,43 +316,43 @@
  
  _EOF_
  
@@ -252,7 +262,7 @@
  auto_switch_type "ptraceopname" "PT_[[:alnum:]]+[[:space:]]+[0-9]+" "sys/ptrace.h"
  
  cat <<_EOF_
-@@ -433,7 +436,7 @@
+@@ -433,7 +445,7 @@
  		return;
  	}
  _EOF_
