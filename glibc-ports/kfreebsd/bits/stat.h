@@ -198,10 +198,17 @@ extern int chflags (__const char *__file, unsigned long int __flags) __THROW;
 /* Set file flags of the file referred to by FD to FLAGS.  */
 extern int fchflags (int __fd, unsigned long int __flags) __THROW;
 
+/* Set file flags for FILE to FLAGS without following symlinks.  */
+extern int lchflags(__const char *__file, int __flags);
 
-extern char *devname_r(__dev_t dev, __mode_t type, char *buf, int len) __THROW;
-extern char *devname(__dev_t dev, __mode_t type) __THROW;
-                                                                                                                                                                                                         
+/* Get device name in /dev with a device number of dev and a file type
+   matching the one encoded in type.  */
+extern char *devname(dev_t dev, mode_t type) __THROW;
+
+/* Store at most BUFLEN characters of the device name in /dev with a 
+   device number of dev and a file type matching the one encoded in type.  */
+extern char *devname_r(dev_t dev, mode_t type, char *buf, int buflen) __THROW;
+
 __END_DECLS
 
 #endif /* __USE_BSD */
