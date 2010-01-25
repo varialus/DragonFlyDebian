@@ -27,7 +27,7 @@ build: build-arch build-indep
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
-	mkdir -p $(ORIGDIR)/sys/kern
+	mkdir -p $(ORIGDIR)/sys/kern $(ORIGDIR)/etc
 	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
 		 usr.sbin/jail bin/chflags sbin/devd usr.sbin/acpi/acpiconf \
 		 sbin/kldconfig sbin/kldload sbin/kldstat sbin/kldunload \
@@ -41,7 +41,7 @@ get-orig-source:
 		 sbin/mdconfig sbin/ccdconfig sbin/swapon sbin/atacontrol sbin/camcontrol \
 	         sbin/gbde sbin/geom bin/kenv \
 		 usr.sbin/kbdcontrol share/syscons/keymaps \
-		 sys/kern/syscalls.c ; do \
+		 sys/kern/syscalls.c etc/pf.os ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
 	tar --numeric-owner --owner 0 --group 0 -czf ../freebsd-utils_$(VERSION).orig.tar.gz $(ORIGDIR)
