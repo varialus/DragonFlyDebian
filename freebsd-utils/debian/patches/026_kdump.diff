@@ -194,8 +194,38 @@
  /*
   * These are simple support macros. print_or utilizes a variable
   * defined in the calling function to track whether or not it should
-@@ -304,43 +316,43 @@
+@@ -302,45 +314,72 @@
+ 	}
+ }
  
++/*
++ * MANUAL
++ */
++
++void
++acltypename (int arg)
++{
++	switch (arg) {
++	case 0x00000000:
++		(void)printf("ACL_TYPE_ACCESS_OLD");
++		break;
++	case 0x00000001:
++		(void)printf("ACL_TYPE_ACCESS_OLD");
++		break;
++	case 0x00000002:
++		(void)printf("ACL_TYPE_ACCESS");
++		break;
++	case 0x00000003:
++		(void)printf("ACL_TYPE_DEFAULT");
++		break;
++	case 0x00000004:
++		(void)printf("ACL_TYPE_NFS4");
++	 	break;
++	default: /* Should not reach */
++		(void)printf("<invalid=%ld>", (long)arg);
++	}
++}
++
  _EOF_
  
 -auto_or_type "modename" "S_[A-Z]+[[:space:]]+[0-6]{7}" "sys/stat.h"
@@ -231,8 +261,8 @@
 -auto_switch_type "madvisebehavname" "_?MADV_[A-Z]+[[:space:]]+[0-9]+" "sys/mman.h"
 -auto_switch_type "msyncflagsname" "MS_[A-Z]+[[:space:]]+0x[0-9]+" "sys/mman.h"
 +auto_switch_type "whencename" "SEEK_[A-Z]+[[:space:]]+[0-9]+" "stdio.h"
-+auto_switch_type "rlimitname" "RLIMIT_[A-Z]++[[:space:]]" "bits/resource.h"
-+auto_switch_type "shutdownhowname" "SHUT_[A-Z]+[[:space:]]" "sys/socket.h"
++auto_switch_type "rlimitname" "RLIMIT_[A-Z]++[[:space:]]+" "bits/resource.h"
++auto_switch_type "shutdownhowname" "SHUT_[A-Z]+[[:space:]]+" "sys/socket.h"
 +auto_switch_type "prioname" "PRIO_[A-Z]+[[:space:]]+" "bits/resource.h"
 +auto_switch_type "madvisebehavname" "_?MADV_[A-Z]+[[:space:]]+[0-9]+" "bits/mman.h"
 +auto_switch_type "msyncflagsname" "MS_[A-Z]+[[:space:]]+[0-9]+" "bits/mman.h"
@@ -245,7 +275,6 @@
 -auto_switch_type "sigprocmaskhowname" "SIG_[A-Z]+[[:space:]]+[0-9]+" "sys/signal.h"
 -auto_switch_type "lio_listioname" "LIO_(NO)?WAIT[[:space:]]+[0-9]+" "aio.h"
 -auto_switch_type "minheritname" "INHERIT_[A-Z]+[[:space:]]+[0-9]+" "sys/mman.h"
-+auto_switch_type "acltypename" "ACL_TYPE_[A-Z]+[[:space:]]+\(0x[0-9]+\)" "sys/acl.h"
 +auto_switch_type "sigprocmaskhowname" "SIG_[A-Z]+[[:space:]]+[0-9]+" "bits/sigaction.h"
 +auto_switch_type "lio_listioname" "LIO_(NO)?WAIT[[:space:]]+" "aio.h"
 +auto_switch_type "minheritname" "INHERIT_[A-Z]+[[:space:]]+[0-9]+" "bits/mman.h"
@@ -262,7 +291,16 @@
  auto_switch_type "ptraceopname" "PT_[[:alnum:]]+[[:space:]]+[0-9]+" "sys/ptrace.h"
  
  cat <<_EOF_
-@@ -433,7 +445,7 @@
+@@ -403,7 +442,7 @@
+ {
+ 	switch (func) {
+ _EOF_
+-egrep "^#[[:space:]]*define[[:space:]]+RTP_[A-Z]+[[:space:]]+0x[0-9]+[[:space:]]*" \
++egrep "^#[[:space:]]*define[[:space:]]+RTP_[A-Z]+[[:space:]]+[0-9]+[[:space:]]*" \
+ 	$include_dir/sys/rtprio.h | grep -v RTP_PRIO | \
+ 	awk '{ for (i = 1; i <= NF; i++) \
+ 		if ($i ~ /define/) \
+@@ -433,7 +472,7 @@
  		return;
  	}
  _EOF_
