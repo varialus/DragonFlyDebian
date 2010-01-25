@@ -5,435 +5,3784 @@ It was downloaded from FreeBSD CVS (http://www.freebsd.org/)
 
 Upstream Author: The FreeBSD Project
 
-Copyright:
-  Copyright (c) 1992-2008 The FreeBSD Project.
-  Copyright (c) 1979, 1980, 1983, 1986, 1988, 1989, 1991, 1992, 1993, 1994
-          The Regents of the University of California. All rights reserved.
+License for all components unless stated otherwise:
+--
+  BSD-like License, version BY-LC-NE (BSD-BY-LC-NE)
+    4042 files are licensed under this license:
 
-License:
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted under the terms of the BSD License.
+    sys/amd64/acpica/*
+    sys/amd64/amd64/* excluding:
+    -+ sys/amd64/amd64/busdma_machdep.c
+    -? sys/amd64/amd64/db_disasm.c
+    -? sys/amd64/amd64/db_interface.c
+    -? sys/amd64/amd64/db_trace.c
+    -+ sys/amd64/amd64/identcpu.c
+    -+ sys/amd64/amd64/in_cksum.c
+    -? sys/amd64/amd64/legacy.c
+    -+ sys/amd64/amd64/local_apic.c
+    -+ sys/amd64/amd64/machdep.c
+    -+ sys/amd64/amd64/mp_machdep.c
+    -+ sys/amd64/amd64/mptable.c
+    -? sys/amd64/amd64/nexus.c
+    -+ sys/amd64/amd64/pmap.c
+    -+ sys/amd64/amd64/trap.c
+    -+ sys/amd64/amd64/vm_machdep.c
+    sys/amd64/ia32/* excluding:
+    -+ sys/amd64/ia32/ia32_syscall.c
+    sys/amd64/include/* excluding:
+    -+ sys/amd64/include/_inttypes.h
+    -+ sys/amd64/include/_stdint.h
+    -+ sys/amd64/include/_types.h
+    -+ sys/amd64/include/apicreg.h
+    -+ sys/amd64/include/bus.h
+    -? sys/amd64/include/clock.h
+    -? sys/amd64/include/db_machdep.h
+    -+ sys/amd64/include/floatingpoint.h
+    -+ sys/amd64/include/ieeefp.h
+    -+ sys/amd64/include/mptable.h
+    -? sys/amd64/include/nexusvar.h
+    -+ sys/amd64/include/param.h
+    -? sys/amd64/include/resource.h
+    -? sys/amd64/include/smp.h
+    -? sys/amd64/include/stack.h
+    -+ sys/amd64/include/varargs.h
+    -+ sys/amd64/include/vmparam.h
+    + sys/amd64/include/pc/bios.h
+    + sys/amd64/include/xen/xenfunc.h
+    + sys/amd64/include/xen/xenvar.h
+    sys/amd64/isa/*
+    sys/amd64/linux32/* excluding:
+    -? sys/amd64/linux32/linux32_genassym.c
+    -? sys/amd64/linux32/linux32_proto.h
+    -? sys/amd64/linux32/linux32_syscall.h
+    -? sys/amd64/linux32/linux32_sysent.c
+    sys/amd64/pci/*
+    + sys/arm/arm/dump_machdep.c
+    + sys/arm/arm/elf_machdep.c
+    + sys/arm/arm/elf_trampoline.c
+    + sys/arm/arm/gdb_machdep.c
+    + sys/arm/arm/genassym.c
+    + sys/arm/arm/mem.c
+    + sys/arm/arm/minidump_machdep.c
+    + sys/arm/arm/stack_machdep.c
+    sys/arm/at91/* excluding:
+    -+ sys/arm/at91/at91_machdep.c
+    -? sys/arm/at91/at91_pio_rm9200.h
+    + sys/arm/include/_bus.h
+    + sys/arm/include/_limits.h
+    + sys/arm/include/asm.h
+    + sys/arm/include/blockio.h
+    + sys/arm/include/bootinfo.h
+    + sys/arm/include/clock.h
+    + sys/arm/include/elf.h
+    + sys/arm/include/endian.h
+    + sys/arm/include/exec.h
+    + sys/arm/include/gdb_machdep.h
+    + sys/arm/include/ieee.h
+    + sys/arm/include/kdb.h
+    + sys/arm/include/limits.h
+    + sys/arm/include/md_var.h
+    + sys/arm/include/memdev.h
+    + sys/arm/include/metadata.h
+    + sys/arm/include/minidump.h
+    + sys/arm/include/mutex.h
+    + sys/arm/include/pcpu.h
+    + sys/arm/include/runq.h
+    + sys/arm/include/sf_buf.h
+    + sys/arm/include/signal.h
+    + sys/arm/include/stdarg.h
+    + sys/arm/include/utrap.h
+    + sys/arm/include/vm.h
+    + sys/arm/include/vmparam.h
+    sys/arm/mv/* excluding:
+    -+ sys/arm/mv/mv_machdep.c
+    -+ sys/arm/mv/mvvar.h
+    sys/arm/mv/discovery/*
+    sys/arm/mv/kirkwood/*
+    sys/arm/mv/orion/*
+    + sys/arm/sa11x0/uart_bus_sa1110.c
+    + sys/arm/sa11x0/uart_cpu_sa1110.c
+    + sys/arm/sa11x0/uart_dev_sa1110.c
+    + sys/arm/sa11x0/uart_dev_sa1110.h
+    + sys/arm/xscale/i80321/i80321_aau.c
+    + sys/arm/xscale/i80321/i80321_dma.c
+    + sys/arm/xscale/i80321/uart_bus_i80321.c
+    + sys/arm/xscale/i80321/uart_cpu_i80321.c
+    sys/arm/xscale/i8134x/* excluding:
+    -+ sys/arm/xscale/i8134x/crb_machdep.c
+    -+ sys/arm/xscale/i8134x/i81342_space.c
+    -+ sys/arm/xscale/i8134x/iq81342_7seg.c
+    -+ sys/arm/xscale/i8134x/obio.c
+    -+ sys/arm/xscale/i8134x/obio_space.c
+    -+ sys/arm/xscale/i8134x/obiovar.h
+    sys/arm/xscale/ixp425/* excluding:
+    -+ sys/arm/xscale/ixp425/avila_ata.c
+    -+ sys/arm/xscale/ixp425/avila_machdep.c
+    -+ sys/arm/xscale/ixp425/ixdp425_pci.c
+    -+ sys/arm/xscale/ixp425/ixdp425reg.h
+    -+ sys/arm/xscale/ixp425/ixp425.c
+    -+ sys/arm/xscale/ixp425/ixp425_a4x_space.c
+    -+ sys/arm/xscale/ixp425/ixp425_intr.h
+    -+ sys/arm/xscale/ixp425/ixp425_mem.c
+    -+ sys/arm/xscale/ixp425/ixp425_pci.c
+    -+ sys/arm/xscale/ixp425/ixp425_pci_space.c
+    -+ sys/arm/xscale/ixp425/ixp425_space.c
+    -+ sys/arm/xscale/ixp425/ixp425_timer.c
+    -+ sys/arm/xscale/ixp425/ixp425reg.h
+    -+ sys/arm/xscale/ixp425/ixp425var.h
+    sys/arm/xscale/pxa/* excluding:
+    -+ sys/arm/xscale/pxa/pxa_machdep.c
+    -+ sys/arm/xscale/pxa/pxa_space.c
+    -+ sys/arm/xscale/pxa/pxareg.h
+    -+ sys/arm/xscale/pxa/pxavar.h
+    sys/boot/arm/at91/boot0/*
+    sys/boot/arm/at91/boot0iic/*
+    sys/boot/arm/at91/boot0spi/*
+    sys/boot/arm/at91/boot2/* excluding:
+    -? sys/boot/arm/at91/boot2/boot2.c
+    -? sys/boot/arm/at91/boot2/bwct_board.c
+    + sys/boot/arm/at91/bootspi/main.c
+    sys/boot/arm/at91/libat91/* excluding:
+    -? sys/boot/arm/at91/libat91/at91rm9200.h
+    -? sys/boot/arm/at91/libat91/eeprom.c
+    -? sys/boot/arm/at91/libat91/emac.c
+    -? sys/boot/arm/at91/libat91/emac.h
+    -? sys/boot/arm/at91/libat91/p_string.c
+    -? sys/boot/arm/at91/libat91/printf.c
+    -? sys/boot/arm/at91/libat91/spi_flash.c
+    -? sys/boot/arm/at91/libat91/spi_flash.h
+    -? sys/boot/arm/at91/libat91/tag_list.c
+    -? sys/boot/arm/at91/libat91/tag_list.h
+    sys/boot/arm/ixp425/boot2/* excluding:
+    -? sys/boot/arm/ixp425/boot2/boot2.c
+    sys/boot/arm/uboot/*
+    sys/boot/common/* excluding:
+    -+ sys/boot/common/dev_net.c
+    -+ sys/boot/common/isapnp.h
+    -? sys/boot/common/load_elf32.c
+    -? sys/boot/common/load_elf32_obj.c
+    -? sys/boot/common/load_elf64.c
+    -? sys/boot/common/load_elf64_obj.c
+    -+ sys/boot/common/ls.c
+    -+ sys/boot/common/panic.c
+    -? sys/boot/common/pnp.c
+    -? sys/boot/common/reloc_elf32.c
+    -? sys/boot/common/reloc_elf64.c
+    + sys/boot/efi/include/efilib.h
+    sys/boot/efi/libefi/*
+    sys/boot/ficl/* excluding:
+    -? sys/boot/ficl/fileaccess.c
+    -? sys/boot/ficl/unix.c
+    + sys/boot/ficl/arm/sysdep.h
+    + sys/boot/ficl/i386/sysdep.h
+    + sys/boot/ficl/ia64/sysdep.h
+    + sys/boot/ficl/mips/sysdep.h
+    + sys/boot/ficl/powerpc/sysdep.h
+    + sys/boot/ficl/sparc64/sysdep.h
+    sys/boot/i386/kgzldr/*
+    sys/boot/i386/libfirewire/*
+    sys/boot/i386/libi386/* excluding:
+    -? sys/boot/i386/libi386/nullconsole.c
+    -+ sys/boot/i386/libi386/pread.c
+    sys/boot/i386/loader/*
+    sys/boot/ia64/common/*
+    sys/boot/ia64/efi/* excluding:
+    -+ sys/boot/ia64/efi/conf.c
+    sys/boot/ia64/ski/* excluding:
+    -+ sys/boot/ia64/ski/conf.c
+    sys/boot/ofw/common/*
+    sys/boot/ofw/libofw/* excluding:
+    -? sys/boot/ofw/libofw/ofw_console.c
+    -+ sys/boot/ofw/libofw/openfirm.c
+    -+ sys/boot/ofw/libofw/openfirm.h
+    + sys/boot/pc98/boot2/dinode.h
+    + sys/boot/pc98/boot2/fs.h
+    + sys/boot/pc98/boot2/inode.h
+    + sys/boot/pc98/boot2/probe_keyboard.c
+    + sys/boot/pc98/boot2/quota.h
+    sys/boot/pc98/libpc98/*
+    sys/boot/pc98/loader/*
+    sys/boot/powerpc/ofw/* excluding:
+    -+ sys/boot/powerpc/ofw/start.c
+    sys/boot/powerpc/uboot/*
+    sys/boot/sparc64/loader/*
+    sys/boot/uboot/common/*
+    sys/boot/uboot/lib/* excluding:
+    -+ sys/boot/uboot/lib/api_public.h
+    sys/boot/zfs/*
+    sys/bsm/*
+    sys/cam/ata/*
+    + sys/cam/scsi/scsi_dvcfg.h
+    + sys/cam/scsi/scsi_low.c
+    + sys/cam/scsi/scsi_low.h
+    + sys/cam/scsi/scsi_low_pisa.c
+    + sys/cam/scsi/scsi_low_pisa.h
+    sys/compat/freebsd32/* excluding:
+    -? sys/compat/freebsd32/freebsd32_proto.h
+    -? sys/compat/freebsd32/freebsd32_syscall.h
+    -? sys/compat/freebsd32/freebsd32_syscalls.c
+    -? sys/compat/freebsd32/freebsd32_sysent.c
+    sys/compat/ia32/* excluding:
+    -? sys/compat/ia32/ia32_genassym.c
+    sys/compat/linsysfs/*
+    sys/compat/linux/* excluding:
+    -+ sys/compat/linux/linux_futex.c
+    -+ sys/compat/linux/linux_futex.h
+    -+ sys/compat/linux/linux_getcwd.c
+    -+ sys/compat/linux/linux_time.c
+    sys/compat/netbsd/*
+    sys/compat/svr4/* excluding:
+    -+ sys/compat/svr4/svr4_acl.h
+    -+ sys/compat/svr4/svr4_fcntl.c
+    -+ sys/compat/svr4/svr4_fuser.h
+    -+ sys/compat/svr4/svr4_ipc.c
+    -+ sys/compat/svr4/svr4_ipc.h
+    -? sys/compat/svr4/svr4_proto.h
+    -+ sys/compat/svr4/svr4_resource.c
+    -+ sys/compat/svr4/svr4_resource.h
+    -+ sys/compat/svr4/svr4_socket.c
+    -+ sys/compat/svr4/svr4_socket.h
+    -+ sys/compat/svr4/svr4_stream.c
+    -? sys/compat/svr4/svr4_syscall.h
+    -? sys/compat/svr4/svr4_syscallnames.c
+    -? sys/compat/svr4/svr4_sysent.c
+    -+ sys/compat/svr4/svr4_sysvec.c
+    sys/contrib/altq/altq/* excluding:
+    -+ sys/contrib/altq/altq/altq_classq.h
+    -? sys/contrib/altq/altq/altq_hfsc.c
+    -? sys/contrib/altq/altq/altq_hfsc.h
+    -+ sys/contrib/altq/altq/altq_red.c
+    -+ sys/contrib/altq/altq/altq_rio.c
+    -+ sys/contrib/altq/altq/altq_rmclass.c
+    -+ sys/contrib/altq/altq/altq_rmclass.h
+    -? sys/contrib/altq/altq/altqconf.h
+    + sys/contrib/ipfilter/netinet/fil.c
+    + sys/contrib/ipfilter/netinet/ip_netbios_pxy.c
+    sys/contrib/ngatm/netnatm/*
+    sys/contrib/ngatm/netnatm/api/*
+    sys/contrib/ngatm/netnatm/misc/*
+    sys/contrib/ngatm/netnatm/msg/* excluding:
+    -? sys/contrib/ngatm/netnatm/msg/uni_ie.h
+    -? sys/contrib/ngatm/netnatm/msg/uni_ietab.h
+    -? sys/contrib/ngatm/netnatm/msg/uni_msg.c
+    -? sys/contrib/ngatm/netnatm/msg/uni_msg.h
+    sys/contrib/ngatm/netnatm/saal/*
+    sys/contrib/ngatm/netnatm/sig/* excluding:
+    -? sys/contrib/ngatm/netnatm/sig/sig_unimsgcpy.c
+    -? sys/contrib/ngatm/netnatm/sig/unimsgcpy.h
+    sys/contrib/pf/net/* excluding:
+    -? sys/contrib/pf/net/if_pflog.c
+    -? sys/contrib/pf/net/pf_osfp.c
+    sys/contrib/pf/netinet/*
+    sys/contrib/rdma/* excluding:
+    -? sys/contrib/rdma/ib_addr.h
+    -? sys/contrib/rdma/rdma_addr.c
+    -? sys/contrib/rdma/rdma_cm.h
+    -? sys/contrib/rdma/rdma_cm_ib.h
+    -? sys/contrib/rdma/rdma_cma.c
+    -? sys/contrib/rdma/types.h
+    + sys/contrib/rdma/krping/krping.c
+    sys/crypto/*
+    sys/crypto/blowfish/*
+    sys/crypto/camellia/*
+    sys/crypto/des/*
+    + sys/crypto/rijndael/test00.c
+    sys/crypto/sha2/*
+    sys/crypto/via/*
+    + sys/ddb/db_capture.c
+    + sys/ddb/db_ps.c
+    + sys/ddb/db_script.c
+    + sys/ddb/db_textdump.c
+    + sys/ddb/db_thread.c
+    + sys/ddb/ddb.h
+    sys/dev/*
+    sys/dev/aac/*
+    sys/dev/acpi_support/*
+    sys/dev/acpica/*
+    sys/dev/acpica/Osd/*
+    sys/dev/adb/*
+    sys/dev/adlink/*
+    + sys/dev/advansys/advansys.h
+    + sys/dev/advansys/advlib.c
+    + sys/dev/advansys/advlib.h
+    + sys/dev/advansys/adwlib.c
+    + sys/dev/advansys/adwlib.h
+    + sys/dev/advansys/adwvar.h
+    sys/dev/ae/*
+    sys/dev/age/*
+    sys/dev/agp/*
+    + sys/dev/aha/aha.c
+    + sys/dev/aha/aha_mca.c
+    sys/dev/ahci/*
+    sys/dev/aic/* excluding:
+    -+ sys/dev/aic/aic6360reg.h
+    sys/dev/alc/*
+    sys/dev/ale/*
+    sys/dev/amd/*
+    sys/dev/amdtemp/*
+    sys/dev/amr/*
+    sys/dev/arcmsr/*
+    sys/dev/asmc/*
+    sys/dev/ata/*
+    sys/dev/ata/chipsets/*
+    sys/dev/atkbdc/* excluding:
+    -+ sys/dev/atkbdc/psm.c
+    -+ sys/dev/atkbdc/psm.h
+    sys/dev/auxio/*
+    sys/dev/bce/*
+    sys/dev/bfe/*
+    + sys/dev/bktr/bktr_i2c.c
+    + sys/dev/bktr/bktr_i2c.h
+    + sys/dev/bktr/msp34xx.c
+    sys/dev/bm/*
+    + sys/dev/buslogic/bt_mca.c
+    sys/dev/bwi/* excluding:
+    -+ sys/dev/bwi/if_bwi_pci.c
+    sys/dev/cardbus/*
+    sys/dev/cas/*
+    + sys/dev/cfe/cfe_console.c
+    + sys/dev/cfe/cfe_resource.c
+    sys/dev/cfi/*
+    sys/dev/ciss/*
+    sys/dev/cmx/*
+    sys/dev/coretemp/*
+    sys/dev/cpuctl/*
+    sys/dev/cpufreq/*
+    sys/dev/cs/*
+    sys/dev/ct/*
+    + sys/dev/cxgb/ulp/iw_cxgb/iw_cxgb_user.h
+    sys/dev/cy/*
+    sys/dev/dcons/*
+    sys/dev/digi/*
+    sys/dev/dpt/*
+    sys/dev/e1000/*
+    sys/dev/ed/* excluding:
+    -? sys/dev/ed/if_edreg.h
+    sys/dev/eisa/*
+    + sys/dev/ep/if_ep_eisa.c
+    + sys/dev/ep/if_ep_mca.c
+    sys/dev/et/*
+    sys/dev/ex/*
+    sys/dev/fatm/* excluding:
+    -? sys/dev/fatm/firmware.h
+    sys/dev/fb/* excluding:
+    -+ sys/dev/fb/boot_font.c
+    -? sys/dev/fb/gfb.h
+    -? sys/dev/fb/machfbreg.h
+    sys/dev/fdc/*
+    sys/dev/firewire/*
+    sys/dev/flash/*
+    sys/dev/fxp/*
+    sys/dev/gem/*
+    sys/dev/glxsb/* excluding:
+    -? sys/dev/glxsb/glxsb.c
+    sys/dev/hatm/*
+    sys/dev/hifn/*
+    + sys/dev/hme/if_hme_pci.c
+    sys/dev/hptiop/*
+    sys/dev/hptmv/*
+    sys/dev/hptrr/*
+    sys/dev/hwpmc/*
+    sys/dev/ic/* excluding:
+    -+ sys/dev/ic/hd64570.h
+    -? sys/dev/ic/i8237.h
+    -+ sys/dev/ic/i82586.h
+    -+ sys/dev/ic/sab82532.h
+    sys/dev/ichwd/*
+    sys/dev/ida/* excluding:
+    -+ sys/dev/ida/ida_eisa.c
+    -? sys/dev/ida/idaio.h
+    + sys/dev/ie/if_ie_isa.c
+    sys/dev/ieee488/*
+    sys/dev/iicbus/*
+    sys/dev/iir/*
+    sys/dev/io/*
+    sys/dev/ipmi/*
+    sys/dev/ips/*
+    sys/dev/ipw/*
+    sys/dev/iscsi/initiator/*
+    sys/dev/isp/* excluding:
+    -+ sys/dev/isp/isp_freebsd.c
+    -+ sys/dev/isp/isp_freebsd.h
+    -+ sys/dev/isp/isp_ioctl.h
+    -+ sys/dev/isp/isp_pci.c
+    -+ sys/dev/isp/isp_sbus.c
+    sys/dev/ispfw/* excluding:
+    -+ sys/dev/ispfw/ispfw.c
+    sys/dev/iwi/*
+    sys/dev/ixgb/*
+    sys/dev/ixgbe/*
+    sys/dev/jme/*
+    sys/dev/joy/*
+    sys/dev/kbd/*
+    sys/dev/kbdmux/*
+    sys/dev/ksyms/*
+    + sys/dev/le/if_le_cbus.c
+    + sys/dev/le/if_le_lebuffer.c
+    + sys/dev/le/lebuffer_sbus.c
+    sys/dev/mc146818/* excluding:
+    -? sys/dev/mc146818/mc146818reg.h
+    sys/dev/mca/*
+    sys/dev/md/*
+    sys/dev/mem/*
+    sys/dev/mfi/*
+    sys/dev/mge/*
+    + sys/dev/mii/acphyreg.h
+    + sys/dev/mii/atphy.c
+    + sys/dev/mii/atphyreg.h
+    + sys/dev/mii/axphy.c
+    + sys/dev/mii/axphyreg.h
+    + sys/dev/mii/e1000phy.c
+    + sys/dev/mii/e1000phyreg.h
+    + sys/dev/mii/inphy.c
+    + sys/dev/mii/inphyreg.h
+    + sys/dev/mii/ip1000phy.c
+    + sys/dev/mii/ip1000phyreg.h
+    + sys/dev/mii/jmphy.c
+    + sys/dev/mii/jmphyreg.h
+    + sys/dev/mii/ruephy.c
+    + sys/dev/mii/ruephyreg.h
+    + sys/dev/mii/smcphy.c
+    + sys/dev/mii/tdkphy.c
+    + sys/dev/mii/tdkphyreg.h
+    + sys/dev/mii/truephy.c
+    + sys/dev/mii/truephyreg.h
+    sys/dev/mlx/*
+    sys/dev/mly/*
+    sys/dev/mmc/*
+    + sys/dev/mpt/mpt_user.c
+    sys/dev/mse/*
+    sys/dev/ncv/*
+    sys/dev/nmdm/*
+    sys/dev/nsp/*
+    sys/dev/null/*
+    sys/dev/nve/*
+    sys/dev/nvram/*
+    sys/dev/nxge/*
+    sys/dev/nxge/include/* excluding:
+    -? sys/dev/nxge/include/build-version.h
+    sys/dev/nxge/xgehal/*
+    sys/dev/ofw/* excluding:
+    -+ sys/dev/ofw/ofw_pci.h
+    -+ sys/dev/ofw/ofw_standard.c
+    -+ sys/dev/ofw/openfirm.c
+    -+ sys/dev/ofw/openfirm.h
+    sys/dev/patm/* excluding:
+    -? sys/dev/patm/if_patm_rtables.c
+    sys/dev/patm/genrtab/*
+    sys/dev/pbio/*
+    + sys/dev/pccard/pccard_device.c
+    + sys/dev/pccard/pccardvarp.h
+    + sys/dev/pccbb/pccbb_isa.c
+    + sys/dev/pccbb/pccbbdevid.h
+    + sys/dev/pccbb/pccbbvar.h
+    sys/dev/pcf/*
+    sys/dev/pci/*
+    sys/dev/powermac_nvram/*
+    sys/dev/ppbus/* excluding:
+    -+ sys/dev/ppbus/lpt.c
+    -? sys/dev/ppbus/lptio.h
+    -? sys/dev/ppbus/pps.c
+    sys/dev/ppc/*
+    sys/dev/pst/*
+    sys/dev/puc/* excluding:
+    -+ sys/dev/puc/puc_pci.c
+    sys/dev/quicc/*
+    sys/dev/random/*
+    sys/dev/rc/*
+    sys/dev/safe/*
+    sys/dev/sbni/*
+    sys/dev/scc/*
+    + sys/dev/scd/scd.c
+    + sys/dev/scd/scdreg.h
+    sys/dev/sdhci/*
+    sys/dev/sec/*
+    sys/dev/siba/*
+    sys/dev/siis/*
+    sys/dev/sio/*
+    sys/dev/smbus/*
+    sys/dev/smc/*
+    sys/dev/sn/* excluding:
+    -+ sys/dev/sn/if_sn.c
+    -+ sys/dev/sn/if_snreg.h
+    + sys/dev/snc/if_snc.c
+    + sys/dev/snc/if_snc_cbus.c
+    + sys/dev/snc/if_snc_pccard.c
+    + sys/dev/snc/if_sncvar.h
+    sys/dev/snp/*
+    sys/dev/sound/*
+    sys/dev/sound/isa/*
+    sys/dev/sound/macio/*
+    sys/dev/sound/midi/*
+    sys/dev/sound/pci/* excluding:
+    -? sys/dev/sound/pci/ds1.h
+    sys/dev/sound/pci/hda/*
+    sys/dev/sound/pcm/*
+    sys/dev/sound/sbus/*
+    sys/dev/sound/usb/*
+    sys/dev/stg/* excluding:
+    -? sys/dev/stg/tmc18c30.h
+    sys/dev/streams/*
+    sys/dev/sym/*
+    sys/dev/syscons/*
+    sys/dev/syscons/apm/*
+    sys/dev/syscons/blank/*
+    sys/dev/syscons/daemon/*
+    sys/dev/syscons/dragon/*
+    sys/dev/syscons/fade/*
+    sys/dev/syscons/fire/*
+    sys/dev/syscons/green/*
+    + sys/dev/syscons/logo/logo_saver.c
+    sys/dev/syscons/rain/*
+    sys/dev/syscons/snake/*
+    sys/dev/syscons/star/*
+    sys/dev/syscons/teken/* excluding:
+    -? sys/dev/syscons/teken/teken_wcwidth.h
+    sys/dev/syscons/warp/*
+    + sys/dev/tdfx/tdfx_linux.c
+    sys/dev/trm/*
+    sys/dev/tsec/*
+    sys/dev/twa/*
+    sys/dev/twe/*
+    sys/dev/tx/*
+    + sys/dev/txp/3c990img.h
+    sys/dev/uart/* excluding:
+    -+ sys/dev/uart/uart_kbd_sun.h
+    -? sys/dev/uart/uart_kbd_sun_tables.h
+    sys/dev/ubsec/* excluding:
+    -+ sys/dev/ubsec/ubsec.c
+    sys/dev/usb/* excluding:
+    -+ sys/dev/usb/usb_cdc.h
+    -+ sys/dev/usb/usb_hid.c
+    sys/dev/usb/controller/* excluding:
+    -+ sys/dev/usb/controller/ehci.h
+    -+ sys/dev/usb/controller/ehci_pci.c
+    -+ sys/dev/usb/controller/ohci.h
+    -+ sys/dev/usb/controller/ohci_pci.c
+    -+ sys/dev/usb/controller/uhci.h
+    -+ sys/dev/usb/controller/uhci_pci.c
+    + sys/dev/usb/input/usb_rdesc.h
+    sys/dev/usb/misc/* excluding:
+    -? sys/dev/usb/misc/udbp.h
+    + sys/dev/usb/net/if_ruereg.h
+    + sys/dev/usb/net/if_udav.c
+    + sys/dev/usb/net/if_udavreg.h
+    + sys/dev/usb/net/usb_ethernet.c
+    + sys/dev/usb/net/usb_ethernet.h
+    sys/dev/usb/quirk/*
+    + sys/dev/usb/serial/ucycom.c
+    + sys/dev/usb/serial/umct.c
+    + sys/dev/usb/serial/uvscom.c
+    sys/dev/usb/storage/* excluding:
+    -? sys/dev/usb/storage/rio500_usb.h
+    sys/dev/usb/template/*
+    + sys/dev/usb/wlan/if_zydfw.h
+    sys/dev/utopia/*
+    sys/dev/vkbd/*
+    + sys/dev/vx/if_vx_eisa.c
+    + sys/dev/vx/if_vx_pci.c
+    sys/dev/watchdog/*
+    sys/dev/xe/*
+    sys/dev/xen/blkback/*
+    sys/dev/xen/netback/*
+    sys/dev/xen/pcifront/*
+    sys/dev/xen/xenpci/* excluding:
+    -? sys/dev/xen/xenpci/evtchn.c
+    sys/fs/cd9660/*
+    sys/fs/deadfs/*
+    + sys/fs/devfs/devfs_rule.c
+    sys/fs/fdescfs/*
+    sys/fs/fifofs/*
+    sys/fs/hpfs/*
+    + sys/fs/msdosfs/msdosfs_fileno.c
+    + sys/fs/msdosfs/msdosfs_iconv.c
+    sys/fs/nfs/*
+    sys/fs/nfsclient/*
+    sys/fs/nfsserver/*
+    sys/fs/ntfs/*
+    sys/fs/nullfs/*
+    sys/fs/portalfs/*
+    sys/fs/procfs/* excluding:
+    -+ sys/fs/procfs/procfs.c
+    -+ sys/fs/procfs/procfs_rlimit.c
+    sys/fs/pseudofs/*
+    sys/fs/tmpfs/*
+    sys/fs/udf/* excluding:
+    -? sys/fs/udf/osta.c
+    -? sys/fs/udf/osta.h
+    sys/fs/unionfs/*
+    sys/gdb/*
+    sys/geom/* excluding:
+    -+ sys/geom/geom_ccd.c
+    -+ sys/geom/geom_redboot.c
+    sys/geom/bde/*
+    sys/geom/cache/*
+    sys/geom/concat/*
+    sys/geom/eli/*
+    sys/geom/gate/*
+    sys/geom/journal/*
+    sys/geom/label/*
+    sys/geom/linux_lvm/*
+    sys/geom/mirror/*
+    sys/geom/multipath/*
+    sys/geom/nop/*
+    sys/geom/part/*
+    sys/geom/raid3/*
+    sys/geom/shsec/*
+    sys/geom/stripe/*
+    sys/geom/uzip/*
+    sys/geom/vinum/* excluding:
+    -+ sys/geom/vinum/geom_vinum_share.c
+    -+ sys/geom/vinum/geom_vinum_subr.c
+    -+ sys/geom/vinum/geom_vinum_var.h
+    sys/geom/virstor/*
+    sys/geom/zero/*
+    sys/gnu/fs/ext2fs/* excluding:
+    -+ sys/gnu/fs/ext2fs/ext2_fs.h
+    -+ sys/gnu/fs/ext2fs/ext2_fs_sb.h
+    -? sys/gnu/fs/ext2fs/ext2_inode_cnv.c
+    -+ sys/gnu/fs/ext2fs/ext2_linux_balloc.c
+    -+ sys/gnu/fs/ext2fs/ext2_linux_ialloc.c
+    -+ sys/gnu/fs/ext2fs/ext2_vfsops.c
+    -+ sys/gnu/fs/ext2fs/i386-bitops.h
+    + sys/gnu/fs/xfs/FreeBSD/xfs_buf.c
+    + sys/gnu/fs/xfs/FreeBSD/xfs_mountops.c
+    + sys/gnu/fs/xfs/FreeBSD/xfs_mountops.h
+    + sys/gnu/fs/xfs/FreeBSD/xfs_vnops.c
+    sys/i386/acpica/*
+    sys/i386/bios/* excluding:
+    -? sys/i386/bios/apm.c
+    -? sys/i386/bios/apm.h
+    sys/i386/cpufreq/*
+    sys/i386/i386/* excluding:
+    -+ sys/i386/i386/busdma_machdep.c
+    -? sys/i386/i386/db_disasm.c
+    -? sys/i386/i386/db_interface.c
+    -? sys/i386/i386/db_trace.c
+    -? sys/i386/i386/elan-mmcr.c
+    -+ sys/i386/i386/identcpu.c
+    -? sys/i386/i386/legacy.c
+    -+ sys/i386/i386/local_apic.c
+    -+ sys/i386/i386/longrun.c
+    -+ sys/i386/i386/machdep.c
+    -? sys/i386/i386/mp_clock.c
+    -+ sys/i386/i386/mp_machdep.c
+    -+ sys/i386/i386/mptable.c
+    -? sys/i386/i386/nexus.c
+    -? sys/i386/i386/perfmon.c
+    -+ sys/i386/i386/pmap.c
+    -+ sys/i386/i386/trap.c
+    -+ sys/i386/i386/vm_machdep.c
+    + sys/i386/ibcs2/coff.h
+    + sys/i386/ibcs2/ibcs2_fcntl.c
+    + sys/i386/ibcs2/ibcs2_isc.c
+    + sys/i386/ibcs2/ibcs2_signal.c
+    + sys/i386/ibcs2/ibcs2_stat.c
+    + sys/i386/ibcs2/ibcs2_sysi86.c
+    + sys/i386/ibcs2/ibcs2_util.c
+    + sys/i386/ibcs2/ibcs2_util.h
+    + sys/i386/ibcs2/ibcs2_xenix.c
+    + sys/i386/ibcs2/imgact_coff.c
+    sys/i386/include/* excluding:
+    -+ sys/i386/include/_inttypes.h
+    -+ sys/i386/include/_stdint.h
+    -+ sys/i386/include/_types.h
+    -+ sys/i386/include/apicreg.h
+    -? sys/i386/include/apm_bios.h
+    -? sys/i386/include/apm_segments.h
+    -+ sys/i386/include/bootinfo.h
+    -+ sys/i386/include/bus.h
+    -? sys/i386/include/clock.h
+    -? sys/i386/include/cserial.h
+    -? sys/i386/include/db_machdep.h
+    -+ sys/i386/include/floatingpoint.h
+    -+ sys/i386/include/ieeefp.h
+    -? sys/i386/include/if_wl_wavelan.h
+    -+ sys/i386/include/mptable.h
+    -? sys/i386/include/nexusvar.h
+    -? sys/i386/include/perfmon.h
+    -? sys/i386/include/resource.h
+    -? sys/i386/include/smp.h
+    -? sys/i386/include/speaker.h
+    -? sys/i386/include/stack.h
+    -+ sys/i386/include/stdarg.h
+    sys/i386/include/pc/* excluding:
+    -? sys/i386/include/pc/display.h
+    + sys/i386/include/xen/xen_clock_util.h
+    + sys/i386/include/xen/xenfunc.h
+    + sys/i386/include/xen/xenvar.h
+    sys/i386/isa/* excluding:
+    -+ sys/i386/isa/elink.c
+    -+ sys/i386/isa/elink.h
+    sys/i386/linux/* excluding:
+    -? sys/i386/linux/linux_genassym.c
+    -? sys/i386/linux/linux_proto.h
+    -? sys/i386/linux/linux_syscall.h
+    -? sys/i386/linux/linux_sysent.c
+    sys/i386/pci/*
+    sys/i386/svr4/* excluding:
+    -? sys/i386/svr4/svr4_genassym.c
+    sys/i386/xbox/*
+    + sys/i386/xen/xen_clock_util.c
+    + sys/i386/xen/xen_rtc.c
+    sys/ia64/acpica/*
+    sys/ia64/disasm/*
+    sys/ia64/ia32/*
+    sys/ia64/ia64/* excluding:
+    -+ sys/ia64/ia64/busdma_machdep.c
+    -+ sys/ia64/ia64/in_cksum.c
+    -? sys/ia64/ia64/interrupt.c
+    -? sys/ia64/ia64/nexus.c
+    -+ sys/ia64/ia64/pmap.c
+    -? sys/ia64/ia64/sscdisk.c
+    -+ sys/ia64/ia64/vm_machdep.c
+    sys/ia64/include/* excluding:
+    -+ sys/ia64/include/_inttypes.h
+    -+ sys/ia64/include/_stdint.h
+    -+ sys/ia64/include/_types.h
+    -? sys/ia64/include/asm.h
+    -? sys/ia64/include/bootinfo.h
+    -+ sys/ia64/include/bus.h
+    -? sys/ia64/include/clock.h
+    -? sys/ia64/include/intrcnt.h
+    -? sys/ia64/include/pmc_mdep.h
+    -? sys/ia64/include/resource.h
+    -? sys/ia64/include/signal.h
+    -? sys/ia64/include/smp.h
+    -+ sys/ia64/include/stdarg.h
+    -+ sys/ia64/include/varargs.h
+    sys/ia64/isa/*
+    sys/ia64/pci/*
+    sys/isa/* excluding:
+    -+ sys/isa/pnpreg.h
+    sys/kern/* excluding:
+    -? sys/kern/imgact_gzip.c
+    -? sys/kern/inflate.c
+    -+ sys/kern/init_main.c
+    -? sys/kern/init_sysent.c
+    -? sys/kern/kern_ntptime.c
+    -? sys/kern/kern_tc.c
+    -+ sys/kern/ksched.c
+    -? sys/kern/md4c.c
+    -? sys/kern/md5c.c
+    -+ sys/kern/p1003_1b.c
+    -+ sys/kern/posix4_mib.c
+    -? sys/kern/stack_protector.c
+    -+ sys/kern/subr_bufring.c
+    -? sys/kern/subr_disk.c
+    -? sys/kern/subr_rman.c
+    -+ sys/kern/subr_trap.c
+    -+ sys/kern/sys_process.c
+    -? sys/kern/syscalls.c
+    -? sys/kern/systrace_args.c
+    -+ sys/kern/sysv_ipc.c
+    -+ sys/kern/sysv_shm.c
+    -+ sys/kern/vfs_aio.c
+    sys/kgssapi/* excluding:
+    -? sys/kgssapi/gssapi.h
+    sys/kgssapi/krb5/*
+    sys/libkern/* excluding:
+    -? sys/libkern/arc4random.c
+    -? sys/libkern/bcd.c
+    -? sys/libkern/crc32.c
+    -+ sys/libkern/iconv.c
+    -+ sys/libkern/iconv_xlat.c
+    -? sys/libkern/inet_ntoa.c
+    -? sys/libkern/jenkins.h
+    -? sys/libkern/qsort_r.c
+    -+ sys/libkern/strcasecmp.c
+    -+ sys/libkern/strstr.c
+    sys/libkern/arm/*
+    sys/mips/adm5120/* excluding:
+    -+ sys/mips/adm5120/if_admsw.c
+    -+ sys/mips/adm5120/obio.c
+    -+ sys/mips/adm5120/obiovar.h
+    sys/mips/idt/* excluding:
+    -+ sys/mips/idt/obio.c
+    -+ sys/mips/idt/obiovar.h
+    sys/mips/include/* excluding:
+    -+ sys/mips/include/_inttypes.h
+    -+ sys/mips/include/_stdint.h
+    -+ sys/mips/include/_types.h
+    -+ sys/mips/include/archtype.h
+    -+ sys/mips/include/bootinfo.h
+    -? sys/mips/include/bswap.h
+    -+ sys/mips/include/bus.h
+    -+ sys/mips/include/bus_octeon.h
+    -+ sys/mips/include/cache.h
+    -+ sys/mips/include/cache_mipsNN.h
+    -+ sys/mips/include/cache_r4k.h
+    -? sys/mips/include/clock.h
+    -? sys/mips/include/clockvar.h
+    -+ sys/mips/include/cpufunc.h
+    -+ sys/mips/include/cpuinfo.h
+    -+ sys/mips/include/db_machdep.h
+    -? sys/mips/include/defs.h
+    -+ sys/mips/include/elf.h
+    -+ sys/mips/include/floatingpoint.h
+    -? sys/mips/include/fpu.h
+    -+ sys/mips/include/frame.h
+    -? sys/mips/include/ieeefp.h
+    -+ sys/mips/include/intr.h
+    -? sys/mips/include/locore.h
+    -? sys/mips/include/mutex.h
+    -? sys/mips/include/pltfm.h
+    -? sys/mips/include/pmc_mdep.h
+    -+ sys/mips/include/pte.h
+    -? sys/mips/include/queue.h
+    -? sys/mips/include/regdef.h
+    -+ sys/mips/include/reloc.h
+    -? sys/mips/include/resource.h
+    -+ sys/mips/include/rm7000.h
+    -? sys/mips/include/setjmp.h
+    -? sys/mips/include/smp.h
+    -? sys/mips/include/stdarg.h
+    + sys/mips/malta/gt.c
+    + sys/mips/malta/gtvar.h
+    + sys/mips/malta/malta_machdep.c
+    + sys/mips/malta/uart_bus_maltausart.c
+    + sys/mips/malta/uart_cpu_maltausart.c
+    sys/mips/mips/* excluding:
+    -+ sys/mips/mips/busdma_machdep.c
+    -+ sys/mips/mips/cache.c
+    -+ sys/mips/mips/cache_mipsNN.c
+    -+ sys/mips/mips/db_disasm.c
+    -+ sys/mips/mips/db_interface.c
+    -? sys/mips/mips/db_trace.c
+    -+ sys/mips/mips/dump_machdep.c
+    -+ sys/mips/mips/gdb_machdep.c
+    -+ sys/mips/mips/in_cksum.c
+    -+ sys/mips/mips/intr_machdep.c
+    -? sys/mips/mips/mainbus.c
+    -? sys/mips/mips/mp_machdep.c
+    -? sys/mips/mips/nexus.c
+    sys/mips/sentry5/* excluding:
+    -+ sys/mips/sentry5/obio.c
+    -+ sys/mips/sentry5/obiovar.h
+    -? sys/mips/sentry5/s5reg.h
+    sys/modules/ata/atadevel/*
+    sys/modules/dtrace/dtraceall/*
+    sys/net/* excluding:
+    -+ sys/net/bridgestp.h
+    -? sys/net/ethernet.h
+    -+ sys/net/fddi.h
+    -+ sys/net/flowtable.c
+    -+ sys/net/flowtable.h
+    -+ sys/net/if_arcsubr.c
+    -+ sys/net/if_atm.h
+    -+ sys/net/if_atmsubr.c
+    -+ sys/net/if_bridge.c
+    -+ sys/net/if_bridgevar.h
+    -+ sys/net/if_edsc.c
+    -+ sys/net/if_fddisubr.c
+    -+ sys/net/if_gre.c
+    -+ sys/net/if_gre.h
+    -? sys/net/if_lagg.c
+    -? sys/net/if_lagg.h
+    -+ sys/net/if_media.c
+    -+ sys/net/if_media.h
+    -? sys/net/if_mib.c
+    -? sys/net/if_mib.h
+    -? sys/net/if_sppp.h
+    -? sys/net/if_spppfr.c
+    -? sys/net/if_spppsubr.c
+    -? sys/net/if_tun.c
+    -? sys/net/if_tun.h
+    -? sys/net/if_vlan.c
+    -? sys/net/if_vlan_var.h
+    -? sys/net/ppp_defs.h
+    -? sys/net/zlib.c
+    -? sys/net/zlib.h
+    sys/net80211/* excluding:
+    -? sys/net80211/ieee80211_amrr.c
+    -? sys/net80211/ieee80211_amrr.h
+    -+ sys/net80211/ieee80211_crypto_ccmp.c
+    -+ sys/net80211/ieee80211_crypto_tkip.c
+    + sys/netatalk/aarp.c
+    + sys/netatalk/ddp_input.c
+    + sys/netatalk/ddp_pcb.c
+    + sys/netatalk/ddp_pcb.h
+    + sys/netatalk/ddp_usrreq.c
+    + sys/netgraph/ng_atmllc.c
+    + sys/netgraph/ng_atmllc.h
+    + sys/netgraph/ng_car.c
+    + sys/netgraph/ng_car.h
+    + sys/netgraph/ng_deflate.c
+    + sys/netgraph/ng_deflate.h
+    + sys/netgraph/ng_device.c
+    + sys/netgraph/ng_device.h
+    + sys/netgraph/ng_eiface.c
+    + sys/netgraph/ng_eiface.h
+    + sys/netgraph/ng_etf.c
+    + sys/netgraph/ng_etf.h
+    + sys/netgraph/ng_gif.c
+    + sys/netgraph/ng_gif.h
+    + sys/netgraph/ng_gif_demux.c
+    + sys/netgraph/ng_gif_demux.h
+    + sys/netgraph/ng_hub.c
+    + sys/netgraph/ng_hub.h
+    + sys/netgraph/ng_ip_input.c
+    + sys/netgraph/ng_ip_input.h
+    + sys/netgraph/ng_ipfw.c
+    + sys/netgraph/ng_ipfw.h
+    + sys/netgraph/ng_nat.c
+    + sys/netgraph/ng_nat.h
+    + sys/netgraph/ng_pipe.c
+    + sys/netgraph/ng_pipe.h
+    + sys/netgraph/ng_ppp.c
+    + sys/netgraph/ng_pred1.c
+    + sys/netgraph/ng_pred1.h
+    + sys/netgraph/ng_split.c
+    + sys/netgraph/ng_split.h
+    + sys/netgraph/ng_tag.c
+    + sys/netgraph/ng_tag.h
+    + sys/netgraph/ng_tcpmss.c
+    + sys/netgraph/ng_tcpmss.h
+    + sys/netgraph/ng_vlan.c
+    + sys/netgraph/ng_vlan.h
+    sys/netgraph/atm/*
+    sys/netgraph/atm/ccatm/*
+    sys/netgraph/atm/sscfu/*
+    sys/netgraph/atm/sscop/*
+    sys/netgraph/atm/uni/*
+    sys/netgraph/bluetooth/common/*
+    sys/netgraph/bluetooth/drivers/bt3c/*
+    sys/netgraph/bluetooth/drivers/h4/*
+    sys/netgraph/bluetooth/drivers/ubt/*
+    sys/netgraph/bluetooth/drivers/ubtbcmfw/*
+    sys/netgraph/bluetooth/hci/*
+    sys/netgraph/bluetooth/include/*
+    sys/netgraph/bluetooth/l2cap/*
+    sys/netgraph/bluetooth/socket/*
+    sys/netgraph/netflow/*
+    sys/netinet/* excluding:
+    -+ sys/netinet/if_atm.c
+    -+ sys/netinet/if_atm.h
+    -? sys/netinet/in_rmx.c
+    -+ sys/netinet/ip_divert.h
+    -+ sys/netinet/ip_gre.c
+    -+ sys/netinet/ip_gre.h
+    -+ sys/netinet/tcp_lro.c
+    -+ sys/netinet/tcp_lro.h
+    -+ sys/netinet/tcp_offload.c
+    -+ sys/netinet/tcp_offload.h
+    -+ sys/netinet/toedev.h
+    sys/netinet/ipfw/*
+    sys/netinet/libalias/* excluding:
+    -? sys/netinet/libalias/alias_pptp.c
+    sys/netinet6/* excluding:
+    -? sys/netinet6/icmp6.h
+    -? sys/netinet6/ip6.h
+    sys/netipsec/* excluding:
+    -? sys/netipsec/ah_var.h
+    -? sys/netipsec/esp_var.h
+    -? sys/netipsec/ipip_var.h
+    -? sys/netipsec/ipsec_input.c
+    -? sys/netipsec/xform.h
+    -? sys/netipsec/xform_ah.c
+    -? sys/netipsec/xform_esp.c
+    -? sys/netipsec/xform_ipip.c
+    sys/netipx/*
+    + sys/netncp/ncpio.h
+    sys/nfs/*
+    sys/nfsclient/* excluding:
+    -+ sys/nfsclient/bootp_subr.c
+    -? sys/nfsclient/krpc.h
+    -+ sys/nfsclient/krpc_subr.c
+    sys/nfsserver/*
+    + sys/nlm/nlm.h
+    + sys/nlm/nlm_advlock.c
+    + sys/nlm/nlm_prot_impl.c
+    + sys/nlm/nlm_prot_server.c
+    + sys/nlm/nlm_prot_svc.c
+    + sys/opencrypto/criov.c
+    + sys/opencrypto/crypto.c
+    + sys/opencrypto/cryptodev.c
+    + sys/opencrypto/cryptodev.h
+    + sys/opencrypto/deflate.c
+    + sys/opencrypto/deflate.h
+    + sys/opencrypto/rmd160.c
+    + sys/opencrypto/rmd160.h
+    sys/pc98/cbus/* excluding:
+    -+ sys/pc98/cbus/fdc.c
+    -+ sys/pc98/cbus/olpt.c
+    + sys/pc98/include/_bus.h
+    + sys/pc98/include/apm_bios.h
+    + sys/pc98/include/bus.h
+    + sys/pc98/include/md_var.h
+    + sys/pc98/include/npx.h
+    + sys/pc98/include/param.h
+    + sys/pc98/include/pci_cfgreg.h
+    + sys/pc98/include/ppireg.h
+    + sys/pc98/include/timerreg.h
+    + sys/pc98/include/pc/display.h
+    sys/pc98/pc98/* excluding:
+    -+ sys/pc98/pc98/machdep.c
+    sys/pci/* excluding:
+    -+ sys/pci/if_rl.c
+    -+ sys/pci/if_rlreg.h
+    -? sys/pci/locate.pl
+    + sys/powerpc/aim/interrupt.c
+    + sys/powerpc/aim/mp_cpudep.c
+    + sys/powerpc/aim/nexus.c
+    + sys/powerpc/aim/platform_chrp.c
+    + sys/powerpc/aim/uma_machdep.c
+    + sys/powerpc/booke/interrupt.c
+    + sys/powerpc/booke/mp_cpudep.c
+    + sys/powerpc/booke/platform_bare.c
+    + sys/powerpc/booke/pmap.c
+    sys/powerpc/cpufreq/*
+    sys/powerpc/fpu/* excluding:
+    -+ sys/powerpc/fpu/fpu_emu.c
+    -+ sys/powerpc/fpu/fpu_extern.h
+    sys/powerpc/include/* excluding:
+    -+ sys/powerpc/include/_inttypes.h
+    -+ sys/powerpc/include/_stdint.h
+    -+ sys/powerpc/include/_types.h
+    -+ sys/powerpc/include/asm.h
+    -+ sys/powerpc/include/bat.h
+    -+ sys/powerpc/include/bus.h
+    -? sys/powerpc/include/clock.h
+    -+ sys/powerpc/include/cpu.h
+    -? sys/powerpc/include/db_machdep.h
+    -+ sys/powerpc/include/fpu.h
+    -+ sys/powerpc/include/frame.h
+    -? sys/powerpc/include/ieeefp.h
+    -+ sys/powerpc/include/intr.h
+    -+ sys/powerpc/include/param.h
+    -+ sys/powerpc/include/pcb.h
+    -+ sys/powerpc/include/pio.h
+    -+ sys/powerpc/include/platform.h
+    -+ sys/powerpc/include/pmap.h
+    -? sys/powerpc/include/pmc_mdep.h
+    -+ sys/powerpc/include/proc.h
+    -? sys/powerpc/include/profile.h
+    -+ sys/powerpc/include/psl.h
+    -+ sys/powerpc/include/pte.h
+    -? sys/powerpc/include/reg.h
+    -? sys/powerpc/include/resource.h
+    -? sys/powerpc/include/setjmp.h
+    -+ sys/powerpc/include/signal.h
+    -+ sys/powerpc/include/spr.h
+    -? sys/powerpc/include/stack.h
+    -? sys/powerpc/include/trap.h
+    -+ sys/powerpc/include/trap_aim.h
+    -+ sys/powerpc/include/ucontext.h
+    -+ sys/powerpc/include/vmparam.h
+    sys/powerpc/mpc85xx/*
+    sys/powerpc/ofw/* excluding:
+    -+ sys/powerpc/ofw/ofw_real.c
+    sys/powerpc/powermac/*
+    sys/powerpc/powerpc/* excluding:
+    -+ sys/powerpc/powerpc/altivec.c
+    -+ sys/powerpc/powerpc/bus_machdep.c
+    -+ sys/powerpc/powerpc/busdma_machdep.c
+    -+ sys/powerpc/powerpc/copystr.c
+    -+ sys/powerpc/powerpc/cpu.c
+    -? sys/powerpc/powerpc/db_disasm.c
+    -? sys/powerpc/powerpc/db_interface.c
+    -? sys/powerpc/powerpc/db_trace.c
+    -+ sys/powerpc/powerpc/fpu.c
+    -+ sys/powerpc/powerpc/fuswintr.c
+    -+ sys/powerpc/powerpc/in_cksum.c
+    -+ sys/powerpc/powerpc/suswintr.c
+    -+ sys/powerpc/powerpc/syncicache.c
+    sys/powerpc/psim/*
+    + sys/rpc/clnt_rc.c
+    + sys/rpc/getnetconfig.c
+    + sys/rpc/replay.c
+    + sys/rpc/replay.h
+    + sys/rpc/rpcm_subs.h
+    + sys/rpc/rpcsec_gss.h
+    sys/rpc/rpcsec_gss/*
+    sys/security/audit/*
+    sys/security/mac/*
+    sys/security/mac_biba/*
+    sys/security/mac_bsdextended/*
+    sys/security/mac_ifoff/*
+    sys/security/mac_lomac/*
+    sys/security/mac_mls/*
+    sys/security/mac_none/*
+    sys/security/mac_partition/*
+    sys/security/mac_portacl/*
+    sys/security/mac_seeotheruids/*
+    sys/security/mac_stub/*
+    sys/security/mac_test/*
+    sys/sparc64/central/*
+    sys/sparc64/ebus/*
+    sys/sparc64/fhc/*
+    sys/sparc64/include/* excluding:
+    -+ sys/sparc64/include/_inttypes.h
+    -+ sys/sparc64/include/_stdint.h
+    -+ sys/sparc64/include/bus.h
+    -+ sys/sparc64/include/bus_dma.h
+    -+ sys/sparc64/include/cache.h
+    -? sys/sparc64/include/db_machdep.h
+    -+ sys/sparc64/include/idprom.h
+    -? sys/sparc64/include/ieeefp.h
+    -+ sys/sparc64/include/instr.h
+    -? sys/sparc64/include/pmc_mdep.h
+    -? sys/sparc64/include/profile.h
+    -? sys/sparc64/include/resource.h
+    -+ sys/sparc64/include/varargs.h
+    -+ sys/sparc64/include/vmparam.h
+    sys/sparc64/isa/*
+    sys/sparc64/pci/*
+    sys/sparc64/sparc64/* excluding:
+    -+ sys/sparc64/sparc64/bus_machdep.c
+    -+ sys/sparc64/sparc64/cache.c
+    -+ sys/sparc64/sparc64/db_disasm.c
+    -+ sys/sparc64/sparc64/eeprom.c
+    -+ sys/sparc64/sparc64/elf_machdep.c
+    -? sys/sparc64/sparc64/identcpu.c
+    -+ sys/sparc64/sparc64/iommu.c
+    -? sys/sparc64/sparc64/nexus.c
+    -+ sys/sparc64/sparc64/pmap.c
+    -+ sys/sparc64/sparc64/trap.c
+    -+ sys/sparc64/sparc64/vm_machdep.c
+    sys/sun4v/include/* excluding:
+    -+ sys/sun4v/include/_inttypes.h
+    -+ sys/sun4v/include/_stdint.h
+    -+ sys/sun4v/include/bus.h
+    -+ sys/sun4v/include/bus_dma.h
+    -? sys/sun4v/include/db_machdep.h
+    -+ sys/sun4v/include/idprom.h
+    -? sys/sun4v/include/ieeefp.h
+    -? sys/sun4v/include/in_cksum.h
+    -+ sys/sun4v/include/instr.h
+    -? sys/sun4v/include/pmc_mdep.h
+    -? sys/sun4v/include/profile.h
+    -? sys/sun4v/include/resource.h
+    -? sys/sun4v/include/upa.h
+    -+ sys/sun4v/include/varargs.h
+    -? sys/sun4v/include/ver.h
+    -+ sys/sun4v/include/vmparam.h
+    sys/sun4v/mdesc/*
+    sys/sun4v/sun4v/* excluding:
+    -+ sys/sun4v/sun4v/bus_machdep.c
+    -+ sys/sun4v/sun4v/hviommu.c
+    -? sys/sun4v/sun4v/nexus.c
+    -+ sys/sun4v/sun4v/trap.c
+    -+ sys/sun4v/sun4v/vm_machdep.c
+    sys/sys/* excluding:
+    -+ sys/sys/_pthreadtypes.h
+    -+ sys/sys/aio.h
+    -+ sys/sys/buf_ring.h
+    -+ sys/sys/bus_dma.h
+    -? sys/sys/cdio.h
+    -+ sys/sys/chio.h
+    -+ sys/sys/clock.h
+    -? sys/sys/dataacq.h
+    -? sys/sys/disk.h
+    -? sys/sys/fnv_hash.h
+    -+ sys/sys/iconv.h
+    -? sys/sys/inflate.h
+    -? sys/sys/kbio.h
+    -+ sys/sys/kernel.h
+    -+ sys/sys/link_aout.h
+    -+ sys/sys/link_elf.h
+    -+ sys/sys/mchain.h
+    -? sys/sys/md4.h
+    -? sys/sys/md5.h
+    -? sys/sys/memrange.h
+    -+ sys/sys/mouse.h
+    -? sys/sys/msg.h
+    -+ sys/sys/pioctl.h
+    -+ sys/sys/posix4.h
+    -+ sys/sys/priority.h
+    -+ sys/sys/ptio.h
+    -? sys/sys/rman.h
+    -+ sys/sys/rtprio.h
+    -+ sys/sys/sched.h
+    -? sys/sys/sem.h
+    -+ sys/sys/semaphore.h
+    -+ sys/sys/shm.h
+    -? sys/sys/smp.h
+    -? sys/sys/snoop.h
+    -? sys/sys/statvfs.h
+    -? sys/sys/syscall.h
+    -? sys/sys/sysproto.h
+    -+ sys/sys/tiio.h
+    -? sys/sys/timepps.h
+    -+ sys/sys/timers.h
+    -? sys/sys/timetc.h
+    -? sys/sys/timex.h
+    sys/ufs/ffs/*
+    sys/ufs/ufs/*
+    sys/vm/* excluding:
+    -+ sys/vm/default_pager.c
+    -+ sys/vm/swap_pager.c
+    -+ sys/vm/vm_fault.c
+    -+ sys/vm/vm_pageout.c
+    -+ sys/vm/vnode_pager.c
+    + sys/xdr/xdr_mbuf.c
+    + sys/xen/interface/elfstructs.h
+    usr.sbin/config/* excluding:
+    -? usr.sbin/config/configvers.h
 
-    THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
-    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-    ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
-    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-    SUCH DAMAGE.
+  | Redistribution and use in source and binary forms, with or without
+  | modification, are permitted provided that the following conditions
+  | are met:
+  | 1. Redistributions of source code must retain the above copyright
+  |    notice, this list of conditions and the following disclaimer.
+  | 2. Redistributions in binary form must reproduce the above copyright
+  |    notice, this list of conditions and the following disclaimer in the
+  |    documentation and/or other materials provided with the distribution.
+  |
+  | THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+  | ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  | IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  | ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+  | FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  | DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+  | OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  | HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  | LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  | OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  | SUCH DAMAGE.
+--
 
-On Debian GNU systems, the complete text of the BSD License can be 
-found in `/usr/share/common-licenses/BSD'.
+    However, the license of 1449 files was not explicitly specified:
 
-There are, however, some exceptions. Parts of this package are distributed
-under other licenses:
+    ? sys/amd64/amd64/db_disasm.c
+    ? sys/amd64/amd64/db_interface.c
+    ? sys/amd64/amd64/db_trace.c
+    ? sys/amd64/amd64/legacy.c
+    ? sys/amd64/amd64/nexus.c
+    ? sys/amd64/include/clock.h
+    ? sys/amd64/include/db_machdep.h
+    ? sys/amd64/include/nexusvar.h
+    ? sys/amd64/include/resource.h
+    ? sys/amd64/include/smp.h
+    ? sys/amd64/include/stack.h
+    ? sys/amd64/include/pc/display.h
+    ? sys/amd64/include/xen/synch_bitops.h
+    ? sys/amd64/include/xen/xen-os.h
+    ? sys/amd64/linux32/linux32_genassym.c
+    ? sys/amd64/linux32/linux32_proto.h
+    ? sys/amd64/linux32/linux32_syscall.h
+    ? sys/amd64/linux32/linux32_sysent.c
+    ? sys/arm/arm/db_interface.c
+    ? sys/arm/arm/db_trace.c
+    ? sys/arm/arm/nexus.c
+    ? sys/arm/at91/at91_pio_rm9200.h
+    ? sys/arm/include/cpu.h
+    ? sys/arm/include/db_machdep.h
+    ? sys/arm/include/ieeefp.h
+    ? sys/arm/include/machdep.h
+    ? sys/arm/include/pmc_mdep.h
+    ? sys/arm/include/ptrace.h
+    ? sys/arm/include/reg.h
+    ? sys/arm/include/resource.h
+    ? sys/arm/include/setjmp.h
+    ? sys/arm/include/sigframe.h
+    ? sys/arm/include/smp.h
+    ? sys/arm/include/stack.h
+    ? sys/arm/include/swi.h
+    ? sys/arm/include/trap.h
+    ? sys/boot/arm/at91/boot2/boot2.c
+    ? sys/boot/arm/at91/boot2/bwct_board.c
+    sys/boot/arm/at91/bootiic/*
+    sys/boot/arm/at91/bootspi/* excluding:
+    -+ sys/boot/arm/at91/bootspi/main.c
+    ? sys/boot/arm/at91/libat91/at91rm9200.h
+    ? sys/boot/arm/at91/libat91/eeprom.c
+    ? sys/boot/arm/at91/libat91/emac.c
+    ? sys/boot/arm/at91/libat91/emac.h
+    ? sys/boot/arm/at91/libat91/p_string.c
+    ? sys/boot/arm/at91/libat91/printf.c
+    ? sys/boot/arm/at91/libat91/spi_flash.c
+    ? sys/boot/arm/at91/libat91/spi_flash.h
+    ? sys/boot/arm/at91/libat91/tag_list.c
+    ? sys/boot/arm/at91/libat91/tag_list.h
+    ? sys/boot/arm/ixp425/boot2/boot2.c
+    ? sys/boot/common/load_elf32.c
+    ? sys/boot/common/load_elf32_obj.c
+    ? sys/boot/common/load_elf64.c
+    ? sys/boot/common/load_elf64_obj.c
+    ? sys/boot/common/pnp.c
+    ? sys/boot/common/reloc_elf32.c
+    ? sys/boot/common/reloc_elf64.c
+    sys/boot/efi/include/* excluding:
+    -+ sys/boot/efi/include/efilib.h
+    sys/boot/efi/include/i386/*
+    sys/boot/efi/include/ia64/*
+    ? sys/boot/ficl/fileaccess.c
+    ? sys/boot/ficl/unix.c
+    ? sys/boot/ficl/arm/sysdep.c
+    ? sys/boot/ficl/i386/sysdep.c
+    ? sys/boot/ficl/ia64/sysdep.c
+    ? sys/boot/ficl/mips/sysdep.c
+    ? sys/boot/ficl/powerpc/sysdep.c
+    ? sys/boot/ficl/sparc64/sysdep.c
+    sys/boot/i386/boot2/*
+    sys/boot/i386/btx/lib/*
+    sys/boot/i386/gptboot/*
+    ? sys/boot/i386/libi386/nullconsole.c
+    sys/boot/i386/zfsboot/*
+    ? sys/boot/ofw/libofw/ofw_console.c
+    sys/boot/pc98/boot2/* excluding:
+    -+ sys/boot/pc98/boot2/dinode.h
+    -+ sys/boot/pc98/boot2/fs.h
+    -+ sys/boot/pc98/boot2/inode.h
+    -+ sys/boot/pc98/boot2/probe_keyboard.c
+    -+ sys/boot/pc98/boot2/quota.h
+    sys/boot/pc98/btx/lib/*
+    sys/boot/powerpc/boot1.chrp/*
+    sys/boot/sparc64/boot1/*
+    ? sys/cam/scsi/scsi_all.h
+    ? sys/cam/scsi/scsi_da.h
+    ? sys/cam/scsi/scsi_iu.h
+    ? sys/cam/scsi/scsi_message.h
+    ? sys/cam/scsi/scsi_sg.h
+    ? sys/compat/freebsd32/freebsd32_proto.h
+    ? sys/compat/freebsd32/freebsd32_syscall.h
+    ? sys/compat/freebsd32/freebsd32_syscalls.c
+    ? sys/compat/freebsd32/freebsd32_sysent.c
+    ? sys/compat/ia32/ia32_genassym.c
+    ? sys/compat/svr4/svr4_proto.h
+    ? sys/compat/svr4/svr4_syscall.h
+    ? sys/compat/svr4/svr4_syscallnames.c
+    ? sys/compat/svr4/svr4_sysent.c
+    ? sys/contrib/altq/altq/altq_hfsc.c
+    ? sys/contrib/altq/altq/altq_hfsc.h
+    ? sys/contrib/altq/altq/altqconf.h
+    sys/contrib/dev/*
+    sys/contrib/dev/acpica/*
+    sys/contrib/dev/acpica/common/*
+    sys/contrib/dev/acpica/compiler/*
+    sys/contrib/dev/acpica/debugger/*
+    sys/contrib/dev/acpica/disassembler/*
+    sys/contrib/dev/acpica/dispatcher/*
+    sys/contrib/dev/acpica/events/*
+    sys/contrib/dev/acpica/executer/*
+    sys/contrib/dev/acpica/hardware/*
+    sys/contrib/dev/acpica/include/*
+    sys/contrib/dev/acpica/include/platform/*
+    sys/contrib/dev/acpica/namespace/*
+    sys/contrib/dev/acpica/parser/*
+    sys/contrib/dev/acpica/resources/*
+    sys/contrib/dev/acpica/tables/*
+    sys/contrib/dev/acpica/tools/acpiexec/*
+    sys/contrib/dev/acpica/utilities/*
+    sys/contrib/dev/nve/*
+    sys/contrib/dev/ral/*
+    sys/contrib/ia64/libuwx/test/*
+    sys/contrib/ipfilter/netinet/* excluding:
+    -+ sys/contrib/ipfilter/netinet/fil.c
+    -+ sys/contrib/ipfilter/netinet/ip_netbios_pxy.c
+    ? sys/contrib/ngatm/netnatm/msg/uni_ie.h
+    ? sys/contrib/ngatm/netnatm/msg/uni_ietab.h
+    ? sys/contrib/ngatm/netnatm/msg/uni_msg.c
+    ? sys/contrib/ngatm/netnatm/msg/uni_msg.h
+    ? sys/contrib/ngatm/netnatm/sig/sig_unimsgcpy.c
+    ? sys/contrib/ngatm/netnatm/sig/unimsgcpy.h
+    ? sys/contrib/pf/net/if_pflog.c
+    ? sys/contrib/pf/net/pf_osfp.c
+    ? sys/contrib/rdma/ib_addr.h
+    ? sys/contrib/rdma/rdma_addr.c
+    ? sys/contrib/rdma/rdma_cm.h
+    ? sys/contrib/rdma/rdma_cm_ib.h
+    ? sys/contrib/rdma/rdma_cma.c
+    ? sys/contrib/rdma/types.h
+    sys/contrib/rdma/krping/* excluding:
+    -+ sys/contrib/rdma/krping/krping.c
+    sys/crypto/rc4/*
+    sys/crypto/rijndael/* excluding:
+    -+ sys/crypto/rijndael/test00.c
+    sys/ddb/* excluding:
+    -+ sys/ddb/db_capture.c
+    -+ sys/ddb/db_ps.c
+    -+ sys/ddb/db_script.c
+    -+ sys/ddb/db_textdump.c
+    -+ sys/ddb/db_thread.c
+    -+ sys/ddb/ddb.h
+    ? sys/dev/advansys/advmcode.c
+    ? sys/dev/advansys/advmcode.h
+    ? sys/dev/advansys/adwmcode.c
+    ? sys/dev/advansys/adwmcode.h
+    sys/dev/asr/*
+    sys/dev/ath/ath_hal/*
+    sys/dev/ath/ath_hal/ar5210/*
+    sys/dev/ath/ath_hal/ar5211/*
+    sys/dev/ath/ath_hal/ar5212/*
+    sys/dev/ath/ath_hal/ar5312/*
+    sys/dev/ath/ath_hal/ar5416/*
+    ? sys/dev/bktr/ioctl_bt848.h
+    sys/dev/ce/*
+    sys/dev/cfe/* excluding:
+    -+ sys/dev/cfe/cfe_console.c
+    -+ sys/dev/cfe/cfe_resource.c
+    sys/dev/cp/*
+    sys/dev/ctau/*
+    sys/dev/cx/*
+    ? sys/dev/cxgb/bin2h.pl
+    ? sys/dev/cxgb/cxgb_include.h
+    ? sys/dev/cxgb/cxgb_t3fw.c
+    ? sys/dev/cxgb/common/cxgb_ctl_defs.h
+    ? sys/dev/cxgb/common/jhash.h
+    ? sys/dev/cxgb/ulp/tom/cxgb_tcp_offload.h
+    ? sys/dev/drm/drm-subprocess.pl
+    ? sys/dev/drm/drm_pciids.h
+    ? sys/dev/ed/if_edreg.h
+    ? sys/dev/en/midwayreg.h
+    ? sys/dev/fatm/firmware.h
+    ? sys/dev/fb/gfb.h
+    ? sys/dev/fb/machfbreg.h
+    sys/dev/fe/*
+    ? sys/dev/glxsb/glxsb.c
+    ? sys/dev/ic/i8237.h
+    sys/dev/ichsmb/*
+    ? sys/dev/ida/idaio.h
+    ? sys/dev/ie/if_ie507.h
+    ? sys/dev/ie/if_iereg.h
+    ? sys/dev/ie/if_ievar.h
+    sys/dev/iwn/*
+    sys/dev/led/*
+    ? sys/dev/mc146818/mc146818reg.h
+    ? sys/dev/mcd/mcd_isa.c
+    ? sys/dev/mcd/mcdvar.h
+    sys/dev/mn/*
+    ? sys/dev/mxge/mxge_eth_z8e.c
+    ? sys/dev/mxge/mxge_ethp_z8e.c
+    ? sys/dev/mxge/mxge_rss_eth_z8e.c
+    ? sys/dev/mxge/mxge_rss_ethp_z8e.c
+    sys/dev/nfe/*
+    ? sys/dev/nxge/include/build-version.h
+    ? sys/dev/patm/if_patm_rtables.c
+    ? sys/dev/ppbus/lptio.h
+    ? sys/dev/ppbus/pps.c
+    sys/dev/ral/*
+    ? sys/dev/scd/scd_isa.c
+    ? sys/dev/scd/scdvar.h
+    ? sys/dev/sf/starfire_rx.h
+    ? sys/dev/sf/starfire_tx.h
+    sys/dev/si/*
+    ? sys/dev/sk/yukonreg.h
+    ? sys/dev/snc/dp83932reg.h
+    ? sys/dev/snc/dp83932var.h
+    ? sys/dev/sound/pci/ds1.h
+    sys/dev/speaker/*
+    sys/dev/spibus/*
+    ? sys/dev/stg/tmc18c30.h
+    ? sys/dev/syscons/logo/logo.c
+    ? sys/dev/syscons/teken/teken_wcwidth.h
+    ? sys/dev/ti/ti_fw.h
+    ? sys/dev/ti/ti_fw2.h
+    ? sys/dev/uart/uart_kbd_sun_tables.h
+    ? sys/dev/usb/misc/udbp.h
+    ? sys/dev/usb/serial/u3g.c
+    ? sys/dev/usb/serial/uark.c
+    ? sys/dev/usb/serial/uftdi_reg.h
+    ? sys/dev/usb/serial/umoscom.c
+    ? sys/dev/usb/serial/uslcom.c
+    ? sys/dev/usb/storage/rio500_usb.h
+    sys/dev/usb/wlan/* excluding:
+    -+ sys/dev/usb/wlan/if_uath.c
+    -+ sys/dev/usb/wlan/if_zydfw.h
+    sys/dev/wl/*
+    sys/dev/wpi/*
+    sys/dev/xen/balloon/*
+    sys/dev/xen/blkfront/*
+    sys/dev/xen/console/*
+    sys/dev/xen/evtchn/*
+    ? sys/dev/xen/netfront/netfront.c
+    ? sys/dev/xen/xenpci/evtchn.c
+    sys/fs/coda/*
+    ? sys/fs/msdosfs/bootsect.h
+    ? sys/fs/msdosfs/bpb.h
+    ? sys/fs/udf/osta.c
+    ? sys/fs/udf/osta.h
+    ? sys/gnu/fs/ext2fs/ext2_inode_cnv.c
+    sys/gnu/fs/reiserfs/*
+    ? sys/gnu/fs/xfs/FreeBSD/xfs_compat.h
+    ? sys/gnu/fs/xfs/FreeBSD/xfs_config.h
+    ? sys/gnu/fs/xfs/FreeBSD/xfs_node.h
+    sys/gnu/fs/xfs/FreeBSD/support/* excluding:
+    -+ sys/gnu/fs/xfs/FreeBSD/support/debug.c
+    -+ sys/gnu/fs/xfs/FreeBSD/support/debug.h
+    -+ sys/gnu/fs/xfs/FreeBSD/support/ktrace.c
+    -+ sys/gnu/fs/xfs/FreeBSD/support/ktrace.h
+    -+ sys/gnu/fs/xfs/FreeBSD/support/move.h
+    -+ sys/gnu/fs/xfs/FreeBSD/support/sema.h
+    -+ sys/gnu/fs/xfs/FreeBSD/support/support.h
+    -+ sys/gnu/fs/xfs/FreeBSD/support/time.h
+    -+ sys/gnu/fs/xfs/FreeBSD/support/uuid.c
+    -+ sys/gnu/fs/xfs/FreeBSD/support/uuid.h
+    ? sys/i386/bios/apm.c
+    ? sys/i386/bios/apm.h
+    ? sys/i386/i386/db_disasm.c
+    ? sys/i386/i386/db_interface.c
+    ? sys/i386/i386/db_trace.c
+    ? sys/i386/i386/elan-mmcr.c
+    ? sys/i386/i386/legacy.c
+    ? sys/i386/i386/mp_clock.c
+    ? sys/i386/i386/nexus.c
+    ? sys/i386/i386/perfmon.c
+    ? sys/i386/ibcs2/ibcs2_ioctl.h
+    ? sys/i386/ibcs2/ibcs2_isc_syscall.h
+    ? sys/i386/ibcs2/ibcs2_isc_sysent.c
+    ? sys/i386/ibcs2/ibcs2_proto.h
+    ? sys/i386/ibcs2/ibcs2_syscall.h
+    ? sys/i386/ibcs2/ibcs2_sysent.c
+    ? sys/i386/ibcs2/ibcs2_xenix.h
+    ? sys/i386/ibcs2/ibcs2_xenix_syscall.h
+    ? sys/i386/ibcs2/ibcs2_xenix_sysent.c
+    ? sys/i386/include/apm_bios.h
+    ? sys/i386/include/apm_segments.h
+    ? sys/i386/include/clock.h
+    ? sys/i386/include/cserial.h
+    ? sys/i386/include/db_machdep.h
+    ? sys/i386/include/if_wl_wavelan.h
+    ? sys/i386/include/nexusvar.h
+    ? sys/i386/include/perfmon.h
+    ? sys/i386/include/resource.h
+    ? sys/i386/include/smp.h
+    ? sys/i386/include/speaker.h
+    ? sys/i386/include/stack.h
+    ? sys/i386/include/pc/display.h
+    sys/i386/include/xen/* excluding:
+    -+ sys/i386/include/xen/xen_clock_util.h
+    -+ sys/i386/include/xen/xenfunc.h
+    -+ sys/i386/include/xen/xenpmap.h
+    -+ sys/i386/include/xen/xenvar.h
+    ? sys/i386/linux/linux_genassym.c
+    ? sys/i386/linux/linux_proto.h
+    ? sys/i386/linux/linux_syscall.h
+    ? sys/i386/linux/linux_sysent.c
+    ? sys/i386/svr4/svr4_genassym.c
+    ? sys/ia64/ia64/interrupt.c
+    ? sys/ia64/ia64/nexus.c
+    ? sys/ia64/ia64/sscdisk.c
+    ? sys/ia64/include/asm.h
+    ? sys/ia64/include/bootinfo.h
+    ? sys/ia64/include/clock.h
+    ? sys/ia64/include/intrcnt.h
+    ? sys/ia64/include/pmc_mdep.h
+    ? sys/ia64/include/resource.h
+    ? sys/ia64/include/signal.h
+    ? sys/ia64/include/smp.h
+    sys/ia64/include/pc/*
+    ? sys/kern/imgact_gzip.c
+    ? sys/kern/inflate.c
+    ? sys/kern/init_sysent.c
+    ? sys/kern/kern_ntptime.c
+    ? sys/kern/kern_tc.c
+    ? sys/kern/md4c.c
+    ? sys/kern/md5c.c
+    ? sys/kern/stack_protector.c
+    ? sys/kern/subr_disk.c
+    ? sys/kern/subr_rman.c
+    ? sys/kern/syscalls.c
+    ? sys/kern/systrace_args.c
+    ? sys/kgssapi/gssapi.h
+    ? sys/libkern/arc4random.c
+    ? sys/libkern/bcd.c
+    ? sys/libkern/crc32.c
+    ? sys/libkern/inet_ntoa.c
+    ? sys/libkern/jenkins.h
+    ? sys/libkern/qsort_r.c
+    ? sys/mips/include/bswap.h
+    ? sys/mips/include/clock.h
+    ? sys/mips/include/clockvar.h
+    ? sys/mips/include/defs.h
+    ? sys/mips/include/fpu.h
+    ? sys/mips/include/ieeefp.h
+    ? sys/mips/include/locore.h
+    ? sys/mips/include/mutex.h
+    ? sys/mips/include/pltfm.h
+    ? sys/mips/include/pmc_mdep.h
+    ? sys/mips/include/queue.h
+    ? sys/mips/include/regdef.h
+    ? sys/mips/include/resource.h
+    ? sys/mips/include/setjmp.h
+    ? sys/mips/include/smp.h
+    ? sys/mips/include/stdarg.h
+    ? sys/mips/mips/db_trace.c
+    ? sys/mips/mips/mainbus.c
+    ? sys/mips/mips/mp_machdep.c
+    ? sys/mips/mips/nexus.c
+    ? sys/mips/sentry5/s5reg.h
+    ? sys/net/ethernet.h
+    ? sys/net/if_lagg.c
+    ? sys/net/if_lagg.h
+    ? sys/net/if_mib.c
+    ? sys/net/if_mib.h
+    ? sys/net/if_sppp.h
+    ? sys/net/if_spppfr.c
+    ? sys/net/if_spppsubr.c
+    ? sys/net/if_tun.c
+    ? sys/net/if_tun.h
+    ? sys/net/if_vlan.c
+    ? sys/net/if_vlan_var.h
+    ? sys/net/ppp_defs.h
+    ? sys/net/zlib.c
+    ? sys/net/zlib.h
+    ? sys/net80211/ieee80211_amrr.c
+    ? sys/net80211/ieee80211_amrr.h
+    sys/netatalk/* excluding:
+    -+ sys/netatalk/aarp.c
+    -+ sys/netatalk/ddp_input.c
+    -+ sys/netatalk/ddp_pcb.c
+    -+ sys/netatalk/ddp_pcb.h
+    -+ sys/netatalk/ddp_usrreq.c
+    sys/netgraph/* excluding:
+    -+ sys/netgraph/ng_atmllc.c
+    -+ sys/netgraph/ng_atmllc.h
+    -+ sys/netgraph/ng_car.c
+    -+ sys/netgraph/ng_car.h
+    -+ sys/netgraph/ng_deflate.c
+    -+ sys/netgraph/ng_deflate.h
+    -+ sys/netgraph/ng_device.c
+    -+ sys/netgraph/ng_device.h
+    -+ sys/netgraph/ng_eiface.c
+    -+ sys/netgraph/ng_eiface.h
+    -+ sys/netgraph/ng_etf.c
+    -+ sys/netgraph/ng_etf.h
+    -+ sys/netgraph/ng_fec.c
+    -+ sys/netgraph/ng_fec.h
+    -+ sys/netgraph/ng_gif.c
+    -+ sys/netgraph/ng_gif.h
+    -+ sys/netgraph/ng_gif_demux.c
+    -+ sys/netgraph/ng_gif_demux.h
+    -+ sys/netgraph/ng_hub.c
+    -+ sys/netgraph/ng_hub.h
+    -+ sys/netgraph/ng_ip_input.c
+    -+ sys/netgraph/ng_ip_input.h
+    -+ sys/netgraph/ng_ipfw.c
+    -+ sys/netgraph/ng_ipfw.h
+    -+ sys/netgraph/ng_nat.c
+    -+ sys/netgraph/ng_nat.h
+    -+ sys/netgraph/ng_pipe.c
+    -+ sys/netgraph/ng_pipe.h
+    -+ sys/netgraph/ng_ppp.c
+    -+ sys/netgraph/ng_pred1.c
+    -+ sys/netgraph/ng_pred1.h
+    -+ sys/netgraph/ng_split.c
+    -+ sys/netgraph/ng_split.h
+    -+ sys/netgraph/ng_tag.c
+    -+ sys/netgraph/ng_tag.h
+    -+ sys/netgraph/ng_tcpmss.c
+    -+ sys/netgraph/ng_tcpmss.h
+    -+ sys/netgraph/ng_vlan.c
+    -+ sys/netgraph/ng_vlan.h
+    ? sys/netinet/in_rmx.c
+    ? sys/netinet/libalias/alias_pptp.c
+    ? sys/netinet6/icmp6.h
+    ? sys/netinet6/ip6.h
+    ? sys/netipsec/ah_var.h
+    ? sys/netipsec/esp_var.h
+    ? sys/netipsec/ipip_var.h
+    ? sys/netipsec/ipsec_input.c
+    ? sys/netipsec/xform.h
+    ? sys/netipsec/xform_ah.c
+    ? sys/netipsec/xform_esp.c
+    ? sys/netipsec/xform_ipip.c
+    ? sys/netncp/ncp.h
+    ? sys/netncp/ncp_cfg.h
+    ? sys/netncp/ncp_crypt.c
+    ? sys/netncp/nwerror.h
+    ? sys/nfsclient/krpc.h
+    ? sys/nlm/nlm_prot.h
+    ? sys/nlm/nlm_prot_clnt.c
+    ? sys/nlm/nlm_prot_xdr.c
+    ? sys/nlm/sm_inter.h
+    ? sys/nlm/sm_inter_xdr.c
+    sys/opencrypto/* excluding:
+    -+ sys/opencrypto/criov.c
+    -+ sys/opencrypto/crypto.c
+    -+ sys/opencrypto/cryptodev.c
+    -+ sys/opencrypto/cryptodev.h
+    -+ sys/opencrypto/deflate.c
+    -+ sys/opencrypto/deflate.h
+    -+ sys/opencrypto/rmd160.c
+    -+ sys/opencrypto/rmd160.h
+    sys/pc98/include/* excluding:
+    -+ sys/pc98/include/_bus.h
+    -+ sys/pc98/include/apm_bios.h
+    -+ sys/pc98/include/bus.h
+    -+ sys/pc98/include/md_var.h
+    -+ sys/pc98/include/npx.h
+    -+ sys/pc98/include/param.h
+    -+ sys/pc98/include/pci_cfgreg.h
+    -+ sys/pc98/include/ppireg.h
+    -+ sys/pc98/include/timerreg.h
+    sys/pc98/include/pc/* excluding:
+    -+ sys/pc98/include/pc/display.h
+    sys/pc98/linux/*
+    ? sys/pci/locate.pl
+    ? sys/powerpc/include/clock.h
+    ? sys/powerpc/include/db_machdep.h
+    ? sys/powerpc/include/ieeefp.h
+    ? sys/powerpc/include/pmc_mdep.h
+    ? sys/powerpc/include/profile.h
+    ? sys/powerpc/include/reg.h
+    ? sys/powerpc/include/resource.h
+    ? sys/powerpc/include/setjmp.h
+    ? sys/powerpc/include/stack.h
+    ? sys/powerpc/include/trap.h
+    ? sys/powerpc/powerpc/db_disasm.c
+    ? sys/powerpc/powerpc/db_interface.c
+    ? sys/powerpc/powerpc/db_trace.c
+    sys/rpc/* excluding:
+    -+ sys/rpc/clnt_rc.c
+    -+ sys/rpc/getnetconfig.c
+    -+ sys/rpc/replay.c
+    -+ sys/rpc/replay.h
+    -+ sys/rpc/rpcm_subs.h
+    -+ sys/rpc/rpcsec_gss.h
+    ? sys/sparc64/include/db_machdep.h
+    ? sys/sparc64/include/ieeefp.h
+    ? sys/sparc64/include/pmc_mdep.h
+    ? sys/sparc64/include/profile.h
+    ? sys/sparc64/include/resource.h
+    ? sys/sparc64/sparc64/identcpu.c
+    ? sys/sparc64/sparc64/nexus.c
+    ? sys/sun4v/include/db_machdep.h
+    ? sys/sun4v/include/ieeefp.h
+    ? sys/sun4v/include/in_cksum.h
+    ? sys/sun4v/include/pmc_mdep.h
+    ? sys/sun4v/include/profile.h
+    ? sys/sun4v/include/resource.h
+    ? sys/sun4v/include/upa.h
+    ? sys/sun4v/include/ver.h
+    ? sys/sun4v/sun4v/nexus.c
+    ? sys/sys/cdio.h
+    ? sys/sys/dataacq.h
+    ? sys/sys/disk.h
+    ? sys/sys/fnv_hash.h
+    ? sys/sys/inflate.h
+    ? sys/sys/kbio.h
+    ? sys/sys/md4.h
+    ? sys/sys/md5.h
+    ? sys/sys/memrange.h
+    ? sys/sys/msg.h
+    ? sys/sys/rman.h
+    ? sys/sys/sem.h
+    ? sys/sys/smp.h
+    ? sys/sys/snoop.h
+    ? sys/sys/statvfs.h
+    ? sys/sys/syscall.h
+    ? sys/sys/sysproto.h
+    ? sys/sys/timepps.h
+    ? sys/sys/timetc.h
+    ? sys/sys/timex.h
+    sys/xdr/* excluding:
+    -+ sys/xdr/xdr_mbuf.c
+    sys/xen/* excluding:
+    -+ sys/xen/gnttab.h
+    -+ sys/xen/reboot.c
+    sys/xen/evtchn/*
+    sys/xen/xenbus/* excluding:
+    -+ sys/xen/xenbus/xenbus_probe_backend.c
+    ? usr.sbin/config/configvers.h
 
-  Sources in `src/gnu' directory are licensed under the GNU General Public
-  License version 2. On Debian GNU systems, the complete text of the GNU 
-  General Public License version 2 can be found in 
-  `/usr/share/common-licenses/GPL-2'.
+Other used licenses:
+--
+  BSD-like License, version BY-LC (BSD-BY-LC)
+    274 files are licensed under this license:
 
-  Sources in `src/cddl' directory are licensed under the Common Development 
-  and Distribution License, as shown below:
-    
-    COMMON DEVELOPMENT AND DISTRIBUTION LICENSE Version 1.0
-    
-    1. Definitions.
-    
-        1.1. "Contributor" means each individual or entity that creates
-             or contributes to the creation of Modifications.
-    
-        1.2. "Contributor Version" means the combination of the Original
-             Software, prior Modifications used by a Contributor (if any),
-             and the Modifications made by that particular Contributor.
-    
-        1.3. "Covered Software" means (a) the Original Software, or (b)
-             Modifications, or (c) the combination of files containing
-             Original Software with files containing Modifications, in
-             each case including portions thereof.
-    
-        1.4. "Executable" means the Covered Software in any form other
-             than Source Code.
-    
-        1.5. "Initial Developer" means the individual or entity that first
-             makes Original Software available under this License.
-    
-        1.6. "Larger Work" means a work which combines Covered Software or
-             portions thereof with code not governed by the terms of this
-             License.
-    
-        1.7. "License" means this document.
-    
-        1.8. "Licensable" means having the right to grant, to the maximum
-             extent possible, whether at the time of the initial grant or
-             subsequently acquired, any and all of the rights conveyed
-             herein.
-    
-        1.9. "Modifications" means the Source Code and Executable form of
-             any of the following:
-    
-            A. Any file that results from an addition to, deletion from or
-               modification of the contents of a file containing Original
-               Software or previous Modifications;
-    
-            B. Any new file that contains any part of the Original
-               Software or previous Modifications; or
-    
-            C. Any new file that is contributed or otherwise made
-               available under the terms of this License.
-    
-        1.10. "Original Software" means the Source Code and Executable
-              form of computer software code that is originally released
-              under this License.
-    
-        1.11. "Patent Claims" means any patent claim(s), now owned or
-              hereafter acquired, including without limitation, method,
-              process, and apparatus claims, in any patent Licensable by
-              grantor.
-    
-        1.12. "Source Code" means (a) the common form of computer software
-              code in which modifications are made and (b) associated
-              documentation included in or with such code.
-    
-        1.13. "You" (or "Your") means an individual or a legal entity
-              exercising rights under, and complying with all of the terms
-              of, this License.  For legal entities, "You" includes any
-              entity which controls, is controlled by, or is under common
-              control with You.  For purposes of this definition,
-              "control" means (a) the power, direct or indirect, to cause
-              the direction or management of such entity, whether by
-              contract or otherwise, or (b) ownership of more than fifty
-              percent (50%) of the outstanding shares or beneficial
-              ownership of such entity.
-    
-    2. License Grants.
-    
-        2.1. The Initial Developer Grant.
-    
-        Conditioned upon Your compliance with Section 3.1 below and
-        subject to third party intellectual property claims, the Initial
-        Developer hereby grants You a world-wide, royalty-free,
-        non-exclusive license:
-    
-            (a) under intellectual property rights (other than patent or
-                trademark) Licensable by Initial Developer, to use,
-                reproduce, modify, display, perform, sublicense and
-                distribute the Original Software (or portions thereof),
-                with or without Modifications, and/or as part of a Larger
-                Work; and
-    
-            (b) under Patent Claims infringed by the making, using or
-                selling of Original Software, to make, have made, use,
-                practice, sell, and offer for sale, and/or otherwise
-                dispose of the Original Software (or portions thereof).
-    
-            (c) The licenses granted in Sections 2.1(a) and (b) are
-                effective on the date Initial Developer first distributes
-                or otherwise makes the Original Software available to a
-                third party under the terms of this License.
-    
-            (d) Notwithstanding Section 2.1(b) above, no patent license is
-                granted: (1) for code that You delete from the Original
-                Software, or (2) for infringements caused by: (i) the
-                modification of the Original Software, or (ii) the
-                combination of the Original Software with other software
-                or devices.
-    
-        2.2. Contributor Grant.
-    
-        Conditioned upon Your compliance with Section 3.1 below and
-        subject to third party intellectual property claims, each
-        Contributor hereby grants You a world-wide, royalty-free,
-        non-exclusive license:
-    
-            (a) under intellectual property rights (other than patent or
-                trademark) Licensable by Contributor to use, reproduce,
-                modify, display, perform, sublicense and distribute the
-                Modifications created by such Contributor (or portions
-                thereof), either on an unmodified basis, with other
-                Modifications, as Covered Software and/or as part of a
-                Larger Work; and
-    
-            (b) under Patent Claims infringed by the making, using, or
-                selling of Modifications made by that Contributor either
-                alone and/or in combination with its Contributor Version
-                (or portions of such combination), to make, use, sell,
-                offer for sale, have made, and/or otherwise dispose of:
-                (1) Modifications made by that Contributor (or portions
-                thereof); and (2) the combination of Modifications made by
-                that Contributor with its Contributor Version (or portions
-                of such combination).
-    
-            (c) The licenses granted in Sections 2.2(a) and 2.2(b) are
-                effective on the date Contributor first distributes or
-                otherwise makes the Modifications available to a third
-                party.
-    
-            (d) Notwithstanding Section 2.2(b) above, no patent license is
-                granted: (1) for any code that Contributor has deleted
-                from the Contributor Version; (2) for infringements caused
-                by: (i) third party modifications of Contributor Version,
-                or (ii) the combination of Modifications made by that
-                Contributor with other software (except as part of the
-                Contributor Version) or other devices; or (3) under Patent
-                Claims infringed by Covered Software in the absence of
-                Modifications made by that Contributor.
-    
-    3. Distribution Obligations.
-    
-        3.1. Availability of Source Code.
-    
-        Any Covered Software that You distribute or otherwise make
-        available in Executable form must also be made available in Source
-        Code form and that Source Code form must be distributed only under
-        the terms of this License.  You must include a copy of this
-        License with every copy of the Source Code form of the Covered
-        Software You distribute or otherwise make available.  You must
-        inform recipients of any such Covered Software in Executable form
-        as to how they can obtain such Covered Software in Source Code
-        form in a reasonable manner on or through a medium customarily
-        used for software exchange.
-    
-        3.2. Modifications.
-    
-        The Modifications that You create or to which You contribute are
-        governed by the terms of this License.  You represent that You
-        believe Your Modifications are Your original creation(s) and/or
-        You have sufficient rights to grant the rights conveyed by this
-        License.
-    
-        3.3. Required Notices.
-    
-        You must include a notice in each of Your Modifications that
-        identifies You as the Contributor of the Modification.  You may
-        not remove or alter any copyright, patent or trademark notices
-        contained within the Covered Software, or any notices of licensing
-        or any descriptive text giving attribution to any Contributor or
-        the Initial Developer.
-    
-        3.4. Application of Additional Terms.
-    
-        You may not offer or impose any terms on any Covered Software in
-        Source Code form that alters or restricts the applicable version
-        of this License or the recipients' rights hereunder.  You may
-        choose to offer, and to charge a fee for, warranty, support,
-        indemnity or liability obligations to one or more recipients of
-        Covered Software.  However, you may do so only on Your own behalf,
-        and not on behalf of the Initial Developer or any Contributor.
-        You must make it absolutely clear that any such warranty, support,
-        indemnity or liability obligation is offered by You alone, and You
-        hereby agree to indemnify the Initial Developer and every
-        Contributor for any liability incurred by the Initial Developer or
-        such Contributor as a result of warranty, support, indemnity or
-        liability terms You offer.
-    
-        3.5. Distribution of Executable Versions.
-    
-        You may distribute the Executable form of the Covered Software
-        under the terms of this License or under the terms of a license of
-        Your choice, which may contain terms different from this License,
-        provided that You are in compliance with the terms of this License
-        and that the license for the Executable form does not attempt to
-        limit or alter the recipient's rights in the Source Code form from
-        the rights set forth in this License.  If You distribute the
-        Covered Software in Executable form under a different license, You
-        must make it absolutely clear that any terms which differ from
-        this License are offered by You alone, not by the Initial
-        Developer or Contributor.  You hereby agree to indemnify the
-        Initial Developer and every Contributor for any liability incurred
-        by the Initial Developer or such Contributor as a result of any
-        such terms You offer.
-    
-        3.6. Larger Works.
-    
-        You may create a Larger Work by combining Covered Software with
-        other code not governed by the terms of this License and
-        distribute the Larger Work as a single product.  In such a case,
-        You must make sure the requirements of this License are fulfilled
-        for the Covered Software.
-    
-    4. Versions of the License.
-    
-        4.1. New Versions.
-    
-        Sun Microsystems, Inc. is the initial license steward and may
-        publish revised and/or new versions of this License from time to
-        time.  Each version will be given a distinguishing version number.
-        Except as provided in Section 4.3, no one other than the license
-        steward has the right to modify this License.
-    
-        4.2. Effect of New Versions.
-    
-        You may always continue to use, distribute or otherwise make the
-        Covered Software available under the terms of the version of the
-        License under which You originally received the Covered Software.
-        If the Initial Developer includes a notice in the Original
-        Software prohibiting it from being distributed or otherwise made
-        available under any subsequent version of the License, You must
-        distribute and make the Covered Software available under the terms
-        of the version of the License under which You originally received
-        the Covered Software.  Otherwise, You may also choose to use,
-        distribute or otherwise make the Covered Software available under
-        the terms of any subsequent version of the License published by
-        the license steward.
-    
-        4.3. Modified Versions.
-    
-        When You are an Initial Developer and You want to create a new
-        license for Your Original Software, You may create and use a
-        modified version of this License if You: (a) rename the license
-        and remove any references to the name of the license steward
-        (except to note that the license differs from this License); and
-        (b) otherwise make it clear that the license contains terms which
-        differ from this License.
-    
-    5. DISCLAIMER OF WARRANTY.
-    
-        COVERED SOFTWARE IS PROVIDED UNDER THIS LICENSE ON AN "AS IS"
-        BASIS, WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED,
-        INCLUDING, WITHOUT LIMITATION, WARRANTIES THAT THE COVERED
-        SOFTWARE IS FREE OF DEFECTS, MERCHANTABLE, FIT FOR A PARTICULAR
-        PURPOSE OR NON-INFRINGING.  THE ENTIRE RISK AS TO THE QUALITY AND
-        PERFORMANCE OF THE COVERED SOFTWARE IS WITH YOU.  SHOULD ANY
-        COVERED SOFTWARE PROVE DEFECTIVE IN ANY RESPECT, YOU (NOT THE
-        INITIAL DEVELOPER OR ANY OTHER CONTRIBUTOR) ASSUME THE COST OF ANY
-        NECESSARY SERVICING, REPAIR OR CORRECTION.  THIS DISCLAIMER OF
-        WARRANTY CONSTITUTES AN ESSENTIAL PART OF THIS LICENSE.  NO USE OF
-        ANY COVERED SOFTWARE IS AUTHORIZED HEREUNDER EXCEPT UNDER THIS
-        DISCLAIMER.
-    
-    6. TERMINATION.
-    
-        6.1. This License and the rights granted hereunder will terminate
-        automatically if You fail to comply with terms herein and fail to
-        cure such breach within 30 days of becoming aware of the breach.
-        Provisions which, by their nature, must remain in effect beyond
-        the termination of this License shall survive.
-    
-        6.2. If You assert a patent infringement claim (excluding
-        declaratory judgment actions) against Initial Developer or a
-        Contributor (the Initial Developer or Contributor against whom You
-        assert such claim is referred to as "Participant") alleging that
-        the Participant Software (meaning the Contributor Version where
-        the Participant is a Contributor or the Original Software where
-        the Participant is the Initial Developer) directly or indirectly
-        infringes any patent, then any and all rights granted directly or
-        indirectly to You by such Participant, the Initial Developer (if
-        the Initial Developer is not the Participant) and all Contributors
-        under Sections 2.1 and/or 2.2 of this License shall, upon 60 days
-        notice from Participant terminate prospectively and automatically
-        at the expiration of such 60 day notice period, unless if within
-        such 60 day period You withdraw Your claim with respect to the
-        Participant Software against such Participant either unilaterally
-        or pursuant to a written agreement with Participant.
-    
-        6.3. In the event of termination under Sections 6.1 or 6.2 above,
-        all end user licenses that have been validly granted by You or any
-        distributor hereunder prior to termination (excluding licenses
-        granted to You by any distributor) shall survive termination.
-    
-    7. LIMITATION OF LIABILITY.
-    
-        UNDER NO CIRCUMSTANCES AND UNDER NO LEGAL THEORY, WHETHER TORT
-        (INCLUDING NEGLIGENCE), CONTRACT, OR OTHERWISE, SHALL YOU, THE
-        INITIAL DEVELOPER, ANY OTHER CONTRIBUTOR, OR ANY DISTRIBUTOR OF
-        COVERED SOFTWARE, OR ANY SUPPLIER OF ANY OF SUCH PARTIES, BE
-        LIABLE TO ANY PERSON FOR ANY INDIRECT, SPECIAL, INCIDENTAL, OR
-        CONSEQUENTIAL DAMAGES OF ANY CHARACTER INCLUDING, WITHOUT
-        LIMITATION, DAMAGES FOR LOST PROFITS, LOSS OF GOODWILL, WORK
-        STOPPAGE, COMPUTER FAILURE OR MALFUNCTION, OR ANY AND ALL OTHER
-        COMMERCIAL DAMAGES OR LOSSES, EVEN IF SUCH PARTY SHALL HAVE BEEN
-        INFORMED OF THE POSSIBILITY OF SUCH DAMAGES.  THIS LIMITATION OF
-        LIABILITY SHALL NOT APPLY TO LIABILITY FOR DEATH OR PERSONAL
-        INJURY RESULTING FROM SUCH PARTY'S NEGLIGENCE TO THE EXTENT
-        APPLICABLE LAW PROHIBITS SUCH LIMITATION.  SOME JURISDICTIONS DO
-        NOT ALLOW THE EXCLUSION OR LIMITATION OF INCIDENTAL OR
-        CONSEQUENTIAL DAMAGES, SO THIS EXCLUSION AND LIMITATION MAY NOT
-        APPLY TO YOU.
-    
-    8. U.S. GOVERNMENT END USERS.
-    
-        The Covered Software is a "commercial item," as that term is
-        defined in 48 C.F.R. 2.101 (Oct. 1995), consisting of "commercial
-        computer software" (as that term is defined at 48
-        C.F.R. 252.227-7014(a)(1)) and "commercial computer software
-        documentation" as such terms are used in 48 C.F.R. 12.212
-        (Sept. 1995).  Consistent with 48 C.F.R. 12.212 and 48
-        C.F.R. 227.7202-1 through 227.7202-4 (June 1995), all
-        U.S. Government End Users acquire Covered Software with only those
-        rights set forth herein.  This U.S. Government Rights clause is in
-        lieu of, and supersedes, any other FAR, DFAR, or other clause or
-        provision that addresses Government rights in computer software
-        under this License.
-    
-    9. MISCELLANEOUS.
-    
-        This License represents the complete agreement concerning subject
-        matter hereof.  If any provision of this License is held to be
-        unenforceable, such provision shall be reformed only to the extent
-        necessary to make it enforceable.  This License shall be governed
-        by the law of the jurisdiction specified in a notice contained
-        within the Original Software (except to the extent applicable law,
-        if any, provides otherwise), excluding such jurisdiction's
-        conflict-of-law provisions.  Any litigation relating to this
-        License shall be subject to the jurisdiction of the courts located
-        in the jurisdiction and venue specified in a notice contained
-        within the Original Software, with the losing party responsible
-        for costs, including, without limitation, court costs and
-        reasonable attorneys' fees and expenses.  The application of the
-        United Nations Convention on Contracts for the International Sale
-        of Goods is expressly excluded.  Any law or regulation which
-        provides that the language of a contract shall be construed
-        against the drafter shall not apply to this License.  You agree
-        that You alone are responsible for compliance with the United
-        States export administration regulations (and the export control
-        laws and regulation of any other countries) when You use,
-        distribute or otherwise make available any Covered Software.
-    
-    10. RESPONSIBILITY FOR CLAIMS.
-    
-        As between Initial Developer and the Contributors, each party is
-        responsible for claims and damages arising, directly or
-        indirectly, out of its utilization of rights under this License
-        and You agree to work with Initial Developer and Contributors to
-        distribute such responsibility on an equitable basis.  Nothing
-        herein is intended or shall be deemed to constitute any admission
-        of liability.
-    
-    --------------------------------------------------------------------
-    
-    NOTICE PURSUANT TO SECTION 9 OF THE COMMON DEVELOPMENT AND
-    DISTRIBUTION LICENSE (CDDL)
-    
-    For Covered Software in this distribution, this License shall
-    be governed by the laws of the State of California (excluding
-    conflict-of-law provisions).
-    
-    Any litigation relating to this License shall be subject to the
-    jurisdiction of the Federal Courts of the Northern District of
-    California and the state courts of the State of California, with
-    venue lying in Santa Clara County, California.
+    + sys/amd64/amd64/busdma_machdep.c
+    + sys/amd64/amd64/local_apic.c
+    + sys/amd64/amd64/mp_machdep.c
+    + sys/amd64/amd64/mptable.c
+    + sys/amd64/include/apicreg.h
+    + sys/amd64/include/mptable.h
+    + sys/arm/arm/busdma_machdep.c
+    + sys/arm/xscale/ixp425/avila_ata.c
+    sys/cam/*
+    sys/cam/scsi/* excluding:
+    -? sys/cam/scsi/scsi_all.h
+    -+ sys/cam/scsi/scsi_ch.c
+    -+ sys/cam/scsi/scsi_ch.h
+    -? sys/cam/scsi/scsi_da.h
+    -+ sys/cam/scsi/scsi_dvcfg.h
+    -? sys/cam/scsi/scsi_iu.h
+    -+ sys/cam/scsi/scsi_low.c
+    -+ sys/cam/scsi/scsi_low.h
+    -+ sys/cam/scsi/scsi_low_pisa.c
+    -+ sys/cam/scsi/scsi_low_pisa.h
+    -? sys/cam/scsi/scsi_message.h
+    -? sys/cam/scsi/scsi_sg.h
+    + sys/dev/advansys/adv_eisa.c
+    + sys/dev/advansys/adv_isa.c
+    + sys/dev/advansys/adv_pci.c
+    + sys/dev/advansys/advansys.c
+    + sys/dev/advansys/adw_pci.c
+    + sys/dev/advansys/adwcam.c
+    + sys/dev/aha/aha_isa.c
+    + sys/dev/aha/ahareg.h
+    sys/dev/ahb/*
+    sys/dev/aic7xxx/*
+    sys/dev/aic7xxx/aicasm/*
+    sys/dev/ath/*
+    sys/dev/ath/ath_rate/amrr/*
+    sys/dev/ath/ath_rate/onoe/*
+    sys/dev/ath/ath_rate/sample/*
+    + sys/dev/atkbdc/psm.c
+    + sys/dev/atkbdc/psm.h
+    sys/dev/buslogic/* excluding:
+    -+ sys/dev/buslogic/bt_mca.c
+    + sys/dev/bwi/if_bwi_pci.c
+    sys/dev/cxgb/* excluding:
+    -? sys/dev/cxgb/bin2h.pl
+    -? sys/dev/cxgb/cxgb_include.h
+    -? sys/dev/cxgb/cxgb_t3fw.c
+    sys/dev/cxgb/common/* excluding:
+    -? sys/dev/cxgb/common/cxgb_ctl_defs.h
+    -? sys/dev/cxgb/common/jhash.h
+    sys/dev/cxgb/sys/*
+    sys/dev/cxgb/ulp/iw_cxgb/* excluding:
+    -+ sys/dev/cxgb/ulp/iw_cxgb/iw_cxgb_user.h
+    sys/dev/cxgb/ulp/toecore/*
+    sys/dev/cxgb/ulp/tom/* excluding:
+    -? sys/dev/cxgb/ulp/tom/cxgb_tcp_offload.h
+    sys/dev/de/*
+    + sys/dev/ep/if_epreg.h
+    + sys/dev/ep/if_epvar.h
+    + sys/dev/ida/ida_eisa.c
+    + sys/dev/isp/isp_freebsd.c
+    + sys/dev/isp/isp_freebsd.h
+    + sys/dev/isp/isp_ioctl.h
+    + sys/dev/isp/isp_pci.c
+    + sys/dev/isp/isp_sbus.c
+    + sys/dev/ispfw/ispfw.c
+    sys/dev/malo/*
+    sys/dev/mpt/* excluding:
+    -+ sys/dev/mpt/mpt_user.c
+    sys/dev/mpt/mpilib/*
+    sys/dev/mwl/*
+    sys/dev/mxge/* excluding:
+    -? sys/dev/mxge/mxge_eth_z8e.c
+    -? sys/dev/mxge/mxge_ethp_z8e.c
+    -? sys/dev/mxge/mxge_rss_eth_z8e.c
+    -? sys/dev/mxge/mxge_rss_ethp_z8e.c
+    sys/dev/my/*
+    sys/dev/pdq/*
+    + sys/dev/usb/wlan/if_uath.c
+    + sys/dev/vx/if_vxreg.h
+    + sys/dev/vx/if_vxvar.h
+    + sys/dev/xen/netfront/mbufq.h
+    sys/fs/devfs/* excluding:
+    -+ sys/fs/devfs/devfs_rule.c
+    + sys/geom/geom_redboot.c
+    + sys/i386/i386/busdma_machdep.c
+    + sys/i386/i386/local_apic.c
+    + sys/i386/i386/mp_machdep.c
+    + sys/i386/i386/mptable.c
+    + sys/i386/ibcs2/ibcs2_ioctl.c
+    + sys/i386/ibcs2/ibcs2_ipc.c
+    + sys/i386/ibcs2/ibcs2_msg.c
+    + sys/i386/ibcs2/ibcs2_other.c
+    + sys/i386/ibcs2/ibcs2_socksys.c
+    + sys/i386/ibcs2/ibcs2_socksys.h
+    + sys/i386/ibcs2/ibcs2_stropts.h
+    + sys/i386/include/apicreg.h
+    + sys/i386/include/mptable.h
+    + sys/i386/xen/mp_machdep.c
+    + sys/i386/xen/mptable.c
+    + sys/ia64/ia64/busdma_machdep.c
+    + sys/kern/subr_bufring.c
+    + sys/kern/vfs_aio.c
+    + sys/mips/malta/yamon.c
+    + sys/mips/mips/dump_machdep.c
+    + sys/mips/mips/intr_machdep.c
+    + sys/net/flowtable.c
+    + sys/net/flowtable.h
+    + sys/net/if_edsc.c
+    + sys/netinet/ip_divert.h
+    + sys/netinet/tcp_lro.c
+    + sys/netinet/tcp_lro.h
+    + sys/netinet/tcp_offload.c
+    + sys/netinet/tcp_offload.h
+    + sys/netinet/toedev.h
+    + sys/powerpc/powerpc/busdma_machdep.c
+    + sys/sparc64/sbus/sbusreg.h
+    + sys/sys/aio.h
+    + sys/sys/buf_ring.h
+    + sys/sys/mouse.h
+    + sys/sys/ptio.h
+
+  | Redistribution and use in source and binary forms, with or without
+  | modification, are permitted provided that the following conditions
+  | are met:
+  | 1. Redistributions of source code must retain the above copyright
+  |    notice, this list of conditions and the following disclaimer.
+  | 2. The name of the developer may NOT be used to endorse or promote products
+  |    derived from this software without specific prior written permission.
+  |
+  | THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+  | ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  | IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  | ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+  | FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  | DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+  | OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  | HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  | LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  | OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  | SUCH DAMAGE.
+--
+
+--
+  BSD-like License, version BY-LC-NE-AD (BSD-BY-LC-NE-AD)
+    707 files are licensed under this license:
+
+    + sys/amd64/amd64/identcpu.c
+    + sys/amd64/amd64/in_cksum.c
+    + sys/amd64/amd64/machdep.c
+    + sys/amd64/amd64/pmap.c
+    + sys/amd64/amd64/trap.c
+    + sys/amd64/amd64/vm_machdep.c
+    + sys/amd64/ia32/ia32_syscall.c
+    + sys/amd64/include/_inttypes.h
+    + sys/amd64/include/_stdint.h
+    + sys/amd64/include/_types.h
+    + sys/amd64/include/bus.h
+    + sys/amd64/include/floatingpoint.h
+    + sys/amd64/include/ieeefp.h
+    + sys/amd64/include/param.h
+    + sys/amd64/include/varargs.h
+    + sys/amd64/include/vmparam.h
+    + sys/amd64/include/xen/xenpmap.h
+    sys/arm/arm/* excluding:
+    -+ sys/arm/arm/busdma_machdep.c
+    -? sys/arm/arm/db_interface.c
+    -? sys/arm/arm/db_trace.c
+    -+ sys/arm/arm/dump_machdep.c
+    -+ sys/arm/arm/elf_machdep.c
+    -+ sys/arm/arm/elf_trampoline.c
+    -+ sys/arm/arm/gdb_machdep.c
+    -+ sys/arm/arm/genassym.c
+    -+ sys/arm/arm/mem.c
+    -+ sys/arm/arm/minidump_machdep.c
+    -? sys/arm/arm/nexus.c
+    -+ sys/arm/arm/stack_machdep.c
+    + sys/arm/at91/at91_machdep.c
+    + sys/arm/include/_inttypes.h
+    + sys/arm/include/_stdint.h
+    + sys/arm/include/_types.h
+    + sys/arm/include/armreg.h
+    + sys/arm/include/asmacros.h
+    + sys/arm/include/atomic.h
+    + sys/arm/include/bootconfig.h
+    + sys/arm/include/bus.h
+    + sys/arm/include/bus_dma.h
+    + sys/arm/include/cpuconf.h
+    + sys/arm/include/cpufunc.h
+    + sys/arm/include/disassem.h
+    + sys/arm/include/fiq.h
+    + sys/arm/include/float.h
+    + sys/arm/include/floatingpoint.h
+    + sys/arm/include/fp.h
+    + sys/arm/include/frame.h
+    + sys/arm/include/in_cksum.h
+    + sys/arm/include/intr.h
+    + sys/arm/include/katelib.h
+    + sys/arm/include/param.h
+    + sys/arm/include/pcb.h
+    + sys/arm/include/pmap.h
+    + sys/arm/include/proc.h
+    + sys/arm/include/profile.h
+    + sys/arm/include/psl.h
+    + sys/arm/include/pte.h
+    + sys/arm/include/reloc.h
+    + sys/arm/include/sysarch.h
+    + sys/arm/include/ucontext.h
+    + sys/arm/include/undefined.h
+    + sys/arm/mv/mv_machdep.c
+    + sys/arm/mv/mvvar.h
+    sys/arm/sa11x0/* excluding:
+    -+ sys/arm/sa11x0/uart_bus_sa1110.c
+    -+ sys/arm/sa11x0/uart_cpu_sa1110.c
+    -+ sys/arm/sa11x0/uart_dev_sa1110.c
+    -+ sys/arm/sa11x0/uart_dev_sa1110.h
+    sys/arm/xscale/*
+    sys/arm/xscale/i80321/* excluding:
+    -+ sys/arm/xscale/i80321/i80321_aau.c
+    -+ sys/arm/xscale/i80321/i80321_dma.c
+    -+ sys/arm/xscale/i80321/uart_bus_i80321.c
+    -+ sys/arm/xscale/i80321/uart_cpu_i80321.c
+    + sys/arm/xscale/i8134x/crb_machdep.c
+    + sys/arm/xscale/i8134x/i81342_space.c
+    + sys/arm/xscale/i8134x/iq81342_7seg.c
+    + sys/arm/xscale/i8134x/obio.c
+    + sys/arm/xscale/i8134x/obio_space.c
+    + sys/arm/xscale/i8134x/obiovar.h
+    + sys/arm/xscale/ixp425/avila_machdep.c
+    + sys/arm/xscale/ixp425/ixdp425_pci.c
+    + sys/arm/xscale/ixp425/ixdp425reg.h
+    + sys/arm/xscale/ixp425/ixp425.c
+    + sys/arm/xscale/ixp425/ixp425_a4x_space.c
+    + sys/arm/xscale/ixp425/ixp425_intr.h
+    + sys/arm/xscale/ixp425/ixp425_mem.c
+    + sys/arm/xscale/ixp425/ixp425_pci.c
+    + sys/arm/xscale/ixp425/ixp425_pci_space.c
+    + sys/arm/xscale/ixp425/ixp425_space.c
+    + sys/arm/xscale/ixp425/ixp425_timer.c
+    + sys/arm/xscale/ixp425/ixp425reg.h
+    + sys/arm/xscale/ixp425/ixp425var.h
+    + sys/arm/xscale/pxa/pxa_machdep.c
+    + sys/arm/xscale/pxa/pxa_space.c
+    + sys/arm/xscale/pxa/pxareg.h
+    + sys/arm/xscale/pxa/pxavar.h
+    + sys/boot/common/dev_net.c
+    + sys/boot/common/isapnp.h
+    + sys/boot/common/ls.c
+    + sys/boot/common/panic.c
+    + sys/boot/i386/libi386/pread.c
+    + sys/boot/ia64/efi/conf.c
+    + sys/boot/ia64/ski/conf.c
+    + sys/boot/ofw/libofw/openfirm.c
+    + sys/boot/ofw/libofw/openfirm.h
+    + sys/boot/powerpc/ofw/start.c
+    + sys/cam/scsi/scsi_ch.c
+    + sys/cam/scsi/scsi_ch.h
+    sys/compat/linprocfs/*
+    + sys/compat/linux/linux_futex.c
+    + sys/compat/linux/linux_futex.h
+    + sys/compat/linux/linux_getcwd.c
+    + sys/compat/linux/linux_time.c
+    sys/compat/ndis/*
+    + sys/compat/svr4/svr4_acl.h
+    + sys/compat/svr4/svr4_fcntl.c
+    + sys/compat/svr4/svr4_fuser.h
+    + sys/compat/svr4/svr4_ipc.c
+    + sys/compat/svr4/svr4_ipc.h
+    + sys/compat/svr4/svr4_resource.c
+    + sys/compat/svr4/svr4_resource.h
+    + sys/compat/svr4/svr4_socket.c
+    + sys/compat/svr4/svr4_socket.h
+    + sys/compat/svr4/svr4_stream.c
+    + sys/compat/svr4/svr4_sysvec.c
+    + sys/contrib/altq/altq/altq_classq.h
+    + sys/contrib/altq/altq/altq_red.c
+    + sys/contrib/altq/altq/altq_rio.c
+    + sys/contrib/altq/altq/altq_rmclass.c
+    + sys/contrib/altq/altq/altq_rmclass.h
+    + sys/dev/aic/aic6360reg.h
+    sys/dev/an/*
+    sys/dev/bge/*
+    sys/dev/bktr/* excluding:
+    -+ sys/dev/bktr/bktr_i2c.c
+    -+ sys/dev/bktr/bktr_i2c.h
+    -? sys/dev/bktr/ioctl_bt848.h
+    -+ sys/dev/bktr/msp34xx.c
+    sys/dev/cm/*
+    sys/dev/dc/*
+    sys/dev/en/* excluding:
+    -? sys/dev/en/midwayreg.h
+    + sys/dev/ep/if_ep.c
+    + sys/dev/ep/if_ep_isa.c
+    + sys/dev/ep/if_ep_pccard.c
+    sys/dev/esp/*
+    sys/dev/exca/*
+    + sys/dev/fb/boot_font.c
+    sys/dev/hme/* excluding:
+    -+ sys/dev/hme/if_hme_pci.c
+    + sys/dev/ic/hd64570.h
+    + sys/dev/ic/i82586.h
+    + sys/dev/ic/sab82532.h
+    + sys/dev/ie/if_ie.c
+    + sys/dev/ie/if_iee16.h
+    sys/dev/if_ndis/*
+    sys/dev/le/* excluding:
+    -+ sys/dev/le/if_le_cbus.c
+    -+ sys/dev/le/if_le_lebuffer.c
+    -+ sys/dev/le/lebuffer_sbus.c
+    sys/dev/lge/*
+    + sys/dev/mcd/mcd.c
+    + sys/dev/mcd/mcdreg.h
+    sys/dev/mii/* excluding:
+    -+ sys/dev/mii/acphyreg.h
+    -+ sys/dev/mii/atphy.c
+    -+ sys/dev/mii/atphyreg.h
+    -+ sys/dev/mii/axphy.c
+    -+ sys/dev/mii/axphyreg.h
+    -+ sys/dev/mii/e1000phy.c
+    -+ sys/dev/mii/e1000phyreg.h
+    -+ sys/dev/mii/inphy.c
+    -+ sys/dev/mii/inphyreg.h
+    -+ sys/dev/mii/ip1000phy.c
+    -+ sys/dev/mii/ip1000phyreg.h
+    -+ sys/dev/mii/jmphy.c
+    -+ sys/dev/mii/jmphyreg.h
+    -+ sys/dev/mii/ruephy.c
+    -+ sys/dev/mii/ruephyreg.h
+    -+ sys/dev/mii/smcphy.c
+    -+ sys/dev/mii/tdkphy.c
+    -+ sys/dev/mii/tdkphyreg.h
+    -+ sys/dev/mii/truephy.c
+    -+ sys/dev/mii/truephyreg.h
+    sys/dev/mk48txx/*
+    sys/dev/msk/*
+    sys/dev/nge/*
+    + sys/dev/ofw/ofw_pci.h
+    + sys/dev/ofw/ofw_standard.c
+    + sys/dev/ofw/openfirm.c
+    + sys/dev/ofw/openfirm.h
+    sys/dev/pccard/* excluding:
+    -+ sys/dev/pccard/pccard_device.c
+    -+ sys/dev/pccard/pccardvarp.h
+    + sys/dev/pccbb/pccbb.c
+    + sys/dev/pccbb/pccbb_pci.c
+    + sys/dev/pccbb/pccbbreg.h
+    sys/dev/pcn/*
+    + sys/dev/ppbus/lpt.c
+    + sys/dev/puc/puc_pci.c
+    sys/dev/re/*
+    sys/dev/rndtest/*
+    sys/dev/rp/*
+    + sys/dev/sf/if_sf.c
+    + sys/dev/sf/if_sfreg.h
+    sys/dev/sis/*
+    sys/dev/sk/* excluding:
+    -? sys/dev/sk/yukonreg.h
+    + sys/dev/sn/if_sn.c
+    + sys/dev/sn/if_snreg.h
+    + sys/dev/snc/dp83932.c
+    + sys/dev/snc/dp83932subr.c
+    + sys/dev/snc/dp83932subr.h
+    + sys/dev/snc/if_sncreg.h
+    sys/dev/ste/*
+    sys/dev/stge/*
+    sys/dev/tdfx/* excluding:
+    -+ sys/dev/tdfx/tdfx_linux.c
+    + sys/dev/ti/if_ti.c
+    + sys/dev/ti/if_tireg.h
+    sys/dev/tl/*
+    sys/dev/txp/* excluding:
+    -+ sys/dev/txp/3c990img.h
+    + sys/dev/uart/uart_kbd_sun.h
+    + sys/dev/ubsec/ubsec.c
+    + sys/dev/usb/usb_cdc.h
+    + sys/dev/usb/usb_hid.c
+    + sys/dev/usb/controller/ehci.h
+    + sys/dev/usb/controller/ehci_pci.c
+    + sys/dev/usb/controller/ohci.h
+    + sys/dev/usb/controller/ohci_pci.c
+    + sys/dev/usb/controller/uhci.h
+    + sys/dev/usb/controller/uhci_pci.c
+    sys/dev/usb/input/* excluding:
+    -+ sys/dev/usb/input/usb_rdesc.h
+    sys/dev/usb/net/* excluding:
+    -+ sys/dev/usb/net/if_ruereg.h
+    -+ sys/dev/usb/net/if_udav.c
+    -+ sys/dev/usb/net/if_udavreg.h
+    -+ sys/dev/usb/net/usb_ethernet.c
+    -+ sys/dev/usb/net/usb_ethernet.h
+    sys/dev/usb/serial/* excluding:
+    -? sys/dev/usb/serial/u3g.c
+    -? sys/dev/usb/serial/uark.c
+    -+ sys/dev/usb/serial/ucycom.c
+    -? sys/dev/usb/serial/uftdi_reg.h
+    -+ sys/dev/usb/serial/umct.c
+    -? sys/dev/usb/serial/umoscom.c
+    -? sys/dev/usb/serial/uslcom.c
+    -+ sys/dev/usb/serial/uvscom.c
+    sys/dev/vge/*
+    sys/dev/vr/*
+    + sys/dev/vx/if_vx.c
+    sys/dev/wb/*
+    sys/dev/wds/*
+    sys/dev/wi/*
+    sys/dev/xl/*
+    sys/fs/msdosfs/* excluding:
+    -? sys/fs/msdosfs/bootsect.h
+    -? sys/fs/msdosfs/bpb.h
+    -+ sys/fs/msdosfs/msdosfs_fileno.c
+    -+ sys/fs/msdosfs/msdosfs_iconv.c
+    sys/fs/nwfs/*
+    + sys/fs/procfs/procfs.c
+    + sys/fs/procfs/procfs_rlimit.c
+    sys/fs/smbfs/*
+    + sys/geom/geom_ccd.c
+    + sys/geom/vinum/geom_vinum_share.c
+    + sys/geom/vinum/geom_vinum_subr.c
+    + sys/geom/vinum/geom_vinum_var.h
+    + sys/gnu/fs/xfs/FreeBSD/support/sema.h
+    + sys/i386/i386/identcpu.c
+    + sys/i386/i386/longrun.c
+    + sys/i386/i386/machdep.c
+    + sys/i386/i386/pmap.c
+    + sys/i386/i386/trap.c
+    + sys/i386/i386/vm_machdep.c
+    + sys/i386/ibcs2/ibcs2_dirent.h
+    + sys/i386/ibcs2/ibcs2_errno.c
+    + sys/i386/ibcs2/ibcs2_errno.h
+    + sys/i386/ibcs2/ibcs2_fcntl.h
+    + sys/i386/ibcs2/ibcs2_ipc.h
+    + sys/i386/ibcs2/ibcs2_misc.c
+    + sys/i386/ibcs2/ibcs2_mount.h
+    + sys/i386/ibcs2/ibcs2_signal.h
+    + sys/i386/ibcs2/ibcs2_stat.h
+    + sys/i386/ibcs2/ibcs2_statfs.h
+    + sys/i386/ibcs2/ibcs2_sysvec.c
+    + sys/i386/ibcs2/ibcs2_termios.h
+    + sys/i386/ibcs2/ibcs2_time.h
+    + sys/i386/ibcs2/ibcs2_types.h
+    + sys/i386/ibcs2/ibcs2_unistd.h
+    + sys/i386/ibcs2/ibcs2_ustat.h
+    + sys/i386/ibcs2/ibcs2_utime.h
+    + sys/i386/ibcs2/ibcs2_utsname.h
+    + sys/i386/include/_inttypes.h
+    + sys/i386/include/_stdint.h
+    + sys/i386/include/_types.h
+    + sys/i386/include/bootinfo.h
+    + sys/i386/include/bus.h
+    + sys/i386/include/floatingpoint.h
+    + sys/i386/include/ieeefp.h
+    + sys/i386/include/stdarg.h
+    + sys/i386/include/xen/xenpmap.h
+    + sys/i386/isa/elink.c
+    + sys/i386/isa/elink.h
+    + sys/i386/xen/clock.c
+    + sys/i386/xen/pmap.c
+    + sys/i386/xen/xen_machdep.c
+    + sys/ia64/ia64/in_cksum.c
+    + sys/ia64/ia64/pmap.c
+    + sys/ia64/ia64/vm_machdep.c
+    + sys/ia64/include/_inttypes.h
+    + sys/ia64/include/_stdint.h
+    + sys/ia64/include/_types.h
+    + sys/ia64/include/bus.h
+    + sys/ia64/include/stdarg.h
+    + sys/ia64/include/varargs.h
+    + sys/isa/pnpreg.h
+    + sys/kern/init_main.c
+    + sys/kern/ksched.c
+    + sys/kern/p1003_1b.c
+    + sys/kern/posix4_mib.c
+    + sys/kern/subr_trap.c
+    + sys/kern/sys_process.c
+    + sys/kern/sysv_ipc.c
+    + sys/kern/sysv_shm.c
+    + sys/libkern/iconv.c
+    + sys/libkern/iconv_xlat.c
+    + sys/libkern/strcasecmp.c
+    + sys/libkern/strstr.c
+    + sys/mips/adm5120/if_admsw.c
+    + sys/mips/adm5120/obio.c
+    + sys/mips/adm5120/obiovar.h
+    + sys/mips/idt/obio.c
+    + sys/mips/idt/obiovar.h
+    + sys/mips/include/_inttypes.h
+    + sys/mips/include/_stdint.h
+    + sys/mips/include/_types.h
+    + sys/mips/include/archtype.h
+    + sys/mips/include/bootinfo.h
+    + sys/mips/include/bus.h
+    + sys/mips/include/bus_octeon.h
+    + sys/mips/include/cache.h
+    + sys/mips/include/cache_mipsNN.h
+    + sys/mips/include/cache_r4k.h
+    + sys/mips/include/cpufunc.h
+    + sys/mips/include/cpuinfo.h
+    + sys/mips/include/db_machdep.h
+    + sys/mips/include/elf.h
+    + sys/mips/include/floatingpoint.h
+    + sys/mips/include/frame.h
+    + sys/mips/include/intr.h
+    + sys/mips/include/pte.h
+    + sys/mips/include/reloc.h
+    + sys/mips/include/rm7000.h
+    + sys/mips/malta/gt_pci.c
+    + sys/mips/malta/gtreg.h
+    + sys/mips/malta/maltareg.h
+    + sys/mips/malta/obio.c
+    + sys/mips/malta/obiovar.h
+    + sys/mips/malta/yamon.h
+    + sys/mips/mips/busdma_machdep.c
+    + sys/mips/mips/cache.c
+    + sys/mips/mips/cache_mipsNN.c
+    + sys/mips/mips/db_disasm.c
+    + sys/mips/mips/db_interface.c
+    + sys/mips/mips/gdb_machdep.c
+    + sys/mips/mips/in_cksum.c
+    + sys/mips/sentry5/obio.c
+    + sys/mips/sentry5/obiovar.h
+    + sys/net/bridgestp.h
+    + sys/net/fddi.h
+    + sys/net/if_arcsubr.c
+    + sys/net/if_atm.h
+    + sys/net/if_atmsubr.c
+    + sys/net/if_bridge.c
+    + sys/net/if_bridgevar.h
+    + sys/net/if_fddisubr.c
+    + sys/net/if_gre.c
+    + sys/net/if_gre.h
+    + sys/net/if_media.c
+    + sys/net/if_media.h
+    + sys/netgraph/ng_fec.c
+    + sys/netgraph/ng_fec.h
+    + sys/netinet/if_atm.c
+    + sys/netinet/if_atm.h
+    + sys/netinet/ip_gre.c
+    + sys/netinet/ip_gre.h
+    sys/netnatm/*
+    sys/netncp/* excluding:
+    -? sys/netncp/ncp.h
+    -? sys/netncp/ncp_cfg.h
+    -? sys/netncp/ncp_crypt.c
+    -+ sys/netncp/ncpio.h
+    -? sys/netncp/nwerror.h
+    sys/netsmb/*
+    + sys/nfsclient/bootp_subr.c
+    + sys/nfsclient/krpc_subr.c
+    + sys/pc98/cbus/fdc.c
+    + sys/pc98/cbus/olpt.c
+    + sys/pc98/pc98/machdep.c
+    + sys/pci/if_rl.c
+    + sys/pci/if_rlreg.h
+    sys/powerpc/aim/* excluding:
+    -+ sys/powerpc/aim/interrupt.c
+    -+ sys/powerpc/aim/mp_cpudep.c
+    -+ sys/powerpc/aim/nexus.c
+    -+ sys/powerpc/aim/platform_chrp.c
+    -+ sys/powerpc/aim/uma_machdep.c
+    sys/powerpc/booke/* excluding:
+    -+ sys/powerpc/booke/interrupt.c
+    -+ sys/powerpc/booke/mp_cpudep.c
+    -+ sys/powerpc/booke/platform_bare.c
+    -+ sys/powerpc/booke/pmap.c
+    + sys/powerpc/fpu/fpu_emu.c
+    + sys/powerpc/fpu/fpu_extern.h
+    + sys/powerpc/include/_inttypes.h
+    + sys/powerpc/include/_stdint.h
+    + sys/powerpc/include/_types.h
+    + sys/powerpc/include/asm.h
+    + sys/powerpc/include/bat.h
+    + sys/powerpc/include/bus.h
+    + sys/powerpc/include/cpu.h
+    + sys/powerpc/include/fpu.h
+    + sys/powerpc/include/frame.h
+    + sys/powerpc/include/intr.h
+    + sys/powerpc/include/param.h
+    + sys/powerpc/include/pcb.h
+    + sys/powerpc/include/pio.h
+    + sys/powerpc/include/platform.h
+    + sys/powerpc/include/pmap.h
+    + sys/powerpc/include/proc.h
+    + sys/powerpc/include/psl.h
+    + sys/powerpc/include/pte.h
+    + sys/powerpc/include/signal.h
+    + sys/powerpc/include/spr.h
+    + sys/powerpc/include/trap_aim.h
+    + sys/powerpc/include/ucontext.h
+    + sys/powerpc/include/vmparam.h
+    + sys/powerpc/ofw/ofw_real.c
+    + sys/powerpc/powerpc/altivec.c
+    + sys/powerpc/powerpc/bus_machdep.c
+    + sys/powerpc/powerpc/copystr.c
+    + sys/powerpc/powerpc/cpu.c
+    + sys/powerpc/powerpc/fpu.c
+    + sys/powerpc/powerpc/fuswintr.c
+    + sys/powerpc/powerpc/in_cksum.c
+    + sys/powerpc/powerpc/suswintr.c
+    + sys/powerpc/powerpc/syncicache.c
+    + sys/sparc64/include/_inttypes.h
+    + sys/sparc64/include/_stdint.h
+    + sys/sparc64/include/bus.h
+    + sys/sparc64/include/bus_dma.h
+    + sys/sparc64/include/cache.h
+    + sys/sparc64/include/idprom.h
+    + sys/sparc64/include/instr.h
+    + sys/sparc64/include/varargs.h
+    + sys/sparc64/include/vmparam.h
+    sys/sparc64/sbus/* excluding:
+    -+ sys/sparc64/sbus/sbusreg.h
+    + sys/sparc64/sparc64/bus_machdep.c
+    + sys/sparc64/sparc64/cache.c
+    + sys/sparc64/sparc64/db_disasm.c
+    + sys/sparc64/sparc64/eeprom.c
+    + sys/sparc64/sparc64/elf_machdep.c
+    + sys/sparc64/sparc64/iommu.c
+    + sys/sparc64/sparc64/pmap.c
+    + sys/sparc64/sparc64/trap.c
+    + sys/sparc64/sparc64/vm_machdep.c
+    + sys/sun4v/include/_inttypes.h
+    + sys/sun4v/include/_stdint.h
+    + sys/sun4v/include/bus.h
+    + sys/sun4v/include/bus_dma.h
+    + sys/sun4v/include/idprom.h
+    + sys/sun4v/include/instr.h
+    + sys/sun4v/include/varargs.h
+    + sys/sun4v/include/vmparam.h
+    + sys/sun4v/sun4v/bus_machdep.c
+    + sys/sun4v/sun4v/hviommu.c
+    + sys/sun4v/sun4v/trap.c
+    + sys/sun4v/sun4v/vm_machdep.c
+    + sys/sys/_pthreadtypes.h
+    + sys/sys/bus_dma.h
+    + sys/sys/chio.h
+    + sys/sys/clock.h
+    + sys/sys/iconv.h
+    + sys/sys/kernel.h
+    + sys/sys/link_aout.h
+    + sys/sys/link_elf.h
+    + sys/sys/mchain.h
+    + sys/sys/pioctl.h
+    + sys/sys/posix4.h
+    + sys/sys/priority.h
+    + sys/sys/rtprio.h
+    + sys/sys/sched.h
+    + sys/sys/semaphore.h
+    + sys/sys/shm.h
+    + sys/sys/tiio.h
+    + sys/sys/timers.h
+    + sys/vm/default_pager.c
+    + sys/vm/swap_pager.c
+    + sys/vm/vm_fault.c
+    + sys/vm/vm_pageout.c
+    + sys/vm/vnode_pager.c
+    + sys/xen/reboot.c
+
+  | Redistribution and use in source and binary forms, with or without
+  | modification, are permitted provided that the following conditions
+  | are met:
+  | 1. Redistributions of source code must retain the above copyright
+  |    notice, this list of conditions and the following disclaimer.
+  | 2. Redistributions in binary form must reproduce the above copyright
+  |    notice, this list of conditions and the following disclaimer in the
+  |    documentation and/or other materials provided with the distribution.
+  | 3. All advertising materials mentioning features or use of this software
+  |    must display the following acknowledgement:
+  |      This product includes software developed by the University of
+  |      California, Berkeley and its contributors.
+  | 4. Neither the name of the University nor the names of its contributors
+  |    may be used to endorse or promote products derived from this software
+  |    without specific prior written permission.
+  |
+  | THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+  | ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  | IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  | ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+  | FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  | DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+  | OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  | HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  | LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  | OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  | SUCH DAMAGE.
+--
+
+--
+  GNU General Public License, version 2 (GPL-2)
+    11 files are licensed under this license:
+
+    + sys/amd64/include/xen/hypercall.h
+    + sys/gnu/fs/ext2fs/ext2_fs.h
+    + sys/gnu/fs/ext2fs/ext2_fs_sb.h
+    + sys/gnu/fs/ext2fs/ext2_linux_balloc.c
+    + sys/gnu/fs/ext2fs/ext2_linux_ialloc.c
+    + sys/gnu/fs/ext2fs/ext2_vfsops.c
+    + sys/gnu/fs/ext2fs/i386-bitops.h
+    + sys/net80211/ieee80211_crypto_ccmp.c
+    + sys/net80211/ieee80211_crypto_tkip.c
+    + sys/xen/gnttab.h
+    + sys/xen/xenbus/xenbus_probe_backend.c
+
+  On Debian systems, the complete text of the
+  GNU General Public License version 2 can be found in
+  /usr/share/common-licenses/GPL-2
+--
+
+--
+  GNU General Public License, version 2 or later (GPL-2+)
+    9 files are licensed under this license:
+
+    + sys/boot/uboot/lib/api_public.h
+    sys/dev/lmc/*
+    sys/gnu/dev/sound/pci/*
+
+  On Debian systems, the complete text of the
+  GNU General Public License version 2 can be found in
+  /usr/share/common-licenses/GPL-2
+--
+
+--
+  GNU General Public License (GPL-any)
+    143 files are licensed under this license:
+
+    sys/gnu/fs/xfs/* excluding:
+    -+ sys/gnu/fs/xfs/xfs_fs.h
+    sys/gnu/fs/xfs/FreeBSD/* excluding:
+    -+ sys/gnu/fs/xfs/FreeBSD/xfs_buf.c
+    -? sys/gnu/fs/xfs/FreeBSD/xfs_compat.h
+    -? sys/gnu/fs/xfs/FreeBSD/xfs_config.h
+    -+ sys/gnu/fs/xfs/FreeBSD/xfs_mountops.c
+    -+ sys/gnu/fs/xfs/FreeBSD/xfs_mountops.h
+    -? sys/gnu/fs/xfs/FreeBSD/xfs_node.h
+    -+ sys/gnu/fs/xfs/FreeBSD/xfs_vnops.c
+    + sys/gnu/fs/xfs/FreeBSD/support/debug.c
+    + sys/gnu/fs/xfs/FreeBSD/support/debug.h
+    + sys/gnu/fs/xfs/FreeBSD/support/ktrace.c
+    + sys/gnu/fs/xfs/FreeBSD/support/ktrace.h
+    + sys/gnu/fs/xfs/FreeBSD/support/move.h
+    + sys/gnu/fs/xfs/FreeBSD/support/support.h
+    + sys/gnu/fs/xfs/FreeBSD/support/time.h
+    + sys/gnu/fs/xfs/FreeBSD/support/uuid.c
+    + sys/gnu/fs/xfs/FreeBSD/support/uuid.h
+
+  On Debian systems, the complete text of the
+  GNU General Public License can be found in
+  /usr/share/common-licenses/GPL
+--
+
+--
+  GNU Library/Lesser General Public License (LGPL-any)
+    The following file is licensed under this license:
+
+    + sys/gnu/fs/xfs/xfs_fs.h
+
+  | This program is free software; you can redistribute it and/or modify it under
+  | the terms of the GNU Lesser General Public License as published by the Free
+  | Software Foundation.
+
+  On Debian systems, the complete text of the
+  GNU Library/Lesser General Public License can be found in
+  /usr/share/common-licenses/LGPL
+--
+
+--
+  CDDL license
+    338 files are licensed under this license:
+    sys/cddl/*  
+
+  |   COMMON DEVELOPMENT AND DISTRIBUTION LICENSE Version 1.0
+  | 
+  | 1. Definitions.
+  | 
+  |     1.1. "Contributor" means each individual or entity that creates
+  |          or contributes to the creation of Modifications.
+  | 
+  |     1.2. "Contributor Version" means the combination of the Original
+  |          Software, prior Modifications used by a Contributor (if any),
+  |          and the Modifications made by that particular Contributor.
+  | 
+  |     1.3. "Covered Software" means (a) the Original Software, or (b)
+  |          Modifications, or (c) the combination of files containing
+  |          Original Software with files containing Modifications, in
+  |          each case including portions thereof.
+  | 
+  |     1.4. "Executable" means the Covered Software in any form other
+  |          than Source Code.
+  | 
+  |     1.5. "Initial Developer" means the individual or entity that first
+  |          makes Original Software available under this License.
+  | 
+  |     1.6. "Larger Work" means a work which combines Covered Software or
+  |          portions thereof with code not governed by the terms of this
+  |          License.
+  | 
+  |     1.7. "License" means this document.
+  | 
+  |     1.8. "Licensable" means having the right to grant, to the maximum
+  |          extent possible, whether at the time of the initial grant or
+  |          subsequently acquired, any and all of the rights conveyed
+  |          herein.
+  | 
+  |     1.9. "Modifications" means the Source Code and Executable form of
+  |          any of the following:
+  | 
+  |         A. Any file that results from an addition to, deletion from or
+  |            modification of the contents of a file containing Original
+  |            Software or previous Modifications;
+  | 
+  |         B. Any new file that contains any part of the Original
+  |            Software or previous Modifications; or
+  | 
+  |         C. Any new file that is contributed or otherwise made
+  |            available under the terms of this License.
+  | 
+  |     1.10. "Original Software" means the Source Code and Executable
+  |           form of computer software code that is originally released
+  |           under this License.
+  | 
+  |     1.11. "Patent Claims" means any patent claim(s), now owned or
+  |           hereafter acquired, including without limitation, method,
+  |           process, and apparatus claims, in any patent Licensable by
+  |           grantor.
+  | 
+  |     1.12. "Source Code" means (a) the common form of computer software
+  |           code in which modifications are made and (b) associated
+  |           documentation included in or with such code.
+  | 
+  |     1.13. "You" (or "Your") means an individual or a legal entity
+  |           exercising rights under, and complying with all of the terms
+  |           of, this License.  For legal entities, "You" includes any
+  |           entity which controls, is controlled by, or is under common
+  |           control with You.  For purposes of this definition,
+  |           "control" means (a) the power, direct or indirect, to cause
+  |           the direction or management of such entity, whether by
+  |           contract or otherwise, or (b) ownership of more than fifty
+  |           percent (50%) of the outstanding shares or beneficial
+  |           ownership of such entity.
+  | 
+  | 2. License Grants.
+  | 
+  |     2.1. The Initial Developer Grant.
+  | 
+  |     Conditioned upon Your compliance with Section 3.1 below and
+  |     subject to third party intellectual property claims, the Initial
+  |     Developer hereby grants You a world-wide, royalty-free,
+  |     non-exclusive license:
+  | 
+  |         (a) under intellectual property rights (other than patent or
+  |             trademark) Licensable by Initial Developer, to use,
+  |             reproduce, modify, display, perform, sublicense and
+  |             distribute the Original Software (or portions thereof),
+  |             with or without Modifications, and/or as part of a Larger
+  |             Work; and
+  | 
+  |         (b) under Patent Claims infringed by the making, using or
+  |             selling of Original Software, to make, have made, use,
+  |             practice, sell, and offer for sale, and/or otherwise
+  |             dispose of the Original Software (or portions thereof).
+  | 
+  |         (c) The licenses granted in Sections 2.1(a) and (b) are
+  |             effective on the date Initial Developer first distributes
+  |             or otherwise makes the Original Software available to a
+  |             third party under the terms of this License.
+  | 
+  |         (d) Notwithstanding Section 2.1(b) above, no patent license is
+  |             granted: (1) for code that You delete from the Original
+  |             Software, or (2) for infringements caused by: (i) the
+  |             modification of the Original Software, or (ii) the
+  |             combination of the Original Software with other software
+  |             or devices.
+  | 
+  |     2.2. Contributor Grant.
+  | 
+  |     Conditioned upon Your compliance with Section 3.1 below and
+  |     subject to third party intellectual property claims, each
+  |     Contributor hereby grants You a world-wide, royalty-free,
+  |     non-exclusive license:
+  | 
+  |         (a) under intellectual property rights (other than patent or
+  |             trademark) Licensable by Contributor to use, reproduce,
+  |             modify, display, perform, sublicense and distribute the
+  |             Modifications created by such Contributor (or portions
+  |             thereof), either on an unmodified basis, with other
+  |             Modifications, as Covered Software and/or as part of a
+  |             Larger Work; and
+  | 
+  |         (b) under Patent Claims infringed by the making, using, or
+  |             selling of Modifications made by that Contributor either
+  |             alone and/or in combination with its Contributor Version
+  |             (or portions of such combination), to make, use, sell,
+  |             offer for sale, have made, and/or otherwise dispose of:
+  |             (1) Modifications made by that Contributor (or portions
+  |             thereof); and (2) the combination of Modifications made by
+  |             that Contributor with its Contributor Version (or portions
+  |             of such combination).
+  | 
+  |         (c) The licenses granted in Sections 2.2(a) and 2.2(b) are
+  |             effective on the date Contributor first distributes or
+  |             otherwise makes the Modifications available to a third
+  |             party.
+  | 
+  |         (d) Notwithstanding Section 2.2(b) above, no patent license is
+  |             granted: (1) for any code that Contributor has deleted
+  |             from the Contributor Version; (2) for infringements caused
+  |             by: (i) third party modifications of Contributor Version,
+  |             or (ii) the combination of Modifications made by that
+  |             Contributor with other software (except as part of the
+  |             Contributor Version) or other devices; or (3) under Patent
+  |             Claims infringed by Covered Software in the absence of
+  |             Modifications made by that Contributor.
+  | 
+  | 3. Distribution Obligations.
+  | 
+  |     3.1. Availability of Source Code.
+  | 
+  |     Any Covered Software that You distribute or otherwise make
+  |     available in Executable form must also be made available in Source
+  |     Code form and that Source Code form must be distributed only under
+  |     the terms of this License.  You must include a copy of this
+  |     License with every copy of the Source Code form of the Covered
+  |     Software You distribute or otherwise make available.  You must
+  |     inform recipients of any such Covered Software in Executable form
+  |     as to how they can obtain such Covered Software in Source Code
+  |     form in a reasonable manner on or through a medium customarily
+  |     used for software exchange.
+  | 
+  |     3.2. Modifications.
+  | 
+  |     The Modifications that You create or to which You contribute are
+  |     governed by the terms of this License.  You represent that You
+  |     believe Your Modifications are Your original creation(s) and/or
+  |     You have sufficient rights to grant the rights conveyed by this
+  |     License.
+  | 
+  |     3.3. Required Notices.
+  | 
+  |     You must include a notice in each of Your Modifications that
+  |     identifies You as the Contributor of the Modification.  You may
+  |     not remove or alter any copyright, patent or trademark notices
+  |     contained within the Covered Software, or any notices of licensing
+  |     or any descriptive text giving attribution to any Contributor or
+  |     the Initial Developer.
+  | 
+  |     3.4. Application of Additional Terms.
+  | 
+  |     You may not offer or impose any terms on any Covered Software in
+  |     Source Code form that alters or restricts the applicable version
+  |     of this License or the recipients' rights hereunder.  You may
+  |     choose to offer, and to charge a fee for, warranty, support,
+  |     indemnity or liability obligations to one or more recipients of
+  |     Covered Software.  However, you may do so only on Your own behalf,
+  |     and not on behalf of the Initial Developer or any Contributor.
+  |     You must make it absolutely clear that any such warranty, support,
+  |     indemnity or liability obligation is offered by You alone, and You
+  |     hereby agree to indemnify the Initial Developer and every
+  |     Contributor for any liability incurred by the Initial Developer or
+  |     such Contributor as a result of warranty, support, indemnity or
+  |     liability terms You offer.
+  | 
+  |     3.5. Distribution of Executable Versions.
+  | 
+  |     You may distribute the Executable form of the Covered Software
+  |     under the terms of this License or under the terms of a license of
+  |     Your choice, which may contain terms different from this License,
+  |     provided that You are in compliance with the terms of this License
+  |     and that the license for the Executable form does not attempt to
+  |     limit or alter the recipient's rights in the Source Code form from
+  |     the rights set forth in this License.  If You distribute the
+  |     Covered Software in Executable form under a different license, You
+  |     must make it absolutely clear that any terms which differ from
+  |     this License are offered by You alone, not by the Initial
+  |     Developer or Contributor.  You hereby agree to indemnify the
+  |     Initial Developer and every Contributor for any liability incurred
+  |     by the Initial Developer or such Contributor as a result of any
+  |     such terms You offer.
+  | 
+  |     3.6. Larger Works.
+  | 
+  |     You may create a Larger Work by combining Covered Software with
+  |     other code not governed by the terms of this License and
+  |     distribute the Larger Work as a single product.  In such a case,
+  |     You must make sure the requirements of this License are fulfilled
+  |     for the Covered Software.
+  | 
+  | 4. Versions of the License.
+  | 
+  |     4.1. New Versions.
+  | 
+  |     Sun Microsystems, Inc. is the initial license steward and may
+  |     publish revised and/or new versions of this License from time to
+  |     time.  Each version will be given a distinguishing version number.
+  |     Except as provided in Section 4.3, no one other than the license
+  |     steward has the right to modify this License.
+  | 
+  |     4.2. Effect of New Versions.
+  | 
+  |     You may always continue to use, distribute or otherwise make the
+  |     Covered Software available under the terms of the version of the
+  |     License under which You originally received the Covered Software.
+  |     If the Initial Developer includes a notice in the Original
+  |     Software prohibiting it from being distributed or otherwise made
+  |     available under any subsequent version of the License, You must
+  |     distribute and make the Covered Software available under the terms
+  |     of the version of the License under which You originally received
+  |     the Covered Software.  Otherwise, You may also choose to use,
+  |     distribute or otherwise make the Covered Software available under
+  |     the terms of any subsequent version of the License published by
+  |     the license steward.
+  | 
+  |     4.3. Modified Versions.
+  | 
+  |     When You are an Initial Developer and You want to create a new
+  |     license for Your Original Software, You may create and use a
+  |     modified version of this License if You: (a) rename the license
+  |     and remove any references to the name of the license steward
+  |     (except to note that the license differs from this License); and
+  |     (b) otherwise make it clear that the license contains terms which
+  |     differ from this License.
+  | 
+  | 5. DISCLAIMER OF WARRANTY.
+  | 
+  |     COVERED SOFTWARE IS PROVIDED UNDER THIS LICENSE ON AN "AS IS"
+  |     BASIS, WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED,
+  |     INCLUDING, WITHOUT LIMITATION, WARRANTIES THAT THE COVERED
+  |     SOFTWARE IS FREE OF DEFECTS, MERCHANTABLE, FIT FOR A PARTICULAR
+  |     PURPOSE OR NON-INFRINGING.  THE ENTIRE RISK AS TO THE QUALITY AND
+  |     PERFORMANCE OF THE COVERED SOFTWARE IS WITH YOU.  SHOULD ANY
+  |     COVERED SOFTWARE PROVE DEFECTIVE IN ANY RESPECT, YOU (NOT THE
+  |     INITIAL DEVELOPER OR ANY OTHER CONTRIBUTOR) ASSUME THE COST OF ANY
+  |     NECESSARY SERVICING, REPAIR OR CORRECTION.  THIS DISCLAIMER OF
+  |     WARRANTY CONSTITUTES AN ESSENTIAL PART OF THIS LICENSE.  NO USE OF
+  |     ANY COVERED SOFTWARE IS AUTHORIZED HEREUNDER EXCEPT UNDER THIS
+  |     DISCLAIMER.
+  | 
+  | 6. TERMINATION.
+  | 
+  |     6.1. This License and the rights granted hereunder will terminate
+  |     automatically if You fail to comply with terms herein and fail to
+  |     cure such breach within 30 days of becoming aware of the breach.
+  |     Provisions which, by their nature, must remain in effect beyond
+  |     the termination of this License shall survive.
+  | 
+  |     6.2. If You assert a patent infringement claim (excluding
+  |     declaratory judgment actions) against Initial Developer or a
+  |     Contributor (the Initial Developer or Contributor against whom You
+  |     assert such claim is referred to as "Participant") alleging that
+  |     the Participant Software (meaning the Contributor Version where
+  |     the Participant is a Contributor or the Original Software where
+  |     the Participant is the Initial Developer) directly or indirectly
+  |     infringes any patent, then any and all rights granted directly or
+  |     indirectly to You by such Participant, the Initial Developer (if
+  |     the Initial Developer is not the Participant) and all Contributors
+  |     under Sections 2.1 and/or 2.2 of this License shall, upon 60 days
+  |     notice from Participant terminate prospectively and automatically
+  |     at the expiration of such 60 day notice period, unless if within
+  |     such 60 day period You withdraw Your claim with respect to the
+  |     Participant Software against such Participant either unilaterally
+  |     or pursuant to a written agreement with Participant.
+  | 
+  |     6.3. In the event of termination under Sections 6.1 or 6.2 above,
+  |     all end user licenses that have been validly granted by You or any
+  |     distributor hereunder prior to termination (excluding licenses
+  |     granted to You by any distributor) shall survive termination.
+  | 
+  | 7. LIMITATION OF LIABILITY.
+  | 
+  |     UNDER NO CIRCUMSTANCES AND UNDER NO LEGAL THEORY, WHETHER TORT
+  |     (INCLUDING NEGLIGENCE), CONTRACT, OR OTHERWISE, SHALL YOU, THE
+  |     INITIAL DEVELOPER, ANY OTHER CONTRIBUTOR, OR ANY DISTRIBUTOR OF
+  |     COVERED SOFTWARE, OR ANY SUPPLIER OF ANY OF SUCH PARTIES, BE
+  |     LIABLE TO ANY PERSON FOR ANY INDIRECT, SPECIAL, INCIDENTAL, OR
+  |     CONSEQUENTIAL DAMAGES OF ANY CHARACTER INCLUDING, WITHOUT
+  |     LIMITATION, DAMAGES FOR LOST PROFITS, LOSS OF GOODWILL, WORK
+  |     STOPPAGE, COMPUTER FAILURE OR MALFUNCTION, OR ANY AND ALL OTHER
+  |     COMMERCIAL DAMAGES OR LOSSES, EVEN IF SUCH PARTY SHALL HAVE BEEN
+  |     INFORMED OF THE POSSIBILITY OF SUCH DAMAGES.  THIS LIMITATION OF
+  |     LIABILITY SHALL NOT APPLY TO LIABILITY FOR DEATH OR PERSONAL
+  |     INJURY RESULTING FROM SUCH PARTY'S NEGLIGENCE TO THE EXTENT
+  |     APPLICABLE LAW PROHIBITS SUCH LIMITATION.  SOME JURISDICTIONS DO
+  |     NOT ALLOW THE EXCLUSION OR LIMITATION OF INCIDENTAL OR
+  |     CONSEQUENTIAL DAMAGES, SO THIS EXCLUSION AND LIMITATION MAY NOT
+  |     APPLY TO YOU.
+  | 
+  | 8. U.S. GOVERNMENT END USERS.
+  | 
+  |     The Covered Software is a "commercial item," as that term is
+  |     defined in 48 C.F.R. 2.101 (Oct. 1995), consisting of "commercial
+  |     computer software" (as that term is defined at 48
+  |     C.F.R. 252.227-7014(a)(1)) and "commercial computer software
+  |     documentation" as such terms are used in 48 C.F.R. 12.212
+  |     (Sept. 1995).  Consistent with 48 C.F.R. 12.212 and 48
+  |     C.F.R. 227.7202-1 through 227.7202-4 (June 1995), all
+  |     U.S. Government End Users acquire Covered Software with only those
+  |     rights set forth herein.  This U.S. Government Rights clause is in
+  |     lieu of, and supersedes, any other FAR, DFAR, or other clause or
+  |     provision that addresses Government rights in computer software
+  |     under this License.
+  | 
+  | 9. MISCELLANEOUS.
+  | 
+  |     This License represents the complete agreement concerning subject
+  |     matter hereof.  If any provision of this License is held to be
+  |     unenforceable, such provision shall be reformed only to the extent
+  |     necessary to make it enforceable.  This License shall be governed
+  |     by the law of the jurisdiction specified in a notice contained
+  |     within the Original Software (except to the extent applicable law,
+  |     if any, provides otherwise), excluding such jurisdiction's
+  |     conflict-of-law provisions.  Any litigation relating to this
+  |     License shall be subject to the jurisdiction of the courts located
+  |     in the jurisdiction and venue specified in a notice contained
+  |     within the Original Software, with the losing party responsible
+  |     for costs, including, without limitation, court costs and
+  |     reasonable attorneys' fees and expenses.  The application of the
+  |     United Nations Convention on Contracts for the International Sale
+  |     of Goods is expressly excluded.  Any law or regulation which
+  |     provides that the language of a contract shall be construed
+  |     against the drafter shall not apply to this License.  You agree
+  |     that You alone are responsible for compliance with the United
+  |     States export administration regulations (and the export control
+  |     laws and regulation of any other countries) when You use,
+  |     distribute or otherwise make available any Covered Software.
+  | 
+  | 10. RESPONSIBILITY FOR CLAIMS.
+  | 
+  |     As between Initial Developer and the Contributors, each party is
+  |     responsible for claims and damages arising, directly or
+  |     indirectly, out of its utilization of rights under this License
+  |     and You agree to work with Initial Developer and Contributors to
+  |     distribute such responsibility on an equitable basis.  Nothing
+  |     herein is intended or shall be deemed to constitute any admission
+  |     of liability.
+  | 
+  | --------------------------------------------------------------------
+  | 
+  | NOTICE PURSUANT TO SECTION 9 OF THE COMMON DEVELOPMENT AND
+  | DISTRIBUTION LICENSE (CDDL)
+  | 
+  | For Covered Software in this distribution, this License shall
+  | be governed by the laws of the State of California (excluding
+  | conflict-of-law provisions).
+  | 
+  | Any litigation relating to this License shall be subject to the
+  | jurisdiction of the Federal Courts of the Northern District of
+  | California and the state courts of the State of California, with
+  | venue lying in Santa Clara County, California.
+
+--
+
+--
+  MIT-like License (MIT)
+    161 files are licensed under this license:
+
+    sys/contrib/ia64/libuwx/src/*
+    sys/dev/drm/* excluding:
+    -? sys/dev/drm/drm-subprocess.pl
+    -? sys/dev/drm/drm_pciids.h
+    + sys/xen/interface
+    sys/xen/interface/* excluding:
+    -+ sys/xen/interface/elfstructs.h
+    sys/xen/interface/arch-x86/*
+    sys/xen/interface/arch-x86/hvm/*
+    sys/xen/interface/foreign/*
+    sys/xen/interface/hvm/*
+    sys/xen/interface/io/*
+
+  | Permission is hereby granted, free of charge, to any person
+  | obtaining a copy of this software and associated documentation
+  | files (the "Software"), to deal in the Software without
+  | restriction, including without limitation the rights to use,
+  | copy, modify, merge, publish, distribute, sublicense, and/or sell
+  | copies of the Software, and to permit persons to whom the
+  | Software is furnished to do so, subject to the following
+  | conditions:
+  |
+  | The above copyright notice and this permission notice shall be
+  | included in all copies or substantial portions of the Software.
+  |
+  | THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  | EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+  | OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  | NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+  | HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+  | WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+  | FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  | OTHER DEALINGS IN THE SOFTWARE.
+
+--
 
   Sources/Binaries in the following directories are licensed under
   DFSG-incompatible terms and were therefore removed from the package
   (and disabled in the build system):
 
-src/sys/contrib/dev/nve
-src/sys/contrib/dev/oltr
-src/sys/dev/hptmv
-src/sys/dev/hptrr
-src/sys/dev/rr232x
+    src/sys/contrib/dev/nve
+    src/sys/contrib/dev/oltr
+    src/sys/dev/hptmv
+    src/sys/dev/hptrr
+    src/sys/dev/rr232x
 
   The following directories contained code that is itself free, but depends
   on the above cited non-free sources and was also removed (and disabled):
 
-src/sys/dev/nve
-src/sys/modules/hptmv
-src/sys/modules/hptrr
-src/sys/modules/nve
-src/sys/modules/oltr
-src/sys/modules/rr232x
+    src/sys/dev/nve
+    src/sys/modules/hptmv
+    src/sys/modules/hptrr
+    src/sys/modules/nve
+    src/sys/modules/oltr
+    src/sys/modules/rr232x
+
+
+----------------------------------------------------------------------
+--                  Short Copyright Holders Report                  --
+--         (790 holders out of 15230 copyright statements)          --
+----------------------------------------------------------------------
+
+Copyright: (C) 1980-2009 The Regents of the University of California
+Copyright: (C) 1992-2009 The FreeBSD Project
+Copyright: (C) 2004, 2007-2009 The FreeBSD Foundation
+Copyright: (C) 1988-1992, 1999-2009 Intel Corp.
+Copyright: (C) 1984, 1986-2001, 2003-2009 Sun Microsystems Inc.
+Copyright: (C) 2002-2009 Sam Leffler <sam@errno.com>
+Copyright: (C) 2002-2009 Errno Consulting
+Copyright: (C) 1999-2009 Marcel Moolenaar
+Copyright: (C) 1994-2007 The NetBSD Foundation Inc.
+Copyright: (C) 1996-2001 Michael Smith <msmith@freebsd.org> <msmith@freebd.org>
+Copyright: (C) 1997-2005, 2007-2008 Doug Rabson <dfr@freebsd.org> <dfr@rabson.org>
+Copyright: (C) 1995-2006 Silicon Graphics Inc.
+Copyright: (C) 1998-2009 M. Warner Losh. All Rights Reserved. <imp@village.org> <imp@freebsd.org>
+Copyright: (C) 1987-1999 Carnegie Mellon University
+Copyright: (C) 2002-2008 Atheros Communications Inc.
+Copyright: (C) 1999-2009 Robert N. M. Watson
+Copyright: (C) 1997-2005 Bill Paul <wpaul@windriver.com> <wpaul@ctr.columbia.edu> <wpaul@ee.columbia.edu> <william.paul@windriver.com> <wpaul@bsdi.com> <wpaul@osd.bsdi.com>
+Copyright: (C) 1995, 2004-2009 Pawel Jakub Dawidek <parag@cgt.com> <pjd@freebsd.org> <pavel@inr.net.kiae.su>
+Copyright: (C) 2000-2003 Jake Burkholder. <jake@freebsd.org>
+Copyright: (C) 2003-2007 Hartmut Brandt <harti@freebsd.org>
+Copyright: (C) Software Distribution Coordinator <software.distribution@cs.cmu.edu>
+Copyright: (C) 1996-2003 Communication Systems (FhG Fokus).
+Copyright: (C) 1996-2003 Fraunhofer Institute for Open
+Copyright: (C) 1994-2002, 2004-2005 Justin T. Gibbs.
+Copyright: (C) 2005-2009 Hans Petter Selasky. All Rights Reserved. <hselasky@freebsd.org>
+Copyright: (C) 1995-2001, 2003 WIDE Project.
+Copyright: (C) 1997-2008 Poul-Henning Kamp <phk@freebsd.org>
+Copyright: (C) 1996-2000 Whistle Communications Inc.
+Copyright: (C) 2007-2009 Chelsio Inc.
+Copyright: (C) 2001-2005 Networks Associates Technology Inc.
+Copyright: (C) 2001-2003 Thomas Moestl <tmm@freebsd.org>
+Copyright: (C) 1995-2001, 2003-2007 Peter Wemm <peter@freebsd.org> <peter@netplex.com.au>
+Copyright: (C) 1999-2001 Boris Popov
+Copyright: (C) 2000-2004, 2006, 2008 Benno Rice. <benno@jeamland.net> <benno@freebsd.org> <benno@eloquent.com.au>
+Copyright: (C) 1999-2009 Maksim Yevmenkin <m_evmenkin@yahoo.com>
+Copyright: (C) 2001-2003 Wasabi Systems Inc.
+Copyright: (C) 1998-1999 Mark Newton
+Copyright: (C) 1993-1997, 1999 Wolfgang Solfrank.
+Copyright: (C) 1993-1997, 1999 TooLs GmbH. <paulp@uts.amdahl.com>
+Copyright: (C) 1994-2006 Cronyx Engineering. <rik@cronyx.ru>
+Copyright: (C) 1999 Archie Cobbs <archie@freebsd.org>
+Copyright: (C) 2008-2009 Isilon Inc
+Copyright: (C) 1998-2004, 2007 Hidetoshi Shimokawa <simokawa@freebsd.org>
+Copyright: (C) 1994-1997 Christos Zoulas
+Copyright: (C) Inc: Alfred Perlstein <alfred@freebsd.org>
+Copyright: (C) 1997-2001 Nicolas Souchu
+Copyright: (C) 1997-2001 John Sadler <john_sadler@alum.mit.edu>
+Copyright: (C) 2004-2009 Kip Macy <kmacy@freebsd.org>
+Copyright: (C) 2004-2009 Marius Strobl <marius@freebsd.org>
+Copyright: (C) 1993-1996, 1998 David Greenman
+Copyright: (C) 2001-2008 Cisco Systems Inc. All Rights Reserved.
+Copyright: (C) 1999-2001 Cameron Grant <cg@freebsd.org> <gandalf@vilnya.demon.co.uk>
+Copyright: (C) 1994-1996, 1998, 2002 Massachusetts Institute of Technology
+Copyright: (C) 2000 Gareth Hughes <gareth@valinux.com>
+Copyright: (C) 2002-2007 Neterion Inc.
+Copyright: (C) 1995-1998, 2004, 2006-2008 John Birrell <jb@cimlogic.com.au> <jb@freebsd.org>
+Copyright: (C) 1996-1999 Kazutaka YOKOTA <yokota@zodiac.mech.utsunomiya-u.ac.jp> <yokota@freebsd.org>
+Copyright: (C) 2000-2006 John Baldwin <jhb@freebsd.org>
+Copyright: (C) 1999-2000, 2002-2003 Cedar Park
+Copyright: (C) 2003-2008 Olivier Houchard. All Rights Reserved.
+Copyright: (C) 2000 VA Linux Systems
+Copyright: (C) 1999-2009 Apple Inc.
+Copyright: (C) 2000-2003, 2003-04 Adaptec Inc.
+Copyright: (C) 1988, 1990 University of Utah.
+Copyright: (C) 1994-1998 Mark Brinicombe.
+Copyright: (C) 1995-2001 Angelos D. Keromytis <kermit@csd.uch.gr>
+Copyright: (C) 2005-2009 Ariff Abdullah <ariff@freebsd.org>
+Copyright: (C) 2003-2006 SPARTA Inc.
+Copyright: (C) 1996-1998, 2000-2001 Berkeley Software Design Inc. All Rights Reserved.
+Copyright: (C) 2004-2007 Damien Bergamini <damien.bergamini@free.fr>
+Copyright: (C) 1993-2003 Darren Reed.
+Copyright: (C) 1997-2009 Matthew Jacob <mjacob@freebsd.org>
+Copyright: (C) 1994-1996, 1996-12-17, 1997 Stefan Esser <se@freebsd.org> <se@mi.uni-koeln.de>
+Copyright: (C) 2008-2009 Nathan Whitehorn <nwhitehorn@freebsd.org>
+Copyright: (C) 1998, 2001 Brian Somers <brian@awfulhak.org>
+Copyright: (C) 2003-2009 Alan L. Cox <alc@cs.rice.edu>
+Copyright: (C) 2000-2009 Mark R V Murray
+Copyright: (C) 2002-2005 Peter Grehan. All Rights Reserved.
+Copyright: (C) 1999-2000 Precision Insight
+Copyright: (C) 2000-2001, 2003-2006, 2008 TAKAHASHI Yoshihiro. All Rights Reserved. <nyan@freebsd.org>
+Copyright: (C) 2000-2005, 2007-2009 Scott Long <scottl@freebsd.org>
+Copyright: (C) 1994-1995 Scott Bartram
+Copyright: (C) 2003-2006 Hewlett-Packard Development Company
+Copyright: (C) 1992, 2001 Julian Elischer <julian@tfs.com> <julian@freebsd.org>
+Copyright: (C) 1998-2001, 2003-2007 Takanori Watanabe <takawata@jp.freebsd.org>
+Copyright: (C) 2003-2008 Joseph Koshy
+Copyright: (C) 2001-2002, 2005, 2008 David E. O'Brien. All Rights Reserved. <obrien@freebsd.org>
+Copyright: (C) 2002-2005, 2007-2008 HighPoint Technologies Inc.
+Copyright: (C) 1998, 2004 Lennart Augustsson <augustss@netbsd.org> <lennart@augustsson.net> <augustss@carlstedt.se>
+Copyright: (C) 1994-2001 Naofumi HONDA. All Rights Reserved.
+Copyright: (C) 1995-1999, 2001-2002 Niels Provos <provos@physnet.uni-hamburg.de> <provos@citi.umich.edu>
+Copyright: (C) 2006-2009 Rafal Jaworowski <raj@freebsd.org> <raj@semihalf.com>
+Copyright: (C) 2003, 2004-05 Vinod Kashyap
+Copyright: (C) 1996-1997, 2001-2008 Juniper Networks Inc.
+Copyright: (C) 1994-1995 Wolfgang Stanglmeier <se@mi.uni-koeln.de> <wolf@cologne.de>
+Copyright: (C) 1997-1999, 2001 Semen Ustimenko <semenu@freebsd.org>
+Copyright: (C) 1995-2005 Mark Adler
+Copyright: (C) 1997-2001 Jonathan Lemon <jlemon@freebsd.org>
+Copyright: (C) 2006-2008 Semihalf <m8@semihalf.com> <raj@semihalf.com> <ppk@semihalf.com>
+Copyright: (C) 1999-2002, 2005-2006 Mitsuru IWASAKI <iwasaki@jp.freebsd.org> <iwasaki@freebsd.org>
+Copyright: (C) 2007-2008 MARVELL INTERNATIONAL LTD.
+Copyright: (C) 1996-1999 John D. Polstra.
+Copyright: (C) 2004, 2006, 2008-2009 Pyun YongHyeon <yongari@freebsd.org>
+Copyright: (C) 2000-2005 LSI Logic Corporation
+Copyright: (C) 2005, 2008-2009 Ed Schouten <ed@freebsd.org>
+Copyright: (C) 1993-1997 John S. Dyson
+Copyright: (C) 1997, 1999-2000, 2003 Matthew N. Dodd <winter@jurai.net> <winter@freebsd.org>
+Copyright: (C) 2006, 2009 IronPort Systems Inc. <ambrisko@ironport.com>
+Copyright: (C) 1994-1997, 2001 Matt Thomas <matt@3am-software.com> <thomas@lkg.dec.com>
+Copyright: (C) 1997, 1997-99, 1998-2009 Luigi Rizzo <luigi@freebsd.org>
+Copyright: (C) 2001 Slawa Olhovchenkov <johnp@knight-trosoft.com>
+Copyright: (C) Serge Vakulenko <vak@cronyx.ru>
+Copyright: (C) 1996, 1999-2001 Matthew R. Green
+Copyright: (C) 2006-2009 Alexander Motin <mav@freebsd.org> <mav@alkar.net>
+Copyright: (C) 2001-2002 Mike Barcroft <mike@freebsd.org>
+Copyright: (C) 2002-2007 K A Fraser
+Copyright: (C) 1993-1996, 2004 Charles M. Hannum. All Rights Reserved.
+Copyright: (C) 1995 Mike Mitchell
+Copyright: (C) 2003, 2006-2008 Bruce M. Simpson. <bms@spc.org>
+Copyright: (C) 2002-2009 Jeffrey Roberson <jeff@freebsd.org>
+Copyright: (C) Harti Brandt <harti@freebsd.org>
+Copyright: (C) 2004-07 Applied Micro Circuits Corporation.
+Copyright: (C) 1993-1994, 1996, 1998-1999 Christopher G. Demetriou. All Rights Reserved.
+Copyright: (C) 2002-2007 Nate Lawson
+Copyright: (C) 2004-2005, 2007 Lukas Ertl
+Copyright: (C) Rickard E. (Rik) Faith <faith@valinux.com>
+Copyright: (C) 1990-1991, 1994 University of Michigan.
+Copyright: (C) 2001, 2006, 2008-2009 Written by: John
+Copyright: (C) 2000, 2004-2007 Ruslan Ermilov <ru@freebsd.org>
+Copyright: (C) 1996-2000 Distributed Processing Technology Corporation
+Copyright: (C) 2003-2005 Eric Anholt <anholt@freebsd.org>
+Copyright: (C) 1990-1991, 1994 Regents of The
+Copyright: (C) 1992-1995 Jan-Simon Pendry
+Copyright: (C) 1999-2002, 2004 Jason L. Wright <jason@thought.net>
+Copyright: (C) 1998-2002 Katsushi Kobayashi
+Copyright: (C) 2007 The DragonFly Project. All Rights Reserved.
+Copyright: (C) 2007-2009 Marvell Semiconductor Inc.
+Copyright: (C) 1995-1998 Eric Young <eay@cryptsoft.com> <eay@mincom.oz.au>
+Copyright: (C) Sepherosa Ziehau <sepherosa@gmail.com>
+Copyright: (C) 1997-2003 Kenneth D. Merry. <ken@freebsd.org>
+Copyright: (C) 2001 Atsushi Onoe
+Copyright: (C) 2002-2004 Roman Kurakin <rik@freebsd.org> <rik@cronyx.ru>
+Copyright: (C) 1997 Manuel Bouyer. All Rights Reserved.
+Copyright: (C) 2004-2009 Jung-uk Kim <jkim@freebsd.org> <jkim@niksun.com>
+Copyright: (C) 1995-1999 Kouichi Matsuda. All Rights Reserved.
+Copyright: (C) Atsushi Murai <amurai@spec.co.jp>
+Copyright: (C) 1995-2005 Jean-loup Gailly.
+Copyright: (C) 2000 Hans Reiser
+Copyright: (C) 2000-2001 Jonathan Chen. <jon@freebsd.org>
+Copyright: (C) 1992, 2009 University of Guelph
+Copyright: (C) 1999-2000 Roger Hardiman
+Copyright: (C) 2006-2007 Oleksandr Tymoshenko <gonzo@freebsd.org>
+Copyright: (C) 1997-2003 Sony Computer Science Laboratories Inc. All Rights Reserved.
+Copyright: (C) 1994-1999 KATO Takenori
+Copyright: (C) 1999-2001, 2003-2004 Theo de Raadt <aaron@monkey.org> <deraadt@openbsd.org>
+Copyright: (C) 1998-2001 Gerard Roudier <groudier@free.fr>
+Copyright: (C) 1998-1999, 2001, 2004 Dag-Erling Coïdan Smørgrav 
+Copyright: (C) Pace Willisson <pace@blitz.com>
+Copyright: (C) 1989-1990 William Jolitz
+Copyright: (C) 1992-1994, 1997, 2001, 2004-2005 Joerg Wunsch <joerg_wunsch@uriah.heep.sax.de>
+Copyright: (C) 1998 Robert Nordier
+Copyright: (C) 1993-1994 Herb Peyerl <hpeyerl@novatel.ca>
+Copyright: (C) 1996 Steve Passe
+Copyright: (C) 2001-2005 McAfee Inc.
+Copyright: (C) 2000-2003 Orion Hodson <oho@acm.org> <o.hodson@cs.ucl.ac.uk> <orion@freebsd.org>
+Copyright: (C) 2000-2001 Adaptec Corporation.
+Copyright: (C) 1997-1998, 2000-2001 07:21:34 jsadler Exp
+Copyright: (C) 1996 Washington University.
+Copyright: (C) 1995 Steven Wallace
+Copyright: (C) 1996-2001 Eduardo Horvath.
+Copyright: (C) 2003-2006 Keir Fraser <keir@xensource.com> <keir.fraser@citrix.com>
+Copyright: (C) 2006-2009 Myricom Inc.
+Copyright: (C) 1996 Charles D. Cranor
+Copyright: (C) 1999 Luoqi Chen <luoqi@freebsd.org>
+Copyright: (C) 2005 Antoine Brodin
+Copyright: (C) 2005-2006 IBM Corporation
+Copyright: (C) 2008-2009 Weongyo Jeong <weongyo@freebsd.org>
+Copyright: (C) 1997-1998 Amancio Hasty
+Copyright: (C) 1992, 1995 Terrence R. Lambert.
+Copyright: (C) 2001 Ilmar S. Habibulin
+Copyright: (C) 1995-1999 John Ioannidis,
+Copyright: (C) 1995-1999 Advanced System Products Inc.
+Copyright: (C) 1995-1996, 2004 Bruce D. Evans.
+Copyright: (C) 1995-2008 Qlogic Inc.
+Copyright: (C) 1994 John Dyson
+Copyright: (C) 2006-2009 Andrew Thompson <thompsa@freebsd.org>
+Copyright: (C) 2000, 2003-2005 Paul Saab <ps@freebsd.org>
+Copyright: (C) 1995 Godmar Back <gback@cs.utah.edu>
+Copyright: (C) 2000-2002, 2004-2009 Broadcom Corporation. All Rights Reserved.
+Copyright: (C) 1996-2000, 2003-2005, 2007 David Young. All Rights Reserved. <dej@ox.org>
+Copyright: (C) 1998-2003 Tsubai Masanari. All Rights Reserved.
+Copyright: (C) 2001 Wind River Systems <jhb@freebsd.org>
+Copyright: (C) 2004-2005 Gleb Smirnoff <glebius@freebsd.org>
+Copyright: (C) 2003-2006 Topspin Communications. All Rights Reserved.
+Copyright: (C) 2002, 2004 Topspin Corporation. All Rights Reserved.
+Copyright: (C) 2005 Rusty Russell
+Copyright: (C) 2000, 2002, 2006 Alfred Perlstein <alfred@freebsd.org> <alfred@paycounter.com>
+Copyright: (C) 1997-1998 Marc Horowitz. All Rights Reserved.
+Copyright: (C) 2009 Rick Macklem
+Copyright: (C) 1999 Seigo Tanimura
+Copyright: (C) 1993-1995 Hannu Savolainen
+Copyright: (C) 2002-2003 Leif Delgass <ldelgass@retinalburn.net>
+Copyright: (C) 1996-2000 Justin Gibbs.
+Copyright: (C) 2005-2008 Stanislav Sedov <stas@freebsd.org>
+Copyright: (C) 2002-2003 Tungsten Graphics
+Copyright: (C) 2000-2001 Alcove - Nicolas <nsouch@freebsd.org>
+Copyright: (C) 2003 Ichiro FUKUHARA <ichiro@ichiro.org>
+Copyright: (C) 2001-2003, 2005, 2008 Shunsuke Akiyama <akiyama@freebsd.org> <akiyama@jp.freebsd.org>
+Copyright: (C) 2001 Charles Mott <cm@linktel.net>
+Copyright: (C) 1995-1999 Per Fogelstrom <jqj@cornell>
+Copyright: (C) 2000-2001, 2006 Network Security Inc.
+Copyright: (C) 2000-2001 Coleman Kane <cokane@freebsd.org>
+Copyright: (C) 2003-2008 Warner Losh. All Rights Reserved.
+Copyright: (C) 2005-2008 Daniel Braniss <danny@cs.huji.ac.il>
+Copyright: (C) Tim Hudson <tjh@cryptsoft.com> <tjh@mincom.oz.au>
+Copyright: (C) 2003 Mathew Kanner
+Copyright: (C) 1989-1991 William F. Jolitz <william@ernie.berkeley.edu>
+Copyright: (C) 1999-2005 Kurakin Roman <rik@freebsd.org> <rik@cronyx.ru>
+Copyright: (C) 2004-2005 Bosko Milekic <bmilekic@freebsd.org>
+Copyright: (C) 2000-2001 Katsurajima Naoto <raven@katsurajima.seya.yokohama.jp>
+Copyright: (C) 2000, 2002 Mitsuru Iwasaki
+Copyright: (C) Keith Whitwell <keith@tungstengraphics.com>
+Copyright: (C) 2002-2003, 2006 Ryan Beasley <ryanb@goddamnbastard.org> <ryan.beasley@gmail.com>
+Copyright: (C) 2005-2007 XenSource Ltd.
+Copyright: (C) 2002 Eric Moore
+Copyright: (C) 2001, 2004 The Aerospace Corporation. All Rights Reserved.
+Copyright: (C) 1995-1997 Jason R. Thorpe <thorpej@and.com> <thorpej@nas.nasa.gov>
+Copyright: (C) 2001, 2004 Daniel Hartmeier
+Copyright: (C) 2002-2006 Andre Oppermann
+Copyright: (C) 1994-1995 Andrey A. Chernov <ache@astral.msk.su>
+Copyright: (C) 2000-2001 Greg Ansley
+Copyright: (C) 1993, 1995-1996 Paul Kranenburg
+Copyright: (C) 1992-1997 Kevin E. Martin <martin@valinux.com>
+Copyright: (C) 2009 H. Baldwin
+Copyright: (C) 1993-1995 Sean Eric Fagan
+Copyright: (C) 2006-2008 Marian Balakowicz <m8@semihalf.com>
+Copyright: (C) 2009 Advanced Computing Technologies LLC <jhb@freebsd.org>
+Copyright: (C) 1993-1995 Adam Glass
+Copyright: (C) 1995 Fujitsu Limited
+Copyright: (C) 1993 Andrew Herbert <andrew@werple.apana.org.au>
+Copyright: (C) 2004, 2006 Bernd Walter. All Rights Reserved. <ticso@freebsd.org>
+Copyright: (C) 1997-1999 Eduardo E. Horvath. All Rights Reserved.
+Copyright: (C) 1988-1989 Stephen Deering.
+Copyright: (C) 2002-2006 Internet Business Solutions AG
+Copyright: (C) 2008 Marco Trillo. All Rights Reserved.
+Copyright: (C) 2005 Voltaire Inc. All Rights Reserved.
+Copyright: (C) 2003-2004 Tim J. Robbins.
+Copyright: (C) 2007 Vsevolod Lobko.
+Copyright: (C) 2006, 2008 Yahoo! Inc. <jhb@freebsd.org>
+Copyright: (C) 1998, 2007-2008 1. Redistributions
+Copyright: (C) 1998-1999 I2O Special Interest Group (I2O SIG).
+Copyright: (C) 1997 Richard Waltham <dormouse@farsrobt.demon.co.uk>
+Copyright: (C) 1996 Paul Vixie
+Copyright: (C) 1996-1998 Matthias Drochner. All Rights Reserved.
+Copyright: (C) 2000, 2002-2004 David O'Brien <obrien@freebsd.org>
+Copyright: (C) 2001 Eric Hernes
+Copyright: (C) 2003, 2005 Ryuichiro Imura
+Copyright: (C) 1999, 2003 Global Technology Associates Inc.
+Copyright: (C) 2001 John Prince
+Copyright: (C) 1997 Implementations of FICL
+Copyright: (C) 2004-2006 Christian Limpach.
+Copyright: (C) 2006 Wojciech A. Koszek <wkoszek@freebsd.org>
+Copyright: (C) 2000 Noriaki Mitsunaga
+Copyright: (C) 1998, 2001 Marc Bouget
+Copyright: (C) 1996-1998 HD Associates Inc. All Rights Reserved.
+Copyright: (C) 1999-2005 Mellanox Technologies Ltd. All Rights Reserved.
+Copyright: (C) 2005-2007 Ivan Voras <ivoras@gmail.com> <ivoras@freebsd.org>
+Copyright: (C) 1988-2000 Specialix International,
+Copyright: (C) 1990, 1993 Talke Studio
+Copyright: (C) 2000 NEC PC-98
+Copyright: (C) 2004-2006 Voltaire Corporation. All Rights Reserved.
+Copyright: (C) 2002 The Weather Channel Inc.
+Copyright: (C) 2007-2009 Bruce Simpson.
+Copyright: (C) 2005-2006 Jonathan Gray <jsg@openbsd.org>
+Copyright: (C) 2001-2002, 2006 Alexander Kabaev <kan@freebsd.org>
+Copyright: (C) 2001, 2004-2006 David Xu <davidxu@freebsd.org>
+Copyright: (C) 1990, 1993 Andrew Moore
+Copyright: (C) 1992-1993 E. Stark <stark@cs.sunysb.edu>
+Copyright: (C) 1997 Causality Limited
+Copyright: (C) 2002-2003 Politecnico di Torino
+Copyright: (C) 2007-2008 Attilio Rao <attilio@freebsd.org>
+Copyright: (C) 1995, 2008 John Hay. All Rights Reserved.
+Copyright: (C) 1993-2001 David S. Miller <davem@redhat.com> <davem@nadzieja.rutgers.edu>
+Copyright: (C) 2006-2007 Piotr Kruszynski <ppk@semihalf.com>
+Copyright: (C) 2002-2004 Juli Mallett. All Rights Reserved. <jmallett@freebsd.org>
+Copyright: (C) 2001-2004 WARRANTIES OF MERCHANTABILITY
+Copyright: (C) 2001-2004 REPRODUCTION OR DISCLOSURE TO ANY
+Copyright: (C) 2001-2004 INCLUDING ALL IMPLIED
+Copyright: (C) 1995 Jean-Marc Zucconi
+Copyright: (C) 2001-2004 THE INFORMATION CONTAINED HEREIN IS PROPRIETARY AND CONFIDENTIAL
+Copyright: (C) 1994 Charles Hannum. All Rights Reserved. <mycroft@ai.mit.edu>
+Copyright: (C) 2003 Nathan L. Binkert <binkertn@umich.edu>
+Copyright: (C) 1993-1995, 2004-2006 Rights Reserved.
+Copyright: (C) 2006-2007, 2009 Roman Divacky <rdivacky@freebsd.org>
+Copyright: (C) 1997-1998, 2000 Opsycon AB
+Copyright: (C) 1997-2001 Granch Ltd. All Rights Reserved.
+Copyright: (C) 1998, 2000-2001 Ben Harris
+Copyright: (C) 1988 Julian Onions <jpo@cs.nott.ac.uk>
+Copyright: (C) 1997-1999, 2001-2004 NVIDIA Corporation. All Rights Reserved.
+Copyright: (C) 2002 Frank C. Earl <fearl@airmail.net>
+Copyright: (C) 2001-2004 TO NVIDIA
+Copyright: (C) Denis I.Timofeev <timofeev@granch.ru>
+Copyright: (C) 2004 Avid Technology Inc.
+Copyright: (C) 2006 Stephane E. Potvin <sepotvin@videotron.ca>
+Copyright: (C) 2001-2004 EXPRESS OR IMPLIED WARRANTY OF ANY KIND
+Copyright: (C) 1993-1995 Rodney W. Grimes
+Copyright: (C) 2001-2004 AND FITNESS FOR A
+Copyright: (C) 2004, 2006 John-Mark Gurney. <jmg@freebsd.org>
+Copyright: (C) 2007, 2009 Ulf Lilleengen
+Copyright: (C) 1991-1992 Linus Torvalds.
+Copyright: (C) 2008-2009 Piotr Ziecik <kosmo@semihalf.com>
+Copyright: (C) 2001-2004 THIRD PARTY IS SUBJECT TO WRITTEN PRE-APPROVAL BY NVIDIA
+Copyright: (C) 1997, 2002-2006 Rice University
+Copyright: (C) 1987 Nottingham University
+Copyright: (C) 2001-2004 Ian Dowse. All Rights Reserved. <iedowse@freebsd.org>
+Copyright: (C) 1998, 2001 Matthew Dillon. All Rights Reserved.
+Copyright: (C) 2002-2006 K Fraser
+Copyright: (C) 2001-2004 THE INFORMATION CONTAINED HEREIN IS PROVIDED "AS IS"
+Copyright: (C) Leubner <achim_leubner@adaptec.com> <achim.leubner@intel.com>
+Copyright: (C) 2001-2004 CORPORATION. USE
+Copyright: (C) 2008-2009 Stacey Son <sson@freebsd.org>
+Copyright: (C) 1999 FreeBSD(98) Porting Team.
+Copyright: (C) 1994-1996 Tatsumi <hosokawa@jp.freebsd.org> <hosokawa@mt.cs.keio.ac.jp>
+Copyright: (C) 2001-2004 PARTICULAR PURPOSE.
+Copyright: (C) 1999, 2001, 2005-2006 Russell Cattelan <cattelan@thebarn.com>
+Copyright: (C) 1995-1999 Mark Tinguely
+Copyright: (C) 1992-1993 Garrett A. Wollman.
+Copyright: (C) 2005-2006 Masanori Ozawa <ozawa@ongs.co.jp>
+Copyright: (C) 2005-2006 ONGS Inc.
+Copyright: (C) 2006 Michael Lorenz
+Copyright: (C) 2004 Felix Kuehling
+Copyright: (C) 1998 Larry Lile <lile@stdio.com>
+Copyright: (C) 2008-2009 Edward Tomasz Napierała <trasz@freebsd.org>
+Copyright: (C) 1994 Peter Galbavy. All Rights Reserved.
+Copyright: (C) 2001-2002 Michael Shalayeff
+Copyright: (C) 1992-1993 University of Vermont
+Copyright: (C) 1992-1995 Blaise Pascal
+Copyright: (C) 1999-2001 Vitaly V Belekhov
+Copyright: (C) 2006-2009 FreeBSD Foundation
+Copyright: (C) 1995-2001 Tekram Technology Co. Ltd.
+Copyright: (C) 2007 Seccuris Inc.
+Copyright: (C) 2007-2009 Advanced Micro Devices Inc.
+Copyright: (C) 2007-2008 Citrix Systems Inc.
+Copyright: (C) 2004 Infinicon Corporation. All Rights Reserved.
+Copyright: (C) 2005-2007 Cisco Systems. All Rights Reserved.
+Copyright: (C) 2001 Jason Evans <jasone@freebsd.org>
+Copyright: (C) 2006-2008 Red Hat <armbru@redhat.com>
+Copyright: (C) 2004-2009 University of Zagreb
+Copyright: (C) 1992-1995 Laboratoire MASI - Institut
+Copyright: (C) 1992-1995 Universite Pierre et Marie
+Copyright: (C) 2007-2009 Rui Paulo <rpaulo@freebsd.org>
+Copyright: (C) 2006-2007 Daniel Roethlisberger <daniel@roe.ch>
+Copyright: (C) 2000 KIYOHARA Takashi <kiyohara@kk.iij4u.ne.jp> <kiyohara@kk.iij4u.or.jp>
+Copyright: (C) 2000-03, 2000-04 ICP vortex GmbH
+Copyright: (C) 2006 Konstantin Dimitrov <kosio.dimitrov@gmail.com>
+Copyright: (C) Motomichi Matsuzaki <mzaki@e-mail.ne.jp>
+Copyright: (C) 2000 Aaron D. Gifford. All Rights Reserved. <me@aarongifford.com>
+Copyright: (C) 1992-1995 Curie (Paris VI)
+Copyright: (C) Fixes/Additions: Boji Tony Kannanthanam <boji.t.kannanthanam@intel.com>
+Copyright: (C) 2005, 2008 Paolo Pisati <piso@freebsd.org>
+Copyright: (C) 2002-2005 Network Appliance Inc. All Rights Reserved.
+Copyright: (C) 1992-1995 Remy Card <card@masi.ibp.fr>
+Copyright: (C) 2006-2008 Grzegorz Bernacki
+Copyright: (C) 1998-1999 Andrew Gallatin <gallatin@cs.duke.edu>
+Copyright: (C) 1999, 2009 Adrian Chadd
+Copyright: (C) 1996-1998 Crystal Semiconductor Corp.
+Copyright: (C) 2002, 2006 Maxim Sobolev <sobomax@freebsd.org>
+Copyright: (C) 2000 Dug Song <dugsong@umich.edu>
+Copyright: (C) 2003-2007 Yuriy Tsibizov <yuriy.tsibizov@gfk.ru>
+Copyright: (C) 2002-2005 M Warner Losh. All Rights Reserved. <imp@freebsd.org>
+Copyright: (C) 2006 Daichi Goto <daichi@freebsd.org>
+Copyright: (C) 2006 Ian Campbell
+Copyright: (C) 1996 Sujal M. Patel
+Copyright: (C) 2007 Rajesh Prabhakaran.
+Copyright: (C) 1998-2009 Universita` di Pisa
+Copyright: (C) 2007 LSI Corp.
+Copyright: (C) 2001 Robert Drehmel
+Copyright: (C) 2002-2003, 2005 Henning Brauer <henning@openbsd.org>
+Copyright: (C) 2000-2008 Dag-Erling Coïdan Smørgrav
+Copyright: (C) 1992-1993 Erik Forsberg.
+Copyright: (C) 2003, 2009 Norikatsu Shigemura <nork@freebsd.org>
+Copyright: (C) 1996-1997, 2000 Junichi SATOH <junichi@astec.co.jp>
+Copyright: (C) 2001 Patrik Lindergren <patrik@ipunplugged.com>
+Copyright: (C) 2002 JF Hay. All Rights Reserved.
+Copyright: (C) 1999 Invertex Inc. All Rights Reserved.
+Copyright: (C) 2000 Andrew Miklic
+Copyright: (C) 1991 Algorithmics Ltd
+Copyright: (C) 1991-2 RSA Data Security Inc. Created
+Copyright: (C) 2006 Telephone Corporation) . All
+Copyright: (C) 2001-2003 Roman V. Palagin <romanp@unshadow.net>
+Copyright: (C) 1995 Jim Lowe
+Copyright: (C) 1997-1998 Oleg Sharoiko.
+Copyright: (C) 1998 Joachim Kuebart <joki@kuebart.stuttgart.netsurf.de>
+Copyright: (C) 2003, 2007 David Madole <dwmalone@freebsd.org>
+Copyright: (C) 2004-2005 Bruno Ducrot
+Copyright: (C) 1999 Niklas Hallqvist. <niklas@appli.se>
+Copyright: (C) Julian Elisher <julian@freebsd.org>
+Copyright: (C) 2002-2003 B Dragovic
+Copyright: (C) 2006 Kevin Lo. All Rights Reserved.
+Copyright: (C) 1993, 1997 RTMX Inc.
+Copyright: (C) 1998-2000 HAYAKAWA Koichi. All Rights Reserved.
+Copyright: (C) Street <mckusick@mckusick.com>
+Copyright: (C) 2000-2003 Hiroyuki Aizu <aizu@navi.org>
+Copyright: (C) 1989 Digital Equipment Corporation.
+Copyright: (C) 1993 Brian Moore
+Copyright: (C) 1996 The President
+Copyright: (C) 1988-1992 Santa Clara
+Copyright: (C) 1995 Jason M. Rinn.
+Copyright: (C) 1996 Fellows of Harvard
+Copyright: (C) 1997 Simon Shapiro
+Copyright: (C) 2000 Silicon Integrated Systems Corp
+Copyright: (C) Leo Yuriev <ly@cronyx.ru>
+Copyright: (C) 2003, 2005 Ryan McBride. All Rights Reserved. <mcbride@openbsd.org>
+Copyright: (C) 1996 Erik Stahlman. <erik@vt.edu>
+Copyright: (C) 2005 Tom Rhodes
+Copyright: (C) 1999, 2001 FreeBSD Incorporated
+Copyright: (C) 1997-2001 Gerd Knorr <kraxel@bytesex.org> <kraxel@cs.tu-berlin.de>
+Copyright: (C) 1993 Gary Clark II
+Copyright: (C) 2007 Stephan Uphoff <ups@freebsd.org>
+Copyright: (C) 2005-2006 Open Grid Computing Inc. All Rights Reserved.
+Copyright: (C) 1996 Scott K. Stevens
+Copyright: (C) 1999-2004 Taku YAMAMOTO <taku@cent.saitama-u.ac.jp> <taku@tackymt.homeip.net>
+Copyright: (C) 2005-2006 International Business Machines Corporation.
+Copyright: (C) 2000-2004 Mark R. V. Murray
+Copyright: (C) 2002, 2004 Mark Santcroos <marks@ripe.net>
+Copyright: (C) 1997-1998 Maxim Bolotin
+Copyright: (C) 1994 Lars <fredriks@mcs.com>
+Copyright: (C) 1996 College. All Rights Reserved.
+Copyright: (C) Steve Reid <sreid@sea-to-sky.net>
+Copyright: (C) 1995 Micro Design International Inc.
+Copyright: (C) 1996 Gardner Buchanan <gbuchanan@shl.com>
+Copyright: (C) 1996 Chuck Cranor <chuck@ccrc.wustl.edu>
+Copyright: (C) 1993 Andy Rutter <andy@acronym.co.uk>
+Copyright: (C) 1998, 2000 Marshall Kirk McKusick. All Rights Reserved.
+Copyright: (C) Sung-Ching Lin <sclin@sis.com.tw>
+Copyright: (C) 2005-2006 Rink Springer <rink@il.fontys.nl>
+Copyright: (C) 2006 Niall O'Higgins <niallo@openbsd.org>
+Copyright: (C) 1997-1999 Nan Yang Computer Services Limited. All Rights Reserved.
+Copyright: (C) 2006-2009 David Christensen <davidch@broadcom.com>
+Copyright: (C) 2004, 2006-2008 Benjamin Close <benjsc@freebsd.org> <benjamin.close@clearchain.com>
+Copyright: (C) 1993 Holger Veit
+Copyright: (C) 1998-1999, 2003 Scott Mitchell
+Copyright: (C) 2006 NTT (Nippon Telegraph
+Copyright: (C) 2001 Jean-Jacques Bernard-Gundol <jj@wabbitt.org>
+Copyright: (C) 1996-2000 California/Information Sciences Institute.
+Copyright: (C) 2000-2001 MITSUNAGA Noriaki
+Copyright: (C) 2005, 2007-2008 Ammasso Inc. All Rights Reserved.
+Copyright: (C) 2004-2008 Qing Li. All Rights Reserved.
+Copyright: (C) 2005 Mike Wray
+Copyright: (C) 1989 Van Jacobson <van@helios.ee.lbl.gov>
+Copyright: (C) Michel Dänzer <daenzerm@student.ethz.ch> <michel@daenzer.net>
+Copyright: (C) 2003 IPNET Internet Communication Company
+Copyright: (C) 2000 Stephane Potvin <sepotvin@videotron.ca>
+Copyright: (C) 2008 Swinburne University of Technology
+Copyright: (C) 1999 Peter Jeremy
+Copyright: (C) Mark Tillotson <markt@chaos.org.uk>
+Copyright: (C) 2002 Dima Dorfman. All Rights Reserved.
+Copyright: (C) 1996 Nate Williams <nate@freebsd.org>
+Copyright: (C) 1999-2000 Nick Hibma <n_hibma@freebsd.org>
+Copyright: (C) 2002 Myson Technology Inc.
+Copyright: (C) 2005 John Bicket
+Copyright: (C) 2005-2006 Reyk Floeter <reyk@openbsd.org>
+Copyright: (C) 2001 Dachb0den Labs <h1kari@dachb0den.com>
+Copyright: (C) 1993-1994 Capo) <jc@irbs.uucp>
+Copyright: (C) 2001 Markus Friedl. All Rights Reserved.
+Copyright: (C) 2005 YAMAMOTO Takashi,
+Copyright: (C) 1993 Eric S. Raymond
+Copyright: (C) 2003 Shingo WATANABE <nabe@nabechan.org>
+Copyright: (C) Dave Chapeskie <dchapeskie@sandvine.com>
+Copyright: (C) 2008-2009 Bjoern A. Zeeb. <bz@freebsd.org>
+Copyright: (C) 1996-2000 University of Southern
+Copyright: (C) Requested <oz@gcom.com> <daniele@orlandi.com>
+Copyright: (C) Reiner Sailer <sailer@watson.ibm.com>
+Copyright: (C) 1999 Wittawat Yamwong
+Copyright: (C) 2000 Akamba Corp.
+Copyright: (C) 1999-2000 Assar Westerlund
+Copyright: (C) 2004-2006 Erich Chen <erich@tekram.com.tw>
+Copyright: (C) 2000-2001 NOKUBI Hirotaka
+Copyright: (C) 1993-1994 Chris Provenzano <proven@mit.edu>
+Copyright: (C) D. Keromytis <angelos@cis.upenn.edu>
+Copyright: (C) 1993-1994 A. Chernov) <ache@astral.msk.su>
+Copyright: (C) 2000-2004 OMNIKEY GmbH
+Copyright: (C) 2001-2002 Packet Design
+Copyright: (C) 1993-1994 Vakulenko) <vak@zebub.msk.su>
+Copyright: (C) 1995 Mikael Hybsch
+Copyright: (C) Grigoriy Orlov <gluk@ptci.ru>
+Copyright: (C) 1994 Jordan K. Hubbard
+Copyright: (C) 2000 Paycounter Inc.
+Copyright: (C) 2001 John H. Baldwin <jhb@freebsd.org>
+Copyright: (C) 2003-2004 Jouni Malinen <jkmaline@cc.hut.fi>
+Copyright: (C) 1993 Daniel Boulet
+Copyright: (C) 2008 Internet Architectures
+Copyright: (C) 1996-1999 Internet Software Consortium.
+Copyright: (C) 2005 Emmanuel Dreyfus
+Copyright: (C) 2005 Christopher Clark
+Copyright: (C) Erik Salander <erik@whistle.com>
+Copyright: (C) 1995 Volker Lendecke <lendecke@namu01.gwdg.de>
+Copyright: (C) 2001 Carrel <william.carrel@infospace.com> <anderson@cs.duke.edu>
+Copyright: (C) 2005 Nuno Antunes <nuno.antunes@gmail.com>
+Copyright: (C) 1999, 2001 Created: <jhartmann@precisioninsight.com> <gareth@valinux.com>
+Copyright: (C) 2000-2001 Chiharu Shibata
+Copyright: (C) 2000-2004 Diomidis D. Spinellis
+Copyright: (C) 2005 Anthony Liguori <aliguori@us.ibm.com>
+Copyright: (C) 2000 Nick Sayer
+Copyright: (C) José Fonseca <j_r_fonseca@yahoo.co.uk>
+Copyright: (C) 1993-1995 Dufault) <dufault@hda.com>
+Copyright: (C) 1992-2000 Don Kim <don.kim@esstech.com>
+Copyright: (C) 2007 Pisa. All Rights Reserved.
+Copyright: (C) 2004 Alessandro Cerri. All Rights Reserved.
+Copyright: (C) 1997 Todd Vierling
+Copyright: (C) 2008-2009 BitGravity Inc.
+Copyright: (C) 1995-1996, 2002 Daniel M. Eischen <deischen@freebsd.org>
+Copyright: (C) 1998 Todd C. Miller <todd.miller@courtesan.com>
+Copyright: (C) 2003-2005 Craig Boston
+Copyright: (C) 2002-2003 Gordon Tetlow
+Copyright: (C) 1995 Gordon Ross
+Copyright: (C) 2009 Michael Gmelin <freebsd@grem.de>
+Copyright: (C) 2004-2005 MARVELL SEMICONDUCTOR ISRAEL LTD.
+Copyright: (C) 2003-2004 Quinton Dolan <q@onthenet.com.au>
+Copyright: (C) Paul Popelka <paulp@uts.amdahl.com>
+Copyright: (C) 1997 Aaron C. Smith
+Copyright: (C) 2005 Chris Jones
+Copyright: (C) 1988-1989 Olivetti Advanced Technology Center
+Copyright: (C) C.L. Huang <ching@tekram.com.tw>
+Copyright: (C) 2005-2008 Ralink Technology <paul_lin@ralinktech.com.tw>
+Copyright: (C) 1996 Naoki Hamada <nao@tom-yam.or.jp>
+Copyright: (C) 2008 Centre for Advanced
+Copyright: (C) 1997 Jonathan Stone
+Copyright: (C) 1996 Javier Mart\xEDn Rueda <jmrueda@diatel.upm.es>
+Copyright: (C) 2009 James Gritton.
+Copyright: (C) James Courtier-Dutton <james@superbug.demon.co.uk>
+Copyright: (C) 2004 Internet Systems Consortium Inc.
+Copyright: (C) 2009 Konstantin Belousov
+Copyright: (C) 2004 Texas A&M University
+Copyright: (C) 2004 Video54 Technologies Inc.
+Copyright: (C) Alexander Kvitchenko <aak@cronyx.ru>
+Copyright: (C) 2007 Jeremy Teo
+Copyright: (C) 2005 David Schultz <das@freebsd.org>
+Copyright: (C) 2007 Marcus Glocker <mglocker@openbsd.org>
+Copyright: (C) Panu Rissanen <bande@lut.fi>
+Copyright: (C) Daryll Strauss <daryll@valinux.com>
+Copyright: (C) 2006 Itronix Inc.
+Copyright: (C) 2002 Sandvine Inc.
+Copyright: (C) Sascha Wildner <saw@online.de>
+Copyright: (C) 1994 Henrik Vestergaard Draboel
+Copyright: (C) 2003 Jason Wright
+Copyright: (C) 2002 Maxime Henrion <mux@freebsd.org>
+Copyright: (C) 2004 Alexey Popov <lollypop@flexuser.ru>
+Copyright: (C) 2003 Izumi Tsutsui. All Rights Reserved.
+Copyright: (C) 2006 Vadim Goncharov <vadimnuclight@tpu.ru>
+Copyright: (C) 2004 FUKUDA Nobuhiko <nfukuda@spa.is.uec.ac.jp>
+Copyright: (C) 2006 Tobias Reifenberger
+Copyright: (C) 2001 Aaron Campbell <aaron@monkey.org>
+Copyright: (C) Jeff Hartmann <jhartmann@valinux.com>
+Copyright: (C) 2006 Florian Stoehr <ich@florian-stoehr.de>
+Copyright: (C) 2002-2003 Cedric Berger
+Copyright: (C) 2008 Nokia Corporation
+Copyright: (C) 2004 Colin Percival
+Copyright: (C) 2004 Nicolai Haehnle. <prefect_@gmx.net>
+Copyright: (C) 1997-2003 Guido van Rooij.
+Copyright: (C) 1997 Chris Shenton <chris@gnome.co.uk>
+Copyright: (C) 1992-1993 State Agricultural College.
+Copyright: (C) 1994 Arne H Juul
+Copyright: (C) 2006 Markus Armbruster
+Copyright: (C) 1993-1995 Wunsch) <joerg_wunsch@uriah.sax.de>
+Copyright: (C) 1990-1998 Open Software Foundation,
+Copyright: (C) Brooks Davis <brooks@freebsd.org>
+Copyright: (C) 2002-2004 David Boggs. <boggs@boggs.palo-alto.ca.us>
+Copyright: (C) 2005-2008 Paul Lin
+Copyright: (C) 1992-1993 Agricultural College.
+Copyright: (C) 2003 Stuart <stu@ipng.org.uk>
+Copyright: (C) 2006 Shigeaki Tagashira <shigeaki@se.hiroshima-u.ac.jp>
+Copyright: (C) 1999-2003 3Com Corporation.
+Copyright: (C) Haddad <paul@pth.com>
+Copyright: (C) 2000 Jeroen C. van Gelderen
+Copyright: (C) 2002 Hiroyuki Bessho for Genetec
+Copyright: (C) 1994 University of Lule}
+Copyright: (C) McDougall <bsdx@spawnet.com>
+Copyright: (C) 2003 Orlando Bassotto <orlando.bassotto@ieo-research.it>
+Copyright: (C) M. Sekiguchi <seki@sysrap.cs.fujitsu.co.jp>
+Copyright: (C) Gallatin <gallatin@cs.duke.edu>
+Copyright: (C) 1996 Junior University. All Rights Reserved.
+Copyright: (C) 2008-2009 Gen Otsuji
+Copyright: (C) Roland C. Dowdeswell <elric@netbsd.org>
+Copyright: (C) Bill Ryder <bryder@sgi.com>
+Copyright: (C) 1988-1989 Ing. C. Olivetti
+Copyright: (C) Durda IV <bsdmail@nemesis.lonestar.org>
+Copyright: (C) A. Koszek <dunstan@freebsd.czest.pl>
+Copyright: (C) Zwan <paulz@trantor.xs4all.nl>
+Copyright: (C) 2004 Max Khon
+Copyright: (C) 2001 George Reid <greid@ukug.uk.freebsd.org>
+Copyright: (C) 2001 Truman Joe
+Copyright: (C) 1992-1997 Chapel Hill
+Copyright: (C) 1998 Engineering Co.
+Copyright: (C) Nathan Binkert <nate@openbsd.org>
+Copyright: (C) 2008 Michael J. Silbersack.
+Copyright: (C) 2005 Yahoo! Technologies Norway AS
+Copyright: (C) 1997 Dedicated to RHS
+Copyright: (C) 2006 Dag-Erling Smorgrav <des@des.no>
+Copyright: (C) Jaroslav Kysela <perex@suse.cz>
+Copyright: (C) 1999 Matrox Graphics Inc.
+Copyright: (C) 1993-1995 Oregon 97222. All
+Copyright: (C) Oded Kedem <oded@kashya.com>
+Copyright: (C) 1990-2 RSA Data Security Inc. All Rights Reserved.
+Copyright: (C) Zupan <blaz@gold.amis.net>
+Copyright: (C) Doug Ambrisko <ambrisko@whistle.com>
+Copyright: (C) 1998 Ben Ghofrani
+Copyright: (C) 1998 System Planning
+Copyright: (C) 2003 Rear Right
+Copyright: (C) 1999 PocketBSD Project. All Rights Reserved.
+Copyright: (C) 1996 Bob Jenkins <bob_jenkins@burtleburtle.net>
+Copyright: (C) 2001 Tobias Weingartner
+Copyright: (C) 2006 Tom Cosgrove <tom@openbsd.org>
+Copyright: (C) 2009 Michael Reifenberger
+Copyright: (C) 2006 Mellanox Technologies. All Rights Reserved.
+Copyright: (C) 2003-2004 M Williamson
+Copyright: (C) Geoff Rehmet <csgr@cs.ru.ac.za>
+Copyright: (C) Dave Airlie <airlied@redhat.com>
+Copyright: (C) 2005 PathScale Inc. All Rights Reserved.
+Copyright: (C) 2003 OGAWA Takaya <t-ogawa@triaez.kaisei.org>
+Copyright: (C) 2003 Rear Left
+Copyright: (C) Serge Babkin <babkin@hq.icb.chel.su>
+Copyright: (C) Jaworowski <raj@semihalf.com>
+Copyright: (C) 2005 Aravind Menon
+Copyright: (C) Magnus Damm <magnus@valinux.co.jp>
+Copyright: (C) 2009 Carlson Wireless Inc.
+Copyright: (C) 1999 Shin Takemura
+Copyright: (C) Varuna De Silva <varunax@gmail.com>
+Copyright: (C) 2008 Marius Nuennerich
+Copyright: (C) From Thomas Sandford <t.d.g.sandford@comp.brad.ac.uk>
+Copyright: (C) Lea <reg@shale.csir.co.za>
+Copyright: (C) 1996 Javier Mart^mn Rueda <jmrueda@diatel.upm.es>
+Copyright: (C) 2000 Cesar Miquel <miquel@df.uba.ar>
+Copyright: (C) 2005 Wayne J. Salamon
+Copyright: (C) 2001-2002 Christopher Gilbert
+Copyright: (C) 2003 Duncan <dmlb@dmlb.org>
+Copyright: (C) 2004-2005 Philip Paeps <philip@freebsd.org>
+Copyright: (C) 2009 Roelof Jonkman
+Copyright: (C) 2000-2001 Adam Prewett
+Copyright: (C) 2008 Rafal Czubak
+Copyright: (C) 1994 Jarle Greipsland.
+Copyright: (C) 2000-07-29 Arjan de Vet <arjan.devet@adv.iae.nl>
+Copyright: (C) 1995 Ugen J.S.Antsilevich
+Copyright: (C) 2003 Bob Bishop
+Copyright: (C) Hiroshi Yamashita <bluemoon@msj.biglobe.ne.jp>
+Copyright: (C) 2000 Daniel Capo Sobral
+Copyright: (C) 2003-2005 Alan Stern
+Copyright: (C) Max Filippov <jcmvbkbc@gmail.com>
+Copyright: (C) 2000 Sascha Schumann. All Rights Reserved.
+Copyright: (C) 1988-1998 Z280 Download Code Version
+Copyright: (C) Ryan Wilson <hap9@epoch.ncsc.mil>
+Copyright: (C) 2001 Guy Carver <john_sadler@alum.mit.edu>
+Copyright: (C) 1994 Gordon W. Ross
+Copyright: (C) 1996 Mark Salyzyn
+Copyright: (C) Alex Deucher <alexander.deucher@amd.com>
+Copyright: (C) 1993-2006 4Front Technologies
+Copyright: (C) 1996 The Board of Trustees
+Copyright: (C) 2002-2003 Paul J. Ledbetter III
+Copyright: (C) Dodd <winter@jurai.net>
+Copyright: (C) Tomi Mikkonen <tomitm@remedy.fi>
+Copyright: (C) Sergey Babkin <babkin@bellatlantic.net>
+Copyright: (C) 1999 Brian Scott Dean <brdean@unx.sas.com.>
+Copyright: (C) Stefan Berger <stefanb@us.ibm.com>
+Copyright: (C) 1988-1989 C. S.p.A.
+Copyright: (C) Hollis Blanchard <hollisb@us.ibm.com>
+Copyright: (C) 1997 Werner Koch
+Copyright: (C) Benjamin Liu <benjamin.liu@intel.com>
+Copyright: (C) Modified for PS/2 <yuen@nuie.nagoya-u.ac.jp>
+Copyright: (C) 1997 Sandro Sigala
+Copyright: (C) 2003 Mike Frantzen <frantzen@w4g.org>
+Copyright: (C) Will Barker <w.barker@zen.co.uk>
+Copyright: (C) 2008-2009 Michal Hajduk
+Copyright: (C) 2002 Sean Bullington <amistry@am-productions.biz>
+Copyright: (C) 1995-1996 Erik Theisen. All Rights Reserved.
+Copyright: (C) 1995 Apple Computer.
+Copyright: (C) 2001-2007 Thomas Quinot <thomas@cuivre.fr.eu.org>
+Copyright: (C) 1999 Brian Fundakowski Feldman
+Copyright: (C) 1991-2006 Terms of Use
+Copyright: (C) Ford <bford@uop.cs.uop.edu>
+Copyright: (C) 2001 Larry Hastings <john_sadler@alum.mit.edu>
+Copyright: (C) 2002-2005 Areca Technology Corporation All Rights Reserved.
+Copyright: (C) Jakub Dawidek <pjd@freebsd.org>
+Copyright: (C) 2006 Berndt Walter. All Rights Reserved.
+Copyright: (C) 1994 The Australian National University.
+Copyright: (C) 1996-1999 Mark Dawson
+Copyright: (C) Kazutaka Yokota <yokota@zodiac.mech.utsunomiya-u.ac.jp>
+Copyright: (C) 2005 Jose Renato Santos
+Copyright: (C) Ken Key <key@cs.utk.edu>
+Copyright: (C) 2001-2003 Corporation. All Rights Reserved.
+Copyright: (C) 2004 Suleiman Souhlal <refugee@segfaulted.com>
+Copyright: (C) 1991-2006 Unicode Inc. All Rights Reserved. Distributed
+Copyright: (C) 2001 John Fremlin
+Copyright: (C) 1999 Pierre Beyssac
+Copyright: (C) Olof Johansson <offe@ludd.luth.se>
+Copyright: (C) 2008 Isilon Systems Inc.
+Copyright: (C) Richard Stearn <richard@rns-stearn.demon.co.uk>
+Copyright: (C) Kendy Kutzner <kutzner@fokus.fraunhofer.de>
+Copyright: (C) 2008-09-25 Andrea Guzzo <aguzzo@anywi.com>
+Copyright: (C) Mitch Lichtenberg <mpl@broadcom.com>
+Copyright: (C) 1991-2008 Søren Schmidt
+Copyright: (C) 2005 Nguyen Anh Quynh <aquynh@gmail.com>
+Copyright: (C) Kenneth Merry <ken@freebsd.org>
+Copyright: (C) Martin Renters <martin@tdc.on.ca>
+Copyright: (C) 2005 Samy Al Bahra
+Copyright: (C) Mikko Saarnivala <mikko.saarnivala@sensinode.com>
+Copyright: (C) 2003-2006 Anish Mistry <marks@ripe.net>
+Copyright: (C) 2001 Tamotsu Hattori.
+Copyright: (C) 1997-1998 Cybernet Corporation
+Copyright: (C) Denton Gentry <denny1@home.com>
+Copyright: (C) 2008 AnyWi Technologies
+Copyright: (C) T.Hatanou <hatanou@yasuda.comm.waseda.ac.jp>
+Copyright: (C) 2002 Bang Jun-Young
+Copyright: (C) Nakajima <jun.nakajima@intel.com>
+Copyright: (C) 1994-2000 Paul Richards. All Rights Reserved.
+Copyright: (C) 1999 Ville-Pertti Keinonen
+Copyright: (C) Hannes Kaelber <hannes.kaelber@x2e.de>
+Copyright: (C) 2001 Richard Earnshaw
+Copyright: (C) 2005 Bin Ren
+Copyright: (C) 1997-2002 Feral Software
+Copyright: (C) 2040 2. Command
+Copyright: (C) 2000 Munehiro Matsuda
+Copyright: (C) Christoph Robitschko <chmr@edvz.tu-graz.ac.at>
+Copyright: (C) 2005 Dan M. Smith
+Copyright: (C) 2000 Matthew C. Forman
+Copyright: (C) 2000-2003 Tor Egge
+Copyright: (C) Yanagisawa Takeshi <yanagisw@aa.ap.titech.ac.jp>
+Copyright: (C) 1994 Geoffrey M. Rehmet
+Copyright: (C) Michaelis <hm@kts.org>
+Copyright: (C) Andres Vega Garcia <avega@sophia.inria.fr>
+Copyright: (C) 2000 Iwasa Kazmi
+Copyright: (C) 1998 Jeremy Fitzhardinge <jeremy@zip.com.au>
+Copyright: (C) 2005 Markus Brueffer <markus@freebsd.org>
+Copyright: (C) 2006 Kris Kennaway <kris@freebsd.org>
+Copyright: (C) Jacob <mjacob@feral.com>
+Copyright: (C) 1995 Computer Systems Laboratory at the University
+Copyright: (C) 1994 HOSOKAWA Tatsumi <hosokawa@mt.cs.keio.ac.jp>
+Copyright: (C) 1997 ARM Limited
+Copyright: (C) 1995-2000 FORE Systems
+Copyright: (C) Francisco Moraes <fmoraes@nc.rr.com>
+Copyright: (C) Wolfgang Grandeggar <wolfgang@cec.ch>
+Copyright: (C) 1995 The University of Utah
+Copyright: (C) 2002-2003 MarcusCom Inc.
+Copyright: (C) Brown <rbrown64@csc.com.au>
+Copyright: (C) 2000 Dmitry Dicky <diwil@dataart.com>
+Copyright: (C) 1996 Jim Hayes
+Copyright: (C) 1998 128 bit DP
+Copyright: (C) Joe Marcus Clarke <marcus@freebsd.org>
+Copyright: (C) 2001-2004 ZyDAS Technology Corporation.
+Copyright: (C) 2004-2006 ARECA Co. Ltd.
+Copyright: (C) 1998-1999, 2001 Internet Research Institute Inc.
+Copyright: (C) Leendert van Doorn <leendert@watson.ibm.com>
+Copyright: (C) Jackson <toj@gorilla.net>
+Copyright: (C) 1999-2004 Rewritten on DDK
+Copyright: (C) 1999 Richard Henderson <rth@twiddle.net>
+Copyright: (C) 2008 Deglitch Networks
+Copyright: (C) Paolo Abeni <paolo.abeni@email.it>
+Copyright: (C) Fulko Hew <fulko.hew@gmail.com>
+Copyright: (C) 2002 Takeshi Shibagaki
+Copyright: (C) 1999 MAEKAWA Masahide <bishop@rr.iij4u.or.jp>
+Copyright: (C) 1996 The Leland Stanford
+Copyright: (C) David Dawes <dawes@xfree86.org>
+Copyright: (C) 1996 Matthias Pfaller.
+Copyright: (C) 2004-2006 Taipei Taiwan All Rights Reserved.
+Copyright: (C) Michal Ostrowski <mostrows@styx.uwaterloo.ca>
+Copyright: (C) 2004 Intel Research Cambridge
+Copyright: (C) 2001 ARM Ltd
+Copyright: (C) 2001 Dag-Erling Smørgrav
+Copyright: (C) Simon 'Horms' Horman <horms@verge.net.au>
+Copyright: (C) 2007 Shivakumar GN
+Copyright: (C) 2005 Travis Poppe
+Copyright: (C) 2008 Ilya Maykov <ivmaykov@gmail.com>
+Copyright: (C) 2002 Ositech Communications Inc. All Rights Reserved
+Copyright: (C) Christoph Egger <christoph.egger@amd.com>
+Copyright: (C) 2008 Carlos Corbacho
+Copyright: (C) 1995 Bruce Evans.
+Copyright: (C) 1998 Rev 2.03: Support
+Copyright: (C) 1992-1997 North Carolina.
+Copyright: (C) 1999 Brad Forschinger
+Copyright: (C) 2000-2001 Richard Hodges
+Copyright: (C) 1997 Research Center.
+Copyright: (C) 1998-08-07 Greg Troxel <gdt@ir.bbn.com>
+Copyright: (C) 1994-1995 Ignatios Souvatzis
+Copyright: (C) Okada <hokada@isl.melco.co.jp>
+Copyright: (C) 1988-1998 Specialix Research Ltd
+Copyright: (C) Oleg Cherevko <olwi@aq.ml.com.ua>
+Copyright: (C) 2001 Matt Dillon
+Copyright: (C) 2000 Nikolai Saoukh
+Copyright: (C) 2003 Hifn Inc.
+Copyright: (C) 2000 Sergey A. Babkin
+Copyright: (C) Hannes Gredler <hannes@juniper.net>
+
