@@ -203,11 +203,11 @@ extern int lchflags(__const char *__file, int __flags);
 
 /* Get device name in /dev with a device number of dev and a file type
    matching the one encoded in type.  */
-extern char *devname(dev_t dev, mode_t type) __THROW;
+extern char *devname(__dev_t dev, __mode_t type) __THROW;
 
 /* Store at most BUFLEN characters of the device name in /dev with a 
    device number of dev and a file type matching the one encoded in type.  */
-extern char *devname_r(dev_t dev, mode_t type, char *buf, int buflen) __THROW;
+extern char *devname_r(__dev_t dev, __mode_t type, char *buf, int buflen) __THROW;
 
 __END_DECLS
 

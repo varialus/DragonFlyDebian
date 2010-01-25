@@ -34,7 +34,7 @@
 #include <sys/sysctl.h>
 
 char *
-__devname_r(dev_t dev, mode_t type, char *buf, int len)
+__devname_r(__dev_t dev, __mode_t type, char *buf, int len)
 {
 	int i;
 	size_t j;
@@ -59,7 +59,7 @@ __devname_r(dev_t dev, mode_t type, char *buf, int len)
 
 
 char *
-__devname(dev_t dev, mode_t type)
+__devname(__dev_t dev, __mode_t type)
 {
 	static char buf[SPECNAMELEN + 1];
 
