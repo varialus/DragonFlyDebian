@@ -40,7 +40,7 @@ get-orig-source:
 		 sbin/mount_reiserfs sbin/mount \
 		 sbin/mdconfig sbin/ccdconfig sbin/swapon sbin/atacontrol sbin/camcontrol \
 	         sbin/gbde sbin/geom bin/kenv \
-		 usr.sbin/kbdcontrol share/syscons/keymaps \
+		 usr.sbin/kbdcontrol usr.sbin/vidcontrol share/syscons \
 		 sys/kern/syscalls.c etc/pf.os ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
@@ -57,7 +57,7 @@ lib-stamp: patch-stamp
 	$(MAKE) -C lib
 	touch $@
 
-build-arch: freebsd-utils gbde geli kbdcontrol kldutils freebsd-net-tools
+build-arch: freebsd-utils gbde geli kbdcontrol vidcontrol kldutils freebsd-net-tools
 
 freebsd-utils: freebsd-utils-stamp
 freebsd-utils-stamp: patch-stamp
@@ -107,6 +107,12 @@ kbdcontrol-stamp: patch-stamp
 	$(PMAKE) -C usr.sbin/kbdcontrol
 	sed -i -e "s/^choices=.*/choices=\"`cd share/syscons/keymaps && echo *.kbd | sed -e 's/ /, /g'`\"/g" \
 	debian/kbdcontrol.config
+	touch $@
+
+vidcontrol: vidcontrol-stamp
+vidcontrol-stamp: patch-stamp
+	$(PMAKE) -C usr.sbin/vidcontrol
+	$(PMAKE) -C share/syscons/scrnmaps
 	touch $@
 
 kldutils: kldutils-stamp
@@ -170,6 +176,9 @@ clean:
 	$(PMAKE) -C sbin/gbde clean
 
 	$(PMAKE) -C usr.sbin/kbdcontrol clean
+	
+	! [ -f usr.sbin/vidcontrol/Makefile ] || $(PMAKE) -C usr.sbin/vidcontrol clean
+	! [ -f share/syscons/scrnmap/Makefile ] || $(PMAKE) -C share/syscons/scrnmap clean
 
 	$(PMAKE) -C sbin/kldconfig clean
 	$(PMAKE) -C sbin/kldload clean
