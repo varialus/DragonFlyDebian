@@ -16,13 +16,13 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
  
  DPADD=	${LIBL} ${LIBSBUF}
 -LDADD=	-ll -lsbuf
-+LDADD=	-ll -lbsd
++LDADD=	-ll -lsbuf -lbsd
  
  CLEANFILES+=	kernconf.c
  
 --- a/usr.sbin/config/main.c
 +++ b/usr.sbin/config/main.c
-@@ -41,12 +41,18 @@
+@@ -41,12 +41,17 @@
    "$FreeBSD$";
  #endif /* not lint */
  
@@ -37,12 +37,11 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
 +
 +#ifndef BSD
 +#include <bsd/string.h> /* strlcpy, strlcat */
-+#include "sbuf.c"
 +#endif
  
  #include <assert.h>
  #include <ctype.h>
-@@ -605,7 +611,11 @@
+@@ -605,7 +610,11 @@
  	if ((dirp = opendir(p)) == NULL)
  		err(EX_OSERR, "opendir %s", p);
  	while ((dp = readdir(dirp)) != NULL) {
