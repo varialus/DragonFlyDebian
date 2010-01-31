@@ -18,7 +18,17 @@ Index: freebsd-utils/sbin/swapon/swapon.c
  #include <sys/stat.h>
  #include <sys/param.h>
  #include <sys/sysctl.h>
-@@ -71,6 +72,8 @@
+@@ -51,7 +52,9 @@
+ #include <fstab.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <bsd/stdlib.h>
+ #include <string.h>
++#include <bsd/string.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <libutil.h>
+@@ -71,6 +74,8 @@
  	int ch, doall;
  	int sflag = 0, lflag = 0, hflag = 0, qflag = 0;
  
@@ -27,7 +37,7 @@ Index: freebsd-utils/sbin/swapon/swapon.c
  	if ((ptr = strrchr(argv[0], '/')) == NULL)
  		ptr = argv[0];
  	if (strstr(ptr, "swapon"))
-@@ -80,7 +83,7 @@
+@@ -80,7 +85,7 @@
  	orig_prog = which_prog;
  	
  	doall = 0;
@@ -36,7 +46,7 @@ Index: freebsd-utils/sbin/swapon/swapon.c
  		switch(ch) {
  		case 'A':
  			if (which_prog == SWAPCTL) {
-@@ -132,6 +135,9 @@
+@@ -132,6 +137,9 @@
  				usage();
  			}
  			break;
@@ -46,7 +56,7 @@ Index: freebsd-utils/sbin/swapon/swapon.c
  		case '?':
  		default:
  			usage();
-@@ -271,7 +277,8 @@
+@@ -271,7 +279,8 @@
  	    hlen = 10;
  	    break;
  	default:
