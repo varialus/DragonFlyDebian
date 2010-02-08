@@ -24,6 +24,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <hp-timing.h>
+#include <sys/sysctl.h>
 
 static long int posix_sysconf (int name);
 
@@ -31,15 +32,33 @@ static long int posix_sysconf (int name);
 long int
 __sysconf (int name)
 {
-  if (name == _SC_CPUTIME || name == _SC_THREAD_CPUTIME)
+  int request[2];
+  int value;
+  size_t len = sizeof(value);
+
+  switch(name)
     {
+      case _SC_CPUTIME:
+      case _SC_THREAD_CPUTIME:
 #if HP_TIMING_AVAIL
-      // XXX We can add  here test for machines which cannot support a
-      // XXX usable TSC.
-      return 200809L;
+	// XXX We can add  here test for machines which cannot support a
+	// XXX usable TSC.
+	return 200809L;
 #else
-      return -1;
+	return -1;
 #endif
+      case _SC_NGROUPS_MAX:
+	request[0] = CTL_KERN;
+	request[1] = KERN_NGROUPS;
+	if (sysctl(request, 2, &value, &len, NULL, 0) == -1)
+	    return NGROUPS_MAX;
+	return (long)value;
+      case _SC_ARG_MAX:
+	request[0] = CTL_KERN;
+	request[1] = KERN_ARGMAX;
+	if (sysctl(request, 2, &value, &len, NULL, 0) == -1)
+	    return ARG_MAX;
+	return (long)value;
     }
   return posix_sysconf (name);
 }
