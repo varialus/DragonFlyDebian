@@ -1,39 +1,19 @@
 To be merged in the kfreebsd/ directory when 2.11 is the default
 
-Index: Makefile
-===================================================================
---- Makefile	(révision 2971)
-+++ Makefile	(copie de travail)
+--- a/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd/Makefile
+--- b/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd/Makefile
 @@ -36,7 +36,7 @@
  # For <fcntl.h>.
  sysdep_routines += sys_open sys_openat open_2
  # For <sys/stat.h>.
 -sysdep_routines += sys_fchmodat sys_fstat sys_fstatat sys_lstat sys_mkdirat sys_mkfifoat sys_mknod sys_mknodat sys_nfstat sys_nlstat sys_nstat sys_stat
-+sysdep_routines += sys_fchmodat sys_fstat sys_fstatat sys_lstat sys_mkdirat sys_mkfifoat sys_mknod sys_mknodat sys_nfstat sys_nlstat sys_nstat sys_stat chflags fchflags lchflags
++sysdep_routines += sys_fchmodat sys_fstat sys_fstatat sys_lstat sys_mkdirat sys_mkfifoat sys_mknod sys_mknodat sys_nfstat sys_nlstat sys_nstat sys_stat lchflags
  # For <sys/statfs.h>.
  sysdep_routines += fstatfs64 statfs64 sys_fstatfs sys_statfs
  # For <stdio.h>
-Index: syscalls.list
-===================================================================
---- syscalls.list	(révision 2971)
-+++ syscalls.list	(copie de travail)
-@@ -15,6 +15,7 @@
- sys_aio_suspend		-	aio_suspend		i:bnP		__syscall_aio_suspend
- sys_aio_waitcomplete	-	aio_waitcomplete	i:pp		__syscall_aio_waitcomplete
- sys_aio_write		-	aio_write		i:p		__syscall_aio_write
-+chflags			-	chflags			i:si		chflags
- sys_clock_getres	-	clock_getres		i:ip		__syscall_clock_getres
- sys_clock_gettime	-	clock_gettime		i:ip		__syscall_clock_gettime
- sys_clock_settime	-	clock_settime		i:ip		__syscall_clock_settime
-@@ -23,6 +24,7 @@
- extattr_delete_file	-	extattr_delete_file	i:ss		extattr_delete_file
- extattr_get_file	-	extattr_get_file	i:ssbn		extattr_get_file
- extattr_set_file	-	extattr_set_file	i:ssbn		extattr_set_file
-+fchflags		-	fchflags		i:ii		fchflags
- fhopen			-	fhopen			i:pi		fhopen
- sys_fork		-	fork			i:		__syscall_fork	fork
- sys_fhstat		-	fhstat			i:pp		__syscall_fhstat
-@@ -57,6 +59,7 @@
+--- a/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd/syscalls.list
++++ b/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd/syscalls.list
+@@ -15,6 +15,7 @@@ -57,6 +59,7 @@
  kldunload		-	kldunload		i:i		kldunload
  kldunloadf		-	kldunloadf		i:ii		kldunloadf
  ktrace			-	ktrace			i:siii		ktrace
@@ -41,16 +21,14 @@ Index: syscalls.list
  lchmod			-	lchmod			i:si		__lchmod lchmod
  lchown			-	lchown			i:sii		__lchown lchown
  sys_lio_listio		-	lio_listio		i:ibnP		__syscall_lio_listio
-Index: Versions
-===================================================================
---- Versions	(révision 2971)
-+++ Versions	(copie de travail)
+--- a/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd/Versions
++++ b/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd/Versions
 @@ -87,6 +87,9 @@
      kenv;
      sysctlnametomib;
    }
 +  GLIBC_2.11 {
-+    chflags; fchflags; lchflags;
++    lchflags;
 +  }
    GLIBC_PRIVATE {
      # needed by libpthread.
