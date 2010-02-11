@@ -50,6 +50,9 @@ __libc_open (const char *file, int oflag, ...)
     LIBC_CANCEL_RESET (oldtype);
   }
 
+#if 0
+/* At least 8.0 kernel seems be fine and this workaround does not respect "sysctl vfs.timestamp_precision" */
+
   if (fd >= 0 && (oflag & O_TRUNC))
     {
       /* Set the modification time.  The kernel ought to do this.  */
@@ -74,6 +77,7 @@ __libc_open (const char *file, int oflag, ...)
 	}
       __set_errno (saved_errno);
     }
+#endif
 
   return fd;
 }
