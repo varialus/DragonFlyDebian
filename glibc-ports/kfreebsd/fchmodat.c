@@ -136,4 +136,3 @@ fchmodat (fd, file, mode, flag)
     return __chmod(file, mode);
 #endif
 }
-stub_warning(fchmodat)

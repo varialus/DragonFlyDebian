@@ -312,5 +312,3 @@ __openat_2 (fd, file, oflag)
 }
 
 strong_alias (__openat_2, __openat64_2)
-stub_warning(openat)
-stub_warning(openat64)
