@@ -130,6 +130,9 @@ build-flavor-%-stamp: src config
 	# Add the abiname and the flavor to the kernel version
 	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)-$*"/g' $(FLAVOR_DIR)-$*/sys/conf/newvers.sh
 
+	# Change ident to the kernel version
+	sed -i -e 's/^i=.*/i="Debian $* ($(full_version))"/g' $(FLAVOR_DIR)-$*/sys/conf/newvers.sh
+
 	# Set /lib/modules/${RELEASE} as module dir
 	sed -i -e 's,^KODIR?=.*,KODIR="/lib/modules/$(version)-$(abiname)-$*",g' $(FLAVOR_DIR)-$*/sys/conf/kern.pre.mk
 
