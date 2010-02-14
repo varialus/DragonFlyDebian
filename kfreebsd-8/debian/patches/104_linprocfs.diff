@@ -2,8 +2,8 @@
 Improve linprocfs, see #344546, #521304, #460331
 for other/related problems.
 
---- a/sys//compat/linprocfs/linprocfs.c
-+++ b/sys//compat/linprocfs/linprocfs.c
+--- a/sys/compat/linprocfs/linprocfs.c
++++ b/sys/compat/linprocfs/linprocfs.c
 @@ -110,13 +110,36 @@
  /*
   * Various conversion macros
@@ -41,7 +41,7 @@ for other/related problems.
  /**
   * @brief Mapping of ki_stat in struct kinfo_proc to the linux state
   *
-@@ -498,12 +521,24 @@
+@@ -502,12 +525,24 @@
  {
  	long cp_time[CPUSTATES];
  	struct timeval tv;
@@ -67,7 +67,15 @@ for other/related problems.
  	return (0);
  }
  
-@@ -637,10 +672,10 @@
+@@ -634,25 +669,22 @@
+ 	PS_ADD("pgrp",		"%d",	p->p_pgid);
+ 	PS_ADD("session",	"%d",	p->p_session->s_sid);
+ 	PROC_UNLOCK(p);
+-	PS_ADD("tty",		"%d",	0); /* XXX */
++	PS_ADD("tty",		"%d",	kp.ki_tdev);
+ 	PS_ADD("tpgid",		"%d",	kp.ki_tpgid);
+ 	PS_ADD("flags",		"%u",	0); /* XXX */
+ 	PS_ADD("minflt",	"%lu",	kp.ki_rusage.ru_minflt);
  	PS_ADD("cminflt",	"%lu",	kp.ki_rusage_ch.ru_minflt);
  	PS_ADD("majflt",	"%lu",	kp.ki_rusage.ru_majflt);
  	PS_ADD("cmajflt",	"%lu",	kp.ki_rusage_ch.ru_majflt);
@@ -82,10 +90,10 @@ for other/related problems.
  	PS_ADD("priority",	"%d",	kp.ki_pri.pri_user);
  	PS_ADD("nice",		"%d",	kp.ki_nice); /* 19 (nicest) to -19 */
  	PS_ADD("0",		"%d",	0); /* removed field */
-@@ -648,7 +683,7 @@
- 	/* XXX: starttime is not right, it is the _same_ for _every_ process.
- 	   It should be the number of jiffies between system boot and process
- 	   start. */
+ 	PS_ADD("itrealvalue",	"%d",	0); /* XXX */
+-	/* XXX: starttime is not right, it is the _same_ for _every_ process.
+-	   It should be the number of jiffies between system boot and process
+-	   start. */
 -	PS_ADD("starttime",	"%lu",	T2J(tvtohz(&kp.ki_start)));
 +	PS_ADD("starttime",	"%lu",	TV2J((&kp.ki_start)) - TV2J((&boottime)));
  	PS_ADD("vsize",		"%ju",	P2K((uintmax_t)kp.ki_size));
