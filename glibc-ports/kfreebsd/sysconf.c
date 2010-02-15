@@ -50,13 +50,13 @@ __sysconf (int name)
       case _SC_NGROUPS_MAX:
 	request[0] = CTL_KERN;
 	request[1] = KERN_NGROUPS;
-	if (sysctl(request, 2, &value, &len, NULL, 0) == -1)
+	if (__sysctl(request, 2, &value, &len, NULL, 0) == -1)
 	    return NGROUPS_MAX;
 	return (long)value;
       case _SC_ARG_MAX:
 	request[0] = CTL_KERN;
 	request[1] = KERN_ARGMAX;
-	if (sysctl(request, 2, &value, &len, NULL, 0) == -1)
+	if (__sysctl(request, 2, &value, &len, NULL, 0) == -1)
 	    return ARG_MAX;
 	return (long)value;
     }
