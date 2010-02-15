@@ -154,140 +154,15 @@ __openat (fd, file, oflag)
       mode = va_arg (arg, int);
       va_end (arg);
     }
-
-# ifndef __ASSUME_ATFCTS
-  if (__have_atfcts >= 0)
-# endif
+  
+  if (SINGLE_THREAD_P)
+    return __openat_nocancel(fd, file, oflag, mode);
+  else
     {
-      if (SINGLE_THREAD_P)
-	{
-	  result = INLINE_SYSCALL (openat, 4, fd, file, oflag, mode);
-	}
-      else
-	{
-	  int oldtype = LIBC_CANCEL_ASYNC ();
-	  result = INLINE_SYSCALL (openat, 4, fd, file, oflag, mode);
-	  LIBC_CANCEL_RESET (oldtype);
-	}
-# ifndef __ASSUME_ATFCTS
-      if (result == -1 && errno == ENOSYS)
-	__have_atfcts = -1;
-# endif
+      int oldtype = LIBC_CANCEL_ASYNC ();
+      result = __openat_nocancel(fd, file, oflag, mode);
+      LIBC_CANCEL_RESET (oldtype);
     }
-
-#ifndef __ASSUME_ATFCTS
-  if (__have_atfcts < 0)
-    {
-      if (fd != AT_FDCWD && file[0] != '/')
-	{
-	  int mib[4];
-	  size_t kf_len = 0;
-	  char *kf_buf, *kf_bufp;
-	  size_t filelen;
-
-	  if (fd < 0)
-	    {
-	      __set_errno (EBADF);
-	      return -1;
-	    }
-
-	  filelen = strlen (file);
-	  if (__builtin_expect (filelen == 0, 0))
-	    {
-	      __set_errno (ENOENT);
-	      return -1;
-	    }
-
-	  mib[0] = CTL_KERN;
-	  mib[1] = KERN_PROC;
-	  mib[2] = KERN_PROC_FILEDESC;
-	  mib[3] = __getpid ();
-
-	  if (__sysctl (mib, 4, NULL, &kf_len, NULL, 0) != 0)
-	    {
-	      __set_errno (ENOSYS);
-	      return -1;
-	    }
-
-	  kf_buf = alloca (kf_len + filelen);
-	  if (__sysctl (mib, 4, kf_buf, &kf_len, NULL, 0) != 0)
-	    {
-	      __set_errno (ENOSYS);
-	      return -1;
-	    }
-
-	  kf_bufp = kf_buf;
-	  while (kf_bufp < kf_buf + kf_len)
-	    {
-	      struct kinfo_file *kf =
-		(struct kinfo_file *) (uintptr_t) kf_bufp;
-
-	      if (kf->kf_fd == fd)
-		{
-		  if (kf->kf_type != KF_TYPE_VNODE ||
-		      kf->kf_vnode_type != KF_VTYPE_VDIR)
-		    {
-		      __set_errno (ENOTDIR);
-		      return -1;
-		    }
-
-		  strcat (kf->kf_path, "/");
-		  strcat (kf->kf_path, file);
-		  file = kf->kf_path;
-		  break;
-		}
-	      kf_bufp += kf->kf_structsize;
-	    }
-
-	  if (kf_bufp >= kf_buf + kf_len)
-	    {
-	      __set_errno (EBADF);
-	      return -1;
-	    }
-	}
-      if (SINGLE_THREAD_P)
-	{
-	  result = INLINE_SYSCALL (open, 3, file, oflag, mode);
-	}
-      else
-	{
-	  int oldtype = LIBC_CANCEL_ASYNC ();
-	  result = INLINE_SYSCALL (open, 3, file, oflag, mode);
-	  LIBC_CANCEL_RESET (oldtype);
-	}
-
-    }
-#endif
-
-#if 0
-/* At least 8.0 kernel seems be fine and this workaround does not respect "sysctl vfs.timestamp_precision" */
-
-  if (result >= 0 && (oflag & O_TRUNC))
-    {
-      /* Set the modification time.  The kernel ought to do this.  */
-      int saved_errno = errno;
-      struct timeval tv[2];
-
-      if (__gettimeofday (&tv[1], NULL) >= 0)
-	{
-	  struct stat statbuf;
-
-	  if (__fxstat (_STAT_VER, result, &statbuf) >= 0)
-	    {
-	      tv[0].tv_sec = statbuf.st_atime;
-	      tv[0].tv_usec = 0;
-
-#ifdef NOT_IN_libc
-	      futimes (fd, tv);
-#else
-	      __futimes (fd, tv);
-#endif
-	    }
-	}
-      __set_errno (saved_errno);
-    }
-#endif
-
   return result;
 }
 

@@ -49,36 +49,6 @@ __libc_open (const char *file, int oflag, ...)
     fd = INLINE_SYSCALL (open, 3, file, oflag, mode);
     LIBC_CANCEL_RESET (oldtype);
   }
-
-#if 0
-/* At least 8.0 kernel seems be fine and this workaround does not respect "sysctl vfs.timestamp_precision" */
-
-  if (fd >= 0 && (oflag & O_TRUNC))
-    {
-      /* Set the modification time.  The kernel ought to do this.  */
-      int saved_errno = errno;
-      struct timeval tv[2];
-
-      if (__gettimeofday (&tv[1], NULL) >= 0)
-	{
-	  struct stat statbuf;
-
-	  if (__fxstat (_STAT_VER, fd, &statbuf) >= 0)
-	    {
-	      tv[0].tv_sec = statbuf.st_atime;
-	      tv[0].tv_usec = 0;
-
-#ifdef NOT_IN_libc
-	      futimes (fd, tv);
-#else
-	      __futimes (fd, tv);
-#endif
-	    }
-	}
-      __set_errno (saved_errno);
-    }
-#endif
-
   return fd;
 }
 libc_hidden_def (__libc_open)
