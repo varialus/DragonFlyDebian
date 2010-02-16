@@ -23,13 +23,28 @@ To be merged in the kfreebsd/ directory when 2.11 is the default
  sys_lio_listio		-	lio_listio		i:ibnP		__syscall_lio_listio
 --- a/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd/Versions
 +++ b/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd/Versions
-@@ -87,6 +87,9 @@
+@@ -87,6 +87,11 @@
      kenv;
      sysctlnametomib;
    }
 +  GLIBC_2.11 {
 +    lchflags;
++    #errlist-compat 94
++    _sys_errlist; sys_errlist; _sys_nerr; sys_nerr;
 +  }
    GLIBC_PRIVATE {
      # needed by libpthread.
      __clone; __libc_fork; __libc_sigaction;
+--- a/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd/bits/errno.h
++++ b/ports/sysdeps/unix/bsd/bsd4.4/kfreebsd/bits/errno.h
+@@ -155,8 +155,9 @@
+ #define	EMULTIHOP	90		/* Multihop attempted */
+ #define	ENOLINK		91		/* Link has been severed */
+ #define	EPROTO		92		/* Protocol error */
++#define	ENOTCAPABLE	93		/* Capabilities insufficient */
+ 
+-#define	ELAST		92		/* Must be equal largest errno */
++#define	ELAST		93		/* Must be equal largest errno */
+ 
+ # ifndef __ASSEMBLER__
+ /* Function to get address of global `errno' variable.  */

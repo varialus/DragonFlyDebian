@@ -155,8 +155,9 @@
 #define	EMULTIHOP	90		/* Multihop attempted */
 #define	ENOLINK		91		/* Link has been severed */
 #define	EPROTO		92		/* Protocol error */
+#define	ENOTCAPABLE	93		/* Capabilities insufficient */
 
-#define	ELAST		92		/* Must be equal largest errno */
+#define	ELAST		93		/* Must be equal largest errno */
 
 # ifndef __ASSEMBLER__
 /* Function to get address of global `errno' variable.  */
