@@ -37,7 +37,7 @@ for other/related problems.
  #define P2K(x) ((x) << (PAGE_SHIFT - 10))		/* pages to kbytes */
  
 +#define TV2J(x)	(((x)->tv_sec) * 100UL + ((x)->tv_usec) / 10000)
-+                
++
  /**
   * @brief Mapping of ki_stat in struct kinfo_proc to the linux state
   *
@@ -53,13 +53,13 @@ for other/related problems.
 +	for (cnt = 0, i = 0; i <= mp_maxid; ++i)
 +		if (!(CPU_ABSENT(i)))
 +		    cnt++;
-+		    
++
 +	if (!cnt)
 +	    cnt = 1;
-+	    
++
 +	i = ((cp_time[CP_IDLE])/cnt) % (stathz ? stathz : hz);
 +	i = (i * 100) / (stathz ? stathz : hz);
-+	
++
  	sbuf_printf(sb, "%lld.%02ld %ld.%02ld\n",
  	    (long long)tv.tv_sec, tv.tv_usec / 10000,
 -	    T2S(cp_time[CP_IDLE]), T2J(cp_time[CP_IDLE]) % 100);
@@ -67,7 +67,25 @@ for other/related problems.
  	return (0);
  }
  
-@@ -634,25 +669,22 @@
+@@ -613,9 +648,17 @@
+ 	struct kinfo_proc kp;
+ 	char state;
+ 	static int ratelimit = 0;
++	unsigned long startcode, startdata;
+ 
+ 	PROC_LOCK(p);
+ 	fill_kinfo_proc(p, &kp);
++	if (p->p_vmspace) {
++	   startcode = (unsigned long) p->p_vmspace->vm_taddr;
++	   startdata = (unsigned long) p->p_vmspace->vm_daddr;
++	} else {
++	   startcode = 0;
++	   startdata = 0;
++	};
+ 	sbuf_printf(sb, "%d", p->p_pid);
+ #define PS_ADD(name, fmt, arg) sbuf_printf(sb, " " fmt, arg)
+ 	PS_ADD("comm",		"(%s)",	p->p_comm);
+@@ -634,30 +677,27 @@
  	PS_ADD("pgrp",		"%d",	p->p_pgid);
  	PS_ADD("session",	"%d",	p->p_session->s_sid);
  	PROC_UNLOCK(p);
@@ -99,7 +117,14 @@ for other/related problems.
  	PS_ADD("vsize",		"%ju",	P2K((uintmax_t)kp.ki_size));
  	PS_ADD("rss",		"%ju",	(uintmax_t)kp.ki_rssize);
  	PS_ADD("rlim",		"%lu",	kp.ki_rusage.ru_maxrss);
-@@ -832,7 +832,7 @@
+-	PS_ADD("startcode",	"%u",	(unsigned)0);
+-	PS_ADD("endcode",	"%u",	0); /* XXX */
++	PS_ADD("startcode",	"%u",	startcode);
++	PS_ADD("endcode",	"%u",	startdata);
+ 	PS_ADD("startstack",	"%u",	0); /* XXX */
+ 	PS_ADD("kstkesp",	"%u",	0); /* XXX */
+ 	PS_ADD("kstkeip",	"%u",	0); /* XXX */
+@@ -800,7 +840,7 @@
  	 */
  	sbuf_printf(sb, "VmSize:\t%8ju kB\n",	B2K((uintmax_t)kp.ki_size));
  	sbuf_printf(sb, "VmLck:\t%8u kB\n",	P2K(0)); /* XXX */
