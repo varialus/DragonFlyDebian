@@ -136,3 +136,4 @@ futimesat (fd, file, tvp)
   return __utimes(file, tvp);
 #endif
 }
+stub_warning(futimesat)

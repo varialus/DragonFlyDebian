@@ -101,3 +101,4 @@ fexecve (fd, argv, envp)
   return -1;
 #endif
 }
+stub_warning(fexecve)
