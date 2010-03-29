@@ -18,7 +18,7 @@ Index: src/usr.sbin/config/Makefile
  
  DPADD=	${LIBL} ${LIBSBUF}
 -LDADD=	-ll -lsbuf
-+LDADD=	-ll -lbsd
++LDADD=	-ll -lsbuf -lbsd
  
  CLEANFILES+=	kernconf.c
  
@@ -26,7 +26,7 @@ Index: src/usr.sbin/config/main.c
 ===================================================================
 --- src.orig/usr.sbin/config/main.c
 +++ src/usr.sbin/config/main.c
-@@ -41,12 +41,18 @@
+@@ -41,12 +41,17 @@
    "$FreeBSD: src/usr.sbin/config/main.c,v 1.76.2.1.4.1 2009/04/15 03:14:26 kensmith Exp $";
  #endif /* not lint */
  
@@ -41,7 +41,6 @@ Index: src/usr.sbin/config/main.c
 +
 +#ifndef BSD
 +#include <bsd/string.h> /* strlcpy, strlcat */
-+#include "sbuf.c"
 +#endif
  
  #include <assert.h>
