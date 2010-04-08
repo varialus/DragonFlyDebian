@@ -7,8 +7,6 @@ SHELL = bash
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-SVN=http://svn.freebsd.org/base/release/8.0.0/
-
 full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
 version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
@@ -20,7 +18,7 @@ flavours	:= $(config_files:debian/arch/$(cpu)/%.config=%)
 configfile	:= DEBCUSTOM
 abiname		:= 1
 
-SVN		:= svn://svn.freebsd.org/base/release/$(version).0
+SVN		:= http://svn.freebsd.org/base/release/$(version).0
 SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
 IMAGE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname)
 HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-headers-$(version)-$(abiname)
