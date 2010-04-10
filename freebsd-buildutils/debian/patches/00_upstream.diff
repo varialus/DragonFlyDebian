@@ -258,16 +258,6 @@ diff -ur src.old/usr.sbin/mtree/mtree.h src/usr.sbin/mtree/mtree.h
 diff -ur src.old/usr.sbin/mtree/spec.c src/usr.sbin/mtree/spec.c
 --- src.old/usr.sbin/mtree/spec.c	2005-03-29 13:44:17.000000000 +0200
 +++ src/usr.sbin/mtree/spec.c	2006-02-09 19:27:56.000000000 +0100
-@@ -169,7 +169,9 @@
- 	char *kw, *val = NULL;
- 	struct group *gr;
- 	struct passwd *pw;
-+#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
- 	mode_t *m;
-+#endif
- 	int value;
- 	char *ep;
- 
 @@ -204,12 +206,14 @@
  			if(!ip->rmd160digest)
  				errx(1, "strdup");

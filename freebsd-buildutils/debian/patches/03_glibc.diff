@@ -1,6 +1,3 @@
-
-  FIXME:  use libbsd instead (strlcpy, strvis, strunvis ...)
-
 diff -ur ../foo.old/src/usr.sbin/btxld/btx.h ./src/usr.sbin/btxld/btx.h
 --- ../foo.old/src/usr.sbin/btxld/btx.h	1999-08-28 03:15:41.000000000 +0200
 +++ ./src/usr.sbin/btxld/btx.h	2005-12-16 23:52:43.000000000 +0100
@@ -44,128 +41,9 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  
 -CFLAGS+= -DMD5 -DSHA1 -DRMD160 -DSHA256
 -DPADD=	${LIBMD}
--LDADD+=	-lmd
+-LDADD=	-lmd
 -
  .include <bsd.prog.mk>
-diff -ur ../foo.old/src/usr.sbin/mtree/compare.c ./src/usr.sbin/mtree/compare.c
---- ../foo.old/src/usr.sbin/mtree/compare.c	2005-12-16 23:52:51.000000000 +0100
-+++ ./src/usr.sbin/mtree/compare.c	2005-12-16 23:52:43.000000000 +0100
-@@ -59,7 +59,9 @@
- #include <stdio.h>
- #include <time.h>
- #include <unistd.h>
-+#ifdef __FreeBSD__
- #include <vis.h>
-+#endif
- 
- #include "mtree.h"
- #include "extern.h"
-@@ -387,6 +389,21 @@
- 	if ((len = readlink(name, tbuf, sizeof(tbuf) - 1)) == -1)
- 		err(1, "line %d: %s", lineno, name);
- 	tbuf[len] = '\0';
-+
-+#ifdef __FreeBSD__
- 	strvis(lbuf, tbuf, VIS_WHITE | VIS_OCTAL);
-+#else
-+	int i = 0, j = 0;
-+	/* borrowed from src/lib/libc/gen/vis.c [rmh] */
-+	while (tbuf[j] != 0)
-+	  {
-+	    lbuf[i++] = '\\';
-+	    lbuf[i++] = ((u_char) tbuf[j] >> 6 & 07) + '0';
-+	    lbuf[i++] = ((u_char) tbuf[j] >> 3 & 07) + '0';
-+	    lbuf[i++] = ((u_char) tbuf[j] & 07) + '0';
-+	    j++;
-+	  }
-+	lbuf[i++] = '\0';
-+#endif
- 	return (lbuf);
- }
-diff -ur ../foo.old/src/usr.sbin/mtree/create.c ./src/usr.sbin/mtree/create.c
---- ../foo.old/src/usr.sbin/mtree/create.c	2005-12-16 23:52:51.000000000 +0100
-+++ ./src/usr.sbin/mtree/create.c	2005-12-16 23:52:43.000000000 +0100
-@@ -60,7 +60,6 @@
- #include <stdio.h>
- #include <time.h>
- #include <unistd.h>
--#include <vis.h>
- #include "mtree.h"
- #include "extern.h"
- 
-@@ -160,7 +159,23 @@
- 	escaped_name = calloc(1, p->fts_namelen * 4  +  1);
- 	if (escaped_name == NULL)
- 		errx(1, "statf(): calloc() failed");
--	strvis(escaped_name, p->fts_name, VIS_WHITE | VIS_OCTAL | VIS_GLOB);
-+#ifdef __FreeBSD__
-+  	strvis(escaped_name, p->fts_name, VIS_WHITE | VIS_OCTAL | VIS_GLOB);
-+#else
-+	/* borrowed from src/lib/libc/gen/vis.c
-+	   FIXME: this replacement was meant for VIS_WHITE | VIS_OCTAL, but
-+	   not VIS_GLOB. I'll have to review that. */
-+	int i = 0, j = 0;
-+	while (p->fts_name[j] != 0)
-+	  {
-+	    escaped_name[i++] = '\\';
-+	    escaped_name[i++] = ((u_char) p->fts_name[j] >> 6 & 07) + '0';
-+	    escaped_name[i++] = ((u_char) p->fts_name[j] >> 3 & 07) + '0';
-+	    escaped_name[i++] = ((u_char) p->fts_name[j] & 07) + '0';
-+	    j++;
-+	  }
-+	escaped_name[i++] = '\0';
-+#endif
- 
- 	if (iflag || S_ISDIR(p->fts_statp->st_mode))
- 		offset = printf("%*s%s", indent, "", escaped_name);
-diff -ur ../foo.old/src/usr.sbin/mtree/spec.c ./src/usr.sbin/mtree/spec.c
---- ../foo.old/src/usr.sbin/mtree/spec.c	2005-12-16 23:52:51.000000000 +0100
-+++ ./src/usr.sbin/mtree/spec.c	2005-12-16 23:52:43.000000000 +0100
-@@ -45,7 +45,6 @@
- #include <pwd.h>
- #include <stdio.h>
- #include <unistd.h>
--#include <vis.h>
- #include "mtree.h"
- #include "extern.h"
- 
-@@ -143,8 +142,10 @@
- #define	MAGIC	"?*["
- 		if (strpbrk(p, MAGIC))
- 			centry->flags |= F_MAGIC;
-+#ifdef __FreeBSD__ /* this is just to detect invalid scape sequences */
- 		if (strunvis(centry->name, p) == -1)
- 			errx(1, "filename %s is ill-encoded", p);
-+#endif
- 		set(NULL, centry);
- 
- 		if (!root) {
-@@ -228,11 +229,7 @@
- 			/* just set flag bit */
- 			break;
- 		case F_MODE:
--			if ((m = setmode(val)) == NULL)
--				errx(1, "line %d: invalid file mode %s",
--				lineno, val);
--			ip->st_mode = getmode(m, 0);
--			free(m);
-+			sscanf (val, "%o", &(ip->st_mode));
- 			break;
- 		case F_NLINK:
- 			ip->st_nlink = strtoul(val, &ep, 10);
-@@ -250,8 +247,10 @@
- 			ip->slink = malloc(strlen(val) + 1);
- 			if (ip->slink == NULL)
- 				errx(1, "malloc");
--			if (strunvis(ip->slink, val) == -1)
--				errx(1, "symlink %s is ill-encoded", val);
-+#ifdef __FreeBSD__ /* this is just to detect invalid scape sequences */
-+  			if (strunvis(ip->slink, val) == -1)
-+  				errx(1, "symlink %s is ill-encoded", val);
-+#endif
- 			break;
- #ifdef ST_MTIM
- 		case F_TIME:
 --- src/usr.sbin/mtree/specspec.c~	2005-12-17 11:59:50.000000000 +0100
 +++ src/usr.sbin/mtree/specspec.c	2005-12-17 12:04:11.000000000 +0100
 @@ -83,8 +83,6 @@
@@ -177,3 +55,215 @@ diff -ur ../foo.old/src/usr.sbin/mtree/spec.c ./src/usr.sbin/mtree/spec.c
  	printf("\n");
  }
  
+--- src/usr.bin/make/cond.c
++++ src/usr.bin/make/cond.c
+@@ -1115,7 +1115,7 @@
+  *	Handle .else statement.
+  */
+ void
+-Cond_Else(char *line __unused, int code __unused, int lineno __unused)
++Cond_Else(char *line, int code, int lineno)
+ {
+ 
+ 	while (isspace((u_char)*line))
+@@ -1156,7 +1156,7 @@
+  *	Handle .endif statement.
+  */
+ void
+-Cond_Endif(char *line __unused, int code __unused, int lineno __unused)
++Cond_Endif(char *line, int code, int lineno)
+ {
+ 
+ 	while (isspace((u_char)*line))
+--- src/usr.bin/make/job.c
++++ src/usr.bin/make/job.c
+@@ -473,7 +473,7 @@
+ }
+ 
+ static void
+-catch_child(int sig __unused)
++catch_child(int sig)
+ {
+ }
+ 
+@@ -2189,7 +2189,7 @@
+  */
+ void
+ #ifdef USE_KQUEUE
+-Job_CatchOutput(int flag __unused)
++Job_CatchOutput(int flag)
+ #else
+ Job_CatchOutput(int flag)
+ #endif
+--- src/usr.bin/make/parse.c
++++ src/usr.bin/make/parse.c
+@@ -2210,13 +2210,13 @@
+ }
+ 
+ static void
+-parse_include(char *file, int code __unused, int lineno __unused)
++parse_include(char *file, int code, int lineno)
+ {
+ 	xparse_include(file, 0);
+ }
+ 
+ static void
+-parse_sinclude(char *file, int code __unused, int lineno __unused)
++parse_sinclude(char *file, int code, int lineno)
+ {
+ 	xparse_include(file, 1);
+ }
+@@ -2230,7 +2230,7 @@
+  *	a warning if the directive is malformed.
+  */
+ static void
+-parse_message(char *line, int iserror, int lineno __unused)
++parse_message(char *line, int iserror, int lineno)
+ {
+ 
+ 	if (!isspace((u_char)*line)) {
+@@ -2257,7 +2257,7 @@
+  *	Parse an .undef directive.
+  */
+ static void
+-parse_undef(char *line, int code __unused, int lineno __unused)
++parse_undef(char *line, int code , int lineno)
+ {
+ 	char *cp;
+ 
+@@ -2279,7 +2279,7 @@
+  *	Parse a .for directive.
+  */
+ static void
+-parse_for(char *line, int code __unused, int lineno)
++parse_for(char *line, int code, int lineno)
+ {
+ 
+ 	if (!For_For(line)) {
+@@ -2311,7 +2311,7 @@
+  *	Parse endfor. This may only happen if there was no matching .for.
+  */
+ static void
+-parse_endfor(char *line __unused, int code __unused, int lineno __unused)
++parse_endfor(char *line, int code, int lineno)
+ {
+ 
+ 	Parse_Error(PARSE_FATAL, "for-less endfor");
+--- src/usr.bin/make/proc.h
++++ src/usr.bin/make/proc.h
+@@ -48,6 +48,6 @@
+ 	pid_t	child_pid;
+ } ProcStuff;
+ 
+-void Proc_Exec(const ProcStuff *) __dead2;
++void Proc_Exec(const ProcStuff *);
+ 
+ #endif /* proc_h_458845848 */
+--- src/usr.bin/make/shell.c
++++ src/usr.bin/make/shell.c
+@@ -120,7 +120,7 @@
+  */
+ static struct Shells shells = TAILQ_HEAD_INITIALIZER(shells);
+ 
+-void ShellDump(const struct Shell *) __unused;
++void ShellDump(const struct Shell *);
+ 
+ /**
+  * Helper function for sorting the builtin list alphabetically.
+--- src/usr.bin/make/util.c
++++ src/usr.bin/make/util.c
+@@ -61,7 +61,7 @@
+ #include "targ.h"
+ #include "util.h"
+ 
+-static void enomem(void) __dead2;
++static void enomem(void);
+ 
+ /*-
+  * Debug --
+--- src/usr.bin/make/util.h
++++ src/usr.bin/make/util.h
+@@ -103,10 +103,10 @@
+ void Debug(const char *, ...);
+ void DebugM(const char *, ...);
+ void Error(const char *, ...);
+-void Fatal(const char *, ...) __dead2;
+-void Punt(const char *, ...) __dead2;
+-void DieHorribly(void) __dead2;
+-void Finish(int) __dead2;
++void Fatal(const char *, ...);
++void Punt(const char *, ...);
++void DieHorribly(void);
++void Finish(int);
+ char *estrdup(const char *);
+ void *emalloc(size_t);
+ void *erealloc(void *, size_t);
+--- src/usr.bin/make/var.c
++++ src/usr.bin/make/var.c
+@@ -248,7 +248,7 @@
+  *	The trimmed word is added to the buffer.
+  */
+ static Boolean
+-VarHead(const char *word, Boolean addSpace, Buffer *buf, void *dummy __unused)
++VarHead(const char *word, Boolean addSpace, Buffer *buf, void *dummy)
+ {
+ 	char *slash;
+ 
+@@ -283,7 +283,7 @@
+  *	The trimmed word is added to the buffer.
+  */
+ static Boolean
+-VarTail(const char *word, Boolean addSpace, Buffer *buf, void *dummy __unused)
++VarTail(const char *word, Boolean addSpace, Buffer *buf, void *dummy)
+ {
+ 	const char *slash;
+ 
+@@ -312,7 +312,7 @@
+  *	The suffix from the word is placed in the buffer.
+  */
+ static Boolean
+-VarSuffix(const char *word, Boolean addSpace, Buffer *buf, void *dummy __unused)
++VarSuffix(const char *word, Boolean addSpace, Buffer *buf, void *dummy)
+ {
+ 	const char *dot;
+ 
+@@ -340,7 +340,7 @@
+  *	The trimmed word is added to the buffer.
+  */
+ static Boolean
+-VarRoot(const char *word, Boolean addSpace, Buffer *buf, void *dummy __unused)
++VarRoot(const char *word, Boolean addSpace, Buffer *buf, void *dummy)
+ {
+ 	char *dot;
+ 
+--- src/usr.bin/yacc/main.c
++++ src/usr.bin/yacc/main.c
+@@ -114,7 +114,7 @@
+ 
+ volatile sig_atomic_t sigdie;
+ 
+-__dead2 void
++ void
+ done(k)
+ int k;
+ {
+@@ -128,7 +128,7 @@
+ 
+ static void
+ onintr(signo)
+-	int signo __unused;
++	int signo;
+ {
+     sigdie = 1;
+     done(1);
+--- src/usr.sbin/mtree/compare.c
++++ src/usr.sbin/mtree/compare.c
+@@ -72,7 +72,7 @@
+ 	}
+ 
+ int
+-compare(char *name __unused, NODE *s, FTSENT *p)
++compare(char *name , NODE *s, FTSENT *p)
+ {
+ 	struct timeval tv[2];
+ 	uint32_t val;
