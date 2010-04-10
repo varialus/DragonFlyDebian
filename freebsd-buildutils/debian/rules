@@ -11,6 +11,10 @@ DEB_BUILD_GNU_TYPE	:= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 DEB_BUILD_GNU_CPU	:= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
 DEB_HOST_ARCH_CPU	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
+ifneq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
+    export STRIPFLAG=
+endif
+
 VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
 SVN=svn://svn.freebsd.org/base/release/$(VERSION).0
 ORIGDIR=freebsd-buildutils-$(VERSION)
