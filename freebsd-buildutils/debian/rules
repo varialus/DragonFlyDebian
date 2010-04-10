@@ -11,6 +11,9 @@ DEB_BUILD_GNU_TYPE	:= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 DEB_BUILD_GNU_CPU	:= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
 DEB_HOST_ARCH_CPU	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
+VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
+SVN=svn://svn.freebsd.org/base/release/$(VERSION).0
+ORIGDIR=freebsd-buildutils-$(VERSION)
 PMAKE=pmake
 CFLAGS=-O2 -g -Wall -DMACHINE_ARCH='"$(DEB_HOST_ARCH_CPU)"' -D_GNU_SOURCE --include bsd/string.h --include bsd/random.h -I$(CURDIR)/build-tree/src/sys
 MAKE_BUILD_FLAGS= CC=gcc NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
@@ -19,13 +22,22 @@ export LDADD=-lbsd
 
 package=freebsd-buildutils
 
+get-orig-source:
+	rm -rf $(ORIGDIR)
+	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
+	        sys/kern/syscalls.c ; do \
+	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
+	done
+	tar --numeric-owner --owner 0 --group 0 -czf ../freebsd-buildutils_$(VERSION).orig.tar.gz $(ORIGDIR)
+	rm -rf $(ORIGDIR)
+
 unpack: unpack-stamp
 unpack-stamp:
 	mkdir build-tree
 	tar -C build-tree -xzf src.tar.gz
 	find build-tree -type d -name CVS | xargs rm -rf
 	find build-tree -type f | (set -e ; while read i ; do sed -i $$i \
-		-e "/^__FBSDID/d" -e "s,<sys/queue.h>,<bsd/queue.h>,g" -e "s/^LDADD=/LDADD+=/g" \
+		-e "/^__FBSDID/d" -e "s,<sys/queue.h>,<bsd/sys/queue.h>,g" -e "s/^LDADD=/LDADD+=/g" \
 		-e "s/[ \t]*__\(dead2\|unused\|result\)[ \t]*/ /g" \
 		-e "s/getline/bsd_&/g" \
 	; done)
