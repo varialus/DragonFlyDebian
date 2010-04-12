@@ -1,16 +1,15 @@
-diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
---- ports.old/Mk/bsd.port.mk	2006-02-13 14:38:58.000000000 +0100
-+++ ports/Mk/bsd.port.mk	2006-02-13 14:40:38.000000000 +0100
-@@ -3336,7 +3332,7 @@
+--- a/ports/Mk/bsd.port.mk
++++ b/ports/Mk/bsd.port.mk
+@@ -3484,7 +3484,7 @@
  .if !defined(DISABLE_VULNERABILITIES) && !defined(PACKAGE_BUILDING)
  	@if [ -f "${AUDITFILE}" ]; then \
  		audit_created=`${_EXTRACT_AUDITFILE} | \
 -			${SED} -nEe "1s/^#CREATED: *([0-9]{4})-?([0-9]{2})-?([0-9]{2}).*$$/\1\2\3/p"`; \
 +			${SED} -ne "1s/^#CREATED: *([0-9]{4})-?([0-9]{2})-?([0-9]{2}).*$$/\1\2\3/p"`; \
- 		audit_expiry=`date -u -v-14d "+%Y%m%d"`; \
+ 		audit_expiry=`/bin/date -u -v-14d "+%Y%m%d"`; \
  		if [ "$$audit_created" -lt "$$audit_expiry" ]; then \
  			${ECHO_MSG} "===>  WARNING: Vulnerability database out of date, checking anyway"; \
-@@ -3440,7 +3436,7 @@
+@@ -3588,7 +3588,7 @@
  	@cd ${_DISTDIR};\
  	${_PATCH_SITES_ENV} ; \
  	for _file in ${PATCHFILES}; do \
@@ -19,7 +18,7 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
  		force_fetch=false; \
  		filebasename=$${file##*/}; \
-@@ -4415,7 +4411,7 @@
+@@ -4665,7 +4665,7 @@
  	@(cd ${_DISTDIR}; \
  	 ${_MASTER_SITES_ENV} ; \
  	 for _file in ${DISTFILES}; do \
@@ -28,7 +27,7 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
  		if [ ! -f $$file -a ! -f $${file##*/} ]; then \
  			if [ ! -z "$$select" ] ; then \
-@@ -4452,7 +4448,7 @@
+@@ -4702,7 +4702,7 @@
  	@(cd ${_DISTDIR}; \
  	 ${_PATCH_SITES_ENV} ; \
  	 for _file in ${PATCHFILES}; do \
@@ -37,7 +36,7 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
  		if [ ! -f $$file -a ! -f $${file##*/} ]; then \
  			if [ ! -z "$$select" ] ; then \
-@@ -4488,7 +4484,7 @@
+@@ -4738,7 +4738,7 @@
  	@(cd ${_DISTDIR}; \
  	${_MASTER_SITES_ENV}; \
  	for _file in ${DISTFILES}; do \
@@ -46,7 +45,7 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
  		if [ ! -z "${LISTALL}" -o ! -f $$file -a ! -f `${BASENAME} $$file` ]; then \
  			if [ ! -z "$$select" ] ; then \
-@@ -4519,7 +4515,7 @@
+@@ -4769,7 +4769,7 @@
  	@(cd ${_DISTDIR}; \
  	${_PATCH_SITES_ENV} ; \
  	for _file in ${PATCHFILES}; do \
@@ -55,7 +54,16 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
  		if [ ! -z "${LISTALL}" -o ! -f $$file -a ! -f `${BASENAME} $$file` ]; then \
  			if [ ! -z "$$select" ] ; then \
-@@ -5173,7 +5169,7 @@
+@@ -5155,7 +5155,7 @@
+ .if defined(LIB_DEPENDS) && !defined(NO_DEPENDS)
+ 	@for i in ${LIB_DEPENDS}; do \
+ 		lib=$${i%%:*}; \
+-		pattern="`${ECHO_CMD} $$lib | ${SED} -E -e 's/\./\\\\./g' -e 's/(\\\\)?\+/\\\\+/g'`"\
++		pattern="`${ECHO_CMD} $$lib | ${SED} -e 's/\./\\\\./g' -e 's/(\\\\)?\+/\\\\+/g'`"\
+ 		dir=$${i#*:}; \
+ 		target=$${i##*:}; \
+ 		if ${TEST} $$dir = $$target; then \
+@@ -5419,7 +5419,7 @@
  .endif
  
  BUILD-DEPENDS-LIST= \
@@ -64,7 +72,7 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  		if [ -d $$dir ]; then \
  			${ECHO_CMD} $$dir; \
  		else \
-@@ -5489,7 +5485,7 @@
+@@ -5768,7 +5768,7 @@
  	done
  	@${ECHO_CMD} '@cwd ${PREFIX}' >> ${TMPPLIST}
  .endif
@@ -73,7 +81,7 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  		${ECHO_CMD} "@unexec rm -f %D/$$i %D/$${i%.gz} %D/$${i%.bz2} %D/$$i.gz %D/$$i.bz2" >> ${TMPPLIST}; \
  	done
  .endfor
-@@ -5540,7 +5536,7 @@
+@@ -5826,7 +5826,7 @@
  add-plist-docs:
  .if defined(PORTDOCS) && !defined(NOPORTDOCS)
  	@if ${EGREP} -qe '^@cw?d' ${TMPPLIST} && \
@@ -82,7 +90,7 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  		${ECHO_CMD} "@cwd ${PREFIX}" >> ${TMPPLIST}; \
  	fi
  .for x in ${PORTDOCS}
-@@ -5563,7 +5559,7 @@
+@@ -5849,7 +5849,7 @@
  add-plist-examples:
  .if defined(PORTEXAMPLES) && !defined(NOPORTEXAMPLES)
  	@if ${EGREP} -qe '^@cw?d' ${TMPPLIST} && \
@@ -91,7 +99,7 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  		${ECHO_CMD} "@cwd ${PREFIX}" >> ${TMPPLIST}; \
  	fi
  .for x in ${PORTEXAMPLES}
-@@ -5587,7 +5583,7 @@
+@@ -5873,7 +5873,7 @@
  add-plist-data:
  .if defined(PORTDATA) && !defined(NOPORTDATA)
  	@if ${EGREP} -qe '^@cw?d' ${TMPPLIST} && \
@@ -100,22 +108,20 @@ diff -ur ports.old/Mk/bsd.port.mk ports/Mk/bsd.port.mk
  		${ECHO_CMD} "@cwd ${PREFIX}" >> ${TMPPLIST}; \
  	fi
  .for x in ${PORTDATA}
-diff -ur src/share/mk.old/bsd.port.mk src/share/mk/bsd.port.mk
---- src/share/mk.old/bsd.port.mk	2006-02-17 14:36:48.000000000 +0100
-+++ src/share/mk/bsd.port.mk	2006-02-17 14:37:53.000000000 +0100
+--- a/src/share/mk/bsd.port.mk
++++ b/src/share/mk/bsd.port.mk
 @@ -1,6 +1,6 @@
- # $FreeBSD: src/share/mk/bsd.port.mk,v 1.307 2004/07/02 20:47:18 eik Exp $
+ # $FreeBSD$
  
 -PORTSDIR?=	/usr/ports
 +PORTSDIR?=	/usr/share
  BSDPORTMK?=	${PORTSDIR}/Mk/bsd.port.mk
  
- .include <bsd.own.mk>
-diff -ur src/share/mk.old/bsd.port.subdir.mk src/share/mk/bsd.port.subdir.mk
---- src/share/mk.old/bsd.port.subdir.mk	2006-02-17 14:36:48.000000000 +0100
-+++ src/share/mk/bsd.port.subdir.mk	2006-02-17 14:38:03.000000000 +0100
+ # Needed to keep bsd.own.mk from reading in /etc/src.conf
+--- a/src/share/mk/bsd.port.subdir.mk
++++ b/src/share/mk/bsd.port.subdir.mk
 @@ -1,6 +1,6 @@
- # $FreeBSD: src/share/mk/bsd.port.subdir.mk,v 1.31 2004/07/02 20:47:18 eik Exp $
+ # $FreeBSD$
  
 -PORTSDIR?=	/usr/ports
 +PORTSDIR?=	/usr/share

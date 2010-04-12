@@ -1,6 +1,5 @@
-diff -ur src.old/usr.bin/cksum/cksum.c src/usr.bin/cksum/cksum.c
---- src.old/usr.bin/cksum/cksum.c	2003-03-14 00:32:28.000000000 +0100
-+++ src/usr.bin/cksum/cksum.c	2006-02-09 19:27:55.000000000 +0100
+--- a/src/usr.bin/cksum/cksum.c
++++ b/src/usr.bin/cksum/cksum.c
 @@ -57,6 +57,7 @@
  #include <stdlib.h>
  #include <string.h>
@@ -9,9 +8,8 @@ diff -ur src.old/usr.bin/cksum/cksum.c src/usr.bin/cksum/cksum.c
  
  #include "extern.h"
  
-diff -ur src.old/usr.bin/cksum/extern.h src/usr.bin/cksum/extern.h
---- src.old/usr.bin/cksum/extern.h	2003-03-14 00:32:28.000000000 +0100
-+++ src/usr.bin/cksum/extern.h	2006-02-09 19:27:55.000000000 +0100
+--- a/src/usr.bin/cksum/extern.h
++++ b/src/usr.bin/cksum/extern.h
 @@ -35,6 +35,7 @@
   */
  
@@ -20,18 +18,17 @@ diff -ur src.old/usr.bin/cksum/extern.h src/usr.bin/cksum/extern.h
  
  __BEGIN_DECLS
  int	crc(int, uint32_t *, off_t *);
-diff -ur src.old/usr.bin/make/main.c src/usr.bin/make/main.c
---- src.old/usr.bin/make/main.c	2005-12-17 12:46:35.000000000 +0100
-+++ src/usr.bin/make/main.c	2006-02-09 19:28:13.000000000 +0100
-@@ -930,6 +930,7 @@
+--- a/src/usr.bin/make/main.c
++++ b/src/usr.bin/make/main.c
+@@ -946,6 +946,7 @@
  	}
  #endif
  
 +#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
  	/*
- 	 * FreeBSD/pc98 kernel used to set the utsname.machine to
- 	 * "i386", and MACHINE was defined as "i386", so it could
-@@ -950,6 +951,7 @@
+ 	 * Prior to 7.0, FreeBSD/pc98 kernel used to set the
+ 	 * utsname.machine to "i386", and MACHINE was defined as
+@@ -965,6 +966,7 @@
  				machine = "pc98";
  		}
  	}
@@ -39,10 +36,9 @@ diff -ur src.old/usr.bin/make/main.c src/usr.bin/make/main.c
  
  	/*
  	 * Get the name of this type of MACHINE from utsname
-diff -ur src.old/usr.sbin/config/main.c src/usr.sbin/config/main.c
---- src.old/usr.sbin/config/main.c	2005-12-17 12:47:02.000000000 +0100
-+++ src/usr.sbin/config/main.c	2006-02-09 19:27:56.000000000 +0100
-@@ -52,6 +52,9 @@
+--- a/src/usr.sbin/config/main.c
++++ b/src/usr.sbin/config/main.c
+@@ -56,6 +56,9 @@
  #include <sysexits.h>
  #include <unistd.h>
  #include <dirent.h>
@@ -52,7 +48,7 @@ diff -ur src.old/usr.sbin/config/main.c src/usr.sbin/config/main.c
  #include "y.tab.h"
  #include "config.h"
  #include "configvers.h"
-@@ -455,7 +458,11 @@
+@@ -606,7 +609,11 @@
  	if ((dirp = opendir(p)) == NULL)
  		err(EX_OSERR, "opendir %s", p);
  	while ((dp = readdir(dirp)) != NULL) {
@@ -64,9 +60,8 @@ diff -ur src.old/usr.sbin/config/main.c src/usr.sbin/config/main.c
  		/* Skip non-headers */
  		if (dp->d_name[i] != '.' || dp->d_name[i + 1] != 'h')
  			continue;
-diff -ur src.old/usr.sbin/mtree/compare.c src/usr.sbin/mtree/compare.c
---- src.old/usr.sbin/mtree/compare.c	2005-03-29 13:44:17.000000000 +0200
-+++ src/usr.sbin/mtree/compare.c	2006-02-09 19:27:56.000000000 +0100
+--- a/src/usr.sbin/mtree/compare.c
++++ b/src/usr.sbin/mtree/compare.c
 @@ -176,21 +176,22 @@
  		    (intmax_t)s->st_size, (intmax_t)p->fts_statp->st_size);
  		tab = "\t";
@@ -120,9 +115,8 @@ diff -ur src.old/usr.sbin/mtree/compare.c src/usr.sbin/mtree/compare.c
  #ifdef MD5
  	if (s->flags & F_MD5) {
  		char *new_digest, buf[33];
-diff -ur src.old/usr.sbin/mtree/create.c src/usr.sbin/mtree/create.c
---- src.old/usr.sbin/mtree/create.c	2005-03-29 13:44:17.000000000 +0200
-+++ src/usr.sbin/mtree/create.c	2006-02-09 19:27:56.000000000 +0100
+--- a/src/usr.sbin/mtree/create.c
++++ b/src/usr.sbin/mtree/create.c
 @@ -73,7 +73,11 @@
  static u_long flags = 0xffffffff;
  
@@ -195,12 +189,11 @@ diff -ur src.old/usr.sbin/mtree/create.c src/usr.sbin/mtree/create.c
  		(void)printf("\n");
  		*puid = saveuid;
  		*pgid = savegid;
-diff -ur src.old/usr.sbin/mtree/extern.h src/usr.sbin/mtree/extern.h
---- src.old/usr.sbin/mtree/extern.h	2004-01-11 20:38:48.000000000 +0100
-+++ src/usr.sbin/mtree/extern.h	2006-02-09 19:27:56.000000000 +0100
+--- a/src/usr.sbin/mtree/extern.h
++++ b/src/usr.sbin/mtree/extern.h
 @@ -29,6 +29,9 @@
   *	@(#)extern.h	8.1 (Berkeley) 6/6/93
-  * $FreeBSD: ./src/usr.sbin/mtree/extern.h,v 1.13 2004/01/11 19:38:48 phk Exp $
+  * $FreeBSD$
   */
 +
 +#include <stdint.h>
@@ -208,10 +201,9 @@ diff -ur src.old/usr.sbin/mtree/extern.h src/usr.sbin/mtree/extern.h
  extern uint32_t crc_total;
  
  #ifdef _FTS_H_
-diff -ur src.old/usr.sbin/mtree/misc.c src/usr.sbin/mtree/misc.c
---- src.old/usr.sbin/mtree/misc.c	2005-03-29 13:44:17.000000000 +0200
-+++ src/usr.sbin/mtree/misc.c	2006-02-09 19:27:56.000000000 +0100
-@@ -106,6 +106,7 @@
+--- a/src/usr.sbin/mtree/misc.c
++++ b/src/usr.sbin/mtree/misc.c
+@@ -107,6 +107,7 @@
  	return (strcmp(((const KEY *)a)->name, ((const KEY *)b)->name));
  }
  
@@ -219,14 +211,13 @@ diff -ur src.old/usr.sbin/mtree/misc.c src/usr.sbin/mtree/misc.c
  char *
  flags_to_string(u_long fflags)
  {
-@@ -121,3 +122,4 @@
+@@ -122,3 +123,4 @@
  
  	return string;
  }
 +#endif /* __FreeBSD__ */
-diff -ur src.old/usr.sbin/mtree/mtree.h src/usr.sbin/mtree/mtree.h
---- src.old/usr.sbin/mtree/mtree.h	2005-03-29 13:44:17.000000000 +0200
-+++ src/usr.sbin/mtree/mtree.h	2006-02-09 19:27:56.000000000 +0100
+--- a/src/usr.sbin/mtree/mtree.h
++++ b/src/usr.sbin/mtree/mtree.h
 @@ -42,7 +42,16 @@
  	struct _node	*parent, *child;	/* up, down */
  	struct _node	*prev, *next;		/* left, right */
@@ -255,10 +246,9 @@ diff -ur src.old/usr.sbin/mtree/mtree.h src/usr.sbin/mtree/mtree.h
  #define	MBITS	(S_ISUID|S_ISGID|S_ISTXT|S_IRWXU|S_IRWXG|S_IRWXO)
  	mode_t	st_mode;			/* mode */
  	u_long	st_flags;			/* flags */
-diff -ur src.old/usr.sbin/mtree/spec.c src/usr.sbin/mtree/spec.c
---- src.old/usr.sbin/mtree/spec.c	2005-03-29 13:44:17.000000000 +0200
-+++ src/usr.sbin/mtree/spec.c	2006-02-09 19:27:56.000000000 +0100
-@@ -204,12 +206,14 @@
+--- a/src/usr.sbin/mtree/spec.c
++++ b/src/usr.sbin/mtree/spec.c
+@@ -204,12 +204,14 @@
  			if(!ip->rmd160digest)
  				errx(1, "strdup");
  			break;
@@ -273,7 +263,7 @@ diff -ur src.old/usr.sbin/mtree/spec.c src/usr.sbin/mtree/spec.c
  		case F_GID:
  			ip->st_gid = strtoul(val, &ep, 10);
  			if (*ep)
-@@ -249,17 +253,19 @@
+@@ -252,17 +254,19 @@
  			if (strunvis(ip->slink, val) == -1)
  				errx(1, "symlink %s is ill-encoded", val);
  			break;
@@ -295,9 +285,8 @@ diff -ur src.old/usr.sbin/mtree/spec.c src/usr.sbin/mtree/spec.c
  		case F_TYPE:
  			switch(*val) {
  			case 'b':
-diff -ur src.old/usr.sbin/mtree/specspec.c src/usr.sbin/mtree/specspec.c
---- src.old/usr.sbin/mtree/specspec.c	2005-03-29 13:44:17.000000000 +0200
-+++ src/usr.sbin/mtree/specspec.c	2006-02-09 19:27:56.000000000 +0100
+--- a/src/usr.sbin/mtree/specspec.c
++++ b/src/usr.sbin/mtree/specspec.c
 @@ -150,8 +150,10 @@
  		differs |= F_SIZE;
  	if (FS(n1, n2, F_SLINK, slink))
@@ -310,10 +299,9 @@ diff -ur src.old/usr.sbin/mtree/specspec.c src/usr.sbin/mtree/specspec.c
  	if (FF(n1, n2, F_UID, st_uid))
  		differs |= F_UID;
  	if (FF(n1, n2, F_UNAME, st_uid))
-diff -ur src.old/usr.sbin/mtree/verify.c src/usr.sbin/mtree/verify.c
---- src.old/usr.sbin/mtree/verify.c	2005-12-17 12:47:12.000000000 +0100
-+++ src/usr.sbin/mtree/verify.c	2006-02-09 19:27:56.000000000 +0100
-@@ -243,9 +243,11 @@
+--- a/src/usr.sbin/mtree/verify.c
++++ b/src/usr.sbin/mtree/verify.c
+@@ -251,9 +251,11 @@
  		if (chmod(path, p->st_mode))
  			(void)printf("%s: permissions not set: %s\n",
  			    path, strerror(errno));

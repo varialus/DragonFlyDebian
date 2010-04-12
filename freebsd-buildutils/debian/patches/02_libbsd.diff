@@ -1,5 +1,5 @@
---- src/share/mk/version_gen.awk
-+++ src/share/mk/version_gen.awk
+--- a/src/share/mk/version_gen.awk
++++ b/src/share/mk/version_gen.awk
 @@ -41,7 +41,7 @@
  	version_count = 0;
  	current_version = "";
@@ -8,28 +8,28 @@
 +	while (bsd_getline < vfile) {
  		# Strip comments.
  		sub("#.*$", "", $0);
-
---- src/usr.bin/file2c/file2c.c
-+++ src/usr.bin/file2c/file2c.c
+ 
+--- a/src/usr.bin/file2c/file2c.c
++++ b/src/usr.bin/file2c/file2c.c
 @@ -10,6 +10,7 @@
  #include <sys/cdefs.h>
- __FBSDID("$FreeBSD: src/usr.bin/file2c/file2c.c,v 1.10.2.1.6.1 2009/04/15 03:14:26 kensmith Exp $");
+ __FBSDID("$FreeBSD$");
  
 +#include <bsd/stdlib.h>
  #include <limits.h>
  #include <stdio.h>
  #include <stdlib.h>
---- src/usr.bin/file2c/Makefile
-+++ src/usr.bin/file2c/Makefile
+--- a/src/usr.bin/file2c/Makefile
++++ b/src/usr.bin/file2c/Makefile
 @@ -1,5 +1,6 @@
- # $FreeBSD: src/usr.bin/file2c/Makefile,v 1.8.20.1 2009/04/15 03:14:26 kensmith Exp $
+ # $FreeBSD$
  
  PROG=	file2c
 +LDADD= -lbsd
  WARNS?=	6
  .include <bsd.prog.mk>
---- src/usr.bin/make/arch.c
-+++ src/usr.bin/make/arch.c
+--- a/src/usr.bin/make/arch.c
++++ b/src/usr.bin/make/arch.c
 @@ -88,7 +88,7 @@
   */
  
@@ -39,8 +39,8 @@
  #include <sys/types.h>
  #include <ar.h>
  #include <ctype.h>
---- src/usr.bin/make/dir.h
-+++ src/usr.bin/make/dir.h
+--- a/src/usr.bin/make/dir.h
++++ b/src/usr.bin/make/dir.h
 @@ -43,7 +43,7 @@
  #ifndef dir_h_6002e3b8
  #define	dir_h_6002e3b8
@@ -50,8 +50,8 @@
  #include "hash.h"
  
  struct GNode;
---- src/usr.bin/make/job.c
-+++ src/usr.bin/make/job.c
+--- a/src/usr.bin/make/job.c
++++ b/src/usr.bin/make/job.c
 @@ -101,7 +101,8 @@
   *			    thems as need creatin'
   */
@@ -62,8 +62,8 @@
  #include <sys/types.h>
  #include <sys/select.h>
  #include <sys/stat.h>
---- src/usr.bin/make/main.c
-+++ src/usr.bin/make/main.c
+--- a/src/usr.bin/make/main.c
++++ b/src/usr.bin/make/main.c
 @@ -65,7 +65,8 @@
  #include <sys/stat.h>
  #include <sys/sysctl.h>
@@ -74,19 +74,19 @@
  #include <sys/resource.h>
  #include <sys/utsname.h>
  #include <sys/wait.h>
---- src/usr.bin/make/shell.c
-+++ src/usr.bin/make/shell.c
+--- a/src/usr.bin/make/shell.c
++++ b/src/usr.bin/make/shell.c
 @@ -40,7 +40,7 @@
  #include <sys/cdefs.h>
- __FBSDID("$FreeBSD: src/usr.bin/make/shell.c,v 1.1.20.1 2009/04/15 03:14:26 kensmith Exp $");
+ __FBSDID("$FreeBSD$");
  
 -#include <sys/queue.h>
 +#include <bsd/sys/queue.h>
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
---- src/usr.bin/make/shell.h
-+++ src/usr.bin/make/shell.h
+--- a/src/usr.bin/make/shell.h
++++ b/src/usr.bin/make/shell.h
 @@ -42,7 +42,7 @@
  #ifndef shell_h_6002e3b8
  #define	shell_h_6002e3b8
@@ -96,8 +96,8 @@
  
  #include "str.h"
  #include "util.h"
---- src/usr.bin/make/suff.c
-+++ src/usr.bin/make/suff.c
+--- a/src/usr.bin/make/suff.c
++++ b/src/usr.bin/make/suff.c
 @@ -90,7 +90,7 @@
   *	    	  	    	if the target had no implicit sources.
   */
@@ -107,8 +107,8 @@
  #include <assert.h>
  #include <string.h>
  #include <stdlib.h>
---- src/usr.bin/make/Makefile
-+++ src/usr.bin/make/Makefile
+--- a/src/usr.bin/make/Makefile
++++ b/src/usr.bin/make/Makefile
 @@ -7,6 +7,7 @@
  SRCS=	arch.c buf.c cond.c dir.c for.c hash.c hash_tables.c job.c	\
  	lst.c main.c make.c parse.c proc.c shell.c str.c suff.c targ.c	\
@@ -117,8 +117,8 @@
  
  WARNS?=	6
  NO_SHARED?=	YES
---- src/usr.bin/yacc/test/ftp.tab.c
-+++ src/usr.bin/yacc/test/ftp.tab.c
+--- a/src/usr.bin/yacc/test/ftp.tab.c
++++ b/src/usr.bin/yacc/test/ftp.tab.c
 @@ -490,10 +490,10 @@
  #include <arpa/telnet.h>
  
@@ -141,8 +141,8 @@
  				reply(221, "You could at least say goodbye.");
  				dologout(0);
  			}
---- src/usr.bin/yacc/test/ftp.y
-+++ src/usr.bin/yacc/test/ftp.y
+--- a/src/usr.bin/yacc/test/ftp.y
++++ b/src/usr.bin/yacc/test/ftp.y
 @@ -750,10 +750,10 @@
  #include <arpa/telnet.h>
  
@@ -165,8 +165,8 @@
  				reply(221, "You could at least say goodbye.");
  				dologout(0);
  			}
---- src/usr.sbin/config/config.h
-+++ src/usr.sbin/config/config.h
+--- a/src/usr.sbin/config/config.h
++++ b/src/usr.sbin/config/config.h
 @@ -34,7 +34,7 @@
   * Config.
   */
@@ -176,8 +176,8 @@
  #include <stdlib.h>
  #include <string.h>
  
---- src/usr.sbin/config/mkoptions.c
-+++ src/usr.sbin/config/mkoptions.c
+--- a/src/usr.sbin/config/mkoptions.c
++++ b/src/usr.sbin/config/mkoptions.c
 @@ -40,6 +40,7 @@
   * Make all the .h files for the optional entries
   */
@@ -186,8 +186,8 @@
  #include <ctype.h>
  #include <err.h>
  #include <stdio.h>
---- src/usr.sbin/config/Makefile
-+++ src/usr.sbin/config/Makefile
+--- a/src/usr.sbin/config/Makefile
++++ b/src/usr.sbin/config/Makefile
 @@ -13,7 +13,7 @@
  CFLAGS+= -I. -I${.CURDIR}
  
@@ -197,8 +197,8 @@
  
  CLEANFILES+=	kernconf.c
  
---- src/usr.sbin/mtree/excludes.c
-+++ src/usr.sbin/mtree/excludes.c
+--- a/src/usr.sbin/mtree/excludes.c
++++ b/src/usr.sbin/mtree/excludes.c
 @@ -32,7 +32,8 @@
  
  #include <sys/types.h>
@@ -209,18 +209,18 @@
  
  #include <err.h>
  #include <fnmatch.h>
---- src/usr.sbin/mtree/spec.c
-+++ src/usr.sbin/mtree/spec.c
+--- a/src/usr.sbin/mtree/spec.c
++++ b/src/usr.sbin/mtree/spec.c
 @@ -35,6 +35,7 @@
  #include <sys/cdefs.h>
- __FBSDID("$FreeBSD: src/usr.sbin/mtree/spec.c,v 1.23.8.1 2009/04/15 03:14:26 kensmith Exp $");
+ __FBSDID("$FreeBSD$");
  
 +#include <bsd/stdlib.h>
  #include <sys/types.h>
  #include <sys/stat.h>
  #include <ctype.h>
---- src/usr.sbin/mtree/Makefile
-+++ src/usr.sbin/mtree/Makefile
+--- a/src/usr.sbin/mtree/Makefile
++++ b/src/usr.sbin/mtree/Makefile
 @@ -7,6 +7,7 @@
  MAN=	mtree.8
  SRCS=	compare.c crc.c create.c excludes.c misc.c mtree.c spec.c verify.c

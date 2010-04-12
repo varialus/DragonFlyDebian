@@ -1,7 +1,6 @@
-diff -ur ../foo.old/src/share/mk/bsd.incs.mk ./src/share/mk/bsd.incs.mk
---- ../foo.old/src/share/mk/bsd.incs.mk	2005-12-17 12:45:38.000000000 +0100
-+++ ./src/share/mk/bsd.incs.mk	2005-12-17 12:49:33.000000000 +0100
-@@ -39,7 +39,7 @@
+--- a/src/share/mk/bsd.incs.mk
++++ b/src/share/mk/bsd.incs.mk
+@@ -41,7 +41,7 @@
  .endif
  installincludes: _${group}INS_${header:T}
  _${group}INS_${header:T}: ${header}
@@ -10,7 +9,7 @@ diff -ur ../foo.old/src/share/mk/bsd.incs.mk ./src/share/mk/bsd.incs.mk
  	    -g ${${group}GRP_${.ALLSRC:T}} -m ${${group}MODE_${.ALLSRC:T}} \
  	    ${.ALLSRC} \
  	    ${DESTDIR}${${group}DIR_${.ALLSRC:T}}/${${group}NAME_${.ALLSRC:T}}
-@@ -51,10 +51,10 @@
+@@ -53,10 +53,10 @@
  installincludes: _${group}INS
  _${group}INS: ${_${group}INCS}
  .if defined(${group}NAME)
@@ -23,10 +22,9 @@ diff -ur ../foo.old/src/share/mk/bsd.incs.mk ./src/share/mk/bsd.incs.mk
  	    ${.ALLSRC} ${DESTDIR}${${group}DIR}
  .endif
  .endif
-diff -ur ../foo.old/src/share/mk/bsd.info.mk ./src/share/mk/bsd.info.mk
---- ../foo.old/src/share/mk/bsd.info.mk	2005-12-17 12:45:38.000000000 +0100
-+++ ./src/share/mk/bsd.info.mk	2005-12-17 12:50:33.000000000 +0100
-@@ -75,7 +75,7 @@
+--- a/src/share/mk/bsd.info.mk
++++ b/src/share/mk/bsd.info.mk
+@@ -73,7 +73,7 @@
  MAKEINFOFLAGS+=	--no-split # simplify some things, e.g., compression
  SRCDIR?=	${.CURDIR}
  INFODIRFILE?=   dir
@@ -35,7 +33,7 @@ diff -ur ../foo.old/src/share/mk/bsd.info.mk ./src/share/mk/bsd.info.mk
  INSTALLINFOFLAGS+=--quiet
  INFOSECTION?=   Miscellaneous
  ICOMPRESS_CMD?=	${COMPRESS_CMD}
-@@ -145,18 +145,8 @@
+@@ -143,18 +143,8 @@
  .for x in ${INFO}
  INSTALLINFODIRS+= ${x:S/$/-install/}
  ${x:S/$/-install/}:
@@ -56,10 +54,9 @@ diff -ur ../foo.old/src/share/mk/bsd.info.mk ./src/share/mk/bsd.info.mk
  .endfor
  
  .PHONY: ${INSTALLINFODIRS}
-diff -ur ../foo.old/src/share/mk/bsd.lib.mk ./src/share/mk/bsd.lib.mk
---- ../foo.old/src/share/mk/bsd.lib.mk	2005-12-17 12:45:38.000000000 +0100
-+++ ./src/share/mk/bsd.lib.mk	2005-12-17 12:49:11.000000000 +0100
-@@ -124,9 +124,9 @@
+--- a/src/share/mk/bsd.lib.mk
++++ b/src/share/mk/bsd.lib.mk
+@@ -161,9 +161,9 @@
  	@${ECHO} building static ${LIB} library
  	@rm -f ${.TARGET}
  .if !defined(NM)
@@ -71,7 +68,7 @@ diff -ur ../foo.old/src/share/mk/bsd.lib.mk ./src/share/mk/bsd.lib.mk
  .endif
  	${RANLIB} ${.TARGET}
  .endif
-@@ -141,9 +141,9 @@
+@@ -178,9 +178,9 @@
  	@${ECHO} building profiled ${LIB} library
  	@rm -f ${.TARGET}
  .if !defined(NM)
@@ -83,7 +80,7 @@ diff -ur ../foo.old/src/share/mk/bsd.lib.mk ./src/share/mk/bsd.lib.mk
  .endif
  	${RANLIB} ${.TARGET}
  .endif
-@@ -160,16 +160,16 @@
+@@ -197,16 +197,16 @@
  	@${ECHO} building shared library ${SHLIB_NAME}
  	@rm -f ${.TARGET} ${SHLIB_LINK}
  .if defined(SHLIB_LINK)
@@ -101,9 +98,9 @@ diff -ur ../foo.old/src/share/mk/bsd.lib.mk ./src/share/mk/bsd.lib.mk
 -	    `NM='${NM}' lorder ${SOBJS} | tsort -q` ${LDADD}
 +	    `NM='${NM}' lorder ${SOBJS} | tsort` ${LDADD}
  .endif
- .endif
- 
-@@ -236,11 +236,11 @@
+ .if defined(CTFMERGE)
+ 	${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${SOBJS}
+@@ -276,11 +276,11 @@
  .ORDER: beforeinstall _libinstall
  _libinstall:
  .if defined(LIB) && !empty(LIB) && ${MK_INSTALLLIB} != "no"
@@ -117,9 +114,8 @@ diff -ur ../foo.old/src/share/mk/bsd.lib.mk ./src/share/mk/bsd.lib.mk
  	    ${_INSTALLFLAGS} lib${LIB}_p.a ${DESTDIR}${LIBDIR}
  .endif
  .if defined(SHLIB_NAME)
-diff -ur ../foo.old/src/share/mk/bsd.man.mk ./src/share/mk/bsd.man.mk
---- ../foo.old/src/share/mk/bsd.man.mk	2005-01-06 12:12:43.000000000 +0100
-+++ ./src/share/mk/bsd.man.mk	2005-12-17 12:49:11.000000000 +0100
+--- a/src/share/mk/bsd.man.mk
++++ b/src/share/mk/bsd.man.mk
 @@ -211,12 +211,12 @@
  			[123]) echo "warn: empty MLINK: $$1 $$2 $$3"; break;; \
  		esac; \
@@ -150,9 +146,8 @@ diff -ur ../foo.old/src/share/mk/bsd.man.mk ./src/share/mk/bsd.man.mk
  	done
  .endif
  .endif
-diff -ur ../foo.old/src/share/mk/bsd.own.mk ./src/share/mk/bsd.own.mk
---- ../foo.old/src/share/mk/bsd.own.mk	2005-04-11 09:13:29.000000000 +0200
-+++ ./src/share/mk/bsd.own.mk	2005-12-17 12:49:11.000000000 +0100
+--- a/src/share/mk/bsd.own.mk
++++ b/src/share/mk/bsd.own.mk
 @@ -18,7 +18,7 @@
  #
  # BINOWN	Binary owner. [root]
@@ -171,7 +166,7 @@ diff -ur ../foo.old/src/share/mk/bsd.own.mk ./src/share/mk/bsd.own.mk
  #
  # SHAREMODE	ASCII text file mode. [${NOBINMODE}]
  #
-@@ -106,7 +106,7 @@
+@@ -113,7 +113,7 @@
  
  # Binaries
  BINOWN?=	root
@@ -180,7 +175,7 @@ diff -ur ../foo.old/src/share/mk/bsd.own.mk ./src/share/mk/bsd.own.mk
  BINMODE?=	555
  NOBINMODE?=	444
  
-@@ -132,7 +132,7 @@
+@@ -139,7 +139,7 @@
  # Share files
  SHAREDIR?=	/usr/share
  SHAREOWN?=	root

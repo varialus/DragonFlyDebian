@@ -16,7 +16,11 @@ ifneq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
 endif
 
 VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
-SVN=svn://svn.freebsd.org/base/release/$(VERSION).0
+SVN=http://svn.freebsd.org/base/release/$(VERSION).0
+
+PCVS=anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
+PTAG=RELEASE_7_3_0
+
 ORIGDIR=freebsd-buildutils-$(VERSION)
 PMAKE=pmake
 CFLAGS=-O2 -g -Wall -DMACHINE_ARCH='"$(DEB_HOST_ARCH_CPU)"' -D_GNU_SOURCE -D'__FBSDID(string)=' -I$(CURDIR)/build-tree/src/sys
@@ -27,18 +31,35 @@ package=freebsd-buildutils
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
-	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
-	        sys/kern/syscalls.c ; do \
-	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
+	mkdir -p $(ORIGDIR)/src/sys/sys $(ORIGDIR)/src/sys/kern/
+	for i in \
+		share/mk \
+		usr.bin/cksum \
+		usr.bin/file2c \
+		usr.bin/lex \
+		usr.bin/make \
+		usr.bin/mkdep \
+		usr.bin/yacc \
+		usr.bin/brandelf \
+		usr.sbin/btxld \
+		usr.sbin/config \
+		usr.sbin/kgzip \
+		usr.sbin/mtree \
+		sys/sys/sbuf.h \
+		sys/kern/subr_sbuf.c \
+	; do \
+		svn export $(SVN)/$$i $(ORIGDIR)/src/$$i ; \
 	done
+	cd $(ORIGDIR); cvs -d $(PCVS) export -r $(PTAG) ports/Mk ; cd ..
 	tar --numeric-owner --owner 0 --group 0 -czf ../freebsd-buildutils_$(VERSION).orig.tar.gz $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
+include /usr/share/quilt/quilt.make
+
 unpack: unpack-stamp
-unpack-stamp:
+unpack-stamp: debian/stamp-patched
 	mkdir build-tree
-	tar -C build-tree -xzf src.tar.gz
-	find build-tree -type d -name CVS | xargs rm -rf
+	cp -a src ports build-tree/
 	set -e ; for i in \
 		build-tree/ports/Mk/bsd.port.mk \
 		build-tree/ports/Mk/bsd.port.subdir.mk \
@@ -49,19 +70,14 @@ unpack-stamp:
 		-e "s,/sbin/,,g" \
 		-e "s,/usr/ports,/usr/share/$(package)/ports,g" \
 	; done
-	set -e ; cd build-tree && \
-		for i in $(CURDIR)/debian/patches/*.diff ; do \
-		  echo "--- Patch $$i ---" ; \
-		  patch -p0 < $$i ; \
-		done
 
 	cp $(CURDIR)/build-tree/src/sys/kern/subr_sbuf.c \
 	   $(CURDIR)/build-tree/src/usr.sbin/config/
 
 	touch unpack-stamp
 
-build: unpack-stamp build-stamp
-build-stamp:
+build: build-stamp
+build-stamp: unpack-stamp
 	dh_testdir
 
 	cd build-tree/src/usr.bin/yacc ; \
@@ -127,7 +143,7 @@ install: build
 	done
 	rmdir $(CURDIR)/debian/$(package)/usr/sbin
 
-clean:
+clean:  unpatch
 	dh_testdir
 	dh_testroot
 	rm -rf build-tree

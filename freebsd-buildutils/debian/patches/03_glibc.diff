@@ -1,52 +1,6 @@
-diff -ur ../foo.old/src/usr.sbin/btxld/btx.h ./src/usr.sbin/btxld/btx.h
---- ../foo.old/src/usr.sbin/btxld/btx.h	1999-08-28 03:15:41.000000000 +0200
-+++ ./src/usr.sbin/btxld/btx.h	2005-12-16 23:52:43.000000000 +0100
-@@ -30,6 +30,7 @@
- #define _BTX_H_
- 
- #include <sys/types.h>
-+#include <stdint.h>
- 
- #define BTX_PGSIZE	0x1000		/* Page size */
- #define BTX_PGBASE	0x5000		/* Start of page tables */
-diff -ur ../foo.old/src/usr.sbin/btxld/elfh.c ./src/usr.sbin/btxld/elfh.c
---- ../foo.old/src/usr.sbin/btxld/elfh.c	2004-06-22 19:05:37.000000000 +0200
-+++ ./src/usr.sbin/btxld/elfh.c	2005-12-16 23:52:43.000000000 +0100
-@@ -30,6 +30,7 @@
- #include <sys/endian.h>
- 
- #include <stddef.h>
-+#include <stdint.h>
- #include "elfh.h"
- 
- #define SET_ME	0xeeeeeeee    /* filled in by btxld */
-diff -ur ../foo.old/src/usr.sbin/btxld/elfh.h ./src/usr.sbin/btxld/elfh.h
---- ../foo.old/src/usr.sbin/btxld/elfh.h	2000-01-04 15:10:36.000000000 +0100
-+++ ./src/usr.sbin/btxld/elfh.h	2005-12-16 23:52:43.000000000 +0100
-@@ -26,7 +26,7 @@
-  * $FreeBSD: ./src/usr.sbin/btxld/elfh.h,v 1.3 2000/01/04 14:10:36 marcel Exp $
-  */
- 
--#include <sys/elf32.h>
-+#include "elf32.h"
- 
- struct elfh {
-     Elf32_Ehdr e;		/* ELF header */
-diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
---- ../foo.old/src/usr.sbin/mtree/Makefile	2005-03-29 13:44:17.000000000 +0200
-+++ ./src/usr.sbin/mtree/Makefile	2005-12-16 23:53:50.000000000 +0100
-@@ -10,8 +10,4 @@
- 
- WARNS?=	4
- 
--CFLAGS+= -DMD5 -DSHA1 -DRMD160 -DSHA256
--DPADD=	${LIBMD}
--LDADD=	-lmd
--
- .include <bsd.prog.mk>
---- src/usr.sbin/mtree/specspec.c~	2005-12-17 11:59:50.000000000 +0100
-+++ src/usr.sbin/mtree/specspec.c	2005-12-17 12:04:11.000000000 +0100
-@@ -83,8 +83,6 @@
+--- a/src/usr.sbin/mtree/specspec.c
++++ b/src/usr.sbin/mtree/specspec.c
+@@ -84,8 +84,6 @@
  		printf(" rmd160digest=%s", n->rmd160digest);
  	if (f & F_SHA256)
  		printf(" sha256digest=%s", n->sha256digest);
@@ -55,8 +9,8 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  	printf("\n");
  }
  
---- src/usr.bin/make/cond.c
-+++ src/usr.bin/make/cond.c
+--- a/src/usr.bin/make/cond.c
++++ b/src/usr.bin/make/cond.c
 @@ -1115,7 +1115,7 @@
   *	Handle .else statement.
   */
@@ -75,9 +29,9 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  {
  
  	while (isspace((u_char)*line))
---- src/usr.bin/make/job.c
-+++ src/usr.bin/make/job.c
-@@ -473,7 +473,7 @@
+--- a/src/usr.bin/make/job.c
++++ b/src/usr.bin/make/job.c
+@@ -474,7 +474,7 @@
  }
  
  static void
@@ -86,7 +40,7 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  {
  }
  
-@@ -2189,7 +2189,7 @@
+@@ -2190,7 +2190,7 @@
   */
  void
  #ifdef USE_KQUEUE
@@ -95,8 +49,8 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  #else
  Job_CatchOutput(int flag)
  #endif
---- src/usr.bin/make/parse.c
-+++ src/usr.bin/make/parse.c
+--- a/src/usr.bin/make/parse.c
++++ b/src/usr.bin/make/parse.c
 @@ -2210,13 +2210,13 @@
  }
  
@@ -149,8 +103,8 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  {
  
  	Parse_Error(PARSE_FATAL, "for-less endfor");
---- src/usr.bin/make/proc.h
-+++ src/usr.bin/make/proc.h
+--- a/src/usr.bin/make/proc.h
++++ b/src/usr.bin/make/proc.h
 @@ -48,6 +48,6 @@
  	pid_t	child_pid;
  } ProcStuff;
@@ -159,8 +113,8 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
 +void Proc_Exec(const ProcStuff *);
  
  #endif /* proc_h_458845848 */
---- src/usr.bin/make/shell.c
-+++ src/usr.bin/make/shell.c
+--- a/src/usr.bin/make/shell.c
++++ b/src/usr.bin/make/shell.c
 @@ -120,7 +120,7 @@
   */
  static struct Shells shells = TAILQ_HEAD_INITIALIZER(shells);
@@ -170,8 +124,8 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  
  /**
   * Helper function for sorting the builtin list alphabetically.
---- src/usr.bin/make/util.c
-+++ src/usr.bin/make/util.c
+--- a/src/usr.bin/make/util.c
++++ b/src/usr.bin/make/util.c
 @@ -61,7 +61,7 @@
  #include "targ.h"
  #include "util.h"
@@ -181,8 +135,8 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  
  /*-
   * Debug --
---- src/usr.bin/make/util.h
-+++ src/usr.bin/make/util.h
+--- a/src/usr.bin/make/util.h
++++ b/src/usr.bin/make/util.h
 @@ -103,10 +103,10 @@
  void Debug(const char *, ...);
  void DebugM(const char *, ...);
@@ -198,8 +152,8 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  char *estrdup(const char *);
  void *emalloc(size_t);
  void *erealloc(void *, size_t);
---- src/usr.bin/make/var.c
-+++ src/usr.bin/make/var.c
+--- a/src/usr.bin/make/var.c
++++ b/src/usr.bin/make/var.c
 @@ -248,7 +248,7 @@
   *	The trimmed word is added to the buffer.
   */
@@ -236,8 +190,8 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  {
  	char *dot;
  
---- src/usr.bin/yacc/main.c
-+++ src/usr.bin/yacc/main.c
+--- a/src/usr.bin/yacc/main.c
++++ b/src/usr.bin/yacc/main.c
 @@ -114,7 +114,7 @@
  
  volatile sig_atomic_t sigdie;
@@ -256,8 +210,8 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  {
      sigdie = 1;
      done(1);
---- src/usr.sbin/mtree/compare.c
-+++ src/usr.sbin/mtree/compare.c
+--- a/src/usr.sbin/mtree/compare.c
++++ b/src/usr.sbin/mtree/compare.c
 @@ -72,7 +72,7 @@
  	}
  
@@ -267,3 +221,45 @@ diff -ur ../foo.old/src/usr.sbin/mtree/Makefile ./src/usr.sbin/mtree/Makefile
  {
  	struct timeval tv[2];
  	uint32_t val;
+--- a/src/usr.sbin/btxld/btx.h
++++ b/src/usr.sbin/btxld/btx.h
+@@ -30,6 +30,7 @@
+ #define _BTX_H_
+ 
+ #include <sys/types.h>
++#include <stdint.h>
+ 
+ #define BTX_PGSIZE	0x1000		/* Page size */
+ #define BTX_PGBASE	0x5000		/* Start of page tables */
+--- a/src/usr.sbin/btxld/elfh.c
++++ b/src/usr.sbin/btxld/elfh.c
+@@ -30,6 +30,7 @@
+ #include <sys/endian.h>
+ 
+ #include <stddef.h>
++#include <stdint.h>
+ #include "elfh.h"
+ 
+ #define SET_ME	0xeeeeeeee    /* filled in by btxld */
+--- a/src/usr.sbin/btxld/elfh.h
++++ b/src/usr.sbin/btxld/elfh.h
+@@ -26,7 +26,7 @@
+  * $FreeBSD$
+  */
+ 
+-#include <sys/elf32.h>
++#include "elf32.h"
+ 
+ struct elfh {
+     Elf32_Ehdr e;		/* ELF header */
+--- a/src/usr.sbin/mtree/Makefile
++++ b/src/usr.sbin/mtree/Makefile
+@@ -11,8 +11,4 @@
+ 
+ WARNS?=	4
+ 
+-CFLAGS+= -DMD5 -DSHA1 -DRMD160 -DSHA256
+-DPADD=	${LIBMD}
+-LDADD=	-lmd
+-
+ .include <bsd.prog.mk>
