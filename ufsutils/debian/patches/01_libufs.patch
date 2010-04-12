@@ -36,6 +36,15 @@ Index: ufsutils/include/ufs/ffs/fs.h
  /*
   * Each disk drive contains some number of filesystems.
   * A filesystem consists of a number of cylinder groups.
+@@ -502,7 +502,7 @@
+  * Turn filesystem block numbers into disk block addresses.
+  * This maps filesystem blocks to device size blocks.
+  */
+-#define	fsbtodb(fs, b)	((daddr_t)(b) << (fs)->fs_fsbtodb)
++#define	fsbtodb(fs, b)	(((intmax_t)(b)) << (fs)->fs_fsbtodb)
+ #define	dbtofsb(fs, b)	((b) >> (fs)->fs_fsbtodb)
+ 
+ /*
 Index: ufsutils/include/ufs/ufs/dinode.h
 ===================================================================
 --- ufsutils.orig/include/ufs/ufs/dinode.h
