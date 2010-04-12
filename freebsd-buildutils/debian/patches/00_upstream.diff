@@ -20,7 +20,7 @@
  int	crc(int, uint32_t *, off_t *);
 --- a/src/usr.bin/make/main.c
 +++ b/src/usr.bin/make/main.c
-@@ -946,6 +946,7 @@
+@@ -914,6 +914,7 @@
  	}
  #endif
  
@@ -28,7 +28,7 @@
  	/*
  	 * Prior to 7.0, FreeBSD/pc98 kernel used to set the
  	 * utsname.machine to "i386", and MACHINE was defined as
-@@ -965,6 +966,7 @@
+@@ -933,6 +934,7 @@
  				machine = "pc98";
  		}
  	}
@@ -48,7 +48,7 @@
  #include "y.tab.h"
  #include "config.h"
  #include "configvers.h"
-@@ -606,7 +609,11 @@
+@@ -605,7 +608,11 @@
  	if ((dirp = opendir(p)) == NULL)
  		err(EX_OSERR, "opendir %s", p);
  	while ((dp = readdir(dirp)) != NULL) {
@@ -136,7 +136,7 @@
  		    (intmax_t)p->fts_statp->st_size);
 +#ifdef ST_MTIM
  	if (keys & F_TIME)
- 		output(indent, &offset, "time=%ld.%ld",
+ 		output(indent, &offset, "time=%ld.%09ld",
 -		    (long)p->fts_statp->st_mtimespec.tv_sec,
 -		    p->fts_statp->st_mtimespec.tv_nsec);
 +		    (long)p->fts_statp->ST_MTIM.tv_sec,
@@ -263,7 +263,7 @@
  		case F_GID:
  			ip->st_gid = strtoul(val, &ep, 10);
  			if (*ep)
-@@ -252,17 +254,19 @@
+@@ -252,20 +254,22 @@
  			if (strunvis(ip->slink, val) == -1)
  				errx(1, "symlink %s is ill-encoded", val);
  			break;
@@ -271,15 +271,19 @@
  		case F_TIME:
 -			ip->st_mtimespec.tv_sec = strtoul(val, &ep, 10);
 +			ip->ST_MTIM.tv_sec = strtoul(val, &ep, 10);
- 			if (*ep != '.')
- 				errx(1, "line %d: invalid time %s",
- 				lineno, val);
- 			val = ep + 1;
--			ip->st_mtimespec.tv_nsec = strtoul(val, &ep, 10);
-+			ip->ST_MTIM.tv_nsec = strtoul(val, &ep, 10);
+ 			if (*ep == '.') {
+ 				/* Note: we require exactly nine
+ 				 * digits after the decimal point. */
+ 				val = ep + 1;
+-				ip->st_mtimespec.tv_nsec
++				ip->ST_MTIM.tv_nsec
+ 				    = strtoul(val, &ep, 10);
+ 			} else
+-				ip->st_mtimespec.tv_nsec = 0;
++				ip->ST_MTIM.tv_nsec = 0;
  			if (*ep)
  				errx(1, "line %d: invalid time %s",
- 				lineno, val);
+ 				    lineno, val);
  			break;
 +#endif
  		case F_TYPE:

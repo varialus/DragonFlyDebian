@@ -18,8 +18,9 @@ endif
 VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
 SVN=http://svn.freebsd.org/base/release/$(VERSION).0
 
+PVERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g' -e 's/\./_/g')
 PCVS=anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
-PTAG=RELEASE_7_3_0
+PTAG=RELEASE_$(PVERSION)_0
 
 ORIGDIR=freebsd-buildutils-$(VERSION)
 PMAKE=pmake
