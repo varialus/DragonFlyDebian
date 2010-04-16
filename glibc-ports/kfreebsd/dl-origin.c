@@ -41,10 +41,9 @@ _dl_get_origin (void)
 
   len = readlink("/proc/self/exe", linkval, sizeof (linkval));
 
-  if (len > 0 && linkval[0] != '[')
+  if (len > 0 && linkval[0] == '/')
     {
       /* We can use this value.  */
-      assert (linkval[0] == '/');
       while (len > 1 && linkval[len - 1] != '/')
 	--len;
       result = (char *) malloc (len + 1);
