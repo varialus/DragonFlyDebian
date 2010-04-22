@@ -50,13 +50,13 @@
 #define __TIME_T_TYPE		__SLONGWORD_TYPE
 #define __USECONDS_T_TYPE	__U32_TYPE
 #define __SUSECONDS_T_TYPE	__SLONGWORD_TYPE
-#define __DADDR_T_TYPE		__S32_TYPE
+#define __DADDR_T_TYPE		__SQUAD_TYPE
 #define __SWBLK_T_TYPE		__S32_TYPE
 #define __KEY_T_TYPE		__SLONGWORD_TYPE
 #define __CLOCKID_T_TYPE	__S32_TYPE
 #define __TIMER_T_TYPE		__S32_TYPE
 #define __BLKSIZE_T_TYPE	__U32_TYPE
-#define __FSID_T_TYPE		struct { int __val[2]; }
+#define __FSID_T_TYPE		union { int __val[2]; int val[2]; }
 #define __SSIZE_T_TYPE		__SWORD_TYPE
 
 /* Number of descriptors that can fit in an `fd_set'.  */

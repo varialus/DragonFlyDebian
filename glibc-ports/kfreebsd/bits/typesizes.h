@@ -56,7 +56,7 @@
 #define __CLOCKID_T_TYPE	__S32_TYPE
 #define __TIMER_T_TYPE		__S32_TYPE
 #define __BLKSIZE_T_TYPE	__U32_TYPE
-#define __FSID_T_TYPE		struct { int __val[2]; }
+#define __FSID_T_TYPE		union { int __val[2]; int val[2]; }
 #define __SSIZE_T_TYPE		__SWORD_TYPE
 
 /* Number of descriptors that can fit in an `fd_set'.  */
