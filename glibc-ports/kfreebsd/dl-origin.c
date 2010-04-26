@@ -32,6 +32,31 @@
    the path of the application from the /proc/self/exe symlink.  Try this
    first and fall back on the generic method if necessary.  */
 
+
+const char *_self_program_name_from_auxv attribute_hidden;
+
+static int
+_dl_self_name(char *buf, int buflen)
+{
+  int len;
+  
+  len = __readlink("/proc/self/exe", buf, buflen);
+
+  if (len > 0 && buf[0] == '/')
+    return len;
+
+  if (_self_program_name_from_auxv)
+  {
+    strncpy(buf, _self_program_name_from_auxv, buflen);
+    buf[buflen - 1] = 0;
+    return strlen(buf);
+  };
+  
+  return -1;
+}
+
+
+
 const char *
 _dl_get_origin (void)
 {
@@ -39,9 +64,9 @@ _dl_get_origin (void)
   char *result;
   int len;
 
-  len = readlink("/proc/self/exe", linkval, sizeof (linkval));
+  len = _dl_self_name(linkval, sizeof(linkval));
 
-  if (len > 0 && linkval[0] == '/')
+  if (len > 0)
     {
       /* We can use this value.  */
       while (len > 1 && linkval[len - 1] != '/')

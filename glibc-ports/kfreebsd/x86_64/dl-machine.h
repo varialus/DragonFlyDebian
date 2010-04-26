@@ -18,9 +18,6 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#ifdef dl_machine_h
-#include_next <dl-machine.h>
-#else
 #include_next <dl-machine.h>
 
 #undef RTLD_START
@@ -76,5 +73,65 @@ _start:\n\
 	jmp *%r12\n\
 .previous\n\
 ");
+
+#if 0
+Under FreeBSD:
+#define AT_EXECPATH     15      /* Path to the executable. */
+
+Under Linux:
+#define AT_PLATFORM     15      /* String identifying platform.  */
+
+Filled entries from kernel:
+
+        if (args->execfd != -1)
+                AUXARGS_ENTRY(pos, AT_EXECFD, args->execfd);
+        AUXARGS_ENTRY(pos, AT_PHDR, args->phdr);    
+        AUXARGS_ENTRY(pos, AT_PHENT, args->phent);  
+        AUXARGS_ENTRY(pos, AT_PHNUM, args->phnum);  
+        AUXARGS_ENTRY(pos, AT_PAGESZ, args->pagesz);
+        AUXARGS_ENTRY(pos, AT_FLAGS, args->flags);
+        AUXARGS_ENTRY(pos, AT_ENTRY, args->entry);
+        AUXARGS_ENTRY(pos, AT_BASE, args->base);
+        if (imgp->execpathp != 0)
+                AUXARGS_ENTRY(pos, AT_EXECPATH, imgp->execpathp);
+        AUXARGS_ENTRY(pos, AT_NULL, 0);
+                                                                                                                
+#endif
+
+#undef  DL_PLATFORM_INIT
+#define DL_PLATFORM_INIT dl_platform_kfreebsd_x86_64_init ()
+
+#ifndef _DL_MACHINE_KFREEBSD
+#define _DL_MACHINE_KFREEBSD
+
+static inline void cpuid(long op, long *rax, long *rdx)
+{
+    __asm__(
+	"push %%rbx\n\t"
+	"cpuid\n\t"
+	"pop %%rbx\n\t"
+	: "=a" (*rax),
+	  "=d" (*rdx)
+	: "0" (op)
+	: "rcx"
+    );
+}
+
+extern const char *_self_program_name_from_auxv attribute_hidden;
+
+                           
+static inline void __attribute__ ((unused))
+dl_platform_kfreebsd_x86_64_init (void)
+{
+	/* we don't have reasonable AT_PLATFORM from kernel
+	   use cpuid to guess AT_HWCAP */
+
+	long val, hwcap;
+
+	cpuid(1, &val, &hwcap);
+	GLRO(dl_hwcap) = hwcap;
+	_self_program_name_from_auxv = GLRO(dl_platform);
+	GLRO(dl_platform) = ELF_MACHINE_NAME;
+}
 
 #endif
