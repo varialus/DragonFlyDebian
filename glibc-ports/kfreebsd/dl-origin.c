@@ -28,31 +28,50 @@
 
 #include <dl-dst.h>
 
-/* On Linux >= 2.1 systems which have the dcache implementation we can get
-   the path of the application from the /proc/self/exe symlink.  Try this
-   first and fall back on the generic method if necessary.  */
-
-
 const char *_self_program_name_from_auxv attribute_hidden;
 
 static int
 _dl_self_name(char *buf, int buflen)
 {
-  int len;
-  
+  int len, wdlen;
+
+  /* try /proc/self/exe symlink. */  
   len = __readlink("/proc/self/exe", buf, buflen);
 
   if (len > 0 && buf[0] == '/')
     return len;
 
-  if (_self_program_name_from_auxv)
+  if (!_self_program_name_from_auxv)
+    return -1;
+
+  len = strlen(_self_program_name_from_auxv);
+  if (len > 0 && _self_program_name_from_auxv[0] == '/')
   {
-    strncpy(buf, _self_program_name_from_auxv, buflen);
+    /* absolute file name */
+    if (len < buflen)
+    {
+      strcpy(buf, _self_program_name_from_auxv);
+      return len;
+    }
+    memcpy(buf, _self_program_name_from_auxv, buflen);
     buf[buflen - 1] = 0;
-    return strlen(buf);
+    return buflen - 1;
   };
   
-  return -1;
+  /* relative file name, do our best */
+  if (NULL == __getcwd(buf, buflen))
+    return -1;
+  
+  wdlen = strlen(buf);
+  buf[wdlen] = '/';
+  if ((wdlen + len + 1) < buflen)
+  {
+    strcpy(buf + wdlen + 1, _self_program_name_from_auxv);
+    return wdlen + len + 1;
+  }
+  memcpy(buf + wdlen + 1, _self_program_name_from_auxv, buflen - wdlen - 1);  
+  buf[buflen - 1] = 0;
+  return buflen - 1;  
 }
 
 
@@ -60,7 +79,7 @@ _dl_self_name(char *buf, int buflen)
 const char *
 _dl_get_origin (void)
 {
-  char linkval[PATH_MAX];
+  char linkval[2*PATH_MAX];
   char *result;
   int len;
 
