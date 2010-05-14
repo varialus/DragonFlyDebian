@@ -28,6 +28,7 @@
 #define	IMPLINK_LOWEXPER	156
 #define	IMPLINK_HIGHEXPER	158
 
+#define IPPROTO_DIVERT          258             /* divert pseudo-protocol */
 
 /* To select the IP level.  */
 #define SOL_IP	0
