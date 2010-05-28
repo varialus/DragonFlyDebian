@@ -36,7 +36,7 @@ sysdep_routines += sys_access sys_faccessat sys_fchownat sys_fexecve sys_getcwd 
 # For <fcntl.h>.
 sysdep_routines += sys_open sys_openat open_2
 # For <sys/stat.h>.
-sysdep_routines += sys_fchmodat sys_fstat sys_fstatat sys_lstat sys_mkdirat sys_mkfifoat sys_mknod sys_mknodat sys_nfstat sys_nlstat sys_nstat sys_stat
+sysdep_routines += sys_fchmodat sys_fstat sys_fstatat sys_lstat sys_mkdirat sys_mkfifoat sys_mknod sys_mknodat sys_nfstat sys_nlstat sys_nstat sys_stat lchflags
 # For <sys/statfs.h>.
 sysdep_routines += fstatfs64 statfs64 sys_fstatfs sys_statfs
 # For <stdio.h>
