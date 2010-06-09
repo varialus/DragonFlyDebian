@@ -1,15 +1,17 @@
 --- a/sys/dev/aic7xxx/aicasm/Makefile
 +++ b/sys/dev/aic7xxx/aicasm/Makefile
-@@ -14,7 +14,7 @@
+@@ -14,8 +14,9 @@
  SRCS=	${GENHDRS} ${CSRCS} ${YSRCS} ${LSRCS}
  CLEANFILES+= ${GENHDRS} ${YSRCS:R:C/(.*)/\1.output/g}
  DPADD=	${LIBL}
 -LDADD=	-ll
 +LDADD=	-ll -ldb
  WARNS?=	6
++NO_WERROR?=	1
  
  # Correct path for kernel builds
-@@ -24,13 +24,6 @@
+ # Don't rely on the kernel's .depend file
+@@ -24,13 +25,6 @@
  DEPENDFILE=	.depend_aicasm
  .endif
  
