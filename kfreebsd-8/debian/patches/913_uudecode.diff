@@ -96,13 +96,21 @@
 +	uudecode -o- ${.CURDIR}/../../contrib/dev/wpi/iwlwifi-3945-2.14.4.fw.uu > ${.TARGET}
  
  .include <bsd.kmod.mk>
---- a/sys/modules/iwnfw/Makefile
-+++ b/sys/modules/iwnfw/Makefile
-@@ -8,6 +8,6 @@
- CLEANFILES=	iwlwifi-4965-4.44.17.fw
+--- a/sys/modules/iwnfw/Makefile.inc
++++ b/sys/modules/iwnfw/Makefile.inc
+@@ -10,4 +10,4 @@
+ FIRMWS=	${_FIRM}:${KMOD}
  
- iwlwifi-4965-4.44.17.fw: ${.CURDIR}/../../contrib/dev/iwn/iwlwifi-4965-4.44.17.fw.uu
--	uudecode -p ${.CURDIR}/../../contrib/dev/iwn/iwlwifi-4965-4.44.17.fw.uu > ${.TARGET}
-+	uudecode -o- ${.CURDIR}/../../contrib/dev/iwn/iwlwifi-4965-4.44.17.fw.uu > ${.TARGET}
+ ${_FIRM}: ${.CURDIR}/../../../contrib/dev/iwn/${_FIRM}.uu
+-	uudecode -p $? > ${.TARGET}
++	uudecode -o- $? > ${.TARGET}
+--- a/sys/modules/runfw/Makefile
++++ b/sys/modules/runfw/Makefile
+@@ -6,6 +6,6 @@
+ CLEANFILES=	runfw
+ 
+ runfw: ${.CURDIR}/../../contrib/dev/run/rt2870.fw.uu
+-	uudecode -p ${.CURDIR}/../../contrib/dev/run/rt2870.fw.uu > ${.TARGET}
++	uudecode -o- ${.CURDIR}/../../contrib/dev/run/rt2870.fw.uu > ${.TARGET}
  
  .include <bsd.kmod.mk>

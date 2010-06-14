@@ -8,6 +8,7 @@ SHELL = bash
 #export DH_VERBOSE=1
 
 full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
+tar_version	:= $(shell echo $(full_version) | sed -e 's/[+-].*//g')
 version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
@@ -16,9 +17,10 @@ cpu		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 config_files	:= $(wildcard debian/arch/$(cpu)/*.config)
 flavours	:= $(config_files:debian/arch/$(cpu)/%.config=%)
 configfile	:= DEBCUSTOM
-abiname		:= 1
+abiname		:= 0
 
 SVN		:= http://svn.freebsd.org/base/release/$(version).0
+SVN		:= http://svn.freebsd.org/base/releng/8.1
 SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
 IMAGE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname)
 HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-headers-$(version)-$(abiname)
@@ -26,8 +28,8 @@ SRC_TAR		:= kfreebsd-source-$(version).tar.bz2
 SRC_DIR		:= kfreebsd-source-$(version)
 HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
 FLAVOR_DIR	:= flavor-$(version)-$(abiname)
-ORIG_DIR	:= kfreebsd-$(major)-$(version)
-ORIG_TAR	:= kfreebsd-$(major)_$(version).orig.tar.gz
+ORIG_DIR	:= kfreebsd-$(major)-$(tar_version)
+ORIG_TAR	:= kfreebsd-$(major)_$(tar_version).orig.tar.gz
 MAKE		:= make MACHINE_ARCH=$(cpu) CC=gcc-4.3 WERROR=
 PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 
