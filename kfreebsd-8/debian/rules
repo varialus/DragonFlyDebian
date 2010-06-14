@@ -135,6 +135,7 @@ build-flavor-%-stamp: src config
 
 	# Set /lib/modules/${RELEASE} as module dir
 	sed -i -e 's,^KODIR?=.*,KODIR="/lib/modules/$(version)-$(abiname)-$*",g' $(FLAVOR_DIR)-$*/sys/conf/kern.pre.mk
+	sed -i -e '/^static char linker_path/s,".*","/lib/modules/$(version)-$(abiname)-$*",g' $(FLAVOR_DIR)-$*/sys/kern/kern_linker.c 
 
 	# Configure the kernel
 	cp debian/arch/$(cpu)/$*.config $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/
