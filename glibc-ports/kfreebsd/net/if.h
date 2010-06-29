@@ -139,6 +139,7 @@ struct if_data {
 #define	IFF_STATICARP	0x80000		/* (n) static ARP */
 #define	IFF_NEEDSGIANT	0x100000	/* (i) hold Giant over if_start calls */
 #define IFF_DYING       0x200000        /* (n) interface is winding down */
+#define	IFF_RENAMING    0x400000        /* (n) interface is being renamed */
 
 /*
  * Old names for driver flags so that user space tools can continue to use
@@ -205,6 +206,8 @@ struct if_data {
 #define	IFCAP_TOE6		0x08000	/* interface can offload TCP6 */
 #define	IFCAP_VLAN_HWFILTER	0x10000 /* interface hw can filter vlan tag */
 #define IFCAP_POLLING_NOCOUNT   0x20000 /* polling ticks cannot be fragmented */
+#define	IFCAP_VLAN_HWTSO        0x40000 /* can do IFCAP_TSO on VLANs */
+#define	IFCAP_LINKSTATE         0x80000 /* the runtime link state is dynamic */
 
 #define	IFCAP_HWCSUM		(IFCAP_RXCSUM | IFCAP_TXCSUM)
 #define	IFCAP_TSO		(IFCAP_TSO4 | IFCAP_TSO6)
@@ -271,6 +274,14 @@ struct if_announcemsghdr {
 #define	IFAN_DEPARTURE	1	/* interface departure */
 
 /*
+ * Buffer with length to be used in SIOCGIFDESCR/SIOCSIFDESCR requests
+ */
+struct ifreq_buffer {
+	size_t  length;
+	void    *buffer;
+};
+ 
+/*
  * Interface request structure used for socket
  * ioctl's.  All interface ioctl's must have parameter
  * definitions which begin with ifr_name.  The
@@ -283,6 +294,7 @@ struct	ifreq {
 		struct	sockaddr ifru_dstaddr;
 		struct	sockaddr ifru_broadaddr;
 		struct	sockaddr ifru_netmask;
+		struct  ifreq_buffer ifru_buffer;
 		short	ifru_flags[2];
 		short	ifru_index;
 		int	ifru_jid;
@@ -297,6 +309,7 @@ struct	ifreq {
 #define	ifr_dstaddr	ifr_ifru.ifru_dstaddr	/* other end of p-to-p link */
 #define	ifr_broadaddr	ifr_ifru.ifru_broadaddr	/* broadcast address */
 #define	ifr_netmask	ifr_ifru.ifru_netmask	/* interface net mask */
+#define	ifr_buffer      ifr_ifru.ifru_buffer    /* user supplied buffer with its length */
 #define	ifr_flags	ifr_ifru.ifru_flags[0]	/* flags (low 16 bits) */
 #define	ifr_flagshigh	ifr_ifru.ifru_flags[1]	/* flags (high 16 bits) */
 #define ifr_jid         ifr_ifru.ifru_jid       /* jail/vnet */
