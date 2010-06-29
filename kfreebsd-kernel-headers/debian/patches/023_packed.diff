@@ -1,14 +1,14 @@
-Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
+Index: b/sys/net80211/ieee80211.h
 ===================================================================
---- kfreebsd-source-8.0.orig/sys/net80211/ieee80211.h	2009-11-12 16:27:26.000000000 +0000
-+++ kfreebsd-source-8.0/sys/net80211/ieee80211.h	2009-11-12 16:42:04.000000000 +0000
+--- a/sys/net80211/ieee80211.h
++++ b/sys/net80211/ieee80211.h
 @@ -1,4 +1,4 @@
 -/*-
 + /*-
   * Copyright (c) 2001 Atsushi Onoe
   * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
   * All rights reserved.
-@@ -46,7 +46,7 @@
+@@ -47,7 +47,7 @@
  	uint8_t		i_service;
  	uint16_t	i_length;
  	uint16_t	i_crc;
@@ -17,7 +17,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  #define IEEE80211_PLCP_SFD      0xF3A0 
  #define IEEE80211_PLCP_SERVICE  0x00
-@@ -68,7 +68,7 @@
+@@ -69,7 +69,7 @@
  	uint8_t		i_seq[2];
  	/* possibly followed by addr4[IEEE80211_ADDR_LEN]; */
  	/* see below */
@@ -26,7 +26,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  struct ieee80211_qosframe {
  	uint8_t		i_fc[2];
-@@ -80,7 +80,7 @@
+@@ -81,7 +81,7 @@
  	uint8_t		i_qos[2];
  	/* possibly followed by addr4[IEEE80211_ADDR_LEN]; */
  	/* see below */
@@ -35,7 +35,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  struct ieee80211_qoscntl {
  	uint8_t		i_qos[2];
-@@ -94,7 +94,7 @@
+@@ -95,7 +95,7 @@
  	uint8_t		i_addr3[IEEE80211_ADDR_LEN];
  	uint8_t		i_seq[2];
  	uint8_t		i_addr4[IEEE80211_ADDR_LEN];
@@ -44,7 +44,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  
  struct ieee80211_qosframe_addr4 {
-@@ -106,7 +106,7 @@
+@@ -107,7 +107,7 @@
  	uint8_t		i_seq[2];
  	uint8_t		i_addr4[IEEE80211_ADDR_LEN];
  	uint8_t		i_qos[2];
@@ -53,7 +53,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  #define	IEEE80211_FC0_VERSION_MASK		0x03
  #define	IEEE80211_FC0_VERSION_SHIFT		0
-@@ -217,7 +217,7 @@
+@@ -218,7 +218,7 @@
  	uint8_t		wme_subtype;	/* OUI subtype */
  	uint8_t		wme_version;	/* spec revision */
  	uint8_t		wme_info;	/* QoS info */
@@ -62,7 +62,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  /*
   * WME/802.11e Tspec Element
-@@ -245,7 +245,7 @@
+@@ -246,7 +246,7 @@
  	uint8_t		ts_delay[4];
  	uint8_t		ts_surplus[2];
  	uint8_t		ts_medium_time[2];
@@ -71,7 +71,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  /*
   * WME AC parameter field
-@@ -254,7 +254,7 @@
+@@ -255,7 +255,7 @@
  	uint8_t		acp_aci_aifsn;
  	uint8_t		acp_logcwminmax;
  	uint16_t	acp_txop;
@@ -80,7 +80,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  #define WME_NUM_AC		4	/* 4 AC categories */
  #define	WME_NUM_TID		16	/* 16 tids */
-@@ -296,7 +296,7 @@
+@@ -297,7 +297,7 @@
  #define	WME_QOSINFO_COUNT	0x0f	/* Mask for param count field */
  	uint8_t		param_reserved;
  	struct ieee80211_wme_acparams	params_acParams[WME_NUM_AC];
@@ -89,7 +89,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  /*
   * Management Notification Frame
-@@ -306,7 +306,7 @@
+@@ -307,7 +307,7 @@
  	uint8_t		mnf_action;
  	uint8_t		mnf_dialog;
  	uint8_t		mnf_status;
@@ -98,7 +98,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  #define	MNF_SETUP_REQ	0
  #define	MNF_SETUP_RESP	1
  #define	MNF_TEARDOWN	2
-@@ -318,7 +318,7 @@
+@@ -319,7 +319,7 @@
  struct ieee80211_action {
  	uint8_t		ia_category;
  	uint8_t		ia_action;
@@ -107,7 +107,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  #define	IEEE80211_ACTION_CAT_SM		0	/* Spectrum Management */
  #define	IEEE80211_ACTION_CAT_QOS	1	/* QoS */
-@@ -334,7 +334,7 @@
+@@ -335,7 +335,7 @@
  struct ieee80211_action_ht_txchwidth {
  	struct ieee80211_action	at_header;
  	uint8_t		at_chwidth;	
@@ -116,7 +116,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  #define	IEEE80211_A_HT_TXCHWIDTH_20	0
  #define	IEEE80211_A_HT_TXCHWIDTH_2040	1
-@@ -343,7 +343,7 @@
+@@ -344,7 +344,7 @@
  struct ieee80211_action_ht_mimopowersave {
  	struct ieee80211_action am_header;
  	uint8_t		am_control;
@@ -125,7 +125,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  #define	IEEE80211_A_HT_MIMOPWRSAVE_ENA		0x01	/* PS enabled */
  #define	IEEE80211_A_HT_MIMOPWRSAVE_MODE		0x02
-@@ -387,7 +387,7 @@
+@@ -388,7 +388,7 @@
  	uint16_t	rq_baparamset;
  	uint16_t	rq_batimeout;		/* in TUs */
  	uint16_t	rq_baseqctl;
@@ -134,7 +134,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  /* BA - ADDBA response */
  struct ieee80211_action_ba_addbaresponse {
-@@ -396,14 +396,14 @@
+@@ -397,14 +397,14 @@
  	uint16_t	rs_statuscode;
  	uint16_t	rs_baparamset; 
  	uint16_t	rs_batimeout;		/* in TUs */
@@ -151,7 +151,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  /* BAR Control */
  #define	IEEE80211_BAR_TID	0xf000		/* TID */
-@@ -419,7 +419,7 @@
+@@ -420,7 +420,7 @@
  struct ieee80211_ba_request {
  	uint16_t	rq_barctl;
  	uint16_t	rq_barseqctl;
@@ -160,7 +160,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  /*
   * Control frames.
-@@ -430,7 +430,7 @@
+@@ -431,7 +431,7 @@
  	uint8_t		i_addr1[IEEE80211_ADDR_LEN];
  	uint8_t		i_addr2[IEEE80211_ADDR_LEN];
  	/* FCS */
@@ -169,7 +169,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  struct ieee80211_frame_rts {
  	uint8_t		i_fc[2];
-@@ -438,21 +438,21 @@
+@@ -439,21 +439,21 @@
  	uint8_t		i_ra[IEEE80211_ADDR_LEN];
  	uint8_t		i_ta[IEEE80211_ADDR_LEN];
  	/* FCS */
@@ -194,7 +194,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  struct ieee80211_frame_pspoll {
  	uint8_t		i_fc[2];
-@@ -460,7 +460,7 @@
+@@ -461,7 +461,7 @@
  	uint8_t		i_bssid[IEEE80211_ADDR_LEN];
  	uint8_t		i_ta[IEEE80211_ADDR_LEN];
  	/* FCS */
@@ -203,7 +203,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  struct ieee80211_frame_cfend {		/* NB: also CF-End+CF-Ack */
  	uint8_t		i_fc[2];
-@@ -468,7 +468,7 @@
+@@ -469,7 +469,7 @@
  	uint8_t		i_ra[IEEE80211_ADDR_LEN];
  	uint8_t		i_bssid[IEEE80211_ADDR_LEN];
  	/* FCS */
@@ -212,7 +212,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  struct ieee80211_frame_bar {
  	uint8_t		i_fc[2];
-@@ -478,7 +478,7 @@
+@@ -479,7 +479,7 @@
  	uint16_t	i_ctl;
  	uint16_t	i_seq;
  	/* FCS */
@@ -221,7 +221,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  /*
   * BEACON management packets
-@@ -535,7 +535,7 @@
+@@ -536,7 +536,7 @@
  	uint16_t	wpa_caps;	/* 802.11i capabilities */
  	uint16_t	wpa_pmkidcnt;	/* 802.11i pmkid count */
  	uint16_t	wpa_pmkids[8];	/* 802.11i pmkids */
@@ -230,7 +230,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  /*
   * 802.11n HT Capability IE
-@@ -550,7 +550,7 @@
+@@ -551,7 +551,7 @@
  	uint16_t	hc_extcap;		/* extended HT capabilities */
  	uint32_t	hc_txbf;		/* txbf capabilities */
  	uint8_t		hc_antenna;		/* antenna capabilities */
@@ -239,7 +239,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  /* HT capability flags (ht_cap) */
  #define	IEEE80211_HTCAP_LDPC		0x0001	/* LDPC supported */
-@@ -630,7 +630,7 @@
+@@ -631,7 +631,7 @@
  	uint8_t		hi_byte3;		/* ht ie byte 3 */
  	uint16_t	hi_byte45;		/* ht ie bytes 4+5 */
  	uint8_t 	hi_basicmcsset[16]; 	/* basic MCS set */
@@ -248,7 +248,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  /* byte1 */
  #define	IEEE80211_HTINFO_2NDCHAN	0x03	/* secondary/ext chan offset */
-@@ -739,7 +739,7 @@
+@@ -740,7 +740,7 @@
  	uint8_t		tim_period;		/* DTIM period */
  	uint8_t		tim_bitctl;		/* bitmap control */
  	uint8_t		tim_bitmap[1];		/* variable-length bitmap */
@@ -257,7 +257,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  struct ieee80211_country_ie {
  	uint8_t		ie;			/* IEEE80211_ELEMID_COUNTRY */
-@@ -749,8 +749,8 @@
+@@ -750,8 +750,8 @@
  		uint8_t schan;			/* starting channel */
  		uint8_t nchan;			/* number channels */
  		uint8_t maxtxpwr;		/* tx power cap */
@@ -268,7 +268,7 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  #define	IEEE80211_COUNTRY_MAX_BANDS	84	/* max possible bands */
  #define	IEEE80211_COUNTRY_MAX_SIZE \
-@@ -765,7 +765,7 @@
+@@ -766,7 +766,7 @@
  	uint8_t		csa_mode;		/* Channel Switch Mode */
  	uint8_t		csa_newchan;		/* New Channel Number */
  	uint8_t		csa_count;		/* Channel Switch Count */
@@ -277,29 +277,29 @@ Index: kfreebsd-source-8.0/sys/net80211/ieee80211.h
  
  /*
   * Note the min acceptable CSA count is used to guard against
-Index: kfreebsd-source-8.0/sys/sys/ata.h
+Index: b/sys/sys/ata.h
 ===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/ata.h	2009-11-12 15:49:02.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/ata.h	2009-11-12 16:40:39.000000000 +0000
-@@ -170,7 +170,7 @@
- #define ATA_SUPPORT_WRITEDMAFUAEXT	0x0040
+--- a/sys/sys/ata.h
++++ b/sys/sys/ata.h
+@@ -185,7 +185,7 @@
  #define ATA_SUPPORT_WRITEDMAQFUAEXT	0x0080
  #define ATA_SUPPORT_64BITWWN		0x0100
+ #define ATA_SUPPORT_UNLOAD		0x2000
 -	} __packed support, enabled;
 +	} __attribute__((__packed__)) support, enabled;
  
  /*088*/ u_int16_t       udmamodes;              /* UltraDMA modes */
  /*089*/ u_int16_t       erase_time;
-@@ -201,7 +201,7 @@
- /*176*/ u_int16_t       media_serial[30];
- 	u_int16_t       reserved206[49];
+@@ -258,7 +258,7 @@
+ /*223*/ u_int16_t       transport_minor;
+ 	u_int16_t       reserved224[31];
  /*255*/ u_int16_t       integrity;
 -} __packed;
 +} __attribute__((__packed__));
  
  
  /* ATA transfer modes */
-@@ -405,7 +405,7 @@
+@@ -474,7 +474,7 @@
  	
      u_int8_t	specific1;		/* sense key specific */
      u_int8_t	specific2;		/* sense key specific */
@@ -308,10 +308,10 @@ Index: kfreebsd-source-8.0/sys/sys/ata.h
  
  struct ata_ioc_request {
      union {
-Index: kfreebsd-source-8.0/sys/dev/ata/atapi-cd.h
+Index: b/sys/dev/ata/atapi-cd.h
 ===================================================================
---- kfreebsd-source-8.0.orig/sys/dev/ata/atapi-cd.h	2009-11-12 15:48:35.000000000 +0000
-+++ kfreebsd-source-8.0/sys/dev/ata/atapi-cd.h	2009-11-12 16:40:39.000000000 +0000
+--- a/sys/dev/ata/atapi-cd.h
++++ b/sys/dev/ata/atapi-cd.h
 @@ -267,7 +267,7 @@
      u_int8_t    vendor_specific_byte1;
      u_int8_t    vendor_specific_byte2;
@@ -321,10 +321,10 @@ Index: kfreebsd-source-8.0/sys/dev/ata/atapi-cd.h
  
  /* CDROM Read Track Information structure */
  struct acd_track_info {
-Index: kfreebsd-source-8.0/sys/dev/ciss/cissio.h
+Index: b/sys/dev/ciss/cissio.h
 ===================================================================
---- kfreebsd-source-8.0.orig/sys/dev/ciss/cissio.h	2009-11-12 15:48:36.000000000 +0000
-+++ kfreebsd-source-8.0/sys/dev/ciss/cissio.h	2009-11-12 16:40:39.000000000 +0000
+--- a/sys/dev/ciss/cissio.h
++++ b/sys/dev/ciss/cissio.h
 @@ -108,18 +108,18 @@
  	u_int8_t	Dev;
  	u_int8_t	Bus:6;
@@ -428,10 +428,10 @@ Index: kfreebsd-source-8.0/sys/dev/ciss/cissio.h
  #endif
  
  /************************************************************************
-Index: kfreebsd-source-8.0/sys/amd64/include/segments.h
+Index: b/sys/amd64/include/segments.h
 ===================================================================
---- kfreebsd-source-8.0.orig/sys/amd64/include/segments.h	2009-11-12 15:48:24.000000000 +0000
-+++ kfreebsd-source-8.0/sys/amd64/include/segments.h	2009-11-12 16:40:39.000000000 +0000
+--- a/sys/amd64/include/segments.h
++++ b/sys/amd64/include/segments.h
 @@ -72,7 +72,7 @@
  	u_int64_t sd_def32:1;		/* default 32 vs 16 bit size */
  	u_int64_t sd_gran:1;		/* limit granularity (byte/page units)*/
