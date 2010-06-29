@@ -4,6 +4,19 @@
  sbin/mount/mount_fs.c |    2 +-
  3 files changed, 15 insertions(+), 12 deletions(-)
 
+--- a/sbin/mount/mntopts.h
++++ b/sbin/mount/mntopts.h
+@@ -37,6 +37,10 @@
+ 	int m_altloc;		/* 1 => set bit in altflags */
+ };
+ 
++#ifndef MNT_NFS4ACLS
++#define  MNT_NFS4ACLS    0x00000010
++#endif
++
+ /* User-visible MNT_ flags. */
+ #define MOPT_ASYNC		{ "async",	0, MNT_ASYNC, 0 }
+ #define MOPT_NOATIME		{ "atime",	1, MNT_NOATIME, 0 }
 Index: b/sbin/mount/mount_fs.c
 ===================================================================
 --- a/sbin/mount/mount_fs.c

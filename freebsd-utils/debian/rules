@@ -17,7 +17,8 @@ else
 endif
 
 VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
-SVN=svn://svn.freebsd.org/base/release/$(VERSION).0
+SVN=http://svn.freebsd.org/base/release/$(VERSION).0
+#SVN=http://svn.freebsd.org/base/releng/8.1
 ORIGDIR=freebsd-utils-$(VERSION)
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
@@ -31,6 +32,7 @@ get-orig-source:
 	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
 		 usr.sbin/jail bin/chflags sbin/devd usr.sbin/acpi/acpiconf \
 		 sbin/kldconfig sbin/kldload sbin/kldstat sbin/kldunload \
+		 usr.bin/ktrdump usr.bin/vmstat sbin/devfs \
 		 sbin/ifconfig sbin/route usr.bin/netstat usr.sbin/rpc.umntall \
 	         usr.sbin/ppp usr.sbin/pppctl usr.sbin/pppd \
 		 sbin/ipfw contrib/pf sbin/pfctl usr.sbin/authpf \

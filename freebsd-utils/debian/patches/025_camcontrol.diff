@@ -1,5 +1,7 @@
---- a/sbin/camcontrol/camcontrol.c
-+++ b/sbin/camcontrol/camcontrol.c
+Index: freebsd-utils/sbin/camcontrol/camcontrol.c
+===================================================================
+--- freebsd-utils.orig/sbin/camcontrol/camcontrol.c	2010-05-08 16:06:54.000000000 +0000
++++ freebsd-utils/sbin/camcontrol/camcontrol.c	2010-06-29 07:55:38.000000000 +0000
 @@ -30,7 +30,7 @@
  __FBSDID("$FreeBSD$");
  
@@ -9,29 +11,31 @@
  #include <sys/types.h>
  #include <sys/endian.h>
  
-@@ -120,9 +120,9 @@
+@@ -123,9 +123,9 @@
  };
  
  #ifndef MINIMALISTIC
--static const char scsicmd_opts[] = "a:c:i:o:r";
+-static const char scsicmd_opts[] = "a:c:dfi:o:r";
 -static const char readdefect_opts[] = "f:GP";
--static const char negotiate_opts[] = "acD:O:qR:T:UW:";
-+static const char scsicmd_opts[] = "+a:c:i:o:r";
+-static const char negotiate_opts[] = "acD:M:O:qR:T:UW:";
++static const char scsicmd_opts[] = "+a:c:dfi:o:r";
 +static const char readdefect_opts[] = "+f:GP";
-+static const char negotiate_opts[] = "+acD:O:qR:T:UW:";
++static const char negotiate_opts[] = "+acD:M:O:qR:T:UW:";
  #endif
  
  struct camcontrol_opts option_table[] = {
-@@ -4431,7 +4431,6 @@
+@@ -4705,7 +4705,6 @@
  	 * the arguments again.
  	 */
  	optind = optstart;
 -	optreset = 1;
  
- 	sitch(cmdlist) {
+ 	switch(cmdlist) {
  #ifndef MINIMALISTIC
---- a/sbin/camcontrol/modeedit.c
-+++ b/sbin/camcontrol/modeedit.c
+Index: freebsd-utils/sbin/camcontrol/modeedit.c
+===================================================================
+--- freebsd-utils.orig/sbin/camcontrol/modeedit.c	2004-01-22 07:23:36.000000000 +0000
++++ freebsd-utils/sbin/camcontrol/modeedit.c	2010-06-29 07:55:00.000000000 +0000
 @@ -140,7 +140,7 @@
  
  
@@ -59,8 +63,10 @@
  {
  	struct editentry *src;		/* Entry value to save. */
  
---- a/sbin/camcontrol/util.c
-+++ b/sbin/camcontrol/util.c
+Index: freebsd-utils/sbin/camcontrol/util.c
+===================================================================
+--- freebsd-utils.orig/sbin/camcontrol/util.c	2003-08-05 09:19:07.000000000 +0000
++++ freebsd-utils/sbin/camcontrol/util.c	2010-06-29 07:55:00.000000000 +0000
 @@ -46,7 +46,7 @@
  #include <sys/cdefs.h>
  __FBSDID("$FreeBSD$");
@@ -79,4 +85,3 @@
  {
  	if (verbose && name && *name)
  		printf("%s:  ", name);
-Les fichiers binaires camcontrol.orig/util.o et camcontrol/util.o sont différents.
