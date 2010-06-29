@@ -18,7 +18,8 @@ else
 endif
 
 VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
-SVN=svn://svn.freebsd.org/base/release/$(VERSION).0
+SVN=http://svn.freebsd.org/base/release/$(VERSION).0
+#SVN=http://svn.freebsd.org/base/releng/8.1
 ORIGDIR=freebsd-libs-$(VERSION)
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
@@ -34,6 +35,7 @@ get-orig-source:
 	         lib/libusbhid sys/cam ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
+	svn cat $(SVN)/$$i/share/misc/usb_hid_usages > $(ORIGDIR)/lib/libusbhid/usb_hid_usages
 	mkdir -p freebsd-libs-$(VERSION)/sys/kern ; \
 	    svn cat $(SVN)/$$i/sys/kern/subr_sbuf.c > $(ORIGDIR)/sys/kern/subr_sbuf.c
 	# Remove unused files with non GPL compatible license (eg BSD 4 clauses)
