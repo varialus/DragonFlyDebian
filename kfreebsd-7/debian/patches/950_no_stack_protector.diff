@@ -1,0 +1,20 @@
+
+ disable ssp for now ...
+ at least under QEMU it panics, might be due to 
+   - QEMU
+   - newer gcc compared to plain FreeBSD
+   - different init order 
+   - ...
+
+--- a/sys/conf/kmod.mk
++++ b/sys/conf/kmod.mk
+@@ -128,6 +128,9 @@
+ CFLAGS+=	-mlongcall -fno-omit-frame-pointer
+ .endif
+ 
++# Disable stack protector as it causes kernel panic
++MK_SSP=		no
++
+ .if defined(FIRMWS)
+ .if !exists(@)
+ ${KMOD:S/$/.c/}: @
