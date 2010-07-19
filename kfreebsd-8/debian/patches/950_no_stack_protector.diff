@@ -8,10 +8,24 @@
 
 --- a/sys/conf/kern.mk
 +++ b/sys/conf/kern.mk
-@@ -125,5 +125,5 @@
+@@ -111,6 +111,8 @@
  #
+ # GCC SSP support.
+ #
++# Disable stack protector as it causes kernel panic
++MK_SSP=		no
  .if ${MK_SSP} != "no" && ${CC} != "icc" && ${MACHINE_ARCH} != "ia64" && \
  	${MACHINE_ARCH} != "arm" && ${MACHINE_ARCH} != "mips"
--CFLAGS+=	-fstack-protector
-+CFLAGS+=	-fno-stack-protector
+ CFLAGS+=	-fstack-protector
+--- a/sys/conf/kmod.mk
++++ b/sys/conf/kmod.mk
+@@ -128,6 +128,9 @@
+ CFLAGS+=	-mlongcall -fno-omit-frame-pointer
  .endif
+ 
++# Disable stack protector as it causes kernel panic
++MK_SSP=		no
++
+ .if defined(FIRMWS)
+ .if !exists(@)
+ ${KMOD:S/$/.c/}: @
