@@ -1,11 +1,20 @@
---- a/sys/netinet6/ip6_input.c
-+++ b/sys/netinet6/ip6_input.c
-@@ -205,7 +205,7 @@
- 	V_ip6_rr_prune = 5;	 /* router renumbering prefix
-                                   * walk list every 5 sec. */
- 	V_ip6_mcast_pmtu = 0;	 /* enable pMTU discovery for multicast? */
--	V_ip6_v6only = 1;
-+	V_ip6_v6only = 0;
- 	V_ip6_keepfaith = 0;
- 	V_ip6_log_time = (time_t)0L;
- #ifdef IPSTEALTH
+--- a/sys/netinet6/in6_proto.c
++++ b/sys/netinet6/in6_proto.c
+@@ -393,7 +393,7 @@
+ VNET_DEFINE(int, ip6_sendredirects) = IPV6_SENDREDIRECTS;
+ VNET_DEFINE(int, ip6_defhlim) = IPV6_DEFHLIM;
+ VNET_DEFINE(int, ip6_defmcasthlim) = IPV6_DEFAULT_MULTICAST_HOPS;
+-VNET_DEFINE(int, ip6_accept_rtadv) = 0;
++VNET_DEFINE(int, ip6_accept_rtadv) = 1;
+ VNET_DEFINE(int, ip6_maxfragpackets);	/* initialized in frag6.c:frag6_init() */
+ VNET_DEFINE(int, ip6_maxfrags);		/* initialized in frag6.c:frag6_init() */
+ VNET_DEFINE(int, ip6_log_interval) = 5;
+@@ -406,7 +406,7 @@
+ VNET_DEFINE(int, ip6_rr_prune) = 5;	/* router renumbering prefix
+ 					 * walk list every 5 sec. */
+ VNET_DEFINE(int, ip6_mcast_pmtu) = 0;	/* enable pMTU discovery for multicast? */
+-VNET_DEFINE(int, ip6_v6only) = 1;
++VNET_DEFINE(int, ip6_v6only) = 0;
+ 
+ VNET_DEFINE(int, ip6_keepfaith) = 0;
+ VNET_DEFINE(time_t, ip6_log_time) = (time_t)0L;
