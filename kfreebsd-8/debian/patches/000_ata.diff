@@ -1,0 +1,16 @@
+A legacy device detection in the ata(4) can fail in some cases. 
+Specifically, Marvell 88SX6141 controllers can cause attach failure or panic. 
+This problem has been fixed in r210168 (HEAD). An Errata Notice for 8.1-RELEASE is planned.
+
+--- head/sys/dev/ata/ata-pci.c	2010/07/16 17:01:36	210167
++++ head/sys/dev/ata/ata-pci.c	2010/07/16 17:27:43	210168
+@@ -769,7 +769,8 @@
+ int
+ ata_legacy(device_t dev)
+ {
+-    return (((pci_read_config(dev, PCIR_PROGIF, 1)&PCIP_STORAGE_IDE_MASTERDEV)&&
++    return (((pci_read_config(dev, PCIR_SUBCLASS, 1) == PCIS_STORAGE_IDE) &&
++	     (pci_read_config(dev, PCIR_PROGIF, 1)&PCIP_STORAGE_IDE_MASTERDEV)&&
+ 	     ((pci_read_config(dev, PCIR_PROGIF, 1) &
+ 	       (PCIP_STORAGE_IDE_MODEPRIM | PCIP_STORAGE_IDE_MODESEC)) !=
+ 	      (PCIP_STORAGE_IDE_MODEPRIM | PCIP_STORAGE_IDE_MODESEC))) ||
