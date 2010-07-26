@@ -3,12 +3,12 @@ Section: libs
 Priority: optional
 Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>
-Build-Depends: debhelper (>= 5.0.0), quilt, freebsd-buildutils, libbsd-dev (>= 0.1.4),
+Build-Depends: debhelper (>= 7, quilt, freebsd-buildutils, libbsd-dev (>= 0.1.4),
  libc0.1-dev (>= 2.10), libgdbm-dev, kfreebsd-kernel-headers (>= 0.45), libexpat-dev
 # libexpat-dev: aka bsdxml. needed by libgeom
 Vcs-Browser: http://svn.debian.org/wsvn/glibc-bsd/trunk/freebsd-libs/
 Vcs-Svn: svn://svn.debian.org/glibc-bsd/trunk/freebsd-libs/
-Standards-Version: 3.8.3
+Standards-Version: 3.9.1
 
 Package: libsbuf0
 Architecture: kfreebsd-any
@@ -69,15 +69,25 @@ Description: FreeBSD GEOM library
 
 Package: libusbhid4
 Architecture: kfreebsd-any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: libusbhid-common (>= ${source:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: FreeBSD library to access USB HID devices
- The usbhid library provides routines to extract data from USB Human
- Interface Devices.
- .
- USB HID devices send and receive data layed out in a device dependent
- way. The usbhid library contains routines to extract the report
+ USB Human Interface Devices send and receive data layed out in a device
+ dependent way. The usbhid library contains routines to extract the report
  descriptor which contains the data layout information and then use this
  information.
+ .
+ This package contains the header files and static library.
+
+Package: libusbhid-common
+Architecture: all
+Depends: ${misc:Depends}
+Description: Common files for the USB HID devices FreeBSD library
+ USB Human Interface Devices send and receive data layed out in a device
+ dependent way. The usbhid library contains routines to extract the report
+ descriptor which contains the data layout information and then use this
+ information.
+ . 
+ This package contains the common files which the library need.
 
 Package: libusbhid-dev
 Section: libdevel

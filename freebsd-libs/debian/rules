@@ -129,8 +129,8 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k -s
-	dh_installdirs -s
+	dh_prep
+	dh_installdirs
 
 	mkdir -p $(DESTDIR)/usr/lib $(DESTDIR)/usr/include $(DESTDIR)/usr/share/man/man3
 	$(PMAKE) -C $(CURDIR)/lib/libsbuf install
@@ -150,11 +150,21 @@ install: build
 	mkdir -p $(CURDIR)/debian/tmp/usr/bin
 	install -m755 debian/libusb-config $(CURDIR)/debian/tmp/usr/bin
 
-	dh_install -s --list-missing --sourcedir=debian/tmp
+	dh_install --list-missing
 
 # Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do by default.
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs -i
+	dh_installdocs -i
+	dh_link -i
+	dh_compress -i
+	dh_fixperms -i
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
 
 # Build architecture-dependent files here.
 binary-arch: build install
