@@ -32,9 +32,9 @@ get-orig-source:
 	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
 		 usr.sbin/jail bin/chflags sbin/devd usr.sbin/acpi/acpiconf \
 		 sbin/kldconfig sbin/kldload sbin/kldstat sbin/kldunload \
-		 usr.bin/ktrdump usr.bin/vmstat sbin/devfs \
+		 usr.bin/ktrdump usr.bin/vmstat sbin/devfs sbin/fdisk \
 		 sbin/ifconfig sbin/route usr.bin/netstat usr.sbin/rpc.umntall \
-	         usr.sbin/ppp usr.sbin/pppctl usr.sbin/pppd usr.sbin/arp \
+	         usr.sbin/ppp usr.sbin/pppctl usr.sbin/arp \
 		 sbin/ipfw contrib/pf sbin/pfctl usr.sbin/authpf \
 		 sbin/mount_std sbin/umount sbin/mount_autofs sbin/mount_cd9660 \
 		 sbin/mount_ext2fs sbin/mount_hpfs sbin/mount_msdosfs sbin/mount_nfs \
@@ -149,10 +149,10 @@ clean:
 	$(PMAKE) -C bin/chflags clean
 	$(PMAKE) -C bin/kenv clean
 	$(PMAKE) -C sbin/ccdconfig clean
-	! [ -f sbin/atacontrol/Makefile ] ||  $(PMAKE) -C sbin/atacontrol clean
-	! [ -f sbin/camcontrol/Makefile ] ||  $(PMAKE) -C sbin/camcontrol clean
-	! [ -f sbin/devd/Makefile ] ||  $(PMAKE) -C sbin/devd clean
-	! [ -f sbin/devfs/Makefile ] ||  $(PMAKE) -C sbin/devfs clean
+	$(PMAKE) -C sbin/atacontrol clean
+	$(PMAKE) -C sbin/camcontrol clean
+	$(PMAKE) -C sbin/devd clean
+	$(PMAKE) -C sbin/devfs clean
 	$(PMAKE) -C sbin/dmesg clean
 	$(PMAKE) -C sbin/mdconfig clean
 	$(PMAKE) -C sbin/mount clean
@@ -173,15 +173,15 @@ clean:
 	$(PMAKE) -C sbin/umount clean
 	$(PMAKE) -C usr.bin/kdump clean
 	$(PMAKE) -C usr.bin/ktrace clean
-	! [ -f usr.sbin/acpi/acpiconf/Makefile ] || $(PMAKE) -C usr.sbin/acpi/acpiconf clean
+	$(PMAKE) -C usr.sbin/acpi/acpiconf clean
 	$(PMAKE) -C usr.sbin/rpc.umntall clean
 
 	$(PMAKE) -C sbin/gbde clean
 
 	$(PMAKE) -C usr.sbin/kbdcontrol clean
 	
-	! [ -f usr.sbin/vidcontrol/Makefile ] || $(PMAKE) -C usr.sbin/vidcontrol clean
-	! [ -f share/syscons/scrnmaps/Makefile ] || $(PMAKE) -C share/syscons/scrnmaps clean
+	$(PMAKE) -C usr.sbin/vidcontrol clean
+	$(PMAKE) -C share/syscons/scrnmaps clean
 
 	$(PMAKE) -C sbin/kldconfig clean
 	$(PMAKE) -C sbin/kldload clean
