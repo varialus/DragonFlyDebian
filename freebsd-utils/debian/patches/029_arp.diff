@@ -1,0 +1,30 @@
+--- a/usr.sbin/arp/arp.c
++++ b/usr.sbin/arp/arp.c
+@@ -48,7 +48,7 @@
+  * arp - display, set, and delete arp table entries
+  */
+ 
+-
++#define GNU_SOURCE
+ #include <sys/param.h>
+ #include <sys/file.h>
+ #include <sys/socket.h>
+@@ -65,6 +65,7 @@
+ 
+ #include <netinet/in.h>
+ #include <netinet/if_ether.h>
++#include <netinet/ether.h>
+ 
+ #include <arpa/inet.h>
+
+@@ -650,8 +706,8 @@
+  * Nuke an arp entry
+  */
+ static void
+-nuke_entry(struct sockaddr_dl *sdl __unused,
+-	struct sockaddr_inarp *addr, struct rt_msghdr *rtm __unused)
++nuke_entry(struct sockaddr_dl *sdl,
++	struct sockaddr_inarp *addr, struct rt_msghdr *rtm)
+ {
+ 	char ip[20];
+ 

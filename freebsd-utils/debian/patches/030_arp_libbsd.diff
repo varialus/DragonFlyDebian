@@ -1,0 +1,68 @@
+#
+# To be removed when this functions are available in libbsd
+#
+
+--- a/usr.sbin/arp/arp.c
++++ b/usr.sbin/arp/arp.c
+@@ -113,6 +114,61 @@
+ 
+ #define SETFUNC(f)	{ if (func) usage(); func = (f); }
+ 
++static void *
++reallocf(void *ptr, size_t size)
++{
++	void *nptr;
++
++	nptr = realloc(ptr, size);
++
++	/*
++	 * When the System V compatibility option (malloc "V" flag) is
++	 * in effect, realloc(ptr, 0) frees the memory and returns NULL.
++	 * So, to avoid double free, call free() only when size != 0.
++	 * realloc(ptr, 0) can't fail when ptr != NULL.
++	 */
++	if (!nptr && ptr && size != 0)
++		free(ptr);
++	return (nptr);
++}
++
++static char hexlist[] = "0123456789abcdef";
++
++char *
++link_ntoa(sdl)
++	const struct sockaddr_dl *sdl;
++{
++	static char obuf[64];
++	char *out = obuf;
++	int i;
++	u_char *in = (u_char *)LLADDR(sdl);
++	u_char *inlim = in + sdl->sdl_alen;
++	int firsttime = 1;
++
++	if (sdl->sdl_nlen) {
++		bcopy(sdl->sdl_data, obuf, sdl->sdl_nlen);
++		out += sdl->sdl_nlen;
++		if (sdl->sdl_alen)
++			*out++ = ':';
++	}
++	while (in < inlim) {
++		if (firsttime)
++			firsttime = 0;
++		else
++			*out++ = '.';
++		i = *in++;
++		if (i > 0xf) {
++			out[1] = hexlist[i & 0xf];
++			i >>= 4;
++			out[0] = hexlist[i];
++			out += 2;
++		} else
++			*out++ = hexlist[i];
++	}
++	*out = 0;
++	return (obuf);
++}
++
+ int
+ main(int argc, char *argv[])
+ {
