@@ -1,0 +1,123 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+SHELL=bash
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
+
+ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
+SVN=svn://svn.freebsd.org/base/release/$(VERSION).0
+ORIGDIR=freebsd-libs-$(VERSION)
+PATH:=/usr/lib/freebsd:$(PATH)
+DESTDIR=$(CURDIR)/debian/tmp
+PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+export SHLIB_MAJOR=0
+export SHLIBDIR=/usr/lib
+
+get-orig-source:
+	rm -rf $(ORIGDIR)
+	for i in \
+	         cddl/compat/opensolaris \
+	         cddl/contrib/opensolaris \
+	         sys/cddl/compat/opensolaris \
+	         sys/cddl/contrib/opensolaris \
+	         cddl/lib/libzfs \
+	         cddl/lib/libnvpair \
+	         cddl/lib/libuutil \
+	         cddl/sbin/zpool \
+	         cddl/sbin/zfs \
+	         ; do \
+	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
+	done
+	tar -czf ../freebsd-libs_$(VERSION).orig.tar.gz $(ORIGDIR)
+	rm -rf $(ORIGDIR)
+
+patch: patch-stamp
+patch-stamp:
+	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
+	touch $@
+
+build: build-zfs
+
+build-zfs: build-zfs-stamp
+build-zfs-stamp: patch
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil
+	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool
+	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs clean
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair clean
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil clean
+	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool clean
+	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs clean
+	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
+	rm -rf .pc
+	rm -f *stamp
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k -s
+	dh_installdirs -s
+
+	mkdir -p $(DESTDIR)/usr/lib $(DESTDIR)/usr/include $(DESTDIR)/usr/share/man/man3
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs install
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair install
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil install
+	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool install
+	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs install
+
+	mkdir -p $(CURDIR)/debian/tmp/usr/lib/pkgconfig
+	mkdir -p $(CURDIR)/debian/tmp/usr/bin
+
+	dh_install -s --list-missing --sourcedir=debian/tmp
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs -a
+	dh_installdocs -a
+#	dh_installexamples
+#	dh_installinit
+#	dh_installcron
+#	dh_installinfo
+#	dh_installman
+	dh_link -a
+	dh_strip -a
+	dh_compress -a
+	dh_fixperms -a
+#	dh_perl
+#	dh_python
+	dh_makeshlibs -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+binary: binary-arch binary-indep
+.PHONY: build clean binary-indep binary-arch binary install configure

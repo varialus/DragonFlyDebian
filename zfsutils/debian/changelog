@@ -1,0 +1,270 @@
+freebsd-libs (8.0-5) unstable; urgency=low
+
+  [ Guillem Jover ]
+  * Use kfreebsd-any instead of explicit architecture list.
+
+  [ Aurelien Jarno ]
+  * Add libgeom0 and libipx2 udeb packages. 
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 28 Jun 2010 23:10:06 +0200
+
+freebsd-libs (8.0-4) unstable; urgency=low
+
+  * libusb2-dev: add a libusb-1.0.so -> libusb.so symlink to make
+    configure scripts happy.
+  * Add patches/13_libusb-update.diff from upstream to update the API.
+  * Add udeb package to libusb2's shlib.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Fri, 08 Jan 2010 14:17:42 +0100
+
+freebsd-libs (8.0-3) unstable; urgency=low
+
+  [ Petr Salinger ]
+  * bump build-depends on kfreebsd-kernel-headers to (>= 0.45)
+  * add libusb2 and libusb2-dev packages
+
+  [ Aurelien Jarno ]
+  * Make libusb2-dev conflict with libusb-dev.
+  * Add a libusb2-udev package. 
+  * Add pkg-config files matching libusb 0.1/libusb 1.0.
+  * Add a libusb-config script matching libusb 0.1.
+  * Make libusb2-dev provides libusb-1.0-0-dev.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 09 Dec 2009 02:03:24 +0100
+
+freebsd-libs (8.0-2) unstable; urgency=low
+
+  * Bump build-depends on kfreebsd-kernel-headers to (>= 0.43).
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 28 Nov 2009 22:42:32 +0100
+
+freebsd-libs (8.0-1) unstable; urgency=low
+
+  [ Petr Salinger ]
+  * based on FreeBSD 8.0
+  * change packages name to reflect SONAME changes:
+    - libusbhid3   -> libusbhid4
+    - libkiconv3   -> libkiconv4
+    - libdevstat6  -> libdevstat7
+  * add libmemstat3 and libmemstat-dev packages
+  * add libnetgraph4 and libnetgraph-dev packages
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 28 Nov 2009 10:42:15 +0100
+
+freebsd-libs (7.2-4) unstable; urgency=low
+
+  [ Aurelien Jarno ]
+  * Fix description of libgeom-dev. 
+  * libkvm0: use our own copy of getbootfile().
+  * Fix dependency between lib and -dev packages.
+  * Add README.source.
+  * Bumped Standards-Version to 3.8.3.
+
+  [ Petr Salinger ]
+  * Build-depends on libc0.1-dev (>= 2.10) instead of libfreebsd-dev.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 27 Oct 2009 20:44:22 +0100
+
+freebsd-libs (7.2-3) unstable; urgency=low
+
+  * Remove unnecessary linkages with libfreebsd.
+  * Bumped Standards-Version to 3.8.2 (no changes).
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 04 Aug 2009 08:29:46 +0200
+
+freebsd-libs (7.2-2) unstable; urgency=low
+
+  * Tighten build-depends on kfreebsd-kernel-headers.
+  * Remove n_un union workarounds.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 15 Jun 2009 10:47:08 +0200
+
+freebsd-libs (7.2-1) unstable; urgency=low
+
+  [ Guillem Jover ]
+  * Use $(filter ...) instead of $(findstring ...) to extract space separated
+    options from DEB_BUILD_OPTIONS.
+  * Line wrap Build-Depends and Depends fields longer than 80 chars.
+
+  [ Petr Salinger ]
+  * based on FreeBSD 7.2
+  * add Vcs-* fields into debian/control.
+
+  [ Aurelien Jarno ]
+  * Tighten build-depends on libbsd-dev.
+  * Use SVN server instead of the deprecated CVS server in get-orig-source.
+  * Add -D'__FBSDID(string)=' to CFLAGS, drop debian/patches/00_fbsdid.diff
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sat, 06 Jun 2009 22:15:03 +0200
+
+freebsd-libs (7.1-2) unstable; urgency=low
+
+  * Upload to unstable.
+  * Don't use a tar in tar build system:
+    - Remove fetch
+    - Add a get-orig-source target.
+    - Use quilt to manage patches.
+    - Remove build-depends on kfreebsd-source-7.1.
+    - Update patches accordingly.
+  * Change patch level to -p1.
+  * Fix a few bashisms in debian/rules.
+  * Fix parallel build support in debian/rules.
+  * Install more manpages.
+  * Switch to debhelper 5.
+  * Bumped Standards-Version to 3.8.1 (no changes).
+  * Update debian/copyright.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 07 Apr 2009 16:59:04 +0200
+
+freebsd-libs (7.1-1) unreleased; urgency=low
+
+  [ Petr Salinger ]
+  * based on FreeBSD 7.1
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 05 Jan 2009 10:53:31 +0100
+
+freebsd-libs (7.0-1) unreleased; urgency=low
+
+  [ Petr Salinger ]
+  * based on FreeBSD 7.0
+  * Change packages name to reflect SONAME changes:
+    - libusbhid2   -> libusbhid3
+    - libkiconv2   -> libkiconv3
+    - libdevstat5  -> libdevstat6
+  * Make it buildable with gcc-4.2
+
+  [ Aurelien Jarno ]
+  * Don't ship useless manpages.
+  * Bumped Standards-Version to 3.8.0 (no changes).
+
+ -- Aurelien Jarno <aurel32@debian.org>  Fri, 11 Jan 2008 10:53:31 +0100
+
+freebsd-libs (6.3-1) unreleased; urgency=low
+
+  [ Petr Salinger ]
+  * based on FreeBSD 6.3
+  * new binary packages libdevstat5 and libdevstat-dev
+
+  [ Aurelien Jarno ]
+  * Bumped Standards-Version to 3.7.3 (no changes).
+  * Change ${Source-Version} into ${binary:Version}.
+  * Don't use ${shlibs:Depends} for -dev packages.
+  * Only link with needed libraries.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 10 Jan 2008 18:23:48 +0100
+
+freebsd-libs (6.2-1) unreleased; urgency=low
+
+  [ Petr Salinger ]
+  * based on FreeBSD 6.2
+
+ -- Aurelien Jarno <aurel32@debian.org>  Mon, 15 Jan 2007 13:42:46 +0100
+
+freebsd-libs (6.1-2) unreleased; urgency=low
+
+  [ Petr Salinger ]
+  * revert r1694, these libraries are located in /lib/,
+    but dev symlink pointed to /usr/lib/
+    breaks many packages using libkvm-dev or libgeom-dev
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 28 Nov 2006 17:09:28 +0100
+
+freebsd-libs (6.1-1) unreleased; urgency=low
+
+  [ Petr Salinger ]
+  * based on FreeBSD 6.1
+
+  [ Aurelien Jarno ]
+  * Bumped Standards-Version to 3.7.2 (no changes).
+  * Change packages name to reflect SONAME changes:
+    - libusbhid1 -> libusbhid2
+    - libkiconv1 -> libkiconv2
+
+ -- Aurelien Jarno <aurel32@debian.org>  Wed, 25 Oct 2006 16:49:43 +0200
+
+freebsd-libs (5.4+1-3) UNRELEASED; urgency=low
+
+  * Add libkiconv (patch from Andraz).
+
+ -- Robert Millan <rmh@aybabtu.com>  Thu,  4 May 2006 17:14:34 +0200
+
+freebsd-libs (5.4+1-2) unreleased; urgency=low
+
+  * Link libgeom with librt (to get clock_gettime).
+
+ -- Robert Millan <rmh@aybabtu.com>  Wed, 19 Apr 2006 11:17:18 +0200
+
+freebsd-libs (5.4+1-1) unreleased; urgency=low
+
+  * Add libgeom.
+  * Major patch and variable cleanup/refactor to sanitise SHLIB_MAJOR and
+    SHLIBDIR overrides.
+
+ -- Robert Millan <rmh@aybabtu.com>  Wed, 19 Apr 2006 10:32:23 +0200
+
+freebsd-libs (5.4-8) unreleased; urgency=low
+
+  * First build on amd64.
+  * Lots of cleanup:
+    - Remove functions that are in libfreebsd
+    - Use dynamic regexps to get rid of many patch hunks.
+    - Reenable most commented code (thanks to new functions in libfreebsd).
+
+ -- Robert Millan <rmh@aybabtu.com>  Wed, 29 Mar 2006 20:38:08 +0200
+
+freebsd-libs (5.4-7) unreleased; urgency=low
+
+  * Add kfreebsd-amd64.
+  * Add missing libgdbm-dev to Build-Depends.
+  * Move shared object so /lib (unfucks freebsd-utils).
+
+ -- Robert Millan <rmh@aybabtu.com>  Sat, 25 Mar 2006 21:01:49 +0100
+
+freebsd-libs (5.4-6) unreleased; urgency=low
+
+  * Added libipx.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 20 Dec 2005 23:18:51 +0100
+
+freebsd-libs (5.4-5) unreleased; urgency=low
+
+  * Renamed libsrbuf to libfreebsd and added nlist.
+  * Added libkvm from old package freebsd-kvm-5.2.1. Some parts are still
+    disabled, but less than in the previous version.
+  * Ship a shared library, so that packages will benefit from improvements
+    of the library.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 20 Dec 2005 20:56:06 +0100
+
+freebsd-libs (5.4-4) unreleased; urgency=low
+
+  * Bumped Standard-Versions to 3.6.2 (no changes).
+  * Improved descriptions.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Tue, 20 Dec 2005 01:51:03 +0100
+
+freebsd-libs (5.4-3) unreleased; urgency=low
+
+  * libusbhid: include <bsd/bsd.h> and link with -lbsd.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 18 Dec 2005 04:57:17 +0100
+
+freebsd-libs (5.4-2) unreleased; urgency=low
+
+  * Added libusbhid1 and libusbhid-dev.
+  * Updated libcam to version 5.4.
+  * Provide a copyright file.
+  * Get the necessary files directly from kfreebsd-source-5.4.
+  * Make -dev packages depends on libc0.1-dev | libc-dev.
+  * Ship some missing manpages.
+  * Build with -02.
+  * Added myself to uploaders.
+
+ -- Aurelien Jarno <aurel32@debian.org>  Sun, 18 Dec 2005 03:59:30 +0100
+
+freebsd-libs (5.4-1) unreleased; urgency=low
+
+  * Initial release.
+
+ -- Robert Millan <rmh@aybabtu.com>  Fri, 12 Aug 2005 12:04:07 +0200
+

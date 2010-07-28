@@ -1,0 +1,61 @@
+Source: freebsd-libs
+Section: libs
+Priority: optional
+Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
+Uploaders: Aurelien Jarno <aurel32@debian.org>
+Build-Depends: debhelper (>= 5.0.0), quilt, freebsd-buildutils, libbsd-dev (>= 0.1.4),
+ libc0.1-dev (>= 2.10), kfreebsd-kernel-headers (>= 0.50), libexpat-dev,
+ libavl-dev, libgeom-dev, libsbuf-dev
+Vcs-Browser: http://svn.debian.org/wsvn/glibc-bsd/trunk/freebsd-libs/
+Vcs-Svn: svn://svn.debian.org/glibc-bsd/trunk/freebsd-libs/
+Standards-Version: 3.8.3
+
+Package: libzfs0
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: FreeBSD ZFS library
+ The ZFS library provides support for managing ZFS filesystems.
+
+Package: libzfs-dev
+Section: libdevel
+Architecture: kfreebsd-any
+Depends: libzfs0 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-dev
+Description: Development files for libzfs
+ This package contains the header files and static library needed to
+ compile applications that use libzfs.
+
+Package: libuutil0
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: OpenSolaris userland utility library
+ This package contains the OpenSolaris userland utility library.
+
+Package: libuutil-dev
+Section: libdevel
+Architecture: kfreebsd-any
+Depends: libuutil0 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-dev
+Description: Development files for libuutil
+ This package contains the header files and static library needed to
+ compile applications that use libuutil.
+
+Package: libnvpair0
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: OpenSolaris name-value pair library
+ This package contains the OpenSolaris libnvpair library, for managing
+ name-value pairs.
+
+Package: libnvpair-dev
+Section: libdevel
+Architecture: kfreebsd-any
+Depends: libnvpair0 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-dev
+Description: Development files for libnvpair
+ This package contains the header files and static library needed to
+ compile applications that use libnvpair.
+
+Package: zfsutils
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: command-line tools to manage ZFS filesystems
+ This package provides the zfs and zpool commands to create and administer
+ ZFS filesystems.

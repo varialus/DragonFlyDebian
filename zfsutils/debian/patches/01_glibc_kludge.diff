@@ -1,0 +1,96 @@
+diff -ur -x debian freebsd-libs-8.0.old/cddl/compat/opensolaris/misc/mnttab.c freebsd-libs-8.0/cddl/compat/opensolaris/misc/mnttab.c
+--- freebsd-libs-8.0.old/cddl/compat/opensolaris/misc/mnttab.c	2008-11-17 15:49:29.000000000 -0500
++++ freebsd-libs-8.0/cddl/compat/opensolaris/misc/mnttab.c	2010-07-27 20:07:02.656479850 -0400
+@@ -89,7 +89,7 @@
+ }
+ 
+ int
+-getmntany(FILE *fd __unused, struct mnttab *mgetp, struct mnttab *mrefp)
++getmntany(FILE *fd, struct mnttab *mgetp, struct mnttab *mrefp)
+ {
+ 	static struct statfs *sfs = NULL;
+ 	static char mntopts[MNTMAXSTR];
+diff -ur -x debian freebsd-libs-8.0.old/cddl/compat/opensolaris/misc/zmount.c freebsd-libs-8.0/cddl/compat/opensolaris/misc/zmount.c
+--- freebsd-libs-8.0.old/cddl/compat/opensolaris/misc/zmount.c	2008-11-17 15:49:29.000000000 -0500
++++ freebsd-libs-8.0/cddl/compat/opensolaris/misc/zmount.c	2010-07-27 20:07:02.659058030 -0400
+@@ -92,6 +92,9 @@
+ 	iov = NULL;
+ 	iovlen = 0;
+ 	build_iovec(&iov, &iovlen, "fstype", fstype, (size_t)-1);
++#ifndef __DECONST
++#define __DECONST(type, var)	((type)(uintptr_t)(const void *)(var))
++#endif
+ 	build_iovec(&iov, &iovlen, "fspath", __DECONST(char *, dir),
+ 	    (size_t)-1);
+ 	build_iovec(&iov, &iovlen, "from", __DECONST(char *, spec), (size_t)-1);
+diff -ur -x debian freebsd-libs-8.0.old/cddl/contrib/opensolaris/lib/libuutil/common/uu_pname.c freebsd-libs-8.0/cddl/contrib/opensolaris/lib/libuutil/common/uu_pname.c
+--- freebsd-libs-8.0.old/cddl/contrib/opensolaris/lib/libuutil/common/uu_pname.c	2008-03-28 18:16:18.000000000 -0400
++++ freebsd-libs-8.0/cddl/contrib/opensolaris/lib/libuutil/common/uu_pname.c	2010-07-27 20:07:02.660028620 -0400
+@@ -31,7 +31,7 @@
+ #include <libintl.h>
+ #include <limits.h>
+ #include <string.h>
+-#include <stdlib.h>
++#include </usr/include/stdlib.h>
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <errno.h>
+diff -ur -x debian freebsd-libs-8.0.old/sys/cddl/compat/opensolaris/rpc/xdr.h freebsd-libs-8.0/sys/cddl/compat/opensolaris/rpc/xdr.h
+--- freebsd-libs-8.0.old/sys/cddl/compat/opensolaris/rpc/xdr.h	2009-08-19 20:08:58.000000000 -0400
++++ freebsd-libs-8.0/sys/cddl/compat/opensolaris/rpc/xdr.h	2010-07-27 20:07:02.661041790 -0400
+@@ -32,7 +32,31 @@
+ 
+ #include_next <rpc/xdr.h>
+ 
+-#ifndef _KERNEL
++/* Copied from the FreeBSD version of <rpc/xdr.h> */
++#ifdef __GLIBC__
++/*
++ * These are XDR control operators
++ */
++
++#define	XDR_GET_BYTES_AVAIL 	1
++#define	XDR_PEEK		2
++#define	XDR_SKIPBYTES		3
++
++struct xdr_bytesrec {
++	bool_t xc_is_last_record;
++	size_t xc_num_avail;
++};
++
++typedef struct xdr_bytesrec xdr_bytesrec;
++#endif
++
++#if defined(__GLIBC__)
++
++/* GNU libc doesn't implement XDR control method */
++#define	XDR_CONTROL(xdrs, req, op)	(1)
++#define xdr_control(xdrs, req, op)	XDR_CONTROL(xdrs, req, op)
++
++#elif !defined(_KERNEL)
+ 
+ #include <assert.h>
+ 
+diff -ur -x debian freebsd-libs-8.0.old/sys/cddl/compat/opensolaris/sys/types.h freebsd-libs-8.0/sys/cddl/compat/opensolaris/sys/types.h
+--- freebsd-libs-8.0.old/sys/cddl/compat/opensolaris/sys/types.h	2008-11-17 15:49:29.000000000 -0500
++++ freebsd-libs-8.0/sys/cddl/compat/opensolaris/sys/types.h	2010-07-27 20:07:02.662057600 -0400
+@@ -66,7 +66,7 @@
+ typedef	int		major_t;
+ 
+ #else
+-#ifdef NEED_SOLARIS_BOOLEAN
++#if 1 //def NEED_SOLARIS_BOOLEAN
+ #if defined(__XOPEN_OR_POSIX)
+ typedef enum { _B_FALSE, _B_TRUE }	boolean_t;
+ #else
+diff -ur -x debian freebsd-libs-8.0.old/sys/cddl/contrib/opensolaris/uts/common/sys/debug.h freebsd-libs-8.0/sys/cddl/contrib/opensolaris/uts/common/sys/debug.h
+--- freebsd-libs-8.0.old/sys/cddl/contrib/opensolaris/uts/common/sys/debug.h	2008-05-22 03:33:39.000000000 -0400
++++ freebsd-libs-8.0/sys/cddl/contrib/opensolaris/uts/common/sys/debug.h	2010-07-27 20:07:02.664079110 -0400
+@@ -34,6 +34,7 @@
+ #pragma ident	"%Z%%M%	%I%	%E% SMI"
+ 
+ #include <sys/types.h>
++//#include_next <sys/debug.h>
+ 
+ #ifdef	__cplusplus
+ extern "C" {

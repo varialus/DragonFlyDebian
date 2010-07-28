@@ -1,0 +1,124 @@
+diff -ur -x debian freebsd-libs-8.0.old/cddl/compat/opensolaris/include/solaris.h freebsd-libs-8.0/cddl/compat/opensolaris/include/solaris.h
+--- freebsd-libs-8.0.old/cddl/compat/opensolaris/include/solaris.h	2008-04-22 03:43:00.000000000 -0400
++++ freebsd-libs-8.0/cddl/compat/opensolaris/include/solaris.h	2010-07-27 20:09:52.788482289 -0400
+@@ -5,6 +5,9 @@
+ 
+ #include <sys/ccompile.h>
+ 
++/* GNU libc has its own dirent64 declaration */
++#ifndef __GLIBC__
+ #define	dirent64	dirent
++#endif
+ 
+ #endif	/* !_SOLARIS_H_ */
+diff -ur -x debian freebsd-libs-8.0.old/cddl/compat/opensolaris/misc/fsshare.c freebsd-libs-8.0/cddl/compat/opensolaris/misc/fsshare.c
+--- freebsd-libs-8.0.old/cddl/compat/opensolaris/misc/fsshare.c	2008-03-28 18:16:18.000000000 -0400
++++ freebsd-libs-8.0/cddl/compat/opensolaris/misc/fsshare.c	2010-07-27 20:09:52.789492219 -0400
+@@ -67,7 +67,7 @@
+  * mountpoint specified in the 'skip' argument.
+  */
+ static char *
+-getline(FILE *fd, const char *skip)
++xgetline(FILE *fd, const char *skip)
+ {
+ 	static char line[MAXLINESIZE];
+ 	size_t len, skiplen;
+@@ -198,7 +198,7 @@
+ 
+ 	/* Place big, fat warning at the begining of the file. */
+ 	fprintf(newfd, "%s", FILE_HEADER);
+-	while (oldfd != NULL && (line = getline(oldfd, mountpoint)) != NULL)
++	while (oldfd != NULL && (line = xgetline(oldfd, mountpoint)) != NULL)
+ 		fprintf(newfd, "%s\n", line);
+ 	if (oldfd != NULL && ferror(oldfd) != 0) {
+ 		error = ferror(oldfd);
+diff -ur -x debian freebsd-libs-8.0.old/cddl/compat/opensolaris/misc/mnttab.c freebsd-libs-8.0/cddl/compat/opensolaris/misc/mnttab.c
+--- freebsd-libs-8.0.old/cddl/compat/opensolaris/misc/mnttab.c	2008-11-17 15:49:29.000000000 -0500
++++ freebsd-libs-8.0/cddl/compat/opensolaris/misc/mnttab.c	2010-07-27 20:09:52.790512709 -0400
+@@ -63,7 +63,7 @@
+ }
+ 
+ char *
+-hasmntopt(struct mnttab *mnt, char *opt)
++solaris_hasmntopt(struct mnttab *mnt, char *opt)
+ {
+ 	char tmpopts[MNT_LINE_MAX];
+ 	char *f, *opts = tmpopts;
+diff -ur -x debian freebsd-libs-8.0.old/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_dataset.c freebsd-libs-8.0/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_dataset.c
+--- freebsd-libs-8.0.old/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_dataset.c	2008-11-17 15:49:29.000000000 -0500
++++ freebsd-libs-8.0/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_dataset.c	2010-07-27 20:09:52.798610639 -0400
+@@ -2166,11 +2166,11 @@
+ 	case ZFS_PROP_NBMAND:
+ 		*val = getprop_uint64(zhp, prop, source);
+ 
+-		if (hasmntopt(&mnt, mntopt_on) && !*val) {
++		if (solaris_hasmntopt(&mnt, mntopt_on) && !*val) {
+ 			*val = B_TRUE;
+ 			if (src)
+ 				*src = ZPROP_SRC_TEMPORARY;
+-		} else if (hasmntopt(&mnt, mntopt_off) && *val) {
++		} else if (solaris_hasmntopt(&mnt, mntopt_off) && *val) {
+ 			*val = B_FALSE;
+ 			if (src)
+ 				*src = ZPROP_SRC_TEMPORARY;
+diff -ur -x debian freebsd-libs-8.0.old/cddl/contrib/opensolaris/lib/libzpool/common/kernel.c freebsd-libs-8.0/cddl/contrib/opensolaris/lib/libzpool/common/kernel.c
+--- freebsd-libs-8.0.old/cddl/contrib/opensolaris/lib/libzpool/common/kernel.c	2009-07-09 16:22:05.000000000 -0400
++++ freebsd-libs-8.0/cddl/contrib/opensolaris/lib/libzpool/common/kernel.c	2010-07-27 20:09:52.800641669 -0400
+@@ -463,7 +463,7 @@
+ /*ARGSUSED*/
+ int
+ vn_rdwr(int uio, vnode_t *vp, void *addr, ssize_t len, offset_t offset,
+-	int x1, int x2, rlim64_t x3, void *x4, ssize_t *residp)
++	int x1, int x2, solaris_rlim64_t x3, void *x4, ssize_t *residp)
+ {
+ 	ssize_t iolen, split;
+ 
+diff -ur -x debian freebsd-libs-8.0.old/cddl/contrib/opensolaris/lib/libzpool/common/sys/zfs_context.h freebsd-libs-8.0/cddl/contrib/opensolaris/lib/libzpool/common/sys/zfs_context.h
+--- freebsd-libs-8.0.old/cddl/contrib/opensolaris/lib/libzpool/common/sys/zfs_context.h	2009-07-09 16:22:05.000000000 -0400
++++ freebsd-libs-8.0/cddl/contrib/opensolaris/lib/libzpool/common/sys/zfs_context.h	2010-07-27 20:09:52.802661419 -0400
+@@ -105,8 +105,8 @@
+ 
+ #define	ZFS_LOG(...)	do {  } while (0)
+ 
+-typedef u_longlong_t      rlim64_t;
+-#define	RLIM64_INFINITY	((rlim64_t)-3)
++typedef u_longlong_t      solaris_rlim64_t;
++#define	RLIM64_INFINITY	((solaris_rlim64_t)-3)
+ 
+ #ifdef ZFS_DEBUG
+ extern void dprintf_setup(int *argc, char **argv);
+@@ -438,7 +438,7 @@
+ extern int vn_openat(char *path, int x1, int oflags, int mode, vnode_t **vpp,
+     int x2, int x3, vnode_t *vp, int fd);
+ extern int vn_rdwr(int uio, vnode_t *vp, void *addr, ssize_t len,
+-    offset_t offset, int x1, int x2, rlim64_t x3, void *x4, ssize_t *residp);
++    offset_t offset, int x1, int x2, solaris_rlim64_t x3, void *x4, ssize_t *residp);
+ extern void vn_close(vnode_t *vp, int openflag, cred_t *cr, kthread_t *td);
+ 
+ #define	vn_remove(path, x1, x2)		remove(path)
+diff -ur -x debian freebsd-libs-8.0.old/sys/cddl/compat/opensolaris/sys/dirent.h freebsd-libs-8.0/sys/cddl/compat/opensolaris/sys/dirent.h
+--- freebsd-libs-8.0.old/sys/cddl/compat/opensolaris/sys/dirent.h	2008-03-28 18:16:18.000000000 -0400
++++ freebsd-libs-8.0/sys/cddl/compat/opensolaris/sys/dirent.h	2010-07-27 20:09:52.803673879 -0400
+@@ -32,7 +32,10 @@
+ #include_next <sys/dirent.h>
+ 
+ typedef	struct dirent	dirent64_t;
++/* GNU libc has its own dirent64 declaration */
++#ifndef __GLIBC__
+ #define	dirent64	dirent
++#endif
+ #define	ino64_t		ino_t
+ 
+ #define	d_ino	d_fileno
+diff -ur -x debian freebsd-libs-8.0.old/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vnops.c freebsd-libs-8.0/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vnops.c
+--- freebsd-libs-8.0.old/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vnops.c	2009-10-12 16:36:55.000000000 -0400
++++ freebsd-libs-8.0/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vnops.c	2010-07-27 20:09:52.816846339 -0400
+@@ -677,7 +677,7 @@
+ zfs_write(vnode_t *vp, uio_t *uio, int ioflag, cred_t *cr, caller_context_t *ct)
+ {
+ 	znode_t		*zp = VTOZ(vp);
+-	rlim64_t	limit = MAXOFFSET_T;
++	solaris_rlim64_t	limit = MAXOFFSET_T;
+ 	ssize_t		start_resid = uio->uio_resid;
+ 	ssize_t		tx_bytes;
+ 	uint64_t	end_size;
