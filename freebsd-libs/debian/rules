@@ -36,8 +36,8 @@ get-orig-source:
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
 	svn cat $(SVN)/$$i/share/misc/usb_hid_usages > $(ORIGDIR)/lib/libusbhid/usb_hid_usages
-	mkdir -p freebsd-libs-$(VERSION)/sys/kern ; \
-	    svn cat $(SVN)/$$i/sys/kern/subr_sbuf.c > $(ORIGDIR)/sys/kern/subr_sbuf.c
+	mkdir -p $(ORIGDIR)/sys/kern && \
+	    svn cat $(SVN)/sys/kern/subr_sbuf.c > $(ORIGDIR)/sys/kern/subr_sbuf.c
 	# Remove unused files with non GPL compatible license (eg BSD 4 clauses)
 	rm -f $(ORIGDIR)/sys/cam/scsi/scsi_ch.*
 	rm -f $(ORIGDIR)/lib/libkvm/kvm_ia64.c
