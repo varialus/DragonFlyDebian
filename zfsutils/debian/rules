@@ -24,7 +24,6 @@ PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
 export SHLIB_MAJOR=0
-export SHLIBDIR=/usr/lib
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
@@ -53,9 +52,9 @@ build: build-zfs
 
 build-zfs: build-zfs-stamp
 build-zfs-stamp: patch
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs SHLIBDIR=./
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair SHLIBDIR=./
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil SHLIBDIR=./
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs
 	touch $@
@@ -79,6 +78,7 @@ install: build
 	dh_clean -k -s
 	dh_installdirs -s
 
+	mkdir -p $(DESTDIR)/usr/lib $(DESTDIR)/usr/include $(DESTDIR)/usr/share/man
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs install
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair install
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil install
