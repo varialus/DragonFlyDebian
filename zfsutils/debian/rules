@@ -19,7 +19,7 @@ endif
 
 VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
 SVN=svn://svn.freebsd.org/base/release/$(VERSION).0
-ORIGDIR=freebsd-libs-$(VERSION)
+ORIGDIR=zfsutils-$(VERSION)
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
@@ -41,7 +41,7 @@ get-orig-source:
 	         ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
-	tar -czf ../freebsd-libs_$(VERSION).orig.tar.gz $(ORIGDIR)
+	tar -czf ../zfsutils_$(VERSION).orig.tar.gz $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
 patch: patch-stamp
