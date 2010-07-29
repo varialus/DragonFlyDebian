@@ -25,7 +25,6 @@ PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
 export SHLIB_MAJOR=0
-export SHLIBDIR=./
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
@@ -54,57 +53,57 @@ build: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-us
 
 build-cam: build-cam-stamp
 build-cam-stamp: patch build-sbuf
-	$(PMAKE) -C $(CURDIR)/lib/libcam
+	$(PMAKE) -C $(CURDIR)/lib/libcam SHLIBDIR=./
 	touch $@
 
 build-geom: build-geom-stamp
 build-geom-stamp: patch build-sbuf
-	$(PMAKE) -C $(CURDIR)/lib/libgeom
+	$(PMAKE) -C $(CURDIR)/lib/libgeom SHLIBDIR=./
 	touch $@
 
 build-netgraph: build-netgraph-stamp
 build-netgraph-stamp: patch
-	$(PMAKE) -C $(CURDIR)/lib/libnetgraph
+	$(PMAKE) -C $(CURDIR)/lib/libnetgraph SHLIBDIR=./
 	touch $@
 
 build-ipx: build-ipx-stamp
 build-ipx-stamp: patch
-	$(PMAKE) -C $(CURDIR)/lib/libipx
+	$(PMAKE) -C $(CURDIR)/lib/libipx SHLIBDIR=./
 	touch $@
 
 build-kiconv: build-kiconv-stamp
 build-kiconv-stamp: patch
-	$(PMAKE) -C $(CURDIR)/lib/libkiconv
+	$(PMAKE) -C $(CURDIR)/lib/libkiconv SHLIBDIR=./
 	touch $@
 
 build-kvm: build-kvm-stamp
 build-kvm-stamp: patch
-	$(PMAKE) -C $(CURDIR)/lib/libkvm
+	$(PMAKE) -C $(CURDIR)/lib/libkvm SHLIBDIR=./
 	touch $@
 
 build-devstat: build-devstat-stamp
 build-devstat-stamp: patch build-kvm
-	$(PMAKE) -C $(CURDIR)/lib/libdevstat
+	$(PMAKE) -C $(CURDIR)/lib/libdevstat SHLIBDIR=./
 	touch $@
 
 build-memstat: build-memstat-stamp
 build-memstat-stamp: patch build-kvm
-	$(PMAKE) -C $(CURDIR)/lib/libmemstat
+	$(PMAKE) -C $(CURDIR)/lib/libmemstat SHLIBDIR=./
 	touch $@
 
 build-sbuf: build-sbuf-stamp
 build-sbuf-stamp: patch
-	$(PMAKE) -C $(CURDIR)/lib/libsbuf
+	$(PMAKE) -C $(CURDIR)/lib/libsbuf SHLIBDIR=./
 	touch $@
 
 build-usbhid: build-usbhid-stamp
 build-usbhid-stamp: patch
-	$(PMAKE) -C $(CURDIR)/lib/libusbhid
+	$(PMAKE) -C $(CURDIR)/lib/libusbhid SHLIBDIR=./
 	touch $@
 
 build-usb: build-usb-stamp
 build-usb-stamp: patch
-	$(PMAKE) -C $(CURDIR)/lib/libusb
+	$(PMAKE) -C $(CURDIR)/lib/libusb SHLIBDIR=./
 	touch $@
 
 clean:
@@ -132,18 +131,18 @@ install: build
 	dh_prep
 	dh_installdirs
 
-	mkdir -p $(DESTDIR)/usr/lib $(DESTDIR)/usr/include $(DESTDIR)/usr/share/man/man3
-	$(PMAKE) -C $(CURDIR)/lib/libsbuf install
-	$(PMAKE) -C $(CURDIR)/lib/libcam install
-	$(PMAKE) -C $(CURDIR)/lib/libgeom install
-	$(PMAKE) -C $(CURDIR)/lib/libipx install
-	$(PMAKE) -C $(CURDIR)/lib/libkiconv install
-	$(PMAKE) -C $(CURDIR)/lib/libkvm install
-	$(PMAKE) -C $(CURDIR)/lib/libdevstat install
-	$(PMAKE) -C $(CURDIR)/lib/libmemstat install
-	$(PMAKE) -C $(CURDIR)/lib/libnetgraph install
-	$(PMAKE) -C $(CURDIR)/lib/libusbhid install
-	$(PMAKE) -C $(CURDIR)/lib/libusb install
+	mkdir -p $(DESTDIR)/lib $(DESTDIR)/usr/lib $(DESTDIR)/usr/include $(DESTDIR)/usr/share/man/man3
+	$(PMAKE) -C $(CURDIR)/lib/libsbuf install SHLIBDIR=/usr/lib
+	$(PMAKE) -C $(CURDIR)/lib/libcam install SHLIBDIR=/usr/lib
+	$(PMAKE) -C $(CURDIR)/lib/libgeom install SHLIBDIR=/lib
+	$(PMAKE) -C $(CURDIR)/lib/libipx install SHLIBDIR=/usr/lib
+	$(PMAKE) -C $(CURDIR)/lib/libkiconv install SHLIBDIR=/usr/lib
+	$(PMAKE) -C $(CURDIR)/lib/libkvm install SHLIBDIR=/lib
+	$(PMAKE) -C $(CURDIR)/lib/libdevstat install SHLIBDIR=/usr/lib
+	$(PMAKE) -C $(CURDIR)/lib/libmemstat install SHLIBDIR=/usr/lib
+	$(PMAKE) -C $(CURDIR)/lib/libnetgraph install SHLIBDIR=/usr/lib
+	$(PMAKE) -C $(CURDIR)/lib/libusbhid install SHLIBDIR=/usr/lib
+	$(PMAKE) -C $(CURDIR)/lib/libusb install SHLIBDIR=/lib
 
 	mkdir -p $(CURDIR)/debian/tmp/usr/lib/pkgconfig
 	install -m644 debian/libusb*.pc $(CURDIR)/debian/tmp/usr/lib/pkgconfig
