@@ -24,6 +24,7 @@ PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
 export SHLIB_MAJOR=0
+export SHLIBDIR=./
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
@@ -48,13 +49,25 @@ patch-stamp:
 	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
 	touch $@
 
-build: build-zfs
+build: build-libuutil build-libnvpair build-libzfs build-zfsutils
 
-build-zfs: build-zfs-stamp
-build-zfs-stamp: patch
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair SHLIBDIR=./
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil SHLIBDIR=./
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs SHLIBDIR=./
+build-libuutil: build-libuutil-stamp
+build-libuutil-stamp: patch
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil
+	touch $@
+
+build-libnvpair: build-libnvpair-stamp
+build-libnvpair-stamp: patch
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair
+	touch $@
+
+build-libzfs: build-libzfs-stamp
+build-libzfs-stamp: patch build-libnvpair-stamp build-libuutil-stamp
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs
+	touch $@
+
+build-zfsutils: build-zfsutils-stamp
+build-zfsutils-stamp: patch build-libzfs-stamp build-libnvpair-stamp build-libuutil-stamp
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs
 	touch $@
@@ -63,10 +76,14 @@ clean:
 	dh_testdir
 	dh_testroot
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair clean
+
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil clean
+
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs clean
+
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool clean
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs clean
+	
 	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
 	rm -rf .pc
 	rm -f *stamp
@@ -75,17 +92,9 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k -s
+	dh_prep -s
 	dh_installdirs -s
-
-	mkdir -p $(DESTDIR)/usr/lib $(DESTDIR)/usr/include $(DESTDIR)/usr/share/man/man8
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair install
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil install
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs install
-	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool install
-	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs install
-
-	dh_install -s --list-missing --sourcedir=debian/tmp
+	dh_install -s
 
 # Build architecture-independent files here.
 binary-indep: build install
