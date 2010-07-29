@@ -52,9 +52,9 @@ build: build-zfs
 
 build-zfs: build-zfs-stamp
 build-zfs-stamp: patch
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs SHLIBDIR=./
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair SHLIBDIR=./
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil SHLIBDIR=./
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs SHLIBDIR=./
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs
 	touch $@
@@ -62,9 +62,9 @@ build-zfs-stamp: patch
 clean:
 	dh_testdir
 	dh_testroot
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs clean
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair clean
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil clean
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs clean
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool clean
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs clean
 	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
@@ -78,10 +78,10 @@ install: build
 	dh_clean -k -s
 	dh_installdirs -s
 
-	mkdir -p $(DESTDIR)/usr/lib $(DESTDIR)/usr/include $(DESTDIR)/usr/share/man
-	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs install
+	mkdir -p $(DESTDIR)/usr/lib $(DESTDIR)/usr/include $(DESTDIR)/usr/share/man/man8
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair install
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil install
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs install
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool install
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs install
 

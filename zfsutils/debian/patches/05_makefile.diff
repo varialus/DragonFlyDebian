@@ -1,45 +1,61 @@
-diff -ur -x debian a/cddl/lib/libzfs/Makefile b/cddl/lib/libzfs/Makefile
---- a/cddl/lib/libzfs/Makefile	2008-11-17 15:49:29.000000000 -0500
-+++ b/cddl/lib/libzfs/Makefile	2010-07-27 20:11:17.801799169 -0400
-@@ -47,5 +47,6 @@
- CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/lib/libnvpair
- CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/lib/libuutil/common
- CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/lib/libzfs/common
-+CFLAGS+= -I${.CURDIR}/../../../lib/libgeom
+--- a/cddl/lib/libzfs/Makefile
++++ b/cddl/lib/libzfs/Makefile
+@@ -7,7 +7,10 @@
  
+ LIB=	zfs
+ DPADD=	${LIBUTIL}
+-LDADD=	-lutil
++LDADD=	-lm -lbsd -lgeom -lnvpair -luutil
++
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libnvpair \
++	-L${.CURDIR}/../../../cddl/lib/libuutil \
+ 
+ SRCS=	deviceid.c \
+ 	fsshare.c \
+--- a/cddl/lib/libuutil/Makefile	2010-07-29 03:23:17.000000000 +0200
++++ b/cddl/lib/libuutil/Makefile	2010-07-29 03:24:01.000000000 +0200
+@@ -22,4 +22,6 @@
+ CFLAGS+= -I${.CURDIR}/../../../cddl/compat/opensolaris/include
+ CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/head
+ 
++LDADD= -lrt -lbsd -lpthread
++
  .include <bsd.lib.mk>
 diff -ur -x debian a/cddl/sbin/zfs/Makefile b/cddl/sbin/zfs/Makefile
 --- a/cddl/sbin/zfs/Makefile	2008-03-27 19:21:25.000000000 -0400
 +++ b/cddl/sbin/zfs/Makefile	2010-07-27 20:11:17.802817408 -0400
-@@ -21,7 +21,13 @@
+@@ -19,9 +19,12 @@
+ CFLAGS+= -I${.CURDIR}/../../../sys/cddl/contrib/opensolaris/uts/common/fs/zfs
+ CFLAGS+= -I${.CURDIR}/../../../sys/cddl/contrib/opensolaris/uts/common/sys
  
- DPADD=	${LIBZFS} ${LIBGEOM} ${LIBBSDXML} ${LIBSBUF} \
- 	${LIBM} ${LIBNVPAIR} ${LIBUUTIL} ${LIBUTIL}
+-DPADD=	${LIBZFS} ${LIBGEOM} ${LIBBSDXML} ${LIBSBUF} \
+-	${LIBM} ${LIBNVPAIR} ${LIBUUTIL} ${LIBUTIL}
 -LDADD=	-lzfs -lgeom -lbsdxml -lsbuf \
-+LDADD=	-lzfs -lgeom -lexpat -lsbuf \
- 	-lm -lnvpair -luutil -lutil
- 
-+LDADD+= -L${.CURDIR}/../../../cddl/lib/libzfs \
-+	-L${.CURDIR}/../../../cddl/lib/libnvpair \
-+	-L${.CURDIR}/../../../cddl/lib/libuutil \
-+	-L${.CURDIR}/../../../lib/libgeom \
-+	-L${.CURDIR}/../../../lib/libsbuf
+-	-lm -lnvpair -luutil -lutil
++DPADD=	${LIBZFS} ${LIBGEOM} \
++	${LIBM} ${LIBNVPAIR} ${LIBUUTIL}
++LDADD=	-lzfs -lgeom -lnvpair -luutil
 +
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libzfs \
++       -L${.CURDIR}/../../../cddl/lib/libnvpair \
++       -L${.CURDIR}/../../../cddl/lib/libuutil 
+ 
  .include <bsd.prog.mk>
 diff -ur -x debian a/cddl/sbin/zpool/Makefile b/cddl/sbin/zpool/Makefile
 --- a/cddl/sbin/zpool/Makefile	2008-11-17 15:49:29.000000000 -0500
 +++ b/cddl/sbin/zpool/Makefile	2010-07-27 20:11:17.803821828 -0400
-@@ -23,7 +23,12 @@
+@@ -21,9 +21,10 @@
+ CFLAGS+= -I${.CURDIR}/../../../sys/cddl/contrib/opensolaris/uts/common/fs/zfs
+ CFLAGS+= -I${.CURDIR}/../../../sys/cddl/contrib/opensolaris/uts/common/sys
  
- DPADD=	${LIBAVL} ${LIBZFS} ${LIBGEOM} ${LIBBSDXML} ${LIBSBUF} \
- 	${LIBM} ${LIBNVPAIR} ${LIBUUTIL} ${LIBUTIL}
+-DPADD=	${LIBAVL} ${LIBZFS} ${LIBGEOM} ${LIBBSDXML} ${LIBSBUF} \
+-	${LIBM} ${LIBNVPAIR} ${LIBUUTIL} ${LIBUTIL}
 -LDADD=	-lavl -lzfs -lgeom -lbsdxml -lsbuf \
-+LDADD=	-lavl -lzfs -lgeom -lexpat -lsbuf \
- 	-lm -lnvpair -luutil -lutil
- 
+-	-lm -lnvpair -luutil -lutil
++DPADD=	${LIBZFS} ${LIBGEOM} ${LIBNVPAIR} ${LIBUUTIL}
++LDADD=	-lzfs -lgeom -lnvpair -luutil
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libzfs \
 +	-L${.CURDIR}/../../../cddl/lib/libnvpair \
 +	-L${.CURDIR}/../../../cddl/lib/libuutil
-+
-+
+ 
  .include <bsd.prog.mk>
