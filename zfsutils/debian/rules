@@ -79,15 +79,11 @@ install: build
 	dh_clean -k -s
 	dh_installdirs -s
 
-	mkdir -p $(DESTDIR)/usr/lib $(DESTDIR)/usr/include $(DESTDIR)/usr/share/man/man3
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs install
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair install
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil install
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool install
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs install
-
-	mkdir -p $(CURDIR)/debian/tmp/usr/lib/pkgconfig
-	mkdir -p $(CURDIR)/debian/tmp/usr/bin
 
 	dh_install -s --list-missing --sourcedir=debian/tmp
 
