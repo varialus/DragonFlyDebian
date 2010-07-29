@@ -10,20 +10,6 @@ Vcs-Browser: http://svn.debian.org/wsvn/glibc-bsd/trunk/zfsutils/
 Vcs-Svn: svn://svn.debian.org/glibc-bsd/trunk/zfsutils/
 Standards-Version: 3.9.1
 
-Package: libzfs0
-Architecture: kfreebsd-any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: FreeBSD ZFS library
- The ZFS library provides support for managing ZFS filesystems.
-
-Package: libzfs-dev
-Section: libdevel
-Architecture: kfreebsd-any
-Depends: libzfs0 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-dev
-Description: Development files for libzfs
- This package contains the header files and static library needed to
- compile applications that use libzfs.
-
 Package: libuutil0
 Architecture: kfreebsd-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -53,9 +39,29 @@ Description: Development files for libnvpair
  This package contains the header files and static library needed to
  compile applications that use libnvpair.
 
+Package: libzfs0
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: FreeBSD ZFS library
+ The Z file system is a pooled filesystem designed for maximum data integrity,
+ supporting data snapshots, multiple copies, and data checksums.
+ .
+ The ZFS library provides support for managing ZFS filesystems.
+
+Package: libzfs-dev
+Section: libdevel
+Architecture: kfreebsd-any
+Depends: libzfs0 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-dev
+Description: Development files for libzfs
+ This package contains the header files and static library needed to
+ compile applications that use libzfs.
+
 Package: zfsutils
 Architecture: kfreebsd-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: command-line tools to manage ZFS filesystems
+ The Z file system is a pooled filesystem designed for maximum data integrity,
+ supporting data snapshots, multiple copies, and data checksums.
+ .
  This package provides the zfs and zpool commands to create and administer
  ZFS filesystems.
