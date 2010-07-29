@@ -9,7 +9,7 @@ SHELL=bash
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
-CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
+CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -DNEED_SOLARIS_BOOLEAN -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -18,7 +18,7 @@ else
 endif
 
 VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
-SVN=svn://svn.freebsd.org/base/release/$(VERSION).0
+SVN=http://svn.freebsd.org/base/release/$(VERSION).0
 ORIGDIR=zfsutils-$(VERSION)
 PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
@@ -50,6 +50,7 @@ get-orig-source:
 	         ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
+	rm -f $(ORIGDIR)/cddl/compat/opensolaris/include/stdlib.h
 	tar -czf ../zfsutils_$(VERSION).orig.tar.gz $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
@@ -94,6 +95,7 @@ clean:
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs clean
 	
 	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
+	rm -f cddl/compat/opensolaris/include/stdlib.h
 	rm -rf .pc
 	rm -f *stamp
 	dh_clean
