@@ -8,7 +8,7 @@
 kfreebsd_cpu	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-kernel-headers
-SRC_TAR		:= /usr/src/kfreebsd-source-8.1.tar.bz2
+SRC_TAR		:= /usr/src/kfreebsd-source-8.1.tar.xz
 SRC_DIR		:= kfreebsd-source-8.1
 
 clean:
@@ -22,7 +22,7 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 	
-	tar xfj $(SRC_TAR)
+	tar xfJ $(SRC_TAR)
 
 	cd $(SRC_DIR) && QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a
 
