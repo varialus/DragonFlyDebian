@@ -27,14 +27,14 @@ __get_nprocs (void)
 {
   /* Fetch sysctl value of "hw.ncpu".  */
   int request[2] = { CTL_HW, HW_NCPU };
-  long int result;
+  int result;
   size_t result_len = sizeof (result);
 
   if (__sysctl (request, 2, &result, &result_len, NULL, 0) < 0)
     /* Dummy result.  */
     return 1;
 
-  return result / __getpagesize();
+  return result;
 }
 
 weak_alias (__get_nprocs, get_nprocs)
@@ -56,13 +56,13 @@ __get_phys_pages (void)
   /* Fetch sysctl value of "hw.physmem".  This is a little smaller than
      the real installed memory size, but so what.  */
   int request[2] = { CTL_HW, HW_PHYSMEM };
-  int result;
+  unsigned long int result;
   size_t result_len = sizeof (result);
 
   if (__sysctl (request, 2, &result, &result_len, NULL, 0) < 0)
     return -1;
 
-  return result;
+  return result / __getpagesize();
 }
 
 weak_alias (__get_phys_pages, get_phys_pages)
