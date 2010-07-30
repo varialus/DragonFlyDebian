@@ -24,7 +24,7 @@ SVN		:= http://svn.freebsd.org/base/release/$(version).0
 SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
 IMAGE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname)
 HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-headers-$(version)-$(abiname)
-SRC_TAR		:= kfreebsd-source-$(version).tar.bz2
+SRC_TAR		:= kfreebsd-source-$(version).tar.xz
 SRC_DIR		:= kfreebsd-source-$(version)
 HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
 FLAVOR_DIR	:= flavor-$(version)-$(abiname)
@@ -115,7 +115,7 @@ install-indep-stamp: build-indep
 
 	mkdir -p $(SOURCE_PACKAGE)/usr/src
 	chown -R root.src $(SRC_DIR)
-	tar cfj $(SOURCE_PACKAGE)/usr/src/$(SRC_TAR) $(SRC_DIR)
+	tar cfJ $(SOURCE_PACKAGE)/usr/src/$(SRC_TAR) $(SRC_DIR)
 
 	touch install-indep-stamp
 
