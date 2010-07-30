@@ -18,6 +18,7 @@
    02111-1307 USA.  */
 
 #include <sys/sysctl.h>
+#include <unistd.h>
 #include <stddef.h>
 
 
@@ -26,14 +27,14 @@ __get_nprocs (void)
 {
   /* Fetch sysctl value of "hw.ncpu".  */
   int request[2] = { CTL_HW, HW_NCPU };
-  int result;
+  long int result;
   size_t result_len = sizeof (result);
 
   if (__sysctl (request, 2, &result, &result_len, NULL, 0) < 0)
     /* Dummy result.  */
     return 1;
 
-  return result;
+  return result / __getpagesize();
 }
 
 weak_alias (__get_nprocs, get_nprocs)
