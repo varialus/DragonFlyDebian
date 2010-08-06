@@ -1,0 +1,63 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          zfs
+# Required-Start:
+# Required-Stop: 
+# Default-Start:     S
+# Default-Stop:      0 6
+# Short-Description: Mount/umount zfs filesystems.
+# Description:
+### END INIT INFO
+
+PATH=/sbin:/bin
+
+. /lib/lsb/init-functions
+. /lib/init/vars.sh
+
+do_start() {
+	if [ "$VERBOSE" = no ]
+	then
+		log_action_begin_msg "Mounting zfs filesystems"
+		zfs mount -a
+		log_action_end_msg $?
+	else
+		log_daemon_msg "Will now mount zfs filesystems"
+		zfs mount -a
+		log_end_msg $?
+	fi
+}
+
+do_stop() {
+	if [ "$VERBOSE" = no ]
+	then
+		log_action_begin_msg "Mounting zfs filesystems"
+		zfs umount -a
+		zfs unshare -a
+		log_action_end_msg $?
+	else
+		log_daemon_msg "Will now mount zfs filesystems"
+		zfs umount -a
+		zfs unshare -a
+		log_end_msg $?
+	fi
+}
+
+
+case "$1" in
+  start|"")
+	do_start
+	;;
+  restart|reload|force-reload)
+	echo "Error: argument '$1' not supported" >&2
+	exit 3
+	;;
+  stop)
+	do_stop
+	;;
+  *)
+	echo "Usage: zfs [start|stop]" >&2
+	exit 3
+	;;
+esac
+
+:
