@@ -25,11 +25,19 @@ VERSION="@VERSION@"
 
 case "$1" in
     remove)
-        # Run postrm hook if defined
+        # Run /etc/kernel-img.conf postrm hook if defined
         postrm_hook=$(sed '/^\s*postrm_hook/!d;s/.*=\s*//' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$postrm_hook" ] ; then
             echo "Running postrm hook script $postrm_hook." 1>&2 
             $postrm_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"
+        fi
+
+        # Run /etc/kernel/postrm.d/ hooks if they exists
+        if [ -d "/etc/kernel/postrm.d" ] ; then
+	    DEB_MAINT_PARAMS=$@ \
+                run-parts --verbose --exit-on-error \
+                    --arg=$RELEASE \
+                    --arg=/boot/kfreebsd-$RELEASE.gz /etc/kernel/postrm.d
         fi
     ;;
     
