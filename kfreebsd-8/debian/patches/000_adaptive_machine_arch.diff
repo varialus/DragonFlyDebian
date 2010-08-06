@@ -5,6 +5,11 @@ same for hw.machine on amd64.
 Add a safety belt debug.adaptive_machine_arch sysctl, to turn the
 substitution off.
 
+
+Compared to upstream, we return i686, not i386 on amd64 for sysctl hw.machine
+This part have to be moved into 907_cpu_class.diff later.
+
+
 --- a/sys/powerpc/include/param.h
 +++ b/sys/powerpc/include/param.h
 @@ -69,6 +69,11 @@
@@ -99,7 +104,7 @@ substitution off.
 +sysctl_hw_machine(SYSCTL_HANDLER_ARGS)
 +{
 +#ifdef SCTL_MASK32
-+	static const char machine32[] = "i386";
++	static const char machine32[] = "i686";
 +#endif
 +	int error;
 +
