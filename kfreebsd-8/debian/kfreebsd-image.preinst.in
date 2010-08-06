@@ -31,7 +31,7 @@ case "$1" in
         preinst_hook=$(sed '/^\s*preinst_hook/!d;s/.*=\s*//' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$preinst_hook" ] ; then
             echo "Running preinst hook script $preinst_hook." 1>&2 
-            $preinst_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"
+            $preinst_hook "$RELEASE" "/boot/kfreebsd-$RELEASE.gz"
         fi
 
         # Run /etc/kernel/preinst.d/ hooks if they exist

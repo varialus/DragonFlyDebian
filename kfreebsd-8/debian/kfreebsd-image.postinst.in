@@ -66,7 +66,7 @@ case "$1" in
         postinst_hook=$(sed '/^\s*postinst_hook/!d;s/.*=\s*//' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$postinst_hook" ] ; then
             echo "Running postinst hook script $postinst_hook." 1>&2 
-            $postinst_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"
+            $postinst_hook "$RELEASE" "/boot/kfreebsd-$RELEASE.gz"
         fi
 
         # Run /etc/kernel/postinst.d/ hooks if they exist
