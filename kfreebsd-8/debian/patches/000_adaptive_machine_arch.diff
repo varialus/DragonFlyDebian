@@ -1,0 +1,120 @@
+When compat32 binary asks for the value of hw.machine_arch, report the
+name of 32bit sibling architecture instead of the host one. Do the
+same for hw.machine on amd64.
+
+Add a safety belt debug.adaptive_machine_arch sysctl, to turn the
+substitution off.
+
+--- a/sys/powerpc/include/param.h
++++ b/sys/powerpc/include/param.h
+@@ -69,6 +69,11 @@
+ #define	MACHINE_ARCH	"powerpc"
+ #endif
+ #define	MID_MACHINE	MID_POWERPC
++#ifdef __powerpc64__
++#ifndef	MACHINE_ARCH32
++#define	MACHINE_ARCH32	"powerpc"
++#endif
++#endif
+ 
+ #if defined(SMP) || defined(KLD_MODULE)
+ #define	MAXCPU		2
+--- a/sys/kern/kern_mib.c
++++ b/sys/kern/kern_mib.c
+@@ -232,11 +232,33 @@
+ SYSCTL_PROC(_hw, OID_AUTO, pagesizes, CTLTYPE_ULONG | CTLFLAG_RD,
+     NULL, 0, sysctl_hw_pagesizes, "LU", "Supported page sizes");
+ 
+-static char	machine_arch[] = MACHINE_ARCH;
+-SYSCTL_STRING(_hw, HW_MACHINE_ARCH, machine_arch, CTLFLAG_RD,
+-    machine_arch, 0, "System architecture");
++#ifdef SCTL_MASK32
++int adaptive_machine_arch = 1;
++SYSCTL_INT(_debug, OID_AUTO, adaptive_machine_arch, CTLFLAG_RW,
++    &adaptive_machine_arch, 1,
++    "Adapt reported machine architecture to the ABI of the binary");
++#endif
+ 
+ static int
++sysctl_hw_machine_arch(SYSCTL_HANDLER_ARGS)
++{
++	int error;
++	static const char machine_arch[] = MACHINE_ARCH;
++#ifdef SCTL_MASK32
++	static const char machine_arch32[] = MACHINE_ARCH32;
++
++	if ((req->flags & SCTL_MASK32) != 0 && adaptive_machine_arch)
++		error = SYSCTL_OUT(req, machine_arch32, sizeof(machine_arch32));
++	else
++#endif
++		error = SYSCTL_OUT(req, machine_arch, sizeof(machine_arch));
++	return (error);
++
++}
++SYSCTL_PROC(_hw, HW_MACHINE_ARCH, machine_arch, CTLTYPE_STRING | CTLFLAG_RD,
++    NULL, 0, sysctl_hw_machine_arch, "A", "System architecture");
++
++static int
+ sysctl_hostname(SYSCTL_HANDLER_ARGS)
+ {
+ 	struct prison *pr, *cpr;
+--- a/sys/ia64/include/param.h
++++ b/sys/ia64/include/param.h
+@@ -57,6 +57,9 @@
+ #ifndef MACHINE_ARCH
+ #define	MACHINE_ARCH	"ia64"
+ #endif
++#ifndef MACHINE_ARCH32
++#define	MACHINE_ARCH32	"i386"
++#endif
+ 
+ #if defined(SMP) || defined(KLD_MODULE)
+ #define	MAXCPU		32
+--- a/sys/amd64/include/param.h
++++ b/sys/amd64/include/param.h
+@@ -59,6 +59,9 @@
+ #ifndef MACHINE_ARCH
+ #define	MACHINE_ARCH	"amd64"
+ #endif
++#ifndef MACHINE_ARCH32
++#define	MACHINE_ARCH32	"i386"
++#endif
+ 
+ #if defined(SMP) || defined(KLD_MODULE)
+ #define MAXCPU		32
+--- a/sys/amd64/amd64/identcpu.c
++++ b/sys/amd64/amd64/identcpu.c
+@@ -76,9 +76,31 @@
+ 
+ int	cpu_class;
+ char machine[] = "amd64";
+-SYSCTL_STRING(_hw, HW_MACHINE, machine, CTLFLAG_RD, 
+-    machine, 0, "Machine class");
+ 
++#ifdef SCTL_MASK32
++extern int adaptive_machine_arch;
++#endif
++
++static int
++sysctl_hw_machine(SYSCTL_HANDLER_ARGS)
++{
++#ifdef SCTL_MASK32
++	static const char machine32[] = "i386";
++#endif
++	int error;
++
++#ifdef SCTL_MASK32
++	if ((req->flags & SCTL_MASK32) != 0 && adaptive_machine_arch)
++		error = SYSCTL_OUT(req, machine32, sizeof(machine32));
++	else
++#endif
++		error = SYSCTL_OUT(req, machine, sizeof(machine));
++	return (error);
++
++}
++SYSCTL_PROC(_hw, HW_MACHINE, machine, CTLTYPE_STRING | CTLFLAG_RD,
++    NULL, 0, sysctl_hw_machine, "A", "Machine class");
++
+ static char cpu_model[128];
+ SYSCTL_STRING(_hw, HW_MODEL, model, CTLFLAG_RD, 
+     cpu_model, 0, "Machine model");
