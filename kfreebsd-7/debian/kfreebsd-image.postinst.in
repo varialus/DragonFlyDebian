@@ -62,7 +62,7 @@ case "$1" in
         done
         export DEB_MAINT_PARAMS
 
-        # Run /etc/kernel-img.cnf postinst hook if defined
+        # Run /etc/kernel-img.conf postinst hook if defined
         postinst_hook=$(sed '/^\s*postinst_hook/!d;s/.*=\s*//' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$postinst_hook" ] ; then
             echo "Running postinst hook script $postinst_hook." 1>&2 
