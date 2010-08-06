@@ -54,7 +54,14 @@ case "$1" in
                 fi    
             fi
         fi
-    
+
+        # Sanitize and quote maintaner script parameters
+        for p in "$@"; do
+            q="$(echo "$p" | sed -e "s/'/'\\''/g")"
+            DEB_MAINT_PARAMS="$DEB_MAINT_PARAMS '$q'"
+        done
+        export DEB_MAINT_PARAMS
+
         # Run /etc/kernel-img.cnf postinst hook if defined
         postinst_hook=$(sed '/^\s*postinst_hook/!d;s/.*=\s*//' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$postinst_hook" ] ; then
@@ -62,12 +69,12 @@ case "$1" in
             $postinst_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"
         fi
 
-        # Run /etc/kernel/postinst.d/ hooks if they exists
+        # Run /etc/kernel/postinst.d/ hooks if they exist
         if [ -d "/etc/kernel/postinst.d" ] ; then
-	    DEB_MAINT_PARAMS=$@ \
-                run-parts --verbose --exit-on-error \
-                    --arg=$RELEASE \
-                    --arg=/boot/kfreebsd-$RELEASE.gz /etc/kernel/postinst.d
+            run-parts --verbose --exit-on-error \
+                --arg=$RELEASE \
+                --arg=/boot/kfreebsd-$RELEASE.gz \
+                /etc/kernel/postinst.d
         fi
     ;;
    
