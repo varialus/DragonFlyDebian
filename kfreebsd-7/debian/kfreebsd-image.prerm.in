@@ -23,11 +23,27 @@ VERSION="@VERSION@"
 
 case "$1" in
     remove)
+        # Sanitize and quote maintaner script parameters
+        for p in "$@"; do
+            q="$(echo "$p" | sed -e "s/'/'\\''/g")"
+            DEB_MAINT_PARAMS="$DEB_MAINT_PARAMS '$q'"
+        done
+        export DEB_MAINT_PARAMS
+
         # Run prerm hook if defined
         prerm_hook=$(sed '/^\s*prerm_hook/!d;s/.*=\s*//g' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$prerm_hook" ] ; then
             echo "Running prerm hook script $prerm_hook." 1>&2 
             $prerm_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"
+        fi
+
+        # Run /etc/kernel/prerm.d/ hooks if they exist
+        if [ -d "/etc/kernel/prerm.d" ]; then
+            echo "Running /etc/kernel/prerm.d hooks..." 1>&2
+            run-parts --verbose --exit-on-error \
+                --arg=$RELEASE \
+                --arg=/boot/kfreebsd-$RELEASE.gz \
+                /etc/kernel/prerm.d
         fi
     ;;
 
