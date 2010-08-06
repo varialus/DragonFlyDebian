@@ -55,14 +55,22 @@ case "$1" in
             fi
         fi
     
-        # Run postinst hook if defined
+        # Run /etc/kernel-img.cnf postinst hook if defined
         postinst_hook=$(sed '/^\s*postinst_hook/!d;s/.*=\s*//' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$postinst_hook" ] ; then
             echo "Running postinst hook script $postinst_hook." 1>&2 
             $postinst_hook "$VERSION" "/boot/kfreebsd-$RELEASE.gz"
         fi
+
+        # Run /etc/kernel/postinst.d/ hooks if they exists
+        if [ -d "/etc/kernel/postinst.d" ] ; then
+	    DEB_MAINT_PARAMS=$@ \
+                run-parts --verbose --exit-on-error \
+                    --arg=$RELEASE \
+                    --arg=/boot/kfreebsd-$RELEASE.gz /etc/kernel/postinst.d
+        fi
     ;;
-    
+   
     abort-upgrade|abort-remove|abort-deconfigure)
     ;;
 
