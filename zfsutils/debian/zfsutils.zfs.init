@@ -1,11 +1,11 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          zfs
+# Provides:          zvol zfs
 # Required-Start:
 # Required-Stop: 
 # Default-Start:     S
 # Default-Stop:      0 6
-# Short-Description: Mount/umount zfs filesystems.
+# Short-Description: Start/stop ZFS subsystem.
 # Description:
 ### END INIT INFO
 
@@ -15,31 +15,90 @@ PATH=/sbin:/bin
 . /lib/init/vars.sh
 
 do_start() {
-	if [ "$VERBOSE" = no ]
-	then
-		log_action_begin_msg "Mounting zfs filesystems"
-		zfs mount -a
-		log_action_end_msg $?
-	else
-		log_daemon_msg "Will now mount zfs filesystems"
-		zfs mount -a
-		log_end_msg $?
+	log_begin_msg "Starting ZFS subsystem..."
+
+	# zvol
+	log_progress_msg "zvol"
+	zfs volinit
+	RET=$?
+	if [ $RET != 0 ] ; then
+		log_end_msg $RET
+		exit $RET
 	fi
+
+	# Enable swap on ZVOLs with property org.freebsd:swap=on.
+	log_progress_msg "swap"
+	zfs list -H -o org.freebsd:swap,name -t volume | \
+	while read state name; do
+		case "${state}" in
+		[oO][nN])
+			swapon /dev/zvol/${name}
+			RET=$?
+			if [ $RET != 0 ] ; then
+				log_end_msg $RET
+				exit $RET
+			fi
+		esac
+	done
+
+	# filesystems
+	log_progress_msg "filesystems"
+	zfs mount -a
+	RET=$?
+	if [ $RET != 0 ] ; then
+		log_end_msg $RET
+		exit $RET
+	fi
+
+	# end
+	log_end_msg 0
 }
 
 do_stop() {
-	if [ "$VERBOSE" = no ]
-	then
-		log_action_begin_msg "Mounting zfs filesystems"
-		zfs umount -a
-		zfs unshare -a
-		log_action_end_msg $?
-	else
-		log_daemon_msg "Will now mount zfs filesystems"
-		zfs umount -a
-		zfs unshare -a
-		log_end_msg $?
+	log_begin_msg "Stopping ZFS subsystem..."
+
+	# Disable swap on ZVOLs with property org.freebsd:swap=on.
+	log_progress_msg "zvol"
+	zfs list -H -o org.freebsd:swap,name -t volume | \
+	while read state name; do
+		case "${state}" in
+		[oO][nN])
+			swapoff /dev/zvol/${name}
+			RET=$?
+			if [ $RET != 0 ] ; then
+				log_end_msg $RET
+				exit $RET
+			fi
+			;;
+		esac
+	done
+
+	# zvol
+	log_progress_msg "zvol"
+	zfs volfini
+	RET=$?
+	if [ $RET != 0 ] ; then
+		log_end_msg $RET
+		exit $RET
 	fi
+
+	# filesystems
+	log_progress_msg "filesystems"
+	zfs unshare -a
+	RET=$?
+	if [ $RET != 0 ] ; then
+		log_end_msg $RET
+		exit $RET
+	fi
+	zfs umount -a
+	RET=$?
+	if [ $RET != 0 ] ; then
+		log_end_msg $RET
+		exit $RET
+	fi
+
+	# end
+	log_end_msg 0
 }
 
 
