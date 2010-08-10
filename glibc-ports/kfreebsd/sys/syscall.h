@@ -319,11 +319,6 @@
 #define	SYS_nfsclnt	375
 #define	SYS_eaccess	376
 #define	SYS_nmount	378
-#define	SYS_kse_exit	379
-#define	SYS_kse_wakeup	380
-#define	SYS_kse_create	381
-#define	SYS_kse_thr_interrupt	382
-#define	SYS_kse_release	383
 #define	SYS_mac_get_proc	384
 #define	SYS_mac_set_proc	385
 #define	SYS_mac_get_fd	386
@@ -376,7 +371,6 @@
 #define	SYS_extattr_list_fd	437
 #define	SYS_extattr_list_file	438
 #define	SYS_extattr_list_link	439
-#define	SYS_kse_switchin	440
 #define	SYS_ksem_timedwait	441
 #define	SYS_thr_suspend	442
 #define	SYS_thr_wake	443
@@ -441,6 +435,7 @@
 #define	SYS_jail_get	506
 #define	SYS_jail_set	507
 #define	SYS_jail_remove	508
-#define	SYS_MAXSYSCALL	509
+#define	SYS_pselect	522
+#define	SYS_MAXSYSCALL	523
 
 #endif

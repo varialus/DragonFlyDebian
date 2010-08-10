@@ -90,7 +90,7 @@ sysdep_routines += swapon swapoff sys_aio_cancel sys_aio_error sys_aio_read sys_
 # for INLINE_SYSCALL
 sysdep_routines += sys_fork sys_execve sys_sigaction sys_close sys_fcntl
 sysdep_routines += sys_clock_getres sys_clock_gettime sys_clock_settime
-sysdep_routines += sys_shm_open sys_shm_unlink
+sysdep_routines += sys_shm_open sys_shm_unlink sys_pselect
 endif
 
 ifeq ($(subdir),posix)
