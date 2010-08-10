@@ -45,6 +45,8 @@ __libc_sendto (int fd, __const void * buf, size_t n, int flags,
 {
   socklen_t new_addrlen;
 
+  if (addr.__sockaddr__)
+  {
 #ifndef NOT_IN_libc
   new_addrlen = INTUSE(__libc_sa_len) ((addr.__sockaddr__)->sa_family);
 #else
@@ -55,6 +57,7 @@ __libc_sendto (int fd, __const void * buf, size_t n, int flags,
     stack corruption */
   if (new_addrlen < addrlen)
     addrlen = new_addrlen;
+  }
 
   /* We pass 6 arguments.  */
   if (SINGLE_THREAD_P)
