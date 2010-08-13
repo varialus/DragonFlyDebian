@@ -1,0 +1,127 @@
+diff -ur a/sys/cddl/compat/opensolaris/sys/byteorder.h b/sys/cddl/compat/opensolaris/sys/byteorder.h
+--- a/sys/cddl/compat/opensolaris/sys/byteorder.h	2010-08-13 16:14:54.000000000 -0400
++++ b/sys/cddl/compat/opensolaris/sys/byteorder.h	2010-08-13 16:22:57.000000000 -0400
+@@ -42,6 +42,8 @@
+ #ifndef _OPENSOLARIS_SYS_BYTEORDER_H_
+ #define	_OPENSOLARIS_SYS_BYTEORDER_H_
+ 
++#include <endian.h>
++
+ /*
+  * Macros to reverse byte order
+  */
+@@ -58,7 +60,7 @@
+ /*
+  * Macros to convert from a specific byte order to/from native byte order
+  */
+-#if _BYTE_ORDER == _BIG_ENDIAN
++#if BYTE_ORDER == BIG_ENDIAN
+ #define	LE_64(x)	BSWAP_64(x)
+ #else
+ #define	LE_64(x)	BMASK_64(x)
+diff -ur a/sys/cddl/contrib/opensolaris/common/nvpair/nvpair.c b/sys/cddl/contrib/opensolaris/common/nvpair/nvpair.c
+--- a/sys/cddl/contrib/opensolaris/common/nvpair/nvpair.c	2010-08-13 16:21:43.000000000 -0400
++++ b/sys/cddl/contrib/opensolaris/common/nvpair/nvpair.c	2010-08-13 16:23:13.000000000 -0400
+@@ -36,6 +36,7 @@
+ #include <sys/varargs.h>
+ #include <sys/sunddi.h>
+ #else
++#include <endian.h>
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -2199,11 +2200,11 @@
+ 	int err = 0;
+ 	nvstream_t nvs;
+ 	int nvl_endian;
+-#if BYTE_ORDER == _LITTLE_ENDIAN
++#if BYTE_ORDER == LITTLE_ENDIAN
+ 	int host_endian = 1;
+ #else
+ 	int host_endian = 0;
+-#endif	/* _LITTLE_ENDIAN */
++#endif	/* LITTLE_ENDIAN */
+ 	nvs_header_t *nvh = (void *)buf;
+ 
+ 	if (buflen == NULL || nvl == NULL ||
+diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/spa.h b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/spa.h
+--- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/spa.h	2010-08-13 16:14:54.000000000 -0400
++++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/spa.h	2010-08-13 16:23:46.000000000 -0400
+@@ -33,6 +33,8 @@
+ #include <sys/types.h>
+ #include <sys/fs/zfs.h>
+ 
++#include <endian.h>
++
+ #ifdef	__cplusplus
+ extern "C" {
+ #endif
+@@ -299,7 +301,7 @@
+  * Note: the byteorder is either 0 or -1, both of which are palindromes.
+  * This simplifies the endianness handling a bit.
+  */
+-#if BYTE_ORDER == _BIG_ENDIAN
++#if BYTE_ORDER == BIG_ENDIAN
+ #define	ZFS_HOST_BYTEORDER	(0ULL)
+ #else
+ #define	ZFS_HOST_BYTEORDER	(-1ULL)
+diff -ur a/sys/cddl/contrib/opensolaris/uts/common/sys/byteorder.h b/sys/cddl/contrib/opensolaris/uts/common/sys/byteorder.h
+--- a/sys/cddl/contrib/opensolaris/uts/common/sys/byteorder.h	2010-08-13 16:14:54.000000000 -0400
++++ b/sys/cddl/contrib/opensolaris/uts/common/sys/byteorder.h	2010-08-13 16:23:59.000000000 -0400
+@@ -48,6 +48,8 @@
+ #include <asm/byteorder.h>
+ #endif
+ 
++#include <endian.h>
++
+ #ifdef	__cplusplus
+ extern "C" {
+ #endif
+@@ -56,7 +58,7 @@
+  * macros for conversion between host and (internet) network byte order
+  */
+ 
+-#if BYTE_ORDER == _BIG_ENDIAN && !defined(ntohl) && !defined(__lint)
++#if BYTE_ORDER == BIG_ENDIAN && !defined(ntohl) && !defined(__lint)
+ /* big-endian */
+ #define	ntohl(x)	(x)
+ #define	ntohs(x)	(x)
+@@ -141,7 +143,7 @@
+ /*
+  * Macros to convert from a specific byte order to/from native byte order
+  */
+-#if BYTE_ORDER == _BIG_ENDIAN
++#if BYTE_ORDER == BIG_ENDIAN
+ #define	BE_8(x)		BMASK_8(x)
+ #define	BE_16(x)	BMASK_16(x)
+ #define	BE_32(x)	BMASK_32(x)
+diff -ur a/sys/cddl/contrib/opensolaris/uts/common/sys/dtrace.h b/sys/cddl/contrib/opensolaris/uts/common/sys/dtrace.h
+--- a/sys/cddl/contrib/opensolaris/uts/common/sys/dtrace.h	2010-08-13 16:14:54.000000000 -0400
++++ b/sys/cddl/contrib/opensolaris/uts/common/sys/dtrace.h	2010-08-13 16:24:08.000000000 -0400
+@@ -29,6 +29,8 @@
+ 
+ #pragma ident	"%Z%%M%	%I%	%E% SMI"
+ 
++#include <endian.h>
++
+ #ifdef	__cplusplus
+ extern "C" {
+ #endif
+@@ -517,7 +519,7 @@
+ 	((((uint64_t)(y)) << 32) | ((x) & UINT32_MAX))
+ 
+ #ifndef _LP64
+-#if BYTE_ORDER == _BIG_ENDIAN
++#if BYTE_ORDER == BIG_ENDIAN
+ #define	DTRACE_PTR(type, name)	uint32_t name##pad; type *name
+ #else
+ #define	DTRACE_PTR(type, name)	type *name; uint32_t name##pad
+@@ -627,7 +629,7 @@
+ #define	DOF_ENCODE_LSB	1
+ #define	DOF_ENCODE_MSB	2
+ 
+-#if BYTE_ORDER == _BIG_ENDIAN
++#if BYTE_ORDER == BIG_ENDIAN
+ #define	DOF_ENCODE_NATIVE	DOF_ENCODE_MSB
+ #else
+ #define	DOF_ENCODE_NATIVE	DOF_ENCODE_LSB

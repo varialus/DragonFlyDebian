@@ -40,20 +40,3 @@ diff -ur -x debian a/sys/cddl/compat/opensolaris/sys/time.h b/sys/cddl/compat/op
  
  #define SEC		1
  #define MILLISEC	1000
-diff -ur -x debian a/sys/cddl/contrib/opensolaris/common/nvpair/nvpair.c b/sys/cddl/contrib/opensolaris/common/nvpair/nvpair.c
---- a/sys/cddl/contrib/opensolaris/common/nvpair/nvpair.c	2009-08-15 22:21:24.000000000 -0400
-+++ b/sys/cddl/contrib/opensolaris/common/nvpair/nvpair.c	2010-07-27 20:09:06.109193269 -0400
-@@ -2199,11 +2199,11 @@
- 	int err = 0;
- 	nvstream_t nvs;
- 	int nvl_endian;
--#if BYTE_ORDER == _LITTLE_ENDIAN
-+#if BYTE_ORDER == LITTLE_ENDIAN
- 	int host_endian = 1;
- #else
- 	int host_endian = 0;
--#endif	/* _LITTLE_ENDIAN */
-+#endif	/* LITTLE_ENDIAN */
- 	nvs_header_t *nvh = (void *)buf;
- 
- 	if (buflen == NULL || nvl == NULL ||
