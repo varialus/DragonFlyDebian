@@ -1,0 +1,40 @@
+--- a/cddl/contrib/opensolaris/cmd/zpool/zpool_main.c
++++ b/cddl/contrib/opensolaris/cmd/zpool/zpool_main.c
+@@ -1468,7 +1468,11 @@
+ 
+ 	if (searchdirs == NULL) {
+ 		searchdirs = safe_malloc(sizeof (char *));
++#ifdef __sun
+ 		searchdirs[0] = "/dev/dsk";
++#else
++		searchdirs[0] = "/dev";
++#endif
+ 		nsearch = 1;
+ 	}
+ 
+--- a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_import.c
++++ b/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_import.c
+@@ -848,7 +848,11 @@
+ 	size_t pathleft;
+ 	struct stat64 statbuf;
+ 	nvlist_t *ret = NULL, *config;
++#ifdef __sun
+ 	static char *default_dir = "/dev/dsk";
++#else
++	static char *default_dir = "/dev";
++#endif
+ 	int fd;
+ 	pool_list_t pools = { 0 };
+ 	pool_entry_t *pe, *penext;
+@@ -894,9 +898,11 @@
+ 		 * reading the labels skips a bunch of slow operations during
+ 		 * close(2) processing, so we replace /dev/dsk with /dev/rdsk.
+ 		 */
++#ifdef __sun
+ 		if (strcmp(path, "/dev/dsk/") == 0)
+ 			rdsk = "/dev/rdsk/";
+ 		else
++#endif
+ 			rdsk = path;
+ 
+ 		if ((dirp = opendir(rdsk)) == NULL) {
