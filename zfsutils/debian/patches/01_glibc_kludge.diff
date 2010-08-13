@@ -23,39 +23,3 @@ diff -ur -x debian a/cddl/compat/opensolaris/misc/zmount.c b/cddl/compat/opensol
  	build_iovec(&iov, &iovlen, "fspath", __DECONST(char *, dir),
  	    (size_t)-1);
  	build_iovec(&iov, &iovlen, "from", __DECONST(char *, spec), (size_t)-1);
-diff -ur -x debian a/sys/cddl/compat/opensolaris/rpc/xdr.h b/sys/cddl/compat/opensolaris/rpc/xdr.h
---- a/sys/cddl/compat/opensolaris/rpc/xdr.h	2009-08-19 20:08:58.000000000 -0400
-+++ b/sys/cddl/compat/opensolaris/rpc/xdr.h	2010-07-27 20:07:02.661041790 -0400
-@@ -32,7 +32,31 @@
- 
- #include_next <rpc/xdr.h>
- 
--#ifndef _KERNEL
-+/* Copied from the FreeBSD version of <rpc/xdr.h> */
-+#ifdef __GLIBC__
-+/*
-+ * These are XDR control operators
-+ */
-+
-+#define	XDR_GET_BYTES_AVAIL 	1
-+#define	XDR_PEEK		2
-+#define	XDR_SKIPBYTES		3
-+
-+struct xdr_bytesrec {
-+	bool_t xc_is_last_record;
-+	size_t xc_num_avail;
-+};
-+
-+typedef struct xdr_bytesrec xdr_bytesrec;
-+#endif
-+
-+#if defined(__GLIBC__)
-+
-+/* GNU libc doesn't implement XDR control method */
-+#define	XDR_CONTROL(xdrs, req, op)	(1)
-+#define xdr_control(xdrs, req, op)	XDR_CONTROL(xdrs, req, op)
-+
-+#elif !defined(_KERNEL)
- 
- #include <assert.h>
- 
