@@ -21,3 +21,14 @@
  
  MLINKS+=	libusb.3 usb.3
  
+--- a/lib/libusb/libusb20.c
++++ b/lib/libusb/libusb20.c
+@@ -1166,7 +1166,7 @@ libusb20_be_alloc_ugen20(void)
+ {
+ 	struct libusb20_backend *pbe;
+ 
+-#ifdef __FreeBSD__
++#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+ 	pbe = libusb20_be_alloc(&libusb20_ugen20_backend);
+ #else
+ 	pbe = NULL;
