@@ -1,0 +1,68 @@
+--- a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_import.c
++++ b/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_import.c
+@@ -845,7 +845,5 @@
+ 	struct dirent64 *dp;
+ 	char path[MAXPATHLEN];
+-	char *end;
+-	size_t pathleft;
+ 	struct stat64 statbuf;
+ 	nvlist_t *ret = NULL, *config;
+ 	static char *default_dir = "/dev/dsk";
+@@ -872,6 +871,11 @@
+ 		char *rdsk;
+ 		int dfd;
+ 
++		if (strcmp(argv[i], default_dir) == 0) {
++			geom_find_import(hdl, &pools);
++			continue;
++		}
++
+ 		/* use realpath to normalize the path */
+ 		if (realpath(argv[i], path) == 0) {
+ 			(void) zfs_error_fmt(hdl, EZFS_BADPATH,
+@@ -879,15 +883,6 @@
+ 			    argv[i]);
+ 			goto error;
+ 		}
+-		end = &path[strlen(path)];
+-		*end++ = '/';
+-		*end = 0;
+-		pathleft = &path[sizeof (path)] - end;
+-
+-		if (strcmp(argv[i], default_dir) == 0) {
+-			geom_find_import(hdl, &pools);
+-			continue;
+-		}
+ 
+ 		/*
+ 		 * Using raw devices instead of block devices when we're
+@@ -911,15 +906,16 @@
+ 		 * This is not MT-safe, but we have no MT consumers of libzfs
+ 		 */
+ 		while ((dp = readdir64(dirp)) != NULL) {
++	                char devpath[MAXPATHLEN];
+ 			const char *name = dp->d_name;
+ 			if (name[0] == '.' &&
+ 			    (name[1] == 0 || (name[1] == '.' && name[2] == 0)))
+ 				continue;
+ 
+-			(void) snprintf(path, sizeof (path), "%s/%s", rdsk,
+-			    dp->d_name);
++			(void) snprintf(devpath, sizeof (devpath), "%s/%s",
++			    rdsk, dp->d_name);
+ 
+-			if ((fd = open64(path, O_RDONLY)) < 0)
++			if ((fd = open64(devpath, O_RDONLY)) < 0)
+ 				continue;
+ 
+ 			/*
+@@ -966,8 +962,7 @@
+ 					continue;
+ 				}
+ 				/* use the non-raw path for the config */
+-				(void) strlcpy(end, name, pathleft);
+-				if (add_config(hdl, &pools, path, config) != 0)
++				if (add_config(hdl, &pools, devpath, config) != 0)
+ 					goto error;
+ 			}
+ 		}
