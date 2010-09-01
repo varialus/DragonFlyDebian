@@ -27,14 +27,20 @@
  #include <assert.h>
  
  /*
-@@ -81,9 +81,7 @@
+@@ -80,10 +80,16 @@
+ }
  
  #undef XDR_CONTROL
++#ifdef __GLIBC__
++#define	XDR_CONTROL(xdrs, req, op)					\
++	(xdrmem_control((xdrs), (req), (op)))
++
++#else
  #define	XDR_CONTROL(xdrs, req, op)					\
--	(((xdrs)->x_ops->x_control == NULL) ?				\
--	    xdrmem_control((xdrs), (req), (op)) :			\
--	    (*(xdrs)->x_ops->x_control)(xdrs, req, op))   
-+	    (xdrmem_control((xdrs), (req), (op)))
+ 	(((xdrs)->x_ops->x_control == NULL) ?				\
+ 	    xdrmem_control((xdrs), (req), (op)) :			\
+ 	    (*(xdrs)->x_ops->x_control)(xdrs, req, op))   
++#endif
  
  #endif	/* !_KERNEL */
  
