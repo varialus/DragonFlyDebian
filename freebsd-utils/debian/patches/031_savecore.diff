@@ -1,0 +1,55 @@
+--- a/sbin/savecore/Makefile
++++ b/sbin/savecore/Makefile
+@@ -1,6 +1,7 @@
+ # $FreeBSD$
+ 
+ PROG=	savecore
++SRCS=	savecore.c zopen.c
+ WARNS?=	6
+ DPADD=	${LIBZ}
+ LDADD=	-lz
+--- a/sbin/savecore/zopen.c
++++ b/sbin/savecore/zopen.c
+@@ -0,0 +1,42 @@
++/*
++ * Public domain stdio wrapper for libz, written by Johan Danielsson.
++ * Ported to GNU libc by Tuco Xyz.
++ */
++
++#include <stdio.h>
++#include <zlib.h>
++
++FILE *zopen(const char *fname, const char *mode);
++
++/* convert arguments */
++static int
++xgzread(void *cookie, char *data, int size)
++{
++    return gzread(cookie, data, size);
++}
++
++static int
++xgzwrite(void *cookie, const char *data, int size)
++{
++    return gzwrite(cookie, (void*)data, size);
++}
++
++static cookie_io_functions_t xgzfunc = {
++    .seek = NULL,
++    .close = gzclose
++};
++
++FILE *
++zopen(const char *fname, const char *mode)
++{
++    gzFile gz = gzopen(fname, mode);
++    if(gz == NULL)
++	return NULL;
++
++    if(*mode == 'r')
++	xgzfunc.read = xgzread;
++    else
++	xgzfunc.write = xgzwrite;
++
++    return fopencookie(gz, mode, xgzfunc);
++}

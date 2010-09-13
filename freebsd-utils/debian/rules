@@ -43,6 +43,7 @@ get-orig-source:
 		 sbin/mdconfig sbin/ccdconfig sbin/swapon sbin/atacontrol sbin/camcontrol \
 	         sbin/gbde sbin/geom bin/kenv \
 		 usr.sbin/kbdcontrol usr.sbin/vidcontrol share/syscons \
+		 sbin/savecore sbin/dumpon \
 		 sys/kern/syscalls.c etc/pf.os ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
@@ -71,6 +72,7 @@ freebsd-utils-stamp: patch-stamp
 	$(PMAKE) -C sbin/devd
 	$(PMAKE) -C sbin/devfs
 	$(PMAKE) -C sbin/dmesg
+	$(PMAKE) -C sbin/dumpon
 	$(PMAKE) -C sbin/mdconfig
 	$(PMAKE) -C sbin/mount
 	$(PMAKE) -C sbin/mount_autofs
@@ -85,6 +87,7 @@ freebsd-utils-stamp: patch-stamp
 	$(PMAKE) -C sbin/mount_udf
 	$(PMAKE) -C sbin/mount_unionfs
 	$(PMAKE) -C sbin/mount_std
+	$(PMAKE) -C sbin/savecore
 	$(PMAKE) -C sbin/swapon
 	$(PMAKE) -C sbin/sysctl 
 	$(PMAKE) -C sbin/umount
@@ -154,6 +157,7 @@ clean:
 	$(PMAKE) -C sbin/devd clean
 	$(PMAKE) -C sbin/devfs clean
 	$(PMAKE) -C sbin/dmesg clean
+	$(PMAKE) -C sbin/dumpon clean
 	$(PMAKE) -C sbin/mdconfig clean
 	$(PMAKE) -C sbin/mount clean
 	$(PMAKE) -C sbin/mount_autofs clean
@@ -168,6 +172,7 @@ clean:
 	$(PMAKE) -C sbin/mount_udf clean
 	$(PMAKE) -C sbin/mount_unionfs clean
 	$(PMAKE) -C sbin/mount_std clean
+	$(PMAKE) -C sbin/savecore clean
 	$(PMAKE) -C sbin/swapon clean
 	$(PMAKE) -C sbin/sysctl  clean
 	$(PMAKE) -C sbin/umount clean
