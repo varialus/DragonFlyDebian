@@ -30,6 +30,7 @@ get-orig-source:
 	rm -rf $(ORIGDIR)
 	mkdir -p $(ORIGDIR)/sys/kern $(ORIGDIR)/etc
 	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
+		 usr.bin/mkuzip \
 		 usr.sbin/jail bin/chflags sbin/devd usr.sbin/acpi/acpiconf \
 		 sbin/kldconfig sbin/kldload sbin/kldstat sbin/kldunload \
 		 usr.bin/ktrdump usr.bin/vmstat sbin/devfs sbin/fdisk \
@@ -93,6 +94,7 @@ freebsd-utils-stamp: patch-stamp
 	$(PMAKE) -C sbin/umount
 	$(PMAKE) -C usr.bin/kdump
 	$(PMAKE) -C usr.bin/ktrace
+	$(PMAKE) -C usr.bin/mkuzip
 	$(PMAKE) -C usr.sbin/acpi/acpiconf
 	$(PMAKE) -C usr.sbin/rpc.umntall
 	touch $@
@@ -178,6 +180,7 @@ clean:
 	$(PMAKE) -C sbin/umount clean
 	$(PMAKE) -C usr.bin/kdump clean
 	$(PMAKE) -C usr.bin/ktrace clean
+	$(PMAKE) -C usr.bin/mkuzip clean
 	$(PMAKE) -C usr.sbin/acpi/acpiconf clean
 	$(PMAKE) -C usr.sbin/rpc.umntall clean
 
