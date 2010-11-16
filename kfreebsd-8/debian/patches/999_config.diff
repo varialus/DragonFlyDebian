@@ -61,7 +61,15 @@
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -185,10 +184,6 @@
+@@ -122,7 +121,6 @@
+ device		trm		# Tekram DC395U/UW/F DC315U adapters
+ 
+ device		adv		# Advansys SCSI adapters
+-device		adw		# Advansys wide SCSI adapters
+ device		aic		# Adaptec 15[012]x SCSI adapters, AIC-6[23]60.
+ device		bt		# Buslogic/Mylex MultiMaster SCSI adapters
+ 
+@@ -185,10 +183,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -72,7 +80,45 @@
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -272,11 +267,8 @@
+@@ -201,8 +195,6 @@
+ device		igb		# Intel PRO/1000 PCIE Server Gigabit Family
+ device		ixgbe		# Intel PRO/10GbE PCIE Ethernet Family
+ device		le		# AMD Am7900 LANCE and Am79C9xx PCnet
+-device		ti		# Alteon Networks Tigon I/II gigabit Ethernet
+-device		txp		# 3Com 3cR990 (``Typhoon'')
+ device		vx		# 3Com 3c590, 3c595 (``Vortex'')
+ 
+ # PCI Ethernet NICs that use the common MII bus controller code.
+@@ -212,12 +204,10 @@
+ device		age		# Attansic/Atheros L1 Gigabit Ethernet
+ device		alc		# Atheros AR8131/AR8132 Ethernet
+ device		ale		# Atheros AR8121/AR8113/AR8114 Ethernet
+-device		bce		# Broadcom BCM5706/BCM5708 Gigabit Ethernet
+ device		bfe		# Broadcom BCM440x 10/100 Ethernet
+ device		bge		# Broadcom BCM570xx Gigabit Ethernet
+ device		dc		# DEC/Intel 21143 and various workalikes
+ device		et		# Agere ET1310 10/100/Gigabit Ethernet
+-device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+ device		jme		# JMicron JMC250 Gigabit/JMC260 Fast Ethernet
+ device		lge		# Level 1 LXT1001 gigabit Ethernet
+ device		msk		# Marvell/SysKonnect Yukon II Gigabit Ethernet
+@@ -227,7 +217,6 @@
+ device		pcn		# AMD Am79C97x PCI 10/100 (precedence over 'le')
+ device		re		# RealTek 8139C+/8169/8169S/8110S
+ device		rl		# RealTek 8129/8139
+-device		sf		# Adaptec AIC-6915 (``Starfire'')
+ device		sge		# Silicon Integrated Systems SiS190/191
+ device		sis		# Silicon Integrated Systems SiS 900/SiS 7016
+ device		sk		# SysKonnect SK-984x & SK-982x gigabit Ethernet
+@@ -247,7 +236,6 @@
+ device		ex		# Intel EtherExpress Pro/10 and Pro/10+
+ device		ep		# Etherlink III based cards
+ device		fe		# Fujitsu MB8696x based cards
+-device		sn		# SMC's 9000 series of Ethernet chips
+ device		xe		# Xircom pccard Ethernet
+ 
+ # Wireless NIC cards
+@@ -272,11 +260,8 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
@@ -84,18 +130,26 @@
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -293,10 +285,8 @@
- #device		udbp		# USB Double Bulk Pipe devices
- device		uhid		# "Human Interface Devices"
- device		ukbd		# Keyboard
--device		ulpt		# Printer
+@@ -296,7 +281,6 @@
+ device		ulpt		# Printer
  device		umass		# Disks/Mass storage - Requires scbus and da
  device		ums		# Mouse
 -device		urio		# Diamond Rio 500 MP3 player
  # USB Serial devices
  device		uark		# Technologies ARK3116 based serial adapters
  device		ubsa		# Belkin F5U103 and compatible serial adapters
-@@ -327,3 +317,11 @@
+@@ -315,10 +299,7 @@
+ device		rue		# RealTek RTL8150 USB Ethernet
+ device		udav		# Davicom DM9601E USB
+ # USB Wireless
+-device		rum		# Ralink Technology RT2501USB wireless NICs
+-device		uath		# Atheros AR5523 wireless NICs
+ device		ural		# Ralink Technology RT2500USB wireless NICs
+-device		zyd		# ZyDAS zb1211/zb1211b wireless NICs
+ 
+ # FireWire support
+ device		firewire	# FireWire bus code
+@@ -327,3 +308,11 @@
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
@@ -183,7 +237,15 @@
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -196,10 +197,6 @@
+@@ -125,7 +126,6 @@
+ device		trm		# Tekram DC395U/UW/F DC315U adapters
+ 
+ device		adv		# Advansys SCSI adapters
+-device		adw		# Advansys wide SCSI adapters
+ device		aha		# Adaptec 154x SCSI adapters
+ device		aic		# Adaptec 15[012]x SCSI adapters, AIC-6[23]60.
+ device		bt		# Buslogic/Mylex MultiMaster SCSI adapters
+@@ -196,10 +196,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -194,7 +256,45 @@
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -285,11 +282,8 @@
+@@ -212,8 +208,6 @@
+ device		igb		# Intel PRO/1000 PCIE Server Gigabit Family
+ device		ixgb		# Intel PRO/10GbE Ethernet Card
+ device		le		# AMD Am7900 LANCE and Am79C9xx PCnet
+-device		ti		# Alteon Networks Tigon I/II gigabit Ethernet
+-device		txp		# 3Com 3cR990 (``Typhoon'')
+ device		vx		# 3Com 3c590, 3c595 (``Vortex'')
+ 
+ # PCI Ethernet NICs that use the common MII bus controller code.
+@@ -223,12 +217,10 @@
+ device		age		# Attansic/Atheros L1 Gigabit Ethernet
+ device		alc		# Atheros AR8131/AR8132 Ethernet
+ device		ale		# Atheros AR8121/AR8113/AR8114 Ethernet
+-device		bce		# Broadcom BCM5706/BCM5708 Gigabit Ethernet
+ device		bfe		# Broadcom BCM440x 10/100 Ethernet
+ device		bge		# Broadcom BCM570xx Gigabit Ethernet
+ device		dc		# DEC/Intel 21143 and various workalikes
+ device		et		# Agere ET1310 10/100/Gigabit Ethernet
+-device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+ device		jme		# JMicron JMC250 Gigabit/JMC260 Fast Ethernet
+ device		lge		# Level 1 LXT1001 gigabit Ethernet
+ device		msk		# Marvell/SysKonnect Yukon II Gigabit Ethernet
+@@ -238,7 +230,6 @@
+ device		pcn		# AMD Am79C97x PCI 10/100 (precedence over 'le')
+ device		re		# RealTek 8139C+/8169/8169S/8110S
+ device		rl		# RealTek 8129/8139
+-device		sf		# Adaptec AIC-6915 (``Starfire'')
+ device		sge		# Silicon Integrated Systems SiS190/191
+ device		sis		# Silicon Integrated Systems SiS 900/SiS 7016
+ device		sk		# SysKonnect SK-984x & SK-982x gigabit Ethernet
+@@ -259,7 +250,6 @@
+ device		ep		# Etherlink III based cards
+ device		fe		# Fujitsu MB8696x based cards
+ device		ie		# EtherExpress 8/16, 3C507, StarLAN 10 etc.
+-device		sn		# SMC's 9000 series of Ethernet chips
+ device		xe		# Xircom pccard Ethernet
+ 
+ # Wireless NIC cards
+@@ -285,11 +275,8 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
@@ -206,18 +306,26 @@
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -306,10 +300,8 @@
- #device		udbp		# USB Double Bulk Pipe devices
- device		uhid		# "Human Interface Devices"
- device		ukbd		# Keyboard
--device		ulpt		# Printer
+@@ -309,7 +296,6 @@
+ device		ulpt		# Printer
  device		umass		# Disks/Mass storage - Requires scbus and da
  device		ums		# Mouse
 -device		urio		# Diamond Rio 500 MP3 player
  # USB Serial devices
  device		u3g		# USB-based 3G modems (Option, Huawei, Sierra)
  device		uark		# Technologies ARK3116 based serial adapters
-@@ -341,3 +333,11 @@
+@@ -329,10 +315,7 @@
+ device		rue		# RealTek RTL8150 USB Ethernet
+ device		udav		# Davicom DM9601E USB
+ # USB Wireless
+-device		rum		# Ralink Technology RT2501USB wireless NICs
+-device		uath		# Atheros AR5523 wireless NICs
+ device		ural		# Ralink Technology RT2500USB wireless NICs
+-device		zyd		# ZyDAS zb1211/zb1211b wireless NICs
+ 
+ # FireWire support
+ device		firewire	# FireWire bus code
+@@ -341,3 +324,11 @@
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
