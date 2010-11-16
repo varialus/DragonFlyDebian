@@ -1,5 +1,6 @@
 #!/bin/sh
 rm -vf `find sys -name *.uu`
+rm -vf sys/contrib/dev/ral/rt2661_ucode.h
 rm -vf sys/gnu/dev/sound/pci/csaimg.h
 rm -vf sys/gnu/dev/sound/pci/maestro3_dsp.h 
 rm -vf sys/dev/drm/mga_ucode.h
@@ -12,7 +13,7 @@ rm -vf sys/dev/digi/*X*.h
 rm -vf sys/dev/sf/starfire_rx.h
 rm -vf sys/dev/sf/starfire_tx.h
 rm -vf sys/dev/sn/ositech.h
-rm -vf sys/dev/sound/pci/ds1-vfw.h
+rm -vf sys/dev/sound/pci/ds1-fw.h
 rm -vf sys/dev/si/si2_z280.c
 rm -vf sys/dev/si/si3_t225.c
 rm -vf sys/dev/cxgb/common/cxgb_ael1002.c
