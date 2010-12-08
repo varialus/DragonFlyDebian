@@ -1,6 +1,6 @@
-/* Copyright (C) 2004 Free Software Foundation, Inc.
+/* Copyright (C) 2004, 2010 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-   Contributed by Robert Millan <robertmh@gnu.org>
+   Contributed by Robert Millan
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -44,8 +44,8 @@
  *
  */
 
+#include <sysdep.h>
 #include <sys/sem.h>
-#include <sys/syscall.h>
 #include <stdarg.h> /* va_list */
 #include <stdlib.h> /* NULL */
 #include <unistd.h>
@@ -60,8 +60,6 @@ union semun
   struct semid_ds *buf;		/* buffer for IPC_STAT & IPC_SET */
   unsigned short *array;	/* array for GETALL & SETALL */
 };
-
-int __syscall(int number, ...);
 
 int
 semctl (int semid, int semnum, int cmd, ...)
@@ -83,5 +81,5 @@ semctl (int semid, int semnum, int cmd, ...)
     }
   va_end (ap);
 
-  return __syscall (SYS_semctl, semid, semnum, cmd, semun_ptr);
+  return INLINE_SYSCALL (semctl, 4, semid, semnum, cmd, semun_ptr);
 }

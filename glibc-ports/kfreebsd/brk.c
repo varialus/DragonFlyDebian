@@ -1,6 +1,6 @@
-/* Copyright (C) 2004 Free Software Foundation, Inc.
+/* Copyright (C) 2004, 2010 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-   Contributed by Robert Millan <robertmh@gnu.org>
+   Contributed by Robert Millan
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -19,13 +19,7 @@
 
 #include <errno.h>
 #include <unistd.h>
-#include <sys/syscall.h>
-
-#ifndef SYS_break
-#define SYS_break SYS_obreak
-#endif
-
-int __syscall(int number, ...);
+#include <sysdep.h>
 
 extern void _end;
 
@@ -41,7 +35,7 @@ __brk (addr)
   if (addr < &_end)
     return 0;
 
-  if (__syscall (SYS_break, addr) == -1)
+  if (INLINE_SYSCALL (obreak, 1, addr) == -1)
     {
       __set_errno (ENOMEM);
       return -1;
