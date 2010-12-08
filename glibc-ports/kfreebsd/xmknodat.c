@@ -58,7 +58,7 @@ __xmknodat (int vers, int fd, const char *file, mode_t mode, dev_t * dev)
       /* The FreeBSD mknod() system call cannot be used to create FIFOs; we
          must use the mkfifo() system call for this purpose.  */
       if (S_ISFIFO (mode))
-	result = INLINE_SYSCALL (mkfifoat, 4, fd, file, mode);
+	result = INLINE_SYSCALL (mkfifoat, 3, fd, file, mode);
       else
 	result = INLINE_SYSCALL (mknodat, 4, fd, file, mode, *dev);
 
