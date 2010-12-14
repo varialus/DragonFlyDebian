@@ -1,4 +1,4 @@
-/* Copyright (C) 2002, 2006 Free Software Foundation, Inc.
+/* Copyright (C) 2002, 2006, 2010 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -48,9 +48,9 @@ struct stat16
 
     __uint32_t __unused1;
 
-    long int st_birthtime;	/* Time of file creation.  */
+    __time_t st_birthtime;	/* Time of file creation.  */
     long int st_birthtimensec;	/* Nanoseconds of file creation.  */
 
-#define _BIRTH_PADSIZE     (2*(8 - sizeof (long)))
+#define _BIRTH_PADSIZE     (16 - sizeof(__time_t) - sizeof (long int))
     char __birth_padding[_BIRTH_PADSIZE];
   };

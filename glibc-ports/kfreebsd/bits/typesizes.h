@@ -1,5 +1,5 @@
 /* bits/typesizes.h -- underlying types for *_t.  kFreeBSD version.
-   Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2010 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -47,7 +47,14 @@
 #define	__FSFILCNT64_T_TYPE	__UQUAD_TYPE
 #define	__ID_T_TYPE		__U32_TYPE
 #define __CLOCK_T_TYPE		__S32_TYPE
-#define __TIME_T_TYPE		__SLONGWORD_TYPE
+
+/* Match the typedefs in sys/${arch}/include/_types.h */
+#if defined(__i386__) || defined(__powerpc__)
+#define __TIME_T_TYPE		__S32_TYPE
+#else
+#define __TIME_T_TYPE		__S64_TYPE
+#endif
+
 #define __USECONDS_T_TYPE	__U32_TYPE
 #define __SUSECONDS_T_TYPE	__SLONGWORD_TYPE
 #define __DADDR_T_TYPE		__SQUAD_TYPE
