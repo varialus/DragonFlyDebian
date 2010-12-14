@@ -61,10 +61,10 @@ __libc_sendto (int fd, __const void * buf, size_t n, int flags,
 
   /* We pass 6 arguments.  */
   if (SINGLE_THREAD_P)
-    return INLINE_SYSCALL (sendto, 6, fd, buf, n, flags, addr, addrlen);
+    return INLINE_SYSCALL (sendto, 6, fd, buf, n, flags, addr.__sockaddr__, addrlen);
 
   int oldtype = LIBC_CANCEL_ASYNC ();
-  int result = INLINE_SYSCALL (sendto, 6, fd, buf, n, flags, addr, addrlen);
+  int result = INLINE_SYSCALL (sendto, 6, fd, buf, n, flags, addr.__sockaddr__, addrlen);
   LIBC_CANCEL_RESET (oldtype);
   return result;
 }

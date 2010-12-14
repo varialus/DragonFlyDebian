@@ -54,7 +54,7 @@ __bind (int fd, __CONST_SOCKADDR_ARG addr, socklen_t addrlen)
     addrlen = new_addrlen;
 
   /* We pass 3 arguments.  */
-  return INLINE_SYSCALL (bind, 3, fd, addr, addrlen);
+  return INLINE_SYSCALL (bind, 3, fd, addr.__sockaddr__, addrlen);
 }
 
 weak_alias (__bind, bind)

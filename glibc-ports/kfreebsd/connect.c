@@ -56,10 +56,10 @@ __libc_connect (int fd, __CONST_SOCKADDR_ARG addr, socklen_t addrlen)
 
   /* We pass 3 arguments.  */
   if (SINGLE_THREAD_P)
-    return INLINE_SYSCALL (connect, 3, fd, addr, addrlen);
+    return INLINE_SYSCALL (connect, 3, fd, addr.__sockaddr__, addrlen);
 
   int oldtype = LIBC_CANCEL_ASYNC ();
-  int result = INLINE_SYSCALL (connect, 3, fd, addr, addrlen);
+  int result = INLINE_SYSCALL (connect, 3, fd, addr.__sockaddr__, addrlen);
   LIBC_CANCEL_RESET (oldtype);
   return result;
 }
