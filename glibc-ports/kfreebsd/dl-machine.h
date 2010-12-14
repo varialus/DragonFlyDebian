@@ -1,5 +1,5 @@
 /* Dynamic linker magic for glibc on FreeBSD kernel.
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2010 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Aurelien Jarno <aurelien@aurel32.net>, 2006.
 
@@ -18,14 +18,15 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
+#include_next <dl-machine.h>
+
 /* Contrary to most kernels which use ELFOSABI_SYSV aka ELFOSABI_NONE,
    FreeBSD uses ELFOSABI_FREEBSD for the OSABI field. */
 
-# define VALID_ELF_OSABI(osabi)		(osabi == ELFOSABI_FREEBSD)
-# define VALID_ELF_ABIVERSION(ver)	(ver == 0)
-# define VALID_ELF_HEADER(hdr,exp,size) \
+#undef VALID_ELF_OSABI
+#define VALID_ELF_OSABI(osabi)		(osabi == ELFOSABI_FREEBSD)
+#undef VALID_ELF_HEADER
+#define VALID_ELF_HEADER(hdr,exp,size) \
   memcmp (hdr,exp,size-2) == 0 \
   && VALID_ELF_OSABI (hdr[EI_OSABI]) \
   && VALID_ELF_ABIVERSION (hdr[EI_ABIVERSION])
-
-#include_next <dl-machine.h>
