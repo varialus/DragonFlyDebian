@@ -48,9 +48,18 @@
 #define	__ID_T_TYPE		__U32_TYPE
 #define __CLOCK_T_TYPE		__S32_TYPE
 
-/* Match the typedefs in sys/${arch}/include/_types.h */
-#if defined(__i386__) || defined(__powerpc__)
-#define __TIME_T_TYPE		__S32_TYPE
+/*
+ * This one is a bit tricky.  It needs to match the size
+ * in the sys/${arch}/include/_types.h typedefs.
+ *
+ * However, for i386 and amd64 we started with __SLONGWORD_TYPE
+ * and we need to maintain ABI.  Even if size is the same, using
+ * a different type may affect C++ ABI (this distinction is
+ * necessary to implement function overload), so it must stay
+ * with __SLONGWORD_TYPE.
+ */
+#if defined(__i386__) || defined(__amd64__) || defined(__powerpc__)
+#define __TIME_T_TYPE		__SLONGWORD_TYPE
 #else
 #define __TIME_T_TYPE		__S64_TYPE
 #endif
