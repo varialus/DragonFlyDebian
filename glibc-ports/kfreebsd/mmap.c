@@ -57,13 +57,13 @@ __mmap (void *addr, size_t len, int prot, int flags, int fd, __off_t offset)
     fd = -1;
 
   /* First try the new syscall. */
-  result = INLINE_SYSCALL (mmap, 6, addr, len, prot, flags, fd, offset);
+  result = (void *) INLINE_SYSCALL (mmap, 6, addr, len, prot, flags, fd, offset);
 
 #ifndef __ASSUME_MMAP_SYSCALL
   if (result == (void *) (-1) && errno == ENOSYS)
     {
-      /* New syscall not available, us the old one. */
-      result = INLINE_SYSCALL (freebsd6_mmap, 7, addr, len, prot, flags, fd, 0, offset);
+      /* New syscall not available, use the old one. */
+      result = (void *) INLINE_SYSCALL (freebsd6_mmap, 7, addr, len, prot, flags, fd, 0, offset);
       if (result != (void *) (-1) && fd >= 0 && len > 0)
 	{
 	  /* Force an update of the atime.  POSIX:2001 mandates that this happens
