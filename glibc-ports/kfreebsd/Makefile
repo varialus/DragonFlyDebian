@@ -64,7 +64,7 @@ sysdep_routines += acl_aclcheck_fd acl_aclcheck_file acl_delete_fd acl_delete_fi
 # For <sys/extattr.h>.
 sysdep_routines += extattrctl extattr_delete_file extattr_get_file extattr_set_file
 # For <sys/jail.h>.
-sysdep_routines += jail
+sysdep_routines += jail jail_attach jail_remove jail_get jail_set
 # For <sys/ktrace.h>.
 sysdep_routines += ktrace utrace
 # For <sys/linker.h>.
