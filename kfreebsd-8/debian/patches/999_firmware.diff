@@ -1,9 +1,10 @@
 
 See #594940  
 
---- a/sys/conf/files
-+++ b/sys/conf/files
-@@ -456,10 +456,6 @@
+diff -Nur a/sys/conf/files b/sys/conf/files
+--- a/sys/conf/files	2010-11-28 04:41:32.000000000 +0100
++++ b/sys/conf/files	2011-01-10 22:11:20.000000000 +0100
+@@ -462,10 +462,6 @@
  dev/advansys/advansys.c		optional adv
  dev/advansys/advlib.c		optional adv
  dev/advansys/advmcode.c		optional adv
@@ -14,7 +15,7 @@ See #594940
  dev/ae/if_ae.c			optional ae pci
  dev/age/if_age.c		optional age pci inet
  dev/agp/agp.c			optional agp pci
-@@ -752,7 +748,6 @@
+@@ -758,7 +754,6 @@
  dev/ath/ath_rate/sample/sample.c	optional ath_rate_sample \
  	compile-with "${NORMAL_C} -I$S/dev/ath"
  #
@@ -22,7 +23,7 @@ See #594940
  dev/bfe/if_bfe.c		optional bfe
  dev/bge/if_bge.c		optional bge
  dev/bktr/bktr_audio.c		optional bktr pci
-@@ -788,34 +783,6 @@
+@@ -794,34 +789,6 @@
  dev/cs/if_cs.c			optional cs
  dev/cs/if_cs_isa.c		optional cs isa
  dev/cs/if_cs_pccard.c		optional cs pccard
@@ -57,7 +58,7 @@ See #594940
  dev/cy/cy.c			optional cy
  dev/cy/cy_isa.c			optional cy isa
  dev/cy/cy_pci.c			optional cy pci
-@@ -826,13 +793,6 @@
+@@ -832,13 +799,6 @@
  dev/dcons/dcons_crom.c		optional dcons_crom
  dev/dcons/dcons_os.c		optional dcons
  dev/de/if_de.c			optional de pci
@@ -71,7 +72,7 @@ See #594940
  dev/digi/digi.c			optional digi
  dev/digi/digi_isa.c		optional digi isa
  dev/digi/digi_pci.c		optional digi pci
-@@ -865,26 +825,6 @@
+@@ -871,26 +831,6 @@
  dev/drm/mach64_drv.c		optional mach64drm
  dev/drm/mach64_irq.c		optional mach64drm
  dev/drm/mach64_state.c		optional mach64drm
@@ -98,7 +99,7 @@ See #594940
  dev/drm/savage_bci.c		optional savagedrm
  dev/drm/savage_drv.c		optional savagedrm
  dev/drm/savage_state.c		optional savagedrm
-@@ -962,7 +902,6 @@
+@@ -972,7 +912,6 @@
  dev/firewire/sbp.c		optional sbp
  dev/firewire/sbp_targ.c		optional sbp_targ
  dev/flash/at45d.c		optional at45d
@@ -106,7 +107,7 @@ See #594940
  dev/gem/if_gem.c		optional gem
  dev/gem/if_gem_pci.c		optional gem pci
  dev/gem/if_gem_sbus.c		optional gem sbus
-@@ -1011,48 +950,6 @@
+@@ -1022,48 +961,6 @@
  dev/ips/ips_ioctl.c		optional ips
  dev/ips/ips_pci.c		optional ips pci
  dev/ipw/if_ipw.c		optional ipw
@@ -155,7 +156,7 @@ See #594940
  dev/iscsi/initiator/iscsi.c	optional iscsi_initiator scbus
  dev/iscsi/initiator/iscsi_subr.c	optional iscsi_initiator scbus
  dev/iscsi/initiator/isc_cam.c	optional iscsi_initiator scbus
-@@ -1066,121 +962,7 @@
+@@ -1076,135 +973,7 @@
  dev/isp/isp_pci.c		optional isp pci
  dev/isp/isp_sbus.c		optional isp sbus
  dev/isp/isp_target.c		optional isp
@@ -271,13 +272,27 @@ See #594940
 -	clean		"iwn6000fw.fwo"
 -iwn6000.fw			optional iwn6000fw | iwnfw		\
 -	dependency	".PHONY"					\
--	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-6000-9.193.4.1.fw.uu" \
+-	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-6000-9.221.4.1.fw.uu" \
+-	no-obj no-implicit-rule						\
+-	clean		"iwn6000.fw"
+-iwn6050fw.c			optional iwn6050fw | iwnfw		\
+-	compile-with	"${AWK} -f $S/tools/fw_stub.awk iwn6050.fw:iwn6050fw -miwn6050fw -c${.TARGET}" \
+-	no-implicit-rule before-depend local				\
+-	clean		"iwn6050fw.c"
+-iwn6050fw.fwo			optional iwn6050fw | iwnfw		\
+-	dependency	"iwn6050.fw"					\
+-	compile-with	"${LD} -b binary -d -warn-common -r -d -o ${.TARGET} iwn6050.fw" \
+-	no-implicit-rule						\
+-	clean		"iwn6050fw.fwo"
+-iwn6050.fw			optional iwn6050fw | iwnfw		\
+-	dependency	".PHONY"					\
+-	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-6050-9.201.4.1.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"iwn6000.fw"
  dev/ixgb/if_ixgb.c		optional ixgb
  dev/ixgb/ixgb_ee.c		optional ixgb
  dev/ixgb/ixgb_hw.c		optional ixgb
-@@ -1282,30 +1063,6 @@
+@@ -1315,30 +1084,6 @@
  dev/mwl/if_mwl.c		optional mwl
  dev/mwl/if_mwl_pci.c		optional mwl pci
  dev/mwl/mwlhal.c		optional mwl
@@ -308,7 +323,7 @@ See #594940
  dev/mxge/if_mxge.c		optional mxge pci
  dev/mxge/mxge_lro.c		optional mxge pci
  dev/mxge/mxge_eth_z8e.c		optional mxge pci
-@@ -1396,62 +1150,6 @@
+@@ -1429,62 +1174,6 @@
  dev/ral/rt2560.c		optional ral
  dev/ral/rt2661.c		optional ral
  dev/ral/if_ral_pci.c		optional ral pci
@@ -371,7 +386,7 @@ See #594940
  dev/random/harvest.c		standard
  dev/random/hash.c		optional random
  dev/random/probe.c		optional random
-@@ -1479,14 +1174,7 @@
+@@ -1509,14 +1198,7 @@
  dev/scd/scd.c			optional scd isa
  dev/scd/scd_isa.c		optional scd isa
  dev/sdhci/sdhci.c		optional sdhci pci
@@ -386,7 +401,7 @@ See #594940
  dev/siba/siba_bwn.c		optional siba_bwn pci
  dev/siba/siba_core.c		optional siba_bwn pci
  dev/siis/siis.c			optional siis pci
-@@ -1497,9 +1185,6 @@
+@@ -1527,9 +1209,6 @@
  dev/smbus/smbus.c		optional smbus
  dev/smbus/smbus_if.m		optional smbus
  dev/smc/if_smc.c		optional smc
@@ -396,7 +411,7 @@ See #594940
  dev/snp/snp.c			optional snp
  dev/sound/clone.c		optional sound
  dev/sound/unit.c		optional sound
-@@ -1515,10 +1200,6 @@
+@@ -1545,10 +1224,6 @@
  dev/sound/pci/atiixp.c		optional snd_atiixp pci
  dev/sound/pci/cmi.c		optional snd_cmi pci
  dev/sound/pci/cs4281.c		optional snd_cs4281 pci
@@ -407,7 +422,7 @@ See #594940
  dev/sound/pci/emu10k1.c		optional snd_emu10k1 pci \
  	dependency "emu10k1-alsa%diked.h" \
  	warning "kernel contains GPL contaminated emu10k1 headers"
-@@ -1541,8 +1222,6 @@
+@@ -1571,8 +1246,6 @@
  dev/sound/pci/fm801.c		optional snd_fm801 pci
  dev/sound/pci/ich.c		optional snd_ich pci
  dev/sound/pci/maestro.c		optional snd_maestro pci
@@ -416,7 +431,7 @@ See #594940
  dev/sound/pci/neomagic.c	optional snd_neomagic pci
  dev/sound/pci/solo.c		optional snd_solo pci
  dev/sound/pci/spicds.c		optional snd_spicds pci
-@@ -1622,7 +1301,6 @@
+@@ -1652,7 +1325,6 @@
  dev/syscons/warp/warp_saver.c	optional warp_saver
  dev/tdfx/tdfx_linux.c		optional tdfx_linux tdfx compat_linux
  dev/tdfx/tdfx_pci.c		optional tdfx pci
@@ -424,7 +439,7 @@ See #594940
  dev/tl/if_tl.c			optional tl pci
  dev/trm/trm.c			optional trm
  dev/twa/tw_cl_init.c		optional twa \
-@@ -1640,7 +1317,6 @@
+@@ -1670,7 +1342,6 @@
  dev/twe/twe.c			optional twe
  dev/twe/twe_freebsd.c		optional twe
  dev/tx/if_tx.c			optional tx
@@ -432,15 +447,15 @@ See #594940
  dev/uart/uart_bus_acpi.c	optional uart acpi
  #dev/uart/uart_bus_cbus.c	optional uart cbus
  dev/uart/uart_bus_ebus.c	optional uart ebus
-@@ -1715,7 +1391,6 @@
- dev/usb/net/if_axe.c		optional axe
+@@ -1748,7 +1419,6 @@
  dev/usb/net/if_cdce.c		optional cdce
  dev/usb/net/if_cue.c		optional cue
+ dev/usb/net/if_ipheth.c		optional ipheth
 -dev/usb/net/if_kue.c		optional kue
  dev/usb/net/if_rue.c		optional rue
  dev/usb/net/if_udav.c		optional udav
  dev/usb/net/usb_ethernet.c	optional aue | axe | cdce | cue | kue | rue | \
-@@ -1724,13 +1399,10 @@
+@@ -1757,13 +1427,10 @@
  #
  # USB WLAN drivers
  #
@@ -454,9 +469,10 @@ See #594940
  #
  # USB serial and parallel port drivers
  #
---- a/sys/conf/files.i386
-+++ b/sys/conf/files.i386
-@@ -116,17 +116,9 @@
+diff -Nur a/sys/conf/files.i386 b/sys/conf/files.i386
+--- a/sys/conf/files.i386	2011-01-10 22:07:12.000000000 +0100
++++ b/sys/conf/files.i386	2011-01-10 22:07:58.000000000 +0100
+@@ -141,17 +141,9 @@
  dev/atkbdc/atkbdc_isa.c		optional atkbdc isa
  dev/atkbdc/atkbdc_subr.c	optional atkbdc
  dev/atkbdc/psm.c		optional psm atkbdc
@@ -474,17 +490,31 @@ See #594940
  dev/cx/csigma.c			optional cx
  dev/cx/cxddk.c			optional cx
  dev/cx/if_cx.c			optional cx
---- a/sys/modules/Makefile
-+++ b/sys/modules/Makefile
-@@ -34,7 +34,6 @@
+diff -Nur a/sys/modules/drm/Makefile b/sys/modules/drm/Makefile
+--- a/sys/modules/drm/Makefile	2005-12-03 02:23:50.000000000 +0100
++++ b/sys/modules/drm/Makefile	2011-01-10 22:07:58.000000000 +0100
+@@ -4,9 +4,6 @@
+ 	drm \
+ 	i915 \
+ 	mach64 \
+-	mga \
+-	r128 \
+-	radeon \
+ 	savage \
+ 	sis \
+ 	tdfx
+diff -Nur a/sys/modules/Makefile b/sys/modules/Makefile
+--- a/sys/modules/Makefile	2011-01-10 22:07:12.000000000 +0100
++++ b/sys/modules/Makefile	2011-01-10 22:09:34.000000000 +0100
+@@ -36,7 +36,6 @@
  	ata \
  	ath \
  	${_auxio} \
--	bce \
+-	${_bce} \
  	bfe \
  	bge \
  	${_bios} \
-@@ -50,7 +49,6 @@
+@@ -53,7 +52,6 @@
  	${_cbb} \
  	cd9660 \
  	cd9660_iconv \
@@ -492,7 +522,7 @@ See #594940
  	${_ciss} \
  	${_cm} \
  	${_cmx} \
-@@ -58,14 +56,11 @@
+@@ -61,14 +59,11 @@
  	coda5 \
  	${_coff} \
  	${_coretemp} \
@@ -503,11 +533,11 @@ See #594940
  	${_cryptodev} \
  	${_cs} \
 -	${_ctau} \
--	cxgb \
+-	${_cxgb} \
  	${_cyclic} \
  	dc \
  	dcons \
-@@ -86,13 +81,11 @@
+@@ -89,13 +84,11 @@
  	${_ex} \
  	${_exca} \
  	${_ext2fs} \
@@ -521,7 +551,7 @@ See #594940
  	gem \
  	geom \
  	${_glxsb} \
-@@ -131,14 +124,10 @@
+@@ -137,14 +130,10 @@
  	ip_mroute_mod \
  	${_ips} \
  	${_ipw} \
@@ -534,9 +564,9 @@ See #594940
  	${_iwn} \
 -	${_iwnfw} \
  	${_ixgb} \
+ 	${_ixgbe} \
  	jme \
- 	joy \
-@@ -230,14 +219,12 @@
+@@ -240,14 +229,12 @@
  	${_pst} \
  	puc \
  	ral \
@@ -551,14 +581,15 @@ See #594940
  	${_s3} \
  	${_safe} \
  	${_sbni} \
-@@ -246,14 +233,12 @@
+@@ -256,7 +243,6 @@
  	${_scsi_low} \
  	sdhci \
  	sem \
 -	sf \
  	sge \
- 	siba_bwn \
- 	siis \
+ 	${_siba_bwn} \
+ 	siftr \
+@@ -264,7 +250,6 @@
  	sis \
  	sk \
  	${_smbfs} \
@@ -566,22 +597,23 @@ See #594940
  	${_snc} \
  	snp \
  	${_sound} \
-@@ -268,14 +253,12 @@
- 	sym \
+@@ -279,7 +264,6 @@
+ 	${_sym} \
  	${_syscons} \
  	sysvipc \
 -	ti \
  	tl \
  	${_tmpfs} \
- 	trm \
+ 	${_tpm} \
+@@ -287,7 +271,6 @@
  	${_twa} \
  	twe \
  	tx \
 -	txp \
- 	uart \
+ 	${_uart} \
  	ubsec \
  	udf \
-@@ -301,7 +284,6 @@
+@@ -313,7 +296,6 @@
  	wlan_wep \
  	wlan_xauth \
  	${_wpi} \
@@ -589,7 +621,7 @@ See #594940
  	${_x86bios} \
  	${_xe} \
  	xfs \
-@@ -352,9 +334,7 @@
+@@ -379,9 +361,7 @@
  _bktr=		bktr
  _cardbus=	cardbus
  _cbb=		cbb
@@ -599,7 +631,7 @@ See #594940
  _cpuctl=	cpuctl
  _cpufreq=	cpufreq
  _cs=		cs
-@@ -443,18 +423,14 @@
+@@ -475,11 +455,8 @@
  _ipmi=		ipmi
  _ips=		ips
  _ipw=		ipw
@@ -609,16 +641,17 @@ See #594940
  _iwn=		iwn
 -_iwnfw=		iwnfw
  _ixgb=		ixgb
+ _ixgbe=		ixgbe
  _mly=		mly
- _nfe=		nfe
- _nvram=		nvram
+@@ -489,7 +466,6 @@
  _nxge=		nxge
+ _tpm=		tpm
  _wpi=		wpi
 -_wpifw=		wpifw
  .if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
- .if exists(${.CURDIR}/../crypto/via)
  _padlock=	padlock
-@@ -512,11 +488,8 @@
+ .endif
+@@ -550,11 +526,8 @@
  _ipmi=		ipmi
  _ips=		ips
  _ipw=		ipw
@@ -628,9 +661,9 @@ See #594940
  _iwn=		iwn
 -_iwnfw=		iwnfw
  _ixgb=		ixgb
+ _ixgbe=		ixgbe
  _lindev=	lindev
- _linprocfs=	linprocfs
-@@ -551,7 +524,6 @@
+@@ -590,7 +563,6 @@
  _x86bios=	x86bios
  _wi=		wi
  _wpi=		wpi
@@ -638,20 +671,9 @@ See #594940
  .if ${MK_ZFS} != "no" || defined(ALL_MODULES)
  _zfs=		zfs
  .endif
---- a/sys/modules/drm/Makefile
-+++ b/sys/modules/drm/Makefile
-@@ -4,9 +4,6 @@
- 	drm \
- 	i915 \
- 	mach64 \
--	mga \
--	r128 \
--	radeon \
- 	savage \
- 	sis \
- 	tdfx
---- a/sys/modules/sound/driver/Makefile
-+++ b/sys/modules/sound/driver/Makefile
+diff -Nur a/sys/modules/sound/driver/Makefile b/sys/modules/sound/driver/Makefile
+--- a/sys/modules/sound/driver/Makefile	2009-01-25 19:20:15.000000000 +0100
++++ b/sys/modules/sound/driver/Makefile	2011-01-10 22:07:58.000000000 +0100
 @@ -1,7 +1,7 @@
  # $FreeBSD$
  
@@ -662,19 +684,20 @@ See #594940
  SUBDIR+=	neomagic sb16 sb8 sbc solo spicds t4dwave via8233
  SUBDIR+=	via82c686 vibes driver uaudio
  
---- a/sys/modules/usb/Makefile
-+++ b/sys/modules/usb/Makefile
+diff -Nur a/sys/modules/usb/Makefile b/sys/modules/usb/Makefile
+--- a/sys/modules/usb/Makefile	2010-11-27 20:40:51.000000000 +0100
++++ b/sys/modules/usb/Makefile	2011-01-10 22:10:10.000000000 +0100
 @@ -27,11 +27,11 @@
  
  SUBDIR = usb
- SUBDIR += ehci musb ohci uhci uss820dci ${_at91dci} ${_atmegadci}
+ SUBDIR += ehci musb ohci uhci xhci uss820dci ${_at91dci} ${_atmegadci}
 -SUBDIR += rum run uath upgt ural zyd ${_urtw}
 +SUBDIR += run uath upgt ural ${_urtw}
  SUBDIR += atp uhid ukbd ums udbp ufm
  SUBDIR += ucom u3g uark ubsa ubser uchcom ucycom ufoma uftdi ugensa uipaq ulpt \
  	  umct umodem umoscom uplcom uslcom uvisor uvscom
--SUBDIR += uether aue axe cdce cue kue rue udav uhso
-+SUBDIR += uether aue axe cdce cue rue udav uhso
+-SUBDIR += uether aue axe cdce cue kue rue udav uhso ipheth
++SUBDIR += uether aue axe cdce cue rue udav uhso ipheth
  SUBDIR += usfs umass urio
  SUBDIR += quirk template
  
