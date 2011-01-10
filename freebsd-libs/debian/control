@@ -3,15 +3,19 @@ Section: libs
 Priority: optional
 Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>
-Build-Depends: debhelper (>= 7), quilt, freebsd-buildutils, libbsd-dev (>= 0.1.4),
- libc0.1-dev (>= 2.10), libgdbm-dev, kfreebsd-kernel-headers (>= 0.51), libexpat-dev
+Build-Depends: debhelper (>= 7), quilt, freebsd-buildutils,
+ libbsd-dev (>= 0.1.4) [kfreebsd-any],
+ libc0.1-dev (>= 2.10) [kfreebsd-any],
+ libgdbm-dev [kfreebsd-any],
+ kfreebsd-kernel-headers (>= 0.51) [kfreebsd-any],
+ libexpat-dev [kfreebsd-any]
 # libexpat-dev: aka bsdxml. needed by libgeom
 Vcs-Browser: http://svn.debian.org/wsvn/glibc-bsd/trunk/freebsd-libs/
 Vcs-Svn: svn://svn.debian.org/glibc-bsd/trunk/freebsd-libs/
 Standards-Version: 3.9.1
 
 Package: libsbuf0
-Architecture: kfreebsd-any
+Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: FreeBSD string buffer library
  This library provide a way to handle string buffers. It contains
@@ -32,8 +36,9 @@ Description: FreeBSD string buffer library (udeb)
 
 Package: libsbuf-dev
 Section: libdevel
-Architecture: kfreebsd-any
+Architecture: any
 Depends: libsbuf0 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-dev
+Replaces: kfreebsd-kernel-headers (<< 0.54)
 Description: Development files for libsbuf
  This package contains the header files and static library needed to
  compile applications that use libsbuf.

@@ -1,0 +1,44 @@
+--- a/lib/libsbuf/Makefile
++++ b/lib/libsbuf/Makefile
+@@ -4,6 +4,7 @@
+ SHLIBDIR?= /lib
+ SRCS=	subr_sbuf.c 
+ WARNS?= 2
++CFLAGS+= -I${.CURDIR}/../../sys
+ 
+ .PATH:	${.CURDIR}/../../sys/kern
+ 
+--- a/sys/kern/subr_sbuf.c
++++ b/sys/kern/subr_sbuf.c
+@@ -44,6 +44,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <sys/user.h> /* PAGE_SIZE */
+ #endif /* _KERNEL */
+ 
+ #include <sys/sbuf.h>
+--- a/sys/sys/sbuf.h
++++ b/sys/sys/sbuf.h
+@@ -31,8 +31,6 @@
+ #ifndef _SYS_SBUF_H_
+ #define	_SYS_SBUF_H_
+ 
+-#include <sys/_types.h>
+-
+ /*
+  * Structure definition
+  */
+@@ -64,10 +62,8 @@
+ int		 sbuf_bcpy(struct sbuf *, const void *, size_t);
+ int		 sbuf_cat(struct sbuf *, const char *);
+ int		 sbuf_cpy(struct sbuf *, const char *);
+-int		 sbuf_printf(struct sbuf *, const char *, ...)
+-	__printflike(2, 3);
+-int		 sbuf_vprintf(struct sbuf *, const char *, __va_list)
+-	__printflike(2, 0);
++int		 sbuf_printf(struct sbuf *, const char *, ...);
++int		 sbuf_vprintf(struct sbuf *, const char *, __va_list);
+ int		 sbuf_putc(struct sbuf *, int);
+ int		 sbuf_trim(struct sbuf *);
+ int		 sbuf_overflowed(struct sbuf *);

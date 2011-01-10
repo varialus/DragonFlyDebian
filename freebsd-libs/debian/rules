@@ -9,7 +9,7 @@ SHELL=bash
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
-CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)='
+CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -25,6 +25,7 @@ PATH:=/usr/lib/freebsd:$(PATH)
 DESTDIR=$(CURDIR)/debian/tmp
 PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
 export SHLIB_MAJOR=0
+kernel=$(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
@@ -37,6 +38,8 @@ get-orig-source:
 	svn cat $(SVN)/share/misc/usb_hid_usages > $(ORIGDIR)/lib/libusbhid/usb_hid_usages
 	mkdir -p $(ORIGDIR)/sys/kern && \
 	    svn cat $(SVN)/sys/kern/subr_sbuf.c > $(ORIGDIR)/sys/kern/subr_sbuf.c
+	mkdir -p $(ORIGDIR)/sys/sys && \
+	    svn cat $(SVN)/sys/sys/sbuf.h > $(ORIGDIR)/sys/sys/sbuf.h
 	# Remove unused files with non GPL compatible license (eg BSD 4 clauses)
 	rm -f $(ORIGDIR)/sys/cam/scsi/scsi_ch.*
 	rm -f $(ORIGDIR)/lib/libkvm/kvm_ia64.c
@@ -49,7 +52,11 @@ patch-stamp:
 	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
 	touch $@
 
+ifeq ($(kernel), kfreebsd)
 build: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-usb build-devstat build-memstat build-netgraph
+else
+build: build-sbuf
+endif
 
 build-cam: build-cam-stamp
 build-cam-stamp: patch build-sbuf
@@ -109,6 +116,8 @@ build-usb-stamp: patch
 clean:
 	dh_testdir
 	dh_testroot
+	$(PMAKE) -C $(CURDIR)/lib/libsbuf clean
+ifeq ($(kernel), kfreebsd)
 	$(PMAKE) -C $(CURDIR)/lib/libcam clean
 	$(PMAKE) -C $(CURDIR)/lib/libnetgraph clean
 	$(PMAKE) -C $(CURDIR)/lib/libdevstat clean
@@ -117,9 +126,9 @@ clean:
 	$(PMAKE) -C $(CURDIR)/lib/libipx clean
 	$(PMAKE) -C $(CURDIR)/lib/libkiconv clean
 	$(PMAKE) -C $(CURDIR)/lib/libkvm clean
-	$(PMAKE) -C $(CURDIR)/lib/libsbuf clean
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid clean
 	$(PMAKE) -C $(CURDIR)/lib/libusb clean
+endif
 	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
 	rm -rf .pc
 	rm -f *stamp
@@ -133,6 +142,7 @@ install: build
 
 	mkdir -p $(DESTDIR)/lib $(DESTDIR)/usr/lib $(DESTDIR)/usr/include $(DESTDIR)/usr/share/man/man3
 	$(PMAKE) -C $(CURDIR)/lib/libsbuf install SHLIBDIR=/usr/lib
+ifeq ($(kernel), kfreebsd)
 	$(PMAKE) -C $(CURDIR)/lib/libcam install SHLIBDIR=/usr/lib
 	$(PMAKE) -C $(CURDIR)/lib/libgeom install SHLIBDIR=/lib
 	$(PMAKE) -C $(CURDIR)/lib/libipx install SHLIBDIR=/usr/lib
@@ -148,6 +158,7 @@ install: build
 	install -m644 debian/libusb*.pc $(CURDIR)/debian/tmp/usr/lib/pkgconfig
 	mkdir -p $(CURDIR)/debian/tmp/usr/bin
 	install -m755 debian/libusb-config $(CURDIR)/debian/tmp/usr/bin
+endif
 
 	dh_install --list-missing
 
@@ -183,10 +194,12 @@ binary-arch: build install
 #	dh_perl
 #	dh_python
 	dh_makeshlibs -a
+ifeq ($(kernel), kfreebsd)
 	dh_makeshlibs -plibgeom0 --add-udeb=libgeom0-udeb
 	dh_makeshlibs -plibipx2 --add-udeb=libipx2-udeb
 	dh_makeshlibs -plibsbuf0 --add-udeb=libsbuf0-udeb
 	dh_makeshlibs -plibusb2 --add-udeb=libusb2-udeb
+endif
 	dh_installdeb -a
 	dh_shlibdeps -a
 	dh_gencontrol -a
