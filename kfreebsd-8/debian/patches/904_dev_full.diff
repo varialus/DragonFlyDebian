@@ -2,9 +2,10 @@
 Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
 	/dev/full already rejected in upstream (kern/68961)
 
---- a/sys/dev/null/null.c
-+++ b/sys/dev/null/null.c
-@@ -43,13 +43,16 @@
+diff -ur a/sys/dev/null/null.c b/sys/dev/null/null.c
+--- a/sys/dev/null/null.c	2010-08-06 11:47:48.000000000 +0200
++++ b/sys/dev/null/null.c	2010-11-09 00:41:11.000000000 +0100
+@@ -43,9 +43,11 @@
  
  /* For use with destroy_dev(9). */
  static struct cdev *null_dev;
@@ -16,12 +17,7 @@ Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
  static d_ioctl_t null_ioctl;
  static d_read_t zero_read;
  
- #define NULL_MINOR	2
-+#define FULL_MINOR	3
- #define ZERO_MINOR	12
- 
- static struct cdevsw null_cdevsw = {
-@@ -60,6 +63,14 @@
+@@ -57,6 +59,14 @@
  	.d_name =	"null",
  };
  
@@ -36,7 +32,7 @@ Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
  static struct cdevsw zero_cdevsw = {
  	.d_version =	D_VERSION,
  	.d_read =	zero_read,
-@@ -81,11 +92,25 @@
+@@ -78,11 +88,25 @@
  
  /* ARGSUSED */
  static int
@@ -62,14 +58,14 @@ Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
  	if (cmd != DIOCSKERNELDUMP)
  		return (ENOIOCTL);
  	error = priv_check(td, PRIV_SETDUMPER);
-@@ -117,12 +142,15 @@
+@@ -114,12 +138,15 @@
  		zbuf = (void *)malloc(PAGE_SIZE, M_TEMP, M_WAITOK | M_ZERO);
- 		null_dev = make_dev(&null_cdevsw, NULL_MINOR, UID_ROOT,
- 			GID_WHEEL, 0666, "null");
-+		full_dev = make_dev(&full_cdevsw, FULL_MINOR, UID_ROOT,
-+			GID_WHEEL, 0666, "full");
- 		zero_dev = make_dev(&zero_cdevsw, ZERO_MINOR, UID_ROOT,
- 			GID_WHEEL, 0666, "zero");
+ 		null_dev = make_dev_credf(MAKEDEV_ETERNAL_KLD, &null_cdevsw, 0,
+ 		    NULL, UID_ROOT, GID_WHEEL, 0666, "null");
++		null_dev = make_dev_credf(MAKEDEV_ETERNAL_KLD, &full_cdevsw, 0,
++		    NULL, UID_ROOT, GID_WHEEL, 0666, "full");
+ 		zero_dev = make_dev_credf(MAKEDEV_ETERNAL_KLD, &zero_cdevsw, 0,
+ 		    NULL, UID_ROOT, GID_WHEEL, 0666, "zero");
  		break;
  
  	case MOD_UNLOAD:
