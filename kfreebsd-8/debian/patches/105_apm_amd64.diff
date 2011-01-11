@@ -1,25 +1,16 @@
 --- a/sys/dev/acpica/acpi.c
 +++ b/sys/dev/acpica/acpi.c
-@@ -2308,9 +2308,8 @@
- int
+@@ -2315,9 +2315,7 @@
  acpi_ReqSleepState(struct acpi_softc *sc, int state)
  {
+ #if defined(__amd64__) || defined(__i386__)
 -#if defined(__i386__)
-+#if defined(__amd64__) || defined(__i386__)
      struct apm_clone_data *clone;
 -#endif
+     ACPI_STATUS status;
  
      if (state < ACPI_STATE_S1 || state > ACPI_S_STATES_MAX)
- 	return (EINVAL);
-@@ -2325,7 +2324,6 @@
- 	    return (ENXIO);
-     }
- 
--#if defined(__amd64__) || defined(__i386__)
-     /* If a suspend request is already in progress, just return. */
-     ACPI_LOCK(acpi);
-     if (sc->acpi_next_sstate != 0) {
-@@ -2335,7 +2333,6 @@
+@@ -2342,7 +2340,6 @@
  
      /* Record the pending state and notify all apm devices. */
      sc->acpi_next_sstate = state;
@@ -27,15 +18,15 @@
      STAILQ_FOREACH(clone, &sc->apm_cdevs, entries) {
  	clone->notify_status = APM_EV_NONE;
  	if ((clone->flags & ACPI_EVF_DEVD) == 0) {
-@@ -2343,7 +2340,6 @@
- 	    KNOTE_UNLOCKED(&clone->sel_read.si_note, 0);
+@@ -2350,7 +2347,6 @@
+ 	    KNOTE_LOCKED(&clone->sel_read.si_note, 0);
  	}
      }
 -#endif
  
      /* If devd(8) is not running, immediately enter the sleep state. */
      if (!devctl_process_running()) {
-@@ -2414,7 +2410,6 @@
+@@ -2418,7 +2414,6 @@
       * are writable since read-only devices couldn't ack the request.
       */
      sleeping = TRUE;
@@ -43,7 +34,7 @@
      clone->notify_status = APM_EV_ACKED;
      STAILQ_FOREACH(clone, &sc->apm_cdevs, entries) {
  	if ((clone->flags & ACPI_EVF_WRITE) != 0 &&
-@@ -2423,7 +2418,6 @@
+@@ -2427,7 +2422,6 @@
  	    break;
  	}
      }
@@ -74,7 +65,7 @@
  struct apm_event_info {
 --- a/sys/amd64/acpica/acpi_machdep.c
 +++ b/sys/amd64/acpica/acpi_machdep.c
-@@ -43,6 +43,24 @@
+@@ -44,6 +44,24 @@
  
  #include <machine/nexusvar.h>
  
@@ -99,14 +90,14 @@
  SYSCTL_DECL(_debug_acpi);
  
  int acpi_resume_beep;
-@@ -54,8 +72,433 @@
+@@ -55,7 +73,432 @@
  TUNABLE_INT("hw.acpi.reset_video", &acpi_reset_video);
  
  static int intr_model = ACPI_INTR_PIC;
 -static struct apm_clone_data acpi_clone;
 +static int apm_active;
 +static struct clonedevs *apm_clones;
- 
++
 +MALLOC_DEFINE(M_APMDEV, "apmdev", "APM device emulation");
 +
 +static d_open_t		apmopen;
@@ -530,11 +521,10 @@
 +	ACPI_UNLOCK(acpi);
 +	return (sleeping);
 +}
-+
+ 
  int
  acpi_machdep_init(device_t dev)
- {
-@@ -63,14 +506,11 @@
+@@ -64,14 +507,12 @@
  
  	sc = devclass_get_softc(devclass_find("acpi"), 0);
  
@@ -550,10 +540,11 @@
 +	sc->acpi_clone = apm_create_clone(sc->acpi_dev_t, sc);
 +	clone_setup(&apm_clones);
 +	EVENTHANDLER_REGISTER(dev_clone, apm_clone, 0, 1000);
- 	acpi_install_wakeup_handler(sc);
++	acpi_install_wakeup_handler(sc);
  
  	if (intr_model != ACPI_INTR_PIC)
---- a/sys/amd64/include/apm_bios.h
+ 		acpi_SetIntrModel(intr_model);
+--- /dev/null
 +++ b/sys/amd64/include/apm_bios.h
 @@ -0,0 +1,264 @@
 +/*-
@@ -820,4 +811,3 @@
 +#endif /* !ASSEMBLER && !INITIALIZER */
 +
 +#endif /* !_MACHINE_APM_BIOS_H_ */
-

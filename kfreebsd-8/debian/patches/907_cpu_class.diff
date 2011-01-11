@@ -8,10 +8,10 @@ Status: Rejected in upstream (kern/77355).
  	case CPUCLASS_486:
  		printf("486");
 +		machine[1] = '4';
- 		bzero_vector = i486_bzero;
  		break;
  #endif
-@@ -644,6 +645,7 @@
+ #if defined(I586_CPU)
+@@ -643,6 +644,7 @@
  		       (intmax_t)(tsc_freq + 4999) / 1000000,
  		       (u_int)((tsc_freq + 4999) / 10000) % 100);
  		printf("586");
@@ -19,7 +19,7 @@ Status: Rejected in upstream (kern/77355).
  		break;
  #endif
  #if defined(I686_CPU)
-@@ -653,6 +655,7 @@
+@@ -652,6 +654,7 @@
  		       (intmax_t)(tsc_freq + 4999) / 1000000,
  		       (u_int)((tsc_freq + 4999) / 10000) % 100);
  		printf("686");
@@ -27,3 +27,14 @@ Status: Rejected in upstream (kern/77355).
  		break;
  #endif
  	default:
+--- a/sys/amd64/amd64/identcpu.c
++++ b/sys/amd64/amd64/identcpu.c
+@@ -85,7 +85,7 @@
+ sysctl_hw_machine(SYSCTL_HANDLER_ARGS)
+ {
+ #ifdef SCTL_MASK32
+-	static const char machine32[] = "i386";
++	static const char machine32[] = "i686";
+ #endif
+ 	int error;
+ 
