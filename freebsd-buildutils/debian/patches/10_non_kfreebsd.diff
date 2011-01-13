@@ -1,0 +1,15 @@
+--- a/src/usr.bin/make/main.c
++++ b/src/usr.bin/make/main.c
+@@ -943,11 +943,7 @@
+ 	 * run-time.
+ 	 */
+ 	if (machine == NULL) {
+-		static struct utsname utsname;
+-
+-		if (uname(&utsname) == -1)
+-			err(2, "uname");
+-		machine = utsname.machine;
++		machine = MACHINE_ARCH;
+ 	}
+ 
+ 	if ((machine_arch = getenv("MACHINE_ARCH")) == NULL) {
