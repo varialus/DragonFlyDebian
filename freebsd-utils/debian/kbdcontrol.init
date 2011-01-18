@@ -22,7 +22,87 @@
 set -e
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-which kbdcontrol >/dev/null
+which kbdcontrol >/dev/null || exit 0
+
+# in general, keymap layout can be
+# native:  the plain FreeBSD/cons25 layout
+# debian:  the Debian Policy 9.8 (Keyboard configuration) conforming, aka cons25-debian
+# auto:    scan /etc/inittab and guess the right one
+FLAVOUR=auto
+
+# for auto do the guess
+if [ $FLAVOUR = auto ]
+then
+  if grep -v "#" /etc/inittab | grep -q -e "respawn:/sbin/getty.*cons25-debian"
+  then
+    FLAVOUR=debian
+  fi
+fi
+
+
+alter_to_debian_keymap () {
+	# change keymap layout to Debian Policy 9.8 (Keyboard configuration) conforming
+
+	# 014   del    del    bs     bs     del    del    bs     bs      O
+	# 142   del    del    bs     bs     del    del    bs     bs      O
+
+	# 103   fkey61 fkey61 fkey61 fkey61 fkey61 fkey61 boot   fkey61  O
+	# 231   fkey61 fkey61 fkey61 fkey61 fkey61 fkey61 boot   fkey61  O
+
+	# in following part change only first one, do not change the rest (decimal separator)
+
+	# 083   fkey61 '.'    '.'    '.'    '.'    '.'    boot   boot    N
+	# 211   fkey61 '.'    '.'    '.'    '.'    '.'    boot   boot    N
+
+	echo -n "Altering to policy conforming cons25-debian layout..."
+	TMPFILE=`mktemp -t keymap.XXXXXXXXXX` || exit 1
+
+	kbdcontrol -d | sed \
+	  -e "s/^  083   del   /  083   fkey61/" \
+	  -e "s/^  211   del   /  211   fkey61/" \
+	  -e "s/^  083   bs    /  083   fkey61/" \
+	  -e "s/^  211   bs    /  211   fkey61/" \
+	  -e "s/^  014   .*/  014   del    del    bs     bs     del    del    bs     bs      O/" \
+	  -e "s/^  142   .*/  142   del    del    bs     bs     del    del    bs     bs      O/" \
+	  -e "s/^  103   .*/  103   fkey61 fkey61 fkey61 fkey61 fkey61 fkey61 boot   fkey61  O/" \
+	  -e "s/^  231   .*/  231   fkey61 fkey61 fkey61 fkey61 fkey61 fkey61 boot   fkey61  O/" \
+	  > $TMPFILE
+
+	kbdcontrol -l $TMPFILE  
+	rm -f $TMPFILE
+  
+	# and generate  ESC [ 3 ~ for fkey61  
+	SEQ=`/bin/echo -n -e \\\033[3~`
+	#echo $SEQ | od -ax
+	kbdcontrol -f 61 $SEQ
+	echo "done."
+}
+
+
+alter_to_native_keymap () {
+	# change keymap layout to usual cons25
+
+	# 014   bs     bs     del    del    bs     bs     del    del     O
+	# 142   bs     bs     del    del    bs     bs     del    del     O
+
+	echo -n "Altering to native cons25 layout..."
+	TMPFILE=`mktemp -t keymap.XXXXXXXXXX` || exit 1
+
+	kbdcontrol -d | sed \
+	  -e "s/^  014   .*/  014   bs     bs     del    del    bs     bs     del    del     O/" \
+	  -e "s/^  142   .*/  142   bs     bs     del    del    bs     bs     del    del     O/" \
+	  > $TMPFILE
+
+	kbdcontrol -l $TMPFILE  
+	rm -f $TMPFILE
+  
+	# and generate del for fkey61  
+	SEQ=`/bin/echo -n -e \\\\177`
+	#echo $SEQ | od -ax
+	kbdcontrol -f 61 $SEQ
+	echo "done."
+}
+
 
 do_start() {
 	if test -e /etc/kbdcontrol.conf ; then
@@ -32,9 +112,14 @@ do_start() {
 	fi
 }
 
+
 case "$1" in
   start|"")
 	do_start
+	if [ $FLAVOUR = debian ]
+	then
+		alter_to_debian_keymap < /dev/console
+	fi
 	;;
   restart|reload|force-reload)
 	echo "Error: argument '$1' not supported" >&2
@@ -43,8 +128,14 @@ case "$1" in
   stop)
 	# No-op
 	;;
+  keymap-native)
+	alter_to_native_keymap < /dev/console
+	;;
+  keymap-debian)
+	alter_to_debian_keymap < /dev/console
+	;;
   *)
-	echo "Usage: $0 [start|stop]" >&2
+	echo "Usage: $0 [start|stop|keymap-native|keymap-debian]" >&2
 	exit 3
 	;;
 esac
