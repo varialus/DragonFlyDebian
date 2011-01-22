@@ -3,22 +3,16 @@ Author: rmh
 Status: gotta uncomment WARNS (see #351366), and find a portable way to add
   "-lbsd".  after this it can be sent upstream.
 
---- a/usr.sbin/config/Makefile
-+++ b/usr.sbin/config/Makefile
-@@ -9,11 +9,11 @@
- kernconf.c: kernconf.tmpl
- 	file2c 'char kernconfstr[] = {' ',0};' < ${.CURDIR}/kernconf.tmpl > kernconf.c
- 
--WARNS?=	6
--CFLAGS+= -I. -I${.CURDIR}
-+#WARNS?=	6
-+CFLAGS+= -I. -I${.CURDIR} -D_GNU_SOURCE
- 
- DPADD=	${LIBL} ${LIBSBUF}
--LDADD=	-ll -lsbuf
-+LDADD=	-ll -lsbuf -lbsd
- 
- CLEANFILES+=	kernconf.c
+--- a/usr.sbin/config/config.h
++++ b/usr.sbin/config/config.h
+@@ -34,7 +34,7 @@
+  * Config.
+  */
+ #include <sys/types.h>
+-#include <sys/queue.h>
++#include <bsd/sys/queue.h>
+ #include <stdlib.h>
+ #include <string.h>
  
 --- a/usr.sbin/config/main.c
 +++ b/usr.sbin/config/main.c
@@ -41,7 +35,7 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
  
  #include <assert.h>
  #include <ctype.h>
-@@ -605,7 +610,11 @@
+@@ -607,7 +612,11 @@
  	if ((dirp = opendir(p)) == NULL)
  		err(EX_OSERR, "opendir %s", p);
  	while ((dp = readdir(dirp)) != NULL) {
@@ -53,3 +47,20 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
  		/* Skip non-headers */
  		if (dp->d_name[i] != '.' || dp->d_name[i + 1] != 'h')
  			continue;
+--- a/usr.sbin/config/Makefile
++++ b/usr.sbin/config/Makefile
+@@ -9,11 +9,11 @@
+ kernconf.c: kernconf.tmpl
+ 	file2c 'char kernconfstr[] = {' ',0};' < ${.CURDIR}/kernconf.tmpl > kernconf.c
+ 
+-WARNS?=	6
+-CFLAGS+= -I. -I${.CURDIR}
++#WARNS?=	6
++CFLAGS+= -I. -I${.CURDIR} -D_GNU_SOURCE
+ 
+ DPADD=	${LIBL} ${LIBSBUF}
+-LDADD=	-ll -lsbuf
++LDADD=	-ll -lsbuf -lbsd
+ 
+ CLEANFILES+=	kernconf.c
+ 

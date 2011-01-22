@@ -12,12 +12,12 @@ tar_version	:= $(shell echo $(full_version) | sed -e 's/-.*//g')
 version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
-os		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 cpu		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 config_files	:= $(wildcard debian/arch/$(cpu)/*.config)
 flavours	:= $(config_files:debian/arch/$(cpu)/%.config=%)
 configfile	:= DEBCUSTOM
 abiname		:= 0
+ld_target	:= $(shell ld --help | sed -ne "s/^ld: supported targets: \([^ ]*\) .*/\1/p")
 
 #SVN		:= http://svn.freebsd.org/base/release/$(version).0
 SVN		:= http://svn.freebsd.org/base/releng/$(version)
@@ -76,11 +76,14 @@ src-stamp:
 	mkdir $(CURDIR)/src
 	cp -af $(CURDIR)/sys $(CURDIR)/usr.sbin $(CURDIR)/src
 
-	set -e ; find src -type f | (while read i ; do \
+	set -e ; find src/sys -type f | (while read i ; do \
 		sed -i $$i \
-		-e 's/defined\( \|\t\)*(\( \|\t\)*__FreeBSD__\( \|\t\)*)/defined(__FreeBSD_kernel__)/g' \
-		-e 's/#\( \|\t\)*ifdef\( \|\t\)*__FreeBSD__/#ifdef __FreeBSD_kernel__/g' \
-		-e 's/#\( \|\t\)*ifndef\( \|\t\)*__FreeBSD__/#ifndef __FreeBSD_kernel__/g' \
+		-e 's/defined\( \|\t\)*(\( \|\t\)*__FreeBSD__\( \|\t\)*)/1/g' \
+		-e 's/#\( \|\t\)*ifdef\( \|\t\)*__FreeBSD__/#if 1/g' \
+		-e 's/#\( \|\t\)*ifndef\( \|\t\)*__FreeBSD__/#if 0/g' \
+		-e 's/defined\( \|\t\)*(\( \|\t\)*\(__linux__\|linux\)\( \|\t\)*)/0/g' \
+		-e 's/#\( \|\t\)*ifdef\( \|\t\)*\(__linux__\|linux\)/#if 0/g' \
+		-e 's/#\( \|\t\)*ifndef\( \|\t\)*\(__linux__\|linux\)/#if 1/g' \
 		-e 's/__FreeBSD__/$(major)/g' \
 		-e 's,#\( \|\t\)*include\( \|\t\)*<sys/device.h>,,g' \
 		-e 's,#\( \|\t\)*include\( \|\t\)*<dev/rndvar.h>,,g' \
@@ -102,11 +105,7 @@ build-indep-stamp: src
 
 	touch build-indep-stamp
 
-ifeq ($(os), kfreebsd)
 build: build-arch build-indep
-else
-build: build-indep
-endif
 
 install-indep: install-indep-stamp
 install-indep-stamp: build-indep
@@ -121,14 +120,18 @@ install-indep-stamp: build-indep
 
 	touch install-indep-stamp
 
-config: src
+config: config-stamp
+config-stamp: src
+	rm -rf config
 	cp -af src/usr.sbin/config config
-	$(MAKE) -C config
+	CFLAGS="-D__va_list=__builtin_va_list" $(MAKE) -C config
+	touch $@
 
 build-arch: $(foreach flavor,$(flavours),build-flavor-$(flavor)-stamp)
-build-flavor-%-stamp: src config
+src-flavor-%-stamp: src config
 	cp -af src $(FLAVOR_DIR)-$*
-
+	touch $@
+build-flavor-%-stamp: src-flavor-%-stamp
 	# Add the abiname and the flavor to the kernel version
 	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)-$*"/g' $(FLAVOR_DIR)-$*/sys/conf/newvers.sh
 
@@ -138,6 +141,14 @@ build-flavor-%-stamp: src config
 	# Set /lib/modules/${RELEASE} as module dir
 	sed -i -e 's,^KODIR?=.*,KODIR="/lib/modules/$(version)-$(abiname)-$*",g' $(FLAVOR_DIR)-$*/sys/conf/kern.pre.mk
 	sed -i -e '/^static char linker_path/s,".*","/lib/modules/$(version)-$(abiname)-$*",g' $(FLAVOR_DIR)-$*/sys/kern/kern_linker.c 
+
+	# Always set explicit link target to match with ld's implicit target (needed
+	# to build on non-kFreeBSD)
+ifeq ($(cpu), amd64)
+	sed -i -e 's/elf64-x86-64-freebsd/$(ld_target)/g' $(FLAVOR_DIR)-$*/sys/conf/ldscript.amd64
+else ifeq ($(cpu), i386)
+	sed -i -e 's/elf32-i386-freebsd/$(ld_target)/g' $(FLAVOR_DIR)-$*/sys/conf/ldscript.i386
+endif
 
 	# Configure the kernel
 	cp debian/arch/$(cpu)/$*.config $(FLAVOR_DIR)-$*/sys/$(cpu)/conf/
@@ -255,7 +266,6 @@ binary-indep: build-indep install-indep
 	dh_builddeb -i
 
 # Build architecture-dependent files here.
-ifeq ($(os), kfreebsd)
 binary-arch: build-arch install-arch
 	dh_testdir
 	dh_testroot
@@ -271,10 +281,6 @@ binary-arch: build-arch install-arch
 	dh_gencontrol -s
 	dh_md5sums -s
 	dh_builddeb -s
-else
-binary-arch:
-	# We have nothing to do
-endif
 
 binary: binary-indep binary-arch
 
