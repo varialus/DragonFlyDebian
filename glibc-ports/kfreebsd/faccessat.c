@@ -169,4 +169,3 @@ faccessat (fd, file, mode, flag)
   __set_errno (EACCES);
   return -1;
 }
-stub_warning(faccessat)

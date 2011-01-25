@@ -135,4 +135,3 @@ fchownat (fd, file, owner, group, flag)
     return __chown(file, owner, group);
 #endif
 }
-stub_warning(fchownat)
