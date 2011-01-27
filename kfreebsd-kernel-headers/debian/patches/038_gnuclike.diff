@@ -672,3 +672,61 @@
  #define __MAKE_SET(set, sym)						\
  	static void const * const __set_##set##_sym_##sym 		\
  	__section("set_" #set) __used = &sym
+--- a/sys/mips/include/bus.h
++++ b/sys/mips/include/bus.h
+@@ -820,7 +820,7 @@
+ 		  bus_size_t offset __unused, bus_size_t len __unused, int flags)
+ {
+ #if 0
+-#ifdef __GNUCLIKE_ASM
++#ifdef __GNUC__
+ 	if (flags & BUS_SPACE_BARRIER_READ)
+ 		__asm __volatile("lock; addl $0,0(%%rsp)" : : : "memory");
+ 	else
+--- a/sys/mips/include/bus_octeon.h
++++ b/sys/mips/include/bus_octeon.h
+@@ -793,7 +793,7 @@
+ 		  bus_size_t offset __unused, bus_size_t len __unused, int flags)
+ {
+ #if 0
+-#ifdef __GNUCLIKE_ASM
++#ifdef __GNUC__
+ 	if (flags & BUS_SPACE_BARRIER_READ)
+ 		__asm __volatile("lock; addl $0,0(%%rsp)" : : : "memory");
+ 	else
+--- a/sys/mips/include/endian.h
++++ b/sys/mips/include/endian.h
+@@ -68,7 +68,7 @@
+ #endif
+ 
+ #ifndef __ASSEMBLER__
+-#if defined(__GNUCLIKE_BUILTIN_CONSTANT_P) && defined(__OPTIMIZE__)
++#if defined(__GNUC__) && defined(__OPTIMIZE__)
+ #define	__is_constant(x)	__builtin_constant_p(x)
+ #else
+ #define	__is_constant(x)	0
+--- a/sys/mips/include/_types.h
++++ b/sys/mips/include/_types.h
+@@ -63,7 +63,7 @@
+ typedef	long long		__int64_t;
+ /* LONGLONG */
+ typedef	unsigned long long	__uint64_t;
+-#elif defined(__GNUCLIKE_ATTRIBUTE_MODE_DI)
++#elif defined(__GNUC__)
+ typedef	int __attribute__((__mode__(__DI__)))		__int64_t;
+ typedef	unsigned int __attribute__((__mode__(__DI__)))	__uint64_t;
+ #else
+@@ -151,11 +151,11 @@
+ /*
+  * Unusual type definitions.
+  */
+-#ifdef __GNUCLIKE_BUILTIN_VARARGS
++#ifdef __GNUC__
+ typedef __builtin_va_list	__va_list;	/* internally known to gcc */
+ #else
+ typedef	char *			__va_list;
+-#endif /* __GNUCLIKE_BUILTIN_VARARGS */
++#endif /* __GNUC__ */
+ #if defined(__GNUC_VA_LIST_COMPATIBILITY) && !defined(__GNUC_VA_LIST) \
+     && !defined(__NO_GNUC_VA_LIST)
+ #define	__GNUC_VA_LIST
