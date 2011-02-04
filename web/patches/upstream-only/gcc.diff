@@ -1,22 +1,116 @@
 
 Author: rmh
-Status: untested, unsent
+Description: GCC port for AMD64 and MIPS.
+Status: Sent upstream, but with bad timing in their release cycle. Will try
+	again after GCC 4.6 release.
 
-diff -ur gcc.old/config/i386/kfreebsd-gnu.h gcc/config/i386/kfreebsd-gnu.h
---- gcc.old/config/i386/kfreebsd-gnu.h	2006-03-02 21:22:05.000000000 +0100
-+++ gcc/config/i386/kfreebsd-gnu.h	2006-03-03 00:08:05.000000000 +0100
-@@ -1,5 +1,5 @@
--/* Definitions for Intel 386 running kFreeBSD-based GNU systems with ELF format
--   Copyright (C) 2004
-+/* Definitions for Intel 386 (and AMD x86-64) running kFreeBSD-based GNU systems with ELF format
-+   Copyright (C) 2004, 2006
-    Free Software Foundation, Inc.
-    Contributed by Robert Millan.
+Index: libgcc/config.host
+===================================================================
+--- libgcc/config.host	(revision 169473)
++++ libgcc/config.host	(working copy)
+@@ -393,9 +393,9 @@
+ 	;;
+ mips*-*-netbsd*)			# NetBSD/mips, either endian.
+ 	;;
+-mips64*-*-linux*)
++mips64*-*-linux* | mips64*-*-kfreebsd*-gnu)
+ 	;;
+-mips*-*-linux*)				# Linux MIPS, either endian.
++mips*-*-linux* | mips*-*-kfreebsd*-gnu)				# Linux MIPS, either endian.
+ 	;;
+ mips*-*-openbsd*)
+ 	;;
+Index: gcc/config.gcc
+===================================================================
+--- gcc/config.gcc	(revision 169473)
++++ gcc/config.gcc	(working copy)
+@@ -1122,7 +1122,7 @@
+ 	tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h svr4.h linux.h \
+ 		 i386/x86-64.h i386/linux64.h"
+ 	case ${target} in
+-	x86_64-*-kfreebsd*-gnu) tm_file="${tm_file} kfreebsd-gnu.h" ;;
++	x86_64-*-kfreebsd*-gnu) tm_file="${tm_file} kfreebsd-gnu.h i386/kfreebsd-gnu.h" ;;
+ 	x86_64-*-knetbsd*-gnu) tm_file="${tm_file} knetbsd-gnu.h" ;;
+ 	esac
+ 	tmake_file="${tmake_file} i386/t-linux64 i386/t-crtstuff i386/t-crtpc i386/t-crtfm t-dfprules"
+@@ -1568,20 +1568,25 @@
+ 	target_cpu_default="MASK_ABICALLS"
+ 	tm_file="elfos.h ${tm_file} mips/elf.h netbsd.h netbsd-elf.h mips/netbsd.h"
+ 	;;
+-mips64*-*-linux* | mipsisa64*-*-linux*)
++mips64*-*-linux* | mipsisa64*-*-linux* | mips64*-*-kfreebsd*-gnu | mipsisa64*-*-kfreebsd*-gnu)
+ 	tm_file="dbxelf.h elfos.h svr4.h linux.h ${tm_file} mips/linux.h mips/linux64.h"
+ 	tmake_file="${tmake_file} mips/t-linux64 mips/t-libgcc-mips16"
+ 	tm_defines="${tm_defines} MIPS_ABI_DEFAULT=ABI_N32"
++	case ${target_os} in
++		kfreebsd*-gnu)  
++			tm_file="${tm_file} kfreebsd-gnu.h mips/kfreebsd-gnu.h" 
++			;;
++	esac
+ 	case ${target} in
+-		mips64el-st-linux-gnu)
++		mips64el-st-*)
+ 			tm_file="${tm_file} mips/st.h"
+ 			tmake_file="${tmake_file} mips/t-st"
+ 			;;
+-		mips64octeon*-*-linux*)
++		mips64octeon*-*-*)
+ 			tm_defines="${tm_defines} MIPS_CPU_STRING_DEFAULT=\\\"octeon\\\""
+ 			target_cpu_default=MASK_SOFT_FLOAT_ABI
+ 			;;
+-		mipsisa64r2*-*-linux*)
++		mipsisa64r2*-*-*)
+ 			tm_defines="${tm_defines} MIPS_ISA_DEFAULT=65"
+ 			;;
+ 	esac
+@@ -1589,9 +1594,14 @@
+ 	gas=yes
+ 	test x$with_llsc != x || with_llsc=yes
+ 	;;
+-mips*-*-linux*)				# Linux MIPS, either endian.
++mips*-*-linux* | mips*-*-kfreebsd*-gnu)				# Linux MIPS, either endian.
+         tm_file="dbxelf.h elfos.h svr4.h linux.h ${tm_file} mips/linux.h"
+ 	tmake_file="${tmake_file} mips/t-libgcc-mips16"
++	case ${target_os} in
++		kfreebsd*-gnu)  
++			tm_file="${tm_file} kfreebsd-gnu.h mips/kfreebsd-gnu.h" 
++			;;
++	esac
+ 	case ${target} in
+         mipsisa32r2*)
+ 		tm_defines="${tm_defines} MIPS_ISA_DEFAULT=33"
+Index: gcc/config/i386/linux.h
+===================================================================
+--- gcc/config/i386/linux.h	(revision 169473)
++++ gcc/config/i386/linux.h	(working copy)
+@@ -99,7 +99,7 @@
+ /* If ELF is the default format, we should not use /lib/elf.  */
  
-@@ -20,7 +20,28 @@
- the Free Software Foundation, 51 Franklin Street, Fifth Floor,
- Boston, MA 02110-1301, USA.  */
+ /* These macros may be overridden in k*bsd-gnu.h and i386/k*bsd-gnu.h. */
+-#define LINK_EMULATION "elf_i386"
++#define LINK_EMULATION(em)	em
+ #define GLIBC_DYNAMIC_LINKER "/lib/ld-linux.so.2"
  
+ #undef  ASM_SPEC
+@@ -109,7 +109,7 @@
+ 
+ #undef  SUBTARGET_EXTRA_SPECS
+ #define SUBTARGET_EXTRA_SPECS \
+-  { "link_emulation", LINK_EMULATION },\
++  { "link_emulation", LINK_EMULATION("elf_i386") },\
+   { "dynamic_linker", LINUX_DYNAMIC_LINKER }
+ 
+ #undef	LINK_SPEC
+Index: gcc/config/i386/kfreebsd-gnu.h
+===================================================================
+--- gcc/config/i386/kfreebsd-gnu.h	(revision 169473)
++++ gcc/config/i386/kfreebsd-gnu.h	(working copy)
+@@ -19,7 +19,15 @@
+ along with GCC; see the file COPYING3.  If not see
+ <http://www.gnu.org/licenses/>.  */
+ 
+-#undef LINK_EMULATION
+-#define LINK_EMULATION "elf_i386_fbsd"
 +#ifdef GLIBC_DYNAMIC_LINKER32
 +#undef GLIBC_DYNAMIC_LINKER32
 +#define GLIBC_DYNAMIC_LINKER32 "/lib/ld.so.1"
@@ -27,78 +121,62 @@ diff -ur gcc.old/config/i386/kfreebsd-gnu.h gcc/config/i386/kfreebsd-gnu.h
 +#define GLIBC_DYNAMIC_LINKER64 "/lib/ld-kfreebsd-x86-64.so.1"
 +#endif
 +
- #undef LINK_EMULATION
- #define LINK_EMULATION "elf_i386_fbsd"
-+
-+#ifdef LINK_EMULATION32
-+#undef LINK_EMULATION32
-+#define LINK_EMULATION32 LINK_EMULATION
-+#endif
-+
-+#ifdef LINK_EMULATION64
-+#undef LINK_EMULATION64
-+#define LINK_EMULATION64 "elf_x86_64_fbsd"
-+#endif
-+
  #undef REG_NAME
  #define REG_NAME(reg) sc_ ## reg
-diff -ur gcc.old/config/i386/knetbsd-gnu.h gcc/config/i386/knetbsd-gnu.h
---- gcc.old/config/i386/knetbsd-gnu.h	2006-03-02 21:22:05.000000000 +0100
-+++ gcc/config/i386/knetbsd-gnu.h	2006-03-03 00:08:52.000000000 +0100
-@@ -1,5 +1,5 @@
--/* Definitions for Intel 386 running kNetBSD-based GNU systems with ELF format
--   Copyright (C) 2004
-+/* Definitions for Intel 386 (and AMD x86-64) running kNetBSD-based GNU systems with ELF format
-+   Copyright (C) 2004, 2006
-    Free Software Foundation, Inc.
-    Contributed by Robert Millan.
- 
-@@ -20,5 +20,15 @@
- the Free Software Foundation, 51 Franklin Street, Fifth Floor,
- Boston, MA 02110-1301, USA.  */
- 
-+#ifdef GLIBC_DYNAMIC_LINKER32
-+#undef GLIBC_DYNAMIC_LINKER32
-+#define GLIBC_DYNAMIC_LINKER32 "/lib/ld.so.1"
-+#endif
-+
-+#ifdef GLIBC_DYNAMIC_LINKER64
-+#undef GLIBC_DYNAMIC_LINKER64
-+#define GLIBC_DYNAMIC_LINKER64 "/lib/ld-knetbsd-x86-64.so.1"
-+#endif
-+
- #undef REG_NAME
- #define REG_NAME(reg) sc_ ## reg
-diff -ur gcc.old/config/i386/linux64.h gcc/config/i386/linux64.h
---- gcc.old/config/i386/linux64.h	2006-03-02 21:22:05.000000000 +0100
-+++ gcc/config/i386/linux64.h	2006-03-03 00:03:42.000000000 +0100
-@@ -49,11 +49,14 @@
-    When the -shared link option is used a final link is not being
-    done.  */
- 
-+/* These macros may be overridden in k*bsd-gnu.h and i386/k*bsd-gnu.h. */
- #define GLIBC_DYNAMIC_LINKER32 "/lib/ld-linux.so.2"
- #define GLIBC_DYNAMIC_LINKER64 "/lib64/ld-linux-x86-64.so.2"
-+#define LINK_EMULATION32	"elf_i386"
-+#define LINK_EMULATION64	"elf_x86_64"
+Index: gcc/config/i386/linux64.h
+===================================================================
+--- gcc/config/i386/linux64.h	(revision 169473)
++++ gcc/config/i386/linux64.h	(working copy)
+@@ -75,7 +75,8 @@
+ #endif
  
  #undef	LINK_SPEC
--#define LINK_SPEC "%{!m32:-m elf_x86_64} %{m32:-m elf_i386} \
-+#define LINK_SPEC "%{!m32:-m " LINK_EMULATION64 "} %{m32:-m " LINK_EMULATION32 "} \
+-#define LINK_SPEC "%{" SPEC_64 ":-m elf_x86_64} %{" SPEC_32 ":-m elf_i386} \
++#define LINK_SPEC "%{" SPEC_64 ":-m " LINK_EMULATION("elf_x86_64") "} \
++  %{" SPEC_32 ":-m " LINK_EMULATION("elf_i386") "} \
    %{shared:-shared} \
    %{!shared: \
      %{!static: \
-diff -ur gcc.old/config.gcc gcc/config.gcc
---- gcc.old/config.gcc	2006-03-02 21:23:14.000000000 +0100
-+++ gcc/config.gcc	2006-03-02 23:54:23.000000000 +0100
-@@ -1079,8 +1079,8 @@
- 	tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h svr4.h linux.h \
- 		 i386/x86-64.h i386/linux64.h"
- 	case ${target} in
--	x86_64-*-kfreebsd*-gnu) tm_file="${tm_file} kfreebsd-gnu.h" ;;
--	x86_64-*-knetbsd*-gnu) tm_file="${tm_file} knetbsd-gnu.h" ;;
-+	x86_64-*-kfreebsd*-gnu) tm_file="${tm_file} kfreebsd-gnu.h i386/kfreebsd-gnu.h" ;;
-+	x86_64-*-knetbsd*-gnu) tm_file="${tm_file} knetbsd-gnu.h i386/knetbsd-gnu.h" ;;
- 	esac
- 	tmake_file="${tmake_file} i386/t-linux64 i386/t-crtfm"
- 	;;
+Index: gcc/config/kfreebsd-gnu.h
+===================================================================
+--- gcc/config/kfreebsd-gnu.h	(revision 169473)
++++ gcc/config/kfreebsd-gnu.h	(working copy)
+@@ -35,3 +35,6 @@
+ #undef GLIBC_DYNAMIC_LINKER
+ #define GLIBC_DYNAMIC_LINKER "/lib/ld.so.1"
+ #endif
++
++#undef LINK_EMULATION
++#define LINK_EMULATION(em) em "_fbsd"
+Index: gcc/config/mips/linux.h
+===================================================================
+--- gcc/config/mips/linux.h	(revision 169473)
++++ gcc/config/mips/linux.h	(working copy)
+@@ -121,8 +121,8 @@
+ #endif
+ 
+ /* -march=native handling only makes sense with compiler running on
+-   a MIPS chip.  */
+-#if defined(__mips__)
++   a MIPS chip (and for now, it is only supported on GNU/Linux).  */
++#if defined(__mips__) && defined(__linux__)
+ extern const char *host_detect_local_cpu (int argc, const char **argv);
+ # define EXTRA_SPEC_FUNCTIONS \
+   { "local_cpu_detect", host_detect_local_cpu },
+Index: gcc/config/mips/linux64.h
+===================================================================
+--- gcc/config/mips/linux64.h	(revision 169473)
++++ gcc/config/mips/linux64.h	(working copy)
+@@ -57,9 +57,9 @@
+ 	  %{mabi=64: -dynamic-linker " LINUX_DYNAMIC_LINKER64 "} \
+ 	  %{mabi=32: -dynamic-linker " LINUX_DYNAMIC_LINKER32 "}}} \
+       %{static:-static}}} \
+-%{mabi=n32:-melf32%{EB:b}%{EL:l}tsmipn32} \
+-%{mabi=64:-melf64%{EB:b}%{EL:l}tsmip} \
+-%{mabi=32:-melf32%{EB:b}%{EL:l}tsmip}"
++%{mabi=n32:-m" LINK_EMULATION("elf32%{EB:b}%{EL:l}tsmipn32") "} \
++%{mabi=64:-m" LINK_EMULATION("elf64%{EB:b}%{EL:l}tsmip") "} \
++%{mabi=32:-m" LINK_EMULATION("elf32%{EB:b}%{EL:l}tsmip") "}"
+ 
+ #undef LOCAL_LABEL_PREFIX
+ #define LOCAL_LABEL_PREFIX (TARGET_OLDABI ? "$" : ".")
