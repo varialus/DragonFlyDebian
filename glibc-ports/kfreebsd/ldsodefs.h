@@ -36,4 +36,23 @@ extern void _dl_aux_init (ElfW(auxv_t) *av) internal_function;
 /* Initialization which is normally done by the dynamic linker.  */
 extern void _dl_non_dynamic_init (void) internal_function;
 
+/* Contrary to most kernels which use ELFOSABI_SYSV aka ELFOSABI_NONE,
+   FreeBSD uses ELFOSABI_FREEBSD for the OSABI field. */
+#define VALID_ELF_HEADER(hdr,exp,size)	(memcmp (hdr, expected2, size) == 0)
+#define VALID_ELF_OSABI(osabi)		(osabi == ELFOSABI_FREEBSD)
+#define VALID_ELF_ABIVERSION(osabi,ver) (ver == 0)
+#define MORE_ELF_HEADER_DATA \
+  static const unsigned char expected2[EI_PAD] =	\
+  {							\
+    [EI_MAG0] = ELFMAG0,				\
+    [EI_MAG1] = ELFMAG1,				\
+    [EI_MAG2] = ELFMAG2,				\
+    [EI_MAG3] = ELFMAG3,				\
+    [EI_CLASS] = ELFW(CLASS),				\
+    [EI_DATA] = byteorder,				\
+    [EI_VERSION] = EV_CURRENT,				\
+    [EI_OSABI] = ELFOSABI_FREEBSD			\
+    [EI_ABIVERSION] = 0					\
+  }
+
 #endif /* ldsodefs.h */
