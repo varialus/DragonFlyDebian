@@ -51,7 +51,7 @@ extern void _dl_non_dynamic_init (void) internal_function;
     [EI_CLASS] = ELFW(CLASS),				\
     [EI_DATA] = byteorder,				\
     [EI_VERSION] = EV_CURRENT,				\
-    [EI_OSABI] = ELFOSABI_FREEBSD			\
+    [EI_OSABI] = ELFOSABI_FREEBSD,			\
     [EI_ABIVERSION] = 0					\
   }
 
