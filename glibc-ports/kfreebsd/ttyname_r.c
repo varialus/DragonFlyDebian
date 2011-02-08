@@ -20,6 +20,7 @@
 #include <stddef.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
+#include <termios.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
@@ -51,11 +52,11 @@ __ttyname_r (fd, buf, buflen)
       return ERANGE;
     }
 
-  if (!__isatty (fd))
-    {
-      __set_errno (ENOTTY);
-      return ENOTTY;
-    }
+  /* isatty check, tcgetattr is used because it sets the correct
+     errno (EBADF resp. ENOTTY) on error.  */
+  struct termios term;
+  if (__builtin_expect (__tcgetattr (fd, &term) < 0, 0))
+    return errno;
 
   /* Prepare the result buffer.  */
   memcpy (buf, dev, sizeof (dev) - 1);

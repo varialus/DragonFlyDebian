@@ -19,6 +19,7 @@
 #include <stddef.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
+#include <termios.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
@@ -37,7 +38,10 @@ ttyname (fd)
   static size_t buflen;
   struct fiodgname_arg fgn;
 
-  if (!__isatty (fd))
+  /* isatty check, tcgetattr is used because it sets the correct
+     errno (EBADF resp. ENOTTY) on error.  */
+  struct termios term;
+  if (__builtin_expect (__tcgetattr (fd, &term) < 0, 0))
     return NULL;
 
   if (buflen == 0)
