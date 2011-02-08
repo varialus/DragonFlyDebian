@@ -44,14 +44,10 @@ extern const char __libc_ptyname1[] attribute_hidden;
 extern const char __libc_ptyname2[] attribute_hidden;
 
 
-/* Store at most BUFLEN characters of the pathname of the slave pseudo
-   terminal associated with the master FD is open on in BUF.
-   Return 0 on success, otherwise an error number.  */
 int
-__ptsname_r (int fd, char *buf, size_t buflen)
+__ptsname_internal (int fd, char *buf, size_t buflen, struct stat64 *stp)
 {
   int saved_errno = errno;
-  struct stat64 st;
   char *p;
 
   if (buf == NULL)
@@ -62,11 +58,11 @@ __ptsname_r (int fd, char *buf, size_t buflen)
 
   /* Don't call isatty (fd) - it usually fails with errno = EAGAIN.  */
 
-  if (__fxstat64 (_STAT_VER, fd, &st) < 0)
+  if (__fxstat64 (_STAT_VER, fd, stp) < 0)
     return errno;
 
   /* Check if FD really is a master pseudo terminal.  */
-  if (!(S_ISCHR (st.st_mode)))
+  if (!(S_ISCHR (stp->st_mode)))
     {
       __set_errno (ENOTTY);
       return ENOTTY;
@@ -82,16 +78,16 @@ __ptsname_r (int fd, char *buf, size_t buflen)
   /* instead of strlen(_PATH_DEV) we use (sizeof (_PATH_DEV) - 1)  */
   p = __mempcpy (buf, _PATH_DEV, sizeof (_PATH_DEV) - 1);
   buflen -= (sizeof (_PATH_DEV) - 1);
-  if(__sysctlbyname("kern.devname", p, &buflen, &st.st_rdev, sizeof (st.st_rdev)) < 0)
+  if(__sysctlbyname("kern.devname", p, &buflen, &stp->st_rdev, sizeof (stp->st_rdev)) < 0)
     return errno;
   p[0] = 't';
 
-  if (__xstat64 (_STAT_VER, buf, &st) < 0)
+  if (__xstat64 (_STAT_VER, buf, stp) < 0)
     return errno;
 
   /* Check if the pathname we're about to return might be
      slave pseudo terminal of the given master pseudo terminal.  */
-  if (!(S_ISCHR (st.st_mode)))
+  if (!(S_ISCHR (stp->st_mode)))
     {
       /* This really is a configuration problem.  */
       __set_errno (ENOTTY);
@@ -100,5 +96,16 @@ __ptsname_r (int fd, char *buf, size_t buflen)
 
   __set_errno (saved_errno);
   return 0;
+}
+
+
+/* Store at most BUFLEN characters of the pathname of the slave pseudo
+   terminal associated with the master FD is open on in BUF.
+   Return 0 on success, otherwise an error number.  */
+int
+__ptsname_r (int fd, char *buf, size_t buflen)
+{
+  struct stat64 st;
+  return __ptsname_internal (fd, buf, buflen, &st);
 }
 weak_alias (__ptsname_r, ptsname_r)
