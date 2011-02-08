@@ -20,6 +20,9 @@
 # error "Never include <bits/stat.h> directly; use <sys/stat.h> instead."
 #endif
 
+#ifndef _BITS_STAT_H
+#define _BITS_STAT_H   1
+
 /* This structure needs to be defined in accordance with the
    implementation of __stat, __fstat, and __lstat.  */
 
@@ -212,3 +215,5 @@ extern char *devname_r(__dev_t dev, __mode_t type, char *buf, int buflen) __THRO
 __END_DECLS
 
 #endif /* __USE_BSD */
+
+#endif /* bits/stat.h */
