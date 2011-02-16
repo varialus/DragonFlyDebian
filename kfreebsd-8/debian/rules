@@ -16,7 +16,7 @@ cpu		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 config_files	:= $(wildcard debian/arch/$(cpu)/*.config)
 flavours	:= $(config_files:debian/arch/$(cpu)/%.config=%)
 configfile	:= DEBCUSTOM
-abiname		:= 0
+abiname		:= 1
 ld_target	:= $(shell ld --help | sed -ne "s/^ld: supported targets: \([^ ]*\) .*/\1/p")
 
 ifeq ($(cpu), mipsel)
@@ -25,8 +25,8 @@ else
 kfreebsd_cpu	:= $(cpu)
 endif
 
-#SVN		:= http://svn.freebsd.org/base/release/$(version).0
-SVN		:= http://svn.freebsd.org/base/releng/$(version)
+SVN		:= http://svn.freebsd.org/base/release/$(version).0
+#SVN		:= http://svn.freebsd.org/base/releng/$(version)
 #SVN		:= http://svn.freebsd.org/base/stable/$(major)
 SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
 IMAGE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname)
