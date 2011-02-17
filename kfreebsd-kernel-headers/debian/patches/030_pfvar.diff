@@ -1,10 +1,8 @@
-Index: src/sys/contrib/pf/net/pfvar.h
-===================================================================
---- src/sys/contrib/pf/net/pfvar.h.orig
-+++ src/sys/contrib/pf/net/pfvar.h
+--- a/sys/contrib/pf/net/pfvar.h
++++ b/sys/contrib/pf/net/pfvar.h
 @@ -40,13 +40,14 @@
  #include <sys/tree.h>
- #ifdef __FreeBSD_kernel__
+ #if 1
  #include <sys/lock.h>
 -#include <sys/sx.h>
  #else
@@ -15,14 +13,14 @@ Index: src/sys/contrib/pf/net/pfvar.h
  #include <net/radix.h>
  #include <net/route.h>
 +#ifdef _KERNEL
- #ifdef __FreeBSD_kernel__
+ #if 1
  #include <net/if_clone.h>
  #include <net/pf_mtag.h>
-@@ -54,6 +56,7 @@
+@@ -54,6 +55,7 @@
  #else
  
  #endif
 +#endif
  
- #ifdef __FreeBSD_kernel__
+ #if 1
  #include <netinet/in.h>

@@ -1,7 +1,5 @@
-Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/dev/usb/usb.h	2009-11-12 15:48:44.000000000 +0000
-+++ kfreebsd-source-8.0/sys/dev/usb/usb.h	2009-11-12 16:31:48.000000000 +0000
+--- a/sys/dev/usb/usb.h
++++ b/sys/dev/usb/usb.h
 @@ -146,7 +146,7 @@
  	uWord	wValue;
  	uWord	wIndex;
@@ -11,7 +9,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_device_request usb_device_request_t;
  
  #define	UT_WRITE		0x00
-@@ -268,7 +268,7 @@
+@@ -270,7 +270,7 @@
  	uByte	bLength;
  	uByte	bDescriptorType;
  	uByte	bDescriptorSubtype;
@@ -20,7 +18,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_descriptor usb_descriptor_t;
  
  struct usb_device_descriptor {
-@@ -291,7 +291,7 @@
+@@ -293,7 +293,7 @@
  	uByte	iProduct;
  	uByte	iSerialNumber;
  	uByte	bNumConfigurations;
@@ -29,7 +27,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_device_descriptor usb_device_descriptor_t;
  
  /* Binary Device Object Store (BOS) */
-@@ -300,7 +300,7 @@
+@@ -302,7 +302,7 @@
  	uByte	bDescriptorType;
  	uWord	wTotalLength;
  	uByte	bNumDeviceCaps;
@@ -38,7 +36,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_bos_descriptor usb_bos_descriptor_t;
  
  /* Binary Device Object Store Capability */
-@@ -314,7 +314,7 @@
+@@ -316,7 +316,7 @@
  #define	USB_DEVCAP_SUPER_SPEED	0x03
  #define	USB_DEVCAP_CONTAINER_ID	0x04
  	/* data ... */
@@ -47,7 +45,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_bos_cap_descriptor usb_bos_cap_descriptor_t;
  
  struct usb_devcap_usb2ext_descriptor {
-@@ -323,7 +323,7 @@
+@@ -325,7 +325,7 @@
  	uByte	bDevCapabilityType;
  	uByte	bmAttributes;
  #define	USB_V2EXT_LPM 0x02
@@ -56,8 +54,8 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_devcap_usb2ext_descriptor usb_devcap_usb2ext_descriptor_t;
  
  struct usb_devcap_ss_descriptor {
-@@ -335,7 +335,7 @@
- 	uByte	bFunctionaltySupport;
+@@ -337,7 +337,7 @@
+ 	uByte	bFunctionalitySupport;
  	uByte	bU1DevExitLat;
  	uByte	bU2DevExitLat;
 -} __packed;
@@ -65,16 +63,16 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_devcap_ss_descriptor usb_devcap_ss_descriptor_t;
  
  struct usb_devcap_container_id_descriptor {
-@@ -344,7 +344,7 @@
+@@ -346,7 +346,7 @@
  	uByte	bDevCapabilityType;
  	uByte	bReserved;
- 	uByte	ContainerID;
+ 	uByte	bContainerID;
 -} __packed;
 +}  __attribute__ ((__packed__));
  typedef struct usb_devcap_container_id_descriptor
  		usb_devcap_container_id_descriptor_t;
  
-@@ -376,7 +376,7 @@
+@@ -379,7 +379,7 @@
  #define	UC_REMOTE_WAKEUP	0x20
  	uByte	bMaxPower;		/* max current in 2 mA units */
  #define	UC_POWER_FACTOR 2
@@ -83,7 +81,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_config_descriptor usb_config_descriptor_t;
  
  struct usb_interface_descriptor {
-@@ -389,7 +389,7 @@
+@@ -392,7 +392,7 @@
  	uByte	bInterfaceSubClass;
  	uByte	bInterfaceProtocol;
  	uByte	iInterface;
@@ -92,7 +90,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_interface_descriptor usb_interface_descriptor_t;
  
  struct usb_interface_assoc_descriptor {
-@@ -401,7 +401,7 @@
+@@ -404,7 +404,7 @@
  	uByte	bFunctionSubClass;
  	uByte	bFunctionProtocol;
  	uByte	iFunction;
@@ -101,7 +99,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_interface_assoc_descriptor usb_interface_assoc_descriptor_t;
  
  /* Interface class codes */
-@@ -524,7 +524,7 @@
+@@ -530,7 +530,7 @@
  	uWord	wMaxPacketSize;
  #define	UE_ZERO_MPS 0xFFFF		/* for internal use only */
  	uByte	bInterval;
@@ -110,8 +108,8 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_endpoint_descriptor usb_endpoint_descriptor_t;
  
  struct usb_endpoint_ss_comp_descriptor {
-@@ -533,7 +533,7 @@
- 	uWord	bMaxBurst;
+@@ -539,7 +539,7 @@
+ 	uByte	bMaxBurst;
  	uByte	bmAttributes;
  	uWord	wBytesPerInterval;
 -} __packed;
@@ -119,7 +117,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_endpoint_ss_comp_descriptor
  		usb_endpoint_ss_comp_descriptor_t;
  
-@@ -542,7 +542,7 @@
+@@ -548,7 +548,7 @@
  	uByte	bDescriptorType;
  	uWord	bString[126];
  	uByte	bUnused;
@@ -128,7 +126,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_string_descriptor usb_string_descriptor_t;
  
  #define	USB_MAKE_STRING_DESC(m,name)	\
-@@ -550,7 +550,7 @@
+@@ -556,7 +556,7 @@
    uByte bLength;			\
    uByte bDescriptorType;		\
    uByte bData[sizeof((uint8_t []){m})];	\
@@ -137,7 +135,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  static const struct name name = {	\
    .bLength = sizeof(struct name),	\
    .bDescriptorType = UDESC_STRING,	\
-@@ -584,7 +584,7 @@
+@@ -590,7 +590,7 @@
  #define	UHD_NOT_REMOV(desc, i) \
      (((desc)->DeviceRemovable[(i)/8] >> ((i) % 8)) & 1)
  	uByte	PortPowerCtrlMask[1];	/* deprecated */
@@ -146,16 +144,16 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_hub_descriptor usb_hub_descriptor_t;
  
  struct usb_hub_ss_descriptor {
-@@ -597,7 +597,7 @@
+@@ -603,7 +603,7 @@
  	uByte	bHubHdrDecLat;
  	uWord	wHubDelay;
- 	uByte	DeviceRemovable[2];	/* max 15 ports */
+ 	uByte	DeviceRemovable[32];	/* max 255 ports */
 -} __packed;
 +}  __attribute__ ((__packed__));
  typedef struct usb_hub_ss_descriptor usb_hub_ss_descriptor_t;
  
  /* minimum HUB descriptor (8-ports maximum) */
-@@ -610,7 +610,7 @@
+@@ -616,7 +616,7 @@
  	uByte	bHubContrCurrent;
  	uByte	DeviceRemovable[1];
  	uByte	PortPowerCtrlMask[1];
@@ -164,7 +162,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_hub_descriptor_min usb_hub_descriptor_min_t;
  
  struct usb_device_qualifier {
-@@ -623,7 +623,7 @@
+@@ -629,7 +629,7 @@
  	uByte	bMaxPacketSize0;
  	uByte	bNumConfigurations;
  	uByte	bReserved;
@@ -173,7 +171,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_device_qualifier usb_device_qualifier_t;
  
  struct usb_otg_descriptor {
-@@ -632,7 +632,7 @@
+@@ -638,7 +638,7 @@
  	uByte	bmAttributes;
  #define	UOTG_SRP	0x01
  #define	UOTG_HNP	0x02
@@ -182,7 +180,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_otg_descriptor usb_otg_descriptor_t;
  
  /* OTG feature selectors */
-@@ -647,7 +647,7 @@
+@@ -653,7 +653,7 @@
  #define	UDS_REMOTE_WAKEUP		0x0002
  /* Endpoint status flags */
  #define	UES_HALT			0x0001
@@ -191,7 +189,7 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_status usb_status_t;
  
  struct usb_hub_status {
-@@ -655,7 +655,7 @@
+@@ -661,7 +661,7 @@
  #define	UHS_LOCAL_POWER			0x0001
  #define	UHS_OVER_CURRENT		0x0002
  	uWord	wHubChange;
@@ -200,19 +198,17 @@ Index: kfreebsd-source-8.0/sys/dev/usb/usb.h
  typedef struct usb_hub_status usb_hub_status_t;
  
  struct usb_port_status {
-@@ -677,7 +677,7 @@
- #define	UPS_C_SUSPEND			0x0004
- #define	UPS_C_OVERCURRENT_INDICATOR	0x0008
- #define	UPS_C_PORT_RESET		0x0010
+@@ -702,7 +702,7 @@
+ #define	UPS_C_BH_PORT_RESET		0x0020
+ #define	UPS_C_PORT_LINK_STATE		0x0040
+ #define	UPS_C_PORT_CONFIG_ERROR		0x0080
 -} __packed;
 +}  __attribute__ ((__packed__));
  typedef struct usb_port_status usb_port_status_t;
  
  /*
-Index: kfreebsd-source-8.0/sys/i386/include/cpufunc.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/i386/include/cpufunc.h	2009-11-12 15:48:49.000000000 +0000
-+++ kfreebsd-source-8.0/sys/i386/include/cpufunc.h	2009-11-12 16:30:50.000000000 +0000
+--- a/sys/i386/include/cpufunc.h
++++ b/sys/i386/include/cpufunc.h
 @@ -38,6 +38,8 @@
  #ifndef _MACHINE_CPUFUNC_H_
  #define	_MACHINE_CPUFUNC_H_
@@ -251,10 +247,8 @@ Index: kfreebsd-source-8.0/sys/i386/include/cpufunc.h
  u_int	rcr0(void);
  u_int	rcr2(void);
  u_int	rcr3(void);
-Index: kfreebsd-source-8.0/sys/sys/_types.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/_types.h	2009-11-12 15:49:02.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/_types.h	2009-11-12 16:30:50.000000000 +0000
+--- a/sys/sys/_types.h
++++ b/sys/sys/_types.h
 @@ -31,6 +31,7 @@
  
  #include <sys/cdefs.h>
