@@ -1,7 +1,6 @@
-diff -ur a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs.h b/cddl/contrib/opensolaris/lib/libzfs/common/libzfs.h
---- a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs.h	2010-08-13 16:14:57.000000000 -0400
-+++ b/cddl/contrib/opensolaris/lib/libzfs/common/libzfs.h	2010-08-13 16:32:38.000000000 -0400
-@@ -577,7 +577,7 @@
+--- a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs.h
++++ b/cddl/contrib/opensolaris/lib/libzfs/common/libzfs.h
+@@ -601,7 +601,7 @@
  extern int zpool_enable_datasets(zpool_handle_t *, const char *, int);
  extern int zpool_disable_datasets(zpool_handle_t *, boolean_t);
  
@@ -10,11 +9,10 @@ diff -ur a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs.h b/cddl/contrib/op
  extern int zmount(const char *, const char *, int, char *, char *, int, char *,
      int);
  #endif
-diff -ur a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_impl.h b/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_impl.h
---- a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_impl.h	2010-08-13 16:14:57.000000000 -0400
-+++ b/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_impl.h	2010-08-13 16:32:38.000000000 -0400
-@@ -188,7 +188,7 @@
- extern int zfs_unshare_proto(zfs_handle_t *zhp,
+--- a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_impl.h
++++ b/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_impl.h
+@@ -190,7 +190,7 @@
+ extern int zfs_unshare_proto(zfs_handle_t *,
      const char *, zfs_share_proto_t *);
  
 -#ifdef	__FreeBSD__
@@ -22,10 +20,9 @@ diff -ur a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_impl.h b/cddl/contr
  
  /*
   * This is FreeBSD version of ioctl, because Solaris' ioctl() updates
-diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dmu.c b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dmu.c
---- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dmu.c	2010-08-13 16:14:57.000000000 -0400
-+++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dmu.c	2010-08-13 16:32:38.000000000 -0400
-@@ -722,7 +722,7 @@
+--- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dmu.c
++++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dmu.c
+@@ -726,7 +726,7 @@
  	return (err);
  }
  
@@ -34,7 +31,7 @@ diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dmu.c b/sys/cddl/contr
  int
  dmu_write_pages(objset_t *os, uint64_t object, uint64_t offset, uint64_t size,
      page_t *pp, dmu_tx_t *tx)
-@@ -780,7 +780,7 @@
+@@ -781,7 +781,7 @@
  	dmu_buf_rele_array(dbp, numbufs, FTAG);
  	return (err);
  }
@@ -42,10 +39,9 @@ diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/dmu.c b/sys/cddl/contr
 +#endif	/* !__FreeBSD__ && !__FreeBSD_kernel__ */
  #endif	/* _KERNEL */
  
- typedef struct {
-diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/zvol.h b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/zvol.h
---- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/zvol.h	2010-08-13 16:14:57.000000000 -0400
-+++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/zvol.h	2010-08-13 16:32:38.000000000 -0400
+ /*
+--- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/zvol.h
++++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/zvol.h
 @@ -51,7 +51,7 @@
  extern int zvol_open(dev_t *devp, int flag, int otyp, cred_t *cr);
  extern int zvol_dump(dev_t dev, caddr_t addr, daddr_t offset, int nblocks);
@@ -55,31 +51,18 @@ diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/zvol.h b/sys/cddl/
  extern int zvol_strategy(buf_t *bp);
  extern int zvol_read(dev_t dev, uio_t *uiop, cred_t *cr);
  extern int zvol_write(dev_t dev, uio_t *uiop, cred_t *cr);
-diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/vdev.c b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/vdev.c
---- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/vdev.c	2010-08-13 16:14:57.000000000 -0400
-+++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/vdev.c	2010-08-13 16:32:38.000000000 -0400
-@@ -2419,7 +2419,7 @@
- boolean_t
- vdev_is_bootable(vdev_t *vd)
- {
--#ifdef __FreeBSD_version
-+#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
- 	return (B_TRUE);
- #else
- 	int c;
-diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_acl.c b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_acl.c
---- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_acl.c	2010-08-13 16:14:57.000000000 -0400
-+++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_acl.c	2010-08-13 16:32:38.000000000 -0400
-@@ -1852,7 +1852,7 @@
+--- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_acl.c
++++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_acl.c
+@@ -1878,7 +1878,7 @@
  			} else {
- 				fgid = zfs_fuid_create_cred(zfsvfs,
- 				    ZFS_GROUP, tx, cr, fuidp);
+ 				acl_ids->z_fgid = zfs_fuid_create_cred(zfsvfs,
+ 				    ZFS_GROUP, cr, &acl_ids->z_fuidp);
 -#ifdef __FreeBSD__
 +#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
- 				gid = fgid = parent->z_phys->zp_gid;
+ 				gid = acl_ids->z_fgid = dzp->z_phys->zp_gid;
  #else
  				gid = crgetgid(cr);
-@@ -2385,7 +2385,7 @@
+@@ -2562,7 +2562,7 @@
  	is_attr = ((zp->z_phys->zp_flags & ZFS_XATTR) &&
  	    (ZTOV(zp)->v_type == VDIR));
  
@@ -88,10 +71,9 @@ diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_acl.c b/sys/cddl/c
  	/*
  	 * In FreeBSD, we don't care about permissions of individual ADS.
  	 * Note that not checking them is not just an optimization - without
-diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_dir.c b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_dir.c
---- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_dir.c	2010-08-13 16:14:57.000000000 -0400
-+++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_dir.c	2010-08-13 16:32:38.000000000 -0400
-@@ -850,7 +850,7 @@
+--- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_dir.c
++++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_dir.c
+@@ -833,7 +833,7 @@
  	 * In FreeBSD, access checking for creating an EA is being done
  	 * in zfs_setextattr(),
  	 */
@@ -100,7 +82,7 @@ diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_dir.c b/sys/cddl/c
  	if (error = zfs_zaccess(zp, ACE_WRITE_NAMED_ATTRS, 0, B_FALSE, cr))
  		return (error);
  #endif
-@@ -929,7 +929,7 @@
+@@ -916,7 +916,7 @@
  
  	if (!(flags & CREATE_XATTR_DIR)) {
  		zfs_dirent_unlock(dl);
@@ -109,10 +91,9 @@ diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_dir.c b/sys/cddl/c
  		return (ENOATTR);
  #else
  		return (ENOENT);
-diff -ur a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vfsops.c b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vfsops.c
---- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vfsops.c	2010-08-13 16:14:57.000000000 -0400
-+++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vfsops.c	2010-08-13 16:32:38.000000000 -0400
-@@ -984,7 +984,7 @@
+--- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vfsops.c
++++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vfsops.c
+@@ -1385,7 +1385,7 @@
  		rrw_exit(&zfsvfs->z_teardown_lock, FTAG);
  		rw_exit(&zfsvfs->z_teardown_inactive_lock);
  
