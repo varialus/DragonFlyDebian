@@ -9,7 +9,7 @@ SHELL=bash
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
-CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
+CFLAGS = -Wall -g -pipe -fPIC -I. -I$(CURDIR)/sys -D_GNU_SOURCE -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
