@@ -11,7 +11,7 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-args=`echo ${args} | sed -e "s/ remount,/ /g" -e "s/,remount,/,/g" \
- -e "s/,remount / /g" -e "s/-o remount / /g"`
+args=`echo ${args} |
+  sed -r -e "/-o[[:space:]]+[^[:space:]]*remount/ s/remount/update/g"`
 
 exec /lib/freebsd/mount ${args}
