@@ -1,0 +1,46 @@
+
+grub-pc 1.98+20100804-14 (included with squeeze) supports SPA_VERSION up to
+(and including) 23.
+
+zfsutils ATTOW implements SPA_VERSION 15.  When it surpasses 23 a GRUB
+update is mandatory and warning message will be necessary (maybe a debconf
+template as well).
+
+Index: zfsutils/cddl/contrib/opensolaris/cmd/zpool/zpool_main.c
+===================================================================
+--- zfsutils.orig/cddl/contrib/opensolaris/cmd/zpool/zpool_main.c	2011-02-23 11:21:17.310006001 +0100
++++ zfsutils/cddl/contrib/opensolaris/cmd/zpool/zpool_main.c	2011-02-23 11:20:06.178006002 +0100
+@@ -3608,11 +3608,11 @@
+ 
+ 	if (cb.cb_poolname[0] != '\0') {
+ 		(void) printf(
+-		    "If you boot from pool '%s', don't forget to update boot code.\n"
+-		    "Assuming you use GPT partitioning and da0 is your boot disk\n"
++		    "If you boot from pool '%s', don't forget to update the boot code.\n"
++		    "Assuming you use GNU GRUB and da0 is your boot disk\n"
+ 		    "the following command will do it:\n"
+ 		    "\n"
+-		    "\tgpart bootcode -b /boot/pmbr -p /boot/gptzfsboot -i 1 da0\n\n",
++		    "\tgrub-install /dev/da0\n\n",
+ 		    cb.cb_poolname);
+ 	}
+ 
+Index: zfsutils/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_pool.c
+===================================================================
+--- zfsutils.orig/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_pool.c	2011-02-23 11:21:08.374006002 +0100
++++ zfsutils/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_pool.c	2011-02-23 11:20:01.282006001 +0100
+@@ -1895,11 +1895,11 @@
+ 			(void) fprintf(stderr, dgettext(TEXT_DOMAIN, "If "
+ 			    "you boot from pool '%s', you may need to update\n"
+ 			    "boot code on newly attached disk '%s'.\n\n"
+-			    "Assuming you use GPT partitioning and 'da0' is "
++			    "Assuming you use GNU GRUB and 'da0' is "
+ 			    "your new boot disk\n"
+ 			    "you may use the following command:\n\n"
+-			    "\tgpart bootcode -b /boot/pmbr -p "
+-			    "/boot/gptzfsboot -i 1 da0\n\n"),
++			    "\tgrub-install "
++			    "/dev/da0\n\n"),
+ 			    zhp->zpool_name, new_disk);
+ 		}
+ 		return (0);
