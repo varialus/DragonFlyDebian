@@ -1,0 +1,29 @@
+Description: Fix ydhms_diff() on mips*-kfreebsd-gnu.
+Author: rmh
+Upstream status: http://sources.redhat.com/bugzilla/show_bug.cgi?id=12401
+
+--- a/time/mktime.c	2010-11-17 17:34:19 +0000
++++ b/time/mktime.c	2011-01-15 11:45:08 +0000
+@@ -163,13 +163,20 @@ const unsigned short int __mon_yday[2][1
+    The result may overflow.  It is the caller's responsibility to
+    detect overflow.  */
+ 
++#if INT_MAX <= LONG_MAX / 2
++# define TIME_T long int
++#else
++# define TIME_T time_t
++#endif
++
+ static inline time_t
+-ydhms_diff (long int year1, long int yday1, int hour1, int min1, int sec1,
++ydhms_diff (TIME_T year1, TIME_T yday1, int hour1, int min1, int sec1,
+ 	    int year0, int yday0, int hour0, int min0, int sec0)
+ {
+   verify (C99_integer_division, -1 / 2 == 0);
+   verify (long_int_year_and_yday_are_wide_enough,
+-	  INT_MAX <= LONG_MAX / 2 || TIME_T_MAX <= UINT_MAX);
++	  INT_MAX <= TIME_T_MAX / 2 || TIME_T_MAX <= UINT_MAX ||
++	  INT_MAX <= LONG_MAX / 2);
+ 
+   /* Compute intervening leap days correctly even if year is negative.
+      Take care to avoid integer overflow here.  */
