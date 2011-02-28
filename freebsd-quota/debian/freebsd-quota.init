@@ -1,0 +1,98 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          quota freebsd-quota
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     S
+# Default-Stop:      0 6
+# Short-Description: Activate user quota accounting.
+# Description:       Update any quota accounting files and
+#                    active the kernel server for accounting.
+### END INIT INFO
+#
+# Written 2011 by Mats Erik Andersson
+# Licensed using four-clause FreeBSD statement.
+#
+###
+
+PATH=/sbin:/bin
+DESC="user quota management"
+
+DEFAULTFILE=/etc/default/quota
+
+QUOTAON=/sbin/quotaon
+QUOTAOFF=/sbin/quotaoff
+QUOTACHECK=/sbin/quotacheck
+
+# Default values
+QUOTACHECK_OPTIONS="-a"
+QUOTAON_OPTIONS="-a"
+QUOTAOFF_OPTIONS="-a"
+
+# Are we active?
+[ -x "$QUOTACHECK" ] || exit 0
+
+# Possibly override the settings above.
+if [ -r "$DEFAULTFILE" ]; then
+	. $DEFAULTFILE
+fi
+
+# Enable VERBOSE setting and load rcS variables.
+. /lib/init/vars.sh
+
+# Define log_* functions according to LSB.
+. /lib/lsb/init-functions
+
+start_quota()
+{
+	# Recalculate correct accounting status
+        if [ -n "${QUOTACHECK_OPTIONS}" ]
+	then
+		[ "$VERBOSE" = "no" ] || log_action_cont_msg "quotacheck"
+		$QUOTACHECK ${QUOTACHECK_OPTIONS}
+	else
+		log_warning_message "Quota recalculation has been turned off!"
+	fi
+
+	# Activate quota accounting
+        if [ -n "${QUOTAON_OPTIONS}" ]
+	then
+		[ "$VERBOSE" = "no" ] || log_action_cont_msg "quotaon"
+		$QUOTAON ${QUOTAON_OPTIONS}
+	else
+		log_warning_message "Quota accounting has been turned off!"
+	fi
+}
+
+stop_quota()
+{
+	# Deactivate quota accounting
+	[ "$VERBOSE" = "no" ] || log_action_cont_msg "quotaoff"
+        [ -n "${QUOTAOFF_OPTIONS}" ] && $QUOTAOFF ${QUOTAOFF_OPTIONS}
+}
+
+case "$1" in
+  start)
+	log_action_begin_msg "Activating $DESC"
+	start_quota
+	log_action_end_msg 0
+	;;
+  stop)
+	log_action_begin_msg "Stopping $DESC"
+	stop_quota
+	log_action_end_msg 0
+	;;
+  restart|force-reload)
+	# Really a senseless thing to do, but still.
+	log_action_begin_msg "Restarting $DESC"
+	stop_quota
+	start_quota
+	log_action_end_msg 0
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|force-reload}" >&2
+	exit 3
+	;;
+esac
+
+:

@@ -1,0 +1,16 @@
+Description: Adaption of upstream FreeBSD source.
+ GNU/kFreeBSD resorts to a compatibility library.
+Author: Mats Erik Andersson <debian@gisladisker.se>
+Forwarded: not-needed
+Last-Update: 2011-01-21
+
+--- freebsd-8.1.orig/usr.bin/quota/Makefile	2010-06-14 04:09:06.000000000 +0200
++++ freebsd-8.1/usr.bin/quota/Makefile	2011-01-21 13:54:16.000000000 +0100
+@@ -5,6 +5,6 @@
+ BINOWN=	root
+ 
+ DPADD=	${LIBRPCSVC} ${LIBUTIL}
+-LDADD=	-lrpcsvc -lutil
++LDADD=	-lrpcsvc -lbsd
+ 
+ .include <bsd.prog.mk>

@@ -1,0 +1,113 @@
+Description: Adaption of upstream FreeBSD source.
+ Compilation errors found in GNU/kFreeBSD.
+ .
+ Attributes and a compatibility library.
+Author: Mats Erik Andersson <debian@gisladisker.se>
+Forwarded: not-needed
+Last-Update: 2011-01-20
+
+--- freebsd-8.1.orig/sbin/fsck/fsutil.c	2010-06-14 04:09:06.000000000 +0200
++++ freebsd-8.1/sbin/fsck/fsutil.c	2011-01-20 19:30:59.000000000 +0100
+@@ -46,6 +46,7 @@
+ #include <stdarg.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <bsd/stdlib.h>
+ #include <string.h>
+ 
+ #include "fsutil.h"
+@@ -53,7 +54,8 @@
+ static const char *dev = NULL;
+ static int preen = 0;
+ 
+-static void vmsg(int, const char *, va_list) __printflike(2, 0);
++static void vmsg(int, const char *, va_list)
++     __THROW __attribute__ ((__format__ (__printf__, 2, 0))) __wur;
+ 
+ void
+ setcdevname(const char *cd, int pr)
+--- freebsd-8.1.orig/sbin/fsck/fsutil.h	2010-06-14 04:09:06.000000000 +0200
++++ freebsd-8.1/sbin/fsck/fsutil.h	2011-01-20 19:28:09.000000000 +0100
+@@ -32,9 +32,12 @@
+  */
+ 
+ void perror(const char *);
+-void pfatal(const char *, ...) __printflike(1, 2);
+-void pwarn(const char *, ...) __printflike(1, 2);
+-void panic(const char *, ...) __dead2 __printflike(1, 2);
++void pfatal(const char *, ...)
++     __THROW __attribute__ ((__format__ (__printf__, 1, 2))) __wur;
++void pwarn(const char *, ...)
++     __THROW __attribute__ ((__format__ (__printf__, 1, 2))) __wur;
++void panic(const char *, ...) __attribute__ ((noreturn))
++     __THROW __attribute__ ((__format__ (__printf__, 1, 2))) __wur;
+ const char *devcheck(const char *);
+ const char *cdevname(void);
+ void setcdevname(const char *, int);
+--- freebsd-8.1.orig/sbin/fsck_ffs/fsck.h	2010-06-14 04:09:06.000000000 +0200
++++ freebsd-8.1/sbin/fsck_ffs/fsck.h	2011-01-20 19:28:09.000000000 +0100
+@@ -63,6 +63,7 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <stdio.h>
++#include <signal.h>
+ 
+ #define	MAXDUP		10	/* limit on dup blks (per inode) */
+ #define	MAXBAD		10	/* limit on bad blks (per inode) */
+@@ -372,7 +373,8 @@
+ struct inostat *inoinfo(ino_t inum);
+ int		linkup(ino_t orphan, ino_t parentdir, char *name);
+ int		makeentry(ino_t parent, ino_t ino, const char *name);
+-void		panic(const char *fmt, ...) __printflike(1, 2);
++void		panic(const char *fmt, ...)
++     __THROW __attribute__ ((__format__ (__printf__, 1, 2))) __wur;
+ void		pass1(void);
+ void		pass1b(void);
+ int		pass1check(struct inodesc *);
+@@ -381,10 +383,12 @@
+ void		pass4(void);
+ int		pass4check(struct inodesc *);
+ void		pass5(void);
+-void		pfatal(const char *fmt, ...) __printflike(1, 2);
++void		pfatal(const char *fmt, ...)
++     __THROW __attribute__ ((__format__ (__printf__, 1, 2))) __wur;
+ void		pinode(ino_t ino);
+ void		propagate(void);
+-void		pwarn(const char *fmt, ...) __printflike(1, 2);
++void		pwarn(const char *fmt, ...)
++     __THROW __attribute__ ((__format__ (__printf__, 1, 2))) __wur;
+ int		readsb(int listerr);
+ int		reply(const char *question);
+ void		rwerror(const char *mesg, ufs2_daddr_t blk);
+--- freebsd-8.1.orig/sbin/fsck_ffs/fsutil.c	2010-06-14 04:09:06.000000000 +0200
++++ freebsd-8.1/sbin/fsck_ffs/fsutil.c	2011-01-20 19:28:09.000000000 +0100
+@@ -59,6 +59,8 @@
+ 
+ #include "fsck.h"
+ 
++#define __unused
++
+ static void slowio_start(void);
+ static void slowio_end(void);
+ 
+--- freebsd-8.1.orig/sbin/fsck_ffs/utilities.c	2010-06-14 04:09:06.000000000 +0200
++++ freebsd-8.1/sbin/fsck_ffs/utilities.c	2011-01-20 19:28:09.000000000 +0100
+@@ -55,6 +55,7 @@
+ 
+ #include "fsck.h"
+ 
++#define __unused
+ 
+ char *
+ blockcheck(char *origname)
+--- freebsd-8.1.orig/sbin/quotacheck/Makefile	2010-06-14 04:09:06.000000000 +0200
++++ freebsd-8.1/sbin/quotacheck/Makefile	2011-01-20 19:28:09.000000000 +0100
+@@ -6,6 +6,8 @@
+ WARNS?=	2
+ MAN=	quotacheck.8
+ 
++LDADD=	-lbsd
++
+ .PATH:	${.CURDIR}/../fsck ${.CURDIR}/../fsck_ffs
+ 
+ .include <bsd.prog.mk>

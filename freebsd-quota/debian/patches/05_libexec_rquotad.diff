@@ -1,0 +1,95 @@
+Description: Adaptions of upstream FreeBSD source.
+ Glibc uses a partly different set of RPC library
+ calls which need to be migrated.
+Author: Mats Erik Andersson <debian@gisladisker.se>
+Forwarded: not-needed
+Last-Update: 2010-01-21
+
+--- freebsd-8.1.orig/libexec/rpc.rquotad/rquotad.c	2010-06-14 04:09:06.000000000 +0200
++++ freebsd-8.1/libexec/rpc.rquotad/rquotad.c	2011-01-21 20:08:22.000000000 +0100
+@@ -16,6 +16,7 @@
+ #include <ufs/ufs/quota.h>
+ #include <rpc/rpc.h>
+ #include <rpcsvc/rquota.h>
++#include <rpc/pmap_clnt.h> /* pmap_unset() */
+ #include <arpa/inet.h>
+ #include <netdb.h>
+ 
+@@ -57,7 +58,7 @@
+ {
+ 
+ 	(void) sig;
+-	(void) rpcb_unset(RQUOTAPROG, RQUOTAVERS, NULL);
++	(void) pmap_unset(RQUOTAPROG, RQUOTAVERS);
+ 	exit(0);
+ }
+ 
+@@ -77,7 +78,7 @@
+ 	if (!from_inetd) {
+ 		daemon(0, 0);
+ 
+-		(void) rpcb_unset(RQUOTAPROG, RQUOTAVERS, NULL);
++		(void) pmap_unset(RQUOTAPROG, RQUOTAVERS);
+ 
+ 		(void) signal(SIGINT, cleanup);
+ 		(void) signal(SIGTERM, cleanup);
+@@ -87,17 +88,14 @@
+ 	openlog("rpc.rquotad", LOG_CONS|LOG_PID, LOG_DAEMON);
+ 
+ 	/* create and register the service */
+-	if (from_inetd) {
+-		transp = svc_tli_create(0, NULL, NULL, 0, 0);
+-		if (transp == NULL) {
+-			syslog(LOG_ERR, "couldn't create udp service.");
+-			exit(1);
+-		}
+-		ok = svc_reg(transp, RQUOTAPROG, RQUOTAVERS,
+-			     rquota_service, NULL);
+-	} else
+-		ok = svc_create(rquota_service,
+-				RQUOTAPROG, RQUOTAVERS, "udp");
++	transp = svcudp_create(from_inetd ? 0 : RPC_ANYSOCK);
++	if (transp == NULL) {
++		syslog(LOG_ERR, "couldn't create udp service.");
++		exit(1);
++	}
++
++	ok = svc_register(transp, RQUOTAPROG, RQUOTAVERS, rquota_service,
++			from_inetd ? 0 : IPPROTO_UDP);
+ 	if (!ok) {
+ 		syslog(LOG_ERR,
+ 		    "unable to register (RQUOTAPROG, RQUOTAVERS, %s)",
+@@ -143,7 +141,8 @@
+ 	struct timeval timev;
+ 
+ 	bzero((char *)&getq_args, sizeof(getq_args));
+-	if (!svc_getargs(transp, (xdrproc_t)xdr_getquota_args, &getq_args)) {
++	if (!svc_getargs(transp, (xdrproc_t)xdr_getquota_args,
++				(char *) &getq_args)) {
+ 		svcerr_decode(transp);
+ 		return;
+ 	}
+@@ -175,10 +174,12 @@
+ 		getq_rslt.getquota_rslt_u.gqr_rquota.rq_ftimeleft =
+ 		    dqblk.dqb_itime - timev.tv_sec;
+ 	}
+-	if (!svc_sendreply(transp, (xdrproc_t)xdr_getquota_rslt, &getq_rslt)) {
++	if (!svc_sendreply(transp, (xdrproc_t)xdr_getquota_rslt,
++				(char *) &getq_rslt)) {
+ 		svcerr_systemerr(transp);
+ 	}
+-	if (!svc_freeargs(transp, (xdrproc_t)xdr_getquota_args, &getq_args)) {
++	if (!svc_freeargs(transp, (xdrproc_t)xdr_getquota_args,
++				(char *) &getq_args)) {
+ 		syslog(LOG_ERR, "unable to free arguments");
+ 		exit(1);
+ 	}
+@@ -193,7 +194,7 @@
+ 
+ 	save_errno = errno;
+ 
+-	caller = (struct sockaddr *)svc_getrpccaller(transp)->buf;
++	caller = (struct sockaddr *)svc_getcaller(transp);
+ 	getnameinfo(caller, caller->sa_len, name, sizeof (name),
+ 		    NULL, 0, NI_NUMERICHOST);
+ 	errno = save_errno;
