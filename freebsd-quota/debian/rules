@@ -10,14 +10,10 @@ ORIGDIR=freebsd-quota-$(VERSION)
 TARNAME=freebsd-quota_$(VERSION).orig.tar.gz
 
 CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)=' -D'__RCSID(string)='
-PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) -I$(CURDIR)/debian" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
-	for nn in  sbin libexec usr.bin usr.sbin; \
-	do \
-		mkdir -p $(CURDIR)/$(ORIGDIR)/$$nn; \
-	done
 	for nn in  sbin/fsck  sbin/fsck_ffs  sbin/quotacheck \
 			libexec/rpc.rquotad  usr.bin/quota \
 			usr.sbin/edquota  usr.sbin/quotaon  usr.sbin/repquota; \
@@ -34,7 +30,6 @@ build:
 	$(PMAKE) -C usr.bin/quota
 	$(PMAKE) -C usr.sbin/edquota
 	$(PMAKE) -C usr.sbin/quotaon
-	ln -s quotaon usr.sbin/quotaon/quotaoff
 	$(PMAKE) -C usr.sbin/repquota
 
 override_dh_auto_clean:
