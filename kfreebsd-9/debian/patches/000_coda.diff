@@ -1,0 +1,50 @@
+--- a/sys/fs/coda/coda.h
++++ b/sys/fs/coda/coda.h
+@@ -41,7 +41,9 @@
+ #ifndef _CODA_HEADER_
+ #define _CODA_HEADER_
+ 
++#ifdef _KERNEL
+ #include "opt_coda.h"	/* for CODA_COMPAT_5 option */
++#endif
+ 
+ /* Avoid CODA_COMPAT_5 redefinition in coda5 module */
+ #if defined (CODA5_MODULE) && !defined(CODA_COMPAT_5)
+@@ -782,8 +784,8 @@
+ #define PIOCPARM_MASK 0x0000ffff
+ struct ViceIoctl {
+         caddr_t in, out;        /* Data to be transferred in, or out */
+-        short in_size;          /* Size of input buffer <= 2K */
+-        short out_size;         /* Maximum size of output buffer, <= 2K */
++        unsigned short in_size;	/* Size of input buffer <= 8K */
++        unsigned short out_size; /* Maximum size of output buffer, <= 8K */
+ };
+ 
+ #if defined(__CYGWIN32__) || defined(DJGPP)
+--- a/sys/fs/coda/coda_venus.c
++++ b/sys/fs/coda/coda_venus.c
+@@ -274,6 +274,12 @@
+ 	tmp = ((com >> 16) & IOCPARM_MASK) - sizeof (char *) - sizeof (int);
+ 	inp->cmd |= (tmp & IOCPARM_MASK) << 16;
+ 
++	if (iap->vi.in_size > VC_MAXMSGSIZE ||
++	    iap->vi.out_size > VC_MAXMSGSIZE) {
++		CODA_FREE(inp, coda_ioctl_size);
++		return (EINVAL);
++	}
++
+ 	inp->rwflag = flag;
+ 	inp->len = iap->vi.in_size;
+ 	inp->data = (char *)(sizeof (struct coda_ioctl_in));
+--- a/sys/fs/coda/coda_vnops.c
++++ b/sys/fs/coda/coda_vnops.c
+@@ -471,7 +471,8 @@
+ 		    iap->path)););
+ 		return (EINVAL);
+ 	}
+-	if (iap->vi.in_size > VC_MAXDATASIZE) {
++	if (iap->vi.in_size > VC_MAXDATASIZE ||
++	    iap->vi.out_size > VC_MAXDATASIZE) {
+ 		NDFREE(&ndp, 0);
+ 		return (EINVAL);
+ 	}

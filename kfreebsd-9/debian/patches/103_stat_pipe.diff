@@ -1,0 +1,20 @@
+--- a/sys/kern/sys_pipe.c
++++ b/sys/kern/sys_pipe.c
+@@ -1405,6 +1405,8 @@
+ 	struct thread *td;
+ {
+ 	struct pipe *pipe = fp->f_data;
++	unsigned long hash;
++	
+ #ifdef MAC
+ 	int error;
+ 
+@@ -1431,6 +1433,8 @@
+ 	 * Left as 0: st_dev, st_ino, st_nlink, st_rdev, st_flags, st_gen.
+ 	 * XXX (st_dev, st_ino) should be unique.
+ 	 */
++	hash = (unsigned long) (pipe->pipe_pair);
++	ub->st_ino = (((hash >> 31) ^ hash) & 0x7FFFFFFF); 
+ 	return (0);
+ }
+ 
