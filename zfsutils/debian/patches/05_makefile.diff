@@ -34,7 +34,7 @@ diff -ur -x debian a/cddl/sbin/zfs/Makefile b/cddl/sbin/zfs/Makefile
 -	-lm -lnvpair -luutil -lutil
 +DPADD=	${LIBZFS} ${LIBGEOM} \
 +	${LIBM} ${LIBNVPAIR} ${LIBUUTIL}
-+LDADD=	-lzfs -lgeom -lnvpair -luutil
++LDADD=	-lzfs -lgeom -lnvpair -luutil -lbsd
 +
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libzfs \
 +       -L${.CURDIR}/../../../cddl/lib/libnvpair \
@@ -53,7 +53,7 @@ diff -ur -x debian a/cddl/sbin/zpool/Makefile b/cddl/sbin/zpool/Makefile
 -LDADD=	-lavl -lzfs -lgeom -lbsdxml -lsbuf \
 -	-lm -lnvpair -luutil -lutil
 +DPADD=	${LIBZFS} ${LIBGEOM} ${LIBNVPAIR} ${LIBUUTIL}
-+LDADD=	-lzfs -lgeom -lnvpair -luutil
++LDADD=	-lzfs -lgeom -lnvpair -luutil -lbsd
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libzfs \
 +	-L${.CURDIR}/../../../cddl/lib/libnvpair \
 +	-L${.CURDIR}/../../../cddl/lib/libuutil
