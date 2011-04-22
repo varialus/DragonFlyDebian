@@ -42,8 +42,11 @@ get-orig-source:
 	         cddl/contrib/opensolaris/lib/libzpool \
 	         sys/cddl/compat/opensolaris \
 	         sys/cddl/contrib/opensolaris \
+	         cddl/lib/libavl \
 	         cddl/lib/libnvpair \
 	         cddl/lib/libuutil \
+	         cddl/lib/libzpool \
+	         cddl/lib/libumem \
 	         cddl/lib/libzfs \
 	         cddl/sbin/zpool \
 	         cddl/sbin/zfs \
@@ -63,7 +66,7 @@ patch-stamp:
 	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
 	touch $@
 
-build: build-libuutil build-libnvpair build-libzfs build-zfsutils
+build: build-libuutil build-libnvpair build-libzfs build-libumem build-libzpool build-zfsutils build-libavl
 
 build-libuutil: build-libuutil-stamp
 build-libuutil-stamp: patch
@@ -80,10 +83,35 @@ build-libzfs-stamp: patch build-libnvpair-stamp build-libuutil-stamp
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs
 	touch $@
 
+build-libumem: build-libumem-stamp
+build-libumem-stamp: patch
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libumem
+	touch $@
+
+
+build-libzpool: build-libzpool-stamp
+build-libzpool-stamp: patch
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libzpool
+	touch $@
+
+build-libzfs: build-libzfs-stamp
+build-libzfs-stamp: patch build-libnvpair-stamp build-libuutil-stamp
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs
+	touch $@
+
+build-libavl: build-libavl-stamp
+build-libavl-stamp: patch
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libavl
+	touch $@
+
 build-zfsutils: build-zfsutils-stamp
-build-zfsutils-stamp: patch build-libzfs-stamp build-libnvpair-stamp build-libuutil-stamp
+build-zfsutils-stamp: patch build-libzfs-stamp build-libnvpair-stamp build-libuutil-stamp build-libumem build-libzpool build-libavl
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs
+
+	$(PMAKE) -C $(CURDIR)/cddl/usr.sbin/zdb
+	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/zinject 
+	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/ztest/   
 	touch $@
 
 clean:
@@ -98,6 +126,14 @@ clean:
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool clean
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs clean
 	
+	
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libumem clean
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libzpool clean
+	$(PMAKE) -C $(CURDIR)/cddl/lib/libavl clean
+	$(PMAKE) -C $(CURDIR)/cddl/usr.sbin/zdb clean
+	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/ztest clean
+	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/zinject clean
+
 	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
 	rm -rf .pc
 	rm -f *stamp
@@ -135,6 +171,8 @@ binary-arch: build install
 	dh_makeshlibs -plibnvpair0 --add-udeb=libnvpair0-udeb
 	dh_makeshlibs -plibuutil0 --add-udeb=libuutil0-udeb
 	dh_makeshlibs -plibzfs0 --add-udeb=libzfs0-udeb
+	dh_makeshlibs -pzpool0 --add-udeb=libzpool0-udeb
+	dh_makeshlibs -pumem0 --add-udeb=libumem0-udeb.install
 	dh_makeshlibs -pzfsutils --add-udeb=zfsutils-udeb
 	dh_installdeb -a
 	dh_shlibdeps -a
