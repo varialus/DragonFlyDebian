@@ -23,3 +23,33 @@ diff -ur -x debian a/cddl/compat/opensolaris/misc/zmount.c b/cddl/compat/opensol
  	build_iovec(&iov, &iovlen, "fspath", __DECONST(char *, dir),
  	    (size_t)-1);
  	build_iovec(&iov, &iovlen, "from", __DECONST(char *, spec), (size_t)-1);
+--- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/arc.c
++++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/arc.c
+@@ -2265,7 +2265,7 @@
+ }
+ 
+ static void
+-arc_reclaim_thread(void *dummy __unused)
++arc_reclaim_thread(void *dummy)
+ {
+ 	clock_t			growtime = 0;
+ 	arc_reclaim_strategy_t	last_reclaim = ARC_RECLAIM_CONS;
+@@ -3771,7 +3771,7 @@
+ static eventhandler_tag arc_event_lowmem = NULL;
+ 
+ static void
+-arc_lowmem(void *arg __unused, int howto __unused)
++arc_lowmem(void *arg, int howto)
+ {
+ 
+ 	/* Serialize access via arc_lowmem_lock. */
+@@ -4828,7 +4828,7 @@
+  * heart of the L2ARC.
+  */
+ static void
+-l2arc_feed_thread(void *dummy __unused)
++l2arc_feed_thread(void *dummy)
+ {
+ 	callb_cpr_t cpr;
+ 	l2arc_dev_t *dev;
+v
