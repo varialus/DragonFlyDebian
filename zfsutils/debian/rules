@@ -86,7 +86,7 @@ build-libumem-stamp: patch
 
 
 build-libzpool: build-libzpool-stamp
-build-libzpool-stamp: patch
+build-libzpool-stamp: patch build-libavl build-libnvpair-stamp build-libumem
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libzpool
 	touch $@
 
@@ -101,7 +101,7 @@ build-libavl-stamp: patch
 	touch $@
 
 build-zfsutils: build-zfsutils-stamp
-build-zfsutils-stamp: patch build-libzfs-stamp build-libnvpair-stamp build-libuutil-stamp build-libumem build-libzpool build-libavl
+build-zfsutils-stamp: patch build-libzfs-stamp build-libnvpair-stamp build-libuutil-stamp build-libumem build-libzpool
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs
 
