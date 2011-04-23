@@ -1,3 +1,14 @@
+---
+ cddl/lib/libuutil/Makefile    |    2 ++
+ cddl/lib/libzfs/Makefile      |    5 ++++-
+ cddl/lib/libzpool/Makefile    |    5 ++++-
+ cddl/sbin/zfs/Makefile        |   11 +++++++----
+ cddl/sbin/zpool/Makefile      |    9 +++++----
+ cddl/usr.bin/zinject/Makefile |    7 ++++++-
+ cddl/usr.bin/ztest/Makefile   |    5 ++++-
+ cddl/usr.sbin/zdb/Makefile    |    7 ++++++-
+ 8 files changed, 38 insertions(+), 13 deletions(-)
+
 --- a/cddl/lib/libzfs/Makefile
 +++ b/cddl/lib/libzfs/Makefile
 @@ -7,7 +7,10 @@
@@ -12,8 +23,8 @@
  
  SRCS=	deviceid.c \
  	fsshare.c \
---- a/cddl/lib/libuutil/Makefile	2010-07-29 03:23:17.000000000 +0200
-+++ b/cddl/lib/libuutil/Makefile	2010-07-29 03:24:01.000000000 +0200
+--- a/cddl/lib/libuutil/Makefile
++++ b/cddl/lib/libuutil/Makefile
 @@ -22,4 +22,6 @@
  CFLAGS+= -I${.CURDIR}/../../../cddl/compat/opensolaris/include
  CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/head
@@ -21,9 +32,8 @@
 +LDADD= -lrt -lbsd -lpthread
 +
  .include <bsd.lib.mk>
-diff -ur -x debian a/cddl/sbin/zfs/Makefile b/cddl/sbin/zfs/Makefile
---- a/cddl/sbin/zfs/Makefile	2008-03-27 19:21:25.000000000 -0400
-+++ b/cddl/sbin/zfs/Makefile	2010-07-27 20:11:17.802817408 -0400
+--- a/cddl/sbin/zfs/Makefile
++++ b/cddl/sbin/zfs/Makefile
 @@ -19,9 +19,12 @@
  CFLAGS+= -I${.CURDIR}/../../../sys/cddl/contrib/opensolaris/uts/common/fs/zfs
  CFLAGS+= -I${.CURDIR}/../../../sys/cddl/contrib/opensolaris/uts/common/sys
@@ -41,9 +51,8 @@ diff -ur -x debian a/cddl/sbin/zfs/Makefile b/cddl/sbin/zfs/Makefile
 +       -L${.CURDIR}/../../../cddl/lib/libuutil 
  
  .include <bsd.prog.mk>
-diff -ur -x debian a/cddl/sbin/zpool/Makefile b/cddl/sbin/zpool/Makefile
---- a/cddl/sbin/zpool/Makefile	2008-11-17 15:49:29.000000000 -0500
-+++ b/cddl/sbin/zpool/Makefile	2010-07-27 20:11:17.803821828 -0400
+--- a/cddl/sbin/zpool/Makefile
++++ b/cddl/sbin/zpool/Makefile
 @@ -21,9 +21,10 @@
  CFLAGS+= -I${.CURDIR}/../../../sys/cddl/contrib/opensolaris/uts/common/fs/zfs
  CFLAGS+= -I${.CURDIR}/../../../sys/cddl/contrib/opensolaris/uts/common/sys
@@ -59,12 +68,9 @@ diff -ur -x debian a/cddl/sbin/zpool/Makefile b/cddl/sbin/zpool/Makefile
 +	-L${.CURDIR}/../../../cddl/lib/libuutil
  
  .include <bsd.prog.mk>
-
-Index: zfsutils-8.1-patch/cddl/usr.sbin/zdb/Makefile
-===================================================================
---- zfsutils-8.1-patch.orig/cddl/usr.sbin/zdb/Makefile	2011-04-06 17:17:31.000000000 -0400
-+++ zfsutils-8.1-patch/cddl/usr.sbin/zdb/Makefile	2011-04-06 17:17:47.000000000 -0400
-@@ -18,7 +18,12 @@
+--- a/cddl/usr.sbin/zdb/Makefile
++++ b/cddl/usr.sbin/zdb/Makefile
+@@ -21,7 +21,12 @@
  
  DPADD=	${LIBAVL} ${LIBGEOM} ${LIBM} ${LIBNVPAIR} ${LIBPTHREAD} ${LIBUMEM} \
  	${LIBUUTIL} ${LIBZ} ${LIBZFS} ${LIBZPOOL}
@@ -78,11 +84,9 @@ Index: zfsutils-8.1-patch/cddl/usr.sbin/zdb/Makefile
  
  CSTD=	c99
  
-Index: zfsutils-8.1-patch/cddl/usr.bin/zinject/Makefile
-===================================================================
---- zfsutils-8.1-patch.orig/cddl/usr.bin/zinject/Makefile	2011-04-06 17:17:31.000000000 -0400
-+++ zfsutils-8.1-patch/cddl/usr.bin/zinject/Makefile	2011-04-06 17:17:47.000000000 -0400
-@@ -17,6 +17,11 @@
+--- a/cddl/usr.bin/zinject/Makefile
++++ b/cddl/usr.bin/zinject/Makefile
+@@ -20,6 +20,11 @@
  
  DPADD=	${LIBAVL} ${LIBGEOM} ${LIBM} ${LIBNVPAIR} ${LIBUMEM} ${LIBUUTIL} \
  	${LIBZFS} ${LIBZPOOL} ${LIBUUTIL}
@@ -95,12 +99,9 @@ Index: zfsutils-8.1-patch/cddl/usr.bin/zinject/Makefile
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libzfs
  
  .include <bsd.prog.mk>
-Index: zfsutils-8.1-patch/cddl/usr.bin/ztest/Makefile
-===================================================================
---- zfsutils-8.1-patch.orig/cddl/usr.bin/ztest/Makefile	2011-04-06 17:17:31.000000000 -0400
-+++ zfsutils-8.1-patch/cddl/usr.bin/ztest/Makefile	2011-04-06 17:21:32.000000000 -0400
-@@ -14,7 +14,10 @@
- CFLAGS+= -I${.CURDIR}/../../lib/libumem
+--- a/cddl/usr.bin/ztest/Makefile
++++ b/cddl/usr.bin/ztest/Makefile
+@@ -17,7 +17,10 @@
  
  DPADD=	${LIBM} ${LIBNVPAIR} ${LIBUMEM} ${LIBZPOOL} \
  	${LIBPTHREAD} ${LIBZ} ${LIBAVL}
@@ -112,8 +113,8 @@ Index: zfsutils-8.1-patch/cddl/usr.bin/ztest/Makefile
  
  CSTD=	c99
  
---- zfsutils-8.2.orig/cddl/lib/libzpool/Makefile
-+++ zfsutils-8.2/cddl/lib/libzpool/Makefile
+--- a/cddl/lib/libzpool/Makefile
++++ b/cddl/lib/libzpool/Makefile
 @@ -53,7 +53,10 @@
  CFLAGS+=	-I${.CURDIR}/../../../lib/libthr/arch/${MACHINE_ARCH}/include
  
@@ -126,4 +127,3 @@ Index: zfsutils-8.1-patch/cddl/usr.bin/ztest/Makefile
  
  # atomic.S doesn't like profiling.
  NO_PROFILE=
-

@@ -1,18 +1,22 @@
-diff -ur -x debian a/cddl/compat/opensolaris/misc/mnttab.c b/cddl/compat/opensolaris/misc/mnttab.c
---- a/cddl/compat/opensolaris/misc/mnttab.c	2008-11-17 15:49:29.000000000 -0500
-+++ b/cddl/compat/opensolaris/misc/mnttab.c	2010-07-27 20:07:02.656479850 -0400
-@@ -89,7 +89,7 @@
+---
+ cddl/compat/opensolaris/misc/mnttab.c                |    2 +-
+ cddl/compat/opensolaris/misc/zmount.c                |    3 +++
+ sys/cddl/contrib/opensolaris/uts/common/fs/zfs/arc.c |    6 +++---
+ 3 files changed, 7 insertions(+), 4 deletions(-)
+
+--- a/cddl/compat/opensolaris/misc/mnttab.c
++++ b/cddl/compat/opensolaris/misc/mnttab.c
+@@ -164,7 +164,7 @@
  }
  
  int
 -getmntany(FILE *fd __unused, struct mnttab *mgetp, struct mnttab *mrefp)
 +getmntany(FILE *fd, struct mnttab *mgetp, struct mnttab *mrefp)
  {
- 	static struct statfs *sfs = NULL;
- 	static char mntopts[MNTMAXSTR];
-diff -ur -x debian a/cddl/compat/opensolaris/misc/zmount.c b/cddl/compat/opensolaris/misc/zmount.c
---- a/cddl/compat/opensolaris/misc/zmount.c	2008-11-17 15:49:29.000000000 -0500
-+++ b/cddl/compat/opensolaris/misc/zmount.c	2010-07-27 20:07:02.659058030 -0400
+ 	struct statfs *sfs;
+ 	int i, error;
+--- a/cddl/compat/opensolaris/misc/zmount.c
++++ b/cddl/compat/opensolaris/misc/zmount.c
 @@ -92,6 +92,9 @@
  	iov = NULL;
  	iovlen = 0;
@@ -52,4 +56,3 @@ diff -ur -x debian a/cddl/compat/opensolaris/misc/zmount.c b/cddl/compat/opensol
  {
  	callb_cpr_t cpr;
  	l2arc_dev_t *dev;
-v
