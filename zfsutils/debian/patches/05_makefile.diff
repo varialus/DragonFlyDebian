@@ -59,3 +59,59 @@ diff -ur -x debian a/cddl/sbin/zpool/Makefile b/cddl/sbin/zpool/Makefile
 +	-L${.CURDIR}/../../../cddl/lib/libuutil
  
  .include <bsd.prog.mk>
+
+Index: zfsutils-8.1-patch/cddl/usr.sbin/zdb/Makefile
+===================================================================
+--- zfsutils-8.1-patch.orig/cddl/usr.sbin/zdb/Makefile	2011-04-06 17:17:31.000000000 -0400
++++ zfsutils-8.1-patch/cddl/usr.sbin/zdb/Makefile	2011-04-06 17:17:47.000000000 -0400
+@@ -18,7 +18,13 @@
+ 
+ DPADD=	${LIBAVL} ${LIBGEOM} ${LIBM} ${LIBNVPAIR} ${LIBPTHREAD} ${LIBUMEM} \
+ 	${LIBUUTIL} ${LIBZ} ${LIBZFS} ${LIBZPOOL}
+-LDADD=	-lavl -lgeom -lm -lnvpair -lpthread -lumem -luutil -lz -lzfs -lzpool
++LDADD=	-lgeom -lm -lnvpair -lpthread -lumem -luutil -lz -lzfs -lzpool
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libumem
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libzpool
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libnvpair
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libuutil
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libzfs
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libavl  ${.CURDIR}/../../../cddl/lib/libavl/libavl.a
+ 
+ CSTD=	c99
+ 
+Index: zfsutils-8.1-patch/cddl/usr.bin/zinject/Makefile
+===================================================================
+--- zfsutils-8.1-patch.orig/cddl/usr.bin/zinject/Makefile	2011-04-06 17:17:31.000000000 -0400
++++ zfsutils-8.1-patch/cddl/usr.bin/zinject/Makefile	2011-04-06 17:17:47.000000000 -0400
+@@ -17,6 +17,12 @@
+ 
+ DPADD=	${LIBAVL} ${LIBGEOM} ${LIBM} ${LIBNVPAIR} ${LIBUMEM} ${LIBUUTIL} \
+ 	${LIBZFS} ${LIBZPOOL} ${LIBUUTIL}
+-LDADD=	-lavl -lgeom -lm -lnvpair -lumem -luutil -lzfs -lzpool
++LDADD=	-lgeom -lm -lnvpair -lumem -luutil -lzfs -lzpool
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libzpool
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libumem
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libnvpair
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libuutil
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libzfs
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libavl  ${.CURDIR}/../../../cddl/lib/libavl/libavl.a
+ 
+ .include <bsd.prog.mk>
+Index: zfsutils-8.1-patch/cddl/usr.bin/ztest/Makefile
+===================================================================
+--- zfsutils-8.1-patch.orig/cddl/usr.bin/ztest/Makefile	2011-04-06 17:17:31.000000000 -0400
++++ zfsutils-8.1-patch/cddl/usr.bin/ztest/Makefile	2011-04-06 17:21:32.000000000 -0400
+@@ -14,7 +14,11 @@
+ CFLAGS+= -I${.CURDIR}/../../lib/libumem
+ 
+ DPADD=	${LIBM} ${LIBNVPAIR} ${LIBUMEM} ${LIBZPOOL} \
+ 	${LIBPTHREAD} ${LIBZ} ${LIBAVL}
+-LDADD=	-lm -lnvpair -lumem -lzpool -lpthread -lz -lavl
++LDADD=	-lm -lnvpair -lumem -lzpool -lpthread -lz -lrt -ldl -lbsd
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libzpool
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libumem
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libnvpair
++LDADD+= -L${.CURDIR}/../../../cddl/lib/libavl  ${.CURDIR}/../../../cddl/lib/libavl/libavl.a
+ 
+ CSTD=	c99
+ 
