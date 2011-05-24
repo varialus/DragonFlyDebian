@@ -21,6 +21,9 @@
 #include <unistd.h>
 #include <sysdep.h>
 
+extern int __syscall_obreak (void *addr);
+libc_hidden_proto (__syscall_obreak)
+
 extern void _end;
 
 /* sbrk.c expects this.  */
