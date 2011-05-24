@@ -61,6 +61,10 @@ union semun
   unsigned short *array;	/* array for GETALL & SETALL */
 };
 
+extern int __syscall_semctl (int semid, int semnum,
+                             int cmd, union semun *arg);
+libc_hidden_proto (__syscall_semctl)
+
 int
 semctl (int semid, int semnum, int cmd, ...)
 {
