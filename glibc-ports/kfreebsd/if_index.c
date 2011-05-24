@@ -227,8 +227,8 @@ add_c (struct nameindex_locals *l, const char *name)
     {
       size_t new_allocated =
 	(l->c_len + n < 2 * l->c_allocated + 1
-	 ? l->c_len + n
-	 : 2 * l->c_allocated + 1);
+	 ? 2 * l->c_allocated + 1
+	 : l->c_len + n);
       char *new_array = (char *) realloc (l->c_array, new_allocated);
       if (new_array == NULL)
 	{
