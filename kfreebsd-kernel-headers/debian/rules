@@ -15,7 +15,6 @@ endif
 
 HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-kernel-headers
 SRC_TAR		:= /usr/src/kfreebsd-source-8.2.tar.xz
-SRC_DIR		:= kfreebsd-source-8.2
 
 clean:
 	dh_testdir
@@ -28,9 +27,9 @@ build: build-stamp
 build-stamp:
 	dh_testdir
 	
-	tar xfJ $(SRC_TAR)
+	tar xfJ $(SRC_TAR) --strip-components=1
 
-	cd $(SRC_DIR) && QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a
+	QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a
 
 	touch build-stamp
 
@@ -39,17 +38,17 @@ install: build
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-	dh_install --sourcedir=$(SRC_DIR)
+	dh_install --sourcedir=$(CURDIR)
 
 	# legacy USB stack
 	#mkdir -p $(HEADERS_PACKAGE)/usr/include/legacy/dev/usb
 	#install -p $(CURDIR)/debian/legacy-usb/*.h $(HEADERS_PACKAGE)/usr/include/legacy/dev/usb/
 
 ifneq ($(filter i386 amd64, $(kfreebsd_cpu)),)
-	sh debian/generate-asm.sh $(kfreebsd_cpu) $(SRC_DIR)/sys $(HEADERS_PACKAGE)/usr/include
+	sh debian/generate-asm.sh $(kfreebsd_cpu) $(CURDIR)/sys $(HEADERS_PACKAGE)/usr/include
 else
 	mkdir -p $(HEADERS_PACKAGE)/usr/include/machine
-	cd $(SRC_DIR)/sys/$(kfreebsd_cpu)/include \
+	cd $(CURDIR)/sys/$(kfreebsd_cpu)/include \
 		&& find . -type f -name "*.h" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/include/machine \;
 endif
 
