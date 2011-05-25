@@ -3,9 +3,13 @@ Description: retry forever after mouse is dettached, since you never know
  when it can be attached back.
 Status: sent upstream
 
---- src.old/usr.sbin/moused/moused.c	2005-02-20 16:47:05.000000000 +0100
-+++ src/usr.sbin/moused/moused.c	2005-02-20 16:46:25.000000000 +0100
-@@ -778,9 +778,9 @@
+---
+ usr.sbin/moused/moused.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+--- a/usr.sbin/moused/moused.c
++++ b/usr.sbin/moused/moused.c
+@@ -756,9 +756,9 @@ main(int argc, char *argv[])
  	usage();
      }
  
@@ -17,7 +21,7 @@ Status: sent upstream
  	    retry = 5;
      }
  
-@@ -790,7 +790,7 @@
+@@ -768,7 +768,7 @@ main(int argc, char *argv[])
  	    signal(SIGINT , cleanup);
  	    signal(SIGQUIT, cleanup);
  	    signal(SIGTERM, cleanup);
