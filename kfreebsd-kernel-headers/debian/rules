@@ -19,6 +19,7 @@ SRC_TAR		:= /usr/src/kfreebsd-source-8.2.tar.xz
 clean:
 	dh_testdir
 	dh_testroot
+	rm -rf .pc
 	rm -f *-stamp
 	rm -rf sys usr.sbin
 	dh_clean
@@ -29,7 +30,7 @@ build-stamp:
 
 	tar xfJ $(SRC_TAR) --strip-components=1
 
-	QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a
+	QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a || test $$? = 2
 
 	touch build-stamp
 
