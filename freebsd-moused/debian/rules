@@ -41,9 +41,9 @@ build: build-arch build-indep
 clean:
 	dh_testdir
 	dh_testroot
-	
+
 	$(PMAKE) -C usr.sbin/moused clean
-	
+
 	dh_clean
 
 install-indep: build-indep
@@ -53,11 +53,11 @@ install-arch: build-arch
 	dh_testroot
 	dh_prep -a
 	dh_installdirs -a
-	
+
 	$(PMAKE) -C usr.sbin/moused install
 	# Geez
 	mv $(DESTDIR)/moused $(DESTDIR)/usr/sbin/
-	
+
 	dh_install -a
 
 install: install-indep install-arch

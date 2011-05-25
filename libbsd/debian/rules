@@ -20,7 +20,7 @@ build-indep:
 
 build-arch:
 	dh_testdir
-	
+
 	$(MAKE)
 
 build: build-indep build-arch
@@ -28,9 +28,9 @@ build: build-indep build-arch
 clean:
 	dh_testdir
 	dh_testroot
-	
+
 	$(MAKE) clean
-	
+
 	dh_clean
 
 install-arch: build-arch
@@ -38,7 +38,7 @@ install-arch: build-arch
 	dh_testroot
 	dh_prep
 	dh_installdirs
-	
+
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 
 binary-indep:
@@ -66,4 +66,3 @@ binary: binary-indep binary-arch
 
 .PHONY: install-arch
 .PHONY: clean build-indep build-arch build binary-indep binary-arch binary
-

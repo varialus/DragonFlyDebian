@@ -33,17 +33,17 @@ include /usr/share/quilt/quilt.make
 
 build: patch
 	dh_testdir
-	
+
 	CFLAGS="$(CFLAGS)" LDADD="$(LDADD)" $(MAKE)
 
 clean:
 	dh_testdir
 	dh_testroot
-	
+
 	[ ! -f Makefile ] || $(MAKE) clean
-	
+
 	$(this) unpatch
-	
+
 	dh_clean
 
 install: build
@@ -51,11 +51,11 @@ install: build
 	dh_testroot
 	dh_prep
 	dh_installdirs
-	
+
 	mkdir -p $(DESTDIR)/lib
 	mkdir -p $(DESTDIR)/sbin
 	mkdir -p $(DESTDIR)/usr/share/man/man8
-	
+
 	$(MAKE) install DESTDIR=$(DESTDIR) prefix=/usr exec_prefix=/
 
 # Build architecture-independent files here.
@@ -83,4 +83,3 @@ binary-arch: install
 binary: binary-indep binary-arch
 
 .PHONY: build clean binary-indep binary-arch binary install
-

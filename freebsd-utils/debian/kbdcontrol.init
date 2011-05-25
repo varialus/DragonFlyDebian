@@ -13,7 +13,7 @@
 #		This file should be used to construct scripts for /etc/init.d.
 #
 #		Written by Miquel van Smoorenburg <miquels@cistron.nl>.
-#		Modified for Debian 
+#		Modified for Debian
 #		by Ian Murdock <imurdock@gnu.ai.mit.edu>.
 #
 # Version:	@(#)skeleton  1.9  26-Feb-2001  miquels@cistron.nl
@@ -68,10 +68,10 @@ alter_to_debian_keymap () {
 	  -e "s/^  231   .*/  231   fkey61 fkey61 fkey61 fkey61 fkey61 fkey61 boot   fkey61  O/" \
 	  > $TMPFILE
 
-	kbdcontrol -l $TMPFILE  
+	kbdcontrol -l $TMPFILE
 	rm -f $TMPFILE
-  
-	# and generate  ESC [ 3 ~ for fkey61  
+
+	# and generate  ESC [ 3 ~ for fkey61
 	SEQ=`/bin/echo -n -e \\\033[3~`
 	#echo $SEQ | od -ax
 	kbdcontrol -f 61 $SEQ
@@ -93,10 +93,10 @@ alter_to_native_keymap () {
 	  -e "s/^  142   .*/  142   bs     bs     del    del    bs     bs     del    del     O/" \
 	  > $TMPFILE
 
-	kbdcontrol -l $TMPFILE  
+	kbdcontrol -l $TMPFILE
 	rm -f $TMPFILE
-  
-	# and generate del for fkey61  
+
+	# and generate del for fkey61
 	SEQ=`/bin/echo -n -e \\\\177`
 	#echo $SEQ | od -ax
 	kbdcontrol -f 61 $SEQ

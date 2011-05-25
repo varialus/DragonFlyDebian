@@ -12,14 +12,14 @@ PMAKE := freebsd-make DESTDIR=$(pkgdir) BINDIR=/usr/bin
 clean:
 	dh_testdir
 	dh_testroot
-	
+
 	$(PMAKE) clean
-	
+
 	dh_clean
 
 build-indep:
 	dh_testdir
-	
+
 	$(PMAKE)
 
 build-arch:
@@ -31,7 +31,7 @@ install: build-indep
 	dh_testroot
 	dh_prep
 	dh_installdirs
-	
+
 	$(PMAKE) install etc-gnats-freefall
 	for i in $(pkgdir)/usr/share/man/man1/*.gz ; do \
 		[ -L $$i ] || gunzip $$i ; \
@@ -59,6 +59,5 @@ binary-arch:
 
 binary: binary-indep binary-arch
 
-.PHONY: build build-indep build-arch 
+.PHONY: build build-indep build-arch
 .PHONY: clean binary-indep binary-arch binary install
-

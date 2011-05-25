@@ -2,7 +2,7 @@
 rm -vf `find sys -name *.uu`
 rm -vf sys/contrib/dev/ral/rt2661_ucode.h
 rm -vf sys/gnu/dev/sound/pci/csaimg.h
-rm -vf sys/gnu/dev/sound/pci/maestro3_dsp.h 
+rm -vf sys/gnu/dev/sound/pci/maestro3_dsp.h
 rm -vf sys/dev/drm/mga_ucode.h
 rm -vf sys/dev/drm/r128_cce.c
 rm -vf sys/dev/drm/r600_microcode.h

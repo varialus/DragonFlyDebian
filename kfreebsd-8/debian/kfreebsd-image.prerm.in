@@ -33,7 +33,7 @@ case "$1" in
         # Run prerm hook if defined
         prerm_hook=$(sed '/^\s*prerm_hook/!d;s/.*=\s*//g' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$prerm_hook" ] ; then
-            echo "Running prerm hook script $prerm_hook." 1>&2 
+            echo "Running prerm hook script $prerm_hook." 1>&2
             $prerm_hook "$RELEASE" "/boot/kfreebsd-$RELEASE.gz"
         fi
 

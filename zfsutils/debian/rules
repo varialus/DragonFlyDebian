@@ -17,14 +17,14 @@ else
 	CFLAGS += -O2
 endif
 
-VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
-SVN=http://svn.freebsd.org/base/release/$(VERSION).0
-ORIGDIR=zfsutils-$(VERSION)
-PATH:=/usr/lib/freebsd:$(PATH)
-DESTDIR=$(CURDIR)/debian/tmp
-PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
-export SHLIB_MAJOR=0
-export SHLIBDIR=./
+VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
+SVN = http://svn.freebsd.org/base/release/$(VERSION).0
+ORIGDIR = zfsutils-$(VERSION)
+PATH := /usr/lib/freebsd:$(PATH)
+DESTDIR = $(CURDIR)/debian/tmp
+PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+export SHLIB_MAJOR = 0
+export SHLIBDIR = ./
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
@@ -106,8 +106,8 @@ build-zfsutils-stamp: patch build-libzfs-stamp build-libnvpair-stamp build-libuu
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs
 
 	$(PMAKE) -C $(CURDIR)/cddl/usr.sbin/zdb
-	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/zinject 
-	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/ztest/   
+	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/zinject
+	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/ztest/
 	touch $@
 
 clean:
@@ -121,8 +121,7 @@ clean:
 
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool clean
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs clean
-	
-	
+
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libumem clean
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libzpool clean
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libavl clean

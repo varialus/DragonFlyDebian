@@ -20,13 +20,13 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f *-stamp
-	rm -rf kfreebsd-source-* 
+	rm -rf kfreebsd-source-*
 	dh_clean
 
 build: build-stamp
 build-stamp:
 	dh_testdir
-	
+
 	tar xfJ $(SRC_TAR) --strip-components=1
 
 	QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a
@@ -67,12 +67,12 @@ binary-arch: build install
 #	dh_installlogrotate
 #	dh_installemacsen
 #	dh_installpam
-#	dh_installmime	
+#	dh_installmime
 #	dh_installinit
 #	dh_installcron
 #	dh_installman
 #	dh_installinfo
-	dh_installchangelogs 
+	dh_installchangelogs
 	dh_link
 	dh_strip
 	dh_compress

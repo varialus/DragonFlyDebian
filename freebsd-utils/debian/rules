@@ -16,13 +16,13 @@ else
 	CXXFLAGS += -O2
 endif
 
-VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
-SVN=http://svn.freebsd.org/base/release/$(VERSION).0
-#SVN=http://svn.freebsd.org/base/releng/8.1
-ORIGDIR=freebsd-utils-$(VERSION)
-PATH:=/usr/lib/freebsd:$(PATH)
-DESTDIR=$(CURDIR)/debian/tmp
-PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) -I$(CURDIR)/debian/include" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
+SVN = http://svn.freebsd.org/base/release/$(VERSION).0
+#SVN = http://svn.freebsd.org/base/releng/8.1
+ORIGDIR = freebsd-utils-$(VERSION)
+PATH := /usr/lib/freebsd:$(PATH)
+DESTDIR = $(CURDIR)/debian/tmp
+PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) -I$(CURDIR)/debian/include" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
 
 build: build-arch build-indep
 
@@ -34,14 +34,14 @@ get-orig-source:
 		 sbin/kldconfig sbin/kldload sbin/kldstat sbin/kldunload \
 		 usr.bin/ktrdump usr.bin/vmstat sbin/devfs sbin/fdisk \
 		 sbin/ifconfig sbin/route usr.bin/netstat usr.sbin/rpc.umntall \
-	         usr.sbin/ppp usr.sbin/pppctl usr.sbin/arp usr.bin/mkuzip \
+		 usr.sbin/ppp usr.sbin/pppctl usr.sbin/arp usr.bin/mkuzip \
 		 sbin/ipfw contrib/pf sbin/pfctl usr.sbin/authpf \
 		 sbin/mount_std sbin/umount sbin/mount_autofs sbin/mount_cd9660 \
 		 sbin/mount_ext2fs sbin/mount_hpfs sbin/mount_msdosfs sbin/mount_nfs \
 		 sbin/mount_ntfs sbin/mount_nullfs sbin/mount_udf sbin/mount_unionfs \
 		 sbin/mount_reiserfs sbin/mount \
 		 sbin/mdconfig sbin/ccdconfig sbin/swapon sbin/atacontrol sbin/camcontrol \
-	         sbin/gbde sbin/geom bin/kenv \
+		 sbin/gbde sbin/geom bin/kenv \
 		 usr.sbin/kbdcontrol usr.sbin/vidcontrol share/syscons \
 		 sbin/savecore sbin/dumpon \
 		 sys/kern/syscalls.c etc/pf.os ; do \
@@ -89,7 +89,7 @@ freebsd-utils-stamp: patch-stamp
 	$(PMAKE) -C sbin/mount_std
 	$(PMAKE) -C sbin/savecore
 	$(PMAKE) -C sbin/swapon
-	$(PMAKE) -C sbin/sysctl 
+	$(PMAKE) -C sbin/sysctl
 	$(PMAKE) -C sbin/umount
 	$(PMAKE) -C usr.bin/kdump
 	$(PMAKE) -C usr.bin/ktrace
@@ -186,7 +186,7 @@ clean:
 	$(PMAKE) -C sbin/gbde clean
 
 	$(PMAKE) -C usr.sbin/kbdcontrol clean
-	
+
 	$(PMAKE) -C usr.sbin/vidcontrol clean
 	$(PMAKE) -C share/syscons/scrnmaps clean
 

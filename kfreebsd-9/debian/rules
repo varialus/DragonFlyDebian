@@ -55,6 +55,7 @@ get-orig-source:
 control: clean
 	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
 		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
+	echo >> $(CURDIR)/debian/control
 	for arch in `ls $(CURDIR)/debian/arch/` ; do \
 		for config in `ls $(CURDIR)/debian/arch/$$arch/ | grep \.config` ; do \
 			flavor=$${config/.config/} ; \
@@ -62,6 +63,7 @@ control: clean
 			test -f $(CURDIR)/debian/arch/$$arch/$$flavor.defines && recommends=`awk '/^Recommends: / {print $$2}' $(CURDIR)/debian/arch/$$arch/$$flavor.defines` ; \
 			sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@arch@/$$arch/g" -e "s/@recommends@/$$recommends/g" \
 				$(CURDIR)/debian/control.flavor.in >> $(CURDIR)/debian/control ; \
+			echo >> $(CURDIR)/debian/control ; \
 		done ; \
 	done
 
@@ -148,7 +150,7 @@ build-flavor-%-stamp: src-flavor-%-stamp
 
 	# Set /lib/modules/${RELEASE} as module dir
 	sed -i -e 's,^KODIR?=.*,KODIR="/lib/modules/$(version)-$(abiname)-$*",g' $(FLAVOR_DIR)-$*/sys/conf/kern.pre.mk
-	sed -i -e '/^static char linker_path/s,".*","/lib/modules/$(version)-$(abiname)-$*",g' $(FLAVOR_DIR)-$*/sys/kern/kern_linker.c 
+	sed -i -e '/^static char linker_path/s,".*","/lib/modules/$(version)-$(abiname)-$*",g' $(FLAVOR_DIR)-$*/sys/kern/kern_linker.c
 
 	# Always set explicit link target to match with ld's implicit target (needed
 	# to build on non-kFreeBSD)
@@ -199,7 +201,7 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	install -o root -g root -m 644 \
 		$(FLAVOR_DIR)-$*/sys/boot/forth/loader.conf \
 		$(IMAGE_PACKAGE)-$*/boot/defaults/loader.conf
-	
+
 	# install the config file
 	install -o root -g root -m 644 \
 		$(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/conf/$*.config \
@@ -293,4 +295,3 @@ binary: binary-indep binary-arch
 
 .PHONY: clean build build-indep
 .PHONY: binary-indep binary-arch binary-indep binary-arch binary
-

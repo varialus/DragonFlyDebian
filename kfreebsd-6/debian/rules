@@ -28,18 +28,20 @@ SRC_DIR		:= kfreebsd-source-$(version)
 HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
 FLAVOR_DIR	:= flavor-$(version)-$(abiname)
 
-MAKE		:= make MACHINE_ARCH=$(cpu) CC=gcc-3.4 WERROR= 
+MAKE		:= make MACHINE_ARCH=$(cpu) CC=gcc-3.4 WERROR=
 PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 
 control: clean
 	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
 		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
+	echo >> $(CURDIR)/debian/control
 	for arch in `ls $(CURDIR)/debian/arch/` ; do \
 		for config in `ls $(CURDIR)/debian/arch/$$arch/ | grep \.config` ; do \
 			flavor=$${config/.config/} ; \
 			test -f $(CURDIR)/debian/arch/$$arch/$$flavor.defines && recommends=`awk '/^Recommends: / {print $$2}' $(CURDIR)/debian/arch/$$arch/$$flavor.defines` ; \
 			sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@arch@/$$arch/g" -e "s/@recommends@/$$recommends/g" \
 				$(CURDIR)/debian/control.flavor.in >> $(CURDIR)/debian/control ; \
+			echo >> $(CURDIR)/debian/control ; \
 		done ; \
 	done
 
@@ -55,7 +57,7 @@ clean:
 src: src-stamp
 src-stamp:
 	tar xfj $(CURDIR)/src.tar.bz2
-	
+
 	set -e ; find src -type d -name CVS | xargs rm -rf
 
 	set -e ; find src -type f | (while read i ; do \
@@ -71,7 +73,7 @@ src-stamp:
 		-e 's,#\( \|\t\)*include\( \|\t\)*\(<\|"\)bpfilter.h\(>\|"\),,g' \
 		-e 's,#\( \|\t\)*include\( \|\t\)*\(<\|"\)pflog.h\(>\|"\),,g' \
 	; done)
-	
+
 	set -e ; cd $(CURDIR)/src ; QUILT_PC=$(CURDIR)/.pc QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a ; cd $(CURDIR)
 
 	install debian/gen-ld-u-options src/usr.sbin/config
@@ -81,7 +83,7 @@ src-stamp:
 build-indep: build-indep-stamp
 build-indep-stamp: src
 	dh_testdir
-	
+
 	cp -af src $(SRC_DIR)
 
 	touch build-indep-stamp
@@ -112,7 +114,7 @@ config: src
 build-arch: $(foreach flavor,$(flavours),build-flavor-$(flavor)-stamp)
 build-flavor-%-stamp: src config
 	cp -af src $(FLAVOR_DIR)-$*
-	
+
 	# Add the abiname and the flavor to the kernel version
 	sed -i -e 's/^RELEASE=".*"/RELEASE="$(version)-$(abiname)-$*"/g' $(FLAVOR_DIR)-$*/sys/conf/newvers.sh
 
@@ -132,11 +134,11 @@ build-flavor-%-stamp: src config
 	touch build-flavor-$*-stamp
 
 install-common-stamp: src
-	dh_testdir 
+	dh_testdir
 	dh_testroot
 	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
 	cd src \
-		&& find . -type f -name "*.h" -not -regex ".*modules.*" -not -regex ".*sys/$(cpu)/.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \; 
+		&& find . -type f -name "*.h" -not -regex ".*modules.*" -not -regex ".*sys/$(cpu)/.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \;
 	find $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) -type f -exec chmod 644 {} \;
 
 	touch install-common-stamp
@@ -160,7 +162,7 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	install -o root -g root -m 644 \
 		$(FLAVOR_DIR)-$*/sys/boot/forth/loader.conf \
 		$(IMAGE_PACKAGE)-$*/boot/defaults/loader.conf
-	
+
 	# now install the kernel
 	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(cpu)/compile/$(configfile) DESTDIR=$(IMAGE_PACKAGE)-$* install
 	mv $(IMAGE_PACKAGE)-$*/lib/modules/$(version)-$(abiname)-$*/kernel $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
@@ -179,7 +181,7 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 
 	# remove device.hints (built into kernel)
 	rm -f $(IMAGE_PACKAGE)-$*/boot/device.hints
-	
+
 	# override file
 	mkdir -p $(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides
 	install -p -o root -g root -m 644 \
@@ -194,13 +196,13 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	# scripts
 	sed -e "s/@RELEASE@/$(version)-$(abiname)-$*/g" debian/kfreebsd-image.postinst.in \
 		> debian/kfreebsd-image-$(version)-$(abiname)-$*.postinst
-	
+
 	# headers package
 	mkdir -p $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu)
 	cd $(FLAVOR_DIR)-$*/sys/$(cpu) \
 		&& find . -type f -name "*.h" -not -regex ".*modules.*" -exec cp --parents {} $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu) \; \
 		&& cp -d --parents compile/$(configfile)/machine $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu) \
-		&& cp -d --parents conf/$(configfile) $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu) 
+		&& cp -d --parents conf/$(configfile) $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu)
 	find $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(cpu) -type f -exec chmod 644 {} \;
 	for dir in `ls $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)/sys` ; do \
 		ln -s ../../$(HEADERS_DIR)/sys/$$dir $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$$dir ; \
@@ -246,10 +248,9 @@ binary-arch: build-arch install-arch
 else
 binary-arch:
 	# We have nothing to do
-endif	
+endif
 
 binary: binary-indep binary-arch
 
 .PHONY: clean build build-indep
 .PHONY: binary-indep binary-arch binary-indep binary-arch binary
-

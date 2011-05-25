@@ -30,7 +30,7 @@ case "$1" in
         # Run preinst hook if defined
         preinst_hook=$(sed '/^\s*preinst_hook/!d;s/.*=\s*//' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$preinst_hook" ] ; then
-            echo "Running preinst hook script $preinst_hook." 1>&2 
+            echo "Running preinst hook script $preinst_hook." 1>&2
             $preinst_hook "$RELEASE" "/boot/kfreebsd-$RELEASE.gz"
         fi
 

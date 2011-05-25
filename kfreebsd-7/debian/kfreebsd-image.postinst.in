@@ -34,7 +34,7 @@ case "$1" in
             done
 
 	    mkdir -p /boot/kernel
-    
+
             if [ "$(readlink -f /boot/kernel/kernel.gz)" != "/boot/kfreebsd-$RELEASE.gz" ] ; then
                 rm -f /boot/kernel/kernel.old.gz
                 if [ -L /boot/kernel/kernel.gz ] ; then
@@ -42,7 +42,7 @@ case "$1" in
                 fi
                 ln -s /boot/kfreebsd-$RELEASE.gz /boot/kernel/kernel.gz
             fi
-    
+
             # on i386 acpi MUST be within kfreebsd-loader reach
             if [ "${RELEASE%%-[456]86}" != "${RELEASE}" ] ; then
                 if [ "$(readlink -f /boot/kernel/acpi.ko)" != "/lib/modules/$RELEASE/acpi.ko" ] ; then
@@ -51,7 +51,7 @@ case "$1" in
                         mv /boot/kernel/acpi.ko /boot/kernel/acpi.ko.old
                     fi
                     ln -s /lib/modules/$RELEASE/acpi.ko /boot/kernel/acpi.ko
-                fi    
+                fi
             fi
         fi
 
@@ -65,7 +65,7 @@ case "$1" in
         # Run /etc/kernel-img.conf postinst hook if defined
         postinst_hook=$(sed '/^\s*postinst_hook/!d;s/.*=\s*//' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$postinst_hook" ] ; then
-            echo "Running postinst hook script $postinst_hook." 1>&2 
+            echo "Running postinst hook script $postinst_hook." 1>&2
             $postinst_hook "$RELEASE" "/boot/kfreebsd-$RELEASE.gz"
         fi
 
@@ -77,7 +77,7 @@ case "$1" in
                 /etc/kernel/postinst.d
         fi
     ;;
-   
+
     abort-upgrade|abort-remove|abort-deconfigure)
     ;;
 
@@ -93,5 +93,3 @@ esac
 #DEBHELPER#
 
 exit 0
-
-

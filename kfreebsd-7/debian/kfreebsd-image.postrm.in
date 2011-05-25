@@ -35,7 +35,7 @@ case "$1" in
         # Run /etc/kernel-img.conf postrm hook if defined
         postrm_hook=$(sed '/^\s*postrm_hook/!d;s/.*=\s*//' $KERNEL_IMG_CONF 2>/dev/null || true)
         if [ -n "$postrm_hook" ] ; then
-            echo "Running postrm hook script $postrm_hook." 1>&2 
+            echo "Running postrm hook script $postrm_hook." 1>&2
             $postrm_hook "$RELEASE" "/boot/kfreebsd-$RELEASE.gz"
         fi
 
@@ -48,7 +48,7 @@ case "$1" in
                 /etc/kernel/postrm.d
         fi
     ;;
-    
+
     purge|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
     ;;
 

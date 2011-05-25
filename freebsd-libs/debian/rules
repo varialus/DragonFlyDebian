@@ -1,7 +1,8 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 # Sample debian/rules that uses debhelper.
-SHELL=bash
+
+SHELL = bash
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
@@ -17,15 +18,15 @@ else
 	CFLAGS += -O2
 endif
 
-VERSION=$(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
-SVN=http://svn.freebsd.org/base/release/$(VERSION).0
-#SVN=http://svn.freebsd.org/base/releng/8.1
-ORIGDIR=freebsd-libs-$(VERSION)
-PATH:=/usr/lib/freebsd:$(PATH)
-DESTDIR=$(CURDIR)/debian/tmp
-PMAKE=COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
-export SHLIB_MAJOR=0
-kernel=$(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
+SVN = http://svn.freebsd.org/base/release/$(VERSION).0
+#SVN = http://svn.freebsd.org/base/releng/8.1
+ORIGDIR = freebsd-libs-$(VERSION)
+PATH := /usr/lib/freebsd:$(PATH)
+DESTDIR = $(CURDIR)/debian/tmp
+PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+export SHLIB_MAJOR = 0
+kernel = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
