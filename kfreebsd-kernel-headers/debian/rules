@@ -41,10 +41,6 @@ install: build
 	dh_installdirs
 	dh_install --sourcedir=$(CURDIR)
 
-	# legacy USB stack
-	#mkdir -p $(HEADERS_PACKAGE)/usr/include/legacy/dev/usb
-	#install -p $(CURDIR)/debian/legacy-usb/*.h $(HEADERS_PACKAGE)/usr/include/legacy/dev/usb/
-
 ifneq ($(filter i386 amd64, $(kfreebsd_cpu)),)
 	sh debian/generate-asm.sh $(kfreebsd_cpu) $(CURDIR)/sys $(HEADERS_PACKAGE)/usr/include
 else
