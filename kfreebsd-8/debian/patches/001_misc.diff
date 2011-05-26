@@ -2,6 +2,10 @@
 Status: chflags is BSD-specific.  We could add it to freebsd-utils.
   The rest has been rejected (kern/93502)
 
+---
+ sys/conf/kern.mk |   18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
 --- a/sys/conf/kern.mk
 +++ b/sys/conf/kern.mk
 @@ -1,5 +1,9 @@
@@ -31,7 +35,7 @@ Status: chflags is BSD-specific.  We could add it to freebsd-utils.
  .if !defined(WITH_GCC3)
  _Wno_pointer_sign=-Wno-pointer-sign
  .endif
-@@ -36,8 +44,12 @@
+@@ -36,8 +44,12 @@ _wundef=	-Wundef
  # reserved for user applications.
  #
  .if ${MACHINE_ARCH} == "i386" && ${CC} != "icc"

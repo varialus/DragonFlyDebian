@@ -22,7 +22,7 @@
 
 --- a/contrib/pf/authpf/authpf.c
 +++ b/contrib/pf/authpf/authpf.c
-@@ -33,10 +33,11 @@
+@@ -33,10 +33,11 @@ __FBSDID("$FreeBSD$");
  
  #include <err.h>
  #include <errno.h>
@@ -36,7 +36,7 @@
  #include <pwd.h>
  #include <signal.h>
  #include <stdio.h>
-@@ -70,10 +71,10 @@
+@@ -70,10 +71,10 @@ struct timeval	Tstart, Tend;	/* start an
  
  volatile sig_atomic_t	want_death;
  static void		need_death(int signo);
@@ -50,7 +50,7 @@
  #endif
  
  /*
-@@ -93,8 +94,9 @@
+@@ -93,8 +94,9 @@ main(int argc, char *argv[])
  	gid_t		 gid;
  	uid_t		 uid;
  	char		*shell;
@@ -61,7 +61,7 @@
  	config = fopen(PATH_CONFFILE, "r");
  	if (config == NULL) {
  		syslog(LOG_ERR, "can not open %s (%m)", PATH_CONFFILE);
-@@ -140,15 +142,16 @@
+@@ -140,15 +142,16 @@ main(int argc, char *argv[])
  		syslog(LOG_ERR, "cannot find user for uid %u", uid);
  		goto die;
  	}
@@ -81,7 +81,7 @@
  	if (strcmp(shell, PATH_AUTHPF_SHELL)) {
  		syslog(LOG_ERR, "wrong shell for user %s, uid %u",
  		    pw->pw_name, pw->pw_uid);
-@@ -318,7 +321,9 @@
+@@ -318,7 +321,9 @@ main(int argc, char *argv[])
  	while (1) {
  		printf("\r\nHello %s. ", luser);
  		printf("You are authenticated from host \"%s\"\r\n", ipsrc);
@@ -91,7 +91,7 @@
  		print_message(PATH_MESSAGE);
  		while (1) {
  			sleep(10);
-@@ -716,7 +721,7 @@
+@@ -716,7 +721,7 @@ change_filter(int add, const char *luser
  		syslog(LOG_INFO, "allowing %s, user %s", ipsrc, luser);
  	} else {
  		gettimeofday(&Tend, NULL);
@@ -100,7 +100,7 @@
  		syslog(LOG_INFO, "removed %s, user %s - duration %jd seconds",
  		    ipsrc, luser, (intmax_t)(Tend.tv_sec - Tstart.tv_sec));
  #else
-@@ -829,10 +834,10 @@
+@@ -829,10 +834,10 @@ need_death(int signo)
  /*
   * function that removes our stuff when we go away.
   */
@@ -116,7 +116,7 @@
  {
 --- a/contrib/pf/ftp-proxy/ftp-proxy.c
 +++ b/contrib/pf/ftp-proxy/ftp-proxy.c
-@@ -95,7 +95,7 @@
+@@ -95,7 +95,7 @@ void	client_read(struct bufferevent *, v
  int	drop_privs(void);
  void	end_session(struct session *);
  int	exit_daemon(void);
@@ -125,7 +125,7 @@
  void	handle_connection(const int, short, void *);
  void	handle_signal(int, short, void *);
  struct session * init_session(void);
-@@ -229,7 +229,7 @@
+@@ -229,7 +229,7 @@ client_read(struct bufferevent *bufev, v
  		    buf_avail);
  		s->cbuf_valid += read;
  
@@ -134,7 +134,7 @@
  			logmsg(LOG_DEBUG, "#%d client: %s", s->id, linebuf);
  			if (!client_parse(s)) {
  				end_session(s);
-@@ -305,7 +305,7 @@
+@@ -305,7 +305,7 @@ exit_daemon(void)
  {
  	struct session *s, *next;
  
@@ -143,7 +143,7 @@
  	LIST_FOREACH_SAFE(s, &sessions, entry, next) {
  #else
  	for (s = LIST_FIRST(&sessions); s != LIST_END(&sessions); s = next) {
-@@ -324,7 +324,7 @@
+@@ -324,7 +324,7 @@ exit_daemon(void)
  }
  
  int
@@ -152,7 +152,7 @@
  {
  	size_t i;
  
-@@ -566,7 +566,7 @@
+@@ -566,7 +566,7 @@ logmsg(int pri, const char *message, ...
  
  		/* We don't care about truncation. */
  		vsnprintf(buf, sizeof buf, message, ap);
@@ -161,7 +161,7 @@
  		/* XXX: strnvis might be nice to have */
  		strvisx(visbuf, buf,
  		    MIN((sizeof(visbuf) / 4) - 1, strlen(buf)),
-@@ -1053,7 +1053,7 @@
+@@ -1053,7 +1053,7 @@ server_read(struct bufferevent *bufev, v
  		    buf_avail);
  		s->sbuf_valid += read;
  
@@ -183,7 +183,7 @@
  #define INTPTR(x)	x
 --- a/contrib/pf/pfctl/parse.y
 +++ b/contrib/pf/pfctl/parse.y
-@@ -57,12 +57,12 @@
+@@ -57,12 +57,12 @@ __FBSDID("$FreeBSD$");
  #include <limits.h>
  #include <pwd.h>
  #include <grp.h>
@@ -198,7 +198,7 @@
  #define	HTONL(x)	(x) = htonl((__uint32_t)(x))
  #endif
  
-@@ -402,6 +402,7 @@
+@@ -402,6 +402,7 @@ typedef struct {
  	} v;
  	int lineno;
  } YYSTYPE;
@@ -206,7 +206,7 @@
  
  #define DYNIF_MULTIADDR(addr) ((addr).type == PF_ADDR_DYNIFTL && \
  	(!((addr).iflags & PFI_AFLAG_NOALIAS) ||		 \
-@@ -1027,7 +1028,7 @@
+@@ -1027,7 +1028,7 @@ scrub_opt	: NODF	{
  			scrub_opts.randomid = 1;
  		}
  		| RTABLE number				{
@@ -215,7 +215,7 @@
  			if ($2 > RT_TABLEID_MAX || $2 < 0) {
  				yyerror("invalid rtable id");
  				YYERROR;
-@@ -1172,7 +1173,7 @@
+@@ -1172,7 +1173,7 @@ antispoof_opt	: label	{
  			antispoof_opts.label = $1;
  		}
  		| RTABLE number				{
@@ -224,7 +224,7 @@
  			if ($2 > RT_TABLEID_MAX || $2 < 0) {
  				yyerror("invalid rtable id");
  				YYERROR;
-@@ -2147,7 +2148,7 @@
+@@ -2155,7 +2156,7 @@ filter_opt	: USER uids {
  			free($2);
  		}
  		| RTABLE number				{
@@ -233,7 +233,7 @@
  			if ($2 > RT_TABLEID_MAX || $2 < 0) {
  				yyerror("invalid rtable id");
  				YYERROR;
-@@ -3452,7 +3453,7 @@
+@@ -3468,7 +3469,7 @@ redirection	: /* empty */			{ $$ = NULL;
  		}
  		;
  
@@ -242,7 +242,7 @@
  natpass		: /* empty */	{ $$.b1 = $$.b2 = 0; $$.w2 = 0; }
  		| PASS		{ $$.b1 = 1; $$.b2 = 0; $$.w2 = 0; }
  /* else 
-@@ -3826,7 +3827,7 @@
+@@ -3842,7 +3843,7 @@ tagged		: /* empty */		{ $$.neg = 0; $$.
  
  rtable		: /* empty */		{ $$ = -1; }
  		| RTABLE number		{
@@ -253,7 +253,7 @@
  #else
 --- a/contrib/pf/pfctl/pfctl_altq.c
 +++ b/contrib/pf/pfctl/pfctl_altq.c
-@@ -77,7 +77,7 @@
+@@ -77,7 +77,7 @@ static int		 gsc_add_seg(struct gen_sc *
  			     double);
  static double		 sc_x2y(struct service_curve *, double);
  
@@ -262,7 +262,7 @@
  u_int32_t	 getifspeed(int, char *);
  #else
  u_int32_t	 getifspeed(char *);
-@@ -153,7 +153,7 @@
+@@ -153,7 +153,7 @@ print_altq(const struct pf_altq *a, unsi
  		return;
  	}
  
@@ -271,7 +271,7 @@
  	if (a->local_flags & PFALTQ_FLAG_IF_REMOVED)
  		printf("INACTIVE ");
  #endif
-@@ -191,7 +191,7 @@
+@@ -191,7 +191,7 @@ print_queue(const struct pf_altq *a, uns
  {
  	unsigned	i;
  
@@ -280,7 +280,7 @@
  	if (a->local_flags & PFALTQ_FLAG_IF_REMOVED)
  		printf("INACTIVE ");
  #endif
-@@ -237,7 +237,7 @@
+@@ -237,7 +237,7 @@ eval_pfaltq(struct pfctl *pf, struct pf_
  	if (bw->bw_absolute > 0)
  		pa->ifbandwidth = bw->bw_absolute;
  	else
@@ -289,7 +289,7 @@
  		if ((rate = getifspeed(pf->dev, pa->ifname)) == 0) {
  #else
  		if ((rate = getifspeed(pa->ifname)) == 0) {
-@@ -1096,7 +1096,7 @@
+@@ -1096,7 +1096,7 @@ rate2str(double rate)
  	return (buf);
  }
  
@@ -298,7 +298,7 @@
  /*
   * XXX
   * FreeBSD does not have SIOCGIFDATA.
-@@ -1153,7 +1153,7 @@
+@@ -1153,7 +1153,7 @@ getifmtu(char *ifname)
  	    sizeof(ifr.ifr_name))
  		errx(1, "getifmtu: strlcpy");
  	if (ioctl(s, SIOCGIFMTU, (caddr_t)&ifr) == -1)
@@ -309,7 +309,7 @@
  		err(1, "SIOCGIFMTU");
 --- a/contrib/pf/pfctl/pfctl.c
 +++ b/contrib/pf/pfctl/pfctl.c
-@@ -59,7 +59,7 @@
+@@ -59,7 +59,7 @@ __FBSDID("$FreeBSD$");
  #include "pfctl_parser.h"
  #include "pfctl.h"
  
@@ -318,7 +318,7 @@
  #define HTONL(x)	(x) = htonl((__uint32_t)(x))
  #endif
  
-@@ -250,7 +250,7 @@
+@@ -250,7 +250,7 @@ pfctl_enable(int dev, int opts)
  	if (ioctl(dev, DIOCSTART)) {
  		if (errno == EEXIST)
  			errx(1, "pf already enabled");
@@ -327,7 +327,7 @@
  		else if (errno == ESRCH)
  			errx(1, "pfil registeration failed");
  #endif
-@@ -1895,7 +1895,7 @@
+@@ -1895,7 +1895,7 @@ pfctl_debug(int dev, u_int32_t level, in
  int
  pfctl_test_altqsupport(int dev, int opts)
  {
@@ -336,7 +336,7 @@
  	return (0);
  #else
  	struct pfioc_altq pa;
-@@ -2171,7 +2171,7 @@
+@@ -2171,7 +2171,7 @@ main(int argc, char *argv[])
  		/* turn off options */
  		opts &= ~ (PF_OPT_DISABLE | PF_OPT_ENABLE);
  		clearopt = showopt = debugopt = NULL;
@@ -360,7 +360,7 @@
  enum {	PFRB_TABLES = 1, PFRB_TSTATS, PFRB_ADDRS, PFRB_ASTATS,
  	PFRB_IFACES, PFRB_TRANS, PFRB_MAX };
  struct pfr_buffer {
-@@ -89,7 +95,7 @@
+@@ -89,7 +95,7 @@ void	 warn_namespace_collision(const cha
  int	 pfctl_show_ifaces(const char *, int);
  FILE	*pfctl_fopen(const char *, const char *);
  
@@ -371,7 +371,7 @@
  
 --- a/contrib/pf/pfctl/pfctl_optimize.c
 +++ b/contrib/pf/pfctl/pfctl_optimize.c
-@@ -860,7 +860,7 @@
+@@ -860,7 +860,7 @@ block_feedback(struct pfctl *pf, struct
  				break;
  			}
  		}
@@ -382,7 +382,7 @@
  		if (por2 == TAILQ_END(&block->sb_rules))
 --- a/contrib/pf/pfctl/pfctl_parser.c
 +++ b/contrib/pf/pfctl/pfctl_parser.c
-@@ -43,7 +43,7 @@
+@@ -43,7 +43,7 @@ __FBSDID("$FreeBSD$");
  #include <netinet/in.h>
  #include <netinet/in_systm.h>
  #include <netinet/ip.h>
@@ -391,7 +391,7 @@
  #include <netinet/icmp6.h>
  #include <net/pfvar.h>
  #include <arpa/inet.h>
-@@ -60,6 +60,29 @@
+@@ -60,6 +60,29 @@ __FBSDID("$FreeBSD$");
  #include <ifaddrs.h>
  #include <unistd.h>
  
@@ -421,7 +421,7 @@
  #include "pfctl_parser.h"
  #include "pfctl.h"
  
-@@ -598,7 +621,7 @@
+@@ -598,7 +621,7 @@ print_status(struct pf_status *s, int op
  		printf("Limit Counters\n");
  		for (i = 0; i < LCNT_MAX; i++) {
  			printf("  %-25s %14lld ", pf_lcounters[i],
@@ -430,7 +430,7 @@
  				    (unsigned long long)s->lcounters[i]);
  #else
  				    s->lcounters[i]);
-@@ -647,7 +670,7 @@
+@@ -647,7 +670,7 @@ print_src_node(struct pf_src_node *sn, i
  			    sn->expire, min, sec);
  		}
  		printf(", %llu pkts, %llu bytes",
@@ -441,7 +441,7 @@
  #else
 --- a/contrib/pf/pfctl/pfctl_parser.h
 +++ b/contrib/pf/pfctl/pfctl_parser.h
-@@ -158,7 +158,7 @@
+@@ -158,7 +158,7 @@ struct node_queue_opt {
  	}			 data;
  };
  
@@ -452,7 +452,7 @@
   * Absolutely this is not correct location to define this.
 --- a/contrib/pf/pfctl/pfctl_qstats.c
 +++ b/contrib/pf/pfctl/pfctl_qstats.c
-@@ -89,7 +89,7 @@
+@@ -89,7 +89,7 @@ pfctl_show_altq(int dev, const char *ifa
  	struct pf_altq_node	*root = NULL, *node;
  	int			 nodes, dotitle = (opts & PF_OPT_SHOWALL);
  
@@ -461,7 +461,7 @@
  	if (!altqsupport)
  		return (-1);
  #endif
-@@ -118,7 +118,7 @@
+@@ -118,7 +118,7 @@ pfctl_show_altq(int dev, const char *ifa
  		for (node = root; node != NULL; node = node->next) {
  			if (iface != NULL && strcmp(node->altq.ifname, iface))
  				continue;
@@ -470,7 +470,7 @@
  			if (node->altq.local_flags & PFALTQ_FLAG_IF_REMOVED)
  				continue;
  #endif
-@@ -161,7 +161,7 @@
+@@ -161,7 +161,7 @@ pfctl_update_qstats(int dev, struct pf_a
  			warn("DIOCGETALTQ");
  			return (-1);
  		}
@@ -479,7 +479,7 @@
  		if (pa.altq.qid > 0 &&
  		    !(pa.altq.local_flags & PFALTQ_FLAG_IF_REMOVED)) {
  #else
-@@ -184,7 +184,7 @@
+@@ -184,7 +184,7 @@ pfctl_update_qstats(int dev, struct pf_a
  				pfctl_insert_altq_node(root, pa.altq, qstats);
  			}
  		}
@@ -488,7 +488,7 @@
  		  else if (pa.altq.local_flags & PFALTQ_FLAG_IF_REMOVED) {
  		  	memset(&qstats.data, 0, sizeof(qstats.data));
  			if ((node = pfctl_find_altq_node(*root, pa.altq.qname,
-@@ -302,7 +302,7 @@
+@@ -302,7 +302,7 @@ pfctl_print_altq_nodestat(int dev, const
  {
  	if (a->altq.qid == 0)
  		return;
@@ -499,7 +499,7 @@
  #endif
 --- a/contrib/pf/pfctl/pf_print_state.c
 +++ b/contrib/pf/pfctl/pf_print_state.c
-@@ -35,7 +35,21 @@
+@@ -35,7 +35,21 @@ __FBSDID("$FreeBSD$");
  
  #include <sys/types.h>
  #include <sys/socket.h>
@@ -521,7 +521,7 @@
  #include <net/if.h>
  #define TCPSTATES
  #include <netinet/tcp_fsm.h>
-@@ -282,7 +296,7 @@
+@@ -282,7 +296,7 @@ print_state(struct pf_state *s, int opts
  		s->expire /= 60;
  		printf(", expires in %.2u:%.2u:%.2u", s->expire, min, sec);
  		printf(", %llu:%llu pkts, %llu:%llu bytes",
@@ -530,7 +530,7 @@
  		    (unsigned long long)s->packets[0],
  		    (unsigned long long)s->packets[1],
  		    (unsigned long long)s->bytes[0],
-@@ -302,7 +316,7 @@
+@@ -304,7 +318,7 @@ print_state(struct pf_state *s, int opts
  	}
  	if (opts & PF_OPT_VERBOSE2) {
  		printf("   id: %016llx creatorid: %08x%s\n",
@@ -541,7 +541,7 @@
  		    betoh64(s->id), ntohl(s->creatorid),
 --- a/contrib/pf/pflogd/pflogd.c
 +++ b/contrib/pf/pflogd/pflogd.c
-@@ -37,7 +37,7 @@
+@@ -37,7 +37,7 @@ __FBSDID("$FreeBSD$");
  #include <sys/ioctl.h>
  #include <sys/file.h>
  #include <sys/stat.h>
@@ -550,7 +550,7 @@
  #include <net/bpf.h>	/* BIOCLOCK */
  #endif
  #include <stdio.h>
-@@ -51,7 +51,7 @@
+@@ -51,7 +51,7 @@ __FBSDID("$FreeBSD$");
  #include <errno.h>
  #include <stdarg.h>
  #include <fcntl.h>
@@ -559,7 +559,7 @@
  #include "pidfile.h"
  #else
  #include <util.h>
-@@ -158,11 +158,6 @@
+@@ -158,11 +158,6 @@ logmsg(int pri, const char *message, ...
  	va_end(ap);
  }
  
@@ -571,7 +571,7 @@
  usage(void)
  {
  	fprintf(stderr, "usage: pflogd [-Dx] [-d delay] [-f filename]");
-@@ -352,7 +347,7 @@
+@@ -352,7 +347,7 @@ int
  scan_dump(FILE *fp, off_t size)
  {
  	struct pcap_file_header hdr;
@@ -580,7 +580,7 @@
  	struct pcap_sf_pkthdr ph;
  #else
  	struct pcap_pkthdr ph;
-@@ -425,7 +420,7 @@
+@@ -425,7 +420,7 @@ void
  dump_packet_nobuf(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
  {
  	FILE *f = (FILE *)user;
@@ -589,7 +589,7 @@
  	struct pcap_sf_pkthdr sh;
  #endif
  
-@@ -434,7 +429,7 @@
+@@ -434,7 +429,7 @@ dump_packet_nobuf(u_char *user, const st
  		return;
  	}
  
@@ -598,7 +598,7 @@
  	sh.ts.tv_sec = (bpf_int32)h->ts.tv_sec;
  	sh.ts.tv_usec = (bpf_int32)h->ts.tv_usec;
  	sh.caplen = h->caplen;
-@@ -447,7 +442,7 @@
+@@ -447,7 +442,7 @@ dump_packet_nobuf(u_char *user, const st
  		off_t pos = ftello(f);
  
  		/* try to undo header to prevent corruption */
@@ -607,7 +607,7 @@
  		if (pos < sizeof(sh) ||
  		    ftruncate(fileno(f), pos - sizeof(sh))) {
  #else
-@@ -522,7 +517,7 @@
+@@ -522,7 +517,7 @@ void
  dump_packet(u_char *user, const struct pcap_pkthdr *h, const u_char *sp)
  {
  	FILE *f = (FILE *)user;
@@ -616,7 +616,7 @@
  	struct pcap_sf_pkthdr sh;
  	size_t len = sizeof(sh) + h->caplen;
  #else
-@@ -555,7 +550,7 @@
+@@ -555,7 +550,7 @@ dump_packet(u_char *user, const struct p
  	}
  
   append:	
@@ -625,7 +625,7 @@
   	sh.ts.tv_sec = (bpf_int32)h->ts.tv_sec;
   	sh.ts.tv_usec = (bpf_int32)h->ts.tv_usec;
  	sh.caplen = h->caplen;
-@@ -583,7 +578,7 @@
+@@ -583,7 +578,7 @@ main(int argc, char **argv)
  	pcap_handler phandler = dump_packet;
  	const char *errstr = NULL;
  
@@ -634,7 +634,7 @@
  	/* another ?paranoid? safety measure we do not have */
  #else
  	closefrom(STDERR_FILENO + 1);
-@@ -690,7 +685,7 @@
+@@ -690,7 +685,7 @@ main(int argc, char **argv)
  		np = pcap_dispatch(hpcap, PCAP_NUM_PKTS,
  		    phandler, (u_char *)dpcap);
  		if (np < 0) {
@@ -645,7 +645,7 @@
  				    "Device not/no longer configured");
 --- a/contrib/pf/pflogd/pidfile.c
 +++ b/contrib/pf/pflogd/pidfile.c
-@@ -48,7 +48,7 @@
+@@ -48,7 +48,7 @@ static const char rcsid[] = "$OpenBSD: p
  #include <stdio.h>
  #include <stdlib.h>
  #include <unistd.h>
@@ -656,7 +656,7 @@
  #include <util.h>
 --- a/contrib/pf/pflogd/privsep.c
 +++ b/contrib/pf/pflogd/privsep.c
-@@ -31,7 +31,7 @@
+@@ -31,7 +31,7 @@ __FBSDID("$FreeBSD$");
  #include <errno.h>
  #include <fcntl.h>
  #include <limits.h>
@@ -665,7 +665,7 @@
  #include <pcap.h>
  #include <pcap-int.h>
  #endif
-@@ -40,7 +40,7 @@
+@@ -40,7 +40,7 @@ __FBSDID("$FreeBSD$");
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
@@ -674,7 +674,7 @@
  /* XXX: pcap pollutes namespace with strlcpy if not present previously */
  #include <pcap.h>
  #include <pcap-int.h>
-@@ -79,7 +79,7 @@
+@@ -79,7 +79,7 @@ priv_init(void)
  	int snaplen, ret, olderrno;
  	struct passwd *pw;
  
@@ -685,7 +685,7 @@
  	for (i = 1; i < _NSIG; i++)
 --- a/contrib/pf/tftp-proxy/filter.c
 +++ b/contrib/pf/tftp-proxy/filter.c
-@@ -298,7 +298,7 @@
+@@ -298,7 +298,7 @@ prepare_rule(u_int32_t id, int rs_num, s
  		pfr.rule.quick = 1;
  		pfr.rule.log = rule_log;
  		pfr.rule.keep_state = 1;
@@ -1211,7 +1211,7 @@
 +
 --- a/sbin/pfctl/Makefile
 +++ b/sbin/pfctl/Makefile
-@@ -21,7 +21,7 @@
+@@ -21,7 +21,7 @@ CFLAGS+= -DENABLE_ALTQ
  
  YFLAGS=
  
@@ -1222,7 +1222,7 @@
  .include <bsd.prog.mk>
 --- a/usr.sbin/authpf/Makefile
 +++ b/usr.sbin/authpf/Makefile
-@@ -16,7 +16,7 @@
+@@ -16,7 +16,7 @@ CFLAGS+= -I${.CURDIR}/../../contrib/pf/p
  # XXX ALTQ:
  CFLAGS+= -DENABLE_ALTQ
  

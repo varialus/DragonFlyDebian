@@ -4,7 +4,7 @@
 
 --- a/sbin/umount/umount.c
 +++ b/sbin/umount/umount.c
-@@ -94,7 +94,7 @@
+@@ -94,7 +94,7 @@ main(int argc, char *argv[])
  	sync();
  
  	all = errs = 0;
@@ -13,7 +13,7 @@
  		switch (ch) {
  		case 'A':
  			all = 2;
-@@ -102,9 +102,6 @@
+@@ -102,9 +102,6 @@ main(int argc, char *argv[])
  		case 'a':
  			all = 1;
  			break;
@@ -23,7 +23,7 @@
  		case 'f':
  			fflag = MNT_FORCE;
  			break;
-@@ -160,7 +157,7 @@
+@@ -160,7 +157,7 @@ main(int argc, char *argv[])
  		break;
  	case 1:
  		if (setfsent() == 0)
@@ -32,7 +32,7 @@
  		errs = umountall(typelist);
  		break;
  	case 0:
-@@ -199,9 +196,6 @@
+@@ -199,9 +196,6 @@ umountall(char **typelist)
  		    strcmp(fs->fs_type, FSTAB_RO) &&
  		    strcmp(fs->fs_type, FSTAB_RQ))
  			continue;
@@ -42,7 +42,7 @@
  		if (checkvfsname(fs->fs_vfstype, typelist))
  			continue;
  
-@@ -351,24 +345,12 @@
+@@ -358,24 +352,12 @@ umountfs(struct statfs *sfs)
  
  	if (!namematch(ai))
  		return (1);
@@ -69,16 +69,16 @@
  	/* Mark this this file system as unmounted. */
  	getmntentry(NULL, NULL, &sfs->f_fsid, REMOVE);
  	if (vflag)
-@@ -385,7 +367,7 @@
- 			    clnt_spcreateerror("RPCPROG_MNT"));
+@@ -392,7 +374,7 @@ umountfs(struct statfs *sfs)
+ 			    clnt_spcreateerror("MOUNTPROG"));
  			return (1);
  		}
 -		clp->cl_auth = authsys_create_default();
 +		clp->cl_auth = authunix_create_default();
  		try.tv_sec = 20;
  		try.tv_usec = 0;
- 		clnt_stat = clnt_call(clp, RPCMNT_UMOUNT, (xdrproc_t)xdr_dir,
-@@ -592,6 +574,6 @@
+ 		clnt_stat = clnt_call(clp, MOUNTPROC_UMNT, (xdrproc_t)xdr_dir,
+@@ -600,6 +582,6 @@ usage()
  
  	(void)fprintf(stderr, "%s\n%s\n",
  	    "usage: umount [-fv] special | node | fsid",

@@ -1,11 +1,11 @@
 ---
  lib/libdevstat/Makefile  |    4 ++--
- lib/libdevstat/devstat.c |   10 +++++++---
- 2 files changed, 9 insertions(+), 5 deletions(-)
+ lib/libdevstat/devstat.c |    6 +++++-
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
 --- a/lib/libdevstat/Makefile
 +++ b/lib/libdevstat/Makefile
-@@ -8,7 +8,7 @@
+@@ -8,7 +8,7 @@ SRCS=	devstat.c
  INCS=	devstat.h
  
  DPADD=	${LIBKVM}
@@ -14,7 +14,7 @@
  
  MAN=	devstat.3
  
-@@ -31,7 +31,7 @@
+@@ -31,7 +31,7 @@ MLINKS+=devstat.3 buildmatch.3
  MLINKS+=devstat.3 compute_stats.3
  MLINKS+=devstat.3 compute_etime.3
  
@@ -25,7 +25,7 @@
  
 --- a/lib/libdevstat/devstat.c
 +++ b/lib/libdevstat/devstat.c
-@@ -44,6 +44,7 @@
+@@ -45,6 +45,7 @@ __FBSDID("$FreeBSD$");
  #include <stdarg.h>
  #include <kvm.h>
  #include <nlist.h>
@@ -33,7 +33,7 @@
  
  #include "devstat.h"
  
-@@ -1588,6 +1589,7 @@
+@@ -1589,6 +1590,7 @@ get_devstat_kvm(kvm_t *kd)
  	struct devstatlist dhead;
  	int num_devs;
  	char *rv = NULL;
@@ -41,7 +41,7 @@
  
  	if ((num_devs = devstat_getnumdevs(kd)) <= 0)
  		return(NULL);
-@@ -1615,9 +1617,11 @@
+@@ -1616,9 +1618,11 @@ get_devstat_kvm(kvm_t *kd)
  			return(NULL);
  		}
  		nds = &ds;

@@ -5,9 +5,13 @@ for other/related problems.
 Submitted as
 http://www.freebsd.org/cgi/query-pr.cgi?pr=144584
 
+---
+ sys/compat/linprocfs/linprocfs.c |   66 +++++++++++++++++++++++++++++++--------
+ 1 file changed, 53 insertions(+), 13 deletions(-)
+
 --- a/sys/compat/linprocfs/linprocfs.c
 +++ b/sys/compat/linprocfs/linprocfs.c
-@@ -110,13 +110,36 @@
+@@ -104,13 +104,36 @@ __FBSDID("$FreeBSD$");
  /*
   * Various conversion macros
   */
@@ -44,7 +48,7 @@ http://www.freebsd.org/cgi/query-pr.cgi?pr=144584
  /**
   * @brief Mapping of ki_stat in struct kinfo_proc to the linux state
   *
-@@ -502,12 +525,24 @@
+@@ -430,12 +453,24 @@ linprocfs_douptime(PFS_FILL_ARGS)
  {
  	long cp_time[CPUSTATES];
  	struct timeval tv;
@@ -70,7 +74,7 @@ http://www.freebsd.org/cgi/query-pr.cgi?pr=144584
  	return (0);
  }
  
-@@ -613,9 +648,17 @@
+@@ -541,9 +576,17 @@ linprocfs_doprocstat(PFS_FILL_ARGS)
  	struct kinfo_proc kp;
  	char state;
  	static int ratelimit = 0;
@@ -88,7 +92,7 @@ http://www.freebsd.org/cgi/query-pr.cgi?pr=144584
  	sbuf_printf(sb, "%d", p->p_pid);
  #define PS_ADD(name, fmt, arg) sbuf_printf(sb, " " fmt, arg)
  	PS_ADD("comm",		"(%s)",	p->p_comm);
-@@ -634,30 +677,27 @@
+@@ -562,30 +605,27 @@ linprocfs_doprocstat(PFS_FILL_ARGS)
  	PS_ADD("pgrp",		"%d",	p->p_pgid);
  	PS_ADD("session",	"%d",	p->p_session->s_sid);
  	PROC_UNLOCK(p);
@@ -127,7 +131,7 @@ http://www.freebsd.org/cgi/query-pr.cgi?pr=144584
  	PS_ADD("startstack",	"%u",	0); /* XXX */
  	PS_ADD("kstkesp",	"%u",	0); /* XXX */
  	PS_ADD("kstkeip",	"%u",	0); /* XXX */
-@@ -800,7 +840,7 @@
+@@ -728,7 +768,7 @@ linprocfs_doprocstatus(PFS_FILL_ARGS)
  	 */
  	sbuf_printf(sb, "VmSize:\t%8ju kB\n",	B2K((uintmax_t)kp.ki_size));
  	sbuf_printf(sb, "VmLck:\t%8u kB\n",	P2K(0)); /* XXX */

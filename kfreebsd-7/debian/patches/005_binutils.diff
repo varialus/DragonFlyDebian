@@ -1,11 +1,23 @@
 
 Status: Reported as kern/93331
 
-Index: src/sys/i386/i386/locore.s
-===================================================================
---- src.orig/sys/i386/i386/locore.s
-+++ src/sys/i386/i386/locore.s
-@@ -338,7 +338,7 @@
+---
+ sys/amd64/amd64/cpu_switch.S       |   16 ++++++++--------
+ sys/amd64/ia32/ia32_signal.c       |    8 ++++----
+ sys/amd64/ia32/ia32_sigtramp.S     |    8 ++++----
+ sys/amd64/include/cpufunc.h        |   18 +++++++++---------
+ sys/amd64/linux32/linux32_locore.s |    8 ++++----
+ sys/amd64/linux32/linux32_sysvec.c |    8 ++++----
+ sys/compat/ndis/winx32_wrap.S      |    2 +-
+ sys/i386/i386/locore.s             |    6 +++---
+ sys/i386/i386/swtch.s              |    6 +++---
+ sys/i386/include/cpufunc.h         |    8 ++++----
+ sys/i386/linux/linux_locore.s      |    4 ++--
+ 11 files changed, 46 insertions(+), 46 deletions(-)
+
+--- a/sys/i386/i386/locore.s
++++ b/sys/i386/i386/locore.s
+@@ -336,7 +336,7 @@ NON_GPROF_ENTRY(sigcode)
  	pushl	%eax
  	testl	$PSL_VM,UC_EFLAGS(%eax)
  	jne	1f
@@ -14,7 +26,7 @@ Index: src/sys/i386/i386/locore.s
  1:
  	movl	$SYS_sigreturn,%eax
  	pushl	%eax			/* junk to fake return addr. */
-@@ -355,7 +355,7 @@
+@@ -353,7 +353,7 @@ freebsd4_sigcode:
  	pushl	%eax
  	testl	$PSL_VM,UC4_EFLAGS(%eax)
  	jne	1f
@@ -23,7 +35,7 @@ Index: src/sys/i386/i386/locore.s
  1:
  	movl	$344,%eax		/* 4.x SYS_sigreturn */
  	pushl	%eax			/* junk to fake return addr. */
-@@ -373,7 +373,7 @@
+@@ -371,7 +371,7 @@ osigcode:
  	pushl	%eax
  	testl	$PSL_VM,SC_PS(%eax)
  	jne	9f
@@ -32,11 +44,9 @@ Index: src/sys/i386/i386/locore.s
  9:
  	movl	$103,%eax		/* 3.x SYS_sigreturn */
  	pushl	%eax			/* junk to fake return addr. */
-Index: src/sys/i386/i386/swtch.s
-===================================================================
---- src.orig/sys/i386/i386/swtch.s
-+++ src/sys/i386/i386/swtch.s
-@@ -130,7 +130,7 @@
+--- a/sys/i386/i386/swtch.s
++++ b/sys/i386/i386/swtch.s
+@@ -130,7 +130,7 @@ ENTRY(cpu_switch)
  	movl	%ebp,PCB_EBP(%edx)
  	movl	%esi,PCB_ESI(%edx)
  	movl	%edi,PCB_EDI(%edx)
@@ -45,7 +55,7 @@ Index: src/sys/i386/i386/swtch.s
  	pushfl					/* PSL */
  	popl	PCB_PSL(%edx)
  	/* Test if debug registers should be saved. */
-@@ -301,7 +301,7 @@
+@@ -301,7 +301,7 @@ sw1:
  	/* This must be done after loading the user LDT. */
  	.globl	cpu_switch_load_gs
  cpu_switch_load_gs:
@@ -54,7 +64,7 @@ Index: src/sys/i386/i386/swtch.s
  
  	/* Test if debug registers should be restored. */
  	testl	$PCB_DBREGS,PCB_FLAGS(%edx)
-@@ -371,7 +371,7 @@
+@@ -371,7 +371,7 @@ ENTRY(savectx)
  	movl	%ebp,PCB_EBP(%ecx)
  	movl	%esi,PCB_ESI(%ecx)
  	movl	%edi,PCB_EDI(%ecx)
@@ -63,11 +73,9 @@ Index: src/sys/i386/i386/swtch.s
  	pushfl
  	popl	PCB_PSL(%ecx)
  
-Index: src/sys/i386/include/cpufunc.h
-===================================================================
---- src.orig/sys/i386/include/cpufunc.h
-+++ src/sys/i386/include/cpufunc.h
-@@ -452,7 +452,7 @@
+--- a/sys/i386/include/cpufunc.h
++++ b/sys/i386/include/cpufunc.h
+@@ -466,7 +466,7 @@ static __inline u_int
  rfs(void)
  {
  	u_int sel;
@@ -76,7 +84,7 @@ Index: src/sys/i386/include/cpufunc.h
  	return (sel);
  }
  
-@@ -468,7 +468,7 @@
+@@ -482,7 +482,7 @@ static __inline u_int
  rgs(void)
  {
  	u_int sel;
@@ -85,7 +93,7 @@ Index: src/sys/i386/include/cpufunc.h
  	return (sel);
  }
  
-@@ -507,13 +507,13 @@
+@@ -521,13 +521,13 @@ rtr(void)
  static __inline void
  load_fs(u_int sel)
  {
@@ -101,10 +109,8 @@ Index: src/sys/i386/include/cpufunc.h
  }
  
  static __inline void
-Index: src/sys/i386/linux/linux_locore.s
-===================================================================
---- src.orig/sys/i386/linux/linux_locore.s
-+++ src/sys/i386/linux/linux_locore.s
+--- a/sys/i386/linux/linux_locore.s
++++ b/sys/i386/linux/linux_locore.s
 @@ -8,7 +8,7 @@
  NON_GPROF_ENTRY(linux_sigcode)
  	call	*LINUX_SIGF_HANDLER(%esp)
@@ -114,7 +120,7 @@ Index: src/sys/i386/linux/linux_locore.s
  	movl	%esp, %ebx			/* pass sigframe */
  	push	%eax				/* fake ret addr */
  	movl	$LINUX_SYS_linux_sigreturn,%eax	/* linux_sigreturn() */
-@@ -20,7 +20,7 @@
+@@ -20,7 +20,7 @@ linux_rt_sigcode:
  	call	*LINUX_RT_SIGF_HANDLER(%esp)
  	leal	LINUX_RT_SIGF_UC(%esp),%ebx	/* linux ucp */
  	leal	LINUX_RT_SIGF_SC(%ebx),%ecx	/* linux sigcontext */
@@ -123,11 +129,9 @@ Index: src/sys/i386/linux/linux_locore.s
  	push	%eax				/* fake ret addr */
  	movl	$LINUX_SYS_linux_rt_sigreturn,%eax   /* linux_rt_sigreturn() */
  	int	$0x80				/* enter kernel with args */
-Index: src/sys/compat/ndis/winx32_wrap.S
-===================================================================
---- src.orig/sys/compat/ndis/winx32_wrap.S
-+++ src/sys/compat/ndis/winx32_wrap.S
-@@ -369,7 +369,7 @@
+--- a/sys/compat/ndis/winx32_wrap.S
++++ b/sys/compat/ndis/winx32_wrap.S
+@@ -369,7 +369,7 @@ ENTRY(x86_getfs)
  	ret
  
  ENTRY(x86_setfs)
@@ -136,11 +140,9 @@ Index: src/sys/compat/ndis/winx32_wrap.S
  	ret
  
  ENTRY(x86_gettid)
-Index: src/sys/amd64/amd64/cpu_switch.S
-===================================================================
---- src.orig/sys/amd64/amd64/cpu_switch.S
-+++ src/sys/amd64/amd64/cpu_switch.S
-@@ -260,12 +260,12 @@
+--- a/sys/amd64/amd64/cpu_switch.S
++++ b/sys/amd64/amd64/cpu_switch.S
+@@ -260,12 +260,12 @@ do_kthread:
  	jmp	do_tss
  
  store_seg:
@@ -157,7 +159,7 @@ Index: src/sys/amd64/amd64/cpu_switch.S
  	jmp	done_store_seg
  2:	movq	PCPU(GS32P),%rax
  	movq	(%rax),%rax
-@@ -277,11 +277,11 @@
+@@ -277,11 +277,11 @@ load_seg:
  	jnz	2f
  1:	movl	$MSR_GSBASE,%ecx
  	rdmsr
@@ -173,11 +175,9 @@ Index: src/sys/amd64/amd64/cpu_switch.S
  	jmp	restore_fsbase
  	/* Restore userland %gs while preserving kernel gsbase */
  2:	movq	PCPU(GS32P),%rax
-Index: src/sys/amd64/ia32/ia32_signal.c
-===================================================================
---- src.orig/sys/amd64/ia32/ia32_signal.c
-+++ src/sys/amd64/ia32/ia32_signal.c
-@@ -328,8 +328,8 @@
+--- a/sys/amd64/ia32/ia32_signal.c
++++ b/sys/amd64/ia32/ia32_signal.c
+@@ -328,8 +328,8 @@ freebsd4_ia32_sendsig(sig_t catcher, ksi
  	sf.sf_uc.uc_mcontext.mc_onstack = (oonstack) ? 1 : 0;
  	sf.sf_uc.uc_mcontext.mc_gs = rgs();
  	sf.sf_uc.uc_mcontext.mc_fs = rfs();
@@ -188,7 +188,7 @@ Index: src/sys/amd64/ia32/ia32_signal.c
  	sf.sf_uc.uc_mcontext.mc_edi = regs->tf_rdi;
  	sf.sf_uc.uc_mcontext.mc_esi = regs->tf_rsi;
  	sf.sf_uc.uc_mcontext.mc_ebp = regs->tf_rbp;
-@@ -443,8 +443,8 @@
+@@ -443,8 +443,8 @@ ia32_sendsig(sig_t catcher, ksiginfo_t *
  	sf.sf_uc.uc_mcontext.mc_onstack = (oonstack) ? 1 : 0;
  	sf.sf_uc.uc_mcontext.mc_gs = rgs();
  	sf.sf_uc.uc_mcontext.mc_fs = rfs();
@@ -199,11 +199,9 @@ Index: src/sys/amd64/ia32/ia32_signal.c
  	sf.sf_uc.uc_mcontext.mc_edi = regs->tf_rdi;
  	sf.sf_uc.uc_mcontext.mc_esi = regs->tf_rsi;
  	sf.sf_uc.uc_mcontext.mc_ebp = regs->tf_rbp;
-Index: src/sys/amd64/include/cpufunc.h
-===================================================================
---- src.orig/sys/amd64/include/cpufunc.h
-+++ src/sys/amd64/include/cpufunc.h
-@@ -482,7 +482,7 @@
+--- a/sys/amd64/include/cpufunc.h
++++ b/sys/amd64/include/cpufunc.h
+@@ -496,7 +496,7 @@ static __inline u_int
  rfs(void)
  {
  	u_int sel;
@@ -212,7 +210,7 @@ Index: src/sys/amd64/include/cpufunc.h
  	return (sel);
  }
  
-@@ -490,7 +490,7 @@
+@@ -504,7 +504,7 @@ static __inline u_int
  rgs(void)
  {
  	u_int sel;
@@ -221,7 +219,7 @@ Index: src/sys/amd64/include/cpufunc.h
  	return (sel);
  }
  
-@@ -498,20 +498,20 @@
+@@ -512,20 +512,20 @@ static __inline u_int
  rss(void)
  {
  	u_int sel;
@@ -245,7 +243,7 @@ Index: src/sys/amd64/include/cpufunc.h
  }
  
  #ifdef _KERNEL
-@@ -526,7 +526,7 @@
+@@ -540,7 +540,7 @@ load_fs(u_int sel)
  
  	/* Preserve the fsbase value across the selector load */
  	fsbase = MSR_FSBASE;
@@ -254,7 +252,7 @@ Index: src/sys/amd64/include/cpufunc.h
              : : "rm" (sel), "c" (fsbase) : "eax", "edx");
  }
  
-@@ -544,7 +544,7 @@
+@@ -558,7 +558,7 @@ load_gs(u_int sel)
  	 * being trashed happens to be the kernel gsbase at the time.
  	 */
  	gsbase = MSR_GSBASE;
@@ -263,7 +261,7 @@ Index: src/sys/amd64/include/cpufunc.h
              : : "rm" (sel), "c" (gsbase) : "eax", "edx");
  }
  #else
-@@ -552,13 +552,13 @@
+@@ -566,13 +566,13 @@ load_gs(u_int sel)
  static __inline void
  load_fs(u_int sel)
  {
@@ -279,11 +277,9 @@ Index: src/sys/amd64/include/cpufunc.h
  }
  #endif
  
-Index: src/sys/amd64/linux32/linux32_sysvec.c
-===================================================================
---- src.orig/sys/amd64/linux32/linux32_sysvec.c
-+++ src/sys/amd64/linux32/linux32_sysvec.c
-@@ -365,9 +365,9 @@
+--- a/sys/amd64/linux32/linux32_sysvec.c
++++ b/sys/amd64/linux32/linux32_sysvec.c
+@@ -374,9 +374,9 @@ linux_rt_sendsig(sig_t catcher, ksiginfo
  	frame.sf_sc.uc_mcontext.sc_mask   = frame.sf_sc.uc_sigmask.__bits[0];
  	frame.sf_sc.uc_mcontext.sc_gs     = rgs();
  	frame.sf_sc.uc_mcontext.sc_fs     = rfs();
@@ -295,7 +291,7 @@ Index: src/sys/amd64/linux32/linux32_sysvec.c
  	    "=rm" (frame.sf_sc.uc_mcontext.sc_ds));
  	frame.sf_sc.uc_mcontext.sc_edi    = regs->tf_rdi;
  	frame.sf_sc.uc_mcontext.sc_esi    = regs->tf_rsi;
-@@ -499,8 +499,8 @@
+@@ -508,8 +508,8 @@ linux_sendsig(sig_t catcher, ksiginfo_t
  	frame.sf_sc.sc_mask   = lmask.__bits[0];
  	frame.sf_sc.sc_gs     = rgs();
  	frame.sf_sc.sc_fs     = rfs();
@@ -306,11 +302,9 @@ Index: src/sys/amd64/linux32/linux32_sysvec.c
  	frame.sf_sc.sc_edi    = regs->tf_rdi;
  	frame.sf_sc.sc_esi    = regs->tf_rsi;
  	frame.sf_sc.sc_ebp    = regs->tf_rbp;
-Index: src/sys/amd64/ia32/ia32_sigtramp.S
-===================================================================
---- src.orig/sys/amd64/ia32/ia32_sigtramp.S
-+++ src/sys/amd64/ia32/ia32_sigtramp.S
-@@ -45,8 +45,8 @@
+--- a/sys/amd64/ia32/ia32_sigtramp.S
++++ b/sys/amd64/ia32/ia32_sigtramp.S
+@@ -45,8 +45,8 @@ ia32_sigcode:
  	calll	*IA32_SIGF_HANDLER(%esp)
  	leal	IA32_SIGF_UC(%esp),%eax	/* get ucontext */
  	pushl	%eax
@@ -321,7 +315,7 @@ Index: src/sys/amd64/ia32/ia32_sigtramp.S
  	movl	$SYS_sigreturn,%eax
  	pushl	%eax			/* junk to fake return addr. */
  	int	$0x80			/* enter kernel with args */
-@@ -60,8 +60,8 @@
+@@ -60,8 +60,8 @@ freebsd4_ia32_sigcode:
  	calll	*IA32_SIGF_HANDLER(%esp)
  	leal	IA32_SIGF_UC4(%esp),%eax/* get ucontext */
  	pushl	%eax
@@ -332,10 +326,8 @@ Index: src/sys/amd64/ia32/ia32_sigtramp.S
  	movl	$344,%eax		/* 4.x SYS_sigreturn */
  	pushl	%eax			/* junk to fake return addr. */
  	int	$0x80			/* enter kernel with args */
-Index: src/sys/amd64/linux32/linux32_locore.s
-===================================================================
---- src.orig/sys/amd64/linux32/linux32_locore.s
-+++ src/sys/amd64/linux32/linux32_locore.s
+--- a/sys/amd64/linux32/linux32_locore.s
++++ b/sys/amd64/linux32/linux32_locore.s
 @@ -11,8 +11,8 @@
  NON_GPROF_ENTRY(linux_sigcode)
  	call	*LINUX_SIGF_HANDLER(%esp)
@@ -347,7 +339,7 @@ Index: src/sys/amd64/linux32/linux32_locore.s
  	movl	%esp, %ebx			/* pass sigframe */
  	push	%eax				/* fake ret addr */
  	movl	$LINUX_SYS_linux_sigreturn,%eax	/* linux_sigreturn() */
-@@ -24,8 +24,8 @@
+@@ -24,8 +24,8 @@ linux_rt_sigcode:
  	call	*LINUX_RT_SIGF_HANDLER(%esp)
  	leal	LINUX_RT_SIGF_UC(%esp),%ebx	/* linux ucp */
  	leal	LINUX_RT_SIGF_SC(%ebx),%ecx	/* linux sigcontext */

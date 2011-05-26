@@ -1,12 +1,11 @@
 ---
- sbin/route/route.c |    8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ sbin/route/Makefile |    1 +
+ sbin/route/route.c  |    7 +++++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-Index: freebsd-utils/sbin/route/route.c
-===================================================================
---- freebsd-utils.orig/sbin/route/route.c	2009-04-14 23:05:36.000000000 +0000
-+++ freebsd-utils/sbin/route/route.c	2009-11-14 10:24:14.000000000 +0000
-@@ -63,10 +63,13 @@
+--- a/sbin/route/route.c
++++ b/sbin/route/route.c
+@@ -63,10 +63,13 @@ static const char rcsid[] =
  #include <paths.h>
  #include <stdio.h>
  #include <stdlib.h>
@@ -20,7 +19,7 @@ Index: freebsd-utils/sbin/route/route.c
  
  struct keytab {
  	char	*kt_cp;
-@@ -110,7 +113,7 @@
+@@ -110,7 +113,7 @@ int	getaddr(), rtmsg(), x25_makemask();
  int	prefixlen();
  extern	char *iso_ntoa();
  
@@ -29,7 +28,7 @@ Index: freebsd-utils/sbin/route/route.c
  
  void
  usage(cp)
-@@ -134,7 +137,7 @@
+@@ -134,7 +137,7 @@ main(argc, argv)
  	if (argc < 2)
  		usage((char *)NULL);
  
@@ -38,11 +37,9 @@ Index: freebsd-utils/sbin/route/route.c
  		switch(ch) {
  		case 'n':
  			nflag = 1;
-Index: freebsd-utils/sbin/route/Makefile
-===================================================================
---- freebsd-utils.orig/sbin/route/Makefile	2006-07-27 13:26:29.000000000 +0000
-+++ freebsd-utils/sbin/route/Makefile	2009-11-14 10:24:14.000000000 +0000
-@@ -7,6 +7,7 @@
+--- a/sbin/route/Makefile
++++ b/sbin/route/Makefile
+@@ -7,6 +7,7 @@ PROG=	route
  MAN=	route.8
  SRCS=	route.c keywords.h
  WARNS?=	0

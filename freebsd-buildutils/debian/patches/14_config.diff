@@ -1,3 +1,10 @@
+---
+ src/sys/kern/subr_sbuf.c     |    4 ++--
+ src/sys/sys/sbuf.h           |    9 ++++-----
+ src/usr.sbin/config/Makefile |    4 ++--
+ src/usr.sbin/config/main.c   |    2 ++
+ 4 files changed, 10 insertions(+), 9 deletions(-)
+
 --- a/src/sys/sys/sbuf.h
 +++ b/src/sys/sys/sbuf.h
 @@ -31,7 +31,8 @@
@@ -10,7 +17,7 @@
  
  /*
   * Structure definition
-@@ -64,10 +65,8 @@
+@@ -64,10 +65,8 @@ int		 sbuf_bcat(struct sbuf *, const voi
  int		 sbuf_bcpy(struct sbuf *, const void *, size_t);
  int		 sbuf_cat(struct sbuf *, const char *);
  int		 sbuf_cpy(struct sbuf *, const char *);
@@ -25,7 +32,7 @@
  int		 sbuf_overflowed(struct sbuf *);
 --- a/src/sys/kern/subr_sbuf.c
 +++ b/src/sys/kern/subr_sbuf.c
-@@ -77,8 +77,8 @@
+@@ -77,8 +77,8 @@ static MALLOC_DEFINE(M_SBUF, "sbuf", "st
  #define	SBUF_CLEARFLAG(s, f)	do { (s)->s_flags &= ~(f); } while (0)
  
  #define	SBUF_MINEXTENDSIZE	16		/* Should be power of 2. */
@@ -47,7 +54,7 @@
  
  kernconf.c: kernconf.tmpl
  	file2c 'char kernconfstr[] = {' ',0};' < ${.CURDIR}/kernconf.tmpl > kernconf.c
-@@ -13,7 +13,7 @@
+@@ -13,7 +13,7 @@ WARNS?=	6
  CFLAGS+= -I. -I${.CURDIR}
  
  DPADD=	${LIBL} ${LIBSBUF}
@@ -58,7 +65,7 @@
  
 --- a/src/usr.sbin/config/main.c
 +++ b/src/usr.sbin/config/main.c
-@@ -43,6 +43,8 @@
+@@ -43,6 +43,8 @@ static const char rcsid[] =
  
  #include <sys/types.h>
  #include <sys/stat.h>

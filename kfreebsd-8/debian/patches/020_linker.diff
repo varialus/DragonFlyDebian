@@ -4,9 +4,14 @@
   for details see http://sourceware.org/bugzilla/show_bug.cgi?id=5391
 
 
+---
+ sys/conf/kern.post.mk |    4 +++-
+ sys/conf/kmod.mk      |    4 +++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
 --- a/sys/conf/kern.post.mk
 +++ b/sys/conf/kern.post.mk
-@@ -85,7 +85,9 @@
+@@ -85,7 +85,9 @@ gdbinit:
  ${FULLKERNEL}: ${SYSTEM_DEP} vers.o
  	@rm -f ${.TARGET}
  	@echo linking ${.TARGET}
@@ -19,9 +24,9 @@
  .endif
 --- a/sys/conf/kmod.mk
 +++ b/sys/conf/kmod.mk
-@@ -176,7 +176,9 @@
+@@ -180,7 +180,9 @@ ${PROG}.symbols: ${FULLPROG}
  
- .if ${MACHINE_ARCH} != amd64
+ .if ${MACHINE_ARCH} != amd64 && ${MACHINE_ARCH} != mips
  ${FULLPROG}: ${KMOD}.kld
 -	${LD} -Bshareable ${LDFLAGS} -o ${.TARGET} ${KMOD}.kld
 +	gen-ld-u-options ${KMOD}.kld > ${KMOD}.lopt

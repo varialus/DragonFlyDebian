@@ -1,11 +1,14 @@
 
 Status: xargs -J option requested to both upstream and debian.
 
-Index: src/sys/conf/kmod.mk
-===================================================================
---- src.orig/sys/conf/kmod.mk
-+++ src/sys/conf/kmod.mk
-@@ -204,7 +204,7 @@
+---
+ sys/conf/kmod.mk                      |    2 +-
+ sys/contrib/dev/acpica/acpica_prep.sh |    4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+--- a/sys/conf/kmod.mk
++++ b/sys/conf/kmod.mk
+@@ -204,7 +204,7 @@ ${FULLPROG}: ${OBJS}
  	grep -v '^#' < ${EXPORT_SYMS} > export_syms
  .endif
  	awk -f ${SYSDIR}/conf/kmod_syms.awk ${.TARGET} \
@@ -14,11 +17,9 @@ Index: src/sys/conf/kmod.mk
  .endif
  .endif
  .if !defined(DEBUG_FLAGS) && ${MACHINE_ARCH} == amd64
-Index: src/sys/contrib/dev/acpica/acpica_prep.sh
-===================================================================
---- src.orig/sys/contrib/dev/acpica/acpica_prep.sh
-+++ src/sys/contrib/dev/acpica/acpica_prep.sh
-@@ -55,12 +55,12 @@
+--- a/sys/contrib/dev/acpica/acpica_prep.sh
++++ b/sys/contrib/dev/acpica/acpica_prep.sh
+@@ -55,12 +55,12 @@ done
  
  echo copying full dirs
  for i in ${fulldirs}; do

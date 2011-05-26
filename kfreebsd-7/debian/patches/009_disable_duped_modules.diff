@@ -1,11 +1,20 @@
 
 Status: in upstream BTS
 
-Index: src/sys/conf/Makefile.amd64
-===================================================================
---- src.orig/sys/conf/Makefile.amd64
-+++ src/sys/conf/Makefile.amd64
-@@ -39,6 +39,8 @@
+---
+ sys/conf/Makefile.amd64      |    2 ++
+ sys/conf/Makefile.arm        |    2 ++
+ sys/conf/Makefile.i386       |    2 ++
+ sys/conf/Makefile.ia64       |    2 ++
+ sys/conf/Makefile.pc98       |    2 ++
+ sys/conf/Makefile.powerpc    |    2 ++
+ sys/conf/Makefile.sparc64    |    2 ++
+ usr.sbin/config/mkmakefile.c |   25 +++++++++++++++++++++++++
+ 8 files changed, 39 insertions(+)
+
+--- a/sys/conf/Makefile.amd64
++++ b/sys/conf/Makefile.amd64
+@@ -40,6 +40,8 @@ CFLAGS+=	-fno-omit-frame-pointer
  
  MKMODULESENV+= MACHINE=amd64
  
@@ -14,11 +23,9 @@ Index: src/sys/conf/Makefile.amd64
  %BEFORE_DEPEND
  
  %OBJS
-Index: src/sys/conf/Makefile.arm
-===================================================================
---- src.orig/sys/conf/Makefile.arm
-+++ src/sys/conf/Makefile.arm
-@@ -108,6 +108,8 @@
+--- a/sys/conf/Makefile.arm
++++ b/sys/conf/Makefile.arm
+@@ -108,6 +108,8 @@ ${KERNEL_KO}.tramp: ${KERNEL_KO} $S/$M/$
  
  MKMODULESENV+=	MACHINE=${MACHINE}
  
@@ -27,11 +34,9 @@ Index: src/sys/conf/Makefile.arm
  %BEFORE_DEPEND
  
  %OBJS
-Index: src/sys/conf/Makefile.i386
-===================================================================
---- src.orig/sys/conf/Makefile.i386
-+++ src/sys/conf/Makefile.i386
-@@ -34,6 +34,8 @@
+--- a/sys/conf/Makefile.i386
++++ b/sys/conf/Makefile.i386
+@@ -40,6 +40,8 @@ MACHINE=i386
  
  MKMODULESENV+=	MACHINE=${MACHINE}
  
@@ -40,11 +45,9 @@ Index: src/sys/conf/Makefile.i386
  %BEFORE_DEPEND
  
  %OBJS
-Index: src/sys/conf/Makefile.ia64
-===================================================================
---- src.orig/sys/conf/Makefile.ia64
-+++ src/sys/conf/Makefile.ia64
-@@ -36,6 +36,8 @@
+--- a/sys/conf/Makefile.ia64
++++ b/sys/conf/Makefile.ia64
+@@ -36,6 +36,8 @@ CFLAGS+= -mconstant-gp
  
  ASM_CFLAGS= -x assembler-with-cpp -Wa,-x -DLOCORE ${CFLAGS}
  
@@ -53,11 +56,9 @@ Index: src/sys/conf/Makefile.ia64
  %BEFORE_DEPEND
  
  %OBJS
-Index: src/sys/conf/Makefile.pc98
-===================================================================
---- src.orig/sys/conf/Makefile.pc98
-+++ src/sys/conf/Makefile.pc98
-@@ -34,6 +34,8 @@
+--- a/sys/conf/Makefile.pc98
++++ b/sys/conf/Makefile.pc98
+@@ -34,6 +34,8 @@ MACHINE=pc98
  
  MKMODULESENV+=	MACHINE=${MACHINE}
  
@@ -66,11 +67,9 @@ Index: src/sys/conf/Makefile.pc98
  %BEFORE_DEPEND
  
  %OBJS
-Index: src/sys/conf/Makefile.powerpc
-===================================================================
---- src.orig/sys/conf/Makefile.powerpc
-+++ src/sys/conf/Makefile.powerpc
-@@ -37,6 +37,8 @@
+--- a/sys/conf/Makefile.powerpc
++++ b/sys/conf/Makefile.powerpc
+@@ -37,6 +37,8 @@ DDB_ENABLED!=	grep DDB opt_ddb.h || true
  CFLAGS+=	-fno-omit-frame-pointer
  .endif
  
@@ -79,11 +78,9 @@ Index: src/sys/conf/Makefile.powerpc
  %BEFORE_DEPEND
  
  %OBJS
-Index: src/sys/conf/Makefile.sparc64
-===================================================================
---- src.orig/sys/conf/Makefile.sparc64
-+++ src/sys/conf/Makefile.sparc64
-@@ -32,6 +32,8 @@
+--- a/sys/conf/Makefile.sparc64
++++ b/sys/conf/Makefile.sparc64
+@@ -32,6 +32,8 @@ S=	../../..
  
  MDOBJS=	exception.o interrupt.o
  
@@ -92,11 +89,9 @@ Index: src/sys/conf/Makefile.sparc64
  %BEFORE_DEPEND
  
  %OBJS
-Index: src/usr.sbin/config/mkmakefile.c
-===================================================================
---- src.orig/usr.sbin/config/mkmakefile.c
-+++ src/usr.sbin/config/mkmakefile.c
-@@ -70,6 +70,7 @@
+--- a/usr.sbin/config/mkmakefile.c
++++ b/usr.sbin/config/mkmakefile.c
+@@ -70,6 +70,7 @@ static void do_clean(FILE *);
  static void do_rules(FILE *);
  static void do_xxfiles(char *, FILE *);
  static void do_objs(FILE *);
@@ -104,7 +99,7 @@ Index: src/usr.sbin/config/mkmakefile.c
  static void do_before_depend(FILE *);
  static int opteq(const char *, const char *);
  static void read_files(void);
-@@ -146,6 +147,8 @@
+@@ -146,6 +147,8 @@ makefile(void)
  		}
  		if (eq(line, "%BEFORE_DEPEND\n"))
  			do_before_depend(ofp);
@@ -113,7 +108,7 @@ Index: src/usr.sbin/config/mkmakefile.c
  		else if (eq(line, "%OBJS\n"))
  			do_objs(ofp);
  		else if (strncmp(line, "%FILES.", 7) == 0)
-@@ -626,6 +629,28 @@
+@@ -626,6 +629,28 @@ do_objs(FILE *fp)
  }
  
  static void

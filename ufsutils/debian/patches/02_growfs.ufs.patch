@@ -1,8 +1,11 @@
-Index: ufsutils/growfs.ufs/growfs.c
-===================================================================
---- ufsutils.orig/growfs.ufs/growfs.c
-+++ ufsutils/growfs.ufs/growfs.c
-@@ -51,10 +51,10 @@
+---
+ growfs.ufs/Makefile |   20 ++++++++++++--------
+ growfs.ufs/growfs.c |    8 +++++++-
+ 2 files changed, 19 insertions(+), 9 deletions(-)
+
+--- a/growfs.ufs/growfs.c
++++ b/growfs.ufs/growfs.c
+@@ -51,10 +51,10 @@ __FBSDID("$FreeBSD: src/sbin/growfs/grow
  
  /* ********************************************************** INCLUDES ***** */
  #include <sys/param.h>
@@ -14,7 +17,7 @@ Index: ufsutils/growfs.ufs/growfs.c
  
  #include <stdio.h>
  #include <paths.h>
-@@ -1929,10 +1929,12 @@
+@@ -1929,10 +1929,12 @@ get_dev_size(int fd, int *size)
     int sectorsize;
     off_t mediasize;
  
@@ -27,7 +30,7 @@ Index: ufsutils/growfs.ufs/growfs.c
  
     if (sectorsize <= 0)
         errx(1, "bogus sectorsize: %d", sectorsize);
-@@ -2288,9 +2290,11 @@
+@@ -2288,9 +2290,11 @@ return_disklabel(int fd, struct disklabe
  		}
  		lp->d_checksum=sum;
  
@@ -39,7 +42,7 @@ Index: ufsutils/growfs.ufs/growfs.c
  	}
  	free(lp);
  
-@@ -2314,8 +2318,10 @@
+@@ -2314,8 +2318,10 @@ get_disklabel(int fd)
  	if (!lab)
  		errx(1, "malloc failed");
  
@@ -50,10 +53,8 @@ Index: ufsutils/growfs.ufs/growfs.c
  
      unlabeled++;
  
-Index: ufsutils/growfs.ufs/Makefile
-===================================================================
---- ufsutils.orig/growfs.ufs/Makefile
-+++ ufsutils/growfs.ufs/Makefile
+--- a/growfs.ufs/Makefile
++++ b/growfs.ufs/Makefile
 @@ -6,14 +6,18 @@
  
  #GFSDBG=

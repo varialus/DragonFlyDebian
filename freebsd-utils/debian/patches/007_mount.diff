@@ -1,12 +1,13 @@
 ---
  sbin/mount/Makefile   |    2 +-
- sbin/mount/mount.c    |   23 +++++++++++++----------
+ sbin/mount/mntopts.h  |    4 ++++
+ sbin/mount/mount.c    |   22 +++++++++++-----------
  sbin/mount/mount_fs.c |    2 +-
- 3 files changed, 15 insertions(+), 12 deletions(-)
+ 4 files changed, 17 insertions(+), 13 deletions(-)
 
 --- a/sbin/mount/mntopts.h
 +++ b/sbin/mount/mntopts.h
-@@ -37,6 +37,10 @@
+@@ -37,6 +37,10 @@ struct mntopt {
  	int m_altloc;		/* 1 => set bit in altflags */
  };
  
@@ -17,11 +18,9 @@
  /* User-visible MNT_ flags. */
  #define MOPT_ASYNC		{ "async",	0, MNT_ASYNC, 0 }
  #define MOPT_NOATIME		{ "atime",	1, MNT_NOATIME, 0 }
-Index: b/sbin/mount/mount_fs.c
-===================================================================
 --- a/sbin/mount/mount_fs.c
 +++ b/sbin/mount/mount_fs.c
-@@ -52,7 +52,7 @@
+@@ -52,7 +52,7 @@ static const char rcsid[] =
  #include <sys/mount.h>
  
  #include <err.h>
@@ -30,11 +29,9 @@ Index: b/sbin/mount/mount_fs.c
  #include <libgen.h>
  #include <stdio.h>
  #include <stdlib.h>
-Index: b/sbin/mount/mount.c
-===================================================================
 --- a/sbin/mount/mount.c
 +++ b/sbin/mount/mount.c
-@@ -58,6 +58,8 @@
+@@ -58,6 +58,8 @@ __FBSDID("$FreeBSD$");
  #include <unistd.h>
  #include <libutil.h>
  
@@ -43,7 +40,7 @@ Index: b/sbin/mount/mount.c
  #include "extern.h"
  #include "mntopts.h"
  #include "pathnames.h"
-@@ -159,6 +161,7 @@
+@@ -160,6 +162,7 @@ use_mountprog(const char *vfstype)
  static int
  exec_mountprog(const char *name, const char *execname, char *const argv[])
  {
@@ -51,7 +48,7 @@ Index: b/sbin/mount/mount.c
  	pid_t pid;
  	int status;
  
-@@ -167,13 +170,11 @@
+@@ -168,13 +171,11 @@ exec_mountprog(const char *name, const c
  		warn("fork");
  		exit (1);
  	case 0:					/* Child. */
@@ -68,7 +65,7 @@ Index: b/sbin/mount/mount.c
  		}
  		exit(1);
  	default:				/* Parent. */
-@@ -250,7 +251,7 @@
+@@ -251,7 +252,7 @@ main(int argc, char *argv[])
  	options = NULL;
  	vfslist = NULL;
  	vfstype = "ufs";
@@ -77,7 +74,7 @@ Index: b/sbin/mount/mount.c
  		switch (ch) {
  		case 'a':
  			all = 1;
-@@ -258,9 +259,6 @@
+@@ -259,9 +260,6 @@ main(int argc, char *argv[])
  		case 'd':
  			debug = 1;
  			break;
@@ -87,7 +84,7 @@ Index: b/sbin/mount/mount.c
  		case 'f':
  			init_flags |= MNT_FORCE;
  			break;
-@@ -645,11 +643,13 @@
+@@ -646,11 +644,13 @@ prmount(struct statfs *sfp)
  			(void)printf(", reads: sync %ju async %ju",
  			    (uintmax_t)sfp->f_syncreads,
  			    (uintmax_t)sfp->f_asyncreads);
@@ -101,7 +98,7 @@ Index: b/sbin/mount/mount.c
  	}
  	(void)printf(")\n");
  }
-@@ -839,7 +839,7 @@
+@@ -840,7 +840,7 @@ usage(void)
  {
  
  	(void)fprintf(stderr, "%s\n%s\n%s\n",
@@ -110,7 +107,7 @@ Index: b/sbin/mount/mount.c
  "       mount [-dfpruvw] special | node",
  "       mount [-dfpruvw] [-o options] [-t ufs | external_type] special node");
  	exit(1);
-@@ -856,7 +856,7 @@
+@@ -865,7 +865,7 @@ putfsent(struct statfs *ent)
  
  	if (strncmp(ent->f_mntfromname, "<below>", 7) == 0 ||
  	    strncmp(ent->f_mntfromname, "<above>", 7) == 0) {
@@ -119,11 +116,9 @@ Index: b/sbin/mount/mount.c
  		    +1));
  	}
  
-Index: b/sbin/mount/Makefile
-===================================================================
 --- a/sbin/mount/Makefile
 +++ b/sbin/mount/Makefile
-@@ -8,6 +8,6 @@
+@@ -8,6 +8,6 @@ MAN=	mount.8
  # We do NOT install the getmntopts.3 man page.
  
  DPADD=	${LIBUTIL}

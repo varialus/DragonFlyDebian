@@ -1,8 +1,14 @@
-Index: freebsd-utils/usr.bin/netstat/netgraph.c
-===================================================================
---- freebsd-utils.orig/usr.bin/netstat/netgraph.c	2010-04-02 11:07:55.000000000 +0000
-+++ freebsd-utils/usr.bin/netstat/netgraph.c	2010-06-29 07:38:26.000000000 +0000
-@@ -76,8 +76,8 @@
+---
+ usr.bin/netstat/Makefile   |    1 
+ usr.bin/netstat/main.c     |  114 ++++++++++++++++++++++-----------------------
+ usr.bin/netstat/mroute6.c  |    1 
+ usr.bin/netstat/netgraph.c |    4 -
+ usr.bin/netstat/netstat.h  |   13 +++++
+ 5 files changed, 74 insertions(+), 59 deletions(-)
+
+--- a/usr.bin/netstat/netgraph.c
++++ b/usr.bin/netstat/netgraph.c
+@@ -76,8 +76,8 @@ netgraphprotopr(u_long off, const char *
  		const char *const modname = "ng_socket.ko";
  /* XXX We should get "mpath" from "sysctl kern.module_path" */
  		const char *mpath[] = { "/", "/boot/", "/modules/", NULL };
@@ -13,11 +19,9 @@ Index: freebsd-utils/usr.bin/netstat/netgraph.c
  		const char **pre;
  		struct kld_file_stat ks;
  		int fileid;
-Index: freebsd-utils/usr.bin/netstat/mroute6.c
-===================================================================
---- freebsd-utils.orig/usr.bin/netstat/mroute6.c	2008-01-02 23:26:11.000000000 +0000
-+++ freebsd-utils/usr.bin/netstat/mroute6.c	2010-06-29 07:38:26.000000000 +0000
-@@ -89,6 +89,7 @@
+--- a/usr.bin/netstat/mroute6.c
++++ b/usr.bin/netstat/mroute6.c
+@@ -89,6 +89,7 @@ __FBSDID("$FreeBSD$");
  #include <stdio.h>
  #include <stdlib.h>
  
@@ -25,11 +29,9 @@ Index: freebsd-utils/usr.bin/netstat/mroute6.c
  #define	KERNEL 1
  #include <netinet6/ip6_mroute.h>
  #undef KERNEL
-Index: freebsd-utils/usr.bin/netstat/main.c
-===================================================================
---- freebsd-utils.orig/usr.bin/netstat/main.c	2010-02-10 00:34:13.000000000 +0000
-+++ freebsd-utils/usr.bin/netstat/main.c	2010-06-29 07:40:12.000000000 +0000
-@@ -75,118 +75,118 @@
+--- a/usr.bin/netstat/main.c
++++ b/usr.bin/netstat/main.c
+@@ -75,118 +75,118 @@ __FBSDID("$FreeBSD$");
  
  static struct nlist nl[] = {
  #define	N_IFNET		0
@@ -205,10 +207,8 @@ Index: freebsd-utils/usr.bin/netstat/main.c
  };
  
  struct protox {
-Index: freebsd-utils/usr.bin/netstat/netstat.h
-===================================================================
---- freebsd-utils.orig/usr.bin/netstat/netstat.h	2010-02-10 00:34:13.000000000 +0000
-+++ freebsd-utils/usr.bin/netstat/netstat.h	2010-06-29 07:38:26.000000000 +0000
+--- a/usr.bin/netstat/netstat.h
++++ b/usr.bin/netstat/netstat.h
 @@ -35,6 +35,19 @@
   */
  
@@ -229,11 +229,9 @@ Index: freebsd-utils/usr.bin/netstat/netstat.h
  
  extern int	Aflag;	/* show addresses of protocol control block */
  extern int	aflag;	/* show all sockets (including servers) */
-Index: freebsd-utils/usr.bin/netstat/Makefile
-===================================================================
---- freebsd-utils.orig/usr.bin/netstat/Makefile	2009-02-15 16:16:38.000000000 +0000
-+++ freebsd-utils/usr.bin/netstat/Makefile	2010-06-29 07:38:26.000000000 +0000
-@@ -22,6 +22,7 @@
+--- a/usr.bin/netstat/Makefile
++++ b/usr.bin/netstat/Makefile
+@@ -22,6 +22,7 @@ BINGRP=	kmem
  BINMODE=2555
  DPADD=	${LIBKVM} ${LIBMEMSTAT} ${LIBUTIL}
  LDADD=	-lkvm -lmemstat -lutil

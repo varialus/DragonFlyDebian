@@ -5,9 +5,13 @@ It is a revert of upstream commit r18970:
 | 
 | This makes Xorg happy if you aren't using moused.
 
+---
+ sys/dev/atkbdc/psm.c |   23 -----------------------
+ 1 file changed, 23 deletions(-)
+
 --- a/sys/dev/atkbdc/psm.c
 +++ b/sys/dev/atkbdc/psm.c
-@@ -70,10 +70,7 @@
+@@ -70,10 +70,7 @@ __FBSDID("$FreeBSD$");
  #include <sys/module.h>
  #include <sys/bus.h>
  #include <sys/conf.h>
@@ -18,7 +22,7 @@ It is a revert of upstream commit r18970:
  #include <sys/syslog.h>
  #include <machine/bus.h>
  #include <sys/rman.h>
-@@ -302,7 +299,6 @@
+@@ -302,7 +299,6 @@ struct psm_softc {		/* Driver status inf
  	struct cdev	*bdev;
  	int		lasterr;
  	int		cmdcount;
@@ -26,7 +30,7 @@ It is a revert of upstream commit r18970:
  };
  static devclass_t psm_devclass;
  #define	PSM_SOFTC(unit)	\
-@@ -1494,7 +1490,6 @@
+@@ -1494,7 +1490,6 @@ psmopen(struct cdev *dev, int flag, int
  	sc->mode.level = sc->dflt_mode.level;
  	sc->mode.protocol = sc->dflt_mode.protocol;
  	sc->watchdog = FALSE;
@@ -34,7 +38,7 @@ It is a revert of upstream commit r18970:
  
  	/* flush the event queue */
  	sc->queue.count = 0;
-@@ -1634,12 +1629,6 @@
+@@ -1634,12 +1629,6 @@ psmclose(struct cdev *dev, int flag, int
  	/* remove anything left in the output buffer */
  	empty_aux_buffer(sc->kbdc, 10);
  
@@ -47,7 +51,7 @@ It is a revert of upstream commit r18970:
  	/* close is almost always successful */
  	sc->state &= ~PSM_OPEN;
  	kbdc_lock(sc->kbdc, FALSE);
-@@ -2201,15 +2190,6 @@
+@@ -2201,15 +2190,6 @@ psmioctl(struct cdev *dev, u_long cmd, c
  		break;
  #endif /* MOUSE_GETHWID */
  
@@ -63,7 +67,7 @@ It is a revert of upstream commit r18970:
  	default:
  		return (ENOTTY);
  	}
-@@ -3474,9 +3454,6 @@
+@@ -3474,9 +3454,6 @@ next:
  		wakeup(sc);
  	}
  	selwakeuppri(&sc->rsel, PZERO);

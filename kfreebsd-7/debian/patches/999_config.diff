@@ -1,5 +1,10 @@
---- a/sys/amd64/conf/GENERIC	2010-03-29 21:26:18.000000000 +0200
-+++ b/sys/amd64/conf/GENERIC	2010-03-29 21:28:02.000000000 +0200
+---
+ sys/amd64/conf/GENERIC |   37 ++++++++++++++++---------------------
+ sys/i386/conf/GENERIC  |   41 ++++++++++++++++++-----------------------
+ 2 files changed, 34 insertions(+), 44 deletions(-)
+
+--- a/sys/amd64/conf/GENERIC
++++ b/sys/amd64/conf/GENERIC
 @@ -18,13 +18,13 @@
  #
  # $FreeBSD$
@@ -18,7 +23,7 @@
  
  options 	SCHED_ULE		# ULE scheduler
  options 	PREEMPTION		# Enable kernel thread preemption
-@@ -52,7 +52,7 @@
+@@ -52,7 +52,7 @@ options 	COMPAT_IA32		# Compatible with
  options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
@@ -27,7 +32,7 @@
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -75,7 +75,7 @@
+@@ -75,7 +75,7 @@ options 	AUDIT			# Security event auditi
  options 	INCLUDE_CONFIG_FILE     # Include this file in kernel
  
  # Make an SMP-capable kernel by default
@@ -36,7 +41,7 @@
  
  # CPU frequency control
  device		cpufreq
-@@ -84,9 +84,6 @@
+@@ -84,9 +84,6 @@ device		cpufreq
  device		acpi
  device		pci
  
@@ -46,7 +51,7 @@
  # ATA and ATAPI devices
  device		ata
  device		atadisk		# ATA disk drives
-@@ -94,6 +91,8 @@
+@@ -94,6 +91,8 @@ device		ataraid		# ATA RAID drives
  device		atapicd		# ATAPI CDROM drives
  device		atapifd		# ATAPI floppy drives
  device		atapist		# ATAPI tape drives
@@ -55,7 +60,7 @@
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -176,10 +175,6 @@
+@@ -176,10 +175,6 @@ device		uart		# Generic UART driver
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -66,7 +71,7 @@
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -256,13 +251,8 @@
+@@ -256,13 +251,8 @@ device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
@@ -80,7 +85,7 @@
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -279,11 +269,8 @@
+@@ -279,11 +269,8 @@ device		usb		# USB Bus (required)
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
@@ -92,7 +97,7 @@
  # USB Serial devices
  device		ucom		# Generic com ttys
  device		uark		# Technologies ARK3116 based serial adapters
-@@ -313,3 +300,11 @@
+@@ -313,3 +300,11 @@ device		fwe		# Ethernet over FireWire (n
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
@@ -104,8 +109,8 @@
 +options		ALTQ_RIO	# RED In/Out
 +options		ALTQ_HFSC	# Hierarchical Packet Scheduler (HFSC)
 +options		ALTQ_PRIQ	# Priority Queuing (PRIQ)
---- a/sys/i386/conf/GENERIC	2010-03-29 21:26:18.000000000 +0200
-+++ b/sys/i386/conf/GENERIC	2010-03-29 21:28:02.000000000 +0200
+--- a/sys/i386/conf/GENERIC
++++ b/sys/i386/conf/GENERIC
 @@ -18,15 +18,15 @@
  #
  # $FreeBSD$
@@ -128,7 +133,7 @@
  
  options 	SCHED_ULE		# ULE scheduler
  options 	PREEMPTION		# Enable kernel thread preemption
-@@ -53,7 +53,7 @@
+@@ -53,7 +53,7 @@ options 	COMPAT_43TTY		# BSD 4.3 TTY com
  options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
@@ -137,7 +142,7 @@
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -75,7 +75,7 @@
+@@ -75,7 +75,7 @@ options 	AUDIT			# Security event auditi
  options 	INCLUDE_CONFIG_FILE     # Include this file in kernel
  
  # To make an SMP kernel, the next two lines are needed
@@ -146,7 +151,7 @@
  device		apic			# I/O APIC
  
  # CPU frequency control
-@@ -85,9 +85,6 @@
+@@ -85,9 +85,6 @@ device		cpufreq
  device		eisa
  device		pci
  
@@ -156,7 +161,7 @@
  # ATA and ATAPI devices
  device		ata
  device		atadisk		# ATA disk drives
-@@ -95,6 +92,8 @@
+@@ -95,6 +92,8 @@ device		ataraid		# ATA RAID drives
  device		atapicd		# ATAPI CDROM drives
  device		atapifd		# ATAPI floppy drives
  device		atapist		# ATAPI tape drives
@@ -165,7 +170,7 @@
  options 	ATA_STATIC_ID	# Static device numbering
  
  # SCSI Controllers
-@@ -187,10 +186,6 @@
+@@ -187,10 +186,6 @@ device		uart		# Generic UART driver
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -176,7 +181,7 @@
  
  # If you've got a "dumb" serial or parallel PCI card that is
  # supported by the puc(4) glue driver, uncomment the following
-@@ -270,13 +265,8 @@
+@@ -270,13 +265,8 @@ device		loop		# Network loopback
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
@@ -190,7 +195,7 @@
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -293,11 +283,8 @@
+@@ -293,11 +283,8 @@ device		usb		# USB Bus (required)
  device		ugen		# Generic
  device		uhid		# "Human Interface Devices"
  device		ukbd		# Keyboard
@@ -202,7 +207,7 @@
  # USB Serial devices
  device		ucom		# Generic com ttys
  device		uark		# Technologies ARK3116 based serial adapters
-@@ -327,3 +314,11 @@
+@@ -327,3 +314,11 @@ device		fwe		# Ethernet over FireWire (n
  device		fwip		# IP over FireWire (RFC 2734,3146)
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons

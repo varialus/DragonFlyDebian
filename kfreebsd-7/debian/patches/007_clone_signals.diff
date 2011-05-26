@@ -1,8 +1,11 @@
-Index: src/sys/kern/kern_fork.c
-===================================================================
---- src.orig/sys/kern/kern_fork.c
-+++ src/sys/kern/kern_fork.c
-@@ -529,7 +529,13 @@
+---
+ sys/kern/kern_fork.c |    8 +++++++-
+ sys/sys/unistd.h     |    4 ++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+--- a/sys/kern/kern_fork.c
++++ b/sys/kern/kern_fork.c
+@@ -530,7 +530,13 @@ again:
  		p2->p_sigacts = newsigacts;
  	}
  	if (flags & RFLINUXTHPN) 
@@ -17,10 +20,8 @@ Index: src/sys/kern/kern_fork.c
  	else
  	        p2->p_sigparent = SIGCHLD;
  
-Index: src/sys/sys/unistd.h
-===================================================================
---- src.orig/sys/sys/unistd.h
-+++ src/sys/sys/unistd.h
+--- a/sys/sys/unistd.h
++++ b/sys/sys/unistd.h
 @@ -181,6 +181,10 @@
  #define	RFHIGHPID	(1<<18)	/* use a pid higher then 10 (idleproc) */
  #define	RFPPWAIT	(1<<31)	/* parent sleeps until child exits (vfork) */

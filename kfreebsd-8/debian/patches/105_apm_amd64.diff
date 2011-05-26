@@ -1,6 +1,13 @@
+---
+ sys/amd64/acpica/acpi_machdep.c |  457 +++++++++++++++++++++++++++++++++++++++-
+ sys/amd64/include/apm_bios.h    |  264 +++++++++++++++++++++++
+ sys/dev/acpica/acpi.c           |    6 
+ sys/i386/include/apm_bios.h     |   12 -
+ 4 files changed, 719 insertions(+), 20 deletions(-)
+
 --- a/sys/dev/acpica/acpi.c
 +++ b/sys/dev/acpica/acpi.c
-@@ -2315,9 +2315,7 @@
+@@ -2315,9 +2315,7 @@ int
  acpi_ReqSleepState(struct acpi_softc *sc, int state)
  {
  #if defined(__amd64__) || defined(__i386__)
@@ -10,7 +17,7 @@
      ACPI_STATUS status;
  
      if (state < ACPI_STATE_S1 || state > ACPI_S_STATES_MAX)
-@@ -2342,7 +2340,6 @@
+@@ -2342,7 +2340,6 @@ acpi_ReqSleepState(struct acpi_softc *sc
  
      /* Record the pending state and notify all apm devices. */
      sc->acpi_next_sstate = state;
@@ -18,7 +25,7 @@
      STAILQ_FOREACH(clone, &sc->apm_cdevs, entries) {
  	clone->notify_status = APM_EV_NONE;
  	if ((clone->flags & ACPI_EVF_DEVD) == 0) {
-@@ -2350,7 +2347,6 @@
+@@ -2350,7 +2347,6 @@ acpi_ReqSleepState(struct acpi_softc *sc
  	    KNOTE_LOCKED(&clone->sel_read.si_note, 0);
  	}
      }
@@ -26,7 +33,7 @@
  
      /* If devd(8) is not running, immediately enter the sleep state. */
      if (!devctl_process_running()) {
-@@ -2418,7 +2414,6 @@
+@@ -2418,7 +2414,6 @@ acpi_AckSleepState(struct apm_clone_data
       * are writable since read-only devices couldn't ack the request.
       */
      sleeping = TRUE;
@@ -34,7 +41,7 @@
      clone->notify_status = APM_EV_ACKED;
      STAILQ_FOREACH(clone, &sc->apm_cdevs, entries) {
  	if ((clone->flags & ACPI_EVF_WRITE) != 0 &&
-@@ -2427,7 +2422,6 @@
+@@ -2427,7 +2422,6 @@ acpi_AckSleepState(struct apm_clone_data
  	    break;
  	}
      }
@@ -44,7 +51,7 @@
      if (sleeping)
 --- a/sys/i386/include/apm_bios.h
 +++ b/sys/i386/include/apm_bios.h
-@@ -230,12 +230,12 @@
+@@ -230,12 +230,12 @@ typedef struct apm_pwstatus {
  } *apm_pwstatus_t;
  
  struct apm_bios_arg {
@@ -65,7 +72,7 @@
  struct apm_event_info {
 --- a/sys/amd64/acpica/acpi_machdep.c
 +++ b/sys/amd64/acpica/acpi_machdep.c
-@@ -44,6 +44,24 @@
+@@ -44,6 +44,24 @@ __FBSDID("$FreeBSD$");
  
  #include <machine/nexusvar.h>
  
@@ -90,7 +97,7 @@
  SYSCTL_DECL(_debug_acpi);
  
  int acpi_resume_beep;
-@@ -55,7 +73,432 @@
+@@ -55,7 +73,432 @@ int acpi_reset_video;
  TUNABLE_INT("hw.acpi.reset_video", &acpi_reset_video);
  
  static int intr_model = ACPI_INTR_PIC;
@@ -524,7 +531,7 @@
  
  int
  acpi_machdep_init(device_t dev)
-@@ -64,14 +507,12 @@
+@@ -64,14 +507,12 @@ acpi_machdep_init(device_t dev)
  
  	sc = devclass_get_softc(devclass_find("acpi"), 0);
  

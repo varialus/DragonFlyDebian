@@ -48,11 +48,6 @@ get-orig-source:
 	tar -czf ../freebsd-libs_$(VERSION).orig.tar.gz $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
-patch: patch-stamp
-patch-stamp:
-	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
-	touch $@
-
 ifeq ($(kernel), kfreebsd)
 build: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-usb build-devstat build-memstat build-netgraph
 else
@@ -60,57 +55,57 @@ build: build-sbuf
 endif
 
 build-cam: build-cam-stamp
-build-cam-stamp: patch build-sbuf
+build-cam-stamp: build-sbuf
 	$(PMAKE) -C $(CURDIR)/lib/libcam SHLIBDIR=./
 	touch $@
 
 build-geom: build-geom-stamp
-build-geom-stamp: patch build-sbuf
+build-geom-stamp: build-sbuf
 	$(PMAKE) -C $(CURDIR)/lib/libgeom SHLIBDIR=./
 	touch $@
 
 build-netgraph: build-netgraph-stamp
-build-netgraph-stamp: patch
+build-netgraph-stamp:
 	$(PMAKE) -C $(CURDIR)/lib/libnetgraph SHLIBDIR=./
 	touch $@
 
 build-ipx: build-ipx-stamp
-build-ipx-stamp: patch
+build-ipx-stamp:
 	$(PMAKE) -C $(CURDIR)/lib/libipx SHLIBDIR=./
 	touch $@
 
 build-kiconv: build-kiconv-stamp
-build-kiconv-stamp: patch
+build-kiconv-stamp:
 	$(PMAKE) -C $(CURDIR)/lib/libkiconv SHLIBDIR=./
 	touch $@
 
 build-kvm: build-kvm-stamp
-build-kvm-stamp: patch
+build-kvm-stamp:
 	$(PMAKE) -C $(CURDIR)/lib/libkvm SHLIBDIR=./
 	touch $@
 
 build-devstat: build-devstat-stamp
-build-devstat-stamp: patch build-kvm
+build-devstat-stamp: build-kvm
 	$(PMAKE) -C $(CURDIR)/lib/libdevstat SHLIBDIR=./
 	touch $@
 
 build-memstat: build-memstat-stamp
-build-memstat-stamp: patch build-kvm
+build-memstat-stamp: build-kvm
 	$(PMAKE) -C $(CURDIR)/lib/libmemstat SHLIBDIR=./
 	touch $@
 
 build-sbuf: build-sbuf-stamp
-build-sbuf-stamp: patch
+build-sbuf-stamp:
 	$(PMAKE) -C $(CURDIR)/lib/libsbuf SHLIBDIR=./
 	touch $@
 
 build-usbhid: build-usbhid-stamp
-build-usbhid-stamp: patch
+build-usbhid-stamp:
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid SHLIBDIR=./
 	touch $@
 
 build-usb: build-usb-stamp
-build-usb-stamp: patch
+build-usb-stamp:
 	$(PMAKE) -C $(CURDIR)/lib/libusb SHLIBDIR=./
 	touch $@
 
@@ -130,8 +125,6 @@ ifeq ($(kernel), kfreebsd)
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid clean
 	$(PMAKE) -C $(CURDIR)/lib/libusb clean
 endif
-	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
-	rm -rf .pc
 	rm -f *stamp
 	dh_clean
 

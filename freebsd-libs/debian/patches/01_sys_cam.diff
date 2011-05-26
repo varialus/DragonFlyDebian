@@ -1,15 +1,14 @@
 ---
+ sys/cam/ata/ata_all.c   |    2 +-
  sys/cam/cam.c           |    1 +
  sys/cam/cam_xpt.c       |    2 +-
  sys/cam/scsi/scsi_all.c |    1 +
  sys/cam/scsi/scsi_all.h |    2 ++
- 4 files changed, 5 insertions(+), 1 deletion(-)
+ 5 files changed, 6 insertions(+), 2 deletions(-)
 
-Index: freebsd-libs/sys/cam/cam.c
-===================================================================
---- freebsd-libs.orig/sys/cam/cam.c	2009-11-14 09:30:58.000000000 +0000
-+++ freebsd-libs/sys/cam/cam.c	2009-11-14 09:32:53.000000000 +0000
-@@ -36,6 +36,7 @@
+--- a/sys/cam/cam.c
++++ b/sys/cam/cam.c
+@@ -36,6 +36,7 @@ __FBSDID("$FreeBSD$");
  #include <sys/sysctl.h>
  #else /* _KERNEL */
  #include <stdlib.h>
@@ -17,24 +16,20 @@ Index: freebsd-libs/sys/cam/cam.c
  #include <stdio.h>
  #include <camlib.h>
  #endif /* _KERNEL */
-Index: freebsd-libs/sys/cam/cam_xpt.c
-===================================================================
---- freebsd-libs.orig/sys/cam/cam_xpt.c	2009-11-14 09:30:58.000000000 +0000
-+++ freebsd-libs/sys/cam/cam_xpt.c	2009-11-14 09:32:53.000000000 +0000
-@@ -210,7 +210,7 @@
- static union ccb *xpt_get_ccb(struct cam_ed *device);
+--- a/sys/cam/cam_xpt.c
++++ b/sys/cam/cam_xpt.c
+@@ -221,7 +221,7 @@ static union ccb *xpt_get_ccb(struct cam
  static void	 xpt_run_dev_allocq(struct cam_eb *bus);
+ static void	 xpt_run_dev_sendq(struct cam_eb *bus);
  static timeout_t xpt_release_devq_timeout;
 -static void	 xpt_release_simq_timeout(void *arg) __unused;
 +static void	 xpt_release_simq_timeout(void *arg);
  static void	 xpt_release_bus(struct cam_eb *bus);
- static void	 xpt_release_devq_device(struct cam_ed *dev, u_int count,
- 					 int run_queue);
-Index: freebsd-libs/sys/cam/scsi/scsi_all.c
-===================================================================
---- freebsd-libs.orig/sys/cam/scsi/scsi_all.c	2009-11-14 09:30:58.000000000 +0000
-+++ freebsd-libs/sys/cam/scsi/scsi_all.c	2009-11-14 09:32:53.000000000 +0000
-@@ -41,6 +41,7 @@
+ static void	 xpt_release_devq_device(struct cam_ed *dev, cam_rl rl,
+ 		    u_int count, int run_queue);
+--- a/sys/cam/scsi/scsi_all.c
++++ b/sys/cam/scsi/scsi_all.c
+@@ -41,6 +41,7 @@ __FBSDID("$FreeBSD$");
  #include <sys/sysctl.h>
  #else
  #include <errno.h>
@@ -42,10 +37,8 @@ Index: freebsd-libs/sys/cam/scsi/scsi_all.c
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
-Index: freebsd-libs/sys/cam/scsi/scsi_all.h
-===================================================================
---- freebsd-libs.orig/sys/cam/scsi/scsi_all.h	2009-11-14 09:30:58.000000000 +0000
-+++ freebsd-libs/sys/cam/scsi/scsi_all.h	2009-11-14 09:32:53.000000000 +0000
+--- a/sys/cam/scsi/scsi_all.h
++++ b/sys/cam/scsi/scsi_all.h
 @@ -32,6 +32,8 @@
   * bus reset.
   */
@@ -55,11 +48,9 @@ Index: freebsd-libs/sys/cam/scsi/scsi_all.h
  #endif /* _KERNEL */
  
  /*
-Index: freebsd-libs/sys/cam/ata/ata_all.c
-===================================================================
---- freebsd-libs.orig/sys/cam/ata/ata_all.c	2009-11-14 09:33:07.000000000 +0000
-+++ freebsd-libs/sys/cam/ata/ata_all.c	2009-11-14 09:33:15.000000000 +0000
-@@ -53,7 +53,7 @@
+--- a/sys/cam/ata/ata_all.c
++++ b/sys/cam/ata/ata_all.c
+@@ -53,7 +53,7 @@ __FBSDID("$FreeBSD$");
  #include <sys/ata.h>
  #include <cam/ata/ata_all.h>
  #include <sys/sbuf.h>

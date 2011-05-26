@@ -4,15 +4,15 @@
 
 --- a/sbin/sysctl/sysctl.c
 +++ b/sbin/sysctl/sysctl.c
-@@ -57,6 +57,7 @@
+@@ -57,6 +57,7 @@ static const char rcsid[] =
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
 +#include <time.h>
  
- static int	aflag, bflag, dflag, eflag, hflag, Nflag, nflag, oflag;
- static int	qflag, xflag;
-@@ -338,6 +339,7 @@
+ static int	aflag, bflag, dflag, eflag, hflag, iflag;
+ static int	Nflag, nflag, oflag, qflag, xflag, warncount;
+@@ -346,6 +347,7 @@ S_clockinfo(int l2, void *p)
  static int
  S_loadavg(int l2, void *p)
  {
@@ -20,7 +20,7 @@
  	struct loadavg *tv = (struct loadavg*)p;
  
  	if (l2 != sizeof(*tv)) {
-@@ -348,6 +350,7 @@
+@@ -356,6 +358,7 @@ S_loadavg(int l2, void *p)
  		(double)tv->ldavg[0]/(double)tv->fscale,
  		(double)tv->ldavg[1]/(double)tv->fscale,
  		(double)tv->ldavg[2]/(double)tv->fscale);

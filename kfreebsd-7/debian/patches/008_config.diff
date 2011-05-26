@@ -3,11 +3,14 @@ Author: rmh
 Status: gotta uncomment WARNS (see #351366), and find a portable way to add
   "-lbsd".  after this it can be sent upstream.
 
-Index: src/usr.sbin/config/Makefile
-===================================================================
---- src.orig/usr.sbin/config/Makefile
-+++ src/usr.sbin/config/Makefile
-@@ -9,11 +9,11 @@
+---
+ usr.sbin/config/Makefile |    6 +++---
+ usr.sbin/config/main.c   |   11 ++++++++++-
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+--- a/usr.sbin/config/Makefile
++++ b/usr.sbin/config/Makefile
+@@ -9,11 +9,11 @@ SRCS=	config.y main.c lang.l mkmakefile.
  kernconf.c: kernconf.tmpl
  	file2c 'char kernconfstr[] = {' ',0};' < ${.CURDIR}/kernconf.tmpl > kernconf.c
  
@@ -22,12 +25,10 @@ Index: src/usr.sbin/config/Makefile
  
  CLEANFILES+=	kernconf.c
  
-Index: src/usr.sbin/config/main.c
-===================================================================
---- src.orig/usr.sbin/config/main.c
-+++ src/usr.sbin/config/main.c
-@@ -41,12 +41,17 @@
-   "$FreeBSD: src/usr.sbin/config/main.c,v 1.76.2.1.4.1 2009/04/15 03:14:26 kensmith Exp $";
+--- a/usr.sbin/config/main.c
++++ b/usr.sbin/config/main.c
+@@ -41,12 +41,17 @@ static const char rcsid[] =
+   "$FreeBSD$";
  #endif /* not lint */
  
 +#include <stdarg.h>
@@ -45,7 +46,7 @@ Index: src/usr.sbin/config/main.c
  
  #include <assert.h>
  #include <ctype.h>
-@@ -606,7 +612,11 @@
+@@ -606,7 +611,11 @@ cleanheaders(char *p)
  	if ((dirp = opendir(p)) == NULL)
  		err(EX_OSERR, "opendir %s", p);
  	while ((dp = readdir(dirp)) != NULL) {

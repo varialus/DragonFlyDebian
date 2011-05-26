@@ -1,8 +1,16 @@
-Index: src/sys/conf/files
-===================================================================
---- src.orig/sys/conf/files
-+++ src/sys/conf/files
-@@ -476,180 +476,6 @@
+---
+ sys/amd64/conf/GENERIC |    6 -
+ sys/conf/files         |  174 -------------------------------------------------
+ sys/conf/files.amd64   |   30 --------
+ sys/conf/files.i386    |   35 ---------
+ sys/conf/kern.pre.mk   |    3 
+ sys/i386/conf/GENERIC  |    6 -
+ sys/modules/Makefile   |   11 ---
+ 7 files changed, 265 deletions(-)
+
+--- a/sys/conf/files
++++ b/sys/conf/files
+@@ -476,180 +476,6 @@ dev/ata/atapi-cam.c		optional atapicam
  dev/ata/atapi-cd.c		optional atapicd
  dev/ata/atapi-fd.c		optional atapifd
  dev/ata/atapi-tape.c		optional atapist
@@ -183,11 +191,9 @@ Index: src/sys/conf/files
  dev/awi/am79c930.c		optional awi
  dev/awi/awi.c			optional awi
  dev/awi/if_awi_pccard.c		optional awi pccard
-Index: src/sys/conf/files.i386
-===================================================================
---- src.orig/sys/conf/files.i386
-+++ src/sys/conf/files.i386
-@@ -46,32 +46,6 @@
+--- a/sys/conf/files.i386
++++ b/sys/conf/files.i386
+@@ -46,32 +46,6 @@ ukbdmap.h			optional	ukbd_dflt_keymap	\
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -220,7 +226,7 @@ Index: src/sys/conf/files.i386
  #
  compat/linprocfs/linprocfs.c	optional linprocfs
  compat/linsysfs/linsysfs.c	optional linsysfs
-@@ -173,14 +147,6 @@
+@@ -173,14 +147,6 @@ dev/fdc/fdc_pccard.c		optional fdc pccar
  dev/fe/if_fe_isa.c		optional fe isa
  dev/glxsb/glxsb.c		optional glxsb
  dev/glxsb/glxsb_hash.c		optional glxsb
@@ -235,7 +241,7 @@ Index: src/sys/conf/files.i386
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_intel.c		optional hwpmc
  dev/hwpmc/hwpmc_core.c		optional hwpmc
-@@ -212,7 +178,6 @@
+@@ -212,7 +178,6 @@ dev/mem/memutil.c		optional mem
  dev/mse/mse.c			optional mse
  dev/mse/mse_isa.c		optional mse isa
  dev/nfe/if_nfe.c		optional nfe pci
@@ -243,11 +249,9 @@ Index: src/sys/conf/files.i386
  dev/nvram/nvram.c		optional nvram isa
  dev/pcf/pcf_isa.c		optional pcf
  dev/random/nehemiah.c		optional random
-Index: src/sys/conf/kern.pre.mk
-===================================================================
---- src.orig/sys/conf/kern.pre.mk
-+++ src/sys/conf/kern.pre.mk
-@@ -65,9 +65,6 @@
+--- a/sys/conf/kern.pre.mk
++++ b/sys/conf/kern.pre.mk
+@@ -65,9 +65,6 @@ INCLUDES+= -I$S/contrib/ipfilter
  # ... and the same for pf
  INCLUDES+= -I$S/contrib/pf
  
@@ -257,11 +261,9 @@ Index: src/sys/conf/kern.pre.mk
  # ... and the same for the NgATM stuff
  INCLUDES+= -I$S/contrib/ngatm
  
-Index: src/sys/i386/conf/GENERIC
-===================================================================
---- src.orig/sys/i386/conf/GENERIC
-+++ src/sys/i386/conf/GENERIC
-@@ -133,8 +133,6 @@
+--- a/sys/i386/conf/GENERIC
++++ b/sys/i386/conf/GENERIC
+@@ -133,8 +133,6 @@ device		arcmsr		# Areca SATA II RAID
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -270,7 +272,7 @@ Index: src/sys/i386/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -256,10 +254,6 @@
+@@ -256,10 +254,6 @@ device		wlan_amrr	# AMRR transmit rate c
  device		wlan_scan_ap	# 802.11 AP mode scanning
  device		wlan_scan_sta	# 802.11 STA mode scanning
  device		an		# Aironet 4500/4800 802.11 wireless NICs.
@@ -281,11 +283,9 @@ Index: src/sys/i386/conf/GENERIC
  device		awi		# BayStack 660 and others
  device		ral		# Ralink Technology RT2500 wireless NICs.
  device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
-Index: src/sys/modules/Makefile
-===================================================================
---- src.orig/sys/modules/Makefile
-+++ src/sys/modules/Makefile
-@@ -31,7 +31,6 @@
+--- a/sys/modules/Makefile
++++ b/sys/modules/Makefile
+@@ -31,7 +31,6 @@ SUBDIR=	${_3dfx} \
  	${_arl} \
  	${_asr} \
  	ata \
@@ -293,7 +293,7 @@ Index: src/sys/modules/Makefile
  	aue \
  	${_auxio} \
  	${_awi} \
-@@ -105,8 +104,6 @@
+@@ -105,8 +104,6 @@ SUBDIR=	${_3dfx} \
  	hifn \
  	hme \
  	${_hptiop} \
@@ -302,7 +302,7 @@ Index: src/sys/modules/Makefile
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -207,11 +204,9 @@
+@@ -207,11 +204,9 @@ SUBDIR=	${_3dfx} \
  	ntfs_iconv \
  	${_nxge} \
  	nullfs \
@@ -314,7 +314,7 @@ Index: src/sys/modules/Makefile
  	${_opensolaris} \
  	${_padlock} \
  	patm \
-@@ -476,8 +471,6 @@
+@@ -476,8 +471,6 @@ _cx=		cx
  _dpt=		dpt
  _ex=		ex
  _hptiop=	hptiop
@@ -323,7 +323,7 @@ Index: src/sys/modules/Makefile
  _ichwd=		ichwd
  _ida=		ida
  _iir=		iir
-@@ -490,7 +483,6 @@
+@@ -490,7 +483,6 @@ _iwifw=		iwifw
  _ixgb=		ixgb
  _mly=		mly
  _nfe=		nfe
@@ -331,7 +331,7 @@ Index: src/sys/modules/Makefile
  _nvram=		nvram
  _nxge=		nxge
  _wpi=		wpi
-@@ -540,8 +532,6 @@
+@@ -540,8 +532,6 @@ _em=		em
  _exca=		exca
  _ext2fs=	ext2fs
  _hptiop=	hptiop
@@ -340,7 +340,7 @@ Index: src/sys/modules/Makefile
  _i2c=		i2c
  _ichwd=		ichwd
  _ida=		ida
-@@ -563,7 +553,6 @@
+@@ -563,7 +553,6 @@ _linux=		linux
  _mly=		mly
  _ndis=		ndis
  _nfe=		nfe
@@ -348,11 +348,9 @@ Index: src/sys/modules/Makefile
  _nvram=		nvram
  _nxge=		nxge
  .if ${MK_CDDL} != "no" || defined(ALL_MODULES)
-Index: src/sys/amd64/conf/GENERIC
-===================================================================
---- src.orig/sys/amd64/conf/GENERIC
-+++ src/sys/amd64/conf/GENERIC
-@@ -126,8 +126,6 @@
+--- a/sys/amd64/conf/GENERIC
++++ b/sys/amd64/conf/GENERIC
+@@ -126,8 +126,6 @@ device		amr		# AMI MegaRAID
  device		arcmsr		# Areca SATA II RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -361,7 +359,7 @@ Index: src/sys/amd64/conf/GENERIC
  device		iir		# Intel Integrated RAID
  device		ips		# IBM (Adaptec) ServeRAID
  device		mly		# Mylex AcceleRAID/eXtremeRAID
-@@ -243,10 +241,6 @@
+@@ -243,10 +241,6 @@ device		wlan_amrr	# AMRR transmit rate c
  device		wlan_scan_ap	# 802.11 AP mode scanning
  device		wlan_scan_sta	# 802.11 STA mode scanning
  device		an		# Aironet 4500/4800 802.11 wireless NICs.
@@ -372,11 +370,9 @@ Index: src/sys/amd64/conf/GENERIC
  device		awi		# BayStack 660 and others
  device		ral		# Ralink Technology RT2500 wireless NICs.
  device		wi		# WaveLAN/Intersil/Symbol 802.11 wireless NICs.
-Index: src/sys/conf/files.amd64
-===================================================================
---- src.orig/sys/conf/files.amd64
-+++ src/sys/conf/files.amd64
-@@ -47,27 +47,6 @@
+--- a/sys/conf/files.amd64
++++ b/sys/conf/files.amd64
+@@ -47,27 +47,6 @@ ukbdmap.h			optional	ukbd_dflt_keymap	\
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -404,7 +400,7 @@ Index: src/sys/conf/files.amd64
  #
  amd64/acpica/OsdEnvironment.c	optional	acpi
  amd64/acpica/acpi_machdep.c	optional	acpi
-@@ -173,14 +152,6 @@
+@@ -173,14 +152,6 @@ dev/fdc/fdc.c			optional	fdc
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
@@ -419,7 +415,7 @@ Index: src/sys/conf/files.amd64
  dev/hwpmc/hwpmc_amd.c		optional	hwpmc
  dev/hwpmc/hwpmc_intel.c		optional	hwpmc
  dev/hwpmc/hwpmc_core.c		optional	hwpmc
-@@ -192,7 +163,6 @@
+@@ -192,7 +163,6 @@ dev/lindev/full.c		optional	lindev
  dev/lindev/lindev.c		optional	lindev
  dev/mem/memutil.c		optional	mem
  dev/nfe/if_nfe.c		optional	nfe pci

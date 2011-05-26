@@ -1,6 +1,17 @@
+---
+ sys/dev/aic7xxx/aicasm/Makefile            |   10 ++--------
+ sys/dev/aic7xxx/aicasm/aicasm.h            |    5 +++--
+ sys/dev/aic7xxx/aicasm/aicasm_gram.y       |    7 ++++---
+ sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y |    5 +++--
+ sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l |    6 ++++--
+ sys/dev/aic7xxx/aicasm/aicasm_scan.l       |    6 ++++--
+ sys/dev/aic7xxx/aicasm/aicasm_symbol.c     |    7 ++++---
+ sys/dev/aic7xxx/aicasm/aicasm_symbol.h     |    5 +++--
+ 8 files changed, 27 insertions(+), 24 deletions(-)
+
 --- a/sys/dev/aic7xxx/aicasm/Makefile
 +++ b/sys/dev/aic7xxx/aicasm/Makefile
-@@ -14,8 +14,9 @@
+@@ -14,8 +14,9 @@ GENHDRS=	aicasm_gram.h aicasm_macro_gram
  SRCS=	${GENHDRS} ${CSRCS} ${YSRCS} ${LSRCS}
  CLEANFILES+= ${GENHDRS} ${YSRCS:R:C/(.*)/\1.output/g}
  DPADD=	${LIBL}
@@ -11,7 +22,7 @@
  
  # Correct path for kernel builds
  # Don't rely on the kernel's .depend file
-@@ -24,13 +25,6 @@
+@@ -24,13 +25,6 @@ WARNS?=	6
  DEPENDFILE=	.depend_aicasm
  .endif
  
@@ -53,7 +64,7 @@
  #else
  #include <sys/queue.h>
  #endif
-@@ -1534,7 +1535,7 @@
+@@ -1534,7 +1535,7 @@ initialize_symbol(symbol_t *symbol)
  }
  
  static void

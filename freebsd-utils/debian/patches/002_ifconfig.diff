@@ -1,23 +1,22 @@
 ---
- sbin/ifconfig/Makefile      |   15 ++++++++-------
+ sbin/ifconfig/Makefile      |   23 ++++++++++++-----------
  sbin/ifconfig/af_atalk.c    |    6 +++---
  sbin/ifconfig/af_inet.c     |    4 ++--
  sbin/ifconfig/af_inet6.c    |   17 +++++++++--------
  sbin/ifconfig/af_ipx.c      |    4 ++--
- sbin/ifconfig/af_link.c     |    3 ++-
+ sbin/ifconfig/af_link.c     |    4 +++-
+ sbin/ifconfig/af_nd6.c      |    4 ++--
  sbin/ifconfig/ifcarp.c      |    1 +
  sbin/ifconfig/ifclone.c     |    3 ++-
- sbin/ifconfig/ifconfig.c    |   25 ++++++++++++++++++-------
+ sbin/ifconfig/ifconfig.c    |   37 ++++++++++++++++++++++++-------------
  sbin/ifconfig/ifgre.c       |    2 +-
- sbin/ifconfig/ifieee80211.c |    3 +++
+ sbin/ifconfig/ifieee80211.c |    4 ++++
  sbin/ifconfig/ifvlan.c      |    2 ++
- 12 files changed, 53 insertions(+), 32 deletions(-)
+ 13 files changed, 67 insertions(+), 44 deletions(-)
 
-Index: freebsd-utils/sbin/ifconfig/Makefile
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/Makefile	2009-12-07 06:05:36.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/Makefile	2010-06-29 08:26:23.000000000 +0000
-@@ -21,22 +21,22 @@
+--- a/sbin/ifconfig/Makefile
++++ b/sbin/ifconfig/Makefile
+@@ -21,22 +21,22 @@ SRCS+=	af_atalk.c		# AppleTalk support
  SRCS+=	af_nd6.c		# ND6 support
  
  SRCS+=	ifclone.c		# clone device support
@@ -51,7 +50,7 @@ Index: freebsd-utils/sbin/ifconfig/Makefile
  
  .if ${MK_IPX_SUPPORT} != "no" && !defined(RELEASE_CRUNCH)
  SRCS+=	af_ipx.c		# IPX support
-@@ -47,6 +47,7 @@
+@@ -47,6 +47,7 @@ LDADD+=	-lipx
  MAN=	ifconfig.8
  
  CFLAGS+= -Wall -Wmissing-prototypes -Wcast-qual -Wwrite-strings -Wnested-externs
@@ -59,10 +58,8 @@ Index: freebsd-utils/sbin/ifconfig/Makefile
  WARNS?=	0
  
  .include <bsd.prog.mk>
-Index: freebsd-utils/sbin/ifconfig/ifcarp.c
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/ifcarp.c	2010-02-07 06:22:28.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/ifcarp.c	2010-06-29 08:26:23.000000000 +0000
+--- a/sbin/ifconfig/ifcarp.c
++++ b/sbin/ifconfig/ifcarp.c
 @@ -43,6 +43,7 @@
  #include <ctype.h>
  #include <stdio.h>
@@ -71,11 +68,9 @@ Index: freebsd-utils/sbin/ifconfig/ifcarp.c
  #include <stdlib.h>
  #include <unistd.h>
  #include <err.h>
-Index: freebsd-utils/sbin/ifconfig/ifconfig.c
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/ifconfig.c	2010-04-28 00:49:24.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/ifconfig.c	2010-06-29 08:28:37.000000000 +0000
-@@ -48,6 +48,11 @@
+--- a/sbin/ifconfig/ifconfig.c
++++ b/sbin/ifconfig/ifconfig.c
+@@ -48,6 +48,11 @@ static const char rcsid[] =
  #include <sys/module.h>
  #include <sys/linker.h>
  
@@ -87,7 +82,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
  #include <net/ethernet.h>
  #include <net/if.h>
  #include <net/if_var.h>
-@@ -66,7 +71,7 @@
+@@ -66,7 +71,7 @@ static const char rcsid[] =
  #include <err.h>
  #include <errno.h>
  #include <fcntl.h>
@@ -96,7 +91,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
-@@ -156,7 +161,7 @@
+@@ -156,7 +161,7 @@ main(int argc, char *argv[])
  	all = downonly = uponly = namesonly = noload = verbose = 0;
  
  	/* Parse leading line options */
@@ -105,7 +100,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
  	for (p = opts; p != NULL; p = p->next)
  		strlcat(options, p->opt, sizeof(options));
  	while ((c = getopt(argc, argv, options)) != -1) {
-@@ -643,8 +648,9 @@
+@@ -643,8 +648,9 @@ deletetunnel(const char *vname, int para
  		err(1, "SIOCDIFPHYADDR");
  }
  
@@ -116,7 +111,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
      const struct afswtch *afp)
  {
  	struct ifreq my_ifr;
-@@ -658,7 +664,7 @@
+@@ -658,7 +664,7 @@ setifvnet(const char *jname, int dummy _
  }
  
  static void
@@ -125,7 +120,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
      const struct afswtch *afp)
  {
  	struct ifreq my_ifr;
-@@ -671,8 +677,10 @@
+@@ -671,8 +677,10 @@ setifrvnet(const char *jname, int dummy
  		err(1, "SIOCSIFRVNET(%d, %s)", my_ifr.ifr_jid, my_ifr.ifr_name);
  }
  
@@ -137,7 +132,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
      const struct afswtch *afp)
  {
  	if (afp->af_getaddr != NULL) {
-@@ -682,7 +690,7 @@
+@@ -682,7 +690,7 @@ setifnetmask(const char *addr, int dummy
  }
  
  static void
@@ -146,7 +141,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
      const struct afswtch *afp)
  {
  	if (afp->af_getaddr != NULL)
-@@ -690,7 +698,7 @@
+@@ -690,7 +698,7 @@ setifbroadaddr(const char *addr, int dum
  }
  
  static void
@@ -155,7 +150,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
      const struct afswtch *afp)
  {
  	const struct afswtch *inet;
-@@ -723,7 +731,7 @@
+@@ -723,7 +731,7 @@ notealias(const char *addr, int param, i
  
  /*ARGSUSED*/
  static void
@@ -164,7 +159,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
      const struct afswtch *afp)
  {
  	if (afp->af_getaddr != NULL)
-@@ -783,7 +791,7 @@
+@@ -783,7 +791,7 @@ setifcap(const char *vname, int value, i
  }
  
  static void
@@ -173,7 +168,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
      const struct afswtch *afp)
  {
  	strncpy(ifr.ifr_name, name, sizeof (ifr.ifr_name));
-@@ -793,7 +801,7 @@
+@@ -793,7 +801,7 @@ setifmetric(const char *val, int dummy _
  }
  
  static void
@@ -182,7 +177,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
      const struct afswtch *afp)
  {
  	strncpy(ifr.ifr_name, name, sizeof (ifr.ifr_name));
-@@ -803,7 +811,7 @@
+@@ -803,7 +811,7 @@ setifmtu(const char *val, int dummy __un
  }
  
  static void
@@ -191,7 +186,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
      const struct afswtch *afp)
  {
  	char *newname;
-@@ -825,9 +833,10 @@
+@@ -825,9 +833,10 @@ setifname(const char *val, int dummy __u
  
  /* ARGSUSED */
  static void
@@ -203,7 +198,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
  	char *newdescr;
  
  	ifr.ifr_buffer.length = strlen(val) + 1;
-@@ -902,7 +911,7 @@
+@@ -902,7 +911,7 @@ status(const struct afswtch *afp, const
  	putchar('\n');
  
  	for (;;) {
@@ -212,7 +207,7 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
  			ifr.ifr_buffer.buffer = descr;
  			ifr.ifr_buffer.length = descrlen;
  			if (ioctl(s, SIOCGIFDESCR, &ifr) == 0) {
-@@ -1113,8 +1122,10 @@
+@@ -1113,8 +1122,10 @@ static struct cmd basic_cmds[] = {
  	DEF_CMD_ARG2("tunnel",			settunnel),
  	DEF_CMD("-tunnel", 0,			deletetunnel),
  	DEF_CMD("deletetunnel", 0,		deletetunnel),
@@ -223,11 +218,9 @@ Index: freebsd-utils/sbin/ifconfig/ifconfig.c
  	DEF_CMD("link0",	IFF_LINK0,	setifflags),
  	DEF_CMD("-link0",	-IFF_LINK0,	setifflags),
  	DEF_CMD("link1",	IFF_LINK1,	setifflags),
-Index: freebsd-utils/sbin/ifconfig/af_inet6.c
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/af_inet6.c	2009-12-07 06:05:36.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/af_inet6.c	2010-06-29 08:26:23.000000000 +0000
-@@ -42,7 +42,6 @@
+--- a/sbin/ifconfig/af_inet6.c
++++ b/sbin/ifconfig/af_inet6.c
+@@ -42,7 +42,6 @@ static const char rcsid[] =
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
@@ -235,7 +228,7 @@ Index: freebsd-utils/sbin/ifconfig/af_inet6.c
  
  #include <arpa/inet.h>
  
-@@ -53,6 +52,8 @@
+@@ -53,6 +52,8 @@ static const char rcsid[] =
  #include <netdb.h>
  
  #include <netinet6/nd6.h>	/* Define ND6_INFINITE_LIFETIME */
@@ -244,7 +237,7 @@ Index: freebsd-utils/sbin/ifconfig/af_inet6.c
  
  #include "ifconfig.h"
  
-@@ -73,7 +74,7 @@
+@@ -73,7 +74,7 @@ extern void setnd6defif(const char *, in
  static	char addr_buf[MAXHOSTNAMELEN *2 + 1];	/*for getnameinfo()*/
  
  static void
@@ -253,7 +246,7 @@ Index: freebsd-utils/sbin/ifconfig/af_inet6.c
      const struct afswtch *afp)
  {
          if (afp->af_getprefix != NULL)
-@@ -82,7 +83,7 @@
+@@ -82,7 +83,7 @@ setifprefixlen(const char *addr, int dum
  }
  
  static void
@@ -262,7 +255,7 @@ Index: freebsd-utils/sbin/ifconfig/af_inet6.c
      const struct afswtch *afp)
  {
  	if (afp->af_af != AF_INET6)
-@@ -117,21 +118,21 @@
+@@ -117,21 +118,21 @@ setip6lifetime(const char *cmd, const ch
  }
  
  static void
@@ -287,7 +280,7 @@ Index: freebsd-utils/sbin/ifconfig/af_inet6.c
      const struct afswtch *afp)
  {
  	struct ifaddrs *ifap, *ifa;
-@@ -177,7 +178,7 @@
+@@ -177,7 +178,7 @@ in6_fillscopeid(struct sockaddr_in6 *sin
  }
  
  static void
@@ -296,7 +289,7 @@ Index: freebsd-utils/sbin/ifconfig/af_inet6.c
  {
  	struct sockaddr_in6 *sin, null_sin;
  	struct in6_ifreq ifr6;
-@@ -527,7 +528,7 @@
+@@ -527,7 +528,7 @@ static struct afswtch af_inet6 = {
  };
  
  static void
@@ -305,11 +298,9 @@ Index: freebsd-utils/sbin/ifconfig/af_inet6.c
  {
  	ip6lifetime++;	/* print IPv6 address lifetime */
  }
-Index: freebsd-utils/sbin/ifconfig/ifclone.c
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/ifclone.c	2009-06-23 23:49:52.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/ifclone.c	2010-06-29 08:26:23.000000000 +0000
-@@ -42,6 +42,7 @@
+--- a/sbin/ifconfig/ifclone.c
++++ b/sbin/ifconfig/ifclone.c
+@@ -42,6 +42,7 @@ static const char rcsid[] =
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
@@ -317,7 +308,7 @@ Index: freebsd-utils/sbin/ifconfig/ifclone.c
  #include <unistd.h>
  
  #include "ifconfig.h"
-@@ -174,7 +175,7 @@
+@@ -174,7 +175,7 @@ static struct cmd clone_cmds[] = {
  };
  
  static void
@@ -326,11 +317,9 @@ Index: freebsd-utils/sbin/ifconfig/ifclone.c
  {
  	list_cloners();
  	exit(0);
-Index: freebsd-utils/sbin/ifconfig/af_link.c
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/af_link.c	2007-02-24 23:55:46.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/af_link.c	2010-06-29 08:26:23.000000000 +0000
-@@ -46,13 +46,15 @@
+--- a/sbin/ifconfig/af_link.c
++++ b/sbin/ifconfig/af_link.c
+@@ -46,13 +46,15 @@ static const char rcsid[] =
  #include <net/if_dl.h>
  #include <net/if_types.h>
  #include <net/ethernet.h>
@@ -347,10 +336,8 @@ Index: freebsd-utils/sbin/ifconfig/af_link.c
  {
  	/* XXX no const 'cuz LLADDR is defined wrong */
  	struct sockaddr_dl *sdl = (struct sockaddr_dl *) ifa->ifa_addr;
-Index: freebsd-utils/sbin/ifconfig/ifieee80211.c
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/ifieee80211.c	2010-04-06 13:04:27.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/ifieee80211.c	2010-06-29 08:26:23.000000000 +0000
+--- a/sbin/ifconfig/ifieee80211.c
++++ b/sbin/ifconfig/ifieee80211.c
 @@ -90,6 +90,10 @@
  #include <fcntl.h>
  #include <inttypes.h>
@@ -362,11 +349,9 @@ Index: freebsd-utils/sbin/ifconfig/ifieee80211.c
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
-Index: freebsd-utils/sbin/ifconfig/af_atalk.c
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/af_atalk.c	2009-06-23 23:49:52.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/af_atalk.c	2010-06-29 08:26:23.000000000 +0000
-@@ -55,7 +55,7 @@
+--- a/sbin/ifconfig/af_atalk.c
++++ b/sbin/ifconfig/af_atalk.c
+@@ -55,7 +55,7 @@ static struct ifaliasreq at_addreq;
  
  /* XXX  FIXME -- should use strtoul for better parsing. */
  static void
@@ -375,7 +360,7 @@ Index: freebsd-utils/sbin/ifconfig/af_atalk.c
      const struct afswtch *afp)
  {
  	u_int	first = 123, last = 123;
-@@ -69,7 +69,7 @@
+@@ -69,7 +69,7 @@ setatrange(const char *range, int dummy
  }
  
  static void
@@ -384,7 +369,7 @@ Index: freebsd-utils/sbin/ifconfig/af_atalk.c
      const struct afswtch *afp)
  {
  	if (!strcmp(phase, "1"))
-@@ -81,7 +81,7 @@
+@@ -81,7 +81,7 @@ setatphase(const char *phase, int dummy
  }
  
  static void
@@ -393,11 +378,9 @@ Index: freebsd-utils/sbin/ifconfig/af_atalk.c
  {
  	struct sockaddr_at *sat, null_sat;
  	struct netrange *nr;
-Index: freebsd-utils/sbin/ifconfig/af_inet.c
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/af_inet.c	2009-06-23 23:49:52.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/af_inet.c	2010-06-29 08:26:23.000000000 +0000
-@@ -42,13 +42,13 @@
+--- a/sbin/ifconfig/af_inet.c
++++ b/sbin/ifconfig/af_inet.c
+@@ -43,13 +43,13 @@ static const char rcsid[] =
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
@@ -412,7 +395,7 @@ Index: freebsd-utils/sbin/ifconfig/af_inet.c
  
  #include "ifconfig.h"
  
-@@ -56,7 +56,7 @@
+@@ -57,7 +57,7 @@ static struct in_aliasreq in_addreq;
  static struct ifreq in_ridreq;
  
  static void
@@ -421,11 +404,9 @@ Index: freebsd-utils/sbin/ifconfig/af_inet.c
  {
  	struct sockaddr_in *sin, null_sin;
  	
-Index: freebsd-utils/sbin/ifconfig/af_ipx.c
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/af_ipx.c	2007-06-13 18:07:59.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/af_ipx.c	2010-06-29 08:26:23.000000000 +0000
-@@ -41,9 +41,9 @@
+--- a/sbin/ifconfig/af_ipx.c
++++ b/sbin/ifconfig/af_ipx.c
+@@ -41,9 +41,9 @@ static const char rcsid[] =
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
@@ -436,7 +417,7 @@ Index: freebsd-utils/sbin/ifconfig/af_ipx.c
  #define IPTUNNEL
  #include <netipx/ipx.h>
  #include <netipx/ipx_if.h>
-@@ -54,7 +54,7 @@
+@@ -54,7 +54,7 @@ static struct ifaliasreq ipx_addreq;
  static struct ifreq ipx_ridreq;
  
  static void
@@ -445,11 +426,9 @@ Index: freebsd-utils/sbin/ifconfig/af_ipx.c
  {
  	struct sockaddr_ipx *sipx, null_sipx;
  
-Index: freebsd-utils/sbin/ifconfig/ifgre.c
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/ifgre.c	2009-06-23 23:49:52.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/ifgre.c	2010-06-29 08:26:23.000000000 +0000
-@@ -65,7 +65,7 @@
+--- a/sbin/ifconfig/ifgre.c
++++ b/sbin/ifconfig/ifgre.c
+@@ -65,7 +65,7 @@ gre_status(int s)
  }
  
  static void
@@ -458,10 +437,8 @@ Index: freebsd-utils/sbin/ifconfig/ifgre.c
      const struct afswtch *afp)
  {
  	uint32_t grekey = atol(val);
-Index: freebsd-utils/sbin/ifconfig/ifvlan.c
-===================================================================
---- freebsd-utils.orig/sbin/ifconfig/ifvlan.c	2010-03-18 19:10:03.000000000 +0000
-+++ freebsd-utils/sbin/ifconfig/ifvlan.c	2010-06-29 08:26:23.000000000 +0000
+--- a/sbin/ifconfig/ifvlan.c
++++ b/sbin/ifconfig/ifvlan.c
 @@ -52,6 +52,8 @@
  #include <err.h>
  #include <errno.h>
@@ -471,9 +448,9 @@ Index: freebsd-utils/sbin/ifconfig/ifvlan.c
  #include "ifconfig.h"
  
  #ifndef lint
---- freebsd-utils.orig/sbin/ifconfig/af_nd6.c
-+++ freebsd-utils/sbin/ifconfig/af_nd6.c
-@@ -65,7 +65,7 @@
+--- a/sbin/ifconfig/af_nd6.c
++++ b/sbin/ifconfig/af_nd6.c
+@@ -65,7 +65,7 @@ void setnd6flags(const char *, int, int,
  void setnd6defif(const char *, int, int, const struct afswtch *);
  
  void
@@ -482,7 +459,7 @@ Index: freebsd-utils/sbin/ifconfig/ifvlan.c
  	int d, int s,
  	const struct afswtch *afp)
  {
-@@ -89,7 +89,7 @@
+@@ -89,7 +89,7 @@ setnd6flags(const char *dummyaddr __unus
  }
  
  void

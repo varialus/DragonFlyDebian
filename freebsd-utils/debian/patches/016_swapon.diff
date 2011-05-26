@@ -3,14 +3,13 @@ Get rid of getbsize.  Default in upstream is 512, but we might want to have
 something sane instead...
 
 ---
- sbin/swapon/swapon.c |   13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ sbin/swapon/Makefile |    2 +-
+ sbin/swapon/swapon.c |   13 +++++++++++--
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
-Index: freebsd-utils/sbin/swapon/swapon.c
-===================================================================
---- freebsd-utils.orig/sbin/swapon/swapon.c	2009-11-14 13:35:38.000000000 +0000
-+++ freebsd-utils/sbin/swapon/swapon.c	2009-11-14 13:40:51.000000000 +0000
-@@ -41,6 +41,7 @@
+--- a/sbin/swapon/swapon.c
++++ b/sbin/swapon/swapon.c
+@@ -41,6 +41,7 @@ static char sccsid[] = "@(#)swapon.c	8.1
  #include <sys/cdefs.h>
  __FBSDID("$FreeBSD$");
  
@@ -18,7 +17,7 @@ Index: freebsd-utils/sbin/swapon/swapon.c
  #include <sys/stat.h>
  #include <sys/param.h>
  #include <sys/sysctl.h>
-@@ -51,7 +52,9 @@
+@@ -51,7 +52,9 @@ __FBSDID("$FreeBSD$");
  #include <fstab.h>
  #include <stdio.h>
  #include <stdlib.h>
@@ -28,7 +27,7 @@ Index: freebsd-utils/sbin/swapon/swapon.c
  #include <unistd.h>
  #include <fcntl.h>
  #include <libutil.h>
-@@ -71,6 +74,8 @@
+@@ -71,6 +74,8 @@ main(int argc, char **argv)
  	int ch, doall;
  	int sflag = 0, lflag = 0, hflag = 0, qflag = 0;
  
@@ -37,7 +36,7 @@ Index: freebsd-utils/sbin/swapon/swapon.c
  	if ((ptr = strrchr(argv[0], '/')) == NULL)
  		ptr = argv[0];
  	if (strstr(ptr, "swapon"))
-@@ -80,7 +85,7 @@
+@@ -80,7 +85,7 @@ main(int argc, char **argv)
  	orig_prog = which_prog;
  	
  	doall = 0;
@@ -46,7 +45,7 @@ Index: freebsd-utils/sbin/swapon/swapon.c
  		switch(ch) {
  		case 'A':
  			if (which_prog == SWAPCTL) {
-@@ -132,6 +137,9 @@
+@@ -132,6 +137,9 @@ main(int argc, char **argv)
  				usage();
  			}
  			break;
@@ -56,7 +55,7 @@ Index: freebsd-utils/sbin/swapon/swapon.c
  		case '?':
  		default:
  			usage();
-@@ -271,7 +279,8 @@
+@@ -271,7 +279,8 @@ swaplist(int lflag, int sflag, int hflag
  	    hlen = 10;
  	    break;
  	default:
@@ -66,11 +65,9 @@ Index: freebsd-utils/sbin/swapon/swapon.c
  	    snprintf(buf, sizeof(buf), "%ld-blocks", blocksize);
  	    break;
  	}
-Index: freebsd-utils/sbin/swapon/Makefile
-===================================================================
---- freebsd-utils.orig/sbin/swapon/Makefile	2009-11-14 13:35:38.000000000 +0000
-+++ freebsd-utils/sbin/swapon/Makefile	2009-11-14 13:36:03.000000000 +0000
-@@ -9,6 +9,6 @@
+--- a/sbin/swapon/Makefile
++++ b/sbin/swapon/Makefile
+@@ -9,6 +9,6 @@ MLINKS=	swapon.8 swapoff.8
  MLINKS+=swapon.8 swapctl.8
  
  DPADD=	${LIBUTIL}

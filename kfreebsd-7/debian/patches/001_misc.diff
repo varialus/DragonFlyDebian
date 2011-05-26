@@ -2,12 +2,15 @@
 Status: chflags is BSD-specific.  We could add it to freebsd-utils.
   The rest has been rejected (kern/93502)
 
-Index: src/sys/conf/kern.mk
-===================================================================
---- src.orig/sys/conf/kern.mk
-+++ src/sys/conf/kern.mk
+---
+ sys/conf/kern.mk      |   18 +++++++++++++++---
+ sys/conf/kern.post.mk |    2 --
+ 2 files changed, 15 insertions(+), 5 deletions(-)
+
+--- a/sys/conf/kern.mk
++++ b/sys/conf/kern.mk
 @@ -1,5 +1,9 @@
- # $FreeBSD: src/sys/conf/kern.mk,v 1.52.2.1.2.1 2009/04/15 03:14:26 kensmith Exp $
+ # $FreeBSD$
  
 +.if !defined(OPSYS)
 +OPSYS!=		uname -s
@@ -33,7 +36,7 @@ Index: src/sys/conf/kern.mk
  .if !defined(WITH_GCC3)
  _Wno_pointer_sign=-Wno-pointer-sign
  .endif
-@@ -36,8 +44,12 @@
+@@ -36,8 +44,12 @@ _wundef=	-Wundef
  # reserved for user applications.
  #
  .if ${MACHINE_ARCH} == "i386" && ${CC} != "icc"
@@ -47,11 +50,9 @@ Index: src/sys/conf/kern.mk
  INLINE_LIMIT?=	8000
  .endif
  
-Index: src/sys/conf/kern.post.mk
-===================================================================
---- src.orig/sys/conf/kern.post.mk
-+++ src/sys/conf/kern.post.mk
-@@ -211,11 +221,9 @@
+--- a/sys/conf/kern.post.mk
++++ b/sys/conf/kern.post.mk
+@@ -211,11 +211,9 @@ kernel-install:
  .if exists(${DESTDIR}${KODIR})
  	-thiskernel=`sysctl -n kern.bootfile` ; \
  	if [ ! "`dirname "$$thiskernel"`" -ef ${DESTDIR}${KODIR} ] ; then \

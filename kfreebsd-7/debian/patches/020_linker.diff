@@ -4,11 +4,14 @@
   for details see http://sourceware.org/bugzilla/show_bug.cgi?id=5391
 
 
-Index: src/sys/conf/kern.post.mk
-===================================================================
---- src.orig/sys/conf/kern.post.mk
-+++ src/sys/conf/kern.post.mk
-@@ -85,7 +85,9 @@
+---
+ sys/conf/kern.post.mk |    4 +++-
+ sys/conf/kmod.mk      |    4 +++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+--- a/sys/conf/kern.post.mk
++++ b/sys/conf/kern.post.mk
+@@ -85,7 +85,9 @@ gdbinit:
  ${FULLKERNEL}: ${SYSTEM_DEP} vers.o
  	@rm -f ${.TARGET}
  	@echo linking ${.TARGET}
@@ -19,11 +22,9 @@ Index: src/sys/conf/kern.post.mk
  .if defined(CTFMERGE)
  	${SYSTEM_CTFMERGE}
  .endif
-Index: src/sys/conf/kmod.mk
-===================================================================
---- src.orig/sys/conf/kmod.mk
-+++ src/sys/conf/kmod.mk
-@@ -177,7 +177,9 @@
+--- a/sys/conf/kmod.mk
++++ b/sys/conf/kmod.mk
+@@ -177,7 +177,9 @@ ${PROG}.symbols: ${FULLPROG}
  
  .if ${MACHINE_ARCH} != amd64
  ${FULLPROG}: ${KMOD}.kld

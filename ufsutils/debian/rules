@@ -6,7 +6,6 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-this = $(MAKE) -f debian/rules
 lib = libufs2
 
 DESTDIR = $(CURDIR)/debian/tmp
@@ -29,9 +28,7 @@ else
 	CFLAGS += -O2
 endif
 
-include /usr/share/quilt/quilt.make
-
-build: patch
+build:
 	dh_testdir
 
 	CFLAGS="$(CFLAGS)" LDADD="$(LDADD)" $(MAKE)
@@ -41,8 +38,6 @@ clean:
 	dh_testroot
 
 	[ ! -f Makefile ] || $(MAKE) clean
-
-	$(this) unpatch
 
 	dh_clean
 

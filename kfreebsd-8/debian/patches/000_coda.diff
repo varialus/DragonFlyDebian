@@ -1,3 +1,9 @@
+---
+ sys/fs/coda/coda.h       |    6 ++++--
+ sys/fs/coda/coda_venus.c |    6 ++++++
+ sys/fs/coda/coda_vnops.c |    3 ++-
+ 3 files changed, 12 insertions(+), 3 deletions(-)
+
 --- a/sys/fs/coda/coda.h
 +++ b/sys/fs/coda/coda.h
 @@ -41,7 +41,9 @@
@@ -10,7 +16,7 @@
  
  /* Avoid CODA_COMPAT_5 redefinition in coda5 module */
  #if defined (CODA5_MODULE) && !defined(CODA_COMPAT_5)
-@@ -782,8 +784,8 @@
+@@ -782,8 +784,8 @@ union coda_downcalls {
  #define PIOCPARM_MASK 0x0000ffff
  struct ViceIoctl {
          caddr_t in, out;        /* Data to be transferred in, or out */
@@ -23,7 +29,7 @@
  #if defined(__CYGWIN32__) || defined(DJGPP)
 --- a/sys/fs/coda/coda_venus.c
 +++ b/sys/fs/coda/coda_venus.c
-@@ -274,6 +274,12 @@
+@@ -274,6 +274,12 @@ venus_ioctl(void *mdp, struct CodaFid *f
  	tmp = ((com >> 16) & IOCPARM_MASK) - sizeof (char *) - sizeof (int);
  	inp->cmd |= (tmp & IOCPARM_MASK) << 16;
  
@@ -38,7 +44,7 @@
  	inp->data = (char *)(sizeof (struct coda_ioctl_in));
 --- a/sys/fs/coda/coda_vnops.c
 +++ b/sys/fs/coda/coda_vnops.c
-@@ -471,7 +471,8 @@
+@@ -471,7 +471,8 @@ coda_ioctl(struct vop_ioctl_args *ap)
  		    iap->path)););
  		return (EINVAL);
  	}

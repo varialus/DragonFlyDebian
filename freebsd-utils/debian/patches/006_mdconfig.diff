@@ -9,7 +9,7 @@
 
 --- a/sbin/mdconfig/mdconfig.c
 +++ b/sbin/mdconfig/mdconfig.c
-@@ -41,6 +41,7 @@
+@@ -41,6 +41,7 @@ static void usage(void);
  static int md_find(char *, const char *);
  static int md_query(char *name);
  static int md_list(char *units, int opt);
@@ -17,7 +17,7 @@
  static char *geom_config_get(struct gconf *g, char *name);
  static void md_prthumanval(char *length);
  
-@@ -259,9 +260,7 @@
+@@ -269,9 +270,7 @@ main(int argc, char **argv)
  	}
  	mdio.md_version = MDIOVERSION;
  
@@ -28,7 +28,7 @@
  	fd = open("/dev/" MDCTL_NAME, O_RDWR, 0);
  	if (fd < 0)
  		err(1, "open(/dev/%s)", MDCTL_NAME);
-@@ -460,3 +459,21 @@
+@@ -471,3 +470,21 @@ md_query(char *name)
  {
  	return (md_list(name, OPT_UNIT));
  }
@@ -52,7 +52,7 @@
 +}
 --- a/sbin/mdconfig/Makefile
 +++ b/sbin/mdconfig/Makefile
-@@ -5,6 +5,6 @@
+@@ -5,6 +5,6 @@ MAN=		mdconfig.8
  MLINKS=		mdconfig.8 vnconfig.8
  
  DPADD=	${LIBUTIL} ${LIBGEOM} ${LIBBSDXML} ${LIBSBUF} 

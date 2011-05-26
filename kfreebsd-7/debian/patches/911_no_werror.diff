@@ -1,22 +1,23 @@
 
 
-Index: src/sys/modules/hwpmc/Makefile
-===================================================================
---- src.orig/sys/modules/hwpmc/Makefile
-+++ src/sys/modules/hwpmc/Makefile
-@@ -9,6 +9,7 @@
+---
+ sys/modules/geom/geom_eli/Makefile |    1 +
+ sys/modules/hwpmc/Makefile         |    1 +
+ 2 files changed, 2 insertions(+)
+
+--- a/sys/modules/hwpmc/Makefile
++++ b/sys/modules/hwpmc/Makefile
+@@ -9,6 +9,7 @@ KMOD=	hwpmc
  SRCS=	hwpmc_mod.c hwpmc_logging.c vnode_if.h
  
  WARNS?=	2
 +NO_WERROR?= 1
  
  .if ${MACHINE_ARCH} == "amd64"
- SRCS+=	hwpmc_amd.c hwpmc_piv.c hwpmc_x86.c
-Index: src/sys/modules/geom/geom_eli/Makefile
-===================================================================
---- src.orig/sys/modules/geom/geom_eli/Makefile
-+++ src/sys/modules/geom/geom_eli/Makefile
-@@ -12,5 +12,6 @@
+ SRCS+=	hwpmc_amd.c hwpmc_core.c hwpmc_intel.c hwpmc_piv.c hwpmc_tsc.c
+--- a/sys/modules/geom/geom_eli/Makefile
++++ b/sys/modules/geom/geom_eli/Makefile
+@@ -12,5 +12,6 @@ SRCS+=	g_eli_privacy.c
  SRCS+=	pkcs5v2.c
  SRCS+=	vnode_if.h
  WARNS?=	2

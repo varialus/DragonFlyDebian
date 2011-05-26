@@ -1,6 +1,13 @@
+---
+ usr.bin/kdump/Makefile |    5 +-
+ usr.bin/kdump/kdump.c  |   46 +++++++++++----------
+ usr.bin/kdump/mksubr   |  103 +++++++++++++++++++++++++++++++++----------------
+ usr.bin/kdump/stat16.h |   55 ++++++++++++++++++++++++++
+ 4 files changed, 154 insertions(+), 55 deletions(-)
+
 --- a/usr.bin/kdump/kdump.c
 +++ b/usr.bin/kdump/kdump.c
-@@ -45,20 +45,18 @@
+@@ -45,20 +45,18 @@ static char sccsid[] = "@(#)kdump.c	8.1
  #include <sys/cdefs.h>
  __FBSDID("$FreeBSD$");
  
@@ -24,7 +31,7 @@
  #include <sys/un.h>
  #ifdef IPX
  #include <sys/types.h>
-@@ -71,6 +69,8 @@
+@@ -71,6 +69,8 @@ extern int errno;
  #include <netinet/in.h>
  #include <ctype.h>
  #include <dlfcn.h>
@@ -33,7 +40,7 @@
  #include <err.h>
  #include <grp.h>
  #include <inttypes.h>
-@@ -79,6 +79,7 @@
+@@ -79,6 +79,7 @@ extern int errno;
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
@@ -41,7 +48,7 @@
  #include <time.h>
  #include <unistd.h>
  #include <vis.h>
-@@ -97,7 +98,7 @@
+@@ -97,7 +98,7 @@ void ktrpsig(struct ktr_psig *);
  void ktrcsw(struct ktr_csw *);
  void ktruser(int, unsigned char *);
  void ktrsockaddr(struct sockaddr *);
@@ -50,7 +57,7 @@
  void ktrstruct(char *, size_t);
  void usage(void);
  void sockfamilyname(int);
-@@ -111,6 +112,9 @@
+@@ -111,6 +112,9 @@ struct ktr_header ktr_header;
  #define TIME_FORMAT	"%b %e %T %Y"
  #define eqs(s1, s2)	(strcmp((s1), (s2)) == 0)
  
@@ -60,7 +67,7 @@
  int
  main(int argc, char *argv[])
  {
-@@ -650,7 +654,7 @@
+@@ -653,7 +657,7 @@ ktrsyscall(struct ktr_syscall *ktr)
  				ip++;
  				narg--;
  				c = ',';
@@ -69,7 +76,7 @@
  				print_number(ip,narg,c);
  				print_number(ip,narg,c);
  				(void)putchar(',');
-@@ -742,18 +746,18 @@
+@@ -745,18 +749,18 @@ ktrsyscall(struct ktr_syscall *ktr)
  				ip++;
  				narg--;
  				c = ',';
@@ -100,7 +107,7 @@
  				print_number(ip,narg,c);
  				(void)putchar(',');
  				acltypename((int)*ip);
-@@ -1243,7 +1247,7 @@
+@@ -1246,7 +1250,7 @@ ktrsockaddr(struct sockaddr *sa)
  }
  
  void
@@ -109,7 +116,7 @@
  {
  	char mode[12], timestr[PATH_MAX + 4];
  	struct passwd *pwd;
-@@ -1348,7 +1352,7 @@
+@@ -1351,7 +1355,7 @@ ktrstruct(char *buf, size_t buflen)
  	if (strcmp(name, "stat") == 0) {
  		if (datalen != sizeof(struct stat))
  			goto invalid;
@@ -139,7 +146,7 @@
  .include <bsd.prog.mk>
 --- a/usr.bin/kdump/mksubr
 +++ b/usr.bin/kdump/mksubr
-@@ -56,7 +56,9 @@
+@@ -56,7 +56,9 @@ _EOF_
  		if ($i ~ /define/) \
  			break; \
  		++i; \
@@ -150,7 +157,7 @@
  cat <<_EOF_
  	if (or == 0)
  		(void)printf("<invalid>%ld", (long)arg);
-@@ -135,6 +137,7 @@
+@@ -135,6 +137,7 @@ cat <<_EOF_
  #include <sys/fcntl.h>
  #include <sys/stat.h>
  #include <sys/unistd.h>
@@ -158,7 +165,7 @@
  #include <sys/mman.h>
  #include <sys/wait.h>
  #define _KERNEL
-@@ -148,21 +151,30 @@
+@@ -148,21 +151,30 @@ cat <<_EOF_
  #include <sys/reboot.h>
  #include <sched.h>
  #include <sys/linker.h>
@@ -194,7 +201,7 @@
  /*
   * These are simple support macros. print_or utilizes a variable
   * defined in the calling function to track whether or not it should
-@@ -302,45 +314,72 @@
+@@ -304,45 +316,72 @@ sockoptlevelname (int level, int decimal
  	}
  }
  
@@ -291,7 +298,7 @@
  auto_switch_type "ptraceopname" "PT_[[:alnum:]]+[[:space:]]+[0-9]+" "sys/ptrace.h"
  
  cat <<_EOF_
-@@ -403,7 +442,7 @@
+@@ -405,7 +444,7 @@ rtprioname (int func)
  {
  	switch (func) {
  _EOF_
@@ -300,7 +307,7 @@
  	$include_dir/sys/rtprio.h | grep -v RTP_PRIO | \
  	awk '{ for (i = 1; i <= NF; i++) \
  		if ($i ~ /define/) \
-@@ -433,7 +472,7 @@
+@@ -435,7 +474,7 @@ sendrecvflagsname (int flags)
  		return;
  	}
  _EOF_
@@ -309,7 +316,7 @@
  	awk '{ for (i = 1; i <= NF; i++) \
  		if ($i ~ /define/) \
  			break; \
---- a/usr.bin/kdump/stat16.h
+--- /dev/null
 +++ b/usr.bin/kdump/stat16.h
 @@ -0,0 +1,55 @@
 +/* Copyright (C) 2002, 2006 Free Software Foundation, Inc.

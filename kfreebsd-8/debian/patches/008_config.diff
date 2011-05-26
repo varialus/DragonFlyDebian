@@ -3,6 +3,12 @@ Author: rmh
 Status: gotta uncomment WARNS (see #351366), and find a portable way to add
   "-lbsd".  after this it can be sent upstream.
 
+---
+ usr.sbin/config/Makefile |    6 +++---
+ usr.sbin/config/config.h |    2 +-
+ usr.sbin/config/main.c   |   11 ++++++++++-
+ 3 files changed, 14 insertions(+), 5 deletions(-)
+
 --- a/usr.sbin/config/config.h
 +++ b/usr.sbin/config/config.h
 @@ -34,7 +34,7 @@
@@ -16,7 +22,7 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
  
 --- a/usr.sbin/config/main.c
 +++ b/usr.sbin/config/main.c
-@@ -41,12 +41,17 @@
+@@ -41,12 +41,17 @@ static const char rcsid[] =
    "$FreeBSD$";
  #endif /* not lint */
  
@@ -35,7 +41,7 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
  
  #include <assert.h>
  #include <ctype.h>
-@@ -607,7 +612,11 @@
+@@ -618,7 +623,11 @@ cleanheaders(char *p)
  	if ((dirp = opendir(p)) == NULL)
  		err(EX_OSERR, "opendir %s", p);
  	while ((dp = readdir(dirp)) != NULL) {
@@ -49,7 +55,7 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
  			continue;
 --- a/usr.sbin/config/Makefile
 +++ b/usr.sbin/config/Makefile
-@@ -9,11 +9,11 @@
+@@ -9,11 +9,11 @@ SRCS=	config.y main.c lang.l mkmakefile.
  kernconf.c: kernconf.tmpl
  	file2c 'char kernconfstr[] = {' ',0};' < ${.CURDIR}/kernconf.tmpl > kernconf.c
  

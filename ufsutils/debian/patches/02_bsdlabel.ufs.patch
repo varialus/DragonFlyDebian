@@ -1,8 +1,11 @@
-Index: ufsutils/bsdlabel/bsdlabel.c
-===================================================================
---- ufsutils.orig/bsdlabel/bsdlabel.c
-+++ ufsutils/bsdlabel/bsdlabel.c
-@@ -60,7 +60,9 @@
+---
+ bsdlabel/Makefile   |   16 ++++++----------
+ bsdlabel/bsdlabel.c |   21 +++++++++++++++++++--
+ 2 files changed, 25 insertions(+), 12 deletions(-)
+
+--- a/bsdlabel/bsdlabel.c
++++ b/bsdlabel/bsdlabel.c
+@@ -60,7 +60,9 @@ __FBSDID("$FreeBSD: src/sbin/bsdlabel/bs
  #include <sys/file.h>
  #include <sys/stat.h>
  #include <sys/wait.h>
@@ -12,7 +15,7 @@ Index: ufsutils/bsdlabel/bsdlabel.c
  #define DKTYPENAMES
  #define FSTYPENAMES
  #include <sys/disklabel.h>
-@@ -68,7 +70,7 @@
+@@ -68,7 +70,7 @@ __FBSDID("$FreeBSD: src/sbin/bsdlabel/bs
  #include <unistd.h>
  #include <string.h>
  #include <stdio.h>
@@ -21,7 +24,7 @@ Index: ufsutils/bsdlabel/bsdlabel.c
  #include <stdlib.h>
  #include <signal.h>
  #include <stdarg.h>
-@@ -476,8 +478,12 @@
+@@ -476,8 +478,12 @@ readlabel(int flag)
  		err(1, specname);
  	if (is_file)
  		get_file_parms(f);
@@ -34,7 +37,7 @@ Index: ufsutils/bsdlabel/bsdlabel.c
  		err(4, "cannot get disk geometry");
  	}
  	if (mediasize > (off_t)0xffffffff * secsize)
-@@ -665,10 +671,12 @@
+@@ -665,10 +671,12 @@ editit(void)
  
  	omask = sigblock(sigmask(SIGINT)|sigmask(SIGQUIT)|sigmask(SIGHUP));
  	while ((pid = fork()) < 0) {
@@ -47,7 +50,7 @@ Index: ufsutils/bsdlabel/bsdlabel.c
  		if (errno != EAGAIN) {
  			warn("fork");
  			return(0);
-@@ -1426,8 +1434,12 @@
+@@ -1426,8 +1434,12 @@ getvirginlabel(void)
  
  	if (is_file)
  		get_file_parms(f);
@@ -60,7 +63,7 @@ Index: ufsutils/bsdlabel/bsdlabel.c
  		close (f);
  		return (NULL);
  	}
-@@ -1443,13 +1455,18 @@
+@@ -1443,13 +1455,18 @@ getvirginlabel(void)
  	 * to get any good ideas from the device, construct something
  	 * which is IBM-PC friendly.
  	 */
@@ -80,10 +83,8 @@ Index: ufsutils/bsdlabel/bsdlabel.c
  		loclab.d_ntracks = 1;
  	else if (loclab.d_secperunit <= 63*16*1024)
  		loclab.d_ntracks = 16;
-Index: ufsutils/bsdlabel/Makefile
-===================================================================
---- ufsutils.orig/bsdlabel/Makefile
-+++ ufsutils/bsdlabel/Makefile
+--- a/bsdlabel/Makefile
++++ b/bsdlabel/Makefile
 @@ -4,14 +4,8 @@
  .PATH: ${.CURDIR}/../../sys/geom
  
@@ -101,7 +102,7 @@ Index: ufsutils/bsdlabel/Makefile
  
  DPADD=	${LIBGEOM}
  LDADD=	-lgeom
-@@ -19,7 +13,9 @@
+@@ -19,7 +13,9 @@ LDADD=	-lgeom
  .include <bsd.prog.mk>
  
  test: ${PROG}

@@ -1,12 +1,13 @@
 ---
+ sbin/kldconfig/Makefile    |    1 +
  sbin/kldconfig/kldconfig.c |   12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ sbin/kldload/Makefile      |    1 +
+ sbin/kldunload/Makefile    |    1 +
+ 4 files changed, 6 insertions(+), 9 deletions(-)
 
-Index: freebsd-utils/sbin/kldconfig/kldconfig.c
-===================================================================
---- freebsd-utils.orig/sbin/kldconfig/kldconfig.c	2009-11-14 10:43:32.000000000 +0000
-+++ freebsd-utils/sbin/kldconfig/kldconfig.c	2009-11-14 10:44:33.000000000 +0000
-@@ -40,14 +40,8 @@
+--- a/sbin/kldconfig/kldconfig.c
++++ b/sbin/kldconfig/kldconfig.c
+@@ -40,14 +40,8 @@ __FBSDID("$FreeBSD$");
  #include <string.h>
  #include <unistd.h>
  
@@ -23,7 +24,7 @@ Index: freebsd-utils/sbin/kldconfig/kldconfig.c
  
  /* the default sysctl name */
  #define PATHCTL	"kern.module_path"
-@@ -208,7 +202,7 @@
+@@ -208,7 +202,7 @@ addpath(struct pathhead *pathq, char *pa
  
  /* Remove a path component from the module search path */
  static void
@@ -32,10 +33,8 @@ Index: freebsd-utils/sbin/kldconfig/kldconfig.c
  {
  	char pathbuf[MAXPATHLEN+1];
  	struct pathentry *pe;
-Index: freebsd-utils/sbin/kldconfig/Makefile
-===================================================================
---- freebsd-utils.orig/sbin/kldconfig/Makefile	2009-11-14 10:43:32.000000000 +0000
-+++ freebsd-utils/sbin/kldconfig/Makefile	2009-11-14 10:44:33.000000000 +0000
+--- a/sbin/kldconfig/Makefile
++++ b/sbin/kldconfig/Makefile
 @@ -29,5 +29,6 @@
  PROG=		kldconfig
  MAN=		kldconfig.8
@@ -43,10 +42,8 @@ Index: freebsd-utils/sbin/kldconfig/Makefile
 +LDADD=		-lbsd
  
  .include <bsd.prog.mk>
-Index: freebsd-utils/sbin/kldload/Makefile
-===================================================================
---- freebsd-utils.orig/sbin/kldload/Makefile	2009-11-14 10:44:52.000000000 +0000
-+++ freebsd-utils/sbin/kldload/Makefile	2009-11-14 10:45:23.000000000 +0000
+--- a/sbin/kldload/Makefile
++++ b/sbin/kldload/Makefile
 @@ -29,5 +29,6 @@
  PROG=	kldload
  MAN=	kldload.8
@@ -54,10 +51,8 @@ Index: freebsd-utils/sbin/kldload/Makefile
 +LDADD=         -lbsd
  
  .include <bsd.prog.mk>
-Index: freebsd-utils/sbin/kldunload/Makefile
-===================================================================
---- freebsd-utils.orig/sbin/kldunload/Makefile	2009-11-14 10:45:00.000000000 +0000
-+++ freebsd-utils/sbin/kldunload/Makefile	2009-11-14 10:45:33.000000000 +0000
+--- a/sbin/kldunload/Makefile
++++ b/sbin/kldunload/Makefile
 @@ -28,6 +28,7 @@
  
  PROG=	kldunload

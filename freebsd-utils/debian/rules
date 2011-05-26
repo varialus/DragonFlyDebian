@@ -50,20 +50,15 @@ get-orig-source:
 	tar --numeric-owner --owner 0 --group 0 -czf ../freebsd-utils_$(VERSION).orig.tar.gz $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
-patch: patch-stamp
-patch-stamp:
-	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
-	touch $@
-
 lib: lib-stamp
-lib-stamp: patch-stamp
+lib-stamp:
 	$(MAKE) -C lib
 	touch $@
 
 build-arch: freebsd-utils gbde geli kbdcontrol vidcontrol kldutils freebsd-net-tools
 
 freebsd-utils: freebsd-utils-stamp
-freebsd-utils-stamp: patch-stamp
+freebsd-utils-stamp:
 #	$(PMAKE) -C bin/chflags
 	$(PMAKE) -C bin/kenv
 	$(PMAKE) -C sbin/atacontrol
@@ -99,30 +94,30 @@ freebsd-utils-stamp: patch-stamp
 	touch $@
 
 gbde: gbde-stamp
-gbde-stamp: patch-stamp
+gbde-stamp:
 #	$(PMAKE) -C sbin/gbde
 	touch $@
 
 geli: geli-stamp
-geli-stamp: patch-stamp
+geli-stamp:
 #	$(PMAKE) -C sbin/geom/class/eli
 	touch $@
 
 kbdcontrol: kbdcontrol-stamp
-kbdcontrol-stamp: patch-stamp
+kbdcontrol-stamp:
 	$(PMAKE) -C usr.sbin/kbdcontrol
 	sed -i -e "s/^choices=.*/choices=\"`cd share/syscons/keymaps && echo *.kbd | sed -e 's/ /, /g'`\"/g" \
 	debian/kbdcontrol.config
 	touch $@
 
 vidcontrol: vidcontrol-stamp
-vidcontrol-stamp: patch-stamp
+vidcontrol-stamp:
 	$(PMAKE) -C usr.sbin/vidcontrol
 	$(PMAKE) -C share/syscons/scrnmaps
 	touch $@
 
 kldutils: kldutils-stamp
-kldutils-stamp: patch-stamp
+kldutils-stamp:
 	$(PMAKE) -C sbin/kldconfig
 	$(PMAKE) -C sbin/kldload
 	$(PMAKE) -C sbin/kldstat
@@ -130,7 +125,7 @@ kldutils-stamp: patch-stamp
 	touch $@
 
 freebsd-net-tools: freebsd-net-tools-stamp
-freebsd-net-tools-stamp: patch-stamp lib-stamp
+freebsd-net-tools-stamp: lib-stamp
 	$(PMAKE) -C sbin/ifconfig
 	$(PMAKE) -C sbin/pfctl
 	$(PMAKE) -C sbin/route
@@ -203,8 +198,6 @@ clean:
 	$(PMAKE) -C usr.sbin/authpf clean
 	$(PMAKE) -C usr.sbin/pppctl clean
 
-	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
-	rm -rf .pc
 	rm -f *stamp
 	dh_clean
 

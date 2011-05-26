@@ -55,10 +55,8 @@ get-orig-source:
 	tar --numeric-owner --owner 0 --group 0 -czf ../freebsd-buildutils_$(VERSION).orig.tar.gz $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
-include /usr/share/quilt/quilt.make
-
 unpack: unpack-stamp
-unpack-stamp: debian/stamp-patched
+unpack-stamp:
 	mkdir build-tree
 	cp -a src ports build-tree/
 	set -e ; for i in \
@@ -144,7 +142,7 @@ install: build
 	done
 	rmdir $(CURDIR)/debian/$(package)/usr/sbin
 
-clean:  unpatch
+clean:
 	dh_testdir
 	dh_testroot
 	rm -rf build-tree

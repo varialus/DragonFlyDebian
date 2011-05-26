@@ -1,10 +1,14 @@
 
 Status: xargs -J option requested to both upstream and debian.
 
-diff -ur a/sys/conf/kmod.mk b/sys/conf/kmod.mk
---- a/sys/conf/kmod.mk	2010-07-22 20:47:41.000000000 +0200
-+++ b/sys/conf/kmod.mk	2010-11-09 00:29:56.000000000 +0100
-@@ -220,7 +220,7 @@
+---
+ sys/conf/kmod.mk                      |    2 +-
+ sys/contrib/dev/acpica/acpica_prep.sh |    4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+--- a/sys/conf/kmod.mk
++++ b/sys/conf/kmod.mk
+@@ -207,7 +207,7 @@ ${FULLPROG}: ${OBJS}
  	grep -v '^#' < ${EXPORT_SYMS} > export_syms
  .endif
  	awk -f ${SYSDIR}/conf/kmod_syms.awk ${.TARGET} \
@@ -13,11 +17,9 @@ diff -ur a/sys/conf/kmod.mk b/sys/conf/kmod.mk
  .endif
  .endif
  .if !defined(DEBUG_FLAGS) && \
-Només a b/sys/conf: kmod.mk.orig
-diff -ur a/sys/contrib/dev/acpica/acpica_prep.sh b/sys/contrib/dev/acpica/acpica_prep.sh
---- a/sys/contrib/dev/acpica/acpica_prep.sh	2010-07-06 22:57:28.000000000 +0200
-+++ b/sys/contrib/dev/acpica/acpica_prep.sh	2010-11-09 00:30:19.000000000 +0100
-@@ -59,10 +59,10 @@
+--- a/sys/contrib/dev/acpica/acpica_prep.sh
++++ b/sys/contrib/dev/acpica/acpica_prep.sh
+@@ -59,10 +59,10 @@ done
  # copy files
  echo copying full dirs
  for i in ${fulldirs}; do

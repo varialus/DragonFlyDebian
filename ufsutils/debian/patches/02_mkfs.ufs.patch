@@ -1,8 +1,12 @@
-Index: ufsutils/mkfs.ufs/mkfs.c
-===================================================================
---- ufsutils.orig/mkfs.ufs/mkfs.c
-+++ ufsutils/mkfs.ufs/mkfs.c
-@@ -53,6 +53,7 @@
+---
+ mkfs.ufs/Makefile |   23 +++++++++++++----------
+ mkfs.ufs/mkfs.c   |    1 +
+ mkfs.ufs/newfs.c  |   21 +++++++++++++++++----
+ 3 files changed, 31 insertions(+), 14 deletions(-)
+
+--- a/mkfs.ufs/mkfs.c
++++ b/mkfs.ufs/mkfs.c
+@@ -53,6 +53,7 @@ __FBSDID("$FreeBSD: src/sbin/newfs/mkfs.
  #include <stdint.h>
  #include <stdio.h>
  #include <unistd.h>
@@ -10,11 +14,9 @@ Index: ufsutils/mkfs.ufs/mkfs.c
  #include <sys/param.h>
  #include <sys/time.h>
  #include <sys/types.h>
-Index: ufsutils/mkfs.ufs/newfs.c
-===================================================================
---- ufsutils.orig/mkfs.ufs/newfs.c
-+++ ufsutils/mkfs.ufs/newfs.c
-@@ -55,7 +55,6 @@
+--- a/mkfs.ufs/newfs.c
++++ b/mkfs.ufs/newfs.c
+@@ -55,7 +55,6 @@ __FBSDID("$FreeBSD: src/sbin/newfs/newfs
   */
  #include <sys/param.h>
  #include <sys/stat.h>
@@ -22,7 +24,7 @@ Index: ufsutils/mkfs.ufs/newfs.c
  #include <sys/disklabel.h>
  #include <sys/file.h>
  #include <sys/mount.h>
-@@ -140,6 +139,7 @@
+@@ -140,6 +139,7 @@ struct uufsd disk;		/* libufs disk struc
  static char	device[MAXPATHLEN];
  static char	*disktype;
  static int	unlabeled;
@@ -30,7 +32,7 @@ Index: ufsutils/mkfs.ufs/newfs.c
  
  static struct disklabel *getdisklabel(char *s);
  static void rewritelabel(char *s, struct disklabel *lp);
-@@ -156,6 +156,8 @@
+@@ -156,6 +156,8 @@ main(int argc, char *argv[])
  	int ch, i;
  	off_t mediasize;
  
@@ -39,7 +41,7 @@ Index: ufsutils/mkfs.ufs/newfs.c
  	while ((ch = getopt(argc, argv,
  	    "EJL:NO:RS:T:Ua:b:c:d:e:f:g:h:i:lm:no:s:")) != -1)
  		switch (ch) {
-@@ -297,12 +299,19 @@
+@@ -297,12 +299,19 @@ main(int argc, char *argv[])
  	}
  	if (fstat(disk.d_fd, &st) < 0)
  		err(1, "%s", special);
@@ -60,7 +62,7 @@ Index: ufsutils/mkfs.ufs/newfs.c
  		if (fssize == 0)
  			fssize = mediasize / sectorsize;
  		else if (fssize > mediasize / sectorsize)
-@@ -375,7 +384,7 @@
+@@ -375,7 +384,7 @@ main(int argc, char *argv[])
  			pp->p_size *= secperblk;
  	}
  	mkfs(pp, special);
@@ -69,7 +71,7 @@ Index: ufsutils/mkfs.ufs/newfs.c
  		if (realsectorsize != DEV_BSIZE)
  			pp->p_size /= realsectorsize / DEV_BSIZE;
  		if (!Nflag && bcmp(pp, &oldpartition, sizeof(oldpartition)))
-@@ -388,6 +397,7 @@
+@@ -388,6 +397,7 @@ main(int argc, char *argv[])
  struct disklabel *
  getdisklabel(char *s)
  {
@@ -77,7 +79,7 @@ Index: ufsutils/mkfs.ufs/newfs.c
  	static struct disklabel lab;
  	struct disklabel *lp;
  
-@@ -399,6 +409,7 @@
+@@ -399,6 +409,7 @@ getdisklabel(char *s)
  		if (lp != NULL)
  			return (lp);
  	}
@@ -85,7 +87,7 @@ Index: ufsutils/mkfs.ufs/newfs.c
  	return (NULL);
  }
  
-@@ -409,8 +420,10 @@
+@@ -409,8 +420,10 @@ rewritelabel(char *s, struct disklabel *
  		return;
  	lp->d_checksum = 0;
  	lp->d_checksum = dkcksum(lp);
@@ -96,7 +98,7 @@ Index: ufsutils/mkfs.ufs/newfs.c
  }
  
  static void
-@@ -418,7 +431,7 @@
+@@ -418,7 +431,7 @@ usage()
  {
  	fprintf(stderr,
  	    "usage: %s [ -fsoptions ] special-device%s\n",
@@ -105,13 +107,11 @@ Index: ufsutils/mkfs.ufs/newfs.c
  	    " [device-type]");
  	fprintf(stderr, "where fsoptions are:\n");
  	fprintf(stderr, "\t-J Enable journaling via gjournal\n");
-Index: ufsutils/mkfs.ufs/Makefile
-===================================================================
---- ufsutils.orig/mkfs.ufs/Makefile
-+++ ufsutils/mkfs.ufs/Makefile
+--- a/mkfs.ufs/Makefile
++++ b/mkfs.ufs/Makefile
 @@ -1,17 +1,20 @@
  #	@(#)Makefile	8.2 (Berkeley) 3/27/94
- # $FreeBSD: src/sbin/newfs/Makefile,v 1.22 2003/02/11 03:06:45 jmallett Exp $
+ # $FreeBSD: src/sbin/newfs/Makefile,v 1.22.34.1 2010/02/10 00:26:20 kensmith Exp $
  
 -PROG=	newfs
 -DPADD=	${LIBUFS}

@@ -1,8 +1,11 @@
-Index: ufsutils/tunefs.ufs/tunefs.c
-===================================================================
---- ufsutils.orig/tunefs.ufs/tunefs.c
-+++ ufsutils/tunefs.ufs/tunefs.c
-@@ -48,8 +48,15 @@
+---
+ tunefs.ufs/Makefile |   13 ++++++++-----
+ tunefs.ufs/tunefs.c |   15 +++++++++++++++
+ 2 files changed, 23 insertions(+), 5 deletions(-)
+
+--- a/tunefs.ufs/tunefs.c
++++ b/tunefs.ufs/tunefs.c
+@@ -48,8 +48,15 @@ __FBSDID("$FreeBSD: src/sbin/tunefs/tune
  #include <sys/mount.h>
  #include <sys/disklabel.h>
  #include <sys/stat.h>
@@ -18,7 +21,7 @@ Index: ufsutils/tunefs.ufs/tunefs.c
  #include <ufs/ufs/dinode.h>
  #include <ufs/ffs/fs.h>
  
-@@ -84,8 +91,12 @@
+@@ -84,8 +91,12 @@ main(int argc, char *argv[])
  	int mflag, mvalue, nflag, oflag, ovalue, pflag, sflag, svalue;
  	int ch, found_arg, i;
  	const char *chg[2];
@@ -31,7 +34,7 @@ Index: ufsutils/tunefs.ufs/tunefs.c
  
  	if (argc < 3)
  		usage();
-@@ -241,9 +252,11 @@
+@@ -241,9 +252,11 @@ main(int argc, char *argv[])
  		goto err;
  	if (disk.d_name != special) {
  		special = disk.d_name;
@@ -43,7 +46,7 @@ Index: ufsutils/tunefs.ufs/tunefs.c
  	}
  
  	if (pflag) {
-@@ -402,6 +415,7 @@
+@@ -402,6 +415,7 @@ main(int argc, char *argv[])
  	if (sbwrite(&disk, Aflag) == -1)
  		goto err;
  	ufs_disk_close(&disk);
@@ -51,7 +54,7 @@ Index: ufsutils/tunefs.ufs/tunefs.c
  	if (active) {
  		bzero(&args, sizeof(args));
  		if (mount("ufs", on,
-@@ -409,6 +423,7 @@
+@@ -409,6 +423,7 @@ main(int argc, char *argv[])
  			err(9, "%s: reload", special);
  		warnx("file system reloaded");
  	}
@@ -59,13 +62,11 @@ Index: ufsutils/tunefs.ufs/tunefs.c
  	exit(0);
  err:
  	if (disk.d_error != NULL)
-Index: ufsutils/tunefs.ufs/Makefile
-===================================================================
---- ufsutils.orig/tunefs.ufs/Makefile
-+++ ufsutils/tunefs.ufs/Makefile
+--- a/tunefs.ufs/Makefile
++++ b/tunefs.ufs/Makefile
 @@ -1,9 +1,12 @@
  #	@(#)Makefile	8.1 (Berkeley) 6/5/93
- # $FreeBSD: src/sbin/tunefs/Makefile,v 1.8 2003/01/23 08:15:05 ru Exp $
+ # $FreeBSD: src/sbin/tunefs/Makefile,v 1.8.36.1 2010/02/10 00:26:20 kensmith Exp $
  
 -PROG=	tunefs
 -DPADD=	${LIBUFS}

@@ -1,6 +1,25 @@
+---
+ src/usr.bin/make/cond.c       |    4 ++--
+ src/usr.bin/make/job.c        |    4 ++--
+ src/usr.bin/make/parse.c      |   12 ++++++------
+ src/usr.bin/make/proc.h       |    2 +-
+ src/usr.bin/make/shell.c      |    2 +-
+ src/usr.bin/make/util.c       |    2 +-
+ src/usr.bin/make/util.h       |    8 ++++----
+ src/usr.bin/make/var.c        |    8 ++++----
+ src/usr.bin/yacc/defs.h       |    3 +++
+ src/usr.bin/yacc/main.c       |    4 ++--
+ src/usr.sbin/btxld/btx.h      |    1 +
+ src/usr.sbin/btxld/elfh.c     |    1 +
+ src/usr.sbin/btxld/elfh.h     |    2 +-
+ src/usr.sbin/mtree/Makefile   |    4 ----
+ src/usr.sbin/mtree/compare.c  |    2 +-
+ src/usr.sbin/mtree/specspec.c |    2 --
+ 16 files changed, 30 insertions(+), 31 deletions(-)
+
 --- a/src/usr.sbin/mtree/specspec.c
 +++ b/src/usr.sbin/mtree/specspec.c
-@@ -84,8 +84,6 @@
+@@ -84,8 +84,6 @@ shownode(NODE *n, int f, char const *pat
  		printf(" rmd160digest=%s", n->rmd160digest);
  	if (f & F_SHA256)
  		printf(" sha256digest=%s", n->sha256digest);
@@ -11,7 +30,7 @@
  
 --- a/src/usr.bin/make/cond.c
 +++ b/src/usr.bin/make/cond.c
-@@ -1115,7 +1115,7 @@
+@@ -1115,7 +1115,7 @@ Cond_If(char *line, int code, int lineno
   *	Handle .else statement.
   */
  void
@@ -20,7 +39,7 @@
  {
  
  	while (isspace((u_char)*line))
-@@ -1156,7 +1156,7 @@
+@@ -1156,7 +1156,7 @@ Cond_Else(char *line __unused, int code
   *	Handle .endif statement.
   */
  void
@@ -31,7 +50,7 @@
  	while (isspace((u_char)*line))
 --- a/src/usr.bin/make/job.c
 +++ b/src/usr.bin/make/job.c
-@@ -474,7 +474,7 @@
+@@ -479,7 +479,7 @@ mkfifotemp(char *template)
  }
  
  static void
@@ -40,7 +59,7 @@
  {
  }
  
-@@ -2190,7 +2190,7 @@
+@@ -2195,7 +2195,7 @@ Job_CatchChildren(Boolean block)
   */
  void
  #ifdef USE_KQUEUE
@@ -51,7 +70,7 @@
  #endif
 --- a/src/usr.bin/make/parse.c
 +++ b/src/usr.bin/make/parse.c
-@@ -2210,13 +2210,13 @@
+@@ -2210,13 +2210,13 @@ xparse_include(char *file, int sinclude)
  }
  
  static void
@@ -67,7 +86,7 @@
  {
  	xparse_include(file, 1);
  }
-@@ -2230,7 +2230,7 @@
+@@ -2230,7 +2230,7 @@ parse_sinclude(char *file, int code __un
   *	a warning if the directive is malformed.
   */
  static void
@@ -76,7 +95,7 @@
  {
  
  	if (!isspace((u_char)*line)) {
-@@ -2257,7 +2257,7 @@
+@@ -2257,7 +2257,7 @@ parse_message(char *line, int iserror, i
   *	Parse an .undef directive.
   */
  static void
@@ -85,7 +104,7 @@
  {
  	char *cp;
  
-@@ -2279,7 +2279,7 @@
+@@ -2279,7 +2279,7 @@ parse_undef(char *line, int code __unuse
   *	Parse a .for directive.
   */
  static void
@@ -94,7 +113,7 @@
  {
  
  	if (!For_For(line)) {
-@@ -2311,7 +2311,7 @@
+@@ -2311,7 +2311,7 @@ parse_for(char *line, int code __unused,
   *	Parse endfor. This may only happen if there was no matching .for.
   */
  static void
@@ -105,7 +124,7 @@
  	Parse_Error(PARSE_FATAL, "for-less endfor");
 --- a/src/usr.bin/make/proc.h
 +++ b/src/usr.bin/make/proc.h
-@@ -48,6 +48,6 @@
+@@ -48,6 +48,6 @@ typedef struct ProcStuff {
  	pid_t	child_pid;
  } ProcStuff;
  
@@ -115,7 +134,7 @@
  #endif /* proc_h_458845848 */
 --- a/src/usr.bin/make/shell.c
 +++ b/src/usr.bin/make/shell.c
-@@ -120,7 +120,7 @@
+@@ -120,7 +120,7 @@ struct Shell *commandShell;
   */
  static struct Shells shells = TAILQ_HEAD_INITIALIZER(shells);
  
@@ -126,7 +145,7 @@
   * Helper function for sorting the builtin list alphabetically.
 --- a/src/usr.bin/make/util.c
 +++ b/src/usr.bin/make/util.c
-@@ -61,7 +61,7 @@
+@@ -61,7 +61,7 @@ __FBSDID("$FreeBSD$");
  #include "targ.h"
  #include "util.h"
  
@@ -137,7 +156,7 @@
   * Debug --
 --- a/src/usr.bin/make/util.h
 +++ b/src/usr.bin/make/util.h
-@@ -103,10 +103,10 @@
+@@ -103,10 +103,10 @@ do {						\
  void Debug(const char *, ...);
  void DebugM(const char *, ...);
  void Error(const char *, ...);
@@ -154,7 +173,7 @@
  void *erealloc(void *, size_t);
 --- a/src/usr.bin/make/var.c
 +++ b/src/usr.bin/make/var.c
-@@ -248,7 +248,7 @@
+@@ -248,7 +248,7 @@ VarDestroy(Var *v, Boolean f)
   *	The trimmed word is added to the buffer.
   */
  static Boolean
@@ -163,7 +182,7 @@
  {
  	char *slash;
  
-@@ -283,7 +283,7 @@
+@@ -283,7 +283,7 @@ VarHead(const char *word, Boolean addSpa
   *	The trimmed word is added to the buffer.
   */
  static Boolean
@@ -172,7 +191,7 @@
  {
  	const char *slash;
  
-@@ -312,7 +312,7 @@
+@@ -312,7 +312,7 @@ VarTail(const char *word, Boolean addSpa
   *	The suffix from the word is placed in the buffer.
   */
  static Boolean
@@ -181,7 +200,7 @@
  {
  	const char *dot;
  
-@@ -340,7 +340,7 @@
+@@ -340,7 +340,7 @@ VarSuffix(const char *word, Boolean addS
   *	The trimmed word is added to the buffer.
   */
  static Boolean
@@ -192,7 +211,7 @@
  
 --- a/src/usr.bin/yacc/main.c
 +++ b/src/usr.bin/yacc/main.c
-@@ -114,7 +114,7 @@
+@@ -114,7 +114,7 @@ static void usage(void);
  
  volatile sig_atomic_t sigdie;
  
@@ -201,7 +220,7 @@
  done(k)
  int k;
  {
-@@ -128,7 +128,7 @@
+@@ -128,7 +128,7 @@ int k;
  
  static void
  onintr(signo)
@@ -212,7 +231,7 @@
      done(1);
 --- a/src/usr.sbin/mtree/compare.c
 +++ b/src/usr.sbin/mtree/compare.c
-@@ -72,7 +72,7 @@
+@@ -72,7 +72,7 @@ __FBSDID("$FreeBSD$");
  	}
  
  int
@@ -254,7 +273,7 @@
      Elf32_Ehdr e;		/* ELF header */
 --- a/src/usr.sbin/mtree/Makefile
 +++ b/src/usr.sbin/mtree/Makefile
-@@ -11,8 +11,4 @@
+@@ -11,8 +11,4 @@ LDADD= -lbsd
  
  WARNS?=	4
  
