@@ -24,17 +24,21 @@ clean:
 	rm -rf sys usr.sbin
 	dh_clean
 
-build: build-stamp
-build-stamp:
+build-arch:
+
+build-indep: build-indep-stamp
+build-indep-stamp:
 	dh_testdir
 
 	tar xfJ $(SRC_TAR) --strip-components=1
 
 	QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a || test $$? = 2
 
-	touch build-stamp
+	touch $@
 
-install: build
+build: build-arch build-indep
+
+install-indep: build-indep
 	dh_testdir
 	dh_testroot
 	dh_prep
@@ -49,12 +53,16 @@ else
 		&& find . -type f -name "*.h" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/include/machine \;
 endif
 
+install-arch: build-arch
+
+install: install-arch install-indep
+
 # Build architecture-independent files here.
-binary-indep: build install
+binary-indep: install-indep
 # We have nothing to do by default.
 
 # Build architecture-dependent files here.
-binary-arch: build install
+binary-arch: install-indep
 	dh_testdir
 	dh_testroot
 	dh_installdocs
@@ -70,4 +78,5 @@ binary-arch: build install
 	dh_builddeb
 
 binary: binary-indep binary-arch
+
 .PHONY: build clean binary-indep binary-arch binary install
