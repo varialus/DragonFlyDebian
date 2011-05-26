@@ -41,8 +41,6 @@ ORIG_TAR	:= kfreebsd-$(major)_$(tar_version).orig.tar.gz
 MAKE		:= make MACHINE_ARCH=$(kfreebsd_cpu) CC=gcc-4.3 WERROR=
 PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 
-include /usr/share/quilt/quilt.make
-
 get-orig-source:
 	rm -rf $(ORIG_DIR)
 	for i in sys usr.sbin/config ; do \
@@ -67,7 +65,7 @@ control: clean
 		done ; \
 	done
 
-clean: unpatch
+clean:
 	dh_testdir
 	dh_testroot
 	rm -rf src kfreebsd-source-* flavor-* config
@@ -81,8 +79,6 @@ clean: unpatch
 
 src: src-stamp
 src-stamp:
-	QUILT_PATCHES=$(QUILT_PATCH_DIR) quilt --quiltrc /dev/null push -a || test $$? = 2
-
 	mkdir $(CURDIR)/src
 	cp -af $(CURDIR)/sys $(CURDIR)/usr.sbin $(CURDIR)/src
 

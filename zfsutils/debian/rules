@@ -62,46 +62,41 @@ get-orig-source:
 	tar -czf ../zfsutils_$(VERSION).orig.tar.gz $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
-patch: patch-stamp
-patch-stamp:
-	QUILT_PATCHES=debian/patches quilt push -a || test $$? = 2
-	touch $@
-
 build: build-libuutil build-libnvpair build-libzfs build-libumem build-libzpool build-zfsutils build-libavl
 
 build-libuutil: build-libuutil-stamp
-build-libuutil-stamp: patch
+build-libuutil-stamp:
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libuutil
 	touch $@
 
 build-libnvpair: build-libnvpair-stamp
-build-libnvpair-stamp: patch
+build-libnvpair-stamp:
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libnvpair
 	touch $@
 
 build-libumem: build-libumem-stamp
-build-libumem-stamp: patch
+build-libumem-stamp:
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libumem
 	touch $@
 
 
 build-libzpool: build-libzpool-stamp
-build-libzpool-stamp: patch build-libavl build-libnvpair-stamp build-libumem
+build-libzpool-stamp: build-libavl build-libnvpair-stamp build-libumem
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libzpool
 	touch $@
 
 build-libzfs: build-libzfs-stamp
-build-libzfs-stamp: patch build-libnvpair-stamp build-libuutil-stamp
+build-libzfs-stamp: build-libnvpair-stamp build-libuutil-stamp
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs
 	touch $@
 
 build-libavl: build-libavl-stamp
-build-libavl-stamp: patch
+build-libavl-stamp:
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libavl
 	touch $@
 
 build-zfsutils: build-zfsutils-stamp
-build-zfsutils-stamp: patch build-libzfs-stamp build-libnvpair-stamp build-libuutil-stamp build-libumem build-libzpool
+build-zfsutils-stamp: build-libzfs-stamp build-libnvpair-stamp build-libuutil-stamp build-libumem build-libzpool
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zpool
 	$(PMAKE) -C $(CURDIR)/cddl/sbin/zfs
 
@@ -129,8 +124,6 @@ clean:
 	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/ztest clean
 	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/zinject clean
 
-	QUILT_PATCHES=debian/patches quilt pop -a -R || test $$? = 2
-	rm -rf .pc
 	rm -f *stamp
 	dh_clean
 
