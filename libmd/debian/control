@@ -1,0 +1,32 @@
+Source: libmd
+Section: libs
+Priority: optional
+Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
+Uploaders: Guillem Jover <guillem@debian.org>, Aurelien Jarno <aurel32@debian.org>
+Build-Depends: debhelper (>= 7), freebsd-buildutils, libbsd-dev
+Vcs-Browser: http://svn.debian.org/wsvn/glibc-bsd/trunk/libmd/
+Vcs-Svn: svn://svn.debian.org/glibc-bsd/trunk/libmd/
+Standards-Version: 3.9.2
+
+Package: libmd-dev
+Section: libdevel
+Architecture: any
+Depends: libmd0 (= ${binary:Version}), ${misc:Depends}
+Description: message digest functions from BSD systems - development files
+ This package contains the header files and static library needed to
+ compile applications that use libmd.
+
+Package: libmd0
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: message digest functions from BSD systems - shared library
+ The md library provides various message digest ("hash") functions.
+
+Package: libmd0-dbg
+Section: debug
+Priority: extra
+Architecture: any
+Depends: libmd0 (= ${binary:Version}), ${misc:Depends}
+Description: message digest functions from BSD systems - debugging symbols
+ This library provides message digest functions commonly available on the
+ BSDs base system but not on others like GNU systems.
