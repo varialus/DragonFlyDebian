@@ -49,10 +49,10 @@ kfreebsd-8 (8.1+dfsg-7.1) unstable; urgency=high
 
 kfreebsd-8 (8.1+dfsg-7) unstable; urgency=low
 
-  [ Robert Millan ] 
+  [ Robert Millan ]
   * Add 917_track_alignment.diff to remove obsolete warning about track
     alignment in MSDOS partitions. Closes: #603380.
-  
+
   [ Petr Salinger ]
   * Add 918_delete_key.diff to conform to Debian Policy,
     9.8 Keyboard configuration. Closes: #605065.
@@ -66,10 +66,10 @@ kfreebsd-8 (8.1+dfsg-6) unstable; urgency=low
   * Drop non-free firmware. Closes: #594940.
     - prune .orig.tar.gz
     - disable firmware in kernel via 999_config.diff
-    - drop firmware even as modules inside 999_firmware.diff 
+    - drop firmware even as modules inside 999_firmware.diff
   * Re-enable ulpt in kernel. Closes: #598417.
   * Raise NKPT on amd64 via 916_NKPT_amd64.diff. Closes: #596577.
-  
+
   [ Aurelien Jarno ]
   * Replace 106_teken_op.diff by upstream patch.
   * Add 108_teken_utf8_table.diff to be able to display upper case vowels
@@ -79,7 +79,7 @@ kfreebsd-8 (8.1+dfsg-6) unstable; urgency=low
 
 kfreebsd-8 (8.1-5) unstable; urgency=medium
 
-  * Correctly update a root filesystem to read/write when the mount 
+  * Correctly update a root filesystem to read/write when the mount
     options are passed as flags instead of iovec, like in busybox.
   * Fix Coda filesystem kernel memory disclosure (CVE-2010-3014).
   * Disable TEKEN_XTERM as TEKEN_UTF8 is enough to get UTF-8 support
@@ -92,7 +92,7 @@ kfreebsd-8 (8.1-4) unstable; urgency=low
   [ Petr Salinger ]
   * Report i686 instead of i386 on amd64 machine for 32-bit binaries.
   * Teach how to handle orig_pair ESC sequence for TERM=cons25.
-    Closes: #559364.    
+    Closes: #559364.
   * enable VESA also for 64-bit kernel, similarly as for 32-bits
     kernels since 8.0-3
 
@@ -103,7 +103,7 @@ kfreebsd-8 (8.1-3) unstable; urgency=high
   [ Aurelien Jarno ]
   * Backport adaptive_machine_arch support from -CURRENT, change an amd64
     machine into i386 for 32-bit binaries.
-  * Call postinst/postrm hooks as defined by the "Policy for Linux kernel, 
+  * Call postinst/postrm hooks as defined by the "Policy for Linux kernel,
     initramfs, boot loader update process".
 
   [ Guillem Jover ]
@@ -136,7 +136,7 @@ kfreebsd-8 (8.1-1) unstable; urgency=low
   [ Guillem Jover ]
   * Use kfreebsd-any instead of explicit architecture list.
   * Fold Build-Depends field into several lines.
-  
+
   [ Aurelien Jarno ]
   * debian/control.in: bump Standards-Version to 3.9.1 (no changes).
 
@@ -144,7 +144,7 @@ kfreebsd-8 (8.1-1) unstable; urgency=low
 
 kfreebsd-8 (8.0-11) unstable; urgency=medium
 
-  * Also disable -fstack-protector for modules, now that 
+  * Also disable -fstack-protector for modules, now that
     freebsd-buildutils enable it by default. Closes: #587630.
 
  -- Aurelien Jarno <aurel32@debian.org>  Tue, 20 Jul 2010 00:00:55 +0200
@@ -200,7 +200,7 @@ kfreebsd-8 (8.0-5) unstable; urgency=high
       - 105_pts.diff
 
   * Merge packaging changes from kfreebsd-7
-      debian/control: add ${misc:Depends} to all packages. 
+      debian/control: add ${misc:Depends} to all packages.
 
  -- Aurelien Jarno <aurel32@debian.org>  Thu, 08 Apr 2010 13:41:21 +0200
 
@@ -301,7 +301,7 @@ kfreebsd-7 (7.2-6) unstable; urgency=low
 
   [ Aurelien Jarno ]
   * Really build the ZFS module.
-  * Enable TMPFS, it is need early in the boot process. 
+  * Enable TMPFS, it is need early in the boot process.
   * Add debian/README.source.
   * Align modules load address on pages.
 
@@ -364,7 +364,7 @@ kfreebsd-7 (7.2-1) unstable; urgency=low
 
   [ Aurelien Jarno ]
   * Keep sources of ZFS but don't enable them.
-  * Remove alternative build-depends on freebsd6-buildutils. 
+  * Remove alternative build-depends on freebsd6-buildutils.
   * Remove compat flavours as we are going to the official archive.
   * Move ndiswrapper modules to kfreebsd-image, the same way the Linux
     modules are in main in the Debian.
@@ -373,8 +373,8 @@ kfreebsd-7 (7.2-1) unstable; urgency=low
 
 kfreebsd-7 (7.1-4) unstable; urgency=low
 
-  * debian/control.flavor.in: depends on kldutils instead of 
-    module-init-tools. 
+  * debian/control.flavor.in: depends on kldutils instead of
+    module-init-tools.
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 13 Apr 2009 21:27:55 +0200
 
@@ -386,7 +386,7 @@ kfreebsd-7 (7.1-3) unstable; urgency=low
   * debian/rules: make sure ~/.quiltrc or /etc/quilt.quiltrc is not used.
   * 000_ktimer.diff: fix local privilege escalation (CVE-2009-1041 /
     FreeBSD-SA-09:06.ktimer).
-  * 000_kenv.diff: fix kernel panic when dumping environment 
+  * 000_kenv.diff: fix kernel panic when dumping environment
     (FreeBSD-EN-09:01.kenv).
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 23 Mar 2009 19:00:14 +0100
@@ -415,9 +415,9 @@ kfreebsd-7 (7.1-1) unstable; urgency=low
   * Do not specify SMP in GENERIC, it is enabled on per flavour basis
   * Ship config file used for building corresponding flavour
   * redefine POLL_HUP to be distinct from POLL_ERR
-  
+
   [ Aurelien Jarno ]
-  * debian/patches/*: convert to patchlevel p1 as requested by the new 
+  * debian/patches/*: convert to patchlevel p1 as requested by the new
     dpkg-source.
   * debian/control.compat.in, debian/control.flavor.in: set section of
     images to admin.
@@ -447,11 +447,11 @@ kfreebsd-7 (7.0-6) unstable; urgency=high
 
 kfreebsd-7 (7.0-5) unstable; urgency=high
 
-  * Fix amd64 swapgs local privilege escalation 
+  * Fix amd64 swapgs local privilege escalation
     (FreeBSD-SA-08:07.amd64 / CVE-2008-3890).
-  * Fix nmount(2) local arbitrary code execution 
+  * Fix nmount(2) local arbitrary code execution
     (FreeBSD-SA-08:08.nmount / CVE-2008-3531).
-  * Fix remote kernel panics on IPv6 connections 
+  * Fix remote kernel panics on IPv6 connections
     (FreeBSD-SA-08:09.icmp6 /CVE-2008-3530).
 
  -- Aurelien Jarno <aurel32@debian.org>  Thu, 04 Sep 2008 11:49:44 +0200
@@ -497,7 +497,7 @@ kfreebsd-7 (7.0~cvs20080107-1) unstable; urgency=low
 
   [ Aurelien Jarno ]
   * Refresh all patches.
-  * Bumped Standards-Version to 3.7.3 (no changes). 
+  * Bumped Standards-Version to 3.7.3 (no changes).
 
  -- Aurelien Jarno <aurel32@debian.org>  Mon, 07 Jan 2008 11:48:14 +0100
 
@@ -560,7 +560,7 @@ kfreebsd-6 (6.2-1) unreleased; urgency=low
   * New upstream version (RELENG_6_2_0_RELEASE)
      - drop obsolete 000_kmem, 000_net, 000_ppp, 000_smbfs,
                      002_glibc_dev_isp, 006_proc_mounts patches
-     - update 009_disable_duped_modules, 
+     - update 009_disable_duped_modules,
               903_disable_non-free_drivers,
               999_config patches
 
@@ -605,7 +605,7 @@ kfreebsd-6 (6.1-0.4) unreleased; urgency=low
 
 kfreebsd-6 (6.1-0.3) unreleased; urgency=low
 
-  * Relax the conflict with kfreebsd-loader to (<< 5.4-1.3). 
+  * Relax the conflict with kfreebsd-loader to (<< 5.4-1.3).
 
  -- Aurelien Jarno <aurel32@debian.org>  Thu, 12 Oct 2006 16:19:38 +0200
 
@@ -635,7 +635,7 @@ kfreebsd-6 (6.1-0.1) unreleased; urgency=low
   * Do not load directly executed shared library (e.g. ld.so) at base addr 0
 
   [ Aurelien Jarno ]
-  * Bumped Standards-Version to 3.7.2 (no changes). 
+  * Bumped Standards-Version to 3.7.2 (no changes).
 
  -- Aurelien Jarno <aurel32@debian.org>  Tue, 25 Jul 2006 00:58:48 +0200
 
@@ -751,13 +751,13 @@ kfreebsd-5 (5.3-6) unstable; urgency=low
 kfreebsd-5 (5.3-5) unstable; urgency=low
 
   * Enabled atapicam driver (closes: bug#323155).
-  * Allow the kernel to execve ET_DYN files. 
+  * Allow the kernel to execve ET_DYN files.
 
  -- Aurelien Jarno <aurel32@debian.org>  Wed, 17 Aug 2005 15:44:18 +0200
 
 kfreebsd-5 (5.3-4) unstable; urgency=low
 
-  * Added OSS_GETVERSION ioctl. Patch from Robert Millan (closes: 
+  * Added OSS_GETVERSION ioctl. Patch from Robert Millan (closes:
     bug#322197)
 
  -- Aurelien Jarno <aurel32@debian.org>  Wed, 10 Aug 2005 00:56:00 +0200
