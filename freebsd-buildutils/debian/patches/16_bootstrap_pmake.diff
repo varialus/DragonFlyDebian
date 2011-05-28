@@ -1,0 +1,25 @@
+Author: Guillem Jover <guillem@debian.org>
+
+---
+ src/usr.bin/make/Makefile.dist |   11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+--- a/src/usr.bin/make/Makefile.dist
++++ b/src/usr.bin/make/Makefile.dist
+@@ -2,9 +2,12 @@
+ # a simple makefile to help builds on !FreeBSD systems
+ pmake:
+ 	@echo 'make started.'
+-	cc -D__dead2="" -D__unused="" -Darc4random=random -D__FBSDID="static const char *id=" -DDEFSHELLNAME=\"sh\" -I. -c *.c
+-	cc *.o -o pmake
++	cc -D__unused="" -D__FBSDID="static const char *id=" -DDEFSHELLNAME=\"sh\" -I. -c *.c
++	cc *.o -lbsd -o pmake
+ 	@echo 'make completed.'
+ 
+-clean:
+-	@rm -f *.o pmake
++mostlyclean:
++	@rm -f *.o
++
++clean: mostlyclean
++	@rm -f pmake
