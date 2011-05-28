@@ -79,23 +79,21 @@ build: build-stamp
 build-stamp: unpack-stamp
 	dh_testdir
 
-	cd build-tree/src/usr.bin/yacc ; \
-		$(PMAKE) $(MAKE_BUILD_FLAGS)
+	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/yacc
 
-	cd build-tree/src/usr.bin/cksum ; $(PMAKE) $(MAKE_BUILD_FLAGS)
+	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/cksum
 
 	cd build-tree/src/usr.bin/lex ; \
 		$(PMAKE) bootstrap ; \
 		$(YACC) -d -o parse.c parse.y ; \
 		$(PMAKE) $(MAKE_BUILD_FLAGS)
 
-	cd build-tree/src/usr.bin/make ; \
-		$(PMAKE) $(MAKE_BUILD_FLAGS)
+	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/make
 
-	cd build-tree/src/usr.bin/mkdep ; $(PMAKE) $(MAKE_BUILD_FLAGS)
-	cd build-tree/src/usr.sbin/mtree ; $(PMAKE) $(MAKE_BUILD_FLAGS)
-	cd build-tree/src/usr.bin/file2c ; $(PMAKE) $(MAKE_BUILD_FLAGS)
-	cd build-tree/src/usr.bin/brandelf ; $(PMAKE) $(MAKE_BUILD_FLAGS)
+	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/mkdep
+	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.sbin/mtree
+	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/file2c
+	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/brandelf
 
 	cd build-tree/src/usr.sbin/config ; \
 		$(YACC) -d config.y ; \
@@ -112,15 +110,14 @@ install: build
 	dh_installdirs
 
 	for i in cksum lex make mkdep yacc file2c brandelf ; do \
-		cd $(CURDIR)/build-tree/src/usr.bin/$$i; \
-		$(PMAKE) install DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/bin ; \
+	  $(PMAKE) -C $(CURDIR)/build-tree/src/usr.bin/$$i install \
+		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/bin ; \
 	done
 	for i in mtree config ; do \
-		cd $(CURDIR)/build-tree/src/usr.sbin/$$i; \
-		$(PMAKE) install DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/sbin ; \
+	  $(PMAKE) -C $(CURDIR)/build-tree/src/usr.sbin/$$i install \
+		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/sbin ; \
 	done
-	cd build-tree/src/share/mk ; \
-		$(PMAKE) install \
+	$(PMAKE) -C build-tree/src/share/mk install \
 		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/share
 
 	cp -af $(CURDIR)/build-tree/ports/Mk \
