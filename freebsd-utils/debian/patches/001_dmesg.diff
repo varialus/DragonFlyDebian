@@ -1,6 +1,7 @@
 ---
- sbin/dmesg/dmesg.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ sbin/dmesg/Makefile |    2 +-
+ sbin/dmesg/dmesg.c  |    7 +++++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
 --- a/sbin/dmesg/dmesg.c
 +++ b/sbin/dmesg/dmesg.c
@@ -32,3 +33,14 @@
  		case '?':
  		default:
  			usage();
+--- a/sbin/dmesg/Makefile
++++ b/sbin/dmesg/Makefile
+@@ -6,7 +6,7 @@ MAN=	dmesg.8
+ 
+ WARNS?=	6
+ 
+-LDADD=	-lkvm
++LDADD=	-lkvm -lbsd
+ DPADD=	${LIBKVM}
+ 
+ .include <bsd.prog.mk>
