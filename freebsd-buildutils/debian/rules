@@ -123,11 +123,11 @@ install: build
 
 	for i in cksum lex make mkdep yacc file2c brandelf ; do \
 	  $(PMAKE) -C $(CURDIR)/build-tree/src/usr.bin/$$i install \
-		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/bin ; \
+		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/lib/freebsd ; \
 	done
 	for i in mtree config ; do \
 	  $(PMAKE) -C $(CURDIR)/build-tree/src/usr.sbin/$$i install \
-		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/sbin ; \
+		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/lib/freebsd ; \
 	done
 	$(PMAKE) -C build-tree/src/share/mk install \
 		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/share
@@ -141,10 +141,6 @@ install: build
 		$(CURDIR)/debian/$(package)/var
 
 	# relocate binaries
-	mv \
-		$(CURDIR)/debian/$(package)/usr/bin/* \
-		$(CURDIR)/debian/$(package)/usr/sbin/* \
-		$(CURDIR)/debian/$(package)/usr/lib/freebsd/
 	for i in `cd $(CURDIR)/debian/$(package)/usr/lib/freebsd && ls` ; do \
 		ln -s ../lib/freebsd/$$i \
 		$(CURDIR)/debian/$(package)/usr/bin/freebsd-$$i ; \
