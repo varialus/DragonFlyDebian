@@ -10,6 +10,7 @@
 DEB_BUILD_GNU_TYPE	:= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 DEB_BUILD_GNU_CPU	:= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
 DEB_HOST_ARCH_CPU	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+DEB_HOST_MULTIARCH	:= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 ifneq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
     export STRIPFLAG=
@@ -23,7 +24,7 @@ PCVS = anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
 PTAG = RELEASE_$(PVERSION)_0
 
 ORIGDIR = freebsd-buildutils-$(VERSION)
-CFLAGS = -O2 -g -Wall -DMACHINE_ARCH='"$(DEB_HOST_ARCH_CPU)"' -D_GNU_SOURCE -D'__FBSDID(string)=' -I$(CURDIR)/build-tree/src/sys
+CFLAGS = -O2 -g -Wall -DMACHINE_ARCH='"$(DEB_HOST_ARCH_CPU)"' -DMACHINE_MULTIARCH='"$(DEB_HOST_MULTIARCH)"' -D_GNU_SOURCE -D'__FBSDID(string)=' -I$(CURDIR)/build-tree/src/sys
 MAKE_BUILD_FLAGS = CC=gcc NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
 
 PMAKE_BOOTSTRAP = $(CURDIR)/build-tree/src/usr.bin/make/pmake

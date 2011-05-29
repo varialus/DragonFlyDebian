@@ -1,0 +1,798 @@
+---
+ src/share/mk/bsd.libnames.mk |  680 +++++++++++++++++++++++++++++++++++--------
+ src/share/mk/bsd.own.mk      |    4 
+ src/usr.bin/make/main.c      |   14 
+ src/usr.bin/make/make.1      |    6 
+ 4 files changed, 588 insertions(+), 116 deletions(-)
+
+--- a/src/usr.bin/make/main.c
++++ b/src/usr.bin/make/main.c
+@@ -861,6 +861,7 @@ main(int argc, char **argv)
+ {
+ 	const char *machine;
+ 	const char *machine_arch;
++	const char *machine_multiarch;
+ 	const char *machine_cpu;
+ 	Boolean outOfDate = TRUE;	/* FALSE if all targets up to date */
+ 	const char *p;
+@@ -947,8 +948,8 @@ main(int argc, char **argv)
+ 	 * so we can share an executable for similar machines.
+ 	 * (i.e. m68k: amiga hp300, mac68k, sun3, ...)
+ 	 *
+-	 * Note that both MACHINE and MACHINE_ARCH are decided at
+-	 * run-time.
++	 * Note that all of MACHINE, MACHINE_ARCH and MACHINE_MULTIARCH
++	 * are decided at run-time.
+ 	 */
+ 	if (machine == NULL) {
+ #ifdef MACHINE_ARCH
+@@ -966,6 +967,14 @@ main(int argc, char **argv)
+ #endif
+ 	}
+ 
++	if ((machine_multiarch = getenv("MACHINE_MULTIARCH")) == NULL) {
++#ifdef MACHINE_MULTIARCH
++	    machine_multiarch = MACHINE_MULTIARCH;
++#else
++	    machine_multiarch = "unknown-unknown-unknown";
++#endif
++	}
++
+ 	/*
+ 	 * Set machine_cpu to the minumum supported CPU revision based
+ 	 * on the target architecture, if not already set.
+@@ -1008,6 +1017,7 @@ main(int argc, char **argv)
+ 	Var_SetGlobal("MFLAGS", "");
+ 	Var_SetGlobal("MACHINE", machine);
+ 	Var_SetGlobal("MACHINE_ARCH", machine_arch);
++	Var_SetGlobal("MACHINE_MULTIARCH", machine_multiarch);
+ 	Var_SetGlobal("MACHINE_CPU", machine_cpu);
+ #ifdef MAKE_VERSION
+ 	Var_SetGlobal("MAKE_VERSION", MAKE_VERSION);
+--- a/src/usr.bin/make/make.1
++++ b/src/usr.bin/make/make.1
+@@ -815,6 +815,12 @@ if not defined.
+ Name of the machine architecture
+ .Nm
+ was compiled for, defined at compilation time.
++.It Va MACHINE_MULTIARCH
++Name of the machine multiarch triplet
++.Nm
++was compiler for, defined at compilation time. It's common use is for path
++components, to allow co-installation in multiarch environment.
++.
+ .It Va VPATH
+ Makefiles may assign a colon-delimited list of directories to
+ .Va VPATH .
+--- a/src/share/mk/bsd.own.mk
++++ b/src/share/mk/bsd.own.mk
+@@ -26,6 +26,9 @@
+ #
+ # LIBDIR	Base path for libraries. [/usr/lib]
+ #
++# LIBARCHDIR	Base path for multi-arch libraries.
++#		[/usr/lib/${MACHINE_MULTIARCH}]
++#
+ # LIBCOMPATDIR	Base path for compat libraries. [/usr/lib/compat]
+ #
+ # LIBDATADIR	Base path for misc. utility data files. [/usr/libdata]
+@@ -127,6 +130,7 @@ KMODGRP?=	${BINGRP}
+ KMODMODE?=	${BINMODE}
+ 
+ LIBDIR?=	/usr/lib
++LIBARCHDIR?=	/usr/lib/${MACHINE_MULTIARCH}
+ LIBCOMPATDIR?=	/usr/lib/compat
+ LIBDATADIR?=	/usr/libdata
+ LINTLIBDIR?=	/usr/libdata/lint
+--- a/src/share/mk/bsd.libnames.mk
++++ b/src/share/mk/bsd.libnames.mk
+@@ -8,104 +8,424 @@
+ .error bsd.libnames.mk cannot be included directly.
+ .endif
+ 
+-LIBCRT0?=	${DESTDIR}${LIBDIR}/crt0.o
++.if exists(${DESTDIR}${LIBARCHDIR}/crt0.o)
++LIBCRT0?=	${DESTDIR}${LIBARCHDIR}/crt0.o
++.else
++LIBCRT0?=	${DESTDIR}/usr/lib/crt0.o
++.endif
+ 
+-LIBALIAS?=	${DESTDIR}${LIBDIR}/libalias.a
+-LIBARCHIVE?=	${DESTDIR}${LIBDIR}/libarchive.a
+-LIBASN1?=	${DESTDIR}${LIBDIR}/libasn1.a
+-LIBATM?=	${DESTDIR}${LIBDIR}/libatm.a
+-LIBAUDITD?=	${DESTDIR}${LIBDIR}/libauditd.a
+-LIBAVL?=	${DESTDIR}${LIBDIR}/libavl.a
+-LIBBEGEMOT?=	${DESTDIR}${LIBDIR}/libbegemot.a
++.if exists(${DESTDIR}${LIBARCHDIR}/libalias.a)
++LIBALIAS?=	${DESTDIR}${LIBARCHDIR}/libalias.a
++.else
++LIBALIAS?=	${DESTDIR}/usr/lib/libalias.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libarchive.a)
++LIBARCHIVE?=	${DESTDIR}${LIBARCHDIR}/libarchive.a
++.else
++LIBARCHIVE?=	${DESTDIR}/usr/lib/libarchive.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libasn1.a)
++LIBASN1?=	${DESTDIR}${LIBARCHDIR}/libasn1.a
++.else
++LIBASN1?=	${DESTDIR}/usr/lib/libasn1.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libatm.a)
++LIBATM?=	${DESTDIR}${LIBARCHDIR}/libatm.a
++.else
++LIBATM?=	${DESTDIR}/usr/lib/libatm.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libauditd.a)
++LIBAUDITD?=	${DESTDIR}${LIBARCHDIR}/libauditd.a
++.else
++LIBAUDITD?=	${DESTDIR}/usr/lib/libauditd.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libavl.a)
++LIBAVL?=	${DESTDIR}${LIBARCHDIR}/libavl.a
++.else
++LIBAVL?=	${DESTDIR}/usr/lib/libavl.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libbegemot.a)
++LIBBEGEMOT?=	${DESTDIR}${LIBARCHDIR}/libbegemot.a
++.else
++LIBBEGEMOT?=	${DESTDIR}/usr/lib/libbegemot.a
++.endif
+ .if ${MK_BIND_LIBS} != "no"
+-LIBBIND?=	${DESTDIR}${LIBDIR}/libbind.a
+-LIBBIND9?=	${DESTDIR}${LIBDIR}/libbind9.a
++.if exists(${DESTDIR}${LIBARCHDIR}/libbind.a)
++LIBBIND?=	${DESTDIR}${LIBARCHDIR}/libbind.a
++.else
++LIBBIND?=	${DESTDIR}/usr/lib/libbind.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libbind9.a)
++LIBBIND9?=	${DESTDIR}${LIBARCHDIR}/libbind9.a
++.else
++LIBBIND9?=	${DESTDIR}/usr/lib/libbind9.a
++.endif
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libbluetooth.a)
++LIBBLUETOOTH?=	${DESTDIR}${LIBARCHDIR}/libbluetooth.a
++.else
++LIBBLUETOOTH?=	${DESTDIR}/usr/lib/libbluetooth.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libbsdxml.a)
++LIBBSDXML?=	${DESTDIR}${LIBARCHDIR}/libbsdxml.a
++.else
++LIBBSDXML?=	${DESTDIR}/usr/lib/libbsdxml.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libbsm.a)
++LIBBSM?=	${DESTDIR}${LIBARCHDIR}/libbsm.a
++.else
++LIBBSM?=	${DESTDIR}/usr/lib/libbsm.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libbsnmp.a)
++LIBBSNMP?=	${DESTDIR}${LIBARCHDIR}/libbsnmp.a
++.else
++LIBBSNMP?=	${DESTDIR}/usr/lib/libbsnmp.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libbz2.a)
++LIBBZ2?=	${DESTDIR}${LIBARCHDIR}/libbz2.a
++.else
++LIBBZ2?=	${DESTDIR}/usr/lib/libbz2.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libc.a)
++LIBC?=		${DESTDIR}${LIBARCHDIR}/libc.a
++.else
++LIBC?=		${DESTDIR}/usr/lib/libc.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libc_pic.a)
++LIBC_PIC?=	${DESTDIR}${LIBARCHDIR}/libc_pic.a
++.else
++LIBC_PIC?=	${DESTDIR}/usr/lib/libc_pic.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libcalendar.a)
++LIBCALENDAR?=	${DESTDIR}${LIBARCHDIR}/libcalendar.a
++.else
++LIBCALENDAR?=	${DESTDIR}/usr/lib/libcalendar.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libcam.a)
++LIBCAM?=	${DESTDIR}${LIBARCHDIR}/libcam.a
++.else
++LIBCAM?=	${DESTDIR}/usr/lib/libcam.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libcom_err.a)
++LIBCOM_ERR?=	${DESTDIR}${LIBARCHDIR}/libcom_err.a
++.else
++LIBCOM_ERR?=	${DESTDIR}/usr/lib/libcom_err.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libcompat.a)
++LIBCOMPAT?=	${DESTDIR}${LIBARCHDIR}/libcompat.a
++.else
++LIBCOMPAT?=	${DESTDIR}/usr/lib/libcompat.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libcrypt.a)
++LIBCRYPT?=	${DESTDIR}${LIBARCHDIR}/libcrypt.a
++.else
++LIBCRYPT?=	${DESTDIR}/usr/lib/libcrypt.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libcrypto.a)
++LIBCRYPTO?=	${DESTDIR}${LIBARCHDIR}/libcrypto.a
++.else
++LIBCRYPTO?=	${DESTDIR}/usr/lib/libcrypto.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libctf.a)
++LIBCTF?=	${DESTDIR}${LIBARCHDIR}/libctf.a
++.else
++LIBCTF?=	${DESTDIR}/usr/lib/libctf.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libcurses.a)
++LIBCURSES?=	${DESTDIR}${LIBARCHDIR}/libcurses.a
++.else
++LIBCURSES?=	${DESTDIR}/usr/lib/libcurses.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libdevinfo.a)
++LIBDEVINFO?=	${DESTDIR}${LIBARCHDIR}/libdevinfo.a
++.else
++LIBDEVINFO?=	${DESTDIR}/usr/lib/libdevinfo.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libdevstat.a)
++LIBDEVSTAT?=	${DESTDIR}${LIBARCHDIR}/libdevstat.a
++.else
++LIBDEVSTAT?=	${DESTDIR}/usr/lib/libdevstat.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libdialog.a)
++LIBDIALOG?=	${DESTDIR}${LIBARCHDIR}/libdialog.a
++.else
++LIBDIALOG?=	${DESTDIR}/usr/lib/libdialog.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libdisk.a)
++LIBDISK?=	${DESTDIR}${LIBARCHDIR}/libdisk.a
++.else
++LIBDISK?=	${DESTDIR}/usr/lib/libdisk.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libdns.a)
++LIBDNS?=	${DESTDIR}${LIBARCHDIR}/libdns.a
++.else
++LIBDNS?=	${DESTDIR}/usr/lib/libdns.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libdtrace.a)
++LIBDTRACE?=	${DESTDIR}${LIBARCHDIR}/libdtrace.a
++.else
++LIBDTRACE?=	${DESTDIR}/usr/lib/libdtrace.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libdwarf.a)
++LIBDWARF?=	${DESTDIR}${LIBARCHDIR}/libdwarf.a
++.else
++LIBDWARF?=	${DESTDIR}/usr/lib/libdwarf.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libedit.a)
++LIBEDIT?=	${DESTDIR}${LIBARCHDIR}/libedit.a
++.else
++LIBEDIT?=	${DESTDIR}/usr/lib/libedit.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libelf.a)
++LIBELF?=	${DESTDIR}${LIBARCHDIR}/libelf.a
++.else
++LIBELF?=	${DESTDIR}/usr/lib/libelf.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libfetch.a)
++LIBFETCH?=	${DESTDIR}${LIBARCHDIR}/libfetch.a
++.else
++LIBFETCH?=	${DESTDIR}/usr/lib/libfetch.a
+ .endif
+-LIBBLUETOOTH?=	${DESTDIR}${LIBDIR}/libbluetooth.a
+-LIBBSDXML?=	${DESTDIR}${LIBDIR}/libbsdxml.a
+-LIBBSM?=	${DESTDIR}${LIBDIR}/libbsm.a
+-LIBBSNMP?=	${DESTDIR}${LIBDIR}/libbsnmp.a
+-LIBBZ2?=	${DESTDIR}${LIBDIR}/libbz2.a
+-LIBC?=		${DESTDIR}${LIBDIR}/libc.a
+-LIBC_PIC?=	${DESTDIR}${LIBDIR}/libc_pic.a
+-LIBCALENDAR?=	${DESTDIR}${LIBDIR}/libcalendar.a
+-LIBCAM?=	${DESTDIR}${LIBDIR}/libcam.a
+-LIBCOM_ERR?=	${DESTDIR}${LIBDIR}/libcom_err.a
+-LIBCOMPAT?=	${DESTDIR}${LIBDIR}/libcompat.a
+-LIBCRYPT?=	${DESTDIR}${LIBDIR}/libcrypt.a
+-LIBCRYPTO?=	${DESTDIR}${LIBDIR}/libcrypto.a
+-LIBCTF?=	${DESTDIR}${LIBDIR}/libctf.a
+-LIBCURSES?=	${DESTDIR}${LIBDIR}/libcurses.a
+-LIBDEVINFO?=	${DESTDIR}${LIBDIR}/libdevinfo.a
+-LIBDEVSTAT?=	${DESTDIR}${LIBDIR}/libdevstat.a
+-LIBDIALOG?=	${DESTDIR}${LIBDIR}/libdialog.a
+-LIBDISK?=	${DESTDIR}${LIBDIR}/libdisk.a
+-LIBDNS?=	${DESTDIR}${LIBDIR}/libdns.a
+-LIBDTRACE?=	${DESTDIR}${LIBDIR}/libdtrace.a
+-LIBDWARF?=	${DESTDIR}${LIBDIR}/libdwarf.a
+-LIBEDIT?=	${DESTDIR}${LIBDIR}/libedit.a
+-LIBELF?=	${DESTDIR}${LIBDIR}/libelf.a
+-LIBFETCH?=	${DESTDIR}${LIBDIR}/libfetch.a
+ LIBFL?=		"don't use LIBFL, use LIBL"
+-LIBFORM?=	${DESTDIR}${LIBDIR}/libform.a
+-LIBFTPIO?=	${DESTDIR}${LIBDIR}/libftpio.a
+-LIBG2C?=	${DESTDIR}${LIBDIR}/libg2c.a
+-LIBGCC?=	${DESTDIR}${LIBDIR}/libgcc.a
+-LIBGCC_PIC?=	${DESTDIR}${LIBDIR}/libgcc_pic.a
+-LIBGEOM?=	${DESTDIR}${LIBDIR}/libgeom.a
+-LIBGNUREGEX?=	${DESTDIR}${LIBDIR}/libgnuregex.a
+-LIBGSSAPI?=	${DESTDIR}${LIBDIR}/libgssapi.a
+-LIBGSSAPI_KRB5?= ${DESTDIR}${LIBDIR}/libgssapi_krb5.a
+-LIBHDB?=	${DESTDIR}${LIBDIR}/libhdb.a
+-LIBHISTORY?=	${DESTDIR}${LIBDIR}/libhistory.a
+-LIBHEIMNTLM?=	${DESTDIR}${LIBDIR}/libheimntlm.a
+-LIBHX509?=	${DESTDIR}${LIBDIR}/libhx509.a
+-LIBIPSEC?=	${DESTDIR}${LIBDIR}/libipsec.a
++.if exists(${DESTDIR}${LIBARCHDIR}/libform.a)
++LIBFORM?=	${DESTDIR}${LIBARCHDIR}/libform.a
++.else
++LIBFORM?=	${DESTDIR}/usr/lib/libform.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libftpio.a)
++LIBFTPIO?=	${DESTDIR}${LIBARCHDIR}/libftpio.a
++.else
++LIBFTPIO?=	${DESTDIR}/usr/lib/libftpio.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libg2c.a)
++LIBG2C?=	${DESTDIR}${LIBARCHDIR}/libg2c.a
++.else
++LIBG2C?=	${DESTDIR}/usr/lib/libg2c.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libgcc.a)
++LIBGCC?=	${DESTDIR}${LIBARCHDIR}/libgcc.a
++.else
++LIBGCC?=	${DESTDIR}/usr/lib/libgcc.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libgcc_pic.a)
++LIBGCC_PIC?=	${DESTDIR}${LIBARCHDIR}/libgcc_pic.a
++.else
++LIBGCC_PIC?=	${DESTDIR}/usr/lib/libgcc_pic.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libgeom.a)
++LIBGEOM?=	${DESTDIR}${LIBARCHDIR}/libgeom.a
++.else
++LIBGEOM?=	${DESTDIR}/usr/lib/libgeom.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libgnuregex.a)
++LIBGNUREGEX?=	${DESTDIR}${LIBARCHDIR}/libgnuregex.a
++.else
++LIBGNUREGEX?=	${DESTDIR}/usr/lib/libgnuregex.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libgssapi.a)
++LIBGSSAPI?=	${DESTDIR}${LIBARCHDIR}/libgssapi.a
++.else
++LIBGSSAPI?=	${DESTDIR}/usr/lib/libgssapi.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libgssapi_krb5.a)
++LIBGSSAPI_KRB5?= ${DESTDIR}${LIBARCHDIR}/libgssapi_krb5.a
++.else
++LIBGSSAPI_KRB5?= ${DESTDIR}/usr/lib/libgssapi_krb5.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libhdb.a)
++LIBHDB?=	${DESTDIR}${LIBARCHDIR}/libhdb.a
++.else
++LIBHDB?=	${DESTDIR}/usr/lib/libhdb.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libhistory.a)
++LIBHISTORY?=	${DESTDIR}${LIBARCHDIR}/libhistory.a
++.else
++LIBHISTORY?=	${DESTDIR}/usr/lib/libhistory.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libheimntlm.a)
++LIBHEIMNTLM?=	${DESTDIR}${LIBARCHDIR}/libheimntlm.a
++.else
++LIBHEIMNTLM?=	${DESTDIR}/usr/lib/libheimntlm.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libhx509.a)
++LIBHX509?=	${DESTDIR}${LIBARCHDIR}/libhx509.a
++.else
++LIBHX509?=	${DESTDIR}/usr/lib/libhx509.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libipsec.a)
++LIBIPSEC?=	${DESTDIR}${LIBARCHDIR}/libipsec.a
++.else
++LIBIPSEC?=	${DESTDIR}/usr/lib/libipsec.a
++.endif
+ .if ${MK_IPX} != "no"
+-LIBIPX?=	${DESTDIR}${LIBDIR}/libipx.a
++.if exists(${DESTDIR}${LIBARCHDIR}/libipx.a)
++LIBIPX?=	${DESTDIR}${LIBARCHDIR}/libipx.a
++.else
++LIBIPX?=	${DESTDIR}/usr/lib/libipx.a
++.endif
+ .endif
+ .if ${MK_BIND_LIBS} != "no"
+-LIBISC?=	${DESTDIR}${LIBDIR}/libisc.a
+-LIBISCCC?=	${DESTDIR}${LIBDIR}/libisccc.a
+-LIBISCCFG?=	${DESTDIR}${LIBDIR}/libisccfg.a
+-.endif
+-LIBJAIL?=	${DESTDIR}${LIBDIR}/libjail.a
+-LIBKADM5CLNT?=	${DESTDIR}${LIBDIR}/libkadm5clnt.a
+-LIBKADM5SRV?=	${DESTDIR}${LIBDIR}/libkadm5srv.a
+-LIBKAFS5?=	${DESTDIR}${LIBDIR}/libkafs5.a
+-LIBKEYCAP?=	${DESTDIR}${LIBDIR}/libkeycap.a
+-LIBKICONV?=	${DESTDIR}${LIBDIR}/libkiconv.a
+-LIBKRB5?=	${DESTDIR}${LIBDIR}/libkrb5.a
+-LIBKVM?=	${DESTDIR}${LIBDIR}/libkvm.a
+-LIBL?=		${DESTDIR}${LIBDIR}/libl.a
++.if exists(${DESTDIR}${LIBARCHDIR}/libisc.a)
++LIBISC?=	${DESTDIR}${LIBARCHDIR}/libisc.a
++.else
++LIBISC?=	${DESTDIR}/usr/lib/libisc.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libisccc.a)
++LIBISCCC?=	${DESTDIR}${LIBARCHDIR}/libisccc.a
++.else
++LIBISCCC?=	${DESTDIR}/usr/lib/libisccc.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libisccfg.a)
++LIBISCCFG?=	${DESTDIR}${LIBARCHDIR}/libisccfg.a
++.else
++LIBISCCFG?=	${DESTDIR}/usr/lib/libisccfg.a
++.endif
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libjail.a)
++LIBJAIL?=	${DESTDIR}${LIBARCHDIR}/libjail.a
++.else
++LIBJAIL?=	${DESTDIR}/usr/lib/libjail.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libkadm5clnt.a)
++LIBKADM5CLNT?=	${DESTDIR}${LIBARCHDIR}/libkadm5clnt.a
++.else
++LIBKADM5CLNT?=	${DESTDIR}/usr/lib/libkadm5clnt.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libkadm5srv.a)
++LIBKADM5SRV?=	${DESTDIR}${LIBARCHDIR}/libkadm5srv.a
++.else
++LIBKADM5SRV?=	${DESTDIR}/usr/lib/libkadm5srv.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libkafs5.a)
++LIBKAFS5?=	${DESTDIR}${LIBARCHDIR}/libkafs5.a
++.else
++LIBKAFS5?=	${DESTDIR}/usr/lib/libkafs5.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libkeycap.a)
++LIBKEYCAP?=	${DESTDIR}${LIBARCHDIR}/libkeycap.a
++.else
++LIBKEYCAP?=	${DESTDIR}/usr/lib/libkeycap.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libkiconv.a)
++LIBKICONV?=	${DESTDIR}${LIBARCHDIR}/libkiconv.a
++.else
++LIBKICONV?=	${DESTDIR}/usr/lib/libkiconv.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libkrb5.a)
++LIBKRB5?=	${DESTDIR}${LIBARCHDIR}/libkrb5.a
++.else
++LIBKRB5?=	${DESTDIR}/usr/lib/libkrb5.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libkvm.a)
++LIBKVM?=	${DESTDIR}${LIBARCHDIR}/libkvm.a
++.else
++LIBKVM?=	${DESTDIR}/usr/lib/libkvm.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libl.a)
++LIBL?=		${DESTDIR}${LIBARCHDIR}/libl.a
++.else
++LIBL?=		${DESTDIR}/usr/lib/libl.a
++.endif
+ LIBLN?=		"don't use LIBLN, use LIBL"
+ .if ${MK_BIND} != "no"
+-LIBLWRES?=	${DESTDIR}${LIBDIR}/liblwres.a
++.if exists(${DESTDIR}${LIBARCHDIR}/liblwres.a)
++LIBLWRES?=	${DESTDIR}${LIBARCHDIR}/liblwres.a
++.else
++LIBLWRES?=	${DESTDIR}/usr/lib/liblwres.a
++.endif
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/liblzma.a)
++LIBLZMA?=	${DESTDIR}${LIBARCHDIR}/liblzma.a
++.else
++LIBLZMA?=	${DESTDIR}/usr/lib/liblzma.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libm.a)
++LIBM?=		${DESTDIR}${LIBARCHDIR}/libm.a
++.else
++LIBM?=		${DESTDIR}/usr/lib/libm.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libmagic.a)
++LIBMAGIC?=	${DESTDIR}${LIBARCHDIR}/libmagic.a
++.else
++LIBMAGIC?=	${DESTDIR}/usr/lib/libmagic.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libmd.a)
++LIBMD?=		${DESTDIR}${LIBARCHDIR}/libmd.a
++.else
++LIBMD?=		${DESTDIR}/usr/lib/libmd.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libmemstat.a)
++LIBMEMSTAT?=	${DESTDIR}${LIBARCHDIR}/libmemstat.a
++.else
++LIBMEMSTAT?=	${DESTDIR}/usr/lib/libmemstat.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libmenu.a)
++LIBMENU?=	${DESTDIR}${LIBARCHDIR}/libmenu.a
++.else
++LIBMENU?=	${DESTDIR}/usr/lib/libmenu.a
+ .endif
+-LIBLZMA?=	${DESTDIR}${LIBDIR}/liblzma.a
+-LIBM?=		${DESTDIR}${LIBDIR}/libm.a
+-LIBMAGIC?=	${DESTDIR}${LIBDIR}/libmagic.a
+-LIBMD?=		${DESTDIR}${LIBDIR}/libmd.a
+-LIBMEMSTAT?=	${DESTDIR}${LIBDIR}/libmemstat.a
+-LIBMENU?=	${DESTDIR}${LIBDIR}/libmenu.a
+ .if ${MK_SENDMAIL} != "no"
+-LIBMILTER?=	${DESTDIR}${LIBDIR}/libmilter.a
++.if exists(${DESTDIR}${LIBARCHDIR}/libmilter.a)
++LIBMILTER?=	${DESTDIR}${LIBARCHDIR}/libmilter.a
++.else
++LIBMILTER?=	${DESTDIR}/usr/lib/libmilter.a
++.endif
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libmp.a)
++LIBMP?=		${DESTDIR}${LIBARCHDIR}/libmp.a
++.else
++LIBMP?=		${DESTDIR}/usr/lib/libmp.a
+ .endif
+-LIBMP?=		${DESTDIR}${LIBDIR}/libmp.a
+ .if ${MK_NCP} != "no"
+-LIBNCP?=	${DESTDIR}${LIBDIR}/libncp.a
++.if exists(${DESTDIR}${LIBARCHDIR}/libncp.a)
++LIBNCP?=	${DESTDIR}${LIBARCHDIR}/libncp.a
++.else
++LIBNCP?=	${DESTDIR}/usr/lib/libncp.a
++.endif
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libncurses.a)
++LIBNCURSES?=	${DESTDIR}${LIBARCHDIR}/libncurses.a
++.else
++LIBNCURSES?=	${DESTDIR}/usr/lib/libncurses.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libncursesw.a)
++LIBNCURSESW?=	${DESTDIR}${LIBARCHDIR}/libncursesw.a
++.else
++LIBNCURSESW?=	${DESTDIR}/usr/lib/libncursesw.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libnetgraph.a)
++LIBNETGRAPH?=	${DESTDIR}${LIBARCHDIR}/libnetgraph.a
++.else
++LIBNETGRAPH?=	${DESTDIR}/usr/lib/libnetgraph.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libngatm.a)
++LIBNGATM?=	${DESTDIR}${LIBARCHDIR}/libngatm.a
++.else
++LIBNGATM?=	${DESTDIR}/usr/lib/libngatm.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libnvpair.a)
++LIBNVPAIR?=	${DESTDIR}${LIBARCHDIR}/libnvpair.a
++.else
++LIBNVPAIR?=	${DESTDIR}/usr/lib/libnvpair.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libobjc.a)
++LIBOBJC?=	${DESTDIR}${LIBARCHDIR}/libobjc.a
++.else
++LIBOBJC?=	${DESTDIR}/usr/lib/libobjc.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libopie.a)
++LIBOPIE?=	${DESTDIR}${LIBARCHDIR}/libopie.a
++.else
++LIBOPIE?=	${DESTDIR}/usr/lib/libopie.a
+ .endif
+-LIBNCURSES?=	${DESTDIR}${LIBDIR}/libncurses.a
+-LIBNCURSESW?=	${DESTDIR}${LIBDIR}/libncursesw.a
+-LIBNETGRAPH?=	${DESTDIR}${LIBDIR}/libnetgraph.a
+-LIBNGATM?=	${DESTDIR}${LIBDIR}/libngatm.a
+-LIBNVPAIR?=	${DESTDIR}${LIBDIR}/libnvpair.a
+-LIBOBJC?=	${DESTDIR}${LIBDIR}/libobjc.a
+-LIBOPIE?=	${DESTDIR}${LIBDIR}/libopie.a
+ 
+ # The static PAM library doesn't know its secondary dependencies,
+ # so we have to specify them explicitly.
+-LIBPAM?=	${DESTDIR}${LIBDIR}/libpam.a
++.if exists(${DESTDIR}${LIBARCHDIR}/libpam.a)
++LIBPAM?=	${DESTDIR}${LIBARCHDIR}/libpam.a
++.else
++LIBPAM?=	${DESTDIR}/usr/lib/libpam.a
++.endif
+ MINUSLPAM=	-lpam
+ .if defined(LDFLAGS) && !empty(LDFLAGS:M-static)
+ .if ${MK_KERBEROS} != "no"
+@@ -127,38 +447,170 @@ MINUSLPAM+=	-lypclnt
+ .endif
+ .endif
+ 
+-LIBPANEL?=	${DESTDIR}${LIBDIR}/libpanel.a
+-LIBPCAP?=	${DESTDIR}${LIBDIR}/libpcap.a
+-LIBPMC?=	${DESTDIR}${LIBDIR}/libpmc.a
+-LIBPROC?=	${DESTDIR}${LIBDIR}/libproc.a
+-LIBPTHREAD?=	${DESTDIR}${LIBDIR}/libpthread.a
+-LIBRADIUS?=	${DESTDIR}${LIBDIR}/libradius.a
+-LIBREADLINE?=	${DESTDIR}${LIBDIR}/libreadline.a
+-LIBROKEN?=	${DESTDIR}${LIBDIR}/libroken.a
+-LIBRPCSVC?=	${DESTDIR}${LIBDIR}/librpcsvc.a
+-LIBSBUF?=	${DESTDIR}${LIBDIR}/libsbuf.a
+-LIBSDP?=	${DESTDIR}${LIBDIR}/libsdp.a
+-LIBSMB?=	${DESTDIR}${LIBDIR}/libsmb.a
+-LIBSSH?=	${DESTDIR}${LIBDIR}/libssh.a
+-LIBSSL?=	${DESTDIR}${LIBDIR}/libssl.a
+-LIBSTAND?=	${DESTDIR}${LIBDIR}/libstand.a
+-LIBSTDCPLUSPLUS?= ${DESTDIR}${LIBDIR}/libstdc++.a
+-LIBTACPLUS?=	${DESTDIR}${LIBDIR}/libtacplus.a
+-LIBTERMCAP?=	${DESTDIR}${LIBDIR}/libtermcap.a
++.if exists(${DESTDIR}${LIBARCHDIR}/libpanel.a)
++LIBPANEL?=	${DESTDIR}${LIBARCHDIR}/libpanel.a
++.else
++LIBPANEL?=	${DESTDIR}/usr/lib/libpanel.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libpcap.a)
++LIBPCAP?=	${DESTDIR}${LIBARCHDIR}/libpcap.a
++.else
++LIBPCAP?=	${DESTDIR}/usr/lib/libpcap.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libpmc.a)
++LIBPMC?=	${DESTDIR}${LIBARCHDIR}/libpmc.a
++.else
++LIBPMC?=	${DESTDIR}/usr/lib/libpmc.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libproc.a)
++LIBPROC?=	${DESTDIR}${LIBARCHDIR}/libproc.a
++.else
++LIBPROC?=	${DESTDIR}/usr/lib/libproc.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libpthread.a)
++LIBPTHREAD?=	${DESTDIR}${LIBARCHDIR}/libpthread.a
++.else
++LIBPTHREAD?=	${DESTDIR}/usr/lib/libpthread.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libradius.a)
++LIBRADIUS?=	${DESTDIR}${LIBARCHDIR}/libradius.a
++.else
++LIBRADIUS?=	${DESTDIR}/usr/lib/libradius.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libreadline.a)
++LIBREADLINE?=	${DESTDIR}${LIBARCHDIR}/libreadline.a
++.else
++LIBREADLINE?=	${DESTDIR}/usr/lib/libreadline.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libroken.a)
++LIBROKEN?=	${DESTDIR}${LIBARCHDIR}/libroken.a
++.else
++LIBROKEN?=	${DESTDIR}/usr/lib/libroken.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/librpcsvc.a)
++LIBRPCSVC?=	${DESTDIR}${LIBARCHDIR}/librpcsvc.a
++.else
++LIBRPCSVC?=	${DESTDIR}/usr/lib/librpcsvc.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libsbuf.a)
++LIBSBUF?=	${DESTDIR}${LIBARCHDIR}/libsbuf.a
++.else
++LIBSBUF?=	${DESTDIR}/usr/lib/libsbuf.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libsdp.a)
++LIBSDP?=	${DESTDIR}${LIBARCHDIR}/libsdp.a
++.else
++LIBSDP?=	${DESTDIR}/usr/lib/libsdp.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libsmb.a)
++LIBSMB?=	${DESTDIR}${LIBARCHDIR}/libsmb.a
++.else
++LIBSMB?=	${DESTDIR}/usr/lib/libsmb.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libssh.a)
++LIBSSH?=	${DESTDIR}${LIBARCHDIR}/libssh.a
++.else
++LIBSSH?=	${DESTDIR}/usr/lib/libssh.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libssl.a)
++LIBSSL?=	${DESTDIR}${LIBARCHDIR}/libssl.a
++.else
++LIBSSL?=	${DESTDIR}/usr/lib/libssl.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libstand.a)
++LIBSTAND?=	${DESTDIR}${LIBARCHDIR}/libstand.a
++.else
++LIBSTAND?=	${DESTDIR}/usr/lib/libstand.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libstdc++.a)
++LIBSTDCPLUSPLUS?= ${DESTDIR}${LIBARCHDIR}/libstdc++.a
++.else
++LIBSTDCPLUSPLUS?= ${DESTDIR}/usr/lib/libstdc++.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libtacplus.a)
++LIBTACPLUS?=	${DESTDIR}${LIBARCHDIR}/libtacplus.a
++.else
++LIBTACPLUS?=	${DESTDIR}/usr/lib/libtacplus.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libtermcap.a)
++LIBTERMCAP?=	${DESTDIR}${LIBARCHDIR}/libtermcap.a
++.else
++LIBTERMCAP?=	${DESTDIR}/usr/lib/libtermcap.a
++.endif
+ LIBTERMLIB?=	"don't use LIBTERMLIB, use LIBTERMCAP"
+ LIBTINFO?=	"don't use LIBTINFO, use LIBNCURSES"
+-LIBUFS?=	${DESTDIR}${LIBDIR}/libufs.a
+-LIBUGIDFW?=	${DESTDIR}${LIBDIR}/libugidfw.a
+-LIBUMEM?=	${DESTDIR}${LIBDIR}/libumem.a
+-LIBUSBHID?=	${DESTDIR}${LIBDIR}/libusbhid.a
+-LIBUSB?=	${DESTDIR}${LIBDIR}/libusb.a
+-LIBUTIL?=	${DESTDIR}${LIBDIR}/libutil.a
+-LIBUUTIL?=	${DESTDIR}${LIBDIR}/libuutil.a
+-LIBVGL?=	${DESTDIR}${LIBDIR}/libvgl.a
+-LIBWRAP?=	${DESTDIR}${LIBDIR}/libwrap.a
+-LIBXPG4?=	${DESTDIR}${LIBDIR}/libxpg4.a
+-LIBY?=		${DESTDIR}${LIBDIR}/liby.a
+-LIBYPCLNT?=	${DESTDIR}${LIBDIR}/libypclnt.a
+-LIBZ?=		${DESTDIR}${LIBDIR}/libz.a
+-LIBZFS?=	${DESTDIR}${LIBDIR}/libzfs.a
+-LIBZPOOL?=	${DESTDIR}${LIBDIR}/libzpool.a
++.if exists(${DESTDIR}${LIBARCHDIR}/libufs.a)
++LIBUFS?=	${DESTDIR}${LIBARCHDIR}/libufs.a
++.else
++LIBUFS?=	${DESTDIR}/usr/lib/libufs.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libugidfw.a)
++LIBUGIDFW?=	${DESTDIR}${LIBARCHDIR}/libugidfw.a
++.else
++LIBUGIDFW?=	${DESTDIR}/usr/lib/libugidfw.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libumem.a)
++LIBUMEM?=	${DESTDIR}${LIBARCHDIR}/libumem.a
++.else
++LIBUMEM?=	${DESTDIR}/usr/lib/libumem.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libusbhid.a)
++LIBUSBHID?=	${DESTDIR}${LIBARCHDIR}/libusbhid.a
++.else
++LIBUSBHID?=	${DESTDIR}/usr/lib/libusbhid.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libusb.a)
++LIBUSB?=	${DESTDIR}${LIBARCHDIR}/libusb.a
++.else
++LIBUSB?=	${DESTDIR}/usr/lib/libusb.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libutil.a)
++LIBUTIL?=	${DESTDIR}${LIBARCHDIR}/libutil.a
++.else
++LIBUTIL?=	${DESTDIR}/usr/lib/libutil.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libuutil.a)
++LIBUUTIL?=	${DESTDIR}${LIBARCHDIR}/libuutil.a
++.else
++LIBUUTIL?=	${DESTDIR}/usr/lib/libuutil.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libvgl.a)
++LIBVGL?=	${DESTDIR}${LIBARCHDIR}/libvgl.a
++.else
++LIBVGL?=	${DESTDIR}/usr/lib/libvgl.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libwrap.a)
++LIBWRAP?=	${DESTDIR}${LIBARCHDIR}/libwrap.a
++.else
++LIBWRAP?=	${DESTDIR}/usr/lib/libwrap.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libxpg4.a)
++LIBXPG4?=	${DESTDIR}${LIBARCHDIR}/libxpg4.a
++.else
++LIBXPG4?=	${DESTDIR}/usr/lib/libxpg4.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/liby.a)
++LIBY?=		${DESTDIR}${LIBARCHDIR}/liby.a
++.else
++LIBY?=		${DESTDIR}/usr/lib/liby.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libypclnt.a)
++LIBYPCLNT?=	${DESTDIR}${LIBARCHDIR}/libypclnt.a
++.else
++LIBYPCLNT?=	${DESTDIR}/usr/lib/libypclnt.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libz.a)
++LIBZ?=		${DESTDIR}${LIBARCHDIR}/libz.a
++.else
++LIBZ?=		${DESTDIR}/usr/lib/libz.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libzfs.a)
++LIBZFS?=	${DESTDIR}${LIBARCHDIR}/libzfs.a
++.else
++LIBZFS?=	${DESTDIR}/usr/lib/libzfs.a
++.endif
++.if exists(${DESTDIR}${LIBARCHDIR}/libzpool.a)
++LIBZPOOL?=	${DESTDIR}${LIBARCHDIR}/libzpool.a
++.else
++LIBZPOOL?=	${DESTDIR}/usr/lib/libzpool.a
++.endif
