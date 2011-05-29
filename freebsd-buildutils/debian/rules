@@ -137,10 +137,14 @@ install: build
 
 	# remove trash
 	rm -rf 	$(CURDIR)/debian/$(package)/usr/include \
-		$(CURDIR)/debian/$(package)/usr/share/man \
 		$(CURDIR)/debian/$(package)/var
+	find $(CURDIR)/debian/$(package)/usr/share/man -type l | \
+		xargs rm
 
-	# relocate binaries
+	# relocate files
+	for m in `find $(CURDIR)/debian/$(package)/usr/share/man -type f`; do \
+		mv $$m `echo $$m | sed -e 's:\(man[0-9]/\):\1freebsd-:'` ; \
+	done
 	for i in `cd $(CURDIR)/debian/$(package)/usr/lib/freebsd && ls` ; do \
 		ln -s ../lib/freebsd/$$i \
 		$(CURDIR)/debian/$(package)/usr/bin/freebsd-$$i ; \
