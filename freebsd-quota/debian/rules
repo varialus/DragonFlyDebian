@@ -10,8 +10,10 @@ DESTDIR = $(CURDIR)/debian/tmp
 ORIGDIR = $(SOURCE)-$(VERSION)
 TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 
-CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)=' -D'__RCSID(string)='
-PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)=' \
+         -D'__RCSID(string)='
+PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 \
+        NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
 
 get-orig-source:
 	rm -rf $(ORIGDIR)

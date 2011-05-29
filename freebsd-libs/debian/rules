@@ -10,7 +10,8 @@ SHELL = bash
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
-CFLAGS = -Wall -g -pipe -fPIC -I. -I$(CURDIR)/sys -D_GNU_SOURCE -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
+CFLAGS = -Wall -g -pipe -fPIC -I. -I$(CURDIR)/sys -D_GNU_SOURCE \
+         -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -27,7 +28,8 @@ TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
-PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 \
+        NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
 export SHLIB_MAJOR = 0
 kernel = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 

@@ -9,7 +9,9 @@ SHELL=bash
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
-CFLAGS = -Wall -Wno-unknown-pragmas -g -pipe -fPIC -I. -D_GNU_SOURCE -DNEED_SOLARIS_BOOLEAN -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
+CFLAGS = -Wall -Wno-unknown-pragmas -g -pipe -fPIC -I. \
+         -D_GNU_SOURCE -DNEED_SOLARIS_BOOLEAN -D'__FBSDID(string)=' \
+         -D__va_list=__builtin_va_list
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -25,7 +27,8 @@ TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
-PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 \
+        NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
 export SHLIB_MAJOR = 0
 export SHLIBDIR = ./
 
