@@ -25,7 +25,10 @@ TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
-PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) -I$(CURDIR)/debian/local/include" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) \
+        -I$(CURDIR)/debian/local/include" \
+        NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO \
+        DESTDIR=$(DESTDIR) make
 
 build: build-arch build-indep
 
