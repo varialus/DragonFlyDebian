@@ -16,10 +16,13 @@ else
 	CXXFLAGS += -O2
 endif
 
+SOURCE = freebsd-utils
 VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
 SVN = http://svn.freebsd.org/base/release/$(VERSION).0
 #SVN = http://svn.freebsd.org/base/releng/8.1
-ORIGDIR = freebsd-utils-$(VERSION)
+ORIGDIR = $(SOURCE)-$(VERSION)
+TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
+
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
 PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) -I$(CURDIR)/debian/local/include" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
@@ -47,7 +50,7 @@ get-orig-source:
 		 sys/kern/syscalls.c etc/pf.os ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
-	tar --numeric-owner --owner 0 --group 0 -czf ../freebsd-utils_$(VERSION).orig.tar.gz $(ORIGDIR)
+	tar --numeric-owner --owner 0 --group 0 -czf ../$(TARNAME) $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
 lib: lib-stamp

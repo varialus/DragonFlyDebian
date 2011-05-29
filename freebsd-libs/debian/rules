@@ -18,10 +18,13 @@ else
 	CFLAGS += -O2
 endif
 
+SOURCE = freebsd-libs
 VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
 SVN = http://svn.freebsd.org/base/release/$(VERSION).0
 #SVN = http://svn.freebsd.org/base/releng/8.1
-ORIGDIR = freebsd-libs-$(VERSION)
+ORIGDIR = $(SOURCE)-$(VERSION)
+TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
+
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
 PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
@@ -45,7 +48,7 @@ get-orig-source:
 	rm -f $(ORIGDIR)/sys/cam/scsi/scsi_ch.*
 	rm -f $(ORIGDIR)/lib/libkvm/kvm_ia64.c
 	rm -f $(ORIGDIR)/lib/libkvm/kvm_powerpc.c
-	tar -czf ../freebsd-libs_$(VERSION).orig.tar.gz $(ORIGDIR)
+	tar -czf ../$(TARNAME) $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
 ifeq ($(kernel), kfreebsd)

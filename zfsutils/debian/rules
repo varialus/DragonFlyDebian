@@ -17,9 +17,12 @@ else
 	CFLAGS += -O2
 endif
 
+SOURCE = zfsutils
 VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
 SVN = http://svn.freebsd.org/base/release/$(VERSION).0
-ORIGDIR = zfsutils-$(VERSION)
+ORIGDIR = $(SOURCE)-$(VERSION)
+TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
+
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
 PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
@@ -59,7 +62,7 @@ get-orig-source:
 	rm -f $(ORIGDIR)/cddl/compat/opensolaris/include/alloca.h
 	rm -f $(ORIGDIR)/cddl/compat/opensolaris/include/stdlib.h
 	rm -rf $(ORIGDIR)/sys/cddl/contrib/opensolaris/uts/common/zmod
-	tar -czf ../zfsutils_$(VERSION).orig.tar.gz $(ORIGDIR)
+	tar -czf ../$(TARNAME) $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
 build: build-libuutil build-libnvpair build-libzfs build-libumem build-libzpool build-zfsutils build-libavl

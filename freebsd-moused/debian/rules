@@ -14,9 +14,11 @@ else
 	CXXFLAGS += -O2
 endif
 
+SOURCE = freebsd-moused
 VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
 SVN = http://svn.freebsd.org/base/release/$(VERSION).0
-ORIGDIR = freebsd-moused-$(VERSION)
+ORIGDIR = $(SOURCE)-$(VERSION)
+TARNAME =$(SOURCE)_$(VERSION).orig.tar.gz
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
@@ -24,7 +26,7 @@ get-orig-source:
 	for i in usr.sbin/moused ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
-	tar --numeric-owner --owner 0 --group 0 -czf ../freebsd-moused_$(VERSION).orig.tar.gz $(ORIGDIR)
+	tar --numeric-owner --owner 0 --group 0 -czf ../$(TARNAME) $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
 PATH := /usr/lib/freebsd:$(PATH)

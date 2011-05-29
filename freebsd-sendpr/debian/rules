@@ -5,12 +5,12 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-PKG := freebsd-sendpr
-
+SOURCE := freebsd-sendpr
 VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
 FREEBSD_VERSION = $(shell echo $(VERSION) | sed -e 's/^[^+]\++//g')
 SVN = http://svn.freebsd.org/base/release/$(FREEBSD_VERSION).0
-ORIGDIR = $(PKG)-$(VERSION)
+ORIGDIR = $(SOURCE)-$(VERSION)
+TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
@@ -18,10 +18,10 @@ get-orig-source:
 	for i in gnu/usr.bin/send-pr ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
-	tar --numeric-owner --owner 0 --group 0 -czf ../$(PKG)_$(VERSION).orig.tar.gz $(ORIGDIR)
+	tar --numeric-owner --owner 0 --group 0 -czf ../$(TARNAME) $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
-pkgdir := $(CURDIR)/debian/$(PKG)
+pkgdir := $(CURDIR)/debian/$(SOURCE)
 
 PMAKE := freebsd-make DESTDIR=$(pkgdir) BINDIR=/usr/bin
 

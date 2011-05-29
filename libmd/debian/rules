@@ -11,11 +11,13 @@ else
 	CFLAGS += -O2
 endif
 
-PKG = libmd
 DBG = libmd0-dbg
+
+SOURCE = libmd
 VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
 SVN = http://svn.freebsd.org/base/release/$(VERSION).0
-ORIGDIR = $(PKG)-$(VERSION)
+ORIGDIR = $(SOURCE)-$(VERSION)
+TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
@@ -28,7 +30,7 @@ get-orig-source:
 	for i in lib/libmd ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
-	tar -czf ../$(PKG)_$(VERSION).orig.tar.gz $(ORIGDIR)
+	tar -czf ../$(TARNAME) $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
 build-indep:
