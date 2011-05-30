@@ -76,17 +76,17 @@
 +# General rules
 +
 +%.lo: %.c
-+	$(CC) -o $@ $(ALL_CFLAGS) $(CFLAGS) $(INCLUDES) -DPIC -fPIC -c $<
++	$(CC) -o $@ $(CPPFLAGS) $(ALL_CFLAGS) $(CFLAGS) $(INCLUDES) -DPIC -fPIC -c $<
 +
 +%.o: %.c
-+	$(CC) -o $@ $(ALL_CFLAGS) $(CFLAGS) $(INCLUDES) -c $<
++	$(CC) -o $@ $(CPPFLAGS) $(ALL_CFLAGS) $(CFLAGS) $(INCLUDES) -c $<
 +
 +# Objectives
 +
 +all:: libs $(PROG)
 +
 +$(PROG):: $(OBJS)
-+	$(CC) -o $@ $(ALL_CFLAGS) $(CFLAGS) $^ $(LDADD)
++	$(CC) -o $@ $(LDFLAGS) $^ $(LDADD)
 +
 +ifneq (,$(findstring static,$(LIB_type)))
 +LIB_targets += lib$(LIB).a
@@ -101,7 +101,7 @@
 +	ln -fs $^ $@
 +
 +$(SHLIB_SONAME):: $(LIBSOBJS)
-+	gcc -shared -Wl,-soname -Wl,$(SHLIB_SONAME) -o $@ $^ $(LDADD)
++	gcc $(LDFLAGS) -shared -Wl,-soname -Wl,$(SHLIB_SONAME) -o $@ $^ $(LDADD)
 +
 +lib$(LIB).a:: $(LIBOBJS)
 +	ar rcs $@ $^
