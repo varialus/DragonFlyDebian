@@ -8,9 +8,11 @@
 
 DESTDIR = $(CURDIR)/debian/tmp
 
-CFLAGS = -Wall -g
-
 DEB_HOST_ARCH_OS = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+
+CFLAGS := -Wall $(shell dpkg-buildflags --get CFLAGS)
+CPPFLAGS := $(shell dpkg-buildflags --get CPPFLAGS)
+LDFLAGS := $(shell dpkg-buildflags --get LDFLAGS)
 
 # GNU/kFreeBSD already have off_t 64bit. It must not be enabled,
 # as it would change size of ino_t
@@ -18,12 +20,6 @@ ifneq (kfreebsd,$(DEB_HOST_ARCH_OS))
 # really only on other systems, as GNU/kFreeBSD already have off_t 64bit
 # on GNU/kFreeBSD it must not be enabled, as it would change size of ino_t
 CFLAGS += -D_FILE_OFFSET_BITS=64 -I$(CURDIR)/sys
-endif
-
-ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
-else
-	CFLAGS += -O2
 endif
 
 SOURCE = $(shell dpkg-parsechangelog | sed -e '/^Source:/!d' -e 's/^Source: //g')
@@ -49,7 +45,7 @@ get-orig-source:
 build:
 	dh_testdir
 
-	CFLAGS="$(CFLAGS)" LDADD="$(LDADD)" $(MAKE)
+	CPPFLAGS="$(CPPFLAGS)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(MAKE)
 
 clean:
 	dh_testdir
