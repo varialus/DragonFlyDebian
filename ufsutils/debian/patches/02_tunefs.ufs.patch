@@ -1,11 +1,11 @@
 ---
- tunefs.ufs/Makefile |   13 ++++++++-----
- tunefs.ufs/tunefs.c |   15 +++++++++++++++
+ sbin/tunefs/Makefile |   13 ++++++++-----
+ sbin/tunefs/tunefs.c |   15 +++++++++++++++
  2 files changed, 23 insertions(+), 5 deletions(-)
 
---- a/tunefs.ufs/tunefs.c
-+++ b/tunefs.ufs/tunefs.c
-@@ -48,8 +48,15 @@ __FBSDID("$FreeBSD: src/sbin/tunefs/tune
+--- a/sbin/tunefs/tunefs.c
++++ b/sbin/tunefs/tunefs.c
+@@ -48,8 +48,15 @@ __FBSDID("$FreeBSD$");
  #include <sys/mount.h>
  #include <sys/disklabel.h>
  #include <sys/stat.h>
@@ -62,11 +62,11 @@
  	exit(0);
  err:
  	if (disk.d_error != NULL)
---- a/tunefs.ufs/Makefile
-+++ b/tunefs.ufs/Makefile
+--- a/sbin/tunefs/Makefile
++++ b/sbin/tunefs/Makefile
 @@ -1,9 +1,12 @@
  #	@(#)Makefile	8.1 (Berkeley) 6/5/93
- # $FreeBSD: src/sbin/tunefs/Makefile,v 1.8.36.1 2010/02/10 00:26:20 kensmith Exp $
+ # $FreeBSD$
  
 -PROG=	tunefs
 -DPADD=	${LIBUFS}
@@ -76,9 +76,9 @@
 +SRCS = tunefs.c
 +MAN = tunefs.8:tunefs.ufs.8
 +
-+LDADD += -L../libufs -lufs -lbsd
-+INCLUDES = -I../libufs
++LDADD += -L../../lib/libufs -lufs -lbsd
++INCLUDES = -I../../lib/libufs
 +
-+include ../Makefile.common
++include ../../Makefile.common
  
 -.include <bsd.prog.mk>

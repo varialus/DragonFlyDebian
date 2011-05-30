@@ -1,11 +1,11 @@
 ---
- growfs.ufs/Makefile |   20 ++++++++++++--------
- growfs.ufs/growfs.c |    8 +++++++-
+ sbin/growfs/Makefile |   20 ++++++++++++--------
+ sbin/growfs/growfs.c |    8 +++++++-
  2 files changed, 19 insertions(+), 9 deletions(-)
 
---- a/growfs.ufs/growfs.c
-+++ b/growfs.ufs/growfs.c
-@@ -51,10 +51,10 @@ __FBSDID("$FreeBSD: src/sbin/growfs/grow
+--- a/sbin/growfs/growfs.c
++++ b/sbin/growfs/growfs.c
+@@ -51,10 +51,10 @@ __FBSDID("$FreeBSD$");
  
  /* ********************************************************** INCLUDES ***** */
  #include <sys/param.h>
@@ -53,9 +53,9 @@
  
      unlabeled++;
  
---- a/growfs.ufs/Makefile
-+++ b/growfs.ufs/Makefile
-@@ -6,14 +6,18 @@
+--- a/sbin/growfs/Makefile
++++ b/sbin/growfs/Makefile
+@@ -6,14 +6,17 @@
  
  #GFSDBG=
  
@@ -72,7 +72,7 @@
 +endif
 + 
 +WARNS = 6
-+LDADD += -L../libufs -lufs
++LDADD += -L../../lib/libufs -lufs
 +INCLUDES =
  
 -.if defined(GFSDBG)
@@ -80,5 +80,4 @@
 -.endif  
 -
 -.include <bsd.prog.mk>      
-+include ../Makefile.common
-+ 
++include ../../Makefile.common

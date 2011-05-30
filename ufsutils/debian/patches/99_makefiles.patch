@@ -5,14 +5,14 @@
 
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,28 @@
+@@ -0,0 +1,27 @@
 +#
 +# ufsutils Makefile
 +#
 +
-+#SUBDIRS = dump.ufs
-+SUBDIRS = libport libdisklabel libufs badsect.ufs dumpfs.ufs fsck.ufs \
-+	  fsdb.ufs growfs.ufs mkfs.ufs tunefs.ufs ffsinfo
++#SUBDIRS = sbin/dump
++SUBDIRS = port lib/libufs sbin/badsect sbin/dumpfs sbin/fsck_ffs sbin/fsdb \
++	  sbin/growfs sbin/newfs sbin/tunefs sbin/ffsinfo
 +
 +clean_targets = $(addsuffix -clean,$(SUBDIRS))
 +install_targets = $(addsuffix -install,$(SUBDIRS))
@@ -33,10 +33,9 @@
 +	$(MAKE) -C $(subst -install,,$@) install
 +
 +.PHONY: all clean install $(SUBDIRS) $(clean_targets) $(install_targets)
-+
 --- /dev/null
 +++ b/Makefile.common
-@@ -0,0 +1,92 @@
+@@ -0,0 +1,91 @@
 +#
 +# $Id: Makefile.common 45 2004-05-03 11:07:29Z guillem $
 +#
@@ -51,7 +50,7 @@
 +
 +#LDADD += -lbsd
 +CFLAGS ?= -Wall -g -O2
-+ALL_CFLAGS += -I../include -include port/port.h -include bsd/bsd.h -D_GNU_SOURCE
++ALL_CFLAGS += -I../../port -include port.h -include bsd/bsd.h -D_GNU_SOURCE
 +# -DHAVE_BSD_ERRNO -DHAVE_BSD_SIGNALS -DHAVE_BSD_STATFS -DHAVE_BSD_DISKLABEL -DHAVE_BSD_MOUNT -DHAVE_UFS_SNAPSHOT -DHAVE_BSD_SYSCTL
 +
 +INSTALL = install
@@ -128,4 +127,3 @@
 +	$(INSTALL_DATA) lib$(LIB).so $(DESTDIR)$(libdir)/lib$(LIB).so
 +	$(INSTALL_DATA) $(SHLIB_SONAME) $(DESTDIR)$(libdir)/$(SHLIB_SONAME)
 +endif
-+

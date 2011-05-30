@@ -1,10 +1,10 @@
 ---
- dumpfs.ufs/Makefile |   14 +++++++++-----
- dumpfs.ufs/dumpfs.c |    1 +
+ sbin/dumpfs/Makefile |   14 +++++++++-----
+ sbin/dumpfs/dumpfs.c |    1 +
  2 files changed, 10 insertions(+), 5 deletions(-)
 
---- a/dumpfs.ufs/dumpfs.c
-+++ b/dumpfs.ufs/dumpfs.c
+--- a/sbin/dumpfs/dumpfs.c
++++ b/sbin/dumpfs/dumpfs.c
 @@ -68,6 +68,7 @@ static const char rcsid[] =
  #include <fcntl.h>
  #include <fstab.h>
@@ -13,11 +13,11 @@
  #include <stdint.h>
  #include <stdio.h>
  #include <stdlib.h>
---- a/dumpfs.ufs/Makefile
-+++ b/dumpfs.ufs/Makefile
+--- a/sbin/dumpfs/Makefile
++++ b/sbin/dumpfs/Makefile
 @@ -1,9 +1,13 @@
  #	@(#)Makefile	8.1 (Berkeley) 6/5/93
- # $FreeBSD: src/sbin/dumpfs/Makefile,v 1.9.34.1 2010/02/10 00:26:20 kensmith Exp $
+ # $FreeBSD$
  
 -PROG=	dumpfs
 -DPADD=	${LIBUFS}
@@ -28,9 +28,9 @@
 +WARNS = 0
 +MAN = dumpfs.8:dumpfs.ufs.8
 +
-+LDADD += -L../libufs/ -lufs -lbsd
-+INCLUDES = -I../libufs
++LDADD += -L../../lib/libufs/ -lufs -lbsd
++INCLUDES = -I../../lib/libufs
 +
-+include ../Makefile.common
++include ../../Makefile.common
  
 -.include <bsd.prog.mk>

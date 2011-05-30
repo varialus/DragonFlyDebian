@@ -1,11 +1,11 @@
 ---
- bsdlabel/Makefile   |   16 ++++++----------
- bsdlabel/bsdlabel.c |   21 +++++++++++++++++++--
+ sbin/bsdlabel/Makefile   |   16 ++++++----------
+ sbin/bsdlabel/bsdlabel.c |   21 +++++++++++++++++++--
  2 files changed, 25 insertions(+), 12 deletions(-)
 
---- a/bsdlabel/bsdlabel.c
-+++ b/bsdlabel/bsdlabel.c
-@@ -60,7 +60,9 @@ __FBSDID("$FreeBSD: src/sbin/bsdlabel/bs
+--- a/sbin/bsdlabel/bsdlabel.c
++++ b/sbin/bsdlabel/bsdlabel.c
+@@ -60,7 +60,9 @@ __FBSDID("$FreeBSD$");
  #include <sys/file.h>
  #include <sys/stat.h>
  #include <sys/wait.h>
@@ -15,7 +15,7 @@
  #define DKTYPENAMES
  #define FSTYPENAMES
  #include <sys/disklabel.h>
-@@ -68,7 +70,7 @@ __FBSDID("$FreeBSD: src/sbin/bsdlabel/bs
+@@ -68,7 +70,7 @@ __FBSDID("$FreeBSD$");
  #include <unistd.h>
  #include <string.h>
  #include <stdio.h>
@@ -83,8 +83,8 @@
  		loclab.d_ntracks = 1;
  	else if (loclab.d_secperunit <= 63*16*1024)
  		loclab.d_ntracks = 16;
---- a/bsdlabel/Makefile
-+++ b/bsdlabel/Makefile
+--- a/sbin/bsdlabel/Makefile
++++ b/sbin/bsdlabel/Makefile
 @@ -4,14 +4,8 @@
  .PATH: ${.CURDIR}/../../sys/geom
  
@@ -97,7 +97,7 @@
 -LINKS=	${BINDIR}/bsdlabel ${BINDIR}/disklabel
 -MLINKS=	bsdlabel.8 disklabel.8
 -.endif
-+SRCS=	bsdlabel.c ../libdisklabel/geom_bsd_enc.c
++SRCS=	bsdlabel.c ../../libdisklabel/geom_bsd_enc.c
 +MAN = bsdlabel.8:bsdlabel.8
  
  DPADD=	${LIBGEOM}
@@ -113,4 +113,4 @@
 -	sh -x ${.CURDIR}/runtest.sh
 +	sh -x ${CURDIR}/runtest.sh
 +
-+include ../Makefile.common
++include ../../Makefile.common

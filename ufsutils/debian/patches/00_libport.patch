@@ -1,12 +1,23 @@
 ---
- include/port/blockdev.h |    9 ++++
- include/port/port.h     |   22 +++++++++++
- libport/Makefile        |   13 ++++++
- libport/blockdev.c      |   92 ++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 136 insertions(+)
+ port/Makefile       |   12 ++++++
+ port/blockdev.c     |   92 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ port/blockdev.h     |    8 ++++
+ port/getdisklabel.c |    7 +++
+ port/port.h         |   22 ++++++++++++
+ 5 files changed, 141 insertions(+)
 
 --- /dev/null
-+++ b/include/port/port.h
++++ b/port/getdisklabel.c
+@@ -0,0 +1,7 @@
++#include <stdlib.h>
++#include <sys/disklabel.h>
++
++struct disklabel *getdiskbyname(const char *name)
++{
++	return NULL;
++}
+--- /dev/null
++++ b/port/port.h
 @@ -0,0 +1,22 @@
 +#ifndef LIBPORT_H
 +#define LIBPORT_H
@@ -31,7 +42,7 @@
 +
 +#endif
 --- /dev/null
-+++ b/libport/blockdev.c
++++ b/port/blockdev.c
 @@ -0,0 +1,92 @@
 +/*
 + * Copyright (C) 2004 Guillem Jover <guillem@debian.org>
@@ -79,7 +90,7 @@
 +#endif
 +#include <sys/stat.h>
 +#include <unistd.h>
-+#include <port/blockdev.h>
++#include "blockdev.h"
 +
 +static const int sector_size = 512;
 +
@@ -126,8 +137,8 @@
 +	return size;
 +}
 --- /dev/null
-+++ b/include/port/blockdev.h
-@@ -0,0 +1,9 @@
++++ b/port/blockdev.h
+@@ -0,0 +1,8 @@
 +#ifndef LIBPORT_BLOCKDEV_H
 +#define LIBPORT_BLOCKDEV_H
 +
@@ -136,13 +147,12 @@
 +int64_t get_block_device_size(int fd);
 +
 +#endif
-+
 --- /dev/null
-+++ b/libport/Makefile
-@@ -0,0 +1,13 @@
++++ b/port/Makefile
+@@ -0,0 +1,12 @@
 +LIB = port
 +LIB_type = static
-+LIBSRCS = blockdev.c
++LIBSRCS = blockdev.c getdisklabel.c
 +
 +ALL_CFLAGS = -D_LIBPORT
 +ifdef LIBPORT_DEBUG
@@ -152,4 +162,3 @@
 +INCLUDES =
 +
 +include ../Makefile.common
-+

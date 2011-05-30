@@ -1,26 +1,26 @@
 ---
- ffsinfo/Makefile |   18 +++++++-----------
+ sbin/ffsinfo/Makefile |   18 +++++++-----------
  1 file changed, 7 insertions(+), 11 deletions(-)
 
---- a/ffsinfo/Makefile
-+++ b/ffsinfo/Makefile
+--- a/sbin/ffsinfo/Makefile
++++ b/sbin/ffsinfo/Makefile
 @@ -4,16 +4,12 @@
- # $FreeBSD: src/sbin/ffsinfo/Makefile,v 1.7.32.1 2010/02/10 00:26:20 kensmith Exp $
+ # $FreeBSD$
  #
  
 -GROWFS= ${.CURDIR}/../growfs
 -.PATH: ${GROWFS}
 +PROG = ffsinfo
-+SRCS = ffsinfo.c ../growfs.ufs/debug.c
++SRCS = ffsinfo.c ../growfs/debug.c
 +MAN = ffsinfo.8:ffsinfo.8
  
 -PROG=	ffsinfo
 -SRCS=	ffsinfo.c debug.c
 -MAN=	ffsinfo.8
-+ALL_CFLAGS = -DFS_DEBUG -I../growfs.ufs -I../libufs
-+LDADD += -L../libufs -lufs -lbsd
++ALL_CFLAGS = -DFS_DEBUG -I../growfs -I../../lib/libufs
++LDADD += -L../../lib/libufs -lufs -lbsd
 +
-+include ../Makefile.common
++include ../../Makefile.common
  
 -WARNS?=	0
 -CFLAGS+=-DFS_DEBUG -I${GROWFS}

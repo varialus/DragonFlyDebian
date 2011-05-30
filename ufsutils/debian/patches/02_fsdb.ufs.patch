@@ -1,12 +1,12 @@
 ---
- fsdb.ufs/Makefile   |   20 +++++++++-----------
- fsdb.ufs/fsdb.8     |    2 +-
- fsdb.ufs/fsdb.c     |   14 +++++++++++++-
- fsdb.ufs/fsdbutil.c |   13 ++++++++++++-
+ sbin/fsdb/Makefile   |   20 +++++++++-----------
+ sbin/fsdb/fsdb.8     |    2 +-
+ sbin/fsdb/fsdb.c     |   14 +++++++++++++-
+ sbin/fsdb/fsdbutil.c |   13 ++++++++++++-
  4 files changed, 35 insertions(+), 14 deletions(-)
 
---- a/fsdb.ufs/fsdb.8
-+++ b/fsdb.ufs/fsdb.8
+--- a/sbin/fsdb/fsdb.8
++++ b/sbin/fsdb/fsdb.8
 @@ -263,7 +263,7 @@ There are a bunch of other things that y
  .Nm
  does not implement.
@@ -16,8 +16,8 @@
  beyond what
  .Xr fsck 8
  can repair.
---- a/fsdb.ufs/fsdb.c
-+++ b/fsdb.ufs/fsdb.c
+--- a/sbin/fsdb/fsdb.c
++++ b/sbin/fsdb/fsdb.c
 @@ -35,13 +35,13 @@ static const char rcsid[] =
  
  #include <sys/param.h>
@@ -52,8 +52,8 @@
  static void 
  usage(void)
  {
---- a/fsdb.ufs/fsdbutil.c
-+++ b/fsdb.ufs/fsdbutil.c
+--- a/sbin/fsdb/fsdbutil.c
++++ b/sbin/fsdb/fsdbutil.c
 @@ -41,7 +41,6 @@ static const char rcsid[] =
  #include <stdint.h>
  #include <string.h>
@@ -81,11 +81,11 @@
  static int charsperline(void);
  static int printindir(ufs2_daddr_t blk, int level, char *bufp);
  static void printblocks(ino_t inum, union dinode *dp);
---- a/fsdb.ufs/Makefile
-+++ b/fsdb.ufs/Makefile
-@@ -2,15 +2,13 @@
+--- a/sbin/fsdb/Makefile
++++ b/sbin/fsdb/Makefile
+@@ -2,15 +2,12 @@
  #	@(#)Makefile	8.1 (Berkeley) 6/5/93
- # $FreeBSD: src/sbin/fsdb/Makefile,v 1.19.24.1 2010/02/10 00:26:20 kensmith Exp $
+ # $FreeBSD$
  
 -PROG=	fsdb
 -MAN=	fsdb.8
@@ -101,10 +101,9 @@
 +MAN = fsdb.8:fsdb.ufs.8
 +SRCS = fsdb.c fsdbutil.c
 +WARNS = 0
-+LDADD += -ledit -ltermcap -L../libufs -lufs -lbsd -L../fsck.ufs -lfsck.ufs
++LDADD += -ledit -ltermcap -L../../lib/libufs -lufs -lbsd -L../fsck_ffs -lfsck.ufs
 +DPADD += ${LIBEDIT} ${LIBTERMCAP}
-+INCLUDES = -I../fsck.ufs
++INCLUDES = -I../fsck_ffs
  
 -.include <bsd.prog.mk>
-+include ../Makefile.common
-+ 
++include ../../Makefile.common
