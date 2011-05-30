@@ -1,7 +1,7 @@
 ---
- sbin/growfs/Makefile |   20 ++++++++++++--------
+ sbin/growfs/Makefile |   16 ++++++++++------
  sbin/growfs/growfs.c |    8 +++++++-
- 2 files changed, 19 insertions(+), 9 deletions(-)
+ 2 files changed, 17 insertions(+), 7 deletions(-)
 
 --- a/sbin/growfs/growfs.c
 +++ b/sbin/growfs/growfs.c
@@ -17,7 +17,7 @@
  
  #include <stdio.h>
  #include <paths.h>
-@@ -1929,10 +1929,12 @@ get_dev_size(int fd, int *size)
+@@ -1925,10 +1925,12 @@ get_dev_size(int fd, int *size)
     int sectorsize;
     off_t mediasize;
  
@@ -30,7 +30,7 @@
  
     if (sectorsize <= 0)
         errx(1, "bogus sectorsize: %d", sectorsize);
-@@ -2288,9 +2290,11 @@ return_disklabel(int fd, struct disklabe
+@@ -2285,9 +2287,11 @@ return_disklabel(int fd, struct disklabe
  		}
  		lp->d_checksum=sum;
  
@@ -42,7 +42,7 @@
  	}
  	free(lp);
  
-@@ -2314,8 +2318,10 @@ get_disklabel(int fd)
+@@ -2311,8 +2315,10 @@ get_disklabel(int fd)
  	if (!lab)
  		errx(1, "malloc failed");
  
@@ -55,29 +55,26 @@
  
 --- a/sbin/growfs/Makefile
 +++ b/sbin/growfs/Makefile
-@@ -6,14 +6,17 @@
+@@ -6,12 +6,16 @@
  
  #GFSDBG=
  
 -PROG=   growfs
-+PROG=   growfs.ufs
++PROG=	growfs.ufs
  SRCS=   growfs.c
 -MAN=	growfs.8
 +MAN=	growfs.8:growfs.ufs.8
  
--WARNS?=	6
+-.if defined(GFSDBG)
+-SRCS+=  debug.c
+-.endif  
 +ifdef GFSDBG
 +SRCS +=  debug.c
 +ALL_CFLAGS = -DFS_DEBUG
 +endif
-+ 
-+WARNS = 6
+ 
+-.include <bsd.prog.mk>      
 +LDADD += -L../../lib/libufs -lufs
 +INCLUDES =
- 
--.if defined(GFSDBG)
--SRCS+=  debug.c
--.endif  
--
--.include <bsd.prog.mk>      
++
 +include ../../Makefile.common

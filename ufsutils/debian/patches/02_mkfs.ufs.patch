@@ -1,8 +1,9 @@
 ---
- sbin/newfs/Makefile |   23 +++++++++++++----------
+ sbin/newfs/Makefile |   22 ++++++++++------------
  sbin/newfs/mkfs.c   |    1 +
- sbin/newfs/newfs.c  |   21 +++++++++++++++++----
- 3 files changed, 31 insertions(+), 14 deletions(-)
+ sbin/newfs/newfs.8  |    4 ++--
+ sbin/newfs/newfs.c  |   22 ++++++++++++++++++----
+ 4 files changed, 31 insertions(+), 18 deletions(-)
 
 --- a/sbin/newfs/mkfs.c
 +++ b/sbin/newfs/mkfs.c
@@ -16,53 +17,55 @@
  #include <sys/types.h>
 --- a/sbin/newfs/newfs.c
 +++ b/sbin/newfs/newfs.c
-@@ -55,7 +55,6 @@ __FBSDID("$FreeBSD$");
+@@ -55,7 +55,9 @@ __FBSDID("$FreeBSD$");
   */
  #include <sys/param.h>
  #include <sys/stat.h>
--#include <sys/disk.h>
++#ifdef HAVE_BSD_DISKLABEL
+ #include <sys/disk.h>
++#endif
  #include <sys/disklabel.h>
  #include <sys/file.h>
  #include <sys/mount.h>
-@@ -140,6 +139,7 @@ struct uufsd disk;		/* libufs disk struc
- static char	device[MAXPATHLEN];
- static char	*disktype;
- static int	unlabeled;
-+static char	*progname;
- 
- static struct disklabel *getdisklabel(char *s);
- static void rewritelabel(char *s, struct disklabel *lp);
-@@ -156,6 +156,8 @@ main(int argc, char *argv[])
- 	int ch, i;
+@@ -133,6 +135,8 @@ main(int argc, char *argv[])
  	off_t mediasize;
+ 	char part_name;		/* partition name, default to full disk */
  
-+	progname = argv[0];
++	setprogname(argv[0]);
 +
+ 	part_name = 'c';
+ 	reserved = 0;
  	while ((ch = getopt(argc, argv,
- 	    "EJL:NO:RS:T:Ua:b:c:d:e:f:g:h:i:lm:no:s:")) != -1)
- 		switch (ch) {
-@@ -297,12 +299,19 @@ main(int argc, char *argv[])
+@@ -303,8 +307,9 @@ main(int argc, char *argv[])
  	}
  	if (fstat(disk.d_fd, &st) < 0)
  		err(1, "%s", special);
-+/*
- 	if ((st.st_mode & S_IFMT) != S_IFCHR)
- 		errx(1, "%s: not a character-special device", special);
-+*/
- 
+-	if ((st.st_mode & S_IFMT) != S_IFCHR) {
+-		warn("%s: not a character-special device", special);
++	if ((st.st_mode & S_IFMT) != S_IFCHR &&
++	    (st.st_mode & S_IFMT) != S_IFBLK) {
++		warn("%s: not a block or character-special device", special);
+ 		is_file = 1;	/* assume it is a file */
+ 		dkname = special;
+ 		if (sectorsize == 0)
+@@ -312,10 +317,15 @@ main(int argc, char *argv[])
+ 		mediasize = st.st_size;
+ 		/* set fssize from the partition */
+ 	} else {
 +#ifdef HAVE_BSD_DISKLABEL
- 	if (sectorsize == 0)
- 		ioctl(disk.d_fd, DIOCGSECTORSIZE, &sectorsize);
--	if (sectorsize && !ioctl(disk.d_fd, DIOCGMEDIASIZE, &mediasize)) {
+ 	    if (sectorsize == 0)
+ 		if (ioctl(disk.d_fd, DIOCGSECTORSIZE, &sectorsize) == -1)
+ 		    sectorsize = 0;	/* back out on error for safety */
+-	    if (sectorsize && ioctl(disk.d_fd, DIOCGMEDIASIZE, &mediasize) != -1)
 +#else
-+	sectorsize = 512;
++	    sectorsize = 512;
 +#endif
-+	mediasize = get_block_device_size(disk.d_fd);
-+	if (sectorsize && mediasize) {
- 		if (fssize == 0)
- 			fssize = mediasize / sectorsize;
- 		else if (fssize > mediasize / sectorsize)
-@@ -375,7 +384,7 @@ main(int argc, char *argv[])
++	    mediasize = get_block_device_size(disk.d_fd);
++	    if (sectorsize && mediasize)
+ 		getfssize(&fssize, special, mediasize / sectorsize, reserved);
+ 	}
+ 	pp = NULL;
+@@ -370,7 +380,7 @@ main(int argc, char *argv[])
  			pp->p_size *= secperblk;
  	}
  	mkfs(pp, special);
@@ -71,64 +74,51 @@
  		if (realsectorsize != DEV_BSIZE)
  			pp->p_size /= realsectorsize / DEV_BSIZE;
  		if (!Nflag && bcmp(pp, &oldpartition, sizeof(oldpartition)))
-@@ -388,6 +397,7 @@ main(int argc, char *argv[])
- struct disklabel *
- getdisklabel(char *s)
- {
-+#if HAVE_BSD_DISKLABEL
- 	static struct disklabel lab;
- 	struct disklabel *lp;
- 
-@@ -399,6 +409,7 @@ getdisklabel(char *s)
- 		if (lp != NULL)
- 			return (lp);
+@@ -415,8 +425,10 @@ getdisklabel(char *s)
+ 		return &lab;
  	}
-+#endif
- 	return (NULL);
- }
  
-@@ -409,8 +420,10 @@ rewritelabel(char *s, struct disklabel *
- 		return;
- 	lp->d_checksum = 0;
- 	lp->d_checksum = dkcksum(lp);
 +#if HAVE_BSD_DISKLABEL
- 	if (ioctl(disk.d_fd, DIOCWDINFO, (char *)lp) < 0)
+ 	if (ioctl(disk.d_fd, DIOCGDINFO, (char *)&lab) != -1)
+ 		return (&lab);
++#endif
+ 	unlabeled++;
+ 	if (disktype) {
+ 		lp = getdiskbyname(disktype);
+@@ -441,8 +453,10 @@ rewritelabel(char *s, struct disklabel *
+ 			errx(1, "cannot write label");
+ 		return;
+ 	}
++#if HAVE_BSD_DISKLABEL
+ 	if (ioctl(disk.d_fd, DIOCWDINFO, (char *)lp) == -1)
  		warn("ioctl (WDINFO): %s: can't rewrite disk label", s);
 +#endif
  }
  
  static void
-@@ -418,7 +431,7 @@ usage()
- {
- 	fprintf(stderr,
- 	    "usage: %s [ -fsoptions ] special-device%s\n",
--	    getprogname(),
-+	    progname,
- 	    " [device-type]");
- 	fprintf(stderr, "where fsoptions are:\n");
- 	fprintf(stderr, "\t-J Enable journaling via gjournal\n");
 --- a/sbin/newfs/Makefile
 +++ b/sbin/newfs/Makefile
-@@ -1,17 +1,19 @@
+@@ -1,20 +1,18 @@
  #	@(#)Makefile	8.2 (Berkeley) 3/27/94
  # $FreeBSD$
  
+-.PATH: ${.CURDIR}/../../sys/geom
+-
 -PROG=	newfs
 -DPADD=	${LIBUFS}
 -LDADD=	-lufs
--SRCS=	newfs.c mkfs.c
--WARNS?=	2
+-SRCS=	newfs.c mkfs.c geom_bsd_enc.c
+-
++PROG=	mkfs.ufs
++SRCS=	newfs.c mkfs.c ../../sys/geom/geom_bsd_enc.c
+ WARNS?=	2
 -MAN=	newfs.8
-+PROG = mkfs.ufs
-+SRCS = newfs.c mkfs.c
-+WARNS ?= 2
-+MAN = newfs.8:mkfs.ufs.8
++MAN=	newfs.8:mkfs.ufs.8
++
++LDADD += -L../../lib/libufs -lufs -L../../port -lport -lbsd
++INCLUDES = -I../../lib/libufs -include ../../port/blockdev.h
  
 -.include <bsd.prog.mk>
-+LDADD += -L../../lib/libufs -lufs -L../../port -lport -lbsd
-+INCLUDES = -I../../lib/libufs \
-+           -include ../../port/blockdev.h
-+
 +include ../../Makefile.common
  
  test:	${PROG}
@@ -139,3 +129,18 @@
 +	sh ${CURDIR}/runtest00.sh | tee _.test
 +	diff --ignore-matching-lines=FreeBSD _.test ${CURDIR}/ref.test
  	echo All Tests Passed
+--- a/sbin/newfs/newfs.8
++++ b/sbin/newfs/newfs.8
+@@ -78,10 +78,10 @@ The following options define the general
+ .It Fl E
+ Erase the content of the disk before making the filesystem.
+ The reserved area in front of the superblock (for bootcode) will not be erased.
+-
++.Pp
+ This is a relevant option for flash based storage devices that use
+ wear levelling algorithms.
+-
++.Pp
+ NB: Erasing may take as long time as writing every sector on the disk.
+ .It Fl J
+ Enable journaling on the new file system via gjournal.

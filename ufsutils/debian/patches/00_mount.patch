@@ -37,15 +37,15 @@
  #define	STATFS_VERSION	0x20030518	/* current version number */
  struct statfs {
  	uint32_t f_version;		/* structure version number */
-@@ -224,6 +221,7 @@ void          __mnt_vnode_markerfree(str
+@@ -220,6 +217,7 @@ void          __mnt_vnode_markerfree(str
  } while (0)
  
  #endif /* _KERNEL */
 +#endif
  
  /*
-  * User specifiable flags.
-@@ -404,6 +402,7 @@ struct nfs_public {
+  * User specifiable flags, stored in mnt_flag.
+@@ -415,6 +413,7 @@ struct nfs_public {
  	char		*np_index;	/* Index file */
  };
  
@@ -53,7 +53,7 @@
  /*
   * Filesystem configuration information. One of these exists for each
   * type of filesystem supported by the kernel. These are searched at
-@@ -441,6 +440,7 @@ struct ovfsconf {
+@@ -452,6 +451,7 @@ struct ovfsconf {
  	int	vfc_flags;
  };
  #endif
@@ -61,7 +61,7 @@
  
  /*
   * NB: these flags refer to IMPLEMENTATION properties, not properties of
-@@ -505,6 +505,7 @@ struct vfsquery {
+@@ -517,6 +517,7 @@ struct vfsquery {
  #define VQ_FLAG4000	0x4000	/* placeholder */
  #define VQ_FLAG8000	0x8000	/* placeholder */
  
@@ -69,7 +69,7 @@
  #ifdef _KERNEL
  /* Point a sysctl request at a vfsidctl's data. */
  #define VCTLTOREQ(vc, req)						\
-@@ -766,5 +767,5 @@ int	getvfsbyname(const char *, struct xv
+@@ -794,5 +795,5 @@ int	getvfsbyname(const char *, struct xv
  __END_DECLS
  
  #endif /* _KERNEL */
