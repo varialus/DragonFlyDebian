@@ -19,7 +19,7 @@ LDFLAGS := $(shell dpkg-buildflags --get LDFLAGS)
 ifneq (kfreebsd,$(DEB_HOST_ARCH_OS))
 # really only on other systems, as GNU/kFreeBSD already have off_t 64bit
 # on GNU/kFreeBSD it must not be enabled, as it would change size of ino_t
-CFLAGS += -D_FILE_OFFSET_BITS=64 -I$(CURDIR)/sys
+CFLAGS += -D_FILE_OFFSET_BITS=64
 endif
 
 SOURCE = $(shell dpkg-parsechangelog | sed -e '/^Source:/!d' -e 's/^Source: //g')
