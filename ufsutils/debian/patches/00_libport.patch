@@ -1,13 +1,13 @@
 ---
- port/Makefile       |   12 ++++++
- port/blockdev.c     |   92 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- port/blockdev.h     |    8 ++++
- port/getdisklabel.c |    7 +++
- port/port.h         |   22 ++++++++++++
+ lib/port/Makefile       |   12 ++++++
+ lib/port/blockdev.c     |   92 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ lib/port/blockdev.h     |    8 ++++
+ lib/port/getdisklabel.c |    7 +++
+ lib/port/port.h         |   22 ++++++++++++
  5 files changed, 141 insertions(+)
 
 --- /dev/null
-+++ b/port/getdisklabel.c
++++ b/lib/port/getdisklabel.c
 @@ -0,0 +1,7 @@
 +#include <stdlib.h>
 +#include <sys/disklabel.h>
@@ -17,7 +17,7 @@
 +	return NULL;
 +}
 --- /dev/null
-+++ b/port/port.h
++++ b/lib/port/port.h
 @@ -0,0 +1,22 @@
 +#ifndef LIBPORT_H
 +#define LIBPORT_H
@@ -42,7 +42,7 @@
 +
 +#endif
 --- /dev/null
-+++ b/port/blockdev.c
++++ b/lib/port/blockdev.c
 @@ -0,0 +1,92 @@
 +/*
 + * Copyright (C) 2004 Guillem Jover <guillem@debian.org>
@@ -137,7 +137,7 @@
 +	return size;
 +}
 --- /dev/null
-+++ b/port/blockdev.h
++++ b/lib/port/blockdev.h
 @@ -0,0 +1,8 @@
 +#ifndef LIBPORT_BLOCKDEV_H
 +#define LIBPORT_BLOCKDEV_H
@@ -148,7 +148,7 @@
 +
 +#endif
 --- /dev/null
-+++ b/port/Makefile
++++ b/lib/port/Makefile
 @@ -0,0 +1,12 @@
 +LIB = port
 +LIB_type = static
@@ -161,4 +161,4 @@
 +
 +INCLUDES =
 +
-+include ../Makefile.common
++include ../../Makefile.common
