@@ -4,7 +4,7 @@
 
 --- a/usr.sbin/moused/moused.c
 +++ b/usr.sbin/moused/moused.c
-@@ -45,7 +45,6 @@
+@@ -45,10 +45,10 @@
   **/
  
  #include <sys/cdefs.h>
@@ -12,21 +12,17 @@
  
  #include <sys/param.h>
  #include <sys/consio.h>
-@@ -72,6 +71,7 @@ __FBSDID("$FreeBSD$");
- #include <syslog.h>
- #include <termios.h>
- #include <unistd.h>
 +#include <sys/ttycom.h>
- 
- #define MAX_CLICKTHRESHOLD	2000	/* 2 seconds */
- #define MAX_BUTTON2TIMEOUT	2000	/* 2 seconds */
-@@ -466,8 +466,7 @@ static void	moused(void);
- static void	hup(int sig);
+ #include <sys/mouse.h>
+ #include <sys/socket.h>
+ #include <sys/stat.h>
+@@ -533,8 +533,7 @@ static void	hup(int sig);
  static void	cleanup(int sig);
+ static void	pause_mouse(int sig);
  static void	usage(void);
 -static void	log_or_warn(int log_pri, int errnum, const char *fmt, ...)
 -		    __printflike(3, 4);
 +static void	log_or_warn(int log_pri, int errnum, const char *fmt, ...);
  
  static int	r_identify(void);
- static char	*r_if(int type);
+ static const char *r_if(int type);

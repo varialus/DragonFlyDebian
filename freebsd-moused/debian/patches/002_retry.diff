@@ -9,7 +9,7 @@ Status: sent upstream
 
 --- a/usr.sbin/moused/moused.c
 +++ b/usr.sbin/moused/moused.c
-@@ -755,9 +755,9 @@ main(int argc, char *argv[])
+@@ -878,9 +878,9 @@ main(int argc, char *argv[])
  	usage();
      }
  
@@ -21,10 +21,10 @@ Status: sent upstream
  	    retry = 5;
      }
  
-@@ -767,7 +767,7 @@ main(int argc, char *argv[])
- 	    signal(SIGINT , cleanup);
+@@ -891,7 +891,7 @@ main(int argc, char *argv[])
  	    signal(SIGQUIT, cleanup);
  	    signal(SIGTERM, cleanup);
+ 	    signal(SIGUSR1, pause_mouse);
 -	    for (i = 0; i < retry; ++i) {
 +	    for (i = 0; i < retry || retry == 0; ++i) {
  		if (i > 0)
