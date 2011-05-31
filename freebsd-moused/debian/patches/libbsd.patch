@@ -1,25 +1,26 @@
 ---
- usr.sbin/moused/Makefile |    1 +
+ usr.sbin/moused/Makefile |    2 +-
  usr.sbin/moused/moused.c |    1 +
- 2 files changed, 2 insertions(+)
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
 --- a/usr.sbin/moused/Makefile
 +++ b/usr.sbin/moused/Makefile
-@@ -2,6 +2,7 @@
- 
- PROG=	moused
- MAN=	moused.8
-+LDADD=	-lbsd
- 
+@@ -6,7 +6,7 @@ MAN=	moused.8
  WARNS?=6
  
+ DPADD=	${LIBRT}  ${LIBM}
+-LDADD=	-lrt -lm
++LDADD=	-lrt -lm -lbsd
+ 
+ #BINMODE=4555
+ #PRECIOUSPROG=
 --- a/usr.sbin/moused/moused.c
 +++ b/usr.sbin/moused/moused.c
-@@ -68,6 +68,7 @@ __FBSDID("$FreeBSD$");
+@@ -68,6 +68,7 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
 +#include <bsd/string.h>
  #include <syslog.h>
  #include <termios.h>
- #include <unistd.h>
+ #include <time.h>

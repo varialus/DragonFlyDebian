@@ -1,10 +1,11 @@
 ---
- usr.sbin/moused/moused.c |    5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ usr.sbin/moused/Makefile |    4 ++--
+ usr.sbin/moused/moused.c |   12 ++++++------
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
 --- a/usr.sbin/moused/moused.c
 +++ b/usr.sbin/moused/moused.c
-@@ -45,10 +45,10 @@
+@@ -45,7 +45,6 @@
   **/
  
  #include <sys/cdefs.h>
@@ -12,11 +13,23 @@
  
  #include <sys/param.h>
  #include <sys/consio.h>
-+#include <sys/ttycom.h>
- #include <sys/mouse.h>
+@@ -53,6 +52,7 @@ __FBSDID("$FreeBSD$");
  #include <sys/socket.h>
  #include <sys/stat.h>
-@@ -533,8 +533,7 @@ static void	hup(int sig);
+ #include <sys/time.h>
++#include <sys/ttycom.h>
+ #include <sys/un.h>
+ 
+ #include <ctype.h>
+@@ -70,6 +70,7 @@ __FBSDID("$FreeBSD$");
+ #include <string.h>
+ #include <syslog.h>
+ #include <termios.h>
++#include <time.h>
+ #include <unistd.h>
+ #include <math.h>
+ 
+@@ -532,8 +533,7 @@ static void	hup(int sig);
  static void	cleanup(int sig);
  static void	pause_mouse(int sig);
  static void	usage(void);
@@ -26,3 +39,41 @@
  
  static int	r_identify(void);
  static const char *r_if(int type);
+@@ -1355,13 +1355,13 @@ moused(void)
+ }
+ 
+ static void
+-hup(__unused int sig)
++hup(int sig)
+ {
+     longjmp(env, 1);
+ }
+ 
+ static void
+-cleanup(__unused int sig)
++cleanup(int sig)
+ {
+     if (rodent.rtype == MOUSE_PROTO_X10MOUSEREM)
+ 	unlink(_PATH_MOUSEREMOTE);
+@@ -1369,7 +1369,7 @@ cleanup(__unused int sig)
+ }
+ 
+ static void
+-pause_mouse(__unused int sig)
++pause_mouse(int sig)
+ {
+     paused = !paused;
+ }
+--- a/usr.sbin/moused/Makefile
++++ b/usr.sbin/moused/Makefile
+@@ -5,8 +5,8 @@ MAN=	moused.8
+ 
+ WARNS?=6
+ 
+-DPADD=	${LIBUTIL}  ${LIBM}
+-LDADD=	-lutil -lm
++DPADD=	${LIBRT}  ${LIBM}
++LDADD=	-lrt -lm
+ 
+ #BINMODE=4555
+ #PRECIOUSPROG=
