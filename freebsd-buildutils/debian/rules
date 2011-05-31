@@ -101,7 +101,7 @@ build-stamp: unpack-stamp
 	cd build-tree/src/usr.bin/lex ; \
 		$(PMAKE) bootstrap ; \
 		$(YACC) -d -o parse.c parse.y ; \
-		$(PMAKE) $(MAKE_BUILD_FLAGS)
+		$(PMAKE) $(MAKE_BUILD_FLAGS) NO_PROFILE=1 NO_INSTALLLIB=1
 
 	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/mkdep
 	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.sbin/mtree
