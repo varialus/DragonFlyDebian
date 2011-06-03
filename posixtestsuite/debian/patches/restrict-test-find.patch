@@ -1,10 +1,10 @@
 ---
- locate-test |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ locate-test |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 --- a/locate-test
 +++ b/locate-test
-@@ -99,7 +99,7 @@ then
+@@ -99,13 +99,13 @@ then
  fi
  
  # Simple version right now, just locate all:
@@ -13,3 +13,10 @@
  
  # Force something .c or .sh
  # Avoid .o, backups
+ # IF --execs, force it has no "-buildonly"
+ # If --buildable, remove the .sh files
+-find "$WHERE" -type f \
++find $WHERE -type f \
+     \( \
+        \( -name "[0-9]*-*.c" -o -name "[0-9]*-[0-9]*.sh" \) \
+        ! -name \*.o ! -name \*~ \
