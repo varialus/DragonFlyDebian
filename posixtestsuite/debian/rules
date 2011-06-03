@@ -1,11 +1,15 @@
 #!/usr/bin/make -f
 
+DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+
+REPORT := /usr/share/doc/posixtestsuite/report.$(DEB_HOST_GNU_TYPE).log
+
 build-indep:
+
+build-arch:
 	dh_testdir
 
 	$(MAKE)
-
-build-arch:
 
 build: build-indep build-arch
 
@@ -17,15 +21,18 @@ clean:
 
 	dh_clean
 
-install-indep: build-indep
+install-arch: build-arch
 	dh_testdir
 	dh_testroot
 	dh_prep
 	dh_installdirs
 
-#	$(MAKE) install DESTDIR=$(CURDIR)/debian/posixtestsuite
+	gzip -c9 logfile >$(CURDIR)/debian/posixtestsuite/$(REPORT).gz
 
-binary-indep: install-indep
+binary-indep:
+	# Nothing to do.
+
+binary-arch: install-arch
 	dh_testdir
 	dh_testroot
 	dh_installdocs
@@ -43,10 +50,7 @@ binary-indep: install-indep
 	dh_md5sums
 	dh_builddeb
 
-binary-arch:
-	# Nothing to do.
-
 binary: binary-indep binary-arch
 
-.PHONY: clean install
+.PHONY: clean install-arch
 .PHONY: build build-indep build-arch binary-indep binary-arch binary
