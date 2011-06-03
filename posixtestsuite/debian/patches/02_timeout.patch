@@ -1,40 +1,22 @@
-Author: Robert Millan <rmh@debian.org>
+Author: Robert Millan <rmh@debian.org>, Guillem Jover <guillem@debian.org>
 Status: not-sent-upstream
 Description:
- Use expect to set a timeout on tests, to avoid them hanging indefinitely.
+ Use coreutils' timeout to set a timeout on tests, to avoid them hanging
+ indefinitely. The t0 timeout program in the upstream project does not
+ seem to correctly handle the childs which keep running even after the
+ process timesout.
 
-Index: b/timeout
-===================================================================
---- /dev/null
-+++ b/timeout
-@@ -0,0 +1,8 @@
-+#!/bin/sh
-+if test -e $1 ; then
-+  expect << EOF
-+set timeout 30
-+eval spawn `pwd`/$1 $2
-+expect
-+EOF
-+fi
-Index: b/Makefile
-===================================================================
---- a/Makefile
-+++ b/Makefile
-@@ -46,7 +46,11 @@ TIMEOUT = $(top_builddir)/t0 $(TIMEOUT_V
- all: build-tests run-tests 
- 
- build-tests: $(BUILD_TESTS:.c=.test)
--run-tests: $(RUN_TESTS:.test=.run-test)
-+run-tests:
-+	-chmod 755 timeout
-+	for i in $(RUN_TESTS); do \
-+		./timeout $$i; \
-+	done
- 
- functional-tests: functional-make functional-run
- stress-tests: stress-make stress-run
-Index: b/functional/mqueues/run.sh
-===================================================================
+---
+ Makefile                              |   19 +++++++------------
+ execute.sh                            |    7 +++----
+ functional/mqueues/run.sh             |    2 +-
+ functional/semaphores/run.sh          |    2 +-
+ functional/threads/pi_test/run.sh     |    2 +-
+ functional/threads/robust_test/run.sh |    2 +-
+ stress/mqueues/run.sh                 |    2 +-
+ stress/semaphores/run.sh              |    2 +-
+ 8 files changed, 16 insertions(+), 22 deletions(-)
+
 --- a/functional/mqueues/run.sh
 +++ b/functional/mqueues/run.sh
 @@ -12,7 +12,7 @@ RunTest()
@@ -42,12 +24,10 @@ Index: b/functional/mqueues/run.sh
  	echo "TEST: " $1
  	TOTAL=$TOTAL+1
 -	./$1
-+	../../timeout $1
++	timeout 120 ./$1
  	if [ $? == 0 ]; then
  		PASS=$PASS+1
  		echo -ne "\t\t\t***TEST PASSED***\n\n"
-Index: b/functional/semaphores/run.sh
-===================================================================
 --- a/functional/semaphores/run.sh
 +++ b/functional/semaphores/run.sh
 @@ -12,7 +12,7 @@ RunTest()
@@ -55,12 +35,10 @@ Index: b/functional/semaphores/run.sh
  	echo "TEST: " $1
  	TOTAL=$TOTAL+1
 -	./$1
-+	../../timeout $1
++	timeout 120 ./$1
  	if [ $? == 0 ]; then
  		PASS=$PASS+1
  		echo -ne "\t\t\t***TEST PASSED***\n\n"
-Index: b/functional/threads/pi_test/run.sh
-===================================================================
 --- a/functional/threads/pi_test/run.sh
 +++ b/functional/threads/pi_test/run.sh
 @@ -21,7 +21,7 @@ Run()
@@ -68,12 +46,10 @@ Index: b/functional/threads/pi_test/run.sh
          echo "TEST: " $1
          TOTAL=$TOTAL+1
 -        ./$1 > output.$1
-+        ../../timeout $1 > output.$1
++        timeout 120 ./$1 > output.$1
          if [ $? == 0 ]; then
                  PASS=$PASS+1
                  echo -ne "\t\t\t***TEST PASSED***\n\n"
-Index: b/functional/threads/robust_test/run.sh
-===================================================================
 --- a/functional/threads/robust_test/run.sh
 +++ b/functional/threads/robust_test/run.sh
 @@ -7,7 +7,7 @@ Run()
@@ -81,12 +57,10 @@ Index: b/functional/threads/robust_test/run.sh
          echo "TEST: " $1
          TOTAL=$TOTAL+1
 -        ./$1
-+        ../../timeout $1
++        timeout 120 ./$1
          if [ $? == 0 ]; then
                  PASS=$PASS+1
                  echo -ne "\t\t\t***TEST PASSED***\n\n"
-Index: b/stress/mqueues/run.sh
-===================================================================
 --- a/stress/mqueues/run.sh
 +++ b/stress/mqueues/run.sh
 @@ -12,7 +12,7 @@ RunTest()
@@ -94,12 +68,10 @@ Index: b/stress/mqueues/run.sh
  	echo "TEST: " $1 $2
  	TOTAL=$TOTAL+1
 -	./$1 $2
-+	../../timeout $1 $2
++	timeout 120 ./$1 $2
  	if [ $? == 0 ]; then
  		PASS=$PASS+1
  		echo -ne "\t\t\t***TEST PASSED***\n\n"
-Index: b/stress/semaphores/run.sh
-===================================================================
 --- a/stress/semaphores/run.sh
 +++ b/stress/semaphores/run.sh
 @@ -12,7 +12,7 @@ RunTest()
@@ -107,7 +79,79 @@ Index: b/stress/semaphores/run.sh
  	echo "TEST: " $1 $2
  	TOTAL=$TOTAL+1
 -	./$1 $2
-+	../../timeout $1 $2
++	timeout 120 ./$1 $2
  	if [ $? == 0 ]; then
  		PASS=$PASS+1
  		echo -ne "\t\t\t***TEST PASSED***\n\n"
+--- a/execute.sh
++++ b/execute.sh
+@@ -166,9 +166,8 @@ declare -i OTH=0
+ # Maximum Two minutes waiting time period to execute a test. If it exceeds, the test case will go into the 'HUNG' category.
+ TIMEOUT_VAL=120
+ 
+-# if gcc available then remove the below line comment else put the t0 in posixtestsuite directory.
+-#gcc -o t0 t0.c
+-./t0 0 > /dev/null 2>&1
++# Find dynamically the return value on timeout
++timeout 1 sleep 2 > /dev/null 2>&1
+ TIMEVAL_RET=$?
+ 
+ # Find executable files from the conformance directory
+@@ -233,7 +232,7 @@ fi
+             then
+             FILEcut=`echo $FILE | cut -b3-80`
+             TOTAL=$TOTAL+1
+-            ./t0 $TIMEOUT_VAL $FILE > /dev/null 2>&1
++            timeout $TIMEOUT_VAL $FILE > /dev/null 2>&1
+ 
+             RET_VAL=$?
+ 
+--- a/Makefile
++++ b/Makefile
+@@ -21,8 +21,7 @@
+ # Expiration delay is 240 seconds
+ TIMEOUT_VAL = 240
+ # The following value is the shell return value of a timedout application.
+-# with the bash shell, the ret val of a killed application is 128 + signum
+-# and under Linux, SIGALRM=14, so we have (Linux+bash) 142.
++# With coreutils' timeout, the ret val of a killed application is 124
+ TIMEOUT_RET = $(shell cat $(top_builddir)/t0.val)
+ 
+ top_builddir = .
+@@ -40,7 +39,7 @@ FUNCTIONAL_RUN := $(shell $(top_builddir
+ STRESS_MAKE := $(shell $(top_builddir)/locate-test --smake)
+ STRESS_RUN := $(shell $(top_builddir)/locate-test --srun)
+ PWD := $(shell pwd)
+-TIMEOUT = $(top_builddir)/t0 $(TIMEOUT_VAL)
++TIMEOUT = timeout $(TIMEOUT_VAL)
+ 
+ 
+ all: build-tests run-tests 
+@@ -96,7 +95,7 @@ clean:
+ # Rule to run an executable test
+ # If it is only a build test, then the binary exist, so we don't need to run
+ .PHONY: %.run-test
+-%.run-test: %.test $(top_builddir)/t0 $(top_builddir)/t0.val
++%.run-test: %.test $(top_builddir)/t0.val
+ 	@COMPLOG=$(LOGFILE).$$$$; \
+ 	[ -f $< ] || exit 0; \
+ 	$(TIMEOUT) $< > $$COMPLOG 2>&1; \
+@@ -137,14 +136,10 @@ clean:
+ 	fi; \
+ 	rm -f $$COMPLOG;
+ 
+-$(top_builddir)/t0: $(top_builddir)/t0.c
+-	@echo Building timeout helper files; \
+-	$(CC) -O2 -o $@ $<
+-	
+-$(top_builddir)/t0.val: $(top_builddir)/t0
+-	echo `$(top_builddir)/t0 0; echo $$?` > $(top_builddir)/t0.val
+-	
+-%.run-test: %.sh $(top_builddir)/t0 $(top_builddir)/t0.val
++$(top_builddir)/t0.val:
++	echo `timeout 1 sleep 2; echo $$?` > $(top_builddir)/t0.val
++
++%.run-test: %.sh $(top_builddir)/t0.val
+ 	@COMPLOG=$(LOGFILE).$$$$; \
+ 	chmod +x $<; \
+ 	$(TIMEOUT) $< > $$COMPLOG 2>&1; \
