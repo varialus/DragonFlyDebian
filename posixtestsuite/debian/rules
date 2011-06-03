@@ -6,10 +6,14 @@ REPORT := /usr/share/doc/posixtestsuite/report.$(DEB_HOST_GNU_TYPE).log
 
 build-indep:
 
-build-arch:
+# We need a stamp file to avoid running the test suite twice.
+build-arch: build-arch-stamp
+build-arch-stamp:
 	dh_testdir
 
 	$(MAKE)
+
+	touch $@
 
 build: build-indep build-arch
 
@@ -18,6 +22,8 @@ clean:
 	dh_testroot
 
 	$(MAKE) clean
+
+	$(RM) *-stamp
 
 	dh_clean
 
