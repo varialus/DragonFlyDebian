@@ -36,8 +36,8 @@
 #define	MAXFIDSZ	16
 
 struct fid {
-	u_short		fid_len;		/* length of data in bytes */
-	u_short		fid_reserved;		/* force longword alignment */
+	__u_short	fid_len;		/* length of data in bytes */
+	__u_short	fid_reserved;		/* force longword alignment */
 	char		fid_data[MAXFIDSZ];	/* data (variable length) */
 };
 
@@ -185,8 +185,8 @@ struct fid {
  * Generic file handle
  */
 struct fhandle {
-	fsid_t	fh_fsid;	/* Filesystem id of mount point */
-	struct	fid fh_fid;	/* Filesys specific id */
+	__fsid_t	fh_fsid;	/* Filesystem id of mount point */
+	struct		fid fh_fid;	/* Filesys specific id */
 };
 typedef struct fhandle	fhandle_t;
 
@@ -194,14 +194,14 @@ typedef struct fhandle	fhandle_t;
  * Export arguments for local filesystem mount calls.
  */
 struct export_args {
-	int	ex_flags;		/* export related flags */
-	uid_t	ex_root;		/* mapping for root uid */
-	struct	xucred ex_anon;		/* mapping for anonymous user */
-	struct	sockaddr *ex_addr;	/* net address to which exported */
-	u_char	ex_addrlen;		/* and the net address length */
-	struct	sockaddr *ex_mask;	/* mask of valid bits in saddr */
-	u_char	ex_masklen;		/* and the smask length */
-	char	*ex_indexfile;		/* index file for WebNFS URLs */
+	int		ex_flags;		/* export related flags */
+	uid_t		ex_root;		/* mapping for root uid */
+	struct		xucred ex_anon;		/* mapping for anonymous user */
+	struct		sockaddr *ex_addr;	/* net address to which exported */
+	__u_char	ex_addrlen;		/* and the net address length */
+	struct		sockaddr *ex_mask;	/* mask of valid bits in saddr */
+	__u_char	ex_masklen;		/* and the smask length */
+	char		*ex_indexfile;		/* index file for WebNFS URLs */
 };
 
 /*
@@ -223,7 +223,7 @@ struct nfs_public {
  * XXX: Never change the first two arguments!
  */
 struct vfsconf {
-	u_int	vfc_version;		/* ABI version number */
+	__u_int	vfc_version;		/* ABI version number */
 	char	vfc_name[MFSNAMELEN];	/* filesystem type name */
 	struct	vfsops *vfc_vfsops;	/* filesystem operations vector */
 	int	vfc_typenum;		/* historic filesystem type number */
@@ -269,7 +269,7 @@ typedef u_int32_t fsctlop_t;
 
 struct vfsidctl {
 	int		vc_vers;	/* should be VFSIDCTL_VERS1 (below) */
-	fsid_t		vc_fsid;	/* fsid to operate on. */
+	__fsid_t	vc_fsid;	/* fsid to operate on. */
 	char		vc_fstypename[MFSNAMELEN];
 					/* type of fs 'nfs' or '*' */
 	fsctlop_t	vc_op;		/* operation VFS_CTL_* (below) */
