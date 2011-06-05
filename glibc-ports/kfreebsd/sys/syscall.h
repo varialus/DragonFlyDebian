@@ -436,6 +436,14 @@
 #define	SYS_jail_set	507
 #define	SYS_jail_remove	508
 #define	SYS_pselect	522
-#define	SYS_MAXSYSCALL	523
+#define SYS_getloginclass	523
+#define SYS_setloginclass	524
+#define SYS_rctl_get_racct	525
+#define SYS_rctl_get_rules	526
+#define SYS_rctl_get_limits	527
+#define SYS_rctl_add_rule	528
+#define SYS_rctl_remove_rule	529
+#define SYS_posix_fallocate	530
+#define	SYS_MAXSYSCALL	532
 
 #endif
