@@ -69,7 +69,7 @@ struct fid {
 #define	MNT_NOATIME	0x10000000	/* disable update of file access time */
 #define	MNT_NOCLUSTERR	0x40000000	/* disable cluster read */
 #define	MNT_NOCLUSTERW	0x80000000	/* disable cluster write */
-#define MNT_NFS4ACLS    0x00000010
+#define	MNT_NFS4ACLS	0x00000010
 
 /*
  * NFS export related mount flags.
