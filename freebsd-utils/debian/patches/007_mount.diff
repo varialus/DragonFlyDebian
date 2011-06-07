@@ -1,9 +1,10 @@
 ---
  sbin/mount/Makefile   |    2 +-
  sbin/mount/mntopts.h  |    4 ++++
+ sbin/mount/mount.8    |    5 -----
  sbin/mount/mount.c    |   22 +++++++++++-----------
  sbin/mount/mount_fs.c |    2 +-
- 4 files changed, 17 insertions(+), 13 deletions(-)
+ 5 files changed, 17 insertions(+), 18 deletions(-)
 
 --- a/sbin/mount/mntopts.h
 +++ b/sbin/mount/mntopts.h
@@ -126,3 +127,24 @@
 +LDADD=	-lutil -lbsd
  
  .include <bsd.prog.mk>
+--- a/sbin/mount/mount.8
++++ b/sbin/mount/mount.8
+@@ -37,7 +37,6 @@
+ .Sh SYNOPSIS
+ .Nm
+ .Op Fl adflpruvw
+-.Op Fl F Ar fstab
+ .Op Fl o Ar options
+ .Op Fl t Cm ufs | Ar external_type
+ .Nm
+@@ -96,10 +95,6 @@ flag to
+ determine what the
+ .Nm
+ command is trying to do.
+-.It Fl F Ar fstab
+-Specify the
+-.Pa fstab
+-file to use.
+ .It Fl f
+ Forces the revocation of write access when trying to downgrade
+ a file system mount status from read-write to read-only.
