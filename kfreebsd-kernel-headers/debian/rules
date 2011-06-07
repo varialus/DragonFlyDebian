@@ -24,10 +24,12 @@ clean:
 	rm -rf sys usr.sbin
 	dh_clean
 
-build-arch:
+.PHONY: clean
 
-build-indep: build-indep-stamp
-build-indep-stamp:
+build-indep:
+
+build-arch: build-arch-stamp
+build-arch-stamp:
 	dh_testdir
 
 	tar xfJ $(SRC_TAR) --strip-components=1
@@ -36,9 +38,13 @@ build-indep-stamp:
 
 	touch $@
 
-build: build-arch build-indep
+build: build-indep build-arch
+
+.PHONY: build-indep build-arch build
 
 install-indep: build-indep
+
+install-arch: build-arch
 	dh_testdir
 	dh_testroot
 	dh_prep
@@ -53,16 +59,16 @@ else
 		&& find . -type f -name "*.h" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/include/machine \;
 endif
 
-install-arch: build-arch
+install: install-indep install-arch
 
-install: install-arch install-indep
+.PHONY: install-indep install-arch install
 
 # Build architecture-independent files here.
 binary-indep: install-indep
 # We have nothing to do by default.
 
 # Build architecture-dependent files here.
-binary-arch: install-indep
+binary-arch: install-arch
 	dh_testdir
 	dh_testroot
 	dh_installdocs
@@ -79,4 +85,4 @@ binary-arch: install-indep
 
 binary: binary-indep binary-arch
 
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: binary-indep binary-arch binary
