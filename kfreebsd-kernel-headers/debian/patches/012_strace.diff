@@ -1,6 +1,11 @@
---- src/sys/i386/include/npx.h~	2004-12-01 18:13:36.000000000 +0100
-+++ src/sys/i386/include/npx.h	2004-12-01 18:17:24.000000000 +0100
-@@ -111,7 +111,7 @@
+---
+ sys/amd64/include/fpu.h |    2 +-
+ sys/i386/include/npx.h  |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+--- a/sys/i386/include/npx.h
++++ b/sys/i386/include/npx.h
+@@ -111,7 +111,7 @@ struct  savexmm {
  	} sv_fp[8];
  	struct xmmacc	sv_xmm[8];
  	u_char sv_pad[224];
@@ -9,14 +14,14 @@
  
  union	savefpu {
  	struct	save87	sv_87;
---- src/sys/amd64/include/fpu.h~	2006-03-01 20:30:51.000000000 +0100
-+++ src/sys/amd64/include/fpu.h	2006-03-29 20:27:45.000000000 +0200
-@@ -71,7 +71,7 @@
+--- a/sys/amd64/include/fpu.h
++++ b/sys/amd64/include/fpu.h
+@@ -71,7 +71,7 @@ struct  savefpu {
  	} sv_fp[8];
  	struct xmmacc	sv_xmm[16];
  	u_char sv_pad[96];
 -} __aligned(16);
 +} __attribute__((aligned(16)));
  
- /*
-  * The hardware default control word for i387's and later coprocessors is
+ #ifdef _KERNEL
+ struct fpu_kern_ctx {

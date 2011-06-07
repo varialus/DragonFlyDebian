@@ -1,19 +1,26 @@
-Index: kfreebsd-source-8.0/sys/cam/scsi/scsi_all.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/cam/scsi/scsi_all.h	2009-11-12 15:48:27.000000000 +0000
-+++ kfreebsd-source-8.0/sys/cam/scsi/scsi_all.h	2009-11-12 16:33:38.000000000 +0000
+---
+ sys/amd64/include/md_var.h |    2 ++
+ sys/cam/scsi/scsi_all.h    |    1 +
+ sys/i386/include/md_var.h  |    2 ++
+ sys/sys/_mutex.h           |    2 ++
+ sys/sys/_timeval.h         |    9 +--------
+ sys/sys/bio.h              |    9 +++++++++
+ sys/sys/devicestat.h       |    3 +++
+ sys/sys/timespec.h         |    5 +----
+ 8 files changed, 21 insertions(+), 12 deletions(-)
+
+--- a/sys/cam/scsi/scsi_all.h
++++ b/sys/cam/scsi/scsi_all.h
 @@ -25,6 +25,7 @@
- #define _SCSI_SCSI_ALL_H 1
+ #define	_SCSI_SCSI_ALL_H 1
  
  #include <sys/cdefs.h>
 +#include <stdint.h>
  
  #ifdef _KERNEL
  /*
-Index: kfreebsd-source-8.0/sys/i386/include/md_var.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/i386/include/md_var.h	2009-11-12 15:48:49.000000000 +0000
-+++ kfreebsd-source-8.0/sys/i386/include/md_var.h	2009-11-12 16:33:38.000000000 +0000
+--- a/sys/i386/include/md_var.h
++++ b/sys/i386/include/md_var.h
 @@ -32,6 +32,8 @@
  #ifndef _MACHINE_MD_VAR_H_
  #define	_MACHINE_MD_VAR_H_
@@ -23,10 +30,8 @@ Index: kfreebsd-source-8.0/sys/i386/include/md_var.h
  /*
   * Miscellaneous machine-dependent declarations.
   */
-Index: kfreebsd-source-8.0/sys/amd64/include/md_var.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/amd64/include/md_var.h	2009-11-12 15:48:23.000000000 +0000
-+++ kfreebsd-source-8.0/sys/amd64/include/md_var.h	2009-11-12 16:33:38.000000000 +0000
+--- a/sys/amd64/include/md_var.h
++++ b/sys/amd64/include/md_var.h
 @@ -32,6 +32,8 @@
  #ifndef _MACHINE_MD_VAR_H_
  #define	_MACHINE_MD_VAR_H_
@@ -36,10 +41,8 @@ Index: kfreebsd-source-8.0/sys/amd64/include/md_var.h
  /*
   * Miscellaneous machine-dependent declarations.
   */
-Index: kfreebsd-source-8.0/sys/sys/_mutex.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/_mutex.h	2009-11-12 15:49:02.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/_mutex.h	2009-11-12 16:33:38.000000000 +0000
+--- a/sys/sys/_mutex.h
++++ b/sys/sys/_mutex.h
 @@ -31,6 +31,8 @@
  #ifndef _SYS__MUTEX_H_
  #define	_SYS__MUTEX_H_
@@ -49,10 +52,8 @@ Index: kfreebsd-source-8.0/sys/sys/_mutex.h
  /*
   * Sleep/spin mutex.
   */
-Index: kfreebsd-source-8.0/sys/sys/_timeval.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/_timeval.h	2009-11-12 15:49:02.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/_timeval.h	2009-11-12 16:33:38.000000000 +0000
+--- a/sys/sys/_timeval.h
++++ b/sys/sys/_timeval.h
 @@ -30,6 +30,7 @@
  #define _SYS__TIMEVAL_H_
  
@@ -61,7 +62,7 @@ Index: kfreebsd-source-8.0/sys/sys/_timeval.h
  
  #ifndef _SUSECONDS_T_DECLARED
  typedef	__suseconds_t	suseconds_t;
-@@ -41,12 +42,4 @@
+@@ -41,12 +42,4 @@ typedef	__time_t	time_t;
  #define	_TIME_T_DECLARED
  #endif
  
@@ -74,10 +75,8 @@ Index: kfreebsd-source-8.0/sys/sys/_timeval.h
 -};
 -
  #endif /* !_SYS__TIMEVAL_H_ */
-Index: kfreebsd-source-8.0/sys/sys/bio.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/bio.h	2009-11-12 15:49:02.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/bio.h	2009-11-12 16:33:38.000000000 +0000
+--- a/sys/sys/bio.h
++++ b/sys/sys/bio.h
 @@ -39,6 +39,15 @@
  #define	_SYS_BIO_H_
  
@@ -92,12 +91,10 @@ Index: kfreebsd-source-8.0/sys/sys/bio.h
 +};
 +#endif
  
- struct disk;
- struct bio;
-Index: kfreebsd-source-8.0/sys/sys/devicestat.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/devicestat.h	2009-11-12 15:49:02.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/devicestat.h	2009-11-12 16:33:38.000000000 +0000
+ /* bio_cmd */
+ #define BIO_READ	0x01
+--- a/sys/sys/devicestat.h
++++ b/sys/sys/devicestat.h
 @@ -33,6 +33,9 @@
  
  #include <sys/queue.h>
@@ -108,11 +105,9 @@ Index: kfreebsd-source-8.0/sys/sys/devicestat.h
  
  /*
   * XXX: Should really be SPECNAMELEN
-Index: kfreebsd-source-8.0/sys/sys/timespec.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/timespec.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/timespec.h	2009-11-12 16:33:38.000000000 +0000
-@@ -43,10 +43,7 @@
+--- a/sys/sys/timespec.h
++++ b/sys/sys/timespec.h
+@@ -43,10 +43,7 @@ typedef	__time_t	time_t;
  #define	_TIME_T_DECLARED
  #endif
  

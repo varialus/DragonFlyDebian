@@ -1,6 +1,10 @@
---- kfreebsd-source-8.0.orig/sys/fs/devfs/devfs_int.h
-+++ kfreebsd-source-8.0/sys/fs/devfs/devfs_int.h
-@@ -68,6 +68,9 @@
+---
+ sys/fs/devfs/devfs_int.h |    3 +++
+ 1 file changed, 3 insertions(+)
+
+--- a/sys/fs/devfs/devfs_int.h
++++ b/sys/fs/devfs/devfs_int.h
+@@ -68,6 +68,9 @@ struct cdev_priv {
  	LIST_HEAD(, cdev_privdata) cdp_fdpriv;
  };
  
@@ -9,4 +13,4 @@
 +              
  #define	cdev2priv(c)	member2struct(cdev_priv, cdp_c, c)
  
- struct cdev *devfs_alloc(void);
+ struct cdev *devfs_alloc(int);

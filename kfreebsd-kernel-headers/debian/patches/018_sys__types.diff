@@ -1,6 +1,11 @@
---- src/sys/sys/_types.h.orig	2005-10-11 01:30:09.000000000 +0200
-+++ src/sys/sys/_types.h	2005-12-13 20:13:11.000000000 +0100
-@@ -62,7 +62,6 @@
+---
+ sys/sys/_types.h |   59 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ sys/sys/proc.h   |    1 
+ 2 files changed, 59 insertions(+), 1 deletion(-)
+
+--- a/sys/sys/_types.h
++++ b/sys/sys/_types.h
+@@ -63,7 +63,6 @@ typedef	__int64_t	__rlim_t;	/* resource
  typedef	__uint8_t	__sa_family_t;
  typedef	__uint32_t	__socklen_t;
  typedef	long		__suseconds_t;	/* microseconds (signed) */
@@ -8,7 +13,7 @@
  typedef	struct __mq	*__mqd_t;	/* mq_open()... */
  typedef	__uint32_t	__uid_t;
  typedef	unsigned int	__useconds_t;	/* microseconds (unsigned) */
-@@ -82,4 +82,62 @@
+@@ -98,4 +97,62 @@ typedef	__uint32_t	__dev_t;	/* device nu
  
  typedef	__uint32_t	__fixpt_t;	/* fixed point number */
  
@@ -71,8 +76,8 @@
 +#endif 
 +                
  #endif /* !_SYS__TYPES_H_ */
---- src/sys/sys/proc.h.orig	2005-10-11 01:30:09.000000000 +0200
-+++ src/sys/sys/proc.h	2005-12-13 20:09:19.000000000 +0100
+--- a/sys/sys/proc.h
++++ b/sys/sys/proc.h
 @@ -38,6 +38,7 @@
  #ifndef _SYS_PROC_H_
  #define	_SYS_PROC_H_
@@ -80,4 +85,4 @@
 +#include <sys/_types.h> 
  #include <sys/callout.h>		/* For struct callout. */
  #include <sys/event.h>			/* For struct klist. */
- #ifndef _KERNEL
+ #include <sys/condvar.h>

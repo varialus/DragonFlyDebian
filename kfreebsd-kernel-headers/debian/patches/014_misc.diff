@@ -1,6 +1,12 @@
+---
+ sys/dev/usb/usb.h          |   46 ++++++++++++++++++++++-----------------------
+ sys/i386/include/cpufunc.h |   12 +----------
+ sys/sys/_types.h           |   14 ++++---------
+ 3 files changed, 30 insertions(+), 42 deletions(-)
+
 --- a/sys/dev/usb/usb.h
 +++ b/sys/dev/usb/usb.h
-@@ -146,7 +146,7 @@
+@@ -146,7 +146,7 @@ struct usb_device_request {
  	uWord	wValue;
  	uWord	wIndex;
  	uWord	wLength;
@@ -9,7 +15,7 @@
  typedef struct usb_device_request usb_device_request_t;
  
  #define	UT_WRITE		0x00
-@@ -270,7 +270,7 @@
+@@ -270,7 +270,7 @@ struct usb_descriptor {
  	uByte	bLength;
  	uByte	bDescriptorType;
  	uByte	bDescriptorSubtype;
@@ -18,7 +24,7 @@
  typedef struct usb_descriptor usb_descriptor_t;
  
  struct usb_device_descriptor {
-@@ -293,7 +293,7 @@
+@@ -293,7 +293,7 @@ struct usb_device_descriptor {
  	uByte	iProduct;
  	uByte	iSerialNumber;
  	uByte	bNumConfigurations;
@@ -27,7 +33,7 @@
  typedef struct usb_device_descriptor usb_device_descriptor_t;
  
  /* Binary Device Object Store (BOS) */
-@@ -302,7 +302,7 @@
+@@ -302,7 +302,7 @@ struct usb_bos_descriptor {
  	uByte	bDescriptorType;
  	uWord	wTotalLength;
  	uByte	bNumDeviceCaps;
@@ -36,7 +42,7 @@
  typedef struct usb_bos_descriptor usb_bos_descriptor_t;
  
  /* Binary Device Object Store Capability */
-@@ -316,7 +316,7 @@
+@@ -316,7 +316,7 @@ struct usb_bos_cap_descriptor {
  #define	USB_DEVCAP_SUPER_SPEED	0x03
  #define	USB_DEVCAP_CONTAINER_ID	0x04
  	/* data ... */
@@ -45,7 +51,7 @@
  typedef struct usb_bos_cap_descriptor usb_bos_cap_descriptor_t;
  
  struct usb_devcap_usb2ext_descriptor {
-@@ -325,7 +325,7 @@
+@@ -325,7 +325,7 @@ struct usb_devcap_usb2ext_descriptor {
  	uByte	bDevCapabilityType;
  	uByte	bmAttributes;
  #define	USB_V2EXT_LPM 0x02
@@ -54,7 +60,7 @@
  typedef struct usb_devcap_usb2ext_descriptor usb_devcap_usb2ext_descriptor_t;
  
  struct usb_devcap_ss_descriptor {
-@@ -337,7 +337,7 @@
+@@ -337,7 +337,7 @@ struct usb_devcap_ss_descriptor {
  	uByte	bFunctionalitySupport;
  	uByte	bU1DevExitLat;
  	uByte	bU2DevExitLat;
@@ -63,7 +69,7 @@
  typedef struct usb_devcap_ss_descriptor usb_devcap_ss_descriptor_t;
  
  struct usb_devcap_container_id_descriptor {
-@@ -346,7 +346,7 @@
+@@ -346,7 +346,7 @@ struct usb_devcap_container_id_descripto
  	uByte	bDevCapabilityType;
  	uByte	bReserved;
  	uByte	bContainerID;
@@ -72,7 +78,7 @@
  typedef struct usb_devcap_container_id_descriptor
  		usb_devcap_container_id_descriptor_t;
  
-@@ -379,7 +379,7 @@
+@@ -379,7 +379,7 @@ struct usb_config_descriptor {
  #define	UC_REMOTE_WAKEUP	0x20
  	uByte	bMaxPower;		/* max current in 2 mA units */
  #define	UC_POWER_FACTOR 2
@@ -81,7 +87,7 @@
  typedef struct usb_config_descriptor usb_config_descriptor_t;
  
  struct usb_interface_descriptor {
-@@ -392,7 +392,7 @@
+@@ -392,7 +392,7 @@ struct usb_interface_descriptor {
  	uByte	bInterfaceSubClass;
  	uByte	bInterfaceProtocol;
  	uByte	iInterface;
@@ -90,7 +96,7 @@
  typedef struct usb_interface_descriptor usb_interface_descriptor_t;
  
  struct usb_interface_assoc_descriptor {
-@@ -404,7 +404,7 @@
+@@ -404,7 +404,7 @@ struct usb_interface_assoc_descriptor {
  	uByte	bFunctionSubClass;
  	uByte	bFunctionProtocol;
  	uByte	iFunction;
@@ -99,7 +105,7 @@
  typedef struct usb_interface_assoc_descriptor usb_interface_assoc_descriptor_t;
  
  /* Interface class codes */
-@@ -530,7 +530,7 @@
+@@ -530,7 +530,7 @@ struct usb_endpoint_descriptor {
  	uWord	wMaxPacketSize;
  #define	UE_ZERO_MPS 0xFFFF		/* for internal use only */
  	uByte	bInterval;
@@ -108,7 +114,7 @@
  typedef struct usb_endpoint_descriptor usb_endpoint_descriptor_t;
  
  struct usb_endpoint_ss_comp_descriptor {
-@@ -539,7 +539,7 @@
+@@ -539,7 +539,7 @@ struct usb_endpoint_ss_comp_descriptor {
  	uByte	bMaxBurst;
  	uByte	bmAttributes;
  	uWord	wBytesPerInterval;
@@ -117,7 +123,7 @@
  typedef struct usb_endpoint_ss_comp_descriptor
  		usb_endpoint_ss_comp_descriptor_t;
  
-@@ -548,7 +548,7 @@
+@@ -548,7 +548,7 @@ struct usb_string_descriptor {
  	uByte	bDescriptorType;
  	uWord	bString[126];
  	uByte	bUnused;
@@ -126,7 +132,7 @@
  typedef struct usb_string_descriptor usb_string_descriptor_t;
  
  #define	USB_MAKE_STRING_DESC(m,name)	\
-@@ -556,7 +556,7 @@
+@@ -556,7 +556,7 @@ struct name {				\
    uByte bLength;			\
    uByte bDescriptorType;		\
    uByte bData[sizeof((uint8_t []){m})];	\
@@ -135,7 +141,7 @@
  static const struct name name = {	\
    .bLength = sizeof(struct name),	\
    .bDescriptorType = UDESC_STRING,	\
-@@ -590,7 +590,7 @@
+@@ -590,7 +590,7 @@ struct usb_hub_descriptor {
  #define	UHD_NOT_REMOV(desc, i) \
      (((desc)->DeviceRemovable[(i)/8] >> ((i) % 8)) & 1)
  	uByte	PortPowerCtrlMask[1];	/* deprecated */
@@ -144,7 +150,7 @@
  typedef struct usb_hub_descriptor usb_hub_descriptor_t;
  
  struct usb_hub_ss_descriptor {
-@@ -603,7 +603,7 @@
+@@ -603,7 +603,7 @@ struct usb_hub_ss_descriptor {
  	uByte	bHubHdrDecLat;
  	uWord	wHubDelay;
  	uByte	DeviceRemovable[32];	/* max 255 ports */
@@ -153,7 +159,7 @@
  typedef struct usb_hub_ss_descriptor usb_hub_ss_descriptor_t;
  
  /* minimum HUB descriptor (8-ports maximum) */
-@@ -616,7 +616,7 @@
+@@ -616,7 +616,7 @@ struct usb_hub_descriptor_min {
  	uByte	bHubContrCurrent;
  	uByte	DeviceRemovable[1];
  	uByte	PortPowerCtrlMask[1];
@@ -162,7 +168,7 @@
  typedef struct usb_hub_descriptor_min usb_hub_descriptor_min_t;
  
  struct usb_device_qualifier {
-@@ -629,7 +629,7 @@
+@@ -629,7 +629,7 @@ struct usb_device_qualifier {
  	uByte	bMaxPacketSize0;
  	uByte	bNumConfigurations;
  	uByte	bReserved;
@@ -171,7 +177,7 @@
  typedef struct usb_device_qualifier usb_device_qualifier_t;
  
  struct usb_otg_descriptor {
-@@ -638,7 +638,7 @@
+@@ -638,7 +638,7 @@ struct usb_otg_descriptor {
  	uByte	bmAttributes;
  #define	UOTG_SRP	0x01
  #define	UOTG_HNP	0x02
@@ -180,7 +186,7 @@
  typedef struct usb_otg_descriptor usb_otg_descriptor_t;
  
  /* OTG feature selectors */
-@@ -653,7 +653,7 @@
+@@ -653,7 +653,7 @@ struct usb_status {
  #define	UDS_REMOTE_WAKEUP		0x0002
  /* Endpoint status flags */
  #define	UES_HALT			0x0001
@@ -189,7 +195,7 @@
  typedef struct usb_status usb_status_t;
  
  struct usb_hub_status {
-@@ -661,7 +661,7 @@
+@@ -661,7 +661,7 @@ struct usb_hub_status {
  #define	UHS_LOCAL_POWER			0x0001
  #define	UHS_OVER_CURRENT		0x0002
  	uWord	wHubChange;
@@ -198,7 +204,7 @@
  typedef struct usb_hub_status usb_hub_status_t;
  
  struct usb_port_status {
-@@ -702,7 +702,7 @@
+@@ -702,7 +702,7 @@ struct usb_port_status {
  #define	UPS_C_BH_PORT_RESET		0x0020
  #define	UPS_C_PORT_LINK_STATE		0x0040
  #define	UPS_C_PORT_CONFIG_ERROR		0x0080
@@ -218,7 +224,7 @@
  #ifndef _SYS_CDEFS_H_
  #error this file needs sys/cdefs.h as a prerequisite
  #endif
-@@ -683,16 +685,11 @@
+@@ -683,16 +685,11 @@ void	enable_intr(void);
  void	halt(void);
  void	ia32_pause(void);
  u_char	inb(u_int port);
@@ -235,7 +241,7 @@
  void	lidt(struct region_descriptor *addr);
  void	lldt(u_short sel);
  void	load_cr0(u_int cr0);
-@@ -710,11 +707,6 @@
+@@ -710,11 +707,6 @@ void	load_fs(u_int sel);
  void	load_gs(u_int sel);
  void	ltr(u_short sel);
  void	outb(u_int port, u_char data);
@@ -257,7 +263,7 @@
  
  /*
   * Standard type definitions.
-@@ -39,10 +40,14 @@
+@@ -39,10 +40,14 @@ typedef	__uint32_t	__blksize_t;	/* file
  typedef	__int64_t	__blkcnt_t;	/* file block count */
  typedef	__int32_t	__clockid_t;	/* clock_gettime()... */
  typedef	__uint32_t	__fflags_t;	/* file flags */
@@ -272,7 +278,7 @@
  typedef	__uint32_t	__ino_t;	/* inode number */
  typedef	long		__key_t;	/* IPC key (for Sys V IPC) */
  typedef	__int32_t	__lwpid_t;	/* Thread ID (a.k.a. LWP) */
-@@ -93,13 +98,4 @@
+@@ -93,13 +98,4 @@ typedef	__uint32_t	__dev_t;	/* device nu
  
  typedef	__uint32_t	__fixpt_t;	/* fixed point number */
  

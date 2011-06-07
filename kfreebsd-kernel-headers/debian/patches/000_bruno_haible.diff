@@ -1,7 +1,34 @@
-Index: kfreebsd-source-8.0/sys/i386/include/npx.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/i386/include/npx.h	2009-11-12 15:48:49.000000000 +0000
-+++ kfreebsd-source-8.0/sys/i386/include/npx.h	2009-11-12 16:22:12.000000000 +0000
+---
+ sys/amd64/include/pcb.h |    1 
+ sys/i386/include/npx.h  |    2 
+ sys/i386/include/pcb.h  |    2 
+ sys/i386/include/pmap.h |    7 ++
+ sys/net/if_arp.h        |   14 +++++
+ sys/net/if_dl.h         |   14 ++---
+ sys/nfsclient/nfs.h     |    5 ++
+ sys/sys/callout.h       |    2 
+ sys/sys/dvdio.h         |    2 
+ sys/sys/extattr.h       |   52 ++++++++++-----------
+ sys/sys/filedesc.h      |    1 
+ sys/sys/jail.h          |   16 ++++--
+ sys/sys/linker.h        |   22 +++++----
+ sys/sys/lock.h          |    1 
+ sys/sys/memrange.h      |    7 ++
+ sys/sys/pciio.h         |    2 
+ sys/sys/procfs.h        |    4 +
+ sys/sys/resourcevar.h   |    2 
+ sys/sys/rtprio.h        |   12 +++-
+ sys/sys/signalvar.h     |   10 +++-
+ sys/sys/sysctl.h        |  116 +++++++++++++++++++++++++++++++++++++++++++++---
+ sys/sys/timepps.h       |    2 
+ sys/sys/timex.h         |   21 +++++---
+ sys/sys/ucred.h         |    3 +
+ sys/vm/vm.h             |    2 
+ sys/vm/vm_map.h         |    6 ++
+ 26 files changed, 262 insertions(+), 66 deletions(-)
+
+--- a/sys/i386/include/npx.h
++++ b/sys/i386/include/npx.h
 @@ -41,6 +41,8 @@
  #ifndef _MACHINE_NPX_H_
  #define	_MACHINE_NPX_H_
@@ -11,10 +38,8 @@ Index: kfreebsd-source-8.0/sys/i386/include/npx.h
  /* Environment information of floating point unit */
  struct env87 {
  	long	en_cw;		/* control word (16bits) */
-Index: kfreebsd-source-8.0/sys/amd64/include/pcb.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/amd64/include/pcb.h	2009-11-12 15:48:23.000000000 +0000
-+++ kfreebsd-source-8.0/sys/amd64/include/pcb.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/amd64/include/pcb.h
++++ b/sys/amd64/include/pcb.h
 @@ -40,6 +40,7 @@
  /*
   * AMD64 process control block
@@ -23,10 +48,8 @@ Index: kfreebsd-source-8.0/sys/amd64/include/pcb.h
  #include <machine/fpu.h>
  #include <machine/segments.h>
  
-Index: kfreebsd-source-8.0/sys/i386/include/pcb.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/i386/include/pcb.h	2009-11-12 15:48:49.000000000 +0000
-+++ kfreebsd-source-8.0/sys/i386/include/pcb.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/i386/include/pcb.h
++++ b/sys/i386/include/pcb.h
 @@ -36,6 +36,8 @@
  #ifndef _I386_PCB_H_
  #define _I386_PCB_H_
@@ -36,10 +59,8 @@ Index: kfreebsd-source-8.0/sys/i386/include/pcb.h
  /*
   * Intel 386 process control block
   */
-Index: kfreebsd-source-8.0/sys/i386/include/pmap.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/i386/include/pmap.h	2009-11-12 15:48:49.000000000 +0000
-+++ kfreebsd-source-8.0/sys/i386/include/pmap.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/i386/include/pmap.h
++++ b/sys/i386/include/pmap.h
 @@ -44,6 +44,13 @@
  #ifndef _MACHINE_PMAP_H_
  #define	_MACHINE_PMAP_H_
@@ -54,10 +75,8 @@ Index: kfreebsd-source-8.0/sys/i386/include/pmap.h
  /*
   * Page-directory and page-table entries follow this format, with a few
   * of the fields not present here and there, depending on a lot of things.
-Index: kfreebsd-source-8.0/sys/net/if_arp.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/net/if_arp.h	2009-11-12 15:48:55.000000000 +0000
-+++ kfreebsd-source-8.0/sys/net/if_arp.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/net/if_arp.h
++++ b/sys/net/if_arp.h
 @@ -33,6 +33,11 @@
  #ifndef _NET_IF_ARP_H_
  #define	_NET_IF_ARP_H_
@@ -70,12 +89,10 @@ Index: kfreebsd-source-8.0/sys/net/if_arp.h
  /*
   * Address Resolution Protocol.
   *
-@@ -81,6 +86,15 @@
- 	(sizeof(struct arphdr) + 2*(ar_hln) + 2*(ar_pln))
- #define arphdr_len(ap)	(arphdr_len2((ap)->ar_hln, (ap)->ar_pln))
+@@ -74,6 +79,15 @@ struct	arphdr {
  
-+#define ar_sha(ap)	(((caddr_t)((ap)+1)) +   0)
-+#define ar_spa(ap)	(((caddr_t)((ap)+1)) +   (ap)->ar_hln)
+ #define ar_sha(ap)	(((caddr_t)((ap)+1)) +   0)
+ #define ar_spa(ap)	(((caddr_t)((ap)+1)) +   (ap)->ar_hln)
 +#define ar_tha(ap)	(((caddr_t)((ap)+1)) +   (ap)->ar_hln + (ap)->ar_pln)
 +#define ar_tpa(ap)	(((caddr_t)((ap)+1)) + 2*(ap)->ar_hln + (ap)->ar_pln)
 +
@@ -83,13 +100,13 @@ Index: kfreebsd-source-8.0/sys/net/if_arp.h
 +	(sizeof(struct arphdr) + 2*(ar_hln) + 2*(ar_pln))
 +#define arphdr_len(ap)	(arphdr_len2((ap)->ar_hln, (ap)->ar_pln))
 +
- /*
-  * ARP ioctl request
-  */
-Index: kfreebsd-source-8.0/sys/net/if_dl.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/net/if_dl.h	2009-11-12 15:48:55.000000000 +0000
-+++ kfreebsd-source-8.0/sys/net/if_dl.h	2009-11-12 16:22:12.000000000 +0000
++#define ar_sha(ap)	(((caddr_t)((ap)+1)) +   0)
++#define ar_spa(ap)	(((caddr_t)((ap)+1)) +   (ap)->ar_hln)
+ #define ar_tha(ap)	(((caddr_t)((ap)+1)) +   (ap)->ar_hln + (ap)->ar_pln)
+ #define ar_tpa(ap)	(((caddr_t)((ap)+1)) + 2*(ap)->ar_hln + (ap)->ar_pln)
+ 
+--- a/sys/net/if_dl.h
++++ b/sys/net/if_dl.h
 @@ -33,6 +33,10 @@
  #ifndef _NET_IF_DL_H_
  #define _NET_IF_DL_H_
@@ -101,7 +118,7 @@ Index: kfreebsd-source-8.0/sys/net/if_dl.h
  /*
   * A Link-Level Sockaddr may specify the interface in one of two
   * ways: either by means of a system-provided index number (computed
-@@ -68,15 +72,9 @@
+@@ -68,15 +72,9 @@ struct sockaddr_dl {
  
  #define LLADDR(s) ((caddr_t)((s)->sdl_data + (s)->sdl_nlen))
  
@@ -119,10 +136,8 @@ Index: kfreebsd-source-8.0/sys/net/if_dl.h
 -#endif /* !_KERNEL */
 -
  #endif
-Index: kfreebsd-source-8.0/sys/nfsclient/nfs.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/nfsclient/nfs.h	2009-11-12 15:48:58.000000000 +0000
-+++ kfreebsd-source-8.0/sys/nfsclient/nfs.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/nfsclient/nfs.h
++++ b/sys/nfsclient/nfs.h
 @@ -36,6 +36,11 @@
  #ifndef _NFSCLIENT_NFS_H_
  #define _NFSCLIENT_NFS_H_
@@ -135,10 +150,8 @@ Index: kfreebsd-source-8.0/sys/nfsclient/nfs.h
  #ifdef _KERNEL
  #include "opt_nfs.h"
  #endif
-Index: kfreebsd-source-8.0/sys/sys/callout.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/callout.h	2009-11-12 15:49:02.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/callout.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/callout.h
++++ b/sys/sys/callout.h
 @@ -38,6 +38,8 @@
  #ifndef _SYS_CALLOUT_H_
  #define _SYS_CALLOUT_H_
@@ -148,10 +161,8 @@ Index: kfreebsd-source-8.0/sys/sys/callout.h
  #include <sys/queue.h>
  
  struct lock_object;
-Index: kfreebsd-source-8.0/sys/sys/dvdio.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/dvdio.h	2009-11-12 15:49:02.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/dvdio.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/dvdio.h
++++ b/sys/sys/dvdio.h
 @@ -31,6 +31,8 @@
  #ifndef _SYS_DVDIO_H_
  #define _SYS_DVDIO_H_
@@ -161,11 +172,9 @@ Index: kfreebsd-source-8.0/sys/sys/dvdio.h
  struct dvd_layer {
  	u_int8_t book_type	:4;
  	u_int8_t book_version	:4;
-Index: kfreebsd-source-8.0/sys/sys/extattr.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/extattr.h	2009-11-12 15:49:02.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/extattr.h	2009-11-12 16:22:12.000000000 +0000
-@@ -68,36 +68,36 @@
+--- a/sys/sys/extattr.h
++++ b/sys/sys/extattr.h
+@@ -68,36 +68,36 @@ int	extattr_check_cred(struct vnode *vp,
  	    struct ucred *cred, struct thread *td, accmode_t accmode);
  
  #else
@@ -228,10 +237,8 @@ Index: kfreebsd-source-8.0/sys/sys/extattr.h
  __END_DECLS
  
  #endif /* !_KERNEL */
-Index: kfreebsd-source-8.0/sys/sys/filedesc.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/filedesc.h	2009-11-12 15:49:02.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/filedesc.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/filedesc.h
++++ b/sys/sys/filedesc.h
 @@ -33,6 +33,7 @@
  #ifndef _SYS_FILEDESC_H_
  #define	_SYS_FILEDESC_H_
@@ -240,11 +247,9 @@ Index: kfreebsd-source-8.0/sys/sys/filedesc.h
  #include <sys/queue.h>
  #include <sys/event.h>
  #include <sys/lock.h>
-Index: kfreebsd-source-8.0/sys/sys/jail.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/jail.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/jail.h	2009-11-12 16:24:38.000000000 +0000
-@@ -39,6 +39,10 @@
+--- a/sys/sys/jail.h
++++ b/sys/sys/jail.h
+@@ -39,6 +39,10 @@ struct jail_v0 {
  };
  #endif
  
@@ -255,7 +260,7 @@ Index: kfreebsd-source-8.0/sys/sys/jail.h
  struct jail {
  	uint32_t	version;
  	char		*path;
-@@ -108,11 +112,13 @@
+@@ -108,11 +112,13 @@ struct xprison {
  
  struct iovec;
  
@@ -274,11 +279,9 @@ Index: kfreebsd-source-8.0/sys/sys/jail.h
  
  #else /* _KERNEL */
  
-Index: kfreebsd-source-8.0/sys/sys/linker.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/linker.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/linker.h	2009-11-12 16:22:12.000000000 +0000
-@@ -189,6 +189,13 @@
+--- a/sys/sys/linker.h
++++ b/sys/sys/linker.h
+@@ -189,6 +189,13 @@ int linker_search_symbol_name(caddr_t va
  /* HWPMC helper */
  void *linker_hwpmc_list_objects(void);
  
@@ -292,7 +295,7 @@ Index: kfreebsd-source-8.0/sys/sys/linker.h
  #endif	/* _KERNEL */
  
  /*
-@@ -332,14 +339,13 @@
+@@ -332,14 +339,13 @@ struct kld_sym_lookup {
  #include <sys/cdefs.h>
  
  __BEGIN_DECLS
@@ -314,10 +317,8 @@ Index: kfreebsd-source-8.0/sys/sys/linker.h
  __END_DECLS
  
  #endif
-Index: kfreebsd-source-8.0/sys/sys/lock.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/lock.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/lock.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/lock.h
++++ b/sys/sys/lock.h
 @@ -32,6 +32,7 @@
  #ifndef _SYS_LOCK_H_
  #define _SYS_LOCK_H_
@@ -326,12 +327,10 @@ Index: kfreebsd-source-8.0/sys/sys/lock.h
  #include <sys/queue.h>
  #include <sys/_lock.h>
  
-Index: kfreebsd-source-8.0/sys/sys/memrange.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/memrange.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/memrange.h	2009-11-12 16:25:20.000000000 +0000
+--- a/sys/sys/memrange.h
++++ b/sys/sys/memrange.h
 @@ -4,6 +4,11 @@
-  * $FreeBSD: src/sys/sys/memrange.h,v 1.8.2.1.2.1 2009/10/25 01:10:29 kensmith Exp $
+  * $FreeBSD$
   */
  
 +#ifndef _SYS_MEMRANGE_H_
@@ -342,16 +341,14 @@ Index: kfreebsd-source-8.0/sys/sys/memrange.h
  /* Memory range attributes */
  #define MDF_UNCACHEABLE		(1<<0)	/* region not cached */
  #define MDF_WRITECOMBINE	(1<<1)	/* region supports "write combine" action */
-@@ -69,3 +74,5 @@
+@@ -69,3 +74,5 @@ extern int mem_range_attr_get(struct mem
  extern int mem_range_attr_set(struct mem_range_desc *mrd, int *arg);
  
  #endif
 +
 +#endif /* _SYS_MEMRANGE_H_ */
-Index: kfreebsd-source-8.0/sys/sys/pciio.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/pciio.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/pciio.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/pciio.h
++++ b/sys/sys/pciio.h
 @@ -31,6 +31,8 @@
  #ifndef _SYS_PCIIO_H_
  #define	_SYS_PCIIO_H_
@@ -361,11 +358,9 @@ Index: kfreebsd-source-8.0/sys/sys/pciio.h
  #include <sys/ioccom.h>
  
  #define PCI_MAXNAMELEN	16
-Index: kfreebsd-source-8.0/sys/sys/procfs.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/procfs.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/procfs.h	2009-11-12 16:22:12.000000000 +0000
-@@ -82,4 +82,8 @@
+--- a/sys/sys/procfs.h
++++ b/sys/sys/procfs.h
+@@ -82,4 +82,8 @@ typedef struct prpsinfo {
  
  typedef uint64_t psaddr_t;	/* An address in the target process. */
  
@@ -374,10 +369,8 @@ Index: kfreebsd-source-8.0/sys/sys/procfs.h
 +typedef __pid_t lwpid_t;
 +
  #endif /* _SYS_PROCFS_H_ */
-Index: kfreebsd-source-8.0/sys/sys/resourcevar.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/resourcevar.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/resourcevar.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/resourcevar.h
++++ b/sys/sys/resourcevar.h
 @@ -35,6 +35,8 @@
  
  #include <sys/resource.h>
@@ -387,10 +380,8 @@ Index: kfreebsd-source-8.0/sys/sys/resourcevar.h
  #ifdef _KERNEL
  #include <sys/_lock.h>
  #include <sys/_mutex.h>
-Index: kfreebsd-source-8.0/sys/sys/rtprio.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/rtprio.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/rtprio.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/rtprio.h
++++ b/sys/sys/rtprio.h
 @@ -36,6 +36,10 @@
  
  #include <sys/priority.h>
@@ -410,7 +401,7 @@ Index: kfreebsd-source-8.0/sys/sys/rtprio.h
  /*
   * Scheduling class information.
   */
-@@ -79,14 +82,15 @@
+@@ -79,14 +82,15 @@ struct thread;
  int	rtp_to_pri(struct rtprio *, struct thread *);
  void	pri_to_rtp(struct thread *, struct rtprio *);
  #endif
@@ -429,10 +420,8 @@ Index: kfreebsd-source-8.0/sys/sys/rtprio.h
  __END_DECLS
  #endif	/* !_KERNEL */
  #endif	/* !_SYS_RTPRIO_H_ */
-Index: kfreebsd-source-8.0/sys/sys/signalvar.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/signalvar.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/signalvar.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/signalvar.h
++++ b/sys/sys/signalvar.h
 @@ -43,6 +43,9 @@
   * not exported to user programs.
   */
@@ -443,15 +432,15 @@ Index: kfreebsd-source-8.0/sys/sys/signalvar.h
  /*
   * Logical process signal actions and state, needed only within the process
   * The mapping between sigacts and proc structures is 1:1 except for rfork()
-@@ -95,6 +98,7 @@
+@@ -95,6 +98,7 @@ struct osigaction {
  typedef void __osiginfohandler_t(int, osiginfo_t *, void *);
  #endif /* _KERNEL && COMPAT_43 */
  
 +#if 0
  /* additional signal action values, used only temporarily/internally */
  #define	SIG_CATCH	((__sighandler_t *)2)
- #define SIG_HOLD        ((__sighandler_t *)3)
-@@ -181,7 +188,7 @@
+ /* #define SIG_HOLD        ((__sighandler_t *)3) See signal.h */
+@@ -181,7 +185,7 @@ __sigisempty(sigset_t *set)
  	int i;
  
  	for (i = 0; i < _SIG_WORDS; i++) {
@@ -460,7 +449,7 @@ Index: kfreebsd-source-8.0/sys/sys/signalvar.h
  			return (0);
  	}
  	return (1);
-@@ -193,7 +200,7 @@
+@@ -193,7 +197,7 @@ __sigseteq(sigset_t *set1, sigset_t *set
  	int i;
  
  	for (i = 0; i < _SIG_WORDS; i++) {
@@ -469,7 +458,7 @@ Index: kfreebsd-source-8.0/sys/sys/signalvar.h
  			return (0);
  	}
  	return (1);
-@@ -208,6 +215,8 @@
+@@ -208,6 +212,8 @@ struct osigevent {
  	union sigval sigev_value;	/* Signal value */
  };
  
@@ -478,10 +467,8 @@ Index: kfreebsd-source-8.0/sys/sys/signalvar.h
  typedef struct ksiginfo {
  	TAILQ_ENTRY(ksiginfo)	ksi_link;
  	siginfo_t		ksi_info;
-Index: kfreebsd-source-8.0/sys/sys/sysctl.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/sysctl.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/sysctl.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/sysctl.h
++++ b/sys/sys/sysctl.h
 @@ -36,7 +36,103 @@
  #ifndef _SYS_SYSCTL_H_
  #define	_SYS_SYSCTL_H_
@@ -587,7 +574,7 @@ Index: kfreebsd-source-8.0/sys/sys/sysctl.h
  
  struct thread;
  /*
-@@ -387,7 +483,7 @@
+@@ -387,7 +483,7 @@ TAILQ_HEAD(sysctl_ctx_list, sysctl_ctx_e
  #define	KERN_SECURELVL	 	 9	/* int: system security level */
  #define	KERN_HOSTNAME		10	/* string: hostname */
  #define	KERN_HOSTID		11	/* int: host identifier */
@@ -596,7 +583,7 @@ Index: kfreebsd-source-8.0/sys/sys/sysctl.h
  #define	KERN_VNODE		13	/* struct: vnode structures */
  #define	KERN_PROC		14	/* struct: process entries */
  #define	KERN_FILE		15	/* struct: file entries */
-@@ -711,13 +807,21 @@
+@@ -712,13 +808,21 @@ void	sysctl_unlock(void);
  int	sysctl_wire_old_buffer(struct sysctl_req *req, size_t len);
  
  #else	/* !_KERNEL */
@@ -622,10 +609,8 @@ Index: kfreebsd-source-8.0/sys/sys/sysctl.h
  #endif	/* _KERNEL */
  
  #endif	/* !_SYS_SYSCTL_H_ */
-Index: kfreebsd-source-8.0/sys/sys/timepps.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/timepps.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/timepps.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/timepps.h
++++ b/sys/sys/timepps.h
 @@ -15,6 +15,8 @@
  #ifndef _SYS_TIMEPPS_H_
  #define _SYS_TIMEPPS_H_
@@ -635,10 +620,8 @@ Index: kfreebsd-source-8.0/sys/sys/timepps.h
  #include <sys/ioccom.h>
  #include <sys/time.h>
  
-Index: kfreebsd-source-8.0/sys/sys/timex.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/timex.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/timex.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/timex.h
++++ b/sys/sys/timex.h
 @@ -95,11 +95,9 @@
   */
  #ifndef _SYS_TIMEX_H_
@@ -668,7 +651,7 @@ Index: kfreebsd-source-8.0/sys/sys/timex.h
  	struct timespec time;	/* current time (ns) (ro) */
  	long maxerror;		/* maximum error (us) (ro) */
  	long esterror;		/* estimated error (us) (ro) */
-@@ -225,9 +229,12 @@
+@@ -225,9 +229,12 @@ void	ntp_update_second(int64_t *adjustme
  #else /* !_KERNEL */
  #include <sys/cdefs.h>
  
@@ -683,10 +666,8 @@ Index: kfreebsd-source-8.0/sys/sys/timex.h
  __END_DECLS
  #endif /* _KERNEL */
  
-Index: kfreebsd-source-8.0/sys/sys/ucred.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/sys/ucred.h	2009-11-12 15:49:03.000000000 +0000
-+++ kfreebsd-source-8.0/sys/sys/ucred.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/sys/ucred.h
++++ b/sys/sys/ucred.h
 @@ -33,6 +33,9 @@
  #ifndef _SYS_UCRED_H_
  #define	_SYS_UCRED_H_
@@ -697,23 +678,19 @@ Index: kfreebsd-source-8.0/sys/sys/ucred.h
  #include <bsm/audit.h>
  
  /*
-Index: kfreebsd-source-8.0/sys/vm/vm.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/vm/vm.h	2009-11-12 15:49:04.000000000 +0000
-+++ kfreebsd-source-8.0/sys/vm/vm.h	2009-11-12 16:22:12.000000000 +0000
-@@ -69,6 +69,8 @@
-  */
- typedef	char vm_memattr_t;	/* memory attribute codes */
+--- a/sys/vm/vm.h
++++ b/sys/vm/vm.h
+@@ -63,6 +63,8 @@
+ 
+ #include <machine/vm.h>
  
 +#include <sys/_types.h>
 +
  typedef char vm_inherit_t;	/* inheritance codes */
  
  #define	VM_INHERIT_SHARE	((vm_inherit_t) 0)
-Index: kfreebsd-source-8.0/sys/vm/vm_map.h
-===================================================================
---- kfreebsd-source-8.0.orig/sys/vm/vm_map.h	2009-11-12 15:49:04.000000000 +0000
-+++ kfreebsd-source-8.0/sys/vm/vm_map.h	2009-11-12 16:22:12.000000000 +0000
+--- a/sys/vm/vm_map.h
++++ b/sys/vm/vm_map.h
 @@ -70,6 +70,12 @@
  #include <sys/sx.h>
  #include <sys/_mutex.h>
