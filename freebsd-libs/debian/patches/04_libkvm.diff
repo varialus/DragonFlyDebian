@@ -1,22 +1,20 @@
 ---
  lib/libkvm/Makefile             |    2 +-
- lib/libkvm/kvm.c                |   16 ++++++++++++----
- lib/libkvm/kvm_amd64.c          |    9 +++++----
- lib/libkvm/kvm_cptime.c         |    5 +++--
- lib/libkvm/kvm_file.c           |    8 +++++++-
- lib/libkvm/kvm_getloadavg.c     |   14 ++++++++++----
- lib/libkvm/kvm_getswapinfo.c    |   13 +++++++++----
- lib/libkvm/kvm_minidump_amd64.c |   10 ++++++++++
+ lib/libkvm/kvm.c                |   23 +++++++++++++++++++----
+ lib/libkvm/kvm_cptime.c         |    4 ++--
+ lib/libkvm/kvm_file.c           |    7 ++++++-
+ lib/libkvm/kvm_getloadavg.c     |   12 +++++++++---
+ lib/libkvm/kvm_getswapinfo.c    |    8 +++++---
+ lib/libkvm/kvm_minidump_amd64.c |    9 +++++++++
  lib/libkvm/kvm_minidump_i386.c  |   10 ++++++++++
  lib/libkvm/kvm_pcpu.c           |    6 +++---
- lib/libkvm/kvm_private.h        |    4 ++--
- lib/libkvm/kvm_proc.c           |   19 +++++++++++--------
- 12 files changed, 83 insertions(+), 33 deletions(-)
+ lib/libkvm/kvm_private.h        |    6 ++++--
+ lib/libkvm/kvm_proc.c           |    5 ++++-
+ lib/libkvm/kvm_vnet.c           |   14 +++++++-------
+ 12 files changed, 79 insertions(+), 27 deletions(-)
 
-Index: freebsd-libs/lib/libkvm/Makefile
-===================================================================
---- freebsd-libs.orig/lib/libkvm/Makefile	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/Makefile	2009-11-14 09:09:01.000000000 +0000
+--- a/lib/libkvm/Makefile
++++ b/lib/libkvm/Makefile
 @@ -2,8 +2,8 @@
  # $FreeBSD$
  
@@ -27,19 +25,9 @@ Index: freebsd-libs/lib/libkvm/Makefile
  
  .if ${MACHINE} == "sun4v"
  CFLAGS+=-DSUN4V
-Index: freebsd-libs/lib/libkvm/kvm.c
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm.c	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm.c	2009-11-14 09:09:01.000000000 +0000
-@@ -50,6 +50,7 @@
- #include <sys/stat.h>
- #include <sys/sysctl.h>
- #include <sys/linker.h>
-+#include <sys/sysctl.h>
- 
- #include <net/vnet.h>
- 
-@@ -70,6 +71,10 @@
+--- a/lib/libkvm/kvm.c
++++ b/lib/libkvm/kvm.c
+@@ -70,6 +71,10 @@ static char sccsid[] = "@(#)kvm.c	8.2 (B
  #include <strings.h>
  #include <unistd.h>
  
@@ -50,7 +38,7 @@ Index: freebsd-libs/lib/libkvm/kvm.c
  #include "kvm_private.h"
  
  /* from src/lib/libc/gen/nlist.c */
-@@ -151,6 +156,7 @@
+@@ -151,6 +156,7 @@ _kvm_open(kd, uf, mf, flag, errout)
  	char *errout;
  {
  	struct stat st;
@@ -58,7 +46,7 @@ Index: freebsd-libs/lib/libkvm/kvm.c
  
  	kd->vmfd = -1;
  	kd->pmfd = -1;
-@@ -160,8 +166,17 @@
+@@ -160,8 +166,17 @@ _kvm_open(kd, uf, mf, flag, errout)
  	kd->argspc = 0;
  	kd->argv = 0;
  
@@ -78,7 +66,7 @@ Index: freebsd-libs/lib/libkvm/kvm.c
  	else if (strlen(uf) >= MAXPATHLEN) {
  		_kvm_err(kd, kd->program, "exec file name too long");
  		goto failed;
-@@ -244,7 +259,7 @@
+@@ -244,7 +259,7 @@ kvm_t *
  kvm_openfiles(uf, mf, sf, flag, errout)
  	const char *uf;
  	const char *mf;
@@ -87,7 +75,7 @@ Index: freebsd-libs/lib/libkvm/kvm.c
  	int flag;
  	char *errout;
  {
-@@ -262,7 +277,7 @@
+@@ -262,7 +277,7 @@ kvm_t *
  kvm_open(uf, mf, sf, flag, errstr)
  	const char *uf;
  	const char *mf;
@@ -96,11 +84,9 @@ Index: freebsd-libs/lib/libkvm/kvm.c
  	int flag;
  	const char *errstr;
  {
-Index: freebsd-libs/lib/libkvm/kvm_file.c
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm_file.c	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm_file.c	2009-11-14 09:09:01.000000000 +0000
-@@ -59,7 +59,7 @@
+--- a/lib/libkvm/kvm_file.c
++++ b/lib/libkvm/kvm_file.c
+@@ -59,7 +59,7 @@ static char sccsid[] = "@(#)kvm_file.c	8
  #include <sys/sysctl.h>
  
  #include <limits.h>
@@ -109,7 +95,7 @@ Index: freebsd-libs/lib/libkvm/kvm_file.c
  #include <paths.h>
  #include <stdlib.h>
  
-@@ -80,6 +80,7 @@
+@@ -80,6 +80,7 @@ kvm_deadfiles(kd, op, arg, allproc_o, np
  	int op, arg, nprocs;
  	long allproc_o;
  {
@@ -117,7 +103,7 @@ Index: freebsd-libs/lib/libkvm/kvm_file.c
  	struct proc proc;
  	struct filedesc filed;
  	int buflen = kd->arglen, ocnt = 0, n = 0, once = 0, i;
-@@ -151,6 +152,7 @@
+@@ -151,6 +152,7 @@ kvm_deadfiles(kd, op, arg, allproc_o, np
  	return (n);
  fail:
  	free(ofiles);
@@ -125,7 +111,7 @@ Index: freebsd-libs/lib/libkvm/kvm_file.c
  	return (0);
  	
  }
-@@ -166,6 +168,7 @@
+@@ -166,6 +168,7 @@ kvm_getfiles(kd, op, arg, cnt)
  
  	_kvm_syserr(kd, kd->program, "kvm_getfiles has been broken for years");
  	return (0);
@@ -133,18 +119,16 @@ Index: freebsd-libs/lib/libkvm/kvm_file.c
  	if (ISALIVE(kd)) {
  		size = 0;
  		mib[0] = CTL_KERN;
-@@ -228,4 +231,6 @@
+@@ -228,4 +231,6 @@ kvm_getfiles(kd, op, arg, cnt)
  	}
  	*cnt = nfiles;
  	return (kd->argspc);
 +#endif
 +	return 0;
  }
-Index: freebsd-libs/lib/libkvm/kvm_getloadavg.c
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm_getloadavg.c	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm_getloadavg.c	2009-11-14 09:09:01.000000000 +0000
-@@ -44,15 +44,21 @@
+--- a/lib/libkvm/kvm_getloadavg.c
++++ b/lib/libkvm/kvm_getloadavg.c
+@@ -44,15 +44,21 @@ static char sccsid[] = "@(#)kvm_getloada
  #include <limits.h>
  #include <nlist.h>
  #include <kvm.h>
@@ -169,18 +153,9 @@ Index: freebsd-libs/lib/libkvm/kvm_getloadavg.c
  };
  
  /*
-Index: freebsd-libs/lib/libkvm/kvm_getswapinfo.c
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm_getswapinfo.c	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm_getswapinfo.c	2009-11-14 09:09:01.000000000 +0000
-@@ -47,13 +47,16 @@
- #include <string.h>
- #include <unistd.h>
- #include <limits.h>
-+#include <bsd/string.h>
-+
-+
- 
+--- a/lib/libkvm/kvm_getswapinfo.c
++++ b/lib/libkvm/kvm_getswapinfo.c
+@@ -51,9 +51,9 @@ __FBSDID("$FreeBSD$");
  #include "kvm_private.h"
  
  static struct nlist kvm_swap_nl[] = {
@@ -193,7 +168,7 @@ Index: freebsd-libs/lib/libkvm/kvm_getswapinfo.c
  };
  
  #define NL_SWTAILQ	0
-@@ -210,8 +213,10 @@
+@@ -210,8 +210,10 @@ kvm_getswapinfo_sysctl(
  			swap_ary[unswdev].ksw_total = ttl;
  			swap_ary[unswdev].ksw_used = xsd.xsw_used;
  			swap_ary[unswdev].ksw_flags = xsd.xsw_flags;
@@ -204,11 +179,9 @@ Index: freebsd-libs/lib/libkvm/kvm_getswapinfo.c
  		}
  		tot.ksw_total += ttl;
  		tot.ksw_used += xsd.xsw_used;
-Index: freebsd-libs/lib/libkvm/kvm_minidump_amd64.c
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm_minidump_amd64.c	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm_minidump_amd64.c	2009-11-14 09:09:01.000000000 +0000
-@@ -100,6 +100,15 @@
+--- a/lib/libkvm/kvm_minidump_amd64.c
++++ b/lib/libkvm/kvm_minidump_amd64.c
+@@ -100,6 +100,15 @@ hpt_find(kvm_t *kd, vm_paddr_t pa)
  	return (-1);
  }
  
@@ -224,11 +197,9 @@ Index: freebsd-libs/lib/libkvm/kvm_minidump_amd64.c
  static int
  inithash(kvm_t *kd, uint64_t *base, int len, off_t off)
  {
-Index: freebsd-libs/lib/libkvm/kvm_minidump_i386.c
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm_minidump_i386.c	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm_minidump_i386.c	2009-11-14 09:09:01.000000000 +0000
-@@ -102,6 +102,16 @@
+--- a/lib/libkvm/kvm_minidump_i386.c
++++ b/lib/libkvm/kvm_minidump_i386.c
+@@ -102,6 +102,16 @@ hpt_find(kvm_t *kd, uint64_t pa)
  	return (-1);
  }
  
@@ -245,10 +216,8 @@ Index: freebsd-libs/lib/libkvm/kvm_minidump_i386.c
  static int
  inithash(kvm_t *kd, uint32_t *base, int len, off_t off)
  {
-Index: freebsd-libs/lib/libkvm/kvm_private.h
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm_private.h	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm_private.h	2009-11-14 09:09:01.000000000 +0000
+--- a/lib/libkvm/kvm_private.h
++++ b/lib/libkvm/kvm_private.h
 @@ -34,6 +34,8 @@
   * $FreeBSD$
   */
@@ -258,29 +227,9 @@ Index: freebsd-libs/lib/libkvm/kvm_private.h
  struct __kvm {
  	/*
  	 * a string to be prepended to error messages
-@@ -74,7 +76,7 @@
-  * Functions used internally by kvm, but across kvm modules.
-  */
- void	 _kvm_err(kvm_t *kd, const char *program, const char *fmt, ...)
--	    __printflike(3, 4);
-+	    __attribute__((format(printf,3,4)));
- void	 _kvm_freeprocs(kvm_t *kd);
- void	 _kvm_freevtop(kvm_t *);
- int	 _kvm_initvtop(kvm_t *);
-@@ -83,7 +85,7 @@
- int	 _kvm_nlist(kvm_t *, struct nlist *, int);
- void	*_kvm_realloc(kvm_t *kd, void *, size_t);
- void	 _kvm_syserr (kvm_t *kd, const char *program, const char *fmt, ...)
--	    __printflike(3, 4);
-+	    __attribute__((format(printf,3,4)));
- int	 _kvm_uvatop(kvm_t *, const struct proc *, u_long, u_long *);
- int	 _kvm_vnet_selectpid(kvm_t *, pid_t);
- int	 _kvm_vnet_initialized(kvm_t *, int);
-Index: freebsd-libs/lib/libkvm/kvm_proc.c
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm_proc.c	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm_proc.c	2009-11-14 09:09:01.000000000 +0000
-@@ -54,7 +54,7 @@
+--- a/lib/libkvm/kvm_proc.c
++++ b/lib/libkvm/kvm_proc.c
+@@ -54,7 +54,7 @@ __FBSDID("$FreeBSD$");
  #include <sys/_lock.h>
  #include <sys/_mutex.h>
  #include <sys/_task.h>
@@ -289,7 +238,7 @@ Index: freebsd-libs/lib/libkvm/kvm_proc.c
  #include <sys/user.h>
  #include <sys/proc.h>
  #define	_WANT_PRISON	/* make jail.h give us 'struct prison' */
-@@ -101,6 +101,7 @@
+@@ -101,6 +101,7 @@ kvm_proclist(kd, what, arg, p, bp, maxcn
  	struct kinfo_proc *bp;
  	int maxcnt;
  {
@@ -297,7 +246,7 @@ Index: freebsd-libs/lib/libkvm/kvm_proc.c
  	int cnt = 0;
  	struct kinfo_proc kinfo_proc, *kp;
  	struct pgrp pgrp;
-@@ -427,6 +428,8 @@
+@@ -427,6 +428,8 @@ nopgrp:
  		++cnt;
  	}
  	return (cnt);
@@ -306,23 +255,9 @@ Index: freebsd-libs/lib/libkvm/kvm_proc.c
  }
  
  /*
-Index: freebsd-libs/lib/libkvm/kvm_amd64.c
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm_amd64.c	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm_amd64.c	2009-11-14 09:09:01.000000000 +0000
-@@ -53,6 +53,7 @@
- #include <stdlib.h>
- #include <string.h>
- #include <unistd.h>
-+#include <string.h>
- #include <nlist.h>
- #include <kvm.h>
- 
-Index: freebsd-libs/lib/libkvm/kvm_cptime.c
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm_cptime.c	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm_cptime.c	2009-11-14 09:09:01.000000000 +0000
-@@ -44,8 +44,8 @@
+--- a/lib/libkvm/kvm_cptime.c
++++ b/lib/libkvm/kvm_cptime.c
+@@ -44,8 +44,8 @@ __FBSDID("$FreeBSD$");
  #include "kvm_private.h"
  
  static struct nlist kvm_cp_time_nl[] = {
@@ -333,11 +268,9 @@ Index: freebsd-libs/lib/libkvm/kvm_cptime.c
  };
  
  #define	NL_CP_TIME		0
-Index: freebsd-libs/lib/libkvm/kvm_pcpu.c
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm_pcpu.c	2009-11-14 09:09:01.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm_pcpu.c	2009-11-14 09:09:01.000000000 +0000
-@@ -41,9 +41,9 @@
+--- a/lib/libkvm/kvm_pcpu.c
++++ b/lib/libkvm/kvm_pcpu.c
+@@ -41,9 +41,9 @@ __FBSDID("$FreeBSD$");
  #include "kvm_private.h"
  
  static struct nlist kvm_pcpu_nl[] = {
@@ -350,11 +283,9 @@ Index: freebsd-libs/lib/libkvm/kvm_pcpu.c
  };
  
  /*
-Index: freebsd-libs/lib/libkvm/kvm_vnet.c
-===================================================================
---- freebsd-libs.orig/lib/libkvm/kvm_vnet.c	2009-11-14 09:14:36.000000000 +0000
-+++ freebsd-libs/lib/libkvm/kvm_vnet.c	2009-11-14 09:15:01.000000000 +0000
-@@ -69,18 +69,18 @@
+--- a/lib/libkvm/kvm_vnet.c
++++ b/lib/libkvm/kvm_vnet.c
+@@ -69,18 +69,18 @@ _kvm_vnet_selectpid(kvm_t *kd, pid_t pid
  		 * here to __{start,stop}_set_vnet.
  		 */
  #define	NLIST_START_VNET	0

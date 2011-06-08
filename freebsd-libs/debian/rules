@@ -11,7 +11,8 @@ SHELL = bash
 export DH_OPTIONS
 
 CFLAGS = -Wall -g -pipe -fPIC -I. -I$(CURDIR)/sys -D_GNU_SOURCE \
-         -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
+         $(shell pkg-config --cflags libbsd-overlay) \
+         -D__va_list=__builtin_va_list
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0

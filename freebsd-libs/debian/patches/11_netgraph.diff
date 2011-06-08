@@ -37,21 +37,13 @@ Index: freebsd-libs/lib/libnetgraph/msg.c
 ===================================================================
 --- freebsd-libs.orig/lib/libnetgraph/msg.c	2009-11-16 20:42:38.000000000 +0000
 +++ freebsd-libs/lib/libnetgraph/msg.c	2009-11-16 20:42:39.000000000 +0000
-@@ -44,12 +44,15 @@
+@@ -44,6 +44,7 @@
  #include <sys/types.h>
  #include <sys/socket.h>
  #include <stdarg.h>
 +#include <stdint.h>
  #include <netgraph/ng_message.h>
  #include <netgraph/ng_socket.h>
- 
- #include "netgraph.h"
- #include "internal.h"
- 
-+#define INFTIM          (-1)
-+
- /* Next message token value */
- static int	gMsgId;
  
 Index: freebsd-libs/lib/libnetgraph/Makefile
 ===================================================================
@@ -61,7 +53,7 @@ Index: freebsd-libs/lib/libnetgraph/Makefile
  LIB=		netgraph
  WARNS?=		3
  MAN=		netgraph.3
-+LDADD= -lbsd
++LDADD=		-lbsd
  
  SHLIB_MAJOR=	4
  

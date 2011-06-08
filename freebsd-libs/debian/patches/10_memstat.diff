@@ -84,8 +84,8 @@ Index: freebsd-libs/lib/libmemstat/Makefile
  SHLIB_MAJOR=	3
 -DPADD=		${LIBKVM}
 -LDADD=		-lkvm
-+LDADD=		-lbsd ../libkvm/libkvm.so.0
-+CFLAGS+=-I. -I../libkvm
++LDADD=		-lbsd -L../libkvm -lkvm
++CFLAGS+=	-I${.CURDIR} -I../libkvm
 +
  SRCS+=		memstat.c
  SRCS+=		memstat_all.c

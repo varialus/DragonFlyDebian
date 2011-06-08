@@ -23,15 +23,6 @@ Index: freebsd-libs/lib/libgeom/geom_ctl.c
 ===================================================================
 --- freebsd-libs.orig/lib/libgeom/geom_ctl.c	2009-11-14 09:46:19.000000000 +0000
 +++ freebsd-libs/lib/libgeom/geom_ctl.c	2009-11-14 09:46:40.000000000 +0000
-@@ -141,7 +141,7 @@
- 	struct gctl_req_arg *ap;
- 
- 	req->narg++;
--	req->arg = reallocf(req->arg, sizeof *ap * req->narg);
-+	req->arg = realloc(req->arg, sizeof *ap * req->narg);
- 	gctl_check_alloc(req, req->arg);
- 	if (req->arg == NULL) {
- 		req->narg = 0;
 @@ -167,6 +167,9 @@
  	if (ap->name == NULL)
  		return;
@@ -72,26 +63,3 @@ Index: freebsd-libs/lib/libgeom/geom_xml2tree.c
  #include <libgeom.h>
  
  struct mystate {
-Index: freebsd-libs/lib/libgeom/geom_util.c
-===================================================================
---- freebsd-libs.orig/lib/libgeom/geom_util.c	2009-11-14 09:46:20.000000000 +0000
-+++ freebsd-libs/lib/libgeom/geom_util.c	2009-11-14 09:46:40.000000000 +0000
-@@ -39,6 +39,7 @@
- #include <string.h>
- #include <stdlib.h>
- #include <paths.h>
-+#include <bsd/string.h>
- 
- #include <libgeom.h>
- 
-Index: freebsd-libs/lib/libgeom/geom_getxml.c
-===================================================================
---- freebsd-libs.orig/lib/libgeom/geom_getxml.c	2009-11-14 09:47:41.000000000 +0000
-+++ freebsd-libs/lib/libgeom/geom_getxml.c	2009-11-14 09:47:47.000000000 +0000
-@@ -56,5 +56,5 @@
- 		free(p);
- 		return (NULL);
- 	}
--	return (reallocf(p, strlen(p) + 1));
-+	return (realloc(p, strlen(p) + 1));
- }

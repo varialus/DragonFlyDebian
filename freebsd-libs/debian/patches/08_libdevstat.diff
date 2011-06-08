@@ -10,7 +10,7 @@
  
  DPADD=	${LIBKVM}
 -LDADD=	-lkvm
-+LDADD=	-lrt ../libkvm/libkvm.so.0
++LDADD=	-lrt -L../libkvm -lkvm -lbsd
  
  MAN=	devstat.3
  
@@ -19,7 +19,7 @@
  MLINKS+=devstat.3 compute_etime.3
  
 -CFLAGS+=-I${.CURDIR}
-+CFLAGS+=-I. -I../libkvm
++CFLAGS+=-I${.CURDIR} -I../libkvm
  
  WARNS?=	2
  
@@ -33,24 +33,3 @@
  
  #include "devstat.h"
  
-@@ -1589,6 +1590,7 @@ get_devstat_kvm(kvm_t *kd)
- 	struct devstatlist dhead;
- 	int num_devs;
- 	char *rv = NULL;
-+	char *oldrv;
- 
- 	if ((num_devs = devstat_getnumdevs(kd)) <= 0)
- 		return(NULL);
-@@ -1616,9 +1618,11 @@ get_devstat_kvm(kvm_t *kd)
- 			return(NULL);
- 		}
- 		nds = &ds;
--		rv = (char *)reallocf(rv, sizeof(gen) + 
-+		oldrv = rv;
-+		rv = (char *)realloc(rv, sizeof(gen) + 
- 				      sizeof(ds) * (i + 1));
- 		if (rv == NULL) {
-+			free(oldrv);		
- 			snprintf(devstat_errbuf, sizeof(devstat_errbuf), 
- 				 "%s: out of memory (malloc failed)",
- 				 __func__);
