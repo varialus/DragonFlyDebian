@@ -1,6 +1,12 @@
+---
+ lib/libsbuf/Makefile |    1 +
+ sys/kern/subr_sbuf.c |    1 +
+ sys/sys/sbuf.h       |    9 ++++-----
+ 3 files changed, 6 insertions(+), 5 deletions(-)
+
 --- a/lib/libsbuf/Makefile
 +++ b/lib/libsbuf/Makefile
-@@ -4,6 +4,7 @@
+@@ -4,6 +4,7 @@ LIB=	sbuf
  SHLIBDIR?= /lib
  SRCS=	subr_sbuf.c 
  WARNS?= 2
@@ -10,7 +16,7 @@
  
 --- a/sys/kern/subr_sbuf.c
 +++ b/sys/kern/subr_sbuf.c
-@@ -44,6 +44,7 @@
+@@ -44,6 +44,7 @@ __FBSDID("$FreeBSD$");
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
@@ -20,16 +26,17 @@
  #include <sys/sbuf.h>
 --- a/sys/sys/sbuf.h
 +++ b/sys/sys/sbuf.h
-@@ -31,8 +31,6 @@
+@@ -31,7 +31,8 @@
  #ifndef _SYS_SBUF_H_
  #define	_SYS_SBUF_H_
  
 -#include <sys/_types.h>
--
++#include <sys/types.h>
++#include <stdarg.h>
+ 
  /*
   * Structure definition
-  */
-@@ -64,10 +62,8 @@
+@@ -64,10 +65,8 @@ int		 sbuf_bcat(struct sbuf *, const voi
  int		 sbuf_bcpy(struct sbuf *, const void *, size_t);
  int		 sbuf_cat(struct sbuf *, const char *);
  int		 sbuf_cpy(struct sbuf *, const char *);
@@ -38,7 +45,7 @@
 -int		 sbuf_vprintf(struct sbuf *, const char *, __va_list)
 -	__printflike(2, 0);
 +int		 sbuf_printf(struct sbuf *, const char *, ...);
-+int		 sbuf_vprintf(struct sbuf *, const char *, __va_list);
++int		 sbuf_vprintf(struct sbuf *, const char *, va_list);
  int		 sbuf_putc(struct sbuf *, int);
  int		 sbuf_trim(struct sbuf *);
  int		 sbuf_overflowed(struct sbuf *);
