@@ -1,4 +1,4 @@
-/* Copyright (C) 2007 Free Software Foundation, Inc.
+/* Copyright (C) 2011 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -24,9 +24,9 @@
 extern int __isptymaster(int fd);
 
 int
-unlockpt (int fd)
+grantpt (int fd)
 {
-  /* there is no need/way to do unlocking of slave pseudo-terminal device,
+  /* there is no need/way to do granting of slave pseudo-terminal device,
      just check whether fd might be valid master pseudo-terminal device */
   return __isptymaster(fd);
 }

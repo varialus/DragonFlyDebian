@@ -24,10 +24,10 @@
 #include <sys/sysmacros.h>
 #include <sys/sysctl.h>
 #include <unistd.h>
-
+#include <sys/ioctl.h>
 
 /* Static buffer for `ptsname'.  */
-static char buffer[sizeof (_PATH_TTY) + 2];
+static char buffer[sizeof (_PATH_DEV) + 20];
 
 
 /* Return the pathname of the pseudo terminal slave associated with
@@ -39,15 +39,26 @@ ptsname (int fd)
   return __ptsname_r (fd, buffer, sizeof (buffer)) != 0 ? NULL : buffer;
 }
 
-/* The are declared in getpt.c.  */
-extern const char __libc_ptyname1[] attribute_hidden;
-extern const char __libc_ptyname2[] attribute_hidden;
-
-
 int
-__ptsname_internal (int fd, char *buf, size_t buflen, struct stat64 *stp)
+__isptymaster(int fd)
+{
+  if (0 == __ioctl(fd, TIOCPTMASTER))
+    return 0;
+
+  if (errno != EBADF)
+    __set_errno (EINVAL);
+
+  return -1;
+}
+
+/* Store at most BUFLEN characters of the pathname of the slave pseudo
+   terminal associated with the master FD is open on in BUF.
+   Return 0 on success, otherwise an error number.  */
+int
+__ptsname_r (int fd, char *buf, size_t buflen)
 {
   int saved_errno = errno;
+  struct fiodgname_arg fiodgname;
   char *p;
 
   if (buf == NULL)
@@ -56,19 +67,14 @@ __ptsname_internal (int fd, char *buf, size_t buflen, struct stat64 *stp)
       return EINVAL;
     }
 
-  /* Don't call isatty (fd) - it usually fails with errno = EAGAIN.  */
-
-  if (__fxstat64 (_STAT_VER, fd, stp) < 0)
-    return errno;
-
   /* Check if FD really is a master pseudo terminal.  */
-  if (!(S_ISCHR (stp->st_mode)))
+  if (0 != __isptymaster(fd))
     {
       __set_errno (ENOTTY);
       return ENOTTY;
     }
 
-  if (buflen < sizeof (_PATH_TTY) + 2)
+  if (buflen < sizeof (_PATH_DEV) + 5)
     {
       __set_errno (ERANGE);
       return ERANGE;
@@ -78,34 +84,15 @@ __ptsname_internal (int fd, char *buf, size_t buflen, struct stat64 *stp)
   /* instead of strlen(_PATH_DEV) we use (sizeof (_PATH_DEV) - 1)  */
   p = __mempcpy (buf, _PATH_DEV, sizeof (_PATH_DEV) - 1);
   buflen -= (sizeof (_PATH_DEV) - 1);
-  if(__sysctlbyname("kern.devname", p, &buflen, &stp->st_rdev, sizeof (stp->st_rdev)) < 0)
-    return errno;
-  p[0] = 't';
 
-  if (__xstat64 (_STAT_VER, buf, stp) < 0)
-    return errno;
+  fiodgname.buf = p;
+  fiodgname.len = buflen;
 
-  /* Check if the pathname we're about to return might be
-     slave pseudo terminal of the given master pseudo terminal.  */
-  if (!(S_ISCHR (stp->st_mode)))
-    {
-      /* This really is a configuration problem.  */
-      __set_errno (ENOTTY);
-      return ENOTTY;
-    }
+  if (0 != __ioctl(fd, FIODGNAME, &fiodgname))
+    return errno;
 
   __set_errno (saved_errno);
   return 0;
 }
 
-
-/* Store at most BUFLEN characters of the pathname of the slave pseudo
-   terminal associated with the master FD is open on in BUF.
-   Return 0 on success, otherwise an error number.  */
-int
-__ptsname_r (int fd, char *buf, size_t buflen)
-{
-  struct stat64 st;
-  return __ptsname_internal (fd, buf, buflen, &st);
-}
 weak_alias (__ptsname_r, ptsname_r)
