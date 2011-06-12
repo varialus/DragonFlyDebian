@@ -1,16 +1,21 @@
 ---
- lib/libgeom/Makefile        |    2 +-
+ lib/libgeom/Makefile        |    3 ++-
  lib/libgeom/geom_ctl.c      |    3 +++
  lib/libgeom/geom_stats.c    |    2 +-
- lib/libgeom/geom_util.c     |    1 +
  lib/libgeom/geom_xml2tree.c |    2 +-
- 5 files changed, 7 insertions(+), 3 deletions(-)
+ 4 files changed, 7 insertions(+), 3 deletions(-)
 
-Index: freebsd-libs/lib/libgeom/Makefile
-===================================================================
---- freebsd-libs.orig/lib/libgeom/Makefile	2009-11-14 09:46:19.000000000 +0000
-+++ freebsd-libs/lib/libgeom/Makefile	2009-11-14 09:46:40.000000000 +0000
-@@ -14,7 +14,7 @@
+--- a/lib/libgeom/Makefile
++++ b/lib/libgeom/Makefile
+@@ -1,6 +1,7 @@
+ # $FreeBSD$
+ 
+ LIB=	geom
++SHLIB_MAJOR= 1
+ SHLIBDIR?= /lib
+ SRCS+=	geom_getxml.c
+ SRCS+=	geom_stats.c
+@@ -14,7 +15,7 @@ CFLAGS += -I${.CURDIR}
  WARNS?=	3
  
  DPADD=	${LIBBSDXML} ${LIBSBUF}
@@ -19,11 +24,9 @@ Index: freebsd-libs/lib/libgeom/Makefile
  
  MAN=	libgeom.3
  
-Index: freebsd-libs/lib/libgeom/geom_ctl.c
-===================================================================
---- freebsd-libs.orig/lib/libgeom/geom_ctl.c	2009-11-14 09:46:19.000000000 +0000
-+++ freebsd-libs/lib/libgeom/geom_ctl.c	2009-11-14 09:46:40.000000000 +0000
-@@ -167,6 +167,9 @@
+--- a/lib/libgeom/geom_ctl.c
++++ b/lib/libgeom/geom_ctl.c
+@@ -167,6 +167,9 @@ gctl_ro_param(struct gctl_req *req, cons
  	if (ap->name == NULL)
  		return;
  	ap->nlen = strlen(ap->name) + 1;
@@ -33,10 +36,8 @@ Index: freebsd-libs/lib/libgeom/geom_ctl.c
  	ap->value = __DECONST(void *, value);
  	ap->flag = GCTL_PARAM_RD;
  	if (len >= 0)
-Index: freebsd-libs/lib/libgeom/geom_stats.c
-===================================================================
---- freebsd-libs.orig/lib/libgeom/geom_stats.c	2009-11-14 09:46:20.000000000 +0000
-+++ freebsd-libs/lib/libgeom/geom_stats.c	2009-11-14 09:46:40.000000000 +0000
+--- a/lib/libgeom/geom_stats.c
++++ b/lib/libgeom/geom_stats.c
 @@ -34,11 +34,11 @@
  #include <fcntl.h>
  #include <stdlib.h>
@@ -50,10 +51,8 @@ Index: freebsd-libs/lib/libgeom/geom_stats.c
  #include <sys/types.h>
  #include <sys/devicestat.h>
  
-Index: freebsd-libs/lib/libgeom/geom_xml2tree.c
-===================================================================
---- freebsd-libs.orig/lib/libgeom/geom_xml2tree.c	2009-11-14 09:46:20.000000000 +0000
-+++ freebsd-libs/lib/libgeom/geom_xml2tree.c	2009-11-14 09:46:40.000000000 +0000
+--- a/lib/libgeom/geom_xml2tree.c
++++ b/lib/libgeom/geom_xml2tree.c
 @@ -43,7 +43,7 @@
  #include <sys/sbuf.h>
  #include <sys/sysctl.h>
