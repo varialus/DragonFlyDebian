@@ -5,7 +5,7 @@ Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>, Guillem Jover <guillem@debian.org>
 Build-Depends: debhelper (>= 7), pkg-config, freebsd-buildutils,
  libbsd-dev (>= 0.3.0) [kfreebsd-any],
- libc0.1-dev (>= 2.10) [kfreebsd-any],
+ libc0.1-dev (>= 2.13-0exp2) [kfreebsd-any],
  libgdbm-dev [kfreebsd-any],
  kfreebsd-kernel-headers (>= 0.54) [kfreebsd-any],
 # libexpat-dev: aka bsdxml. needed by libgeom
@@ -245,3 +245,27 @@ Depends: libkiconv4 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-d
 Description: Development files for libkiconv
  This package contains the header files and static library needed to
  compile applications that use libkiconv.
+
+Package: libjail1
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: FreeBSD jail library
+ The jail library provides support for FreeBSD jails.
+
+Package: libjail1-udeb
+Package-Type: udeb
+Section: debian-installer
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: FreeBSD jail library (udeb)
+ The jail library provides support for FreeBSD jails.
+ .
+ This is a minimal package for use in debian-installer.
+
+Package: libjail-dev
+Section: libdevel
+Architecture: kfreebsd-any
+Depends: libjail1 (= ${binary:Version}), ${misc:Depends}
+Description: Development files for libjail
+ This package contains the header files and static library needed to
+ compile applications that use libjail.

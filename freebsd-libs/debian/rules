@@ -21,8 +21,9 @@ else
 endif
 
 SOURCE = freebsd-libs
-VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
-SVN = http://svn.freebsd.org/base/release/$(VERSION).0
+VERSION = $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)-[^-]*$$/\1/p')
+SVN_REL = $(shell echo $(VERSION) | sed -ne 's/+[^+]*$$//p')
+SVN = http://svn.freebsd.org/base/release/$(SVN_REL).0
 #SVN = http://svn.freebsd.org/base/releng/8.1
 ORIGDIR = $(SOURCE)-$(VERSION)
 TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
@@ -37,7 +38,7 @@ kernel = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 get-orig-source:
 	rm -rf $(ORIGDIR)
 	for i in lib/libcam lib/libdevstat lib/libgeom lib/libipx \
-	         lib/libkiconv lib/libnetgraph \
+	         lib/libkiconv lib/libnetgraph lib/libjail \
 	         lib/libkvm lib/libmemstat lib/libsbuf lib/libusb \
 	         lib/libusbhid sys/cam ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
@@ -55,7 +56,7 @@ get-orig-source:
 	rm -rf $(ORIGDIR)
 
 ifeq ($(kernel), kfreebsd)
-build: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-usb build-devstat build-memstat build-netgraph
+build: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-usb build-devstat build-memstat build-netgraph build-jail
 else
 build: build-sbuf
 endif
@@ -115,6 +116,11 @@ build-usb-stamp:
 	$(PMAKE) -C $(CURDIR)/lib/libusb SHLIBDIR=./
 	touch $@
 
+build-jail: build-jail-stamp
+build-jail-stamp:
+	$(PMAKE) -C $(CURDIR)/lib/libjail SHLIBDIR=./
+	touch $@
+
 clean:
 	dh_testdir
 	dh_testroot
@@ -130,6 +136,7 @@ ifeq ($(kernel), kfreebsd)
 	$(PMAKE) -C $(CURDIR)/lib/libkvm clean
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid clean
 	$(PMAKE) -C $(CURDIR)/lib/libusb clean
+	$(PMAKE) -C $(CURDIR)/lib/libjail clean
 endif
 	rm -f *stamp
 	dh_clean
@@ -153,6 +160,7 @@ ifeq ($(kernel), kfreebsd)
 	$(PMAKE) -C $(CURDIR)/lib/libnetgraph install SHLIBDIR=/usr/lib
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid install SHLIBDIR=/usr/lib
 	$(PMAKE) -C $(CURDIR)/lib/libusb install SHLIBDIR=/lib
+	$(PMAKE) -C $(CURDIR)/lib/libjail install SHLIBDIR=/lib
 
 	mkdir -p $(CURDIR)/debian/tmp/usr/lib/pkgconfig
 	install -m644 debian/libusb*.pc $(CURDIR)/debian/tmp/usr/lib/pkgconfig
@@ -199,6 +207,7 @@ ifeq ($(kernel), kfreebsd)
 	dh_makeshlibs -plibipx2 --add-udeb=libipx2-udeb
 	dh_makeshlibs -plibsbuf0 --add-udeb=libsbuf0-udeb
 	dh_makeshlibs -plibusb2 --add-udeb=libusb2-udeb
+	dh_makeshlibs -plibjail1 --add-udeb=libjail1-udeb
 endif
 	dh_installdeb -a
 	dh_shlibdeps -a
