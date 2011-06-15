@@ -37,17 +37,18 @@ kernel = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
+	mkdir -p $(ORIGDIR)/share/misc
+	mkdir -p $(ORIGDIR)/sys/kern
+	mkdir -p $(ORIGDIR)/sys/sys
 	for i in lib/libcam lib/libdevstat lib/libgeom lib/libipx \
 	         lib/libkiconv lib/libnetgraph lib/libjail \
 	         lib/libkvm lib/libmemstat lib/libsbuf lib/libusb \
-	         lib/libusbhid sys/cam ; do \
+	         lib/libusbhid sys/cam \
+	         sys/kern/subr_sbuf.c \
+	         sys/sys/sbuf.h \
+	         share/misc/usb_hid_usages ; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
-	svn cat $(SVN)/share/misc/usb_hid_usages > $(ORIGDIR)/lib/libusbhid/usb_hid_usages
-	mkdir -p $(ORIGDIR)/sys/kern && \
-	    svn cat $(SVN)/sys/kern/subr_sbuf.c > $(ORIGDIR)/sys/kern/subr_sbuf.c
-	mkdir -p $(ORIGDIR)/sys/sys && \
-	    svn cat $(SVN)/sys/sys/sbuf.h > $(ORIGDIR)/sys/sys/sbuf.h
 	# Remove unused files with non GPL compatible license (eg BSD 4 clauses)
 	rm -f $(ORIGDIR)/sys/cam/scsi/scsi_ch.*
 	rm -f $(ORIGDIR)/lib/libkvm/kvm_ia64.c
