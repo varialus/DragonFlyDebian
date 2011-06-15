@@ -4,7 +4,7 @@ Status: chflags is BSD-specific.  We could add it to freebsd-utils.
 
 --- a/sys/conf/kern.mk
 +++ b/sys/conf/kern.mk
-@@ -1,5 +1,9 @@
+@@ -1,12 +1,23 @@
  # $FreeBSD$
  
 +.if !defined(OPSYS)
@@ -12,35 +12,29 @@ Status: chflags is BSD-specific.  We could add it to freebsd-utils.
 +.endif
 +
  #
- # Warning flags for compiling the kernel and components of the kernel.
+ # Warning flags for compiling the kernel and components of the kernel:
  #
-@@ -9,10 +13,14 @@
- .if ${CC:T:Micc} == "icc"
- #CWARNFLAGS=	-w2	# use this if you are terribly bored
- CWARNFLAGS=
--.else
-+elif !defined(CWARNFLAGS)
++.if ${OPSYS} == "FreeBSD"
++# FreeBSD extension, not available in upstream GCC
++format_extensions=	-fformat-extensions
++no_align_long_strings=	-mno-align-long-strings
++.endif
++
  CWARNFLAGS?=	-Wall -Wredundant-decls -Wnested-externs -Wstrict-prototypes \
  		-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual \
--		-Wundef -Wno-pointer-sign -fformat-extensions
-+		-Wundef -Wno-pointer-sign
-+.if ${OPSYS} == "FreeBSD"
-+# FreeBSD extensions, not available in upstream GCC
-+CWARNFLAGS+=  -fformat-extensions
-+.endif
- .endif
+-		-Wundef -Wno-pointer-sign -fformat-extensions \
++		-Wundef -Wno-pointer-sign ${format_extensions} \
+ 		-Wmissing-include-dirs -fdiagnostics-show-option
++
  #
  # The following flags are next up for working on:
-@@ -31,7 +39,11 @@
+ #	-Wextra
+@@ -32,7 +43,7 @@
  #
- .if ${MACHINE_CPUARCH} == "i386" && ${CC:T:Micc} != "icc"
+ .if ${MACHINE_CPUARCH} == "i386"
  .if ${CC:T:Mclang} != "clang"
--CFLAGS+=	-mno-align-long-strings -mpreferred-stack-boundary=2
-+.if ${OPSYS} == "FreeBSD"
-+# FreeBSD extensions, not available in upstream GCC
-+CFLAGS+=	-mno-align-long-strings
-+.endif
-+CFLAGS+=	-mpreferred-stack-boundary=2
+-CFLAGS+=	-mno-align-long-strings -mpreferred-stack-boundary=2 -mno-sse
++CFLAGS+=	${no_align_long_strings} -mpreferred-stack-boundary=2 -mno-sse
+ .else
+ CFLAGS+=	-mno-aes -mno-avx
  .endif
- CFLAGS+=	-mno-mmx -mno-3dnow -mno-sse -mno-sse2 -mno-sse3 -msoft-float
- INLINE_LIMIT?=	8000

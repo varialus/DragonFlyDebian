@@ -1,6 +1,17 @@
 --- a/sys/dev/aic7xxx/aicasm/Makefile
 +++ b/sys/dev/aic7xxx/aicasm/Makefile
-@@ -14,8 +14,9 @@
+@@ -3,6 +3,10 @@
+ #
+ # $FreeBSD$
+ 
++.if !defined(OPSYS)
++OPSYS!=	uname -s
++.endif
++
+ PROG=	aicasm
+ 
+ CSRCS=	aicasm.c aicasm_symbol.c
+@@ -14,8 +18,9 @@
  SRCS=	${GENHDRS} ${CSRCS} ${YSRCS} ${LSRCS}
  CLEANFILES+= ${GENHDRS} ${YSRCS:R:C/(.*)/\1.output/g}
  DPADD=	${LIBL}
@@ -11,17 +22,16 @@
  
  # Correct path for kernel builds
  # Don't rely on the kernel's .depend file
-@@ -24,13 +25,6 @@
+@@ -24,8 +29,12 @@
  DEPENDFILE=	.depend_aicasm
  .endif
  
--.if ${CC:T:Micc} == "icc"
--CFLAGS+=	-restrict
--NOSTDINC=	-X
--.else
--NOSTDINC=	-nostdinc
--.endif
--CFLAGS+= ${NOSTDINC} -I/usr/include -I.
++# This would discard implicit include flags in upstream GCC
++.if ${OPSYS} == "FreeBSD"
+ NOSTDINC=	-nostdinc
+ CFLAGS+= ${NOSTDINC} -I/usr/include -I.
++.endif
++
  .ifdef MAKESRCPATH
  CFLAGS+= -I${MAKESRCPATH}
  .endif

@@ -3,7 +3,7 @@ See #594940
 
 --- a/sys/conf/files
 +++ b/sys/conf/files
-@@ -462,10 +462,6 @@
+@@ -488,10 +488,6 @@
  dev/advansys/advansys.c		optional adv
  dev/advansys/advlib.c		optional adv
  dev/advansys/advmcode.c		optional adv
@@ -12,17 +12,17 @@ See #594940
 -dev/advansys/adwlib.c		optional adw
 -dev/advansys/adwmcode.c		optional adw
  dev/ae/if_ae.c			optional ae pci
- dev/age/if_age.c		optional age pci inet
+ dev/age/if_age.c		optional age pci
  dev/agp/agp.c			optional agp pci
-@@ -758,7 +754,6 @@
- dev/ath/ath_rate/sample/sample.c	optional ath_rate_sample \
+@@ -850,7 +846,6 @@
+ dev/ath/ath_dfs/null/dfs_null.c	optional	ath \
  	compile-with "${NORMAL_C} -I$S/dev/ath"
- #
+ # 
 -dev/bce/if_bce.c		optional bce
  dev/bfe/if_bfe.c		optional bfe
  dev/bge/if_bge.c		optional bge
  dev/bktr/bktr_audio.c		optional bktr pci
-@@ -794,34 +789,6 @@
+@@ -888,34 +883,6 @@
  dev/cs/if_cs.c			optional cs
  dev/cs/if_cs_isa.c		optional cs isa
  dev/cs/if_cs_pccard.c		optional cs pccard
@@ -54,10 +54,10 @@ See #594940
 -	compile-with "${NORMAL_C} -I$S/dev/cxgb"
 -dev/cxgb/cxgb_t3fw.c		optional cxgb cxgb_t3fw \
 -	compile-with "${NORMAL_C} -I$S/dev/cxgb"
- dev/cy/cy.c			optional cy
- dev/cy/cy_isa.c			optional cy isa
- dev/cy/cy_pci.c			optional cy pci
-@@ -832,13 +799,6 @@
+ dev/cxgbe/t4_main.c		optional cxgbe pci \
+ 	compile-with "${NORMAL_C} -I$S/dev/cxgbe"
+ dev/cxgbe/t4_sge.c		optional cxgbe pci \
+@@ -934,13 +901,6 @@
  dev/dcons/dcons_crom.c		optional dcons_crom
  dev/dcons/dcons_os.c		optional dcons
  dev/de/if_de.c			optional de pci
@@ -71,7 +71,7 @@ See #594940
  dev/digi/digi.c			optional digi
  dev/digi/digi_isa.c		optional digi isa
  dev/digi/digi_pci.c		optional digi pci
-@@ -871,26 +831,6 @@
+@@ -976,26 +936,6 @@
  dev/drm/mach64_drv.c		optional mach64drm
  dev/drm/mach64_irq.c		optional mach64drm
  dev/drm/mach64_state.c		optional mach64drm
@@ -98,18 +98,19 @@ See #594940
  dev/drm/savage_bci.c		optional savagedrm
  dev/drm/savage_drv.c		optional savagedrm
  dev/drm/savage_state.c		optional savagedrm
-@@ -972,7 +912,6 @@
- dev/firewire/sbp.c		optional sbp
+@@ -1091,7 +1031,6 @@
  dev/firewire/sbp_targ.c		optional sbp_targ
  dev/flash/at45d.c		optional at45d
--dev/fxp/if_fxp.c		optional fxp inet
+ dev/flash/mx25l.c		optional mx25l
+-dev/fxp/if_fxp.c		optional fxp
  dev/gem/if_gem.c		optional gem
  dev/gem/if_gem_pci.c		optional gem pci
  dev/gem/if_gem_sbus.c		optional gem sbus
-@@ -1022,48 +961,6 @@
+@@ -1148,49 +1087,6 @@
+ dev/ips/ips_disk.c		optional ips
  dev/ips/ips_ioctl.c		optional ips
  dev/ips/ips_pci.c		optional ips pci
- dev/ipw/if_ipw.c		optional ipw
+-dev/ipw/if_ipw.c		optional ipw
 -ipwbssfw.c			optional ipwbssfw | ipwfw		\
 -	compile-with	"${AWK} -f $S/tools/fw_stub.awk ipw_bss.fw:ipw_bss:130 -lintel_ipw -mipw_bss -c${.TARGET}" \
 -	no-implicit-rule before-depend local				\
@@ -120,7 +121,7 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"ipw_bss.fwo"
 -ipw_bss.fw			optional ipwbssfw | ipwfw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/ipw/ipw2100-1.3.fw.uu"		\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/ipw/ipw2100-1.3.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"ipw_bss.fw"
@@ -134,7 +135,7 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"ipw_ibss.fwo"
 -ipw_ibss.fw			optional ipwibssfw | ipwfw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/ipw/ipw2100-1.3-i.fw.uu"	\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/ipw/ipw2100-1.3-i.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"ipw_ibss.fw"
@@ -148,19 +149,19 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"ipw_monitor.fwo"
 -ipw_monitor.fw			optional ipwmonitorfw | ipwfw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/ipw/ipw2100-1.3-p.fw.uu"	\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/ipw/ipw2100-1.3-p.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"ipw_monitor.fw"
  dev/iscsi/initiator/iscsi.c	optional iscsi_initiator scbus
  dev/iscsi/initiator/iscsi_subr.c	optional iscsi_initiator scbus
  dev/iscsi/initiator/isc_cam.c	optional iscsi_initiator scbus
-@@ -1076,135 +973,7 @@
+@@ -1203,163 +1099,6 @@
  dev/isp/isp_pci.c		optional isp pci
  dev/isp/isp_sbus.c		optional isp sbus
  dev/isp/isp_target.c		optional isp
 -dev/ispfw/ispfw.c		optional ispfw
- dev/iwi/if_iwi.c		optional iwi
+-dev/iwi/if_iwi.c		optional iwi
 -iwibssfw.c			optional iwibssfw | iwifw		\
 -	compile-with	"${AWK} -f $S/tools/fw_stub.awk iwi_bss.fw:iwi_bss:300 -lintel_iwi -miwi_bss -c${.TARGET}" \
 -	no-implicit-rule before-depend local				\
@@ -171,7 +172,7 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"iwi_bss.fwo"
 -iwi_bss.fw			optional iwibssfw | iwifw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/iwi/ipw2200-bss.fw.uu"		\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwi/ipw2200-bss.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"iwi_bss.fw"
@@ -185,7 +186,7 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"iwi_ibss.fwo"
 -iwi_ibss.fw			optional iwiibssfw | iwifw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/iwi/ipw2200-ibss.fw.uu"		\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwi/ipw2200-ibss.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"iwi_ibss.fw"
@@ -199,7 +200,7 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"iwi_monitor.fwo"
 -iwi_monitor.fw			optional iwimonitorfw | iwifw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/iwi/ipw2200-sniffer.fw.uu"	\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwi/ipw2200-sniffer.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"iwi_monitor.fw"
@@ -214,8 +215,8 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"iwn1000fw.fwo"
 -iwn1000.fw			optional iwn1000fw | iwnfw		\
--	dependency	".PHONY"					\
--	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-1000-128.50.3.1.fw.uu" \
+-	dependency	"$S/contrib/dev/iwn/iwlwifi-1000-39.31.5.1.fw.uu" \
+-	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-1000-39.31.5.1.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"iwn1000.fw"
 -iwn4965fw.c			optional iwn4965fw | iwnfw		\
@@ -228,7 +229,7 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"iwn4965fw.fwo"
 -iwn4965.fw			optional iwn4965fw | iwnfw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/iwn/iwlwifi-4965-228.61.2.24.fw.uu" \
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-4965-228.61.2.24.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"iwn4965.fw"
@@ -242,8 +243,8 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"iwn5000fw.fwo"
 -iwn5000.fw			optional iwn5000fw | iwnfw		\
--	dependency	".PHONY"					\
--	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-5000-8.24.2.12.fw.uu"	\
+-	dependency	"$S/contrib/dev/iwn/iwlwifi-5000-8.83.5.1.fw.uu" \
+-	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-5000-8.83.5.1.fw.uu"	\
 -	no-obj no-implicit-rule						\
 -	clean		"iwn5000.fw"
 -iwn5150fw.c			optional iwn5150fw | iwnfw		\
@@ -256,7 +257,7 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"iwn5150fw.fwo"
 -iwn5150.fw			optional iwn5150fw | iwnfw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/iwn/iwlwifi-5150-8.24.2.2.fw.uu"\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-5150-8.24.2.2.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"iwn5150.fw"
@@ -270,10 +271,38 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"iwn6000fw.fwo"
 -iwn6000.fw			optional iwn6000fw | iwnfw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/iwn/iwlwifi-6000-9.221.4.1.fw.uu" \
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-6000-9.221.4.1.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"iwn6000.fw"
+-iwn6000g2afw.c			optional iwn6000g2afw | iwnfw		\
+-	compile-with	"${AWK} -f $S/tools/fw_stub.awk iwn6000g2a.fw:iwn6000g2afw -miwn6000g2afw -c${.TARGET}" \
+-	no-implicit-rule before-depend local				\
+-	clean		"iwn6000g2afw.c"
+-iwn6000g2afw.fwo		optional iwn6000g2afw | iwnfw		\
+-	dependency	"iwn6000g2a.fw"					\
+-	compile-with	"${LD} -b binary -d -warn-common -r -d -o ${.TARGET} iwn6000g2a.fw" \
+-	no-implicit-rule						\
+-	clean		"iwn6000g2afw.fwo"
+-iwn6000g2a.fw			optional iwn6000g2afw | iwnfw		\
+-	dependency	"$S/contrib/dev/iwn/iwlwifi-6000g2a-17.168.5.2.fw.uu" \
+-	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-6000g2a-17.168.5.2.fw.uu" \
+-	no-obj no-implicit-rule						\
+-	clean		"iwn6000g2a.fw"
+-iwn6000g2bfw.c			optional iwn6000g2bfw | iwnfw		\
+-	compile-with	"${AWK} -f $S/tools/fw_stub.awk iwn6000g2b.fw:iwn6000g2bfw -miwn6000g2bfw -c${.TARGET}" \
+-	no-implicit-rule before-depend local				\
+-	clean		"iwn6000g2bfw.c"
+-iwn6000g2bfw.fwo		optional iwn6000g2bfw | iwnfw		\
+-	dependency	"iwn6000g2b.fw"					\
+-	compile-with	"${LD} -b binary -d -warn-common -r -d -o ${.TARGET} iwn6000g2b.fw" \
+-	no-implicit-rule						\
+-	clean		"iwn6000g2bfw.fwo"
+-iwn6000g2b.fw			optional iwn6000g2bfw | iwnfw		\
+-	dependency	"$S/contrib/dev/iwn/iwlwifi-6000g2b-17.168.5.2.fw.uu" \
+-	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-6000g2b-17.168.5.2.fw.uu" \
+-	no-obj no-implicit-rule						\
+-	clean		"iwn6000g2b.fw"
 -iwn6050fw.c			optional iwn6050fw | iwnfw		\
 -	compile-with	"${AWK} -f $S/tools/fw_stub.awk iwn6050.fw:iwn6050fw -miwn6050fw -c${.TARGET}" \
 -	no-implicit-rule before-depend local				\
@@ -284,17 +313,20 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"iwn6050fw.fwo"
 -iwn6050.fw			optional iwn6050fw | iwnfw		\
--	dependency	".PHONY"					\
--	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-6050-9.201.4.1.fw.uu" \
+-	dependency	"$S/contrib/dev/iwn/iwlwifi-6050-41.28.5.1.fw.uu" \
+-	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/iwn/iwlwifi-6050-41.28.5.1.fw.uu" \
 -	no-obj no-implicit-rule						\
--	clean		"iwn6000.fw"
+-	clean		"iwn6050.fw"
  dev/ixgb/if_ixgb.c		optional ixgb
  dev/ixgb/ixgb_ee.c		optional ixgb
  dev/ixgb/ixgb_hw.c		optional ixgb
-@@ -1315,30 +1084,6 @@
- dev/mwl/if_mwl.c		optional mwl
- dev/mwl/if_mwl_pci.c		optional mwl pci
- dev/mwl/mwlhal.c		optional mwl
+@@ -1474,33 +1213,6 @@
+ dev/mvs/mvs.c			optional mvs
+ dev/mvs/mvs_if.m		optional mvs
+ dev/mvs/mvs_pci.c		optional mvs pci
+-dev/mwl/if_mwl.c		optional mwl
+-dev/mwl/if_mwl_pci.c		optional mwl pci
+-dev/mwl/mwlhal.c		optional mwl
 -mwlfw.c				optional mwlfw				\
 -	compile-with	"${AWK} -f $S/tools/fw_stub.awk mw88W8363.fw:mw88W8363fw mwlboot.fw:mwlboot -mmwl -c${.TARGET}" \
 -	no-implicit-rule before-depend local				\
@@ -305,7 +337,7 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"mw88W8363.fwo"
 -mw88W8363.fw		optional mwlfw					\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/mwl/mw88W8363.fw.uu"		\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/mwl/mw88W8363.fw.uu"	\
 -	no-obj no-implicit-rule						\
 -	clean		"mw88W8363.fw"
@@ -315,17 +347,20 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"mwlboot.fwo"
 -mwlboot.fw		optional mwlfw					\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/mwl/mwlboot.fw.uu"		\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/mwl/mwlboot.fw.uu"	\
 -	no-obj no-implicit-rule						\
 -	clean		"mwlboot.fw"
  dev/mxge/if_mxge.c		optional mxge pci
  dev/mxge/mxge_lro.c		optional mxge pci
  dev/mxge/mxge_eth_z8e.c		optional mxge pci
-@@ -1429,62 +1174,6 @@
- dev/ral/rt2560.c		optional ral
- dev/ral/rt2661.c		optional ral
- dev/ral/if_ral_pci.c		optional ral pci
+@@ -1589,65 +1301,6 @@
+ dev/puc/puc_pci.c		optional puc pci
+ dev/puc/pucdata.c		optional puc pci
+ dev/quicc/quicc_core.c		optional quicc
+-dev/ral/rt2560.c		optional ral
+-dev/ral/rt2661.c		optional ral
+-dev/ral/if_ral_pci.c		optional ral pci
 -rt2561fw.c			optional rt2561fw | ralfw		\
 -	compile-with	"${AWK} -f $S/tools/fw_stub.awk rt2561.fw:rt2561fw -mrt2561 -c${.TARGET}" \
 -	no-implicit-rule before-depend local				\
@@ -336,7 +371,7 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"rt2561fw.fwo"
 -rt2561.fw			optional rt2561fw | ralfw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/ral/rt2561.fw.uu"		\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/ral/rt2561.fw.uu" \
 -	no-obj no-implicit-rule						\
 -	clean		"rt2561.fw"
@@ -350,7 +385,7 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"rt2561sfw.fwo"
 -rt2561s.fw			optional rt2561sfw | ralfw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/ral/rt2561s.fw.uu"		\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/ral/rt2561s.fw.uu"	\
 -	no-obj no-implicit-rule						\
 -	clean		"rt2561s.fw"
@@ -364,7 +399,7 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"rt2661fw.fwo"
 -rt2661.fw			optional rt2661fw | ralfw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/ral/rt2661.fw.uu"		\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/ral/rt2661.fw.uu"	\
 -	no-obj no-implicit-rule						\
 -	clean		"rt2661.fw"
@@ -378,14 +413,14 @@ See #594940
 -	no-implicit-rule						\
 -	clean		"rt2860fw.fwo"
 -rt2860.fw			optional rt2860fw | ralfw		\
--	dependency	".PHONY"					\
+-	dependency	"$S/contrib/dev/ral/rt2860.fw.uu"		\
 -	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/ral/rt2860.fw.uu"	\
 -	no-obj no-implicit-rule						\
 -	clean		"rt2860.fw"
  dev/random/harvest.c		standard
  dev/random/hash.c		optional random
  dev/random/probe.c		optional random
-@@ -1509,14 +1198,7 @@
+@@ -1672,14 +1325,7 @@
  dev/scd/scd.c			optional scd isa
  dev/scd/scd_isa.c		optional scd isa
  dev/sdhci/sdhci.c		optional sdhci pci
@@ -400,7 +435,7 @@ See #594940
  dev/siba/siba_bwn.c		optional siba_bwn pci
  dev/siba/siba_core.c		optional siba_bwn pci
  dev/siis/siis.c			optional siis pci
-@@ -1527,9 +1209,6 @@
+@@ -1690,9 +1336,6 @@
  dev/smbus/smbus.c		optional smbus
  dev/smbus/smbus_if.m		optional smbus
  dev/smc/if_smc.c		optional smc
@@ -410,7 +445,7 @@ See #594940
  dev/snp/snp.c			optional snp
  dev/sound/clone.c		optional sound
  dev/sound/unit.c		optional sound
-@@ -1545,10 +1224,6 @@
+@@ -1708,10 +1351,6 @@
  dev/sound/pci/atiixp.c		optional snd_atiixp pci
  dev/sound/pci/cmi.c		optional snd_cmi pci
  dev/sound/pci/cs4281.c		optional snd_cs4281 pci
@@ -421,7 +456,7 @@ See #594940
  dev/sound/pci/emu10k1.c		optional snd_emu10k1 pci \
  	dependency "emu10k1-alsa%diked.h" \
  	warning "kernel contains GPL contaminated emu10k1 headers"
-@@ -1571,8 +1246,6 @@
+@@ -1734,8 +1373,6 @@
  dev/sound/pci/fm801.c		optional snd_fm801 pci
  dev/sound/pci/ich.c		optional snd_ich pci
  dev/sound/pci/maestro.c		optional snd_maestro pci
@@ -430,7 +465,7 @@ See #594940
  dev/sound/pci/neomagic.c	optional snd_neomagic pci
  dev/sound/pci/solo.c		optional snd_solo pci
  dev/sound/pci/spicds.c		optional snd_spicds pci
-@@ -1652,7 +1325,6 @@
+@@ -1815,7 +1452,6 @@
  dev/syscons/warp/warp_saver.c	optional warp_saver
  dev/tdfx/tdfx_linux.c		optional tdfx_linux tdfx compat_linux
  dev/tdfx/tdfx_pci.c		optional tdfx pci
@@ -438,28 +473,37 @@ See #594940
  dev/tl/if_tl.c			optional tl pci
  dev/trm/trm.c			optional trm
  dev/twa/tw_cl_init.c		optional twa \
-@@ -1670,7 +1342,6 @@
+@@ -1833,7 +1469,6 @@
  dev/twe/twe.c			optional twe
  dev/twe/twe_freebsd.c		optional twe
  dev/tx/if_tx.c			optional tx
--dev/txp/if_txp.c		optional txp inet
+-dev/txp/if_txp.c		optional txp
  dev/uart/uart_bus_acpi.c	optional uart acpi
  #dev/uart/uart_bus_cbus.c	optional uart cbus
  dev/uart/uart_bus_ebus.c	optional uart ebus
-@@ -1748,7 +1419,6 @@
+@@ -1913,17 +1548,15 @@
  dev/usb/net/if_cdce.c		optional cdce
  dev/usb/net/if_cue.c		optional cue
  dev/usb/net/if_ipheth.c		optional ipheth
 -dev/usb/net/if_kue.c		optional kue
+ dev/usb/net/if_mos.c		optional mos
  dev/usb/net/if_rue.c		optional rue
  dev/usb/net/if_udav.c		optional udav
- dev/usb/net/usb_ethernet.c	optional aue | axe | cdce | cue | kue | rue | \
-@@ -1757,13 +1427,10 @@
+-dev/usb/net/usb_ethernet.c	optional aue | axe | cdce | cue | kue | mos | \
++dev/usb/net/usb_ethernet.c	optional aue | axe | cdce | cue | mos | \
+ 					 rue | udav
+ dev/usb/net/uhso.c		optional uhso
  #
  # USB WLAN drivers
  #
 -dev/usb/wlan/if_rum.c		optional rum
  dev/usb/wlan/if_run.c		optional run
+ runfw.c				optional runfw							\
+ 	compile-with	"${AWK} -f $S/tools/fw_stub.awk runfw:runfw -mrunfw -c${.TARGET}"	\
+@@ -1939,11 +1572,9 @@
+ 	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/run/rt2870.fw.uu"		\
+ 	no-obj no-implicit-rule									\
+ 	clean		"runfw"
 -dev/usb/wlan/if_uath.c		optional uath
  dev/usb/wlan/if_upgt.c		optional upgt
  dev/usb/wlan/if_ural.c		optional ural
@@ -470,7 +514,7 @@ See #594940
  #
 --- a/sys/conf/files.i386
 +++ b/sys/conf/files.i386
-@@ -120,17 +120,9 @@
+@@ -121,17 +121,9 @@
  dev/atkbdc/atkbdc_isa.c		optional atkbdc isa
  dev/atkbdc/atkbdc_subr.c	optional atkbdc
  dev/atkbdc/psm.c		optional psm atkbdc
@@ -499,26 +543,26 @@ See #594940
 -	radeon \
  	savage \
  	sis \
- 	tdfx
+ 	tdfx \
 --- a/sys/modules/Makefile
 +++ b/sys/modules/Makefile
-@@ -36,7 +36,6 @@
- 	ata \
+@@ -37,7 +37,6 @@
  	ath \
+ 	ath_pci \
  	${_auxio} \
--	${_bce} \
+-	bce \
  	bfe \
  	bge \
- 	${_bios} \
-@@ -53,7 +52,6 @@
- 	${_cbb} \
+ 	${_bxe} \
+@@ -56,7 +55,6 @@
+ 	cc \
  	cd9660 \
  	cd9660_iconv \
 -	${_ce} \
  	${_ciss} \
  	${_cm} \
  	${_cmx} \
-@@ -61,14 +59,11 @@
+@@ -64,14 +62,11 @@
  	coda5 \
  	${_coff} \
  	${_coretemp} \
@@ -530,10 +574,10 @@ See #594940
  	${_cs} \
 -	${_ctau} \
 -	${_cxgb} \
+ 	cxgbe \
  	${_cyclic} \
  	dc \
- 	dcons \
-@@ -89,13 +84,11 @@
+@@ -93,13 +88,11 @@
  	${_ex} \
  	${_exca} \
  	${_ext2fs} \
@@ -546,8 +590,8 @@ See #594940
 -	fxp \
  	gem \
  	geom \
- 	${_glxsb} \
-@@ -135,14 +128,10 @@
+ 	${_glxiic} \
+@@ -140,14 +133,10 @@
  	ip_mroute_mod \
  	${_ips} \
  	${_ipw} \
@@ -562,16 +606,16 @@ See #594940
  	${_ixgb} \
  	${_ixgbe} \
  	jme \
-@@ -191,7 +180,6 @@
- 	msk \
+@@ -202,7 +191,6 @@
+ 	${_mthca} \
  	mvs \
  	mwl \
 -	mwlfw \
  	mxge \
  	my \
  	${_ncp} \
-@@ -237,14 +225,12 @@
- 	${_pst} \
+@@ -249,14 +237,12 @@
+ 	pty  \
  	puc \
  	ral \
 -	ralfw \
@@ -585,15 +629,15 @@ See #594940
  	${_s3} \
  	${_safe} \
  	${_sbni} \
-@@ -253,7 +239,6 @@
- 	${_scsi_low} \
+@@ -266,7 +252,6 @@
  	sdhci \
  	sem \
+ 	send \
 -	sf \
  	sge \
- 	${_siba_bwn} \
+ 	siba_bwn \
  	siftr \
-@@ -261,7 +246,6 @@
+@@ -274,7 +259,6 @@
  	sis \
  	sk \
  	${_smbfs} \
@@ -601,23 +645,23 @@ See #594940
  	${_snc} \
  	snp \
  	${_sound} \
-@@ -276,7 +260,6 @@
+@@ -289,7 +273,6 @@
  	${_sym} \
  	${_syscons} \
  	sysvipc \
 -	ti \
  	tl \
- 	${_tmpfs} \
+ 	tmpfs \
  	${_tpm} \
-@@ -284,7 +267,6 @@
+@@ -297,7 +280,6 @@
  	${_twa} \
  	twe \
  	tx \
 -	txp \
- 	${_uart} \
+ 	uart \
  	ubsec \
  	udf \
-@@ -310,7 +292,6 @@
+@@ -324,7 +306,6 @@
  	wlan_wep \
  	wlan_xauth \
  	${_wpi} \
@@ -625,8 +669,8 @@ See #594940
  	${_x86bios} \
  	${_xe} \
  	xfs \
-@@ -376,9 +357,7 @@
- _bktr=		bktr
+@@ -393,9 +374,7 @@
+ _bxe=		bxe
  _cardbus=	cardbus
  _cbb=		cbb
 -_ce=		ce
@@ -635,7 +679,7 @@ See #594940
  _cpuctl=	cpuctl
  _cpufreq=	cpufreq
  _cs=		cs
-@@ -470,11 +449,8 @@
+@@ -493,11 +472,8 @@
  _ipmi=		ipmi
  _ips=		ips
  _ipw=		ipw
@@ -647,7 +691,7 @@ See #594940
  _ixgb=		ixgb
  _ixgbe=		ixgbe
  _mly=		mly
-@@ -483,7 +459,6 @@
+@@ -506,7 +482,6 @@
  _nxge=		nxge
  _tpm=		tpm
  _wpi=		wpi
@@ -655,7 +699,7 @@ See #594940
  .if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
  _padlock=	padlock
  .endif
-@@ -542,11 +517,8 @@
+@@ -567,11 +542,8 @@
  _ipmi=		ipmi
  _ips=		ips
  _ipw=		ipw
@@ -667,7 +711,7 @@ See #594940
  _ixgb=		ixgb
  _ixgbe=		ixgbe
  _lindev=	lindev
-@@ -581,7 +553,6 @@
+@@ -611,7 +583,6 @@
  _x86bios=	x86bios
  _wi=		wi
  _wpi=		wpi
@@ -694,12 +738,12 @@ See #594940
  SUBDIR = usb
  SUBDIR += ehci musb ohci uhci xhci uss820dci ${_at91dci} ${_atmegadci}
 -SUBDIR += rum run uath upgt ural zyd ${_urtw}
-+SUBDIR += run uath upgt ural ${_urtw}
- SUBDIR += atp uhid ukbd ums udbp ufm
++SUBDIR += run upgt ural ${_urtw}
+ SUBDIR += atp uhid ukbd ums udbp ufm uep
  SUBDIR += ucom u3g uark ubsa ubser uchcom ucycom ufoma uftdi ugensa uipaq ulpt \
- 	  umct umodem umoscom uplcom uslcom uvisor uvscom
--SUBDIR += uether aue axe cdce cue kue rue udav uhso ipheth
-+SUBDIR += uether aue axe cdce cue rue udav uhso ipheth
+ 	  umct umcs umodem umoscom uplcom uslcom uvisor uvscom
+-SUBDIR += uether aue axe cdce cue kue mos rue udav uhso ipheth
++SUBDIR += uether aue axe cdce cue mos rue udav uhso ipheth
  SUBDIR += usfs umass urio
  SUBDIR += quirk template
  

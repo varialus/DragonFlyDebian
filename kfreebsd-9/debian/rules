@@ -9,6 +9,7 @@ SHELL = bash
 
 full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
 tar_version	:= $(shell echo $(full_version) | sed -e 's/-.*//g')
+svn_revision	:= $(shell echo $(full_version) | sed -e 's/.*~svn\([0-9]*\)-[0-9]*/\1/g')
 version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
@@ -45,7 +46,7 @@ PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 get-orig-source:
 	rm -rf $(ORIG_DIR)
 	for i in sys usr.sbin/config ; do \
-		svn export $(SVN)/$$i $(ORIG_DIR)/$$i ; \
+		svn export -r $(svn_revision) $(SVN)/$$i $(ORIG_DIR)/$$i ; \
 	done
 	cd $(ORIG_DIR) && $(CURDIR)/debian/prune.sh
 	tar --numeric-owner --owner 0 --group 0 -czf ../$(ORIG_TAR) $(ORIG_DIR)

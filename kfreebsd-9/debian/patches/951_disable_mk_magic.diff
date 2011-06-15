@@ -1,0 +1,48 @@
+
+freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
+
+--- a/sys/modules/Makefile
++++ b/sys/modules/Makefile
+@@ -356,12 +356,11 @@
+ .endif
+ .endif
+ 
+-.if ${MK_INET_SUPPORT} != "no" || defined(ALL_MODULES)
++.if 1
+ _if_gre=	if_gre
+ .endif
+ 
+-.if (${MK_INET_SUPPORT} != "no" || ${MK_INET6_SUPPORT} != "no") || \
+-	defined(ALL_MODULES)
++.if 1
+ _if_carp=	if_carp
+ .endif
+ 
+@@ -373,8 +372,7 @@
+ _netgraph=	netgraph
+ .endif
+ 
+-.if (${MK_PF} != "no" && (${MK_INET_SUPPORT} != "no" || \
+-	${MK_INET6_SUPPORT} != "no")) || defined(ALL_MODULES)
++.if 1
+ _pf=		pf
+ _pflog=		pflog
+ .endif
+@@ -430,7 +428,7 @@
+ _linsysfs=	linsysfs
+ _linux=		linux
+ _mse=		mse
+-.if ${MK_OFED} != "no" || defined(ALL_MODULES)
++.if 1
+ _mlx4=		mlx4
+ _mlx4ib=	mlx4ib
+ _mlxen=		mlxen
+@@ -581,7 +579,7 @@
+ _linsysfs=	linsysfs
+ _linux=		linux
+ _mly=		mly
+-.if ${MK_OFED} != "no" || defined(ALL_MODULES)
++.if 1
+ _mlx4=		mlx4
+ _mlx4ib=	mlx4ib
+ _mlxen=		mlxen

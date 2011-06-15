@@ -8,18 +8,18 @@
 
 --- a/sys/conf/kern.mk
 +++ b/sys/conf/kern.mk
-@@ -125,6 +125,8 @@
+@@ -133,6 +133,8 @@
  #
- # GCC SSP support.
+ # GCC SSP support
  #
 +# Disable stack protector as it causes kernel panic
 +MK_SSP=                no
- .if ${MK_SSP} != "no" && ${CC:T:Micc} != "icc" && \
-     ${MACHINE_CPUARCH} != "ia64" && ${MACHINE_CPUARCH} != "arm" && \
-     ${MACHINE_CPUARCH} != "mips"
+ .if ${MK_SSP} != "no" && ${MACHINE_CPUARCH} != "ia64" && \
+     ${MACHINE_CPUARCH} != "arm" && ${MACHINE_CPUARCH} != "mips"
+ CFLAGS+=	-fstack-protector
 --- a/sys/conf/kmod.mk
 +++ b/sys/conf/kmod.mk
-@@ -151,6 +151,9 @@
+@@ -141,6 +141,9 @@
  CTFFLAGS+=	-g
  .endif
  
