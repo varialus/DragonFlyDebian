@@ -31,7 +31,7 @@ TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
 PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 \
-        NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+        NOSHARED=NO NO_SHARED=NO NO_PROFILE=1 DESTDIR=$(DESTDIR) make
 export SHLIB_MAJOR = 0
 kernel = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
