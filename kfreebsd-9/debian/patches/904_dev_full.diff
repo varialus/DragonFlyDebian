@@ -2,10 +2,9 @@
 Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
 	/dev/full already rejected in upstream (kern/68961)
 
-diff -ur a/sys/dev/null/null.c b/sys/dev/null/null.c
---- a/sys/dev/null/null.c	2010-08-06 11:47:48.000000000 +0200
-+++ b/sys/dev/null/null.c	2010-11-09 00:41:11.000000000 +0100
-@@ -43,9 +43,11 @@
+--- a/sys/dev/null/null.c
++++ b/sys/dev/null/null.c
+@@ -45,9 +45,11 @@
  
  /* For use with destroy_dev(9). */
  static struct cdev *null_dev;
@@ -17,7 +16,7 @@ diff -ur a/sys/dev/null/null.c b/sys/dev/null/null.c
  static d_ioctl_t null_ioctl;
  static d_read_t zero_read;
  
-@@ -57,6 +59,14 @@
+@@ -59,6 +61,14 @@
  	.d_name =	"null",
  };
  
@@ -58,8 +57,8 @@ diff -ur a/sys/dev/null/null.c b/sys/dev/null/null.c
  	if (cmd != DIOCSKERNELDUMP)
  		return (ENOIOCTL);
  	error = priv_check(td, PRIV_SETDUMPER);
-@@ -114,12 +138,15 @@
- 		zbuf = (void *)malloc(PAGE_SIZE, M_TEMP, M_WAITOK | M_ZERO);
+@@ -122,12 +146,15 @@
+ 			printf("null: <null device, zero device>\n");
  		null_dev = make_dev_credf(MAKEDEV_ETERNAL_KLD, &null_cdevsw, 0,
  		    NULL, UID_ROOT, GID_WHEEL, 0666, "null");
 +		null_dev = make_dev_credf(MAKEDEV_ETERNAL_KLD, &full_cdevsw, 0,
@@ -72,5 +71,5 @@ diff -ur a/sys/dev/null/null.c b/sys/dev/null/null.c
  		destroy_dev(null_dev);
 +		destroy_dev(full_dev);
  		destroy_dev(zero_dev);
- 		free(zbuf, M_TEMP);
  		break;
+ 

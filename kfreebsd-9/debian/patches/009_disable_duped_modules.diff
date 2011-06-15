@@ -3,9 +3,9 @@ Status: in upstream BTS
 
 --- a/sys/conf/Makefile.amd64
 +++ b/sys/conf/Makefile.amd64
-@@ -40,6 +40,8 @@
- 
- MKMODULESENV+= MACHINE=amd64
+@@ -48,6 +48,8 @@
+ ASM_CFLAGS+=	${.IMPSRC:T:Mmpboot.S:C/^.+$/-no-integrated-as/}
+ .endif
  
 +%WITHOUT_MODULES
 +
@@ -14,7 +14,7 @@ Status: in upstream BTS
  %OBJS
 --- a/sys/conf/Makefile.arm
 +++ b/sys/conf/Makefile.arm
-@@ -121,6 +121,8 @@
+@@ -123,6 +123,8 @@
  
  MKMODULESENV+=	MACHINE=${MACHINE}
  
@@ -25,9 +25,9 @@ Status: in upstream BTS
  %OBJS
 --- a/sys/conf/Makefile.i386
 +++ b/sys/conf/Makefile.i386
-@@ -34,6 +34,8 @@
- 
- MKMODULESENV+=	MACHINE=${MACHINE}
+@@ -40,6 +40,8 @@
+ ASM_CFLAGS+=	${.IMPSRC:T:Mmpboot.s:C/^.+$/-no-integrated-as/}
+ .endif
  
 +%WITHOUT_MODULES
 +
@@ -47,7 +47,7 @@ Status: in upstream BTS
  %OBJS
 --- a/sys/conf/Makefile.mips
 +++ b/sys/conf/Makefile.mips
-@@ -105,6 +105,8 @@
+@@ -70,6 +70,8 @@
  	${OBJCOPY} -S -O binary ${KERNEL_KO}.tramp.noheader \
  		${KERNEL_KO}.tramp.bin \
  
@@ -69,7 +69,7 @@ Status: in upstream BTS
  %OBJS
 --- a/sys/conf/Makefile.powerpc
 +++ b/sys/conf/Makefile.powerpc
-@@ -37,6 +37,8 @@
+@@ -42,6 +42,8 @@
  CFLAGS+=	-fno-omit-frame-pointer
  .endif
  
@@ -99,7 +99,7 @@ Status: in upstream BTS
  static void do_before_depend(FILE *);
  static int opteq(const char *, const char *);
  static void read_files(void);
-@@ -146,6 +147,8 @@
+@@ -161,6 +162,8 @@
  		}
  		if (eq(line, "%BEFORE_DEPEND\n"))
  			do_before_depend(ofp);
@@ -108,7 +108,7 @@ Status: in upstream BTS
  		else if (eq(line, "%OBJS\n"))
  			do_objs(ofp);
  		else if (strncmp(line, "%FILES.", 7) == 0)
-@@ -626,6 +629,28 @@
+@@ -647,6 +650,28 @@
  }
  
  static void
