@@ -1,9 +1,10 @@
 
 Status: xargs -J option requested to both upstream and debian.
 
---- a/sys/conf/kmod.mk
-+++ b/sys/conf/kmod.mk
-@@ -217,7 +217,7 @@
+diff -ur a/sys/conf/kmod.mk b/sys/conf/kmod.mk
+--- a/sys/conf/kmod.mk	2010-07-22 20:47:41.000000000 +0200
++++ b/sys/conf/kmod.mk	2010-11-09 00:29:56.000000000 +0100
+@@ -220,7 +220,7 @@
  	grep -v '^#' < ${EXPORT_SYMS} > export_syms
  .endif
  	awk -f ${SYSDIR}/conf/kmod_syms.awk ${.TARGET} \
@@ -11,4 +12,20 @@ Status: xargs -J option requested to both upstream and debian.
 +	    export_syms | xargs -I% ${OBJCOPY} % ${.TARGET}
  .endif
  .endif
- .if !defined(DEBUG_FLAGS) && ${__KLD_SHARED} == no
+ .if !defined(DEBUG_FLAGS) && \
+diff -ur a/sys/contrib/dev/acpica/acpica_prep.sh b/sys/contrib/dev/acpica/acpica_prep.sh
+--- a/sys/contrib/dev/acpica/acpica_prep.sh	2010-07-06 22:57:28.000000000 +0200
++++ b/sys/contrib/dev/acpica/acpica_prep.sh	2010-11-09 00:30:19.000000000 +0100
+@@ -59,10 +59,10 @@
+ # copy files
+ echo copying full dirs
+ for i in ${fulldirs}; do
+-	find ${wrk} -name ${i} -type d -print | xargs -J % mv % ${dst}
++	find ${wrk} -name ${i} -type d -print | xargs -I % mv % ${dst}
+ done
+ echo copying remaining files
+-find ${wrk} -type f -print | xargs -J % mv % ${dst}
++find ${wrk} -type f -print | xargs -I % mv % ${dst}
+ 
+ # canonify include paths
+ for H in ${src_headers}; do
