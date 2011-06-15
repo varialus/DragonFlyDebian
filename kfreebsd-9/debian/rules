@@ -18,6 +18,7 @@ flavours	:= $(config_files:debian/arch/$(cpu)/%.config=%)
 configfile	:= DEBCUSTOM
 abiname		:= 0
 ld_target	:= $(shell ld --help | sed -ne "s/^ld: supported targets: \([^ ]*\) .*/\1/p")
+gcc_version	:= 4.3
 
 ifeq ($(cpu), mipsel)
 kfreebsd_cpu	:= mips
@@ -38,7 +39,7 @@ HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
 FLAVOR_DIR	:= flavor-$(version)-$(abiname)
 ORIG_DIR	:= kfreebsd-$(major)-$(tar_version)
 ORIG_TAR	:= kfreebsd-$(major)_$(tar_version).orig.tar.gz
-MAKE		:= make MACHINE_ARCH=$(kfreebsd_cpu) CC=gcc-4.3 WERROR=
+MAKE		:= make MACHINE_ARCH=$(kfreebsd_cpu) CC=gcc-$(gcc_version) WERROR=
 PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 
 get-orig-source:
@@ -51,7 +52,7 @@ get-orig-source:
 	rm -rf $(ORIG_DIR)
 
 control: clean
-	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" \
+	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@gcc_version@/$(gcc_version)/g" \
 		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
 	echo >> $(CURDIR)/debian/control
 	for arch in `ls $(CURDIR)/debian/arch/` ; do \

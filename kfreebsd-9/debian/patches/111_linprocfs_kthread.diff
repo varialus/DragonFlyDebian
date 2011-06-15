@@ -1,0 +1,29 @@
+
+See #630104
+Submitted upstream as http://www.freebsd.org/cgi/query-pr.cgi?pr=157871
+
+
+--- a/sys/compat/linprocfs/linprocfs.c
++++ b/sys/compat/linprocfs/linprocfs.c
+@@ -1044,6 +1044,10 @@
+ 		PROC_UNLOCK(p);
+ 		return (ret);
+ 	}
++	if (p->p_flag & P_KTHREAD) {
++		PROC_UNLOCK(p);
++		return (0);
++	}
+ 	if (p->p_args != NULL) {
+ 		sbuf_bcpy(sb, p->p_args->ar_args, p->p_args->ar_length);
+ 		PROC_UNLOCK(p);
+@@ -1068,6 +1072,10 @@
+ 		PROC_UNLOCK(p);
+ 		return (ret);
+ 	}
++	if (p->p_flag & P_KTHREAD) {
++		PROC_UNLOCK(p);
++		return (0);
++	}
+ 	PROC_UNLOCK(p);
+ 
+ 	ret = linprocfs_doargv(td, p, sb, ps_string_env);
