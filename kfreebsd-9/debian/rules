@@ -176,6 +176,15 @@ install-common-stamp: src
 	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
 	cd src \
 		&& find . -type f -name "*.h" -not -regex ".*modules.*" -not -regex ".*sys/$(kfreebsd_cpu)/.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \;
+
+	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)/conf
+	cd src && cp --parents \
+		src/conf/kern.mk \
+		src/conf/kmod.mk \
+		kern/vnode_if.src \
+		tools/vnode_if.awk \
+		$(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
+
 	find $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) -type f -exec chmod 644 {} \;
 
 	touch install-common-stamp
