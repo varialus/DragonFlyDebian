@@ -58,7 +58,7 @@ sysdep_routines += kenv
 # For <sched.h>.
 sysdep_routines += clone start_thread
 # For <unistd.h>.
-sysdep_routines += getosreldate nfssvc nlm_syscall sys_ftruncate sys_freebsd6_ftruncate sys_truncate sys_freebsd6_truncate
+sysdep_routines += sys_ftruncate sys_freebsd6_ftruncate sys_truncate sys_freebsd6_truncate
 # For <sys/acl.h>.
 sysdep_routines += acl_aclcheck_fd acl_aclcheck_file acl_delete_fd acl_delete_file acl_get_fd acl_get_file acl_set_fd acl_set_file
 # For <sys/extattr.h>.
@@ -72,7 +72,7 @@ sysdep_routines += kldfind kldfirstmod kldload kldnext kldstat kldsym kldunload 
 # For <sys/mman.h>.
 sysdep_routines += minherit sys_mmap sys_freebsd6_mmap sys_munmap
 # For <sys/mount.h>.
-sysdep_routines += fhopen sys_fhstat sys_fhstatfs fhstat fhstat64 fhstatfs fhstatfs64 getfh getfsstat getfsstat64 getvfsbyname sys_getfsstat getmntinfo getmntinfo64 mount nmount unmount
+sysdep_routines += fhopen sys_fhstat sys_fhstatfs fhstat fhstat64 fhstatfs fhstatfs64 getfh getfsstat getfsstat64 sys_getfsstat getmntinfo getmntinfo64 mount nmount unmount
 # For <sys/rfork.h>.
 sysdep_routines += rfork
 # For <sys/rtprio.h>.
