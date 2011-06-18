@@ -7,7 +7,7 @@
 
 --- a/sbin/kldconfig/kldconfig.c
 +++ b/sbin/kldconfig/kldconfig.c
-@@ -40,14 +40,8 @@ __FBSDID("$FreeBSD$");
+@@ -40,15 +40,6 @@
  #include <string.h>
  #include <unistd.h>
  
@@ -19,12 +19,11 @@
 -/* just in case.. */
 -#define NEED_SLASHTERM
 -#endif /* defined(__FreeBSD_version) */
-+#include <bsd/string.h>
-+extern int sysctlnametomib(const char *name, int *mibp, size_t *sizep);
- 
+-
  /* the default sysctl name */
  #define PATHCTL	"kern.module_path"
-@@ -208,7 +202,7 @@ addpath(struct pathhead *pathq, char *pa
+ 
+@@ -208,7 +199,7 @@
  
  /* Remove a path component from the module search path */
  static void

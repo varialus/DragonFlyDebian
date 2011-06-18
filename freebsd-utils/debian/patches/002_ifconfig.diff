@@ -58,31 +58,20 @@
  WARNS?=	0
  
  .include <bsd.prog.mk>
---- a/sbin/ifconfig/ifcarp.c
-+++ b/sbin/ifconfig/ifcarp.c
-@@ -43,6 +43,7 @@
- #include <ctype.h>
- #include <stdio.h>
- #include <string.h>
-+#include <bsd/string.h>
- #include <stdlib.h>
- #include <unistd.h>
- #include <err.h>
 --- a/sbin/ifconfig/ifconfig.c
 +++ b/sbin/ifconfig/ifconfig.c
-@@ -48,6 +48,11 @@
+@@ -48,6 +48,10 @@
  #include <sys/module.h>
  #include <sys/linker.h>
  
 +#include <sys/types.h>
 +#include <sys/sockio.h>
-+#include <bsd/string.h>
 +#include <netinet/ether.h>
 +
  #include <net/ethernet.h>
  #include <net/if.h>
  #include <net/if_var.h>
-@@ -66,7 +71,7 @@
+@@ -66,7 +70,7 @@
  #include <err.h>
  #include <errno.h>
  #include <fcntl.h>
@@ -91,7 +80,7 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
-@@ -156,7 +161,7 @@
+@@ -156,7 +160,7 @@
  	all = downonly = uponly = namesonly = noload = verbose = 0;
  
  	/* Parse leading line options */
@@ -100,7 +89,7 @@
  	for (p = opts; p != NULL; p = p->next)
  		strlcat(options, p->opt, sizeof(options));
  	while ((c = getopt(argc, argv, options)) != -1) {
-@@ -643,8 +648,9 @@
+@@ -643,8 +647,9 @@
  		err(1, "SIOCDIFPHYADDR");
  }
  
@@ -111,7 +100,7 @@
      const struct afswtch *afp)
  {
  	struct ifreq my_ifr;
-@@ -658,7 +664,7 @@
+@@ -658,7 +663,7 @@
  }
  
  static void
@@ -120,7 +109,7 @@
      const struct afswtch *afp)
  {
  	struct ifreq my_ifr;
-@@ -671,8 +677,10 @@
+@@ -671,8 +676,10 @@
  		err(1, "SIOCSIFRVNET(%d, %s)", my_ifr.ifr_jid, my_ifr.ifr_name);
  }
  
@@ -132,7 +121,7 @@
      const struct afswtch *afp)
  {
  	if (afp->af_getaddr != NULL) {
-@@ -682,7 +690,7 @@
+@@ -682,7 +689,7 @@
  }
  
  static void
@@ -141,7 +130,7 @@
      const struct afswtch *afp)
  {
  	if (afp->af_getaddr != NULL)
-@@ -690,7 +698,7 @@
+@@ -690,7 +697,7 @@
  }
  
  static void
@@ -150,7 +139,7 @@
      const struct afswtch *afp)
  {
  	const struct afswtch *inet;
-@@ -723,7 +731,7 @@
+@@ -723,7 +730,7 @@
  
  /*ARGSUSED*/
  static void
@@ -159,7 +148,7 @@
      const struct afswtch *afp)
  {
  	if (afp->af_getaddr != NULL)
-@@ -783,7 +791,7 @@
+@@ -783,7 +790,7 @@
  }
  
  static void
@@ -168,7 +157,7 @@
      const struct afswtch *afp)
  {
  	strncpy(ifr.ifr_name, name, sizeof (ifr.ifr_name));
-@@ -793,7 +801,7 @@
+@@ -793,7 +800,7 @@
  }
  
  static void
@@ -177,7 +166,7 @@
      const struct afswtch *afp)
  {
  	strncpy(ifr.ifr_name, name, sizeof (ifr.ifr_name));
-@@ -803,7 +811,7 @@
+@@ -803,7 +810,7 @@
  }
  
  static void
@@ -186,7 +175,7 @@
      const struct afswtch *afp)
  {
  	char *newname;
-@@ -825,9 +833,10 @@
+@@ -825,9 +832,10 @@
  
  /* ARGSUSED */
  static void
@@ -198,7 +187,7 @@
  	char *newdescr;
  
  	ifr.ifr_buffer.length = strlen(val) + 1;
-@@ -902,7 +911,7 @@
+@@ -902,7 +910,7 @@
  	putchar('\n');
  
  	for (;;) {
@@ -207,7 +196,7 @@
  			ifr.ifr_buffer.buffer = descr;
  			ifr.ifr_buffer.length = descrlen;
  			if (ioctl(s, SIOCGIFDESCR, &ifr) == 0) {
-@@ -1113,8 +1122,10 @@
+@@ -1113,8 +1121,10 @@
  	DEF_CMD_ARG2("tunnel",			settunnel),
  	DEF_CMD("-tunnel", 0,			deletetunnel),
  	DEF_CMD("deletetunnel", 0,		deletetunnel),
@@ -300,15 +289,7 @@
  }
 --- a/sbin/ifconfig/ifclone.c
 +++ b/sbin/ifconfig/ifclone.c
-@@ -42,6 +42,7 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-+#include <bsd/string.h>
- #include <unistd.h>
- 
- #include "ifconfig.h"
-@@ -174,7 +175,7 @@
+@@ -174,7 +174,7 @@
  };
  
  static void
@@ -338,13 +319,12 @@
  	struct sockaddr_dl *sdl = (struct sockaddr_dl *) ifa->ifa_addr;
 --- a/sbin/ifconfig/ifieee80211.c
 +++ b/sbin/ifconfig/ifieee80211.c
-@@ -90,6 +90,10 @@
+@@ -90,6 +90,9 @@
  #include <fcntl.h>
  #include <inttypes.h>
  #include <stdio.h>
 +#include <stdint.h>
 +#include <netinet/ether.h>
-+#include <bsd/string.h>
 +#include "../../lib/linkaddr.h"
  #include <stdlib.h>
  #include <string.h>
@@ -437,17 +417,6 @@
      const struct afswtch *afp)
  {
  	uint32_t grekey = atol(val);
---- a/sbin/ifconfig/ifvlan.c
-+++ b/sbin/ifconfig/ifvlan.c
-@@ -52,6 +52,8 @@
- #include <err.h>
- #include <errno.h>
- 
-+#include <bsd/string.h>
-+
- #include "ifconfig.h"
- 
- #ifndef lint
 --- a/sbin/ifconfig/af_nd6.c
 +++ b/sbin/ifconfig/af_nd6.c
 @@ -65,7 +65,7 @@

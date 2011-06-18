@@ -1,0 +1,106 @@
+
+Workaround for #630907
+
+--- a/sbin/devfs/rule.c
++++ b/sbin/devfs/rule.c
+@@ -38,9 +38,9 @@
+ #include <assert.h>
+ #include <err.h>
+ #include <errno.h>
++#include <stdio.h>
+ #include <grp.h>
+ #include <pwd.h>
+-#include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+--- a/sbin/mount/mount.c
++++ b/sbin/mount/mount.c
+@@ -44,6 +44,7 @@
+ #include <sys/stat.h>
+ #include <sys/wait.h>
+ 
++#include <stdio.h>
+ #include <ctype.h>
+ #include <err.h>
+ #include <errno.h>
+@@ -52,7 +53,6 @@
+ #include <pwd.h>
+ #include <signal.h>
+ #include <stdint.h>
+-#include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+--- a/sbin/mount_hpfs/mount_hpfs.c
++++ b/sbin/mount_hpfs/mount_hpfs.c
+@@ -31,6 +31,7 @@
+  * $FreeBSD$
+  */
+ 
++#include <stdio.h>
+ #include <sys/cdefs.h>
+ #include <sys/param.h>
+ #include <sys/mount.h>
+@@ -40,7 +41,6 @@
+ #include <err.h>
+ #include <grp.h>
+ #include <pwd.h>
+-#include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sysexits.h>
+--- a/sbin/mount_msdosfs/mount_msdosfs.c
++++ b/sbin/mount_msdosfs/mount_msdosfs.c
+@@ -35,6 +35,7 @@
+   "$FreeBSD$";
+ #endif /* not lint */
+ 
++#include <stdio.h>
+ #include <sys/param.h>
+ #include <sys/mount.h>
+ #include <sys/stat.h>
+@@ -47,7 +48,6 @@
+ #include <grp.h>
+ #include <locale.h>
+ #include <pwd.h>
+-#include <stdio.h>
+ /* must be after stdio to declare fparseln */
+ #include <sys/iconv.h>
+ #include <stdlib.h>
+--- a/sbin/mount_ntfs/mount_ntfs.c
++++ b/sbin/mount_ntfs/mount_ntfs.c
+@@ -32,6 +32,7 @@
+  *
+  */
+ 
++#include <stdio.h>
+ #include <sys/cdefs.h>
+ #include <sys/param.h>
+ #define NTFS
+@@ -46,7 +47,6 @@
+ #include <err.h>
+ #include <grp.h>
+ #include <pwd.h>
+-#include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sysexits.h>
+--- a/contrib/pf/authpf/authpf.c
++++ b/contrib/pf/authpf/authpf.c
+@@ -16,6 +16,7 @@
+  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+  */
+ 
++#include <stdio.h>
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
+@@ -39,7 +40,6 @@
+ //#include <login_cap.h>
+ #include <pwd.h>
+ #include <signal.h>
+-#include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <syslog.h>

@@ -7,7 +7,7 @@
 
 --- a/sbin/devfs/extern.h
 +++ b/sbin/devfs/extern.h
-@@ -50,7 +50,7 @@ int eatoi(const char *);
+@@ -50,7 +50,7 @@
  uint16_t eatonum(const char *);
  size_t efgetln(FILE *, char **);
  void tokenize(const char *, int *, char ***);
@@ -18,7 +18,7 @@
  
 --- a/sbin/devfs/Makefile
 +++ b/sbin/devfs/Makefile
-@@ -4,5 +4,6 @@ PROG=	devfs
+@@ -4,5 +4,6 @@
  SRCS=	devfs.c rule.c
  MAN=	devfs.8
  WARNS?=	5
@@ -27,16 +27,7 @@
  .include <bsd.prog.mk>
 --- a/sbin/devfs/rule.c
 +++ b/sbin/devfs/rule.c
-@@ -44,6 +44,8 @@ __FBSDID("$FreeBSD$");
- #include <stdlib.h>
- #include <string.h>
- #include <unistd.h>
-+#include <bsd/stdlib.h>
-+#include <bsd/string.h>
- 
- #include "extern.h"
- 
-@@ -85,8 +87,8 @@ rule_main(int ac, char **av)
+@@ -85,8 +85,8 @@
  	int ch;
  
  	setprogname("devfs rule");
@@ -47,7 +38,7 @@
  		switch (ch) {
  		case 's':
  			in_rsnum = eatonum(optarg);
-@@ -125,7 +127,7 @@ rule_add(int ac, char **av)
+@@ -125,7 +125,7 @@
  }
  
  static int
@@ -56,7 +47,7 @@
  {
  	struct devfs_rule dr;
  	devfs_rnum rnum;
-@@ -153,7 +155,7 @@ rule_apply(int ac __unused, char **av __
+@@ -153,7 +153,7 @@
  }
  
  static int
@@ -65,7 +56,7 @@
  {
  	int rv;
  
-@@ -166,7 +168,7 @@ rule_applyset(int ac, char **av __unused
+@@ -166,7 +166,7 @@
  }
  
  static int
@@ -74,7 +65,7 @@
  {
  	devfs_rid rid;
  	int rv;
-@@ -181,7 +183,7 @@ rule_del(int ac __unused, char **av)
+@@ -181,7 +181,7 @@
  }
  
  static int
@@ -83,7 +74,7 @@
  {
  	struct devfs_rule dr;
  	int rv;
-@@ -202,7 +204,7 @@ rule_delset(int ac, char **av __unused)
+@@ -202,7 +202,7 @@
  }
  
  static int
@@ -92,7 +83,7 @@
  {
  	struct devfs_rule dr;
  	devfs_rnum rnum;
-@@ -229,7 +231,7 @@ rule_show(int ac __unused, char **av)
+@@ -229,7 +229,7 @@
  }
  
  static int
@@ -101,7 +92,7 @@
  {
  	devfs_rsnum rsnum;
  
-@@ -307,7 +309,7 @@ rulespec_instr(struct devfs_rule *dr, co
+@@ -307,7 +307,7 @@
   * Construct a /struct devfs_rule/ from ac and av.
   */
  static void
@@ -112,7 +103,7 @@
  	struct intstr *is;
 --- a/sbin/devfs/devfs.c
 +++ b/sbin/devfs/devfs.c
-@@ -62,7 +62,7 @@ main(int ac, char **av)
+@@ -62,7 +62,7 @@
  	int ch;
  
  	mountpt = NULL;

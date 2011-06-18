@@ -1,5 +1,5 @@
 #
-# To be removed when this functions are available in libbsd
+# To be removed when this function is available in libbsd
 #
 
 ---
@@ -8,28 +8,10 @@
 
 --- a/usr.sbin/arp/arp.c
 +++ b/usr.sbin/arp/arp.c
-@@ -114,6 +114,61 @@ static int	flags, doing_proxy, proxy_onl
+@@ -114,6 +114,43 @@
  
  #define SETFUNC(f)	{ if (func) usage(); func = (f); }
  
-+static void *
-+reallocf(void *ptr, size_t size)
-+{
-+	void *nptr;
-+
-+	nptr = realloc(ptr, size);
-+
-+	/*
-+	 * When the System V compatibility option (malloc "V" flag) is
-+	 * in effect, realloc(ptr, 0) frees the memory and returns NULL.
-+	 * So, to avoid double free, call free() only when size != 0.
-+	 * realloc(ptr, 0) can't fail when ptr != NULL.
-+	 */
-+	if (!nptr && ptr && size != 0)
-+		free(ptr);
-+	return (nptr);
-+}
-+
 +static char hexlist[] = "0123456789abcdef";
 +
 +char *

@@ -5,8 +5,9 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
-CXXFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D'__FBSDID(string)=' -D__va_list=__builtin_va_list
+CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D__va_list=__builtin_va_list \
+	$(shell pkg-config --cflags libbsd-overlay)
+CXXFLAGS = $(CFLAGS)
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -26,7 +27,7 @@ TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
 PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) \
-        -I$(CURDIR)/debian/local/include" \
+        -I$(CURDIR)/debian/local/include -lbsd" \
         NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO \
         DESTDIR=$(DESTDIR) make
 

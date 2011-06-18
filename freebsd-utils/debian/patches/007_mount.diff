@@ -19,28 +19,8 @@
  /* User-visible MNT_ flags. */
  #define MOPT_ASYNC		{ "async",	0, MNT_ASYNC, 0 }
  #define MOPT_NOATIME		{ "atime",	1, MNT_NOATIME, 0 }
---- a/sbin/mount/mount_fs.c
-+++ b/sbin/mount/mount_fs.c
-@@ -52,7 +52,7 @@ static const char rcsid[] =
- #include <sys/mount.h>
- 
- #include <err.h>
--#include <getopt.h>
-+#include <bsd/getopt.h>
- #include <libgen.h>
- #include <stdio.h>
- #include <stdlib.h>
 --- a/sbin/mount/mount.c
 +++ b/sbin/mount/mount.c
-@@ -58,6 +58,8 @@ __FBSDID("$FreeBSD$");
- #include <unistd.h>
- #include <libutil.h>
- 
-+#include <bsd/string.h>
-+
- #include "extern.h"
- #include "mntopts.h"
- #include "pathnames.h"
 @@ -160,6 +162,7 @@ use_mountprog(const char *vfstype)
  static int
  exec_mountprog(const char *name, const char *execname, char *const argv[])
