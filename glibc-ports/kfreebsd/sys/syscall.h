@@ -166,6 +166,8 @@
 #define	SYS_setsid	147
 #define	SYS_quotactl	148
 				/* 149 is old quota */
+
+#define SYS_nlm_syscall	154
 				/* 150 is old getsockname */
 #define	SYS_nfssvc	155
 				/* 156 is old getdirentries */
