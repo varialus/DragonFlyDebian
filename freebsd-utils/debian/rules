@@ -18,9 +18,10 @@ else
 endif
 
 SOURCE = freebsd-utils
-VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
-SVN = http://svn.freebsd.org/base/release/$(VERSION).0
-#SVN = http://svn.freebsd.org/base/releng/8.1
+VERSION = $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)-[^-]*$$/\1/p')
+SVN_REL = $(shell echo $(VERSION) | sed -ne 's/+[^+]*$$//p')
+SVN = http://svn.freebsd.org/base/release/$(SVN_REL).0
+#SVN = http://svn.freebsd.org/base/releng/$(SVN_REL)
 ORIGDIR = $(SOURCE)-$(VERSION)
 TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 
