@@ -36,9 +36,11 @@ build: build-arch build-indep
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
-	mkdir -p $(ORIGDIR)/sys/kern $(ORIGDIR)/etc
+	mkdir -p $(ORIGDIR)/sys/kern $(ORIGDIR)/sys/dev/usb $(ORIGDIR)/etc
 	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
-		 usr.sbin/jail bin/chflags sbin/devd usr.sbin/acpi/acpiconf \
+		 usr.sbin/jail bin/chflags \
+		 sbin/devd etc/devd.conf etc/devd sys/dev/usb/usbdevs \
+		 usr.sbin/acpi/acpiconf \
 		 sbin/kldconfig sbin/kldload sbin/kldstat sbin/kldunload \
 		 usr.bin/ktrdump usr.bin/vmstat sbin/devfs sbin/fdisk \
 		 sbin/ifconfig sbin/route usr.bin/netstat usr.sbin/rpc.umntall \
@@ -73,6 +75,7 @@ freebsd-utils-stamp:
 	$(PMAKE) -C sbin/camcontrol
 	$(PMAKE) -C sbin/ccdconfig
 	$(PMAKE) -C sbin/devd
+	$(PMAKE) -C etc/devd
 	$(PMAKE) -C sbin/devfs
 	$(PMAKE) -C sbin/dmesg
 	$(PMAKE) -C sbin/dumpon
@@ -159,6 +162,7 @@ clean:
 	$(PMAKE) -C sbin/atacontrol clean
 	$(PMAKE) -C sbin/camcontrol clean
 	$(PMAKE) -C sbin/devd clean
+	$(PMAKE) -C etc/devd clean
 	$(PMAKE) -C sbin/devfs clean
 	$(PMAKE) -C sbin/dmesg clean
 	$(PMAKE) -C sbin/dumpon clean
@@ -237,6 +241,7 @@ binary-arch: build install
 #	dh_installpam
 #	dh_installmime
 	dh_installinit -pfreebsd-utils -- start 03 S .
+	dh_installinit -pfreebsd-utils --name=devd -- start 03 S . stop 01 0 6 .
 	dh_installinit -pkldutils --no-start -- start 12 S .
 	dh_installinit -pkbdcontrol -- start 20 S .
 #	dh_installcron

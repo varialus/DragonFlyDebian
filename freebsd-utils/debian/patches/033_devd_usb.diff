@@ -1,0 +1,2813 @@
+--- /dev/null
++++ b/etc/devd/usb.conf
+@@ -0,0 +1,2777 @@
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "intclass" "0x01";
++	action "kldload snd_uaudio";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "intclass" "0x02";
++	match "intsubclass" "0x02";
++	action "kldload umodem";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "intclass" "0x03";
++	action "kldload uhid";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "intclass" "0x07";
++	action "kldload ulpt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "intclass" "0x08";
++	action "kldload umass";
++};
++
++/* the Xbox 360 gamepad doesn't use the HID class */
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "intclass" "0xff";
++	match "intsubclass" "0x5d";
++	match "intprotocol" "0x01";
++	action "kldload uhid";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_3COM";
++	match "product" "$USB_PRODUCT_3COM_3C460B";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ABOCOM";
++	match "product" "($USB_PRODUCT_ABOCOM_DSB650TX_PNA|$USB_PRODUCT_ABOCOM_UFE1000|$USB_PRODUCT_ABOCOM_XX1|$USB_PRODUCT_ABOCOM_XX10|$USB_PRODUCT_ABOCOM_XX2|$USB_PRODUCT_ABOCOM_XX4|$USB_PRODUCT_ABOCOM_XX5|$USB_PRODUCT_ABOCOM_XX6|$USB_PRODUCT_ABOCOM_XX7|$USB_PRODUCT_ABOCOM_XX8|$USB_PRODUCT_ABOCOM_XX9)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ACCTON";
++	match "product" "($USB_PRODUCT_ACCTON_SS1001|$USB_PRODUCT_ACCTON_USB320_EC)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ADMTEK";
++	match "product" "($USB_PRODUCT_ADMTEK_PEGASUS|$USB_PRODUCT_ADMTEK_PEGASUSII|$USB_PRODUCT_ADMTEK_PEGASUSII_2|$USB_PRODUCT_ADMTEK_PEGASUSII_3|$USB_PRODUCT_ADMTEK_PEGASUSII_4)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AEI";
++	match "product" "$USB_PRODUCT_AEI_FASTETHERNET";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ALLIEDTELESYN";
++	match "product" "$USB_PRODUCT_ALLIEDTELESYN_ATUSB100";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ATEN";
++	match "product" "$USB_PRODUCT_ATEN_UC110T";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BELKIN";
++	match "product" "$USB_PRODUCT_BELKIN_USB2LAN";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BILLIONTON";
++	match "product" "($USB_PRODUCT_BILLIONTON_USB100|$USB_PRODUCT_BILLIONTON_USBE100|$USB_PRODUCT_BILLIONTON_USBEL100|$USB_PRODUCT_BILLIONTON_USBLP100)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_COREGA";
++	match "product" "($USB_PRODUCT_COREGA_FETHER_USB_TX|$USB_PRODUCT_COREGA_FETHER_USB_TXS)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DLINK";
++	match "product" "($USB_PRODUCT_DLINK_DSB650|$USB_PRODUCT_DLINK_DSB650TX|$USB_PRODUCT_DLINK_DSB650TX1|$USB_PRODUCT_DLINK_DSB650TX2|$USB_PRODUCT_DLINK_DSB650TX3|$USB_PRODUCT_DLINK_DSB650TX4|$USB_PRODUCT_DLINK_DSB650TX_PNA)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ELCON";
++	match "product" "$USB_PRODUCT_ELCON_PLAN";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ELECOM";
++	match "product" "($USB_PRODUCT_ELECOM_LDUSB20|$USB_PRODUCT_ELECOM_LDUSBLTX|$USB_PRODUCT_ELECOM_LDUSBTX0|$USB_PRODUCT_ELECOM_LDUSBTX1|$USB_PRODUCT_ELECOM_LDUSBTX2|$USB_PRODUCT_ELECOM_LDUSBTX3)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ELSA";
++	match "product" "$USB_PRODUCT_ELSA_USB2ETHERNET";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GIGABYTE";
++	match "product" "$USB_PRODUCT_GIGABYTE_GNBR402W";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HAWKING";
++	match "product" "$USB_PRODUCT_HAWKING_UF100";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HP";
++	match "product" "$USB_PRODUCT_HP_HN210E";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_IODATA";
++	match "product" "($USB_PRODUCT_IODATA_USBETTX|$USB_PRODUCT_IODATA_USBETTXS)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_KINGSTON";
++	match "product" "$USB_PRODUCT_KINGSTON_KNU101TX";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_LINKSYS";
++	match "product" "($USB_PRODUCT_LINKSYS_USB100H1|$USB_PRODUCT_LINKSYS_USB100TX|$USB_PRODUCT_LINKSYS_USB10T|$USB_PRODUCT_LINKSYS_USB10TA|$USB_PRODUCT_LINKSYS_USB10TX1|$USB_PRODUCT_LINKSYS_USB10TX2)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MELCO";
++	match "product" "($USB_PRODUCT_MELCO_LUA2TX5|$USB_PRODUCT_MELCO_LUATX1|$USB_PRODUCT_MELCO_LUATX5)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MICROSOFT";
++	match "product" "$USB_PRODUCT_MICROSOFT_MN110";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NETGEAR";
++	match "product" "$USB_PRODUCT_NETGEAR_FA101";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SIEMENS";
++	match "product" "$USB_PRODUCT_SIEMENS_SPEEDSTREAM";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SIIG2";
++	match "product" "$USB_PRODUCT_SIIG2_USBTOETHER";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SMARTBRIDGES";
++	match "product" "$USB_PRODUCT_SMARTBRIDGES_SMARTNIC";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SMC";
++	match "product" "($USB_PRODUCT_SMC_2202USB|$USB_PRODUCT_SMC_2206USB)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SOHOWARE";
++	match "product" "($USB_PRODUCT_SOHOWARE_NUB100|$USB_PRODUCT_SOHOWARE_NUB110)";
++	action "kldload if_aue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ABOCOM";
++	match "product" "$USB_PRODUCT_ABOCOM_UF200";
++	action "kldload if_axe";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ACERCM";
++	match "product" "$USB_PRODUCT_ACERCM_EP1427X2";
++	action "kldload if_axe";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_APPLE";
++	match "product" "$USB_PRODUCT_APPLE_ETHERNET";
++	action "kldload if_axe";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ASIX";
++	match "product" "($USB_PRODUCT_ASIX_AX88172|$USB_PRODUCT_ASIX_AX88178|$USB_PRODUCT_ASIX_AX88772|$USB_PRODUCT_ASIX_AX88772A|$USB_PRODUCT_ATEN_UC210T)";
++	action "kldload if_axe";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BELKIN";
++	match "product" "$USB_PRODUCT_BELKIN_F5D5055";
++	action "kldload if_axe";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BILLIONTON";
++	match "product" "$USB_PRODUCT_BILLIONTON_USB2AR";
++	action "kldload if_axe";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ACERLABS";
++	match "product" "$USB_PRODUCT_ACERLABS_M5632";
++	action "kldload if_cdce";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AMBIT";
++	match "product" "$USB_PRODUCT_AMBIT_NTL_250";
++	action "kldload if_cdce";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_COMPAQ";
++	match "product" "$USB_PRODUCT_COMPAQ_IPAQLINUX";
++	action "kldload if_cdce";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GMATE";
++	match "product" "$USB_PRODUCT_GMATE_YP3X00";
++	action "kldload if_cdce";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MOTOROLA2";
++	match "product" "($USB_PRODUCT_MOTOROLA2_USBLAN|$USB_PRODUCT_MOTOROLA2_USBLAN2)";
++	action "kldload if_cdce";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NETCHIP";
++	match "product" "$USB_PRODUCT_NETCHIP_ETHERNETGADGET";
++	action "kldload if_cdce";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PROLIFIC";
++	match "product" "$USB_PRODUCT_PROLIFIC_PL2501";
++	action "kldload if_cdce";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SHARP";
++	match "product" "($USB_PRODUCT_SHARP_SL5500|$USB_PRODUCT_SHARP_SL5600|$USB_PRODUCT_SHARP_SLA300|$USB_PRODUCT_SHARP_SLC700|$USB_PRODUCT_SHARP_SLC750)";
++	action "kldload if_cdce";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CATC";
++	match "product" "($USB_PRODUCT_CATC_NETMATE|$USB_PRODUCT_CATC_NETMATE2)";
++	action "kldload if_cue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SMARTBRIDGES";
++	match "product" "$USB_PRODUCT_SMARTBRIDGES_SMARTLINK";
++	action "kldload if_cue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_APPLE";
++	match "product" "($USB_PRODUCT_APPLE_IPHONE|$USB_PRODUCT_APPLE_IPHONE_3G|$USB_PRODUCT_APPLE_IPHONE_3GS|$USB_PRODUCT_APPLE_IPHONE_4)";
++	action "kldload if_ipheth";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_3COM";
++	match "product" "($USB_PRODUCT_3COM_3C19250|$USB_PRODUCT_3COM_3C460)";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ABOCOM";
++	match "product" "$USB_PRODUCT_ABOCOM_URE450";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ADS";
++	match "product" "($USB_PRODUCT_ADS_UBS10BT|$USB_PRODUCT_ADS_UBS10BTX)";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AOX";
++	match "product" "$USB_PRODUCT_AOX_USB101";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ASANTE";
++	match "product" "$USB_PRODUCT_ASANTE_EA";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ATEN";
++	match "product" "($USB_PRODUCT_ATEN_DSB650C|$USB_PRODUCT_ATEN_UC10T)";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_COREGA";
++	match "product" "$USB_PRODUCT_COREGA_ETHER_USB_T";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DLINK";
++	match "product" "$USB_PRODUCT_DLINK_DSB650C";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ENTREGA";
++	match "product" "($USB_PRODUCT_ENTREGA_E45|$USB_PRODUCT_ENTREGA_XX1|$USB_PRODUCT_ENTREGA_XX2)";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_IODATA";
++	match "product" "$USB_PRODUCT_IODATA_USBETT";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_JATON";
++	match "product" "$USB_PRODUCT_JATON_EDA";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_KINGSTON";
++	match "product" "$USB_PRODUCT_KINGSTON_XX1";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_KLSI";
++	match "product" "($USB_PRODUCT_KLSI_DUH3E10BT|$USB_PRODUCT_KLSI_DUH3E10BTN)";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_LINKSYS";
++	match "product" "$USB_PRODUCT_LINKSYS_USB10T";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MOBILITY";
++	match "product" "$USB_PRODUCT_MOBILITY_EA";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NETGEAR";
++	match "product" "($USB_PRODUCT_NETGEAR_EA101|$USB_PRODUCT_NETGEAR_EA101X)";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PERACOM";
++	match "product" "($USB_PRODUCT_PERACOM_ENET|$USB_PRODUCT_PERACOM_ENET2|$USB_PRODUCT_PERACOM_ENET3)";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PORTGEAR";
++	match "product" "($USB_PRODUCT_PORTGEAR_EA8|$USB_PRODUCT_PORTGEAR_EA9)";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PORTSMITH";
++	match "product" "$USB_PRODUCT_PORTSMITH_EEA";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SHARK";
++	match "product" "$USB_PRODUCT_SHARK_PA";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SILICOM";
++	match "product" "($USB_PRODUCT_SILICOM_GPE|$USB_PRODUCT_SILICOM_U2E)";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SMC";
++	match "product" "$USB_PRODUCT_SMC_2102USB";
++	action "kldload if_kue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MOSCHIP";
++	match "product" "($USB_PRODUCT_MOSCHIP_MCS7730|$USB_PRODUCT_MOSCHIP_MCS7830)";
++	action "kldload if_mos";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SITECOMEU";
++	match "product" "$USB_PRODUCT_SITECOMEU_LN030";
++	action "kldload if_mos";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MELCO";
++	match "product" "$USB_PRODUCT_MELCO_LUAKTX";
++	action "kldload if_rue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_REALTEK";
++	match "product" "$USB_PRODUCT_REALTEK_USBKR100";
++	action "kldload if_rue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_OQO";
++	match "product" "$USB_PRODUCT_OQO_ETHER01";
++	action "kldload if_rue";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ABOCOM";
++	match "product" "($USB_PRODUCT_ABOCOM_HWU54DM|$USB_PRODUCT_ABOCOM_RT2573_2|$USB_PRODUCT_ABOCOM_RT2573_3|$USB_PRODUCT_ABOCOM_RT2573_4|$USB_PRODUCT_ABOCOM_WUG2700)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AMIT";
++	match "product" "$USB_PRODUCT_AMIT_CGWLUSB2GO";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ASUS";
++	match "product" "($USB_PRODUCT_ASUS_RT2573_1|$USB_PRODUCT_ASUS_RT2573_2$USB_PRODUCT_BELKIN $USB_PRODUCT_BELKIN_F5D7050A|$USB_PRODUCT_BELKIN_F5D9050V3)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CISCOLINKSYS";
++	match "product" "($USB_PRODUCT_CISCOLINKSYS_WUSB54GC|$USB_PRODUCT_CISCOLINKSYS_WUSB54GR$USB_PRODUCT_CONCEPTRONIC2 $USB_PRODUCT_CONCEPTRONIC2_C54RU2)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_COREGA";
++	match "product" "($USB_PRODUCT_COREGA_CGWLUSB2GL|$USB_PRODUCT_COREGA_CGWLUSB2GPX)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DICKSMITH";
++	match "product" "($USB_PRODUCT_DICKSMITH_CWD854F|$USB_PRODUCT_DICKSMITH_RT2573)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_EDIMAX";
++	match "product" "$USB_PRODUCT_EDIMAX_EW7318USG";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DLINK2";
++	match "product" "($USB_PRODUCT_DLINK2_DWLG122C1|$USB_PRODUCT_DLINK2_WUA1340|$USB_PRODUCT_DLINK2_DWA111|$USB_PRODUCT_DLINK2_DWA110)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GIGABYTE";
++	match "product" "($USB_PRODUCT_GIGABYTE_GNWB01GS|$USB_PRODUCT_GIGABYTE_GNWI05GS)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GIGASET";
++	match "product" "$USB_PRODUCT_GIGASET_RT2573";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GOODWAY";
++	match "product" "$USB_PRODUCT_GOODWAY_RT2573";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GUILLEMOT";
++	match "product" "($USB_PRODUCT_GUILLEMOT_HWGUSB254LB|$USB_PRODUCT_GUILLEMOT_HWGUSB254V2AP)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HUAWEI3COM";
++	match "product" "$USB_PRODUCT_HUAWEI3COM_WUB320G";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MELCO";
++	match "product" "($USB_PRODUCT_MELCO_G54HP|$USB_PRODUCT_MELCO_SG54HP|$USB_PRODUCT_MELCO_WLIUCG|$USB_PRODUCT_MELCO_WLRUCG|$USB_PRODUCT_MELCO_WLRUCGAOSS)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MSI";
++	match "product" "($USB_PRODUCT_MSI_RT2573_1|$USB_PRODUCT_MSI_RT2573_2|$USB_PRODUCT_MSI_RT2573_3|$USB_PRODUCT_MSI_RT2573_4)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NOVATECH";
++	match "product" "$USB_PRODUCT_NOVATECH_RT2573";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PLANEX2";
++	match "product" "($USB_PRODUCT_PLANEX2_GWUS54HP|$USB_PRODUCT_PLANEX2_GWUS54MINI2|$USB_PRODUCT_PLANEX2_GWUSMM)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_QCOM";
++	match "product" "($USB_PRODUCT_QCOM_RT2573|$USB_PRODUCT_QCOM_RT2573_2|$USB_PRODUCT_QCOM_RT2573_3)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_RALINK";
++	match "product" "($USB_PRODUCT_RALINK_RT2573|$USB_PRODUCT_RALINK_RT2573_2|$USB_PRODUCT_RALINK_RT2671)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SITECOMEU";
++	match "product" "($USB_PRODUCT_SITECOMEU_WL113R2|$USB_PRODUCT_SITECOMEU_WL172)";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SPARKLAN";
++	match "product" "$USB_PRODUCT_SPARKLAN_RT2573";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SURECOM";
++	match "product" "$USB_PRODUCT_SURECOM_RT2573";
++	action "kldload if_rum";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ABOCOM";
++	match "product" "($USB_PRODUCT_ABOCOM_RT2770|$USB_PRODUCT_ABOCOM_RT2870|$USB_PRODUCT_ABOCOM_RT3070|$USB_PRODUCT_ABOCOM_RT3071|$USB_PRODUCT_ABOCOM_RT3072)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ABOCOM2";
++	match "product" "$USB_PRODUCT_ABOCOM2_RT2870_1";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ACCTON";
++	match "product" "($USB_PRODUCT_ACCTON_RT2770|$USB_PRODUCT_ACCTON_RT2870_1|$USB_PRODUCT_ACCTON_RT2870_2|$USB_PRODUCT_ACCTON_RT2870_3|$USB_PRODUCT_ACCTON_RT2870_4|$USB_PRODUCT_ACCTON_RT2870_5|$USB_PRODUCT_ACCTON_RT3070|$USB_PRODUCT_ACCTON_RT3070_1|$USB_PRODUCT_ACCTON_RT3070_2|$USB_PRODUCT_ACCTON_RT3070_3|$USB_PRODUCT_ACCTON_RT3070_4|$USB_PRODUCT_ACCTON_RT3070_5)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AIRTIES";
++	match "product" "$USB_PRODUCT_AIRTIES_RT3070";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ALLWIN";
++	match "product" "($USB_PRODUCT_ALLWIN_RT2070|$USB_PRODUCT_ALLWIN_RT2770|$USB_PRODUCT_ALLWIN_RT2870|$USB_PRODUCT_ALLWIN_RT3070|$USB_PRODUCT_ALLWIN_RT3071|$USB_PRODUCT_ALLWIN_RT3072|$USB_PRODUCT_ALLWIN_RT3572)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AMIGO";
++	match "product" "($USB_PRODUCT_AMIGO_RT2870_1|$USB_PRODUCT_AMIGO_RT2870_2)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AMIT";
++	match "product" "($USB_PRODUCT_AMIT_CGWLUSB2GNR|$USB_PRODUCT_AMIT_RT2870_1)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AMIT2";
++	match "product" "$USB_PRODUCT_AMIT2_RT2870";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ASUS";
++	match "product" "($USB_PRODUCT_ASUS_RT2870_1|$USB_PRODUCT_ASUS_RT2870_2|$USB_PRODUCT_ASUS_RT2870_3|$USB_PRODUCT_ASUS_RT2870_4|$USB_PRODUCT_ASUS_RT2870_5|$USB_PRODUCT_ASUS_USBN13|$USB_PRODUCT_ASUS_RT3070_1)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ASUS2";
++	match "product" "$USB_PRODUCT_ASUS2_USBN11";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AZUREWAVE";
++	match "product" "($USB_PRODUCT_AZUREWAVE_RT2870_1|$USB_PRODUCT_AZUREWAVE_RT2870_2|$USB_PRODUCT_AZUREWAVE_RT3070_1|$USB_PRODUCT_AZUREWAVE_RT3070_2|$USB_PRODUCT_AZUREWAVE_RT3070_3)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BELKIN";
++	match "product" "($USB_PRODUCT_BELKIN_F5D8053V3|$USB_PRODUCT_BELKIN_F5D8055|$USB_PRODUCT_BELKIN_F6D4050V1|$USB_PRODUCT_BELKIN_RT2870_1|$USB_PRODUCT_BELKIN_RT2870_2)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CISCOLINKSYS2";
++	match "product" "$USB_PRODUCT_CISCOLINKSYS2_RT3070";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CISCOLINKSYS3";
++	match "product" "$USB_PRODUCT_CISCOLINKSYS3_RT3070";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CONCEPTRONIC2";
++	match "product" "($USB_PRODUCT_CONCEPTRONIC2_RT2870_1|$USB_PRODUCT_CONCEPTRONIC2_RT2870_2|$USB_PRODUCT_CONCEPTRONIC2_RT2870_3|$USB_PRODUCT_CONCEPTRONIC2_RT2870_4|$USB_PRODUCT_CONCEPTRONIC2_RT2870_5|$USB_PRODUCT_CONCEPTRONIC2_RT2870_6|$USB_PRODUCT_CONCEPTRONIC2_RT2870_7|$USB_PRODUCT_CONCEPTRONIC2_RT2870_8|$USB_PRODUCT_CONCEPTRONIC2_RT3070_1|$USB_PRODUCT_CONCEPTRONIC2_RT3070_2|$USB_PRODUCT_CONCEPTRONIC2_VIGORN61)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_COREGA";
++	match "product" "($USB_PRODUCT_COREGA_CGWLUSB300GNM|$USB_PRODUCT_COREGA_RT2870_1|$USB_PRODUCT_COREGA_RT2870_2|$USB_PRODUCT_COREGA_RT2870_3|$USB_PRODUCT_COREGA_RT3070)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CYBERTAN";
++	match "product" "$USB_PRODUCT_CYBERTAN_RT2870";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DLINK";
++	match "product" "($USB_PRODUCT_DLINK_RT2870|$USB_PRODUCT_DLINK_RT3072)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DLINK2";
++	match "product" "($USB_PRODUCT_DLINK2_DWA130|$USB_PRODUCT_DLINK2_RT2870_1|$USB_PRODUCT_DLINK2_RT2870_2|$USB_PRODUCT_DLINK2_RT3070_1|$USB_PRODUCT_DLINK2_RT3070_2|$USB_PRODUCT_DLINK2_RT3070_3|$USB_PRODUCT_DLINK2_RT3070_4|$USB_PRODUCT_DLINK2_RT3070_5|$USB_PRODUCT_DLINK2_RT3072|$USB_PRODUCT_DLINK2_RT3072_1)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_EDIMAX";
++	match "product" "($USB_PRODUCT_EDIMAX_EW7717|$USB_PRODUCT_EDIMAX_EW7718|$USB_PRODUCT_EDIMAX_RT2870_1)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ENCORE";
++	match "product" "($USB_PRODUCT_ENCORE_RT3070_1|$USB_PRODUCT_ENCORE_RT3070_2|$USB_PRODUCT_ENCORE_RT3070_3)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GIGABYTE";
++	match "product" "($USB_PRODUCT_GIGABYTE_GNWB31N|$USB_PRODUCT_GIGABYTE_GNWB32L|$USB_PRODUCT_GIGABYTE_RT2870_1)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GIGASET";
++	match "product" "($USB_PRODUCT_GIGASET_RT3070_1|$USB_PRODUCT_GIGASET_RT3070_2)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GUILLEMOT";
++	match "product" "$USB_PRODUCT_GUILLEMOT_HWNU300";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HAWKING";
++	match "product" "($USB_PRODUCT_HAWKING_HWUN2|$USB_PRODUCT_HAWKING_RT2870_1|$USB_PRODUCT_HAWKING_RT2870_2|$USB_PRODUCT_HAWKING_RT3070)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_IODATA";
++	match "product" "($USB_PRODUCT_IODATA_RT3072_1|$USB_PRODUCT_IODATA_RT3072_2|$USB_PRODUCT_IODATA_RT3072_3|$USB_PRODUCT_IODATA_RT3072_4)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_LINKSYS4";
++	match "product" "($USB_PRODUCT_LINKSYS4_RT3070|$USB_PRODUCT_LINKSYS4_WUSB100|$USB_PRODUCT_LINKSYS4_WUSB54GCV3|$USB_PRODUCT_LINKSYS4_WUSB600N|$USB_PRODUCT_LINKSYS4_WUSB600NV2)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_LOGITEC";
++	match "product" "($USB_PRODUCT_LOGITEC_RT2870_1|$USB_PRODUCT_LOGITEC_RT2870_2|$USB_PRODUCT_LOGITEC_RT2870_3)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MELCO";
++	match "product" "($USB_PRODUCT_MELCO_RT2870_1|$USB_PRODUCT_MELCO_RT2870_2|$USB_PRODUCT_MELCO_WLIUCAG300N|$USB_PRODUCT_MELCO_WLIUCG300N|$USB_PRODUCT_MELCO_WLIUCG301N|$USB_PRODUCT_MELCO_WLIUCGN)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MOTOROLA4";
++	match "product" "($USB_PRODUCT_MOTOROLA4_RT2770|$USB_PRODUCT_MOTOROLA4_RT3070)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MSI";
++	match "product" "($USB_PRODUCT_MSI_RT3070_1|$USB_PRODUCT_MSI_RT3070_2|$USB_PRODUCT_MSI_RT3070_3|$USB_PRODUCT_MSI_RT3070_4|$USB_PRODUCT_MSI_RT3070_5|$USB_PRODUCT_MSI_RT3070_6|$USB_PRODUCT_MSI_RT3070_7|$USB_PRODUCT_MSI_RT3070_8|$USB_PRODUCT_MSI_RT3070_9|$USB_PRODUCT_MSI_RT3070_10|$USB_PRODUCT_MSI_RT3070_11)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_OVISLINK";
++	match "product" "$USB_PRODUCT_OVISLINK_RT3072";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PARA";
++	match "product" "$USB_PRODUCT_PARA_RT3070";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PEGATRON";
++	match "product" "($USB_PRODUCT_PEGATRON_RT2870|$USB_PRODUCT_PEGATRON_RT3070|$USB_PRODUCT_PEGATRON_RT3070_2|$USB_PRODUCT_PEGATRON_RT3070_3)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PHILIPS";
++	match "product" "$USB_PRODUCT_PHILIPS_RT2870";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PLANEX2";
++	match "product" "($USB_PRODUCT_PLANEX2_GWUS300MINIS|$USB_PRODUCT_PLANEX2_GWUSMICRON|$USB_PRODUCT_PLANEX2_RT2870|$USB_PRODUCT_PLANEX2_RT3070)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_QCOM";
++	match "product" "$USB_PRODUCT_QCOM_RT2870";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_QUANTA";
++	match "product" "$USB_PRODUCT_QUANTA_RT3070";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_RALINK";
++	match "product" "($USB_PRODUCT_RALINK_RT2070|$USB_PRODUCT_RALINK_RT2770|$USB_PRODUCT_RALINK_RT2870|$USB_PRODUCT_RALINK_RT3070|$USB_PRODUCT_RALINK_RT3071|$USB_PRODUCT_RALINK_RT3072|$USB_PRODUCT_RALINK_RT3370|$USB_PRODUCT_RALINK_RT3572|$USB_PRODUCT_RALINK_RT8070)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SAMSUNG2";
++	match "product" "$USB_PRODUCT_SAMSUNG2_RT2870_1";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SENAO";
++	match "product" "($USB_PRODUCT_SENAO_RT2870_1|$USB_PRODUCT_SENAO_RT2870_2|$USB_PRODUCT_SENAO_RT2870_3|$USB_PRODUCT_SENAO_RT2870_4|$USB_PRODUCT_SENAO_RT3070|$USB_PRODUCT_SENAO_RT3071|$USB_PRODUCT_SENAO_RT3072_1|$USB_PRODUCT_SENAO_RT3072_2|$USB_PRODUCT_SENAO_RT3072_3|$USB_PRODUCT_SENAO_RT3072_4|$USB_PRODUCT_SENAO_RT3072_5)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SITECOMEU";
++	match "product" "($USB_PRODUCT_SITECOMEU_RT2770|$USB_PRODUCT_SITECOMEU_RT2870_1|$USB_PRODUCT_SITECOMEU_RT2870_2|$USB_PRODUCT_SITECOMEU_RT2870_3|$USB_PRODUCT_SITECOMEU_RT2870_4|$USB_PRODUCT_SITECOMEU_RT3070|$USB_PRODUCT_SITECOMEU_RT3070_2|$USB_PRODUCT_SITECOMEU_RT3070_3|$USB_PRODUCT_SITECOMEU_RT3070_4|$USB_PRODUCT_SITECOMEU_RT3071|$USB_PRODUCT_SITECOMEU_RT3072_1|$USB_PRODUCT_SITECOMEU_RT3072_2|$USB_PRODUCT_SITECOMEU_RT3072_3|$USB_PRODUCT_SITECOMEU_RT3072_4|$USB_PRODUCT_SITECOMEU_RT3072_5|$USB_PRODUCT_SITECOMEU_RT3072_6|$USB_PRODUCT_SITECOMEU_WL608)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SPARKLAN";
++	match "product" "($USB_PRODUCT_SPARKLAN_RT2870_1|$USB_PRODUCT_SPARKLAN_RT3070)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SWEEX2";
++	match "product" "($USB_PRODUCT_SWEEX2_LW153|$USB_PRODUCT_SWEEX2_LW303|$USB_PRODUCT_SWEEX2_LW313)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_TOSHIBA";
++	match "product" "$USB_PRODUCT_TOSHIBA_RT3070";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_UMEDIA";
++	match "product" "$USB_PRODUCT_UMEDIA_RT2870_1";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZCOM";
++	match "product" "($USB_PRODUCT_ZCOM_RT2870_1|$USB_PRODUCT_ZCOM_RT2870_2)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZINWELL";
++	match "product" "($USB_PRODUCT_ZINWELL_RT2870_1|$USB_PRODUCT_ZINWELL_RT2870_2|$USB_PRODUCT_ZINWELL_RT3070|$USB_PRODUCT_ZINWELL_RT3072_1|$USB_PRODUCT_ZINWELL_RT3072_2)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZYXEL";
++	match "product" "($USB_PRODUCT_ZYXEL_RT2870_1|$USB_PRODUCT_ZYXEL_RT2870_2)";
++	action "kldload if_run";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ACCTON";
++	match "product" "($USB_PRODUCT_ACCTON_SMCWUSBG|$USB_PRODUCT_ACCTON_SMCWUSBTG2)";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ATHEROS";
++	match "product" "$USB_PRODUCT_ATHEROS_AR5523";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ATHEROS2";
++	match "product" "($USB_PRODUCT_ATHEROS2_AR5523_1|$USB_PRODUCT_ATHEROS2_AR5523_2|$USB_PRODUCT_ATHEROS2_AR5523_3)";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CONCEPTRONIC";
++	match "product" "($USB_PRODUCT_CONCEPTRONIC_AR5523_1|$USB_PRODUCT_CONCEPTRONIC_AR5523_2)";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DLINK";
++	match "product" "($USB_PRODUCT_DLINK_DWLAG122|$USB_PRODUCT_DLINK_DWLAG132|$USB_PRODUCT_DLINK_DWLG132)";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DLINK2";
++	match "product" "$USB_PRODUCT_DLINK2_DWA120";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GIGASET";
++	match "product" "($USB_PRODUCT_GIGASET_AR5523|$USB_PRODUCT_GIGASET_SMCWUSBTG)";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GLOBALSUN";
++	match "product" "($USB_PRODUCT_GLOBALSUN_AR5523_1|$USB_PRODUCT_GLOBALSUN_AR5523_2)";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NETGEAR";
++	match "product" "$USB_PRODUCT_NETGEAR_WG111U";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NETGEAR3";
++	match "product" "($USB_PRODUCT_NETGEAR3_WG111T|$USB_PRODUCT_NETGEAR3_WPN111|$USB_PRODUCT_NETGEAR3_WPN111_2)";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_UMEDIA";
++	match "product" "($USB_PRODUCT_UMEDIA_TEW444UBEU|$USB_PRODUCT_UMEDIA_AR5523_2)";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_WISTRONNEWEB";
++	match "product" "($USB_PRODUCT_WISTRONNEWEB_AR5523_1|$USB_PRODUCT_WISTRONNEWEB_AR5523_2)";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZCOM";
++	match "product" "$USB_PRODUCT_ZCOM_AR5523";
++	action "kldload if_uath";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SHANTOU";
++	match "product" "($USB_PRODUCT_SHANTOU_DM9601|$USB_PRODUCT_SHANTOU_ST268|$USB_PRODUCT_SHANTOU_ADM8515)";
++	action "kldload if_udav";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_COREGA";
++	match "product" "$USB_PRODUCT_COREGA_FETHER_USB_TXC";
++	action "kldload if_udav";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_KONTRON";
++	match "product" "($USB_PRODUCT_KONTRON_DM9601|$USB_PRODUCT_KONTRON_JP1082)";
++	action "kldload if_udav";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ACCTON";
++	match "product" "$USB_PRODUCT_ACCTON_PRISM_GT";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BELKIN";
++	match "product" "$USB_PRODUCT_BELKIN_F5D7050";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CISCOLINKSYS";
++	match "product" "$USB_PRODUCT_CISCOLINKSYS_WUSB54AG";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CONCEPTRONIC";
++	match "product" "$USB_PRODUCT_CONCEPTRONIC_PRISM_GT";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DELL";
++	match "product" "($USB_PRODUCT_DELL_PRISM_GT_1|$USB_PRODUCT_DELL_PRISM_GT_2)";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_FSC";
++	match "product" "$USB_PRODUCT_FSC_E5400";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GLOBESPAN";
++	match "product" "($USB_PRODUCT_GLOBESPAN_PRISM_GT_1|$USB_PRODUCT_GLOBESPAN_PRISM_GT_2)";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NETGEAR";
++	match "product" "$USB_PRODUCT_NETGEAR_WG111V2_2";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_INTERSIL";
++	match "product" "$USB_PRODUCT_INTERSIL_PRISM_GT";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SMC";
++	match "product" "$USB_PRODUCT_SMC_2862WG";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_USR";
++	match "product" "$USB_PRODUCT_USR_USR5422";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_WISTRONNEWEB";
++	match "product" "$USB_PRODUCT_WISTRONNEWEB_UR045G";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_XYRATEX";
++	match "product" "($USB_PRODUCT_XYRATEX_PRISM_GT_1|$USB_PRODUCT_XYRATEX_PRISM_GT_2)";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZCOM";
++	match "product" "($USB_PRODUCT_ZCOM_XG703A|$USB_PRODUCT_ZCOM_XM142)";
++	action "kldload if_upgt";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ASUS";
++	match "product" "($USB_PRODUCT_ASUS_WL167G|$USB_PRODUCT_ASUS_RT2570)";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BELKIN";
++	match "product" "($USB_PRODUCT_BELKIN_F5D7050|$USB_PRODUCT_BELKIN_F5D7051)";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CISCOLINKSYS";
++	match "product" "($USB_PRODUCT_CISCOLINKSYS_HU200TS|$USB_PRODUCT_CISCOLINKSYS_WUSB54G|$USB_PRODUCT_CISCOLINKSYS_WUSB54GP)";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CONCEPTRONIC2";
++	match "product" "$USB_PRODUCT_CONCEPTRONIC2_C54RU";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DLINK";
++	match "product" "$USB_PRODUCT_DLINK_DWLG122";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GIGABYTE";
++	match "product" "($USB_PRODUCT_GIGABYTE_GN54G|$USB_PRODUCT_GIGABYTE_GNWBKG)";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GUILLEMOT";
++	match "product" "$USB_PRODUCT_GUILLEMOT_HWGUSB254";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MELCO";
++	match "product" "($USB_PRODUCT_MELCO_KG54|$USB_PRODUCT_MELCO_KG54AI|$USB_PRODUCT_MELCO_KG54YB|$USB_PRODUCT_MELCO_NINWIFI)";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MSI";
++	match "product" "($USB_PRODUCT_MSI_RT2570|$USB_PRODUCT_MSI_RT2570_2|$USB_PRODUCT_MSI_RT2570_3)";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NOVATECH";
++	match "product" "$USB_PRODUCT_NOVATECH_NV902";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_RALINK";
++	match "product" "($USB_PRODUCT_RALINK_RT2570|$USB_PRODUCT_RALINK_RT2570_2|$USB_PRODUCT_RALINK_RT2570_3)";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SIEMENS2";
++	match "product" "$USB_PRODUCT_SIEMENS2_WL54G";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SMC";
++	match "product" "$USB_PRODUCT_SMC_2862WG";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SPHAIRON";
++	match "product" "$USB_PRODUCT_SPHAIRON_UB801R";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SURECOM";
++	match "product" "$USB_PRODUCT_SURECOM_RT2570";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_VTECH";
++	match "product" "$USB_PRODUCT_VTECH_RT2570";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZINWELL";
++	match "product" "$USB_PRODUCT_ZINWELL_RT2570";
++	action "kldload if_ural";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NETGEAR";
++	match "product" "($USB_PRODUCT_NETGEAR_WG111V3|$USB_PRODUCT_NETGEAR_WG111V2|0x6100)";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_REALTEK";
++	match "product" "($USB_PRODUCT_REALTEK_RTL8187B_0|$USB_PRODUCT_REALTEK_RTL8187B_1|$USB_PRODUCT_REALTEK_RTL8187B_2|$USB_PRODUCT_REALTEK_RTL8187)";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SITECOMEU";
++	match "product" "($USB_PRODUCT_SITECOMEU_WL168V4|$USB_PRODUCT_SITECOMEU_WL168V1)";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ASUS";
++	match "product" "$USB_PRODUCT_ASUS_P5B_WIFI";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BELKIN";
++	match "product" "$USB_PRODUCT_BELKIN_F5D7050E";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_LINKSYS4";
++	match "product" "$USB_PRODUCT_LINKSYS4_WUSB54GCV2";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SURECOM";
++	match "product" "$USB_PRODUCT_SURECOM_EP9001G2A";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_OVISLINK";
++	match "product" "0x8187";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DICKSMITH";
++	match "product" "0x9401";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HP";
++	match "product" "0xca02";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_LOGITEC";
++	match "product" "0x010c";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SPHAIRON";
++	match "product" "0x0150";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_QCOM";
++	match "product" "0x6232";
++	action "kldload if_urtw";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_3COM2";
++	match "product" "$USB_PRODUCT_3COM2_3CRUSB10075";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ABOCOM";
++	match "product" "$USB_PRODUCT_ABOCOM_WL54";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ASUS";
++	match "product" "$USB_PRODUCT_ASUS_WL159G";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CYBERTAN";
++	match "product" "$USB_PRODUCT_CYBERTAN_TG54USB";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DRAYTEK";
++	match "product" "$USB_PRODUCT_DRAYTEK_VIGOR550";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PLANEX2";
++	match "product" "($USB_PRODUCT_PLANEX2_GWUS54GD|$USB_PRODUCT_PLANEX2_GWUS54GZL)";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PLANEX3";
++	match "product" "($USB_PRODUCT_PLANEX3_GWUS54GZ|$USB_PRODUCT_PLANEX3_GWUS54MINI)";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SAGEM";
++	match "product" "$USB_PRODUCT_SAGEM_XG760A";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SENAO";
++	match "product" "$USB_PRODUCT_SENAO_NUB8301";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SITECOMEU";
++	match "product" "$USB_PRODUCT_SITECOMEU_WL113";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SWEEX";
++	match "product" "$USB_PRODUCT_SWEEX_ZD1211";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_TEKRAM";
++	match "product" "($USB_PRODUCT_TEKRAM_QUICKWLAN|$USB_PRODUCT_TEKRAM_ZD1211_1|$USB_PRODUCT_TEKRAM_ZD1211_2)";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_TWINMOS";
++	match "product" "$USB_PRODUCT_TWINMOS_G240";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_UMEDIA";
++	match "product" "($USB_PRODUCT_UMEDIA_ALL0298V2|$USB_PRODUCT_UMEDIA_TEW429UB_A|$USB_PRODUCT_UMEDIA_TEW429UB)";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_WISTRONNEWEB";
++	match "product" "$USB_PRODUCT_WISTRONNEWEB_UR055G";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZCOM";
++	match "product" "$USB_PRODUCT_ZCOM_ZD1211";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZYDAS";
++	match "product" "$USB_PRODUCT_ZYDAS_ZD1211";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZYXEL";
++	match "product" "($USB_PRODUCT_ZYXEL_AG225H|$USB_PRODUCT_ZYXEL_ZYAIRG220|$USB_PRODUCT_ZYXEL_G200V2)";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ACCTON";
++	match "product" "($USB_PRODUCT_ACCTON_SMCWUSBG_NF|$USB_PRODUCT_ACCTON_SMCWUSBG|$USB_PRODUCT_ACCTON_ZD1211B)";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ASUS";
++	match "product" "$USB_PRODUCT_ASUS_A9T_WIFI";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BELKIN";
++	match "product" "($USB_PRODUCT_BELKIN_F5D7050_V4000|$USB_PRODUCT_BELKIN_ZD1211B)";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CISCOLINKSYS";
++	match "product" "$USB_PRODUCT_CISCOLINKSYS_WUSBF54G";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_FIBERLINE";
++	match "product" "$USB_PRODUCT_FIBERLINE_WL430U";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MELCO";
++	match "product" "$USB_PRODUCT_MELCO_KG54L";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PHILIPS";
++	match "product" "$USB_PRODUCT_PHILIPS_SNU5600";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PLANEX2";
++	match "product" "$USB_PRODUCT_PLANEX2_GW_US54GXS";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SAGEM";
++	match "product" "$USB_PRODUCT_SAGEM_XG76NA";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SITECOMEU";
++	match "product" "$USB_PRODUCT_SITECOMEU_ZD1211B";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_UMEDIA";
++	match "product" "$USB_PRODUCT_UMEDIA_TEW429UBC1";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_USR";
++	match "product" "$USB_PRODUCT_USR_USR5423";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_VTECH";
++	match "product" "$USB_PRODUCT_VTECH_ZD1211B";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZCOM";
++	match "product" "$USB_PRODUCT_ZCOM_ZD1211B";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZYDAS";
++	match "product" "$USB_PRODUCT_ZYDAS_ZD1211B";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ZYXEL";
++	match "product" "($USB_PRODUCT_ZYXEL_M202|$USB_PRODUCT_ZYXEL_G202|$USB_PRODUCT_ZYXEL_G220V2)";
++	action "kldload if_zyd";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ACERP";
++	match "product" "$USB_PRODUCT_ACERP_H10";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AIRPLUS";
++	match "product" "$USB_PRODUCT_AIRPLUS_MCD650";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AIRPRIME";
++	match "product" "$USB_PRODUCT_AIRPRIME_PC5220";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ALINK";
++	match "product" "($USB_PRODUCT_ALINK_3G|$USB_PRODUCT_ALINK_3GU|$USB_PRODUCT_ALINK_DWM652U5)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AMOI";
++	match "product" "($USB_PRODUCT_AMOI_H01|$USB_PRODUCT_AMOI_H01A|$USB_PRODUCT_AMOI_H02)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ANYDATA";
++	match "product" "($USB_PRODUCT_ANYDATA_ADU_500A|$USB_PRODUCT_ANYDATA_ADU_620UW|$USB_PRODUCT_ANYDATA_ADU_E100X)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AXESSTEL";
++	match "product" "$USB_PRODUCT_AXESSTEL_DATAMODEM";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CMOTECH";
++	match "product" "$USB_PRODUCT_CMOTECH_CDMA_MODEM1";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DELL";
++	match "product" "($USB_PRODUCT_DELL_U5500|$USB_PRODUCT_DELL_U5505|$USB_PRODUCT_DELL_U5510|$USB_PRODUCT_DELL_U5520|$USB_PRODUCT_DELL_U5520_2|$USB_PRODUCT_DELL_U5520_3|$USB_PRODUCT_DELL_U5700|$USB_PRODUCT_DELL_U5700_2|$USB_PRODUCT_DELL_U5700_3|$USB_PRODUCT_DELL_U5700_4|$USB_PRODUCT_DELL_U5720|$USB_PRODUCT_DELL_U5720_2|$USB_PRODUCT_DELL_U5730|$USB_PRODUCT_DELL_U5730_2|$USB_PRODUCT_DELL_U5730_3|$USB_PRODUCT_DELL_U740)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DLINK3";
++	match "product" "$USB_PRODUCT_DLINK3_DWM652";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HP";
++	match "product" "($USB_PRODUCT_HP_EV2200|$USB_PRODUCT_HP_HS2300)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_KYOCERA2";
++	match "product" "($USB_PRODUCT_KYOCERA2_CDMA_MSM_K|$USB_PRODUCT_KYOCERA2_KPC680)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_LONGCHEER";
++	match "product" "$USB_PRODUCT_LONGCHEER_W14";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MERLIN";
++	match "product" "$USB_PRODUCT_MERLIN_V620";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NEOTEL";
++	match "product" "$USB_PRODUCT_NEOTEL_PRIME";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NOVATEL";
++	match "product" "($USB_PRODUCT_NOVATEL_E725|$USB_PRODUCT_NOVATEL_ES620|$USB_PRODUCT_NOVATEL_ES620_2|$USB_PRODUCT_NOVATEL_EU730|$USB_PRODUCT_NOVATEL_EU740|$USB_PRODUCT_NOVATEL_EU870D|$USB_PRODUCT_NOVATEL_MC760|$USB_PRODUCT_NOVATEL_MC547|$USB_PRODUCT_NOVATEL_MC950D|$USB_PRODUCT_NOVATEL_U720|$USB_PRODUCT_NOVATEL_U727|$USB_PRODUCT_NOVATEL_U727_2|$USB_PRODUCT_NOVATEL_U740|$USB_PRODUCT_NOVATEL_U740_2|$USB_PRODUCT_NOVATEL_U870|$USB_PRODUCT_NOVATEL_V620|$USB_PRODUCT_NOVATEL_V640|$USB_PRODUCT_NOVATEL_V720|$USB_PRODUCT_NOVATEL_V740|$USB_PRODUCT_NOVATEL_X950D|$USB_PRODUCT_NOVATEL_XU870)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_OPTION";
++	match "product" "($USB_PRODUCT_OPTION_E6500|$USB_PRODUCT_OPTION_E6501|$USB_PRODUCT_OPTION_E6601|$USB_PRODUCT_OPTION_E6721|$USB_PRODUCT_OPTION_E6741|$USB_PRODUCT_OPTION_E6761|$USB_PRODUCT_OPTION_E6800|$USB_PRODUCT_OPTION_E7021|$USB_PRODUCT_OPTION_E7041|$USB_PRODUCT_OPTION_E7061|$USB_PRODUCT_OPTION_E7100|$USB_PRODUCT_OPTION_GE40X|$USB_PRODUCT_OPTION_GT3G|$USB_PRODUCT_OPTION_GT3GPLUS|$USB_PRODUCT_OPTION_GT3GQUAD|$USB_PRODUCT_OPTION_GT3G_1|$USB_PRODUCT_OPTION_GT3G_2|$USB_PRODUCT_OPTION_GT3G_3|$USB_PRODUCT_OPTION_GT3G_4|$USB_PRODUCT_OPTION_GT3G_5|$USB_PRODUCT_OPTION_GT3G_6|$USB_PRODUCT_OPTION_GTHSDPA|$USB_PRODUCT_OPTION_GTM380|$USB_PRODUCT_OPTION_GTMAX36|$USB_PRODUCT_OPTION_GTMAX380HSUPAE|$USB_PRODUCT_OPTION_GTMAXHSUPA|$USB_PRODUCT_OPTION_GTMAXHSUPAE|$USB_PRODUCT_OPTION_VODAFONEMC3G)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_QISDA";
++	match "product" "($USB_PRODUCT_QISDA_H20_1|$USB_PRODUCT_QISDA_H20_2|$USB_PRODUCT_QISDA_H21_1|$USB_PRODUCT_QISDA_H21_2)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_QUALCOMM2";
++	match "product" "($USB_PRODUCT_QUALCOMM2_AC8700|$USB_PRODUCT_QUALCOMM2_MF330)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_QUALCOMMINC";
++	match "product" "($USB_PRODUCT_QUALCOMMINC_AC2726|$USB_PRODUCT_QUALCOMMINC_AC8700|$USB_PRODUCT_QUALCOMMINC_AC8710|$USB_PRODUCT_QUALCOMMINC_E0002|$USB_PRODUCT_QUALCOMMINC_E0003|$USB_PRODUCT_QUALCOMMINC_E0004|$USB_PRODUCT_QUALCOMMINC_E0005|$USB_PRODUCT_QUALCOMMINC_E0006|$USB_PRODUCT_QUALCOMMINC_E0007|$USB_PRODUCT_QUALCOMMINC_E0008|$USB_PRODUCT_QUALCOMMINC_E0009|$USB_PRODUCT_QUALCOMMINC_E000A|$USB_PRODUCT_QUALCOMMINC_E000B|$USB_PRODUCT_QUALCOMMINC_E000C|$USB_PRODUCT_QUALCOMMINC_E000D|$USB_PRODUCT_QUALCOMMINC_E000E|$USB_PRODUCT_QUALCOMMINC_E000F|$USB_PRODUCT_QUALCOMMINC_E0010|$USB_PRODUCT_QUALCOMMINC_E0011|$USB_PRODUCT_QUALCOMMINC_E0012|$USB_PRODUCT_QUALCOMMINC_E0013|$USB_PRODUCT_QUALCOMMINC_E0014|$USB_PRODUCT_QUALCOMMINC_E0017|$USB_PRODUCT_QUALCOMMINC_E0018|$USB_PRODUCT_QUALCOMMINC_E0019|$USB_PRODUCT_QUALCOMMINC_E0020|$USB_PRODUCT_QUALCOMMINC_E0021|$USB_PRODUCT_QUALCOMMINC_E0022|$USB_PRODUCT_QUALCOMMINC_E0023|$USB_PRODUCT_QUALCOMMINC_E0024|$USB_PRODUCT_QUALCOMMINC_E0025|$USB_PRODUCT_QUALCOMMINC_E0026|$USB_PRODUCT_QUALCOMMINC_E0027|$USB_PRODUCT_QUALCOMMINC_E0028|$USB_PRODUCT_QUALCOMMINC_E0029|$USB_PRODUCT_QUALCOMMINC_E0030|$USB_PRODUCT_QUALCOMMINC_E0032|$USB_PRODUCT_QUALCOMMINC_E0033|$USB_PRODUCT_QUALCOMMINC_E0037|$USB_PRODUCT_QUALCOMMINC_E0039|$USB_PRODUCT_QUALCOMMINC_E0042|$USB_PRODUCT_QUALCOMMINC_E0043|$USB_PRODUCT_QUALCOMMINC_E0048|$USB_PRODUCT_QUALCOMMINC_E0049|$USB_PRODUCT_QUALCOMMINC_E0051|$USB_PRODUCT_QUALCOMMINC_E0052|$USB_PRODUCT_QUALCOMMINC_E0054|$USB_PRODUCT_QUALCOMMINC_E0055|$USB_PRODUCT_QUALCOMMINC_E0057|$USB_PRODUCT_QUALCOMMINC_E0058|$USB_PRODUCT_QUALCOMMINC_E0059|$USB_PRODUCT_QUALCOMMINC_E0060|$USB_PRODUCT_QUALCOMMINC_E0061|$USB_PRODUCT_QUALCOMMINC_E0062|$USB_PRODUCT_QUALCOMMINC_E0063|$USB_PRODUCT_QUALCOMMINC_E0064|$USB_PRODUCT_QUALCOMMINC_E0066|$USB_PRODUCT_QUALCOMMINC_E0069|$USB_PRODUCT_QUALCOMMINC_E0070|$USB_PRODUCT_QUALCOMMINC_E0073|$USB_PRODUCT_QUALCOMMINC_E0076|$USB_PRODUCT_QUALCOMMINC_E0078|$USB_PRODUCT_QUALCOMMINC_E0082|$USB_PRODUCT_QUALCOMMINC_E0086|$USB_PRODUCT_QUALCOMMINC_SURFSTICK|$USB_PRODUCT_QUALCOMMINC_E2002|$USB_PRODUCT_QUALCOMMINC_E2003|$USB_PRODUCT_QUALCOMMINC_MF626|$USB_PRODUCT_QUALCOMMINC_MF628|$USB_PRODUCT_QUALCOMMINC_MF633R)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_QUANTA";
++	match "product" "($USB_PRODUCT_QUANTA_GKE|$USB_PRODUCT_QUANTA_GLE|$USB_PRODUCT_QUANTA_GLX|$USB_PRODUCT_QUANTA_Q101|$USB_PRODUCT_QUANTA_Q111)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SIERRA";
++	match "product" "($USB_PRODUCT_SIERRA_AC402|$USB_PRODUCT_SIERRA_AC595U|$USB_PRODUCT_SIERRA_AC597E|$USB_PRODUCT_SIERRA_AC875E|$USB_PRODUCT_SIERRA_AC875U|$USB_PRODUCT_SIERRA_AC875U_2|$USB_PRODUCT_SIERRA_AC880|$USB_PRODUCT_SIERRA_AC880E|$USB_PRODUCT_SIERRA_AC880U|$USB_PRODUCT_SIERRA_AC881|$USB_PRODUCT_SIERRA_AC881E|$USB_PRODUCT_SIERRA_AC881U|$USB_PRODUCT_SIERRA_AC885E|$USB_PRODUCT_SIERRA_AC885E_2|$USB_PRODUCT_SIERRA_AC885U|$USB_PRODUCT_SIERRA_AIRCARD580|$USB_PRODUCT_SIERRA_AIRCARD595|$USB_PRODUCT_SIERRA_AIRCARD875|$USB_PRODUCT_SIERRA_C22|$USB_PRODUCT_SIERRA_C597|$USB_PRODUCT_SIERRA_C888|$USB_PRODUCT_SIERRA_E0029|$USB_PRODUCT_SIERRA_E6892|$USB_PRODUCT_SIERRA_E6893|$USB_PRODUCT_SIERRA_EM5625|$USB_PRODUCT_SIERRA_EM5725|$USB_PRODUCT_SIERRA_MC5720|$USB_PRODUCT_SIERRA_MC5720_2|$USB_PRODUCT_SIERRA_MC5725|$USB_PRODUCT_SIERRA_MC5727|$USB_PRODUCT_SIERRA_MC5727_2|$USB_PRODUCT_SIERRA_MC5728|$USB_PRODUCT_SIERRA_MC8700|$USB_PRODUCT_SIERRA_MC8755|$USB_PRODUCT_SIERRA_MC8755_2|$USB_PRODUCT_SIERRA_MC8755_3|$USB_PRODUCT_SIERRA_MC8755_4|$USB_PRODUCT_SIERRA_MC8765|$USB_PRODUCT_SIERRA_MC8765_2|$USB_PRODUCT_SIERRA_MC8765_3|$USB_PRODUCT_SIERRA_MC8775|$USB_PRODUCT_SIERRA_MC8775_2|$USB_PRODUCT_SIERRA_MC8780|$USB_PRODUCT_SIERRA_MC8780_2|$USB_PRODUCT_SIERRA_MC8780_3|$USB_PRODUCT_SIERRA_MC8781|$USB_PRODUCT_SIERRA_MC8781_2|$USB_PRODUCT_SIERRA_MC8781_3|$USB_PRODUCT_SIERRA_MC8785|$USB_PRODUCT_SIERRA_MC8785_2|$USB_PRODUCT_SIERRA_MC8790|$USB_PRODUCT_SIERRA_MC8791|$USB_PRODUCT_SIERRA_MC8792|$USB_PRODUCT_SIERRA_MINI5725|$USB_PRODUCT_SIERRA_T11|$USB_PRODUCT_SIERRA_T598)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_STELERA";
++	match "product" "$USB_PRODUCT_STELERA_C105|$USB_PRODUCT_STELERA_E1003|$USB_PRODUCT_STELERA_E1004|$USB_PRODUCT_STELERA_E1005|$USB_PRODUCT_STELERA_E1006|$USB_PRODUCT_STELERA_E1007|$USB_PRODUCT_STELERA_E1008|$USB_PRODUCT_STELERA_E1009|$USB_PRODUCT_STELERA_E100A|$USB_PRODUCT_STELERA_E100B|$USB_PRODUCT_STELERA_E100C|$USB_PRODUCT_STELERA_E100D|$USB_PRODUCT_STELERA_E100E|$USB_PRODUCT_STELERA_E100F|$USB_PRODUCT_STELERA_E1010|$USB_PRODUCT_STELERA_E1011|$USB_PRODUCT_STELERA_E1012)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_TCTMOBILE";
++	match "product" "$USB_PRODUCT_TCTMOBILE_X060S";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_TELIT";
++	match "product" "($USB_PRODUCT_TELIT_UC864E|$USB_PRODUCT_TELIT_UC864G)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_TLAYTECH";
++	match "product" "$USB_PRODUCT_TLAYTECH_TEU800";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_TOSHIBA";
++	match "product" "($USB_PRODUCT_TOSHIBA_G450|$USB_PRODUCT_TOSHIBA_HSDPA)";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_YISO";
++	match "product" "$USB_PRODUCT_YISO_C893";
++	action "kldload u3g";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ARKMICRO";
++	match "product" "$USB_PRODUCT_ARKMICRO_ARK3116";
++	action "kldload uark";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ANYDATA";
++	match "product" "($USB_PRODUCT_ANYDATA_ADU_500A|$USB_PRODUCT_ANYDATA_ADU_E100X)";
++	action "kldload ubsa";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AXESSTEL";
++	match "product" "$USB_PRODUCT_AXESSTEL_DATAMODEM";
++	action "kldload ubsa";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BELKIN";
++	match "product" "($USB_PRODUCT_BELKIN_F5U103|$USB_PRODUCT_BELKIN_F5U120)";
++	action "kldload ubsa";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ETEK";
++	match "product" "$USB_PRODUCT_ETEK_1COM";
++	action "kldload ubsa";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GOHUBS";
++	match "product" "$USB_PRODUCT_GOHUBS_GOCOM232";
++	action "kldload ubsa";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PERACOM";
++	match "product" "$USB_PRODUCT_PERACOM_SERIAL1";
++	action "kldload ubsa";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_WCH";
++	match "product" "$USB_PRODUCT_WCH_CH341SER";
++	action "kldload uchcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_WCH2";
++	match "product" "$USB_PRODUCT_WCH2_CH341SER";
++	action "kldload uchcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DELORME";
++	match "product" "$USB_PRODUCT_DELORME_EARTHMATE";
++	action "kldload ucycom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NETCHIP";
++	match "product" "$USB_PRODUCT_NETCHIP_TURBOCONNECT";
++	action "kldload udbp";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PROLIFIC";
++	match "product" "($USB_PRODUCT_PROLIFIC_PL2301|$USB_PRODUCT_PROLIFIC_PL2302)";
++	action "kldload udbp";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ANCHOR";
++	match "product" "$USB_PRODUCT_ANCHOR_EZLINK";
++	action "kldload udbp";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GENESYS";
++	match "product" "$USB_PRODUCT_GENESYS_GL620USB";
++	action "kldload udbp";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_EGALAX";
++	match "product" "($USB_PRODUCT_EGALAX_TPANEL|$USB_PRODUCT_EGALAX_TPANEL2)";
++	action "kldload uep";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_EGALAX2";
++	match "product" "$USB_PRODUCT_EGALAX_TPANEL2";
++	action "kldload uep";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CYPRESS";
++	match "product" "$USB_PRODUCT_CYPRESS_FMRADIO";
++	action "kldload ufm";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ATMEL";
++	match "product" "$USB_PRODUCT_ATMEL_STK541";
++	action "kldload uftdi";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DRESDENELEKTRONIK";
++	match "product" "($USB_PRODUCT_DRESDENELEKTRONIK_SENSORTERMINALBOARD|$USB_PRODUCT_DRESDENELEKTRONIK_WIRELESSHANDHELDTERMINAL)";
++	action "kldload uftdi";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_FALCOM";
++	match "product" "$USB_PRODUCT_FALCOM_TWIST";
++	action "kldload uftdi";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_FTDI";
++	match "product" "($USB_PRODUCT_FTDI_GAMMASCOUT|$USB_PRODUCT_FTDI_SERIAL_8U100AX|$USB_PRODUCT_FTDI_SERIAL_2232C|$USB_PRODUCT_FTDI_SERIAL_2232D|$USB_PRODUCT_FTDI_SERIAL_4232H|$USB_PRODUCT_FTDI_SERIAL_8U232AM|$USB_PRODUCT_FTDI_SERIAL_8U232AM4|$USB_PRODUCT_FTDI_SEMC_DSS20|$USB_PRODUCT_FTDI_CFA_631|$USB_PRODUCT_FTDI_CFA_632|$USB_PRODUCT_FTDI_CFA_633|$USB_PRODUCT_FTDI_CFA_634|$USB_PRODUCT_FTDI_CFA_635|$USB_PRODUCT_FTDI_USB_UIRT|$USB_PRODUCT_FTDI_USBSERIAL|$USB_PRODUCT_FTDI_KBS|$USB_PRODUCT_FTDI_MX2_3|$USB_PRODUCT_FTDI_MX4_5|$USB_PRODUCT_FTDI_LK202|$USB_PRODUCT_FTDI_LK204|$USB_PRODUCT_FTDI_TACTRIX_OPENPORT_13M|$USB_PRODUCT_FTDI_TACTRIX_OPENPORT_13S|$USB_PRODUCT_FTDI_TACTRIX_OPENPORT_13U|$USB_PRODUCT_FTDI_EISCOU|$USB_PRODUCT_FTDI_UOPTBR|$USB_PRODUCT_FTDI_EMCU2D|$USB_PRODUCT_FTDI_PCMSFU|$USB_PRODUCT_FTDI_EMCU2H|$USB_PRODUCT_FTDI_MAXSTREAM|$USB_PRODUCT_FTDI_CTI_USB_NANO_485|$USB_PRODUCT_FTDI_CTI_USB_MINI_485)";
++	action "kldload uftdi";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SIIG2";
++	match "product" "$USB_PRODUCT_SIIG2_US2308";
++	action "kldload uftdi";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_INTREPIDCS";
++	match "product" "($USB_PRODUCT_INTREPIDCS_VALUECAN|$USB_PRODUCT_INTREPIDCS_NEOVI)";
++	action "kldload uftdi";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BBELECTRONICS";
++	match "product" "$USB_PRODUCT_BBELECTRONICS_USOTL4";
++	action "kldload uftdi";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MATRIXORBITAL";
++	match "product" "$USB_PRODUCT_MATRIXORBITAL_MOUA";
++	action "kldload uftdi";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MARVELL";
++	match "product" "$USB_PRODUCT_MARVELL_SHEEVAPLUG";
++	action "kldload uftdi";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MELCO";
++	match "product" "$USB_PRODUCT_MELCO_PCOPRS1";
++	action "kldload uftdi";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_RATOC";
++	match "product" "$USB_PRODUCT_RATOC_REXUSB60F";
++	action "kldload uftdi";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_AIRPRIME";
++	match "product" "$USB_PRODUCT_AIRPRIME_PC5220";
++	action "kldload ugensa";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CMOTECH";
++	match "product" "$USB_PRODUCT_CMOTECH_CDMA_MODEM1";
++	action "kldload ugensa";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_KYOCERA2";
++	match "product" "$USB_PRODUCT_KYOCERA2_CDMA_MSM_K";
++	action "kldload ugensa";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HP";
++	match "product" "$USB_PRODUCT_HP_49GPLUS";
++	action "kldload ugensa";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NOVATEL2";
++	match "product" "$USB_PRODUCT_NOVATEL2_FLEXPACKGPS";
++	action "kldload ugensa";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_OPTION";
++	match "product" "($USB_PRODUCT_OPTION_GSICON72|$USB_PRODUCT_OPTION_GTHSDPA|$USB_PRODUCT_OPTION_GSICONHSUPA|$USB_PRODUCT_OPTION_GTHSUPA|$USB_PRODUCT_OPTION_GE40X|$USB_PRODUCT_OPTION_GE40X_1|$USB_PRODUCT_OPTION_GE40X_2|$USB_PRODUCT_OPTION_GE40X_3|$USB_PRODUCT_OPTION_ICON401|$USB_PRODUCT_OPTION_GMT382|$USB_PRODUCT_OPTION_ICONEDGE|$USB_PRODUCT_OPTION_MODHSXPA|$USB_PRODUCT_OPTION_ICON321|$USB_PRODUCT_OPTION_GTICON322|$USB_PRODUCT_OPTION_ICON505|$USB_PRODUCT_OPTION_ICON505)";
++	action "kldload uhso";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ASUS";
++	match "product" "$USB_PRODUCT_ASUS_P535";
++	action "kldload uipaq";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CASIO";
++	match "product" "$USB_PRODUCT_CASIO_BE300";
++	action "kldload uipaq";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_COMPAQ";
++	match "product" "$USB_PRODUCT_COMPAQ_IPAQPOCKETPC";
++	action "kldload uipaq";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HP";
++	match "product" "($USB_PRODUCT_HP_2215|$USB_PRODUCT_HP_568J)";
++	action "kldload uipaq";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HTC";
++	match "product" "($USB_PRODUCT_HTC_PPC6700MODEM|$USB_PRODUCT_HTC_SMARTPHONE|$USB_PRODUCT_HTC_WINMOBILE|$USB_PRODUCT_HTC_WIZARD)";
++	action "kldload uipaq";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SHARP";
++	match "product" "($USB_PRODUCT_SHARP_WZERO3ES|$USB_PRODUCT_SHARP_WZERO3ADES|$USB_PRODUCT_SHARP_WILLCOM03)";
++	action "kldload uipaq";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_TOSHIBA";
++	match "product" "$USB_PRODUCT_TOSHIBA_POCKETPC_E740";
++	action "kldload uipaq";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MOSCHIP";
++	match "product" "($USB_PRODUCT_MOSCHIP_MCS7820|$USB_PRODUCT_MOSCHIP_MCS7840)";
++	action "kldload umcs";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MCT";
++	match "product" "($USB_PRODUCT_MCT_USB232|$USB_PRODUCT_MCT_SITECOM_USB232|$USB_PRODUCT_MCT_DU_H3SP_USB232)";
++	action "kldload umct";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BELKIN";
++	match "product" "($USB_PRODUCT_BELKIN_F5U109|$USB_PRODUCT_BELKIN_F5U409)";
++	action "kldload umct";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_KYOCERA";
++	match "product" "$USB_PRODUCT_KYOCERA_AHK3001V";
++	action "kldload umodem";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SIERRA";
++	match "product" "$USB_PRODUCT_SIERRA_MC5720";
++	action "kldload umodem";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CURITEL";
++	match "product" "$USB_PRODUCT_CURITEL_PC5740";
++	action "kldload umodem";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MOSCHIP";
++	match "product" "$USB_PRODUCT_MOSCHIP_MCS7703";
++	action "kldload umoscom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ACERP";
++	match "product" "$USB_PRODUCT_ACERP_S81";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ADLINK";
++	match "product" "$USB_PRODUCT_ADLINK_ND6530";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ALCATEL";
++	match "product" "$USB_PRODUCT_ALCATEL_OT535";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ALCOR";
++	match "product" "$USB_PRODUCT_ALCOR_AU9720";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ANCHOR";
++	match "product" "$USB_PRODUCT_ANCHOR_SERIAL";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ATEN";
++	match "product" "$USB_PRODUCT_ATEN_UC232A";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BELKIN";
++	match "product" "$USB_PRODUCT_BELKIN_F5U257";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_COREGA";
++	match "product" "$USB_PRODUCT_COREGA_CGUSBRS232R";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_EPSON";
++	match "product" "($USB_PRODUCT_EPSON_CRESSI_EDY|$USB_PRODUCT_EPSON_N2ITION3)";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ELECOM";
++	match "product" "($USB_PRODUCT_ELECOM_UCSGT|$USB_PRODUCT_ELECOM_UCSGT0)";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HAL";
++	match "product" "$USB_PRODUCT_HAL_IMR001";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HP";
++	match "product" "$USB_PRODUCT_HP_LD220";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_IODATA";
++	match "product" "($USB_PRODUCT_IODATA_USBRSAQ|$USB_PRODUCT_IODATA_USBRSAQ5)";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ITEGNO";
++	match "product" "($USB_PRODUCT_ITEGNO_WM1080A|$USB_PRODUCT_ITEGNO_WM2080A)";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_LEADTEK";
++	match "product" "$USB_PRODUCT_LEADTEK_9531";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MICROSOFT";
++	match "product" "$USB_PRODUCT_MICROSOFT_700WX";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MOBILEACTION";
++	match "product" "$USB_PRODUCT_MOBILEACTION_MA620";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NETINDEX";
++	match "product" "$USB_PRODUCT_NETINDEX_WS002IN";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_NOKIA2";
++	match "product" "$USB_PRODUCT_NOKIA2_CA42";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_OTI";
++	match "product" "$USB_PRODUCT_OTI_DKU5";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PANASONIC";
++	match "product" "$USB_PRODUCT_PANASONIC_TYTP50P6S";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PLX";
++	match "product" "$USB_PRODUCT_PLX_CA42";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PROLIFIC";
++	match "product" "($USB_PRODUCT_PROLIFIC_ALLTRONIX_GPRS|$USB_PRODUCT_PROLIFIC_ALDIGA_AL11U|$USB_PRODUCT_PROLIFIC_DCU11|$USB_PRODUCT_PROLIFIC_HCR331|$USB_PRODUCT_PROLIFIC_MICROMAX_610U|$USB_PRODUCT_PROLIFIC_PHAROS|$USB_PRODUCT_PROLIFIC_PL2303|$USB_PRODUCT_PROLIFIC_RSAQ2|$USB_PRODUCT_PROLIFIC_RSAQ3|$USB_PRODUCT_PROLIFIC_UIC_MSR206)";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PROLIFIC2";
++	match "product" "$USB_PRODUCT_PROLIFIC2_PL2303";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_RADIOSHACK";
++	match "product" "$USB_PRODUCT_RADIOSHACK_USBCABLE";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_RATOC";
++	match "product" "$USB_PRODUCT_RATOC_REXUSB60";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SAGEM";
++	match "product" "$USB_PRODUCT_SAGEM_USBSERIAL";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SAMSUNG";
++	match "product" "$USB_PRODUCT_SAMSUNG_I330";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SANWA";
++	match "product" "$USB_PRODUCT_SANWA_KB_USB2";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SIEMENS3";
++	match "product" "($USB_PRODUCT_SIEMENS3_EF81|$USB_PRODUCT_SIEMENS3_SX1|$USB_PRODUCT_SIEMENS3_X65|$USB_PRODUCT_SIEMENS3_X75)";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SITECOM";
++	match "product" "$USB_PRODUCT_SITECOM_SERIAL";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SMART";
++	match "product" "$USB_PRODUCT_SMART_PL2303";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SONY";
++	match "product" "$USB_PRODUCT_SONY_QN3";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SONYERICSSON";
++	match "product" "($USB_PRODUCT_SONYERICSSON_DATAPILOT|$USB_PRODUCT_SONYERICSSON_DCU10)";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SOURCENEXT";
++	match "product" "($USB_PRODUCT_SOURCENEXT_KEIKAI8|$USB_PRODUCT_SOURCENEXT_KEIKAI8_CHG)";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SPEEDDRAGON";
++	match "product" "$USB_PRODUCT_SPEEDDRAGON_MS3303H";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SYNTECH";
++	match "product" "$USB_PRODUCT_SYNTECH_CPT8001C";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_TDK";
++	match "product" "($USB_PRODUCT_TDK_UHA6400|$USB_PRODUCT_TDK_UPA9664)";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_TRIPPLITE";
++	match "product" "$USB_PRODUCT_TRIPPLITE_U209";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_YCCABLE";
++	match "product" "$USB_PRODUCT_YCCABLE_PL2303";
++	action "kldload uplcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DIAMOND";
++	match "product" "$USB_PRODUCT_DIAMOND_RIO500USB";
++	action "kldload urio";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DIAMOND2";
++	match "product" "($USB_PRODUCT_DIAMOND2_RIO600USB|$USB_PRODUCT_DIAMOND2_RIO800USB)";
++	action "kldload urio";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_BALTECH";
++	match "product" "$USB_PRODUCT_BALTECH_CARDREADER";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_CLIPSAL";
++	match "product" "$USB_PRODUCT_CLIPSAL_5500PCU";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DATAAPEX";
++	match "product" "$USB_PRODUCT_DATAAPEX_MULTICOM";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DELL";
++	match "product" "$USB_PRODUCT_DELL_DW700";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DIGIANSWER";
++	match "product" "$USB_PRODUCT_DIGIANSWER_ZIGBEE802154";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_DYNASTREAM";
++	match "product" "($USB_PRODUCT_DYNASTREAM_ANTDEVBOARD|$USB_PRODUCT_DYNASTREAM_ANTDEVBOARD2|$USB_PRODUCT_DYNASTREAM_ANT2USB)";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ELV";
++	match "product" "$USB_PRODUCT_ELV_USBI2C";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_FOXCONN";
++	match "product" "($USB_PRODUCT_FOXCONN_PIRELLI_DP_L10|$USB_PRODUCT_FOXCONN $USB_PRODUCT_FOXCONN_TCOM_TC_300)";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GEMALTO";
++	match "product" "$USB_PRODUCT_GEMALTO_PROXPU";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_JABLOTRON";
++	match "product" "$USB_PRODUCT_JABLOTRON_PC60B";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_MEI";
++	match "product" "($USB_PRODUCT_MEI_CASHFLOW_SC|$USB_PRODUCT_MEI $USB_PRODUCT_MEI_S2000)";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_JABLOTRON";
++	match "product" "$USB_PRODUCT_JABLOTRON_PC60B";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_OWEN";
++	match "product" "$USB_PRODUCT_OWEN_AC4";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PHILIPS";
++	match "product" "$USB_PRODUCT_PHILIPS_ACE1001";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PLX";
++	match "product" "$USB_PRODUCT_PLX_CA42";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_RENESAS";
++	match "product" "$USB_PRODUCT_RENESAS_RX610";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SILABS";
++	match "product" "($USB_PRODUCT_SILABS_AEROCOMM|$USB_PRODUCT_SILABS_AMBER_AMB2560|$USB_PRODUCT_SILABS_ARGUSISP|$USB_PRODUCT_SILABS_ARKHAM_DS101_A|$USB_PRODUCT_SILABS_ARKHAM_DS101_M|$USB_PRODUCT_SILABS_ARYGON_MIFARE|$USB_PRODUCT_SILABS_AVIT_USB_TTL|$USB_PRODUCT_SILABS_B_G_H3000|$USB_PRODUCT_SILABS_BALLUFF_RFID|$USB_PRODUCT_SILABS_BEI_VCP|$USB_PRODUCT_SILABS_BSM7DUSB|$USB_PRODUCT_SILABS_BURNSIDE|$USB_PRODUCT_SILABS_C2_EDGE_MODEM|$USB_PRODUCT_SILABS_CP2102|$USB_PRODUCT_SILABS_CP210X_2|$USB_PRODUCT_SILABS_CRUMB128|$USB_PRODUCT_SILABS_CYGNAL|$USB_PRODUCT_SILABS_CYGNAL_DEBUG|$USB_PRODUCT_SILABS_CYGNAL_GPS|$USB_PRODUCT_SILABS_DEGREE|$USB_PRODUCT_SILABS_EMS_C1007|$USB_PRODUCT_SILABS_HELICOM|$USB_PRODUCT_SILABS_IMS_USB_RS422|$USB_PRODUCT_SILABS_INFINITY_MIC|$USB_PRODUCT_SILABS_INSYS_MODEM|$USB_PRODUCT_SILABS_KYOCERA_GPS|$USB_PRODUCT_SILABS_LIPOWSKY_HARP|$USB_PRODUCT_SILABS_LIPOWSKY_JTAG|$USB_PRODUCT_SILABS_LIPOWSKY_LIN|$USB_PRODUCT_SILABS_MC35PU|$USB_PRODUCT_SILABS_MJS_TOSLINK|$USB_PRODUCT_SILABS_MSD_DASHHAWK|$USB_PRODUCT_SILABS_POLOLU|$USB_PRODUCT_SILABS_PROCYON_AVS|$USB_PRODUCT_SILABS_SB_PARAMOUNT_ME|$USB_PRODUCT_SILABS_SUUNTO|$USB_PRODUCT_SILABS_TAMSMASTER|$USB_PRODUCT_SILABS_TELEGESYS_ETRX2|$USB_PRODUCT_SILABS_TRACIENT|$USB_PRODUCT_SILABS_TRAQMATE|$USB_PRODUCT_SILABS_USBCOUNT50|$USB_PRODUCT_SILABS_USBPULSE100|$USB_PRODUCT_SILABS_USBSCOPE50|$USB_PRODUCT_SILABS_USBWAVE12|$USB_PRODUCT_SILABS_VSTABI|$USB_PRODUCT_SILABS_WAVIT|$USB_PRODUCT_SILABS_WMRBATT|$USB_PRODUCT_SILABS_WMRRIGBLASTER|$USB_PRODUCT_SILABS_WMRRIGTALK|$USB_PRODUCT_SILABS_ZEPHYR_BIO)";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SILABS2";
++	match "product" "$USB_PRODUCT_SILABS2_DCU11CLONE";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SILABS3";
++	match "product" "$USB_PRODUCT_SILABS3_GPRS_MODEM";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SILABS4";
++	match "product" "$USB_PRODUCT_SILABS4_100EU_MODEM";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SYNTECH";
++	match "product" "$USB_PRODUCT_SYNTECH_CYPHERLAB100";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_USI";
++	match "product" "$USB_PRODUCT_USI_MC60";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_VAISALA";
++	match "product" "$USB_PRODUCT_VAISALA_CABLE";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_WAGO";
++	match "product" "$USB_PRODUCT_WAGO_SERVICECABLE";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_WAVESENSE";
++	match "product" "$USB_PRODUCT_WAVESENSE_JAZZ";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_WIENERPLEINBAUS";
++	match "product" "($USB_PRODUCT_WIENERPLEINBAUS_PL512|$USB_PRODUCT_WIENERPLEINBAUS_RCM|$USB_PRODUCT_WIENERPLEINBAUS_MPOD|$USB_PRODUCT_WIENERPLEINBAUS_CML)";
++	action "kldload uslcom";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ACEECA";
++	match "product" "$USB_PRODUCT_ACEECA_MEZ1000";
++	action "kldload uvisor";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_ALPHASMART";
++	match "product" "$USB_PRODUCT_ALPHASMART_DANA_SYNC";
++	action "kldload uvisor";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_GARMIN";
++	match "product" "$USB_PRODUCT_GARMIN_IQUE_3600";
++	action "kldload uvisor";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_FOSSIL";
++	match "product" "$USB_PRODUCT_FOSSIL_WRISTPDA";
++	action "kldload uvisor";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_HANDSPRING";
++	match "product" "($USB_PRODUCT_HANDSPRING_VISOR|$USB_PRODUCT_HANDSPRING_TREO|$USB_PRODUCT_HANDSPRING_TREO600)";
++	action "kldload uvisor";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_PALM";
++	match "product" "($USB_PRODUCT_PALM_M500|$USB_PRODUCT_PALM_M505|$USB_PRODUCT_PALM_M515|$USB_PRODUCT_PALM_I705|$USB_PRODUCT_PALM_M125|$USB_PRODUCT_PALM_M130|$USB_PRODUCT_PALM_TUNGSTEN_Z|$USB_PRODUCT_PALM_TUNGSTEN_T|$USB_PRODUCT_PALM_ZIRE|$USB_PRODUCT_PALM_ZIRE31)";
++	action "kldload uvisor";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SAMSUNG";
++	match "product" "$USB_PRODUCT_SAMSUNG_I500";
++	action "kldload uvisor";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SONY";
++	match "product" "($USB_PRODUCT_SONY_CLIE_40|$USB_PRODUCT_SONY_CLIE_41|$USB_PRODUCT_SONY_CLIE_S360|$USB_PRODUCT_SONY_CLIE_NX60|$USB_PRODUCT_SONY_CLIE_35|$USB_PRODUCT_SONY_CLIE_25|$USB_PRODUCT_SONY_CLIE_TJ37|$USB_PRODUCT_SONY_CLIE_TH55)";
++	action "kldload uvisor";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_TAPWAVE";
++	match "product" "$USB_PRODUCT_TAPWAVE_ZODIAC";
++	action "kldload uvisor";
++};
++
++nomatch 10 {
++	match "bus" "uhub[0-9]+";
++	match "vendor" "$USB_VENDOR_SUNTAC";
++	match "product" "($USB_PRODUCT_SUNTAC_AS144L4|$USB_PRODUCT_SUNTAC_DS96L|$USB_PRODUCT_SUNTAC_IS96U|$USB_PRODUCT_SUNTAC_PS64P1|$USB_PRODUCT_SUNTAC_VS10U)";
++	action "kldload uvscom";
++};
++
+--- a/etc/devd/Makefile
++++ b/etc/devd/Makefile
+@@ -1,6 +1,11 @@
+ # $FreeBSD$
+ 
+-FILES=	asus.conf uath.conf
++FILES=	asus.conf uath.conf usb_ids.conf
++
++CLEANFILES+=	usb_ids.conf
++
++usb_ids.conf: genusbdevs.sh ../../sys/dev/usb/usbdevs
++	sh genusbdevs.sh > $@
+ 
+ NO_OBJ=
+ FILESDIR=	/etc/devd
+--- /dev/null
++++ b/etc/devd/genusbdevs.sh
+@@ -0,0 +1,15 @@
++#!/bin/sh -e
++
++echo "options {"
++
++grep ^vendor ../../sys/dev/usb/usbdevs | while read dummy vendor_name vendor_id vendor_desc ; do
++  printf "\t# $vendor_desc\n\tset USB_VENDOR_$vendor_name \"$vendor_id\";\n\n"
++done
++
++grep ^product ../../sys/dev/usb/usbdevs | while read dummy vendor_name product_name product_id product_desc ; do
++  printf "\t# $product_desc\n\tset USB_PRODUCT_${vendor_name}_${product_name} \"$product_id\";\n\n"
++done
++
++echo "};"
++
++exit 0
