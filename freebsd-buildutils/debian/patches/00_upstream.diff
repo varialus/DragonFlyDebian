@@ -1,14 +1,24 @@
 --- a/src/usr.bin/make/main.c
 +++ b/src/usr.bin/make/main.c
-@@ -914,6 +914,7 @@
+@@ -63,7 +63,9 @@
+ 
+ #include <sys/param.h>
+ #include <sys/stat.h>
++#ifdef __FreeBSD__
+ #include <sys/sysctl.h>
++#endif
+ #include <sys/time.h>
+ #include <sys/queue.h>
+ #include <sys/resource.h>
+@@ -914,6 +916,7 @@
  	}
  #endif
  
-+#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
++#ifdef __FreeBSD__
  	/*
  	 * Prior to 7.0, FreeBSD/pc98 kernel used to set the
  	 * utsname.machine to "i386", and MACHINE was defined as
-@@ -933,6 +934,7 @@
+@@ -933,6 +936,7 @@
  				machine = "pc98";
  		}
  	}
