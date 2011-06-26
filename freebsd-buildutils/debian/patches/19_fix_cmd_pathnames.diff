@@ -1,0 +1,145 @@
+--- a/ports/Mk/bsd.commands.mk
++++ b/ports/Mk/bsd.commands.mk
+@@ -20,35 +20,35 @@
+ 
+ AWK?=		/usr/bin/awk
+ BASENAME?=	/usr/bin/basename
+-BRANDELF?=	/usr/bin/brandelf
+-BZCAT?=		/usr/bin/bzcat
+-BZIP2_CMD?=	/usr/bin/bzip2
++BRANDELF?=	/usr/bin/freebsd-brandelf
++BZCAT?=		/bin/cat
++BZIP2_CMD?=	/bin/bzip2
+ CAT?=		/bin/cat
+-CHGRP?=		/usr/bin/chgrp
++CHGRP?=		/bin/chgrp
+ CHMOD?=		/bin/chmod
+-CHOWN?=		/usr/sbin/chown
++CHOWN?=		/bin/chown
+ CHROOT?=	/usr/sbin/chroot
+ COMM?=		/usr/bin/comm
+ CP?=		/bin/cp
+-CPIO?=		/usr/bin/cpio
++CPIO?=		/bin/cpio
+ CUT?=		/usr/bin/cut
+ DC?=		/usr/bin/dc
+ DIALOG?=	/usr/bin/dialog
+ DIFF?=		/usr/bin/diff
+ DIRNAME?=	/usr/bin/dirname
+-EGREP?=		/usr/bin/egrep
+-EXPR?=		/bin/expr
++EGREP?=		/bin/grep
++EXPR?=		/usr/bin/expr
+ FALSE?=		false				# Shell builtin
+ FILE?=		/usr/bin/file
+ FIND?=		/usr/bin/find
+ FLEX?=		/usr/bin/flex
+ FMT?=		/usr/bin/fmt
+ GMAKE?=		gmake
+-GREP?=		/usr/bin/grep
+-GUNZIP_CMD?=	/usr/bin/gunzip -f
+-GZCAT?=		/usr/bin/gzcat
++GREP?=		/bin/grep
++GUNZIP_CMD?=	/usr/bin/unzip -f
++GZCAT?=		/bin/cat
+ GZIP?=		-9
+-GZIP_CMD?=	/usr/bin/gzip -nf ${GZIP}
++GZIP_CMD?=	/bin/gzip -nf ${GZIP}
+ HEAD?=		/usr/bin/head
+ ID?=		/usr/bin/id
+ IDENT?=		/usr/bin/ident
+@@ -56,8 +56,8 @@
+ LN?=		/bin/ln
+ LS?=		/bin/ls
+ MKDIR?=		/bin/mkdir -p
+-MKTEMP?=	/usr/bin/mktemp
+-MOUNT?=		/sbin/mount
++MKTEMP?=	/bin/mktemp
++MOUNT?=		/bin/mount
+ MOUNT_DEVFS?=	${MOUNT} -t devfs devfs
+ # XXX: this is a work-around for an obscure bug where
+ # mount -t nullfs returns zero status on errors within
+@@ -67,53 +67,36 @@
+ OBJCOPY?=	/usr/bin/objcopy
+ OBJDUMP?=	/usr/bin/objdump
+ PASTE?=		/usr/bin/paste
+-PAX?=		/bin/pax
++PAX?=		/usr/bin/pax
+ PRINTF?=	/usr/bin/printf
+-PW?=		/usr/sbin/pw
+-REALPATH?=	/bin/realpath
++
++REALPATH?=	/bin/readlink -f
+ RM?=		/bin/rm
+ RMDIR?=		/bin/rmdir
+-SED?=		/usr/bin/sed
++SED?=		/bin/sed
+ SETENV?=	/usr/bin/env
+ SH?=		/bin/sh
+ SORT?=		/usr/bin/sort
+ STRIP_CMD?=	/usr/bin/strip
+ # Command to run commands as privileged user
+-# Example: "/usr/local/bin/sudo sh -c" to use "sudo" instead of "su"
+-SU_CMD?=	/usr/bin/su root -c
+-SYSCTL?=	/sbin/sysctl
++# Example: "/bin/sudo sh -c" to use "sudo" instead of "su"
++SU_CMD?=	/bin/su root -c
++SYSCTL?=	/bin/sysctl
+ TAIL?=		/usr/bin/tail
+ TEST?=		test				# Shell builtin
+ TR?=		LANG=C /usr/bin/tr
+ TRUE?=		true				# Shell builtin
+ UMOUNT?=	/sbin/umount
+-UNAME?=		/usr/bin/uname
+-UNMAKESELF_CMD?=	${LOCALBASE}/bin/unmakeself
+-UNZIP_CMD?=	${LOCALBASE}/bin/unzip
++UNAME?=		/bin/uname
++
++UNZIP_CMD?=	/usr/bin/unzip
+ WHICH?=		/usr/bin/which
+ XARGS?=		/usr/bin/xargs
+-XMKMF?=		${LOCALBASE}/bin/xmkmf -a
++XMKMF?=		/usr/bin/xmkmf -a
+ YACC?=		/usr/bin/yacc
+ 
+ XZ?=	-Mmax
+-.if exists(/usr/bin/xz)
+ XZ_CMD?=	/usr/bin/xz ${XZ}
+-.else
+-XZ_CMD?=	${LOCALBASE}/bin/xz ${XZ}
+-.endif
+-
+-.if exists(/sbin/md5)
+-MD5?=		/sbin/md5
+-.else
+-MD5?=		md5
+-.endif
+-.if exists(/sbin/sha256)
+-SHA256?=	/sbin/sha256
+-.elif exists(${LOCALBASE}/sbin/sha256)
+-SHA256?=	${LOCALBASE}/sbin/sha256
+-.else
+-SHA256?=	NO
+-.endif
+ 
+ # ECHO is defined in /usr/share/mk/sys.mk, which can either be "echo",
+ # or "true" if the make flag -s is given.  Use ECHO_CMD where you mean
+@@ -123,18 +106,4 @@
+ # Used to print all the '===>' style prompts - override this to turn them off.
+ ECHO_MSG?=	${ECHO_CMD}
+ 
+-.if exists(${LOCALBASE}/sbin/pkg_info)
+-PKG_CMD?=	${LOCALBASE}/sbin/pkg_create
+-PKG_ADD?=	${LOCALBASE}/sbin/pkg_add
+-PKG_DELETE?=	${LOCALBASE}/sbin/pkg_delete
+-PKG_INFO?=	${LOCALBASE}/sbin/pkg_info
+-PKG_VERSION?=	${LOCALBASE}/sbin/pkg_version
+-.else
+-PKG_CMD?=	/usr/sbin/pkg_create
+-PKG_ADD?=	/usr/sbin/pkg_add
+-PKG_DELETE?=	/usr/sbin/pkg_delete
+-PKG_INFO?=	/usr/sbin/pkg_info
+-PKG_VERSION?=	/usr/sbin/pkg_version
+-.endif
+-
+ .endif
