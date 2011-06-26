@@ -1,0 +1,17 @@
+
+Fixes FTBFS on armel, ia64, powerpc, sparc.
+
+--- a/sys/kern/subr_sbuf.c
++++ b/sys/kern/subr_sbuf.c
+@@ -77,6 +77,11 @@
+ #define	SBUF_SETFLAG(s, f)	do { (s)->s_flags |= (f); } while (0)
+ #define	SBUF_CLEARFLAG(s, f)	do { (s)->s_flags &= ~(f); } while (0)
+ 
++#if !defined(PAGE_SIZE) && !defined(_KERNEL)
++#include <unistd.h>
++#define PAGE_SIZE		sysconf(_SC_PAGESIZE)
++#endif
++
+ #define	SBUF_MINEXTENDSIZE	16		/* Should be power of 2. */
+ #define	SBUF_MAXEXTENDSIZE	PAGE_SIZE
+ #define	SBUF_MAXEXTENDINCR	PAGE_SIZE
