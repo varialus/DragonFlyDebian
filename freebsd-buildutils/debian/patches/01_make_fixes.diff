@@ -9,7 +9,7 @@
 
 --- a/src/share/mk/bsd.incs.mk
 +++ b/src/share/mk/bsd.incs.mk
-@@ -41,7 +41,7 @@ ${group}NAME_${header:T}?=	${header:T}
+@@ -41,7 +41,7 @@
  .endif
  installincludes: _${group}INS_${header:T}
  _${group}INS_${header:T}: ${header}
@@ -18,7 +18,7 @@
  	    -g ${${group}GRP_${.ALLSRC:T}} -m ${${group}MODE_${.ALLSRC:T}} \
  	    ${.ALLSRC} \
  	    ${DESTDIR}${${group}DIR_${.ALLSRC:T}}/${${group}NAME_${.ALLSRC:T}}
-@@ -53,10 +53,10 @@ _${group}INCS+= ${header}
+@@ -53,10 +53,10 @@
  installincludes: _${group}INS
  _${group}INS: ${_${group}INCS}
  .if defined(${group}NAME)
@@ -33,7 +33,7 @@
  .endif
 --- a/src/share/mk/bsd.info.mk
 +++ b/src/share/mk/bsd.info.mk
-@@ -73,7 +73,7 @@ MAKEINFO?=	makeinfo
+@@ -73,7 +73,7 @@
  MAKEINFOFLAGS+=	--no-split # simplify some things, e.g., compression
  SRCDIR?=	${.CURDIR}
  INFODIRFILE?=   dir
@@ -42,7 +42,7 @@
  INSTALLINFOFLAGS+=--quiet
  INFOSECTION?=   Miscellaneous
  ICOMPRESS_CMD?=	${COMPRESS_CMD}
-@@ -143,18 +143,8 @@ ${x:S/$/${ICOMPRESS_EXT}/}:	${x}
+@@ -143,18 +143,8 @@
  .for x in ${INFO}
  INSTALLINFODIRS+= ${x:S/$/-install/}
  ${x:S/$/-install/}:
@@ -65,7 +65,7 @@
  .PHONY: ${INSTALLINFODIRS}
 --- a/src/share/mk/bsd.lib.mk
 +++ b/src/share/mk/bsd.lib.mk
-@@ -161,9 +161,9 @@ lib${LIB}.a: ${OBJS} ${STATICOBJS}
+@@ -161,9 +161,9 @@
  	@${ECHO} building static ${LIB} library
  	@rm -f ${.TARGET}
  .if !defined(NM)
@@ -77,7 +77,7 @@
  .endif
  	${RANLIB} ${.TARGET}
  .endif
-@@ -178,9 +178,9 @@ lib${LIB}_p.a: ${POBJS}
+@@ -178,9 +178,9 @@
  	@${ECHO} building profiled ${LIB} library
  	@rm -f ${.TARGET}
  .if !defined(NM)
@@ -89,7 +89,7 @@
  .endif
  	${RANLIB} ${.TARGET}
  .endif
-@@ -197,16 +197,16 @@ ${SHLIB_NAME}: ${SOBJS}
+@@ -197,16 +197,16 @@
  	@${ECHO} building shared library ${SHLIB_NAME}
  	@rm -f ${.TARGET} ${SHLIB_LINK}
  .if defined(SHLIB_LINK)
@@ -109,7 +109,7 @@
  .endif
  .if defined(CTFMERGE)
  	${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${SOBJS}
-@@ -276,11 +276,11 @@ realinstall: _libinstall
+@@ -276,11 +276,11 @@
  .ORDER: beforeinstall _libinstall
  _libinstall:
  .if defined(LIB) && !empty(LIB) && ${MK_INSTALLLIB} != "no"
@@ -125,7 +125,7 @@
  .if defined(SHLIB_NAME)
 --- a/src/share/mk/bsd.man.mk
 +++ b/src/share/mk/bsd.man.mk
-@@ -211,12 +211,12 @@ _maninstall: ${MAN}
+@@ -211,12 +211,12 @@
  			[123]) echo "warn: empty MLINK: $$1 $$2 $$3"; break;; \
  		esac; \
  		name=$$1; shift; sect=$$1; shift; \
@@ -140,7 +140,7 @@
  	done
  .if defined(MANBUILDCAT) && !empty(MANBUILDCAT)
  	@set ${MLINKS:C/\.([^.]*)$/.\1 \1/}; \
-@@ -226,12 +226,12 @@ _maninstall: ${MAN}
+@@ -226,12 +226,12 @@
  			[123]) echo "warn: empty MLINK: $$1 $$2 $$3"; break;; \
  		esac; \
  		name=$$1; shift; sect=$$1; shift; \
@@ -175,7 +175,7 @@
  #
  # SHAREMODE	ASCII text file mode. [${NOBINMODE}]
  #
-@@ -113,7 +113,7 @@ SRCCONF?=	/etc/src.conf
+@@ -113,7 +113,7 @@
  
  # Binaries
  BINOWN?=	root
@@ -184,7 +184,7 @@
  BINMODE?=	555
  NOBINMODE?=	444
  
-@@ -139,7 +139,7 @@ LIBMODE?=	${NOBINMODE}
+@@ -139,7 +139,7 @@
  # Share files
  SHAREDIR?=	/usr/share
  SHAREOWN?=	root

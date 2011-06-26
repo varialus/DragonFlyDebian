@@ -1,25 +1,6 @@
----
- src/usr.bin/make/cond.c       |    4 ++--
- src/usr.bin/make/job.c        |    4 ++--
- src/usr.bin/make/parse.c      |   12 ++++++------
- src/usr.bin/make/proc.h       |    2 +-
- src/usr.bin/make/shell.c      |    2 +-
- src/usr.bin/make/util.c       |    2 +-
- src/usr.bin/make/util.h       |    8 ++++----
- src/usr.bin/make/var.c        |    8 ++++----
- src/usr.bin/yacc/defs.h       |    3 +++
- src/usr.bin/yacc/main.c       |    4 ++--
- src/usr.sbin/btxld/btx.h      |    1 +
- src/usr.sbin/btxld/elfh.c     |    1 +
- src/usr.sbin/btxld/elfh.h     |    2 +-
- src/usr.sbin/mtree/Makefile   |    4 ----
- src/usr.sbin/mtree/compare.c  |    2 +-
- src/usr.sbin/mtree/specspec.c |    2 --
- 16 files changed, 30 insertions(+), 31 deletions(-)
-
 --- a/src/usr.sbin/mtree/specspec.c
 +++ b/src/usr.sbin/mtree/specspec.c
-@@ -84,8 +84,6 @@ shownode(NODE *n, int f, char const *pat
+@@ -84,8 +84,6 @@
  		printf(" rmd160digest=%s", n->rmd160digest);
  	if (f & F_SHA256)
  		printf(" sha256digest=%s", n->sha256digest);
@@ -30,7 +11,7 @@
  
 --- a/src/usr.bin/make/cond.c
 +++ b/src/usr.bin/make/cond.c
-@@ -1115,7 +1115,7 @@ Cond_If(char *line, int code, int lineno
+@@ -1115,7 +1115,7 @@
   *	Handle .else statement.
   */
  void
@@ -39,7 +20,7 @@
  {
  
  	while (isspace((u_char)*line))
-@@ -1156,7 +1156,7 @@ Cond_Else(char *line __unused, int code
+@@ -1156,7 +1156,7 @@
   *	Handle .endif statement.
   */
  void
@@ -50,7 +31,7 @@
  	while (isspace((u_char)*line))
 --- a/src/usr.bin/make/job.c
 +++ b/src/usr.bin/make/job.c
-@@ -479,7 +479,7 @@ mkfifotemp(char *template)
+@@ -478,7 +478,7 @@
  }
  
  static void
@@ -59,7 +40,7 @@
  {
  }
  
-@@ -2195,7 +2195,7 @@ Job_CatchChildren(Boolean block)
+@@ -2194,7 +2194,7 @@
   */
  void
  #ifdef USE_KQUEUE
@@ -70,7 +51,7 @@
  #endif
 --- a/src/usr.bin/make/parse.c
 +++ b/src/usr.bin/make/parse.c
-@@ -2210,13 +2210,13 @@ xparse_include(char *file, int sinclude)
+@@ -2210,13 +2210,13 @@
  }
  
  static void
@@ -86,7 +67,7 @@
  {
  	xparse_include(file, 1);
  }
-@@ -2230,7 +2230,7 @@ parse_sinclude(char *file, int code __un
+@@ -2230,7 +2230,7 @@
   *	a warning if the directive is malformed.
   */
  static void
@@ -95,7 +76,7 @@
  {
  
  	if (!isspace((u_char)*line)) {
-@@ -2257,7 +2257,7 @@ parse_message(char *line, int iserror, i
+@@ -2257,7 +2257,7 @@
   *	Parse an .undef directive.
   */
  static void
@@ -104,7 +85,7 @@
  {
  	char *cp;
  
-@@ -2279,7 +2279,7 @@ parse_undef(char *line, int code __unuse
+@@ -2279,7 +2279,7 @@
   *	Parse a .for directive.
   */
  static void
@@ -113,7 +94,7 @@
  {
  
  	if (!For_For(line)) {
-@@ -2311,7 +2311,7 @@ parse_for(char *line, int code __unused,
+@@ -2311,7 +2311,7 @@
   *	Parse endfor. This may only happen if there was no matching .for.
   */
  static void
@@ -122,19 +103,9 @@
  {
  
  	Parse_Error(PARSE_FATAL, "for-less endfor");
---- a/src/usr.bin/make/proc.h
-+++ b/src/usr.bin/make/proc.h
-@@ -48,6 +48,6 @@ typedef struct ProcStuff {
- 	pid_t	child_pid;
- } ProcStuff;
- 
--void Proc_Exec(const ProcStuff *) __dead2;
-+void Proc_Exec(const ProcStuff *);
- 
- #endif /* proc_h_458845848 */
 --- a/src/usr.bin/make/shell.c
 +++ b/src/usr.bin/make/shell.c
-@@ -120,7 +120,7 @@ struct Shell *commandShell;
+@@ -120,7 +120,7 @@
   */
  static struct Shells shells = TAILQ_HEAD_INITIALIZER(shells);
  
@@ -143,37 +114,9 @@
  
  /**
   * Helper function for sorting the builtin list alphabetically.
---- a/src/usr.bin/make/util.c
-+++ b/src/usr.bin/make/util.c
-@@ -61,7 +61,7 @@ __FBSDID("$FreeBSD$");
- #include "targ.h"
- #include "util.h"
- 
--static void enomem(void) __dead2;
-+static void enomem(void);
- 
- /*-
-  * Debug --
---- a/src/usr.bin/make/util.h
-+++ b/src/usr.bin/make/util.h
-@@ -103,10 +103,10 @@ do {						\
- void Debug(const char *, ...);
- void DebugM(const char *, ...);
- void Error(const char *, ...);
--void Fatal(const char *, ...) __dead2;
--void Punt(const char *, ...) __dead2;
--void DieHorribly(void) __dead2;
--void Finish(int) __dead2;
-+void Fatal(const char *, ...);
-+void Punt(const char *, ...);
-+void DieHorribly(void);
-+void Finish(int);
- char *estrdup(const char *);
- void *emalloc(size_t);
- void *erealloc(void *, size_t);
 --- a/src/usr.bin/make/var.c
 +++ b/src/usr.bin/make/var.c
-@@ -248,7 +248,7 @@ VarDestroy(Var *v, Boolean f)
+@@ -248,7 +248,7 @@
   *	The trimmed word is added to the buffer.
   */
  static Boolean
@@ -182,7 +125,7 @@
  {
  	char *slash;
  
-@@ -283,7 +283,7 @@ VarHead(const char *word, Boolean addSpa
+@@ -283,7 +283,7 @@
   *	The trimmed word is added to the buffer.
   */
  static Boolean
@@ -191,7 +134,7 @@
  {
  	const char *slash;
  
-@@ -312,7 +312,7 @@ VarTail(const char *word, Boolean addSpa
+@@ -312,7 +312,7 @@
   *	The suffix from the word is placed in the buffer.
   */
  static Boolean
@@ -200,7 +143,7 @@
  {
  	const char *dot;
  
-@@ -340,7 +340,7 @@ VarSuffix(const char *word, Boolean addS
+@@ -340,7 +340,7 @@
   *	The trimmed word is added to the buffer.
   */
  static Boolean
@@ -211,16 +154,7 @@
  
 --- a/src/usr.bin/yacc/main.c
 +++ b/src/usr.bin/yacc/main.c
-@@ -114,7 +114,7 @@ static void usage(void);
- 
- volatile sig_atomic_t sigdie;
- 
--__dead2 void
-+ void
- done(k)
- int k;
- {
-@@ -128,7 +128,7 @@ int k;
+@@ -128,7 +128,7 @@
  
  static void
  onintr(signo)
@@ -231,7 +165,7 @@
      done(1);
 --- a/src/usr.sbin/mtree/compare.c
 +++ b/src/usr.sbin/mtree/compare.c
-@@ -72,7 +72,7 @@ __FBSDID("$FreeBSD$");
+@@ -72,7 +72,7 @@
  	}
  
  int
@@ -240,26 +174,6 @@
  {
  	struct timeval tv[2];
  	uint32_t val;
---- a/src/usr.sbin/btxld/btx.h
-+++ b/src/usr.sbin/btxld/btx.h
-@@ -30,6 +30,7 @@
- #define _BTX_H_
- 
- #include <sys/types.h>
-+#include <stdint.h>
- 
- #define BTX_PGSIZE	0x1000		/* Page size */
- #define BTX_PGBASE	0x5000		/* Start of page tables */
---- a/src/usr.sbin/btxld/elfh.c
-+++ b/src/usr.sbin/btxld/elfh.c
-@@ -30,6 +30,7 @@
- #include <sys/endian.h>
- 
- #include <stddef.h>
-+#include <stdint.h>
- #include "elfh.h"
- 
- #define SET_ME	0xeeeeeeee    /* filled in by btxld */
 --- a/src/usr.sbin/btxld/elfh.h
 +++ b/src/usr.sbin/btxld/elfh.h
 @@ -26,7 +26,7 @@
@@ -273,7 +187,7 @@
      Elf32_Ehdr e;		/* ELF header */
 --- a/src/usr.sbin/mtree/Makefile
 +++ b/src/usr.sbin/mtree/Makefile
-@@ -11,8 +11,4 @@ LDADD= -lbsd
+@@ -10,8 +10,4 @@
  
  WARNS?=	4
  
@@ -282,15 +196,3 @@
 -LDADD=	-lmd
 -
  .include <bsd.prog.mk>
---- a/src/usr.bin/yacc/defs.h
-+++ b/src/usr.bin/yacc/defs.h
-@@ -42,6 +42,9 @@
- #include <err.h>
- #include <stdio.h>
- 
-+#ifndef __dead2
-+# define __dead2
-+#endif
- 
- /*  machine-dependent definitions			*/
- /*  the following definitions are for the Tahoe		*/

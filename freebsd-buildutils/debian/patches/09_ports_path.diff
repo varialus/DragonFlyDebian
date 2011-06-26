@@ -6,7 +6,7 @@
 
 --- a/ports/Mk/bsd.port.mk
 +++ b/ports/Mk/bsd.port.mk
-@@ -3487,7 +3487,7 @@ check-vulnerable:
+@@ -3487,7 +3487,7 @@
  .if !defined(DISABLE_VULNERABILITIES) && !defined(PACKAGE_BUILDING)
  	@if [ -f "${AUDITFILE}" ]; then \
  		audit_created=`${_EXTRACT_AUDITFILE} | \
@@ -15,7 +15,7 @@
  		audit_expiry=`/bin/date -u -v-14d "+%Y%m%d"`; \
  		if [ "$$audit_created" -lt "$$audit_expiry" ]; then \
  			${ECHO_MSG} "===>  WARNING: Vulnerability database out of date, checking anyway"; \
-@@ -3591,7 +3591,7 @@ do-fetch:
+@@ -3591,7 +3591,7 @@
  	@cd ${_DISTDIR};\
  	${_PATCH_SITES_ENV} ; \
  	for _file in ${PATCHFILES}; do \
@@ -24,7 +24,7 @@
  		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
  		force_fetch=false; \
  		filebasename=$${file##*/}; \
-@@ -4732,7 +4732,7 @@ fetch-list:
+@@ -4732,7 +4732,7 @@
  	@(cd ${_DISTDIR}; \
  	 ${_MASTER_SITES_ENV} ; \
  	 for _file in ${DISTFILES}; do \
@@ -33,7 +33,7 @@
  		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
  		if [ ! -f $$file -a ! -f $${file##*/} ]; then \
  			if [ ! -z "$$select" ] ; then \
-@@ -4769,7 +4769,7 @@ fetch-list:
+@@ -4769,7 +4769,7 @@
  	@(cd ${_DISTDIR}; \
  	 ${_PATCH_SITES_ENV} ; \
  	 for _file in ${PATCHFILES}; do \
@@ -42,7 +42,7 @@
  		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
  		if [ ! -f $$file -a ! -f $${file##*/} ]; then \
  			if [ ! -z "$$select" ] ; then \
-@@ -4805,7 +4805,7 @@ fetch-url-list-int:
+@@ -4805,7 +4805,7 @@
  	@(cd ${_DISTDIR}; \
  	${_MASTER_SITES_ENV}; \
  	for _file in ${DISTFILES}; do \
@@ -51,7 +51,7 @@
  		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
  		if [ ! -z "${LISTALL}" -o ! -f $$file -a ! -f `${BASENAME} $$file` ]; then \
  			if [ ! -z "$$select" ] ; then \
-@@ -4836,7 +4836,7 @@ fetch-url-list-int:
+@@ -4836,7 +4836,7 @@
  	@(cd ${_DISTDIR}; \
  	${_PATCH_SITES_ENV} ; \
  	for _file in ${PATCHFILES}; do \
@@ -60,7 +60,7 @@
  		select=`${ECHO_CMD} $${_file#$${file}} | ${SED} -e 's/^://' -e 's/,/ /g'` ; \
  		if [ ! -z "${LISTALL}" -o ! -f $$file -a ! -f `${BASENAME} $$file` ]; then \
  			if [ ! -z "$$select" ] ; then \
-@@ -5222,7 +5222,7 @@ lib-depends:
+@@ -5222,7 +5222,7 @@
  .if defined(LIB_DEPENDS) && !defined(NO_DEPENDS)
  	@for i in ${LIB_DEPENDS}; do \
  		lib=$${i%%:*}; \
@@ -69,7 +69,7 @@
  		dir=$${i#*:}; \
  		target=$${i##*:}; \
  		if ${TEST} $$dir = $$target; then \
-@@ -5486,7 +5486,7 @@ build-depends-list:
+@@ -5486,7 +5486,7 @@
  .endif
  
  BUILD-DEPENDS-LIST= \
@@ -78,7 +78,7 @@
  		if [ -d $$dir ]; then \
  			${ECHO_CMD} $$dir; \
  		else \
-@@ -5767,7 +5767,7 @@ generate-plist:
+@@ -5767,7 +5767,7 @@
  	done
  	@${ECHO_CMD} '@cwd ${PREFIX}' >> ${TMPPLIST}
  .endif
@@ -87,7 +87,7 @@
  		${ECHO_CMD} "@unexec rm -f %D/$$i %D/$${i%.gz} %D/$${i%.bz2} %D/$$i.gz %D/$$i.bz2" >> ${TMPPLIST}; \
  	done
  .endfor
-@@ -5822,7 +5822,7 @@ ${TMPPLIST}:
+@@ -5822,7 +5822,7 @@
  add-plist-docs:
  .if defined(PORTDOCS) && !defined(NOPORTDOCS)
  	@if ${EGREP} -qe '^@cw?d' ${TMPPLIST} && \
@@ -96,7 +96,7 @@
  		${ECHO_CMD} "@cwd ${PREFIX}" >> ${TMPPLIST}; \
  	fi
  .for x in ${PORTDOCS}
-@@ -5845,7 +5845,7 @@ add-plist-docs:
+@@ -5845,7 +5845,7 @@
  add-plist-examples:
  .if defined(PORTEXAMPLES) && !defined(NOPORTEXAMPLES)
  	@if ${EGREP} -qe '^@cw?d' ${TMPPLIST} && \
@@ -105,7 +105,7 @@
  		${ECHO_CMD} "@cwd ${PREFIX}" >> ${TMPPLIST}; \
  	fi
  .for x in ${PORTEXAMPLES}
-@@ -5869,7 +5869,7 @@ add-plist-examples:
+@@ -5869,7 +5869,7 @@
  add-plist-data:
  .if defined(PORTDATA) && !defined(NOPORTDATA)
  	@if ${EGREP} -qe '^@cw?d' ${TMPPLIST} && \

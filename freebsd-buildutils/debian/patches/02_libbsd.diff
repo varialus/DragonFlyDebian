@@ -1,28 +1,6 @@
----
- src/share/mk/version_gen.awk    |    2 +-
- src/usr.bin/file2c/Makefile     |    1 +
- src/usr.bin/file2c/file2c.c     |    1 +
- src/usr.bin/make/Makefile       |    1 +
- src/usr.bin/make/arch.c         |    3 ++-
- src/usr.bin/make/dir.h          |    2 +-
- src/usr.bin/make/job.c          |    3 ++-
- src/usr.bin/make/main.c         |    3 ++-
- src/usr.bin/make/shell.c        |    2 +-
- src/usr.bin/make/shell.h        |    2 +-
- src/usr.bin/make/suff.c         |    2 +-
- src/usr.bin/yacc/test/ftp.tab.c |    6 +++---
- src/usr.bin/yacc/test/ftp.y     |    6 +++---
- src/usr.sbin/config/Makefile    |    2 +-
- src/usr.sbin/config/config.h    |    2 +-
- src/usr.sbin/config/mkoptions.c |    1 +
- src/usr.sbin/mtree/Makefile     |    1 +
- src/usr.sbin/mtree/excludes.c   |    3 ++-
- src/usr.sbin/mtree/spec.c       |    1 +
- 19 files changed, 27 insertions(+), 17 deletions(-)
-
 --- a/src/share/mk/version_gen.awk
 +++ b/src/share/mk/version_gen.awk
-@@ -43,7 +43,7 @@ BEGIN {
+@@ -43,7 +43,7 @@
  	version_count = 0;
  	current_version = "";
  	stderr = "/dev/stderr";
@@ -31,118 +9,9 @@
  		# Strip comments.
  		sub("#.*$", "", $0);
  
---- a/src/usr.bin/file2c/file2c.c
-+++ b/src/usr.bin/file2c/file2c.c
-@@ -10,6 +10,7 @@
- #include <sys/cdefs.h>
- __FBSDID("$FreeBSD$");
- 
-+#include <bsd/stdlib.h>
- #include <limits.h>
- #include <stdio.h>
- #include <stdlib.h>
---- a/src/usr.bin/file2c/Makefile
-+++ b/src/usr.bin/file2c/Makefile
-@@ -1,5 +1,6 @@
- # $FreeBSD$
- 
- PROG=	file2c
-+LDADD= -lbsd
- WARNS?=	6
- .include <bsd.prog.mk>
---- a/src/usr.bin/make/arch.c
-+++ b/src/usr.bin/make/arch.c
-@@ -88,7 +88,8 @@ __FBSDID("$FreeBSD$");
-  */
- 
- #include <sys/param.h>
--#include <sys/queue.h>
-+#include <bsd/sys/queue.h>
-+#include <bsd/string.h>
- #include <sys/types.h>
- #include <ar.h>
- #include <ctype.h>
---- a/src/usr.bin/make/dir.h
-+++ b/src/usr.bin/make/dir.h
-@@ -43,7 +43,7 @@
- #ifndef dir_h_6002e3b8
- #define	dir_h_6002e3b8
- 
--#include <sys/queue.h>
-+#include <bsd/sys/queue.h>
- #include "hash.h"
- 
- struct GNode;
---- a/src/usr.bin/make/job.c
-+++ b/src/usr.bin/make/job.c
-@@ -101,7 +101,8 @@ __FBSDID("$FreeBSD$");
-  *			    thems as need creatin'
-  */
- 
--#include <sys/queue.h>
-+#include <bsd/sys/queue.h>
-+#include <bsd/stdlib.h>
- #include <sys/types.h>
- #include <sys/select.h>
- #include <sys/stat.h>
---- a/src/usr.bin/make/main.c
-+++ b/src/usr.bin/make/main.c
-@@ -65,7 +65,8 @@ __FBSDID("$FreeBSD$");
- #include <sys/stat.h>
- #include <sys/sysctl.h>
- #include <sys/time.h>
--#include <sys/queue.h>
-+#include <bsd/sys/queue.h>
-+#include <bsd/err.h>
- #include <sys/resource.h>
- #include <sys/utsname.h>
- #include <sys/wait.h>
---- a/src/usr.bin/make/shell.c
-+++ b/src/usr.bin/make/shell.c
-@@ -40,7 +40,7 @@
- #include <sys/cdefs.h>
- __FBSDID("$FreeBSD$");
- 
--#include <sys/queue.h>
-+#include <bsd/sys/queue.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
---- a/src/usr.bin/make/shell.h
-+++ b/src/usr.bin/make/shell.h
-@@ -42,7 +42,7 @@
- #ifndef shell_h_6002e3b8
- #define	shell_h_6002e3b8
- 
--#include <sys/queue.h>
-+#include <bsd/sys/queue.h>
- 
- #include "str.h"
- #include "util.h"
---- a/src/usr.bin/make/suff.c
-+++ b/src/usr.bin/make/suff.c
-@@ -90,7 +90,7 @@ __FBSDID("$FreeBSD$");
-  *	    	  	    	if the target had no implicit sources.
-  */
- 
--#include <sys/queue.h>
-+#include <bsd/sys/queue.h>
- #include <assert.h>
- #include <string.h>
- #include <stdlib.h>
---- a/src/usr.bin/make/Makefile
-+++ b/src/usr.bin/make/Makefile
-@@ -7,6 +7,7 @@ CFLAGS+=-I${.CURDIR}
- SRCS=	arch.c buf.c cond.c dir.c for.c hash.c hash_tables.c job.c	\
- 	lst.c main.c make.c parse.c proc.c shell.c str.c suff.c targ.c	\
- 	util.c var.c
-+LDFLAGS= -lbsd
- 
- WARNS?=	6
- NO_SHARED?=	YES
 --- a/src/usr.bin/yacc/test/ftp.tab.c
 +++ b/src/usr.bin/yacc/test/ftp.tab.c
-@@ -490,10 +490,10 @@ lookup(p, cmd)
+@@ -490,10 +490,10 @@
  #include <arpa/telnet.h>
  
  /*
@@ -155,7 +24,7 @@
  	char *s;
  	register FILE *iop;
  {
-@@ -584,7 +584,7 @@ yylex()
+@@ -584,7 +584,7 @@
  		case CMD:
  			(void) signal(SIGALRM, toolong);
  			(void) alarm((unsigned) timeout);
@@ -166,7 +35,7 @@
  			}
 --- a/src/usr.bin/yacc/test/ftp.y
 +++ b/src/usr.bin/yacc/test/ftp.y
-@@ -750,10 +750,10 @@ lookup(p, cmd)
+@@ -750,10 +750,10 @@
  #include <arpa/telnet.h>
  
  /*
@@ -179,7 +48,7 @@
  	char *s;
  	register FILE *iop;
  {
-@@ -844,7 +844,7 @@ yylex()
+@@ -844,7 +844,7 @@
  		case CMD:
  			(void) signal(SIGALRM, toolong);
  			(void) alarm((unsigned) timeout);
@@ -188,67 +57,3 @@
  				reply(221, "You could at least say goodbye.");
  				dologout(0);
  			}
---- a/src/usr.sbin/config/config.h
-+++ b/src/usr.sbin/config/config.h
-@@ -34,7 +34,7 @@
-  * Config.
-  */
- #include <sys/types.h>
--#include <sys/queue.h>
-+#include <bsd/sys/queue.h>
- #include <stdlib.h>
- #include <string.h>
- 
---- a/src/usr.sbin/config/mkoptions.c
-+++ b/src/usr.sbin/config/mkoptions.c
-@@ -40,6 +40,7 @@ static const char rcsid[] =
-  * Make all the .h files for the optional entries
-  */
- 
-+#include <bsd/string.h>
- #include <ctype.h>
- #include <err.h>
- #include <stdio.h>
---- a/src/usr.sbin/config/Makefile
-+++ b/src/usr.sbin/config/Makefile
-@@ -13,7 +13,7 @@ WARNS?=	6
- CFLAGS+= -I. -I${.CURDIR}
- 
- DPADD=	${LIBL} ${LIBSBUF}
--LDADD=	-ll -lsbuf
-+LDADD=	-ll -lsbuf -lbsd
- 
- CLEANFILES+=	kernconf.c
- 
---- a/src/usr.sbin/mtree/excludes.c
-+++ b/src/usr.sbin/mtree/excludes.c
-@@ -32,7 +32,8 @@ __FBSDID("$FreeBSD$");
- 
- #include <sys/types.h>
- #include <sys/time.h>		/* XXX for mtree.h */
--#include <sys/queue.h>
-+#include <bsd/sys/queue.h>
-+#include <bsd/stdio.h>
- 
- #include <err.h>
- #include <fnmatch.h>
---- a/src/usr.sbin/mtree/spec.c
-+++ b/src/usr.sbin/mtree/spec.c
-@@ -35,6 +35,7 @@ static char sccsid[] = "@(#)spec.c	8.1 (
- #include <sys/cdefs.h>
- __FBSDID("$FreeBSD$");
- 
-+#include <bsd/stdlib.h>
- #include <sys/types.h>
- #include <sys/stat.h>
- #include <ctype.h>
---- a/src/usr.sbin/mtree/Makefile
-+++ b/src/usr.sbin/mtree/Makefile
-@@ -7,6 +7,7 @@ PROG=	mtree
- MAN=	mtree.8 mtree.5
- SRCS=	compare.c crc.c create.c excludes.c misc.c mtree.c spec.c verify.c
- SRCS+=	specspec.c
-+LDADD= -lbsd
- 
- WARNS?=	4
- 

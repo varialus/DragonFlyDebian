@@ -7,7 +7,7 @@
 
 --- a/src/usr.bin/make/main.c
 +++ b/src/usr.bin/make/main.c
-@@ -861,6 +861,7 @@ main(int argc, char **argv)
+@@ -858,6 +858,7 @@
  {
  	const char *machine;
  	const char *machine_arch;
@@ -15,7 +15,7 @@
  	const char *machine_cpu;
  	Boolean outOfDate = TRUE;	/* FALSE if all targets up to date */
  	const char *p;
-@@ -947,8 +948,8 @@ main(int argc, char **argv)
+@@ -944,8 +945,8 @@
  	 * so we can share an executable for similar machines.
  	 * (i.e. m68k: amiga hp300, mac68k, sun3, ...)
  	 *
@@ -26,7 +26,7 @@
  	 */
  	if (machine == NULL) {
  #ifdef MACHINE_ARCH
-@@ -966,6 +967,14 @@ main(int argc, char **argv)
+@@ -963,6 +964,14 @@
  #endif
  	}
  
@@ -41,7 +41,7 @@
  	/*
  	 * Set machine_cpu to the minumum supported CPU revision based
  	 * on the target architecture, if not already set.
-@@ -1008,6 +1017,7 @@ main(int argc, char **argv)
+@@ -1005,6 +1014,7 @@
  	Var_SetGlobal("MFLAGS", "");
  	Var_SetGlobal("MACHINE", machine);
  	Var_SetGlobal("MACHINE_ARCH", machine_arch);
@@ -51,7 +51,7 @@
  	Var_SetGlobal("MAKE_VERSION", MAKE_VERSION);
 --- a/src/usr.bin/make/make.1
 +++ b/src/usr.bin/make/make.1
-@@ -815,6 +815,12 @@ if not defined.
+@@ -815,6 +815,12 @@
  Name of the machine architecture
  .Nm
  was compiled for, defined at compilation time.
@@ -76,7 +76,7 @@
  # LIBCOMPATDIR	Base path for compat libraries. [/usr/lib/compat]
  #
  # LIBDATADIR	Base path for misc. utility data files. [/usr/libdata]
-@@ -127,6 +130,7 @@ KMODGRP?=	${BINGRP}
+@@ -127,6 +130,7 @@
  KMODMODE?=	${BINMODE}
  
  LIBDIR?=	/usr/lib
@@ -592,7 +592,7 @@
  MINUSLPAM=	-lpam
  .if defined(LDFLAGS) && !empty(LDFLAGS:M-static)
  .if ${MK_KERBEROS} != "no"
-@@ -127,38 +447,170 @@ MINUSLPAM+=	-lypclnt
+@@ -127,38 +447,170 @@
  .endif
  .endif
  

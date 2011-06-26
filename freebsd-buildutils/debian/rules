@@ -27,10 +27,11 @@ PTAG = RELEASE_$(PVERSION)_0
 ORIGDIR = $(SOURCE)-$(VERSION)
 TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 
-CFLAGS = -O2 -g -Wall -D_GNU_SOURCE -D'__FBSDID(string)=' \
+CFLAGS = -O2 -g -Wall -D_GNU_SOURCE \
          -DMACHINE_ARCH='"$(DEB_HOST_ARCH_CPU)"' \
          -DMACHINE_MULTIARCH='"$(DEB_HOST_MULTIARCH)"' \
-         -I$(CURDIR)/build-tree/src/sys
+         -I$(CURDIR)/build-tree/src/sys \
+	 $(shell pkg-config --cflags libbsd-overlay) -lbsd
 MAKE_BUILD_FLAGS = CC=gcc NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
 
 PMAKE_FLAGS = -m $(CURDIR)/src/share/mk
@@ -80,9 +81,6 @@ unpack-stamp:
 		-e "s,/usr/ports,/usr/share/$(package)/ports,g" \
 	; done
 
-	cp $(CURDIR)/build-tree/src/sys/kern/subr_sbuf.c \
-	   $(CURDIR)/build-tree/src/usr.sbin/config/
-
 	touch unpack-stamp
 
 build: build-stamp
@@ -108,12 +106,6 @@ build-stamp: unpack-stamp
 	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/file2c
 	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/brandelf
 
-	cd build-tree/src/usr.sbin/config ; \
-		$(YACC) -d config.y ; \
-		cp y.tab.c config.c ; \
-		PATH=$(PATH):$(CURDIR)/build-tree/src/usr.bin/file2c \
-		$(PMAKE) $(MAKE_BUILD_FLAGS)
-
 	touch build-stamp
 
 install: build
@@ -126,7 +118,7 @@ install: build
 	  $(PMAKE) -C $(CURDIR)/build-tree/src/usr.bin/$$i install \
 		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/lib/freebsd ; \
 	done
-	for i in mtree config ; do \
+	for i in mtree ; do \
 	  $(PMAKE) -C $(CURDIR)/build-tree/src/usr.sbin/$$i install \
 		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/lib/freebsd ; \
 	done
