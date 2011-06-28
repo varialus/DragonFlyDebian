@@ -199,6 +199,8 @@ typedef struct sigevent
     void *sigev_notify_attributes;		/* Really pthread_attr_t.  */
   } sigevent_t;
 
+#define sigev_notify_kqueue	sigev_signo
+
 /* `sigev_notify' values.  */
 enum
 {
@@ -207,8 +209,12 @@ enum
   SIGEV_NONE = 0,		/* Other notification: meaningless.  */
 # define SIGEV_NONE	SIGEV_NONE
   /* Not yet supported by the kernel.  */
-  SIGEV_THREAD = 2		/* Deliver via thread creation.  */
+  SIGEV_THREAD = 2,		/* Deliver via thread creation.  */
 # define SIGEV_THREAD	SIGEV_THREAD
+  SIGEV_KEVENT = 3,
+# define SIGEV_KEVENT	SIGEV_KEVENT
+  SIGEV_THREAD_ID = 4,
+# define SIGEV_THREAD_ID	SIGEV_THREAD_ID
 };
 
 #endif	/* have _SIGNAL_H.  */
