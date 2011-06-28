@@ -182,8 +182,12 @@ install-common-stamp: src
 		sys/conf/kern.mk \
 		sys/conf/kmod.mk \
 		sys/conf/kmod_syms.awk \
+		sys/kern/bus_if.m \
+		sys/dev/pci/pci_if.m \
+		sys/kern/device_if.m \
 		sys/kern/vnode_if.src \
 		sys/tools/vnode_if.awk \
+		sys/tools/makeobjops.awk \
 		$(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
 
 	find $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) -type f -exec chmod 644 {} \;
@@ -261,6 +265,7 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	for dir in `ls $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)/sys` ; do \
 		ln -s ../../$(HEADERS_DIR)/sys/$$dir $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$$dir ; \
 	done
+	ln -s $(kfreebsd_cpu)/include $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/machine
 
 	touch install-flavor-$*-stamp
 
