@@ -1,0 +1,479 @@
+--- a/sbin/mount_nfs/mount_nfs.c
++++ b/sbin/mount_nfs/mount_nfs.c
+@@ -130,7 +130,6 @@
+ 	TRYRET_LOCALERR		/* Local failure. */
+ };
+ 
+-static int	fallback_mount(struct iovec *iov, int iovlen, int mntflags);
+ static int	sec_name_to_num(char *sec);
+ static char	*sec_num_to_name(int num);
+ static int	getnfsargs(char *, struct iovec **iov, int *iovlen);
+@@ -150,7 +149,6 @@
+ 	int c;
+ 	struct iovec *iov;
+ 	int mntflags, num, iovlen;
+-	int osversion;
+ 	char *name, *p, *spec, *fstype;
+ 	char mntpath[MAXPATHLEN], errmsg[255];
+ 	char hostname[MAXHOSTNAMELEN + 1], *gssname, gssn[MAXHOSTNAMELEN + 50];
+@@ -421,25 +419,14 @@
+ 	build_iovec(&iov, &iovlen, "fspath", mntpath, (size_t)-1);
+ 	build_iovec(&iov, &iovlen, "errmsg", errmsg, sizeof(errmsg));
+ 
+-	/*
+-	 * XXX:
+-	 * Backwards compatibility routines for older kernels.
+-	 * Remove this and fallback_mount() code when we do not need to support
+-	 * NFS mounts against older kernels which still need
+-	 * struct nfs_args to be passed in via nmount().
+-	 */
+-	osversion = getosreldate();
+-	if (osversion >= 702100) {
+-		if (nmount(iov, iovlen, mntflags))
+-			err(1, "%s, %s", mntpath, errmsg);
+-	} else {
+-		if (fallback_mount(iov, iovlen, mntflags))
++        if (nmount(iov, iovlen, mntflags)) {
+ 			err(1, "%s, %s", mntpath, errmsg);
+ 	}
+ 
+ 	exit(0);
+ }
+ 
++#if 0
+ static int
+ findopt(struct iovec *iov, int iovlen, const char *name,
+     char **valuep, int *lenp)
+@@ -661,16 +648,23 @@
+ 
+ 	return nmount(newiov, newiovlen, mntflags);
+ }
++#endif
+ 
+ static int
+ sec_name_to_num(char *sec)
+ {
++#ifdef RPCSEC_GSS_KRB5
+ 	if (!strcmp(sec, "krb5"))
+ 		return (RPCSEC_GSS_KRB5);
++#endif
++#ifdef RPCSEC_GSS_KRB5I
+ 	if (!strcmp(sec, "krb5i"))
+ 		return (RPCSEC_GSS_KRB5I);
++#endif
++#ifdef RPCSEC_GSS_KRB5P
+ 	if (!strcmp(sec, "krb5p"))
+ 		return (RPCSEC_GSS_KRB5P);
++#endif
+ 	if (!strcmp(sec, "sys"))
+ 		return (AUTH_SYS);
+ 	return (-1);
+@@ -680,12 +674,18 @@
+ sec_num_to_name(int flavor)
+ {
+ 	switch (flavor) {
++#ifdef RPCSEC_GSS_KRB5
+ 	case RPCSEC_GSS_KRB5:
+ 		return ("krb5");
++#endif
++#ifdef RPCSEC_GSS_KRB5I
+ 	case RPCSEC_GSS_KRB5I:
+ 		return ("krb5i");
++#endif
++#ifdef RPCSEC_GSS_KRB5P
+ 	case RPCSEC_GSS_KRB5P:
+ 		return ("krb5p");
++#endif
+ 	case AUTH_SYS:
+ 		return ("sys");
+ 	}
+@@ -830,9 +830,11 @@
+ 	freeaddrinfo(ai_nfs);
+ 
+ 	build_iovec(iov, iovlen, "hostname", nam, (size_t)-1);
++#if 0
+ 	/* Add mounted file system to PATH_MOUNTTAB */
+ 	if (!add_mtab(hostp, spec))
+ 		warnx("can't update %s for %s:%s", PATH_MOUNTTAB, hostp, spec);
++#endif
+ 	return (1);
+ }
+ 
+--- a/sbin/mount_nfs/Makefile
++++ b/sbin/mount_nfs/Makefile
+@@ -4,6 +4,7 @@
+ 
+ PROG=	mount_nfs
+ SRCS=	mount_nfs.c getmntopts.c mounttab.c
++LDADD=	-ltirpc
+ MAN=	mount_nfs.8
+ MLINKS=	mount_nfs.8 mount_newnfs.8
+ 
+--- a/usr.sbin/mountd/Makefile
++++ b/usr.sbin/mountd/Makefile
+@@ -6,12 +6,12 @@
+ MAN=	exports.5 netgroup.5 mountd.8
+ 
+ MOUNT=  ${.CURDIR}/../../sbin/mount
+-CFLAGS+= -I${MOUNT}
++CFLAGS+= -I${MOUNT} -I${.CURDIR}/../../sys
+ WARNS?= 2
+ 
+ .PATH: ${MOUNT}
+ 
+ DPADD=	${LIBUTIL}
+-LDADD=	-lutil
++LDADD=	-ltirpc -lbsd
+ 
+ .include <bsd.prog.mk>
+--- a/usr.sbin/mountd/mountd.c
++++ b/usr.sbin/mountd/mountd.c
+@@ -1926,12 +1926,18 @@
+ 
+ 		if (!strcmp(seclist, "sys"))
+ 			flavor = AUTH_SYS;
++#ifdef RPCSEC_GSS_KRB5
+ 		else if (!strcmp(seclist, "krb5"))
+ 			flavor = RPCSEC_GSS_KRB5;
++#endif
++#ifdef RPCSEC_GSS_KRB5I
+ 		else if (!strcmp(seclist, "krb5i"))
+ 			flavor = RPCSEC_GSS_KRB5I;
++#endif
++#ifdef RPCSEC_GSS_KRB5P
+ 		else if (!strcmp(seclist, "krb5p"))
+ 			flavor = RPCSEC_GSS_KRB5P;
++#endif
+ 		else {
+ 			if (cp)
+ 				*cp = savedc;
+--- a/usr.sbin/nfsd/Makefile
++++ b/usr.sbin/nfsd/Makefile
+@@ -3,6 +3,8 @@
+ 
+ PROG=	nfsd
+ MAN=	nfsd.8 nfsv4.4 stablerestart.5
++CFLAGS+= -I${.CURDIR}/../../sys
++LDADD=   -ltirpc -lbsd
+ 
+ WARNS?=	6
+ 
+--- a/usr.sbin/nfsd/nfsd.c
++++ b/usr.sbin/nfsd/nfsd.c
+@@ -849,13 +849,13 @@
+ }
+ 
+ void
+-nonfs(__unused int signo)
++nonfs(int signo)
+ {
+ 	syslog(LOG_ERR, "missing system call: NFS not available");
+ }
+ 
+ void
+-reapchild(__unused int signo)
++reapchild(int signo)
+ {
+ 	pid_t pid;
+ 	int i;
+@@ -890,7 +890,7 @@
+  * Cleanup master after SIGUSR1.
+  */
+ void
+-cleanup(__unused int signo)
++cleanup(int signo)
+ {
+ 	nfsd_exit(0);
+ }
+@@ -899,7 +899,7 @@
+  * Cleanup child after SIGUSR1.
+  */
+ void
+-child_cleanup(__unused int signo)
++child_cleanup(int signo)
+ {
+ 	exit(0);
+ }
+--- a/usr.sbin/rpc.lockd/Makefile
++++ b/usr.sbin/rpc.lockd/Makefile
+@@ -4,24 +4,26 @@
+ PROG=	rpc.lockd
+ MAN=	rpc.lockd.8
+ MLINKS=	rpc.lockd.8 lockd.8
+-SRCS=	kern.c nlm_prot_svc.c lockd.c lock_proc.c lockd_lock.c
++SRCS=	kern.c nlm_prot_svc.c nlm_prot_xdr.c lockd.c lock_proc.c lockd_lock.c sm_inter_xdr.c
+ 
+-CFLAGS+= -I. -I${DESTDIR}/usr/include/rpcsvc
++CFLAGS+= -I. -I${.CURDIR}/../../include/rpcsvc
+ #WARNS?= 2
+ 
+ DPADD=	${LIBRPCSVC} ${LIBUTIL}
+-LDADD=	-lrpcsvc -lutil
++LDADD=	-ltirpc -lbsd
+ 
+-CLEANFILES= nlm_prot_svc.c nlm_prot.h test
++CLEANFILES= nlm_prot_svc.c nlm_prot_xdr.c nlm_prot.h test
+ 
+-RPCSRC= ${DESTDIR}/usr/include/rpcsvc/nlm_prot.x
++RPCSRC= ${.CURDIR}/../../include/rpcsvc/nlm_prot.x
+ RPCGEN= rpcgen -L -C
+ 
++.PATH: ../rpc.statd
++
+ nlm_prot_svc.c: ${RPCSRC}
+ 	${RPCGEN} -m -o ${.TARGET} ${RPCSRC}
+ 
+-nlm_prot.h: ${RPCSRC}
+-	${RPCGEN} -h -o ${.TARGET} ${RPCSRC}
++nlm_prot_xdr.c: ${RPCSRC}
++	${RPCGEN} -c -o ${.TARGET} ${RPCSRC}
+ 
+ test: ${.CURDIR}/test.c
+ 	cc -o test ${.CURDIR}/test.c -lrpcsvc
+--- a/usr.sbin/rpc.lockd/lockd.c
++++ b/usr.sbin/rpc.lockd/lockd.c
+@@ -187,8 +187,7 @@
+ 		kernel_lockd = TRUE;
+ 	}
+ 	if (kernel_lockd) {
+-		if (getosreldate() >= 800040)
+-			kernel_lockd_client = TRUE;
++                kernel_lockd_client = TRUE;
+ 	}
+ 
+ 	(void)rpcb_unset(NLM_PROG, NLM_SM, NULL);
+@@ -807,7 +806,7 @@
+ 		ret = callrpc("localhost", SM_PROG, SM_VERS, SM_UNMON_ALL,
+ 		    (xdrproc_t)xdr_my_id, &id, (xdrproc_t)xdr_sm_stat, &stat);
+ 		if (ret == RPC_PROGUNAVAIL) {
+-			syslog(LOG_WARNING, "%lu %s", SM_PROG,
++			syslog(LOG_WARNING, "%u %s", SM_PROG,
+ 			    clnt_sperrno(ret));
+ 			sleep(2);
+ 			continue;
+@@ -816,7 +815,7 @@
+ 	} while (0);
+ 
+ 	if (ret != 0) {
+-		syslog(LOG_ERR, "%lu %s", SM_PROG, clnt_sperrno(ret));
++		syslog(LOG_ERR, "%u %s", SM_PROG, clnt_sperrno(ret));
+ 		exit(1);
+ 	}
+ 
+--- a/usr.sbin/rpc.lockd/lock_proc.c
++++ b/usr.sbin/rpc.lockd/lock_proc.c
+@@ -770,7 +770,7 @@
+  */
+ void *
+ nlm_cancel_res_1_svc(arg, rqstp)
+-	nlm_res *arg __unused;
++	nlm_res *arg;
+ 	struct svc_req *rqstp;
+ {
+ 	if (debug_level)
+@@ -803,7 +803,7 @@
+  */
+ void *
+ nlm_granted_res_1_svc(arg, rqstp)
+-	nlm_res *arg __unused;
++	nlm_res *arg;
+ 	struct svc_req *rqstp;
+ {
+ 	if (debug_level)
+@@ -902,7 +902,7 @@
+  */
+ void *
+ nlm_free_all_3_svc(arg, rqstp)
+-	nlm_notify *arg __unused;
++	nlm_notify *arg;
+ 	struct svc_req *rqstp;
+ {
+ 	static char dummy;
+@@ -1260,7 +1260,7 @@
+  */
+ void *
+ nlm4_cancel_res_4_svc(arg, rqstp)
+-	nlm4_res *arg __unused;
++	nlm4_res *arg;
+ 	struct svc_req *rqstp;
+ {
+ 	if (debug_level)
+@@ -1275,7 +1275,7 @@
+  */
+ void *
+ nlm4_unlock_res_4_svc(arg, rqstp)
+-	nlm4_res *arg __unused;
++	nlm4_res *arg;
+ 	struct svc_req *rqstp;
+ {
+ 	if (debug_level)
+@@ -1290,7 +1290,7 @@
+  */
+ void *
+ nlm4_granted_res_4_svc(arg, rqstp)
+-	nlm4_res *arg __unused;
++	nlm4_res *arg;
+ 	struct svc_req *rqstp;
+ {
+ 	if (debug_level)
+@@ -1389,7 +1389,7 @@
+  */
+ void *
+ nlm4_free_all_4_svc(arg, rqstp)
+-	struct nlm4_notify *arg __unused;
++	struct nlm4_notify *arg;
+ 	struct svc_req *rqstp;
+ {
+ 	static char dummy;
+@@ -1407,7 +1407,7 @@
+ void *
+ nlm_sm_notify_0_svc(arg, rqstp)
+ 	struct nlm_sm_status *arg;
+-	struct svc_req *rqstp __unused;
++	struct svc_req *rqstp;
+ {
+ 	static char dummy;
+ 	notify(arg->mon_name, arg->state);
+--- a/usr.sbin/rpc.lockd/lockd_lock.c
++++ b/usr.sbin/rpc.lockd/lockd_lock.c
+@@ -1176,8 +1176,8 @@
+ 
+ enum hwlock_status
+ test_hwlock(fl, conflicting_fl)
+-	const struct file_lock *fl __unused;
+-	struct file_lock **conflicting_fl __unused;
++	const struct file_lock *fl;
++	struct file_lock **conflicting_fl;
+ {
+ 
+ 	/*
+@@ -1891,7 +1891,7 @@
+  */
+ 
+ struct nlm4_holder *
+-testlock(struct nlm4_lock *lock, bool_t exclusive, int flags __unused)
++testlock(struct nlm4_lock *lock, bool_t exclusive, int flags)
+ {
+ 	struct file_lock test_fl, *conflicting_fl;
+ 
+@@ -1991,7 +1991,7 @@
+ 
+ /* unlock a filehandle */
+ enum nlm_stats
+-unlock(nlm4_lock *lock, const int flags __unused)
++unlock(nlm4_lock *lock, const int flags)
+ {
+ 	struct file_lock fl;
+ 	enum nlm_stats err;
+@@ -2187,7 +2187,7 @@
+ void
+ send_granted(fl, opcode)
+ 	struct file_lock *fl;
+-	int opcode __unused;
++	int opcode;
+ {
+ 	CLIENT *cli;
+ 	static char dummy;
+--- a/usr.sbin/rpc.lockd/kern.c
++++ b/usr.sbin/rpc.lockd/kern.c
+@@ -51,8 +51,9 @@
+ #include <syslog.h>
+ #include <unistd.h>
+ #include <netdb.h>
++#include <signal.h>
+ 
+-#include "nlm_prot.h"
++#include <nlm_prot.h>
+ #include <nfs/nfsproto.h>
+ #include <nfs/nfs_lock.h>
+ 
+--- a/usr.sbin/rpc.statd/Makefile
++++ b/usr.sbin/rpc.statd/Makefile
+@@ -2,22 +2,25 @@
+ 
+ PROG=	rpc.statd
+ MAN=	rpc.statd.8
+-SRCS=	file.c sm_inter_svc.c sm_inter.h statd.c procs.c
++SRCS=	file.c sm_inter_svc.c sm_inter_xdr.c sm_inter.h statd.c procs.c
+ 
+ CFLAGS+= -I.
+ #WARNS?= 2
+ 
+ DPADD=	${LIBRPCSVC}
+-LDADD=	-lrpcsvc
++LDADD=	-ltirpc -lbsd
+ 
+-CLEANFILES= sm_inter_svc.c sm_inter.h
++CLEANFILES= sm_inter_svc.c sm_inter_xdr.c sm_inter.h
+ 
+-RPCSRC= ${DESTDIR}/usr/include/rpcsvc/sm_inter.x
++RPCSRC= ${.CURDIR}/../../include/rpcsvc/sm_inter.x
+ RPCGEN= rpcgen -L -C
+ 
+ sm_inter_svc.c: ${RPCSRC}
+ 	${RPCGEN} -m -o ${.TARGET} ${RPCSRC}
+ 
++sm_inter_xdr.c: ${RPCSRC}
++	${RPCGEN} -c -o ${.TARGET} ${RPCSRC}
++
+ sm_inter.h: ${RPCSRC}
+ 	${RPCGEN} -h -o ${.TARGET} ${RPCSRC}
+ 
+--- a/usr.sbin/rpc.statd/procs.c
++++ b/usr.sbin/rpc.statd/procs.c
+@@ -257,7 +257,7 @@
+ 		earlier call to sm_mon_1
+ */
+ 
+-struct sm_stat *sm_unmon_1_svc(mon_id *arg, struct svc_req *req __unused)
++struct sm_stat *sm_unmon_1_svc(mon_id *arg, struct svc_req *req)
+ {
+   static sm_stat res;
+   HostInfo *hp;
+@@ -295,7 +295,7 @@
+ 		host and program number.
+ */
+ 
+-struct sm_stat *sm_unmon_all_1_svc(my_id *arg, struct svc_req *req __unused)
++struct sm_stat *sm_unmon_all_1_svc(my_id *arg, struct svc_req *req)
+ {
+   static sm_stat res;
+   HostInfo *hp;
+@@ -332,7 +332,7 @@
+ 		and inform all hosts on the monitor list.
+ */
+ 
+-void *sm_simu_crash_1_svc(void *v __unused, struct svc_req *req __unused)
++void *sm_simu_crash_1_svc(void *v, struct svc_req *req)
+ {
+   static char dummy;
+   int work_to_do;
+@@ -377,7 +377,7 @@
+ 		that modify the list.
+ */
+ 
+-void *sm_notify_1_svc(stat_chge *arg, struct svc_req *req __unused)
++void *sm_notify_1_svc(stat_chge *arg, struct svc_req *req)
+ {
+   struct timeval timeout = { 20, 0 };	/* 20 secs timeout		*/
+   CLIENT *cli;
+--- a/usr.sbin/rpc.statd/statd.c
++++ b/usr.sbin/rpc.statd/statd.c
+@@ -55,6 +55,8 @@
+ #include <unistd.h>
+ #include "statd.h"
+ 
++extern void sm_prog_1(struct svc_req *rqstp, register SVCXPRT *transp);
++
+ int debug = 0;		/* Controls syslog() calls for debug messages	*/
+ 
+ char **hosts, *svcport_str = NULL;
+@@ -446,7 +448,7 @@
+ 		children to exit when they have done their work.
+ */
+ 
+-static void handle_sigchld(int sig __unused)
++static void handle_sigchld(int sig)
+ {
+   int pid, status;
+   pid = wait4(-1, &status, WNOHANG, (struct rusage*)0);

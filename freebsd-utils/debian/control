@@ -5,7 +5,7 @@ Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
 Uploaders: Aurelien Jarno <aurel32@debian.org>, Guillem Jover <guillem@debian.org>, Robert Millan <rmh@debian.org>
 Build-Depends: debhelper (>= 7), po-debconf, freebsd-buildutils, sharutils,
  flex | flex-old,
- kfreebsd-kernel-headers (>= 0.54),
+ kfreebsd-kernel-headers (>= 0.56),
 # libc0.1-dev (>= 2.11.2-3): ifconfig
  libc0.1-dev (>= 2.11.2-3),
  libbsd-dev (>= 0.3.0), pkg-config,
@@ -24,13 +24,15 @@ Build-Depends: debhelper (>= 7), po-debconf, freebsd-buildutils, sharutils,
 # libgeom-dev : ccdconfig
  libgeom-dev,
 # libsbuf-dev: ifconfig, mdconfig
- libsbuf-dev (>= 8.2), libsbuf-dev (>= 8.2-2) | kfreebsd-kernel-headers (<< 0.56),
+ libsbuf-dev (>= 8.2-2),
 # libcam-dev: camcontrol
  libcam-dev (>= 8.2),
 # libedit-dev: pppctl
  libedit-dev,
 # libexpat1-dev: ifconfig
  libexpat1-dev,
+# libtirpc-dev: mount_nfs, mountd, nfsd, rpc.lockd, rpc.statd
+ libtirpc-dev,
 Vcs-Browser: http://svn.debian.org/wsvn/glibc-bsd/trunk/freebsd-utils/
 Vcs-Svn: svn://svn.debian.org/glibc-bsd/trunk/freebsd-utils/
 Standards-Version: 3.9.2
@@ -117,6 +119,37 @@ Description: FreeBSD networking tools
  GNU/kFreeBSD.
  .
  This is a minimal package for use in debian-installer.
+
+Package: freebsd-nfs-client
+Section: net
+Priority: standard
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: freebsd-nfs-common
+Replaces: freebsd-utils (<= 8.2+ds1-1)
+Description: FreeBSD client utility needed for NFS on GNU/kFreeBSD
+ This package provides FreeBSD client utility needed for NFS on
+ Debian GNU/kFreeBSD.
+
+Package: freebsd-nfs-server
+Section: net
+Priority: optional
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}, freebsd-nfs-common
+Provides: nfs-server, nfs-kernel-server
+Description: FreeBSD server utilities needed for NFS on GNU/kFreeBSD
+ This package provides FreeBSD utilities needed for NFS server on
+ Debian GNU/kFreeBSD.
+
+Package: freebsd-nfs-common
+Section: net
+Priority: standard
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}, rpcbind
+Provides: nfs-common
+Description: NFS support files common to client and server
+ Use this package on any machine that uses NFS, either as client or
+ server.
 
 # FIXME:
 # - add jail

@@ -6,7 +6,7 @@
 #export DH_VERBOSE=1
 
 CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D__va_list=__builtin_va_list \
-	$(shell pkg-config --cflags libbsd-overlay)
+	$(shell pkg-config --cflags libbsd-overlay) -isystem /usr/include/tirpc
 CXXFLAGS = $(CFLAGS)
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
@@ -28,15 +28,26 @@ TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
 PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) \
-        -I$(CURDIR)/debian/local/include -lbsd" \
+        -I$(CURDIR)/debian/local/include -I$(CURDIR)/include -lbsd" \
         NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO \
         DESTDIR=$(DESTDIR) make
+
+RPCHDRS=include/rpcsvc/nfs_prot.h include/rpcsvc/nlm_prot.h \
+	include/rpcsvc/mount.h include/rpcsvc/sm_inter.h \
+	sys/kgssapi/gssd.h
+
+.SUFFIXES: .x .h
+
+.x.h:
+	rpcgen -h -DWANT_NFS3 $< -o $@
 
 build: build-arch build-indep
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
-	mkdir -p $(ORIGDIR)/sys/kern $(ORIGDIR)/sys/dev/usb $(ORIGDIR)/etc
+	mkdir -p $(ORIGDIR)/sys/kern $(ORIGDIR)/sys/dev/usb $(ORIGDIR)/etc \
+		$(ORIGDIR)/include/rpcsvc \
+		$(ORIGDIR)/sys/kgssapi
 	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
 		 usr.sbin/jail bin/chflags \
 		 sbin/devd etc/devd.conf etc/devd sys/dev/usb/usbdevs \
@@ -48,14 +59,24 @@ get-orig-source:
 		 usr.sbin/ppp usr.sbin/pppctl usr.sbin/arp usr.bin/mkuzip \
 		 sbin/ipfw contrib/pf sbin/pfctl usr.sbin/authpf sys/contrib/pf/net \
 		 sbin/mount_std sbin/umount sbin/mount_autofs sbin/mount_cd9660 \
-		 sbin/mount_ext2fs sbin/mount_hpfs sbin/mount_msdosfs sbin/mount_nfs \
+		 sbin/mount_ext2fs sbin/mount_hpfs sbin/mount_msdosfs \
 		 sbin/mount_ntfs sbin/mount_nullfs sbin/mount_udf sbin/mount_unionfs \
 		 sbin/mount_reiserfs sbin/mount \
 		 sbin/mdconfig sbin/ccdconfig sbin/swapon sbin/atacontrol sbin/camcontrol \
 		 sbin/gbde sbin/geom bin/kenv \
 		 usr.sbin/kbdcontrol usr.sbin/vidcontrol share/syscons \
 		 sbin/savecore sbin/dumpon \
-		 sys/kern/syscalls.c etc/pf.os ; do \
+		 sys/kern/syscalls.c etc/pf.os \
+		 usr.sbin/mountd usr.sbin/rpc.statd usr.sbin/rpc.lockd \
+		 usr.sbin/gssd usr.sbin/nfsd usr.sbin/nfscbd \
+		 usr.sbin/nfsdumpstate usr.sbin/nfsuserd usr.sbin/nfsrevoke \
+		 sbin/nfsiod \
+		 sbin/mount_nfs \
+		 include/rpcsvc/nfs_prot.x include/rpcsvc/sm_inter.x \
+		 include/rpcsvc/nlm_prot.x include/rpcsvc/mount.x \
+		 sys/kgssapi/gssd.x \
+		 usr.bin/showmount \
+	; do \
 	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
 	tar --numeric-owner --owner 0 --group 0 -czf ../$(TARNAME) $(ORIGDIR)
@@ -66,10 +87,10 @@ lib-stamp:
 	$(MAKE) -C lib
 	touch $@
 
-build-arch: freebsd-utils gbde geli kbdcontrol vidcontrol kldutils freebsd-net-tools
+build-arch: freebsd-utils gbde geli kbdcontrol vidcontrol kldutils freebsd-net-tools freebsd-nfs-utils
 
 freebsd-utils: freebsd-utils-stamp
-freebsd-utils-stamp:
+freebsd-utils-stamp: $(RPCHDRS)
 #	$(PMAKE) -C bin/chflags
 	$(PMAKE) -C bin/kenv
 	$(PMAKE) -C sbin/atacontrol
@@ -147,6 +168,22 @@ freebsd-net-tools-stamp: lib-stamp
 	$(PMAKE) -C usr.sbin/pppctl
 	touch $@
 
+freebsd-nfs-utils: freebsd-nfs-utils-stamp
+freebsd-nfs-utils-stamp: lib-stamp
+#	$(PMAKE) -C usr.bin/showmount
+	$(PMAKE) -C sbin/mount_nfs
+	$(PMAKE) -C sbin/nfsiod
+#	$(PMAKE) -C usr.sbin/gssd
+#	$(PMAKE) -C usr.sbin/nfscbd
+#	$(PMAKE) -C usr.sbin/nfsuserd
+#	$(PMAKE) -C usr.sbin/nfsrevoke
+#	$(PMAKE) -C usr.sbin/nfsdumpstate
+	$(PMAKE) -C usr.sbin/rpc.statd
+	$(PMAKE) -C usr.sbin/rpc.lockd
+	$(PMAKE) -C usr.sbin/mountd
+	$(PMAKE) -C usr.sbin/nfsd
+	touch $@
+
 build-indep: build-indep-stamp
 build-indep-stamp:
 	touch $@
@@ -211,6 +248,19 @@ clean:
 	$(PMAKE) -C usr.sbin/authpf clean
 	$(PMAKE) -C usr.sbin/pppctl clean
 
+	$(PMAKE) -C sbin/nfsiod clean
+	$(PMAKE) -C usr.sbin/gssd clean
+	$(PMAKE) -C usr.sbin/nfscbd clean
+	$(PMAKE) -C usr.sbin/nfsuserd clean
+	$(PMAKE) -C usr.sbin/nfsrevoke clean
+	$(PMAKE) -C usr.sbin/nfsdumpstate clean
+	$(PMAKE) -C usr.sbin/rpc.statd clean
+	$(PMAKE) -C usr.sbin/rpc.lockd clean
+	$(PMAKE) -C usr.sbin/mountd clean
+	$(PMAKE) -C usr.sbin/nfsd clean
+
+	$(RM) $(RPCHDRS)
+
 	rm -f *stamp
 	dh_clean
 
@@ -245,6 +295,11 @@ binary-arch: build install
 	dh_installinit -pfreebsd-utils --name=devd -- start 03 S . stop 01 0 1 6 .
 	dh_installinit -pkldutils --no-start -- start 12 S .
 	dh_installinit -pkbdcontrol -- start 20 S .
+	dh_installinit -pfreebsd-nfs-common --name=rpc.lockd -- start 20 2 3 4 5 S . stop 20 0 1 6 .
+	dh_installinit -pfreebsd-nfs-common --name=rpc.statd -- start 20 2 3 4 5 S . stop 20 0 1 6 .
+	dh_installinit -pfreebsd-nfs-client --name=nfsiod -- start 20 2 3 4 5 S . stop 20 0 1 6 .
+	dh_installinit -pfreebsd-nfs-server --name=mountd -- start 20 2 3 4 5 S . stop 80 0 1 6 .
+	dh_installinit -pfreebsd-nfs-server --name=nfsd -- start 20 2 3 4 5 S . stop 80 0 1 6 .
 #	dh_installcron
 #	dh_installinfo
 	dh_installman
