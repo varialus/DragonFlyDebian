@@ -86,19 +86,19 @@ src-stamp:
 
 	set -e ; find src/sys -type f | (while read i ; do \
 		sed -i $$i \
-		-e 's/defined\( \|\t\)*(\( \|\t\)*__FreeBSD__\( \|\t\)*)/1/g' \
-		-e 's/#\( \|\t\)*ifdef\( \|\t\)*__FreeBSD__/#if 1/g' \
-		-e 's/#\( \|\t\)*ifndef\( \|\t\)*__FreeBSD__/#if 0/g' \
-		-e 's/defined\( \|\t\)*(\( \|\t\)*\(__linux__\|linux\)\( \|\t\)*)/0/g' \
-		-e 's/#\( \|\t\)*ifdef\( \|\t\)*\(__linux__\|linux\)/#if 0/g' \
-		-e 's/#\( \|\t\)*ifndef\( \|\t\)*\(__linux__\|linux\)/#if 1/g' \
+		-e 's/defined\s*(\s*__FreeBSD__\s*)/1/g' \
+		-e 's/#\s*ifdef\s*__FreeBSD__/#if 1/g' \
+		-e 's/#\s*ifndef\s*__FreeBSD__/#if 0/g' \
+		-e 's/defined\s*(\s*\(__linux__\|linux\)\s*)/0/g' \
+		-e 's/#\s*ifdef\s*\(__linux__\|linux\)/#if 0/g' \
+		-e 's/#\s*ifndef\s*\(__linux__\|linux\)/#if 1/g' \
 		-e 's/__FreeBSD__/$(major)/g' \
-		-e 's,#\( \|\t\)*include\( \|\t\)*<sys/device.h>,,g' \
-		-e 's,#\( \|\t\)*include\( \|\t\)*<dev/rndvar.h>,,g' \
-		-e 's,#\( \|\t\)*include\( \|\t\)*<sys/pool.h>,,g' \
-		-e 's,#\( \|\t\)*include\( \|\t\)*<netinet/ip_ipsp.h>,,g' \
-		-e 's,#\( \|\t\)*include\( \|\t\)*\(<\|"\)bpfilter.h\(>\|"\),,g' \
-		-e 's,#\( \|\t\)*include\( \|\t\)*\(<\|"\)pflog.h\(>\|"\),,g' \
+		-e 's,#\s*include\s*<sys/device.h>,,g' \
+		-e 's,#\s*include\s*<dev/rndvar.h>,,g' \
+		-e 's,#\s*include\s*<sys/pool.h>,,g' \
+		-e 's,#\s*include\s*<netinet/ip_ipsp.h>,,g' \
+		-e 's,#\s*include\s*\(<\|"\)bpfilter.h\(>\|"\),,g' \
+		-e 's,#\s*include\s*\(<\|"\)pflog.h\(>\|"\),,g' \
 	; done)
 
 	install debian/gen-ld-u-options src/usr.sbin/config
