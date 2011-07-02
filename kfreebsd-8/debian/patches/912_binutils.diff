@@ -19,7 +19,7 @@
    .interp         : { *(.interp) }
    .hash           : { *(.hash) }
    .dynsym         : { *(.dynsym) }
-@@ -61,7 +61,8 @@ SECTIONS
+@@ -61,7 +61,8 @@
    .eh_frame_hdr : { *(.eh_frame_hdr) }
    /* Adjust the address for the data segment.  We want to adjust up to
       the same address within the page on the next page up.  */
@@ -29,3 +29,16 @@
    /* Ensure the __preinit_array_start label is properly aligned.  We
       could instead move the label definition inside the section, but
       the linker would then create the section even if it turns out to
+--- a/sys/conf/ldscript.mips
++++ b/sys/conf/ldscript.mips
+@@ -30,8 +30,8 @@
+  * $FreeBSD$
+  */
+ 
+-OUTPUT_FORMAT("elf32-tradbigmips", "elf32-tradbigmips", 
+-		"elf32-tradlittlemips")
++OUTPUT_FORMAT("elf32-tradbigmips-freebsd", "elf32-tradbigmips-freebsd", 
++		"elf32-tradlittlemips-freebsd")
+ 
+ OUTPUT_ARCH(mips)
+ ENTRY(_start)

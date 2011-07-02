@@ -152,11 +152,12 @@ build-flavor-%-stamp: src-flavor-%-stamp
 
 	# Always set explicit link target to match with ld's implicit target (needed
 	# to build on non-kFreeBSD)
-ifeq ($(cpu), amd64)
-	sed -i -e 's/elf64-x86-64-freebsd/$(ld_target)/g' $(FLAVOR_DIR)-$*/sys/conf/ldscript.amd64
-else ifeq ($(cpu), i386)
-	sed -i -e 's/elf32-i386-freebsd/$(ld_target)/g' $(FLAVOR_DIR)-$*/sys/conf/ldscript.i386
-endif
+	sed -i \
+		-e 's/elf32-i386-freebsd/$(ld_target)/g' \
+		-e 's/elf64-x86-64-freebsd/$(ld_target)/g' \
+		-e 's/elf32-tradlittlemips-freebsd/$(ld_target)/g' \
+		-e 's/elf32-tradbigmips-freebsd/$(ld_target)/g' \
+	$(FLAVOR_DIR)-$*/sys/conf/ldscript.$(kfreebsd_cpu)
 
 	# Configure the kernel
 	cp debian/arch/$(cpu)/$*.config $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/conf/
