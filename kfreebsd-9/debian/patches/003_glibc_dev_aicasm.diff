@@ -1,3 +1,6 @@
+
+Sent to freebsd-hackers (2011-07-02)
+
 --- a/sys/dev/aic7xxx/aicasm/Makefile
 +++ b/sys/dev/aic7xxx/aicasm/Makefile
 @@ -3,6 +3,10 @@
@@ -16,16 +19,19 @@
  CLEANFILES+= ${GENHDRS} ${YSRCS:R:C/(.*)/\1.output/g}
  DPADD=	${LIBL}
 -LDADD=	-ll
-+LDADD=	-ll -ldb
++LDADD=	-ll -ldb -lbsd
  WARNS?=	5
 +NO_WERROR?=	1
  
  # Correct path for kernel builds
  # Don't rely on the kernel's .depend file
-@@ -24,8 +29,12 @@
+@@ -24,8 +29,15 @@
  DEPENDFILE=	.depend_aicasm
  .endif
  
++LIBBSD_CFLAGS!=	pkg-config --cflags libbsd-overlay
++CFLAGS+=	${LIBBSD_CFLAGS}
++
 +# This would discard implicit include flags in upstream GCC
 +.if ${OPSYS} == "FreeBSD"
  NOSTDINC=	-nostdinc
@@ -35,35 +41,22 @@
  .ifdef MAKESRCPATH
  CFLAGS+= -I${MAKESRCPATH}
  .endif
---- a/sys/dev/aic7xxx/aicasm/aicasm.h
-+++ b/sys/dev/aic7xxx/aicasm/aicasm.h
-@@ -42,8 +42,9 @@
-  * $FreeBSD$
-  */
- 
--#ifdef __linux__
--#include "../queue.h"
-+#include <sys/param.h>		/* __GLIBC__ */
-+#ifdef __GLIBC__
-+#include <bsd/sys/queue.h>
- #else
- #include <sys/queue.h>
- #endif
 --- a/sys/dev/aic7xxx/aicasm/aicasm_gram.y
 +++ b/sys/dev/aic7xxx/aicasm/aicasm_gram.y
-@@ -52,8 +52,9 @@
+@@ -51,12 +51,7 @@
+ #include <stdlib.h>
  #include <string.h>
  #include <sysexits.h>
- 
+-
 -#ifdef __linux__
 -#include "../queue.h"
-+#include <sys/param.h>		/* __GLIBC__ */
-+#ifdef __GLIBC__
-+#include <bsd/sys/queue.h>
- #else
+-#else
  #include <sys/queue.h>
- #endif
-@@ -1534,7 +1535,7 @@
+-#endif
+ 
+ #include "aicasm.h"
+ #include "aicasm_symbol.h"
+@@ -1534,7 +1529,7 @@
  }
  
  static void
@@ -72,50 +65,6 @@
  {
  	struct macro_arg *marg;
  	int retval;
---- a/sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y
-+++ b/sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y
-@@ -52,8 +52,9 @@
- #include <string.h>
- #include <sysexits.h>
- 
--#ifdef __linux__
--#include "../queue.h"
-+#include <sys/param.h>		/* __GLIBC__ */
-+#ifdef __GLIBC__
-+#include <bsd/sys/queue.h>
- #else
- #include <sys/queue.h>
- #endif
---- a/sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l
-+++ b/sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l
-@@ -51,8 +51,10 @@
- #include <stdio.h>
- #include <string.h>
- #include <sysexits.h>
--#ifdef __linux__
--#include "../queue.h"
-+
-+#include <sys/param.h>		/* __GLIBC__ */
-+#ifdef __GLIBC__
-+#include <bsd/sys/queue.h>
- #else
- #include <sys/queue.h>
- #endif
---- a/sys/dev/aic7xxx/aicasm/aicasm_scan.l
-+++ b/sys/dev/aic7xxx/aicasm/aicasm_scan.l
-@@ -51,8 +51,10 @@
- #include <stdio.h>
- #include <string.h>
- #include <sysexits.h>
--#ifdef __linux__
--#include "../queue.h"
-+
-+#include <sys/param.h>		/* __GLIBC__ */
-+#ifdef __GLIBC__
-+#include <bsd/sys/queue.h>
- #else
- #include <sys/queue.h>
- #endif
 --- a/sys/dev/aic7xxx/aicasm/aicasm_symbol.c
 +++ b/sys/dev/aic7xxx/aicasm/aicasm_symbol.c
 @@ -44,10 +44,11 @@
@@ -133,17 +82,85 @@
  #endif
  #include <ctype.h>
  #include <fcntl.h>
---- a/sys/dev/aic7xxx/aicasm/aicasm_symbol.h
-+++ b/sys/dev/aic7xxx/aicasm/aicasm_symbol.h
-@@ -42,8 +42,9 @@
+--- a/sys/dev/aic7xxx/aicasm/aicasm.c
++++ b/sys/dev/aic7xxx/aicasm/aicasm.c
+@@ -53,7 +53,7 @@
+ #include <sysexits.h>
+ #include <unistd.h>
+ 
+-#if linux
++#ifdef __GLIBC__
+ #include <endian.h>
+ #else
+ #include <machine/endian.h>
+--- a/sys/dev/aic7xxx/aicasm/aicasm.h
++++ b/sys/dev/aic7xxx/aicasm/aicasm.h
+@@ -42,11 +42,7 @@
   * $FreeBSD$
   */
  
 -#ifdef __linux__
 -#include "../queue.h"
-+#include <sys/param.h>		/* __GLIBC__ */
-+#ifdef __GLIBC__
-+#include <bsd/sys/queue.h>
- #else
+-#else
  #include <sys/queue.h>
- #endif
+-#endif
+ 
+ #ifndef TRUE
+ #define TRUE 1
+--- a/sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y
++++ b/sys/dev/aic7xxx/aicasm/aicasm_macro_gram.y
+@@ -51,12 +51,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sysexits.h>
+-
+-#ifdef __linux__
+-#include "../queue.h"
+-#else
+ #include <sys/queue.h>
+-#endif
+ 
+ #include "aicasm.h"
+ #include "aicasm_symbol.h"
+--- a/sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l
++++ b/sys/dev/aic7xxx/aicasm/aicasm_macro_scan.l
+@@ -51,11 +51,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <sysexits.h>
+-#ifdef __linux__
+-#include "../queue.h"
+-#else
+ #include <sys/queue.h>
+-#endif
+ 
+ #include "aicasm.h"
+ #include "aicasm_symbol.h"
+--- a/sys/dev/aic7xxx/aicasm/aicasm_scan.l
++++ b/sys/dev/aic7xxx/aicasm/aicasm_scan.l
+@@ -51,11 +51,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <sysexits.h>
+-#ifdef __linux__
+-#include "../queue.h"
+-#else
+ #include <sys/queue.h>
+-#endif
+ 
+ #include "aicasm.h"
+ #include "aicasm_symbol.h"
+--- a/sys/dev/aic7xxx/aicasm/aicasm_symbol.h
++++ b/sys/dev/aic7xxx/aicasm/aicasm_symbol.h
+@@ -42,11 +42,7 @@
+  * $FreeBSD$
+  */
+ 
+-#ifdef __linux__
+-#include "../queue.h"
+-#else
+ #include <sys/queue.h>
+-#endif
+ 
+ typedef enum {
+ 	UNINITIALIZED,

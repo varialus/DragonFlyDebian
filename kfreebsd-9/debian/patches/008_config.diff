@@ -1,41 +1,9 @@
 
-Author: rmh
-Status: gotta uncomment WARNS (see #351366), and find a portable way to add
-  "-lbsd".  after this it can be sent upstream.
+Sent to freebsd-hackers (2011-07-02)
 
---- a/usr.sbin/config/config.h
-+++ b/usr.sbin/config/config.h
-@@ -34,7 +34,7 @@
-  * Config.
-  */
- #include <sys/types.h>
--#include <sys/queue.h>
-+#include <bsd/sys/queue.h>
- #include <stdlib.h>
- #include <string.h>
- 
 --- a/usr.sbin/config/main.c
 +++ b/usr.sbin/config/main.c
-@@ -41,12 +41,17 @@
-   "$FreeBSD$";
- #endif /* not lint */
- 
-+#include <stdarg.h>
- #include <sys/types.h>
- #include <sys/stat.h>
- #include <sys/sbuf.h>
- #include <sys/file.h>
- #include <sys/mman.h>
--#include <sys/param.h>
-+#include <sys/param.h> /* BSD */
-+
-+#ifndef BSD
-+#include <bsd/string.h> /* strlcpy, strlcat */
-+#endif
- 
- #include <assert.h>
- #include <ctype.h>
-@@ -591,7 +596,11 @@
+@@ -591,7 +591,11 @@
  	if ((dirp = opendir(p)) == NULL)
  		err(EX_OSERR, "opendir %s", p);
  	while ((dp = readdir(dirp)) != NULL) {
@@ -49,12 +17,8 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
  			continue;
 --- a/usr.sbin/config/Makefile
 +++ b/usr.sbin/config/Makefile
-@@ -9,10 +9,10 @@
- kernconf.c: kernconf.tmpl
- 	file2c 'char kernconfstr[] = {' ',0};' < ${.CURDIR}/kernconf.tmpl > kernconf.c
- 
--CFLAGS+= -I. -I${.CURDIR}
-+CFLAGS+= -I. -I${.CURDIR} -D_GNU_SOURCE
+@@ -12,7 +12,7 @@
+ CFLAGS+= -I. -I${.CURDIR}
  
  DPADD=	${LIBL} ${LIBSBUF}
 -LDADD=	-ll -lsbuf
