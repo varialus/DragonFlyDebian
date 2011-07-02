@@ -12,6 +12,18 @@ DEB_BUILD_GNU_CPU	:= $(shell dpkg-architecture -qDEB_BUILD_GNU_CPU)
 DEB_HOST_ARCH_CPU	:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 DEB_HOST_MULTIARCH	:= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
+ifeq ($(DEB_HOST_ARCH_CPU), mipsel)
+MACHINE_ARCH		:= mips
+else
+MACHINE_ARCH		:= $(DEB_HOST_ARCH_CPU)
+endif
+
+ifeq ($(DEB_HOST_MULTIARCH), mipsel)
+MACHINE_MULTIARCH	:= mips
+else
+MACHINE_MULTIARCH	:= $(DEB_HOST_MULTIARCH)
+endif
+
 ifneq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
     export STRIPFLAG=
 endif
@@ -28,8 +40,8 @@ ORIGDIR = $(SOURCE)-$(VERSION)
 TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 
 CFLAGS = -O2 -g -Wall -D_GNU_SOURCE \
-         -DMACHINE_ARCH='"$(DEB_HOST_ARCH_CPU)"' \
-         -DMACHINE_MULTIARCH='"$(DEB_HOST_MULTIARCH)"' \
+         -DMACHINE_ARCH='"$(MACHINE_ARCH)"' \
+         -DMACHINE_MULTIARCH='"$(MACHINE_MULTIARCH)"' \
          -I$(CURDIR)/build-tree/src/sys \
 	 $(shell pkg-config --cflags libbsd-overlay) -lbsd
 MAKE_BUILD_FLAGS = CC=gcc NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
