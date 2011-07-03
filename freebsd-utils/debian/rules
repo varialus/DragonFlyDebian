@@ -6,7 +6,8 @@
 #export DH_VERBOSE=1
 
 CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D__va_list=__builtin_va_list \
-	$(shell pkg-config --cflags libbsd-overlay) -isystem /usr/include/tirpc
+	$(shell pkg-config --cflags libbsd-overlay) -isystem /usr/include/tirpc \
+	-D__FreeBSD_version=802000
 CXXFLAGS = $(CFLAGS)
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
