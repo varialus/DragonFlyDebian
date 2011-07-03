@@ -3,7 +3,7 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
 
 --- a/sys/modules/Makefile
 +++ b/sys/modules/Makefile
-@@ -356,12 +356,11 @@
+@@ -357,12 +357,11 @@
  .endif
  .endif
  
@@ -18,7 +18,7 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
  _if_carp=	if_carp
  .endif
  
-@@ -373,8 +372,7 @@
+@@ -374,8 +373,7 @@
  _netgraph=	netgraph
  .endif
  
@@ -27,8 +27,8 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
 +.if 1
  _pf=		pf
  _pflog=		pflog
- .endif
-@@ -430,7 +428,7 @@
+ .if ${MK_INET_SUPPORT} != "no"
+@@ -434,7 +432,7 @@
  _linsysfs=	linsysfs
  _linux=		linux
  _mse=		mse
@@ -37,7 +37,7 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
  _mlx4=		mlx4
  _mlx4ib=	mlx4ib
  _mlxen=		mlxen
-@@ -581,7 +579,7 @@
+@@ -585,7 +583,7 @@
  _linsysfs=	linsysfs
  _linux=		linux
  _mly=		mly
