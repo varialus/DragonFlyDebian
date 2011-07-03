@@ -21,12 +21,25 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-extern int __isptymaster(int fd);
 
 int
-unlockpt (int fd)
+__unlockpt (int fd)
 {
+  struct stat64 st;
+
   /* there is no need/way to do unlocking of slave pseudo-terminal device,
      just check whether fd might be valid master pseudo-terminal device */
-  return __isptymaster(fd);
+
+  if (__fxstat64 (_STAT_VER, fd, &st) < 0)
+    return -1;
+
+  if (!(S_ISCHR (st.st_mode)))
+  {
+    __set_errno (ENOTTY);
+    return -1;
+  }
+
+  return 0;
 }
+
+weak_alias (__unlockpt, unlockpt)

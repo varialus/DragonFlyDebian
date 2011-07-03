@@ -21,27 +21,63 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <sysdep.h>
 
-/* The system call does not change the controlling terminal, so we have
- * to do it ourselves.  */
-extern int __syscall_posix_openpt (int oflag);
-libc_hidden_proto (__syscall_posix_openpt)
 
-/* Prototype for function that opens BSD-style master pseudo-terminals.  */
-int __bsd_getpt (void);
+/* Prefix for master pseudo terminal nodes.  */
+#define _PATH_PTY "/dev/pty"
+
+
+/* Letters indicating a series of pseudo terminals.  */
+#ifndef PTYNAME1
+#define PTYNAME1 "pqrs"
+#endif
+const char __libc_ptyname1[] attribute_hidden = PTYNAME1;
+
+/* Letters indicating the position within a series.  */
+#ifndef PTYNAME2
+#define PTYNAME2 "0123456789abcdefghijklmnopqrstuv";
+#endif
+const char __libc_ptyname2[] attribute_hidden = PTYNAME2;
+
 
 /* Open a master pseudo terminal and return its file descriptor.  */
 int
 __posix_openpt (int oflag)
 {
-  int fd = INLINE_SYSCALL (posix_openpt, 1, oflag);
-  if (fd >= 0)
+  char buf[sizeof (_PATH_PTY) + 2];
+  const char *p, *q;
+  char *s;
+
+  s = __mempcpy (buf, _PATH_PTY, sizeof (_PATH_PTY) - 1);
+  /* s[0] and s[1] will be filled in the loop.  */
+  s[2] = '\0';
+
+  for (p = __libc_ptyname1; *p != '\0'; ++p)
     {
-      if (!(oflag & O_NOCTTY))
-        __ioctl (fd, TIOCSCTTY, NULL);
+      s[0] = *p;
+
+      for (q = __libc_ptyname2; *q != '\0'; ++q)
+	{
+	  int fd;
+
+	  s[1] = *q;
+
+	  fd = __open (buf, oflag);
+	  if (fd >= 0)
+	    {
+	      if (!(oflag & O_NOCTTY))
+		__ioctl (fd, TIOCSCTTY, NULL);
+
+	      return fd;
+	    }
+
+	  if (errno == ENOENT)
+	    return -1;
+	}
     }
-  return fd;
+
+  __set_errno (ENOENT);
+  return -1;
 }
 
 weak_alias (__posix_openpt, posix_openpt)
@@ -50,18 +86,7 @@ weak_alias (__posix_openpt, posix_openpt)
 int
 __getpt (void)
 {
-  int fd = __posix_openpt (O_RDWR);
-  if (fd == -1)
-      fd = __bsd_getpt ();
-  return fd;
+  return __posix_openpt (O_RDWR);
 }
 
-
-/* Letters indicating a series of pseudo terminals.  */
-#define PTYNAME1 "pqrs";
-/* Letters indicating the position within a series.  */
-#define PTYNAME2 "0123456789abcdefghijklmnopqrstuv";
-
-#define __getpt __bsd_getpt
-#define HAVE_POSIX_OPENPT
-#include <sysdeps/unix/bsd/getpt.c>
+weak_alias (__getpt, getpt)
