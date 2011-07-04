@@ -1,0 +1,327 @@
+
+Workaround for #630907.  This patch can be removed when libbsd overlay
+is re-enabled.
+
+--- a/src/usr.bin/cksum/cksum.c
++++ b/src/usr.bin/cksum/cksum.c
+@@ -57,6 +57,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
++#include <stdint.h>	/* uintXX_t (glibc) */
+ 
+ #include "extern.h"
+ 
+--- a/src/usr.bin/cksum/extern.h
++++ b/src/usr.bin/cksum/extern.h
+@@ -35,6 +35,7 @@
+  */
+ 
+ #include <sys/cdefs.h>
++#include <stdint.h>		/* uintXX_t (glibc) */
+ 
+ __BEGIN_DECLS
+ int	crc(int, uint32_t *, off_t *);
+--- a/src/usr.bin/file2c/Makefile
++++ b/src/usr.bin/file2c/Makefile
+@@ -1,5 +1,6 @@
+ # $FreeBSD$
+ 
+ PROG=	file2c
++LDADD= -lbsd
+ WARNS?=	6
+ .include <bsd.prog.mk>
+--- a/src/usr.bin/file2c/file2c.c
++++ b/src/usr.bin/file2c/file2c.c
+@@ -10,6 +10,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <bsd/stdlib.h>
+ #include <limits.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+--- a/src/usr.bin/make/arch.c
++++ b/src/usr.bin/make/arch.c
+@@ -88,7 +88,8 @@
+  */
+ 
+ #include <sys/param.h>
+-#include <sys/queue.h>
++#include <bsd/sys/queue.h>
++#include <bsd/string.h>
+ #include <sys/types.h>
+ #include <ar.h>
+ #include <ctype.h>
+--- a/src/usr.bin/make/dir.h
++++ b/src/usr.bin/make/dir.h
+@@ -43,7 +43,7 @@
+ #ifndef dir_h_6002e3b8
+ #define	dir_h_6002e3b8
+ 
+-#include <sys/queue.h>
++#include <bsd/sys/queue.h>
+ #include "hash.h"
+ 
+ struct GNode;
+--- a/src/usr.bin/make/job.c
++++ b/src/usr.bin/make/job.c
+@@ -101,7 +101,8 @@
+  *			    thems as need creatin'
+  */
+ 
+-#include <sys/queue.h>
++#include <bsd/sys/queue.h>
++#include <bsd/stdlib.h>
+ #include <sys/types.h>
+ #include <sys/select.h>
+ #include <sys/stat.h>
+--- a/src/usr.bin/make/main.c
++++ b/src/usr.bin/make/main.c
+@@ -67,7 +67,8 @@
+ #include <sys/sysctl.h>
+ #endif
+ #include <sys/time.h>
+-#include <sys/queue.h>
++#include <bsd/sys/queue.h>
++#include <bsd/err.h>
+ #include <sys/resource.h>
+ #include <sys/utsname.h>
+ #include <sys/wait.h>
+@@ -149,6 +150,8 @@
+ time_t		now;		/* Time at start of make */
+ struct GNode	*DEFAULT;	/* .DEFAULT node */
+ 
++#include <bsd/getopt.h>		/* optreset */
++
+ /**
+  * Exit with usage message.
+  */
+@@ -382,7 +385,7 @@
+ 		if ((optind < argc) && strcmp(argv[optind], "--") == 0) {
+ 			found_dd = TRUE;
+ 		}
+-		if ((c = getopt(argc, argv, OPTFLAGS)) == -1) {
++		if ((c = bsd_getopt(argc, argv, OPTFLAGS)) == -1) {
+ 			break;
+ 		}
+ 		switch(c) {
+--- a/src/usr.bin/make/proc.h
++++ b/src/usr.bin/make/proc.h
+@@ -48,6 +48,6 @@
+ 	pid_t	child_pid;
+ } ProcStuff;
+ 
+-void Proc_Exec(const ProcStuff *) __dead2;
++void Proc_Exec(const ProcStuff *);
+ 
+ #endif /* proc_h_458845848 */
+--- a/src/usr.bin/make/shell.c
++++ b/src/usr.bin/make/shell.c
+@@ -40,7 +40,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
+-#include <sys/queue.h>
++#include <bsd/sys/queue.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+--- a/src/usr.bin/make/shell.h
++++ b/src/usr.bin/make/shell.h
+@@ -42,7 +42,7 @@
+ #ifndef shell_h_6002e3b8
+ #define	shell_h_6002e3b8
+ 
+-#include <sys/queue.h>
++#include <bsd/sys/queue.h>
+ 
+ #include "str.h"
+ #include "util.h"
+--- a/src/usr.bin/make/suff.c
++++ b/src/usr.bin/make/suff.c
+@@ -90,7 +90,7 @@
+  *	    	  	    	if the target had no implicit sources.
+  */
+ 
+-#include <sys/queue.h>
++#include <bsd/sys/queue.h>
+ #include <assert.h>
+ #include <string.h>
+ #include <stdlib.h>
+--- a/src/usr.bin/make/util.c
++++ b/src/usr.bin/make/util.c
+@@ -61,7 +61,7 @@
+ #include "targ.h"
+ #include "util.h"
+ 
+-static void enomem(void) __dead2;
++static void enomem(void);
+ 
+ /*-
+  * Debug --
+--- a/src/usr.bin/make/util.h
++++ b/src/usr.bin/make/util.h
+@@ -103,10 +103,10 @@
+ void Debug(const char *, ...);
+ void DebugM(const char *, ...);
+ void Error(const char *, ...);
+-void Fatal(const char *, ...) __dead2;
+-void Punt(const char *, ...) __dead2;
+-void DieHorribly(void) __dead2;
+-void Finish(int) __dead2;
++void Fatal(const char *, ...);
++void Punt(const char *, ...);
++void DieHorribly(void);
++void Finish(int);
+ char *estrdup(const char *);
+ void *emalloc(size_t);
+ void *erealloc(void *, size_t);
+--- a/src/usr.bin/yacc/defs.h
++++ b/src/usr.bin/yacc/defs.h
+@@ -42,6 +42,9 @@
+ #include <err.h>
+ #include <stdio.h>
+ 
++#ifndef __dead2
++# define __dead2
++#endif
+ 
+ /*  machine-dependent definitions			*/
+ /*  the following definitions are for the Tahoe		*/
+--- a/src/usr.bin/yacc/main.c
++++ b/src/usr.bin/yacc/main.c
+@@ -114,7 +114,7 @@
+ 
+ volatile sig_atomic_t sigdie;
+ 
+-__dead2 void
++ void
+ done(k)
+ int k;
+ {
+--- a/src/usr.sbin/btxld/btx.h
++++ b/src/usr.sbin/btxld/btx.h
+@@ -30,6 +30,7 @@
+ #define _BTX_H_
+ 
+ #include <sys/types.h>
++#include <stdint.h>
+ 
+ #define BTX_PGSIZE	0x1000		/* Page size */
+ #define BTX_PGBASE	0x5000		/* Start of page tables */
+--- a/src/usr.sbin/btxld/btxld.c
++++ b/src/usr.sbin/btxld/btxld.c
+@@ -30,7 +30,6 @@
+ #endif /* not lint */
+ 
+ #include <sys/param.h>
+-#include <sys/endian.h>
+ #include <sys/stat.h>
+ #include <sys/mman.h>
+ 
+--- a/src/usr.sbin/btxld/elfh.c
++++ b/src/usr.sbin/btxld/elfh.c
+@@ -27,9 +27,9 @@
+  */
+ 
+ #include <sys/types.h>
+-#include <sys/endian.h>
+ 
+ #include <stddef.h>
++#include <stdint.h>
+ #include "elfh.h"
+ 
+ #define SET_ME	0xeeeeeeee    /* filled in by btxld */
+--- a/src/usr.sbin/kgzip/elfhdr.c
++++ b/src/usr.sbin/kgzip/elfhdr.c
+@@ -26,7 +26,6 @@
+  * $FreeBSD$
+  */
+ 
+-#include <sys/endian.h>
+ #include <stddef.h>
+ #include "elfhdr.h"
+ 
+--- a/src/usr.sbin/kgzip/kgzld.c
++++ b/src/usr.sbin/kgzip/kgzld.c
+@@ -27,7 +27,6 @@
+  */
+ 
+ #include <sys/types.h>
+-#include <sys/endian.h>
+ #include <sys/wait.h>
+ 
+ #include <err.h>
+--- a/src/usr.sbin/mtree/create.c
++++ b/src/usr.sbin/mtree/create.c
+@@ -77,7 +77,11 @@
+ static u_long flags = 0xffffffff;
+ 
+ static int	dsort(const FTSENT * const *, const FTSENT * const *);
+-static void	output(int, int *, const char *, ...) __printflike(3, 4);
++static void	output(int, int *, const char *, ...)
++#ifdef __FreeBSD__
++__printflike(3, 4)
++#endif
++;
+ static int	statd(FTS *, FTSENT *, uid_t *, gid_t *, mode_t *, u_long *);
+ static void	statf(int, FTSENT *);
+ 
+--- a/src/usr.sbin/mtree/excludes.c
++++ b/src/usr.sbin/mtree/excludes.c
+@@ -32,7 +32,8 @@
+ 
+ #include <sys/types.h>
+ #include <sys/time.h>		/* XXX for mtree.h */
+-#include <sys/queue.h>
++#include <bsd/sys/queue.h>
++#include <bsd/stdio.h>
+ 
+ #include <err.h>
+ #include <fnmatch.h>
+--- a/src/usr.sbin/mtree/extern.h
++++ b/src/usr.sbin/mtree/extern.h
+@@ -29,6 +29,9 @@
+  *	@(#)extern.h	8.1 (Berkeley) 6/6/93
+  * $FreeBSD$
+  */
++
++#include <stdint.h>
++
+ extern uint32_t crc_total;
+ 
+ #ifdef _FTS_H_
+--- a/src/usr.sbin/mtree/mtree.h
++++ b/src/usr.sbin/mtree/mtree.h
+@@ -60,6 +60,9 @@
+ 	char	*slink;				/* symbolic link reference */
+ 	uid_t	st_uid;				/* uid */
+ 	gid_t	st_gid;				/* gid */
++#ifndef S_ISTXT
++#define S_ISTXT S_ISVTX
++#endif
+ #define	MBITS	(S_ISUID|S_ISGID|S_ISTXT|S_IRWXU|S_IRWXG|S_IRWXO)
+ 	mode_t	st_mode;			/* mode */
+ 	u_long	st_flags;			/* flags */
+--- a/src/usr.sbin/mtree/spec.c
++++ b/src/usr.sbin/mtree/spec.c
+@@ -35,6 +35,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <bsd/stdlib.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <ctype.h>
+--- a/src/usr.bin/make/Makefile.dist
++++ b/src/usr.bin/make/Makefile.dist
+@@ -2,7 +2,7 @@
+ # a simple makefile to help builds on !FreeBSD systems
+ pmake:
+ 	@echo 'make started.'
+-	cc $(shell pkg-config --cflags libbsd-overlay) -DDEFSHELLNAME=\"sh\" -I. -c *.c
++	cc -D__FBSDID="static const char *id=" -DDEFSHELLNAME=\"sh\" -I. -c *.c
+ 	cc *.o -lbsd -o pmake
+ 	@echo 'make completed.'
+ 

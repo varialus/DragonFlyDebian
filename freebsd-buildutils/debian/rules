@@ -42,8 +42,10 @@ TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 CFLAGS = -O2 -g -Wall -D_GNU_SOURCE \
          -DMACHINE_ARCH='"$(MACHINE_ARCH)"' \
          -DMACHINE_MULTIARCH='"$(MACHINE_MULTIARCH)"' \
-         -I$(CURDIR)/build-tree/src/sys \
-	 $(shell pkg-config --cflags libbsd-overlay) -lbsd
+         -I$(CURDIR)/build-tree/src/sys -lbsd \
+	 -D'__FBSDID(string)='
+# disabled due to #630907 (see also 20_libbsd_overlay.diff)
+# $(shell pkg-config --cflags libbsd-overlay)
 MAKE_BUILD_FLAGS = CC=gcc NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
 
 PMAKE_FLAGS = -m $(CURDIR)/src/share/mk
