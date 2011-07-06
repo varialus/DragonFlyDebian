@@ -242,10 +242,23 @@
  # Notify all users before beginning emergency shutdown when we get
  # a _CRT or _HOT thermal event and we're going to power down the system
  # very soon.
-@@ -262,55 +69,3 @@
- 	match "subsystem"	"Resume";
- 	action "/etc/rc.resume acpi $notify";
+@@ -249,68 +56,3 @@
+ 	match "type"		"checksum";
+ 	action "logger -p kern.warn 'ZFS: checksum mismatch, zpool=$pool path=$vdev_path offset=$zio_offset size=$zio_size'";
  };
+-
+-# User requested suspend, so perform preparation steps and then execute
+-# the actual suspend process.
+-notify 10 {
+-	match "system"		"ACPI";
+-	match "subsystem"	"Suspend";
+-	action "/etc/rc.suspend acpi $notify";
+-};
+-notify 10 {
+-	match "system"		"ACPI";
+-	match "subsystem"	"Resume";
+-	action "/etc/rc.resume acpi $notify";
+-};
 -
 -/* EXAMPLES TO END OF FILE
 -
