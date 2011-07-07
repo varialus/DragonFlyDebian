@@ -1,0 +1,223 @@
+
+Sent to freebsd-hackers (2011-07-07)
+
+--- a/usr.sbin/config/config.h
++++ b/usr.sbin/config/config.h
+@@ -199,7 +199,7 @@
+ extern int	maxusers;
+ 
+ extern char *PREFIX;		/* Config file name - for error messages */
+-extern char srcdir[];		/* root of the kernel source tree */
++extern char *srcdir;		/* root of the kernel source tree */
+ 
+ #define eq(a,b)	(!strcmp(a,b))
+ #define ns(s)	strdup(s)
+--- a/usr.sbin/config/main.c
++++ b/usr.sbin/config/main.c
+@@ -71,8 +71,8 @@
+ #define	CDIR	"../compile/"
+ 
+ char *	PREFIX;
+-char 	destdir[MAXPATHLEN];
+-char 	srcdir[MAXPATHLEN];
++char *	destdir;
++char *	srcdir;
+ 
+ int	debugging;
+ int	profiling;
+@@ -122,8 +122,8 @@
+ 			printmachine = 1;
+ 			break;
+ 		case 'd':
+-			if (*destdir == '\0')
+-				strlcpy(destdir, optarg, sizeof(destdir));
++			if (destdir == NULL)
++				destdir = strdup(optarg);
+ 			else
+ 				errx(EXIT_FAILURE, "directory already set");
+ 			break;
+@@ -165,14 +165,13 @@
+ 			err(2, "%s", PREFIX);
+ 		yyfile = PREFIX;
+ 	}
+-	if (*destdir != '\0') {
++	if (destdir != NULL) {
+ 		len = strlen(destdir);
+ 		while (len > 1 && destdir[len - 1] == '/')
+ 			destdir[--len] = '\0';
+ 		get_srcdir();
+ 	} else {
+-		strlcpy(destdir, CDIR, sizeof(destdir));
+-		strlcat(destdir, PREFIX, sizeof(destdir));
++		(void) asprintf(&destdir, CDIR "%s", PREFIX);
+ 	}
+ 
+ 	SLIST_INIT(&cputype);
+@@ -229,6 +228,19 @@
+ 	exit(0);
+ }
+ 
++#ifndef __GLIBC__
++static char *
++canonicalize_file_name(const char *pathname)
++{
++	char *ret = malloc(MAXPATHLEN);
++	if (realpath(pathname, ret) == NULL) {
++		free(ret);
++		ret = NULL;
++	}
++	return ret;
++}
++#endif
++
+ /*
+  * get_srcdir
+  *	determine the root of the kernel source tree
+@@ -241,7 +253,9 @@
+ 	char *p, *pwd;
+ 	int i;
+ 
+-	if (realpath("../..", srcdir) == NULL)
++	if (srcdir != NULL)
++		free(srcdir);
++	if ((srcdir = canonicalize_file_name("../..")) == NULL)
+ 		err(EXIT_FAILURE, "Unable to find root of source tree");
+ 	if ((pwd = getenv("PWD")) != NULL && *pwd == '/' &&
+ 	    (pwd = strdup(pwd)) != NULL) {
+@@ -254,9 +268,12 @@
+ 			*p = '\0';
+ 		}
+ 		if (stat(pwd, &lg) != -1 && stat(srcdir, &phy) != -1 &&
+-		    lg.st_dev == phy.st_dev && lg.st_ino == phy.st_ino)
+-			strlcpy(srcdir, pwd, MAXPATHLEN);
+-		free(pwd);
++		    lg.st_dev == phy.st_dev && lg.st_ino == phy.st_ino) {
++			free(srcdir);
++			srcdir = pwd;
++		} else {
++			free(pwd);
++		}
+ 	}
+ }
+ 
+--- a/usr.sbin/config/mkmakefile.c
++++ b/usr.sbin/config/mkmakefile.c
+@@ -304,9 +304,9 @@
+ }
+ 
+ static void
+-read_file(char *fname)
++read_file(const char *fname)
+ {
+-	char ifname[MAXPATHLEN];
++	char *ifname = NULL;
+ 	FILE *fp;
+ 	struct file_list *tp;
+ 	struct device *dp;
+@@ -349,8 +349,9 @@
+ 			    fname);
+ 			exit(1);
+ 		}
+-		(void) snprintf(ifname, sizeof(ifname), "../../%s", wd);
++		(void) asprintf(&ifname, "../../%s", wd);
+ 		read_file(ifname);
++		free(ifname);
+ 		while (((wd = get_word(fp)) != (char *)EOF) && wd)
+ 			;
+ 		goto next;
+@@ -559,14 +560,13 @@
+ static void
+ read_files(void)
+ {
+-	char fname[MAXPATHLEN];
++	char *fname = NULL;
+ 	struct files_name *nl, *tnl;
+ 	
+-	(void) snprintf(fname, sizeof(fname), "../../conf/files");
+-	read_file(fname);
+-	(void) snprintf(fname, sizeof(fname),
+-		       	"../../conf/files.%s", machinename);
++	read_file("../../conf/files");
++	(void) asprintf(&fname, "../../conf/files.%s", machinename);
+ 	read_file(fname);
++	free(fname);
+ 	for (nl = STAILQ_FIRST(&fntab); nl != NULL; nl = tnl) {
+ 		read_file(nl->f_name);
+ 		tnl = STAILQ_NEXT(nl, f_next);
+--- a/usr.sbin/config/mkoptions.c
++++ b/usr.sbin/config/mkoptions.c
+@@ -290,22 +290,21 @@
+ static char *
+ tooption(char *name)
+ {
+-	static char hbuf[MAXPATHLEN];
+-	char nbuf[MAXPATHLEN];
++	char *nbuf;
+ 	struct opt_list *po;
+ 
+ 	/* "cannot happen"?  the otab list should be complete.. */
+-	(void)strlcpy(nbuf, "options.h", sizeof(nbuf));
++	nbuf = strdup("options.h");
+ 
+ 	SLIST_FOREACH(po, &otab, o_next) {
+ 		if (eq(po->o_name, name)) {
+-			strlcpy(nbuf, po->o_file, sizeof(nbuf));
++			free(nbuf);
++			nbuf = strdup(po->o_file);
+ 			break;
+ 		}
+ 	}
+ 
+-	(void)strlcpy(hbuf, path(nbuf), sizeof(hbuf));
+-	return (hbuf);
++	return (nbuf);
+ }
+ 
+ 	
+@@ -363,7 +362,7 @@
+ {
+ 	FILE *fp;
+ 	char *wd, *this, *val;
+-	char genopt[MAXPATHLEN];
++	char *genopt = NULL;
+ 
+ 	fp = fopen(fname, "r");
+ 	if (fp == 0)
+@@ -387,7 +386,7 @@
+ 				exit(1);
+ 			}
+ 			char *s = ns(this);
+-			(void)snprintf(genopt, sizeof(genopt), "opt_%s.h",
++			(void)asprintf(&genopt, "opt_%s.h",
+ 			    lower(s));
+ 			val = genopt;
+ 			free(s);
+@@ -399,6 +398,7 @@
+ 			update_option(this, val, flags);
+ 	}
+ 	(void)fclose(fp);
++	free(genopt);
+ 	return (1);
+ }
+ 
+@@ -408,16 +408,17 @@
+ static void
+ read_options(void)
+ {
+-	char fname[MAXPATHLEN];
++	char *fname = NULL;
+ 
+ 	SLIST_INIT(&otab);
+ 	read_option_file("../../conf/options", 0);
+-	(void)snprintf(fname, sizeof fname, "../../conf/options.%s",
++	(void)asprintf(&fname, "../../conf/options.%s",
+ 	    machinename);
+ 	if (!read_option_file(fname, 0)) {
+-		(void)snprintf(fname, sizeof fname, "options.%s", machinename);
++		(void)asprintf(&fname, "options.%s", machinename);
+ 		read_option_file(fname, 0);
+ 	}
++	free(fname);
+ 	read_option_file("../../conf/options-compat", OL_ALIAS);
+ }
+ 
