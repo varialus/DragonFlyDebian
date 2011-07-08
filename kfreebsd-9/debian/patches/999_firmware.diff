@@ -481,7 +481,7 @@ See #594940
  dev/uart/uart_bus_acpi.c	optional uart acpi
  #dev/uart/uart_bus_cbus.c	optional uart cbus
  dev/uart/uart_bus_ebus.c	optional uart ebus
-@@ -1914,17 +1549,15 @@
+@@ -1914,18 +1549,16 @@
  dev/usb/net/if_cdce.c		optional cdce
  dev/usb/net/if_cue.c		optional cue
  dev/usb/net/if_ipheth.c		optional ipheth
@@ -489,6 +489,7 @@ See #594940
  dev/usb/net/if_mos.c		optional mos
  dev/usb/net/if_rue.c		optional rue
  dev/usb/net/if_udav.c		optional udav
+ dev/usb/net/if_usie.c		optional usie
 -dev/usb/net/usb_ethernet.c	optional aue | axe | cdce | cue | kue | mos | \
 +dev/usb/net/usb_ethernet.c	optional aue | axe | cdce | cue | mos | \
  					 rue | udav
@@ -500,7 +501,7 @@ See #594940
  dev/usb/wlan/if_run.c		optional run
  runfw.c				optional runfw							\
  	compile-with	"${AWK} -f $S/tools/fw_stub.awk runfw:runfw -mrunfw -c${.TARGET}"	\
-@@ -1940,11 +1573,9 @@
+@@ -1941,11 +1574,9 @@
  	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/run/rt2870.fw.uu"		\
  	no-obj no-implicit-rule									\
  	clean		"runfw"
@@ -737,8 +738,8 @@ See #594940
  
  SUBDIR = usb
  SUBDIR += ehci musb ohci uhci xhci uss820dci ${_at91dci} ${_atmegadci}
--SUBDIR += rum run uath upgt ural zyd ${_urtw}
-+SUBDIR += run upgt ural ${_urtw}
+-SUBDIR += rum run uath upgt usie ural zyd ${_urtw}
++SUBDIR += run upgt usie ural ${_urtw}
  SUBDIR += atp uhid ukbd ums udbp ufm uep
  SUBDIR += ucom u3g uark ubsa ubser uchcom ucycom ufoma uftdi ugensa uipaq ulpt \
  	  umct umcs umodem umoscom uplcom uslcom uvisor uvscom

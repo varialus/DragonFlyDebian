@@ -139,7 +139,7 @@ config: config-stamp
 config-stamp: src
 	rm -rf config
 	cp -af src/usr.sbin/config config
-	CFLAGS="-D__va_list=__builtin_va_list $(shell pkg-config --cflags libbsd-overlay)" $(MAKE) -C config
+	CFLAGS="-D__va_list=__builtin_va_list $(shell pkg-config --cflags libbsd-overlay) -lbsd" $(MAKE) -C config
 	touch $@
 
 build-arch: $(foreach flavor,$(flavours),build-flavor-$(flavor)-stamp)
