@@ -1,0 +1,96 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses cdbs.  Originaly written by Robert Millan.
+# This file is public domain.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+CFLAGS = -Wall -g -pipe -D_GNU_SOURCE -D'__FBSDID(string)='
+
+ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+VERSION = $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)-[^-]*$$/\1/p')
+
+PATH:=/usr/lib/freebsd:$(PATH)
+PMAKE=COPTS="$(CFLAGS)" WERROR= MOUNT=$(CURDIR)/sbin/mount make
+
+
+build: build-arch build-indep
+
+build-arch:
+	$(PMAKE) -C mount_fusefs
+
+build-indep: build-indep-stamp
+build-indep-stamp:
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+
+	-$(PMAKE) -C mount_fusefs clean
+
+	rm -f fuse_module/@ fuse_module/machine
+
+	rm -f *stamp
+	dh_clean
+
+install: install-indep install-arch
+install-indep:
+	dh_testdir
+	dh_testroot
+	dh_prep -i
+	dh_installdirs -i
+	dh_install -i
+	mkdir -p debian/fuse-dkms/usr/src/fuse-$(VERSION)/tools
+	cp -a fuse_module Makefile.common include \
+		debian/fuse-dkms/usr/src/fuse-$(VERSION)/
+	install -m755 tools/genopnames.awk debian/fuse-dkms/usr/src/fuse-$(VERSION)/tools/
+
+install-arch:
+	dh_testdir
+	dh_testroot
+	dh_prep -a
+	dh_installdirs -a
+	dh_install -a
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependant files that arn't kernel modules here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+#	dh_installexamples
+#	dh_installmenu
+	dh_installdebconf
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installpam
+#	dh_installmime
+#	dh_installcron
+#	dh_installinfo
+	dh_installman
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+#	dh_perl
+#	dh_python
+	dh_dkms -V $(VERSION)
+	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-arch binary-indep
+.PHONY: build clean binary-indep binary-arch binary install install-indep install-arch configure

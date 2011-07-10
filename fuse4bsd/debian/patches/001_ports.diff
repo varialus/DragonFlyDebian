@@ -1,0 +1,352 @@
+
+Based on http://www.freebsd.org/cgi/cvsweb.cgi/ports/sysutils/fusefs-kmod/files/
+
+diff -ur a/fuse_module/Makefile b/fuse_module/Makefile
+--- a/fuse_module/Makefile	2009-02-26 22:21:58.000000000 +0000
++++ b/fuse_module/Makefile	2011-06-06 14:58:54.000000000 +0000
+@@ -1,3 +1,5 @@
++.undef KERNCONF
++
+ .include "../Makefile.common"
+ 
+ SRCS = fuse_main.c    \
+@@ -22,7 +24,8 @@
+ 
+ .if defined(KERNCONF)
+ KERNCONF1!= echo ${KERNCONF} | sed -e 's/ .*//g'
+-KERNCONFDIR= /usr/obj/usr/src/sys/${KERNCONF1}
++KRNLOBJDIR!=	make -C /usr/src -f /usr/src/Makefile.inc1 -V KRNLOBJDIR
++KERNCONFDIR= ${KRNLOBJDIR}/${KERNCONF1}
+ .endif
+ 
+ .if defined(KERNCONFDIR)
+diff -ur a/fuse_module/fuse.h b/fuse_module/fuse.h
+--- a/fuse_module/fuse.h	2009-02-26 22:21:58.000000000 +0000
++++ b/fuse_module/fuse.h	2011-06-06 14:58:54.000000000 +0000
+@@ -25,6 +25,22 @@
+ #endif
+ #endif
+ 
++#ifndef VFSOPS_TAKES_THREAD
++#if __FreeBSD_version >= 800087
++#define VFSOPS_TAKES_THREAD 0
++#else
++#define VFSOPS_TAKES_THREAD 1
++#endif
++#endif
++
++#ifndef VOP_ACCESS_TAKES_ACCMODE_T
++#if __FreeBSD_version >= 800052
++#define VOP_ACCESS_TAKES_ACCMODE_T 1
++#else
++#define VOP_ACCESS_TAKES_ACCMODE_T 0
++#endif
++#endif
++
+ #ifndef VOP_OPEN_TAKES_FP
+ #if __FreeBSD_version >= 700044
+ #define VOP_OPEN_TAKES_FP 1
+@@ -49,6 +65,14 @@
+ #endif
+ #endif
+ 
++#ifndef VOP_GETATTR_TAKES_THREAD
++#if __FreeBSD_version >= 800046
++#define VOP_GETATTR_TAKES_THREAD 0
++#else
++#define VOP_GETATTR_TAKES_THREAD 1
++#endif
++#endif
++
+ #ifndef USE_PRIVILEGE_API
+ /*
+  * __FreeBSD_version bump was omitted for introduction of
+diff -ur a/fuse_module/fuse_dev.c b/fuse_module/fuse_dev.c
+--- a/fuse_module/fuse_dev.c	2009-02-26 22:21:58.000000000 +0000
++++ b/fuse_module/fuse_dev.c	2011-06-06 14:58:54.000000000 +0000
+@@ -52,8 +52,13 @@
+ 	.d_read = fusedev_read,
+ 	.d_write = fusedev_write,
+ 	.d_version = D_VERSION,
++#ifndef D_NEEDMINOR
++#define D_NEEDMINOR 0
++#endif
+ #if ! DO_GIANT_MANUALLY
+-	.d_flags = D_NEEDGIANT,
++	.d_flags = D_NEEDMINOR|D_NEEDGIANT,
++#else
++	.d_flags = D_NEEDMINOR,
+ #endif
+ };
+ 
+@@ -548,7 +553,12 @@
+ 	/* find any existing device, or allocate new unit number */
+ 	i = clone_create(&fuseclones, &fuse_cdevsw, &unit, dev, 0);
+ 	if (i) {
+-		*dev = make_dev(&fuse_cdevsw, unit2minor(unit),
++		*dev = make_dev(&fuse_cdevsw,
++#if __FreeBSD_version < 800062
++				unit2minor(unit),
++#else /* __FreeBSD_version >= 800062 */
++				unit,
++#endif /* __FreeBSD_version < 800062 */
+ 			        UID_ROOT, GID_OPERATOR,
+ 		                S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP,
+                                 "fuse%d", unit);
+diff -ur a/fuse_module/fuse_io.c b/fuse_module/fuse_io.c
+--- a/fuse_module/fuse_io.c	2009-02-26 22:21:58.000000000 +0000
++++ b/fuse_module/fuse_io.c	2011-06-06 14:58:54.000000000 +0000
+@@ -35,6 +35,10 @@
+ #include <vm/vnode_pager.h>
+ #include <vm/vm_object.h>
+ 
++#if (__FreeBSD__ >= 8)
++#define vfs_bio_set_validclean vfs_bio_set_valid
++#endif
++
+ #include "fuse.h"
+ #include "fuse_session.h"
+ #include "fuse_vnode.h"
+@@ -157,7 +161,11 @@
+ 		goto out;
+ 
+ 	if (uio->uio_rw == UIO_WRITE && fp->f_flag & O_APPEND) {
+-		if ((err = VOP_GETATTR(vp, &va, cred, td)))
++		if ((err = VOP_GETATTR(vp, &va, cred
++#if VOP_GETATTR_TAKES_THREAD
++		    , td
++#endif
++		    )))
+ 			goto out;
+ 		uio->uio_offset = va.va_size;
+ 	} else if ((flags & FOF_OFFSET) == 0)
+@@ -823,7 +831,11 @@
+ #if FUSELIB_CONFORM_BIOREAD
+ 		struct vattr va;
+ 
+-		if ((err = VOP_GETATTR(vp, &va, cred, curthread)))
++		if ((err = VOP_GETATTR(vp, &va, cred
++#if VOP_GETATTR_TAKES_THREAD
++		    , curthread
++#endif
++		    )))
+ 			goto out;
+ #endif
+ 
+diff -ur a/fuse_module/fuse_main.c b/fuse_module/fuse_main.c
+--- a/fuse_module/fuse_main.c	2009-02-26 22:21:58.000000000 +0000
++++ b/fuse_module/fuse_main.c	2011-06-06 14:58:54.000000000 +0000
+@@ -108,6 +108,9 @@
+ 	switch (what) {
+ 	case MOD_LOAD:                /* kldload */
+ 
++#if __FreeBSD_version > 800009
++	        fuse_fileops.fo_truncate = vnops.fo_truncate;
++#endif
+ 		fuse_fileops.fo_ioctl    = vnops.fo_ioctl;
+ 		fuse_fileops.fo_poll     = vnops.fo_poll;
+ 		fuse_fileops.fo_kqfilter = vnops.fo_kqfilter;
+diff -ur a/fuse_module/fuse_vfsops.c b/fuse_module/fuse_vfsops.c
+--- a/fuse_module/fuse_vfsops.c	2009-02-26 22:21:58.000000000 +0000
++++ b/fuse_module/fuse_vfsops.c	2011-06-06 14:58:54.000000000 +0000
+@@ -18,6 +18,7 @@
+ #include <sys/namei.h>
+ #include <sys/mount.h>
+ #include <sys/sysctl.h>
++#include <sys/fcntl.h>
+ 
+ #include "fuse.h"
+ #include "fuse_session.h"
+@@ -213,8 +214,14 @@
+  * Mount system call
+  */
+ static int
++#if VFSOPS_TAKES_THREAD
+ fuse_mount(struct mount *mp, struct thread *td)
+ {
++#else
++fuse_mount(struct mount *mp)
++{
++	struct thread *td = curthread;
++#endif
+ 	int err = 0;
+ 	size_t len;
+ 	char *fspec, *subtype = NULL;
+@@ -529,8 +536,14 @@
+  * Unmount system call
+  */
+ static int
++#if VFSOPS_TAKES_THREAD
+ fuse_unmount(struct mount *mp, int mntflags, struct thread *td)
+ {
++#else
++fuse_unmount(struct mount *mp, int mntflags)
++{
++	struct thread *td = curthread;
++#endif
+ 	int flags = 0, err = 0;
+ 	struct fuse_data *data;
+ 	struct fuse_secondary_data *fsdat = NULL;
+@@ -633,8 +646,14 @@
+ 
+ /* stolen from portalfs */
+ static int
++#if VFSOPS_TAKES_THREAD
+ fuse_root(struct mount *mp, int flags, struct vnode **vpp, struct thread *td)
+ {
++#else
++fuse_root(struct mount *mp, int flags, struct vnode **vpp)
++{
++	struct thread *td = curthread;
++#endif
+ 	/*
+ 	 * Return locked reference to root.
+ 	 */
+@@ -650,7 +669,11 @@
+ 		data = fsdat->master;
+ 		sx_slock(&data->mhierlock);
+ 		if (data->mpri == FM_PRIMARY)
+-			err = fuse_root(data->mp, flags, vpp, td);
++			err = fuse_root(data->mp, flags, vpp
++#if VFSOPS_TAKES_THREAD
++			    , td
++#endif
++			    );
+ 		else
+ 			err = ENXIO;
+ 		sx_sunlock(&data->mhierlock);
+@@ -667,7 +690,11 @@
+ 	if (vp->v_type == VNON) {
+ 		struct vattr va;
+ 
+-		(void)VOP_GETATTR(vp, &va, td->td_ucred, td);
++		(void)VOP_GETATTR(vp, &va, td->td_ucred
++#if VOP_GETATTR_TAKES_THREAD
++		    , td
++#endif
++		);
+ 	}
+ 	*vpp = vp;
+ #if _DEBUG2G
+@@ -678,8 +705,14 @@
+ }
+ 
+ static int
++#if VFSOPS_TAKES_THREAD
+ fuse_statfs(struct mount *mp, struct statfs *sbp, struct thread *td)
+ {
++#else
++fuse_statfs(struct mount *mp, struct statfs *sbp)
++{
++	struct thread *td = curthread;
++#endif
+ 	struct fuse_dispatcher fdi;
+ 	struct fuse_statfs_out *fsfo;
+ 	struct fuse_data *data;
+@@ -696,7 +729,11 @@
+ 
+ 		sx_slock(&data->mhierlock);
+ 		if (data->mpri == FM_PRIMARY)
+-			err = fuse_statfs(data->mp, sbp, td);
++			err = fuse_statfs(data->mp, sbp
++#if VFSOPS_TAKES_THREAD
++			    , td
++#endif
++			    );
+ 		else
+ 			err = ENXIO;
+ 		sx_sunlock(&data->mhierlock);
+@@ -794,7 +831,11 @@
+ 	if (nodeid == FUSE_ROOT_ID) {
+ 		if (parentid != FUSE_NULL_ID)
+ 			return (ENOENT);
+-		err = VFS_ROOT(mp, myflags, vpp, td);
++		err = VFS_ROOT(mp, myflags, vpp
++#if VFSOPS_TAKES_THREAD
++		    , td
++#endif
++		    );
+ 		if (err)
+ 			return (err);
+ 		KASSERT(*vpp, ("we neither err'd nor found the root node"));
+diff -ur a/fuse_module/fuse_vnops.c b/fuse_module/fuse_vnops.c
+--- a/fuse_module/fuse_vnops.c	2009-02-26 22:21:58.000000000 +0000
++++ b/fuse_module/fuse_vnops.c	2011-06-06 14:58:54.000000000 +0000
+@@ -799,8 +799,11 @@
+ 	struct vnode *vp = ap->a_vp;
+ 	struct vattr *vap = ap->a_vap;
+ 	struct ucred *cred = ap->a_cred;
++#if VOP_GETATTR_TAKES_THREAD
+ 	struct thread *td = ap->a_td;
+-
++#else
++	struct thread *td = curthread;
++#endif
+ 	struct fuse_dispatcher fdi;
+ 	struct timespec uptsp;
+ 	int err = 0;
+@@ -871,7 +874,11 @@
+ fuse_access(ap)
+ 	struct vop_access_args /* {
+ 		struct vnode *a_vp;
++#if VOP_ACCESS_TAKES_ACCMODE_T
++		accmode_t a_accmode;
++#else
+ 		int a_mode;
++#endif
+ 		struct ucred *a_cred;
+ 		struct thread *a_td;
+ 	} */ *ap;
+@@ -886,7 +893,13 @@
+ 	else
+ 		facp.facc_flags |= FACCESS_DO_ACCESS;
+ 
+-	return fuse_access_i(vp, ap->a_mode, ap->a_cred, ap->a_td, &facp);
++	return fuse_access_i(vp,
++#if VOP_ACCESS_TAKES_ACCMODE_T
++	    ap->a_accmode,
++#else
++	    ap->a_mode,
++#endif
++	    ap->a_cred, ap->a_td, &facp);
+ }
+ 
+ /*
+@@ -946,7 +959,11 @@
+ 		/* We are to do the check in-kernel */
+ 
+ 		if (! (facp->facc_flags & FACCESS_VA_VALID)) {
+-			err = VOP_GETATTR(vp, VTOVA(vp), cred, td);
++			err = VOP_GETATTR(vp, VTOVA(vp), cred
++#if VOP_GETATTR_TAKES_THREAD
++			    , td
++#endif
++			    );
+ 			if (err)
+ 				return (err);
+ 			facp->facc_flags |= FACCESS_VA_VALID;
+@@ -1929,7 +1946,11 @@
+ 		 * It will not invalidate pages which are dirty, locked, under
+ 		 * writeback or mapped into pagetables.") 
+ 		 */
++#if VOP_GETATTR_TAKES_THREAD
+ 		err = vinvalbuf(vp, 0, td, PCATCH, 0);
++#else
++		err = vinvalbuf(vp, 0, PCATCH, 0);
++#endif
+ 		fufh->flags |= FOPEN_KEEP_CACHE;
+ 	}
+ 
+@@ -3005,8 +3026,11 @@
+ 	struct vattr *vap = ap->a_vap;
+ 	struct vnode *vp = ap->a_vp;
+ 	struct ucred *cred = ap->a_cred;
++#if VOP_GETATTR_TAKES_THREAD
+ 	struct thread *td = ap->a_td;
+-
++#else
++	struct thread *td = curthread;
++#endif
+ 	int err = 0;
+ 	struct fuse_dispatcher fdi;
+ 	struct fuse_setattr_in *fsai;

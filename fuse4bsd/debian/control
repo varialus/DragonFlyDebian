@@ -1,0 +1,30 @@
+Source: fuse4bsd
+Section: libs
+Priority: optional
+Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
+Uploaders: Robert Millan <rmh@debian.org>
+Build-Depends: debhelper (>= 7), po-debconf,
+ freebsd-buildutils,
+ libbsd-dev,
+ dkms (>= 2.1.1.2-6.FIXME),
+# for MNT_NFS4ACLS
+ libc0.1-dev (>= 2.13-6),
+Standards-Version: 3.9.2
+
+Package: fuse4bsd
+Section: utils
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: fuse-dkms
+Description: Filesystem in USErspace (utilities)
+ Simple interface for userspace programs to export a virtual
+ filesystem to kFreeBSD.
+ .
+ This package contains the fusermount utility which is necessary to
+ mount fuse filesystems.
+
+Package: fuse-dkms
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, dkms
+Description: FUSE module for kFreeBSD
+ This package provides FUSE module for kernel of FreeBSD.
