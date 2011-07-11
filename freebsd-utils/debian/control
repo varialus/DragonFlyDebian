@@ -120,36 +120,25 @@ Description: FreeBSD networking tools
  .
  This is a minimal package for use in debian-installer.
 
-#Package: freebsd-nfs-client
-#Section: net
-#Priority: standard
-#Architecture: kfreebsd-any
-#Depends: ${shlibs:Depends}, ${misc:Depends}
-#Recommends: freebsd-nfs-common
-#Replaces: freebsd-utils (<= 8.2+ds1-1)
-#Description: FreeBSD client utility needed for NFS on GNU/kFreeBSD
-# This package provides FreeBSD client utility needed for NFS on
-# Debian GNU/kFreeBSD.
+Package: freebsd-nfs-server
+Section: net
+Priority: optional
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}, freebsd-nfs-common
+Provides: nfs-server, nfs-kernel-server
+Description: FreeBSD server utilities needed for NFS on GNU/kFreeBSD
+ This package provides FreeBSD utilities needed for NFS server on
+ Debian GNU/kFreeBSD.
 
-#Package: freebsd-nfs-server
-#Section: net
-#Priority: optional
-#Architecture: kfreebsd-any
-#Depends: ${shlibs:Depends}, ${misc:Depends}, freebsd-nfs-common
-#Provides: nfs-server, nfs-kernel-server
-#Description: FreeBSD server utilities needed for NFS on GNU/kFreeBSD
-# This package provides FreeBSD utilities needed for NFS server on
-# Debian GNU/kFreeBSD.
-
-#Package: freebsd-nfs-common
-#Section: net
-#Priority: standard
-#Architecture: kfreebsd-any
-#Depends: ${shlibs:Depends}, ${misc:Depends}, rpcbind
-#Provides: nfs-common
-#Description: NFS support files common to client and server
-# Use this package on any machine that uses NFS, either as client or
-# server.
+Package: freebsd-nfs-common
+Section: net
+Priority: standard
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}, rpcbind
+Provides: nfs-common
+Description: NFS support files common to client and server
+ Use this package on any machine that uses NFS, either as client or
+ server.
 
 # FIXME:
 # - add jail
