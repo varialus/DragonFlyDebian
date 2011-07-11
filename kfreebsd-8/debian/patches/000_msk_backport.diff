@@ -1,17 +1,61 @@
 
 See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
 
---- a/sys/dev/msk.old/if_msk.c	2010-11-26 21:37:19.000000000 +0100
-+++ b/sys/dev/msk/if_msk.c	2011-05-28 02:22:07.000000000 +0200
-@@ -99,7 +99,7 @@
-  */
+Patch obtained from 8-STABLE using:
+
+  svn diff http://svn.freebsd.org/base/release/8.2.0/sys/dev/msk \
+    http://svn.freebsd.org/base/stable/8/sys/dev/msk
+
+--- a/sys/dev/msk/if_mskreg.h
++++ b/sys/dev/msk/if_mskreg.h
+@@ -144,6 +144,8 @@
+ #define DEVICEID_MRVL_436A	0x436A
+ #define DEVICEID_MRVL_436B	0x436B
+ #define DEVICEID_MRVL_436C	0x436C
++#define DEVICEID_MRVL_436D	0x436D
++#define DEVICEID_MRVL_4370	0x4370
+ #define DEVICEID_MRVL_4380	0x4380
+ #define DEVICEID_MRVL_4381	0x4381
  
- #include <sys/cdefs.h>
--__FBSDID("$FreeBSD$");
-+__FBSDID("$FreeBSD: head/sys/dev/msk/if_msk.c 222269 2011-05-24 20:39:07Z yongari $");
+@@ -321,6 +323,9 @@
+ #define PCI_OS_SPD_X100		2	/* PCI-X 100MHz Bus */
+ #define PCI_OS_SPD_X133		3	/* PCI-X 133MHz Bus */
  
- #include <sys/param.h>
- #include <sys/systm.h>
++/* PCI_OUR_REG_3	32 bit	Our Register 3 (Yukon-ECU only) */
++#define	PCI_CLK_MACSEC_DIS	BIT_17	/* Disable Clock MACSec. */
++
+ /* PCI_OUR_REG_4	32 bit	Our Register 4 (Yukon-ECU only) */
+ #define	PCI_TIMER_VALUE_MSK	(0xff<<16)	/* Bit 23..16:	Timer Value Mask */
+ #define	PCI_FORCE_ASPM_REQUEST	BIT_15	/* Force ASPM Request (A1 only) */
+@@ -677,6 +682,7 @@
+ /* ASF Subsystem Registers (Yukon-2 only) */
+ #define B28_Y2_SMB_CONFIG	0x0e40	/* 32 bit ASF SMBus Config Register */
+ #define B28_Y2_SMB_CSD_REG	0x0e44	/* 32 bit ASF SMB Control/Status/Data */
++#define B28_Y2_CPU_WDOG		0x0e48	/* 32 bit Watchdog Register */
+ #define B28_Y2_ASF_IRQ_V_BASE	0x0e60	/* 32 bit ASF IRQ Vector Base */
+ #define B28_Y2_ASF_STAT_CMD	0x0e68	/* 32 bit ASF Status and Command Reg */
+ #define B28_Y2_ASF_HCU_CCSR	0x0e68	/* 32 bit ASF HCU CCSR (Yukon EX) */
+@@ -918,6 +924,10 @@
+ #define	CHIP_REV_YU_EX_A0	1 /* Chip Rev. for Yukon-2 EX A0 */
+ #define	CHIP_REV_YU_EX_B0	2 /* Chip Rev. for Yukon-2 EX B0 */
+ 
++#define	CHIP_REV_YU_SU_A0	0 /* Chip Rev. for Yukon-2 SUPR A0 */
++#define	CHIP_REV_YU_SU_B0	1 /* Chip Rev. for Yukon-2 SUPR B0 */
++#define	CHIP_REV_YU_SU_B1	3 /* Chip Rev. for Yukon-2 SUPR B1 */
++
+ /*	B2_Y2_CLK_GATE	 8 bit	Clock Gating (Yukon-2 only) */
+ #define Y2_STATUS_LNK2_INAC	BIT_7	/* Status Link 2 inactiv (0 = activ) */
+ #define Y2_CLK_GAT_LNK2_DIS	BIT_6	/* Disable clock gating Link 2 */
+@@ -2555,6 +2565,7 @@
+ 	struct msk_hw_stats	msk_stats;
+ 	int			msk_if_flags;
+ 	uint16_t		msk_vtag;	/* VLAN tag id. */
++	uint32_t		msk_csum;
+ };
+ 
+ #define MSK_TIMEOUT	1000
+--- a/sys/dev/msk/if_msk.c
++++ b/sys/dev/msk/if_msk.c
 @@ -221,6 +221,10 @@
  	    "Marvell Yukon 88E8071 Gigabit Ethernet" },
  	{ VENDORID_MARVELL, DEVICEID_MRVL_436C,
@@ -39,6 +83,15 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  static int msk_init_rx_ring(struct msk_if_softc *);
  static int msk_init_jumbo_rx_ring(struct msk_if_softc *);
  static void msk_init_tx_ring(struct msk_if_softc *);
+@@ -560,7 +566,7 @@
+ 		msk_phy_writereg(sc_if, PHY_ADDR_MARV, PHY_MARV_INT_MASK, 0);
+ 		/* Disable Rx/Tx MAC. */
+ 		gmac = GMAC_READ_2(sc, sc_if->msk_port, GM_GP_CTRL);
+-		if ((GM_GPCR_RX_ENA | GM_GPCR_TX_ENA) != 0) {
++		if ((gmac & (GM_GPCR_RX_ENA | GM_GPCR_TX_ENA)) != 0) {
+ 			gmac &= ~(GM_GPCR_RX_ENA | GM_GPCR_TX_ENA);
+ 			GMAC_WRITE_2(sc, sc_if->msk_port, GM_GP_CTRL, gmac);
+ 			/* Read again to ensure writing. */
 @@ -642,6 +648,54 @@
  }
  
@@ -346,15 +399,6 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  
  	/* Clear all error bits in the PCI status register. */
  	status = pci_read_config(sc->msk_dev, PCIR_STATUS, 2);
-@@ -1242,7 +1334,7 @@
- 
- 	pci_write_config(sc->msk_dev, PCIR_STATUS, status |
- 	    PCIM_STATUS_PERR | PCIM_STATUS_SERR | PCIM_STATUS_RMABORT |
--	    PCIM_STATUS_RTABORT | PCIM_STATUS_PERRREPORT, 2);
-+	    PCIM_STATUS_RTABORT | PCIM_STATUS_MDPERR, 2);
- 	CSR_WRITE_2(sc, B0_CTST, CS_MRST_CLR);
- 
- 	switch (sc->msk_bustype) {
 @@ -1275,17 +1367,22 @@
  	/* Reset GPHY/GMAC Control */
  	for (i = 0; i < sc->msk_num_port; i++) {
@@ -426,16 +470,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  	if ((sc_if->msk_flags & MSK_FLAG_DESCV2) != 0 &&
  	    (sc_if->msk_flags & MSK_FLAG_NORX_CSUM) == 0)
  		ifp->if_capabilities |= IFCAP_RXCSUM;
-@@ -1509,8 +1603,6 @@
- 	ifp->if_capenable = ifp->if_capabilities;
- 	ifp->if_ioctl = msk_ioctl;
- 	ifp->if_start = msk_start;
--	ifp->if_timer = 0;
--	ifp->if_watchdog = NULL;
- 	ifp->if_init = msk_init;
- 	IFQ_SET_MAXLEN(&ifp->if_snd, MSK_TX_RING_CNT - 1);
- 	ifp->if_snd.ifq_drv_maxlen = MSK_TX_RING_CNT - 1;
-@@ -1544,7 +1636,7 @@
+@@ -1544,7 +1638,7 @@
  		 * this workaround does not work so disable checksum offload
  		 * for VLAN interface.
  		 */
@@ -444,7 +479,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  		/*
  		 * Enable Rx checksum offloading for VLAN tagged frames
  		 * if controller support new descriptor format.
-@@ -1630,13 +1722,15 @@
+@@ -1630,13 +1724,15 @@
  		}
  	}
  
@@ -461,7 +496,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  	    sc->msk_hw_id == CHIP_ID_YUKON_UNKNOWN) {
  		device_printf(dev, "unknown device: id=0x%02x, rev=0x%02x\n",
  		    sc->msk_hw_id, sc->msk_hw_rev);
-@@ -1670,9 +1764,6 @@
+@@ -1670,9 +1766,6 @@
  	resource_int_value(device_get_name(dev), device_get_unit(dev),
  	    "int_holdoff", &sc->msk_int_holdoff);
  
@@ -471,7 +506,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  	sc->msk_pmd = CSR_READ_1(sc, B2_PMD_TYP);
  	/* Check number of MACs. */
  	sc->msk_num_port = 1;
-@@ -1746,6 +1837,11 @@
+@@ -1746,6 +1839,11 @@
  		sc->msk_clock = 156;	/* 156 MHz */
  		sc->msk_pflags |= MSK_FLAG_JUMBO;
  		break;
@@ -483,16 +518,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  	case CHIP_ID_YUKON_UL_2:
  		sc->msk_clock = 125;	/* 125 MHz */
  		sc->msk_pflags |= MSK_FLAG_JUMBO;
-@@ -1811,7 +1907,7 @@
- 	}
- 	mmd->port = MSK_PORT_A;
- 	mmd->pmd = sc->msk_pmd;
--	mmd->mii_flags |= MIIF_DOPAUSE | MIIF_FORCEPAUSE;
-+	mmd->mii_flags |= MIIF_DOPAUSE;
- 	if (sc->msk_pmd == 'L' || sc->msk_pmd == 'S')
- 		mmd->mii_flags |= MIIF_HAVEFIBER;
- 	if (sc->msk_pmd == 'P')
-@@ -1825,7 +1921,8 @@
+@@ -1825,7 +1923,8 @@
  			error = ENXIO;
  			goto fail;
  		}
@@ -502,7 +528,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  		if (mmd == NULL) {
  			device_printf(dev, "failed to allocate memory for "
  			    "ivars of PORT_B\n");
-@@ -1834,9 +1931,9 @@
+@@ -1834,9 +1933,9 @@
  		}
  		mmd->port = MSK_PORT_B;
  		mmd->pmd = sc->msk_pmd;
@@ -514,26 +540,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  			mmd->mii_flags |= MIIF_HAVEFIBER | MIIF_MACPRIV0;
  		device_set_ivars(sc->msk_devs[MSK_PORT_B], mmd);
  	}
-@@ -1888,7 +1985,8 @@
- 		/* Can't hold locks while calling detach. */
- 		MSK_IF_UNLOCK(sc_if);
- 		callout_drain(&sc_if->msk_tick_ch);
--		ether_ifdetach(ifp);
-+		if (ifp)
-+			ether_ifdetach(ifp);
- 		MSK_IF_LOCK(sc_if);
- 	}
- 
-@@ -1990,7 +2088,7 @@
- 	error = bus_dma_tag_create(
- 		    bus_get_dma_tag(sc->msk_dev),	/* parent */
- 		    MSK_STAT_ALIGN, 0,		/* alignment, boundary */
--		    BUS_SPACE_MAXADDR,		/* lowaddr */
-+		    BUS_SPACE_MAXADDR_32BIT,	/* lowaddr */
- 		    BUS_SPACE_MAXADDR,		/* highaddr */
- 		    NULL, NULL,			/* filter, filterarg */
- 		    MSK_STAT_RING_SZ,		/* maxsize */
-@@ -2886,6 +2984,7 @@
+@@ -2886,6 +2985,7 @@
  
  	MSK_LOCK(sc);
  
@@ -541,7 +548,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  	mskc_reset(sc);
  	for (i = 0; i < sc->msk_num_port; i++) {
  		if (sc->msk_if[i] != NULL && sc->msk_if[i]->msk_ifp != NULL &&
-@@ -2919,6 +3018,96 @@
+@@ -2919,6 +3019,96 @@
  }
  #endif
  
@@ -638,7 +645,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  static void
  msk_rxeof(struct msk_if_softc *sc_if, uint32_t status, uint32_t control,
      int len)
-@@ -2973,18 +3162,8 @@
+@@ -2973,18 +3163,8 @@
  			msk_fixup_rx(m);
  #endif
  		ifp->if_ipackets++;
@@ -659,7 +666,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  		/* Check for VLAN tagged packets. */
  		if ((status & GMR_FS_VLAN) != 0 &&
  		    (ifp->if_capenable & IFCAP_VLAN_HWTAGGING) != 0) {
-@@ -3043,18 +3222,8 @@
+@@ -3043,18 +3223,8 @@
  			msk_fixup_rx(m);
  #endif
  		ifp->if_ipackets++;
@@ -680,16 +687,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  		/* Check for VLAN tagged packets. */
  		if ((status & GMR_FS_VLAN) != 0 &&
  		    (ifp->if_capenable & IFCAP_VLAN_HWTAGGING) != 0) {
-@@ -3260,7 +3429,7 @@
- 		CSR_WRITE_1(sc, B2_TST_CTRL1, TST_CFG_WRITE_ON);
- 		pci_write_config(sc->msk_dev, PCIR_STATUS, v16 |
- 		    PCIM_STATUS_PERR | PCIM_STATUS_SERR | PCIM_STATUS_RMABORT |
--		    PCIM_STATUS_RTABORT | PCIM_STATUS_PERRREPORT, 2);
-+		    PCIM_STATUS_RTABORT | PCIM_STATUS_MDPERR, 2);
- 		CSR_WRITE_1(sc, B2_TST_CTRL1, TST_CFG_WRITE_OFF);
- 	}
- 
-@@ -3371,6 +3540,9 @@
+@@ -3371,6 +3541,9 @@
  			break;
  		case OP_RXCHKSVLAN:
  			sc_if->msk_vtag = ntohs(len);
@@ -699,7 +697,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  			break;
  		case OP_RXSTAT:
  			if (!(sc_if->msk_ifp->if_drv_flags & IFF_DRV_RUNNING))
-@@ -3504,37 +3676,24 @@
+@@ -3504,37 +3677,24 @@
  
  	ifp = sc_if->msk_ifp;
  	sc = sc_if->msk_softc;
@@ -747,7 +745,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  	}
  }
  
-@@ -3583,11 +3742,12 @@
+@@ -3583,11 +3743,12 @@
  		ifp->if_capenable &= ~(IFCAP_TSO4 | IFCAP_TXCSUM);
  	}
  
@@ -765,7 +763,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  		CSR_WRITE_4(sc, MR_ADDR(sc_if->msk_port, GMAC_CTRL),
  		    GMC_BYP_MACSECRX_ON | GMC_BYP_MACSECTX_ON |
  		    GMC_BYP_RETR_ON);
-@@ -3695,13 +3855,13 @@
+@@ -3695,13 +3856,13 @@
  		msk_set_tx_stfwd(sc_if);
  	}
  
@@ -786,7 +784,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  
  	/*
  	 * Disable Force Sync bit and Alloc bit in Tx RAM interface
-@@ -3758,8 +3918,13 @@
+@@ -3758,8 +3919,13 @@
  	msk_init_tx_ring(sc_if);
  
  	/* Disable Rx checksum offload and RSS hash. */
@@ -802,7 +800,7 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  	if (sc_if->msk_framesize > (MCLBYTES - MSK_RX_BUF_ALIGN)) {
  		msk_set_prefetch(sc, sc_if->msk_rxq,
  		    sc_if->msk_rdata.msk_jumbo_rx_ring_paddr,
-@@ -3777,7 +3942,8 @@
+@@ -3777,7 +3943,8 @@
  		msk_stop(sc_if);
  		return;
  	}
@@ -812,60 +810,3 @@ See http://www.freebsd.org/cgi/query-pr.cgi?pr=154591
  		/* Disable flushing of non-ASF packets. */
  		CSR_WRITE_4(sc, MR_ADDR(sc_if->msk_port, RX_GMF_CTRL_T),
  		    GMF_RX_MACSEC_FLUSH_OFF);
---- a/sys/dev/msk.old/if_mskreg.h	2010-05-06 20:47:16.000000000 +0200
-+++ b/sys/dev/msk/if_mskreg.h	2011-05-28 02:22:07.000000000 +0200
-@@ -93,7 +93,7 @@
-  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-  */
- 
--/*$FreeBSD$*/
-+/*$FreeBSD: head/sys/dev/msk/if_mskreg.h 222230 2011-05-23 21:51:47Z yongari $*/
- 
- /*
-  * SysKonnect PCI vendor ID
-@@ -144,6 +144,8 @@
- #define DEVICEID_MRVL_436A	0x436A
- #define DEVICEID_MRVL_436B	0x436B
- #define DEVICEID_MRVL_436C	0x436C
-+#define DEVICEID_MRVL_436D	0x436D
-+#define DEVICEID_MRVL_4370	0x4370
- #define DEVICEID_MRVL_4380	0x4380
- #define DEVICEID_MRVL_4381	0x4381
- 
-@@ -321,6 +323,9 @@
- #define PCI_OS_SPD_X100		2	/* PCI-X 100MHz Bus */
- #define PCI_OS_SPD_X133		3	/* PCI-X 133MHz Bus */
- 
-+/* PCI_OUR_REG_3	32 bit	Our Register 3 (Yukon-ECU only) */
-+#define	PCI_CLK_MACSEC_DIS	BIT_17	/* Disable Clock MACSec. */
-+
- /* PCI_OUR_REG_4	32 bit	Our Register 4 (Yukon-ECU only) */
- #define	PCI_TIMER_VALUE_MSK	(0xff<<16)	/* Bit 23..16:	Timer Value Mask */
- #define	PCI_FORCE_ASPM_REQUEST	BIT_15	/* Force ASPM Request (A1 only) */
-@@ -677,6 +682,7 @@
- /* ASF Subsystem Registers (Yukon-2 only) */
- #define B28_Y2_SMB_CONFIG	0x0e40	/* 32 bit ASF SMBus Config Register */
- #define B28_Y2_SMB_CSD_REG	0x0e44	/* 32 bit ASF SMB Control/Status/Data */
-+#define B28_Y2_CPU_WDOG		0x0e48	/* 32 bit Watchdog Register */
- #define B28_Y2_ASF_IRQ_V_BASE	0x0e60	/* 32 bit ASF IRQ Vector Base */
- #define B28_Y2_ASF_STAT_CMD	0x0e68	/* 32 bit ASF Status and Command Reg */
- #define B28_Y2_ASF_HCU_CCSR	0x0e68	/* 32 bit ASF HCU CCSR (Yukon EX) */
-@@ -918,6 +924,10 @@
- #define	CHIP_REV_YU_EX_A0	1 /* Chip Rev. for Yukon-2 EX A0 */
- #define	CHIP_REV_YU_EX_B0	2 /* Chip Rev. for Yukon-2 EX B0 */
- 
-+#define	CHIP_REV_YU_SU_A0	0 /* Chip Rev. for Yukon-2 SUPR A0 */
-+#define	CHIP_REV_YU_SU_B0	1 /* Chip Rev. for Yukon-2 SUPR B0 */
-+#define	CHIP_REV_YU_SU_B1	3 /* Chip Rev. for Yukon-2 SUPR B1 */
-+
- /*	B2_Y2_CLK_GATE	 8 bit	Clock Gating (Yukon-2 only) */
- #define Y2_STATUS_LNK2_INAC	BIT_7	/* Status Link 2 inactiv (0 = activ) */
- #define Y2_CLK_GAT_LNK2_DIS	BIT_6	/* Disable clock gating Link 2 */
-@@ -2555,6 +2565,7 @@
- 	struct msk_hw_stats	msk_stats;
- 	int			msk_if_flags;
- 	uint16_t		msk_vtag;	/* VLAN tag id. */
-+	uint32_t		msk_csum;
- };
- 
- #define MSK_TIMEOUT	1000
