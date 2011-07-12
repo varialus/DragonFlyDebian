@@ -50,7 +50,7 @@ __getosreldate(void)
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_OSRELDATE;
 	size = sizeof osreldate;
-	if (sysctl(mib, 2, &osreldate, &size, NULL, 0) == -1)
+	if (__sysctl(mib, 2, &osreldate, &size, NULL, 0) == -1)
 		return (-1);
     }		
     return (osreldate);
