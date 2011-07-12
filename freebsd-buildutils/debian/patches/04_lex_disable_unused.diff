@@ -1,0 +1,30 @@
+
+Defining __unused causes breakage in system headers (see #522773 and #522774).
+
+Note: special care should be taken with flex.skl; this code isn't compiled in
+lex itself, it is used as template to generate code that will later be built
+in other packages (e.g. kfreebsd-9).
+
+--- a/src/usr.bin/lex/flex.skl
++++ b/src/usr.bin/lex/flex.skl
+@@ -5,10 +5,8 @@
+  * $FreeBSD$
+  */
+ 
+-#if defined(__FreeBSD__)
+ #include <sys/cdefs.h>
+-#else
+-#define __unused
++#ifndef __dead2
+ #define __dead2
+ #endif
+ 
+@@ -264,7 +262,7 @@
+ %*
+ 
+ static void *yy_flex_alloc YY_PROTO(( yy_size_t ));
+-static void *yy_flex_realloc YY_PROTO(( void *, yy_size_t )) __unused;
++static void *yy_flex_realloc YY_PROTO(( void *, yy_size_t )) __attribute__((unused));
+ static void yy_flex_free YY_PROTO(( void * ));
+ 
+ #define yy_new_buffer yy_create_buffer
