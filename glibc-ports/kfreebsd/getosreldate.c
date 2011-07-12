@@ -34,21 +34,25 @@
 int
 __getosreldate(void)
 {
-	int mib[2];
-	size_t size;
-	int value;
-	char *temp;
+    static int osreldate;
 
+    int mib[2];
+    size_t size;
+    char *temp;
+
+    if (osreldate == 0)
+    {
 	if ((temp = getenv("OSVERSION"))) {
-		value = atoi(temp);
-		return (value);
+		osreldate = atoi(temp);
+		return (osreldate);
 	}
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_OSRELDATE;
-	size = sizeof value;
-	if (sysctl(mib, 2, &value, &size, NULL, 0) == -1)
+	size = sizeof osreldate;
+	if (sysctl(mib, 2, &osreldate, &size, NULL, 0) == -1)
 		return (-1);
-	return (value);
+    }		
+    return (osreldate);
 }
 weak_alias (__getosreldate, getosreldate)
