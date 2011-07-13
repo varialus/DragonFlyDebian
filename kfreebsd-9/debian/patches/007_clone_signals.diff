@@ -13,7 +13,7 @@ compatibility untill old versions of glibc are flushed out.
 -	        p2->p_sigparent = SIGUSR1;
 +	{
 +		int sig;
-+		sig = (flags >> 24) & 0x7F;
++		sig = RFTHPNSIGNUM(flags);
 +	        if (sig == 0) sig = SIGUSR1;
 +	        if (sig == SIGCHLD) sig = 0;
 +	        p2->p_sigparent = sig;
@@ -21,3 +21,38 @@ compatibility untill old versions of glibc are flushed out.
  	else
  	        p2->p_sigparent = SIGCHLD;
  
+@@ -723,12 +729,16 @@
+ 	static struct timeval lastfail;
+ 
+ 	/* Check for the undefined or unimplemented flags. */
+-	if ((flags & ~(RFFLAGS | RFTSIGFLAGS(RFTSIGMASK))) != 0)
++	if ((flags & ~(RFFLAGS | RFTSIGFLAGS(RFTSIGMASK) | (RFTHPNMASK << RFTHPNSHIFT))) != 0)
+ 		return (EINVAL);
+ 
+-	/* Signal value requires RFTSIGZMB. */
+-	if ((flags & RFTSIGFLAGS(RFTSIGMASK)) != 0 && (flags & RFTSIGZMB) == 0)
+-		return (EINVAL);
++	/* Signal value requires either RFTSIGZMB or RFLINUXTHPN. */
++	if ((flags & RFTSIGZMB) == 0 && (flags & RFLINUXTHPN) == 0) {
++		if ((flags & RFTSIGFLAGS(RFTSIGMASK)) != 0)
++			return (EINVAL);
++		if ((flags & (RFTHPNMASK << RFTHPNSHIFT)) != 0)
++			return (EINVAL);
++	}
+ 
+ 	/* Can't copy and clear. */
+ 	if ((flags & (RFFDG|RFCFDG)) == (RFFDG|RFCFDG))
+--- a/sys/sys/unistd.h
++++ b/sys/sys/unistd.h
+@@ -191,6 +191,11 @@
+     RFTHREAD | RFSIGSHARE | RFLINUXTHPN | RFSTOPPED | RFHIGHPID | RFTSIGZMB | \
+     RFPPWAIT)
+ 
++#define RFTHPNSHIFT	24	/* reserve bits 24-30 */
++#define RFTHPNMASK	0x7F    /* for compatibility with linuxthreads/clone()   */
++				/* allow to specify  "clone exit parent notification" signal */
++#define RFTHPNSIGNUM(flags)	(((flags) >> RFTHPNSHIFT) & RFTHPNMASK)
++
+ #endif /* __BSD_VISIBLE */
+ 
+ #endif /* !_SYS_UNISTD_H_ */
