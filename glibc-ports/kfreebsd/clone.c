@@ -26,6 +26,29 @@
 #include <stddef.h>
 #undef __clone
 
+
+#include <sys/sysctl.h>
+
+static inline int
+__kernel_osreldate(void)
+{
+    static int osreldate;
+
+    int mib[2];
+    size_t size;
+    char *temp;
+
+    if (osreldate == 0)
+    {
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_OSRELDATE;
+	size = sizeof osreldate;
+	if (__sysctl(mib, 2, &osreldate, &size, NULL, 0) == -1)
+		return (-1);
+    }		
+    return (osreldate);
+}
+
 /* __start_thread (flags, child_stack, fn, arg)
    is roughly equivalent to
 
@@ -63,6 +86,19 @@ int __clone (int (*fn) (void *), void *child_stack, int flags, void *arg)
     }
 
   if ((flags & CSIGNAL) != SIGCHLD)
+  {
+    if (__kernel_osreldate() >= 802509)    /* XXX have to be updated after upstream merge */
+                /* we slightly cheat here, */
+                /* the 9.x snapshot prior to r223966 does not support it too */
+    {
+      if ((flags & CSIGNAL) & ~RFTSIGMASK)
+	{
+	  __set_errno (EINVAL);
+	  return -1;
+	}
+        rfork_flags |= (RFTSIGZMB | RFTSIGFLAGS(flags & CSIGNAL));
+    }
+    else
     {
       if ((flags & CSIGNAL) & ~RFTHPNMASK)
 	{
@@ -74,7 +110,7 @@ int __clone (int (*fn) (void *), void *child_stack, int flags, void *arg)
       else
         rfork_flags |= (RFLINUXTHPN | ((flags & CSIGNAL) <<  RFTHPNSHIFT));
     }
-
+  } 
   if (flags & CLONE_VM)
     rfork_flags |= RFMEM;
 
