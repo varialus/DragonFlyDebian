@@ -1,30 +1,23 @@
+
+Starting with r223966 in 9-CURRENT, a new interface is available
+(RFTSIGZMB).  At the time of writing glibc isn't using it.  Even
+when it does, we need to keep this patch for backward
+compatibility untill old versions of glibc are flushed out.
+
 --- a/sys/kern/kern_fork.c
 +++ b/sys/kern/kern_fork.c
-@@ -477,7 +477,13 @@
- 		p2->p_sigacts = newsigacts;
- 	}
- 	if (flags & RFLINUXTHPN) 
+@@ -480,7 +480,13 @@
+ 	if (flags & RFTSIGZMB)
+ 	        p2->p_sigparent = RFTSIGNUM(flags);
+ 	else if (flags & RFLINUXTHPN)
 -	        p2->p_sigparent = SIGUSR1;
 +	{
 +		int sig;
-+		sig = RFTHPNSIGNUM(flags);
++		sig = (flags >> 24) & 0x7F;
 +	        if (sig == 0) sig = SIGUSR1;
 +	        if (sig == SIGCHLD) sig = 0;
 +	        p2->p_sigparent = sig;
 +	}
  	else
  	        p2->p_sigparent = SIGCHLD;
- 
---- a/sys/sys/unistd.h
-+++ b/sys/sys/unistd.h
-@@ -182,6 +182,10 @@
- #define	RFHIGHPID	(1<<18)	/* use a pid higher than 10 (idleproc) */
- #define	RFPPWAIT	(1<<31)	/* parent sleeps until child exits (vfork) */
- #define	RFKERNELONLY	(RFSTOPPED | RFHIGHPID | RFPPWAIT)
-+#define RFTHPNSHIFT	24	/* reserve bits 24-30 */
-+#define RFTHPNMASK	0x7F    /* for compatibility with linuxthreads/clone()   */
-+				/* allow to specify  "clone exit parent notification" signal */
-+#define RFTHPNSIGNUM(flags)	(((flags) >> RFTHPNSHIFT) & RFTHPNMASK)
- 
- #endif /* __BSD_VISIBLE */
  
