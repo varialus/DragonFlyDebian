@@ -1,0 +1,44 @@
+
+Fix initialization of i8259 controller.  Opposite side is in
+qemu-0.14.1+dfsg/hw/i8259.c: pic_ioport_write()
+
+--- a/sys/mips/malta/gt_pci.c
++++ b/sys/mips/malta/gt_pci.c
+@@ -326,15 +326,15 @@
+ 	    ICW4_8086);
+ 
+ 	/* mask all interrupts */
+-	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu1, 0,
++	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu1, 1,
+ 	    sc->sc_imask & 0xff);
+ 
+ 	/* enable special mask mode */
+-	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu1, 1,
++	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu1, 0,
+ 	    OCW3_SEL | OCW3_ESMM | OCW3_SMM);
+ 
+ 	/* read IRR by default */
+-	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu1, 1,
++	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu1, 0,
+ 	    OCW3_SEL | OCW3_RR);
+ 
+ 	/* reset, program device, 4 bytes */
+@@ -348,15 +348,15 @@
+ 	    ICW4_8086);
+ 
+ 	/* mask all interrupts */
+-	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu2, 0,
++	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu2, 1,
+ 	    sc->sc_imask & 0xff);
+ 
+ 	/* enable special mask mode */
+-	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu2, 1,
++	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu2, 0,
+ 	    OCW3_SEL | OCW3_ESMM | OCW3_SMM);
+ 
+ 	/* read IRR by default */
+-	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu2, 1,
++	bus_space_write_1(sc->sc_st, sc->sc_ioh_icu2, 0,
+ 	    OCW3_SEL | OCW3_RR);
+ 
+ 	/*
