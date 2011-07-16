@@ -204,6 +204,14 @@ _dl_show_auxv (void)
 	  [AT_GID - 2] =		{ "GID:          ", dec },
 	  [AT_EGID - 2] =		{ "EGID:         ", dec },
 	  [AT_CLKTCK - 2] =		{ "CLKTCK:       ", dec },
+	  [AT_EXECPATH - 2] =		{ "EXECPATH      ", str },
+	  [AT_CANARY - 2] =		{ "CANARY:       0x", hex },
+	  [AT_CANARYLEN - 2] =		{ "CANARYLEN:    ", dec },
+	  [AT_OSRELDATE - 2] =		{ "OSRELDATE:    ", dec },
+	  [AT_NCPUS - 2] =		{ "NCPUS:        ", dec },
+	  [AT_PAGESIZES - 2] =		{ "PAGESIZES:    0x", hex },
+	  [AT_PAGESIZESLEN - 2] =	{ "PAGESIZESLEN: ", dec },
+	  [AT_STACKPROT - 2] =		{ "STACKPROT:    0x", hex },
 	};
       unsigned int idx = (unsigned int) (av->a_type - 2);
 
