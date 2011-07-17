@@ -19,6 +19,7 @@
 
 #define _dl_aux_init _dl_aux_init_ignored_code
 #include <elf/dl-support.c>
+#include <bits/elf.h>
 #undef _dl_aux_init
 
 #ifdef HAVE_AUX_VECTOR

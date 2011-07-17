@@ -18,14 +18,13 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#ifndef _ELF_H
-
-#include_next <elf/elf.h>
+#ifndef _BITS_ELF_H
+#define _BITS_ELF_H
 
 __BEGIN_DECLS
 
 #define	AT_EXECPATH	15	/* Path to the executable. */
-#define	AT_CANARY	16	/* Canary for SSP */
+#define	AT_CANARY	16	/* Canary for SSP. */
 #define	AT_CANARYLEN	17	/* Length of the canary. */
 #define	AT_OSRELDATE	18	/* OSRELDATE. */
 #define	AT_NCPUS	19	/* Number of CPUs. */

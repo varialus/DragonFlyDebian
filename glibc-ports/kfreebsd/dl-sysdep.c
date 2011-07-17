@@ -32,6 +32,7 @@
 # define _dl_sysdep_start _dl_sysdep_start_ignored_code
 # define _dl_show_auxv _dl_show_auxv_ignored_code
 # include <elf/dl-sysdep.c>
+# include <bits/elf.h>
 # undef _dl_sysdep_start
 # undef _dl_show_auxv
 
