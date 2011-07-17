@@ -31,7 +31,6 @@ __BEGIN_DECLS
 #define	AT_PAGESIZES	20	/* Pagesizes. */
 #define	AT_PAGESIZESLEN	21	/* Number of pagesizes. */
 #define	AT_STACKPROT	23	/* Initial stack protection. */
-#define	AT_COUNT	24	/* Count of defined aux entry types. */
 
 __END_DECLS
 
