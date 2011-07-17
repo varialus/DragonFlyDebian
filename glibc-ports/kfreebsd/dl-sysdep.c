@@ -47,13 +47,6 @@ _dl_sysdep_start (void **start_argptr,
   ElfW(auxv_t) *av;
   uid_t uid = 0;
   gid_t gid = 0;
-  unsigned int seen = 0;
-# ifdef HAVE_AUX_XID
-#  define set_seen(tag) (tag)	/* Evaluate for the side effects.  */
-# else
-#  define M(type) (1 << (type))
-#  define set_seen(tag) seen |= M ((tag)->a_type)
-# endif
 #ifdef NEED_DL_SYSINFO
   uintptr_t new_sysinfo = 0;
 #endif
@@ -65,7 +58,7 @@ _dl_sysdep_start (void **start_argptr,
   user_entry = (ElfW(Addr)) ENTRY_POINT;
   GLRO(dl_platform) = NULL; /* Default to nothing known about the platform.  */
 
-  for (av = _dl_auxv; av->a_type != AT_NULL; set_seen (av++))
+  for (av = _dl_auxv; av->a_type != AT_NULL; av++)
     switch (av->a_type)
       {
       case AT_PHDR:
@@ -85,31 +78,17 @@ _dl_sysdep_start (void **start_argptr,
 	_dl_base_addr = av->a_un.a_val;
 	break;
 #endif
-#ifndef __powerpc__
-	/* For some odd reason these are not in sys/powerpc/include/elf.h.  */
-      case AT_UID:
-      case AT_EUID:
-	uid ^= av->a_un.a_val;
-	break;
-      case AT_GID:
-      case AT_EGID:
-	gid ^= av->a_un.a_val;
-	break;
-#endif
       }
 
-  if (seen != -1)
     {
       /* Fill in the values we have not gotten from the kernel through the
 	 auxiliary vector.  */
-# ifndef HAVE_AUX_XID
 #  define SEE(UID, var, uid) \
-   if ((seen & M (AT_##UID)) == 0) var ^= __get##uid ()
+   var ^= __get##uid ()
       SEE (UID, uid, uid);
       SEE (EUID, uid, euid);
       SEE (GID, gid, gid);
       SEE (EGID, gid, egid);
-# endif
 
       /* If one of the two pairs of IDs does not match this is a setuid
 	 or setgid run.  */

@@ -27,7 +27,6 @@ void
 internal_function
 _dl_aux_init (ElfW(auxv_t) *av)
 {
-  int seen = 0;
   uid_t uid = 0;
   gid_t gid = 0;
 
@@ -43,30 +42,5 @@ _dl_aux_init (ElfW(auxv_t) *av)
       case AT_PHNUM:
 	GL(dl_phnum) = av->a_un.a_val;
 	break;
-#ifndef __powerpc__
-	/* For some odd reason these are not in sys/powerpc/include/elf.h.  */
-      case AT_UID:
-	uid ^= av->a_un.a_val;
-	seen |= 1;
-	break;
-      case AT_EUID:
-	uid ^= av->a_un.a_val;
-	seen |= 2;
-	break;
-      case AT_GID:
-	gid ^= av->a_un.a_val;
-	seen |= 4;
-	break;
-      case AT_EGID:
-	gid ^= av->a_un.a_val;
-	seen |= 8;
-	break;
-#endif
-      }
-  if (seen == 0xf)
-    {
-      __libc_enable_secure = uid != 0 || gid != 0;
-      __libc_enable_secure_decided = 1;
-    }
 }
 #endif
