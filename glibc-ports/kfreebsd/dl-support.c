@@ -39,5 +39,6 @@ _dl_aux_init (ElfW(auxv_t) *av)
       case AT_PHNUM:
 	GL(dl_phnum) = av->a_un.a_val;
 	break;
+      }
 }
 #endif
