@@ -92,6 +92,8 @@ _dl_sysdep_start (void **start_argptr,
 	break;
 #endif
 #ifndef HAVE_AUX_SECURE
+#ifndef __powerpc__
+	/* For some odd reason these are not in sys/powerpc/include/elf.h.  */
       case AT_UID:
       case AT_EUID:
 	uid ^= av->a_un.a_val;
@@ -100,6 +102,7 @@ _dl_sysdep_start (void **start_argptr,
       case AT_EGID:
 	gid ^= av->a_un.a_val;
 	break;
+#endif
 #endif
       }
 
@@ -196,11 +199,14 @@ _dl_show_auxv (void)
 	  [AT_BASE - 2] =		{ "BASE:         0x", hex },
 	  [AT_FLAGS - 2] =		{ "FLAGS:        0x", hex },
 	  [AT_ENTRY - 2] =		{ "ENTRY:        0x", hex },
+#ifndef __powerpc__
+	  /* For some odd reason these are not in sys/powerpc/include/elf.h.  */
 	  [AT_NOTELF - 2] =		{ "NOTELF:       ", hex },
 	  [AT_UID - 2] =		{ "UID:          ", dec },
 	  [AT_EUID - 2] =		{ "EUID:         ", dec },
 	  [AT_GID - 2] =		{ "GID:          ", dec },
 	  [AT_EGID - 2] =		{ "EGID:         ", dec },
+#endif
 	  [AT_EXECPATH - 2] =		{ "EXECPATH      ", str },
 	  [AT_CANARY - 2] =		{ "CANARY:       0x", hex },
 	  [AT_CANARYLEN - 2] =		{ "CANARYLEN:    ", dec },

@@ -43,6 +43,8 @@ _dl_aux_init (ElfW(auxv_t) *av)
       case AT_PHNUM:
 	GL(dl_phnum) = av->a_un.a_val;
 	break;
+#ifndef __powerpc__
+	/* For some odd reason these are not in sys/powerpc/include/elf.h.  */
       case AT_UID:
 	uid ^= av->a_un.a_val;
 	seen |= 1;
@@ -59,6 +61,7 @@ _dl_aux_init (ElfW(auxv_t) *av)
 	gid ^= av->a_un.a_val;
 	seen |= 8;
 	break;
+#endif
       }
   if (seen == 0xf)
     {
