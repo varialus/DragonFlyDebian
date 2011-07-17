@@ -45,21 +45,15 @@ _dl_sysdep_start (void **start_argptr,
   ElfW(Word) phnum = 0;
   ElfW(Addr) user_entry;
   ElfW(auxv_t) *av;
-#ifdef HAVE_AUX_SECURE
-# define set_seen(tag) (tag)	/* Evaluate for the side effects.  */
-# define set_seen_secure() ((void) 0)
-#else
   uid_t uid = 0;
   gid_t gid = 0;
   unsigned int seen = 0;
-# define set_seen_secure() (seen = -1)
 # ifdef HAVE_AUX_XID
 #  define set_seen(tag) (tag)	/* Evaluate for the side effects.  */
 # else
 #  define M(type) (1 << (type))
 #  define set_seen(tag) seen |= M ((tag)->a_type)
 # endif
-#endif
 #ifdef NEED_DL_SYSINFO
   uintptr_t new_sysinfo = 0;
 #endif
@@ -91,7 +85,6 @@ _dl_sysdep_start (void **start_argptr,
 	_dl_base_addr = av->a_un.a_val;
 	break;
 #endif
-#ifndef HAVE_AUX_SECURE
 #ifndef __powerpc__
 	/* For some odd reason these are not in sys/powerpc/include/elf.h.  */
       case AT_UID:
@@ -103,10 +96,8 @@ _dl_sysdep_start (void **start_argptr,
 	gid ^= av->a_un.a_val;
 	break;
 #endif
-#endif
       }
 
-#ifndef HAVE_AUX_SECURE
   if (seen != -1)
     {
       /* Fill in the values we have not gotten from the kernel through the
@@ -124,7 +115,6 @@ _dl_sysdep_start (void **start_argptr,
 	 or setgid run.  */
       INTUSE(__libc_enable_secure) = uid | gid;
     }
-#endif
 
 #ifndef HAVE_AUX_PAGESIZE
   if (GLRO(dl_pagesize) == 0)
