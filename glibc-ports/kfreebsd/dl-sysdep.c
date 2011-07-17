@@ -83,6 +83,7 @@ _dl_sysdep_start (void **start_argptr,
     {
       /* Fill in the values we have not gotten from the kernel through the
 	 auxiliary vector.  */
+#  undef SEE
 #  define SEE(UID, var, uid) \
    var ^= __get##uid ()
       SEE (UID, uid, uid);
