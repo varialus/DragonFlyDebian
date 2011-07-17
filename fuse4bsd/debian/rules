@@ -68,22 +68,13 @@ binary-arch: build install
 	dh_testroot
 	dh_installchangelogs
 	dh_installdocs
-#	dh_installexamples
-#	dh_installmenu
 	dh_installdebconf
-#	dh_installlogrotate
-#	dh_installemacsen
-#	dh_installpam
-#	dh_installmime
-#	dh_installcron
-#	dh_installinfo
+	dh_installinit -pfuse4bsd --name=fuse -- start 20 S . stop 20 0 1 6 .
 	dh_installman
 	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
-#	dh_perl
-#	dh_python
 	dh_dkms -V $(VERSION)
 	dh_makeshlibs
 	dh_installdeb
