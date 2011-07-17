@@ -37,9 +37,6 @@ _dl_aux_init (ElfW(auxv_t) *av)
       case AT_PAGESZ:
 	GLRO(dl_pagesize) = av->a_un.a_val;
 	break;
-      case AT_CLKTCK:
-	GLRO(dl_clktck) = av->a_un.a_val;
-	break;
       case AT_PHDR:
 	GL(dl_phdr) = (void *) av->a_un.a_val;
 	break;

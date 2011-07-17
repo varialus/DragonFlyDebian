@@ -101,9 +101,6 @@ _dl_sysdep_start (void **start_argptr,
 	gid ^= av->a_un.a_val;
 	break;
 #endif
-      case AT_CLKTCK:
-	GLRO(dl_clktck) = av->a_un.a_val;
-	break;
       }
 
 #ifndef HAVE_AUX_SECURE
@@ -204,7 +201,6 @@ _dl_show_auxv (void)
 	  [AT_EUID - 2] =		{ "EUID:         ", dec },
 	  [AT_GID - 2] =		{ "GID:          ", dec },
 	  [AT_EGID - 2] =		{ "EGID:         ", dec },
-	  [AT_CLKTCK - 2] =		{ "CLKTCK:       ", dec },
 	  [AT_EXECPATH - 2] =		{ "EXECPATH      ", str },
 	  [AT_CANARY - 2] =		{ "CANARY:       0x", hex },
 	  [AT_CANARYLEN - 2] =		{ "CANARYLEN:    ", dec },
