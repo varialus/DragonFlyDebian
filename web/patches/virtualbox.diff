@@ -1,0 +1,3962 @@
+
+Incomplete patch with some kludges.  It makes 4.0.10 build, but still
+won't run (it gives bogus NSPR errors, export NSPR_LOG_MODULES=all:5
+for a complete log).
+
+Most of this patch has been submitted to upstream BTS:
+
+http://www.virtualbox.org/ticket/9224
+http://www.virtualbox.org/ticket/9227
+http://www.virtualbox.org/ticket/9228
+http://www.virtualbox.org/ticket/9229
+http://www.virtualbox.org/ticket/9234
+
+=== modified file 'Config.kmk'
+--- Config.kmk	2011-07-05 17:05:22 +0000
++++ Config.kmk	2011-07-18 14:01:39 +0000
+@@ -206,6 +206,8 @@
+   VBOX_PACKAGE_OS = SOLARIS
+ else ifeq ($(KBUILD_TARGET),os2)
+   VBOX_PACKAGE_OS = OS2
++else ifeq ($(KBUILD_TARGET),gnukfreebsd)
++  VBOX_PACKAGE_OS = GNU/kFreeBSD
+ else if1of ($(KBUILD_TARGET), dragonfly freebsd netbsd openbsd)
+   VBOX_PACKAGE_OS = BSD
+ else
+@@ -235,8 +237,8 @@
+ ## @{
+ # This indicates that additions (of some kind or another) is being _built_.
+ # VBOX_WITHOUT_ADDITIONS overrides it.
+-#if1of ($(KBUILD_TARGET), freebsd linux os2 solaris win)
+-if1of ($(KBUILD_TARGET), freebsd linux solaris win)
++#if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux os2 solaris win)
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux solaris win)
+  VBOX_WITH_ADDITIONS = 1
+ endif
+ # Build the optional ring-0 part of the additions for syntax checking.
+@@ -245,7 +247,7 @@
+  VBOX_WITH_ADDITION_DRIVERS = 1
+ endif
+ # Build X11 additions. Can be disabled separately.
+-if1of ($(KBUILD_TARGET), dragonfly freebsd linux netbsd openbsd solaris)
++if1of ($(KBUILD_TARGET), dragonfly freebsd gnukfreebsd linux netbsd openbsd solaris)
+  VBOX_WITH_X11_ADDITIONS = 1
+ endif
+ # Enable the building of shared folders in the windows additions.
+@@ -280,7 +282,7 @@
+ # Include documentation in the package
+ VBOX_WITH_DOCS_PACKING = 1
+ # Include CHM when building docs (unset in LocalConfig.kmk to suppress CHM)
+-ifn1of ($(KBUILD_TARGET), linux)
++ifn1of ($(KBUILD_TARGET), linux gnukfreebsd)
+  VBOX_WITH_DOCS_CHM = 1
+ endif
+ # Don't bother with documentation, overrides VBOX_WITH_DOCS.
+@@ -342,7 +344,7 @@
+  VBOX_WITH_DBUS = 1
+ endif
+ # Enable building PAM modules
+-if1of ($(KBUILD_TARGET), linux solaris)
++if1of ($(KBUILD_TARGET), linux gnukfreebsd solaris)
+  VBOX_WITH_PAM = 1
+ endif
+ # Disable WINMM support for Windows (not implemented).
+@@ -352,7 +354,7 @@
+ # Enable Host Guest Shared Memory Interface
+ VBOX_WITH_HGSMI = 1
+ # Enable Video 2D Acceleration
+-if1of ($(KBUILD_TARGET), darwin linux win freebsd)
++if1of ($(KBUILD_TARGET), darwin linux gnukfreebsd win freebsd)
+  VBOX_WITH_VIDEOHWACCEL = 1
+ endif
+ # Enable Wddm Video driver for Vista+ guests
+@@ -408,7 +410,7 @@
+ # Enable MSI support in devices
+ VBOX_WITH_MSI_DEVICES = 1
+ # Enable host network interface API.
+-if1of ($(KBUILD_TARGET), darwin freebsd linux solaris win)
++if1of ($(KBUILD_TARGET), darwin freebsd gnukfreebsd linux solaris win)
+  VBOX_WITH_HOSTNETIF_API = 1
+ endif
+ ## @}
+@@ -424,7 +426,7 @@
+ VBOX_WITH_MAIN = 1
+ # Set this to prefix all C symbols in XPCOM, to avoid dynamic linking problems
+ # caused by our XPCOM library polluting the symbol namespace for system libs.
+-if1of ($(KBUILD_TARGET), linux solaris)
++if1of ($(KBUILD_TARGET), linux gnukfreebsd solaris)
+  VBOX_WITH_XPCOM_NAMESPACE_CLEANUP = 1
+ endif
+ # Set this to not use COM or XPCOM in places where it can be avoided.
+@@ -461,7 +463,7 @@
+ #VBOX_WITH_VBOXFB = 1
+ # Enables the Python<->XPCOM and Python<->COM bindings.
+ VBOX_WITH_PYTHON ?= 1
+-if1of ($(KBUILD_TARGET), darwin linux solaris)
++if1of ($(KBUILD_TARGET), darwin linux gnukfreebsd solaris)
+  # Enable Java<->XPCOM bridge + glue code
+  VBOX_WITH_JXPCOM ?= 1
+ endif
+@@ -469,6 +471,7 @@
+  # Enable Java<->MSCOM glue, bridge is provided by an external lib (Jacob)
+  VBOX_WITH_JMSCOM ?= 1
+ endif
++# FIXME: this requires openjdk-6-jdk
+ if1of ($(KBUILD_TARGET), darwin linux solaris)
+  # Enable Java<->JAX-WS bridge
+  VBOX_WITH_JWS ?= 1
+@@ -485,7 +488,7 @@
+ VBOX_WITH_TESTCASES = 1
+ # Enables the ffmpeg module for recording test runs.
+ # TODO: Enable this for normal build server builds?
+-#if1of ($(KBUILD_TARGET), linux)
++#if1of ($(KBUILD_TARGET), linux gnukfreebsd)
+ # VBOX_WITH_FFMPEG = 1
+ #endif
+ # Enable shared folders
+@@ -497,13 +500,13 @@
+ # Enable this to prevent the guest from writing guest properties.
+ VBOX_WITH_GUEST_PROPS_RDONLY_GUEST =
+ # Enable the guest control service.
+-if1of ($(KBUILD_TARGET), darwin freebsd linux solaris win)
++if1of ($(KBUILD_TARGET), darwin freebsd gnukfreebsd linux solaris win)
+  VBOX_WITH_GUEST_CONTROL = 1
+ endif
+ # Enable ballooning
+ VBOX_WITH_MEMBALLOON = 1
+ # Enable crOpenGL service
+-if1of ($(KBUILD_TARGET), darwin freebsd linux solaris win)
++if1of ($(KBUILD_TARGET), darwin freebsd gnukfreebsd linux solaris win)
+  VBOX_WITH_CROGL = 1
+ endif
+ # Enable the VNC server in VBoxHeadless (GPL only).
+@@ -516,19 +519,19 @@
+ ## @name Networking
+ ## @{
+ # Use VBoxNetFlt for host interface networking.
+-if1of ($(KBUILD_TARGET), darwin freebsd linux solaris win)
++if1of ($(KBUILD_TARGET), darwin freebsd gnukfreebsd linux solaris win)
+  VBOX_WITH_NETFLT = 1
+  ifeq ($(KBUILD_TARGET),solaris)
+  # Disabled until some Nevada version ships the required headers.
+  #  VBOX_WITH_NETFLT_CROSSBOW = 1
+  endif
+  # Use VBoxNetAdp for host only networking.
+- if1of ($(KBUILD_TARGET), darwin freebsd linux solaris) ## @todo this should be set and used on windows too.
++ if1of ($(KBUILD_TARGET), darwin freebsd gnukfreebsd linux solaris) ## @todo this should be set and used on windows too.
+   VBOX_WITH_NETADP = 1
+  endif
+ endif
+ # Enable Virtual Distributed Ethernet or not.
+-if1of ($(KBUILD_TARGET), freebsd linux)
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux)
+  VBOX_WITH_VDE = 1
+ endif
+ ## @}
+@@ -584,7 +587,7 @@
+ # Where the application files are (going to be) installed.
+ #VBOX_PATH_APP_PRIVATE       = /usr/lib/virtualbox
+ ifdef VBOX_WITH_HARDENING
+- if1of ($(KBUILD_TARGET), linux solaris)
++ if1of ($(KBUILD_TARGET), linux gnukfreebsd solaris)
+   VBOX_PATH_APP_PRIVATE      = /opt/VirtualBox
+  else ifeq ($(KBUILD_TARGET),darwin)
+   VBOX_PATH_APP_PRIVATE      = /Applications/VirtualBox.app/Contents/MacOS
+@@ -625,7 +628,7 @@
+ ifdef VBOX_WITH_HARDENING
+  if1of ($(KBUILD_TARGET), solaris)
+   VBOX_WITH_RUNPATH = $(VBOX_PATH_APP_PRIVATE)/$(if-expr $(KBUILD_TARGET_ARCH) == "amd64",amd64,i386)
+- else if1of ($(KBUILD_TARGET), freebsd linux)
++ else if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux)
+   VBOX_WITH_RUNPATH = $(VBOX_PATH_APP_PRIVATE)
+  endif
+ endif
+@@ -634,7 +637,7 @@
+ # things gets a bit complicated since the $ORIGIN+setuid policy differs.
+ #VBOX_WITH_ORIGIN = 1
+ ifndef VBOX_WITH_HARDENING
+- if1of ($(KBUILD_TARGET), linux solaris)
++ if1of ($(KBUILD_TARGET), linux gnukfreebsd solaris)
+   VBOX_WITH_ORIGIN = 1
+  endif
+ endif
+@@ -673,7 +676,7 @@
+ ## For experimenting with disabling preemption instead of interrupts
+ # when working VT-x/AMD-V in VMMR0.
+ ## @todo os2? Reconsider perhaps windows? (see defect) This should be made the default.
+-if1of ($(KBUILD_TARGET), darwin freebsd linux solaris win)
++if1of ($(KBUILD_TARGET), darwin freebsd gnukfreebsd linux solaris win)
+  VBOX_WITH_VMMR0_DISABLE_PREEMPTION = 1
+ endif
+ # Mask all Local APIC interrupt vectors which are set up to NMI mode when switching
+@@ -886,14 +889,14 @@
+  VBOX_WITH_OS2_ADDITIONS_BIN=
+  VBOX_WITH_SECURELABEL=
+  VBOX_WITH_KCHMVIEWER=
+- ifn1of ($(KBUILD_TARGET), linux)
++ ifn1of ($(KBUILD_TARGET), linux gnukfreebsd)
+   VBOX_WITH_DOCS=
+   VBOX_WITH_DOCS_PACKING=
+  endif
+  VBOX_WITH_TESTSUITE=
+  VBOX_WITH_INTEL_PXE=
+  VBOX_WITH_FFMPEG=
+- ifn1of ($(KBUILD_TARGET), darwin linux solaris win)
++ ifn1of ($(KBUILD_TARGET), darwin linux gnukfreebsd solaris win)
+   VBOX_WITH_INSTALLER=
+  endif
+  # branding
+@@ -927,7 +930,7 @@
+   VBOX_PATH_SHARED_LIBS=
+   VBOX_PATH_APP_DOCS=
+   VBOX_WITH_RUNPATH=
+-  if1of ($(KBUILD_TARGET), linux solaris)
++  if1of ($(KBUILD_TARGET), linux gnukfreebsd solaris)
+    VBOX_WITH_ORIGIN=1
+   endif
+  endif
+@@ -1036,7 +1039,7 @@
+ #
+ # Image and object format config.
+ #
+-if1of ($(KBUILD_TARGET), freebsd linux l4 netbsd openbsd solaris)
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux l4 netbsd openbsd solaris)
+  VBOX_LDR_FMT = elf
+ endif
+ ifeq ($(KBUILD_TARGET),darwin)
+@@ -1293,6 +1296,7 @@
+ DEFS.freebsd = RT_OS_FREEBSD __FREEBSD__
+ DEFS.l4      = RT_OS_L4 __L4__ __L4ENV__ L4API_l4v2 ARCH_$(KBUILD_TARGET_ARCH) __NO_CTYPE _FILE_OFFSET_BITS=64
+ DEFS.linux   = RT_OS_LINUX _FILE_OFFSET_BITS=64
++DEFS.gnukfreebsd = _FILE_OFFSET_BITS=64
+ DEFS.netbsd  = RT_OS_NETBSD
+ DEFS.openbsd = RT_OS_OPENBSD
+ DEFS.os2     = RT_OS_OS2 __OS2__
+@@ -1440,7 +1444,7 @@
+ #
+ # Add the output dir(s) to the dynamic loader search path.
+ #
+-if1of ($(KBUILD_HOST), freebsd linux l4 netbsd openbsd solaris)
++if1of ($(KBUILD_HOST), freebsd gnukfreebsd linux l4 netbsd openbsd solaris)
+  export LD_LIBRARY_PATH:=$(PATH_BIN):$(PATH_LIB):$(LD_LIBRARY_PATH)
+ endif
+ ifeq ($(KBUILD_HOST),os2)
+@@ -1473,7 +1477,7 @@
+  LIB_XPCOM       = $(PATH_BIN)/VBoxXPCOM.s.so
+  LIB_DDU         = $(PATH_BIN)/VBoxDDU.s.so
+ endif
+-if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris)
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux netbsd openbsd solaris)
+  LIB_RUNTIME     = $(PATH_BIN)/VBoxRT.so
+  LIB_RUNTIME_EF  = $(PATH_LIB)/RuntimeEFCPP.a
+  LIB_KPROFILE    = $(PATH_BIN)/kPrf2.so
+@@ -1626,7 +1630,7 @@
+ 
+ # We need to export YASM for OSE, but since it was converted to .zip we need to
+ # allow for the location used by the zip to be properly cleaned up first.
+-if1of ($(KBUILD_HOST).$(KBUILD_HOST_ARCH), linux.x86 solaris.x86 win.x86)
++if1of ($(KBUILD_HOST).$(KBUILD_HOST_ARCH), linux.x86 gnukfreebsd.x86 solaris.x86 win.x86)
+  PATH_TOOL_YASM ?= $(PATH_DEVTOOLS_BLD)/bin
+ endif
+ 
+@@ -1863,7 +1867,7 @@
+   VBOX_LIB_OGL_HOSTCRUTIL = $(PATH_BIN)/VBoxOGLhostcrutil$(VBOX_SUFF_DLL)
+  endif
+ 
+- if1of ($(KBUILD_TARGET), freebsd linux solaris)
++ if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux solaris)
+  # VBOX_PATH_MESA_SOURCE = $(PATH_ROOT)/src/libs/mesa-7.2
+   VBOX_PATH_MESA_SOURCE = $(VBOX_PATH_X11_ROOT)/mesa-7.2
+   VBOX_MESA_INCS = \
+@@ -2282,7 +2286,7 @@
+  SDK_VBOX_LIBXSLT_LIBS   ?= $(PATH_LIB)/VBox-libxslt$(VBOX_SUFF_LIB)
+  SDK_VBOX_LIBXSLT_DEFS   ?=
+  SDK_VBOX_LIBXSLT_DEFS.win += WIN32 _WINDOWS _MBCS _REENTRANT
+-#else if1of ($(KBUILD_TARGET), linux)
++#else if1of ($(KBUILD_TARGET), linux gnukfreebsd)
+ # SDK_VBOX_LIBXSLT_INCS      ?=
+ # SDK_VBOX_LIBXSLT_LIBS      ?=
+ # SDK_VBOX_LIBXSLT_CFLAGS    ?= $(shell pkg-config libxslt-1.0 --cflags)
+@@ -2305,6 +2309,7 @@
+  SDK_VBOX_ZLIB_INCS  ?=
+  SDK_VBOX_ZLIB_LIBS  ?= z
+  SDK_VBOX_ZLIB_DEFS.linux ?= _LARGEFILE64_SOURCE
++ SDK_VBOX_ZLIB_DEFS.gnukfreebsd ?= _LARGEFILE64_SOURCE
+ endif
+ 
+ SDK_VBOX_OPENSSL      = .
+@@ -2313,7 +2318,7 @@
+ SDK_VBOX_OPENSSL_ORDERDEPS ?= $(crypto-headers_1_TARGET)
+ SDK_VBOX_OPENSSL_LIBS ?= $(PATH_LIB)/VBox-libcrypto$(VBOX_SUFF_LIB)
+ # Build entire openssl library, not just the minimal subset.
+-if1of ($(KBUILD_TARGET), linux solaris)
++if1of ($(KBUILD_TARGET), linux gnukfreebsd solaris)
+  VBOX_OPENSSL_ALL = 1
+ endif
+ 
+@@ -2330,7 +2335,7 @@
+ endif
+ 
+ SDK_VBOX_FFMPEG       = .
+-if1of ($(KBUILD_TARGET), darwin linux os2 solaris win)
++if1of ($(KBUILD_TARGET), darwin linux gnukfreebsd os2 solaris win)
+  SDK_VBOX_FFMPEG_INCS ?= \
+ 	$(PATH_ROOT)/src/libs/ffmpeg-20060710/libavutil \
+ 	$(PATH_ROOT)/src/libs/ffmpeg-20060710/libavcodec \
+@@ -2771,7 +2776,7 @@
+ TEMPLATE_VBOXR0DRV_CXXFLAGS.amd64     = $(TEMPLATE_VBOXR0DRV_CFLAGS.amd64)
+ endif # Solaris
+ 
+-ifeq ($(KBUILD_TARGET),freebsd)
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
+ # x86 FreeBSD (6.2 or something):
+ #  cc -O2 -fno-strict-aliasing -pipe -Werror -D_KERNEL -DKLD_MODULE \
+ #   -nostdinc -I- -I. -I@ -I@/contrib/altq -I@/../include -I/usr/include \
+@@ -2798,9 +2803,9 @@
+ # Note: @ -> /usr/src/sys  and  machine -> /usr/src/sys/i386/include
+ 
+ ## The location of the FreeBSD kernel source.
+-VBOX_FREEBSD_SRC ?= /usr/src/sys
++VBOX_FREEBSD_SRC ?= /usr/src/kfreebsd-headers-8.2-1-amd64/sys
+ ## The FreeBSD /usr/include.
+-VBOX_FREEBSD_SYS_INCS ?= /usr/include
++VBOX_FREEBSD_SYS_INCS ?= $(VBOX_FREEBSD_SRC)
+ 
+ TEMPLATE_VBOXR0DRV_TOOL                = $(VBOX_GCC_TOOL)
+ TEMPLATE_VBOXR0DRV_LDTOOL              = FREEBSDKMODLD
+@@ -2815,7 +2820,7 @@
+ 	$(VBOX_GCC_WARN) -Wpointer-arith -Winline $(VBOX_GCC_Wno-pointer-sign) \
+ 	-Wstrict-prototypes -Wmissing-prototypes -Wstrict-prototypes -Wnested-externs \
+ 	-Wimplicit-function-declaration -Werror-implicit-function-declaration \
+-	-O2 -fformat-extensions -ffreestanding -fno-strict-aliasing -fno-common -finline-limit=8000 \
++	-O2 -ffreestanding -fno-strict-aliasing -fno-common -finline-limit=8000 \
+ 	$(VBOX_GCC_fno-stack-protector) $(VBOX_GCC_R0_OPT) $(VBOX_GCC_R0_FP) \
+ 	-nostdinc -std=c99
+ TEMPLATE_VBOXR0DRV_CFLAGS.x86          = -m32 -mno-align-long-strings -mpreferred-stack-boundary=2 -mno-mmx -mno-3dnow -mno-sse -mno-sse2
+@@ -2824,7 +2829,7 @@
+ 	-mno-3dnow -msoft-float -fno-asynchronous-unwind-tables -Wundef
+ TEMPLATE_VBOXR0DRV_CXXFLAGS            = -fno-exceptions -fno-rtti \
+ 	$(VBOX_GCC_WARN) -Wpointer-arith -Winline \
+-	-O2 -fno-format-extensions -fno-strict-aliasing -fno-common -finline-limit=8000 \
++	-O2 -fno-strict-aliasing -fno-common -finline-limit=8000 \
+ 	$(VBOX_GCC_fno-stack-protector) $(VBOX_GCC_R0_OPT) $(VBOX_GCC_R0_FP) \
+ 	-nostdinc
+ TEMPLATE_VBOXR0DRV_CXXFLAGS.x86        = $(TEMPLATE_VBOXR0DRV_CFLAGS.x86)
+@@ -2847,8 +2852,8 @@
+ 		$(foreach p,$(libpath), -L$(p))\
+ 		$(foreach lib,$(libs), $(if $(findstring $(lib),$(subst /,x,$(lib))), -l$(patsubst lib%,%,$(basename $(lib))), $(lib)))
+ # Strip non-exported symbols private and localize the exported ones.
+-	awk -f $(VBOX_FREEBSD_SRC)/conf/kmod_syms.awk  $(out) $(if $(othersrc), $(othersrc),/dev/null) \
+-		| xargs -J% objcopy % $(out)
++	original-awk -f $(VBOX_FREEBSD_SRC)/conf/kmod_syms.awk  $(out) $(if $(othersrc), $(othersrc),/dev/null) \
++		| while read i ; do objcopy $i $(out) ; done
+ 
+ ## Strip debug info (comment out if debugging or something).
+ 	objcopy --strip-debug $(out)
+@@ -2861,8 +2866,8 @@
+ 		$(foreach p,$(libpath), -L$(p))\
+ 		$(foreach lib,$(libs), $(if $(findstring $(lib),$(subst /,x,$(lib))), -l$(patsubst lib%,%,$(basename $(lib))), $(lib)))
+ # Strip non-exported symbols private and localize the exported ones.
+-	awk -f $(VBOX_FREEBSD_SRC)/conf/kmod_syms.awk $(outbase).kld $(if $(othersrc), $(othersrc),/dev/null) \
+-		| xargs -J% objcopy % $(outbase).kld
++	original-awk -f $(VBOX_FREEBSD_SRC)/conf/kmod_syms.awk $(outbase).kld $(if $(othersrc), $(othersrc),/dev/null) \
++		| while read i ; do objcopy $i $(outbase).kld ; done
+ 
+ # Link the final .ko (a shared object).
+ 	ld $(flags) -Bshareable -o $(out) $(outbase).kld
+@@ -2983,8 +2988,8 @@
+ 	-T$(L4_LIBDIR)/../main_dyn.ld -nostdlib \
+ 	-Wl,--export-dynamic,--dynamic-linker=libld-l4.s.so \
+ 	-Wl,--rpath-link,$(L4_LIBDIR)
+-TEMPLATE_VBOXR3EXE_LDFLAGS.linux       = -Wl,-z,noexecstack $(VBOX_LD_as_needed)
+- ifeq ($(KBUILD_TARGET),linux)
++TEMPLATE_VBOXR3EXE_LDFLAGS.gnukfreebsd       = -Wl,-z,noexecstack $(VBOX_LD_as_needed)
++ if1of ($(KBUILD_TARGET), linux gnukfreebsd)
+ TEMPLATE_VBOXR3EXE_LIBS                = pthread m rt dl
+  else ifeq ($(KBUILD_TARGET),l4)
+ TEMPLATE_VBOXR3EXE_LIBS                = \
+@@ -3033,6 +3038,7 @@
+  endif
+  ifdef VBOX_WITH_ORIGIN
+   TEMPLATE_VBOXR3EXE_LDFLAGS.linux    += $(VBOX_GCC_ORIGIN_OPT)
++  TEMPLATE_VBOXR3EXE_LDFLAGS.gnukfreebsd    += $(VBOX_GCC_ORIGIN_OPT)
+  endif
+ endif
+ 
+@@ -3075,7 +3081,7 @@
+ #				       -
+ TEMPLATE_VBoxR3DllNoPic                = VBox ring-3 SO/DLLs without PIC, without warnings.
+ TEMPLATE_VBoxR3DllNoPic_EXTENDS        = VBOXR3
+-if1of ($(KBUILD_TARGET).$(KBUILD_TARGET_ARCH), linux.x86 freebsd.x86)
++if1of ($(KBUILD_TARGET).$(KBUILD_TARGET_ARCH), linux.x86 freebsd.x86 gnukfreebsd.x86)
+  TEMPLATE_VBoxR3DllNoPic_DEFS          = $(TEMPLATE_VBOXR3EXE_DEFS)
+  TEMPLATE_VBoxR3DllNoPic_CFLAGS        = $(TEMPLATE_VBOXR3EXE_CFLAGS)   $(VBOX_GCC_WERR)
+  TEMPLATE_VBoxR3DllNoPic_CXXFLAGS      = $(TEMPLATE_VBOXR3EXE_CXXFLAGS) $(VBOX_GCC_WERR)
+@@ -3094,7 +3100,7 @@
+ #				       -
+ TEMPLATE_VBoxR3DllWarnNoPic                = VBox ring-3 SO/DLLs without PIC, with warnings.
+ TEMPLATE_VBoxR3DllWarnNoPic_EXTENDS        = VBOXR3
+-if1of ($(KBUILD_TARGET).$(KBUILD_TARGET_ARCH), linux.x86 freebsd.x86)
++if1of ($(KBUILD_TARGET).$(KBUILD_TARGET_ARCH), linux.x86 freebsd.x86 gnukfreebsd.x86)
+  TEMPLATE_VBoxR3DllWarnNoPic_DEFS          = $(TEMPLATE_VBOXR3EXE_DEFS)
+  TEMPLATE_VBoxR3DllWarnNoPic_CFLAGS        = $(TEMPLATE_VBOXR3EXE_CFLAGS)
+  TEMPLATE_VBoxR3DllWarnNoPic_CXXFLAGS      = $(TEMPLATE_VBOXR3EXE_CXXFLAGS)
+@@ -3190,6 +3196,7 @@
+ ifn1of ($(KBUILD_TARGET), win os2)
+  TEMPLATE_VBOXR3HARDENEDEXE_LDFLAGS       = $(filter-out '$(VBOX_GCC_RPATH_OPT)%,$(TEMPLATE_VBOXR3EXE_LDFLAGS))
+  TEMPLATE_VBOXR3HARDENEDEXE_LDFLAGS.linux = $(filter-out $(VBOX_GCC_ORIGIN_OPT),$(TEMPLATE_VBOXR3EXE_LDFLAGS.linux))
++ TEMPLATE_VBOXR3HARDENEDEXE_LDFLAGS.gnukfreebsd = $(filter-out $(VBOX_GCC_ORIGIN_OPT),$(TEMPLATE_VBOXR3EXE_LDFLAGS.gnukfreebsd))
+ endif
+ 
+ #
+@@ -3216,6 +3223,7 @@
+  endif
+  ifdef VBOX_WITH_ORIGIN
+   TEMPLATE_VBoxR3SetUidToRoot_LDFLAGS.linux += $(VBOX_GCC_ORIGIN_OPT)
++  TEMPLATE_VBoxR3SetUidToRoot_LDFLAGS.gnukfreebsd += $(VBOX_GCC_ORIGIN_OPT)
+  endif
+ endif
+ 
+@@ -3479,9 +3487,10 @@
+ TEMPLATE_VBOXMAINEXE_OBJCXXFLAGS.kprofile= $(TEMPLATE_VBOXMAINEXE_CXXFLAGS.kprofile)
+ TEMPLATE_VBOXMAINEXE_LDFLAGS.x86         = -m32
+ TEMPLATE_VBOXMAINEXE_LDFLAGS.amd64       = -m64
+- ifeq ($(KBUILD_TARGET),linux)
++ if1of ($(KBUILD_TARGET), linux gnukfreebsd)
+ TEMPLATE_VBOXMAINEXE_LIBS                = pthread m rt $(LIB_RUNTIME) dl
+ TEMPLATE_VBOXMAINEXE_LDFLAGS.linux       = $(VBOX_LD_as_needed)
++TEMPLATE_VBOXMAINEXE_LDFLAGS.gnukfreebsd       = $(VBOX_LD_as_needed)
+  else ifeq ($(KBUILD_TARGET),l4)
+ TEMPLATE_VBOXMAINEXE_LIBS                = $(LIB_RUNTIME)
+ # no libs as yet in l4 target - must be added later
+@@ -3524,6 +3533,7 @@
+  endif
+  ifdef VBOX_WITH_ORIGIN
+ TEMPLATE_VBOXMAINEXE_LDFLAGS.linux      += $(VBOX_GCC_ORIGIN_OPT)
++TEMPLATE_VBOXMAINEXE_LDFLAGS.gnukfreebsd      += $(VBOX_GCC_ORIGIN_OPT)
+  endif
+ 
+ endif # !win
+@@ -3631,6 +3641,8 @@
+ 	NDEBUG TRIMMED
+  TEMPLATE_VBOXMAINCLIENTEXE_CXXFLAGS.linux = $(TEMPLATE_VBOXMAINEXE_CXXFLAGS.linux) \
+ 	-pthread
++ TEMPLATE_VBOXMAINCLIENTEXE_CXXFLAGS.gnukfreebsd = $(TEMPLATE_VBOXMAINEXE_CXXFLAGS.gnukfreebsd) \
++	-pthread
+ endif
+ 
+ #
+@@ -3668,7 +3680,7 @@
+   TEMPLATE_VBoxR3ExtPack_CXXFLAGS = $(TEMPLATE_VBOXR3DLLNOXCPT_CXXFLAGS) -fno-rtti
+  endif
+  TEMPLATE_VBoxR3ExtPack_INST = $(INST_EXTPACK)YouShallOverrideThis/
+- ifeq ($(KBUILD_TARGET),linux)
++ if1of ($(KBUILD_TARGET), linux gnukfreebsd)
+   TEMPLATE_VBoxR3ExtPack_LDFLAGS = $(filter-out '$(VBOX_GCC_RPATH_OPT)$(VBOX_WITH_RUNPATH)' '$(VBOX_GCC_RPATH_OPT)$(VBOX_WITH_RELATIVE_RUNPATH)', $(TEMPLATE_VBOXR3DLLNOXCPT_LDFLAGS))
+  else
+   if !defined(VBOX_WITH_RUNPATH) && defined(VBOX_WITH_RELATIVE_RUNPATH)
+@@ -3800,7 +3812,7 @@
+ 
+  # Hack LD_LIBRARY_PATH for stuff in tools.
+  ifdef VBOX_WITH_QT4_SUN
+-  if1of ($(KBUILD_TARGET), linux)
++  if1of ($(KBUILD_TARGET), linux gnukfreebsd)
+    export LD_LIBRARY_PATH := $(VBOX_PATH_QT4_LIB):$(LD_LIBRARY_PATH)
+   endif
+  endif
+@@ -3868,6 +3880,7 @@
+  else # the gcc guys:
+   TEMPLATE_VBOXQT4GUIEXE_TOOL = $(VBOX_GCC_TOOL)
+   TEMPLATE_VBOXQT4GUIEXE_DEFS.linux = _REENTRANT
++  TEMPLATE_VBOXQT4GUIEXE_DEFS.gnukfreebsd = _REENTRANT
+ 
+   TEMPLATE_VBOXQT4GUIEXE_DEFS.solaris = _REENTRANT
+ 
+@@ -3881,6 +3894,7 @@
+   TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS.x86 = -m32
+   TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS.amd64 = -m64
+   TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS.linux = -pthread
++  TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS.gnukfreebsd = -pthread
+   TEMPLATE_VBOXQT4GUIEXE_OBJCFLAGS = -g -pipe $(VBOX_GCC_PEDANTIC_C) -Wno-long-long -fno-exceptions
+   TEMPLATE_VBOXQT4GUIEXE_OBJCFLAGS.x86 = $(TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS.x86)
+   TEMPLATE_VBOXQT4GUIEXE_OBJCFLAGS.amd64 = $(TEMPLATE_VBOXQT4GUIEXE_CXXFLAGS.amd64)
+@@ -3898,7 +3912,7 @@
+ 	$(LIB_REM) \
+ 	$(LIB_VMM)
+ 
+-  ifeq ($(KBUILD_TARGET),linux)
++  if1of ($(KBUILD_TARGET), linux gnukfreebsd)
+    TEMPLATE_VBOXQT4GUIEXE_LDFLAGS += $(VBOX_LD_as_needed)
+    TEMPLATE_VBOXQT4GUIEXE_LIBS += \
+      $(VBOX_XCURSOR_LIBS) \
+@@ -4085,7 +4099,7 @@
+ TEMPLATE_VBOXBLDPROG_LDFLAGS.sparc32     = -m32
+ TEMPLATE_VBOXBLDPROG_LDFLAGS.amd64       = -m64
+ TEMPLATE_VBOXBLDPROG_LDFLAGS.sparc64     = -m64
+- ifeq ($(KBUILD_HOST),linux)
++ if1of ($(KBUILD_HOST), linux gnukfreebsd)
+ TEMPLATE_VBOXBLDPROG_LIBS                = pthread m rt dl crypt
+  else ifeq ($(KBUILD_HOST),os2)
+ TEMPLATE_VBOXBLDPROG_TOOL                = GXX3OMF
+@@ -4160,6 +4174,10 @@
+ 	$(TEMPLATE_VBOXBLDPROG_LIBS) \
+ 	crypt \
+ 	$(TEMPLATE_VBOXBLDPROG_LIBS.linux)
++TEMPLATE_VBoxAdvBldProg_LIBS.gnukfreebsd = \
++	$(TEMPLATE_VBOXBLDPROG_LIBS) \
++	crypt \
++	$(TEMPLATE_VBOXBLDPROG_LIBS.gnukfreebsd)
+ TEMPLATE_VBoxAdvBldProg_LIBS.solaris = \
+ 	$(TEMPLATE_VBOXBLDPROG_LIBS) \
+ 	contract \
+@@ -4247,11 +4265,13 @@
+  TEMPLATE_VBOXGUESTR3EXE_CXXFLAGS = $(TEMPLATE_VBOXR3EXE_CXXFLAGS) -fno-exceptions
+  TEMPLATE_VBOXGUESTR3EXE_LDFLAGS  = $(filter-out '$(VBOX_GCC_RPATH_OPT)%,$(TEMPLATE_VBOXR3EXE_LDFLAGS))
+  TEMPLATE_VBOXGUESTR3EXE_LDFLAGS.linux = $(filter-out $(VBOX_GCC_ORIGIN_OPT),$(TEMPLATE_VBOXR3EXE_LDFLAGS.linux))
++ TEMPLATE_VBOXGUESTR3EXE_LDFLAGS.gnukfreebsd = $(filter-out $(VBOX_GCC_ORIGIN_OPT),$(TEMPLATE_VBOXR3EXE_LDFLAGS.gnukfreebsd))
+ endif
+ TEMPLATE_VBOXGUESTR3EXE_INST      = $(INST_ADDITIONS)
+ TEMPLATE_VBOXGUESTR3EXE_DEFS     := $(filter-out $(ARCH_BITS_DEFS), $(TEMPLATE_VBOXR3EXE_DEFS)) IN_GUEST IN_GUEST_R3 IN_RT_R3 $(VBOX_GC_ARCH_BITS_DEFS)
+ TEMPLATE_VBOXGUESTR3EXE_DEFS.linux := $(TEMPLATE_VBOXR3EXE_DEFS.linux) LOG_USE_C99 RT_WITHOUT_EXEC_ALLOC
+-ifeq ($(KBUILD_TARGET),linux) # As few libs as possible on linux.
++TEMPLATE_VBOXGUESTR3EXE_DEFS.gnukfreebsd := $(TEMPLATE_VBOXR3EXE_DEFS.gnukfreebsd) LOG_USE_C99 RT_WITHOUT_EXEC_ALLOC
++if1of ($(KBUILD_TARGET), linux gnukfreebsd) # As few libs as possible on linux.
+  TEMPLATE_VBOXGUESTR3EXE_LIBS     = pthread rt m
+ endif
+ if1of ($(KBUILD_TARGET), freebsd netbsd openbsd)
+@@ -4334,7 +4354,7 @@
+ TEMPLATE_VBOXGUESTR3XF86MOD_LDFLAGS.$(KBUILD_TARGET) = $(NO_SUCH_VARIABLE)
+ TEMPLATE_VBOXGUESTR3XF86MOD_LDFLAGS.$(KBUILD_TYPE)   = $(NO_SUCH_VARIABLE)
+ TEMPLATE_VBOXGUESTR3XF86MOD_LDFLAGS          = -r
+-if1of ($(KBUILD_TARGET), dragonfly freebsd linux netbsd openbsd) # the gnu ld guys.
++if1of ($(KBUILD_TARGET), dragonfly freebsd gnukfreebsd linux netbsd openbsd) # the gnu ld guys.
+  TEMPLATE_VBOXGUESTR3XF86MOD_LDFLAGS.release = -S
+  TEMPLATE_VBOXGUESTR3XF86MOD_LDFLAGS.x86     = -m elf_i386
+  TEMPLATE_VBOXGUESTR3XF86MOD_LDFLAGS.amd64   = -m elf_x86_64
+@@ -4368,7 +4388,7 @@
+ ifeq ($(KBUILD_TARGET_ARCH),amd64)
+  TEMPLATE_VBOXGUESTR3XORGMOD_DEFS += _XSERVER64
+ endif
+-if1of ($(KBUILD_TARGET), linux)
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
+  TEMPLATE_VBOXGUESTR3XORGMOD_LDFLAGS = $(TEMPLATE_VBOXGUESTR3DLL_LDFLAGS)
+ endif
+ TEMPLATE_VBOXGUESTR3XORGMOD_LIBS = \
+@@ -4424,6 +4444,7 @@
+ TEMPLATE_VBOXCROGLR3HOSTDLL_DEFS             = CHROMIUM_THREADSAFE VBOX_WITH_HGCM UNPACKS
+ TEMPLATE_VBOXCROGLR3HOSTDLL_DEFS.win         = _WIN32_WINNT=0x0500 WINDOWS=1
+ TEMPLATE_VBOXCROGLR3HOSTDLL_DEFS.linux       = Linux=1 _GNU_SOURCE
++TEMPLATE_VBOXCROGLR3HOSTDLL_DEFS.gnukfreebsd = _GNU_SOURCE
+ TEMPLATE_VBOXCROGLR3HOSTDLL_DEFS.solaris     = SunOS=1 _GNU_SOURCE #GLEXT_64_TYPES_DEFINED
+ TEMPLATE_VBOXCROGLR3HOSTDLL_DEFS.darwin      = DARWIN=1 GL_GLEXT_LEGACY _GNU_SOURCE
+ ifdef VBOX_WITH_COCOA_QT
+@@ -4440,6 +4461,7 @@
+ 	-current_version $(VBOX_VERSION_MAJOR).$(VBOX_VERSION_MINOR).$(VBOX_VERSION_BUILD) \
+ 	-compatibility_version $(VBOX_VERSION_MAJOR).$(VBOX_VERSION_MINOR).$(VBOX_VERSION_BUILD)
+ TEMPLATE_VBOXCROGLR3HOSTDLL_LDFLAGS.linux    = -Wl,--no-as-needed
++TEMPLATE_VBOXCROGLR3HOSTDLL_LDFLAGS.gnukfreebsd    = -Wl,--no-as-needed
+ TEMPLATE_VBOXCROGLR3HOSTDLL_BLDDIRS          = $(VBOX_PATH_CROGL_GENFILES)/
+ 
+ #
+@@ -4458,6 +4480,7 @@
+ TEMPLATE_VBOXCROGLR3GUESTDLL_DEFS             = CHROMIUM_THREADSAFE VBOX_WITH_HGCM
+ TEMPLATE_VBOXCROGLR3GUESTDLL_DEFS.win         = WINDOWS=1
+ TEMPLATE_VBOXCROGLR3GUESTDLL_DEFS.linux       = Linux=1 _GNU_SOURCE
++TEMPLATE_VBOXCROGLR3GUESTDLL_DEFS.gnukfreebsd = _GNU_SOURCE
+ TEMPLATE_VBOXCROGLR3GUESTDLL_DEFS.solaris     = SunOS=1 _GNU_SOURCE #GLEXT_64_TYPES_DEFINED
+ TEMPLATE_VBOXCROGLR3GUESTDLL_DEFS.darwin      = DARWIN=1 GL_GLEXT_LEGACY _GNU_SOURCE
+ ifdef VBOX_WITH_COCOA_QT
+@@ -4615,7 +4638,7 @@
+ 	$(QUIET)$(MV) -f $@.tmp $@
+ 
+ if !defined(VBOX_OSE) && !defined(VBOX_NOINC_LICENSE_VER_KMK)
+- if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris)
++ if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux netbsd openbsd solaris)
+   # VBOX_LICENSE_VER is used in several Makefiles
+   VBOX_LICENSE_VER_KMK = $(PATH_OUT)/license-version.kmk
+ $(VBOX_LICENSE_VER_KMK): $(VBOX_BRAND_LICENSE_HTML)
+
+=== modified file 'configure'
+--- configure	2011-07-05 17:05:22 +0000
++++ configure	2011-07-18 14:42:46 +0000
+@@ -51,6 +51,9 @@
+     ;;
+   freebsd)
+     ;;
++  gnu/kfreebsd)
++    OS='gnukfreebsd'
++    ;;
+   sunos)
+     OS='solaris'
+     ;;
+@@ -914,7 +917,7 @@
+   [ -n "$INCZ" ] && I_INCZ=`prefix_I "$INCZ"`
+   if test_compile "$LIBZ $I_INCZ" zlib zlib; then
+     if test_execute; then
+-      echo "if1of (\$(KBUILD_TARGET),darwin freebsd linux solaris)" >> $CNF
++      echo "if1of (\$(KBUILD_TARGET),darwin freebsd linux gnukfreebsd solaris)" >> $CNF
+       cnf_append " SDK_VBOX_ZLIB_LIBS" "`strip_l "$LIBZ"`"
+       cnf_append " SDK_VBOX_ZLIB_INCS" "$INCZ"
+       echo "endif" >> $CNF
+@@ -2162,7 +2165,7 @@
+ [ $WITH_GSOAP   -eq 0 ] && echo "  --enable-webservice      enable the webservice stuff"
+ [ $OSE          -eq 1 ] && echo "  --enable-vnc             enable the VNC server"
+ [ $WITH_DOCS    -eq 1 ] && echo "  --disable-docs           don't build the documentation"
+-[ "$OS" = "linux" -o "$OS" = "freebsd" ] && echo "  --enable-vde             enable VDE networking"
++[ "$OS" = "linux" -o "$OS" = "freebsd" -o "$OS" = "gnukfreebsd" ] && echo "  --enable-vde             enable VDE networking"
+ cat << EOF
+   --disable-hardening      don't be strict about /dev/vboxdrv access
+   --build-libxml2          build libxml2 from sources
+@@ -2544,7 +2547,7 @@
+ [ $WITH_JAVA   -eq 1 ] && check_java
+ 
+ # PulseAudio
+-if [ "$OS" = "linux" -o "$OS" = "freebsd" ]; then
++if [ "$OS" = "linux" -o "$OS" = "freebsd" -o "$OS" = "gnukfreebsd" ]; then
+   if [ $WITH_PULSE -eq 1 ]; then
+     check_pulse
+   elif [ $WITH_PULSE -eq 0 ]; then
+@@ -2579,6 +2582,12 @@
+   [ $OSE -ge 1 ] && check_makeself
+ fi
+ 
++if [ "$OS" = "gnukfreebsd" ]; then
++  cnf_append "VBOX_WITH_VBOXDRV" ""
++  cnf_append "VBOX_WITH_ADDITION_DRIVERS" ""
++  check_compiler_h
++fi
++
+ [ -n "$SETUP_WINE" ] && setup_wine
+ 
+ if [ $OSE -ge 1 ]; then
+@@ -2590,7 +2599,7 @@
+ fi
+ 
+ # VDE
+-if [ "$OS" = "linux" -o "$OS" = "freebsd" ]; then
++if [ "$OS" = "linux" -o "$OS" = "freebsd" -o "$OS" = "gnukfreebsd" ]; then
+   if [ $WITH_VDE -eq 1 ]; then
+     cnf_append "VBOX_WITH_VDE" "1"
+   fi
+
+=== modified file 'debian/control'
+--- debian/control	2011-07-05 17:05:22 +0000
++++ debian/control	2011-07-18 14:18:15 +0000
+@@ -12,14 +12,16 @@
+                dkms (>= 2.1.1.1),
+                docbook-xml,
+                docbook-xsl,
+-               g++-multilib [amd64],
++               g++-multilib [any-amd64],
+                genisoimage,
+                gsoap,
+                iasl,
+                imagemagick,
+                kbuild (>= 1:0.1.5svn2274),
+-               libasound2-dev,
+-               libcap-dev,
++               libasound2-dev [linux-any],
++               libbsd-dev [kfreebsd-any],
++               libc0.1-dev (>= 2.13-8) [kfreebsd-any], kfreebsd-headers-8.2-1-amd64 (>= 8.2-4) [kfreebsd-any],
++               libcap-dev [linux-any],
+                libcurl4-openssl-dev,
+                libdrm-dev,
+                libfuse-dev,
+@@ -69,7 +71,7 @@
+ Vcs-Browser: http://git.debian.org/?p=pkg-virtualbox/virtualbox.git
+ 
+ Package: virtualbox-qt
+-Architecture: amd64 i386
++Architecture: amd64 i386 kfreebsd-amd64 kfreebsd-i386
+ Depends: ${shlibs:Depends},
+          ${misc:Depends},
+          virtualbox (= ${binary:Version})
+@@ -84,7 +86,7 @@
+  This package provides the Qt based graphical user interface for VirtualBox.
+ 
+ Package: virtualbox
+-Architecture: amd64 i386
++Architecture: amd64 i386 kfreebsd-amd64 kfreebsd-i386
+ Depends: ${shlibs:Depends},
+          ${misc:Depends},
+          ${python:Depends},
+@@ -111,7 +113,7 @@
+ Package: virtualbox-dbg
+ Section: debug
+ Priority: extra
+-Architecture: amd64 i386
++Architecture: amd64 i386 kfreebsd-amd64 kfreebsd-i386
+ Depends: ${misc:Depends},
+          virtualbox (= ${binary:Version}) | virtualbox-guest-utils (= ${binary:Version})
+ Breaks: virtualbox-ose-dbg (<< 4.0.6-dfsg-1~)
+@@ -199,7 +201,7 @@
+ 
+ Package: virtualbox-guest-x11
+ Section: x11
+-Architecture: amd64 i386
++Architecture: amd64 i386 kfreebsd-amd64 kfreebsd-i386
+ Depends: ${shlibs:Depends},
+          ${misc:Depends},
+          ${xserver:Depends},
+@@ -219,7 +221,7 @@
+  They provide closer integration and improve the interactive performance.
+ 
+ Package: virtualbox-guest-utils
+-Architecture: amd64 i386
++Architecture: amd64 i386 kfreebsd-amd64 kfreebsd-i386
+ Depends: ${shlibs:Depends},
+          ${misc:Depends},
+          adduser,
+@@ -239,7 +241,7 @@
+  between the host system and the virtual machine.
+ 
+ Package: virtualbox-fuse
+-Architecture: amd64 i386
++Architecture: amd64 i386 kfreebsd-amd64 kfreebsd-i386
+ Depends: ${shlibs:Depends},
+          ${misc:Depends},
+          virtualbox (= ${binary:Version})
+
+=== modified file 'debian/rules'
+--- debian/rules	2011-07-05 17:05:22 +0000
++++ debian/rules	2011-07-17 15:06:43 +0000
+@@ -119,6 +119,7 @@
+ 	    --disable-kmods \
+ 	    --enable-webservice \
+ 	    --enable-vde \
++	    --build-debug \
+ 	    --enable-vnc
+ 
+ override_dh_auto_build:
+
+=== modified file 'debian/virtualbox-dkms.install.in'
+--- debian/virtualbox-dkms.install.in	2011-07-05 17:05:22 +0000
++++ debian/virtualbox-dkms.install.in	2011-07-17 15:07:41 +0000
+@@ -1,13 +1,13 @@
+ out/bin/src/vboxdrv/*.* /usr/src/virtualbox-CVERSION/vboxdrv
+-out/bin/src/vboxdrv/linux /usr/src/virtualbox-CVERSION/vboxdrv
++out/bin/src/vboxdrv/freebsd /usr/src/virtualbox-CVERSION/vboxdrv
+ out/bin/src/vboxdrv/Makefile /usr/src/virtualbox-CVERSION/vboxdrv
+ 
+ out/bin/src/vboxnetflt/*.* /usr/src/virtualbox-CVERSION/vboxnetflt
+-out/bin/src/vboxnetflt/linux /usr/src/virtualbox-CVERSION/vboxnetflt
++out/bin/src/vboxnetflt/freebsd /usr/src/virtualbox-CVERSION/vboxnetflt
+ out/bin/src/vboxnetflt/Makefile /usr/src/virtualbox-CVERSION/vboxnetflt
+ 
+ out/bin/src/vboxnetadp/*.* /usr/src/virtualbox-CVERSION/vboxnetadp
+-out/bin/src/vboxnetadp/linux /usr/src/virtualbox-CVERSION/vboxnetadp
++out/bin/src/vboxnetadp/freebsd /usr/src/virtualbox-CVERSION/vboxnetadp
+ out/bin/src/vboxnetadp/Makefile /usr/src/virtualbox-CVERSION/vboxnetadp
+ 
+ out/bin/src/vboxdrv/*-generated.h /usr/src/virtualbox-CVERSION/include
+@@ -25,7 +25,7 @@
+ out/bin/src/vboxdrv/r0drv /usr/src/virtualbox-CVERSION
+ out/bin/src/vboxdrv/common /usr/src/virtualbox-CVERSION
+ out/bin/src/vboxdrv/generic /usr/src/virtualbox-CVERSION
+-out/bin/src/vboxdrv/math /usr/src/virtualbox-CVERSION
++#out/bin/src/vboxdrv/math /usr/src/virtualbox-CVERSION
+ out/bin/src/vboxdrv/VBox /usr/src/virtualbox-CVERSION
+ out/bin/src/vboxdrv/include/iprt/nocrt /usr/src/virtualbox-CVERSION/include/iprt
+ 
+
+=== modified file 'debian/virtualbox-guest-dkms.install.in'
+--- debian/virtualbox-guest-dkms.install.in	2011-07-05 17:05:22 +0000
++++ debian/virtualbox-guest-dkms.install.in	2011-07-05 17:09:02 +0000
+@@ -1,26 +1,5 @@
+-out/bin/additions/src/vboxguest/*.* /usr/src/virtualbox-guest-CVERSION/vboxguest
+-out/bin/additions/src/vboxguest/common /usr/src/virtualbox-guest-CVERSION/vboxguest
+-out/bin/additions/src/vboxguest/generic /usr/src/virtualbox-guest-CVERSION/vboxguest
+-out/bin/additions/src/vboxguest/VBox /usr/src/virtualbox-guest-CVERSION/vboxguest
+-out/bin/additions/src/vboxguest/build_in_tmp /usr/src/virtualbox-guest-CVERSION/vboxguest
+-out/bin/additions/src/vboxguest/Makefile /usr/src/virtualbox-guest-CVERSION/vboxguest
+-
+-out/bin/additions/src/vboxsf/*.* /usr/src/virtualbox-guest-CVERSION/vboxsf
+-out/bin/additions/src/vboxsf/build_in_tmp /usr/src/virtualbox-guest-CVERSION/vboxsf
+-out/bin/additions/src/vboxsf/Makefile /usr/src/virtualbox-guest-CVERSION/vboxsf
+-
+-out/bin/additions/src/vboxvideo/*.* /usr/src/virtualbox-guest-CVERSION/vboxvideo
+-out/bin/additions/src/vboxvideo/build_in_tmp /usr/src/virtualbox-guest-CVERSION/vboxvideo
+-out/bin/additions/src/vboxvideo/Makefile /usr/src/virtualbox-guest-CVERSION/vboxvideo
+-
+-out/bin/additions/src/vboxguest/include/iprt/* /usr/src/virtualbox-guest-CVERSION/include/iprt
+-out/bin/additions/src/vboxguest/include/VBox/* /usr/src/virtualbox-guest-CVERSION/include/VBox
+-out/bin/additions/src/vboxguest/include/internal/* /usr/src/virtualbox-guest-CVERSION/include/internal
+-
+-out/bin/additions/src/vboxsf/include/iprt/* /usr/src/virtualbox-guest-CVERSION/include/iprt
+-out/bin/additions/src/vboxsf/include/VBox/* /usr/src/virtualbox-guest-CVERSION/include/VBox
+-
+-out/bin/additions/src/vboxguest/r0drv /usr/src/virtualbox-guest-CVERSION/
++out/bin/additions/src/vboxvideo_drm/*.* /usr/src/virtualbox-guest-CVERSION/vboxvideo_drm
++out/bin/additions/src/vboxvideo_drm/Makefile /usr/src/virtualbox-guest-CVERSION/vboxvideo_drm
+ 
+ debian/virtualbox-guest-dkms.files/Makefile /usr/src/virtualbox-guest-CVERSION
+ 
+
+=== modified file 'debian/virtualbox-guest-utils.install'
+--- debian/virtualbox-guest-utils.install	2011-07-05 17:05:22 +0000
++++ debian/virtualbox-guest-utils.install	2011-07-18 20:41:38 +0000
+@@ -1,4 +1,4 @@
+ out/bin/additions/VBoxService	/usr/sbin
+ out/bin/additions/VBoxControl	/usr/sbin
+-out/bin/additions/mount.vboxsf	/sbin
++#out/bin/additions/mount.vboxsf	/sbin
+ out/bin/additions/pam_vbox.so	/lib/security
+
+=== modified file 'include/VBox/VBoxGuest.h'
+--- include/VBox/VBoxGuest.h	2011-07-05 17:05:22 +0000
++++ include/VBox/VBoxGuest.h	2011-07-05 17:09:02 +0000
+@@ -175,7 +175,7 @@
+ # define VBOXGUEST_IOCTL_CODE_FAST_(Function)       _IO(  'V', (Function))
+ # define VBOXGUEST_IOCTL_STRIP_SIZE(Code)           VBOXGUEST_IOCTL_CODE_(_IOC_NR((Code)), 0)
+ 
+-#elif defined(RT_OS_FREEBSD) /** @todo r=bird: Please do it like SUPDRVIOC to keep it as similar as possible. */
++#elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__) /** @todo r=bird: Please do it like SUPDRVIOC to keep it as similar as possible. */
+ # include <sys/ioccom.h>
+ 
+ # define VBOXGUEST_IOCTL_CODE_(Function, Size)      _IOWR('V', (Function), VBGLBIGREQ)
+
+=== modified file 'include/VBox/usb.h'
+--- include/VBox/usb.h	2011-07-05 17:05:22 +0000
++++ include/VBox/usb.h	2011-07-05 17:09:02 +0000
+@@ -117,7 +117,7 @@
+     uint8_t         bBus;
+     /** The port number. */
+     uint8_t         bPort;
+-#if defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+     /** Device number. */
+     uint8_t         bDevNum;
+ #endif
+
+=== modified file 'include/iprt/alloca.h'
+--- include/iprt/alloca.h	2011-07-05 17:05:22 +0000
++++ include/iprt/alloca.h	2011-07-18 11:47:32 +0000
+@@ -37,14 +37,18 @@
+  * When we're in kernel territory it starts getting a bit more
+  * interesting of course...
+  */
+-#if defined(IN_RING0) \
+- && (defined(RT_OS_DARWIN) || defined(RT_OS_LINUX) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD))
++#ifdef IN_RING0
++# if defined(RT_OS_DARWIN) || defined(RT_OS_LINUX) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+ /* ASSUMES GNU C */
+-# define alloca(cb) __builtin_alloca(cb)
++#  define alloca(cb) __builtin_alloca(cb)
++# else
++#  include <stdlib.h>
++#  include <malloc.h>
++# endif
+ 
+ #else
+ # include <stdlib.h>
+-# if !defined(RT_OS_DARWIN) && !defined(RT_OS_FREEBSD)
++# if !defined(RT_OS_DARWIN) && !defined(RT_OS_FREEBSD) && !defined(__GLIBC__)
+ #  include <malloc.h>
+ # endif
+ # ifdef RT_OS_SOLARIS
+
+=== modified file 'include/iprt/spinlock.h'
+--- include/iprt/spinlock.h	2011-07-05 17:05:22 +0000
++++ include/iprt/spinlock.h	2011-07-05 17:09:02 +0000
+@@ -61,7 +61,7 @@
+     unsigned long   flFlags;
+ #  define RTSPINLOCKTMP_INITIALIZER { 0 }
+ 
+-# elif defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(RT_OS_SOLARIS)
++# elif defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__) || defined(RT_OS_SOLARIS)
+     /** The saved [R|E]FLAGS. */
+     RTCCUINTREG     uFlags;
+ #  define RTSPINLOCKTMP_INITIALIZER { 0 }
+
+=== modified file 'include/iprt/stdarg.h'
+--- include/iprt/stdarg.h	2011-07-05 17:05:22 +0000
++++ include/iprt/stdarg.h	2011-07-05 17:09:02 +0000
+@@ -27,10 +27,10 @@
+ #define ___iprt_stdarg_h
+ 
+ #if    !defined(IPRT_NO_CRT) \
+-    && !(defined(RT_OS_FREEBSD) && defined(_KERNEL))
++    && !((defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && defined(_KERNEL))
+ 
+ # include <stdarg.h>
+-#elif defined(RT_OS_FREEBSD) && defined(_KERNEL)
++#elif (defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && defined(_KERNEL)
+ # include <machine/stdarg.h>
+ #else
+ # include <iprt/types.h>
+
+=== modified file 'include/iprt/stdint.h'
+--- include/iprt/stdint.h	2011-07-05 17:05:22 +0000
++++ include/iprt/stdint.h	2011-07-05 17:09:02 +0000
+@@ -34,6 +34,7 @@
+  */
+ #if !(defined(RT_OS_LINUX) && defined(__KERNEL__))  \
+   && !(defined(RT_OS_FREEBSD) && defined(_KERNEL)) \
++  && !(defined(__FreeBSD_kernel__) && defined(_KERNEL)) \
+   && !defined(_MSC_VER) \
+   && !defined(__IBMC__) \
+   && !defined(__IBMCPP__) \
+@@ -62,7 +63,7 @@
+ #  define UINT32_C(Value)   (Value ## U)
+ # endif /* 64-bit darwin kludge. */
+ 
+-#elif defined(RT_OS_FREEBSD) && defined(_KERNEL)
++#elif (defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && defined(_KERNEL)
+ 
+ # ifndef __STDC_CONSTANT_MACROS
+ #  define __STDC_CONSTANT_MACROS
+
+=== modified file 'include/iprt/string.h'
+--- include/iprt/string.h	2011-07-05 17:05:22 +0000
++++ include/iprt/string.h	2011-07-05 17:09:02 +0000
+@@ -37,7 +37,12 @@
+ RT_C_DECLS_BEGIN
+ # include "xf86_ansic.h"
+ RT_C_DECLS_END
+-#elif defined(RT_OS_FREEBSD) && defined(_KERNEL)
++#elif (defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && defined(_KERNEL)
++/* stolen from http://vbox.innotek.de/pipermail/vbox-dev/2011-January/003561.html
++   hopefully fixes "link_elf_obj: symbol _Z6memcpyPvPKvm undefined" error
++   similar to http://lists.freebsd.org/pipermail/freebsd-current/2010-January/014715.html
++*/
++RT_C_DECLS_BEGIN
+ /** @todo
+  * XXX: Very ugly hack to get things build on recent FreeBSD builds. They have
+  * memchr now and we need to include param.h to get __FreeBSD_version and make
+@@ -65,6 +70,7 @@
+    * Defining a macro using bcopy here
+    */
+ # define memmove(dst, src, size) bcopy(src, dst, size)
++RT_C_DECLS_END
+ #elif defined(RT_OS_SOLARIS) && defined(_KERNEL)
+   /*
+    * Same case as with FreeBSD kernel:
+@@ -90,7 +96,7 @@
+ RT_C_DECLS_END
+ #endif
+ 
+-#if defined(RT_OS_FREEBSD) && defined(_KERNEL)
++#if (defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && defined(_KERNEL)
+ RT_C_DECLS_BEGIN
+ #if __FreeBSD_version < 900000
+ void *memchr(const void *pv, int ch, size_t cb);
+
+=== modified file 'include/iprt/types.h'
+--- include/iprt/types.h	2011-07-05 17:05:22 +0000
++++ include/iprt/types.h	2011-07-05 17:09:02 +0000
+@@ -53,7 +53,7 @@
+ #  endif
+ #  include <sys/types.h>
+ 
+-# elif defined(RT_OS_FREEBSD) && defined(_KERNEL)
++# elif (defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && defined(_KERNEL)
+     /*
+      * Kludge for the FreeBSD kernel:
+      *  stddef.h and sys/types.h have slightly different offsetof definitions
+@@ -71,7 +71,7 @@
+ #   error "offsetof is not defined..."
+ #  endif
+ 
+-# elif defined(RT_OS_FREEBSD) && HC_ARCH_BITS == 64 && defined(RT_ARCH_X86)
++# elif (defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && HC_ARCH_BITS == 64 && defined(RT_ARCH_X86)
+     /*
+      * Kludge for compiling 32-bit code on a 64-bit FreeBSD:
+      *  FreeBSD declares uint64_t and int64_t wrong (long unsigned and long int
+
+=== modified file 'src/VBox/Additions/Makefile.kmk'
+--- src/VBox/Additions/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/Makefile.kmk	2011-07-05 17:09:02 +0000
+@@ -52,7 +52,7 @@
+   include $(PATH_SUB_CURRENT)/x11/Makefile.kmk
+  endif
+ 
+- ifeq ($(KBUILD_TARGET),freebsd)
++ if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
+   include $(PATH_SUB_CURRENT)/freebsd/Makefile.kmk
+  endif
+  ifeq ($(KBUILD_TARGET),linux)
+
+=== modified file 'src/VBox/Additions/common/Makefile.kmk'
+--- src/VBox/Additions/common/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/common/Makefile.kmk	2011-07-18 14:21:37 +0000
+@@ -22,10 +22,10 @@
+ ifndef VBOX_ONLY_TESTSUITE
+  include $(PATH_SUB_CURRENT)/VBoxGuestLib/Makefile.kmk
+  include $(PATH_SUB_CURRENT)/VBoxControl/Makefile.kmk
+- if1of ($(KBUILD_TARGET), freebsd linux os2 solaris win)
++ if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux os2 solaris win)
+   include $(PATH_SUB_CURRENT)/VBoxGuest/Makefile.kmk
+  endif
+- if1of ($(KBUILD_TARGET), freebsd linux os2 solaris win)
++ if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux os2 solaris win)
+   include $(PATH_SUB_CURRENT)/VBoxService/Makefile.kmk
+  endif
+  ifdef VBOX_WITH_CROGL
+
+=== modified file 'src/VBox/Additions/common/VBoxGuest/Makefile.kmk'
+--- src/VBox/Additions/common/VBoxGuest/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/common/VBoxGuest/Makefile.kmk	2011-07-18 19:39:58 +0000
+@@ -19,13 +19,14 @@
+ include	$(KBUILD_PATH)/subheader.kmk
+ 
+ 
+-if1of ($(KBUILD_TARGET), freebsd $(if $(defined VBOX_WITH_ADDITION_DRIVERS),linux,) os2 solaris win)
++if1of ($(KBUILD_TARGET), freebsd $(if $(defined VBOX_WITH_ADDITION_DRIVERS),linux gnukfreebsd,) os2 solaris win)
+  #
+  # VBoxGuest - The Guest Additions Driver.
+  #
+  SYSMODS += VBoxGuest
+  VBoxGuest_TEMPLATE      = VBOXGUESTR0
+  VBoxGuest_NAME.freebsd  = vboxguest
++ VBoxGuest_NAME.gnukfreebsd = vboxguest
+  VBoxGuest_NAME.linux    = vboxguest
+  VBoxGuest_NAME.solaris  = vboxguest
+  VBoxGuest_NOINST.linux  = true
+@@ -46,10 +47,14 @@
+  #VBoxGuest_DEFS.win     += LOG_ENABLED LOG_TO_BACKDOOR
+  VBoxGuest_DEPS.solaris += $(VBOX_SVN_REV_KMK)
+  VBoxGuest_DEPS.linux   += $(VBOX_SVN_REV_HEADER)
+- VBoxGuest_DEPS.freebsd += $(VBOX_SVN_REV_HEADER)
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++ VBoxGuest_DEPS         += $(VBOX_SVN_REV_HEADER)
++endif
+  VBoxGuest_DEFS          = VBGL_VBOXGUEST VBOX_WITH_HGCM
+  VBoxGuest_INCS          = .
+- VBoxGuest_INCS.freebsd  = $(PATH_VBoxGuest) $(PATH_INS)/gen-sys-hdrs
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++ VBoxGuest_INCS         += $(PATH_VBoxGuest) $(PATH_INS)/gen-sys-hdrs
++endif
+  VBoxGuest_INCS.linux    = ../../../Runtime/r0drv/linux
+  ifneq ($(KBUILD_TARGET),os2)
+   ifeq ($(KBUILD_TARGET),win)
+@@ -66,10 +71,12 @@
+     VBoxGuest.cpp_SDKS   = WINDDKWLH
+    endif
+   endif # win
+-  ifn1of ($(KBUILD_TARGET), linux freebsd solaris)
++  if1of ($(KBUILD_TARGET), linux solaris)
++   VBoxGuest_SOURCES    = VBoxGuest-$(KBUILD_TARGET).c
++  else if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++   VBoxGuest_SOURCES    = VBoxGuest-freebsd.c
++  else
+    VBoxGuest_SOURCES    = VBoxGuest-$(KBUILD_TARGET).cpp
+-  else
+-   VBoxGuest_SOURCES    = VBoxGuest-$(KBUILD_TARGET).c
+   endif
+   VBoxGuest_SOURCES     += \
+   	VBoxGuest.cpp \
+@@ -82,10 +89,12 @@
+   VBoxGuest_LIBS        += \
+   	$(VBOX_LIB_VBGL_R0BASE) \
+   	$(VBOX_LIB_IPRT_GUEST_R0)
+-  VBoxGuest_ORDERDEPS.freebsd = \
++  if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++    VBoxGuest_ORDERDEPS += \
+   	$(PATH_INS)/gen-sys-hdrs/pci_if.h \
+   	$(PATH_INS)/gen-sys-hdrs/bus_if.h \
+   	$(PATH_INS)/gen-sys-hdrs/device_if.h
++  endif
+  else # OS/2:
+   # The library order is crucial, so a bit of trickery is necessary.
+   # A library is used to make sure that VBoxGuestA-os2.asm is first in the link. (temporary hack?)
+@@ -205,7 +214,7 @@
+ 
+ endif # Linux
+ 
+-ifeq ($(KBUILD_TARGET),freebsd)
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
+  #
+  # Install the source files and script(s).
+  #
+
+=== modified file 'src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk'
+--- src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/common/VBoxGuestLib/Makefile.kmk	2011-07-18 19:40:38 +0000
+@@ -39,7 +39,7 @@
+ 	VBoxGuestR3Lib \
+ 	VBoxGuestR3LibShared
+ ifndef VBOX_ONLY_TESTSUITE
+- if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd)
++ if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux netbsd openbsd)
+ #  LIBRARIES += \
+ #  	VBoxGuestR3LibXFree86
+  endif
+
+=== modified file 'src/VBox/Additions/common/VBoxService/VBoxServiceVMInfo.cpp'
+--- src/VBox/Additions/common/VBoxService/VBoxServiceVMInfo.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/common/VBoxService/VBoxServiceVMInfo.cpp	2011-07-18 14:28:44 +0000
+@@ -44,7 +44,7 @@
+ #  include <sys/sockio.h>
+ #  include <net/if_arp.h>
+ # endif
+-# ifdef RT_OS_FREEBSD
++# if defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ #  include <ifaddrs.h> /* getifaddrs, freeifaddrs */
+ #  include <net/if_dl.h> /* LLADDR */
+ #  include <netdb.h> /* getnameinfo */
+@@ -469,7 +469,7 @@
+     if (sd >= 0)
+         closesocket(sd);
+ 
+-#elif defined(RT_OS_FREEBSD)
++#elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+     struct ifaddrs *pIfHead = NULL;
+ 
+     /* Get all available interfaces */
+
+=== modified file 'src/VBox/Additions/common/crOpenGL/Makefile.kmk'
+--- src/VBox/Additions/common/crOpenGL/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/common/crOpenGL/Makefile.kmk	2011-07-17 14:48:19 +0000
+@@ -31,7 +31,7 @@
+     VBoxOGLpackspu \
+     VBoxOGLfeedbackspu
+ 
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+ DLLS += \
+     VBoxOGL \
+     VBoxOGLarrayspu \
+@@ -40,16 +40,16 @@
+     VBoxOGLfeedbackspu
+ endif
+ 
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  #VBoxOGL_DRI = 1
+- ifn1of ($(KBUILD_TARGET),solaris freebsd)   # No DRI on Solaris yet
++ ifn1of ($(KBUILD_TARGET),solaris freebsd gnukfreebsd)   # No DRI on Solaris yet
+   VBoxOGL_FAKEDRI = 1
+  endif
+ 
+  # Only Solaris right now needs C stubs because I can't figure out how to
+  # generate the GOT based relocation ASM yet.
+  ifdef VBoxOGL_FAKEDRI
+-  if1of ($(KBUILD_TARGET).$(KBUILD_TARGET_ARCH),solaris.x86 solaris.amd64 linux.x86 linux.amd64 freebsd.x86 freebsd.amd64)
++  if1of ($(KBUILD_TARGET).$(KBUILD_TARGET_ARCH),solaris.x86 solaris.amd64 linux.x86 linux.amd64 freebsd.x86 freebsd.amd64 gnukfreebsd.x86 gnukfreebsd.amd64)
+    VBOX_OGL_GLX_USE_CSTUBS = 1
+   endif
+  endif
+@@ -61,7 +61,7 @@
+ #
+ VBoxOGL_TEMPLATE       = VBOXCROGLR3GUESTDLL
+ VBoxOGL_INCS           = .
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGL_INCS     += \
+ 	/usr/include/x11 \
+ 	/usr/include/xorg \
+@@ -109,7 +109,7 @@
+ 	$(VBOX_PATH_CROGL_GENFILES)/NULLfuncs.c \
+ 	$(VBOX_PATH_CROGL_GENFILES)/tsfuncs.c
+ 
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGL_SOURCES += \
+ 	glx.c \
+ 	xfont.c
+@@ -125,8 +125,10 @@
+  	$(VBOX_PATH_CROGL_GENFILES)/linux_exports_dri.asm
+   VBoxOGL_SOURCES.solaris += \
+  	$(VBOX_PATH_CROGL_GENFILES)/solaris_exports_dri.asm
+-  VBoxOGL_SOURCES.freebsd += \
++  if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++  VBoxOGL_SOURCES += \
+  	$(VBOX_PATH_CROGL_GENFILES)/freebsd_exports_dri.asm
++  endif
+  else ifdef VBoxOGL_FAKEDRI
+   VBoxOGL_SOURCES += \
+  	fakedri_drv.c
+@@ -137,24 +139,30 @@
+    VBoxOGL_SOURCES.linux += \
+  	$(VBOX_PATH_CROGL_GENFILES)/linux_glxapi_exports.asm \
+  	$(VBOX_PATH_CROGL_GENFILES)/linux_exports_dri.asm
+-   VBoxOGL_SOURCES.freebsd += \
++  if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++   VBoxOGL_SOURCES += \
+  	$(VBOX_PATH_CROGL_GENFILES)/freebsd_glxapi_exports.asm \
+  	$(VBOX_PATH_CROGL_GENFILES)/freebsd_exports_dri.asm
++  endif
+   else
+    VBoxOGL_SOURCES.solaris += \
+   	$(VBOX_PATH_CROGL_GENFILES)/solaris_exports.c
+   VBoxOGL_SOURCES.linux += \
+   	$(VBOX_PATH_CROGL_GENFILES)/linux_exports.c
+-  VBoxOGL_SOURCES.freebsd += \
++  if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++  VBoxOGL_SOURCES += \
+   	$(VBOX_PATH_CROGL_GENFILES)/freebsd_exports.c
+   endif
++  endif
+  else
+   VBoxOGL_SOURCES.linux += \
+   	$(VBOX_PATH_CROGL_GENFILES)/linux_exports.asm
+   VBoxOGL_SOURCES.solaris += \
+   	$(VBOX_PATH_CROGL_GENFILES)/solaris_exports.c
+-  VBoxOGL_SOURCES.freebsd += \
++  if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++  VBoxOGL_SOURCES += \
+   	$(VBOX_PATH_CROGL_GENFILES)/freebsd_exports.c
++  endif
+  endif
+ endif
+ 
+@@ -195,7 +203,7 @@
+ 	$(VBOX_LIB_VBGL_R3_SHARED) \
+ 	$(VBOX_LIB_OGL_CRUTIL) \
+ 	$(PATH_LIB)/additions/VBoxOGLspuload$(VBOX_SUFF_LIB)
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGL_LIBS += \
+  	$(PATH_LIB)/libXcomposite.so \
+  	$(PATH_LIB)/libXdamage.so \
+@@ -262,7 +270,7 @@
+ 	$(QUIET)$(call VBOX_CROGL_PYTHON_ENV,$(VBOX_PATH_CROGL_PYTHON_INCLUDE),$@) $(VBOX_BLD_PYTHON) $< $(VBOX_PATH_CROGL_GLAPI)
+   endif #ifeq ($(KBUILD_TARGET).$(KBUILD_TARGET_ARCH),win.amd64)
+  endif #ifdef VBOX_WITH_WDDM
+-else if1of ($(KBUILD_TARGET), linux solaris freebsd)
++else if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+ $(VBOX_PATH_CROGL_GENFILES)/getprocaddress.c: $(PATH_SUB_CURRENT)/getprocaddress.py $(VBOX_CROGL_API_FILES) | $$(dir $$@)
+ 	$(call MSG_GENERATE,python,$@,$<)
+ 	$(QUIET)$(call VBOX_CROGL_PYTHON_ENV,$(VBOX_PATH_CROGL_PYTHON_INCLUDE),$@) $(VBOX_BLD_PYTHON) $< $(VBOX_PATH_CROGL_GLAPI)
+@@ -274,7 +282,7 @@
+ 		| $$(dir $$@)
+ 	$(call MSG_GENERATE,python,$@,$<)
+ 	$(QUIET)$(call VBOX_CROGL_PYTHON_ENV,$(VBOX_PATH_CROGL_PYTHON_INCLUDE),$@) $(VBOX_BLD_PYTHON) $< $(VBOX_PATH_CROGL_GLAPI)
+- else  ifeq ($(KBUILD_TARGET),freebsd)
++ else  if1of ($(KBUILD_TARGET),freebsd gnukfreebsd)
+ $(VBOX_PATH_CROGL_GENFILES)/freebsd_exports.c: \
+ 		$(PATH_SUB_CURRENT)/FreeBSD_exports.py \
+ 		$(VBOX_CROGL_API_FILES) $(PATH_SUB_CURRENT)/entrypoints.py \
+@@ -306,7 +314,7 @@
+ 		| $$(dir $$@)
+ 	$(call MSG_GENERATE,python,$@,$<)
+ 	$(QUIET)$(call VBOX_CROGL_PYTHON_ENV,$(VBOX_PATH_CROGL_PYTHON_INCLUDE),$@) $(VBOX_BLD_PYTHON) $< $(VBOX_PATH_CROGL_GLAPI)
+- else ifeq ($(KBUILD_TARGET),freebsd)
++ else if1of ($(KBUILD_TARGET),freebsd gnukfreebsd)
+ $(VBOX_PATH_CROGL_GENFILES)/freebsd_exports_dri.asm: \
+ 		$(PATH_SUB_CURRENT)/FreeBSD_i386_exports_dri.py \
+ 		$(VBOX_CROGL_API_FILES) $(PATH_SUB_CURRENT)/entrypoints.py \
+@@ -373,7 +381,7 @@
+ VBoxOGLarrayspu_TEMPLATE      = VBOXCROGLR3GUESTDLL
+ VBoxOGLarrayspu_INCS          = \
+ 	array
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGLarrayspu_INCS += \
+         $(VBOX_MESA_INCS)
+ endif
+@@ -415,7 +423,7 @@
+ VBoxOGLpassthroughspu_TEMPLATE    = VBOXCROGLR3GUESTDLL
+ VBoxOGLpassthroughspu_INCS        = \
+ 	passthrough
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGLpassthroughspu_INCS += \
+         $(VBOX_MESA_INCS)
+ endif
+@@ -458,7 +466,7 @@
+ VBoxOGLpackspu_DEFS          = TRACKS_STATE=1 PACKS=1
+ VBoxOGLpackspu_INCS          = \
+ 	pack
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGLpackspu_INCS += \
+         $(VBOX_MESA_INCS)
+ endif
+@@ -545,7 +553,7 @@
+ VBoxOGLfeedbackspu_TEMPLATE    = VBOXCROGLR3GUESTDLL
+ VBoxOGLfeedbackspu_INCS        = \
+ 	feedback
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGLfeedbackspu_INCS += \
+         $(VBOX_MESA_INCS)
+ endif
+
+=== modified file 'src/VBox/Additions/freebsd/Makefile.kmk'
+--- src/VBox/Additions/freebsd/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/freebsd/Makefile.kmk	2011-07-18 12:59:36 +0000
+@@ -18,7 +18,7 @@
+ SUB_DEPTH = ../../../..
+ include	$(KBUILD_PATH)/subheader.kmk
+ 
+-ifneq ($(KBUILD_HOST),freebsd)
++ifneq ($(KBUILD_HOST),$(KBUILD_TARGET))
+ $(error "The FreeBSD guest additions installer can only be built on FreeBSD!")
+ endif
+ 
+
+=== modified file 'src/VBox/Additions/freebsd/drm/Makefile.kmk'
+--- src/VBox/Additions/freebsd/drm/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/freebsd/drm/Makefile.kmk	2011-07-18 13:01:37 +0000
+@@ -24,7 +24,7 @@
+ ifdef VBOX_WITH_ADDITION_DRIVERS
+  SYSMODS  += vboxvideo_drm
+ endif
+-ifneq ($(KBUILD_HOST),freebsd)
++ifneq ($(KBUILD_HOST),$(KBUILD_TARGET))
+ $(error "The FreeBSD guest additions can only be built on FreeBSD!")
+ endif
+ 
+@@ -45,19 +45,19 @@
+ vboxvideo_drm_NAME          = vboxvideo
+ vboxvideo_drm_DEFS          = VBOX_WITH_HGCM VBOX_SVN_REV=$(VBOX_SVN_REV)
+ vboxvideo_drm_DEPS         += $(VBOX_SVN_REV_KMK)
+-vboxvideo_drm_INCS.freebsd  = \
++vboxvideo_drm_INCS         += \
+ 	$(vboxvideo_drm_0_OUTDIR) \
+ 	$(PATH_INS)/gen-sys-hdrs
+ vboxvideo_drm_SOURCES       = vboxvideo_drm.c
+ vboxvideo_drm_LIBS          = \
+ 	$(VBOX_LIB_VBGL_R0) \
+ 	$(VBOX_LIB_IPRT_GUEST_R0)
+-vboxvideo_drm_ORDERDEPS.freebsd = \
++vboxvideo_drm_ORDERDEPS    += \
+ 	$(PATH_INS)/gen-sys-hdrs/pci_if.h \
+ 	$(PATH_INS)/gen-sys-hdrs/bus_if.h \
+ 	$(PATH_INS)/gen-sys-hdrs/device_if.h \
+ 	$(vboxvideo_drm_0_OUTDIR)/opt_drm.h
+-vboxvideo_drm_CLEAN.freebsd = $(vboxvideo_drm_DEPS)
++vboxvideo_drm_CLEAN         = $(vboxvideo_drm_DEPS)
+ 
+ #
+ # Header for DRM not included by us.
+
+=== modified file 'src/VBox/Additions/freebsd/vboxvfs/Makefile.kmk'
+--- src/VBox/Additions/freebsd/vboxvfs/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/freebsd/vboxvfs/Makefile.kmk	2011-07-18 13:02:17 +0000
+@@ -18,14 +18,14 @@
+ SUB_DEPTH = ../../../../..
+ include	$(KBUILD_PATH)/subheader.kmk
+ 
+-ifneq ($(KBUILD_HOST),freebsd)
++ifneq ($(KBUILD_HOST),$(KBUILD_TARGET))
+ $(error "The FreeBSD guest additions can only be built on FreeBSD!")
+ endif
+ 
+ #
+ # vboxvfs - The Shared Folder Driver
+ #
+-SYSMODS.freebsd      += vboxvfs
++SYSMODS              += vboxvfs
+ vboxvfs_TEMPLATE      = VBOXGUESTR0
+ vboxvfs_DEFS          = VBOX_WITH_HGCM
+ vboxvfs_INCS          = \
+@@ -43,7 +43,7 @@
+        $$(vboxvfs_0_OUTDIR)/vnode_if_typedef.h
+ vboxvfs_CLEAN        += $(vboxvfs_DEPS)
+ 
+-VBOX_AWK := /usr/bin/awk
++VBOX_AWK := /usr/bin/original-awk
+ 
+ $$(vboxvfs_0_OUTDIR)/vnode_if.h: $(VBOX_FREEBSD_SRC)/kern/vnode_if.src
+ 	$(call MSG_TOOL,awk,VBoxGuest,$<,$@)
+
+=== modified file 'src/VBox/Additions/x11/Makefile.kmk'
+--- src/VBox/Additions/x11/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/x11/Makefile.kmk	2011-07-17 11:29:08 +0000
+@@ -22,7 +22,7 @@
+ endif
+ 
+ # Include sub-makefiles.
+-if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris)
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux netbsd openbsd solaris)
+  include $(PATH_SUB_CURRENT)/VBoxClient/Makefile.kmk
+  include $(PATH_SUB_CURRENT)/vboxvideo/Makefile.kmk
+  include $(PATH_SUB_CURRENT)/vboxmouse/Makefile.kmk
+
+=== modified file 'src/VBox/Additions/x11/VBoxClient/Makefile.kmk'
+--- src/VBox/Additions/x11/VBoxClient/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/x11/VBoxClient/Makefile.kmk	2011-07-18 14:22:13 +0000
+@@ -28,7 +28,9 @@
+ ifdef VBOX_WITH_DBUS
+  VBoxClient_DEFS += VBOX_WITH_DBUS
+ endif
+-VBoxClient_DEFS.linux += _GNU_SOURCE
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBoxClient_DEFS += _GNU_SOURCE
++endif
+ VBoxClient_SOURCES = \
+ 	main.cpp
+ VBoxClient_SOURCES += \
+@@ -39,8 +41,10 @@
+ 	$(VBOX_LIBPATH32_X11)
+ VBoxClient_LIBS.freebsd = \
+ 	iconv
+-VBoxClient_LIBS.linux = \
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBoxClient_LIBS += \
+ 	dl
++endif
+ VBoxClient_LIBS.solaris = \
+ 	dl
+ VBoxClient_LIBS = \
+@@ -72,7 +76,7 @@
+ 
+ ifdef VBOX_X11_SEAMLESS_GUEST
+  if defined(VBOX_WITH_TESTCASES) && !defined(VBOX_ONLY_ADDITIONS) && !defined(VBOX_ONLY_SDK)
+-  if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris)
++  if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux netbsd openbsd solaris)
+ 
+ # Set this in LocalConfig.kmk if you are working on the X11 clipboard service
+ # to automatically run the unit test at build time.
+
+=== modified file 'src/VBox/Additions/x11/VBoxClient/seamless-guest.h'
+--- src/VBox/Additions/x11/VBoxClient/seamless-guest.h	2011-07-05 17:05:22 +0000
++++ src/VBox/Additions/x11/VBoxClient/seamless-guest.h	2011-07-17 14:57:53 +0000
+@@ -78,7 +78,7 @@
+     bool interruptEvent(void);
+ };
+ 
+-#if defined(RT_OS_LINUX) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+ # include "seamless-x11.h"  /* for VBoxGuestSeamlessGuestImpl */
+ #else
+ # error Port me
+
+=== modified file 'src/VBox/Devices/Makefile.kmk'
+--- src/VBox/Devices/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Devices/Makefile.kmk	2011-07-05 17:09:02 +0000
+@@ -96,8 +96,9 @@
+   endif
+  endif
+ 
+- VBoxDDU_LDFLAGS.linux    = -Wl,--no-undefined
+- VBoxDDU_LDFLAGS.l4       = -Wl,--no-undefined
++ if1of ($(KBUILD_TARGET), linux l4 gnukfreebsd)
++  VBoxDDU_LDFLAGS        += -Wl,--no-undefined
++ endif
+ 
+  #
+  # VBoxDDULnxHostR3 (Only needed for l4, currently for executing vditool on L4Linux.)
+@@ -215,8 +216,9 @@
+  	-framework IOKit \
+  	-framework Carbon \
+  	-framework DiskArbitration
+- VBoxDD_LDFLAGS.linux    = -Wl,--no-undefined
+- VBoxDD_LDFLAGS.l4       = -Wl,--no-undefined
++ if1of ($(KBUILD_TARGET), linux l4 gnukfreebsd)
++  VBoxDD_LDFLAGS        += -Wl,--no-undefined
++ endif
+ 
+ 
+  #
+@@ -244,8 +246,9 @@
+  endif
+  VBoxDD2_LIBS.darwin    += $(LIB_REM)
+  VBoxDD2_LDFLAGS.darwin  = -install_name $(VBOX_DYLD_EXECUTABLE_PATH)/VBoxDD2.dylib
+- VBoxDD2_LDFLAGS.linux   = -Wl,--no-undefined
+- VBoxDD2_LDFLAGS.l4      = -Wl,--no-undefined
++ if1of ($(KBUILD_TARGET), linux l4 gnukfreebsd)
++  VBoxDD2_LDFLAGS       += -Wl,--no-undefined
++ endif
+ 
+  ifdef VBOX_WITH_PXE_ROM
+   VBoxDD2_DEFS          += VBOX_WITH_PXE_ROM
+@@ -261,8 +264,9 @@
+  	VBOX_HGCM_HOST_CODE \
+  	VBOX_WITH_HGCM \
+  	$(if $(VBOX_BIOS_DMI_FALLBACK),VBOX_BIOS_DMI_FALLBACK,)
+- DevicesR3_DEFS.linux   += _GNU_SOURCE
+- DevicesR3_DEFS.l4      += _GNU_SOURCE
++ if1of ($(KBUILD_TARGET), linux l4 gnukfreebsd)
++  DevicesR3_DEFS        += _GNU_SOURCE
++ endif
+ 
+  DevicesR3_INCS          = \
+  	build
+@@ -931,13 +935,12 @@
+  	Serial/DrvHostSerial.cpp
+  endif # darwin
+ 
+- ifeq ($(KBUILD_TARGET),freebsd)
++ if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
+  Drivers_SOURCES      := $(filter-out \
+  	Storage/DrvHostFloppy% \
+  	, $(Drivers_SOURCES)) \
+  	Audio/ossaudio.c \
+- 	Serial/DrvHostSerial.cpp
+- Drivers_SOURCES.freebsd = \
++ 	Serial/DrvHostSerial.cpp \
+  	Network/DrvTAP.cpp
+  endif # freebsd
+ 
+@@ -1027,14 +1030,12 @@
+  endif
+ 
+  ifdef VBOX_WITH_PULSE
+-  Drivers_DEFS.linux   += VBOX_WITH_PULSE
+-  Drivers_SOURCES.linux+= \
+- 	Audio/pulseaudio.c \
+- 	Audio/pulse_stubs.c
+-  Drivers_DEFS.freebsd += VBOX_WITH_PULSE
+-  Drivers_SOURCES.freebsd+= \
+- 	Audio/pulseaudio.c \
+- 	Audio/pulse_stubs.c
++  if1of ($(KBUILD_TARGET), linux freebsd gnukfreebsd)
++   Drivers_DEFS        += VBOX_WITH_PULSE
++   Drivers_SOURCES     += \
++ 	Audio/pulseaudio.c \
++ 	Audio/pulse_stubs.c
++  endif
+  endif
+ 
+  ifdef VBOX_WITH_VUSB
+@@ -1090,10 +1091,12 @@
+  	USB/USBProxyDevice.cpp \
+  	USB/solaris/USBProxyDevice-solaris.cpp
+ 
+-  Drivers_DEFS.freebsd      += VUSB_HAVE_USBPROXY_DEVICE
+-  Drivers_SOURCES.freebsd   += \
++  if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++   Drivers_DEFS           += VUSB_HAVE_USBPROXY_DEVICE
++   Drivers_SOURCES        += \
+  	USB/USBProxyDevice.cpp \
+  	USB/freebsd/USBProxyDevice-freebsd.cpp
++  endif
+ 
+   ifdef VBOX_WITH_SCSI
+    Drivers_SOURCES += \
+
+=== modified file 'src/VBox/Devices/Network/slirp/slirp.c'
+--- src/VBox/Devices/Network/slirp/slirp.c	2011-07-05 17:05:22 +0000
++++ src/VBox/Devices/Network/slirp/slirp.c	2011-07-18 12:27:04 +0000
+@@ -41,6 +41,8 @@
+  * THE SOFTWARE.
+  */
+ 
++#define _GNU_SOURCE 1
++
+ #include "slirp.h"
+ #ifdef RT_OS_OS2
+ # include <paths.h>
+
+=== modified file 'src/VBox/Devices/PC/Etherboot-src/Makefile.kmk'
+--- src/VBox/Devices/PC/Etherboot-src/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Devices/PC/Etherboot-src/Makefile.kmk	2011-07-05 17:09:02 +0000
+@@ -18,7 +18,7 @@
+ SUB_DEPTH = ../../../../..
+ include $(KBUILD_PATH)/subheader.kmk
+ 
+-if1of ($(KBUILD_TARGET).$(KBUILD_TARGET_ARCH), darwin.x86 darwin.amd64 os2.x86 solaris.x86 solaris.amd64 win.x86 win.amd64 linux.amd64 freebsd.amd64)
++if1of ($(KBUILD_TARGET).$(KBUILD_TARGET_ARCH), darwin.x86 darwin.amd64 os2.x86 solaris.x86 solaris.amd64 win.x86 win.amd64 linux.amd64 freebsd.amd64 gnukfreebsd.amd64)
+  #
+  # Build it from a precompiled binary.
+  # See notes about the binary load address and size way below.
+
+=== modified file 'src/VBox/Devices/Serial/DrvHostSerial.cpp'
+--- src/VBox/Devices/Serial/DrvHostSerial.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Devices/Serial/DrvHostSerial.cpp	2011-07-05 17:09:02 +0000
+@@ -32,7 +32,7 @@
+ #include <iprt/semaphore.h>
+ #include <iprt/uuid.h>
+ 
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+ # include <errno.h>
+ # ifdef RT_OS_SOLARIS
+ #  include <sys/termios.h>
+@@ -100,7 +100,7 @@
+     /** the device path */
+     char                        *pszDevicePath;
+ 
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+     /** the device handle */
+     RTFILE                      DeviceFile;
+ # ifdef RT_OS_DARWIN
+@@ -193,7 +193,7 @@
+ static DECLCALLBACK(int) drvHostSerialSetParameters(PPDMICHARCONNECTOR pInterface, unsigned Bps, char chParity, unsigned cDataBits, unsigned cStopBits)
+ {
+     PDRVHOSTSERIAL pThis = PDMICHAR_2_DRVHOSTSERIAL(pInterface);
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+     struct termios *termiosSetup;
+     int baud_rate;
+ #elif defined(RT_OS_WINDOWS)
+@@ -482,7 +482,7 @@
+         {
+             /* copy the send queue so we get a linear buffer with the maximal size. */
+             uint8_t ch = pThis->u8SendByte;
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+ 
+             size_t cbWritten;
+             rc = RTFileWrite(pThis->DeviceFile, &ch, 1, &cbWritten);
+@@ -677,7 +677,7 @@
+             }
+             cbRemaining = cbRead;
+ 
+-#elif defined(RT_OS_LINUX) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#elif defined(RT_OS_LINUX) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+ 
+             size_t cbRead;
+             struct pollfd aFDs[2];
+@@ -842,7 +842,7 @@
+ static DECLCALLBACK(int) drvHostSerialWakeupRecvThread(PPDMDRVINS pDrvIns, PPDMTHREAD /*pThread*/)
+ {
+     PDRVHOSTSERIAL pThis = PDMINS_2_DATA(pDrvIns, PDRVHOSTSERIAL);
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+     return RTFileWrite(pThis->WakeupPipeW, "", 1, NULL);
+ #elif defined(RT_OS_WINDOWS)
+     if (!SetEvent(pThis->hHaltEventSem))
+@@ -853,7 +853,7 @@
+ #endif
+ }
+ 
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+ /* -=-=-=-=- Monitor thread -=-=-=-=- */
+ 
+ /**
+@@ -973,7 +973,7 @@
+ {
+     PDRVHOSTSERIAL pThis = PDMICHAR_2_DRVHOSTSERIAL(pInterface);
+ 
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+     int modemStateSet = 0;
+     int modemStateClear = 0;
+ 
+@@ -1021,7 +1021,7 @@
+ {
+     PDRVHOSTSERIAL pThis = PDMICHAR_2_DRVHOSTSERIAL(pInterface);
+ 
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+     if (fBreak)
+         ioctl(pThis->DeviceFile, TIOCSBRK);
+     else
+@@ -1057,7 +1057,7 @@
+     RTSemEventDestroy(pThis->SendSem);
+     pThis->SendSem = NIL_RTSEMEVENT;
+ 
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+ 
+     if (pThis->WakeupPipeW != NIL_RTFILE)
+     {
+@@ -1119,7 +1119,7 @@
+     /*
+      * Init basic data members and interfaces.
+      */
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+     pThis->DeviceFile  = NIL_RTFILE;
+ # ifdef RT_OS_DARWIN
+     pThis->DeviceFileR = NIL_RTFILE;
+@@ -1211,7 +1211,7 @@
+         {
+             case VERR_ACCESS_DENIED:
+                 return PDMDrvHlpVMSetError(pDrvIns, rc, RT_SRC_POS,
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+                                            N_("Cannot open host device '%s' for read/write access. Check the permissions "
+                                               "of that device ('/bin/ls -l %s'): Most probably you need to be member "
+                                               "of the device group. Make sure that you logout/login after changing "
+@@ -1229,7 +1229,7 @@
+     }
+ 
+     /* Set to non blocking I/O */
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+ 
+     fcntl(pThis->DeviceFile, F_SETFL, O_NONBLOCK);
+ # ifdef RT_OS_DARWIN
+@@ -1281,7 +1281,7 @@
+     if (RT_FAILURE(rc))
+         return PDMDrvHlpVMSetError(pDrvIns, rc, RT_SRC_POS, N_("HostSerial#%d cannot create send thread"), pDrvIns->iInstance);
+ 
+-#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_LINUX) || defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__GLIBC__)
+     /* Linux & darwin needs a separate thread which monitors the status lines. */
+ # ifndef RT_OS_LINUX
+     ioctl(pThis->DeviceFile, TIOCMGET, &pThis->fStatusLines);
+
+=== modified file 'src/VBox/Devices/Storage/DrvHostBase.cpp'
+--- src/VBox/Devices/Storage/DrvHostBase.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Devices/Storage/DrvHostBase.cpp	2011-07-05 17:09:02 +0000
+@@ -96,7 +96,7 @@
+         /*IN*/ ULONG                Length,
+         /*IN*/ FS_INFORMATION_CLASS FileSystemInformationClass );
+ 
+-#elif defined(RT_OS_FREEBSD)
++#elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ # include <sys/cdefs.h>
+ # include <sys/param.h>
+ # include <errno.h>
+@@ -146,14 +146,14 @@
+     if (    pThis->fMediaPresent
+         &&  pThis->ppScsiTaskDI
+         &&  pThis->cbBlock)
+-#elif RT_OS_FREEBSD
++#elif RT_OS_FREEBSD || defined(__FreeBSD_kernel__)
+     if (    pThis->fMediaPresent
+         &&  pThis->cbBlock)
+ #else
+     if (pThis->fMediaPresent)
+ #endif
+     {
+-#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+         /*
+          * Issue a READ(12) request.
+          */
+@@ -232,7 +232,7 @@
+     {
+         if (pThis->fMediaPresent)
+         {
+-#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+             /** @todo write support... */
+             rc = VERR_WRITE_PROTECT;
+ 
+@@ -277,7 +277,7 @@
+ 
+     if (pThis->fMediaPresent)
+     {
+-#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+         rc = VINF_SUCCESS;
+         /** @todo scsi device buffer flush... */
+ #else
+@@ -947,7 +947,7 @@
+     *pFileDevice = FileDevice;
+     return VINF_SUCCESS;
+ 
+-#elif defined(RT_OS_FREEBSD)
++#elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+     int rc = VINF_SUCCESS;
+     RTFILE FileDevice;
+ 
+@@ -1134,7 +1134,7 @@
+  */
+ static int drvHostBaseGetMediaSize(PDRVHOSTBASE pThis, uint64_t *pcb)
+ {
+-#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+     /*
+      * Try a READ_CAPACITY command...
+      */
+@@ -1212,7 +1212,7 @@
+ }
+ 
+ 
+-#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ /**
+  * Execute a SCSI command.
+  *
+@@ -1323,7 +1323,7 @@
+ 
+     (*ppScsiTaskI)->Release(ppScsiTaskI);
+ 
+-# elif defined(RT_OS_FREEBSD)
++# elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+     int rc = VINF_SUCCESS;
+     int rcBSD = 0;
+     union ccb DeviceCCB;
+
+=== modified file 'src/VBox/Devices/Storage/DrvHostBase.h'
+--- src/VBox/Devices/Storage/DrvHostBase.h	2011-07-05 17:05:22 +0000
++++ src/VBox/Devices/Storage/DrvHostBase.h	2011-07-05 17:09:02 +0000
+@@ -136,7 +136,7 @@
+     uint8_t                *pbDoubleBuffer;
+ #endif
+ 
+-#ifdef RT_OS_FREEBSD
++#if defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+     /** The block size. Set when querying the media size. */
+     uint32_t                cbBlock;
+     /** SCSI bus number. */
+@@ -185,7 +185,7 @@
+ int DRVHostBaseMediaPresent(PDRVHOSTBASE pThis);
+ void DRVHostBaseMediaNotPresent(PDRVHOSTBASE pThis);
+ DECLCALLBACK(void) DRVHostBaseDestruct(PPDMDRVINS pDrvIns);
+-#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ DECLCALLBACK(int) DRVHostBaseScsiCmd(PDRVHOSTBASE pThis, const uint8_t *pbCmd, size_t cbCmd, PDMBLOCKTXDIR enmTxDir,
+                                      void *pvBuf, uint32_t *pcbBuf, uint8_t *pbSense, size_t cbSense, uint32_t cTimeoutMillies);
+ #endif
+
+=== modified file 'src/VBox/Devices/Storage/DrvHostDVD.cpp'
+--- src/VBox/Devices/Storage/DrvHostDVD.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Devices/Storage/DrvHostDVD.cpp	2011-07-05 17:09:02 +0000
+@@ -89,7 +89,7 @@
+ # undef _interlockedbittestandreset64
+ # undef USE_MEDIA_POLLING
+ 
+-#elif defined(RT_OS_FREEBSD)
++#elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ # include <sys/cdefs.h>
+ # include <sys/param.h>
+ # include <stdio.h>
+@@ -146,7 +146,7 @@
+             /*
+              * Eject the disc.
+              */
+-#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+             uint8_t abCmd[16] =
+             {
+                 SCSI_START_STOP_UNIT, 0, 0, 0, 2 /*eject+stop*/, 0,
+@@ -236,7 +236,7 @@
+  */
+ static DECLCALLBACK(int) drvHostDvdDoLock(PDRVHOSTBASE pThis, bool fLock)
+ {
+-#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+     uint8_t abCmd[16] =
+     {
+         SCSI_PREVENT_ALLOW_MEDIUM_REMOVAL, 0, 0, 0, fLock, 0,
+@@ -324,7 +324,7 @@
+     /*
+      * Poll for media change.
+      */
+-#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ #ifdef RT_OS_DARWIN
+     AssertReturn(pThis->ppScsiTaskDI, VERR_INTERNAL_ERROR);
+ #endif
+@@ -394,7 +394,7 @@
+         /*
+          * Poll for media change.
+          */
+-#if defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_DARWIN) || defined(RT_OS_SOLARIS) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+         /* taken care of above. */
+ #elif defined(RT_OS_LINUX)
+         bool fMediaChanged = ioctl(pThis->FileDevice, CDROM_MEDIA_CHANGED, CDSL_CURRENT) == 1;
+@@ -424,7 +424,7 @@
+     int rc;
+     LogFlow(("%s: cmd[0]=%#04x txdir=%d pcbBuf=%d timeout=%d\n", __FUNCTION__, pbCmd[0], enmTxDir, *pcbBuf, cTimeoutMillies));
+ 
+-#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD)
++#if defined(RT_OS_DARWIN) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+     /*
+      * Pass the request on to the internal scsi command interface.
+      * The command seems to be 12 bytes long, the docs a bit copy&pasty on the command length point...
+
+=== modified file 'src/VBox/Devices/USB/freebsd/USBProxyDevice-freebsd.cpp'
+--- src/VBox/Devices/USB/freebsd/USBProxyDevice-freebsd.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Devices/USB/freebsd/USBProxyDevice-freebsd.cpp	2011-07-05 17:09:02 +0000
+@@ -26,7 +26,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
+-#include <sys/poll.h>
++#include <bsd/sys/poll.h>
+ #include <stdint.h>
+ #include <stdio.h>
+ #include <string.h>
+
+=== modified file 'src/VBox/Frontends/Common/Makefile.kmk'
+--- src/VBox/Frontends/Common/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Frontends/Common/Makefile.kmk	2011-07-05 17:09:02 +0000
+@@ -20,7 +20,7 @@
+ 
+ # Include Sub-Makefiles
+ ifneq ($(VBOX_WITH_QTGUI)$(VBOX_WITH_VBOXSDL),)
+- ifeq ($(filter-out freebsd linux openbsd netbsd solaris,$(KBUILD_TARGET)),) # X11
++ ifeq ($(filter-out freebsd linux gnukfreebsd openbsd netbsd solaris,$(KBUILD_TARGET)),) # X11
+   include $(PATH_SUB_CURRENT)/VBoxKeyboard/Makefile.kmk
+  endif
+ endif
+
+=== modified file 'src/VBox/Frontends/Common/VBoxKeyboard/Makefile.kmk'
+--- src/VBox/Frontends/Common/VBoxKeyboard/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Frontends/Common/VBoxKeyboard/Makefile.kmk	2011-07-05 17:09:02 +0000
+@@ -18,7 +18,7 @@
+ SUB_DEPTH = ../../../../..
+ include $(KBUILD_PATH)/subheader.kmk
+ 
+-if1of ($(KBUILD_TARGET), freebsd linux openbsd netbsd solaris) # X11
++if1of ($(KBUILD_TARGET), freebsd linux gnukfreebsd openbsd netbsd solaris) # X11
+  DLLS        += VBoxKeyboard
+  OTHERS      += $(PATH_BIN)/vboxkeyboard.tar.bz2
+  OTHER_CLEAN += $(PATH_BIN)/vboxkeyboard.tar.bz2
+
+=== modified file 'src/VBox/Frontends/VBoxBFE/Makefile.kmk'
+--- src/VBox/Frontends/VBoxBFE/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Frontends/VBoxBFE/Makefile.kmk	2011-07-05 17:09:02 +0000
+@@ -55,10 +55,12 @@
+ ifdef VBOX_WITH_LINUX_COMPILER_H
+ VBoxBFE_DEFS += VBOX_WITH_LINUX_COMPILER_H
+ endif
+-VBoxBFE_DEFS.freebsd = VBOXBFE_WITH_X11
+-VBoxBFE_DEFS.l4 = _GNU_SOURCE
+-VBoxBFE_DEFS.linux = _GNU_SOURCE VBOXBFE_WITH_X11
+-VBoxBFE_DEFS.solaris = VBOXBFE_WITH_X11
++if1of ($(KBUILD_TARGET), linux l4 gnukfreebsd)
++VBoxBFE_DEFS += _GNU_SOURCE
++endif
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux solaris)
++VBoxBFE_DEFS += VBOXBFE_WITH_X11
++endif
+ ifdef VBOX_WITH_CROSSBOW
+  VBoxBFE_DEFS.solaris += VBOX_WITH_CROSSBOW
+ endif
+
+=== modified file 'src/VBox/Frontends/VBoxSDL/Makefile.kmk'
+--- src/VBox/Frontends/VBoxSDL/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Frontends/VBoxSDL/Makefile.kmk	2011-07-05 17:09:02 +0000
+@@ -59,9 +59,12 @@
+   VBoxSDL_DEFS    += VBOX_SECURELABEL
+  endif
+ endif
+-VBoxSDL_DEFS.freebsd = VBOXSDL_WITH_X11
+-VBoxSDL_DEFS.linux = _GNU_SOURCE VBOXSDL_WITH_X11
+-VBoxSDL_DEFS.solaris = VBOXSDL_WITH_X11
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBoxSDL_DEFS      += _GNU_SOURCE
++endif
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux solaris)
++VBoxSDL_DEFS      += VBOXSDL_WITH_X11
++endif
+ ifdef VBOX_OPENGL
+  #VBoxSDL_DEFS.linux += VBOX_OPENGL
+ endif
+@@ -70,7 +73,7 @@
+ 
+ VBoxSDL_INCS = \
+ 	$(VBoxSDL_0_OUTDIR)
+-ifeq ($(filter-out freebsd linux netbsd openbsd solaris,$(KBUILD_TARGET)),) # X11
++ifeq ($(filter-out freebsd linux gnukfreebsd netbsd openbsd solaris,$(KBUILD_TARGET)),) # X11
+ VBoxSDL_INCS += \
+ 	$(VBOX_XCURSOR_INCS)
+ endif
+@@ -79,7 +82,7 @@
+ VBoxSDL_LIBS = \
+ 	$(LIB_SDK_LIBSDL_SDLMAIN)
+ endif
+-ifeq ($(filter-out freebsd linux netbsd openbsd solaris,$(KBUILD_TARGET)),) # X11
++ifeq ($(filter-out freebsd linux gnukfreebsd netbsd openbsd solaris,$(KBUILD_TARGET)),) # X11
+ VBoxSDL_LIBS += \
+ 	$(PATH_DLL)/VBoxKeyboard$(VBOX_SUFF_DLL) \
+ 	$(VBOX_XCURSOR_LIBS) \
+@@ -136,7 +139,7 @@
+ ifdef VBOX_OPENGL
+ tstSDL_LIBS.linux += GL
+ endif
+-ifeq ($(filter-out freebsd linux netbsd openbsd solaris,$(KBUILD_TARGET)),) # X11
++ifeq ($(filter-out freebsd linux gnukfreebsd netbsd openbsd solaris,$(KBUILD_TARGET)),) # X11
+ tstSDL_LIBPATH = \
+ 	$(VBOX_LIBPATH_X11)
+ endif
+
+=== modified file 'src/VBox/Frontends/VirtualBox/Makefile.kmk'
+--- src/VBox/Frontends/VirtualBox/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Frontends/VirtualBox/Makefile.kmk	2011-07-05 17:09:02 +0000
+@@ -90,7 +90,7 @@
+  VirtualBox_INST.darwin = $(INST_BIN)VirtualBox $(INST_BIN)VirtualBoxVM
+ endif
+ VirtualBox_SDKS.win = WINPSDK DXSDK
+-if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd os2) # X11 + os2 ## @todo solaris
++if1of ($(KBUILD_TARGET), freebsd linux gnukfreebsd netbsd openbsd os2) # X11 + os2 ## @todo solaris
+  VirtualBox_SDKS += LIBSDL
+ endif
+ 
+@@ -107,6 +107,7 @@
+ endif
+ VirtualBox_DEFS.freebsd   = VBOX_GUI_USE_QIMAGE VBOX_GUI_USE_SDL
+ VirtualBox_DEFS.linux     = VBOX_GUI_USE_QIMAGE VBOX_GUI_USE_SDL
++VirtualBox_DEFS.gnukfreebsd = VBOX_GUI_USE_QIMAGE VBOX_GUI_USE_SDL
+ VirtualBox_DEFS.netbsd    = VBOX_GUI_USE_QIMAGE VBOX_GUI_USE_SDL
+ VirtualBox_DEFS.openbsd   = VBOX_GUI_USE_QIMAGE VBOX_GUI_USE_SDL
+ VirtualBox_DEFS.solaris   = VBOX_GUI_USE_QIMAGE #VBOX_GUI_USE_SDL
+@@ -202,9 +203,9 @@
+ VirtualBox_LIBS = $(LIB_DDU)
+ 
+ # This library is required for multi-monitor support
+-VirtualBox_LIBS.linux += Xinerama
+-VirtualBox_LIBS.solaris += Xinerama
+-VirtualBox_LIBS.freebsd += Xinerama
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
++VirtualBox_LIBS += Xinerama
++endif
+ 
+ ifneq ($(KBUILD_TARGET),win)
+ VirtualBox_CXXFLAGS += -Wno-switch
+@@ -217,7 +218,9 @@
+ ifeq ($(KBUILD_TYPE),release)
+  VirtualBox_LDFLAGS.win  += /SUBSYSTEM:windows
+ else
+- VirtualBox_LDFLAGS.linux+= -rdynamic # for backtrace_symbols()
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++ VirtualBox_LDFLAGS      += -rdynamic # for backtrace_symbols()
++endif
+  ifeq ($(USERNAME),dmik)
+   VirtualBox_LDFLAGS.win += /SUBSYSTEM:windows
+  else
+@@ -243,7 +246,7 @@
+ 	$(PATH_SDK_WINPSDK_LIB)/Htmlhelp.Lib \
+ 	$(PATH_SDK_DXSDK_LIB)/ddraw.lib \
+ 	$(PATH_SDK_DXSDK_LIB)/dxguid.lib
+-if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris) # X11
++if1of ($(KBUILD_TARGET), freebsd linux gnukfreebsd netbsd openbsd solaris) # X11
+  VirtualBox_LIBS         += $(PATH_DLL)/VBoxKeyboard$(VBOX_SUFF_DLL)
+ endif
+ 
+@@ -252,6 +255,7 @@
+  VirtualBox_LIBS.solaris += GL
+  VirtualBox_LIBS.linux   += GL
+  VirtualBox_LIBS.freebsd += GL
++ VirtualBox_LIBS.gnukfreebsd += GL
+ endif
+ 
+ # Headers containing definitions of classes that use the Q_OBJECT macro.
+@@ -559,7 +563,7 @@
+ 	src/platform/darwin/UIWindowMenuManager.cpp \
+ 	src/platform/darwin/UICocoaDockIconPreview.mm
+ 
+-if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris) # X11
++if1of ($(KBUILD_TARGET), freebsd linux gnukfreebsd netbsd openbsd solaris) # X11
+  VirtualBox_SOURCES += \
+  	src/platform/x11/XKeyboard-new.cpp \
+  	src/platform/x11/VBoxX11Helper.cpp \
+@@ -929,7 +933,7 @@
+ # App for testing GL support
+ #
+ if defined(VBOX_WITH_VIDEOHWACCEL)
+- if1of ($(KBUILD_TARGET), win linux freebsd)
++ if1of ($(KBUILD_TARGET), win linux freebsd gnukfreebsd)
+   LIBRARIES += VBoxOGL2D
+   VBoxOGL2D_TEMPLATE = VBOXR3STATIC
+   VBoxOGL2D_USES = qt4
+
+=== modified file 'src/VBox/GuestHost/OpenGL/Makefile.kmk'
+--- src/VBox/GuestHost/OpenGL/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/GuestHost/OpenGL/Makefile.kmk	2011-07-05 17:09:02 +0000
+@@ -45,7 +45,7 @@
+ endif
+ VBoxOGLcrutil_SDKS.win      = DXSDK
+ VBoxOGLcrutil_INTERMEDIATES = $(VBOX_PATH_CROGL_GENFILES)/cr_opcodes.h
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGLcrutil_INCS += \
+ 	$(VBOX_MESA_INCS)
+ endif
+@@ -155,7 +155,7 @@
+ VBoxOGLcrpacker_TEMPLATE = VBOXCROGLR3GUESTLIB
+ VBoxOGLcrpacker_INCS = \
+ 	packer
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGLcrpacker_INCS += \
+ 	$(VBOX_MESA_INCS)
+ endif
+@@ -300,7 +300,7 @@
+ VBoxOGLspuload_TEMPLATE = VBOXCROGLR3GUESTLIB
+ VBoxOGLspuload_INTERMEDIATES = \
+ 	$(VBOX_PATH_CROGL_GENFILES)/spu_dispatch_table.h
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGLspuload_INCS += \
+ 	$(VBOX_MESA_INCS)
+ endif
+@@ -368,7 +368,7 @@
+ VBoxOGLcrstate_TEMPLATE = VBOXCROGLR3GUESTLIB
+ VBoxOGLcrstate_INCS = \
+ 	state_tracker
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGLcrstate_INCS += \
+ 	$(VBOX_MESA_INCS)
+ endif
+@@ -555,7 +555,7 @@
+ endif
+ VBoxOGLerrorspu_INTERMEDIATES = \
+ 	$(VBOX_PATH_CROGL_GENFILES)/spu_dispatch_table.h
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  VBoxOGLerrorspu_INCS += \
+ 	$(VBOX_MESA_INCS)
+ endif
+
+=== modified file 'src/VBox/GuestHost/OpenGL/include/cr_dll.h'
+--- src/VBox/GuestHost/OpenGL/include/cr_dll.h	2011-07-05 17:05:22 +0000
++++ src/VBox/GuestHost/OpenGL/include/cr_dll.h	2011-07-05 17:09:02 +0000
+@@ -22,7 +22,7 @@
+ 	char *name;
+ #if defined(WINDOWS)
+ 	HINSTANCE hinstLib;
+-#elif defined(IRIX) || defined(IRIX64) || defined(Linux) || defined(FreeBSD) || defined(AIX) || defined(SunOS) || defined(OSF1)
++#elif defined(IRIX) || defined(IRIX64) || defined(Linux) || defined(__GLIBC__) || defined(FreeBSD) || defined(AIX) || defined(SunOS) || defined(OSF1)
+ 	void *hinstLib;
+ #elif defined(DARWIN)
+ 	void *hinstLib;		/* void to avoid including the headers */
+
+=== modified file 'src/VBox/GuestHost/OpenGL/include/cr_timer.h'
+--- src/VBox/GuestHost/OpenGL/include/cr_timer.h	2011-07-05 17:05:22 +0000
++++ src/VBox/GuestHost/OpenGL/include/cr_timer.h	2011-07-05 17:09:03 +0000
+@@ -35,7 +35,7 @@
+ #elif defined(WINDOWS)
+ 	LARGE_INTEGER performance_counter, performance_frequency;
+ 	double one_over_frequency;
+-#elif defined( Linux ) || defined( FreeBSD ) || defined(DARWIN) || defined(AIX) || defined (SunOS) || defined(OSF1)
++#elif defined( Linux ) || defined(__GLIBC__) || defined( FreeBSD ) || defined(DARWIN) || defined(AIX) || defined (SunOS) || defined(OSF1)
+ 	struct timeval timeofday;
+ #endif
+ } CRTimer;
+
+=== modified file 'src/VBox/GuestHost/OpenGL/spu_loader/glloader.py'
+--- src/VBox/GuestHost/OpenGL/spu_loader/glloader.py	2011-07-05 17:05:22 +0000
++++ src/VBox/GuestHost/OpenGL/spu_loader/glloader.py	2011-07-05 17:09:03 +0000
+@@ -34,7 +34,7 @@
+ #  define SYSTEM_AGL "AGL"
+ # endif
+ #include <string.h> /* VBOX */
+-#elif defined(IRIX) || defined(IRIX64) || defined(Linux) || defined(FreeBSD) || defined(AIX) || defined(SunOS) || defined(OSF1)
++#elif defined(IRIX) || defined(IRIX64) || defined(Linux) || defined(__GLIBC__) || defined(FreeBSD) || defined(AIX) || defined(SunOS) || defined(OSF1)
+ #include <string.h>
+ #if defined(AIX)
+ #define SYSTEM_GL "libGL.o"
+@@ -143,7 +143,7 @@
+ 		 * version if it exists; otherwise, we'll use /usr/lib.
+ 		 */
+ 		/*crStrcpy(system_path, "/usr/lib");*/
+-#if defined(__linux__) && defined(__amd64__)
++#if (defined(__linux__) || defined(__GLIBC_)) && defined(__amd64__)
+ 		/*if (sizeof(void *) == 8 && FileExists("/usr/lib64", lib)) {
+ 			crStrcat(system_path, "64");
+ 		}*/
+@@ -154,7 +154,7 @@
+ 		}*/
+ #endif
+ 	}
+-#if !defined(__linux__) && !defined(SunOS) && !defined(__FreeBSD__)
++#if !defined(__linux__) && !defined(__GLIBC__) && !defined(SunOS) && !defined(__FreeBSD__)
+ 	crStrcat( system_path, "/" );
+ #endif
+ #if !defined(CR_NO_GL_SYSTEM_PATH)
+
+=== modified file 'src/VBox/GuestHost/OpenGL/util/dll.c'
+--- src/VBox/GuestHost/OpenGL/util/dll.c	2011-07-05 17:05:22 +0000
++++ src/VBox/GuestHost/OpenGL/util/dll.c	2011-07-05 17:09:03 +0000
+@@ -14,7 +14,7 @@
+ #include <string.h>
+ #endif
+ 
+-#if defined(IRIX) || defined(IRIX64) || defined(Linux) || defined(FreeBSD) || defined(AIX) || defined(DARWIN) || defined(SunOS) || defined(OSF1)
++#if defined(IRIX) || defined(IRIX64) || defined(__GLIBC__) || defined(FreeBSD) || defined(AIX) || defined(DARWIN) || defined(SunOS) || defined(OSF1)
+ #include <dlfcn.h>
+ #endif
+ 
+@@ -203,7 +203,7 @@
+ 		dll_err = "Unknown DLL type";
+ 		break;
+ 	};
+-#elif defined(IRIX) || defined(IRIX64) || defined(Linux) || defined(FreeBSD) || defined(AIX) || defined(SunOS) || defined(OSF1)
++#elif defined(IRIX) || defined(IRIX64) || defined(__GLIBC__) || defined(FreeBSD) || defined(AIX) || defined(SunOS) || defined(OSF1)
+ 	if (resolveGlobal)
+ 		dll->hinstLib = dlopen( dllname, RTLD_LAZY | RTLD_GLOBAL );
+ 	else
+@@ -256,7 +256,7 @@
+ 
+ 	return (CRDLLFunc) NSAddressOfSymbol( nssym );
+ 
+-#elif defined(IRIX) || defined(IRIX64) || defined(Linux) || defined(FreeBSD) || defined(AIX) || defined(SunOS) || defined(OSF1)
++#elif defined(IRIX) || defined(IRIX64) || defined(__GLIBC__) || defined(FreeBSD) || defined(AIX) || defined(SunOS) || defined(OSF1)
+ 	return (CRDLLFunc) dlsym( dll->hinstLib, symname );
+ #else
+ #error CR DLL ARCHITETECTURE
+@@ -300,7 +300,7 @@
+ 		NSUnLinkModule( (NSModule) dll->hinstLib, 0L );
+ 		break;
+ 	}
+-#elif defined(IRIX) || defined(IRIX64) || defined(Linux) || defined(FreeBSD) || defined(AIX) || defined(SunOS) || defined(OSF1)
++#elif defined(IRIX) || defined(IRIX64) || defined(__GLIBC__) || defined(FreeBSD) || defined(AIX) || defined(SunOS) || defined(OSF1)
+ 	/*
+ 	 * Unloading Nvidia's libGL will crash VirtualBox later during shutdown.
+ 	 * Therefore we will skip unloading it. It will be unloaded later anway
+
+=== modified file 'src/VBox/GuestHost/OpenGL/util/timer.c'
+--- src/VBox/GuestHost/OpenGL/util/timer.c	2011-07-05 17:05:22 +0000
++++ src/VBox/GuestHost/OpenGL/util/timer.c	2011-07-05 17:09:03 +0000
+@@ -35,7 +35,7 @@
+ #elif defined( WINDOWS )
+ 	QueryPerformanceCounter( &t->performance_counter );
+ 	return ((double) t->performance_counter.QuadPart)*t->one_over_frequency;
+-#elif defined( Linux ) || defined( FreeBSD ) || defined(DARWIN) || defined(AIX) || defined(SunOS) || defined(OSF1)
++#elif defined( Linux ) || defined(__GLIBC__) || defined( FreeBSD ) || defined(DARWIN) || defined(AIX) || defined(SunOS) || defined(OSF1)
+ 	gettimeofday( &t->timeofday, NULL );	
+ 	return t->timeofday.tv_sec + t->timeofday.tv_usec / 1000000.0;
+ #else
+
+=== modified file 'src/VBox/GuestHost/SharedClipboard/Makefile.kmk'
+--- src/VBox/GuestHost/SharedClipboard/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/GuestHost/SharedClipboard/Makefile.kmk	2011-07-18 14:23:32 +0000
+@@ -19,7 +19,7 @@
+ include $(KBUILD_PATH)/subheader.kmk
+ 
+ if defined(VBOX_WITH_TESTCASES) && !defined(VBOX_ONLY_ADDITIONS) && !defined(VBOX_ONLY_SDK)
+- if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris)
++ if1of ($(KBUILD_TARGET), freebsd gnukfreebsd linux netbsd openbsd solaris)
+   #
+   # Set these in LocalConfig.kmk if you are working on the X11 clipboard service
+   # to automatically run the unit tests at build time:
+
+=== modified file 'src/VBox/HostDrivers/Makefile.kmk'
+--- src/VBox/HostDrivers/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/HostDrivers/Makefile.kmk	2011-07-05 17:09:03 +0000
+@@ -27,12 +27,12 @@
+  ifdef VBOX_WITH_USB
+   include $(PATH_SUB_CURRENT)/VBoxUSB/Makefile.kmk
+  endif
+- if1of ($(KBUILD_TARGET), darwin solaris win linux freebsd)
++ if1of ($(KBUILD_TARGET), darwin solaris win linux freebsd gnukfreebsd)
+   ifdef VBOX_WITH_NETFLT
+    include $(PATH_SUB_CURRENT)/VBoxNetFlt/Makefile.kmk
+   endif
+  endif
+- if1of ($(KBUILD_TARGET), darwin solaris linux freebsd)
++ if1of ($(KBUILD_TARGET), darwin solaris linux freebsd gnukfreebsd)
+   ifdef VBOX_WITH_NETADP
+    include $(PATH_SUB_CURRENT)/VBoxNetAdp/Makefile.kmk
+   endif
+@@ -41,7 +41,7 @@
+   include $(PATH_SUB_CURRENT)/darwin/Makefile.kmk
+  endif
+ 
+- if1of ($(KBUILD_TARGET),linux freebsd)
++ if1of ($(KBUILD_TARGET),linux freebsd gnukfreebsd)
+   #
+   # Install the Makefile for module compilation on Linux and FreeBSD hosts
+   #
+@@ -50,9 +50,10 @@
+   HostDrivers-src_MODE            = a+r,u+w
+   HostDrivers-src_SOURCES.linux   = linux/Makefile
+   HostDrivers-src_SOURCES.freebsd = freebsd/Makefile
++  HostDrivers-src_SOURCES.gnukfreebsd = freebsd/Makefile
+  endif
+ 
+- if1of ($(KBUILD_TARGET),linux)
++ if1of ($(KBUILD_TARGET),linux gnukfreebsd)
+   INSTALLS += HostDrivers-dkms-sh
+   HostDrivers-dkms-sh_INST    = bin/src/
+   HostDrivers-dkms-sh_MODE    = a+rx,u+w
+
+=== modified file 'src/VBox/HostDrivers/Support/Makefile.kmk'
+--- src/VBox/HostDrivers/Support/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/HostDrivers/Support/Makefile.kmk	2011-07-05 17:09:03 +0000
+@@ -45,12 +45,14 @@
+  ifdef VBOX_WITH_VBOXDRV
+   LIBRARIES       += SUPR0IdcClient
+   SYSMODS.freebsd += vboxdrv
++  SYSMODS.gnukfreebsd += vboxdrv
+   SYSMODS.linux   += vboxdrv
+   SYSMODS.win     += VBoxDrv
+   SYSMODS.os2     += VBoxDrv
+   SYSMODS.solaris += vboxdrv
+  endif
+  INSTALLS.linux   += vboxdrv-mod vboxdrv-sh vboxdrv-dkms
++ INSTALLS.gnukfreebsd += vboxdrv-mod vboxdrv-sh vboxdrv-dkms
+  INSTALLS.freebsd += vboxdrv-mod vboxdrv-sh
+ 
+  #
+@@ -64,7 +66,7 @@
+  ifeq ($(KBUILD_TARGET),linux)
+   include $(PATH_SUB_CURRENT)/linux/files_vboxdrv
+  endif
+- ifeq ($(KBUILD_TARGET),freebsd)
++ if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
+   include $(PATH_SUB_CURRENT)/freebsd/files_vboxdrv
+  endif
+ endif # !VBOX_ONLY_DOCS && !VBOX_ONLY_EXTPACKS && !VBOX_ONLY_TESTSUITE
+@@ -89,8 +91,14 @@
+ 	SUPLib.cpp \
+ 	SUPLibSem.cpp \
+ 	SUPR3HardenedIPRT.cpp \
+-	SUPR3HardenedVerify.cpp \
++	SUPR3HardenedVerify.cpp
++ifeq ($(KBUILD_TARGET),gnukfreebsd)
++SUPR3_SOURCES      += \
++	freebsd/SUPLib-freebsd.cpp
++else
++SUPR3_SOURCES      += \
+ 	$(KBUILD_TARGET)/SUPLib-$(KBUILD_TARGET).cpp
++endif
+ 
+ #
+ # Static version of SUPR3.
+@@ -109,8 +117,14 @@
+ SUPR3HardenedStatic_INCS     = .
+ SUPR3HardenedStatic_SOURCES  = \
+ 	SUPR3HardenedMain.cpp \
+-	SUPR3HardenedVerify.cpp \
++	SUPR3HardenedVerify.cpp
++ifeq ($(KBUILD_TARGET),gnukfreebsd)
++SUPR3HardenedStatic_SOURCES += \
++	freebsd/SUPLib-freebsd.cpp
++else
++SUPR3HardenedStatic_SOURCES += \
+ 	$(KBUILD_TARGET)/SUPLib-$(KBUILD_TARGET).cpp
++endif
+ 
+ #
+ # VBoxSupSvc - The system wide service/daemon.
+@@ -119,7 +133,15 @@
+ VBoxSupSvc_SOURCES = \
+ 	SUPSvc.cpp \
+ 	SUPSvcGlobal.cpp \
++	
++ifeq ($(KBUILD_TARGET),gnukfreebsd)
++VBoxSupSvc_SOURCES += \
++	freebsd/SUPSvc-freebsd.cpp
++else
++VBoxSupSvc_SOURCES += \
+ 	$(KBUILD_TARGET)/SUPSvc-$(KBUILD_TARGET).cpp
++endif
++
+ if1of ($(KBUILD_TARGET), win)
+  VBoxSupSvc_SOURCES += \
+ 	SUPSvcGrant.cpp
+@@ -158,8 +180,13 @@
+ SUPR0IdcClient_TEMPLATE = VBOXR0DRV
+ SUPR0IdcClient_DEFS = IN_RT_R0 IN_SUP_R0 IN_SUP_STATIC
+ SUPR0IdcClient_SDKS.win = W2K3DDK WINPSDKINCS
++ifeq ($(KBUILD_TARGET),gnukfreebsd)
++SUPR0IdcClient_SOURCES.$(KBUILD_TARGET) = \
++	freebsd/SUPR0IdcClient-freebsd.c
++else
+ SUPR0IdcClient_SOURCES.$(KBUILD_TARGET) = \
+ 	$(KBUILD_TARGET)/SUPR0IdcClient-$(KBUILD_TARGET).c
++endif
+ SUPR0IdcClient_SOURCES = \
+ 	SUPR0IdcClient.c \
+ 	SUPR0IdcClientComponent.c \
+@@ -396,7 +423,7 @@
+ 	SUPDrvSem.c
+ 
+ endif # os2
+-ifeq ($(KBUILD_TARGET),freebsd)
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
+ 
+ #
+ # vboxdrv.ko - The FreeBSD Kernel Module.
+@@ -406,8 +433,8 @@
+ vboxdrv_INCS         := $(PATH_SUB_CURRENT)
+ vboxdrv_LIBS          = $(PATH_LIB)/RuntimeR0Drv$(VBOX_SUFF_LIB)
+ vboxdrv_SOURCES      := \
+-	$(KBUILD_TARGET)/SUPDrv-$(KBUILD_TARGET).c \
+-	$(PATH_SUB_CURRENT)/$(KBUILD_TARGET)/SUPDrv-$(KBUILD_TARGET).def \
++	freebsd/SUPDrv-freebsd.c \
++	$(PATH_SUB_CURRENT)/freebsd/SUPDrv-freebsd.def \
+ 	SUPDrv.c \
+ 	SUPDrvSem.c
+ ## @todo the SUPDrv-freebsd.def is most probably gonna break it and require build system hacking...
+
+=== modified file 'src/VBox/HostDrivers/Support/SUPDrvIDC.h'
+--- src/VBox/HostDrivers/Support/SUPDrvIDC.h	2011-07-05 17:05:22 +0000
++++ src/VBox/HostDrivers/Support/SUPDrvIDC.h	2011-07-05 17:09:03 +0000
+@@ -226,7 +226,7 @@
+ #if defined(RT_OS_DARWIN)
+ extern int VBOXCALL SUPDrvDarwinIDC(uint32_t iReq, PSUPDRVIDCREQHDR pReq);
+ 
+-#elif defined(RT_OS_FREEBSD)
++#elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ extern int VBOXCALL SUPDrvFreeBSDIDC(uint32_t iReq, PSUPDRVIDCREQHDR pReq);
+ 
+ #elif defined(RT_OS_LINUX)
+
+=== modified file 'src/VBox/HostDrivers/Support/SUPDrvInternal.h'
+--- src/VBox/HostDrivers/Support/SUPDrvInternal.h	2011-07-05 17:05:22 +0000
++++ src/VBox/HostDrivers/Support/SUPDrvInternal.h	2011-07-05 17:09:03 +0000
+@@ -115,7 +115,7 @@
+ 
+ #elif defined(RT_OS_OS2)
+ 
+-#elif defined(RT_OS_FREEBSD)
++#elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ #   define memset  libkern_memset /** @todo these are just hacks to get it compiling, check out later. */
+ #   define memcmp  libkern_memcmp
+ #   define strchr  libkern_strchr
+
+=== modified file 'src/VBox/HostDrivers/Support/SUPR3HardenedMain.cpp'
+--- src/VBox/HostDrivers/Support/SUPR3HardenedMain.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/HostDrivers/Support/SUPR3HardenedMain.cpp	2011-07-05 17:09:03 +0000
+@@ -62,7 +62,7 @@
+ #  ifndef CAP_TO_MASK
+ #   define CAP_TO_MASK(cap) RT_BIT(cap)
+ #  endif
+-# elif defined(RT_OS_FREEBSD)
++# elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ #  include <sys/param.h>
+ #  include <sys/sysctl.h>
+ # elif defined(RT_OS_SOLARIS)
+@@ -317,7 +317,7 @@
+      *
+      * Darwin, OS/2 and Windows all have proper APIs for getting the program file name.
+      */
+-#if defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD) || defined(RT_OS_SOLARIS)
++#if defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__) || defined(RT_OS_SOLARIS)
+ # ifdef RT_OS_LINUX
+     int cchLink = readlink("/proc/self/exe", &g_szSupLibHardenedExePath[0], sizeof(g_szSupLibHardenedExePath) - 1);
+ 
+
+=== modified file 'src/VBox/HostDrivers/Support/freebsd/SUPDrv-freebsd.c'
+--- src/VBox/HostDrivers/Support/freebsd/SUPDrv-freebsd.c	2011-07-05 17:05:22 +0000
++++ src/VBox/HostDrivers/Support/freebsd/SUPDrv-freebsd.c	2011-07-05 17:09:03 +0000
+@@ -100,6 +100,9 @@
+ static struct cdevsw        g_VBoxDrvFreeBSDChrDevSW =
+ {
+     .d_version =        D_VERSION,
++#ifndef __FreeBSD_version
++#error
++#endif
+ #if __FreeBSD_version > 800061
+     .d_flags =          D_PSEUDO | D_TRACKCLOSE | D_NEEDMINOR,
+ #else
+@@ -284,10 +287,10 @@
+  * @param   pDev    The device node.
+  * @param   fOpen   The open flags.
+  * @param   pTd     The thread.
+- * @param   pFd     The file descriptor. FreeBSD 7.0 and later.
+- * @param   iFd     The file descriptor index(?). Pre FreeBSD 7.0.
++ * @param   pFd     The file descriptor. Introduced in FreeBSD 7.0-CURRENT.
++ * @param   iFd     The file descriptor index. Pre FreeBSD 7.0.
+  */
+-#if __FreeBSD__ >= 7
++#if __FreeBSD_version >= 700044
+ static int VBoxDrvFreeBSDOpen(struct cdev *pDev, int fOpen, struct thread *pTd, struct file *pFd)
+ #else
+ static int VBoxDrvFreeBSDOpen(struct cdev *pDev, int fOpen, struct thread *pTd, int iFd)
+
+=== modified file 'src/VBox/HostDrivers/VBoxNetAdp/Makefile.kmk'
+--- src/VBox/HostDrivers/VBoxNetAdp/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/HostDrivers/VBoxNetAdp/Makefile.kmk	2011-07-17 11:38:11 +0000
+@@ -19,7 +19,7 @@
+ include	$(KBUILD_PATH)/subheader.kmk
+ 
+ 
+-if1of ($(KBUILD_TARGET), solaris darwin linux freebsd)
++if1of ($(KBUILD_TARGET), solaris darwin linux freebsd gnukfreebsd)
+ #
+ # VBoxNetAdp - Virtual Network Adapter
+ # Note! On Solaris the name has to be <= 8 chars long.
+@@ -30,7 +30,9 @@
+ VBoxNetAdp_INST = $(INST_VBOXNETADP)$(if $(eq $(KBUILD_TARGET),darwin),Contents/MacOS/)
+ VBoxNetAdp_NAME.solaris     = vboxnet
+ VBoxNetAdp_NAME.linux       = vboxnetadp
+-VBoxNetAdp_NAME.freebsd     = vboxnetadp
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++VBoxNetAdp_NAME             = vboxnetadp
++endif
+ VBoxNetAdp_NOINST.linux     = true
+ VBoxNetAdp_DEPS.solaris    += $(VBOX_SVN_REV_KMK)
+ VBoxNetAdp_DEFS             = IN_RT_R0 VBOX_SVN_REV=$(VBOX_SVN_REV) IN_SUP_STATIC
+@@ -49,9 +51,11 @@
+ VBoxNetAdp_SOURCES.linux   = \
+ 	linux/VBoxNetAdp-linux.c \
+ 	VBoxNetAdp.c
+-VBoxNetAdp_SOURCES.freebsd   = \
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++VBoxNetAdp_SOURCES        += \
+ 	freebsd/VBoxNetAdp-freebsd.c \
+ 	VBoxNetAdp.c
++endif
+ VBoxNetAdp_SOURCES          =
+ #VBoxNetAdp_SOURCES          = \
+ #	VBoxNetAdp.c
+@@ -140,7 +144,7 @@
+ 
+ endif # linux
+ 
+-ifeq ($(KBUILD_TARGET),freebsd)
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
+  #
+  # Install source files for compilation on FreeBSD.
+  # files_vboxnetadp defines VBOX_VBOXNETADP_SOURCES.
+
+=== modified file 'src/VBox/HostDrivers/VBoxNetFlt/Makefile.kmk'
+--- src/VBox/HostDrivers/VBoxNetFlt/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/HostDrivers/VBoxNetFlt/Makefile.kmk	2011-07-17 11:36:54 +0000
+@@ -305,7 +305,7 @@
+ 
+ endif #ifeq ($(KBUILD_TARGET), win)
+ 
+-else if1of ($(KBUILD_TARGET), linux solaris freebsd) ## @todo merge this with the mixed case stuff.
++else if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd) ## @todo merge this with the mixed case stuff.
+ #
+ # vboxnetflt(.ko/.o/) - The lower case driver.
+ # Note! On Solaris the name has to be <= 8 chars long.
+@@ -330,7 +330,9 @@
+ #	$(PATH_LIB)/RuntimeR0Drv$(VBOX_SUFF_LIB)
+ vboxnetflt_SOURCES.linux = linux/VBoxNetFlt-linux.c
+ vboxnetflt_SOURCES.solaris = solaris/VBoxNetFlt-solaris.c
+-vboxnetflt_SOURCES.freebsd = freebsd/VBoxNetFlt-freebsd.c
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++vboxnetflt_SOURCES += freebsd/VBoxNetFlt-freebsd.c
++endif
+ vboxnetflt_SOURCES = VBoxNetFlt.c
+ solaris/VBoxNetFlt-solaris.c_DEFS = VBOX_SVN_REV=$(VBOX_SVN_REV)
+   ifdef VBOX_WITH_NETFLT_CROSSBOW
+@@ -401,8 +403,8 @@
+ 
+ # Gross hack for FreeBSD 7, should figure this out properly
+ ## @todo Properly generate opt_netgraph.h
+-ifeq ($(KBUILD_TARGET),freebsd)
+-vboxnetflt_DEPS.freebsd += $(PATH_OUT)/opt_netgraph.h
++if1of ($(KBUILD_TARGET),freebsd gnukfreebsd)
++vboxnetflt_DEPS += $(PATH_OUT)/opt_netgraph.h
+ $(PATH_OUT)/opt_netgraph.h:
+ 	echo > $(PATH_OUT)/opt_netgraph.h
+ 
+
+=== modified file 'src/VBox/HostServices/Makefile.kmk'
+--- src/VBox/HostServices/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/HostServices/Makefile.kmk	2011-07-17 11:32:28 +0000
+@@ -23,12 +23,12 @@
+ ifdef VBOX_WITH_SHARED_FOLDERS
+  include $(PATH_SUB_CURRENT)/SharedFolders/Makefile.kmk
+ endif
+-if1of ($(KBUILD_TARGET), win linux solaris darwin freebsd)
++if1of ($(KBUILD_TARGET), win linux solaris darwin freebsd gnukfreebsd)
+  ifdef VBOX_WITH_CROGL
+   include $(PATH_SUB_CURRENT)/SharedOpenGL/Makefile.kmk
+  endif
+ endif
+-if1of ($(KBUILD_TARGET), win linux solaris darwin freebsd)
++if1of ($(KBUILD_TARGET), win linux solaris darwin freebsd gnukfreebsd)
+  ifdef VBOX_WITH_SHARED_CLIPBOARD
+   include $(PATH_SUB_CURRENT)/SharedClipboard/Makefile.kmk
+  endif
+
+=== modified file 'src/VBox/HostServices/SharedClipboard/Makefile.kmk'
+--- src/VBox/HostServices/SharedClipboard/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/HostServices/SharedClipboard/Makefile.kmk	2011-07-17 11:33:57 +0000
+@@ -35,7 +35,7 @@
+ 	darwin.cpp \
+ 	$(PATH_ROOT)/src/VBox/GuestHost/SharedClipboard/clipboard-helper.cpp \
+ 	darwin-pasteboard.cpp
+-if1of ($(KBUILD_TARGET), linux solaris freebsd) ## @todo X11
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd) ## @todo X11
+  ifndef VBOX_HEADLESS
+   VBoxSharedClipboard_SOURCES += \
+   	$(PATH_ROOT)/src/VBox/GuestHost/SharedClipboard/clipboard-helper.cpp \
+@@ -51,7 +51,7 @@
+ 	$(LIB_VMM) \
+ 	$(LIB_RUNTIME) \
+ 	$(LIB_REM)
+-if1of ($(KBUILD_TARGET), linux solaris freebsd)
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
+  ifndef VBOX_HEADLESS
+   VBoxSharedClipboard_LIBPATH = \
+ 	$(VBOX_LIBPATH_X11)
+@@ -65,7 +65,7 @@
+ 	-framework ApplicationServices -install_name $(VBOX_DYLD_EXECUTABLE_PATH)/VBoxSharedClipboard.dylib
+ 
+ if defined(VBOX_WITH_TESTCASES) && !defined(VBOX_ONLY_ADDITIONS) && !defined(VBOX_ONLY_SDK)
+- if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris)
++ if1of ($(KBUILD_TARGET), freebsd linux gnukfreebsd netbsd openbsd solaris)
+  #
+  # Set this in LocalConfig.kmk if you are working on the X11 clipboard service
+  # to automatically run the unit test at build time.
+@@ -81,7 +81,7 @@
+ $$(tstClipboardX11-2_0_OUTDIR)/tstClipboardX11-2.run: $$(INSTARGET_tstClipboardX11-2)
+ 	export VBOX_LOG_DEST=nofile; $(INSTARGET_tstClipboardX11-2) quiet
+ 	$(QUIET)$(APPEND) -t "$@" "done"
+- endif # 1of ($(KBUILD_TARGET),freebsd linux netbsd openbsd solaris)
++ endif # 1of ($(KBUILD_TARGET),freebsd linux gnukfreebsd netbsd openbsd solaris)
+ endif
+ 
+ include $(KBUILD_PATH)/subfooter.kmk
+
+=== modified file 'src/VBox/HostServices/SharedOpenGL/Makefile.kmk'
+--- src/VBox/HostServices/SharedOpenGL/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/HostServices/SharedOpenGL/Makefile.kmk	2011-07-17 11:33:29 +0000
+@@ -245,9 +245,9 @@
+ 	render/renderspu_config.c \
+ 	render/renderspu_init.c
+ VBoxOGLrenderspu_SOURCES.win     = render/renderspu_wgl.c render/render.def
+-VBoxOGLrenderspu_SOURCES.linux   = render/renderspu_glx.c
+-VBoxOGLrenderspu_SOURCES.solaris = render/renderspu_glx.c
+-VBoxOGLrenderspu_SOURCES.freebsd = render/renderspu_glx.c
++if1of ($(KBUILD_TARGET), linux solaris freebsd gnukfreebsd)
++VBoxOGLrenderspu_SOURCES += render/renderspu_glx.c
++endif
+ ifdef VBOX_WITH_COCOA_QT
+  VBoxOGLrenderspu_OBJCFLAGS.darwin = -Wno-shadow
+  VBoxOGLrenderspu_SOURCES.darwin = \
+@@ -261,7 +261,7 @@
+ 	$(PATH_LIB)/VBoxOGLhostspuload$(VBOX_SUFF_LIB) \
+ 	$(VBOX_LIB_OGL_HOSTCRUTIL) \
+ 	$(LIB_RUNTIME)
+-if1of ($(KBUILD_TARGET), freebsd linux netbsd openbsd solaris) # the X11 gang
++if1of ($(KBUILD_TARGET), freebsd linux gnukfreebsd netbsd openbsd solaris) # the X11 gang
+  VBoxOGLrenderspu_LIBS += \
+ 	Xmu \
+ 	X11 \
+
+=== modified file 'src/VBox/HostServices/auth/Makefile.kmk'
+--- src/VBox/HostServices/auth/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/HostServices/auth/Makefile.kmk	2011-07-05 17:09:03 +0000
+@@ -20,17 +20,21 @@
+ 
+ # The plugin.
+ ifndef VBOX_ONLY_SDK
+- if ("$(KBUILD_TARGET)" != "linux" && "$(KBUILD_TARGET)" != "solaris") || defined(VBOX_WITH_PAM)
++ if ("$(KBUILD_TARGET)" != "linux" && "$(KBUILD_TARGET)" != "solaris" && "$(KBUILD_TARGET)" != "gnukfreebsd") || defined(VBOX_WITH_PAM)
+   DLLS += VBoxAuth
+  endif
+ endif
+ VBoxAuth_TEMPLATE = VBOXR3
+-VBoxAuth_SOURCES.linux = pam/VBoxAuthPAM.c
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBoxAuth_SOURCES += pam/VBoxAuthPAM.c
++endif
+ VBoxAuth_SOURCES.solaris = pam/VBoxAuthPAM.c
+ VBoxAuth_SOURCES.freebsd = pam/VBoxAuthPAM.c
+ VBoxAuth_SOURCES.win = winlogon/winlogon.cpp
+ VBoxAuth_SOURCES.darwin = directoryservice/directoryservice.cpp
+-VBoxAuth_LIBS.linux = $(LIB_RUNTIME) dl
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBoxAuth_LIBS += $(LIB_RUNTIME) dl
++endif
+ VBoxAuth_LIBS.solaris = $(LIB_RUNTIME) dl
+ VBoxAuth_LIBS.freebsd = $(LIB_RUNTIME)
+ VBoxAuth_LIBS.darwin = $(LIB_RUNTIME)
+@@ -50,7 +54,9 @@
+ VBoxAuth-samples_INST = $(INST_SDK)/bindings/auth/
+ VBoxAuth-samples_MODE = a+r,u+w
+ VBoxAuth-samples_SOURCES = simple/VBoxAuthSimple.cpp
+-VBoxAuth-samples_SOURCES.linux = pam/VBoxAuthPAM.c
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBoxAuth-samples_SOURCES += pam/VBoxAuthPAM.c
++endif
+ VBoxAuth-samples_SOURCES.win = winlogon/winlogon.cpp
+ 
+ # Install the SDK header.
+
+=== modified file 'src/VBox/Installer/Makefile.kmk'
+--- src/VBox/Installer/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Installer/Makefile.kmk	2011-07-05 17:09:03 +0000
+@@ -28,6 +28,9 @@
+  if "$(KBUILD_TARGET)" == "linux" && "$(KBUILD_HOST)" == "linux"
+   include $(PATH_SUB_CURRENT)/linux/Makefile.kmk
+  endif
++ if "$(KBUILD_TARGET)" == "gnukfreebsd" && "$(KBUILD_HOST)" == "gnukfreebsd"
++  include $(PATH_SUB_CURRENT)/linux/Makefile.kmk
++ endif
+  if "$(KBUILD_TARGET)" == "solaris" && "$(KBUILD_HOST)" == "solaris"
+   include $(PATH_SUB_CURRENT)/solaris/Makefile.kmk
+  endif
+
+=== modified file 'src/VBox/Installer/linux/Makefile.kmk'
+--- src/VBox/Installer/linux/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Installer/linux/Makefile.kmk	2011-07-05 17:09:03 +0000
+@@ -18,7 +18,7 @@
+ SUB_DEPTH = ../../../..
+ include $(KBUILD_PATH)/subheader.kmk
+ 
+-ifneq ($(KBUILD_HOST),linux)
++ifn1of ($(KBUILD_HOST), linux gnukfreebsd)
+  $(error "The Linux installer can only be built on Linux!")
+ endif
+ 
+
+=== modified file 'src/VBox/Main/Makefile.kmk'
+--- src/VBox/Main/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/Makefile.kmk	2011-07-17 12:09:17 +0000
+@@ -241,6 +241,7 @@
+ # VBoxSVC_DEFS.linux += VBOX_USE_LIBHAL
+ VBoxSVC_DEFS.solaris += VBOX_USE_LIBHAL
+ VBoxSVC_DEFS.freebsd += VBOX_USE_LIBHAL
++VBoxSVC_DEFS.gnukfreebsd += VBOX_USE_LIBHAL
+ 
+ VBoxSVC_CXXFLAGS = $(filter-out -Wno-unused,$(TEMPLATE_VBOXMAINEXE_CXXFLAGS))
+ 
+@@ -259,6 +260,8 @@
+ VBoxSVC_LIBS += \
+ 	$(PATH_LIB)/SSMStandalone$(VBOX_SUFF_LIB) \
+ 	$(LIB_DDU)
++VBoxSVC_LIBS.gnukfreebsd = \
++	bsd
+ VBoxSVC_SDKS = VBOX_LIBPNG VBOX_ZLIB
+ VBoxSVC_LIBS.solaris = \
+ 	adm \
+@@ -348,8 +351,10 @@
+ 	src-server/linux/vbox-libhal.cpp \
+ 	src-server/solaris/DynLoadLibSolaris.cpp
+ 
+-VBoxSVC_SOURCES.freebsd = \
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++VBoxSVC_SOURCES += \
+ 	src-server/freebsd/HostHardwareFreeBSD.cpp
++endif
+ 
+ ifdef VBOX_WITH_USB
+  ifdef VBOX_WITH_SYSFS_BY_DEFAULT
+@@ -365,7 +370,9 @@
+  VBoxSVC_SOURCES.os2     +=     src-server/os2/USBProxyServiceOs2.cpp
+  VBoxSVC_SOURCES.solaris += src-server/solaris/USBProxyServiceSolaris.cpp
+  VBoxSVC_SOURCES.win     +=     src-server/win/USBProxyServiceWindows.cpp
+- VBoxSVC_SOURCES.freebsd += src-server/freebsd/USBProxyServiceFreeBSD.cpp
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++ VBoxSVC_SOURCES         += src-server/freebsd/USBProxyServiceFreeBSD.cpp
++endif
+ endif
+ 
+ ifdef VBOX_WITH_NETFLT
+@@ -390,7 +397,9 @@
+ endif
+ 
+ ifeq ($(KBUILD_TYPE),debug)
+- VBoxSVC_LDFLAGS.linux   += -rdynamic # for backtrace_symbols()
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++ VBoxSVC_LDFLAGS         += -rdynamic # for backtrace_symbols()
++endif
+ endif
+ 
+ ifdef VBOX_WITH_RESOURCE_USAGE_API
+@@ -398,7 +407,9 @@
+ 	src-server/PerformanceImpl.cpp \
+ 	src-server/Performance.cpp
+  VBoxSVC_SOURCES.darwin  +=  src-server/darwin/PerformanceDarwin.cpp
+- VBoxSVC_SOURCES.freebsd += src-server/freebsd/PerformanceFreeBSD.cpp
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++ VBoxSVC_SOURCES         += src-server/freebsd/PerformanceFreeBSD.cpp
++endif
+  VBoxSVC_SOURCES.linux   +=   src-server/linux/PerformanceLinux.cpp
+  VBoxSVC_SOURCES.os2     +=     src-server/os2/PerformanceOs2.cpp
+  VBoxSVC_SOURCES.solaris += src-server/solaris/PerformanceSolaris.cpp
+@@ -414,9 +425,11 @@
+  VBoxSVC_SOURCES.os2     +=     src-server/os2/NetIf-os2.cpp
+  VBoxSVC_SOURCES.darwin  +=  src-server/darwin/NetIf-darwin.cpp
+  VBoxSVC_SOURCES.solaris += src-server/solaris/NetIf-solaris.cpp
+- VBoxSVC_SOURCES.freebsd += src-server/freebsd/NetIf-freebsd.cpp
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++ VBoxSVC_SOURCES         += src-server/freebsd/NetIf-freebsd.cpp
++endif
+  VBoxSVC_DEFS            += VBOX_WITH_HOSTNETIF_API
+- if1of ($(KBUILD_TARGET), linux darwin solaris freebsd)
++ if1of ($(KBUILD_TARGET), linux darwin solaris gnukfreebsd)
+   VBoxSVC_SOURCES        += src-server/generic/NetIf-generic.cpp
+  endif
+ endif
+@@ -439,6 +452,7 @@
+ VBOX_XML_SCHEMA.darwin        = $(VBOX_PATH_MAIN_SRC)/xml/VirtualBox-settings-macosx.xsd
+ VBOX_XML_SCHEMA.linux         = $(VBOX_PATH_MAIN_SRC)/xml/VirtualBox-settings-linux.xsd
+ VBOX_XML_SCHEMA.freebsd       = $(VBOX_PATH_MAIN_SRC)/xml/VirtualBox-settings-freebsd.xsd
++VBOX_XML_SCHEMA.gnukfreebsd   = $(VBOX_PATH_MAIN_SRC)/xml/VirtualBox-settings-freebsd.xsd
+ VBOX_XML_SCHEMA.win           = $(VBOX_PATH_MAIN_SRC)/xml/VirtualBox-settings-windows.xsd
+ VBOX_XML_SCHEMA.os2           = $(VBOX_PATH_MAIN_SRC)/xml/VirtualBox-settings-os2.xsd
+ VBOX_XML_SCHEMA.solaris       = $(VBOX_PATH_MAIN_SRC)/xml/VirtualBox-settings-solaris.xsd
+@@ -511,7 +525,7 @@
+    VBoxTestOGL_QT_MODULES += Core Gui OpenGL
+    VBoxTestOGL_LDFLAGS.darwin += -framework OpenGL
+    VBoxTestOGL_LIBS.win += $(PATH_SDK_WINPSDK_LIB)/Opengl32.lib
+-   if1of ($(KBUILD_TARGET), solaris linux freebsd)
++   if1of ($(KBUILD_TARGET), solaris linux freebsd gnukfreebsd)
+     # must come after VBoxOGL2D, therefore don't set the arch-specific LIBS variable here!
+     VBoxTestOGL_LIBS += GL
+    endif
+@@ -753,11 +767,13 @@
+ VBoxMain-com-inst_SOURCES = src-all/win/comregister.cmd
+ 
+ 
+-if defined(VBOX_WITH_HARDENING) && "$(KBUILD_TARGET)" == "linux"
++if defined(VBOX_WITH_HARDENING)
++# FIXME: is this really Linux-only?
++# && "$(KBUILD_TARGET)" == "linux"
+  #
+  # Installs linux/hardening related things to components.
+  #
+- INSTALLS.linux += VBoxMain-hardening-inst
++ INSTALLS += VBoxMain-hardening-inst
+  VBoxMain-hardening-inst_INST = $(INST_BIN)components/
+  VBoxMain-hardening-inst_SYMLINKS = \
+ 	VBoxDDU.so=>../VBoxDDU.so \
+
+=== modified file 'src/VBox/Main/cbinding/VBoxXPCOMCGlue.c'
+--- src/VBox/Main/cbinding/VBoxXPCOMCGlue.c	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/cbinding/VBoxXPCOMCGlue.c	2011-07-05 17:09:03 +0000
+@@ -44,7 +44,7 @@
+ /*******************************************************************************
+ *   Defined Constants And Macros                                               *
+ *******************************************************************************/
+-#if defined(__linux__) || defined(__linux_gnu__) || defined(__sun__) || defined(__FreeBSD__)
++#if defined(__linux__) || defined(__linux_gnu__) || defined(__GLIBC__) || defined(__sun__) || defined(__FreeBSD__)
+ # define DYNLIB_NAME    "VBoxXPCOMC.so"
+ #elif defined(__APPLE__)
+ # define DYNLIB_NAME    "VBoxXPCOMC.dylib"
+@@ -189,7 +189,7 @@
+      * Try the known standard locations.
+      */
+     g_szVBoxErrMsg[0] = '\0';
+-#if defined(__gnu__linux__) || defined(__linux__)
++#if defined(__gnu__linux__) || defined(__linux__) || defined(__GLIBC__)
+     if (tryLoadOne("/opt/VirtualBox", 1) == 0)
+         return 0;
+     if (tryLoadOne("/usr/lib/virtualbox", 1) == 0)
+
+=== modified file 'src/VBox/Main/include/ConsoleImpl.h'
+--- src/VBox/Main/include/ConsoleImpl.h	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/include/ConsoleImpl.h	2011-07-05 17:09:03 +0000
+@@ -447,7 +447,7 @@
+     HRESULT powerDown(IProgress *aProgress = NULL);
+ 
+ /* Note: FreeBSD needs this whether netflt is used or not. */
+-#if ((defined(RT_OS_LINUX) && !defined(VBOX_WITH_NETFLT)) || defined(RT_OS_FREEBSD))
++#if ((defined(RT_OS_LINUX) && !defined(VBOX_WITH_NETFLT)) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__))
+     HRESULT attachToTapInterface(INetworkAdapter *networkAdapter);
+     HRESULT detachFromTapInterface(INetworkAdapter *networkAdapter);
+ #endif
+@@ -707,7 +707,7 @@
+     PPDMLED      mapSharedFolderLed;
+     PPDMLED      mapUSBLed[2];
+ /* Note: FreeBSD needs this whether netflt is used or not. */
+-#if ((defined(RT_OS_LINUX) && !defined(VBOX_WITH_NETFLT)) || defined(RT_OS_FREEBSD))
++#if ((defined(RT_OS_LINUX) && !defined(VBOX_WITH_NETFLT)) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__))
+     Utf8Str      maTAPDeviceName[8];
+     RTFILE       maTapFD[8];
+ #endif
+
+=== modified file 'src/VBox/Main/include/HostUSBDeviceImpl.h'
+--- src/VBox/Main/include/HostUSBDeviceImpl.h	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/include/HostUSBDeviceImpl.h	2011-07-05 17:09:03 +0000
+@@ -329,7 +329,7 @@
+ 
+     friend class USBProxyServiceDarwin;
+ #endif
+-#ifdef RT_OS_FreeBSD
++#if defined(RT_OS_FreeBSD) || defined(__FreeBSD_kernel__)
+     friend class USBProxyServiceFreeBSD;
+ #endif
+ };
+
+=== modified file 'src/VBox/Main/include/USBProxyService.h'
+--- src/VBox/Main/include/USBProxyService.h	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/include/USBProxyService.h	2011-07-05 17:09:03 +0000
+@@ -396,7 +396,7 @@
+ };
+ # endif /* RT_OS_WINDOWS */
+ 
+-# ifdef RT_OS_FREEBSD
++# if defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ /**
+  * The FreeBSD hosted USB Proxy Service.
+  */
+
+=== modified file 'src/VBox/Main/src-client/ConsoleImpl.cpp'
+--- src/VBox/Main/src-client/ConsoleImpl.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/src-client/ConsoleImpl.cpp	2011-07-05 17:09:03 +0000
+@@ -29,7 +29,7 @@
+ #   include <stdio.h>
+ #   include <stdlib.h>
+ #   include <string.h>
+-#elif defined(RT_OS_FREEBSD)
++#elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ #   include <errno.h>
+ #   include <sys/ioctl.h>
+ #   include <sys/poll.h>
+@@ -7103,7 +7103,7 @@
+ #endif /* VBOX_WITH_USB */
+ 
+ /* Note: FreeBSD needs this whether netflt is used or not. */
+-#if ((defined(RT_OS_LINUX) && !defined(VBOX_WITH_NETFLT)) || defined(RT_OS_FREEBSD))
++#if ((defined(RT_OS_LINUX) && !defined(VBOX_WITH_NETFLT)) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__))
+ /**
+  * Helper function to handle host interface device creation and attachment.
+  *
+@@ -7220,7 +7220,7 @@
+         }
+     }
+ 
+-# elif defined(RT_OS_FREEBSD)
++# elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+     /*
+      * Set/obtain the tap interface.
+      */
+@@ -7338,7 +7338,7 @@
+     LogFlowThisFunc(("returning %d\n", rc));
+     return rc;
+ }
+-#endif /* (RT_OS_LINUX || RT_OS_FREEBSD) && !VBOX_WITH_NETFLT */
++#endif /* (RT_OS_LINUX || RT_OS_FREEBSD || __FreeBSD_kernel__) && !VBOX_WITH_NETFLT */
+ 
+ /**
+  * Called at power down to terminate host interface networking.
+@@ -7371,11 +7371,11 @@
+         pNetworkAdapter->COMGETTER(AttachmentType)(&attachment);
+         if (attachment == NetworkAttachmentType_Bridged)
+         {
+-#if ((defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD)) && !defined(VBOX_WITH_NETFLT))
++#if ((defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && !defined(VBOX_WITH_NETFLT))
+             HRESULT rc2 = detachFromTapInterface(pNetworkAdapter);
+             if (FAILED(rc2) && SUCCEEDED(rc))
+                 rc = rc2;
+-#endif /* (RT_OS_LINUX || RT_OS_FREEBSD) && !VBOX_WITH_NETFLT */
++#endif /* (RT_OS_LINUX || RT_OS_FREEBSD || __FreeBSD_kernel__) && !VBOX_WITH_NETFLT */
+         }
+     }
+ 
+
+=== modified file 'src/VBox/Main/src-client/ConsoleImpl2.cpp'
+--- src/VBox/Main/src-client/ConsoleImpl2.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/src-client/ConsoleImpl2.cpp	2011-07-05 17:09:03 +0000
+@@ -87,7 +87,7 @@
+ #  include <linux/types.h>
+ #  include <linux/if.h>
+ #  include <linux/wireless.h>
+-# elif defined(RT_OS_FREEBSD)
++# elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ #  include <unistd.h>
+ #  include <sys/types.h>
+ #  include <sys/ioctl.h>
+@@ -1995,14 +1995,14 @@
+                 }
+ # endif
+ #endif /* RT_OS_LINUX */
+-#if defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD) || defined(VBOX_WITH_SOLARIS_OSS)
++#if defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__) || defined(VBOX_WITH_SOLARIS_OSS)
+                 case AudioDriverType_OSS:
+                 {
+                     InsertConfigString(pCfg, "AudioDriver", "oss");
+                     break;
+                 }
+ #endif
+-#ifdef RT_OS_FREEBSD
++#if defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ # ifdef VBOX_WITH_PULSE
+                 case AudioDriverType_Pulse:
+                 {
+@@ -3531,7 +3531,7 @@
+ 
+             case NetworkAttachmentType_Bridged:
+             {
+-#if (defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD)) && !defined(VBOX_WITH_NETFLT)
++#if (defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && !defined(VBOX_WITH_NETFLT)
+                 hrc = attachToTapInterface(aNetworkAdapter);
+                 if (FAILED(hrc))
+                 {
+@@ -3743,8 +3743,8 @@
+                 const char *pszTrunk = szTrunkName;
+                 /* we're not releasing the INetCfg stuff here since we use it later to figure out whether it is wireless */
+ 
+-# elif defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD)
+-#  if defined(RT_OS_FREEBSD)
++# elif defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
++#  if defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+                 /*
+                  * If we bridge to a tap interface open it the `old' direct way.
+                  * This works and performs better than bridging a physical
+@@ -3844,7 +3844,7 @@
+                 }
+                 else
+                     Log(("Failed to open wireless socket\n"));
+-# elif defined(RT_OS_FREEBSD)
++# elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+                 int iSock = socket(AF_INET, SOCK_DGRAM, 0);
+                 if (iSock >= 0)
+                 {
+@@ -3962,7 +3962,7 @@
+             /* NOTHING TO DO HERE */
+ #elif defined(RT_OS_LINUX)
+ /// @todo aleksey: is there anything to be done here?
+-#elif defined(RT_OS_FREEBSD)
++#elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ /** @todo FreeBSD: Check out this later (HIF networking). */
+ #else
+ # error "Port me"
+
+=== modified file 'src/VBox/Main/src-server/MachineImpl.cpp'
+--- src/VBox/Main/src-server/MachineImpl.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/src-server/MachineImpl.cpp	2011-07-05 17:09:03 +0000
+@@ -1545,7 +1545,7 @@
+ STDMETHODIMP Machine::COMSETTER(MemoryBalloonSize)(ULONG memoryBalloonSize)
+ {
+     /* This must match GMMR0Init; currently we only support memory ballooning on all 64-bit hosts except Mac OS X */
+-#if HC_ARCH_BITS == 64 && (defined(RT_OS_WINDOWS) || defined(RT_OS_SOLARIS) || defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD))
++#if HC_ARCH_BITS == 64 && (defined(RT_OS_WINDOWS) || defined(RT_OS_SOLARIS) || defined(RT_OS_LINUX) || defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__))
+     /* check limits */
+     if (memoryBalloonSize >= VMMDEV_MAX_MEMORY_BALLOON(mHWData->mMemorySize))
+         return setError(E_INVALIDARG,
+@@ -10152,7 +10152,7 @@
+                     E_FAIL);
+ #elif defined(VBOX_WITH_SYS_V_IPC_SESSION_WATCHER)
+ # ifdef VBOX_WITH_NEW_SYS_V_KEYGEN
+-#  if defined(RT_OS_FREEBSD) && (HC_ARCH_BITS == 64)
++#  if (defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && (HC_ARCH_BITS == 64)
+     /** @todo Check that this still works correctly. */
+     AssertCompileSize(key_t, 8);
+ #  else
+
+=== modified file 'src/VBox/Main/src-server/freebsd/HostHardwareFreeBSD.cpp'
+--- src/VBox/Main/src-server/freebsd/HostHardwareFreeBSD.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/src-server/freebsd/HostHardwareFreeBSD.cpp	2011-07-05 17:09:03 +0000
+@@ -34,16 +34,15 @@
+ #include <iprt/thread.h>  /* for RTThreadSleep() */
+ #include <iprt/string.h>
+ 
+-#ifdef RT_OS_FREEBSD
+-# include <sys/types.h>
+-# include <sys/stat.h>
+-# include <unistd.h>
+-# include <sys/ioctl.h>
+-# include <fcntl.h>
+-# include <cam/cam.h>
+-# include <cam/cam_ccb.h>
+-# include <cam/scsi/scsi_pass.h>
+-#endif /* RT_OS_FREEBSD */
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <unistd.h>
++#include <sys/ioctl.h>
++#include <fcntl.h>
++#include <stdio.h>	/* needed by <cam/cam.h> */
++#include <cam/cam.h>
++#include <cam/cam_ccb.h>
++#include <cam/scsi/scsi_pass.h>
+ #include <vector>
+ 
+ /******************************************************************************
+
+=== modified file 'src/VBox/Main/src-server/freebsd/NetIf-freebsd.cpp'
+--- src/VBox/Main/src-server/freebsd/NetIf-freebsd.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/src-server/freebsd/NetIf-freebsd.cpp	2011-07-05 17:09:03 +0000
+@@ -44,6 +44,8 @@
+ #include <netinet/in.h>
+ 
+ #include <stdio.h>
++#include <stdlib.h>	/* malloc, free */
++#include <bsd/string.h>	/* strlcpy */
+ #include <unistd.h>
+ #include <errno.h>
+ 
+@@ -159,10 +161,10 @@
+             if (!pInfo->IPv6Address.s.Lo && !pInfo->IPv6Address.s.Hi)
+             {
+                 memcpy(pInfo->IPv6Address.au8,
+-                       ((struct sockaddr_in6 *)addresses[RTAX_IFA])->sin6_addr.__u6_addr.__u6_addr8,
++                       ((struct sockaddr_in6 *)addresses[RTAX_IFA])->sin6_addr.s6_addr,
+                        sizeof(pInfo->IPv6Address));
+                 memcpy(pInfo->IPv6NetMask.au8,
+-                       ((struct sockaddr_in6 *)addresses[RTAX_NETMASK])->sin6_addr.__u6_addr.__u6_addr8,
++                       ((struct sockaddr_in6 *)addresses[RTAX_NETMASK])->sin6_addr.s6_addr,
+                        sizeof(pInfo->IPv6NetMask));
+             }
+             break;
+
+=== modified file 'src/VBox/Main/xml/Settings.cpp'
+--- src/VBox/Main/xml/Settings.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/xml/Settings.cpp	2011-07-05 17:09:03 +0000
+@@ -109,6 +109,8 @@
+ #   define VBOX_XML_PLATFORM     "solaris"
+ #elif defined (RT_OS_WINDOWS)
+ #   define VBOX_XML_PLATFORM     "windows"
++#elif defined (__GLIBC__)
++#   define VBOX_XML_PLATFORM     "gnu"
+ #else
+ #   error Unsupported platform!
+ #endif
+
+=== modified file 'src/VBox/Main/xml/VirtualBox-settings-freebsd.xsd'
+--- src/VBox/Main/xml/VirtualBox-settings-freebsd.xsd	2011-07-05 17:05:22 +0000
++++ src/VBox/Main/xml/VirtualBox-settings-freebsd.xsd	2011-07-05 17:09:03 +0000
+@@ -58,7 +58,7 @@
+           <xsd:restriction base="xsd:token">
+             <xsd:enumeration value="Null"/>
+             <xsd:enumeration value="OSS"/>
+-            <xsd:enumeration value="ALSA"/>
++            <xsd:enumeration value="Pulse"/>
+           </xsd:restriction>
+         </xsd:simpleType>
+       </xsd:attribute>
+
+=== modified file 'src/VBox/Makefile.kmk'
+--- src/VBox/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Makefile.kmk	2011-07-18 14:23:18 +0000
+@@ -22,7 +22,7 @@
+ ifdef VBOX_ONLY_ADDITIONS
+  include $(PATH_SUB_CURRENT)/Runtime/Makefile.kmk
+  ifdef VBOX_WITH_CROGL
+-  if1of ($(KBUILD_TARGET),win linux solaris freebsd)
++  if1of ($(KBUILD_TARGET),win linux gnukfreebsd solaris freebsd)
+    include $(PATH_SUB_CURRENT)/GuestHost/Makefile.kmk
+   endif
+  endif
+
+=== modified file 'src/VBox/Runtime/Makefile.kmk'
+--- src/VBox/Runtime/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/VBox/Runtime/Makefile.kmk	2011-07-17 13:16:11 +0000
+@@ -500,7 +500,7 @@
+ RuntimeR3_SOURCES += \
+ 	common/err/errmsgxpcom.cpp
+ endif
+-if1of ($(KBUILD_TARGET),freebsd linux netbsd openbsd solaris)
++if1of ($(KBUILD_TARGET),freebsd gnukfreebsd linux netbsd openbsd solaris)
+ RuntimeR3_SOURCES += \
+ 	$(if $(VBOX_WITH_DBUS),VBox/dbus.cpp,)
+ endif
+@@ -640,6 +640,62 @@
+  endif
+ endif
+ 
++RuntimeR3_SOURCES.gnukfreebsd = \
++	generic/RTDirQueryInfo-generic.cpp \
++	generic/RTDirSetTimes-generic.cpp \
++	generic/RTFileMove-generic.cpp \
++	generic/RTLogWriteDebugger-generic.cpp \
++	generic/RTProcDaemonize-generic.cpp \
++ 	generic/RTSemEventMultiWait-2-ex-generic.cpp \
++ 	generic/RTSemEventMultiWaitNoResume-2-ex-generic.cpp \
++	generic/RTSystemQueryDmiString-generic.cpp \
++	generic/RTTimeLocalNow-generic.cpp \
++	generic/RTTimerCreate-generic.cpp \
++	generic/RTUuidCreate-generic.cpp \
++	generic/mppresent-generic.cpp \
++	generic/sched-generic.cpp \
++	generic/utf16locale-generic.cpp \
++	generic/uuid-generic.cpp \
++	r3/freebsd/mp-freebsd.cpp \
++	r3/freebsd/rtProcInitExePath-freebsd.cpp \
++	r3/posix/RTFileQueryFsSizes-posix.cpp \
++	r3/posix/RTHandleGetStandard-posix.cpp \
++	r3/posix/RTMemProtect-posix.cpp \
++	r3/posix/RTPathUserHome-posix.cpp \
++	r3/posix/RTSystemQueryOSInfo-posix.cpp \
++	r3/posix/RTSystemQueryTotalRam-posix.cpp \
++	r3/posix/RTTimeNow-posix.cpp \
++	r3/posix/RTTimeSet-posix.cpp \
++	r3/posix/rtmempage-exec-mmap-heap-posix.cpp \
++	r3/posix/dir-posix.cpp \
++	r3/posix/env-posix.cpp \
++	r3/posix/fileio-posix.cpp \
++	r3/posix/fileio2-posix.cpp \
++	r3/posix/filelock-posix.cpp \
++	r3/posix/fs-posix.cpp \
++	r3/posix/fs2-posix.cpp \
++	r3/posix/fs3-posix.cpp \
++	r3/posix/ldrNative-posix.cpp \
++	r3/posix/path-posix.cpp \
++	r3/posix/path2-posix.cpp \
++	r3/posix/pathhost-posix.cpp \
++	r3/posix/pipe-posix.cpp \
++	r3/posix/poll-posix.cpp \
++	r3/posix/process-posix.cpp \
++	r3/posix/process-creation-posix.cpp \
++	r3/posix/rand-posix.cpp \
++	r3/posix/semrw-posix.cpp \
++	r3/posix/symlink-posix.cpp \
++	r3/posix/thread-posix.cpp \
++	r3/posix/time-posix.cpp \
++	r3/posix/timelocal-posix.cpp \
++	r3/posix/timer-posix.cpp \
++	r3/posix/tls-posix.cpp \
++	r3/posix/utf8-posix.cpp \
++ 	r3/posix/semevent-posix.cpp \
++ 	r3/posix/semeventmulti-posix.cpp \
++ 	r3/posix/semmutex-posix.cpp
++
+ RuntimeR3_SOURCES.os2   = \
+ 	generic/RTDirQueryInfo-generic.cpp \
+ 	generic/RTDirSetTimes-generic.cpp \
+@@ -1106,7 +1162,8 @@
+ 	r3/alloc-ef.cpp \
+ 	r3/fileio.cpp \
+ 	r3/fs.cpp
+-RuntimeGuestR3Mini_SOURCES.freebsd = \
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++RuntimeGuestR3Mini_SOURCES += \
+ 	r3/posix/RTMemProtect-posix.cpp \
+ 	r3/posix/rtmempage-exec-mmap-posix.cpp \
+ 	r3/posix/RTPathUserHome-posix.cpp \
+@@ -1116,6 +1173,7 @@
+ 	r3/posix/path-posix.cpp \
+ 	r3/posix/path2-posix.cpp \
+ 	r3/posix/utf8-posix.cpp
++endif
+ RuntimeGuestR3Mini_SOURCES.linux = \
+ 	r3/posix/RTMemProtect-posix.cpp \
+ 	r3/posix/rtmempage-exec-mmap-posix.cpp \
+@@ -1204,8 +1262,10 @@
+ 	r3/solaris/fileaio-solaris.cpp
+ VBoxRT_SOURCES.darwin         += \
+ 	r3/posix/fileaio-posix.cpp
+-VBoxRT_SOURCES.freebsd        += \
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++VBoxRT_SOURCES                += \
+ 	r3/freebsd/fileaio-freebsd.cpp
++endif
+ VBoxRT_INCS                    = $(RuntimeR3_INCS)
+ VBoxRT_INCS.$(KBUILD_TARGET)   = $(RuntimeR3_INCS.$(KBUILD_TARGET))
+ VBoxRT_INCS.$(KBUILD_TARGET).$(KBUILD_TARGET_ARCH) = $(RuntimeR3_INCS.$(KBUILD_TARGET).$(KBUILD_TARGET_ARCH))
+@@ -1231,8 +1291,10 @@
+ ifdef IPRT_WITH_LZO
+  VBoxRT_LIBS                  += lzo2
+ endif
+-VBoxRT_LIBS.linux              = \
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBoxRT_LIBS                   += \
+ 	crypt
++endif
+ VBoxRT_LIBS.darwin             = \
+ 	iconv
+ VBoxRT_LIBS.freebsd            = \
+@@ -1503,8 +1565,10 @@
+ RuntimeR0Drv_DEFS.linux = MODULE KBUILD_MODNAME=KBUILD_STR\(vboxdrv\) KBUILD_BASENAME=KBUILD_STR\(vboxdrv\) IN_SUP_R0
+ 
+ RuntimeR0Drv_INCS      := $(PATH_SUB_CURRENT) include
+-RuntimeR0Drv_INCS.freebsd = \
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++RuntimeR0Drv_INCS      += \
+ 	$(PATH_INS)/gen-sys-hdrs
++endif
+ RuntimeR0Drv_INCS.linux = \
+ 	r0drv/linux
+ RuntimeR0Drv_INCS.solaris = \
+@@ -1772,7 +1836,8 @@
+ 	r0drv/os2/timer-r0drv-os2.cpp \
+ 	r0drv/os2/timerA-r0drv-os2.asm
+ 
+-RuntimeR0Drv_SOURCES.freebsd = \
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++RuntimeR0Drv_SOURCES += \
+ 	common/err/RTErrConvertFromErrno.cpp \
+ 	common/err/RTErrConvertToErrno.cpp \
+ 	common/misc/thread.cpp \
+@@ -1806,6 +1871,7 @@
+ 	generic/timer-generic.cpp \
+ 	r0drv/memobj-r0drv.cpp \
+ 	r0drv/powernotification-r0drv.c
++endif
+ 
+ RuntimeR0Drv_SOURCES.solaris = \
+ 	common/err/RTErrConvertFromErrno.cpp \
+@@ -1846,10 +1912,11 @@
+ 
+ ## PORTME: Porters create and add their selection of platform specific Ring-0 Driver files here.
+ 
+-RuntimeR0Drv_ORDERDEPS.freebsd = \
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
++RuntimeR0Drv_ORDERDEPS += \
+   	$(PATH_INS)/gen-sys-hdrs/bus_if.h \
+   	$(PATH_INS)/gen-sys-hdrs/device_if.h
+-
++endif
+ 
+ #
+ # RuntimeGuestR0 - Guest driver runtime.
+@@ -2054,7 +2121,7 @@
+ 	$(QUIET)$(VBOX_XSLTPROC) -o $@ $< $(filter %.xidl,$^)
+ 
+ 
+-if "$(KBUILD_TARGET)" == "freebsd"
++if1of ($(KBUILD_TARGET), freebsd gnukfreebsd)
+ #
+ # FreeBSDGeneratedKernelHeaders - Generate some kernel interface headers.
+ #
+@@ -2066,7 +2133,7 @@
+ # generate the header next to the source. So, we'll have to temporarily copy
+ # the source file to the destination directory to work.
+ #
+-VBOX_AWK := /usr/bin/awk
++VBOX_AWK := /usr/bin/original-awk
+ INSTALLS += FreeBSDGeneratedKernelHeaders
+ FreeBSDGeneratedKernelHeaders_INST = gen-sys-hdrs/
+ FreeBSDGeneratedKernelHeaders_SOURCES = \
+
+=== modified file 'src/VBox/Runtime/VBox/log-vbox.cpp'
+--- src/VBox/Runtime/VBox/log-vbox.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Runtime/VBox/log-vbox.cpp	2011-07-05 17:09:03 +0000
+@@ -131,7 +131,7 @@
+ #  include <Windows.h>
+ # elif defined(RT_OS_LINUX)
+ #  include <unistd.h>
+-# elif defined(RT_OS_FREEBSD)
++# elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+ #  include <sys/param.h>
+ #  include <sys/sysctl.h>
+ #  include <sys/user.h>
+@@ -368,7 +368,7 @@
+             fclose(pFile);
+         }
+ 
+-#  elif defined(RT_OS_FREEBSD)
++#  elif defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)
+         /* Retrieve the required length first */
+         int aiName[4];
+         aiName[0] = CTL_KERN;
+
+=== modified file 'src/VBox/Runtime/common/err/RTErrConvertFromErrno.cpp'
+--- src/VBox/Runtime/common/err/RTErrConvertFromErrno.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Runtime/common/err/RTErrConvertFromErrno.cpp	2011-07-05 17:09:03 +0000
+@@ -37,7 +37,7 @@
+ # include <sys/errno.h>
+ #elif defined(RT_OS_LINUX) && defined(__KERNEL__)
+ # include <linux/errno.h>
+-#elif defined(RT_OS_FREEBSD) && defined(_KERNEL)
++#elif (defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && defined(_KERNEL)
+ # include <sys/errno.h>
+ #else
+ # include <errno.h>
+
+=== modified file 'src/VBox/Runtime/common/err/RTErrConvertToErrno.cpp'
+--- src/VBox/Runtime/common/err/RTErrConvertToErrno.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Runtime/common/err/RTErrConvertToErrno.cpp	2011-07-05 17:09:03 +0000
+@@ -38,7 +38,7 @@
+ # include <sys/errno.h>
+ #elif defined(RT_OS_LINUX) && defined(__KERNEL__)
+ # include <linux/errno.h>
+-#elif defined(RT_OS_FREEBSD) && defined(_KERNEL)
++#elif (defined(RT_OS_FREEBSD) || defined(__FreeBSD_kernel__)) && defined(_KERNEL)
+ # include <sys/errno.h>
+ #else
+ # include <errno.h>
+
+=== modified file 'src/VBox/Runtime/r0drv/freebsd/mp-r0drv-freebsd.c'
+--- src/VBox/Runtime/r0drv/freebsd/mp-r0drv-freebsd.c	2011-07-05 17:05:22 +0000
++++ src/VBox/Runtime/r0drv/freebsd/mp-r0drv-freebsd.c	2011-07-05 17:09:03 +0000
+@@ -163,17 +163,30 @@
+     /* Will panic if no rendezvousing cpus, so check up front. */
+     if (RTMpGetOnlineCount() > 1)
+     {
+-#if  __FreeBSD_version >= 700000
+-        cpumask_t   Mask = ~(cpumask_t)curcpu;
+-#endif
++#ifndef __FreeBSD_version
++#error
++#endif
++
++#if __FreeBSD_version >= 900000
++        cpuset_t    Mask;
++#elif __FreeBSD_version >= 700000
++        cpumask_t   Mask;
++#endif
++        RTCPUID     idCpu = curcpu;
+         RTMPARGS    Args;
+ 
+         Args.pfnWorker = pfnWorker;
+         Args.pvUser1 = pvUser1;
+         Args.pvUser2 = pvUser2;
+-        Args.idCpu = RTMpCpuId();
++        Args.idCpu = idCpu;
+         Args.cHits = 0;
+ #if __FreeBSD_version >= 700000
++        Mask = all_cpus;
++#if __FreeBSD_version >= 900000
++        CPU_CLR(idCpu, &Mask);
++#else
++        Mask &= ~((cpumask_t)1 << idCpu);
++#endif
+         smp_rendezvous_cpus(Mask, NULL, rtmpOnOthersFreeBSDWrapper, smp_no_rendevous_barrier, &Args);
+ #else
+         smp_rendezvous(NULL, rtmpOnOthersFreeBSDWrapper, NULL, &Args);
+@@ -203,8 +216,10 @@
+ 
+ RTDECL(int) RTMpOnSpecific(RTCPUID idCpu, PFNRTMPWORKER pfnWorker, void *pvUser1, void *pvUser2)
+ {
+-#if  __FreeBSD_version >= 700000
+-    cpumask_t   Mask = 1 << idCpu;
++#if __FreeBSD_version >= 900000
++    cpuset_t    Mask;
++#elif __FreeBSD_version >= 700000
++    cpumask_t   Mask;
+ #endif
+     RTMPARGS    Args;
+ 
+@@ -218,7 +233,11 @@
+     Args.idCpu = idCpu;
+     Args.cHits = 0;
+ #if __FreeBSD_version >= 700000
++#if __FreeBSD_version >= 900000
++    CPU_SETOF(idCpu, &Mask);
++#else
+     Mask = (cpumask_t)1 << idCpu;
++#endif
+     smp_rendezvous_cpus(Mask, NULL, rtmpOnSpecificFreeBSDWrapper, smp_no_rendevous_barrier, &Args);
+ #else
+     smp_rendezvous(NULL, rtmpOnSpecificFreeBSDWrapper, NULL, &Args);
+@@ -242,13 +261,21 @@
+ 
+ RTDECL(int) RTMpPokeCpu(RTCPUID idCpu)
+ {
++#if __FreeBSD_version >= 900000
++    cpuset_t    Mask;
++#else
+     cpumask_t   Mask;
++#endif
+ 
+     /* Will panic if no rendezvousing cpus, so make sure the cpu is online. */
+     if (!RTMpIsCpuOnline(idCpu))
+         return VERR_CPU_NOT_FOUND;
+ 
++#if __FreeBSD_version >= 900000
++    CPU_SETOF(idCpu, &Mask);
++#else
+     Mask = (cpumask_t)1 << idCpu;
++#endif
+     smp_rendezvous_cpus(Mask, NULL, rtmpFreeBSDPokeCallback, smp_no_rendevous_barrier, NULL);
+ 
+     return VINF_SUCCESS;
+
+=== modified file 'src/VBox/Runtime/r3/freebsd/fileaio-freebsd.cpp'
+--- src/VBox/Runtime/r3/freebsd/fileaio-freebsd.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Runtime/r3/freebsd/fileaio-freebsd.cpp	2011-07-05 17:09:03 +0000
+@@ -372,8 +372,12 @@
+         size_t i = 0;
+         PRTFILEAIOREQINTERNAL pReqInt;
+ 
++#ifndef AIO_LISTIO_MAX
++#define AIO_LISTIO_MAX sysconf(_SC_AIO_LISTIO_MAX)
++#endif
++
+         while (   (i < cReqs)
+-               && (i < AIO_LISTIO_MAX))
++               && (AIO_LISTIO_MAX == -1 || i < AIO_LISTIO_MAX))
+         {
+             pReqInt = pahReqs[i];
+             if (RTFILEAIOREQ_IS_NOT_VALID(pReqInt))
+
+=== modified file 'src/VBox/Runtime/r3/posix/utf8-posix.cpp'
+--- src/VBox/Runtime/r3/posix/utf8-posix.cpp	2011-07-05 17:05:22 +0000
++++ src/VBox/Runtime/r3/posix/utf8-posix.cpp	2011-07-05 17:09:03 +0000
+@@ -168,7 +168,7 @@
+             size_t      cbOutLeft = cbOutput2;
+             const void *pvInputLeft = pvInput;
+             void       *pvOutputLeft = pvOutput;
+-#if defined(RT_OS_LINUX) || (defined(RT_OS_DARWIN) && defined(_DARWIN_FEATURE_UNIX_CONFORMANCE)) /* there are different opinions about the constness of the input buffer. */
++#if defined(RT_OS_LINUX) || defined(__GLIBC__) || (defined(RT_OS_DARWIN) && defined(_DARWIN_FEATURE_UNIX_CONFORMANCE)) /* there are different opinions about the constness of the input buffer. */
+             if (iconv(hIconv, (char **)&pvInputLeft, &cbInLeft, (char **)&pvOutputLeft, &cbOutLeft) != (size_t)-1)
+ #else
+             if (iconv(hIconv, (const char **)&pvInputLeft, &cbInLeft, (char **)&pvOutputLeft, &cbOutLeft) != (size_t)-1)
+@@ -294,7 +294,7 @@
+             size_t      cbOutLeft = cbOutput2;
+             const void *pvInputLeft = pvInput;
+             void       *pvOutputLeft = pvOutput;
+-#if defined(RT_OS_LINUX) || (defined(RT_OS_DARWIN) && defined(_DARWIN_FEATURE_UNIX_CONFORMANCE)) /* there are different opinions about the constness of the input buffer. */
++#if defined(RT_OS_LINUX) || defined(__GLIBC__) || (defined(RT_OS_DARWIN) && defined(_DARWIN_FEATURE_UNIX_CONFORMANCE)) /* there are different opinions about the constness of the input buffer. */
+             if (iconv(icHandle, (char **)&pvInputLeft, &cbInLeft, (char **)&pvOutputLeft, &cbOutLeft) != (size_t)-1)
+ #else
+             if (iconv(icHandle, (const char **)&pvInputLeft, &cbInLeft, (char **)&pvOutputLeft, &cbOutLeft) != (size_t)-1)
+
+=== modified file 'src/apps/Makefile.kmk'
+--- src/apps/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/apps/Makefile.kmk	2011-07-05 17:09:03 +0000
+@@ -28,7 +28,7 @@
+   include $(PATH_SUB_CURRENT)/tunctl/Makefile.kmk
+  endif
+ endif
+-if1of ($(KBUILD_TARGET),darwin solaris linux freebsd)
++if1of ($(KBUILD_TARGET),darwin solaris linux freebsd gnukfreebsd)
+  ifneq ($(wildcard $(PATH_SUB_CURRENT)/adpctl),)
+   include $(PATH_SUB_CURRENT)/adpctl/Makefile.kmk
+  endif
+
+=== modified file 'src/libs/xpcom18a4/Config.kmk'
+--- src/libs/xpcom18a4/Config.kmk	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/Config.kmk	2011-07-18 12:19:29 +0000
+@@ -56,7 +56,9 @@
+ TEMPLATE_XPCOM_CFLAGS.profile      = -O
+ TEMPLATE_XPCOM_CFLAGS.freebsd      = -pthread
+ TEMPLATE_XPCOM_CFLAGS.l4           = -nostdinc
+-TEMPLATE_XPCOM_CFLAGS.linux        = -pthread -ansi
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++TEMPLATE_XPCOM_CFLAGS             += -pthread -ansi
++endif
+ TEMPLATE_XPCOM_CFLAGS.solaris      = -fno-omit-frame-pointer # for now anyway.
+ TEMPLATE_XPCOM_DEFS                = \
+ 	MOZILLA_CLIENT=1 \
+@@ -75,6 +77,7 @@
+ TEMPLATE_XPCOM_DEFS.darwin.amd64   = VBOX_MACOSX_FOLLOWS_UNIX_IO
+ TEMPLATE_XPCOM_DEFS.freebsd        = OSTYPE=\"FreeBSD5+\"   OSARCH=\"FreeBSD\" XP_UNIX=1 FREEBSD=1 HAVE_VISIBILITY_ATTRIBUTE=1
+ TEMPLATE_XPCOM_DEFS.linux          = OSTYPE=\"Linux2.6\"    OSARCH=\"Linux\"  XP_UNIX=1 _GNU_SOURCE HAVE_VISIBILITY_ATTRIBUTE=1 ## @todo LINUX=1
++TEMPLATE_XPCOM_DEFS.gnukfreebsd    = OSTYPE=\"GNU/kFreeBSD\" OSARCH=\"GNU/kFreeBSD\"  XP_UNIX=1 _GNU_SOURCE HAVE_VISIBILITY_ATTRIBUTE=1
+ TEMPLATE_XPCOM_DEFS.l4             = OSTYPE=\"L4ENV\"       OSARCH=\"L4\"     XP_UNIX=1 L4ENV HAVE_VISIBILITY_ATTRIBUTE=1
+ # Don't define BSD_SELECT because bsdselect() from kLIBC <= 0.6.3 has problems on SMP
+ TEMPLATE_XPCOM_DEFS.os2            = OSTYPE=\"OS/2_4.5\"    OSARCH=\"OS/2\"   XP_OS2 XP_PC OS2=4
+@@ -165,7 +168,9 @@
+ 	$(VBoxXPCOM_1_TARGET) \
+ 	$(TEMPLATE_XPCOM_LIBS)
+ TEMPLATE_XPCOMEXE_LIBS.freebsd     = $(LIB_PTHREAD)
+-TEMPLATE_XPCOMEXE_LIBS.linux       = dl $(LIB_PTHREAD)
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++TEMPLATE_XPCOMEXE_LIBS            += dl $(LIB_PTHREAD)
++endif
+ TEMPLATE_XPCOMEXE_LIBS.l4          = $(LIB_RUNTIME) $(VBOX_GCC_LIBGCC)
+ TEMPLATE_XPCOMEXE_LDFLAGS.darwin   = -bind_at_load $(filter-out -current_version -compatibility_version $(VBOX_VERSION_MAJOR).$(VBOX_VERSION_MINOR).$(VBOX_VERSION_BUILD),$(TEMPLATE_XPCOM_LDFLAGS.darwin))
+ TEMPLATE_XPCOMEXE_LDFLAGS.l4       = $(L4_DIR)/lib/x86_586/crt0.o \
+
+=== modified file 'src/libs/xpcom18a4/Makefile.kmk'
+--- src/libs/xpcom18a4/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/Makefile.kmk	2011-07-05 17:09:03 +0000
+@@ -472,10 +472,12 @@
+ 	$(shell pkg-config --cflags libIDL-2.0)
+  xpidl_LDFLAGS = \
+ 	$(shell pkg-config --libs-only-L libIDL-2.0)
+-xpidl_LIBS.linux = \
++ if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++  xpidl_LIBS += \
+ 	$(shell pkg-config --libs-only-l libIDL-2.0 | sed -e 's/-l//g')
+- xpidl_LDFLAGS.linux = \
++  xpidl_LDFLAGS += \
+ 	$(VBOX_LD_as_needed)
++ endif
+ endif
+ 
+ #
+@@ -512,8 +514,8 @@
+ 	_PR_PTHREADS
+ ## @todo filling in the missing stuff, please don't just copy it from linux.
+ # FIXME: LINUX should be defined by _linux.cfg
+-VBox-xpcom-nspr_DEFS.linux = \
+-	LINUX=1 \
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBox-xpcom-nspr_DEFS      += \
+ 	_POSIX_SOURCE=1 \
+ 	_BSD_SOURCE=1 \
+ 	_SVID_SOURCE=1 \
+@@ -522,6 +524,7 @@
+ 	HAVE_FCNTL_FILE_LOCKING=1 \
+ 	HAVE_CVAR_BUILT_ON_SEM \
+ 	_PR_PTHREADS
++endif
+ # _BSD_SOURCE is here to keep the Glibc header files happy and make them include the right things
+ # FIXME: L4 should be defined by _linux.cfg
+ VBox-xpcom-nspr_DEFS.l4 = \
+@@ -606,7 +609,7 @@
+ 	nsprpub/lib/libc/src/plerror.c \
+ 	nsprpub/lib/libc/src/plgetopt.c
+ 
+-ifeq ($(filter-out darwin freebsd linux netbsd openbsd solaris,$(KBUILD_TARGET)),) # unixish
++ifeq ($(filter-out darwin freebsd linux gnukfreebsd netbsd openbsd solaris,$(KBUILD_TARGET)),) # unixish
+ VBox-xpcom-nspr_SOURCES += \
+ 	nsprpub/pr/src/md/unix/unix.c \
+ 	nsprpub/pr/src/md/unix/unix_errors.c \
+@@ -649,9 +652,11 @@
+ VBox-xpcom-nspr_SOURCES.l4.x86 = nsprpub/pr/src/md/unix/os_Linux_x86.s
+ VBox-xpcom-nspr_SOURCES.l4.amd64 = nsprpub/pr/src/md/unix/os_Linux_x86_64.s
+ 
+-VBox-xpcom-nspr_SOURCES.linux = nsprpub/pr/src/md/unix/linux.c
+-VBox-xpcom-nspr_SOURCES.linux.x86 = nsprpub/pr/src/md/unix/os_Linux_x86.s
+-VBox-xpcom-nspr_SOURCES.linux.amd64 = nsprpub/pr/src/md/unix/os_Linux_x86_64.s
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBox-xpcom-nspr_SOURCES += nsprpub/pr/src/md/unix/linux.c
++VBox-xpcom-nspr_SOURCES.x86 += nsprpub/pr/src/md/unix/os_Linux_x86.s
++VBox-xpcom-nspr_SOURCES.amd64 += nsprpub/pr/src/md/unix/os_Linux_x86_64.s
++endif
+ 
+ VBox-xpcom-nspr_SOURCES.os2 = \
+ 	nsprpub/pr/src/io/prdir.c \
+@@ -815,7 +820,7 @@
+ 	xpcom/MoreFiles/MoreFilesX.c
+ VBox-xpcom-io_SOURCES.l4 = \
+ 	xpcom/io/nsLocalFileL4.cpp
+-if1of ($(KBUILD_TARGET) $(KBUILD_TARGET).$(KBUILD_TARGET_ARCH), freebsd linux netbsd openbsd solaris darwin.amd64)
++if1of ($(KBUILD_TARGET) $(KBUILD_TARGET).$(KBUILD_TARGET_ARCH), freebsd linux gnukfreebsd netbsd openbsd solaris darwin.amd64)
+ VBox-xpcom-io_SOURCES += \
+ 	xpcom/io/nsLocalFileUnix.cpp
+ endif
+@@ -879,10 +884,12 @@
+                                          xpcom/reflect/xptcall/src/md/unix/xptcstubs_gcc_x86_unix.cpp
+ VBox-xpcom-xptcall_SOURCES.freebsd.amd64=xpcom/reflect/xptcall/src/md/unix/xptcinvoke_x86_64_linux.cpp \
+                                          xpcom/reflect/xptcall/src/md/unix/xptcstubs_x86_64_linux.cpp
+-VBox-xpcom-xptcall_SOURCES.linux.x86   = xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp \
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBox-xpcom-xptcall_SOURCES.x86        += xpcom/reflect/xptcall/src/md/unix/xptcinvoke_gcc_x86_unix.cpp \
+                                          xpcom/reflect/xptcall/src/md/unix/xptcstubs_gcc_x86_unix.cpp
+-VBox-xpcom-xptcall_SOURCES.linux.amd64 = xpcom/reflect/xptcall/src/md/unix/xptcinvoke_x86_64_linux.cpp \
++VBox-xpcom-xptcall_SOURCES.amd64      += xpcom/reflect/xptcall/src/md/unix/xptcinvoke_x86_64_linux.cpp \
+                                          xpcom/reflect/xptcall/src/md/unix/xptcstubs_x86_64_linux.cpp
++endif
+ VBox-xpcom-xptcall_SOURCES.os2         = xpcom/reflect/xptcall/src/md/os2/xptcinvoke_gcc_x86_os2.cpp \
+                                          xpcom/reflect/xptcall/src/md/os2/xptcstubs_gcc_x86_os2.cpp
+ VBox-xpcom-xptcall_SOURCES.solaris.x86 = xpcom/reflect/xptcall/src/md/unix/xptcinvoke_x86_solaris.cpp \
+@@ -959,8 +966,10 @@
+ VBoxXPCOM_NAME = $(basename $(notdir $(LIB_XPCOM)))
+ VBoxXPCOM_DEFS = BUILD_DCONNECT="1" _IMPL_NS_COM
+ ifdef VBOX_WITH_XPCOM_NAMESPACE_CLEANUP
+- VBoxXPCOM_LDFLAGS.linux    = -Wl,--version-script=$(XPCOM_C_NAMESPACE_MAP)
+- VBoxXPCOM_LNK_DEPS.linux  += $(XPCOM_C_NAMESPACE_MAP)
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++ VBoxXPCOM_LDFLAGS += -Wl,--version-script=$(XPCOM_C_NAMESPACE_MAP)
++ VBoxXPCOM_LNK_DEPS += $(XPCOM_C_NAMESPACE_MAP)
++endif
+  VBoxXPCOM_LDFLAGS.solaris  = -Wl,-M,$(XPCOM_C_NAMESPACE_MAP)
+  VBoxXPCOM_LNK_DEPS.solaris+= $(XPCOM_C_NAMESPACE_MAP)
+ endif
+@@ -986,10 +995,12 @@
+ 	$(VBox-xpcom-proxy_1_TARGET) \
+ 	$(VBox-xpcom-nspr_1_TARGET) \
+ 	$(VBoxXPCOMGlue_s_1_TARGET)
+-VBoxXPCOM_LIBS.linux = \
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBoxXPCOM_LIBS += \
+ 	pthread dl
++endif
+ 
+-ifeq ($(filter-out freebsd l4 linux netbsd openbsd,$(KBUILD_TARGET)),) # gnu ld.
++ifeq ($(filter-out freebsd l4 linux gnukfreebsd netbsd openbsd,$(KBUILD_TARGET)),) # gnu ld.
+ VBoxXPCOM_LDFLAGS = -Wl,--whole-archive \
+ 	$(VBox-xpcom-typelib_1_TARGET) \
+ 	$(VBox-xpcom-string_1_TARGET) \
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/config/nsinstall.c'
+--- src/libs/xpcom18a4/nsprpub/config/nsinstall.c	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/config/nsinstall.c	2011-07-17 16:32:09 +0000
+@@ -98,7 +98,7 @@
+ }
+ #endif /* NEXTSTEP */
+ 
+-#ifdef LINUX
++#if defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) 
+ #include <getopt.h>
+ #endif
+ 
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/include/md/_linux.cfg'
+--- src/libs/xpcom18a4/nsprpub/pr/include/md/_linux.cfg	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/include/md/_linux.cfg	2011-07-17 16:32:09 +0000
+@@ -35,6 +35,11 @@
+  *
+  * ***** END LICENSE BLOCK ***** */
+ 
++/*
++ * This file is used by not only Linux but also other glibc systems
++ * such as GNU/Hurd and GNU/k*BSD.
++ */
++
+ #ifndef nspr_cpucfg___
+ #define nspr_cpucfg___
+ 
+@@ -42,7 +47,7 @@
+ #define XP_UNIX
+ #endif
+ 
+-#ifndef LINUX
++#if !defined(LINUX) && defined(__linux__)
+ #define LINUX
+ #endif
+ 
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/include/md/_pth.h'
+--- src/libs/xpcom18a4/nsprpub/pr/include/md/_pth.h	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/include/md/_pth.h	2011-07-17 16:33:24 +0000
+@@ -139,6 +139,7 @@
+ 	(!memcmp(&(t), &pt_zero_tid, sizeof(pthread_t)))
+ #define _PT_PTHREAD_COPY_THR_HANDLE(st, dt)   (dt) = (st)
+ #elif defined(IRIX) || defined(OSF1) || defined(AIX) || defined(SOLARIS) \
++	|| defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) \
+ 	|| defined(HPUX) || defined(LINUX) || defined(FREEBSD) \
+ 	|| defined(NETBSD) || defined(OPENBSD) || defined(BSDI) \
+ 	|| defined(VMS) || defined(NTO) || defined(DARWIN) \
+@@ -191,7 +192,8 @@
+ /*
+  * These platforms don't have sigtimedwait()
+  */
+-#if (defined(AIX) && !defined(AIX4_3_PLUS)) || defined(LINUX) \
++#if (defined(AIX) && !defined(AIX4_3_PLUS)) \
++	|| defined(LINUX) || defined(__GNU__)|| defined(__GLIBC__) \
+ 	|| defined(FREEBSD) || defined(NETBSD) || defined(OPENBSD) \
+ 	|| defined(BSDI) || defined(VMS) || defined(UNIXWARE) \
+ 	|| defined(DARWIN)
+@@ -231,7 +233,8 @@
+ #define PT_PRIO_MAX            sched_get_priority_max(SCHED_OTHER)
+ #endif /* defined(_PR_DCETHREADS) */
+ 
+-#elif defined(LINUX) || defined(FREEBSD)
++#elif defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) \
++	|| defined(FREEBSD)
+ #define PT_PRIO_MIN            sched_get_priority_min(SCHED_OTHER)
+ #define PT_PRIO_MAX            sched_get_priority_max(SCHED_OTHER)
+ #elif defined(NTO)
+@@ -286,7 +289,8 @@
+ 		onemillisec.tv_nsec = 1000000L;			\
+         nanosleep(&onemillisec,NULL);			\
+     PR_END_MACRO
+-#elif defined(HPUX) || defined(LINUX) || defined(SOLARIS) \
++#elif defined(HPUX) || defined(SOLARIS) \
++	|| defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) \
+ 	|| defined(FREEBSD) || defined(NETBSD) || defined(OPENBSD) \
+ 	|| defined(BSDI) || defined(NTO) || defined(DARWIN) \
+ 	|| defined(UNIXWARE)
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/include/md/_unixos.h'
+--- src/libs/xpcom18a4/nsprpub/pr/include/md/_unixos.h	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/include/md/_unixos.h	2011-07-17 16:34:10 +0000
+@@ -46,7 +46,8 @@
+  * Linux: FD_SETSIZE is defined in /usr/include/sys/select.h and should
+  * not be redefined.
+  */
+-#if !defined(LINUX) && !defined(DARWIN) && !defined(NEXTSTEP) && !defined(L4ENV)
++#if !defined(LINUX) && !defined(__GNU__) && !defined(__GLIBC__) \
++  && !defined(DARWIN) && !defined(NEXTSTEP) && !defined(L4ENV)
+ #ifndef FD_SETSIZE
+ #define FD_SETSIZE  4096
+ #endif
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/include/md/_vbox.cfg'
+--- src/libs/xpcom18a4/nsprpub/pr/include/md/_vbox.cfg	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/include/md/_vbox.cfg	2011-07-17 16:39:44 +0000
+@@ -45,7 +45,7 @@
+ # include <md/_freebsd.cfg>
+ #elif defined(RT_OS_L4)
+ # include <md/_l4v2.cfg>
+-#elif defined(RT_OS_LINUX)
++#elif defined(RT_OS_LINUX) || defined(__GNU__) || defined(__GLIBC__)
+ # include <md/_linux.cfg>
+ #elif defined(RT_OS_NETBSD)
+ # include <md/_netbsd.cfg>
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/include/md/prosdep.h'
+--- src/libs/xpcom18a4/nsprpub/pr/include/md/prosdep.h	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/include/md/prosdep.h	2011-07-17 16:32:09 +0000
+@@ -90,7 +90,7 @@
+ #elif defined(IRIX)
+ #include "md/_irix.h"
+ 
+-#elif defined(LINUX)
++#elif defined(LINUX) || defined(__GNU__) || defined(__GLIBC__)
+ #include "md/_linux.h"
+ 
+ #elif defined(OSF1)
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/src/linking/Makefile.in'
+--- src/libs/xpcom18a4/nsprpub/pr/src/linking/Makefile.in	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/src/linking/Makefile.in	2011-07-17 16:32:09 +0000
+@@ -63,7 +63,7 @@
+ INCLUDES = -I$(dist_includedir) -I$(topsrcdir)/pr/include -I$(topsrcdir)/pr/include/private
+ 
+ # For Dl_info and dladdr.
+-ifeq ($(OS_TARGET),Linux)
++ifeq (,$(filter-out Linux GNU GNU_%,$(OS_TARGET)))
+ DEFINES    += -D_GNU_SOURCE
+ endif
+ 
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/src/linking/prlink.c'
+--- src/libs/xpcom18a4/nsprpub/pr/src/linking/prlink.c	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/src/linking/prlink.c	2011-07-17 16:32:09 +0000
+@@ -1810,7 +1810,8 @@
+ PR_IMPLEMENT(char *)
+ PR_GetLibraryFilePathname(const char *name, PRFuncPtr addr)
+ {
+-#if defined(SOLARIS) || defined(LINUX) || defined(FREEBSD)
++#if defined(SOLARIS) || defined(FREEBSD) \
++        || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__)
+     Dl_info dli;
+     char *result;
+ 
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/src/md/prosdep.c'
+--- src/libs/xpcom18a4/nsprpub/pr/src/md/prosdep.c	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/src/md/prosdep.c	2011-07-17 16:32:09 +0000
+@@ -63,7 +63,8 @@
+ 
+     /* Get page size */
+ #ifdef XP_UNIX
+-#if defined SUNOS4 || defined LINUX || defined BSDI || defined AIX \
++#if defined SUNOS4 || defined BSDI || defined AIX \
++        || defined LINUX || defined __GNU__ || defined __GLIBC__ \
+         || defined FREEBSD || defined NETBSD || defined OPENBSD \
+         || defined DARWIN || defined NEXTSTEP
+     _pr_pageSize = getpagesize();
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/src/md/unix/unix.c'
+--- src/libs/xpcom18a4/nsprpub/pr/src/md/unix/unix.c	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/src/md/unix/unix.c	2011-07-17 16:34:49 +0000
+@@ -65,7 +65,7 @@
+  * PRInt32* pointer to a _PRSockLen_t* pointer.
+  */
+ #if defined(HAVE_SOCKLEN_T) \
+-    || (defined(LINUX) && defined(__GLIBC__) && __GLIBC__ >= 2) \
++    || (defined(__GLIBC__) && __GLIBC__ >= 2) \
+     || defined(L4ENV)
+ #define _PRSockLen_t socklen_t
+ #elif defined(IRIX) || defined(HPUX) || defined(OSF1) || defined(SOLARIS) \
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/src/md/unix/uxproces.c'
+--- src/libs/xpcom18a4/nsprpub/pr/src/md/unix/uxproces.c	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/src/md/unix/uxproces.c	2011-07-17 16:32:09 +0000
+@@ -99,7 +99,8 @@
+  * that can share the virtual address space and file descriptors.
+  */
+ #if (defined(IRIX) && !defined(_PR_PTHREADS)) \
+-        || (defined(LINUX) && defined(_PR_PTHREADS))
++        || ((defined(LINUX) || defined(__GNU__) || defined(__GLIBC__)) \
++        && defined(_PR_PTHREADS))
+ #define _PR_SHARE_CLONES
+ #endif
+ 
+@@ -113,7 +114,8 @@
+  */
+ 
+ #if defined(_PR_GLOBAL_THREADS_ONLY) \
+-	|| (defined(_PR_PTHREADS) && !defined(LINUX))
++	|| (defined(_PR_PTHREADS) \
++	&& !defined(LINUX) && !defined(__GNU__) && !defined(__GLIBC__))
+ #define _PR_NATIVE_THREADS
+ #endif
+ 
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/src/md/unix/uxrng.c'
+--- src/libs/xpcom18a4/nsprpub/pr/src/md/unix/uxrng.c	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/src/md/unix/uxrng.c	2011-07-17 16:32:09 +0000
+@@ -138,7 +138,8 @@
+     return 0;
+ }
+ 
+-#elif (defined(LINUX) || defined(FREEBSD) || defined(NETBSD) || defined(OPENBSD))
++#elif (defined(LINUX) || defined(FREEBSD) || defined(__FreeBSD_kernel__) \
++    || defined(NETBSD) || defined(__NetBSD_kernel__) || defined(OPENBSD))
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/src/misc/prnetdb.c'
+--- src/libs/xpcom18a4/nsprpub/pr/src/misc/prnetdb.c	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/src/misc/prnetdb.c	2011-07-17 16:35:48 +0000
+@@ -108,7 +108,7 @@
+ #define _PR_HAVE_GETPROTO_R_INT
+ #endif
+ 
+-#if (defined(LINUX) && defined(__GLIBC__) && __GLIBC__ >= 2) || defined(L4ENV)
++#if (defined(__GLIBC__) && __GLIBC__ >= 2) || defined(L4ENV)
+ #define _PR_HAVE_GETPROTO_R
+ #define _PR_HAVE_5_ARG_GETPROTO_R
+ #endif
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/src/pthreads/ptio.c'
+--- src/libs/xpcom18a4/nsprpub/pr/src/pthreads/ptio.c	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/src/pthreads/ptio.c	2011-07-17 18:22:12 +0000
+@@ -206,7 +206,7 @@
+ #if defined(SOLARIS)
+ #define _PRSockOptVal_t char *
+ #elif defined(IRIX) || defined(OSF1) || defined(AIX) || defined(HPUX) \
+-    || defined(LINUX) || defined(FREEBSD) || defined(BSDI) || defined(VMS) \
++    || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) || defined(FREEBSD) || defined(BSDI) || defined(VMS) \
+     || defined(NTO) || defined(OPENBSD) || defined(DARWIN) \
+     || defined(UNIXWARE) || defined(NETBSD)
+ #define _PRSockOptVal_t void *
+@@ -220,7 +220,8 @@
+ #define _PRSelectFdSetArg_t void *
+ #elif defined(IRIX) || (defined(AIX) && !defined(AIX4_1)) \
+     || defined(OSF1) || defined(SOLARIS) \
+-    || defined(HPUX10_30) || defined(HPUX11) || defined(LINUX) \
++    || defined(HPUX10_30) || defined(HPUX11) \
++    || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) \
+     || defined(FREEBSD) || defined(NETBSD) || defined(OPENBSD) \
+     || defined(BSDI) || defined(VMS) || defined(NTO) || defined(DARWIN) \
+     || defined(UNIXWARE)
+@@ -304,7 +305,7 @@
+  * most current systems.
+  */
+ #if defined(HAVE_SOCKLEN_T) \
+-    || (defined(LINUX) && defined(__GLIBC__) && __GLIBC__ >= 2)
++    || (defined(__GLIBC__) && __GLIBC__ >= 2)
+ typedef socklen_t pt_SockLen;
+ #elif (defined(AIX) && !defined(AIX4_1)) \
+     || defined(VMS)
+@@ -3258,7 +3259,8 @@
+ };
+ 
+ #if defined(HPUX) || defined(OSF1) || defined(SOLARIS) || defined (IRIX) \
+-    || defined(AIX) || defined(LINUX) || defined(FREEBSD) || defined(NETBSD) \
++    || defined(LINUX) || defined(__GNU__) || defined(__GLIBC__) \
++    || defined(AIX) || defined(FREEBSD) || defined(NETBSD) \
+     || defined(OPENBSD) || defined(BSDI) || defined(VMS) || defined(NTO) \
+     || defined(DARWIN) || defined(UNIXWARE)
+ #define _PR_FCNTL_FLAGS O_NONBLOCK
+@@ -4757,7 +4759,8 @@
+ 
+ #include <sys/types.h>
+ #include <sys/time.h>
+-#if !defined(SUNOS4) && !defined(HPUX) && !defined(LINUX)
++#if !defined(SUNOS4) && !defined(HPUX) \
++    && !defined(LINUX) && !defined(__GNU__) && !defined(__GLIBC__)
+ #include <sys/select.h>
+ #endif
+ 
+
+=== modified file 'src/libs/xpcom18a4/nsprpub/pr/tests/Makefile.in'
+--- src/libs/xpcom18a4/nsprpub/pr/tests/Makefile.in	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/nsprpub/pr/tests/Makefile.in	2011-07-17 16:32:09 +0000
+@@ -376,14 +376,10 @@
+     EXTRA_LIBS = -lsocket -lnsl -lgen -lresolv
+ endif
+ 
+-ifeq ($(OS_ARCH), Linux)
+-    ifeq ($(OS_RELEASE), 1.2)
+-        EXTRA_LIBS = -ldl
+-    else
+-        LDOPTS += -Xlinker -rpath $(ABSOLUTE_LIB_DIR)
+-        ifeq ($(USE_PTHREADS),1)
+-            EXTRA_LIBS = -lpthread
+-        endif
++ifeq (,$(filter-out Linux GNU GNU_%,$(OS_ARCH)))
++    LDOPTS += -Xlinker -rpath $(ABSOLUTE_LIB_DIR)
++    ifeq ($(USE_PTHREADS),1)
++        EXTRA_LIBS = -lpthread
+     endif
+ endif
+ 
+
+=== modified file 'src/libs/xpcom18a4/python/Makefile.kmk'
+--- src/libs/xpcom18a4/python/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/python/Makefile.kmk	2011-07-17 11:59:02 +0000
+@@ -155,7 +155,7 @@
+ VBoxPython_EXTENDS      = VBoxPythonBase
+ VBoxPython_DEFS         = $(filter-out VBOX_PYXPCOM_VERSIONED,$(VBoxPythonBase_DEFS))
+ VBoxPython_INCS         = $(VBoxPythonBase_INCS) $(VBOX_PYTHONDEF_INC)
+-if "$(KBUILD_TARGET)" == "linux"
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
+  VBoxPython_LIBS        = $(VBoxPythonBase_LIBS)
+ else
+  VBoxPython_LIBS        = $(VBoxPythonBase_LIBS) $(VBOX_PYTHONDEF_LIB)
+
+=== modified file 'src/libs/xpcom18a4/xpcom/reflect/xptcall/src/md/unix/Makefile.in'
+--- src/libs/xpcom18a4/xpcom/reflect/xptcall/src/md/unix/Makefile.in	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/xpcom/reflect/xptcall/src/md/unix/Makefile.in	2011-07-17 16:45:42 +0000
+@@ -70,7 +70,7 @@
+ # New code for Linux, et. al., with gcc
+ # Migrate other platforms here after testing
+ #
+-ifneq (,$(filter Linux,$(OS_ARCH)))
++ifneq (,$(filter Linux GNU_%,$(OS_ARCH)))
+ # Linux/x86-64
+ ifeq (x86_64,$(OS_TEST))
+ CPPSRCS		:= xptcinvoke_x86_64_linux.cpp xptcstubs_x86_64_linux.cpp
+
+=== modified file 'src/libs/xpcom18a4/xpcom/reflect/xptcall/src/md/unix/xptc_platforms_unixish_x86.h'
+--- src/libs/xpcom18a4/xpcom/reflect/xptcall/src/md/unix/xptc_platforms_unixish_x86.h	2011-07-05 17:05:22 +0000
++++ src/libs/xpcom18a4/xpcom/reflect/xptcall/src/md/unix/xptc_platforms_unixish_x86.h	2011-07-17 16:46:14 +0000
+@@ -67,7 +67,7 @@
+ *
+ */
+ 
+-#if defined(LINUX) || defined(L4)
++#if defined(LINUX) || defined(__GLIBC__) || defined(L4)
+ /* I am assuming that since we are using the Linux compiler for L4, the same will hold true... */
+ 
+ #if (__GNUC__ == 2) && (__GNUC_MINOR__ <= 7)
+
+=== modified file 'src/recompiler/Makefile-old.kmk'
+--- src/recompiler/Makefile-old.kmk	2011-07-05 17:05:22 +0000
++++ src/recompiler/Makefile-old.kmk	2011-07-05 17:09:03 +0000
+@@ -108,7 +108,7 @@
+ #$(REM_MOD)_DEFS           += REM_PHYS_ADDR_IN_TLB
+ #$(REM_MOD)_DEFS           += DEBUG_ALL_LOGGING DEBUG_DISAS DEBUG_PCALL DEBUG_EXEC DEBUG_FLUSH DEBUG_IOPORT DEBUG_SIGNAL DEBUG_TLB_CHECK DEBUG_TB_INVALIDATE DEBUG_TLB  # Enables huge amounts of debug logging.
+ #$(REM_MOD)_DEFS           += DEBUG_TMP_LOGGING # log qemu parts to "/tmp/vbox-qemu.log" - does not work with VBoxREM2.
+-$(REM_MOD)_DEFS.linux      = _GNU_SOURCE
++$(REM_MOD)_DEFS.gnukfreebsd      = _GNU_SOURCE
+ ifdef VBOX_SOLARIS_10
+  $(REM_MOD)_DEFS.solaris   = HOST_SOLARIS=10
+ else
+
+=== modified file 'src/recompiler/Makefile.kmk'
+--- src/recompiler/Makefile.kmk	2011-07-05 17:05:22 +0000
++++ src/recompiler/Makefile.kmk	2011-07-05 17:09:03 +0000
+@@ -64,7 +64,9 @@
+ #VBoxRemPrimary_DEFS           += REM_PHYS_ADDR_IN_TLB
+ #VBoxRemPrimary_DEFS           += DEBUG_ALL_LOGGING DEBUG_DISAS DEBUG_PCALL DEBUG_EXEC DEBUG_FLUSH DEBUG_IOPORT DEBUG_SIGNAL DEBUG_TLB_CHECK DEBUG_TB_INVALIDATE DEBUG_TLB  # Enables huge amounts of debug logging.
+ #VBoxRemPrimary_DEFS           += DEBUG_TMP_LOGGING # log qemu parts to "/tmp/vbox-qemu.log" - does not work with VBoxREM2.
+-VBoxRemPrimary_DEFS.linux      = _GNU_SOURCE
++if1of ($(KBUILD_TARGET), linux gnukfreebsd)
++VBoxRemPrimary_DEFS           += _GNU_SOURCE
++endif
+ ifdef VBOX_SOLARIS_10
+  VBoxRemPrimary_DEFS.solaris   = HOST_SOLARIS=10
+ else
+
