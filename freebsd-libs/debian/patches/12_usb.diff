@@ -32,7 +32,15 @@
  	pbe = NULL;
 --- a/lib/libusb/libusb.h
 +++ b/lib/libusb/libusb.h
-@@ -220,7 +220,7 @@
+@@ -29,6 +29,7 @@
+ 
+ #include <sys/time.h>
+ #include <sys/types.h>
++#include <stdint.h>
+ 
+ #ifdef __cplusplus
+ extern	"C" {
+@@ -220,7 +221,7 @@
  	uint8_t	bSynchAddress;
  	uint8_t *extra;
  	int	extra_length;
@@ -41,7 +49,7 @@
  
  typedef struct libusb_interface_descriptor {
  	uint8_t	bLength;
-@@ -235,12 +235,12 @@
+@@ -235,12 +236,12 @@
  	struct libusb_endpoint_descriptor *endpoint;
  	uint8_t *extra;
  	int	extra_length;
@@ -56,7 +64,7 @@
  
  typedef struct libusb_config_descriptor {
  	uint8_t	bLength;
-@@ -254,7 +254,7 @@
+@@ -254,7 +255,7 @@
  	struct libusb_interface *interface;
  	uint8_t *extra;
  	int	extra_length;
@@ -65,7 +73,7 @@
  
  typedef struct libusb_control_setup {
  	uint8_t	bmRequestType;
-@@ -270,7 +270,7 @@
+@@ -270,7 +271,7 @@
  	uint32_t length;
  	uint32_t actual_length;
  	enum libusb_transfer_status status;
@@ -74,7 +82,7 @@
  
  typedef void (*libusb_transfer_cb_fn) (struct libusb_transfer *transfer);
  
-@@ -289,7 +289,7 @@
+@@ -289,7 +290,7 @@
  	void *os_priv;
  	int	num_iso_packets;
  	struct libusb_iso_packet_descriptor iso_packet_desc[0];
@@ -85,7 +93,16 @@
  
 --- a/lib/libusb/libusb20_desc.h
 +++ b/lib/libusb/libusb20_desc.h
-@@ -98,7 +98,7 @@
+@@ -45,6 +45,8 @@
+ #ifndef _LIBUSB20_DESC_H_
+ #define	_LIBUSB20_DESC_H_
+ 
++#include <stdint.h>
++
+ #ifdef __cplusplus
+ extern	"C" {
+ #endif
+@@ -98,7 +100,7 @@
  	void   *ptr;			/* data pointer */
  	uint16_t len;			/* defaults to zero */
  	uint16_t type;			/* defaults to LIBUSB20_ME_IS_EMPTY */
@@ -94,7 +111,7 @@
  
  struct libusb20_me_format {
  	const uint8_t *format;		/* always set */
-@@ -120,7 +120,7 @@
+@@ -120,7 +122,7 @@
  	   LIBUSB20_ME_IS_##un##SIGNED ,				\
  	   (size) & 0xFF, ((size) / 0x100) & 0xFF, )		\
    LIBUSB20_NOT(ismeta) ( u##int##bits##_t				\
@@ -103,7 +120,7 @@
  
  #define	LIBUSB20_ME_UINT8_T(n, field, arg, ismeta) \
    LIBUSB20_ME_INTEGER(n, field, ismeta, UN, u, 8, , 1)
-@@ -498,7 +498,7 @@
+@@ -498,7 +500,7 @@
  struct libusb20_endpoint {
  	struct LIBUSB20_ENDPOINT_DESC_DECODED desc;
  	struct libusb20_me_struct extra;
@@ -112,7 +129,7 @@
  
  struct libusb20_interface {
  	struct LIBUSB20_INTERFACE_DESC_DECODED desc;
-@@ -507,14 +507,14 @@
+@@ -507,14 +509,14 @@
  	struct libusb20_endpoint *endpoints;
  	uint8_t	num_altsetting;
  	uint8_t	num_endpoints;

@@ -27,7 +27,7 @@
  CFLAGS+=-DSUN4V
 --- a/lib/libkvm/kvm.c
 +++ b/lib/libkvm/kvm.c
-@@ -70,6 +71,10 @@ static char sccsid[] = "@(#)kvm.c	8.2 (B
+@@ -70,6 +70,10 @@
  #include <strings.h>
  #include <unistd.h>
  
@@ -38,7 +38,7 @@
  #include "kvm_private.h"
  
  /* from src/lib/libc/gen/nlist.c */
-@@ -151,6 +156,7 @@ _kvm_open(kd, uf, mf, flag, errout)
+@@ -151,6 +155,7 @@
  	char *errout;
  {
  	struct stat st;
@@ -46,7 +46,7 @@
  
  	kd->vmfd = -1;
  	kd->pmfd = -1;
-@@ -160,8 +166,17 @@ _kvm_open(kd, uf, mf, flag, errout)
+@@ -160,8 +165,17 @@
  	kd->argspc = 0;
  	kd->argv = 0;
  
@@ -66,7 +66,7 @@
  	else if (strlen(uf) >= MAXPATHLEN) {
  		_kvm_err(kd, kd->program, "exec file name too long");
  		goto failed;
-@@ -244,7 +259,7 @@ kvm_t *
+@@ -244,7 +258,7 @@
  kvm_openfiles(uf, mf, sf, flag, errout)
  	const char *uf;
  	const char *mf;
@@ -75,7 +75,7 @@
  	int flag;
  	char *errout;
  {
-@@ -262,7 +277,7 @@ kvm_t *
+@@ -262,7 +276,7 @@
  kvm_open(uf, mf, sf, flag, errstr)
  	const char *uf;
  	const char *mf;
@@ -86,7 +86,7 @@
  {
 --- a/lib/libkvm/kvm_file.c
 +++ b/lib/libkvm/kvm_file.c
-@@ -59,7 +59,7 @@ static char sccsid[] = "@(#)kvm_file.c	8
+@@ -59,7 +59,7 @@
  #include <sys/sysctl.h>
  
  #include <limits.h>
@@ -95,7 +95,7 @@
  #include <paths.h>
  #include <stdlib.h>
  
-@@ -80,6 +80,7 @@ kvm_deadfiles(kd, op, arg, allproc_o, np
+@@ -80,6 +80,7 @@
  	int op, arg, nprocs;
  	long allproc_o;
  {
@@ -103,7 +103,7 @@
  	struct proc proc;
  	struct filedesc filed;
  	int buflen = kd->arglen, ocnt = 0, n = 0, once = 0, i;
-@@ -151,6 +152,7 @@ kvm_deadfiles(kd, op, arg, allproc_o, np
+@@ -151,6 +152,7 @@
  	return (n);
  fail:
  	free(ofiles);
@@ -111,7 +111,7 @@
  	return (0);
  	
  }
-@@ -166,6 +168,7 @@ kvm_getfiles(kd, op, arg, cnt)
+@@ -166,6 +168,7 @@
  
  	_kvm_syserr(kd, kd->program, "kvm_getfiles has been broken for years");
  	return (0);
@@ -119,7 +119,7 @@
  	if (ISALIVE(kd)) {
  		size = 0;
  		mib[0] = CTL_KERN;
-@@ -228,4 +231,6 @@ kvm_getfiles(kd, op, arg, cnt)
+@@ -228,4 +231,6 @@
  	}
  	*cnt = nfiles;
  	return (kd->argspc);
@@ -128,7 +128,7 @@
  }
 --- a/lib/libkvm/kvm_getloadavg.c
 +++ b/lib/libkvm/kvm_getloadavg.c
-@@ -44,15 +44,21 @@ static char sccsid[] = "@(#)kvm_getloada
+@@ -44,15 +44,21 @@
  #include <limits.h>
  #include <nlist.h>
  #include <kvm.h>
@@ -155,7 +155,7 @@
  /*
 --- a/lib/libkvm/kvm_getswapinfo.c
 +++ b/lib/libkvm/kvm_getswapinfo.c
-@@ -51,9 +51,9 @@ __FBSDID("$FreeBSD$");
+@@ -51,9 +51,9 @@
  #include "kvm_private.h"
  
  static struct nlist kvm_swap_nl[] = {
@@ -168,7 +168,7 @@
  };
  
  #define NL_SWTAILQ	0
-@@ -210,8 +210,10 @@ kvm_getswapinfo_sysctl(
+@@ -210,8 +210,10 @@
  			swap_ary[unswdev].ksw_total = ttl;
  			swap_ary[unswdev].ksw_used = xsd.xsw_used;
  			swap_ary[unswdev].ksw_flags = xsd.xsw_flags;
@@ -181,7 +181,7 @@
  		tot.ksw_used += xsd.xsw_used;
 --- a/lib/libkvm/kvm_minidump_amd64.c
 +++ b/lib/libkvm/kvm_minidump_amd64.c
-@@ -100,6 +100,15 @@ hpt_find(kvm_t *kd, vm_paddr_t pa)
+@@ -100,6 +100,15 @@
  	return (-1);
  }
  
@@ -199,7 +199,7 @@
  {
 --- a/lib/libkvm/kvm_minidump_i386.c
 +++ b/lib/libkvm/kvm_minidump_i386.c
-@@ -102,6 +102,16 @@ hpt_find(kvm_t *kd, uint64_t pa)
+@@ -102,6 +102,16 @@
  	return (-1);
  }
  
@@ -229,7 +229,7 @@
  	 * a string to be prepended to error messages
 --- a/lib/libkvm/kvm_proc.c
 +++ b/lib/libkvm/kvm_proc.c
-@@ -54,7 +54,7 @@ __FBSDID("$FreeBSD$");
+@@ -54,7 +54,7 @@
  #include <sys/_lock.h>
  #include <sys/_mutex.h>
  #include <sys/_task.h>
@@ -238,7 +238,7 @@
  #include <sys/user.h>
  #include <sys/proc.h>
  #define	_WANT_PRISON	/* make jail.h give us 'struct prison' */
-@@ -101,6 +101,7 @@ kvm_proclist(kd, what, arg, p, bp, maxcn
+@@ -101,6 +101,7 @@
  	struct kinfo_proc *bp;
  	int maxcnt;
  {
@@ -246,7 +246,7 @@
  	int cnt = 0;
  	struct kinfo_proc kinfo_proc, *kp;
  	struct pgrp pgrp;
-@@ -427,6 +428,8 @@ nopgrp:
+@@ -427,6 +428,8 @@
  		++cnt;
  	}
  	return (cnt);
@@ -257,7 +257,7 @@
  /*
 --- a/lib/libkvm/kvm_cptime.c
 +++ b/lib/libkvm/kvm_cptime.c
-@@ -44,8 +44,8 @@ __FBSDID("$FreeBSD$");
+@@ -44,8 +44,8 @@
  #include "kvm_private.h"
  
  static struct nlist kvm_cp_time_nl[] = {
@@ -270,7 +270,7 @@
  #define	NL_CP_TIME		0
 --- a/lib/libkvm/kvm_pcpu.c
 +++ b/lib/libkvm/kvm_pcpu.c
-@@ -41,9 +41,9 @@ __FBSDID("$FreeBSD$");
+@@ -41,9 +41,9 @@
  #include "kvm_private.h"
  
  static struct nlist kvm_pcpu_nl[] = {
@@ -285,7 +285,7 @@
  /*
 --- a/lib/libkvm/kvm_vnet.c
 +++ b/lib/libkvm/kvm_vnet.c
-@@ -69,18 +69,18 @@ _kvm_vnet_selectpid(kvm_t *kd, pid_t pid
+@@ -69,18 +69,18 @@
  		 * here to __{start,stop}_set_vnet.
  		 */
  #define	NLIST_START_VNET	0
