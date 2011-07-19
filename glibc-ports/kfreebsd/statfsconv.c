@@ -164,7 +164,8 @@ statfs5_to_statvfs (const struct statfs_fbsd5 *pk, struct statvfs *p32)
     | (pk->f_flags & MNT_NOSUID ? ST_NOSUID : 0)
     | (pk->f_flags & MNT_NODEV ? ST_NODEV : 0)
     | (pk->f_flags & MNT_NOEXEC ? ST_NOEXEC : 0)
-    | (pk->f_flags & MNT_SYNCHRONOUS ? ST_SYNCHRONOUS : 0);
+    | (pk->f_flags & MNT_SYNCHRONOUS ? ST_SYNCHRONOUS : 0)
+    | (pk->f_flags & MNT_NOATIME ? ST_NOATIME : 0);
   p32->f_namemax	= pk->f_namemax;
 
   memset (p32->f_spare, '\0', sizeof (p32->f_spare));
@@ -196,7 +197,8 @@ statfs5_to_statvfs64 (const struct statfs_fbsd5 *pk, struct statvfs64 *p64)
     | (pk->f_flags & MNT_NOSUID ? ST_NOSUID : 0)
     | (pk->f_flags & MNT_NODEV ? ST_NODEV : 0)
     | (pk->f_flags & MNT_NOEXEC ? ST_NOEXEC : 0)
-    | (pk->f_flags & MNT_SYNCHRONOUS ? ST_SYNCHRONOUS : 0);
+    | (pk->f_flags & MNT_SYNCHRONOUS ? ST_SYNCHRONOUS : 0)
+    | (pk->f_flags & MNT_NOATIME ? ST_NOATIME : 0);
   p64->f_namemax	= pk->f_namemax;
 
   memset (p64->f_spare, '\0', sizeof (p64->f_spare));

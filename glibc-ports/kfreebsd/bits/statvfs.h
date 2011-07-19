@@ -89,7 +89,9 @@ enum
 # define ST_NODEV	ST_NODEV
   ST_NOEXEC = 8,		/* Disallow program execution.  */
 # define ST_NOEXEC	ST_NOEXEC
-  ST_SYNCHRONOUS = 16		/* Writes are synced at once.  */
+  ST_SYNCHRONOUS = 16,		/* Writes are synced at once.  */
 # define ST_SYNCHRONOUS	ST_SYNCHRONOUS
+  ST_NOATIME = 1024,		/* Do not update access times.  */
+# define ST_NOATIME	ST_NOATIME
 #endif	/* Use GNU.  */
 };
