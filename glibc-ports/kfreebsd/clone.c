@@ -87,7 +87,7 @@ int __clone (int (*fn) (void *), void *child_stack, int flags, void *arg)
 
   if ((flags & CSIGNAL) != SIGCHLD)
   {
-    if (__kernel_osreldate() >= 802509)    /* XXX have to be updated after upstream merge */
+    if (__kernel_osreldate() >= 802510)
                 /* we slightly cheat here, */
                 /* the 9.x snapshot prior to r223966 does not support it too */
     {
