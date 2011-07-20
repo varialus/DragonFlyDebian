@@ -52,3 +52,14 @@ Partially sent to freebsd-hackers (2011-07-02)
  {
  	struct macro_arg *marg;
  	int retval;
+--- a/sys/dev/aic7xxx/aicasm/aicasm_symbol.c
++++ b/sys/dev/aic7xxx/aicasm/aicasm_symbol.c
+@@ -44,7 +44,7 @@
+ 
+ #include <sys/types.h>
+ #include <sys/param.h>
+-#ifdef BSD
++#if defined(BSD) && !defined(__GNU__)
+ #include <db.h>
+ #else
+ #include <db_185.h>
