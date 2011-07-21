@@ -1,0 +1,39 @@
+--- a/usr.sbin/jail/jail.c
++++ b/usr.sbin/jail/jail.c
+@@ -42,7 +42,6 @@
+ #include <errno.h>
+ #include <grp.h>
+ #include <jail.h>
+-#include <login_cap.h>
+ #include <netdb.h>
+ #include <paths.h>
+ #include <pwd.h>
+@@ -93,9 +92,6 @@
+ 		else							\
+ 			errx(1, "%s: no such user", username);		\
+ 	}								\
+-	lcap = login_getpwclass(pwd);					\
+-	if (lcap == NULL)						\
+-		err(1, "getpwclass: %s", username);			\
+ 	ngroups = ngroups_max;						\
+ 	if (getgrouplist(username, pwd->pw_gid, groups, &ngroups) != 0)	\
+ 		err(1, "getgrouplist: %s", username);			\
+@@ -104,7 +100,6 @@
+ int
+ main(int argc, char **argv)
+ {
+-	login_cap_t *lcap = NULL;
+ 	struct passwd *pwd = NULL;
+ 	gid_t *groups;
+ 	size_t sysvallen;
+@@ -326,10 +321,6 @@
+ 			err(1, "setgroups");
+ 		if (setgid(pwd->pw_gid) != 0)
+ 			err(1, "setgid");
+-		if (setusercontext(lcap, pwd, pwd->pw_uid,
+-		    LOGIN_SETALL & ~LOGIN_SETGROUP & ~LOGIN_SETLOGIN) != 0)
+-			err(1, "setusercontext");
+-		login_close(lcap);
+ 	}
+ 	if (lflag) {
+ 		if (*pwd->pw_shell)
