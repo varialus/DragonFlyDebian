@@ -14,7 +14,7 @@
  		/* Possibly a disk image, give it a try.  */
  		;
 -	} else if (ret >= 0 && S_ISCHR(st.st_mode)) {
-+	} else if (ret >= 0 && (S_ISCHR(st.st_mode) && S_ISBLK(st.st_mode))) {
++	} else if (ret >= 0 && (S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode))) {
  		/* This is what we need, do nothing. */
  		;
  	} else if ((fs = getfsfile(name)) != NULL) {
