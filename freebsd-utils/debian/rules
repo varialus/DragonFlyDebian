@@ -64,7 +64,8 @@ get-orig-source:
 		 sbin/mount_ntfs sbin/mount_nullfs sbin/mount_udf sbin/mount_unionfs \
 		 sbin/mount_reiserfs sbin/mount \
 		 sbin/mdconfig sbin/ccdconfig sbin/swapon sbin/atacontrol sbin/camcontrol \
-		 sbin/gbde sbin/geom bin/kenv \
+		 sbin/gbde bin/kenv \
+		 sbin/geom sys/geom/eli sys/crypto/sha2 \
 		 usr.sbin/kbdcontrol usr.sbin/vidcontrol share/syscons \
 		 sbin/savecore sbin/dumpon \
 		 sys/kern/syscalls.c etc/pf.os \
@@ -102,6 +103,7 @@ freebsd-utils-stamp: $(RPCHDRS)
 	$(PMAKE) -C sbin/devfs
 	$(PMAKE) -C sbin/dmesg
 	$(PMAKE) -C sbin/dumpon
+	$(PMAKE) -C sbin/geom
 	$(PMAKE) -C sbin/mdconfig
 	$(PMAKE) -C sbin/mount
 	$(PMAKE) -C sbin/mount_autofs
@@ -206,6 +208,7 @@ clean:
 	$(PMAKE) -C sbin/devfs clean
 	$(PMAKE) -C sbin/dmesg clean
 	$(PMAKE) -C sbin/dumpon clean
+	$(PMAKE) -C sbin/geom clean
 	$(PMAKE) -C sbin/mdconfig clean
 	$(PMAKE) -C sbin/mount clean
 	$(PMAKE) -C sbin/mount_autofs clean

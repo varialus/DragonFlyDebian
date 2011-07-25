@@ -21,20 +21,22 @@ Build-Depends: debhelper (>= 7), po-debconf, freebsd-buildutils, sharutils,
  libkiconv-dev,
 # libdevstat-dev: mdconfig
  libdevstat-dev,
-# libgeom-dev : ccdconfig
+# libgeom-dev : ccdconfig, geom
  libgeom-dev,
-# libsbuf-dev: ifconfig, mdconfig
+# libsbuf-dev: ifconfig, mdconfig, geom
  libsbuf-dev (>= 8.2-2),
 # libcam-dev: camcontrol
  libcam-dev (>= 8.2),
 # libedit-dev: pppctl
  libedit-dev,
-# libexpat1-dev: ifconfig
+# libexpat1-dev: ifconfig, geom
  libexpat1-dev,
 # libtirpc-dev: mount_nfs, mountd, nfsd, rpc.lockd, rpc.statd
  libtirpc-dev,
 # libjail-dev: jail
  libjail-dev,
+# libssl-dev: geom
+ libssl-dev,
 Vcs-Browser: http://svn.debian.org/wsvn/glibc-bsd/trunk/freebsd-utils/
 Vcs-Svn: svn://svn.debian.org/glibc-bsd/trunk/freebsd-utils/
 Standards-Version: 3.9.2
@@ -141,6 +143,18 @@ Provides: nfs-common
 Description: NFS support files common to client and server
  Use this package on any machine that uses NFS, either as client or
  server.
+
+Package: freebsd-geom
+Section: admin
+Priority: standard
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: modular disk I/O request transformation framework
+ The GEOM framework provides an infrastructure in which ``classes'' can
+ perform transformations on disk I/O requests on their path from the upper
+ kernel to the device drivers and back.
+ .
+ This package provides FreeBSD GEOM and associated utilities.
 
 # FIXME:
 # - add ppp (ppp, pppd)

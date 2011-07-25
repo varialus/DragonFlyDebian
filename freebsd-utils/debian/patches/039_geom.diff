@@ -1,0 +1,354 @@
+--- a/sbin/geom/Makefile.inc
++++ b/sbin/geom/Makefile.inc
+@@ -2,5 +2,3 @@
+ 
+ WARNS?=	6
+ CLASS_DIR?=/lib/geom
+-
+-.include "../Makefile.inc"
+--- a/sbin/geom/class/eli/geom_eli.c
++++ b/sbin/geom/class/eli/geom_eli.c
+@@ -1083,7 +1083,7 @@
+ }
+ 
+ static void
+-eli_delkey_attached(struct gctl_req *req, const char *prov __unused)
++eli_delkey_attached(struct gctl_req *req, const char *prov)
+ {
+ 
+ 	gctl_issue(req);
+--- a/sbin/geom/class/eli/Makefile
++++ b/sbin/geom/class/eli/Makefile
+@@ -9,7 +9,7 @@
+ SRCS+=	sha2.c
+ 
+ DPADD=	${LIBMD} ${LIBCRYPTO}
+-LDADD=	-lmd -lcrypto
++LDADD=	-lcrypto
+ 
+ WARNS?=	3
+ 
+--- a/sbin/geom/class/multipath/geom_multipath.c
++++ b/sbin/geom/class/multipath/geom_multipath.c
+@@ -79,7 +79,7 @@
+ };
+ 
+ static void
+-mp_main(struct gctl_req *req, unsigned int flags __unused)
++mp_main(struct gctl_req *req, unsigned int flags)
+ {
+ 	const char *name;
+ 
+--- a/sbin/geom/class/part/geom_part.c
++++ b/sbin/geom/class/part/geom_part.c
+@@ -622,7 +622,7 @@
+ }
+ 
+ static void
+-gpart_show(struct gctl_req *req, unsigned int fl __unused)
++gpart_show(struct gctl_req *req, unsigned int fl)
+ {
+ 	struct gmesh mesh;
+ 	struct gclass *classp;
+@@ -668,7 +668,7 @@
+ }
+ 
+ static void
+-gpart_backup(struct gctl_req *req, unsigned int fl __unused)
++gpart_backup(struct gctl_req *req, unsigned int fl)
+ {
+ 	struct gmesh mesh;
+ 	struct gclass *classp;
+@@ -757,13 +757,13 @@
+ }
+ 
+ static void
+-gpart_sighndl(int sig __unused)
++gpart_sighndl(int sig)
+ {
+ 	undo_restore = 1;
+ }
+ 
+ static void
+-gpart_restore(struct gctl_req *req, unsigned int fl __unused)
++gpart_restore(struct gctl_req *req, unsigned int fl)
+ {
+ 	struct gmesh mesh;
+ 	struct gclass *classp;
+@@ -1211,7 +1211,7 @@
+ }
+ 
+ static void
+-gpart_issue(struct gctl_req *req, unsigned int fl __unused)
++gpart_issue(struct gctl_req *req, unsigned int fl)
+ {
+ 	char buf[4096];
+ 	const char *errstr;
+--- a/sbin/geom/class/sched/geom_sched.c
++++ b/sbin/geom/class/sched/geom_sched.c
+@@ -68,7 +68,7 @@
+ #endif
+ 
+ static void
+-gcmd_createinsert(struct gctl_req *req, unsigned flags __unused)
++gcmd_createinsert(struct gctl_req *req, unsigned flags)
+ {
+ 	const char *reqalgo;
+ 	char name[64];
+--- a/sbin/geom/core/geom.c
++++ b/sbin/geom/core/geom.c
+@@ -770,7 +770,7 @@
+ }
+ 
+ static void
+-std_help(struct gctl_req *req __unused, unsigned flags __unused)
++std_help(struct gctl_req *req, unsigned flags)
+ {
+ 
+ 	usage();
+@@ -794,7 +794,7 @@
+ }
+ 
+ static void
+-std_list(struct gctl_req *req, unsigned flags __unused)
++std_list(struct gctl_req *req, unsigned flags)
+ {
+ 	struct gmesh mesh;
+ 	struct gclass *classp;
+@@ -928,7 +928,7 @@
+ }
+ 
+ static void
+-std_status(struct gctl_req *req, unsigned flags __unused)
++std_status(struct gctl_req *req, unsigned flags)
+ {
+ 	struct gmesh mesh;
+ 	struct gclass *classp;
+@@ -1024,7 +1024,7 @@
+ }
+ 
+ static void
+-std_load(struct gctl_req *req __unused, unsigned flags)
++std_load(struct gctl_req *req, unsigned flags)
+ {
+ 
+ 	/*
+@@ -1049,7 +1049,7 @@
+ }
+ 
+ static void
+-std_unload(struct gctl_req *req, unsigned flags __unused)
++std_unload(struct gctl_req *req, unsigned flags)
+ {
+ 	char name[64];
+ 	int id;
+--- a/sbin/geom/misc/subr.c
++++ b/sbin/geom/misc/subr.c
+@@ -47,7 +47,6 @@
+ 
+ #include "misc/subr.h"
+ 
+-
+ struct std_metadata {
+ 	char		md_magic[16];
+ 	uint32_t	md_version;
+@@ -187,7 +186,7 @@
+ 	if (*s != '\0')
+ 		return (EINVAL);
+ done:
+-	if ((OFF_MAX / unit) < mult || (OFF_MAX / mult / unit) < number)
++	if ((INT64_MAX / unit) < mult || (INT64_MAX / mult / unit) < number)
+ 		return (ERANGE);
+ 	number *= mult * unit;
+ 	if (number % sectorsize)
+--- a/sbin/geom/Makefile
++++ b/sbin/geom/Makefile
+@@ -14,7 +14,7 @@
+ CFLAGS+=-I${.CURDIR} -I${.CURDIR}/core -DSTATIC_GEOM_CLASSES
+ 
+ DPADD=	${LIBGEOM} ${LIBSBUF} ${LIBBSDXML} ${LIBUTIL}
+-LDADD=	-lgeom -lsbuf -lbsdxml -lutil
++LDADD=	-lgeom -lsbuf -lexpat -lutil
+ 
+ .include <bsd.prog.mk>
+ 
+--- a/sbin/geom/class/Makefile
++++ b/sbin/geom/class/Makefile
+@@ -7,16 +7,16 @@
+ .if ${MK_OPENSSL} != "no"
+ SUBDIR+=eli
+ .endif
+-SUBDIR+=journal
++#SUBDIR+=journal
+ SUBDIR+=label
+ SUBDIR+=mirror
+-SUBDIR+=multipath
++#SUBDIR+=multipath
+ SUBDIR+=nop
+-SUBDIR+=part
++#SUBDIR+=part
+ SUBDIR+=raid3
+ SUBDIR+=sched
+ SUBDIR+=shsec
+ SUBDIR+=stripe
+-SUBDIR+=virstor
++#SUBDIR+=virstor
+ 
+ .include <bsd.subdir.mk>
+--- a/sbin/geom/class/mirror/Makefile
++++ b/sbin/geom/class/mirror/Makefile
+@@ -5,6 +5,6 @@
+ CLASS=	mirror
+ 
+ DPADD=	${LIBMD}
+-LDADD=	-lmd
++#LDADD=	-lmd
+ 
+ .include <bsd.lib.mk>
+--- a/sbin/geom/class/raid3/Makefile
++++ b/sbin/geom/class/raid3/Makefile
+@@ -5,6 +5,6 @@
+ CLASS=	raid3
+ 
+ DPADD=	${LIBMD}
+-LDADD=	-lmd
++#LDADD=	-lmd
+ 
+ .include <bsd.lib.mk>
+--- a/sbin/geom/core/Makefile
++++ b/sbin/geom/core/Makefile
+@@ -4,7 +4,7 @@
+ 
+ PROG=	geom
+ MAN=	geom.8
+-SRCS=	geom.c subr.c
++SRCS=	geom.c subr.c expand_number.c
+ 
+ NO_SHARED=NO
+ 
+@@ -12,6 +12,6 @@
+ CFLAGS+= -I${.CURDIR}/../../../sys -I${.CURDIR} -I${.CURDIR}/..
+ 
+ DPADD=	${LIBGEOM} ${LIBSBUF} ${LIBBSDXML} ${LIBUTIL}
+-LDADD=	-lgeom -lsbuf -lbsdxml -lutil
++LDADD=	-lgeom -ldl
+ 
+ .include <bsd.prog.mk>
+--- /dev/null
++++ b/sbin/geom/core/expand_number.c
+@@ -0,0 +1,101 @@
++/*-
++ * Copyright (c) 2007 Eric Anderson <anderson@FreeBSD.org>
++ * Copyright (c) 2007 Pawel Jakub Dawidek <pjd@FreeBSD.org>
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE AUTHORS AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++
++#include <sys/cdefs.h>
++__FBSDID("$FreeBSD$");
++
++#include <sys/types.h>
++#include <ctype.h>
++#include <errno.h>
++#include <inttypes.h>
++#include <libutil.h>
++#include <stdint.h>
++
++/*
++ * Convert an expression of the following forms to a uint64_t.
++ *	1) A positive decimal number.
++ *	2) A positive decimal number followed by a 'b' or 'B' (mult by 1).
++ *	3) A positive decimal number followed by a 'k' or 'K' (mult by 1 << 10).
++ *	4) A positive decimal number followed by a 'm' or 'M' (mult by 1 << 20).
++ *	5) A positive decimal number followed by a 'g' or 'G' (mult by 1 << 30).
++ *	6) A positive decimal number followed by a 't' or 'T' (mult by 1 << 40).
++ *	7) A positive decimal number followed by a 'p' or 'P' (mult by 1 << 50).
++ *	8) A positive decimal number followed by a 'e' or 'E' (mult by 1 << 60).
++ */
++int
++expand_number(const char *buf, uint64_t *num)
++{
++	uint64_t number;
++	unsigned shift;
++	char *endptr;
++
++	number = strtoumax(buf, &endptr, 0);
++
++	if (endptr == buf) {
++		/* No valid digits. */
++		errno = EINVAL;
++		return (-1);
++	}
++
++	switch (tolower((unsigned char)*endptr)) {
++	case 'e':
++		shift = 60;
++		break;
++	case 'p':
++		shift = 50;
++		break;
++	case 't':
++		shift = 40;
++		break;
++	case 'g':
++		shift = 30;
++		break;
++	case 'm':
++		shift = 20;
++		break;
++	case 'k':
++		shift = 10;
++		break;
++	case 'b':
++	case '\0': /* No unit. */
++		*num = number;
++		return (0);
++	default:
++		/* Unrecognized unit. */
++		errno = EINVAL;
++		return (-1);
++	}
++
++	if ((number << shift) >> shift != number) {
++		/* Overflow */
++		errno = ERANGE;
++		return (-1);
++	}
++
++	*num = number << shift;
++	return (0);
++}
+--- a/sys/crypto/sha2/sha2.c
++++ b/sys/crypto/sha2/sha2.c
+@@ -67,8 +67,10 @@
+  *
+  */
+ 
+-#if defined(__bsdi__) || defined(__FreeBSD__)
++#if defined(_KERNEL) && (defined(__bsdi__) || defined(__FreeBSD__))
+ #define assert(x)
++#else
++#include <assert.h>
+ #endif
+ 
+ 
