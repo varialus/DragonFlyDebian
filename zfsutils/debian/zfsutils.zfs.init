@@ -42,15 +42,6 @@ do_start() {
 		esac
 	done
 
-	# filesystems
-	log_progress_msg "filesystems"
-	zfs mount -a
-	RET=$?
-	if [ $RET != 0 ] ; then
-		log_end_msg $RET
-		exit $RET
-	fi
-
 	# end
 	log_end_msg 0
 }
@@ -77,21 +68,6 @@ do_stop() {
 	# zvol
 	log_progress_msg "zvol"
 	zfs volfini
-	RET=$?
-	if [ $RET != 0 ] ; then
-		log_end_msg $RET
-		exit $RET
-	fi
-
-	# filesystems
-	log_progress_msg "filesystems"
-	zfs unshare -a
-	RET=$?
-	if [ $RET != 0 ] ; then
-		log_end_msg $RET
-		exit $RET
-	fi
-	zfs umount -a
 	RET=$?
 	if [ $RET != 0 ] ; then
 		log_end_msg $RET
