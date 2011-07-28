@@ -468,6 +468,15 @@
  int debug = 0;		/* Controls syslog() calls for debug messages	*/
  
  char **hosts, *svcport_str = NULL;
+@@ -189,7 +191,7 @@
+ 	  }
+   }
+   endnetconfig(nc_handle);
+-  init_file("/var/db/statd.status");
++  init_file("/var/lib/misc/statd.status");
+ 
+   /* Note that it is NOT sensible to run this program from inetd - the 	*/
+   /* protocol assumes that it will run immediately at boot time.	*/
 @@ -446,7 +448,7 @@
  		children to exit when they have done their work.
  */
@@ -477,3 +486,14 @@
  {
    int pid, status;
    pid = wait4(-1, &status, WNOHANG, (struct rusage*)0);
+--- a/usr.sbin/rpc.statd/rpc.statd.8
++++ b/usr.sbin/rpc.statd/rpc.statd.8
+@@ -110,7 +110,7 @@
+ after the network has been started.
+ .Sh FILES
+ .Bl -tag -width /usr/include/rpcsvc/sm_inter.x -compact
+-.It Pa /var/db/statd.status
++.It Pa /var/lib/misc/statd.status
+ non-volatile record of currently monitored hosts.
+ .It Pa /usr/include/rpcsvc/sm_inter.x
+ RPC protocol specification used by local applications to register monitoring requests.
