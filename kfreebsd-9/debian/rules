@@ -87,13 +87,13 @@ src-stamp:
 	set -e ; find src/sys -type f | (while read i ; do \
 		sed -i $$i \
 		-e 's/defined\s*(\s*__FreeBSD__\s*)/1/g' \
-		-e 's/#\s*ifdef\s*__FreeBSD__\s*$$/#if 1/g' \
-		-e 's/#\s*ifndef\s*__FreeBSD__\s*$$/#if 0/g' \
+		-e 's/#\s*ifdef\s*__FreeBSD__\(\s\|$$\)/#if 1/g' \
+		-e 's/#\s*ifndef\s*__FreeBSD__\(\s\|$$\)/#if 0/g' \
 		-e 's/__FreeBSD__/$(major)/g' \
 		\
 		-e 's/defined\s*(\s*\(__linux__\|linux\)\s*)/0/g' \
-		-e 's/#\s*ifdef\s*\(__linux__\|linux\)\s*$$/#if 0/g' \
-		-e 's/#\s*ifndef\s*\(__linux__\|linux\)\s*$$/#if 1/g' \
+		-e 's/#\s*ifdef\s*\(__linux__\|linux\)\(\s\|$$\)/#if 0/g' \
+		-e 's/#\s*ifndef\s*\(__linux__\|linux\)\(\s\|$$\)/#if 1/g' \
 	; done)
 
 	install debian/gen-ld-u-options src/usr.sbin/config
