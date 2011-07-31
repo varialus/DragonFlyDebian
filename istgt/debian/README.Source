@@ -1,0 +1,46 @@
+istgt (0.4~20110529-1) unstable; urgency=low
+
+  Unfortunately the upstream author of istgt does not provide any location for
+  his upstream tarballs, uscan(1) could examine to learn about new versions.
+  All you can do is to have look to his blog [1], where he announces new
+  versions (e.g. [2]).
+
+  The tarball itself is reachable through a Wordpress plugin which does not
+  allow browsing through releases (e.g. [3]). The announcement page also
+  contains corresponding hash check sums.
+
+  Finally please note, tarballs are not versioned, but have a timestamp in it.
+  The version of istgt itself can be determined by having a look to
+  `src/istgt_ver.h'.
+
+  To (re-)build the source package from the subversion repository, please
+  consider using svn-buildpackage [4], although this is not required. Do as
+  follows:
+
+  *) $ mkdir ~/tarballs
+  *) Put whatever orig.tar.gz tarball you want to build into ~/tarballs
+  *) $ svn checkout svn://anonscm.debian.org/svn/glibc-bsd/trunk/istgt
+  *) svn-buildpackage
+
+  This will produce source and binary packages in ~/build-area. If you want
+  to work in a full source directory, use the following command instead:
+
+  *) svn-buildpackage --svn-export
+
+  This will produce a source directory in ~/build-area where you can work.
+
+  If you don't want to use svn-buildpackage at all, you have to merge
+  directories manually. For example do:
+
+  *) $ tar zxfv istgt_0.4~20110529.orig.tar.gz
+  *) $ cd istgt-20110529
+  *) $ svn export svn://anonscm.debian.org/svn/glibc-bsd/trunk/istgt/debian \
+       debian/
+  *) $ dpkg-buildpackage
+
+  [1] http://shell.peach.ne.jp/aoyama/
+  [2] http://shell.peach.ne.jp/aoyama/archives/1542
+  [3] http://shell.peach.ne.jp/~aoyama/wordpress/download/istgt-20110717.tar.gz
+  [4] http://packages.debian.org/search?keywords=svn-buildpackage
+
+ -- Arno Töll <debian@toell.net>  Sun, 31 Jul 2011 13:33:15 -0400
