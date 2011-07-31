@@ -1,0 +1,40 @@
+Description: Install binaries to $PREFIX/sbin instead of $PREFIX/bin
+ .
+ * src/Makefile.in: Fix paths hardcoded to the install target
+ * doc/istgt.1.in: Reflect change in resulting man page
+
+Forwarded: not-needed
+Author: Arno Töll <debian@toell.net>
+
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -83,11 +83,11 @@
+ 	$(CC) $(LDFLAGS) $(LIBS) -o $@ $(ISTGTCONTROL)
+ 
+ install: install-dirs
+-	install -c -m 0755 istgt $(DESTDIR)/$(bindir)
+-	install -c -m 0755 istgtcontrol $(DESTDIR)/$(bindir)
++	install -c -m 0755 istgt $(DESTDIR)/$(sbindir)
++	install -c -m 0755 istgtcontrol $(DESTDIR)/$(sbindir)
+ 
+ install-dirs:
+-	mkdir -p $(DESTDIR)/$(bindir)
++	mkdir -p $(DESTDIR)/$(sbindir)
+ 
+ dist: $(DISTFILES)
+ 	mkdir $(DISTDIR)/$(subdir)
+--- a/doc/istgt.1.in
++++ b/doc/istgt.1.in
+@@ -46,10 +46,10 @@
+ .SH FILES
+ .PD 0
+ .TP
+-.I %%PREFIX%%/etc/istgt/istgt.conf
++.I /etc/istgt/istgt.conf
+ Configuration file
+ .TP
+-.I %%PREFIX%%/etc/istgt/auth.conf
++.I /etc/istgt/auth.conf
+ Authentication information file
+ .TP
+ .I /var/run/istgt.pid

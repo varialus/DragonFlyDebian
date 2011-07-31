@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+%:
+	dh $@
+
+override_dh_install:
+	dh_install
+	rm -f debian/istgt/etc/rc.d/istgt
+	rmdir debian/istgt/etc/rc.d
+	rm -f debian/istgt/usr/man/man1/istgt.1.gz
+	rmdir debian/istgt/usr/man/man1 debian/istgt/usr/man 
+
+override_dh_installinit:
+	dh_installinit --no-start
