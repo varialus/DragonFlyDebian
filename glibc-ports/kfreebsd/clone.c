@@ -36,7 +36,6 @@ __kernel_osreldate(void)
 
     int mib[2];
     size_t size;
-    char *temp;
 
     if (osreldate == 0)
     {
