@@ -1,0 +1,20 @@
+--- a/sys/mips/malta/gt_pci.c
++++ b/sys/mips/malta/gt_pci.c
+@@ -367,6 +367,17 @@
+ 	bus_space_write_1(sc->sc_st, sc->sc_ioh_elcr, 1,
+ 	    (sc->sc_elcr >> 8) & 0xff);
+ 
++	{
++		int rid;
++		void *res;
++		res = bus_alloc_resource(dev, SYS_RES_IOPORT, &rid, IO_ICU1, IO_ICU1 + IO_ICUSIZE, IO_ICUSIZE, RF_ACTIVE);
++		if (res == NULL)
++			device_printf(dev, "cannot allocate registers\n");
++		res = bus_alloc_resource(dev, SYS_RES_IOPORT, &rid, IO_ICU2, IO_ICU2 + IO_ICUSIZE, IO_ICUSIZE, RF_ACTIVE);
++		if (res == NULL)
++			device_printf(dev, "cannot allocate registers\n");
++	}
++
+ 	/*
+ 	 * Some ISA interrupts are reserved for devices that
+ 	 * we know are hard-wired to certain IRQs.
