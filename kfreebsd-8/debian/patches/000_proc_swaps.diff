@@ -1,0 +1,133 @@
+--- a/sys/compat/linprocfs/linprocfs.c
++++ b/sys/compat/linprocfs/linprocfs.c
+@@ -501,6 +501,33 @@
+ 	return (0);
+ }
+ 
++static int
++linprocfs_doswaps(PFS_FILL_ARGS)
++{
++	struct xswdev xsw;
++	uintmax_t total, used;
++	int n;
++	char devname[SPECNAMELEN + 1];
++
++	sbuf_printf(sb, "Filename\t\t\t\tType\t\tSize\tUsed\tPriority\n");
++	mtx_lock(&Giant);
++	for (n = 0; ; n++) {
++		if (swap_dev_info(n, &xsw, devname, sizeof(devname)) != 0)
++			break;
++		total = (uintmax_t)xsw.xsw_nblks * PAGE_SIZE / 1024;
++		used  = (uintmax_t)xsw.xsw_used * PAGE_SIZE / 1024;
++
++		/*
++		 * The space and not tab after the device name is on
++		 * purpose.  Linux does so.
++		 */
++		sbuf_printf(sb, "/dev/%-34s unknown\t\t%jd\t%jd\t-1\n",
++		    devname, total, used);
++	}
++	mtx_unlock(&Giant);
++	return (0);
++}
++
+ /*
+  * Filler function for proc/uptime
+  */
+@@ -1416,6 +1443,8 @@
+ 	    NULL, NULL, NULL, 0);
+ 	pfs_create_file(root, "stat", &linprocfs_dostat,
+ 	    NULL, NULL, NULL, PFS_RD);
++	pfs_create_file(root, "swaps", &linprocfs_doswaps,
++	    NULL, NULL, NULL, PFS_RD);
+ 	pfs_create_file(root, "uptime", &linprocfs_douptime,
+ 	    NULL, NULL, NULL, PFS_RD);
+ 	pfs_create_file(root, "version", &linprocfs_doversion,
+--- a/sys/vm/swap_pager.c
++++ b/sys/vm/swap_pager.c
+@@ -2365,35 +2365,53 @@
+ 	mtx_unlock(&sw_dev_mtx);
+ }
+ 
+-static int
+-sysctl_vm_swap_info(SYSCTL_HANDLER_ARGS)
++int
++swap_dev_info(int name, struct xswdev *xs, char *devname, size_t len)
+ {
+-	int	*name = (int *)arg1;
+-	int	error, n;
+-	struct xswdev xs;
+ 	struct swdevt *sp;
+-
+-	if (arg2 != 1) /* name length */
+-		return (EINVAL);
++	char *tmp_devname;
++	int error, n;
+ 
+ 	n = 0;
++	error = ENOENT;
+ 	mtx_lock(&sw_dev_mtx);
+ 	TAILQ_FOREACH(sp, &swtailq, sw_list) {
+-		if (n == *name) {
+-			mtx_unlock(&sw_dev_mtx);
+-			xs.xsw_version = XSWDEV_VERSION;
+-			xs.xsw_dev = sp->sw_dev;
+-			xs.xsw_flags = sp->sw_flags;
+-			xs.xsw_nblks = sp->sw_nblks;
+-			xs.xsw_used = sp->sw_used;
+-
+-			error = SYSCTL_OUT(req, &xs, sizeof(xs));
+-			return (error);
++		if (n != name) {
++			n++;
++			continue;
+ 		}
+-		n++;
++		xs->xsw_version = XSWDEV_VERSION;
++		xs->xsw_dev = sp->sw_dev;
++		xs->xsw_flags = sp->sw_flags;
++		xs->xsw_nblks = sp->sw_nblks;
++		xs->xsw_used = sp->sw_used;
++		if (devname != NULL) {
++			if (vn_isdisk(sp->sw_vp, NULL))
++				tmp_devname = sp->sw_vp->v_rdev->si_name;
++			else
++				tmp_devname = "[file]";
++			strncpy(devname, tmp_devname, len);
++		}
++		error = 0;
++		break;
+ 	}
+ 	mtx_unlock(&sw_dev_mtx);
+-	return (ENOENT);
++	return (error);
++}
++
++static int
++sysctl_vm_swap_info(SYSCTL_HANDLER_ARGS)
++{
++	struct xswdev xs;
++	int error;
++
++	if (arg2 != 1)			/* name length */
++		return (EINVAL);
++	error = swap_dev_info(*(int *)arg1, &xs, NULL, 0);
++	if (error != 0)
++		return (error);
++	error = SYSCTL_OUT(req, &xs, sizeof(xs));
++	return (error);
+ }
+ 
+ SYSCTL_INT(_vm, OID_AUTO, nswapdev, CTLFLAG_RD, &nswapdev, 0,
+--- a/sys/vm/swap_pager.h
++++ b/sys/vm/swap_pager.h
+@@ -75,7 +75,8 @@
+ extern int swap_pager_full;
+ extern int swap_pager_avail;
+ 
+-struct swdevt;
++struct xswdev;
++int swap_dev_info(int name, struct xswdev *xs, char *devname, size_t len);
+ void swap_pager_copy(vm_object_t, vm_object_t, vm_pindex_t, int);
+ void swap_pager_freespace(vm_object_t, vm_pindex_t, vm_size_t);
+ void swap_pager_swap_init(void);
