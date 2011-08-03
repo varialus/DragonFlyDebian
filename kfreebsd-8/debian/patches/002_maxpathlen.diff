@@ -37,3 +37,16 @@
  static	struct users {
  	int	u_default;
  	int	u_min;
+--- a/sys/dev/aic7xxx/aicasm/aicasm_scan.l
++++ b/sys/dev/aic7xxx/aicasm/aicasm_scan.l
+@@ -69,6 +69,10 @@
+ static int  quote_count;
+ static char msgbuf[255];
+ 
++#ifndef PATH_MAX
++#define PATH_MAX 4096
++#endif
++
+ extern int yylex(void);
+ extern int mmlex(void);
+ extern int mmparse(void);
