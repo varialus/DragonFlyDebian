@@ -1,0 +1,282 @@
+
+Debian bug: http://bugs.debian.org/637378
+
+Forwarded as: http://www.freebsd.org/cgi/query-pr.cgi?pr=159654
+
+--- a/sys/amd64/include/apicvar.h
++++ b/sys/amd64/include/apicvar.h
+@@ -32,6 +32,7 @@
+ #ifndef _MACHINE_APICVAR_H_
+ #define _MACHINE_APICVAR_H_
+ 
++#include <sys/types.h>
+ #include <machine/segments.h>
+ 
+ /*
+--- a/sys/amd64/include/cpufunc.h
++++ b/sys/amd64/include/cpufunc.h
+@@ -39,6 +39,8 @@
+ #ifndef _MACHINE_CPUFUNC_H_
+ #define	_MACHINE_CPUFUNC_H_
+ 
++#include <sys/types.h>
++
+ #ifndef _SYS_CDEFS_H_
+ #error this file needs sys/cdefs.h as a prerequisite
+ #endif
+--- a/sys/amd64/include/frame.h
++++ b/sys/amd64/include/frame.h
+@@ -37,6 +37,8 @@
+ #ifndef _MACHINE_FRAME_H_
+ #define _MACHINE_FRAME_H_ 1
+ 
++#include <sys/types.h>
++
+ /*
+  * System stack frames.
+  */
+--- a/sys/amd64/include/intr_machdep.h
++++ b/sys/amd64/include/intr_machdep.h
+@@ -29,6 +29,8 @@
+ #ifndef __MACHINE_INTR_MACHDEP_H__
+ #define	__MACHINE_INTR_MACHDEP_H__
+ 
++#include <sys/types.h>
++
+ #ifdef _KERNEL
+ 
+ /*
+--- a/sys/amd64/include/pcb.h
++++ b/sys/amd64/include/pcb.h
+@@ -41,6 +41,7 @@
+  * AMD64 process control block
+  */
+ #include <stdint.h>
++#include <sys/types.h>
+ #include <machine/fpu.h>
+ #include <machine/segments.h>
+ 
+--- a/sys/amd64/include/pcpu.h
++++ b/sys/amd64/include/pcpu.h
+@@ -29,6 +29,8 @@
+ #ifndef _MACHINE_PCPU_H_
+ #define	_MACHINE_PCPU_H_
+ 
++#include <sys/types.h>
++
+ #ifndef _SYS_CDEFS_H_
+ #error "sys/cdefs.h is a prerequisite for this file"
+ #endif
+--- a/sys/amd64/include/proc.h
++++ b/sys/amd64/include/proc.h
+@@ -33,6 +33,7 @@
+ #ifndef _MACHINE_PROC_H_
+ #define	_MACHINE_PROC_H_
+ 
++#include <sys/types.h>
+ #include <machine/segments.h>
+ 
+ struct proc_ldt {
+--- a/sys/amd64/include/profile.h
++++ b/sys/amd64/include/profile.h
+@@ -33,6 +33,8 @@
+ #ifndef _MACHINE_PROFILE_H_
+ #define	_MACHINE_PROFILE_H_
+ 
++#include <sys/types.h>
++
+ #ifndef _SYS_CDEFS_H_
+ #error this file needs sys/cdefs.h as a prerequisite
+ #endif
+--- a/sys/amd64/include/reg.h
++++ b/sys/amd64/include/reg.h
+@@ -37,6 +37,8 @@
+ #ifndef _MACHINE_REG_H_
+ #define	_MACHINE_REG_H_
+ 
++#include <sys/types.h>
++
+ #if defined(_KERNEL) && !defined(_STANDALONE)
+ #include "opt_compat.h"
+ #endif
+--- a/sys/i386/include/apicvar.h
++++ b/sys/i386/include/apicvar.h
+@@ -32,6 +32,8 @@
+ #ifndef _MACHINE_APICVAR_H_
+ #define _MACHINE_APICVAR_H_
+ 
++#include <sys/types.h>
++
+ /*
+  * Local && I/O APIC variable definitions.
+  */
+--- a/sys/i386/include/cpufunc.h
++++ b/sys/i386/include/cpufunc.h
+@@ -38,6 +38,8 @@
+ #ifndef _MACHINE_CPUFUNC_H_
+ #define	_MACHINE_CPUFUNC_H_
+ 
++#include <sys/types.h>
++
+ #ifndef _SYS_CDEFS_H_
+ #error this file needs sys/cdefs.h as a prerequisite
+ #endif
+--- a/sys/i386/include/proc.h
++++ b/sys/i386/include/proc.h
+@@ -33,6 +33,7 @@
+ #ifndef _MACHINE_PROC_H_
+ #define	_MACHINE_PROC_H_
+ 
++#include <sys/types.h>
+ #include <machine/segments.h>
+ 
+ struct proc_ldt {
+--- a/sys/i386/include/profile.h
++++ b/sys/i386/include/profile.h
+@@ -33,6 +33,8 @@
+ #ifndef _MACHINE_PROFILE_H_
+ #define	_MACHINE_PROFILE_H_
+ 
++#include <sys/types.h>
++
+ #ifndef _SYS_CDEFS_H_
+ #error this file needs sys/cdefs.h as a prerequisite
+ #endif
+--- a/sys/i386/include/sigframe.h
++++ b/sys/i386/include/sigframe.h
+@@ -31,6 +31,8 @@
+ #ifndef _MACHINE_SIGFRAME_H_
+ #define	_MACHINE_SIGFRAME_H_
+ 
++#include <sys/types.h>
++
+ /*
+  * Signal frames, arguments passed to application signal handlers.
+  */
+--- a/sys/mips/include/db_machdep.h
++++ b/sys/mips/include/db_machdep.h
+@@ -37,6 +37,7 @@
+ #ifndef	_MIPS_DB_MACHDEP_H_
+ #define	_MIPS_DB_MACHDEP_H_
+ 
++#include <sys/types.h>
+ #include <machine/frame.h>
+ #include <machine/trap.h>
+ #include <machine/endian.h>
+--- a/sys/mips/include/frame.h
++++ b/sys/mips/include/frame.h
+@@ -37,6 +37,8 @@
+ #ifndef _MACHINE_FRAME_H_
+ #define	_MACHINE_FRAME_H_
+ 
++#include <sys/types.h>
++
+ struct trapframe {
+ 	register_t	zero;
+ 	register_t	ast;
+--- a/sys/mips/include/pcb.h
++++ b/sys/mips/include/pcb.h
+@@ -42,6 +42,7 @@
+ #ifndef _MACHINE_PCB_H_
+ #define	_MACHINE_PCB_H_
+ 
++#include <sys/types.h>
+ #include <machine/frame.h>
+ 
+ /*
+--- a/sys/mips/include/proc.h
++++ b/sys/mips/include/proc.h
+@@ -39,6 +39,8 @@
+ #ifndef _MACHINE_PROC_H_
+ #define	_MACHINE_PROC_H_
+ 
++#include <sys/types.h>
++
+ /*
+  * Machine-dependent part of the proc structure.
+  */
+--- a/sys/mips/include/reg.h
++++ b/sys/mips/include/reg.h
+@@ -42,6 +42,8 @@
+ #ifndef _MACHINE_REG_H_
+ #define	_MACHINE_REG_H_
+ 
++#include <sys/types.h>
++
+ /*
+  * Location of the users' stored registers relative to ZERO.
+  * must be visible to assembly code.
+--- a/sys/mips/include/sigframe.h
++++ b/sys/mips/include/sigframe.h
+@@ -32,6 +32,8 @@
+ #ifndef _MACHINE_SIGFRAME_H_
+ #define	_MACHINE_SIGFRAME_H_
+ 
++#include <sys/types.h>
++
+ /*
+  * WARNING: code in locore.s assumes the layout shown for sf_signum
+  * thru sf_addr so... don't alter them!
+--- a/sys/mips/include/trap.h
++++ b/sys/mips/include/trap.h
+@@ -42,6 +42,8 @@
+ #ifndef _MACHINE_TRAP_H_
+ #define	_MACHINE_TRAP_H_
+ 
++#include <sys/types.h>
++
+ /*
+  * Trap codes also known in trap.c for name strings.
+  * Used for indexing so modify with care.
+--- a/sys/mips/include/ucontext.h
++++ b/sys/mips/include/ucontext.h
+@@ -37,6 +37,8 @@
+ #ifndef _MACHINE_UCONTEXT_H_
+ #define	_MACHINE_UCONTEXT_H_
+ 
++#include <sys/types.h>
++
+ #ifndef _LOCORE
+ 
+ typedef struct	__mcontext {
+--- a/sys/sys/ktrace.h
++++ b/sys/sys/ktrace.h
+@@ -33,6 +33,8 @@
+ #ifndef _SYS_KTRACE_H_
+ #define _SYS_KTRACE_H_
+ 
++#include <sys/types.h>
++
+ /*
+  * operations to ktrace system call  (KTROP(op))
+  */
+--- a/sys/sys/proc.h
++++ b/sys/sys/proc.h
+@@ -61,6 +61,7 @@
+ #else
+ #include <sys/pcpu.h>
+ #endif
++#include <sys/types.h>
+ #include <sys/ucontext.h>
+ #include <sys/ucred.h>
+ #include <machine/proc.h>		/* Machine-dependent proc substruct. */
+--- a/sys/sys/sysent.h
++++ b/sys/sys/sysent.h
+@@ -33,6 +33,7 @@
+ #define	_SYS_SYSENT_H_
+ 
+ #include <bsm/audit.h>
++#include <sys/types.h>
+ 
+ struct rlimit;
+ struct sysent;
+--- a/sys/sys/sysproto.h
++++ b/sys/sys/sysproto.h
+@@ -14,6 +14,7 @@
+ #include <sys/cpuset.h>
+ #include <sys/_semaphore.h>
+ #include <sys/ucontext.h>
++#include <sys/types.h>
+ 
+ #include <bsm/audit_kevents.h>
+ 
