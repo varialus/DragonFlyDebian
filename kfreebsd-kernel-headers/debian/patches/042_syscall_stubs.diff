@@ -1,0 +1,38 @@
+--- a/sys/amd64/include/sysarch.h
++++ b/sys/amd64/include/sysarch.h
+@@ -71,11 +71,11 @@
+ #include <sys/cdefs.h>
+ 
+ __BEGIN_DECLS
+-int amd64_get_fsbase(void **);
+-int amd64_get_gsbase(void **);
+-int amd64_set_fsbase(void *);
+-int amd64_set_gsbase(void *);
+ int sysarch(int, void *);
++static inline int amd64_get_fsbase(void **addr) { return sysarch(AMD64_GET_FSBASE, addr); }
++static inline int amd64_get_gsbase(void **addr) { return sysarch(AMD64_GET_GSBASE, addr); }
++static inline int amd64_set_fsbase(void *addr) { return sysarch(AMD64_SET_FSBASE, &addr); }
++static inline int amd64_set_gsbase(void *addr) { return sysarch(AMD64_SET_GSBASE, &addr); }
+ __END_DECLS
+ #else
+ struct thread;
+--- a/sys/i386/include/sysarch.h
++++ b/sys/i386/include/sysarch.h
+@@ -88,13 +88,13 @@
+ int i386_get_ioperm(unsigned int, unsigned int *, int *);
+ int i386_set_ioperm(unsigned int, unsigned int, int);
+ int i386_vm86(int, void *);
+-int i386_get_fsbase(void **);
+-int i386_get_gsbase(void **);
+-int i386_set_fsbase(void *);
+-int i386_set_gsbase(void *);
+ int i386_set_watch(int, unsigned int, int, int, struct dbreg *);
+ int i386_clr_watch(int, struct dbreg *);
+ int sysarch(int, void *);
++static inline int i386_get_fsbase(void **addr) { return sysarch(I386_GET_FSBASE, addr); }
++static inline int i386_get_gsbase(void **addr) { return sysarch(I386_GET_GSBASE, addr); }
++static inline int i386_set_fsbase(void *addr) { return sysarch(I386_SET_FSBASE, &addr); }
++static inline int i386_set_gsbase(void *addr) { return sysarch(I386_SET_GSBASE, &addr); }
+ __END_DECLS
+ #else
+ struct thread;
