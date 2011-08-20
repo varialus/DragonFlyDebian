@@ -1,0 +1,68 @@
+Description: Make `make' errors fatal
+ Currently, the Makefile does not detect when a subsequent call to `make'
+ in a subdirectory failed for some reasons. This patch checks return status
+ of those calls and makes the top level Makefile fail if needed. 
+ .
+ * Makefile.in: Add sanity check
+
+Forwarded: yes
+Author: Arno Töll <debian@toell.net>
+
+Index: istgt-0.4~20110717/Makefile.in
+===================================================================
+--- istgt-0.4~20110717.orig/Makefile.in	2011-08-20 13:17:57.000000000 -0400
++++ istgt-0.4~20110717/Makefile.in	2011-08-20 13:19:56.500943276 -0400
+@@ -36,17 +36,17 @@
+ 
+ all:
+ 	for subdir in $(SUBDIRS); do \
+-	  cd $$subdir; $(MAKE) $@; cd ..; \
++	  $(MAKE) -C $$subdir $@ || exit $?; \
+ 	done
+ 
+ install:
+ 	for subdir in $(SUBDIRS); do \
+-	  cd $$subdir; $(MAKE) $@; cd ..; \
++	  $(MAKE) -C $$subdir $@ || exit $?; \
+ 	done
+ 
+ install-doc:
+ 	for subdir in doc; do \
+-	  cd $$subdir; $(MAKE) $@; cd ..; \
++	  $(MAKE) -C $$subdir $@; \
+ 	done
+ 
+ 
+@@ -57,7 +57,7 @@
+ 	  cp -p $(srcdir)/$$file $(DISTDIR); \
+ 	done
+ 	for subdir in $(SUBDIRS); do \
+-	  cd $$subdir; $(MAKE) subdir=$$subdir $@; cd ..; \
++	  $(MAKE) -C $$subdir subdir=$$subdir $@ || exit $?; \
+ 	done
+ 	tar cf - $(DISTDIR) | gzip -9c > $(DISTNAME)
+ 	rm -rf $(DISTDIR) distdir
+@@ -67,12 +67,12 @@
+ 
+ clean: local-clean
+ 	for subdir in $(SUBDIRS); do \
+-	  cd $$subdir; $(MAKE) $@; cd ..; \
++	  $(MAKE) -C $$subdir $@ || exit $?; \
+ 	done
+ 
+ distclean: clean local-distclean
+ 	for subdir in $(SUBDIRS); do \
+-	  cd $$subdir; $(MAKE) $@; cd ..; \
++	  $(MAKE) -C $$subdir $@ || exit $?; \
+ 	done
+ 
+ local-clean:
+@@ -85,7 +85,7 @@
+ 
+ depend:
+ 	for subdir in $(SUBDIRS); do \
+-	  cd $$subdir; $(MAKE) $@; cd ..; \
++	  $(MAKE) -C $$subdir $@ || exit $?; \
+ 	done
+ 
+ #########################################################################
