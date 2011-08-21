@@ -117,9 +117,6 @@ static inline void cpuid(long op, long *rax, long *rdx)
     );
 }
 
-extern const char *_self_program_name_from_auxv attribute_hidden;
-
-                           
 static inline void __attribute__ ((unused))
 dl_platform_kfreebsd_x86_64_init (void)
 {
@@ -130,7 +127,6 @@ dl_platform_kfreebsd_x86_64_init (void)
 
 	cpuid(1, &val, &hwcap);
 	GLRO(dl_hwcap) = hwcap;
-	_self_program_name_from_auxv = GLRO(dl_platform);
 	GLRO(dl_platform) = ELF_MACHINE_NAME;
 }
 

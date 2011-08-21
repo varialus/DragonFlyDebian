@@ -36,6 +36,8 @@
 # undef _dl_sysdep_start
 # undef _dl_show_auxv
 
+extern const char *_self_program_name_from_auxv attribute_hidden;
+
 ElfW(Addr)
 _dl_sysdep_start (void **start_argptr,
 		  void (*dl_main) (const ElfW(Phdr) *phdr, ElfW(Word) phnum,
@@ -72,6 +74,9 @@ _dl_sysdep_start (void **start_argptr,
 	break;
       case AT_ENTRY:
 	user_entry = av->a_un.a_val;
+	break;
+      case AT_EXECPATH:
+	_self_program_name_from_auxv = (char *) av->a_un.a_val;
 	break;
 #ifdef NEED_DL_BASE_ADDR
       case AT_BASE:

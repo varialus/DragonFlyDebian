@@ -92,16 +92,12 @@ static inline void cpuid(int op, int *eax, int *edx)
     );
 }
 
-extern const char *_self_program_name_from_auxv attribute_hidden;
-
 static inline void __attribute__ ((unused))
 dl_platform_kfreebsd_i386_init (void)
 {
 	/* we don't have reasonable AT_PLATFORM from kernel
 	   try to use cpuid to get one, also guess AT_HWCAP */
 
-        _self_program_name_from_auxv = GLRO(dl_platform);
-        
 	int val, hwcap;
 
 	val = try_flip_flags(X86_EFLAGS_AC | X86_EFLAGS_ID);
