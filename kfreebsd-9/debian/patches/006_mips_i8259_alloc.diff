@@ -8,7 +8,7 @@
  
  #include <mips/malta/maltareg.h>
  
-@@ -401,7 +402,26 @@
+@@ -401,7 +402,38 @@
  	}
  
  	/* Initialize memory and i/o rmans. */
@@ -31,6 +31,18 @@
 +		res = bus_alloc_resource(child, SYS_RES_IOPORT, &rid, IO_TIMER1, IO_TIMER1 + IO_TIMERSIZE, IO_TIMERSIZE, RF_ACTIVE);
 +		if (res == NULL)
 +			device_printf(child, "cannot allocate registers for i8254 controllers\n");
++
++		res = bus_alloc_resource(child, SYS_RES_IOPORT, &rid, MALTA_SMSC_KYBD_ADR, MALTA_SMSC_KYBD_ADR + 1, 1, RF_ACTIVE);
++		if (res == NULL)
++			device_printf(child, "cannot allocate registers for keyboard controller\n");
++
++		res = bus_alloc_resource(child, SYS_RES_IOPORT, &rid, MALTA_SMSC_KYBD_ADR + 4, MALTA_SMSC_KYBD_ADR + 4 + 1, 1, RF_ACTIVE);
++		if (res == NULL)
++			device_printf(child, "cannot allocate registers for keyboard controller\n");
++
++		res = bus_alloc_resource(child, SYS_RES_IOPORT, &rid, MALTA_RTCADR, MALTA_RTCADR + 2, 2, RF_ACTIVE);
++		if (res == NULL)
++			device_printf(child, "cannot allocate registers for RTC controller\n");
 +	}
 +
  	return (bus_generic_attach(dev));
