@@ -32,6 +32,16 @@
 extern int __syscall_faccessat (int fd, const char *path, int mode, int flag);
 libc_hidden_proto (__syscall_faccessat)
 
+/*
+   The FreeBSD kernel do not test file access correctly when the 
+   process' real user ID is superuser. In particular, they always return
+   zero when testing execute permissions without regard to whether the 
+   file is executable.
+
+   While this behaviour conforms to POSIX.1-2008, it is explicitely 
+   discouraged. This wrapper implements the recommended behaviour.
+ */
+
 int
 faccessat (fd, file, mode, flag)
      int fd;
@@ -49,7 +59,24 @@ faccessat (fd, file, mode, flag)
 	__have_atfcts = -1;
       else
 # endif
+      {
+        if ((result == 0) && (mode & X_OK))
+        {
+          uid_t uid = (flag & AT_EACCESS) ? __geteuid () : __getuid ();
+          if (uid == 0)
+          {
+            struct stat64 stats;
+            if (fstatat64 (fd, file, &stats, flag & AT_SYMLINK_NOFOLLOW))
+              return -1;
+            if ((stats.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) == 0)
+            {
+              __set_errno (EACCES);
+              return -1;
+	    }
+          }
+	}
 	return result;
+      }	
     }
 
 #ifndef __ASSUME_ATFCTS
