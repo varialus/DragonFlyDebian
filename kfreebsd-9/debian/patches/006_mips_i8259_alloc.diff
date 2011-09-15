@@ -8,7 +8,7 @@
  
  #include <mips/malta/maltareg.h>
  
-@@ -401,7 +402,38 @@
+@@ -401,7 +402,42 @@
  	}
  
  	/* Initialize memory and i/o rmans. */
@@ -43,6 +43,10 @@
 +		res = bus_alloc_resource(child, SYS_RES_IOPORT, &rid, MALTA_RTCADR, MALTA_RTCADR + 2, 2, RF_ACTIVE);
 +		if (res == NULL)
 +			device_printf(child, "cannot allocate registers for RTC controller\n");
++
++		res = bus_alloc_resource(child, SYS_RES_IOPORT, &rid, 0x81, 0x81 + 1, 1, RF_ACTIVE);
++		if (res == NULL)
++			device_printf(child, "cannot allocate registers for DMA controller\n");
 +	}
 +
  	return (bus_generic_attach(dev));
