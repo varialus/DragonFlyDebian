@@ -1,0 +1,20 @@
+--- freebsd-buildutils-8.2.orig/src/usr.bin/make/Makefile
++++ freebsd-buildutils-8.2/src/usr.bin/make/Makefile
+@@ -4,6 +4,7 @@
+ 
+ PROG=	make
+ CFLAGS+=-I${.CURDIR}
++LDADD+=-lbsd
+ SRCS=	arch.c buf.c cond.c dir.c for.c hash.c hash_tables.c job.c	\
+ 	lst.c main.c make.c parse.c proc.c shell.c str.c suff.c targ.c	\
+ 	util.c var.c
+--- freebsd-buildutils-8.2.orig/src/usr.sbin/mtree/Makefile
++++ freebsd-buildutils-8.2/src/usr.sbin/mtree/Makefile
+@@ -7,6 +7,7 @@ PROG=	mtree
+ MAN=	mtree.8 mtree.5
+ SRCS=	compare.c crc.c create.c excludes.c misc.c mtree.c spec.c verify.c
+ SRCS+=	specspec.c
++LDADD+=	-lbsd
+ 
+ WARNS?=	4
+ 
