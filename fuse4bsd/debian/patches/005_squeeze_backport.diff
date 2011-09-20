@@ -1,0 +1,15 @@
+--- a/sbin/mount/mntopts.h
++++ b/sbin/mount/mntopts.h
+@@ -54,6 +54,12 @@
+ #define MOPT_SNAPSHOT		{ "snapshot",	0, MNT_SNAPSHOT, 0 }
+ #define MOPT_MULTILABEL		{ "multilabel",	0, MNT_MULTILABEL, 0 }
+ #define MOPT_ACLS		{ "acls",	0, MNT_ACLS, 0 }
++
++/* MNT_NFS4ACLS not available in libc0.1-dev << 2.13-6 */
++#ifndef MNT_NFS4ACLS
++#define MNT_NFS4ACLS 0x00000010
++#endif
++
+ #define MOPT_NFS4ACLS		{ "nfsv4acls",	0, MNT_NFS4ACLS, 0 }
+ 
+ /* Control flags. */
