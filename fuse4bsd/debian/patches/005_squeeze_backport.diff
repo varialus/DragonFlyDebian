@@ -1,3 +1,14 @@
+--- a/fuse_module/Makefile
++++ b/fuse_module/Makefile
+@@ -52,4 +52,8 @@
+ fuse_opnames.c:
+ 	env OUTF=fuse_opnames.c ${AWK} -f ../tools/genopnames.awk fuse_kernel.h
+ 
++# To support freebsd-buildutils << 8.2-2, see bug #594183
++KVER!=		uname -r
++SYSDIR=		/usr/src/kfreebsd-headers-${KVER}/sys
++
+ .include <bsd.kmod.mk>
 --- a/sbin/mount/mntopts.h
 +++ b/sbin/mount/mntopts.h
 @@ -54,6 +54,12 @@

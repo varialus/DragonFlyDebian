@@ -1,6 +1,8 @@
 PACKAGE_NAME="fuse4bsd"
 PACKAGE_VERSION="#MODULE_VERSION#"
-MAKE[0]="PATH=/usr/lib/freebsd:$PATH WERROR= make -C fuse_module"
+# MACHINE= override is just a workaround to support freebsd-buildutils << 8.2-1
+# (see bug #602768).  It should be removed when Squeeze is EOLed.
+MAKE[0]="PATH=/usr/lib/freebsd:$PATH WERROR= MACHINE=$(dpkg-architecture -qDEB_HOST_ARCH_CPU) make -C fuse_module"
 CLEAN="PATH=/usr/lib/freebsd:$PATH make clean"
 BUILT_MODULE_NAME[0]="fuse"
 BUILT_MODULE_LOCATION[0]="fuse_module/"
