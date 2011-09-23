@@ -1,0 +1,139 @@
+
+Status: in upstream BTS
+
+--- a/sys/conf/Makefile.amd64
++++ b/sys/conf/Makefile.amd64
+@@ -48,6 +48,8 @@
+ ASM_CFLAGS+=	${.IMPSRC:T:Mmpboot.S:C/^.+$/-no-integrated-as/}
+ .endif
+ 
++%WITHOUT_MODULES
++
+ %BEFORE_DEPEND
+ 
+ %OBJS
+--- a/sys/conf/Makefile.arm
++++ b/sys/conf/Makefile.arm
+@@ -124,6 +124,8 @@
+ 
+ MKMODULESENV+=	MACHINE=${MACHINE}
+ 
++%WITHOUT_MODULES
++
+ %BEFORE_DEPEND
+ 
+ %OBJS
+--- a/sys/conf/Makefile.i386
++++ b/sys/conf/Makefile.i386
+@@ -40,6 +40,8 @@
+ ASM_CFLAGS+=	${.IMPSRC:T:Mmpboot.s:C/^.+$/-no-integrated-as/}
+ .endif
+ 
++%WITHOUT_MODULES
++
+ %BEFORE_DEPEND
+ 
+ %OBJS
+--- a/sys/conf/Makefile.ia64
++++ b/sys/conf/Makefile.ia64
+@@ -36,6 +36,8 @@
+ 
+ ASM_CFLAGS= -x assembler-with-cpp -Wa,-x -DLOCORE ${CFLAGS}
+ 
++%WITHOUT_MODULES
++
+ %BEFORE_DEPEND
+ 
+ %OBJS
+--- a/sys/conf/Makefile.mips
++++ b/sys/conf/Makefile.mips
+@@ -70,6 +70,8 @@
+ 	${OBJCOPY} -S -O binary ${KERNEL_KO}.tramp.noheader \
+ 		${KERNEL_KO}.tramp.bin \
+ 
++%WITHOUT_MODULES
++
+ %BEFORE_DEPEND
+ 
+ %OBJS
+--- a/sys/conf/Makefile.pc98
++++ b/sys/conf/Makefile.pc98
+@@ -34,6 +34,8 @@
+ 
+ MKMODULESENV+=	MACHINE=${MACHINE}
+ 
++%WITHOUT_MODULES
++
+ %BEFORE_DEPEND
+ 
+ %OBJS
+--- a/sys/conf/Makefile.powerpc
++++ b/sys/conf/Makefile.powerpc
+@@ -42,6 +42,8 @@
+ CFLAGS+=	-fno-omit-frame-pointer
+ .endif
+ 
++%WITHOUT_MODULES
++
+ %BEFORE_DEPEND
+ 
+ %OBJS
+--- a/sys/conf/Makefile.sparc64
++++ b/sys/conf/Makefile.sparc64
+@@ -32,6 +32,8 @@
+ 
+ MDOBJS=	exception.o interrupt.o
+ 
++%WITHOUT_MODULES
++
+ %BEFORE_DEPEND
+ 
+ %OBJS
+--- a/usr.sbin/config/mkmakefile.c
++++ b/usr.sbin/config/mkmakefile.c
+@@ -70,6 +70,7 @@
+ static void do_rules(FILE *);
+ static void do_xxfiles(char *, FILE *);
+ static void do_objs(FILE *);
++static void do_without_modules(FILE *);
+ static void do_before_depend(FILE *);
+ static int opteq(const char *, const char *);
+ static void read_files(void);
+@@ -161,6 +162,8 @@
+ 		}
+ 		if (eq(line, "%BEFORE_DEPEND\n"))
+ 			do_before_depend(ofp);
++		else if (eq(line, "%WITHOUT_MODULES\n"))
++			do_without_modules(ofp);
+ 		else if (eq(line, "%OBJS\n"))
+ 			do_objs(ofp);
+ 		else if (strncmp(line, "%FILES.", 7) == 0)
+@@ -647,6 +650,28 @@
+ }
+ 
+ static void
++do_without_modules(FILE *fp)
++{
++	struct device *dp;
++	int lpos, len;
++	char *cp, *sp;
++
++	fprintf(fp, "MKMODULESENV+= WITHOUT_MODULES=\"");
++	lpos = 34;
++	STAILQ_FOREACH(dp, &dtab, d_next) {
++		sp = dp->d_name;
++		cp = sp + (len = strlen(sp)) - 1;
++		if (len + lpos > 72) {
++			lpos = 8;
++			fprintf(fp, "\\\n\t");
++		}
++		fprintf(fp, "%s ", sp);
++		lpos += len + 1;
++	}
++	fprintf(fp, "\"\n");
++}
++
++static void
+ do_xxfiles(char *tag, FILE *fp)
+ {
+ 	struct file_list *tp;

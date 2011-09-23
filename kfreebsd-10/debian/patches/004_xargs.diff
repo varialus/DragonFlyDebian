@@ -1,0 +1,32 @@
+
+xargs -I works here, although it's not exactly the same.
+-J option requested to findutils maintainers:
+
+http://savannah.gnu.org/patch/?4916
+
+--- a/sys/conf/kmod.mk
++++ b/sys/conf/kmod.mk
+@@ -217,7 +217,7 @@
+ 	grep -v '^#' < ${EXPORT_SYMS} > export_syms
+ .endif
+ 	awk -f ${SYSDIR}/conf/kmod_syms.awk ${.TARGET} \
+-	    export_syms | xargs -J% ${OBJCOPY} % ${.TARGET}
++	    export_syms | xargs -I% ${OBJCOPY} % ${.TARGET}
+ .endif
+ .endif
+ .if !defined(DEBUG_FLAGS) && ${__KLD_SHARED} == no
+--- a/sys/contrib/dev/acpica/acpica_prep.sh
++++ b/sys/contrib/dev/acpica/acpica_prep.sh
+@@ -60,10 +60,10 @@
+ # copy files
+ echo copying full dirs
+ for i in ${fulldirs}; do
+-	find ${wrk} -name ${i} -type d -print | xargs -J % mv % ${dst}
++	find ${wrk} -name ${i} -type d -print | xargs -I % mv % ${dst}
+ done
+ echo copying remaining files
+-find ${wrk} -type f -print | xargs -J % mv % ${dst}
++find ${wrk} -type f -print | xargs -I % mv % ${dst}
+ 
+ # canonify include paths
+ for H in ${src_headers}; do
