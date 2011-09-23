@@ -10,7 +10,9 @@ export DH_VERBOSE=1
 override_dh_auto_configure:
 	dh_auto_configure -- --with-configdir=/etc/istgt \
 		--with-logfacility=daemon \
-		--localstatedir=/var/run/istgt
+		--localstatedir=/var/run/istgt \
+		$(shell dpkg-buildflags --export=configure)
+
 
 override_dh_install:
 	dh_install
