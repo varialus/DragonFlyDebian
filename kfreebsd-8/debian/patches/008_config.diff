@@ -22,7 +22,7 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
  
 --- a/usr.sbin/config/main.c
 +++ b/usr.sbin/config/main.c
-@@ -41,12 +41,17 @@ static const char rcsid[] =
+@@ -41,6 +41,7 @@
    "$FreeBSD$";
  #endif /* not lint */
  
@@ -30,18 +30,18 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
  #include <sys/types.h>
  #include <sys/stat.h>
  #include <sys/sbuf.h>
- #include <sys/file.h>
+@@ -48,6 +49,10 @@
  #include <sys/mman.h>
--#include <sys/param.h>
-+#include <sys/param.h>
-+
+ #include <sys/param.h>
+ 
 +#ifndef __FreeBSD__
 +#include <bsd/string.h> /* strlcpy, strlcat */
 +#endif
- 
++
  #include <assert.h>
  #include <ctype.h>
-@@ -618,7 +623,11 @@ cleanheaders(char *p)
+ #include <err.h>
+@@ -622,7 +627,11 @@
  	if ((dirp = opendir(p)) == NULL)
  		err(EX_OSERR, "opendir %s", p);
  	while ((dp = readdir(dirp)) != NULL) {
@@ -55,7 +55,7 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
  			continue;
 --- a/usr.sbin/config/Makefile
 +++ b/usr.sbin/config/Makefile
-@@ -9,11 +9,11 @@ SRCS=	config.y main.c lang.l mkmakefile.
+@@ -9,11 +9,11 @@
  kernconf.c: kernconf.tmpl
  	file2c 'char kernconfstr[] = {' ',0};' < ${.CURDIR}/kernconf.tmpl > kernconf.c
  

@@ -1,0 +1,14 @@
+--- a/sys/conf/kern.mk
++++ b/sys/conf/kern.mk
+@@ -144,3 +144,11 @@
+ .if defined(WITH_CTF)
+ .undef NO_CTF
+ .endif
++
++#
++# GCC 4.4 onwards automatically enables -fgcse with -O2, which is not
++# currently supported. Avoid.
++#
++.if ${CC} != "icc"
++CFLAGS+=	-fno-gcse
++.endif

@@ -1,0 +1,14 @@
+--- a/sys/conf/kern.mk
++++ b/sys/conf/kern.mk
+@@ -127,3 +127,11 @@
+ 	${MACHINE_ARCH} != "arm" && ${MACHINE_ARCH} != "mips"
+ CFLAGS+=	-fstack-protector
+ .endif
++
++#
++# GCC 4.4 onwards automatically enables -fgcse with -O2, which is not
++# currently supported. Avoid.
++#
++.if ${CC} != "icc"
++CFLAGS+=	-fno-gcse
++.endif
