@@ -1,14 +1,24 @@
---- a/sys/conf/kern.mk
-+++ b/sys/conf/kern.mk
-@@ -127,3 +127,11 @@
- 	${MACHINE_ARCH} != "arm" && ${MACHINE_ARCH} != "mips"
- CFLAGS+=	-fstack-protector
+--- a/sys/conf/kern.pre.mk
++++ b/sys/conf/kern.pre.mk
+@@ -37,6 +37,9 @@
+ . if !empty(COPTFLAGS:M-O[23s]) && empty(COPTFLAGS:M-fno-strict-aliasing)
+ COPTFLAGS+= -fno-strict-aliasing
+ . endif
++. if !empty(COPTFLAGS:M-O[23s]) && empty(COPTFLAGS:M-fno-gcse)
++COPTFLAGS+= -fno-gcse
++. endif
  .endif
-+
-+#
-+# GCC 4.4 onwards automatically enables -fgcse with -O2, which is not
-+# currently supported. Avoid.
-+#
-+.if ${CC} != "icc"
+ .if !defined(NO_CPU_COPTFLAGS)
+ . if ${CC} == "icc"
+--- a/sys/conf/kmod.mk
++++ b/sys/conf/kmod.mk
+@@ -79,6 +79,9 @@
+ . if !empty(CFLAGS:M-O[23s]) && empty(CFLAGS:M-fno-strict-aliasing)
+ CFLAGS+=	-fno-strict-aliasing
+ . endif
++. if !empty(CFLAGS:M-O[23s]) && empty(CFLAGS:M-fno-gcse)
 +CFLAGS+=	-fno-gcse
-+.endif
++. endif
+ WERROR?=	-Werror
+ .endif
+ CFLAGS+=	${WERROR}
