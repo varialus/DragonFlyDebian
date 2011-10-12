@@ -1,0 +1,24 @@
+--- a/sys/conf/kern.pre.mk
++++ b/sys/conf/kern.pre.mk
+@@ -41,6 +41,9 @@
+ .if !empty(COPTFLAGS:M-O[23s]) && empty(COPTFLAGS:M-fno-strict-aliasing)
+ COPTFLAGS+= -fno-strict-aliasing
+ .endif
++.if !empty(COPTFLAGS:M-O[23s]) && empty(COPTFLAGS:M-fno-gcse)
++COPTFLAGS+= -fno-gcse
++.endif
+ .if !defined(NO_CPU_COPTFLAGS)
+ COPTFLAGS+= ${_CPUCFLAGS}
+ .endif
+--- a/sys/conf/kmod.mk
++++ b/sys/conf/kmod.mk
+@@ -91,6 +91,9 @@
+ .if !empty(CFLAGS:M-O[23s]) && empty(CFLAGS:M-fno-strict-aliasing)
+ CFLAGS+=	-fno-strict-aliasing
+ .endif
++.if !empty(CFLAGS:M-O[23s]) && empty(CFLAGS:M-fno-gcse)
++CFLAGS+=	-fno-gcse
++.endif
+ WERROR?=	-Werror
+ CFLAGS+=	${WERROR}
+ CFLAGS+=	-D_KERNEL
