@@ -51,7 +51,7 @@ __libc_connect (int fd, __CONST_SOCKADDR_ARG addr, socklen_t addrlen)
 
   /* Only allow a smaller size, otherwise it could lead to
     stack corruption */
-  if (new_addrlen < addrlen)
+  if ((new_addrlen != 0) && (new_addrlen < addrlen))
     addrlen = new_addrlen;
 
   /* We pass 3 arguments.  */

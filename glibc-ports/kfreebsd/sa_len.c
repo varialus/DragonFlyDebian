@@ -37,7 +37,7 @@ __libc_sa_len (sa_family_t af)
     case AF_IPX:
       return sizeof (struct sockaddr_ipx);
     case AF_LOCAL:
-      return sizeof (struct sockaddr_un);
+      return sizeof (struct sockaddr_un) - sizeof(((struct sockaddr_un *) 0)->__sun_user_compat);
     }
   return 0;
 }

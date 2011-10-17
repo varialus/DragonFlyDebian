@@ -55,7 +55,7 @@ __libc_sendto (int fd, __const void * buf, size_t n, int flags,
 
   /* Only allow a smaller size, otherwise it could lead to
     stack corruption */
-  if (new_addrlen < addrlen)
+  if ((new_addrlen != 0) && (new_addrlen < addrlen))
     addrlen = new_addrlen;
   }
 
