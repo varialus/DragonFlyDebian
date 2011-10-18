@@ -31,7 +31,9 @@ struct sockaddr_un
   {
     __SOCKADDR_COMMON (sun_);
     char sun_path[104];		/* Path name, the kernel restrict it to 104, */
+#if defined(__i386__) || defined(__amd64__)
     char __sun_user_compat[4];  /* but former user header used 108 */
+#endif    
   };
 
 
