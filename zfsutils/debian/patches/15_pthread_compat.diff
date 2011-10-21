@@ -1,0 +1,32 @@
+--- a/cddl/contrib/opensolaris/lib/libzpool/common/sys/zfs_context.h
++++ b/cddl/contrib/opensolaris/lib/libzpool/common/sys/zfs_context.h
+@@ -251,7 +251,28 @@
+ #undef	MUTEX_NOT_HELD
+ #define	MUTEX_HELD(m)	((m)->m_owner == curthread)
+ #define	MUTEX_NOT_HELD(m) (!MUTEX_HELD(m))
+-#define	_mutex_held(m)	pthread_mutex_isowned_np(m)
++/*
++ * glibc/pthread does not define pthread_mutex_isowned_np()
++ * That's a FreeBSD extension available in libthr. Its code is
++ *
++ * int
++ * _pthread_mutex_isowned_np(pthread_mutex_t *mutex)
++ * {
++ *       struct pthread_mutex    *m;
++ *
++ *       m = *mutex;
++ *       if (m <= THR_MUTEX_DESTROYED)
++ *               return (0);
++ *       return (m->m_owner == _get_curthread());
++ * }
++ * Unfortunately we do not support either, this symbol or pthread_mutex as
++ * struct.
++ * In our phtread implementation, pthread_mutex is typedefed to int, on FreeBSD
++ * it's a struct. Hence We can't simply wrap the missing code. Fortunately the code
++ * using _pthread_mutex_isowned_np currently does so in a assert() only,
++ * so we /may/ be safe if our code never "fails". For now.
++ */
++#define	_mutex_held(m)	(1)
+ 
+ /*
+  * Argh -- we have to get cheesy here because the kernel and userland

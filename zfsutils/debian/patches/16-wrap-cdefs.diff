@@ -1,0 +1,42 @@
+--- a/sys/cddl/compat/opensolaris/sys/misc.h
++++ b/sys/cddl/compat/opensolaris/sys/misc.h
+@@ -31,7 +31,11 @@
+ 
+ #include <sys/limits.h>
+ 
++#ifndef UID_MAX
++#define MAXUID UINT_MAX
++#else
+ #define	MAXUID	UID_MAX
++#endif
+ 
+ #define	SPEC_MAXOFFSET_T	OFF_MAX
+ 
+--- a/sys/cddl/compat/opensolaris/sys/vnode.h
++++ b/sys/cddl/compat/opensolaris/sys/vnode.h
+@@ -116,7 +116,11 @@
+ #define	va_blksize	va_blocksize
+ #define	va_seq		va_gen
+ 
++#ifndef OFF_MAX
++#define MAXOFFSET_T	__OFF_MAX
++#else
+ #define	MAXOFFSET_T	OFF_MAX
++#endif
+ #define	EXCL		0
+ 
+ #define	ACCESSED		(AT_ATIME)
+--- a/sys/cddl/compat/opensolaris/sys/stat.h
++++ b/sys/cddl/compat/opensolaris/sys/stat.h
+@@ -36,7 +36,11 @@
+ #define	stat64	stat
+ #endif
+ 
++#ifndef OFF_MAX
++#define MAXOFFSET_T	__OFF_MAX
++#else
+ #define	MAXOFFSET_T	OFF_MAX
++#endif
+ 
+ #if !defined(_KERNEL) && !defined(__GLIBC__)
+ #include <sys/disk.h>

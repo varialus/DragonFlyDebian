@@ -17,9 +17,9 @@
  	int i, error;
 --- a/cddl/compat/opensolaris/misc/zmount.c
 +++ b/cddl/compat/opensolaris/misc/zmount.c
-@@ -92,6 +92,9 @@
- 	iov = NULL;
- 	iovlen = 0;
+@@ -95,6 +95,9 @@
+ 	if (mflag & MS_RDONLY)
+ 		build_iovec(&iov, &iovlen, "ro", NULL, 0);
  	build_iovec(&iov, &iovlen, "fstype", fstype, (size_t)-1);
 +#ifndef __DECONST
 +#define __DECONST(type, var)	((type)(uintptr_t)(const void *)(var))
@@ -29,7 +29,7 @@
  	build_iovec(&iov, &iovlen, "from", __DECONST(char *, spec), (size_t)-1);
 --- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/arc.c
 +++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/arc.c
-@@ -2265,7 +2265,7 @@
+@@ -2327,7 +2327,7 @@
  }
  
  static void
@@ -38,7 +38,7 @@
  {
  	clock_t			growtime = 0;
  	arc_reclaim_strategy_t	last_reclaim = ARC_RECLAIM_CONS;
-@@ -3771,7 +3771,7 @@
+@@ -3705,7 +3705,7 @@
  static eventhandler_tag arc_event_lowmem = NULL;
  
  static void
@@ -47,7 +47,7 @@
  {
  
  	/* Serialize access via arc_lowmem_lock. */
-@@ -4828,7 +4828,7 @@
+@@ -4767,7 +4767,7 @@
   * heart of the L2ARC.
   */
  static void

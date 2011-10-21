@@ -12,12 +12,12 @@
  
 -#include <sys/stdint.h>
 +#include <stdint.h>
- #include_next <sys/types.h>
  
- #define	MAXNAMELEN	256
+ #ifdef _KERNEL
+ typedef	int64_t		clock_t;
 --- a/sys/cddl/contrib/opensolaris/common/avl/avl.c
 +++ b/sys/cddl/contrib/opensolaris/common/avl/avl.c
-@@ -92,7 +92,7 @@
+@@ -89,7 +89,7 @@
  
  #include <sys/types.h>
  #include <sys/param.h>
@@ -28,7 +28,7 @@
  
 --- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/zfs_context.h
 +++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/sys/zfs_context.h
-@@ -33,7 +33,7 @@
+@@ -31,7 +31,7 @@
  #endif
  
  #include <sys/param.h>

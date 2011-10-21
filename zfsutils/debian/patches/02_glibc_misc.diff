@@ -17,17 +17,6 @@
  #include <assert.h>
  
  /*
---- a/sys/cddl/compat/opensolaris/sys/sysmacros.h
-+++ b/sys/cddl/compat/opensolaris/sys/sysmacros.h
-@@ -107,7 +107,7 @@
-  * High order bit is 31 (or 63 in _LP64 kernel).
-  */
- static __inline int
--highbit(ulong_t i)
-+highbit(unsigned long i)
- {
- 	register int h = 1;
- 
 --- a/sys/cddl/compat/opensolaris/sys/time.h
 +++ b/sys/cddl/compat/opensolaris/sys/time.h
 @@ -29,7 +29,12 @@
@@ -43,3 +32,31 @@
  
  #define SEC		1
  #define MILLISEC	1000
+--- a/sys/cddl/contrib/opensolaris/uts/common/sys/sysmacros.h
++++ b/sys/cddl/contrib/opensolaris/uts/common/sys/sysmacros.h
+@@ -380,7 +380,7 @@
+  * High order bit is 31 (or 63 in _LP64 kernel).
+  */
+ static __inline int
+-highbit(ulong_t i)
++highbit(unsigned long i)
+ {
+ 	register int h = 1;
+ 
+--- a/sys/cddl/compat/opensolaris/sys/stat.h
++++ b/sys/cddl/compat/opensolaris/sys/stat.h
+@@ -32,11 +32,13 @@
+ 
+ #include_next <sys/stat.h>
+ 
++#ifndef __GLIBC__
+ #define	stat64	stat
++#endif
+ 
+ #define	MAXOFFSET_T	OFF_MAX
+ 
+-#ifndef _KERNEL
++#if !defined(_KERNEL) && !defined(__GLIBC__)
+ #include <sys/disk.h>
+ 
+ static __inline int

@@ -23,12 +23,21 @@
   */
 -#if _BYTE_ORDER == _BIG_ENDIAN
 +#if BYTE_ORDER == BIG_ENDIAN
- #define	LE_64(x)	BSWAP_64(x)
+ #define	BE_8(x)		BMASK_8(x)
+ #define	BE_16(x)	BMASK_16(x)
+ #define	BE_32(x)	BMASK_32(x)
+@@ -78,7 +80,7 @@
+ #define	BE_64(x)	BSWAP_64(x)
+ #endif
+ 
+-#if _BYTE_ORDER == _BIG_ENDIAN
++#if BYTE_ORDER == BIG_ENDIAN
+ #define	htonll(x)	BMASK_64(x)
+ #define	ntohll(x)	BMASK_64(x)
  #else
- #define	LE_64(x)	BMASK_64(x)
 --- a/sys/cddl/contrib/opensolaris/common/nvpair/nvpair.c
 +++ b/sys/cddl/contrib/opensolaris/common/nvpair/nvpair.c
-@@ -36,6 +36,7 @@
+@@ -33,6 +33,7 @@
  #include <sys/varargs.h>
  #include <sys/sunddi.h>
  #else
@@ -36,7 +45,7 @@
  #include <stdarg.h>
  #include <stdlib.h>
  #include <string.h>
-@@ -2199,11 +2200,11 @@
+@@ -2251,11 +2252,11 @@
  	int err = 0;
  	nvstream_t nvs;
  	int nvl_endian;
@@ -61,7 +70,7 @@
  #ifdef	__cplusplus
  extern "C" {
  #endif
-@@ -299,7 +301,7 @@
+@@ -329,7 +331,7 @@
   * Note: the byteorder is either 0 or -1, both of which are palindromes.
   * This simplifies the endianness handling a bit.
   */
@@ -70,35 +79,6 @@
  #define	ZFS_HOST_BYTEORDER	(0ULL)
  #else
  #define	ZFS_HOST_BYTEORDER	(-1ULL)
---- a/sys/cddl/contrib/opensolaris/uts/common/sys/byteorder.h
-+++ b/sys/cddl/contrib/opensolaris/uts/common/sys/byteorder.h
-@@ -48,6 +48,8 @@
- #include <asm/byteorder.h>
- #endif
- 
-+#include <endian.h>
-+
- #ifdef	__cplusplus
- extern "C" {
- #endif
-@@ -56,7 +58,7 @@
-  * macros for conversion between host and (internet) network byte order
-  */
- 
--#if BYTE_ORDER == _BIG_ENDIAN && !defined(ntohl) && !defined(__lint)
-+#if BYTE_ORDER == BIG_ENDIAN && !defined(ntohl) && !defined(__lint)
- /* big-endian */
- #define	ntohl(x)	(x)
- #define	ntohs(x)	(x)
-@@ -141,7 +143,7 @@
- /*
-  * Macros to convert from a specific byte order to/from native byte order
-  */
--#if BYTE_ORDER == _BIG_ENDIAN
-+#if BYTE_ORDER == BIG_ENDIAN
- #define	BE_8(x)		BMASK_8(x)
- #define	BE_16(x)	BMASK_16(x)
- #define	BE_32(x)	BMASK_32(x)
 --- a/sys/cddl/contrib/opensolaris/uts/common/sys/dtrace.h
 +++ b/sys/cddl/contrib/opensolaris/uts/common/sys/dtrace.h
 @@ -29,6 +29,8 @@

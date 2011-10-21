@@ -1,3 +1,24 @@
+zfsutils (8.3~svn226546-1) UNRELEASED; urgency=low
+
+  [ Arno Töll ]
+  [ Robert Millan ]
+  * New upstream snapshot, based on the FreeBSD 8-STABLE tree which supports
+    ZFS version 28 now.
+  * Refresh patches, leave hunks unchanged where possible. Additionally:
+    + 04_stdint.diff: Extend inclusion of stdint.h to several new files
+    + 05_makefile.diff: Split into gratuitous_dependencies.diff (which is
+      upstream-mergeable) and makefile.diff (which is Debian-specific)
+    + Remove 10_zpool_import.diff entirely (see kern/150207)
+    + Add 15_pthread_compat.diff: Work around compatibility issues with eglibc
+    + Remove 15_ztest.fix entirely
+    + 16-wrap-cdefs.diff: Work around the unavailability of cdefs.h
+  * debian/rules:
+    + Rework get-orig-source target, add new origin paths where needed.
+  * Remove the zfs volinit/volfini commands from the init script as they are
+    not available anymore; also stop on runlevel 1.
+
+ -- Robert Millan <rmh@debian.org>  Fri, 21 Oct 2011 22:16:33 +0200
+
 zfsutils (8.2-4) unstable; urgency=high
 
   * Bring back mount/unmount routines in init script. See #637020 and

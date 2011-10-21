@@ -19,11 +19,21 @@ else
 	CFLAGS += -O2
 endif
 
+full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
+tar_version	:= $(shell echo $(full_version) | sed -e 's/-.*//g')
+svn_revision	:= $(shell echo $(full_version) | sed -e 's/.*~svn\([0-9]*\)-[0-9]*/\1/g')
+version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
+major           := $(shell echo $(version) | sed -e 's/\..*//g')
+revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
+
+#SVN		:= http://svn.freebsd.org/base/release/$(version).0
+#SVN		:= http://svn.freebsd.org/base/releng/$(version)
+SVN		:= http://svn.freebsd.org/base/stable/$(major)
+#SVN		:= http://svn.freebsd.org/base/head
+
 SOURCE = zfsutils
-VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
-SVN = http://svn.freebsd.org/base/release/$(VERSION).0
-ORIGDIR = $(SOURCE)-$(VERSION)
-TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
+ORIGDIR = $(SOURCE)-$(tar_version)
+TARNAME = $(SOURCE)_$(tar_version).orig.tar.gz
 
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
@@ -46,6 +56,7 @@ get-orig-source:
 	         cddl/contrib/opensolaris/lib/libuutil \
 	         cddl/contrib/opensolaris/lib/libzfs \
 	         cddl/contrib/opensolaris/lib/libzpool \
+		 cddl/contrib/opensolaris/cmd/stat/common/ \
 	         sys/cddl/compat/opensolaris \
 	         sys/cddl/contrib/opensolaris \
 	         cddl/lib/libavl \
@@ -60,7 +71,7 @@ get-orig-source:
 	         cddl/usr.bin/ztest \
 	         cddl/usr.sbin/zdb \
 	         ; do \
-	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
+	    svn export $(SVN)/$$i -r $(svn_revision) $(ORIGDIR)/$$i ; \
 	done
 	rm -f $(ORIGDIR)/cddl/compat/opensolaris/include/alloca.h
 	rm -f $(ORIGDIR)/cddl/compat/opensolaris/include/stdlib.h
@@ -87,12 +98,12 @@ build-libumem-stamp:
 
 
 build-libzpool: build-libzpool-stamp
-build-libzpool-stamp: build-libavl build-libnvpair-stamp build-libumem
+build-libzpool-stamp: build-libavl build-libnvpair-stamp build-libumem build-libuutil-stamp build-libzfs-stamp
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libzpool
 	touch $@
 
 build-libzfs: build-libzfs-stamp
-build-libzfs-stamp: build-libnvpair-stamp build-libuutil-stamp
+build-libzfs-stamp: build-libnvpair-stamp build-libuutil-stamp build-libumem-stamp build-libavl-stamp
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs
 	touch $@
 

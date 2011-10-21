@@ -9,18 +9,6 @@
  sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vnops.c     |    2 +-
  8 files changed, 17 insertions(+), 10 deletions(-)
 
---- a/cddl/compat/opensolaris/include/solaris.h
-+++ b/cddl/compat/opensolaris/include/solaris.h
-@@ -5,6 +5,9 @@
- 
- #include <sys/ccompile.h>
- 
-+/* GNU libc has its own dirent64 declaration */
-+#ifndef __GLIBC__
- #define	dirent64	dirent
-+#endif
- 
- #endif	/* !_SOLARIS_H_ */
 --- a/cddl/compat/opensolaris/misc/fsshare.c
 +++ b/cddl/compat/opensolaris/misc/fsshare.c
 @@ -28,6 +28,7 @@
@@ -28,10 +16,10 @@
  
  #include <sys/param.h>
 +#include <sys/file.h>
- #include <stdio.h>
- #include <unistd.h>
- #include <fcntl.h>
-@@ -67,7 +68,7 @@
+ 
+ #include <assert.h>
+ #include <errno.h>
+@@ -69,7 +70,7 @@
   * mountpoint specified in the 'skip' argument.
   */
  static char *
@@ -40,7 +28,7 @@
  {
  	static char line[MAXLINESIZE];
  	size_t len, skiplen;
-@@ -198,7 +199,7 @@
+@@ -200,7 +201,7 @@
  
  	/* Place big, fat warning at the begining of the file. */
  	fprintf(newfd, "%s", FILE_HEADER);
@@ -62,9 +50,9 @@
  	char *f, *opts = tmpopts;
 --- a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_dataset.c
 +++ b/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_dataset.c
-@@ -1637,11 +1637,11 @@
- 	case ZFS_PROP_NBMAND:
- 		*val = getprop_uint64(zhp, prop, source);
+@@ -1735,11 +1735,11 @@
+ 		if (received)
+ 			break;
  
 -		if (hasmntopt(&mnt, mntopt_on) && !*val) {
 +		if (solaris_hasmntopt(&mnt, mntopt_on) && !*val) {
@@ -89,7 +77,7 @@
  
 --- a/cddl/contrib/opensolaris/lib/libzpool/common/sys/zfs_context.h
 +++ b/cddl/contrib/opensolaris/lib/libzpool/common/sys/zfs_context.h
-@@ -105,8 +105,8 @@
+@@ -107,8 +107,8 @@
  
  #define	ZFS_LOG(...)	do {  } while (0)
  
@@ -100,7 +88,7 @@
  
  #ifdef ZFS_DEBUG
  extern void dprintf_setup(int *argc, char **argv);
-@@ -445,7 +445,7 @@
+@@ -496,7 +496,7 @@
  extern int vn_openat(char *path, int x1, int oflags, int mode, vnode_t **vpp,
      int x2, int x3, vnode_t *vp, int fd);
  extern int vn_rdwr(int uio, vnode_t *vp, void *addr, ssize_t len,
@@ -111,20 +99,20 @@
  #define	vn_remove(path, x1, x2)		remove(path)
 --- a/sys/cddl/compat/opensolaris/sys/dirent.h
 +++ b/sys/cddl/compat/opensolaris/sys/dirent.h
-@@ -32,7 +32,10 @@
- #include_next <sys/dirent.h>
- 
+@@ -36,7 +36,10 @@
  typedef	struct dirent	dirent64_t;
+ typedef ino_t		ino64_t;
+ 
 +/* GNU libc has its own dirent64 declaration */
 +#ifndef __GLIBC__
  #define	dirent64	dirent
 +#endif
- #define	ino64_t		ino_t
  
  #define	d_ino	d_fileno
+ 
 --- a/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vnops.c
 +++ b/sys/cddl/contrib/opensolaris/uts/common/fs/zfs/zfs_vnops.c
-@@ -710,7 +710,7 @@
+@@ -724,7 +724,7 @@
  zfs_write(vnode_t *vp, uio_t *uio, int ioflag, cred_t *cr, caller_context_t *ct)
  {
  	znode_t		*zp = VTOZ(vp);
