@@ -1,0 +1,3072 @@
+
+Generated with:
+
+for i in cddl/contrib/opensolaris/cmd/zpool/zpool.8 \
+		cddl/contrib/opensolaris/cmd/zfs/zfs.8 \
+		cddl/contrib/opensolaris/cmd/zdb/zdb.8 ; do
+	perl -pi -e 's/(?<!\\)(?<!\.in |\.ll |\.po |\.ti |\.ce )-/\\-/g' < $i | sponge $i
+done
+
+--- a/cddl/contrib/opensolaris/cmd/zdb/zdb.8
++++ b/cddl/contrib/opensolaris/cmd/zdb/zdb.8
+@@ -15,7 +15,7 @@
+ .SH DESCRIPTION
+ .sp
+ .LP
+-The \fBzdb\fR command is used by support engineers to diagnose failures and gather statistics. Since the \fBZFS\fR file system is always consistent on disk and is self-repairing, \fBzdb\fR should only be run under the direction by a support engineer.
++The \fBzdb\fR command is used by support engineers to diagnose failures and gather statistics. Since the \fBZFS\fR file system is always consistent on disk and is self\-repairing, \fBzdb\fR should only be run under the direction by a support engineer.
+ .sp
+ .LP
+ If no arguments are specified, \fBzdb\fR, performs basic consistency checks on the pool and associated datasets, and report any problems detected.
+--- a/cddl/contrib/opensolaris/cmd/zfs/zfs.8
++++ b/cddl/contrib/opensolaris/cmd/zfs/zfs.8
+@@ -14,48 +14,48 @@
+ .SH SYNOPSIS
+ .LP
+ .nf
+-\fBzfs\fR [\fB-?\fR]
++\fBzfs\fR [\fB\-?\fR]
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBcreate\fR [\fB-p\fR] [\fB-o\fR \fIproperty\fR=\fIvalue\fR] ... \fIfilesystem\fR
++\fBzfs\fR \fBcreate\fR [\fB\-p\fR] [\fB\-o\fR \fIproperty\fR=\fIvalue\fR] ... \fIfilesystem\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBcreate\fR [\fB-ps\fR] [\fB-b\fR \fIblocksize\fR] [\fB-o\fR \fIproperty\fR=\fIvalue\fR] ... \fB-V\fR \fIsize\fR \fIvolume\fR
++\fBzfs\fR \fBcreate\fR [\fB\-ps\fR] [\fB\-b\fR \fIblocksize\fR] [\fB\-o\fR \fIproperty\fR=\fIvalue\fR] ... \fB\-V\fR \fIsize\fR \fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBdestroy\fR [\fB-rRf\fR] \fIfilesystem\fR|\fIvolume\fR
++\fBzfs\fR \fBdestroy\fR [\fB\-rRf\fR] \fIfilesystem\fR|\fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBdestroy\fR [\fB-rRd\fR] \fIsnapshot\fR
++\fBzfs\fR \fBdestroy\fR [\fB\-rRd\fR] \fIsnapshot\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBsnapshot\fR [\fB-r\fR] [\fB-o\fR \fIproperty\fR=\fIvalue\fR]... 
++\fBzfs\fR \fBsnapshot\fR [\fB\-r\fR] [\fB\-o\fR \fIproperty\fR=\fIvalue\fR]... 
+       \fIfilesystem@snapname\fR|\fIvolume@snapname\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBrollback\fR [\fB-rRf\fR] \fIsnapshot\fR
++\fBzfs\fR \fBrollback\fR [\fB\-rRf\fR] \fIsnapshot\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBclone\fR [\fB-p\fR] [\fB-o\fR \fIproperty\fR=\fIvalue\fR] ... \fIsnapshot\fR \fIfilesystem\fR|\fIvolume\fR
++\fBzfs\fR \fBclone\fR [\fB\-p\fR] [\fB\-o\fR \fIproperty\fR=\fIvalue\fR] ... \fIsnapshot\fR \fIfilesystem\fR|\fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBpromote\fR \fIclone-filesystem\fR
++\fBzfs\fR \fBpromote\fR \fIclone\-filesystem\fR
+ .fi
+ 
+ .LP
+@@ -66,18 +66,18 @@
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBrename\fR [\fB-p\fR] \fIfilesystem\fR|\fIvolume\fR \fIfilesystem\fR|\fIvolume\fR
++\fBzfs\fR \fBrename\fR [\fB\-p\fR] \fIfilesystem\fR|\fIvolume\fR \fIfilesystem\fR|\fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBrename\fR \fB-r\fR \fIsnapshot\fR \fIsnapshot\fR
++\fBzfs\fR \fBrename\fR \fB\-r\fR \fIsnapshot\fR \fIsnapshot\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBlist\fR [\fB-r\fR|\fB-d\fR \fIdepth\fR][\fB-H\fR][\fB-o\fR \fIproperty\fR[,...]] [\fB-t\fR \fItype\fR[,...]]
+-     [\fB-s\fR \fIproperty\fR] ... [\fB-S\fR \fIproperty\fR] ... [\fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR] ...
++\fBzfs\fR \fBlist\fR [\fB\-r\fR|\fB\-d\fR \fIdepth\fR][\fB\-H\fR][\fB\-o\fR \fIproperty\fR[,...]] [\fB\-t\fR \fItype\fR[,...]]
++     [\fB\-s\fR \fIproperty\fR] ... [\fB\-S\fR \fIproperty\fR] ... [\fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR] ...
+ .fi
+ 
+ .LP
+@@ -87,35 +87,35 @@
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBget\fR [\fB-r\fR|\fB-d\fR \fIdepth\fR][\fB-Hp\fR][\fB-o\fR \fIfield\fR[,...]] [\fB-s\fR \fIsource\fR[,...]]
++\fBzfs\fR \fBget\fR [\fB\-r\fR|\fB\-d\fR \fIdepth\fR][\fB\-Hp\fR][\fB\-o\fR \fIfield\fR[,...]] [\fB\-s\fR \fIsource\fR[,...]]
+      "\fIall\fR" | \fIproperty\fR[,...] \fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR ...
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBinherit\fR [\fB-r\fR] \fIproperty\fR \fIfilesystem\fR|\fIvolume|snapshot\fR ...
++\fBzfs\fR \fBinherit\fR [\fB\-r\fR] \fIproperty\fR \fIfilesystem\fR|\fIvolume|snapshot\fR ...
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBupgrade\fR [\fB-v\fR]
++\fBzfs\fR \fBupgrade\fR [\fB\-v\fR]
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBupgrade\fR [\fB-r\fR] [\fB-V\fR \fIversion\fR] \fB-a\fR | \fIfilesystem\fR
++\fBzfs\fR \fBupgrade\fR [\fB\-r\fR] [\fB\-V\fR \fIversion\fR] \fB\-a\fR | \fIfilesystem\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBuserspace\fR [\fB-niHp\fR] [\fB-o\fR \fIfield\fR[,...]] [\fB-sS\fR \fIfield\fR] ...
+-     [\fB-t\fR \fItype\fR [,...]] \fIfilesystem\fR|\fIsnapshot\fR
++\fBzfs\fR \fBuserspace\fR [\fB\-niHp\fR] [\fB\-o\fR \fIfield\fR[,...]] [\fB\-sS\fR \fIfield\fR] ...
++     [\fB\-t\fR \fItype\fR [,...]] \fIfilesystem\fR|\fIsnapshot\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBgroupspace\fR [\fB-niHp\fR] [\fB-o\fR \fIfield\fR[,...]] [\fB-sS\fR \fIfield\fR] ...
+-     [\fB-t\fR \fItype\fR [,...]] \fIfilesystem\fR|\fIsnapshot\fR
++\fBzfs\fR \fBgroupspace\fR [\fB\-niHp\fR] [\fB\-o\fR \fIfield\fR[,...]] [\fB\-sS\fR \fIfield\fR] ...
++     [\fB\-t\fR \fItype\fR [,...]] \fIfilesystem\fR|\fIsnapshot\fR
+ .fi
+ 
+ .LP
+@@ -125,37 +125,37 @@
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBmount\fR [\fB-vO\fR] [\fB-o \fIoptions\fR\fR] \fB-a\fR | \fIfilesystem\fR
++\fBzfs\fR \fBmount\fR [\fB\-vO\fR] [\fB\-o \fIoptions\fR\fR] \fB\-a\fR | \fIfilesystem\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBunmount\fR [\fB-f\fR] \fB-a\fR | \fIfilesystem\fR|\fImountpoint\fR
++\fBzfs\fR \fBunmount\fR [\fB\-f\fR] \fB\-a\fR | \fIfilesystem\fR|\fImountpoint\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBshare\fR \fB-a\fR | \fIfilesystem\fR
++\fBzfs\fR \fBshare\fR \fB\-a\fR | \fIfilesystem\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBunshare\fR \fB-a\fR \fIfilesystem\fR|\fImountpoint\fR
++\fBzfs\fR \fBunshare\fR \fB\-a\fR \fIfilesystem\fR|\fImountpoint\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBsend\fR [\fB-vR\fR] [\fB-\fR[\fBiI\fR] \fIsnapshot\fR] \fIsnapshot\fR
++\fBzfs\fR \fBsend\fR [\fB\-vR\fR] [\fB\-\fR[\fBiI\fR] \fIsnapshot\fR] \fIsnapshot\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBreceive\fR [\fB-vnFu\fR] \fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR
++\fBzfs\fR \fBreceive\fR [\fB\-vnFu\fR] \fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBreceive\fR [\fB-vnFu\fR] \fB-d\fR \fIfilesystem\fR
++\fBzfs\fR \fBreceive\fR [\fB\-vnFu\fR] \fB\-d\fR \fIfilesystem\fR
+ .fi
+ 
+ .LP
+@@ -165,59 +165,59 @@
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBallow\fR [\fB-ldug\fR] "\fIeveryone\fR"|\fIuser\fR|\fIgroup\fR[,...] \fIperm\fR|\fI@setname\fR[,...] 
++\fBzfs\fR \fBallow\fR [\fB\-ldug\fR] "\fIeveryone\fR"|\fIuser\fR|\fIgroup\fR[,...] \fIperm\fR|\fI@setname\fR[,...] 
+      \fIfilesystem\fR|\fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBallow\fR [\fB-ld\fR] \fB-e\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR|\fIvolume\fR
++\fBzfs\fR \fBallow\fR [\fB\-ld\fR] \fB\-e\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR|\fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBallow\fR \fB-c\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR|\fIvolume\fR
++\fBzfs\fR \fBallow\fR \fB\-c\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR|\fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBallow\fR \fB-s\fR @\fIsetname\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR|\fIvolume\fR
++\fBzfs\fR \fBallow\fR \fB\-s\fR @\fIsetname\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR|\fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBunallow\fR [\fB-rldug\fR] "\fIeveryone\fR"|\fIuser\fR|\fIgroup\fR[,...] [\fIperm\fR|@\fIsetname\fR[,... ]] 
++\fBzfs\fR \fBunallow\fR [\fB\-rldug\fR] "\fIeveryone\fR"|\fIuser\fR|\fIgroup\fR[,...] [\fIperm\fR|@\fIsetname\fR[,... ]] 
+      \fIfilesystem\fR|\fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBunallow\fR [\fB-rld\fR] \fB-e\fR [\fIperm\fR|@\fIsetname\fR[,... ]] \fIfilesystem\fR|\fIvolume\fR
++\fBzfs\fR \fBunallow\fR [\fB\-rld\fR] \fB\-e\fR [\fIperm\fR|@\fIsetname\fR[,... ]] \fIfilesystem\fR|\fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBunallow\fR [\fB-r\fR] \fB-c\fR [\fIperm\fR|@\fIsetname\fR[ ... ]] \fIfilesystem\fR|\fIvolume\fR
++\fBzfs\fR \fBunallow\fR [\fB\-r\fR] \fB\-c\fR [\fIperm\fR|@\fIsetname\fR[ ... ]] \fIfilesystem\fR|\fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBunallow\fR [\fB-r\fR] \fB-s\fR @\fIsetname\fR [\fIperm\fR|@\fIsetname\fR[,... ]] \fIfilesystem\fR|\fIvolume\fR
++\fBzfs\fR \fBunallow\fR [\fB\-r\fR] \fB\-s\fR @\fIsetname\fR [\fIperm\fR|@\fIsetname\fR[,... ]] \fIfilesystem\fR|\fIvolume\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBhold\fR [\fB-r\fR] \fItag\fR \fIsnapshot\fR...
++\fBzfs\fR \fBhold\fR [\fB\-r\fR] \fItag\fR \fIsnapshot\fR...
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBholds\fR [\fB-r\fR] \fIsnapshot\fR...
++\fBzfs\fR \fBholds\fR [\fB\-r\fR] \fIsnapshot\fR...
+ .fi
+ 
+ .LP
+ .nf
+-\fBzfs\fR \fBrelease\fR [\fB-r\fR] \fItag\fR \fIsnapshot\fR...
++\fBzfs\fR \fBrelease\fR [\fB\-r\fR] \fItag\fR \fIsnapshot\fR...
+ .fi
+ 
+ \fBzfs\fR \fBjail\fR \fBjailid\fR \fB\fIfilesystem\fR\fR
+@@ -275,7 +275,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-A read-only version of a file system or volume at a given point in time. It is specified as \fIfilesystem@name\fR or \fIvolume@name\fR.
++A read\-only version of a file system or volume at a given point in time. It is specified as \fIfilesystem@name\fR or \fIvolume@name\fR.
+ .RE
+ 
+ .SS "ZFS File System Hierarchy"
+@@ -291,7 +291,7 @@
+ .SS "Snapshots"
+ .sp
+ .LP
+-A snapshot is a read-only copy of a file system or volume. Snapshots can be created extremely quickly, and initially consume no additional space within the pool. As data within the active dataset changes, the snapshot consumes more data than would otherwise be shared with the active dataset.
++A snapshot is a read\-only copy of a file system or volume. Snapshots can be created extremely quickly, and initially consume no additional space within the pool. As data within the active dataset changes, the snapshot consumes more data than would otherwise be shared with the active dataset.
+ .sp
+ .LP
+ Snapshots can have arbitrary names. Snapshots of volumes can be cloned or rolled back, but cannot be accessed independently.
+@@ -307,7 +307,7 @@
+ Clones can only be created from a snapshot. When a snapshot is cloned, it creates an implicit dependency between the parent and child. Even though the clone is created somewhere else in the dataset hierarchy, the original snapshot cannot be destroyed as long as a clone exists. The \fBorigin\fR property exposes this dependency, and the \fBdestroy\fR command lists any such dependencies, if they exist.
+ .sp
+ .LP
+-The clone parent-child dependency relationship can be reversed by using the \fBpromote\fR subcommand. This causes the "origin" file system to become a clone of the specified file system, which makes it possible to destroy the file system that the clone was created from.
++The clone parent\-child dependency relationship can be reversed by using the \fBpromote\fR subcommand. This causes the "origin" file system to become a clone of the specified file system, which makes it possible to destroy the file system that the clone was created from.
+ .SS "Mount Points"
+ .sp
+ .LP
+@@ -317,7 +317,7 @@
+ By default, file systems are mounted under \fB/\fIpath\fR\fR, where \fIpath\fR is the name of the file system in the \fBZFS\fR namespace. Directories are created and destroyed as needed.
+ .sp
+ .LP
+-A file system can also have a mount point set in the \fBmountpoint\fR property. This directory is created as needed, and \fBZFS\fR automatically mounts the file system when the \fBzfs mount -a\fR command is invoked (without editing \fB/etc/vfstab\fR). The \fBmountpoint\fR property can be inherited, so if \fBpool/home\fR has a mount point of \fB/export/stuff\fR, then \fBpool/home/user\fR automatically inherits a mount point of \fB/export/stuff/user\fR.
++A file system can also have a mount point set in the \fBmountpoint\fR property. This directory is created as needed, and \fBZFS\fR automatically mounts the file system when the \fBzfs mount \-a\fR command is invoked (without editing \fB/etc/vfstab\fR). The \fBmountpoint\fR property can be inherited, so if \fBpool/home\fR has a mount point of \fB/export/stuff\fR, then \fBpool/home/user\fR automatically inherits a mount point of \fB/export/stuff/user\fR.
+ .sp
+ .LP
+ A file system \fBmountpoint\fR property of \fBnone\fR prevents the file system from being mounted.
+@@ -327,35 +327,35 @@
+ .SS "Zones"
+ .sp
+ .LP
+-A \fBZFS\fR file system can be added to a non-global zone by using the \fBzonecfg\fR \fBadd fs\fR subcommand. A \fBZFS\fR file system that is added to a non-global zone must have its \fBmountpoint\fR property set to \fBlegacy\fR.
++A \fBZFS\fR file system can be added to a non\-global zone by using the \fBzonecfg\fR \fBadd fs\fR subcommand. A \fBZFS\fR file system that is added to a non\-global zone must have its \fBmountpoint\fR property set to \fBlegacy\fR.
+ .sp
+ .LP
+ The physical properties of an added file system are controlled by the global administrator. However, the zone administrator can create, modify, or destroy files within the added file system, depending on how the file system is mounted.
+ .sp
+ .LP
+-A dataset can also be delegated to a non-global zone by using the \fBzonecfg\fR \fBadd dataset\fR subcommand. You cannot delegate a dataset to one zone and the children of the same dataset to another zone. The zone administrator can change properties of the dataset or any of its children. However, the \fBquota\fR property is controlled by the global administrator.
++A dataset can also be delegated to a non\-global zone by using the \fBzonecfg\fR \fBadd dataset\fR subcommand. You cannot delegate a dataset to one zone and the children of the same dataset to another zone. The zone administrator can change properties of the dataset or any of its children. However, the \fBquota\fR property is controlled by the global administrator.
+ .sp
+ .LP
+-A \fBZFS\fR volume can be added as a device to a non-global zone by using the \fBzonecfg\fR \fBadd device\fR subcommand. However, its physical properties can be modified only by the global administrator.
++A \fBZFS\fR volume can be added as a device to a non\-global zone by using the \fBzonecfg\fR \fBadd device\fR subcommand. However, its physical properties can be modified only by the global administrator.
+ .sp
+ .LP
+ For more information about \fBzonecfg\fR syntax, see \fBzonecfg\fR(1M).
+ .sp
+ .LP
+-After a dataset is delegated to a non-global zone, the \fBzoned\fR property is automatically set. A zoned file system cannot be mounted in the global zone, since the zone administrator might have to set the mount point to an unacceptable value.
++After a dataset is delegated to a non\-global zone, the \fBzoned\fR property is automatically set. A zoned file system cannot be mounted in the global zone, since the zone administrator might have to set the mount point to an unacceptable value.
+ .sp
+ .LP
+ The global administrator can forcibly clear the \fBzoned\fR property, though this should be done with extreme care. The global administrator should verify that all the mount points are acceptable before clearing the property.
+ .SS "Native Properties"
+ .sp
+ .LP
+-Properties are divided into two types, native properties and user-defined (or "user") properties. Native properties either export internal statistics or control \fBZFS\fR behavior. In addition, native properties are either editable or read-only. User properties have no effect on \fBZFS\fR behavior, but you can use them to annotate datasets in a way that is meaningful in your environment. For more information about user properties, see the "User Properties" section, below.
++Properties are divided into two types, native properties and user\-defined (or "user") properties. Native properties either export internal statistics or control \fBZFS\fR behavior. In addition, native properties are either editable or read\-only. User properties have no effect on \fBZFS\fR behavior, but you can use them to annotate datasets in a way that is meaningful in your environment. For more information about user properties, see the "User Properties" section, below.
+ .sp
+ .LP
+ Every dataset has a set of properties that export statistics about the dataset as well as control various behaviors. Properties are inherited from the parent unless overridden by the child. Some properties apply only to certain types of datasets (file systems, volumes, or snapshots).
+ .sp
+ .LP
+-The values of numeric properties can be specified using human-readable suffixes (for example, \fBk\fR, \fBKB\fR, \fBM\fR, \fBGb\fR, and so forth, up to \fBZ\fR for zettabyte). The following are all valid (and equal) specifications: 
++The values of numeric properties can be specified using human\-readable suffixes (for example, \fBk\fR, \fBKB\fR, \fBM\fR, \fBGb\fR, and so forth, up to \fBZ\fR for zettabyte). The following are all valid (and equal) specifications: 
+ .sp
+ .in +2
+ .nf
+@@ -366,10 +366,10 @@
+ 
+ .sp
+ .LP
+-The values of non-numeric properties are case sensitive and must be lowercase, except for \fBmountpoint\fR, \fBsharenfs\fR, and \fBsharesmb\fR.
++The values of non\-numeric properties are case sensitive and must be lowercase, except for \fBmountpoint\fR, \fBsharenfs\fR, and \fBsharesmb\fR.
+ .sp
+ .LP
+-The following native properties consist of read-only statistics about the dataset. These properties can be neither set, nor inherited. Native properties apply to all dataset types unless otherwise noted.
++The following native properties consist of read\-only statistics about the dataset. These properties can be neither set, nor inherited. Native properties apply to all dataset types unless otherwise noted.
+ .sp
+ .ne 2
+ .mk
+@@ -391,7 +391,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-For non-snapshots, the compression ratio achieved for the \fBused\fR space of this dataset, expressed as a multiplier.  The \fBused\fR property includes descendant datasets, and, for clones, does not include the space shared with the origin snapshot.  For snapshots, the \fBcompressratio\fR is the same as the \fBrefcompressratio\fR property. Compression can be turned on by running: \fBzfs set compression=on \fIdataset\fR\fR. The default value is \fBoff\fR.
++For non\-snapshots, the compression ratio achieved for the \fBused\fR space of this dataset, expressed as a multiplier.  The \fBused\fR property includes descendant datasets, and, for clones, does not include the space shared with the origin snapshot.  For snapshots, the \fBcompressratio\fR is the same as the \fBrefcompressratio\fR property. Compression can be turned on by running: \fBzfs set compression=on \fIdataset\fR\fR. The default value is \fBoff\fR.
+ .RE
+ 
+ .sp
+@@ -413,7 +413,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-This property is \fBon\fR if the snapshot has been marked for deferred destroy by using the \fBzfs destroy\fR \fB-d\fR command. Otherwise, the property is \fBoff\fR.
++This property is \fBon\fR if the snapshot has been marked for deferred destroy by using the \fBzfs destroy\fR \fB\-d\fR command. Otherwise, the property is \fBoff\fR.
+ .RE
+ 
+ .sp
+@@ -435,7 +435,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-For cloned file systems or volumes, the snapshot from which the clone was created. The origin cannot be destroyed (even with the \fB-r\fR or \fB-f\fR options) so long as a clone exists.
++For cloned file systems or volumes, the snapshot from which the clone was created. The origin cannot be destroyed (even with the \fB\-r\fR or \fB\-f\fR options) so long as a clone exists.
+ .RE
+ 
+ .sp
+@@ -551,7 +551,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-The amount of space consumed by the specified user in this dataset. Space is charged to the owner of each file, as displayed by \fBls\fR \fB-l\fR. The amount of space charged is displayed by \fBdu\fR and \fBls\fR \fB-s\fR. See the \fBzfs userspace\fR subcommand for more information.
++The amount of space consumed by the specified user in this dataset. Space is charged to the owner of each file, as displayed by \fBls\fR \fB\-l\fR. The amount of space charged is displayed by \fBdu\fR and \fBls\fR \fB\-s\fR. See the \fBzfs userspace\fR subcommand for more information.
+ .sp
+ Unprivileged users can access only their own space usage. The root user, or a user who has been granted the \fBuserused\fR privilege with \fBzfs allow\fR, can access everyone's usage.
+ .sp
+@@ -578,7 +578,7 @@
+ .TP
+ .ie t \(bu
+ .el o
+-\fISID numeric ID\fR (for example, \fBS-1-123-456-789\fR)
++\fISID numeric ID\fR (for example, \fBS\-1\-123\-456\-789\fR)
+ .RE
+ .RE
+ 
+@@ -601,7 +601,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-The amount of space consumed by the specified group in this dataset. Space is charged to the group of each file, as displayed by \fBls\fR \fB-l\fR. See the \fBuserused@\fR\fIuser\fR property for more information.
++The amount of space consumed by the specified group in this dataset. Space is charged to the group of each file, as displayed by \fBls\fR \fB\-l\fR. See the \fBuserused@\fR\fIuser\fR property for more information.
+ .sp
+ Unprivileged users can only access their own groups' space usage. The root user, or a user who has been granted the \fBgroupused\fR privilege with \fBzfs allow\fR, can access all groups' usage.
+ .RE
+@@ -626,11 +626,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBaclinherit\fR=\fBdiscard\fR | \fBnoallow\fR | \fBrestricted\fR | \fBpassthrough\fR | \fBpassthrough-x\fR\fR
++\fB\fBaclinherit\fR=\fBdiscard\fR | \fBnoallow\fR | \fBrestricted\fR | \fBpassthrough\fR | \fBpassthrough\-x\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Controls how \fBACL\fR entries are inherited when files and directories are created. A file system with an \fBaclinherit\fR property of \fBdiscard\fR does not inherit any \fBACL\fR entries. A file system with an \fBaclinherit\fR property value of \fBnoallow\fR only inherits inheritable \fBACL\fR entries that specify "deny" permissions. The property value \fBrestricted\fR (the default) removes the \fBwrite_acl\fR and \fBwrite_owner\fR permissions when the \fBACL\fR entry is inherited. A file system with an \fBaclinherit\fR property value of \fBpassthrough\fR inherits all inheritable \fBACL\fR entries without any modifications made to the \fBACL\fR entries when they are inherited. A file system with an \fBaclinherit\fR property value of \fBpassthrough-x\fR has the same meaning as \fBpassthrough\fR, except that the \fBowner@\fR, \fBgroup@\fR, and \fBeveryone@\fR \fBACE\fRs inherit the execute permission only if the file creation mode also requests the execute bit.
++Controls how \fBACL\fR entries are inherited when files and directories are created. A file system with an \fBaclinherit\fR property of \fBdiscard\fR does not inherit any \fBACL\fR entries. A file system with an \fBaclinherit\fR property value of \fBnoallow\fR only inherits inheritable \fBACL\fR entries that specify "deny" permissions. The property value \fBrestricted\fR (the default) removes the \fBwrite_acl\fR and \fBwrite_owner\fR permissions when the \fBACL\fR entry is inherited. A file system with an \fBaclinherit\fR property value of \fBpassthrough\fR inherits all inheritable \fBACL\fR entries without any modifications made to the \fBACL\fR entries when they are inherited. A file system with an \fBaclinherit\fR property value of \fBpassthrough\-x\fR has the same meaning as \fBpassthrough\fR, except that the \fBowner@\fR, \fBgroup@\fR, and \fBeveryone@\fR \fBACE\fRs inherit the execute permission only if the file creation mode also requests the execute bit.
+ .sp
+ When the property value is set to \fBpassthrough\fR, files are created with a mode determined by the inheritable \fBACE\fRs. If no inheritable \fBACE\fRs exist that affect the mode, then the mode is set in accordance to the requested mode from the application.
+ .RE
+@@ -665,9 +665,9 @@
+ .ad
+ .sp .6
+ .RS 4n
+-If this property is set to \fBoff\fR, the file system cannot be mounted, and is ignored by \fBzfs mount -a\fR. Setting this property to \fBoff\fR is similar to setting the \fBmountpoint\fR property to \fBnone\fR, except that the dataset still has a normal \fBmountpoint\fR property, which can be inherited. Setting this property to \fBoff\fR allows datasets to be used solely as a mechanism to inherit properties. One example of setting \fBcanmount=\fR\fBoff\fR is to have two datasets with the same \fBmountpoint\fR, so that the children of both datasets appear in the same directory, but might have different inherited characteristics.
++If this property is set to \fBoff\fR, the file system cannot be mounted, and is ignored by \fBzfs mount \-a\fR. Setting this property to \fBoff\fR is similar to setting the \fBmountpoint\fR property to \fBnone\fR, except that the dataset still has a normal \fBmountpoint\fR property, which can be inherited. Setting this property to \fBoff\fR allows datasets to be used solely as a mechanism to inherit properties. One example of setting \fBcanmount=\fR\fBoff\fR is to have two datasets with the same \fBmountpoint\fR, so that the children of both datasets appear in the same directory, but might have different inherited characteristics.
+ .sp
+-When the \fBnoauto\fR option is set, a dataset can only be mounted and unmounted explicitly. The dataset is not mounted automatically when the dataset is created or imported, nor is it mounted by the \fBzfs mount -a\fR command or unmounted by the \fBzfs unmount -a\fR command.
++When the \fBnoauto\fR option is set, a dataset can only be mounted and unmounted explicitly. The dataset is not mounted automatically when the dataset is created or imported, nor is it mounted by the \fBzfs mount \-a\fR command or unmounted by the \fBzfs unmount \-a\fR command.
+ .sp
+ This property is not inherited.
+ .RE
+@@ -682,20 +682,20 @@
+ .RS 4n
+ Controls the checksum used to verify data integrity. The default value is \fBon\fR, which automatically selects an appropriate algorithm (currently, \fBfletcher4\fR, but this may change in future releases). The value \fBoff\fR disables integrity checking on user data. Disabling checksums is \fBNOT\fR a recommended practice.
+ .sp
+-Changing this property affects only newly-written data.
++Changing this property affects only newly\-written data.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fBcompression\fR=\fBon\fR | \fBoff\fR | \fBlzjb\fR | \fBgzip\fR | \fBgzip-\fR\fIN\fR\fR
++\fB\fBcompression\fR=\fBon\fR | \fBoff\fR | \fBlzjb\fR | \fBgzip\fR | \fBgzip\-\fR\fIN\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Controls the compression algorithm used for this dataset. The \fBlzjb\fR compression algorithm is optimized for performance while providing decent data compression. Setting compression to \fBon\fR uses the \fBlzjb\fR compression algorithm. The \fBgzip\fR compression algorithm uses the same compression as the \fBgzip\fR(1) command. You can specify the \fBgzip\fR level by using the value \fBgzip-\fR\fIN\fR where \fIN\fR is an integer from 1 (fastest) to 9 (best compression ratio). Currently, \fBgzip\fR is equivalent to \fBgzip-6\fR (which is also the default for \fBgzip\fR(1)).
++Controls the compression algorithm used for this dataset. The \fBlzjb\fR compression algorithm is optimized for performance while providing decent data compression. Setting compression to \fBon\fR uses the \fBlzjb\fR compression algorithm. The \fBgzip\fR compression algorithm uses the same compression as the \fBgzip\fR(1) command. You can specify the \fBgzip\fR level by using the value \fBgzip\-\fR\fIN\fR where \fIN\fR is an integer from 1 (fastest) to 9 (best compression ratio). Currently, \fBgzip\fR is equivalent to \fBgzip\-6\fR (which is also the default for \fBgzip\fR(1)).
+ .sp
+-This property can also be referred to by its shortened column name \fBcompress\fR. Changing this property affects only newly-written data.
++This property can also be referred to by its shortened column name \fBcompress\fR. Changing this property affects only newly\-written data.
+ .RE
+ 
+ .sp
+@@ -706,9 +706,9 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Controls the number of copies of data stored for this dataset. These copies are in addition to any redundancy provided by the pool, for example, mirroring or RAID-Z. The copies are stored on different disks, if possible. The space used by multiple copies is charged to the associated file and dataset, changing the \fBused\fR property and counting against quotas and reservations.
++Controls the number of copies of data stored for this dataset. These copies are in addition to any redundancy provided by the pool, for example, mirroring or RAID\-Z. The copies are stored on different disks, if possible. The space used by multiple copies is charged to the associated file and dataset, changing the \fBused\fR property and counting against quotas and reservations.
+ .sp
+-Changing this property only affects newly-written data. Therefore, set this property at file system creation time by using the \fB-o\fR \fBcopies=\fR\fIN\fR option.
++Changing this property only affects newly\-written data. Therefore, set this property at file system creation time by using the \fB\-o\fR \fBcopies=\fR\fIN\fR option.
+ .RE
+ 
+ .sp
+@@ -818,7 +818,7 @@
+ .TP
+ .ie t \(bu
+ .el o
+-\fISID numeric ID\fR (for example, \fBS-1-123-456-789\fR)
++\fISID numeric ID\fR (for example, \fBS\-1\-123\-456\-789\fR)
+ .RE
+ .RE
+ 
+@@ -856,7 +856,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Specifies a suggested block size for files in the file system. This property is designed solely for use with database workloads that access files in fixed-size records. \fBZFS\fR automatically tunes block sizes according to internal algorithms optimized for typical access patterns. 
++Specifies a suggested block size for files in the file system. This property is designed solely for use with database workloads that access files in fixed\-size records. \fBZFS\fR automatically tunes block sizes according to internal algorithms optimized for typical access patterns. 
+ .sp
+ For databases that create very large files but access them in small random chunks, these algorithms may be suboptimal. Specifying a \fBrecordsize\fR greater than or equal to the record size of the database can result in significant performance gains. Use of this property for general purpose file systems is strongly discouraged, and may adversely affect performance.
+ .sp
+@@ -925,7 +925,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Controls whether the set-\fBUID\fR bit is respected for the file system. The default value is \fBon\fR.
++Controls whether the set\-\fBUID\fR bit is respected for the file system. The default value is \fBon\fR.
+ .RE
+ 
+ .sp
+@@ -953,9 +953,9 @@
+ .sp
+ Because \fBSMB\fR shares requires a resource name, a unique resource name is constructed from the dataset name. The constructed name is a copy of the dataset name except that the characters in the dataset name, which would be illegal in the resource name, are replaced with underscore (\fB_\fR) characters. A pseudo property "name" is also supported that allows you to replace the data set name with a specified name. The specified name is then used to replace the prefix dataset in the case of inheritance. For example, if the dataset \fBdata/home/john\fR is set to \fBname=john\fR, then \fBdata/home/john\fR has a resource name of \fBjohn\fR. If a child dataset of \fBdata/home/john/backups\fR, it has a resource name of \fBjohn_backups\fR.
+ .sp
+-When SMB shares are created, the SMB share name appears as an entry in the \fB\&.zfs/shares\fR directory. You can use the \fBls\fR or \fBchmod\fR command to display the share-level ACLs on the entries in this directory.
++When SMB shares are created, the SMB share name appears as an entry in the \fB\&.zfs/shares\fR directory. You can use the \fBls\fR or \fBchmod\fR command to display the share\-level ACLs on the entries in this directory.
+ .sp
+-When the \fBsharesmb\fR property is changed for a dataset, the dataset and any children inheriting the property are re-shared with the new options, only if the property was previously set to \fBoff\fR, or if they were shared before the property was changed. If the new property is set to \fBoff\fR, the file systems are unshared.
++When the \fBsharesmb\fR property is changed for a dataset, the dataset and any children inheriting the property are re\-shared with the new options, only if the property was previously set to \fBoff\fR, or if they were shared before the property was changed. If the new property is set to \fBoff\fR, the file systems are unshared.
+ .RE
+ 
+ .sp
+@@ -968,7 +968,7 @@
+ .RS 4n
+ Controls whether the file system is shared via \fBNFS\fR, and what options are used. A file system with a \fBsharenfs\fR property of \fBoff\fR is managed through traditional tools such as \fBshare\fR(1M), \fBunshare\fR(1M), and \fBdfstab\fR(4). Otherwise, the file system is automatically shared and unshared with the \fBzfs share\fR and \fBzfs unshare\fR commands. If the property is set to \fBon\fR, the \fBshare\fR(1M) command is invoked with no options. Otherwise, the \fBshare\fR(1M) command is invoked with options equivalent to the contents of this property.
+ .sp
+-When the \fBsharenfs\fR property is changed for a dataset, the dataset and any children inheriting the property are re-shared with the new options, only if the property was previously \fBoff\fR, or if they were shared before the property was changed. If the new property is \fBoff\fR, the file systems are unshared.
++When the \fBsharenfs\fR property is changed for a dataset, the dataset and any children inheriting the property are re\-shared with the new options, only if the property was previously \fBoff\fR, or if they were shared before the property was changed. If the new property is \fBoff\fR, the file systems are unshared.
+ .RE
+ 
+ .sp
+@@ -1001,7 +1001,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-The on-disk version of this file system, which is independent of the pool version. This property can only be set to later supported versions. See the \fBzfs upgrade\fR command.
++The on\-disk version of this file system, which is independent of the pool version. This property can only be set to later supported versions. See the \fBzfs upgrade\fR command.
+ .RE
+ 
+ .sp
+@@ -1016,7 +1016,7 @@
+ .sp
+ The reservation is kept equal to the volume's logical size to prevent unexpected behavior for consumers. Without the reservation, the volume could run out of space, resulting in undefined behavior or data corruption, depending on how the volume is used. These effects can also occur when the volume size is changed while it is in use (particularly when shrinking the size). Extreme care should be used when adjusting the volume size.
+ .sp
+-Though not recommended, a "sparse volume" (also known as "thin provisioning") can be created by specifying the \fB-s\fR option to the \fBzfs create -V\fR command, or by changing the reservation after the volume has been created. A "sparse volume" is a volume where the reservation is less then the volume size. Consequently, writes to a sparse volume can fail with \fBENOSPC\fR when the pool is low on space. For a sparse volume, changes to \fBvolsize\fR are not reflected in the reservation.
++Though not recommended, a "sparse volume" (also known as "thin provisioning") can be created by specifying the \fB\-s\fR option to the \fBzfs create \-V\fR command, or by changing the reservation after the volume has been created. A "sparse volume" is a volume where the reservation is less then the volume size. Consequently, writes to a sparse volume can fail with \fBENOSPC\fR when the pool is low on space. For a sparse volume, changes to \fBvolsize\fR are not reflected in the reservation.
+ .RE
+ 
+ .sp
+@@ -1049,7 +1049,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Controls whether the dataset is managed from a non-global zone. See the "Zones" section for more information. The default value is \fBoff\fR.
++Controls whether the dataset is managed from a non\-global zone. See the "Zones" section for more information. The default value is \fBoff\fR.
+ .RE
+ 
+ .sp
+@@ -1063,9 +1063,9 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Indicates whether the file name matching algorithm used by the file system should be case-sensitive, case-insensitive, or allow a combination of both styles of matching. The default value for the \fBcasesensitivity\fR property is \fBsensitive\fR. Traditionally, UNIX and POSIX file systems have case-sensitive file names.
++Indicates whether the file name matching algorithm used by the file system should be case\-sensitive, case\-insensitive, or allow a combination of both styles of matching. The default value for the \fBcasesensitivity\fR property is \fBsensitive\fR. Traditionally, UNIX and POSIX file systems have case\-sensitive file names.
+ .sp
+-The \fBmixed\fR value for the \fBcasesensitivity\fR property indicates that the file system can support requests for both case-sensitive and case-insensitive matching behavior. Currently, case-insensitive matching behavior on a file system that supports mixed behavior is limited to the Solaris CIFS server product. For more information about the \fBmixed\fR value behavior, see the \fISolaris ZFS Administration Guide\fR.
++The \fBmixed\fR value for the \fBcasesensitivity\fR property indicates that the file system can support requests for both case\-sensitive and case\-insensitive matching behavior. Currently, case\-insensitive matching behavior on a file system that supports mixed behavior is limited to the Solaris CIFS server product. For more information about the \fBmixed\fR value behavior, see the \fISolaris ZFS Administration Guide\fR.
+ .RE
+ 
+ .sp
+@@ -1098,12 +1098,12 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Indicates whether the file system should reject file names that include characters that are not present in the \fBUTF-8\fR character code set. If this property is explicitly set to \fBoff\fR, the normalization property must either not be explicitly set or be set to \fBnone\fR. The default value for the \fButf8only\fR property is \fBoff\fR. This property cannot be changed after the file system is created.
++Indicates whether the file system should reject file names that include characters that are not present in the \fBUTF\-8\fR character code set. If this property is explicitly set to \fBoff\fR, the normalization property must either not be explicitly set or be set to \fBnone\fR. The default value for the \fButf8only\fR property is \fBoff\fR. This property cannot be changed after the file system is created.
+ .RE
+ 
+ .sp
+ .LP
+-The \fBcasesensitivity\fR, \fBnormalization\fR, and \fButf8only\fR properties are also new permissions that can be assigned to non-privileged users by using the \fBZFS\fR delegated administration feature.
++The \fBcasesensitivity\fR, \fBnormalization\fR, and \fButf8only\fR properties are also new permissions that can be assigned to non\-privileged users by using the \fBZFS\fR delegated administration feature.
+ .SS "Temporary Mount Point Properties"
+ .sp
+ .LP
+@@ -1123,17 +1123,17 @@
+ 
+ .sp
+ .LP
+-In addition, these options can be set on a per-mount basis using the \fB-o\fR option, without affecting the property that is stored on disk. The values specified on the command line override the values stored in the dataset. The \fB-nosuid\fR option is an alias for \fBnodevices,nosetuid\fR. These properties are reported as "temporary" by the \fBzfs get\fR command. If the properties are changed while the dataset is mounted, the new setting overrides any temporary settings.
++In addition, these options can be set on a per\-mount basis using the \fB\-o\fR option, without affecting the property that is stored on disk. The values specified on the command line override the values stored in the dataset. The \fB\-nosuid\fR option is an alias for \fBnodevices,nosetuid\fR. These properties are reported as "temporary" by the \fBzfs get\fR command. If the properties are changed while the dataset is mounted, the new setting overrides any temporary settings.
+ .SS "User Properties"
+ .sp
+ .LP
+ In addition to the standard native properties, \fBZFS\fR supports arbitrary user properties. User properties have no effect on \fBZFS\fR behavior, but applications or administrators can use them to annotate datasets (file systems, volumes, and snapshots).
+ .sp
+ .LP
+-User property names must contain a colon (\fB:\fR) character to distinguish them from native properties. They may contain lowercase letters, numbers, and the following punctuation characters: colon (\fB:\fR), dash (\fB-\fR), period (\fB\&.\fR), and underscore (\fB_\fR). The expected convention is that the property name is divided into two portions such as \fImodule\fR\fB:\fR\fIproperty\fR, but this namespace is not enforced by \fBZFS\fR. User property names can be at most 256 characters, and cannot begin with a dash (\fB-\fR).
++User property names must contain a colon (\fB:\fR) character to distinguish them from native properties. They may contain lowercase letters, numbers, and the following punctuation characters: colon (\fB:\fR), dash (\fB\-\fR), period (\fB\&.\fR), and underscore (\fB_\fR). The expected convention is that the property name is divided into two portions such as \fImodule\fR\fB:\fR\fIproperty\fR, but this namespace is not enforced by \fBZFS\fR. User property names can be at most 256 characters, and cannot begin with a dash (\fB\-\fR).
+ .sp
+ .LP
+-When making programmatic use of user properties, it is strongly suggested to use a reversed \fBDNS\fR domain name for the \fImodule\fR component of property names to reduce the chance that two independently-developed packages use the same property name for different purposes. Property names beginning with \fBcom.sun\fR. are reserved for use by Sun Microsystems.
++When making programmatic use of user properties, it is strongly suggested to use a reversed \fBDNS\fR domain name for the \fImodule\fR component of property names to reduce the chance that two independently\-developed packages use the same property name for different purposes. Property names beginning with \fBcom.sun\fR. are reserved for use by Sun Microsystems.
+ .sp
+ .LP
+ The values of user properties are arbitrary strings, are always inherited, and are never validated. All of the commands that operate on properties (\fBzfs list\fR, \fBzfs get\fR, \fBzfs set\fR, and so forth) can be used to manipulate both native properties and user properties. Use the \fBzfs inherit\fR command to clear a user property . If the property is not defined in any parent dataset, it is removed entirely. Property values are limited to 1024 characters.
+@@ -1163,7 +1163,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs create\fR [\fB-p\fR] [\fB-o\fR \fIproperty\fR=\fIvalue\fR] ... \fIfilesystem\fR\fR
++\fB\fBzfs create\fR [\fB\-p\fR] [\fB\-o\fR \fIproperty\fR=\fIvalue\fR] ... \fIfilesystem\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1172,22 +1172,22 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-p\fR\fR
++\fB\fB\-p\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Creates all the non-existing parent datasets. Datasets created in this manner are automatically mounted according to the \fBmountpoint\fR property inherited from their parent. Any property specified on the command line using the \fB-o\fR option is ignored. If the target filesystem already exists, the operation completes successfully.
++Creates all the non\-existing parent datasets. Datasets created in this manner are automatically mounted according to the \fBmountpoint\fR property inherited from their parent. Any property specified on the command line using the \fB\-o\fR option is ignored. If the target filesystem already exists, the operation completes successfully.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIproperty\fR=\fIvalue\fR\fR
++\fB\fB\-o\fR \fIproperty\fR=\fIvalue\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Sets the specified property as if the command \fBzfs set\fR \fIproperty\fR=\fIvalue\fR was invoked at the same time the dataset was created. Any editable \fBZFS\fR property can also be set at creation time. Multiple \fB-o\fR options can be specified. An error results if the same property is specified in multiple \fB-o\fR options.
++Sets the specified property as if the command \fBzfs set\fR \fIproperty\fR=\fIvalue\fR was invoked at the same time the dataset was created. Any editable \fBZFS\fR property can also be set at creation time. Multiple \fB\-o\fR options can be specified. An error results if the same property is specified in multiple \fB\-o\fR options.
+ .RE
+ 
+ .RE
+@@ -1196,7 +1196,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs create\fR [\fB-ps\fR] [\fB-b\fR \fIblocksize\fR] [\fB-o\fR \fIproperty\fR=\fIvalue\fR] ... \fB-V\fR \fIsize\fR \fIvolume\fR\fR
++\fB\fBzfs create\fR [\fB\-ps\fR] [\fB\-b\fR \fIblocksize\fR] [\fB\-o\fR \fIproperty\fR=\fIvalue\fR] ... \fB\-V\fR \fIsize\fR \fIvolume\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1207,18 +1207,18 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-p\fR\fR
++\fB\fB\-p\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Creates all the non-existing parent datasets. Datasets created in this manner are automatically mounted according to the \fBmountpoint\fR property inherited from their parent. Any property specified on the command line using the \fB-o\fR option is ignored. If the target filesystem already exists, the operation completes successfully.
++Creates all the non\-existing parent datasets. Datasets created in this manner are automatically mounted according to the \fBmountpoint\fR property inherited from their parent. Any property specified on the command line using the \fB\-o\fR option is ignored. If the target filesystem already exists, the operation completes successfully.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-s\fR\fR
++\fB\fB\-s\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1229,22 +1229,22 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIproperty\fR=\fIvalue\fR\fR
++\fB\fB\-o\fR \fIproperty\fR=\fIvalue\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Sets the specified property as if the \fBzfs set\fR \fIproperty\fR=\fIvalue\fR command was invoked at the same time the dataset was created. Any editable \fBZFS\fR property can also be set at creation time. Multiple \fB-o\fR options can be specified. An error results if the same property is specified in multiple \fB-o\fR options.
++Sets the specified property as if the \fBzfs set\fR \fIproperty\fR=\fIvalue\fR command was invoked at the same time the dataset was created. Any editable \fBZFS\fR property can also be set at creation time. Multiple \fB\-o\fR options can be specified. An error results if the same property is specified in multiple \fB\-o\fR options.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-b\fR \fIblocksize\fR\fR
++\fB\fB\-b\fR \fIblocksize\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Equivalent to \fB-o\fR \fBvolblocksize\fR=\fIblocksize\fR. If this option is specified in conjunction with \fB-o\fR \fBvolblocksize\fR, the resulting behavior is undefined.
++Equivalent to \fB\-o\fR \fBvolblocksize\fR=\fIblocksize\fR. If this option is specified in conjunction with \fB\-o\fR \fBvolblocksize\fR, the resulting behavior is undefined.
+ .RE
+ 
+ .RE
+@@ -1253,7 +1253,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs destroy\fR [\fB-rRf\fR] \fIfilesystem\fR|\fIvolume\fR\fR
++\fB\fBzfs destroy\fR [\fB\-rRf\fR] \fIfilesystem\fR|\fIvolume\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1262,7 +1262,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1273,7 +1273,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-R\fR\fR
++\fB\fB\-R\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1284,32 +1284,32 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-f\fR\fR
++\fB\fB\-f\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Force an unmount of any file systems using the \fBunmount -f\fR command. This option has no effect on non-file systems or unmounted file systems.
++Force an unmount of any file systems using the \fBunmount \-f\fR command. This option has no effect on non\-file systems or unmounted file systems.
+ .RE
+ 
+-Extreme care should be taken when applying either the \fB-r\fR or the \fB-R\fR options, as they can destroy large portions of a pool and cause unexpected behavior for mounted file systems in use. 
++Extreme care should be taken when applying either the \fB\-r\fR or the \fB\-R\fR options, as they can destroy large portions of a pool and cause unexpected behavior for mounted file systems in use. 
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs destroy\fR [\fB-rRd\fR] \fIsnapshot\fR\fR
++\fB\fBzfs destroy\fR [\fB\-rRd\fR] \fIsnapshot\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-The given snapshot is destroyed immediately if and only if the \fBzfs destroy\fR command without the \fB-d\fR option would have destroyed it. Such immediate destruction would occur, for example, if the snapshot had no clones and the user-initiated reference count were zero.
++The given snapshot is destroyed immediately if and only if the \fBzfs destroy\fR command without the \fB\-d\fR option would have destroyed it. Such immediate destruction would occur, for example, if the snapshot had no clones and the user\-initiated reference count were zero.
+ .sp
+ If the snapshot does not qualify for immediate destruction, it is marked for deferred deletion. In this state, it exists as a usable, visible snapshot until both of the preconditions listed above are met, at which point it is destroyed.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-d\fR\fR
++\fB\fB\-d\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1320,7 +1320,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1331,7 +1331,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-R\fR\fR
++\fB\fB\-R\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1344,7 +1344,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs snapshot\fR [\fB-r\fR] [\fB-o\fR \fIproperty\fR=\fIvalue\fR] ... \fIfilesystem@snapname\fR|\fIvolume@snapname\fR\fR
++\fB\fBzfs snapshot\fR [\fB\-r\fR] [\fB\-o\fR \fIproperty\fR=\fIvalue\fR] ... \fIfilesystem@snapname\fR|\fIvolume@snapname\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1353,7 +1353,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1364,7 +1364,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIproperty\fR=\fIvalue\fR\fR
++\fB\fB\-o\fR \fIproperty\fR=\fIvalue\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1377,18 +1377,18 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs rollback\fR [\fB-rRf\fR] \fIsnapshot\fR\fR
++\fB\fBzfs rollback\fR [\fB\-rRf\fR] \fIsnapshot\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Roll back the given dataset to a previous snapshot. When a dataset is rolled back, all data that has changed since the snapshot is discarded, and the dataset reverts to the state at the time of the snapshot. By default, the command refuses to roll back to a snapshot other than the most recent one. In order to do so, all intermediate snapshots must be destroyed by specifying the \fB-r\fR option.
++Roll back the given dataset to a previous snapshot. When a dataset is rolled back, all data that has changed since the snapshot is discarded, and the dataset reverts to the state at the time of the snapshot. By default, the command refuses to roll back to a snapshot other than the most recent one. In order to do so, all intermediate snapshots must be destroyed by specifying the \fB\-r\fR option.
+ .sp
+-The \fB-rR\fR options do not recursively destroy the child snapshots of a recursive snapshot. Only the top-level recursive snapshot is destroyed by either of these options. To completely roll back a recursive snapshot, you must rollback the individual child snapshots.
++The \fB\-rR\fR options do not recursively destroy the child snapshots of a recursive snapshot. Only the top\-level recursive snapshot is destroyed by either of these options. To completely roll back a recursive snapshot, you must rollback the individual child snapshots.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1399,7 +1399,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-R\fR\fR
++\fB\fB\-R\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1410,11 +1410,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-f\fR\fR
++\fB\fB\-f\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Used with the \fB-R\fR option to force an unmount of any clone file systems that are to be destroyed.
++Used with the \fB\-R\fR option to force an unmount of any clone file systems that are to be destroyed.
+ .RE
+ 
+ .RE
+@@ -1423,7 +1423,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs clone\fR [\fB-p\fR] [\fB-o\fR \fIproperty\fR=\fIvalue\fR] ... \fIsnapshot\fR \fIfilesystem\fR|\fIvolume\fR\fR
++\fB\fBzfs clone\fR [\fB\-p\fR] [\fB\-o\fR \fIproperty\fR=\fIvalue\fR] ... \fIsnapshot\fR \fIfilesystem\fR|\fIvolume\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1432,18 +1432,18 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-p\fR\fR
++\fB\fB\-p\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Creates all the non-existing parent datasets. Datasets created in this manner are automatically mounted according to the \fBmountpoint\fR property inherited from their parent. If the target filesystem or volume already exists, the operation completes successfully.
++Creates all the non\-existing parent datasets. Datasets created in this manner are automatically mounted according to the \fBmountpoint\fR property inherited from their parent. If the target filesystem or volume already exists, the operation completes successfully.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIproperty\fR=\fIvalue\fR\fR
++\fB\fB\-o\fR \fIproperty\fR=\fIvalue\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1456,11 +1456,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs promote\fR \fIclone-filesystem\fR\fR
++\fB\fBzfs promote\fR \fIclone\-filesystem\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Promotes a clone file system to no longer be dependent on its "origin" snapshot. This makes it possible to destroy the file system that the clone was created from. The clone parent-child dependency relationship is reversed, so that the origin file system becomes a clone of the specified file system. 
++Promotes a clone file system to no longer be dependent on its "origin" snapshot. This makes it possible to destroy the file system that the clone was created from. The clone parent\-child dependency relationship is reversed, so that the origin file system becomes a clone of the specified file system. 
+ .sp
+ The snapshot that was cloned, and any snapshots previous to this snapshot, are now owned by the promoted clone. The space they use moves from the origin file system to the promoted clone, so enough space must be available to accommodate these snapshots. No new space is consumed by this operation, but the space accounting is adjusted. The promoted clone must not have any conflicting snapshot names of its own. The \fBrename\fR subcommand can be used to rename any conflicting snapshots.
+ .RE
+@@ -1477,7 +1477,7 @@
+ .ad
+ .br
+ .na
+-\fB\fBzfs rename\fR [\fB-p\fR] \fIfilesystem\fR|\fIvolume\fR \fIfilesystem\fR|\fIvolume\fR\fR
++\fB\fBzfs rename\fR [\fB\-p\fR] \fIfilesystem\fR|\fIvolume\fR \fIfilesystem\fR|\fIvolume\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1486,7 +1486,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-p\fR\fR
++\fB\fB\-p\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1499,7 +1499,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs rename\fR \fB-r\fR \fIsnapshot\fR \fIsnapshot\fR\fR
++\fB\fBzfs rename\fR \fB\-r\fR \fIsnapshot\fR \fIsnapshot\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1510,7 +1510,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs\fR \fBlist\fR [\fB-r\fR|\fB-d\fR \fIdepth\fR] [\fB-H\fR] [\fB-o\fR \fIproperty\fR[,\fI\&...\fR]] [ \fB-t\fR \fItype\fR[,\fI\&...\fR]] [ \fB-s\fR \fIproperty\fR ] ... [ \fB-S\fR \fIproperty\fR ] ... [\fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR] ...\fR
++\fB\fBzfs\fR \fBlist\fR [\fB\-r\fR|\fB\-d\fR \fIdepth\fR] [\fB\-H\fR] [\fB\-o\fR \fIproperty\fR[,\fI\&...\fR]] [ \fB\-t\fR \fItype\fR[,\fI\&...\fR]] [ \fB\-s\fR \fIproperty\fR ] ... [ \fB\-S\fR \fIproperty\fR ] ... [\fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR] ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1519,7 +1519,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-H\fR\fR
++\fB\fB\-H\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1530,7 +1530,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1541,7 +1541,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-d\fR \fIdepth\fR\fR
++\fB\fB\-d\fR \fIdepth\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1552,11 +1552,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIproperty\fR\fR
++\fB\fB\-o\fR \fIproperty\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-A comma-separated list of properties to display. The property must be:
++A comma\-separated list of properties to display. The property must be:
+ .RS +4
+ .TP
+ .ie t \(bu
+@@ -1579,7 +1579,7 @@
+ .TP
+ .ie t \(bu
+ .el o
+-The value \fBspace\fR to display space usage properties on file systems and volumes. This is a shortcut for specifying \fB-o name,avail,used,usedsnap,usedds,usedrefreserv,usedchild\fR \fB-t filesystem,volume\fR syntax.
++The value \fBspace\fR to display space usage properties on file systems and volumes. This is a shortcut for specifying \fB\-o name,avail,used,usedsnap,usedds,usedrefreserv,usedchild\fR \fB\-t filesystem,volume\fR syntax.
+ .RE
+ .RE
+ 
+@@ -1587,11 +1587,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-s\fR \fIproperty\fR\fR
++\fB\fB\-s\fR \fIproperty\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-A property for sorting the output by column in ascending order based on the value of the property. The property must be one of the properties described in the "Properties" section, or the special value \fBname\fR to sort by the dataset name. Multiple properties can be specified at one time using multiple \fB-s\fR property options. Multiple \fB-s\fR options are evaluated from left to right in decreasing order of importance.
++A property for sorting the output by column in ascending order based on the value of the property. The property must be one of the properties described in the "Properties" section, or the special value \fBname\fR to sort by the dataset name. Multiple properties can be specified at one time using multiple \fB\-s\fR property options. Multiple \fB\-s\fR options are evaluated from left to right in decreasing order of importance.
+ .sp
+ The following is a list of sorting criteria:
+ .RS +4
+@@ -1624,22 +1624,22 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-S\fR \fIproperty\fR\fR
++\fB\fB\-S\fR \fIproperty\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Same as the \fB-s\fR option, but sorts by property in descending order. 
++Same as the \fB\-s\fR option, but sorts by property in descending order. 
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-t\fR \fItype\fR\fR
++\fB\fB\-t\fR \fItype\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-A comma-separated list of types to display, where \fItype\fR is one of \fBfilesystem\fR, \fBsnapshot\fR , \fBvolume\fR, or \fBall\fR. For example, specifying \fB-t snapshot\fR displays only snapshots.
++A comma\-separated list of types to display, where \fItype\fR is one of \fBfilesystem\fR, \fBsnapshot\fR , \fBvolume\fR, or \fBall\fR. For example, specifying \fB\-t snapshot\fR displays only snapshots.
+ .RE
+ 
+ .RE
+@@ -1652,14 +1652,14 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Sets the property to the given value for each dataset. Only some properties can be edited. See the "Properties" section for more information on what properties can be set and acceptable values. Numeric values can be specified as exact values, or in a human-readable form with a suffix of \fBB\fR, \fBK\fR, \fBM\fR, \fBG\fR, \fBT\fR, \fBP\fR, \fBE\fR, \fBZ\fR (for bytes, kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, or zettabytes, respectively). User properties can be set on snapshots. For more information, see the "User Properties" section.
++Sets the property to the given value for each dataset. Only some properties can be edited. See the "Properties" section for more information on what properties can be set and acceptable values. Numeric values can be specified as exact values, or in a human\-readable form with a suffix of \fBB\fR, \fBK\fR, \fBM\fR, \fBG\fR, \fBT\fR, \fBP\fR, \fBE\fR, \fBZ\fR (for bytes, kilobytes, megabytes, gigabytes, terabytes, petabytes, exabytes, or zettabytes, respectively). User properties can be set on snapshots. For more information, see the "User Properties" section.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs get\fR [\fB-r\fR|\fB-d\fR \fIdepth\fR] [\fB-Hp\fR] [\fB-o\fR \fIfield\fR[,...] [\fB-s\fR \fIsource\fR[,...] "\fIall\fR" | \fIproperty\fR[,...] \fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR ...\fR
++\fB\fBzfs get\fR [\fB\-r\fR|\fB\-d\fR \fIdepth\fR] [\fB\-Hp\fR] [\fB\-o\fR \fIfield\fR[,...] [\fB\-s\fR \fIsource\fR[,...] "\fIall\fR" | \fIproperty\fR[,...] \fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1671,19 +1671,19 @@
+      property  Property name
+      value     Property value
+      source    Property source. Can either be local, default,
+-               temporary, inherited, or none (-).
++               temporary, inherited, or none (\-).
+ .fi
+ .in -2
+ .sp
+ 
+-All columns are displayed by default, though this can be controlled by using the \fB-o\fR option. This command takes a comma-separated list of properties as described in the "Native Properties" and "User Properties" sections.
++All columns are displayed by default, though this can be controlled by using the \fB\-o\fR option. This command takes a comma\-separated list of properties as described in the "Native Properties" and "User Properties" sections.
+ .sp
+ The special value \fBall\fR can be used to display all properties that apply to the given dataset's type (filesystem, volume, or snapshot).
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1694,7 +1694,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-d\fR \fIdepth\fR\fR
++\fB\fB\-d\fR \fIdepth\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1705,7 +1705,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-H\fR\fR
++\fB\fB\-H\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1716,29 +1716,29 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIfield\fR\fR
++\fB\fB\-o\fR \fIfield\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-A comma-separated list of columns to display. \fBname,property,value,source\fR is the default value. 
++A comma\-separated list of columns to display. \fBname,property,value,source\fR is the default value. 
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-s\fR \fIsource\fR\fR
++\fB\fB\-s\fR \fIsource\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-A comma-separated list of sources to display. Those properties coming from a source other than those in this list are ignored. Each source must be one of the following: \fBlocal,default,inherited,temporary,none\fR. The default value is all sources.
++A comma\-separated list of sources to display. Those properties coming from a source other than those in this list are ignored. Each source must be one of the following: \fBlocal,default,inherited,temporary,none\fR. The default value is all sources.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-p\fR\fR
++\fB\fB\-p\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1751,7 +1751,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs inherit\fR [\fB-r\fR] \fIproperty\fR \fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR ...\fR
++\fB\fBzfs inherit\fR [\fB\-r\fR] \fIproperty\fR \fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1760,7 +1760,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1773,7 +1773,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs upgrade\fR [\fB-v\fR]\fR
++\fB\fBzfs upgrade\fR [\fB\-v\fR]\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1784,11 +1784,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs upgrade\fR [\fB-r\fR] [\fB-V\fR \fIversion\fR] [\fB-a\fR | \fIfilesystem\fR]\fR
++\fB\fBzfs upgrade\fR [\fB\-r\fR] [\fB\-V\fR \fIversion\fR] [\fB\-a\fR | \fIfilesystem\fR]\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Upgrades file systems to a new on-disk version. Once this is done, the file systems will no longer be accessible on systems running older versions of the software. \fBzfs send\fR streams generated from new snapshots of these file systems cannot be accessed on systems running older versions of the software.
++Upgrades file systems to a new on\-disk version. Once this is done, the file systems will no longer be accessible on systems running older versions of the software. \fBzfs send\fR streams generated from new snapshots of these file systems cannot be accessed on systems running older versions of the software.
+ .sp
+ In general, the file system version is independent of the pool version. See \fBzpool\fR(1M) for information on the \fBzpool upgrade\fR command. 
+ .sp
+@@ -1797,7 +1797,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-a\fR\fR
++\fB\fB\-a\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1819,7 +1819,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1830,11 +1830,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-V\fR \fIversion\fR\fR
++\fB\fB\-V\fR \fIversion\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Upgrade to the specified \fIversion\fR. If the \fB-V\fR flag is not specified, this command upgrades to the most recent version. This option can only be used to increase the version number, and only up to the most recent version supported by this software.
++Upgrade to the specified \fIversion\fR. If the \fB\-V\fR flag is not specified, this command upgrades to the most recent version. This option can only be used to increase the version number, and only up to the most recent version supported by this software.
+ .RE
+ 
+ .RE
+@@ -1843,7 +1843,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs userspace\fR [\fB-niHp\fR] [\fB-o\fR \fIfield\fR[,...]] [\fB-sS\fR \fIfield\fR]... [\fB-t\fR \fItype\fR [,...]] \fIfilesystem\fR | \fIsnapshot\fR\fR
++\fB\fBzfs userspace\fR [\fB\-niHp\fR] [\fB\-o\fR \fIfield\fR[,...]] [\fB\-sS\fR \fIfield\fR]... [\fB\-t\fR \fItype\fR [,...]] \fIfilesystem\fR | \fIsnapshot\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1852,7 +1852,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-n\fR\fR
++\fB\fB\-n\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1863,18 +1863,18 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-H\fR\fR
++\fB\fB\-H\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Do not print headers, use tab-delimited output.
++Do not print headers, use tab\-delimited output.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-p\fR\fR
++\fB\fB\-p\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1885,7 +1885,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIfield\fR[,...]\fR
++\fB\fB\-o\fR \fIfield\fR[,...]\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1896,35 +1896,35 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-s\fR \fIfield\fR\fR
++\fB\fB\-s\fR \fIfield\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Sort output by this field. The \fIs\fR and \fIS\fR flags may be specified multiple times to sort first by one field, then by another. The default is \fB-s type\fR \fB-s name\fR.
++Sort output by this field. The \fIs\fR and \fIS\fR flags may be specified multiple times to sort first by one field, then by another. The default is \fB\-s type\fR \fB\-s name\fR.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-S\fR \fIfield\fR\fR
++\fB\fB\-S\fR \fIfield\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Sort by this field in reverse order. See \fB-s\fR.
++Sort by this field in reverse order. See \fB\-s\fR.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-t\fR \fItype\fR[,...]\fR
++\fB\fB\-t\fR \fItype\fR[,...]\fR
+ .ad
+ .sp .6
+ .RS 4n
+ Print only the specified types from the following set, \fBall,posixuser,smbuser,posixgroup,smbgroup\fR.
+ .sp
+-The default is \fB-t posixuser,smbuser\fR
++The default is \fB\-t posixuser,smbuser\fR
+ .sp
+ The default can be changed to include group types.
+ .RE
+@@ -1933,11 +1933,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-i\fR\fR
++\fB\fB\-i\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Translate SID to POSIX ID. The POSIX ID may be ephemeral if no mapping exists. Normal POSIX interfaces (for example, \fBstat\fR(2), \fBls\fR \fB-l\fR) perform this translation, so the \fB-i\fR option allows the output from \fBzfs userspace\fR to be compared directly with those utilities. However, \fB-i\fR may lead to confusion if some files were created by an SMB user before a SMB-to-POSIX name mapping was established. In such a case, some files are owned by the SMB entity and some by the POSIX entity. However, the \fB-i\fR option will report that the POSIX entity has the total usage and quota for both.
++Translate SID to POSIX ID. The POSIX ID may be ephemeral if no mapping exists. Normal POSIX interfaces (for example, \fBstat\fR(2), \fBls\fR \fB\-l\fR) perform this translation, so the \fB\-i\fR option allows the output from \fBzfs userspace\fR to be compared directly with those utilities. However, \fB\-i\fR may lead to confusion if some files were created by an SMB user before a SMB\-to\-POSIX name mapping was established. In such a case, some files are owned by the SMB entity and some by the POSIX entity. However, the \fB\-i\fR option will report that the POSIX entity has the total usage and quota for both.
+ .RE
+ 
+ .RE
+@@ -1946,15 +1946,15 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs groupspace\fR [\fB-niHp\fR] [\fB-o\fR \fIfield\fR[,...]] [\fB-sS\fR \fIfield\fR]... [\fB-t\fR \fItype\fR [,...]] \fIfilesystem\fR | \fIsnapshot\fR\fR
++\fB\fBzfs groupspace\fR [\fB\-niHp\fR] [\fB\-o\fR \fIfield\fR[,...]] [\fB\-sS\fR \fIfield\fR]... [\fB\-t\fR \fItype\fR [,...]] \fIfilesystem\fR | \fIsnapshot\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Displays space consumed by, and quotas on, each group in the specified filesystem or snapshot. This subcommand is identical to \fBzfs userspace\fR, except that the default types to display are \fB-t posixgroup,smbgroup\fR.
++Displays space consumed by, and quotas on, each group in the specified filesystem or snapshot. This subcommand is identical to \fBzfs userspace\fR, except that the default types to display are \fB\-t posixgroup,smbgroup\fR.
+ .sp
+ .in +2
+ .nf
+--
++\-
+ .fi
+ .in -2
+ .sp
+@@ -1976,7 +1976,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs mount\fR [\fB-vO\fR] [\fB-o\fR \fIoptions\fR] \fB-a\fR | \fIfilesystem\fR\fR
++\fB\fBzfs mount\fR [\fB\-vO\fR] [\fB\-o\fR \fIoptions\fR] \fB\-a\fR | \fIfilesystem\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1985,18 +1985,18 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIoptions\fR\fR
++\fB\fB\-o\fR \fIoptions\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-An optional, comma-separated list of mount options to use temporarily for the duration of the mount. See the "Temporary Mount Point Properties" section for details.
++An optional, comma\-separated list of mount options to use temporarily for the duration of the mount. See the "Temporary Mount Point Properties" section for details.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-O\fR\fR
++\fB\fB\-O\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2007,7 +2007,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-v\fR\fR
++\fB\fB\-v\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2018,7 +2018,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-a\fR\fR
++\fB\fB\-a\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2042,7 +2042,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs unmount\fR [\fB-f\fR] \fB-a\fR | \fIfilesystem\fR|\fImountpoint\fR\fR
++\fB\fBzfs unmount\fR [\fB\-f\fR] \fB\-a\fR | \fIfilesystem\fR|\fImountpoint\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2051,7 +2051,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-f\fR\fR
++\fB\fB\-f\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2062,7 +2062,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-a\fR\fR
++\fB\fB\-a\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2086,7 +2086,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs share\fR \fB-a\fR | \fIfilesystem\fR\fR
++\fB\fBzfs share\fR \fB\-a\fR | \fIfilesystem\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2095,7 +2095,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-a\fR\fR
++\fB\fB\-a\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2119,7 +2119,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs unshare\fR \fB-a\fR | \fIfilesystem\fR|\fImountpoint\fR\fR
++\fB\fBzfs unshare\fR \fB\-a\fR | \fIfilesystem\fR|\fImountpoint\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2128,7 +2128,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-a\fR\fR
++\fB\fB\-a\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2152,7 +2152,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs send\fR [\fB-vR\fR] [\fB-\fR[\fBiI\fR] \fIsnapshot\fR] \fIsnapshot\fR\fR
++\fB\fBzfs send\fR [\fB\-vR\fR] [\fB\-\fR[\fBiI\fR] \fIsnapshot\fR] \fIsnapshot\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2161,7 +2161,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-i\fR \fIsnapshot\fR\fR
++\fB\fB\-i\fR \fIsnapshot\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2174,31 +2174,31 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-I\fR \fIsnapshot\fR\fR
++\fB\fB\-I\fR \fIsnapshot\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Generate a stream package that sends all intermediary snapshots from the first snapshot to the second snapshot. For example, \fB-I @a fs@d\fR is similar to \fB-i @a fs@b; -i @b fs@c; -i @c fs@d\fR. The incremental source snapshot may be specified as with the \fB-i\fR option.
++Generate a stream package that sends all intermediary snapshots from the first snapshot to the second snapshot. For example, \fB\-I @a fs@d\fR is similar to \fB\-i @a fs@b; \-i @b fs@c; \-i @c fs@d\fR. The incremental source snapshot may be specified as with the \fB\-i\fR option.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-R\fR\fR
++\fB\fB\-R\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+ Generate a replication stream package, which will replicate the specified filesystem, and all descendent file systems, up to the named snapshot. When received, all properties, snapshots, descendent file systems, and clones are preserved.
+ .sp
+-If the \fB-i\fR or \fB-I\fR flags are used in conjunction with the \fB-R\fR flag, an incremental replication stream is generated. The current values of properties, and current snapshot and file system names are set when the stream is received. If the \fB-F\fR flag is specified when this stream is received, snapshots and file systems that do not exist on the sending side are destroyed. 
++If the \fB\-i\fR or \fB\-I\fR flags are used in conjunction with the \fB\-R\fR flag, an incremental replication stream is generated. The current values of properties, and current snapshot and file system names are set when the stream is received. If the \fB\-F\fR flag is specified when this stream is received, snapshots and file systems that do not exist on the sending side are destroyed. 
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-v\fR\fR
++\fB\fB\-v\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2212,11 +2212,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs receive\fR [\fB-vnFu\fR] \fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR\fR
++\fB\fBzfs receive\fR [\fB\-vnFu\fR] \fIfilesystem\fR|\fIvolume\fR|\fIsnapshot\fR\fR
+ .ad
+ .br
+ .na
+-\fB\fBzfs receive\fR [\fB-vnFu\fR] \fB-d\fR \fIfilesystem\fR\fR
++\fB\fBzfs receive\fR [\fB\-vnFu\fR] \fB\-d\fR \fIfilesystem\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2224,16 +2224,16 @@
+ .sp
+ If an incremental stream is received, then the destination file system must already exist, and its most recent snapshot must match the incremental stream's source. For \fBzvols\fR, the destination device link is destroyed and recreated, which means the \fBzvol\fR cannot be accessed during the \fBreceive\fR operation.
+ .sp
+-When a snapshot replication package stream that is generated by using the \fBzfs send\fR \fB-R\fR command is  received, any snapshots that do not exist on the sending location are destroyed by using the \fBzfs destroy\fR \fB-d\fR command.
++When a snapshot replication package stream that is generated by using the \fBzfs send\fR \fB\-R\fR command is  received, any snapshots that do not exist on the sending location are destroyed by using the \fBzfs destroy\fR \fB\-d\fR command.
+ .sp
+-The name of the snapshot (and file system, if a full stream is received) that this subcommand creates depends on the argument type and the \fB-d\fR option.
++The name of the snapshot (and file system, if a full stream is received) that this subcommand creates depends on the argument type and the \fB\-d\fR option.
+ .sp
+-If the argument is a snapshot name, the specified \fIsnapshot\fR is created. If the argument is a file system or volume name, a snapshot with the same name as the sent snapshot is created within the specified \fIfilesystem\fR or \fIvolume\fR. If the \fB-d\fR option is specified, the snapshot name is determined by appending the sent snapshot's name to the specified \fIfilesystem\fR. If the \fB-d\fR option is specified, any required file systems within the specified one are created.
++If the argument is a snapshot name, the specified \fIsnapshot\fR is created. If the argument is a file system or volume name, a snapshot with the same name as the sent snapshot is created within the specified \fIfilesystem\fR or \fIvolume\fR. If the \fB\-d\fR option is specified, the snapshot name is determined by appending the sent snapshot's name to the specified \fIfilesystem\fR. If the \fB\-d\fR option is specified, any required file systems within the specified one are created.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-d\fR\fR
++\fB\fB\-d\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2244,7 +2244,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-u\fR\fR
++\fB\fB\-u\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2255,7 +2255,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-v\fR\fR
++\fB\fB\-v\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2266,22 +2266,22 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-n\fR\fR
++\fB\fB\-n\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Do not actually receive the stream. This can be useful in conjunction with the \fB-v\fR option to verify the name the receive operation would use.
++Do not actually receive the stream. This can be useful in conjunction with the \fB\-v\fR option to verify the name the receive operation would use.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-F\fR\fR
++\fB\fB\-F\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Force a rollback of the file system to the most recent snapshot before performing the receive operation. If receiving an incremental replication stream (for example, one generated by \fBzfs send -R -[iI]\fR), destroy snapshots and file systems that do not exist on the sending side.
++Force a rollback of the file system to the most recent snapshot before performing the receive operation. If receiving an incremental replication stream (for example, one generated by \fBzfs send \-R \-[iI]\fR), destroy snapshots and file systems that do not exist on the sending side.
+ .RE
+ 
+ .RE
+@@ -2301,46 +2301,46 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs allow\fR [\fB-ldug\fR] "\fIeveryone\fR"|\fIuser\fR|\fIgroup\fR[,...] \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR| \fIvolume\fR\fR
++\fB\fBzfs allow\fR [\fB\-ldug\fR] "\fIeveryone\fR"|\fIuser\fR|\fIgroup\fR[,...] \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR| \fIvolume\fR\fR
+ .ad
+ .br
+ .na
+-\fB\fBzfs allow\fR [\fB-ld\fR] \fB-e\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR | \fIvolume\fR\fR
++\fB\fBzfs allow\fR [\fB\-ld\fR] \fB\-e\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR | \fIvolume\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Delegates \fBZFS\fR administration permission for the file systems to non-privileged users.
++Delegates \fBZFS\fR administration permission for the file systems to non\-privileged users.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB[\fB-ug\fR] "\fIeveryone\fR"|\fIuser\fR|\fIgroup\fR[,...]\fR
++\fB[\fB\-ug\fR] "\fIeveryone\fR"|\fIuser\fR|\fIgroup\fR[,...]\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Specifies to whom the permissions are delegated. Multiple entities can be specified as a comma-separated list. If neither of the \fB-ug\fR options are specified, then the argument is interpreted preferentially as the keyword "everyone", then as a user name, and lastly as a group name. To specify a user or group named "everyone", use the \fB-u\fR or \fB-g\fR options. To specify a group with the same name as a user, use the \fB-g\fR options.
++Specifies to whom the permissions are delegated. Multiple entities can be specified as a comma\-separated list. If neither of the \fB\-ug\fR options are specified, then the argument is interpreted preferentially as the keyword "everyone", then as a user name, and lastly as a group name. To specify a user or group named "everyone", use the \fB\-u\fR or \fB\-g\fR options. To specify a group with the same name as a user, use the \fB\-g\fR options.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB[\fB-e\fR] \fIperm\fR|@\fIsetname\fR[,...]\fR
++\fB[\fB\-e\fR] \fIperm\fR|@\fIsetname\fR[,...]\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Specifies that the permissions be delegated to "everyone." Multiple permissions may be specified as a comma-separated list. Permission names are the same as \fBZFS\fR subcommand and property names. See the property list below. Property set names, which begin with an at sign (\fB@\fR) , may be specified. See the \fB-s\fR form below for details.
++Specifies that the permissions be delegated to "everyone." Multiple permissions may be specified as a comma\-separated list. Permission names are the same as \fBZFS\fR subcommand and property names. See the property list below. Property set names, which begin with an at sign (\fB@\fR) , may be specified. See the \fB\-s\fR form below for details.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB[\fB-ld\fR] \fIfilesystem\fR|\fIvolume\fR\fR
++\fB[\fB\-ld\fR] \fIfilesystem\fR|\fIvolume\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Specifies where the permissions are delegated. If neither of the \fB-ld\fR options are specified, or both are, then the permissions are allowed for the file system or volume, and all of its descendents. If only the \fB-l\fR option is used, then is allowed "locally" only for the specified file system. If only the \fB-d\fR option is used, then is allowed only for the descendent file systems.
++Specifies where the permissions are delegated. If neither of the \fB\-ld\fR options are specified, or both are, then the permissions are allowed for the file system or volume, and all of its descendents. If only the \fB\-l\fR option is used, then is allowed "locally" only for the specified file system. If only the \fB\-d\fR option is used, then is allowed only for the descendent file systems.
+ .RE
+ 
+ .RE
+@@ -2416,18 +2416,18 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs allow\fR \fB-c\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR|\fIvolume\fR\fR
++\fB\fBzfs allow\fR \fB\-c\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR|\fIvolume\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Sets "create time" permissions. These permissions are granted (locally) to the creator of any newly-created descendent file system.
++Sets "create time" permissions. These permissions are granted (locally) to the creator of any newly\-created descendent file system.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs allow\fR \fB-s\fR @\fIsetname\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR|\fIvolume\fR\fR
++\fB\fBzfs allow\fR \fB\-s\fR @\fIsetname\fR \fIperm\fR|@\fIsetname\fR[,...] \fIfilesystem\fR|\fIvolume\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2438,15 +2438,15 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs unallow\fR [\fB-rldug\fR] "\fIeveryone\fR"|\fIuser\fR|\fIgroup\fR[,...] [\fIperm\fR|@\fIsetname\fR[, ...]] \fIfilesystem\fR|\fIvolume\fR\fR
++\fB\fBzfs unallow\fR [\fB\-rldug\fR] "\fIeveryone\fR"|\fIuser\fR|\fIgroup\fR[,...] [\fIperm\fR|@\fIsetname\fR[, ...]] \fIfilesystem\fR|\fIvolume\fR\fR
+ .ad
+ .br
+ .na
+-\fB\fBzfs unallow\fR [\fB-rld\fR] \fB-e\fR [\fIperm\fR|@\fIsetname\fR [,...]] \fIfilesystem\fR|\fIvolume\fR\fR
++\fB\fBzfs unallow\fR [\fB\-rld\fR] \fB\-e\fR [\fIperm\fR|@\fIsetname\fR [,...]] \fIfilesystem\fR|\fIvolume\fR\fR
+ .ad
+ .br
+ .na
+-\fB\fBzfs unallow\fR [\fB-r\fR] \fB-c\fR [\fIperm\fR|@\fIsetname\fR[,...]]\fR
++\fB\fBzfs unallow\fR [\fB\-r\fR] \fB\-c\fR [\fIperm\fR|@\fIsetname\fR[,...]]\fR
+ .ad
+ .br
+ .na
+@@ -2454,12 +2454,12 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Removes permissions that were granted with the \fBzfs allow\fR command. No permissions are explicitly denied, so other permissions granted are still in effect. For example, if the permission is granted by an ancestor. If no permissions are specified, then all permissions for the specified \fIuser\fR, \fIgroup\fR, or \fIeveryone\fR are removed. Specifying "everyone" (or using the \fB-e\fR option) only removes the permissions that were granted to "everyone", not all permissions for every user and group. See the \fBzfs allow\fR command for a description of the \fB-ldugec\fR options.
++Removes permissions that were granted with the \fBzfs allow\fR command. No permissions are explicitly denied, so other permissions granted are still in effect. For example, if the permission is granted by an ancestor. If no permissions are specified, then all permissions for the specified \fIuser\fR, \fIgroup\fR, or \fIeveryone\fR are removed. Specifying "everyone" (or using the \fB\-e\fR option) only removes the permissions that were granted to "everyone", not all permissions for every user and group. See the \fBzfs allow\fR command for a description of the \fB\-ldugec\fR options.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2472,7 +2472,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs unallow\fR [\fB-r\fR] \fB-s\fR @\fIsetname\fR [\fIperm\fR|@\fIsetname\fR[,...]]\fR
++\fB\fBzfs unallow\fR [\fB\-r\fR] \fB\-s\fR @\fIsetname\fR [\fIperm\fR|@\fIsetname\fR[,...]]\fR
+ .ad
+ .br
+ .na
+@@ -2487,7 +2487,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs hold\fR [\fB-r\fR] \fItag\fR \fIsnapshot\fR...\fR
++\fB\fBzfs hold\fR [\fB\-r\fR] \fItag\fR \fIsnapshot\fR...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2498,7 +2498,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2511,7 +2511,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs holds\fR [\fB-r\fR] \fIsnapshot\fR...\fR
++\fB\fBzfs holds\fR [\fB\-r\fR] \fIsnapshot\fR...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2520,7 +2520,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2533,7 +2533,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzfs release\fR [\fB-r\fR] \fItag\fR \fIsnapshot\fR...\fR
++\fB\fBzfs release\fR [\fB\-r\fR] \fItag\fR \fIsnapshot\fR...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2544,7 +2544,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-r\fR\fR
++\fB\fB\-r\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -2612,8 +2612,8 @@
+ .sp
+ .in +2
+ .nf
+-# \fBzfs snapshot -r pool/home@yesterday\fR
+-# \fBzfs destroy -r pool/home@yesterday\fR
++# \fBzfs snapshot \-r pool/home@yesterday\fR
++# \fBzfs destroy \-r pool/home@yesterday\fR
+ .fi
+ .in -2
+ .sp
+@@ -2677,13 +2677,13 @@
+ .nf
+ # \fBzfs get all pool/home/bob\fR
+ NAME           PROPERTY              VALUE                  SOURCE
+-pool/home/bob  type                  filesystem             -
+-pool/home/bob  creation              Tue Jul 21 15:53 2009  -
+-pool/home/bob  used                  21K                    -
+-pool/home/bob  available             20.0G                  -
+-pool/home/bob  referenced            21K                    -
+-pool/home/bob  compressratio         1.00x                  -
+-pool/home/bob  mounted               yes                    -
++pool/home/bob  type                  filesystem             \-
++pool/home/bob  creation              Tue Jul 21 15:53 2009  \-
++pool/home/bob  used                  21K                    \-
++pool/home/bob  available             20.0G                  \-
++pool/home/bob  referenced            21K                    \-
++pool/home/bob  compressratio         1.00x                  \-
++pool/home/bob  mounted               yes                    \-
+ pool/home/bob  quota                 20G                    local
+ pool/home/bob  reservation           none                   default
+ pool/home/bob  recordsize            128K                   default
+@@ -2704,10 +2704,10 @@
+ pool/home/bob  shareiscsi            off                    default
+ pool/home/bob  xattr                 on                     default
+ pool/home/bob  copies                1                      default
+-pool/home/bob  version               4                      -
+-pool/home/bob  utf8only              off                    -
+-pool/home/bob  normalization         none                   -
+-pool/home/bob  casesensitivity       sensitive              -
++pool/home/bob  version               4                      \-
++pool/home/bob  utf8only              off                    \-
++pool/home/bob  normalization         none                   \-
++pool/home/bob  casesensitivity       sensitive              \-
+ pool/home/bob  vscan                 off                    default
+ pool/home/bob  nbmand                off                    default
+ pool/home/bob  sharesmb              off                    default
+@@ -2715,10 +2715,10 @@
+ pool/home/bob  refreservation        none                   default
+ pool/home/bob  primarycache          all                    default
+ pool/home/bob  secondarycache        all                    default
+-pool/home/bob  usedbysnapshots       0                      -
+-pool/home/bob  usedbydataset         21K                    -
+-pool/home/bob  usedbychildren        0                      -
+-pool/home/bob  usedbyrefreservation  0                      -
++pool/home/bob  usedbysnapshots       0                      \-
++pool/home/bob  usedbydataset         21K                    \-
++pool/home/bob  usedbychildren        0                      \-
++pool/home/bob  usedbyrefreservation  0                      \-
+ .fi
+ .in -2
+ .sp
+@@ -2730,7 +2730,7 @@
+ .sp
+ .in +2
+ .nf
+-# \fBzfs get -H -o value compression pool/home/bob\fR
++# \fBzfs get \-H \-o value compression pool/home/bob\fR
+ on
+ .fi
+ .in -2
+@@ -2743,7 +2743,7 @@
+ .sp
+ .in +2
+ .nf
+-# \fBzfs get -r -s local -o name,property,value all pool/home/bob\fR
++# \fBzfs get \-r \-s local \-o name,property,value all pool/home/bob\fR
+ NAME           PROPERTY              VALUE
+ pool/home/bob  quota                 20G
+ pool/home/bob  compression           on
+@@ -2760,7 +2760,7 @@
+ .sp
+ .in +2
+ .nf
+-# \fBzfs rollback -r pool/home/anne@yesterday\fR
++# \fBzfs rollback \-r pool/home/anne@yesterday\fR
+ .fi
+ .in -2
+ .sp
+@@ -2827,14 +2827,14 @@
+ .nf
+ # \fBzfs send pool/fs@a | \e\fR
+    \fBssh host zfs receive poolB/received/fs@a\fR
+-# \fBzfs send -i a pool/fs@b | ssh host \e\fR
++# \fBzfs send \-i a pool/fs@b | ssh host \e\fR
+    \fBzfs receive poolB/received/fs\fR
+ .fi
+ .in -2
+ .sp
+ 
+ .LP
+-\fBExample 13 \fRUsing the \fBzfs receive\fR \fB-d\fR Option
++\fBExample 13 \fRUsing the \fBzfs receive\fR \fB\-d\fR Option
+ .sp
+ .LP
+ The following command sends a full stream of \fBpoolA/fsA/fsB@snap\fR to a remote machine, receiving it into \fBpoolB/received/fsA/fsB@snap\fR. The \fBfsA/fsB@snap\fR portion of the received snapshot's name is determined from the name of the sent snapshot. \fBpoolB\fR must contain the file system \fBpoolB/received\fR. If \fBpoolB/received/fsA\fR does not exist, it is created as an empty file system.
+@@ -2843,7 +2843,7 @@
+ .in +2
+ .nf
+ # \fBzfs send poolA/fsA/fsB@snap | \e
+-   ssh host zfs receive -d poolB/received\fR
++   ssh host zfs receive \-d poolB/received\fR
+ .fi
+ .in -2
+ .sp
+@@ -2852,7 +2852,7 @@
+ \fBExample 14 \fRSetting User Properties
+ .sp
+ .LP
+-The following example sets the user-defined \fBcom.example:department\fR property for a dataset.
++The following example sets the user\-defined \fBcom.example:department\fR property for a dataset.
+ 
+ .sp
+ .in +2
+@@ -2871,12 +2871,12 @@
+ .sp
+ .in +2
+ .nf
+-# \fBzfs create -V 2g pool/volumes/vol1\fR
++# \fBzfs create \-V 2g pool/volumes/vol1\fR
+ # \fBzfs set shareiscsi=on pool/volumes/vol1\fR
+ # \fBiscsitadm list target\fR
+ Target: pool/volumes/vol1
+  iSCSI Name: 
+- iqn.1986-03.com.sun:02:7b4b02a6-3277-eb1b-e686-a24762c52a8c
++ iqn.1986\-03.com.sun:02:7b4b02a6\-3277\-eb1b\-e686\-a24762c52a8c
+  Connections: 0
+ .fi
+ .in -2
+@@ -2894,15 +2894,15 @@
+ .sp
+ .in +2
+ .nf
+-# \fBzfs destroy -r pool/users@7daysago\fR
+-# \fBzfs rename -r pool/users@6daysago @7daysago\fR
+-# \fBzfs rename -r pool/users@5daysago @6daysago\fR
+-# \fBzfs rename -r pool/users@yesterday @5daysago\fR
+-# \fBzfs rename -r pool/users@yesterday @4daysago\fR
+-# \fBzfs rename -r pool/users@yesterday @3daysago\fR
+-# \fBzfs rename -r pool/users@yesterday @2daysago\fR
+-# \fBzfs rename -r pool/users@today @yesterday\fR
+-# \fBzfs snapshot -r pool/users@today\fR
++# \fBzfs destroy \-r pool/users@7daysago\fR
++# \fBzfs rename \-r pool/users@6daysago @7daysago\fR
++# \fBzfs rename \-r pool/users@5daysago @6daysago\fR
++# \fBzfs rename \-r pool/users@yesterday @5daysago\fR
++# \fBzfs rename \-r pool/users@yesterday @4daysago\fR
++# \fBzfs rename \-r pool/users@yesterday @3daysago\fR
++# \fBzfs rename \-r pool/users@yesterday @2daysago\fR
++# \fBzfs rename \-r pool/users@today @yesterday\fR
++# \fBzfs snapshot \-r pool/users@today\fR
+ .fi
+ .in -2
+ .sp
+@@ -2936,10 +2936,10 @@
+ .nf
+ # \fBzfs allow cindys create,destroy,mount,snapshot tank/cindys\fR
+ # \fBzfs allow tank/cindys\fR
+--------------------------------------------------------------
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+ Local+Descendent permissions on (tank/cindys)
+           user cindys create,destroy,mount,snapshot
+--------------------------------------------------------------
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+ .fi
+ .in -2
+ .sp
+@@ -2965,14 +2965,14 @@
+ .in +2
+ .nf
+ # \fB# zfs allow staff create,mount tank/users\fR
+-# \fBzfs allow -c destroy tank/users\fR
++# \fBzfs allow \-c destroy tank/users\fR
+ # \fBzfs allow tank/users\fR
+--------------------------------------------------------------
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+ Create time permissions on (tank/users)
+           create,destroy
+ Local+Descendent permissions on (tank/users)
+           group staff create,mount
+-------------------------------------------------------------- 
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\- 
+ .fi
+ .in -2
+ .sp
+@@ -2986,17 +2986,17 @@
+ .sp
+ .in +2
+ .nf
+-# \fBzfs allow -s @pset create,destroy,snapshot,mount tank/users\fR
++# \fBzfs allow \-s @pset create,destroy,snapshot,mount tank/users\fR
+ # \fBzfs allow staff @pset tank/users\fR
+ # \fBzfs allow tank/users\fR
+--------------------------------------------------------------
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+ Permission sets on (tank/users)
+         @pset create,destroy,mount,snapshot
+ Create time permissions on (tank/users)
+         create,destroy
+ Local+Descendent permissions on (tank/users)
+         group staff @pset,create,mount
+--------------------------------------------------------------
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+ .fi
+ .in -2
+ .sp
+@@ -3012,10 +3012,10 @@
+ .nf
+ # \fBzfs allow cindys quota,reservation users/home\fR
+ # \fBzfs allow users/home\fR
+--------------------------------------------------------------
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+ Local+Descendent permissions on (users/home)
+         user cindys quota,reservation
+--------------------------------------------------------------
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+ cindys% \fBzfs set quota=10G users/home/marks\fR
+ cindys% \fBzfs get quota users/home/marks\fR
+ NAME              PROPERTY  VALUE             SOURCE
+@@ -3035,14 +3035,14 @@
+ .nf
+ # \fBzfs unallow staff snapshot tank/users\fR
+ # \fBzfs allow tank/users\fR
+--------------------------------------------------------------
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+ Permission sets on (tank/users)
+         @pset create,destroy,mount,snapshot
+ Create time permissions on (tank/users)
+         create,destroy
+ Local+Descendent permissions on (tank/users)
+         group staff @pset,create,mount
+-------------------------------------------------------------- 
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\- 
+ .fi
+ .in -2
+ .sp
+@@ -3112,4 +3112,4 @@
+ See the \fBgzip\fR(1) man page, which is not part of the SunOS man page collection.
+ .sp
+ .LP
+-For information about using the \fBZFS\fR web-based management tool and other \fBZFS\fR features, see the \fISolaris ZFS Administration Guide\fR.
++For information about using the \fBZFS\fR web\-based management tool and other \fBZFS\fR features, see the \fISolaris ZFS Administration Guide\fR.
+--- a/cddl/contrib/opensolaris/cmd/zpool/zpool.8
++++ b/cddl/contrib/opensolaris/cmd/zpool/zpool.8
+@@ -9,17 +9,17 @@
+ .SH SYNOPSIS
+ .LP
+ .nf
+-\fBzpool\fR [\fB-?\fR]
++\fBzpool\fR [\fB\-?\fR]
+ .fi
+ 
+ .LP
+ .nf
+-\fBzpool add\fR [\fB-fn\fR] \fIpool\fR \fIvdev\fR ...
++\fBzpool add\fR [\fB\-fn\fR] \fIpool\fR \fIvdev\fR ...
+ .fi
+ 
+ .LP
+ .nf
+-\fBzpool attach\fR [\fB-f\fR] \fIpool\fR \fIdevice\fR \fInew_device\fR
++\fBzpool attach\fR [\fB\-f\fR] \fIpool\fR \fIdevice\fR \fInew_device\fR
+ .fi
+ 
+ .LP
+@@ -29,13 +29,13 @@
+ 
+ .LP
+ .nf
+-\fBzpool create\fR [\fB-fn\fR] [\fB-o\fR \fIproperty=value\fR] ... [\fB-O\fR \fIfile-system-property=value\fR] 
+-     ... [\fB-m\fR \fImountpoint\fR] [\fB-R\fR \fIroot\fR] \fIpool\fR \fIvdev\fR ...
++\fBzpool create\fR [\fB\-fn\fR] [\fB\-o\fR \fIproperty=value\fR] ... [\fB\-O\fR \fIfile\-system\-property=value\fR] 
++     ... [\fB\-m\fR \fImountpoint\fR] [\fB\-R\fR \fIroot\fR] \fIpool\fR \fIvdev\fR ...
+ .fi
+ 
+ .LP
+ .nf
+-\fBzpool destroy\fR [\fB-f\fR] \fIpool\fR
++\fBzpool destroy\fR [\fB\-f\fR] \fIpool\fR
+ .fi
+ 
+ .LP
+@@ -45,7 +45,7 @@
+ 
+ .LP
+ .nf
+-\fBzpool export\fR [\fB-f\fR] \fIpool\fR ...
++\fBzpool export\fR [\fB\-f\fR] \fIpool\fR ...
+ .fi
+ 
+ .LP
+@@ -55,39 +55,39 @@
+ 
+ .LP
+ .nf
+-\fBzpool history\fR [\fB-il\fR] [\fIpool\fR] ...
++\fBzpool history\fR [\fB\-il\fR] [\fIpool\fR] ...
+ .fi
+ 
+ .LP
+ .nf
+-\fBzpool import\fR [\fB-d\fR \fIdir\fR] [\fB-D\fR]
++\fBzpool import\fR [\fB\-d\fR \fIdir\fR] [\fB\-D\fR]
+ .fi
+ 
+ .LP
+ .nf
+-\fBzpool import\fR [\fB-o \fImntopts\fR\fR] [\fB-o\fR \fIproperty=value\fR] ... [\fB-d\fR \fIdir\fR | \fB-c\fR \fIcachefile\fR] 
+-     [\fB-D\fR] [\fB-f\fR] [\fB-R\fR \fIroot\fR] \fB-a\fR
++\fBzpool import\fR [\fB\-o \fImntopts\fR\fR] [\fB\-o\fR \fIproperty=value\fR] ... [\fB\-d\fR \fIdir\fR | \fB\-c\fR \fIcachefile\fR] 
++     [\fB\-D\fR] [\fB\-f\fR] [\fB\-R\fR \fIroot\fR] \fB\-a\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzpool import\fR [\fB-o \fImntopts\fR\fR] [\fB-o\fR \fIproperty=value\fR] ... [\fB-d\fR \fIdir\fR | \fB-c\fR \fIcachefile\fR]
+-     [\fB-D\fR] [\fB-f\fR] [\fB-R\fR \fIroot\fR] \fIpool\fR |\fIid\fR [\fInewpool\fR]
++\fBzpool import\fR [\fB\-o \fImntopts\fR\fR] [\fB\-o\fR \fIproperty=value\fR] ... [\fB\-d\fR \fIdir\fR | \fB\-c\fR \fIcachefile\fR]
++     [\fB\-D\fR] [\fB\-f\fR] [\fB\-R\fR \fIroot\fR] \fIpool\fR |\fIid\fR [\fInewpool\fR]
+ .fi
+ 
+ .LP
+ .nf
+-\fBzpool iostat\fR [\fB-T\fR u | d ] [\fB-v\fR] [\fIpool\fR] ... [\fIinterval\fR[\fIcount\fR]]
++\fBzpool iostat\fR [\fB\-T\fR u | d ] [\fB\-v\fR] [\fIpool\fR] ... [\fIinterval\fR[\fIcount\fR]]
+ .fi
+ 
+ .LP
+ .nf
+-\fBzpool list\fR [\fB-H\fR] [\fB-o\fR \fIproperty\fR[,...]] [\fIpool\fR] ...
++\fBzpool list\fR [\fB\-H\fR] [\fB\-o\fR \fIproperty\fR[,...]] [\fIpool\fR] ...
+ .fi
+ 
+ .LP
+ .nf
+-\fBzpool offline\fR [\fB-t\fR] \fIpool\fR \fIdevice\fR ...
++\fBzpool offline\fR [\fB\-t\fR] \fIpool\fR \fIdevice\fR ...
+ .fi
+ 
+ .LP
+@@ -102,12 +102,12 @@
+ 
+ .LP
+ .nf
+-\fBzpool replace\fR [\fB-f\fR] \fIpool\fR \fIdevice\fR [\fInew_device\fR]
++\fBzpool replace\fR [\fB\-f\fR] \fIpool\fR \fIdevice\fR [\fInew_device\fR]
+ .fi
+ 
+ .LP
+ .nf
+-\fBzpool scrub\fR [\fB-s\fR] \fIpool\fR ...
++\fBzpool scrub\fR [\fB\-s\fR] \fIpool\fR ...
+ .fi
+ 
+ .LP
+@@ -117,7 +117,7 @@
+ 
+ .LP
+ .nf
+-\fBzpool status\fR [\fB-xv\fR] [\fIpool\fR] ...
++\fBzpool status\fR [\fB\-xv\fR] [\fIpool\fR] ...
+ .fi
+ 
+ .LP
+@@ -127,12 +127,12 @@
+ 
+ .LP
+ .nf
+-\fBzpool upgrade\fR \fB-v\fR
++\fBzpool upgrade\fR \fB\-v\fR
+ .fi
+ 
+ .LP
+ .nf
+-\fBzpool upgrade\fR [\fB-V\fR \fIversion\fR] \fB-a\fR | \fIpool\fR ...
++\fBzpool upgrade\fR [\fB\-V\fR \fIversion\fR] \fB\-a\fR | \fIpool\fR ...
+ .fi
+ 
+ .SH DESCRIPTION
+@@ -176,7 +176,7 @@
+ .ad
+ .RS 10n
+ .rt  
+-A mirror of two or more devices. Data is replicated in an identical fashion across all components of a mirror. A mirror with \fIN\fR disks of size \fIX\fR can hold \fIX\fR bytes and can withstand (\fIN-1\fR) devices failing before data integrity is compromised.
++A mirror of two or more devices. Data is replicated in an identical fashion across all components of a mirror. A mirror with \fIN\fR disks of size \fIX\fR can hold \fIX\fR bytes and can withstand (\fIN\-1\fR) devices failing before data integrity is compromised.
+ .RE
+ 
+ .sp
+@@ -199,11 +199,11 @@
+ .ad
+ .RS 10n
+ .rt  
+-A variation on \fBRAID-5\fR that allows for better distribution of parity and eliminates the "\fBRAID-5\fR write hole" (in which data and parity become inconsistent after a power loss). Data and parity is striped across all disks within a \fBraidz\fR group.
++A variation on \fBRAID\-5\fR that allows for better distribution of parity and eliminates the "\fBRAID\-5\fR write hole" (in which data and parity become inconsistent after a power loss). Data and parity is striped across all disks within a \fBraidz\fR group.
+ .sp
+-A \fBraidz\fR group can have single-, double- , or triple parity, meaning that the \fBraidz\fR group can sustain one, two, or three failures, respectively, without losing any data. The \fBraidz1\fR \fBvdev\fR type specifies a single-parity \fBraidz\fR group; the \fBraidz2\fR \fBvdev\fR type specifies a double-parity \fBraidz\fR group; and the \fBraidz3\fR \fBvdev\fR type specifies a triple-parity \fBraidz\fR group. The \fBraidz\fR \fBvdev\fR type is an alias for \fBraidz1\fR.
++A \fBraidz\fR group can have single\-, double\- , or triple parity, meaning that the \fBraidz\fR group can sustain one, two, or three failures, respectively, without losing any data. The \fBraidz1\fR \fBvdev\fR type specifies a single\-parity \fBraidz\fR group; the \fBraidz2\fR \fBvdev\fR type specifies a double\-parity \fBraidz\fR group; and the \fBraidz3\fR \fBvdev\fR type specifies a triple\-parity \fBraidz\fR group. The \fBraidz\fR \fBvdev\fR type is an alias for \fBraidz1\fR.
+ .sp
+-A \fBraidz\fR group with \fIN\fR disks of size \fIX\fR with \fIP\fR parity disks can hold approximately (\fIN-P\fR)*\fIX\fR bytes and can withstand \fIP\fR device(s) failing before data integrity is compromised. The minimum number of devices in a \fBraidz\fR group is one more than the number of parity disks. The recommended number is between 3 and 9 to help increase performance.
++A \fBraidz\fR group with \fIN\fR disks of size \fIX\fR with \fIP\fR parity disks can hold approximately (\fIN\-P\fR)*\fIX\fR bytes and can withstand \fIP\fR device(s) failing before data integrity is compromised. The minimum number of devices in a \fBraidz\fR group is one more than the number of parity disks. The recommended number is between 3 and 9 to help increase performance.
+ .RE
+ 
+ .sp
+@@ -214,7 +214,7 @@
+ .ad
+ .RS 10n
+ .rt  
+-A special pseudo-\fBvdev\fR which keeps track of available hot spares for a pool. For more information, see the "Hot Spares" section.
++A special pseudo\-\fBvdev\fR which keeps track of available hot spares for a pool. For more information, see the "Hot Spares" section.
+ .RE
+ 
+ .sp
+@@ -225,7 +225,7 @@
+ .ad
+ .RS 10n
+ .rt  
+-A separate-intent log device. If more than one log device is specified, then writes are load-balanced between devices. Log devices can be mirrored. However, \fBraidz\fR \fBvdev\fR types are not supported for the intent log. For more information, see the "Intent Log" section.
++A separate\-intent log device. If more than one log device is specified, then writes are load\-balanced between devices. Log devices can be mirrored. However, \fBraidz\fR \fBvdev\fR types are not supported for the intent log. For more information, see the "Intent Log" section.
+ .RE
+ 
+ .sp
+@@ -244,7 +244,7 @@
+ Virtual devices cannot be nested, so a mirror or \fBraidz\fR virtual device can only contain files or disks. Mirrors of mirrors (or other combinations) are not allowed.
+ .sp
+ .LP
+-A pool can have any number of virtual devices at the top of the configuration (known as "root vdevs"). Data is dynamically distributed across all top-level devices to balance data among devices. As new virtual devices are added, \fBZFS\fR automatically places data on the newly available devices.
++A pool can have any number of virtual devices at the top of the configuration (known as "root vdevs"). Data is dynamically distributed across all top\-level devices to balance data among devices. As new virtual devices are added, \fBZFS\fR automatically places data on the newly available devices.
+ .sp
+ .LP
+ Virtual devices are specified one at a time on the command line, separated by whitespace. The keywords "mirror" and "raidz" are used to distinguish where a group ends and another begins. For example, the following creates two root vdevs, each a mirror of two disks:
+@@ -262,13 +262,13 @@
+ \fBZFS\fR supports a rich set of mechanisms for handling device failure and data corruption. All metadata and data is checksummed, and \fBZFS\fR automatically repairs bad data from a good copy when corruption is detected.
+ .sp
+ .LP
+-In order to take advantage of these features, a pool must make use of some form of redundancy, using either mirrored or \fBraidz\fR groups. While \fBZFS\fR supports running in a non-redundant configuration, where each root vdev is simply a disk or file, this is strongly discouraged. A single case of bit corruption can render some or all of your data unavailable.
++In order to take advantage of these features, a pool must make use of some form of redundancy, using either mirrored or \fBraidz\fR groups. While \fBZFS\fR supports running in a non\-redundant configuration, where each root vdev is simply a disk or file, this is strongly discouraged. A single case of bit corruption can render some or all of your data unavailable.
+ .sp
+ .LP
+ A pool's health status is described by one of three states: online, degraded, or faulted. An online pool has all devices operating normally. A degraded pool is one in which one or more devices have failed, but the data is still available due to a redundant configuration. A faulted pool has corrupted metadata, or one or more faulted devices, and insufficient replicas to continue functioning. 
+ .sp
+ .LP
+-The health of the top-level vdev, such as mirror or \fBraidz\fR device, is potentially impacted by the state of its associated vdevs, or component devices. A top-level vdev or component device is in one of the following states:
++The health of the top\-level vdev, such as mirror or \fBraidz\fR device, is potentially impacted by the state of its associated vdevs, or component devices. A top\-level vdev or component device is in one of the following states:
+ .sp
+ .ne 2
+ .mk
+@@ -277,7 +277,7 @@
+ .ad
+ .RS 12n
+ .rt  
+-One or more top-level vdevs is in the degraded state because one or more component devices are offline. Sufficient replicas exist to continue functioning.
++One or more top\-level vdevs is in the degraded state because one or more component devices are offline. Sufficient replicas exist to continue functioning.
+ .sp
+ One or more component devices is in the degraded or faulted state, but sufficient replicas exist to continue functioning. The underlying conditions are as follows:
+ .RS +4
+@@ -302,7 +302,7 @@
+ .ad
+ .RS 12n
+ .rt  
+-One or more top-level vdevs is in the faulted state because one or more component devices are offline. Insufficient replicas exist to continue functioning. 
++One or more top\-level vdevs is in the faulted state because one or more component devices are offline. Insufficient replicas exist to continue functioning. 
+ .sp
+ One or more component devices is in the faulted state, and insufficient replicas exist to continue functioning. The underlying conditions are as follows:
+ .RS +4
+@@ -349,7 +349,7 @@
+ .ad
+ .RS 12n
+ .rt  
+-The device was physically removed while the system was running. Device removal detection is hardware-dependent and may not be supported on all platforms.
++The device was physically removed while the system was running. Device removal detection is hardware\-dependent and may not be supported on all platforms.
+ .RE
+ 
+ .sp
+@@ -365,7 +365,7 @@
+ 
+ .sp
+ .LP
+-If a device is removed and later re-attached to the system, \fBZFS\fR attempts to put the device online automatically. Device attach detection is hardware-dependent and might not be supported on all platforms.
++If a device is removed and later re\-attached to the system, \fBZFS\fR attempts to put the device online automatically. Device attach detection is hardware\-dependent and might not be supported on all platforms.
+ .SS "Hot Spares"
+ .sp
+ .LP
+@@ -386,7 +386,7 @@
+ If a pool has a shared spare that is currently being used, the pool can not be exported since other pools may use this shared spare, which may lead to potential data corruption.
+ .sp
+ .LP
+-An in-progress spare replacement can be cancelled by detaching the hot spare. If the original faulted device is detached, then the hot spare assumes its place in the configuration, and is removed from the spare list of all active pools.
++An in\-progress spare replacement can be cancelled by detaching the hot spare. If the original faulted device is detached, then the hot spare assumes its place in the configuration, and is removed from the spare list of all active pools.
+ .sp
+ .LP
+ Spares cannot replace log devices.
+@@ -407,11 +407,11 @@
+ Multiple log devices can also be specified, and they can be mirrored. See the EXAMPLES section for an example of mirroring multiple log devices.
+ .sp
+ .LP
+-Log devices can be added, replaced, attached, detached, and imported and exported as part of the larger pool. Mirrored log devices can be removed by specifying the top-level mirror for the log.
++Log devices can be added, replaced, attached, detached, and imported and exported as part of the larger pool. Mirrored log devices can be removed by specifying the top\-level mirror for the log.
+ .SS "Cache Devices"
+ .sp
+ .LP
+-Devices can be added to a storage pool as "cache devices." These devices provide an additional layer of caching between main memory and disk. For read-heavy workloads, where the working set size is much larger than what can be cached in main memory, using cache devices allow much more of this working set to be served from low latency media. Using cache devices provides the greatest performance improvement for random read-workloads of mostly static content.
++Devices can be added to a storage pool as "cache devices." These devices provide an additional layer of caching between main memory and disk. For read\-heavy workloads, where the working set size is much larger than what can be cached in main memory, using cache devices allow much more of this working set to be served from low latency media. Using cache devices provides the greatest performance improvement for random read\-workloads of mostly static content.
+ .sp
+ .LP
+ To create a pool with cache devices, specify a "cache" \fBvdev\fR with any number of devices. For example:
+@@ -432,7 +432,7 @@
+ .SS "Properties"
+ .sp
+ .LP
+-Each pool has several properties associated with it. Some properties are read-only statistics while others are configurable and change the behavior of the pool. The following are read-only properties:
++Each pool has several properties associated with it. Some properties are read\-only statistics while others are configurable and change the behavior of the pool. The following are read\-only properties:
+ .sp
+ .ne 2
+ .mk
+@@ -501,7 +501,7 @@
+ 
+ .sp
+ .LP
+-These space usage properties report actual physical space available to the storage pool. The physical space can be different from the total amount of space that any contained datasets can actually use. The amount of space used in a \fBraidz\fR configuration depends on the characteristics of the data being written. In addition, \fBZFS\fR reserves some space for internal accounting that the \fBzfs\fR(1M) command takes into account, but the \fBzpool\fR command does not. For non-full pools of a reasonable size, these effects should be invisible. For small pools, or pools that are close to being completely full, these discrepancies may become more noticeable.
++These space usage properties report actual physical space available to the storage pool. The physical space can be different from the total amount of space that any contained datasets can actually use. The amount of space used in a \fBraidz\fR configuration depends on the characteristics of the data being written. In addition, \fBZFS\fR reserves some space for internal accounting that the \fBzfs\fR(1M) command takes into account, but the \fBzpool\fR command does not. For non\-full pools of a reasonable size, these effects should be invisible. For small pools, or pools that are close to being completely full, these discrepancies may become more noticeable.
+ .sp
+ .LP
+ The following property can be set at creation time and import time:
+@@ -560,7 +560,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Controls the location of where the pool configuration is cached. Discovering all pools on system startup requires a cached copy of the configuration data that is stored on the root file system. All pools in this cache are automatically imported when the system boots. Some environments, such as install and clustering, need to cache this information in a different location so that pools are not automatically imported. Setting this property caches the pool configuration in a different location that can later be imported with "\fBzpool import -c\fR". Setting it to the special value "\fBnone\fR" creates a temporary pool that is never cached, and the special value \fB\&''\fR (empty string) uses the default location. 
++Controls the location of where the pool configuration is cached. Discovering all pools on system startup requires a cached copy of the configuration data that is stored on the root file system. All pools in this cache are automatically imported when the system boots. Some environments, such as install and clustering, need to cache this information in a different location so that pools are not automatically imported. Setting this property caches the pool configuration in a different location that can later be imported with "\fBzpool import \-c\fR". Setting it to the special value "\fBnone\fR" creates a temporary pool that is never cached, and the special value \fB\&''\fR (empty string) uses the default location. 
+ .sp
+ Multiple pools can share the same cache file. Because the kernel destroys and recreates this file when pools are added and removed, care should be taken when attempting to access this file. When the last pool using a \fBcachefile\fR is exported or destroyed, the file is removed.
+ .RE
+@@ -573,7 +573,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Controls whether a non-privileged user is granted access based on the dataset permissions defined on the dataset. See \fBzfs\fR(1M) for more information on \fBZFS\fR delegated administration.
++Controls whether a non\-privileged user is granted access based on the dataset permissions defined on the dataset. See \fBzfs\fR(1M) for more information on \fBZFS\fR delegated administration.
+ .RE
+ 
+ .sp
+@@ -628,7 +628,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Controls whether information about snapshots associated with this pool is output when "\fBzfs list\fR" is run without the \fB-t\fR option. The default value is "off".
++Controls whether information about snapshots associated with this pool is output when "\fBzfs list\fR" is run without the \fB\-t\fR option. The default value is "off".
+ .RE
+ 
+ .sp
+@@ -639,7 +639,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-The current on-disk version of the pool. This can be increased, but never decreased. The preferred method of updating pools is with the "\fBzpool upgrade\fR" command, though this property can be used when a specific version is needed for backwards compatibility. This property can be any number between 1 and the current version reported by "\fBzpool upgrade -v\fR".
++The current on\-disk version of the pool. This can be increased, but never decreased. The preferred method of updating pools is with the "\fBzpool upgrade\fR" command, though this property can be used when a specific version is needed for backwards compatibility. This property can be any number between 1 and the current version reported by "\fBzpool upgrade \-v\fR".
+ .RE
+ 
+ .SS "Subcommands"
+@@ -653,7 +653,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool\fR \fB-?\fR\fR
++\fB\fBzpool\fR \fB\-?\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -664,16 +664,16 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool add\fR [\fB-fn\fR] \fIpool\fR \fIvdev\fR ...\fR
++\fB\fBzpool add\fR [\fB\-fn\fR] \fIpool\fR \fIvdev\fR ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Adds the specified virtual devices to the given pool. The \fIvdev\fR specification is described in the "Virtual Devices" section. The behavior of the \fB-f\fR option, and the device checks performed are described in the "zpool create" subcommand.
++Adds the specified virtual devices to the given pool. The \fIvdev\fR specification is described in the "Virtual Devices" section. The behavior of the \fB\-f\fR option, and the device checks performed are described in the "zpool create" subcommand.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-f\fR\fR
++\fB\fB\-f\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -684,7 +684,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-n\fR\fR
++\fB\fB\-n\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -698,16 +698,16 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool attach\fR [\fB-f\fR] \fIpool\fR \fIdevice\fR \fInew_device\fR\fR
++\fB\fBzpool attach\fR [\fB\-f\fR] \fIpool\fR \fIdevice\fR \fInew_device\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Attaches \fInew_device\fR to an existing \fBzpool\fR device. The existing device cannot be part of a \fBraidz\fR configuration. If \fIdevice\fR is not currently part of a mirrored configuration, \fIdevice\fR automatically transforms into a two-way mirror of \fIdevice\fR and \fInew_device\fR. If \fIdevice\fR is part of a two-way mirror, attaching \fInew_device\fR creates a three-way mirror, and so on. In either case, \fInew_device\fR begins to resilver immediately.
++Attaches \fInew_device\fR to an existing \fBzpool\fR device. The existing device cannot be part of a \fBraidz\fR configuration. If \fIdevice\fR is not currently part of a mirrored configuration, \fIdevice\fR automatically transforms into a two\-way mirror of \fIdevice\fR and \fInew_device\fR. If \fIdevice\fR is part of a two\-way mirror, attaching \fInew_device\fR creates a three\-way mirror, and so on. In either case, \fInew_device\fR begins to resilver immediately.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-f\fR\fR
++\fB\fB\-f\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -731,22 +731,22 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool create\fR [\fB-fn\fR] [\fB-o\fR \fIproperty=value\fR] ... [\fB-O\fR \fIfile-system-property=value\fR] ... [\fB-m\fR \fImountpoint\fR] [\fB-R\fR \fIroot\fR] \fIpool\fR \fIvdev\fR ...\fR
++\fB\fBzpool create\fR [\fB\-fn\fR] [\fB\-o\fR \fIproperty=value\fR] ... [\fB\-O\fR \fIfile\-system\-property=value\fR] ... [\fB\-m\fR \fImountpoint\fR] [\fB\-R\fR \fIroot\fR] \fIpool\fR \fIvdev\fR ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Creates a new storage pool containing the virtual devices specified on the command line. The pool name must begin with a letter, and can only contain alphanumeric characters as well as underscore ("_"), dash ("-"), and period ("."). The pool names "mirror", "raidz", "spare" and "log" are reserved, as are names beginning with the pattern "c[0-9]". The \fBvdev\fR specification is described in the "Virtual Devices" section.
++Creates a new storage pool containing the virtual devices specified on the command line. The pool name must begin with a letter, and can only contain alphanumeric characters as well as underscore ("_"), dash ("\-"), and period ("."). The pool names "mirror", "raidz", "spare" and "log" are reserved, as are names beginning with the pattern "c[0\-9]". The \fBvdev\fR specification is described in the "Virtual Devices" section.
+ .sp
+-The command verifies that each device specified is accessible and not currently in use by another subsystem. There are some uses, such as being currently mounted, or specified as the dedicated dump device, that prevents a device from ever being used by \fBZFS\fR. Other uses, such as having a preexisting \fBUFS\fR file system, can be overridden with the \fB-f\fR option.
++The command verifies that each device specified is accessible and not currently in use by another subsystem. There are some uses, such as being currently mounted, or specified as the dedicated dump device, that prevents a device from ever being used by \fBZFS\fR. Other uses, such as having a preexisting \fBUFS\fR file system, can be overridden with the \fB\-f\fR option.
+ .sp
+-The command also checks that the replication strategy for the pool is consistent. An attempt to combine redundant and non-redundant storage in a single pool, or to mix disks and files, results in an error unless \fB-f\fR is specified. The use of differently sized devices within a single \fBraidz\fR or mirror group is also flagged as an error unless \fB-f\fR is specified.
++The command also checks that the replication strategy for the pool is consistent. An attempt to combine redundant and non\-redundant storage in a single pool, or to mix disks and files, results in an error unless \fB\-f\fR is specified. The use of differently sized devices within a single \fBraidz\fR or mirror group is also flagged as an error unless \fB\-f\fR is specified.
+ .sp
+-Unless the \fB-R\fR option is specified, the default mount point is "/\fIpool\fR". The mount point must not exist or must be empty, or else the root dataset cannot be mounted. This can be overridden with the \fB-m\fR option.
++Unless the \fB\-R\fR option is specified, the default mount point is "/\fIpool\fR". The mount point must not exist or must be empty, or else the root dataset cannot be mounted. This can be overridden with the \fB\-m\fR option.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-f\fR\fR
++\fB\fB\-f\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -757,7 +757,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-n\fR\fR
++\fB\fB\-n\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -768,7 +768,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIproperty=value\fR [\fB-o\fR \fIproperty=value\fR] ...\fR
++\fB\fB\-o\fR \fIproperty=value\fR [\fB\-o\fR \fIproperty=value\fR] ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -779,11 +779,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-O\fR \fIfile-system-property=value\fR\fR
++\fB\fB\-O\fR \fIfile\-system\-property=value\fR\fR
+ .ad
+ .br
+ .na
+-\fB[\fB-O\fR \fIfile-system-property=value\fR] ...\fR
++\fB[\fB\-O\fR \fIfile\-system\-property=value\fR] ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -794,18 +794,18 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-R\fR \fIroot\fR\fR
++\fB\fB\-R\fR \fIroot\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Equivalent to "-o cachefile=none,altroot=\fIroot\fR"
++Equivalent to "\-o cachefile=none,altroot=\fIroot\fR"
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-m\fR \fImountpoint\fR\fR
++\fB\fB\-m\fR \fImountpoint\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -818,7 +818,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool destroy\fR [\fB-f\fR] \fIpool\fR\fR
++\fB\fBzpool destroy\fR [\fB\-f\fR] \fIpool\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -827,7 +827,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-f\fR\fR
++\fB\fB\-f\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -851,7 +851,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool export\fR [\fB-f\fR] \fIpool\fR ...\fR
++\fB\fBzpool export\fR [\fB\-f\fR] \fIpool\fR ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -864,11 +864,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-f\fR\fR
++\fB\fB\-f\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+-Forcefully unmount all datasets, using the "\fBunmount -f\fR" command.
++Forcefully unmount all datasets, using the "\fBunmount \-f\fR" command.
+ .sp
+ This command will forcefully export the pool even if it has a shared spare that is currently being used. This may lead to potential data corruption.
+ .RE
+@@ -902,7 +902,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool history\fR [\fB-il\fR] [\fIpool\fR] ...\fR
++\fB\fBzpool history\fR [\fB\-il\fR] [\fIpool\fR] ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -911,7 +911,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-i\fR\fR
++\fB\fB\-i\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -922,7 +922,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-l\fR\fR
++\fB\fB\-l\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -935,18 +935,18 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool import\fR [\fB-d\fR \fIdir\fR | \fB-c\fR \fIcachefile\fR] [\fB-D\fR]\fR
++\fB\fBzpool import\fR [\fB\-d\fR \fIdir\fR | \fB\-c\fR \fIcachefile\fR] [\fB\-D\fR]\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Lists pools available to import. If the \fB-d\fR option is not specified, this command searches for devices in "/dev/dsk". The \fB-d\fR option can be specified multiple times, and all directories are searched. If the device appears to be part of an exported pool, this command displays a summary of the pool with the name of the pool, a numeric identifier, as well as the \fIvdev\fR layout and current health of the device for each device or file. Destroyed pools, pools that were previously destroyed with the "\fBzpool destroy\fR" command, are not listed unless the \fB-D\fR option is specified. 
++Lists pools available to import. If the \fB\-d\fR option is not specified, this command searches for devices in "/dev/dsk". The \fB\-d\fR option can be specified multiple times, and all directories are searched. If the device appears to be part of an exported pool, this command displays a summary of the pool with the name of the pool, a numeric identifier, as well as the \fIvdev\fR layout and current health of the device for each device or file. Destroyed pools, pools that were previously destroyed with the "\fBzpool destroy\fR" command, are not listed unless the \fB\-D\fR option is specified. 
+ .sp
+ The numeric identifier is unique, and can be used instead of the pool name when multiple exported pools of the same name are available.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-c\fR \fIcachefile\fR\fR
++\fB\fB\-c\fR \fIcachefile\fR\fR
+ .ad
+ .RS 16n
+ .rt  
+@@ -957,18 +957,18 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-d\fR \fIdir\fR\fR
++\fB\fB\-d\fR \fIdir\fR\fR
+ .ad
+ .RS 16n
+ .rt  
+-Searches for devices or files in \fIdir\fR. The \fB-d\fR option can be specified multiple times. 
++Searches for devices or files in \fIdir\fR. The \fB\-d\fR option can be specified multiple times. 
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-D\fR\fR
++\fB\fB\-D\fR\fR
+ .ad
+ .RS 16n
+ .rt  
+@@ -981,27 +981,27 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool import\fR [\fB-o\fR \fImntopts\fR] [ \fB-o\fR \fIproperty\fR=\fIvalue\fR] ... [\fB-d\fR \fIdir\fR | \fB-c\fR \fIcachefile\fR] [\fB-D\fR] [\fB-f\fR] [\fB-R\fR \fIroot\fR] \fB-a\fR\fR
++\fB\fBzpool import\fR [\fB\-o\fR \fImntopts\fR] [ \fB\-o\fR \fIproperty\fR=\fIvalue\fR] ... [\fB\-d\fR \fIdir\fR | \fB\-c\fR \fIcachefile\fR] [\fB\-D\fR] [\fB\-f\fR] [\fB\-R\fR \fIroot\fR] \fB\-a\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Imports all pools found in the search directories. Identical to the previous command, except that all pools with a sufficient number of devices available are imported. Destroyed pools, pools that were previously destroyed with the "\fBzpool destroy\fR" command, will not be imported unless the \fB-D\fR option is specified.
++Imports all pools found in the search directories. Identical to the previous command, except that all pools with a sufficient number of devices available are imported. Destroyed pools, pools that were previously destroyed with the "\fBzpool destroy\fR" command, will not be imported unless the \fB\-D\fR option is specified.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fImntopts\fR\fR
++\fB\fB\-o\fR \fImntopts\fR\fR
+ .ad
+ .RS 21n
+ .rt  
+-Comma-separated list of mount options to use when mounting datasets within the pool. See \fBzfs\fR(1M) for a description of dataset properties and mount options.
++Comma\-separated list of mount options to use when mounting datasets within the pool. See \fBzfs\fR(1M) for a description of dataset properties and mount options.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIproperty=value\fR\fR
++\fB\fB\-o\fR \fIproperty=value\fR\fR
+ .ad
+ .RS 21n
+ .rt  
+@@ -1012,7 +1012,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-c\fR \fIcachefile\fR\fR
++\fB\fB\-c\fR \fIcachefile\fR\fR
+ .ad
+ .RS 21n
+ .rt  
+@@ -1023,29 +1023,29 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-d\fR \fIdir\fR\fR
++\fB\fB\-d\fR \fIdir\fR\fR
+ .ad
+ .RS 21n
+ .rt  
+-Searches for devices or files in \fIdir\fR. The \fB-d\fR option can be specified multiple times. This option is incompatible with the \fB-c\fR option.
++Searches for devices or files in \fIdir\fR. The \fB\-d\fR option can be specified multiple times. This option is incompatible with the \fB\-c\fR option.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-D\fR\fR
++\fB\fB\-D\fR\fR
+ .ad
+ .RS 21n
+ .rt  
+-Imports destroyed pools only. The \fB-f\fR option is also required.
++Imports destroyed pools only. The \fB\-f\fR option is also required.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-f\fR\fR
++\fB\fB\-f\fR\fR
+ .ad
+ .RS 21n
+ .rt  
+@@ -1056,7 +1056,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-a\fR\fR
++\fB\fB\-a\fR\fR
+ .ad
+ .RS 21n
+ .rt  
+@@ -1067,7 +1067,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-R\fR \fIroot\fR\fR
++\fB\fB\-R\fR \fIroot\fR\fR
+ .ad
+ .RS 21n
+ .rt  
+@@ -1080,29 +1080,29 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool import\fR [\fB-o\fR \fImntopts\fR] [ \fB-o\fR \fIproperty\fR=\fIvalue\fR] ... [\fB-d\fR \fIdir\fR | \fB-c\fR \fIcachefile\fR] [\fB-D\fR] [\fB-f\fR] [\fB-R\fR \fIroot\fR] \fIpool\fR | \fIid\fR [\fInewpool\fR]\fR
++\fB\fBzpool import\fR [\fB\-o\fR \fImntopts\fR] [ \fB\-o\fR \fIproperty\fR=\fIvalue\fR] ... [\fB\-d\fR \fIdir\fR | \fB\-c\fR \fIcachefile\fR] [\fB\-D\fR] [\fB\-f\fR] [\fB\-R\fR \fIroot\fR] \fIpool\fR | \fIid\fR [\fInewpool\fR]\fR
+ .ad
+ .sp .6
+ .RS 4n
+ Imports a specific pool. A pool can be identified by its name or the numeric identifier. If \fInewpool\fR is specified, the pool is imported using the name \fInewpool\fR. Otherwise, it is imported with the same name as its exported name.
+ .sp
+-If a device is removed from a system without running "\fBzpool export\fR" first, the device appears as potentially active. It cannot be determined if this was a failed export, or whether the device is really in use from another host. To import a pool in this state, the \fB-f\fR option is required.
++If a device is removed from a system without running "\fBzpool export\fR" first, the device appears as potentially active. It cannot be determined if this was a failed export, or whether the device is really in use from another host. To import a pool in this state, the \fB\-f\fR option is required.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fImntopts\fR\fR
++\fB\fB\-o\fR \fImntopts\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Comma-separated list of mount options to use when mounting datasets within the pool. See \fBzfs\fR(1M) for a description of dataset properties and mount options.
++Comma\-separated list of mount options to use when mounting datasets within the pool. See \fBzfs\fR(1M) for a description of dataset properties and mount options.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIproperty=value\fR\fR
++\fB\fB\-o\fR \fIproperty=value\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1113,7 +1113,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-c\fR \fIcachefile\fR\fR
++\fB\fB\-c\fR \fIcachefile\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1124,29 +1124,29 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-d\fR \fIdir\fR\fR
++\fB\fB\-d\fR \fIdir\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Searches for devices or files in \fIdir\fR. The \fB-d\fR option can be specified multiple times. This option is incompatible with the \fB-c\fR option.
++Searches for devices or files in \fIdir\fR. The \fB\-d\fR option can be specified multiple times. This option is incompatible with the \fB\-c\fR option.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-D\fR\fR
++\fB\fB\-D\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Imports destroyed pool. The \fB-f\fR option is also required.
++Imports destroyed pool. The \fB\-f\fR option is also required.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-f\fR\fR
++\fB\fB\-f\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1157,7 +1157,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-R\fR \fIroot\fR\fR
++\fB\fB\-R\fR \fIroot\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1170,16 +1170,16 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool iostat\fR [\fB-T\fR \fBu\fR | \fBd\fR] [\fB-v\fR] [\fIpool\fR] ... [\fIinterval\fR[\fIcount\fR]]\fR
++\fB\fBzpool iostat\fR [\fB\-T\fR \fBu\fR | \fBd\fR] [\fB\-v\fR] [\fIpool\fR] ... [\fIinterval\fR[\fIcount\fR]]\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Displays \fBI/O\fR statistics for the given pools. When given an interval, the statistics are printed every \fIinterval\fR seconds until \fBCtrl-C\fR is pressed. If no \fIpools\fR are specified, statistics for every pool in the system is shown. If \fIcount\fR is specified, the command exits after \fIcount\fR reports are printed.
++Displays \fBI/O\fR statistics for the given pools. When given an interval, the statistics are printed every \fIinterval\fR seconds until \fBCtrl\-C\fR is pressed. If no \fIpools\fR are specified, statistics for every pool in the system is shown. If \fIcount\fR is specified, the command exits after \fIcount\fR reports are printed.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-T\fR \fBu\fR | \fBd\fR\fR
++\fB\fB\-T\fR \fBu\fR | \fBd\fR\fR
+ .ad
+ .RS 12n
+ .rt  
+@@ -1192,11 +1192,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-v\fR\fR
++\fB\fB\-v\fR\fR
+ .ad
+ .RS 12n
+ .rt  
+-Verbose statistics. Reports usage statistics for individual \fIvdevs\fR within the pool, in addition to the pool-wide statistics.
++Verbose statistics. Reports usage statistics for individual \fIvdevs\fR within the pool, in addition to the pool\-wide statistics.
+ .RE
+ 
+ .RE
+@@ -1205,7 +1205,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool list\fR [\fB-H\fR] [\fB-o\fR \fIprops\fR[,...]] [\fIpool\fR] ...\fR
++\fB\fBzpool list\fR [\fB\-H\fR] [\fB\-o\fR \fIprops\fR[,...]] [\fIpool\fR] ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1214,7 +1214,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-H\fR\fR
++\fB\fB\-H\fR\fR
+ .ad
+ .RS 12n
+ .rt  
+@@ -1225,11 +1225,11 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-o\fR \fIprops\fR\fR
++\fB\fB\-o\fR \fIprops\fR\fR
+ .ad
+ .RS 12n
+ .rt  
+-Comma-separated list of properties to display. See the "Properties" section for a list of valid properties. The default list is "name, size, used, available, capacity, health, altroot"
++Comma\-separated list of properties to display. See the "Properties" section for a list of valid properties. The default list is "name, size, used, available, capacity, health, altroot"
+ .RE
+ 
+ .RE
+@@ -1238,7 +1238,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool offline\fR [\fB-t\fR] \fIpool\fR \fIdevice\fR ...\fR
++\fB\fBzpool offline\fR [\fB\-t\fR] \fIpool\fR \fIdevice\fR ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1249,7 +1249,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-t\fR\fR
++\fB\fB\-t\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -1262,7 +1262,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool online\fR [\fB-e\fR] \fIpool\fR \fIdevice\fR...\fR
++\fB\fBzpool online\fR [\fB\-e\fR] \fIpool\fR \fIdevice\fR...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1273,7 +1273,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-e\fR\fR
++\fB\fB\-e\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -1290,14 +1290,14 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Removes the specified device from the pool. This command currently only supports removing hot spares, cache, and log devices. A mirrored log device can be removed by specifying the top-level mirror for the log. Non-log devices that are part of a mirrored configuration can be removed using the \fBzpool detach\fR command. Non-redundant and \fBraidz\fR devices cannot be removed from a pool.
++Removes the specified device from the pool. This command currently only supports removing hot spares, cache, and log devices. A mirrored log device can be removed by specifying the top\-level mirror for the log. Non\-log devices that are part of a mirrored configuration can be removed using the \fBzpool detach\fR command. Non\-redundant and \fBraidz\fR devices cannot be removed from a pool.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool replace\fR [\fB-f\fR] \fIpool\fR \fIold_device\fR [\fInew_device\fR]\fR
++\fB\fBzpool replace\fR [\fB\-f\fR] \fIpool\fR \fIold_device\fR [\fInew_device\fR]\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1310,7 +1310,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-f\fR\fR
++\fB\fB\-f\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -1323,7 +1323,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool scrub\fR [\fB-s\fR] \fIpool\fR ...\fR
++\fB\fBzpool scrub\fR [\fB\-s\fR] \fIpool\fR ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1331,12 +1331,12 @@
+ .sp
+ Scrubbing and resilvering are very similar operations. The difference is that resilvering only examines data that \fBZFS\fR knows to be out of date (for example, when attaching a new device to a mirror or replacing an existing device), whereas scrubbing examines all data to discover silent errors due to hardware faults or disk failure.
+ .sp
+-Because scrubbing and resilvering are \fBI/O\fR-intensive operations, \fBZFS\fR only allows one at a time. If a scrub is already in progress, the "\fBzpool scrub\fR" command terminates it and starts a new scrub. If a resilver is in progress, \fBZFS\fR does not allow a scrub to be started until the resilver completes.
++Because scrubbing and resilvering are \fBI/O\fR\-intensive operations, \fBZFS\fR only allows one at a time. If a scrub is already in progress, the "\fBzpool scrub\fR" command terminates it and starts a new scrub. If a resilver is in progress, \fBZFS\fR does not allow a scrub to be started until the resilver completes.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-s\fR\fR
++\fB\fB\-s\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -1360,7 +1360,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool status\fR [\fB-xv\fR] [\fIpool\fR] ...\fR
++\fB\fBzpool status\fR [\fB\-xv\fR] [\fIpool\fR] ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1371,7 +1371,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-x\fR\fR
++\fB\fB\-x\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -1382,7 +1382,7 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-v\fR\fR
++\fB\fB\-v\fR\fR
+ .ad
+ .RS 6n
+ .rt  
+@@ -1399,14 +1399,14 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Displays all pools formatted using a different \fBZFS\fR on-disk version. Older versions can continue to be used, but some features may not be available. These pools can be upgraded using "\fBzpool upgrade -a\fR". Pools that are formatted with a more recent version are also displayed, although these pools will be inaccessible on the system.
++Displays all pools formatted using a different \fBZFS\fR on\-disk version. Older versions can continue to be used, but some features may not be available. These pools can be upgraded using "\fBzpool upgrade \-a\fR". Pools that are formatted with a more recent version are also displayed, although these pools will be inaccessible on the system.
+ .RE
+ 
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool upgrade\fR \fB-v\fR\fR
++\fB\fBzpool upgrade\fR \fB\-v\fR\fR
+ .ad
+ .sp .6
+ .RS 4n
+@@ -1417,16 +1417,16 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fBzpool upgrade\fR [\fB-V\fR \fIversion\fR] \fB-a\fR | \fIpool\fR ...\fR
++\fB\fBzpool upgrade\fR [\fB\-V\fR \fIversion\fR] \fB\-a\fR | \fIpool\fR ...\fR
+ .ad
+ .sp .6
+ .RS 4n
+-Upgrades the given pool to the latest on-disk version. Once this is done, the pool will no longer be accessible on systems running older versions of the software.
++Upgrades the given pool to the latest on\-disk version. Once this is done, the pool will no longer be accessible on systems running older versions of the software.
+ .sp
+ .ne 2
+ .mk
+ .na
+-\fB\fB-a\fR\fR
++\fB\fB\-a\fR\fR
+ .ad
+ .RS 14n
+ .rt  
+@@ -1437,18 +1437,18 @@
+ .ne 2
+ .mk
+ .na
+-\fB\fB-V\fR \fIversion\fR\fR
++\fB\fB\-V\fR \fIversion\fR\fR
+ .ad
+ .RS 14n
+ .rt  
+-Upgrade to the specified version. If the \fB-V\fR flag is not specified, the pool is upgraded to the most recent version. This option can only be used to increase the version number, and only up to the most recent version supported by this software.
++Upgrade to the specified version. If the \fB\-V\fR flag is not specified, the pool is upgraded to the most recent version. This option can only be used to increase the version number, and only up to the most recent version supported by this software.
+ .RE
+ 
+ .RE
+ 
+ .SH EXAMPLES
+ .LP
+-\fBExample 1 \fRCreating a RAID-Z Storage Pool
++\fBExample 1 \fRCreating a RAID\-Z Storage Pool
+ .sp
+ .LP
+ The following command creates a pool with a single \fBraidz\fR root \fIvdev\fR that consists of six disks.
+@@ -1507,7 +1507,7 @@
+ \fBExample 5 \fRAdding a Mirror to a ZFS Storage Pool
+ .sp
+ .LP
+-The following command adds two mirrored disks to the pool "\fItank\fR", assuming the pool is already made up of two-way mirrors. The additional space is immediately available to any datasets within the pool.
++The following command adds two mirrored disks to the pool "\fItank\fR", assuming the pool is already made up of two\-way mirrors. The additional space is immediately available to any datasets within the pool.
+ 
+ .sp
+ .in +2
+@@ -1532,9 +1532,9 @@
+ .nf
+ # \fBzpool list\fR
+      NAME              SIZE    USED   AVAIL    CAP  HEALTH     ALTROOT
+-     pool             67.5G   2.92M   67.5G     0%  ONLINE     -
+-     tank             67.5G   2.92M   67.5G     0%  ONLINE     -
+-     zion                 -       -       -     0%  FAULTED    -
++     pool             67.5G   2.92M   67.5G     0%  ONLINE     \-
++     tank             67.5G   2.92M   67.5G     0%  ONLINE     \-
++     zion                 \-       \-       \-     0%  FAULTED    \-
+ .fi
+ .in -2
+ .sp
+@@ -1548,7 +1548,7 @@
+ .sp
+ .in +2
+ .nf
+-# \fBzpool destroy -f tank\fR
++# \fBzpool destroy \-f tank\fR
+ .fi
+ .in -2
+ .sp
+@@ -1606,7 +1606,7 @@
+ .sp
+ .in +2
+ .nf
+-# \fBzpool upgrade -a\fR
++# \fBzpool upgrade \-a\fR
+ This system is currently running ZFS version 2.
+ .fi
+ .in -2
+@@ -1654,7 +1654,7 @@
+ \fBExample 12 \fRCreating a ZFS Pool with Mirrored Separate Intent Logs
+ .sp
+ .LP
+-The following command creates a ZFS storage pool consisting of two, two-way mirrors and mirrored log devices:
++The following command creates a ZFS storage pool consisting of two, two\-way mirrors and mirrored log devices:
+ 
+ .sp
+ .in +2
+@@ -1686,7 +1686,7 @@
+ .sp
+ .in +2
+ .nf
+-# \fBzpool iostat -v pool 5\fR
++# \fBzpool iostat \-v pool 5\fR
+ .fi
+ .in -2
+ .sp
+@@ -1695,7 +1695,7 @@
+ \fBExample 14 \fRRemoving a Mirrored Log Device
+ .sp
+ .LP
+-The following command removes the mirrored log device \fBmirror-2\fR.
++The following command removes the mirrored log device \fBmirror\-2\fR.
+ 
+ .sp
+ .LP
+@@ -1711,14 +1711,14 @@
+ 
+          NAME        STATE     READ WRITE CKSUM
+          tank        ONLINE       0     0     0
+-           mirror-0  ONLINE       0     0     0
++           mirror\-0  ONLINE       0     0     0
+              c6t0d0  ONLINE       0     0     0
+              c6t1d0  ONLINE       0     0     0
+-           mirror-1  ONLINE       0     0     0
++           mirror\-1  ONLINE       0     0     0
+              c6t2d0  ONLINE       0     0     0
+              c6t3d0  ONLINE       0     0     0
+          logs
+-           mirror-2  ONLINE       0     0     0
++           mirror\-2  ONLINE       0     0     0
+              c4t0d0  ONLINE       0     0     0
+              c4t1d0  ONLINE       0     0     0
+ .fi
+@@ -1727,12 +1727,12 @@
+ 
+ .sp
+ .LP
+-The command to remove the mirrored log \fBmirror-2\fR is:
++The command to remove the mirrored log \fBmirror\-2\fR is:
+ 
+ .sp
+ .in +2
+ .nf
+-# \fBzpool remove tank mirror-2\fR
++# \fBzpool remove tank mirror\-2\fR
+ .fi
+ .in -2
+ .sp
