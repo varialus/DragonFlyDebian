@@ -1,20 +1,17 @@
-
-Sent to freebsd-hackers (2011-07-05)
-
 --- a/sys/conf/kern.mk
 +++ b/sys/conf/kern.mk
-@@ -1,12 +1,23 @@
+@@ -1,11 +1,21 @@
  # $FreeBSD$
  
-+.if !defined(OPSYS)
-+OPSYS!=		uname -s
++.if ${CC:T:Mclang} != "clang"
++FREEBSD_GCC!=	${CC} --version | grep FreeBSD || true
 +.endif
 +
  #
  # Warning flags for compiling the kernel and components of the kernel:
  #
-+.if ${OPSYS} == "FreeBSD"
-+# FreeBSD extension, not available in upstream GCC
++.if ${FREEBSD_GCC}
++# FreeBSD extensions, not available in upstream GCC
 +format_extensions=	-fformat-extensions
 +no_align_long_strings=	-mno-align-long-strings
 +.endif
@@ -24,11 +21,9 @@ Sent to freebsd-hackers (2011-07-05)
 -		-Wundef -Wno-pointer-sign -fformat-extensions \
 +		-Wundef -Wno-pointer-sign ${format_extensions} \
  		-Wmissing-include-dirs -fdiagnostics-show-option
-+
  #
  # The following flags are next up for working on:
- #	-Wextra
-@@ -32,7 +43,7 @@
+@@ -32,7 +42,7 @@
  #
  .if ${MACHINE_CPUARCH} == "i386"
  .if ${CC:T:Mclang} != "clang"
