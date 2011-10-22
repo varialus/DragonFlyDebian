@@ -79,7 +79,13 @@ get-orig-source:
 	tar --numeric-owner --owner 0 --group 0 -czf ../$(TARNAME) $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
-build: build-libuutil build-libnvpair build-libzfs build-libumem build-libzpool build-zfsutils build-libavl
+build: build-arch build-indep
+
+build-arch: build-libuutil build-libnvpair build-libzfs build-libumem build-libzpool build-zfsutils build-libavl
+
+build-indep:
+# We have nothing to do by default.
+
 
 build-libuutil: build-libuutil-stamp
 build-libuutil-stamp:
@@ -151,11 +157,12 @@ install: build
 	dh_installdirs -s
 	dh_install -s
 
-# Build architecture-independent files here.
+
+binary: binary-arch binary-indep
+
 binary-indep: build install
 # We have nothing to do by default.
 
-# Build architecture-dependent files here.
 binary-arch: build install
 	dh_testdir
 	dh_testroot
@@ -185,5 +192,4 @@ binary-arch: build install
 	dh_md5sums -a
 	dh_builddeb -a
 
-binary: binary-arch binary-indep
-.PHONY: build clean binary-indep binary-arch binary install configure
+.PHONY: build clean binary-indep binary-arch binary install configure build-arch build-indep
