@@ -1,0 +1,193 @@
+This patch adds Debian specific additions to the manpage, whereas other manpage
+related patches can also be submitted upstream.
+
+In particular this patch replaces references to section 1M by 8, e.g. zfs(1M) ->
+zfs(8) and similar.
+--- a/cddl/contrib/opensolaris/cmd/zdb/zdb.8
++++ b/cddl/contrib/opensolaris/cmd/zdb/zdb.8
+@@ -3,7 +3,7 @@
+ .\" The contents of this file are subject to the terms of the Common Development and Distribution License (the "License").  You may not use this file except in compliance with the License.
+ .\" You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE or http://www.opensolaris.org/os/licensing.  See the License for the specific language governing permissions and limitations under the License.
+ .\" When distributing Covered Code, include this CDDL HEADER in each file and include the License file at usr/src/OPENSOLARIS.LICENSE.  If applicable, add the following below this CDDL HEADER, with the fields enclosed by brackets "[]" replaced with your own identifying information: Portions Copyright [yyyy] [name of copyright owner]
+-.TH zdb 1M "31 Oct 2005" "SunOS 5.11" "System Administration Commands"
++.TH zdb 8 "31 Oct 2005" "SunOS 5.11" "System Administration Commands"
+ .SH NAME
+ zdb \- ZFS debugger
+ .SH SYNOPSIS
+@@ -81,4 +81,4 @@
+ .SH SEE ALSO
+ .sp
+ .LP
+-\fBzfs\fR(1M), \fBzpool\fR(1M), \fBattributes\fR(5)
++\fBzfs\fR(8), \fBzpool\fR(8), \fBattributes\fR(5)
+--- a/cddl/contrib/opensolaris/cmd/zfs/zfs.8
++++ b/cddl/contrib/opensolaris/cmd/zfs/zfs.8
+@@ -8,7 +8,7 @@
+ .\" the fields enclosed by brackets "[]" replaced with your own identifying information: Portions Copyright [yyyy] [name of copyright owner]
+ .\" Copyright 2011 Nexenta Systems, Inc.  All rights reserved.
+ .\" Copyright 2011 by Delphix.  All rights reserved.
+-.TH zfs 1M "24 Sep 2009" "SunOS 5.11" "System Administration Commands"
++.TH zfs 8 "24 Sep 2009" "SunOS 5.11" "System Administration Commands"
+ .SH NAME
+ zfs \- configures ZFS file systems
+ .SH SYNOPSIS
+@@ -230,7 +230,7 @@
+ .SH DESCRIPTION
+ .sp
+ .LP
+-The \fBzfs\fR command configures \fBZFS\fR datasets within a \fBZFS\fR storage pool, as described in \fBzpool\fR(1M). A dataset is identified by a unique path within the \fBZFS\fR namespace. For example:
++The \fBzfs\fR command configures \fBZFS\fR datasets within a \fBZFS\fR storage pool, as described in \fBzpool\fR(8). A dataset is identified by a unique path within the \fBZFS\fR namespace. For example:
+ .sp
+ .in +2
+ .nf
+@@ -284,10 +284,11 @@
+ A \fBZFS\fR storage pool is a logical collection of devices that provide space for datasets. A storage pool is also the root of the \fBZFS\fR file system hierarchy.
+ .sp
+ .LP
+-The root of the pool can be accessed as a file system, such as mounting and unmounting, taking snapshots, and setting properties. The physical storage characteristics, however, are managed by the \fBzpool\fR(1M) command.
++The root of the pool can be accessed as a file system, such as mounting and
++unmounting, taking snapshots, and setting properties. The physical storage characteristics, however, are managed by the \fBzpool\fR(8) command.
+ .sp
+ .LP
+-See \fBzpool\fR(1M) for more information on creating and administering pools.
++See \fBzpool\fR(8) for more information on creating and administering pools.
+ .SS "Snapshots"
+ .sp
+ .LP
+@@ -754,7 +755,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Controls whether the file system should be mounted with \fBnbmand\fR (Non Blocking mandatory locks). This is used for \fBCIFS\fR clients. Changes to this property only take effect when the file system is umounted and remounted. See \fBmount\fR(1M) for more information on \fBnbmand\fR mounts.
++Controls whether the file system should be mounted with \fBnbmand\fR (Non Blocking mandatory locks). This is used for \fBCIFS\fR clients. Changes to this property only take effect when the file system is umounted and remounted. See \fBmount\fR(8) for more information on \fBnbmand\fR mounts.
+ .RE
+ 
+ .sp
+@@ -1107,7 +1108,7 @@
+ .SS "Temporary Mount Point Properties"
+ .sp
+ .LP
+-When a file system is mounted, either through \fBmount\fR(1M) for legacy mounts or the \fBzfs mount\fR command for normal file systems, its mount options are set according to its properties. The correlation between properties and mount options is as follows:
++When a file system is mounted, either through \fBmount\fR(8) for legacy mounts or the \fBzfs mount\fR command for normal file systems, its mount options are set according to its properties. The correlation between properties and mount options is as follows:
+ .sp
+ .in +2
+ .nf
+@@ -1143,7 +1144,7 @@
+ During an initial installation or a live upgrade from a \fBUFS\fR file system, a swap device and dump device are created on \fBZFS\fR volumes in the \fBZFS\fR root pool. By default, the swap area size is based on 1/2 the size of physical memory up to 2 Gbytes. The size of the dump device depends on the kernel's requirements at installation time. Separate \fBZFS\fR volumes must be used for the swap area and dump devices. Do not swap to a file on a \fBZFS\fR file system. A \fBZFS\fR swap file configuration is not supported. 
+ .sp
+ .LP
+-If you need to change your swap area or dump device after the system is installed or upgraded, use the \fBswap\fR(1M) and \fBdumpadm\fR(1M) commands. If you need to change the size of your swap area or dump device, see the \fISolaris ZFS Administration Guide\fR.
++If you need to change your swap area or dump device after the system is installed or upgraded, use the \fBswapctl\fR(8) and \fBdumpadm\fR(1M) commands. If you need to change the size of your swap area or dump device, see the \fISolaris ZFS Administration Guide\fR.
+ .SH SUBCOMMANDS
+ .sp
+ .LP
+@@ -1790,7 +1791,7 @@
+ .RS 4n
+ Upgrades file systems to a new on\(hydisk version. Once this is done, the file systems will no longer be accessible on systems running older versions of the software. \fBzfs send\fR streams generated from new snapshots of these file systems cannot be accessed on systems running older versions of the software.
+ .sp
+-In general, the file system version is independent of the pool version. See \fBzpool\fR(1M) for information on the \fBzpool upgrade\fR command. 
++In general, the file system version is independent of the pool version. See \fBzpool\fR(8) for information on the \fBzpool upgrade\fR command. 
+ .sp
+ In some cases, the file system version and the pool version are interrelated and the pool version must be upgraded before the file system version can be upgraded.
+ .sp
+@@ -2000,7 +2001,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Perform an overlay mount. See \fBmount\fR(1M) for more information.
++Perform an overlay mount. See \fBmount\fR(8) for more information.
+ .RE
+ 
+ .sp
+@@ -2637,7 +2638,7 @@
+ \fBExample 5 \fRListing ZFS Datasets
+ .sp
+ .LP
+-The following command lists all active file systems and volumes in the system. Snapshots are displayed if the \fBlistsnaps\fR property is \fBon\fR. The default is \fBoff\fR. See \fBzpool\fR(1M) for more information on pool properties.
++The following command lists all active file systems and volumes in the system. Snapshots are displayed if the \fBlistsnaps\fR property is \fBon\fR. The default is \fBoff\fR. See \fBzpool\fR(8) for more information on pool properties.
+ 
+ .sp
+ .in +2
+@@ -3106,10 +3107,7 @@
+ .SH SEE ALSO
+ .sp
+ .LP
+-\fBssh\fR(1), \fBiscsitadm\fR(1M), \fBmount\fR(1M), \fBshare\fR(1M), \fBsharemgr\fR(1M), \fBunshare\fR(1M), \fBzonecfg\fR(1M), \fBzpool\fR(1M), \fBchmod\fR(2), \fBstat\fR(2), \fBwrite\fR(2), \fBfsync\fR(3C), \fBdfstab\fR(4), \fBattributes\fR(5)
+-.sp
+-.LP
+-See the \fBgzip\fR(1) man page, which is not part of the SunOS man page collection.
++\fBssh\fR(1), \fBiscsitadm\fR(1M), \fBmount\fR(8), \fBshare\fR(1M), \fBsharemgr\fR(1M), \fBunshare\fR(1M), \fBzonecfg\fR(1M), \fBzpool\fR(8), \fBchmod\fR(2), \fBstat\fR(2), \fBwrite\fR(2), \fBfsync\fR(3), \fBdfstab\fR(4), \fBattributes\fR(5), \fBgzip\fR(1).
+ .sp
+ .LP
+ For information about using the \fBZFS\fR web\(hybased management tool and other \fBZFS\fR features, see the \fISolaris ZFS Administration Guide\fR.
+--- a/cddl/contrib/opensolaris/cmd/zpool/zpool.8
++++ b/cddl/contrib/opensolaris/cmd/zpool/zpool.8
+@@ -3,7 +3,7 @@
+ .\" The contents of this file are subject to the terms of the Common Development and Distribution License (the "License"). You may not use this file except in compliance with the License. You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE or http://www.opensolaris.org/os/licensing.
+ .\" See the License for the specific language governing permissions and limitations under the License. When distributing Covered Code, include this CDDL HEADER in each file and include the License file at usr/src/OPENSOLARIS.LICENSE. If applicable, add the following below this CDDL HEADER, with the
+ .\" fields enclosed by brackets "[]" replaced with your own identifying information: Portions Copyright [yyyy] [name of copyright owner]
+-.TH zpool 1M "21 Sep 2009" "SunOS 5.11" "System Administration Commands"
++.TH zpool 8 "21 Sep 2009" "SunOS 5.11" "System Administration Commands"
+ .SH NAME
+ zpool \- configures ZFS storage pools
+ .SH SYNOPSIS
+@@ -141,7 +141,7 @@
+ The \fBzpool\fR command configures \fBZFS\fR storage pools. A storage pool is a collection of devices that provides physical storage and data replication for \fBZFS\fR datasets.
+ .sp
+ .LP
+-All datasets within a storage pool share the same space. See \fBzfs\fR(1M) for information on managing datasets.
++All datasets within a storage pool share the same space. See \fBzfs\fR(8) for information on managing datasets.
+ .SS "Virtual Devices (\fBvdev\fRs)"
+ .sp
+ .LP
+@@ -573,7 +573,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Controls whether a non\(hyprivileged user is granted access based on the dataset permissions defined on the dataset. See \fBzfs\fR(1M) for more information on \fBZFS\fR delegated administration.
++Controls whether a non\(hyprivileged user is granted access based on the dataset permissions defined on the dataset. See \fBzfs\fR(8) for more information on \fBZFS\fR delegated administration.
+ .RE
+ 
+ .sp
+@@ -787,7 +787,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Sets the given file system properties in the root file system of the pool. See the "Properties" section of \fBzfs\fR(1M) for a list of valid properties that can be set.
++Sets the given file system properties in the root file system of the pool. See the "Properties" section of \fBzfs\fR(8) for a list of valid properties that can be set.
+ .RE
+ 
+ .sp
+@@ -809,7 +809,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Sets the mount point for the root dataset. The default mount point is "/\fIpool\fR" or "\fBaltroot\fR/\fIpool\fR" if \fBaltroot\fR is specified. The mount point must be an absolute path, "\fBlegacy\fR", or "\fBnone\fR". For more information on dataset mount points, see \fBzfs\fR(1M).
++Sets the mount point for the root dataset. The default mount point is "/\fIpool\fR" or "\fBaltroot\fR/\fIpool\fR" if \fBaltroot\fR is specified. The mount point must be an absolute path, "\fBlegacy\fR", or "\fBnone\fR". For more information on dataset mount points, see \fBzfs\fR(8).
+ .RE
+ 
+ .RE
+@@ -994,7 +994,7 @@
+ .ad
+ .RS 21n
+ .rt  
+-Comma\(hyseparated list of mount options to use when mounting datasets within the pool. See \fBzfs\fR(1M) for a description of dataset properties and mount options.
++Comma\(hyseparated list of mount options to use when mounting datasets within the pool. See \fBzfs\fR(8) for a description of dataset properties and mount options.
+ .RE
+ 
+ .sp
+@@ -1095,7 +1095,7 @@
+ .ad
+ .sp .6
+ .RS 4n
+-Comma\-separated list of mount options to use when mounting datasets within the pool. See \fBzfs\fR(1M) for a description of dataset properties and mount options.
++Comma\-separated list of mount options to use when mounting datasets within the pool. See \fBzfs\fR(8) for a description of dataset properties and mount options.
+ .RE
+ 
+ .sp
+@@ -1796,4 +1796,4 @@
+ .SH SEE ALSO
+ .sp
+ .LP
+-\fBzfs\fR(1M), \fBattributes\fR(5)
++\fBzfs\fR(8), \fBattributes\fR(5)
