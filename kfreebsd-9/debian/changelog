@@ -1,6 +1,11 @@
-kfreebsd-9 (9.0~svn226368-2) UNRELEASED; urgency=low
+kfreebsd-9 (9.0~svn226368-1) UNRELEASED; urgency=low
+
+  * New upstream snapshot.
 
   [ Robert Millan ]
+  * Fix panic on early boot.  (Closes: #644417)
+    - Switch back to GCC 4.4.
+    - Add -fno-gcse to COPTFLAGS to fix GCC >= 4.4 builds.
   * Disable -frename-registers on i386.  I enabled it in 2006 only because I
     mistakenly thought upstream had done the same.  In fact, upstream only
     enabled this flag on amd64.  See SVN revision 1302.
@@ -10,17 +15,6 @@ kfreebsd-9 (9.0~svn226368-2) UNRELEASED; urgency=low
     after 000_unix_socket_overflow.diff. Closes: #645527.
 
  -- Robert Millan <rmh@debian.org>  Sun, 16 Oct 2011 13:29:21 +0200
-
-kfreebsd-9 (9.0~svn226368-1) experimental; urgency=low
-
-  * New upstream snapshot.
-
-  [ Robert Millan ]
-  * Fix panic on early boot.  (Closes: #644417)
-    - Switch back to GCC 4.4
-    - 008_gcc46.diff: Add -fno-gcse to COPTFLAGS to fix GCC >= 4.4 builds.
-
- -- Robert Millan <rmh@debian.org>  Sat, 15 Oct 2011 12:14:58 +0200
 
 kfreebsd-9 (9.0~svn225873-1) experimental; urgency=low
 
