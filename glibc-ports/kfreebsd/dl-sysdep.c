@@ -182,7 +182,7 @@ _dl_show_auxv (void)
 	  [AT_GID - 2] =		{ "GID:          ", dec },
 	  [AT_EGID - 2] =		{ "EGID:         ", dec },
 #endif
-	  [AT_EXECPATH - 2] =		{ "EXECPATH      ", str },
+	  [AT_EXECPATH - 2] =		{ "EXECPATH:     ", str },
 	  [AT_CANARY - 2] =		{ "CANARY:       0x", hex },
 	  [AT_CANARYLEN - 2] =		{ "CANARYLEN:    ", dec },
 	  [AT_OSRELDATE - 2] =		{ "OSRELDATE:    ", dec },
