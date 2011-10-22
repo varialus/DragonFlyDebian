@@ -1,0 +1,33 @@
+See #645527.
+
+Our former userspace allows 108 bytes in sun_path,
+but kernel restrict it to 104 bytes.
+
+--- a/sys/kern/uipc_usrreq.c
++++ b/sys/kern/uipc_usrreq.c
+@@ -463,7 +463,12 @@
+ 	KASSERT(unp != NULL, ("uipc_bind: unp == NULL"));
+ 
+ 	if (soun->sun_len > sizeof(struct sockaddr_un))
++	{
++	    if (soun->sun_len <= (4 + sizeof(struct sockaddr_un)))
++	        soun->sun_len = sizeof(struct sockaddr_un);  	/* clip it */
++	    else
+ 		return (EINVAL);
++	};
+ 	namelen = soun->sun_len - offsetof(struct sockaddr_un, sun_path);
+ 	if (namelen <= 0)
+ 		return (EINVAL);
+@@ -1255,7 +1260,12 @@
+ 	KASSERT(unp != NULL, ("unp_connect: unp == NULL"));
+ 
+ 	if (nam->sa_len > sizeof(struct sockaddr_un))
++	{
++	    if (nam->sa_len <= (4 + sizeof(struct sockaddr_un)))
++	        nam->sa_len = sizeof(struct sockaddr_un);	/* clip it */
++	    else
+ 		return (EINVAL);
++	};
+ 	len = nam->sa_len - offsetof(struct sockaddr_un, sun_path);
+ 	if (len <= 0)
+ 		return (EINVAL);
