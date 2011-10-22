@@ -98,6 +98,9 @@ Description: OpenSolaris ZFS library (udeb version)
 Package: zfsutils
 Architecture: kfreebsd-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+# Require GRUB with ZFS v28 support to ensure "zpool upgrade" doesn't render
+# system unbootable.
+Breaks: grub-common (<< 1.99~20101210-1~)
 Description: command-line tools to manage ZFS filesystems
  The Z file system is a pooled filesystem designed for maximum data integrity,
  supporting data snapshots, multiple copies, and data checksums.
