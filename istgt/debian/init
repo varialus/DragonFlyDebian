@@ -52,6 +52,15 @@ do_start()
 	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- \
 		$DAEMON_ARGS \
 		|| return 2
+
+	RETVAL=0
+	for i in 1 2 3 4 5 ; do
+		sleep 1
+		status_of_proc -p $PIDFILE "$DAEMON" "$NAME" || RETVAL=$?
+		[ "$RETVAL" = 0 ] && return 0
+	done
+
+	[ "$RETVAL" != 0 ] && return 2
 }
 
 #
