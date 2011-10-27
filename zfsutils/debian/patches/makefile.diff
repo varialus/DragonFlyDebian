@@ -42,31 +42,34 @@
  NO_PROFILE=
 --- a/cddl/sbin/zfs/Makefile
 +++ b/cddl/sbin/zfs/Makefile
-@@ -22,6 +22,10 @@
+@@ -22,6 +22,12 @@
  
  DPADD=	${LIBBSDXML} ${LIBGEOM} ${LIBM} ${LIBNVPAIR} ${LIBSBUF} ${LIBUMEM} \
  	${LIBUTIL} ${LIBUUTIL} ${LIBZFS}
--LDADD=	-lgeom -lnvpair -lutil -luutil -lzfs
-+LDADD=	-lgeom -lnvpair -luutil -lzfs -lbsd
+-LDADD=	-lgeom -lnvpair -lumem -lutil -luutil -lzfs
++LDADD=	-lgeom -lnvpair -lumem -luutil -lzfs -lbsd
 +
-+LDADD+= -L${.CURDIR}/../../../cddl/lib/libnvpair
-+LDADD+= -L${.CURDIR}/../../../cddl/lib/libuutil
++LDADD+=	-L${.CURDIR}/../../../cddl/lib/libnvpair
++LDADD+=	-L${.CURDIR}/../../../cddl/lib/libumem
++LDADD+=	-L${.CURDIR}/../../../cddl/lib/libuutil
 +LDADD+=	-L${.CURDIR}/../../../cddl/lib/libzfs
++
  
  .include <bsd.prog.mk>
 --- a/cddl/sbin/zpool/Makefile
 +++ b/cddl/sbin/zpool/Makefile
-@@ -27,6 +27,11 @@
+@@ -27,6 +27,12 @@
  
  DPADD=	${LIBAVL} ${LIBBSDXML} ${LIBGEOM} ${LIBM} ${LIBNVPAIR} ${LIBSBUF} \
  	${LIBUMEM} ${LIBUTIL} ${LIBUUTIL} ${LIBZFS}
--LDADD=	-lavl -lgeom -lnvpair -lutil -luutil -lzfs
-+LDADD=	-lgeom -lnvpair -luutil -lzfs -lbsd
+-LDADD=	-lavl -lgeom -lnvpair -lumem -lutil -luutil -lzfs
++LDADD=	-lgeom -lnvpair -lumem -luutil -lzfs -lbsd
 +
-+LDADD+= -L${.CURDIR}/../../../cddl/lib/libzfs \
-+	-L${.CURDIR}/../../../cddl/lib/libnvpair \
-+	-L${.CURDIR}/../../../cddl/lib/libuutil \
-+	${.CURDIR}/../../../cddl/lib/libavl/libavl.a
++LDADD+=	-L${.CURDIR}/../../../cddl/lib/libzfs
++LDADD+=	-L${.CURDIR}/../../../cddl/lib/libnvpair
++LDADD+=	-L${.CURDIR}/../../../cddl/lib/libumem
++LDADD+=	-L${.CURDIR}/../../../cddl/lib/libuutil
++LDADD+=	${.CURDIR}/../../../cddl/lib/libavl/libavl.a
  
  .include <bsd.prog.mk>
 --- a/cddl/usr.bin/zinject/Makefile
