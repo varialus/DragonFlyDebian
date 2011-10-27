@@ -1,0 +1,20 @@
+Description: fix build with ld --as-needed
+ With the linker flag --as-needed libraries must be placed
+ behind objects needing their symbols on the commandline.
+Author: Julian Taylor <jtaylor.debian@googlemail.com>
+
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -77,10 +77,10 @@
+ all: stamp-depend config.h istgt istgtcontrol
+ 
+ istgt: $(ISTGT)
+-	$(CC) $(LDFLAGS) $(LIBS) -o $@ $(ISTGT)
++	$(CC) $(LDFLAGS) -o $@ $(ISTGT) $(LIBS)
+ 
+ istgtcontrol: $(ISTGTCONTROL)
+-	$(CC) $(LDFLAGS) $(LIBS) -o $@ $(ISTGTCONTROL)
++	$(CC) $(LDFLAGS) -o $@ $(ISTGTCONTROL) $(LIBS) 
+ 
+ install: install-dirs
+ 	install -c -m 0755 istgt $(DESTDIR)$(sbindir)
