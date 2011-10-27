@@ -39,7 +39,7 @@ PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
 PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 \
         NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
-export SHLIB_MAJOR = 0
+export SHLIB_MAJOR = 1
 export SHLIBDIR = ./
 
 get-orig-source:
@@ -187,11 +187,11 @@ binary-arch: build install
 #	dh_perl
 #	dh_python
 	dh_makeshlibs -a
-	dh_makeshlibs -plibnvpair0 --add-udeb=libnvpair0-udeb
-	dh_makeshlibs -plibuutil0 --add-udeb=libuutil0-udeb
-	dh_makeshlibs -plibzfs0 --add-udeb=libzfs0-udeb
-	dh_makeshlibs -plibzpool0 --add-udeb=libzpool0-udeb
-	dh_makeshlibs -plibumem0 --add-udeb=libumem0-udeb
+	dh_makeshlibs -plibnvpair$(SHLIB_MAJOR) --add-udeb=libnvpair$(SHLIB_MAJOR)-udeb
+	dh_makeshlibs -plibuutil$(SHLIB_MAJOR) --add-udeb=libuutil$(SHLIB_MAJOR)-udeb
+	dh_makeshlibs -plibzfs$(SHLIB_MAJOR) --add-udeb=libzfs$(SHLIB_MAJOR)-udeb
+	dh_makeshlibs -plibzpool$(SHLIB_MAJOR) --add-udeb=libzpool$(SHLIB_MAJOR)-udeb
+	dh_makeshlibs -plibumem$(SHLIB_MAJOR) --add-udeb=libumem$(SHLIB_MAJOR)-udeb
 	dh_makeshlibs -pzfsutils --add-udeb=zfsutils-udeb
 	dh_installdeb -a
 	dh_shlibdeps -a
