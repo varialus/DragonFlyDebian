@@ -59,6 +59,7 @@ get-orig-source:
 		 cddl/contrib/opensolaris/cmd/stat/common/ \
 	         sys/cddl/compat/opensolaris \
 	         sys/cddl/contrib/opensolaris \
+		lib/libmd \
 	         cddl/lib/libavl \
 	         cddl/lib/libnvpair \
 	         cddl/lib/libuutil \
@@ -81,7 +82,7 @@ get-orig-source:
 
 build: build-arch build-indep
 
-build-arch: build-libuutil build-libnvpair build-libzfs build-libumem build-libzpool build-zfsutils build-libavl
+build-arch: build-libmd build-libuutil build-libnvpair build-libzfs build-libumem build-libzpool build-zfsutils build-libavl
 
 build-indep:
 # We have nothing to do by default.
@@ -109,8 +110,13 @@ build-libzpool-stamp: build-libavl build-libnvpair-stamp build-libumem build-lib
 	touch $@
 
 build-libzfs: build-libzfs-stamp
-build-libzfs-stamp: build-libnvpair-stamp build-libuutil-stamp build-libumem-stamp build-libavl-stamp
+build-libzfs-stamp: build-libnvpair-stamp build-libuutil-stamp build-libumem-stamp build-libavl-stamp build-libmd-stamp
 	$(PMAKE) -C $(CURDIR)/cddl/lib/libzfs
+	touch $@
+
+build-libmd: build-libmd-stamp
+build-libmd-stamp:
+	$(PMAKE) -C $(CURDIR)/lib/libmd
 	touch $@
 
 build-libavl: build-libavl-stamp
@@ -146,6 +152,7 @@ clean:
 	$(PMAKE) -C $(CURDIR)/cddl/usr.sbin/zdb clean
 	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/ztest clean
 	$(PMAKE) -C $(CURDIR)/cddl/usr.bin/zinject clean
+	$(PMAKE) -C $(CURDIR)/lib/libmd clean
 
 	rm -f *stamp
 	dh_clean

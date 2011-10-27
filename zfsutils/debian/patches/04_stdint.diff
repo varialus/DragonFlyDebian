@@ -37,3 +37,15 @@
  #include <sys/note.h>
  #include <sys/kernel.h>
  #include <sys/debug.h>
+--- a/lib/libmd/sha256.h
++++ b/lib/libmd/sha256.h
+@@ -30,6 +30,9 @@
+ #define _SHA256_H_
+ 
+ #include <sys/types.h>
++#ifdef __GLIBC__
++#include <stdint.h>
++#endif
+ 
+ typedef struct SHA256Context {
+ 	uint32_t state[8];

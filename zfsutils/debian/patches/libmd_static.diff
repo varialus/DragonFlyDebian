@@ -1,0 +1,43 @@
+--- a/cddl/lib/libzfs/Makefile
++++ b/cddl/lib/libzfs/Makefile
+@@ -7,12 +7,13 @@
+ 
+ LIB=	zfs
+ DPADD=	${LIBMD} ${LIBPTHREAD} ${LIBUMEM} ${LIBUTIL}
+-LDADD=	-lmd -lpthread -lumem -lnvpair -luutil -lgeom -lm -lbsd
++LDADD=	-lpthread -lumem -lnvpair -luutil -lgeom -lm -lbsd
+ 
+ LDADD+= -L${.CURDIR}/../../../cddl/lib/libumem
+ LDADD+= -L${.CURDIR}/../../../cddl/lib/libnvpair
+ LDADD+= -L${.CURDIR}/../../../cddl/lib/libuutil
+ LDADD+= ${.CURDIR}/../../../cddl/lib/libavl/libavl.a
++LDADD+= ${.CURDIR}/../../../lib/libmd/libmd.a
+ 
+ SRCS=	deviceid.c \
+ 	fsshare.c \
+@@ -57,5 +58,6 @@
+ CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/lib/libnvpair
+ CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/lib/libuutil/common
+ CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/lib/libzfs/common
++CFLAGS+= -I${.CURDIR}/../../../lib/libmd
+ 
+ .include <bsd.lib.mk>
+--- a/cddl/lib/libzpool/Makefile
++++ b/cddl/lib/libzpool/Makefile
+@@ -54,13 +54,15 @@
+ CFLAGS+=	-I${.CURDIR}/../../../lib/libpthread/thread
+ CFLAGS+=	-I${.CURDIR}/../../../lib/libpthread/sys
+ CFLAGS+=	-I${.CURDIR}/../../../lib/libthr/arch/${MACHINE_ARCH}/include
++CFLAGS+=	-I${.CURDIR}/../../../lib/libmd
+ 
+ DPADD=		${LIBMD} ${LIBPTHREAD} ${LIBZ}
+-LDADD=		-lmd -lpthread -lz -lumem -lnvpair -lbsd -lrt
++LDADD=		-lpthread -lz -lumem -lnvpair -lbsd -lrt
+ 
+ LDADD+= -L${.CURDIR}/../../../cddl/lib/libumem
+ LDADD+= -L${.CURDIR}/../../../cddl/lib/libnvpair
+ LDADD+= ${.CURDIR}/../../../cddl/lib/libavl/libavl.a
++LDADD+= ${.CURDIR}/../../../lib/libmd/libmd.a
+ 
+ # atomic.S doesn't like profiling.
+ NO_PROFILE=
