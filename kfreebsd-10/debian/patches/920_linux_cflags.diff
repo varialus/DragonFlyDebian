@@ -1,0 +1,27 @@
+
+Rejected on freebsd-hackers:
+
+http://lists.freebsd.org/pipermail/freebsd-hackers/2011-July/thread.html#35854
+
+--- a/sys/conf/kern.pre.mk
++++ b/sys/conf/kern.pre.mk
+@@ -97,6 +97,8 @@
+ .endif
+ WERROR?= -Werror
+ 
++CFLAGS+= -Ulinux -U__linux__ -D__FreeBSD__
++
+ # XXX LOCORE means "don't declare C stuff" not "for locore.s".
+ ASM_CFLAGS= -x assembler-with-cpp -DLOCORE ${CFLAGS}
+ 
+--- a/sys/conf/kmod.mk
++++ b/sys/conf/kmod.mk
+@@ -99,6 +99,8 @@
+ CFLAGS+=	-D_KERNEL
+ CFLAGS+=	-DKLD_MODULE
+ 
++CFLAGS+=	-Ulinux -U__linux__ -D__FreeBSD__
++
+ # Don't use any standard or source-relative include directories.
+ CSTD=		c99
+ NOSTDINC=	-nostdinc
