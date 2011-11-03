@@ -35,7 +35,7 @@ build-arch: build-arch-stamp
 build-arch-stamp:
 	dh_testdir
 
-	tar xfJ $(SRC_TAR) --strip-components=1
+	tar xfJ $(SRC_TAR) --wildcards --strip-components=1 "*.h"
 
 	set -e ; find sys -type f | (while read i ; do \
 	sed -i $$i \
