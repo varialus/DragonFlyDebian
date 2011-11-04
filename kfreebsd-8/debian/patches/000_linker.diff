@@ -1,0 +1,30 @@
+
+  current ld provides magic symbols with names like __start_* and __stop_*
+  only if they are referenced, FreeBSD kernel needs them,
+  for details see http://sourceware.org/bugzilla/show_bug.cgi?id=5391
+
+  Backported from HEAD (r215137)
+
+--- a/sys/sys/cdefs.h
++++ b/sys/sys/cdefs.h
+@@ -396,6 +396,9 @@
+ #endif	/* __STDC__ */
+ #endif	/* __GNUC__ || __INTEL_COMPILER */
+ 
++#define	__GLOBL1(sym)	__asm__(".globl " #sym)
++#define	__GLOBL(sym)	__GLOBL1(sym)
++
+ #if defined(__GNUC__) || defined(__INTEL_COMPILER)
+ #define	__IDSTRING(name,string)	__asm__(".ident\t\"" string "\"")
+ #else
+--- a/sys/sys/linker_set.h
++++ b/sys/sys/linker_set.h
+@@ -45,6 +45,8 @@
+  */
+ #ifdef __GNUCLIKE___SECTION
+ #define __MAKE_SET(set, sym)						\
++	__GLOBL(__CONCAT(__start_set_,set));				\
++	__GLOBL(__CONCAT(__stop_set_,set));				\
+ 	static void const * const __set_##set##_sym_##sym 		\
+ 	__section("set_" #set) __used = &sym
+ #else /* !__GNUCLIKE___SECTION */
