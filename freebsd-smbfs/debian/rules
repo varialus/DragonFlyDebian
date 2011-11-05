@@ -1,0 +1,118 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+SHELL=bash
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+CFLAGS = -Wall -Wno-unknown-pragmas -g -pipe -fPIC -I. \
+         -D_GNU_SOURCE -D'__FBSDID(string)=' \
+         -D__va_list=__builtin_va_list
+
+ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
+tar_version	:= $(shell echo $(full_version) | sed -e 's/-.*//g')
+svn_revision	:= $(shell echo $(full_version) | sed -e 's/.*~svn\([0-9]*\)-[0-9]*/\1/g')
+version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
+major           := $(shell echo $(version) | sed -e 's/\..*//g')
+revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
+
+#SVN		:= http://svn.freebsd.org/base/release/$(version).0
+#SVN		:= http://svn.freebsd.org/base/releng/$(version)
+SVN		:= http://svn.freebsd.org/base/stable/$(major)
+#SVN		:= http://svn.freebsd.org/base/head
+
+SOURCE = freebsd-smbfs
+ORIGDIR = $(SOURCE)-$(tar_version)
+TARNAME = $(SOURCE)_$(tar_version).orig.tar.gz
+
+PATH := /usr/lib/freebsd:$(PATH)
+DESTDIR = $(CURDIR)/debian/tmp
+PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 \
+        NOSHARED=NO NO_SHARED=NO DESTDIR=$(DESTDIR) make
+
+get-orig-source:
+	rm -rf $(ORIGDIR)
+	mkdir -p $(ORIGDIR)/etc
+	for i in \
+		contrib/smbfs \
+		usr.sbin/mount_smbfs \
+		lib/libsmb \
+		sbin/mount \
+		etc/nsmb.conf \
+	; do \
+	    svn export $(SVN)/$$i -r $(svn_revision) $(ORIGDIR)/$$i ; \
+	done
+	tar --numeric-owner --owner 0 --group 0 -czf ../$(TARNAME) $(ORIGDIR)
+	rm -rf $(ORIGDIR)
+
+build: build-arch build-indep
+
+build-arch: build-libsmb build-smbfs
+
+build-indep:
+# We have nothing to do by default.
+
+
+build-libsmb: build-libsmb-stamp
+build-libsmb-stamp:
+	$(PMAKE) -C $(CURDIR)/lib/libsmb
+	touch $@
+
+build-smbfs: build-smbfs-stamp
+build-smbfs-stamp: build-libsmb-stamp
+	$(PMAKE) -C $(CURDIR)/usr.sbin/mount_smbfs
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+
+	$(PMAKE) -C $(CURDIR)/usr.sbin/mount_smbfs clean
+
+	rm -f *stamp
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep -s
+	dh_installdirs -s
+	dh_install -s
+
+
+binary: binary-arch binary-indep
+
+binary-indep: build install
+# We have nothing to do by default.
+
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs -s
+	dh_installdocs -s
+#	dh_installexamples
+#	dh_installcron
+#	dh_installinfo
+	dh_installman
+	dh_link -s
+	dh_strip -s
+	dh_compress -s
+	dh_fixperms -s
+	dh_makeshlibs -s
+	dh_installdeb -s
+	dh_shlibdeps -s
+	dh_gencontrol -s
+	dh_md5sums -s
+	dh_builddeb -s
+
+.PHONY: build clean binary-indep binary-arch binary install configure build-arch build-indep

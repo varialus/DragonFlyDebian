@@ -1,0 +1,11 @@
+--- a/usr.sbin/mount_smbfs/Makefile
++++ b/usr.sbin/mount_smbfs/Makefile
+@@ -8,7 +8,7 @@
+ CONTRIBDIR=	${.CURDIR}/../../contrib/smbfs
+ CFLAGS+=	-DSMBFS -I${MOUNTDIR} -I${CONTRIBDIR}/include
+ 
+-LDADD=	-lsmb -lkiconv
++LDADD=	../../lib/libsmb/libsmb.a -lkiconv -ldl
+ DPADD=	${LIBSMB} ${LIBKICONV}
+ 
+ # Needs to be dynamically linked for optional dlopen() access to
