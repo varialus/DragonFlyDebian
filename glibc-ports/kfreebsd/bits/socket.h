@@ -65,7 +65,7 @@ enum __socket_type
 #define	PF_IMPLINK	3	/* ARPAnet IMP protocol.  */
 #define	PF_PUP		4	/* PUP protocols.  */
 #define	PF_CHAOS	5	/* MIT Chaos protocols.  */
-#define	PF_NS		6	/* Xerox NS protocols.  */
+#define	PF_NETBIOS	6	/* SMB protocols.  */
 #define	PF_ISO		7	/* ISO protocols.  */
 #define	PF_OSI		PF_ISO
 #define	PF_ECMA		8	/* ECMA protocols.  */
@@ -105,7 +105,7 @@ enum __socket_type
 #define	AF_IMPLINK	PF_IMPLINK
 #define	AF_PUP		PF_PUP
 #define	AF_CHAOS	PF_CHAOS
-#define	AF_NS		PF_NS
+#define	AF_NETBIOS	PF_NETBIOS
 #define	AF_ISO		PF_ISO
 #define	AF_OSI		PF_OSI
 #define	AF_ECMA		PF_ECMA
