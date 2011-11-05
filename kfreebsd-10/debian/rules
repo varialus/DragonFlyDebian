@@ -241,6 +241,10 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	install -p -o root -g root -m 644 \
 		debian/kfreebsd-image.overrides \
 		$(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides/kfreebsd-image-$(version)-$(abiname)-$*
+	mkdir -p $(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-$*-di/usr/share/lintian/overrides
+	install -p -o root -g root -m 644 \
+		debian/zlib-modules.overrides \
+		$(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-$*-di/usr/share/lintian/overrides/zlib-modules-$(version)-$(abiname)-$*-di
 
 	# scripts
 	for script in preinst prerm postinst postrm ; do \
