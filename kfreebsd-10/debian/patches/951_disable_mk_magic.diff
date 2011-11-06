@@ -18,7 +18,16 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
  _if_carp=	if_carp
  .endif
  
-@@ -382,8 +381,7 @@
+@@ -374,7 +373,7 @@
+ _ipfilter=	ipfilter
+ .endif
+ 
+-.if ${MK_INET_SUPPORT} != "no" || defined(ALL_MODULES)
++.if 1
+ _ipfw=		ipfw
+ .endif
+ 
+@@ -382,11 +381,10 @@
  _netgraph=	netgraph
  .endif
  
@@ -27,7 +36,11 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
 +.if 1
  _pf=		pf
  _pflog=		pflog
- .if ${MK_INET_SUPPORT} != "no"
+-.if ${MK_INET_SUPPORT} != "no"
++.if 1
+ _pfsync=	pfsync
+ .endif
+ .endif
 @@ -442,7 +440,7 @@
  _linsysfs=	linsysfs
  _linux=		linux
@@ -46,3 +59,69 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
  _mlx4=		mlx4
  _mlx4ib=	mlx4ib
  _mlxen=		mlxen
+--- a/sys/modules/if_carp/Makefile
++++ b/sys/modules/if_carp/Makefile
+@@ -9,7 +9,7 @@
+ SRCS+=	opt_carp.h opt_bpf.h opt_inet.h opt_inet6.h vnode_if.h
+ 
+ .if !defined(KERNBUILDDIR)
+-.if ${MK_INET_SUPPORT} != "no"
++.if 1
+ opt_inet.h:
+ 	@echo "#define INET 1" > ${.TARGET}
+ .endif
+--- a/sys/modules/ipfw/Makefile
++++ b/sys/modules/ipfw/Makefile
+@@ -22,7 +22,7 @@
+ #
+ 
+ .if !defined(KERNBUILDDIR)
+-.if ${MK_INET_SUPPORT} != "no"
++.if 1
+ opt_inet.h:
+ 	echo "#define INET 1" > ${.TARGET}
+ .endif
+--- a/sys/modules/netgraph/ipfw/Makefile
++++ b/sys/modules/netgraph/ipfw/Makefile
+@@ -7,7 +7,7 @@
+ 
+ .if !defined(KERNBUILDDIR)
+ 
+-.if ${MK_INET_SUPPORT} != "no"
++.if 1
+ opt_inet.h:
+ 	echo "#define INET 1" > ${.TARGET}
+ .endif
+--- a/sys/modules/pf/Makefile
++++ b/sys/modules/pf/Makefile
+@@ -14,7 +14,7 @@
+ CFLAGS+= -I${.CURDIR}/../../contrib/pf
+ 
+ .if !defined(KERNBUILDDIR)
+-.if ${MK_INET_SUPPORT} != "no"
++.if 1
+ opt_inet.h:
+ 	echo "#define INET 1" > ${.TARGET}
+ .endif
+--- a/sys/modules/pflog/Makefile
++++ b/sys/modules/pflog/Makefile
+@@ -14,7 +14,7 @@
+ .if defined(KERNBUILDDIR)
+ MKDEP+=		-include ${KERNBUILDDIR}/opt_global.h
+ .else
+-.if ${MK_INET_SUPPORT} != "no"
++.if 1
+ opt_inet.h:
+ 	echo "#define INET 1" > ${.TARGET}
+ .endif
+--- a/sys/modules/pfsync/Makefile
++++ b/sys/modules/pfsync/Makefile
+@@ -14,7 +14,7 @@
+ .if defined(KERNBUILDDIR)
+ MKDEP+=		-include ${KERNBUILDDIR}/opt_global.h
+ .else
+-.if ${MK_INET_SUPPORT} != "no"
++.if 1
+ opt_inet.h:
+ 	echo "#define INET 1" > ${.TARGET}
+ .endif
