@@ -56,11 +56,22 @@ get-orig-source:
 	rm -rf $(ORIG_DIR)
 
 control: clean
+	for arch in `ls $(CURDIR)/debian/arch/` ; do \
+		KW_CONFIG_DIR=debian/arch/$$arch/installer ; \
+		if test -e $$KW_CONFIG_DIR ; then \
+			for config in `ls $(CURDIR)/debian/arch/$$arch/ | grep \.config` ; do \
+				flavor=$${config/.config/} ; \
+				if test -e debian/arch/$$arch/$$flavor.installer ; then \
+					echo "kfreebsd-$$arch $(version)-$(abiname) $$flavor $(version)-$(abiname)-$$flavor - -" ; \
+				fi ; \
+			done > $$KW_CONFIG_DIR/kernel-versions ; \
+		fi ; \
+		echo ; \
+	done
 	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@gcc_version@/$(gcc_version)/g" \
 		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
 	echo >> $(CURDIR)/debian/control
 	for arch in `ls $(CURDIR)/debian/arch/` ; do \
-		export KW_CONFIG_DIR=debian/arch/$$arch/installer ; \
 		for config in `ls $(CURDIR)/debian/arch/$$arch/ | grep \.config` ; do \
 			flavor=$${config/.config/} ; \
 			recommends= ; \
@@ -68,12 +79,9 @@ control: clean
 			sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@arch@/$$arch/g" -e "s/@recommends@/$$recommends/g" \
 				$(CURDIR)/debian/control.flavor.in ; \
 			echo ; \
-			if test -e $$KW_CONFIG_DIR ; then \
-				echo "kfreebsd-$$arch $(version)-$(abiname) $$flavor $(version)-$(abiname)-$$flavor - -" \
-					> $$KW_CONFIG_DIR/kernel-versions ; \
-			fi ; \
 		done ; \
-		if test -e $$KW_CONFIG_DIR ; then \
+		export KW_CONFIG_DIR=debian/arch/$$arch/installer ; \
+		if test -e $$KW_CONFIG_DIR/kernel-versions ; then \
 			kernel-wedge gen-control ; \
 		fi ; \
 		echo ; \
