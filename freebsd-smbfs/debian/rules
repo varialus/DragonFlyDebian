@@ -42,12 +42,12 @@ PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 \
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
-	mkdir -p $(ORIGDIR)/etc
+	mkdir -p $(ORIGDIR)/{etc,sbin/mount}
 	for i in \
 		contrib/smbfs \
 		usr.sbin/mount_smbfs \
 		lib/libsmb \
-		sbin/mount \
+		sbin/mount/{getmntopts.c,mntopts.h} \
 		etc/nsmb.conf \
 	; do \
 	    svn export $(SVN)/$$i -r $(svn_revision) $(ORIGDIR)/$$i ; \
