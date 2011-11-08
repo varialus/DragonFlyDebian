@@ -2,7 +2,7 @@ Source: zfsutils
 Section: admin
 Priority: optional
 Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
-Uploaders: Aurelien Jarno <aurel32@debian.org>, Robert Millan <rmh@debian.org>, Arno Töll <debian@toell.net>
+Uploaders: Aurelien Jarno <aurel32@debian.org>, Robert Millan <rmh@debian.org>, Arno TÃ¶ll <debian@toell.net>
 Dm-Upload-Allowed: yes
 Build-Depends: debhelper (>= 7.0.50~), freebsd-buildutils, libbsd-dev (>= 0.1.4),
  libc0.1-dev (>= 2.10), kfreebsd-kernel-headers (>= 0.51), libgeom-dev, libsbuf-dev,
@@ -18,20 +18,12 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: OpenSolaris userland utility library
  This package contains the OpenSolaris userland utility library.
 
-Package: libuutil-dev
-Section: libdevel
-Architecture: kfreebsd-any
-Depends: libuutil0 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-dev
-Description: Development files for libuutil
- This package contains the header files and static library needed to
- compile applications that use libuutil.
-
 Package: libuutil1-udeb
-XC-Package-Type: udeb
+Package-Type: udeb
 Section: debian-installer
 Architecture: kfreebsd-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenSolaris userland utility library
+Description: OpenSolaris userland utility library (debian-installer version)
  This package contains the OpenSolaris userland utility library.
  .
  This is a minimal package for use in debian-installer.
@@ -44,20 +36,12 @@ Description: OpenSolaris name-value pair library
  This package contains the OpenSolaris libnvpair library, for managing
  name-value pairs.
 
-Package: libnvpair-dev
-Section: libdevel
-Architecture: kfreebsd-any
-Depends: libnvpair0 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-dev
-Description: Development files for libnvpair
- This package contains the header files and static library needed to
- compile applications that use libnvpair, a library to manage name-value pairs.
-
 Package: libnvpair1-udeb
 Package-Type: udeb
 Section: debian-installer
 Architecture: kfreebsd-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenSolaris name-value pair library (udeb version)
+Description: OpenSolaris name-value pair library (debian-installer version)
  This package contains the OpenSolaris libnvpair library, for managing
  name-value pairs.
  .
@@ -73,22 +57,12 @@ Description: OpenSolaris ZFS library
  .
  The ZFS library provides support for managing ZFS filesystems.
 
-Package: libzfs-dev
-Section: libdevel
-Architecture: kfreebsd-any
-Depends: libzfs0 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-dev
-Description: Development files for libzfs
- The ZFS library provides support for managing ZFS filesystems.
- .
- This package contains the header files and static library needed to
- compile applications that use libzfs.
-
 Package: libzfs1-udeb
 Package-Type: udeb
 Section: debian-installer
 Architecture: kfreebsd-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenSolaris ZFS library (udeb version)
+Description: OpenSolaris ZFS library (debian-installer version)
  The Z file system is a pooled filesystem designed for maximum data integrity,
  supporting data snapshots, multiple copies, and data checksums.
  .
@@ -98,7 +72,15 @@ Description: OpenSolaris ZFS library (udeb version)
 
 Package: zfsutils
 Architecture: kfreebsd-any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+# We really need to declare those dependencies manually. Upstream adds happily symbols
+# without providing any version informations for symbols or bumping SONAMES Since those libraries are
+# supposed to used within this source package only, we declare a hard dependency to come
+# over problems like #645305.
+# dpkg-shlibdeps can't help us here, because it only can create unversioned
+# dependencies.
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ libuutil1 (= ${binary:Version}), libnvpair1 (= ${binary:Version}),
+ libzfs1 (= ${binary:Version}), libumem1 (= ${binary:Version}), libzpool1 (= ${binary:Version})
 # Require GRUB with ZFS v28 support to ensure "zpool upgrade" doesn't render
 # system unbootable.
 Breaks: grub-common (<< 1.99~20101210-1~)
@@ -113,8 +95,10 @@ Package: zfsutils-udeb
 Package-Type: udeb
 Section: debian-installer
 Architecture: kfreebsd-any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: command-line tools to manage ZFS filesystems (udeb version)
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ libuutil1 (= ${binary:Version}), libnvpair1 (= ${binary:Version}),
+ libzfs1 (= ${binary:Version}), libumem1 (= ${binary:Version}), libzpool1 (= ${binary:Version})
+Description: command-line tools to manage ZFS filesystems (debian-installer version)
  The Z file system is a pooled filesystem designed for maximum data integrity,
  supporting data snapshots, multiple copies, and data checksums.
  .
@@ -128,51 +112,34 @@ Package: libumem1
 Section: libs
 Architecture: kfreebsd-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenSolaris name-value pair library
+Description: OpenSolaris memory-management library
  This package contains the OpenSolaris libumem library, to detect
  memory management bugs in applications
 
-Package: libumem-dev
-Section: libdevel
-Architecture: kfreebsd-any
-Depends: libumem0 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-dev
-Description: Development files for libnvpair
- This package contains the header files and static library needed to
- compile applications that use libumem.
-
 Package: libumem1-udeb
-XC-Package-Type: udeb
+Package-Type: udeb
 Section: debian-installer
 Architecture: kfreebsd-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenSolaris name-value pair library
+Description: OpenSolaris memory-management library (debian-installer version)
  This package contains the OpenSolaris libumem library, to detect
  memory management bugs in applications
-
+ .
+ This is a minimal package for use in debian-installer.
 
 Package: libzpool1
 Section: libs
 Architecture: kfreebsd-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenSolaris name-value pair library
+Description: OpenSolaris interface library to manage ZFS storage pools
  This package contains the OpenSolaris libzpool library.
- .
- This is a minimal package for use in debian-installer.
-
-Package: libzpool-dev
-Section: libdevel
-Architecture: kfreebsd-any
-Depends: libzpool0 (= ${binary:Version}), ${misc:Depends}, libc0.1-dev | libc-dev
-Description: Development files for libnvpair
- This package contains the header files and static library needed to
- compile applications that use libzpool.
 
 Package: libzpool1-udeb
-XC-Package-Type: udeb
+Package-Type: udeb
 Section: debian-installer
 Architecture: kfreebsd-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenSolaris name-value pair library
+Description: OpenSolaris interface library to manage ZFS storage pools (debian-installer version)
  This package contains the OpenSolaris libzpool library.
  .
  This is a minimal package for use in debian-installer.
