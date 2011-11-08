@@ -89,7 +89,7 @@ lib-stamp:
 	$(MAKE) -C lib
 	touch $@
 
-build-arch: freebsd-utils gbde geli kbdcontrol vidcontrol kldutils freebsd-net-tools freebsd-nfs-utils
+build-arch: freebsd-utils gbde geli kbdcontrol vidcontrol kldutils freebsd-net-tools freebsd-nfs-utils freebsd-ppp
 
 freebsd-utils: freebsd-utils-stamp
 freebsd-utils-stamp: $(RPCHDRS)
@@ -169,6 +169,11 @@ freebsd-net-tools-stamp: lib-stamp
 	$(PMAKE) -C usr.bin/netstat
 	$(PMAKE) -C usr.sbin/arp
 	$(PMAKE) -C usr.sbin/authpf
+	touch $@
+
+freebsd-ppp: freebsd-ppp-stamp
+freebsd-ppp-stamp:
+	$(PMAKE) -C usr.sbin/ppp -DPPP_NO_PAM -DPPP_NO_NAT -DPPP_NO_DES -DPPP_NO_SUID -DPPP_NO_ATM -DPPP_NO_RADIUS
 	$(PMAKE) -C usr.sbin/pppctl
 	touch $@
 
@@ -252,6 +257,7 @@ clean:
 	$(PMAKE) -C usr.bin/netstat clean
 	$(PMAKE) -C usr.sbin/arp clean
 	$(PMAKE) -C usr.sbin/authpf clean
+	$(PMAKE) -C usr.sbin/ppp clean
 	$(PMAKE) -C usr.sbin/pppctl clean
 
 	$(PMAKE) -C sbin/nfsiod clean
@@ -301,6 +307,7 @@ binary-arch: build install
 	dh_installinit -pfreebsd-utils --name=devd -- start 03 S . stop 01 0 1 6 .
 	dh_installinit -pkldutils --no-start -- start 12 S .
 	dh_installinit -pkbdcontrol -- start 20 S .
+	dh_installinit -pfreebsd-ppp -- start 20 2 3 4 5 . stop 80 0 1 6 .
 	dh_installinit -pfreebsd-nfs-common --name=rpc.statd -- start 20 2 3 4 5 S . stop 20 0 1 6 .
 	dh_installinit -pfreebsd-nfs-common --name=rpc.lockd -- start 20 2 3 4 5 S . stop 20 0 1 6 .
 	dh_installinit -pfreebsd-nfs-common --name=nfsiod -- start 20 2 3 4 5 S . stop 20 0 1 6 .

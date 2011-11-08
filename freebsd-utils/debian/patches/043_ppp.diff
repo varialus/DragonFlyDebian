@@ -1,0 +1,272 @@
+
+we don't link against libmd since it's not on debian
+http://martin.hinner.info/libmd/
+
+To run this, you need the if_tun module to be loaded:
+
+# kldload if_tun
+# ./ppp
+Working in interactive mode
+Warning: Add! route failed: ff02::/32: errno: Network is unreachable
+Using interface: tun0
+Warning: No default entry found in config file.
+ppp ON loony>
+
+--- a/usr.sbin/ppp/Makefile
++++ b/usr.sbin/ppp/Makefile
+@@ -38,11 +38,11 @@
+ BINMODE=4550
+ BINOWN=	root
+ .endif
+-BINGRP=	network
++BINGRP=	dialout
+ M4FLAGS=
+ 
+-LDADD= -lcrypt -lmd -lutil -lz
+-DPADD=	${LIBCRYPT} ${LIBMD} ${LIBUTIL} ${LIBZ}
++LDADD= -lcrypt -lbsd -lutil -lz
++DPADD=	${LIBCRYPT} ${LIBUTIL} ${LIBZ}
+ 
+ .SUFFIXES: .8 .8.m4
+ 
+@@ -79,6 +79,7 @@
+ 
+ .if defined(PPP_NO_SUID)
+ CFLAGS+=-DNOSUID
++LDADD+= -llockdev
+ .else
+ SRCS+=	id.c
+ .endif
+--- a/usr.sbin/ppp/acf.c
++++ b/usr.sbin/ppp/acf.c
+@@ -26,7 +26,7 @@
+  * $FreeBSD$
+  */
+ 
+-#include <sys/types.h>
++#include <sys/_types.h>
+ 
+ #include <stdio.h>
+ #include <termios.h>
+--- a/usr.sbin/ppp/bundle.c
++++ b/usr.sbin/ppp/bundle.c
+@@ -26,6 +26,9 @@
+  * $FreeBSD$
+  */
+ 
++#include <sys/ioccom.h>
++#include <time.h>
++
+ #include <sys/param.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+@@ -51,6 +54,8 @@
+ #include <sys/uio.h>
+ #include <sys/wait.h>
+ #include <termios.h>
++// this is mislead about the getpgrp() declaration
++#undef __FAVOR_BSD
+ #include <unistd.h>
+ 
+ #include "layer.h"
+@@ -1629,7 +1634,11 @@
+         log_Printf(LogDEBUG, "Received confirmation from pid %ld\n",
+                    (long)newpid);
+         if (lock && (res = ID0uu_lock_txfr(lock, newpid)) != UU_LOCK_OK)
++#if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
++            log_Printf(LogERROR, "lock transfer failed");
++#else
+             log_Printf(LogERROR, "uu_lock_txfr: %s\n", uu_lockerr(res));
++#endif
+ 
+         log_Printf(LogDEBUG, "Transmitting link (%d bytes)\n", expect);
+         if ((got = writev(reply[0], iov + 1, niov - 1)) != expect) {
+--- a/usr.sbin/ppp/cbcp.c
++++ b/usr.sbin/ppp/cbcp.c
+@@ -28,9 +28,7 @@
+ 
+ #include <sys/param.h>
+ 
+-#ifdef __FreeBSD__
+ #include <netinet/in.h>
+-#endif
+ #include <sys/un.h>
+ 
+ #include <string.h>
+--- a/usr.sbin/ppp/chap.c
++++ b/usr.sbin/ppp/chap.c
+@@ -38,10 +38,7 @@
+ #include <ctype.h>
+ #include <errno.h>
+ #include <fcntl.h>
+-#ifndef NODES
+-#include <md4.h>
+-#endif
+-#include <md5.h>
++#include <sys/md5.h>
+ #include <paths.h>
+ #include <signal.h>
+ #include <stdio.h>
+--- a/usr.sbin/ppp/command.c
++++ b/usr.sbin/ppp/command.c
+@@ -50,14 +50,6 @@
+ #include <termios.h>
+ #include <unistd.h>
+ 
+-#ifndef NONAT
+-#ifdef LOCALNAT
+-#include "alias.h"
+-#else
+-#include <alias.h>
+-#endif
+-#endif
+-
+ #include "layer.h"
+ #include "defs.h"
+ #include "command.h"
+--- a/usr.sbin/ppp/id.h
++++ b/usr.sbin/ppp/id.h
+@@ -61,9 +61,18 @@
+ #define ID0fopen fopen
+ #define ID0open open
+ #define ID0write write
++#if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
++#include <lockdev.h>
++#define ID0uu_lock dev_lock
++#define ID0uu_lock_txfr dev_relock
++#define ID0uu_unlock dev_unlock
++#define UU_LOCK_OK 0
++#else /* on BSD */
+ #define ID0uu_lock uu_lock
+ #define ID0uu_lock_txfr uu_lock_txfr
+ #define ID0uu_unlock uu_unlock
++#endif
++
+ #define ID0login(u)			\
+   do {					\
+     if (logout((u)->ut_line))		\
+--- a/usr.sbin/ppp/physical.c
++++ b/usr.sbin/ppp/physical.c
+@@ -41,6 +41,8 @@
+ #include <sysexits.h>
+ #include <termios.h>
+ #include <time.h>
++// this is mislead about the getpgrp() declaration
++#undef __FAVOR_BSD
+ #include <unistd.h>
+ #include <utmp.h>
+ #if defined(__OpenBSD__) || defined(__NetBSD__)
+@@ -308,11 +310,15 @@
+ 
+   if (*p->name.full == '/' && p->type != PHYS_DIRECT &&
+       (res = ID0uu_lock(p->name.base)) != UU_LOCK_OK) {
++#if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
++    log_Printf(LogPHASE, "%s: %s is in use\n", p->link.name, p->name.full);
++#else
+     if (res == UU_LOCK_INUSE)
+       log_Printf(LogPHASE, "%s: %s is in use\n", p->link.name, p->name.full);
+     else
+       log_Printf(LogPHASE, "%s: %s is in use: uu_lock: %s\n",
+                  p->link.name, p->name.full, uu_lockerr(res));
++#endif
+     return 0;
+   }
+ 
+@@ -323,7 +329,12 @@
+ physical_Unlock(struct physical *p)
+ {
+   if (*p->name.full == '/' && p->type != PHYS_DIRECT &&
+-      ID0uu_unlock(p->name.base) == -1)
++#if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
++      ID0uu_unlock(p->name.base, 0) == -1
++#else
++      ID0uu_unlock(p->name.base) == -1
++#endif
++      )
+     log_Printf(LogALERT, "%s: Can't uu_unlock %s\n", p->link.name,
+                p->name.base);
+ }
+@@ -762,7 +773,11 @@
+     int res;
+ 
+     if ((res = ID0uu_lock_txfr(p->name.base, newpid)) != UU_LOCK_OK)
++#if defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
++      log_Printf(LogPHASE, "uu_lock_txfr");
++#else
+       log_Printf(LogPHASE, "uu_lock_txfr: %s\n", uu_lockerr(res));
++#endif
+   }
+ }
+ 
+--- a/usr.sbin/ppp/prompt.c
++++ b/usr.sbin/ppp/prompt.c
+@@ -40,6 +40,8 @@
+ #include <string.h>
+ #include <sys/fcntl.h>
+ #include <termios.h>
++// this is mislead about the getpgrp() declaration
++#undef __FAVOR_BSD
+ #include <unistd.h>
+ 
+ #include "layer.h"
+--- a/usr.sbin/ppp/tty.c
++++ b/usr.sbin/ppp/tty.c
+@@ -41,6 +41,7 @@
+ #include <sys/uio.h>
+ #include <termios.h>
+ #include <ttyent.h>
++#include <sys/ttycom.h>
+ #include <unistd.h>
+ #ifndef NONETGRAPH
+ #include <netgraph.h>
+--- a/usr.sbin/ppp/tun.c
++++ b/usr.sbin/ppp/tun.c
+@@ -42,7 +42,7 @@
+ 
+ #include <errno.h>
+ #include <string.h>
+-#if defined(__OpenBSD__) || defined(__NetBSD__)
++#if defined(__OpenBSD__) || defined(__NetBSD__) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
+ #include <sys/ioctl.h>
+ #endif
+ #include <stdio.h>
+--- a/usr.sbin/ppp/slcompress.c
++++ b/usr.sbin/ppp/slcompress.c
+@@ -42,7 +42,10 @@
+ #include <sys/param.h>
+ #include <netinet/in_systm.h>
+ #include <netinet/in.h>
++// BSDish struct tcphdr
++#define __FAVOR_BSD 1
+ #include <netinet/tcp.h>
++#undef __FAVOR_BSD
+ #include <netinet/ip.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+--- a/usr.sbin/ppp/tcpmss.c
++++ b/usr.sbin/ppp/tcpmss.c
+@@ -33,7 +33,10 @@
+ #include <netinet/in_systm.h>
+ #include <netinet/in.h>
+ #include <netinet/ip.h>
++// BSDish struct tcphdr
++#define __FAVOR_BSD 1
+ #include <netinet/tcp.h>
++#undef __FAVOR_BSD
+ #include <sys/un.h>
+ 
+ #include <termios.h>
+--- a/usr.sbin/ppp/ip.c
++++ b/usr.sbin/ppp/ip.c
+@@ -38,8 +38,11 @@
+ #include <netinet/ip6.h>
+ #endif
+ #include <netinet/ip_icmp.h>
++// BSDish struct tcphdr
++#define __FAVOR_BSD 1
+ #include <netinet/udp.h>
+ #include <netinet/tcp.h>
++#undef __FAVOR_BSD
+ #include <sys/un.h>
+ 
+ #include <errno.h>
