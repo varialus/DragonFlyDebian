@@ -285,6 +285,8 @@ install-arch:
 	dh_prep -a
 	dh_installdirs -a
 	dh_install -a
+	mkdir -p debian/freebsd-net-tools/usr/bin
+	install -m 2755 -g kmem usr.bin/netstat/netstat debian/freebsd-net-tools/usr/bin/
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -319,7 +321,7 @@ binary-arch: build install
 	dh_link
 	dh_strip
 	dh_compress
-	dh_fixperms
+	dh_fixperms -X/usr/bin/netstat
 #	dh_perl
 #	dh_python
 	dh_makeshlibs
