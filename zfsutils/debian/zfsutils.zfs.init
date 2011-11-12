@@ -74,12 +74,22 @@ do_stop() {
 		log_end_msg $RET
 		exit $RET
 	fi
-	zfs umount -a
-	RET=$?
-	if [ $RET != 0 ] ; then
-		log_end_msg $RET
-		exit $RET
-	fi
+	zfs mount | \
+	while read name mountpoint; do
+		case "${mountpoint}" in
+		/)
+			# / can't be unmounted, skip.
+		;;
+		*)
+			zfs umount ${name}
+			RET=$?
+			if [ $RET != 0 ] ; then
+				log_end_msg $RET
+				exit $RET
+			fi
+		;;
+		esac
+	done
 
 	# end
 	log_end_msg 0
