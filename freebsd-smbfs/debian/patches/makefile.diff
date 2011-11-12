@@ -24,3 +24,14 @@
  # Needs to be dynamically linked for optional dlopen() access to
  # userland libiconv (see the -E option).
  #
+--- a/lib/libsmb/Makefile
++++ b/lib/libsmb/Makefile
+@@ -6,7 +6,7 @@
+ LIB=	smb
+ SHLIB_MAJOR=	4
+ DPADD=	${LIBKICONV}
+-LDADD=	-lkiconv
++LDADD=	-lkiconv -ldl
+ 
+ SRCS=	rcfile.c ctx.c cfopt.c subr.c nls.c rap.c mbuf.c rq.c file.c \
+ 	print.c \
