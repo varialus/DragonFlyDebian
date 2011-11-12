@@ -1,11 +1,26 @@
+--- a/usr.bin/smbutil/Makefile
++++ b/usr.bin/smbutil/Makefile
+@@ -6,6 +6,8 @@
+ DPADD=	${LIBSMB} ${LIBKICONV}
+ LDADD=	-lsmb -lkiconv
+ 
++LDADD+=	-L../../lib/libsmb
++
+ CONTRIBDIR=	${.CURDIR}/../../contrib/smbfs
+ CFLAGS+=	-I${CONTRIBDIR}/include
+ 
 --- a/usr.sbin/mount_smbfs/Makefile
 +++ b/usr.sbin/mount_smbfs/Makefile
-@@ -8,7 +8,7 @@
+@@ -8,9 +8,11 @@
  CONTRIBDIR=	${.CURDIR}/../../contrib/smbfs
  CFLAGS+=	-DSMBFS -I${MOUNTDIR} -I${CONTRIBDIR}/include
  
 -LDADD=	-lsmb -lkiconv
-+LDADD=	../../lib/libsmb/libsmb.a -lkiconv -ldl
++LDADD=	-lsmb -lkiconv -ldl
  DPADD=	${LIBSMB} ${LIBKICONV}
  
++LDADD+=	-L../../lib/libsmb
++
  # Needs to be dynamically linked for optional dlopen() access to
+ # userland libiconv (see the -E option).
+ #

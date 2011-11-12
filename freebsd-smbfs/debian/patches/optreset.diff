@@ -1,0 +1,21 @@
+--- a/contrib/smbfs/smbutil/smbutil.c
++++ b/contrib/smbfs/smbutil/smbutil.c
+@@ -6,6 +6,7 @@
+ #include <stdlib.h>
+ #include <err.h>
+ #include <sysexits.h>
++#include <bsd/getopt.h>
+ 
+ #include <netsmb/smb_lib.h>
+ #include <netsmb/smb_conn.h>
+--- a/usr.bin/smbutil/Makefile
++++ b/usr.bin/smbutil/Makefile
+@@ -4,7 +4,7 @@
+ SRCS=	smbutil.c dumptree.c login.c lookup.c view.c print.c
+ 
+ DPADD=	${LIBSMB} ${LIBKICONV}
+-LDADD=	-lsmb -lkiconv
++LDADD=	-lsmb -lkiconv -lbsd
+ 
+ LDADD+=	-L../../lib/libsmb
+ 

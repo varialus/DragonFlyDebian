@@ -1,0 +1,22 @@
+--- a/contrib/smbfs/smbutil/dumptree.c
++++ b/contrib/smbfs/smbutil/dumptree.c
+@@ -70,8 +70,7 @@
+ 	char buf[200];
+ 
+ 	printf("VC: \\\\%s\\%s\n", vip->srvname, vip->vcname);
+-	printf("(%s:%s) %o", user_from_uid(vip->uid, 0), 
+-	    group_from_gid(vip->gid, 0), vip->mode);
++	printf("(%u:%u) %o", vip->uid, vip->gid, vip->mode);
+ 	printf("\n");
+ 	if (!verbose)
+ 		return;
+@@ -93,8 +92,7 @@
+ 	char buf[200];
+ 
+ 	iprintf(4, "Share:    %s", sip->sname);
+-	printf("(%s:%s) %o", user_from_uid(sip->uid, 0), 
+-	    group_from_gid(sip->gid, 0), sip->mode);
++	printf("(%u:%u) %o", sip->uid, sip->gid, sip->mode);
+ 	printf("\n");
+ 	if (!verbose)
+ 		return;

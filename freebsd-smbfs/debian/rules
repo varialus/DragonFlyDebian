@@ -46,6 +46,7 @@ get-orig-source:
 	for i in \
 		contrib/smbfs \
 		usr.sbin/mount_smbfs \
+		usr.bin/smbutil \
 		lib/libsmb \
 		sbin/mount/{getmntopts.c,mntopts.h} \
 		etc/nsmb.conf \
@@ -71,13 +72,16 @@ build-libsmb-stamp:
 build-smbfs: build-smbfs-stamp
 build-smbfs-stamp: build-libsmb-stamp
 	$(PMAKE) -C $(CURDIR)/usr.sbin/mount_smbfs
+	$(PMAKE) -C $(CURDIR)/usr.bin/smbutil
 	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
 
+	$(PMAKE) -C $(CURDIR)/lib/libsmb clean
 	$(PMAKE) -C $(CURDIR)/usr.sbin/mount_smbfs clean
+	$(PMAKE) -C $(CURDIR)/usr.bin/smbutil clean
 
 	rm -f *stamp
 	dh_clean
