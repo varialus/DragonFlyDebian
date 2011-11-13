@@ -1,0 +1,14 @@
+
+See PR misc/162519
+
+--- a/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_import.c
++++ b/cddl/contrib/opensolaris/lib/libzfs/common/libzfs_import.c
+@@ -1156,7 +1156,7 @@
+ 		int dfd;
+ 
+ 		/* use realpath to normalize the path */
+-		if (realpath(dir[i], path) == 0) {
++		if (realpath(dir[i], path) == 0 && errno != ENOENT && errno != ENOTDIR) {
+ 			(void) zfs_error_fmt(hdl, EZFS_BADPATH,
+ 			    dgettext(TEXT_DOMAIN, "cannot open '%s'"), dir[i]);
+ 			goto error;
