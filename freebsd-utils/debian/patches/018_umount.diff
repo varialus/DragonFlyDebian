@@ -5,7 +5,7 @@
 
 --- a/sbin/umount/umount.c
 +++ b/sbin/umount/umount.c
-@@ -94,7 +94,7 @@ main(int argc, char *argv[])
+@@ -94,7 +94,7 @@
  	sync();
  
  	all = errs = 0;
@@ -14,7 +14,7 @@
  		switch (ch) {
  		case 'A':
  			all = 2;
-@@ -102,9 +102,6 @@ main(int argc, char *argv[])
+@@ -102,9 +102,6 @@
  		case 'a':
  			all = 1;
  			break;
@@ -24,7 +24,7 @@
  		case 'f':
  			fflag = MNT_FORCE;
  			break;
-@@ -160,7 +157,7 @@ main(int argc, char *argv[])
+@@ -160,7 +157,7 @@
  		break;
  	case 1:
  		if (setfsent() == 0)
@@ -33,7 +33,7 @@
  		errs = umountall(typelist);
  		break;
  	case 0:
-@@ -199,9 +196,6 @@ umountall(char **typelist)
+@@ -199,9 +196,6 @@
  		    strcmp(fs->fs_type, FSTAB_RO) &&
  		    strcmp(fs->fs_type, FSTAB_RQ))
  			continue;
@@ -43,7 +43,7 @@
  		if (checkvfsname(fs->fs_vfstype, typelist))
  			continue;
  
-@@ -358,24 +352,12 @@ umountfs(struct statfs *sfs)
+@@ -358,24 +352,12 @@
  
  	if (!namematch(ai))
  		return (1);
@@ -70,7 +70,7 @@
  	/* Mark this this file system as unmounted. */
  	getmntentry(NULL, NULL, &sfs->f_fsid, REMOVE);
  	if (vflag)
-@@ -392,7 +374,7 @@ umountfs(struct statfs *sfs)
+@@ -392,7 +374,7 @@
  			    clnt_spcreateerror("MOUNTPROG"));
  			return (1);
  		}
@@ -79,7 +79,7 @@
  		try.tv_sec = 20;
  		try.tv_usec = 0;
  		clnt_stat = clnt_call(clp, MOUNTPROC_UMNT, (xdrproc_t)xdr_dir,
-@@ -600,6 +582,6 @@ usage()
+@@ -600,6 +582,6 @@
  
  	(void)fprintf(stderr, "%s\n%s\n",
  	    "usage: umount [-fv] special | node | fsid",
@@ -97,7 +97,7 @@
  .Op Fl fv
  .Op Fl h Ar host
  .Op Fl t Ar type
-@@ -69,10 +68,6 @@ are unmounted.
+@@ -69,10 +68,6 @@
  .It Fl A
  All the currently mounted file systems except
  the root are unmounted.

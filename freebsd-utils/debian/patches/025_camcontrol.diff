@@ -16,7 +16,7 @@
  #include <sys/types.h>
  #include <sys/endian.h>
  
-@@ -123,9 +123,9 @@ struct camcontrol_opts {
+@@ -123,9 +123,9 @@
  };
  
  #ifndef MINIMALISTIC
@@ -29,7 +29,7 @@
  #endif
  
  struct camcontrol_opts option_table[] = {
-@@ -4709,7 +4709,6 @@ main(int argc, char **argv)
+@@ -4709,7 +4709,6 @@
  	 * the arguments again.
  	 */
  	optind = optstart;
@@ -39,29 +39,29 @@
  #ifndef MINIMALISTIC
 --- a/sbin/camcontrol/modeedit.c
 +++ b/sbin/camcontrol/modeedit.c
-@@ -140,7 +140,7 @@ static void		 cleanup_editfile(void);
+@@ -140,7 +140,7 @@
  
  
  static void
--editentry_create(void *hook __unused, int letter, void *arg, int count,
+-editentry_create(void *hook __attribute__((unused)), int letter, void *arg, int count,
 +editentry_create(void *hook, int letter, void *arg, int count,
  		 char *name)
  {
  	struct editentry *newentry;	/* Buffer to hold new entry. */
-@@ -162,7 +162,7 @@ editentry_create(void *hook __unused, in
+@@ -162,7 +162,7 @@
  }
  
  static void
--editentry_update(void *hook __unused, int letter, void *arg, int count,
+-editentry_update(void *hook __attribute__((unused)), int letter, void *arg, int count,
 +editentry_update(void *hook, int letter, void *arg, int count,
  		 char *name)
  {
  	struct editentry *dest;		/* Buffer to hold entry to update. */
-@@ -190,7 +190,7 @@ editentry_update(void *hook __unused, in
+@@ -190,7 +190,7 @@
  }
  
  static int
--editentry_save(void *hook __unused, char *name)
+-editentry_save(void *hook __attribute__((unused)), char *name)
 +editentry_save(void *hook, char *name)
  {
  	struct editentry *src;		/* Entry value to save. */
@@ -77,18 +77,18 @@
  #include <sys/types.h>
  
  #include <stdlib.h>
-@@ -107,7 +107,7 @@ cget(void *hook, char *name)
+@@ -107,7 +107,7 @@
  /* arg_put: "put argument" callback
   */
  void
--arg_put(void *hook __unused, int letter, void *arg, int count, char *name)
+-arg_put(void *hook __attribute__((unused)), int letter, void *arg, int count, char *name)
 +arg_put(void *hook, int letter, void *arg, int count, char *name)
  {
  	if (verbose && name && *name)
  		printf("%s:  ", name);
 --- a/sbin/camcontrol/Makefile
 +++ b/sbin/camcontrol/Makefile
-@@ -13,7 +13,7 @@ WARNS?= 3
+@@ -13,7 +13,7 @@
  WARNS?=	6
  .endif
  DPADD=	${LIBCAM} ${LIBSBUF} ${LIBUTIL}

@@ -95,7 +95,7 @@
  
 +#if 0
  static void
--setifvnet(const char *jname, int dummy __unused, int s,
+-setifvnet(const char *jname, int dummy __attribute__((unused)), int s,
 +setifvnet(const char *jname, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -104,7 +104,7 @@
  }
  
  static void
--setifrvnet(const char *jname, int dummy __unused, int s,
+-setifrvnet(const char *jname, int dummy __attribute__((unused)), int s,
 +setifrvnet(const char *jname, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -116,7 +116,7 @@
 +#endif
 +
  static void
--setifnetmask(const char *addr, int dummy __unused, int s,
+-setifnetmask(const char *addr, int dummy __attribute__((unused)), int s,
 +setifnetmask(const char *addr, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -125,7 +125,7 @@
  }
  
  static void
--setifbroadaddr(const char *addr, int dummy __unused, int s,
+-setifbroadaddr(const char *addr, int dummy __attribute__((unused)), int s,
 +setifbroadaddr(const char *addr, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -134,7 +134,7 @@
  }
  
  static void
--setifipdst(const char *addr, int dummy __unused, int s,
+-setifipdst(const char *addr, int dummy __attribute__((unused)), int s,
 +setifipdst(const char *addr, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -143,7 +143,7 @@
  
  /*ARGSUSED*/
  static void
--setifdstaddr(const char *addr, int param __unused, int s, 
+-setifdstaddr(const char *addr, int param __attribute__((unused)), int s, 
 +setifdstaddr(const char *addr, int param, int s,
      const struct afswtch *afp)
  {
@@ -152,7 +152,7 @@
  }
  
  static void
--setifmetric(const char *val, int dummy __unused, int s, 
+-setifmetric(const char *val, int dummy __attribute__((unused)), int s, 
 +setifmetric(const char *val, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -161,7 +161,7 @@
  }
  
  static void
--setifmtu(const char *val, int dummy __unused, int s, 
+-setifmtu(const char *val, int dummy __attribute__((unused)), int s, 
 +setifmtu(const char *val, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -170,7 +170,7 @@
  }
  
  static void
--setifname(const char *val, int dummy __unused, int s, 
+-setifname(const char *val, int dummy __attribute__((unused)), int s, 
 +setifname(const char *val, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -179,7 +179,7 @@
  
  /* ARGSUSED */
  static void
--setifdescr(const char *val, int dummy __unused, int s, 
+-setifdescr(const char *val, int dummy __attribute__((unused)), int s, 
 +setifdescr(const char *val, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -230,7 +230,7 @@
  static	char addr_buf[MAXHOSTNAMELEN *2 + 1];	/*for getnameinfo()*/
  
  static void
--setifprefixlen(const char *addr, int dummy __unused, int s,
+-setifprefixlen(const char *addr, int dummy __attribute__((unused)), int s,
 +setifprefixlen(const char *addr, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -239,7 +239,7 @@
  }
  
  static void
--setip6flags(const char *dummyaddr __unused, int flag, int dummysoc __unused,
+-setip6flags(const char *dummyaddr __attribute__((unused)), int flag, int dummysoc __attribute__((unused)),
 +setip6flags(const char *dummyaddr, int flag, int dummysoc,
      const struct afswtch *afp)
  {
@@ -248,7 +248,7 @@
  }
  
  static void
--setip6pltime(const char *seconds, int dummy __unused, int s, 
+-setip6pltime(const char *seconds, int dummy __attribute__((unused)), int s, 
 +setip6pltime(const char *seconds, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -256,7 +256,7 @@
  }
  
  static void
--setip6vltime(const char *seconds, int dummy __unused, int s, 
+-setip6vltime(const char *seconds, int dummy __attribute__((unused)), int s, 
 +setip6vltime(const char *seconds, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -264,7 +264,7 @@
  }
  
  static void
--setip6eui64(const char *cmd, int dummy __unused, int s,
+-setip6eui64(const char *cmd, int dummy __attribute__((unused)), int s,
 +setip6eui64(const char *cmd, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -273,7 +273,7 @@
  }
  
  static void
--in6_status(int s __unused, const struct ifaddrs *ifa)
+-in6_status(int s __attribute__((unused)), const struct ifaddrs *ifa)
 +in6_status(int s, const struct ifaddrs *ifa)
  {
  	struct sockaddr_in6 *sin, null_sin;
@@ -282,7 +282,7 @@
  };
  
  static void
--in6_Lopt_cb(const char *optarg __unused)
+-in6_Lopt_cb(const char *optarg __attribute__((unused)))
 +in6_Lopt_cb(const char *optarg)
  {
  	ip6lifetime++;	/* print IPv6 address lifetime */
@@ -293,7 +293,7 @@
  };
  
  static void
--clone_Copt_cb(const char *optarg __unused)
+-clone_Copt_cb(const char *optarg __attribute__((unused)))
 +clone_Copt_cb(const char *optarg)
  {
  	list_cloners();
@@ -312,7 +312,7 @@
  static struct ifreq link_ridreq;
  
  static void
--link_status(int s __unused, const struct ifaddrs *ifa)
+-link_status(int s __attribute__((unused)), const struct ifaddrs *ifa)
 +link_status(int s, const struct ifaddrs *ifa)
  {
  	/* XXX no const 'cuz LLADDR is defined wrong */
@@ -335,7 +335,7 @@
  
  /* XXX  FIXME -- should use strtoul for better parsing. */
  static void
--setatrange(const char *range, int dummy __unused, int s, 
+-setatrange(const char *range, int dummy __attribute__((unused)), int s, 
 +setatrange(const char *range, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -344,7 +344,7 @@
  }
  
  static void
--setatphase(const char *phase, int dummy __unused, int s, 
+-setatphase(const char *phase, int dummy __attribute__((unused)), int s, 
 +setatphase(const char *phase, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -353,7 +353,7 @@
  }
  
  static void
--at_status(int s __unused, const struct ifaddrs *ifa)
+-at_status(int s __attribute__((unused)), const struct ifaddrs *ifa)
 +at_status(int s, const struct ifaddrs *ifa)
  {
  	struct sockaddr_at *sat, null_sat;
@@ -379,7 +379,7 @@
  static struct ifreq in_ridreq;
  
  static void
--in_status(int s __unused, const struct ifaddrs *ifa)
+-in_status(int s __attribute__((unused)), const struct ifaddrs *ifa)
 +in_status(int s, const struct ifaddrs *ifa)
  {
  	struct sockaddr_in *sin, null_sin;
@@ -401,7 +401,7 @@
  static struct ifreq ipx_ridreq;
  
  static void
--ipx_status(int s __unused, const struct ifaddrs *ifa)
+-ipx_status(int s __attribute__((unused)), const struct ifaddrs *ifa)
 +ipx_status(int s, const struct ifaddrs *ifa)
  {
  	struct sockaddr_ipx *sipx, null_sipx;
@@ -412,7 +412,7 @@
  }
  
  static void
--setifgrekey(const char *val, int dummy __unused, int s, 
+-setifgrekey(const char *val, int dummy __attribute__((unused)), int s, 
 +setifgrekey(const char *val, int dummy, int s,
      const struct afswtch *afp)
  {
@@ -423,7 +423,7 @@
  void setnd6defif(const char *, int, int, const struct afswtch *);
  
  void
--setnd6flags(const char *dummyaddr __unused,
+-setnd6flags(const char *dummyaddr __attribute__((unused)),
 +setnd6flags(const char *dummyaddr,
  	int d, int s,
  	const struct afswtch *afp)
@@ -432,7 +432,7 @@
  }
  
  void
--setnd6defif(const char *dummyaddr __unused,
+-setnd6defif(const char *dummyaddr __attribute__((unused)),
 +setnd6defif(const char *dummyaddr,
  	int d, int s,
  	const struct afswtch *afp)

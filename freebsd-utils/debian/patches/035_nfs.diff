@@ -164,14 +164,14 @@
  }
  
  void
--nonfs(__unused int signo)
+-nonfs(__attribute__((unused)) int signo)
 +nonfs(int signo)
  {
  	syslog(LOG_ERR, "missing system call: NFS not available");
  }
  
  void
--reapchild(__unused int signo)
+-reapchild(__attribute__((unused)) int signo)
 +reapchild(int signo)
  {
  	pid_t pid;
@@ -180,7 +180,7 @@
   * Cleanup master after SIGUSR1.
   */
  void
--cleanup(__unused int signo)
+-cleanup(__attribute__((unused)) int signo)
 +cleanup(int signo)
  {
  	nfsd_exit(0);
@@ -189,7 +189,7 @@
   * Cleanup child after SIGUSR1.
   */
  void
--child_cleanup(__unused int signo)
+-child_cleanup(__attribute__((unused)) int signo)
 +child_cleanup(int signo)
  {
  	exit(0);
@@ -266,7 +266,7 @@
   */
  void *
  nlm_cancel_res_1_svc(arg, rqstp)
--	nlm_res *arg __unused;
+-	nlm_res *arg __attribute__((unused));
 +	nlm_res *arg;
  	struct svc_req *rqstp;
  {
@@ -275,7 +275,7 @@
   */
  void *
  nlm_granted_res_1_svc(arg, rqstp)
--	nlm_res *arg __unused;
+-	nlm_res *arg __attribute__((unused));
 +	nlm_res *arg;
  	struct svc_req *rqstp;
  {
@@ -284,7 +284,7 @@
   */
  void *
  nlm_free_all_3_svc(arg, rqstp)
--	nlm_notify *arg __unused;
+-	nlm_notify *arg __attribute__((unused));
 +	nlm_notify *arg;
  	struct svc_req *rqstp;
  {
@@ -293,7 +293,7 @@
   */
  void *
  nlm4_cancel_res_4_svc(arg, rqstp)
--	nlm4_res *arg __unused;
+-	nlm4_res *arg __attribute__((unused));
 +	nlm4_res *arg;
  	struct svc_req *rqstp;
  {
@@ -302,7 +302,7 @@
   */
  void *
  nlm4_unlock_res_4_svc(arg, rqstp)
--	nlm4_res *arg __unused;
+-	nlm4_res *arg __attribute__((unused));
 +	nlm4_res *arg;
  	struct svc_req *rqstp;
  {
@@ -311,7 +311,7 @@
   */
  void *
  nlm4_granted_res_4_svc(arg, rqstp)
--	nlm4_res *arg __unused;
+-	nlm4_res *arg __attribute__((unused));
 +	nlm4_res *arg;
  	struct svc_req *rqstp;
  {
@@ -320,7 +320,7 @@
   */
  void *
  nlm4_free_all_4_svc(arg, rqstp)
--	struct nlm4_notify *arg __unused;
+-	struct nlm4_notify *arg __attribute__((unused));
 +	struct nlm4_notify *arg;
  	struct svc_req *rqstp;
  {
@@ -329,7 +329,7 @@
  void *
  nlm_sm_notify_0_svc(arg, rqstp)
  	struct nlm_sm_status *arg;
--	struct svc_req *rqstp __unused;
+-	struct svc_req *rqstp __attribute__((unused));
 +	struct svc_req *rqstp;
  {
  	static char dummy;
@@ -340,8 +340,8 @@
  
  enum hwlock_status
  test_hwlock(fl, conflicting_fl)
--	const struct file_lock *fl __unused;
--	struct file_lock **conflicting_fl __unused;
+-	const struct file_lock *fl __attribute__((unused));
+-	struct file_lock **conflicting_fl __attribute__((unused));
 +	const struct file_lock *fl;
 +	struct file_lock **conflicting_fl;
  {
@@ -351,7 +351,7 @@
   */
  
  struct nlm4_holder *
--testlock(struct nlm4_lock *lock, bool_t exclusive, int flags __unused)
+-testlock(struct nlm4_lock *lock, bool_t exclusive, int flags __attribute__((unused)))
 +testlock(struct nlm4_lock *lock, bool_t exclusive, int flags)
  {
  	struct file_lock test_fl, *conflicting_fl;
@@ -360,7 +360,7 @@
  
  /* unlock a filehandle */
  enum nlm_stats
--unlock(nlm4_lock *lock, const int flags __unused)
+-unlock(nlm4_lock *lock, const int flags __attribute__((unused)))
 +unlock(nlm4_lock *lock, const int flags)
  {
  	struct file_lock fl;
@@ -369,7 +369,7 @@
  void
  send_granted(fl, opcode)
  	struct file_lock *fl;
--	int opcode __unused;
+-	int opcode __attribute__((unused));
 +	int opcode;
  {
  	CLIENT *cli;
@@ -425,7 +425,7 @@
  		earlier call to sm_mon_1
  */
  
--struct sm_stat *sm_unmon_1_svc(mon_id *arg, struct svc_req *req __unused)
+-struct sm_stat *sm_unmon_1_svc(mon_id *arg, struct svc_req *req __attribute__((unused)))
 +struct sm_stat *sm_unmon_1_svc(mon_id *arg, struct svc_req *req)
  {
    static sm_stat res;
@@ -434,7 +434,7 @@
  		host and program number.
  */
  
--struct sm_stat *sm_unmon_all_1_svc(my_id *arg, struct svc_req *req __unused)
+-struct sm_stat *sm_unmon_all_1_svc(my_id *arg, struct svc_req *req __attribute__((unused)))
 +struct sm_stat *sm_unmon_all_1_svc(my_id *arg, struct svc_req *req)
  {
    static sm_stat res;
@@ -443,7 +443,7 @@
  		and inform all hosts on the monitor list.
  */
  
--void *sm_simu_crash_1_svc(void *v __unused, struct svc_req *req __unused)
+-void *sm_simu_crash_1_svc(void *v __attribute__((unused)), struct svc_req *req __attribute__((unused)))
 +void *sm_simu_crash_1_svc(void *v, struct svc_req *req)
  {
    static char dummy;
@@ -452,7 +452,7 @@
  		that modify the list.
  */
  
--void *sm_notify_1_svc(stat_chge *arg, struct svc_req *req __unused)
+-void *sm_notify_1_svc(stat_chge *arg, struct svc_req *req __attribute__((unused)))
 +void *sm_notify_1_svc(stat_chge *arg, struct svc_req *req)
  {
    struct timeval timeout = { 20, 0 };	/* 20 secs timeout		*/
@@ -481,7 +481,7 @@
  		children to exit when they have done their work.
  */
  
--static void handle_sigchld(int sig __unused)
+-static void handle_sigchld(int sig __attribute__((unused)))
 +static void handle_sigchld(int sig)
  {
    int pid, status;
