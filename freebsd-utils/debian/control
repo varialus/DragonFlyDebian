@@ -138,7 +138,9 @@ Package: freebsd-net-tools
 Section: net
 Priority: important
 Architecture: kfreebsd-any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends},
+# just to handle upgrades, maybe remove this after wheezy?
+ pf,
 Replaces: freebsd-utils (<< 5.4), freebsd-hackedutils (<< 7), net-tools
 Provides: net-tools
 Description: FreeBSD networking tools
@@ -230,6 +232,18 @@ Description: A kernel call tracer
  interface. A close examination of this boundary is very useful for bug
  isolation, sanity checking and attempting to capture race conditions.
 
-# FIXME:
-# - add pf (pfctl + authpf + /etc stuff + init.d script)
-# - add ipfw (???)
+Package: pf
+Section: net
+Priority: important
+Architecture: kfreebsd-any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Replaces: freebsd-utils (<< 8.2+ds2-10)
+Homepage: http://www.openbsd.org/faq/pf/
+Description: The OpenBSD Packet Filter
+ Packet Filter (from here on referred to as PF) is OpenBSD's system for
+ filtering TCP/IP traffic and doing Network Address Translation. PF is also
+ capable of normalizing and conditioning TCP/IP traffic and providing
+ bandwidth control and packet prioritization.
+ .
+ This version of PF has been ported to FreeBSD by the FreeBSD project, and
+ subsequently to GNU/kFreeBSD by the Debian project.
