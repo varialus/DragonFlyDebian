@@ -7,6 +7,9 @@ SHELL = bash
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+DEB_HOST_ARCH_OS	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+DEB_HOST_ARCH_CPU	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+
 full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
 tar_version	:= $(shell echo $(full_version) | sed -e 's/-.*//g')
 svn_revision	:= $(shell echo $(full_version) | sed -e 's/.*~svn\([0-9]*\)-[0-9]*/\1/g')
@@ -53,6 +56,18 @@ get-orig-source:
 	rm -rf $(ORIG_DIR)
 
 control: clean
+	for arch in `ls $(CURDIR)/debian/arch/` ; do \
+		KW_CONFIG_DIR=debian/arch/$$arch/installer ; \
+		if test -e $$KW_CONFIG_DIR ; then \
+			for config in `ls $(CURDIR)/debian/arch/$$arch/ | grep \.config` ; do \
+				flavor=$${config/.config/} ; \
+				if test -e debian/arch/$$arch/$$flavor.installer ; then \
+					echo "kfreebsd-$$arch $(version)-$(abiname) $$flavor $(version)-$(abiname)-$$flavor - -" ; \
+				fi ; \
+			done > $$KW_CONFIG_DIR/kernel-versions ; \
+		fi ; \
+		echo ; \
+	done
 	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@gcc_version@/$(gcc_version)/g" \
 		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
 	echo >> $(CURDIR)/debian/control
@@ -62,10 +77,15 @@ control: clean
 			recommends= ; \
 			test -f $(CURDIR)/debian/arch/$$arch/$$flavor.defines && recommends=`awk '/^Recommends: / {print $$2}' $(CURDIR)/debian/arch/$$arch/$$flavor.defines` ; \
 			sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@arch@/$$arch/g" -e "s/@recommends@/$$recommends/g" \
-				$(CURDIR)/debian/control.flavor.in >> $(CURDIR)/debian/control ; \
-			echo >> $(CURDIR)/debian/control ; \
+				$(CURDIR)/debian/control.flavor.in ; \
+			echo ; \
 		done ; \
-	done
+		export KW_CONFIG_DIR=debian/arch/$$arch/installer ; \
+		if test -e $$KW_CONFIG_DIR/kernel-versions ; then \
+			kernel-wedge gen-control ; \
+		fi ; \
+		echo ; \
+	done >> $(CURDIR)/debian/control
 
 clean:
 	dh_testdir
@@ -241,6 +261,10 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	install -p -o root -g root -m 644 \
 		debian/kfreebsd-image.overrides \
 		$(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides/kfreebsd-image-$(version)-$(abiname)-$*
+	mkdir -p $(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-$*-di/usr/share/lintian/overrides
+	install -p -o root -g root -m 644 \
+		debian/zlib-modules.overrides \
+		$(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-$*-di/usr/share/lintian/overrides/zlib-modules-$(version)-$(abiname)-$*-di
 
 	# scripts
 	for script in preinst prerm postinst postrm ; do \
@@ -261,6 +285,11 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 		ln -s ../../$(HEADERS_DIR)/sys/$$dir $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$$dir ; \
 	done
 	ln -s $(kfreebsd_cpu)/include $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/machine
+
+ifeq ($(DEB_HOST_ARCH_OS), kfreebsd)
+	KW_CONFIG_DIR=debian/arch/$(DEB_HOST_ARCH_CPU)/installer kernel-wedge install-files \
+		$(version)-$(abiname) debian/arch/$(DEB_HOST_ARCH_CPU)/installer
+endif
 
 	touch install-flavor-$*-stamp
 
