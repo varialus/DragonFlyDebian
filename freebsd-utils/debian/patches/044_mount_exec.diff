@@ -1,0 +1,24 @@
+
+mount_smbfs is not in /sbin
+
+--- a/sbin/mount/mount.c
++++ b/sbin/mount/mount.c
+@@ -160,7 +160,6 @@
+ static int
+ exec_mountprog(const char *name, const char *execname, char *const argv[])
+ {
+-	char buf[256];
+ 	pid_t pid;
+ 	int status;
+ 
+@@ -169,9 +168,7 @@
+ 		warn("fork");
+ 		exit (1);
+ 	case 0:					/* Child. */
+-		/* Mount programs are located in /sbin. */
+-		snprintf(buf, sizeof(buf), "/sbin/%s", execname);
+-		execv(buf, argv);
++		execvp(execname, argv);
+ 		if (errno == ENOENT) {
+ 			warn("exec %s not found", execname);
+ 		}
