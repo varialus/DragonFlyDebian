@@ -1,36 +1,32 @@
+
+Revision 220937 in upstream removed a similar kludge, which had become
+unnecessary in some cases but not in the one that concerns us (see
+comment below).
+
 --- a/sys/kern/vfs_mount.c
 +++ b/sys/kern/vfs_mount.c
-@@ -559,10 +559,10 @@
- 	struct vfsopt *opt, *noro_opt, *tmp_opt;
- 	char *fstype, *fspath, *errmsg;
- 	int error, fstypelen, fspathlen, errmsg_len, errmsg_pos;
--	int has_rw, has_noro;
-+	int has_noro;
+@@ -639,6 +639,24 @@
+ 	}
  
- 	errmsg = fspath = NULL;
--	errmsg_len = has_noro = has_rw = fspathlen = 0;
-+	errmsg_len = has_noro = fspathlen = 0;
- 	errmsg_pos = -1;
- 
- 	error = vfs_buildopts(fsoptions, &optlist);
-@@ -659,10 +659,8 @@
- 			fsflags &= ~MNT_RDONLY;
- 			has_noro = 1;
- 		}
--		else if (strcmp(opt->name, "rw") == 0) {
-+		else if (strcmp(opt->name, "rw") == 0)
- 			fsflags &= ~MNT_RDONLY;
--			has_rw = 1;
--		}
- 		else if (strcmp(opt->name, "ro") == 0)
- 			fsflags |= MNT_RDONLY;
- 		else if (strcmp(opt->name, "rdonly") == 0) {
-@@ -684,7 +682,7 @@
- 	 * we need a mount option "noro", since in vfs_mergeopts(),
- 	 * "noro" will cancel "ro", but "rw" will not do anything.
- 	 */
--	if (has_rw && !has_noro) {
-+	if (!(fsflags & MNT_RDONLY) && !has_noro) {
- 		noro_opt = malloc(sizeof(struct vfsopt), M_MOUNT, M_WAITOK);
- 		noro_opt->name = strdup("noro", M_MOUNT);
- 		noro_opt->value = NULL;
+ 	/*
++	 * If MNT_RDONLY was not specified as a mount option, and we
++	 * are trying to update a mount-point from "ro", it means
++	 * read-write mode is desired by userland even if "rw" or
++	 * "noro" weren't specified explicitly. Add "noro" here to
++	 * make that happen.
++	 */
++	if (!(fsflags & MNT_RDONLY)) {
++		struct vfsopt *noro_opt;
++		noro_opt = malloc(sizeof(struct vfsopt), M_MOUNT, M_WAITOK);
++		noro_opt->name = strdup("noro", M_MOUNT);
++		noro_opt->value = NULL;
++		noro_opt->len = 0;
++		noro_opt->pos = -1;
++		noro_opt->seen = 1;
++		TAILQ_INSERT_TAIL(optlist, noro_opt, link);
++	}
++
++	/*
+ 	 * Be ultra-paranoid about making sure the type and fspath
+ 	 * variables will fit in our mp buffers, including the
+ 	 * terminating NUL.
