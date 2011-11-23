@@ -355,7 +355,7 @@ See #594940
  dev/mxge/if_mxge.c		optional mxge pci
  dev/mxge/mxge_lro.c		optional mxge pci
  dev/mxge/mxge_eth_z8e.c		optional mxge pci
-@@ -1587,65 +1298,6 @@
+@@ -1588,65 +1299,6 @@
  dev/puc/puc_pci.c		optional puc pci
  dev/puc/pucdata.c		optional puc pci
  dev/quicc/quicc_core.c		optional quicc
@@ -421,11 +421,17 @@ See #594940
  dev/random/harvest.c		standard
  dev/random/hash.c		optional random
  dev/random/probe.c		optional random
-@@ -1670,14 +1322,7 @@
+@@ -1671,7 +1323,6 @@
  dev/scd/scd.c			optional scd isa
  dev/scd/scd_isa.c		optional scd isa
  dev/sdhci/sdhci.c		optional sdhci pci
 -dev/sf/if_sf.c			optional sf pci
+ dev/sfxge/common/efx_bootcfg.c	optional sfxge inet pci
+ dev/sfxge/common/efx_ev.c	optional sfxge inet pci
+ dev/sfxge/common/efx_filter.c	optional sfxge inet pci
+@@ -1704,12 +1355,6 @@
+ dev/sfxge/sfxge_rx.c		optional sfxge inet pci
+ dev/sfxge/sfxge_tx.c		optional sfxge inet pci
  dev/sge/if_sge.c		optional sge pci
 -dev/si/si.c			optional si
 -dev/si/si2_z280.c		optional si
@@ -436,7 +442,7 @@ See #594940
  dev/siba/siba_bwn.c		optional siba_bwn pci
  dev/siba/siba_core.c		optional siba_bwn pci
  dev/siis/siis.c			optional siis pci
-@@ -1688,9 +1333,6 @@
+@@ -1720,9 +1365,6 @@
  dev/smbus/smbus.c		optional smbus
  dev/smbus/smbus_if.m		optional smbus
  dev/smc/if_smc.c		optional smc
@@ -446,7 +452,7 @@ See #594940
  dev/snp/snp.c			optional snp
  dev/sound/clone.c		optional sound
  dev/sound/unit.c		optional sound
-@@ -1706,10 +1348,6 @@
+@@ -1738,10 +1380,6 @@
  dev/sound/pci/atiixp.c		optional snd_atiixp pci
  dev/sound/pci/cmi.c		optional snd_cmi pci
  dev/sound/pci/cs4281.c		optional snd_cs4281 pci
@@ -457,7 +463,7 @@ See #594940
  dev/sound/pci/emu10k1.c		optional snd_emu10k1 pci \
  	dependency "emu10k1-alsa%diked.h" \
  	warning "kernel contains GPL contaminated emu10k1 headers"
-@@ -1732,8 +1370,6 @@
+@@ -1764,8 +1402,6 @@
  dev/sound/pci/fm801.c		optional snd_fm801 pci
  dev/sound/pci/ich.c		optional snd_ich pci
  dev/sound/pci/maestro.c		optional snd_maestro pci
@@ -466,7 +472,7 @@ See #594940
  dev/sound/pci/neomagic.c	optional snd_neomagic pci
  dev/sound/pci/solo.c		optional snd_solo pci
  dev/sound/pci/spicds.c		optional snd_spicds pci
-@@ -1813,7 +1449,6 @@
+@@ -1845,7 +1481,6 @@
  dev/syscons/warp/warp_saver.c	optional warp_saver
  dev/tdfx/tdfx_linux.c		optional tdfx_linux tdfx compat_linux
  dev/tdfx/tdfx_pci.c		optional tdfx pci
@@ -474,7 +480,7 @@ See #594940
  dev/tl/if_tl.c			optional tl pci
  dev/trm/trm.c			optional trm
  dev/twa/tw_cl_init.c		optional twa \
-@@ -1836,7 +1471,6 @@
+@@ -1868,7 +1503,6 @@
  dev/tws/tws_services.c		optional tws
  dev/tws/tws_user.c		optional tws
  dev/tx/if_tx.c			optional tx
@@ -482,7 +488,7 @@ See #594940
  dev/uart/uart_bus_acpi.c	optional uart acpi
  #dev/uart/uart_bus_cbus.c	optional uart cbus
  dev/uart/uart_bus_ebus.c	optional uart ebus
-@@ -1916,19 +1550,17 @@
+@@ -1948,19 +1582,17 @@
  dev/usb/net/if_cdce.c		optional cdce
  dev/usb/net/if_cue.c		optional cue
  dev/usb/net/if_ipheth.c		optional ipheth
@@ -503,7 +509,7 @@ See #594940
  dev/usb/wlan/if_run.c		optional run
  runfw.c				optional runfw							\
  	compile-with	"${AWK} -f $S/tools/fw_stub.awk runfw:runfw -mrunfw -c${.TARGET}"	\
-@@ -1944,11 +1576,9 @@
+@@ -1976,11 +1608,9 @@
  	compile-with	"uudecode -o ${.TARGET} $S/contrib/dev/run/rt2870.fw.uu"		\
  	no-obj no-implicit-rule									\
  	clean		"runfw"
@@ -637,10 +643,10 @@ See #594940
  	sem \
  	send \
 -	sf \
+ 	${_sfxge} \
  	sge \
  	siba_bwn \
- 	siftr \
-@@ -277,7 +262,6 @@
+@@ -278,7 +263,6 @@
  	sis \
  	sk \
  	${_smbfs} \
@@ -648,7 +654,7 @@ See #594940
  	${_snc} \
  	snp \
  	${_sound} \
-@@ -292,7 +276,6 @@
+@@ -293,7 +277,6 @@
  	${_sym} \
  	${_syscons} \
  	sysvipc \
@@ -656,7 +662,7 @@ See #594940
  	tl \
  	tmpfs \
  	${_tpm} \
-@@ -301,7 +284,6 @@
+@@ -302,7 +285,6 @@
  	twe \
  	tws \
  	tx \
@@ -664,7 +670,7 @@ See #594940
  	uart \
  	ubsec \
  	udf \
-@@ -329,7 +311,6 @@
+@@ -331,7 +313,6 @@
  	wlan_wep \
  	wlan_xauth \
  	${_wpi} \
@@ -672,7 +678,7 @@ See #594940
  	${_x86bios} \
  	${_xe} \
  	xfs \
-@@ -405,9 +386,7 @@
+@@ -407,9 +388,7 @@
  _bxe=		bxe
  _cardbus=	cardbus
  _cbb=		cbb
@@ -682,7 +688,7 @@ See #594940
  _cpuctl=	cpuctl
  _cpufreq=	cpufreq
  _cs=		cs
-@@ -506,11 +485,8 @@
+@@ -508,11 +487,8 @@
  _ipmi=		ipmi
  _ips=		ips
  _ipw=		ipw
@@ -694,7 +700,7 @@ See #594940
  _ixgb=		ixgb
  _ixgbe=		ixgbe
  _mly=		mly
-@@ -519,7 +495,6 @@
+@@ -521,7 +497,6 @@
  _nxge=		nxge
  _tpm=		tpm
  _wpi=		wpi
@@ -702,7 +708,7 @@ See #594940
  .if ${MK_CRYPT} != "no" || defined(ALL_MODULES)
  _padlock=	padlock
  .endif
-@@ -580,11 +555,8 @@
+@@ -583,11 +558,8 @@
  _ipmi=		ipmi
  _ips=		ips
  _ipw=		ipw
@@ -714,7 +720,7 @@ See #594940
  _ixgb=		ixgb
  _ixgbe=		ixgbe
  _lindev=	lindev
-@@ -626,7 +598,6 @@
+@@ -631,7 +603,6 @@
  _x86bios=	x86bios
  _wi=		wi
  _wpi=		wpi

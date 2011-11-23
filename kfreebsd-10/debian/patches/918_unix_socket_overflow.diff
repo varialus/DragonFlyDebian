@@ -5,7 +5,7 @@ but kernel restrict it to 104 bytes.
 
 --- a/sys/kern/uipc_usrreq.c
 +++ b/sys/kern/uipc_usrreq.c
-@@ -463,7 +463,12 @@
+@@ -464,7 +464,12 @@
  	KASSERT(unp != NULL, ("uipc_bind: unp == NULL"));
  
  	if (soun->sun_len > sizeof(struct sockaddr_un))
@@ -18,7 +18,7 @@ but kernel restrict it to 104 bytes.
  	namelen = soun->sun_len - offsetof(struct sockaddr_un, sun_path);
  	if (namelen <= 0)
  		return (EINVAL);
-@@ -1255,7 +1260,12 @@
+@@ -1256,7 +1261,12 @@
  	KASSERT(unp != NULL, ("unp_connect: unp == NULL"));
  
  	if (nam->sa_len > sizeof(struct sockaddr_un))
