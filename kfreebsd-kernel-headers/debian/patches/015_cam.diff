@@ -9,16 +9,6 @@
  sys/sys/timespec.h         |    5 +----
  8 files changed, 21 insertions(+), 12 deletions(-)
 
---- a/sys/cam/scsi/scsi_all.h
-+++ b/sys/cam/scsi/scsi_all.h
-@@ -25,6 +25,7 @@
- #define	_SCSI_SCSI_ALL_H 1
- 
- #include <sys/cdefs.h>
-+#include <stdint.h>
- 
- #ifdef _KERNEL
- /*
 --- a/sys/i386/include/md_var.h
 +++ b/sys/i386/include/md_var.h
 @@ -32,6 +32,8 @@
@@ -41,17 +31,6 @@
  /*
   * Miscellaneous machine-dependent declarations.
   */
---- a/sys/sys/_mutex.h
-+++ b/sys/sys/_mutex.h
-@@ -31,6 +31,8 @@
- #ifndef _SYS__MUTEX_H_
- #define	_SYS__MUTEX_H_
- 
-+#include <stdint.h>
-+
- /*
-  * Sleep/spin mutex.
-  */
 --- a/sys/sys/_timeval.h
 +++ b/sys/sys/_timeval.h
 @@ -30,6 +30,7 @@
@@ -62,7 +41,7 @@
  
  #ifndef _SUSECONDS_T_DECLARED
  typedef	__suseconds_t	suseconds_t;
-@@ -41,12 +42,4 @@ typedef	__time_t	time_t;
+@@ -41,12 +42,4 @@
  #define	_TIME_T_DECLARED
  #endif
  
@@ -77,37 +56,36 @@
  #endif /* !_SYS__TIMEVAL_H_ */
 --- a/sys/sys/bio.h
 +++ b/sys/sys/bio.h
-@@ -39,6 +39,15 @@
- #define	_SYS_BIO_H_
- 
+@@ -41,6 +41,15 @@
  #include <sys/queue.h>
-+#include <stdint.h>
+ #include <stdint.h>
+ 
 +/* FIXME: this struct is copied from BSDish sys/time.h.  It should be somewhere else. (maybe Glibc?) */
 +#ifndef bintime
 +#define bintime bintime
 +struct bintime {
-+        time_t  sec;
-+        uint64_t frac;
++	time_t  sec;
++	uint64_t frac;
 +};
 +#endif
- 
++
  /* bio_cmd */
  #define BIO_READ	0x01
+ #define BIO_WRITE	0x02
 --- a/sys/sys/devicestat.h
 +++ b/sys/sys/devicestat.h
-@@ -33,6 +33,9 @@
+@@ -33,6 +33,8 @@
  
  #include <sys/queue.h>
  #include <sys/time.h>
 +#include <sys/_types.h>
 +#include <sys/resource.h>
-+#include <stdint.h>
+ #include <stdint.h>
  
  /*
-  * XXX: Should really be SPECNAMELEN
 --- a/sys/sys/timespec.h
 +++ b/sys/sys/timespec.h
-@@ -43,10 +43,7 @@ typedef	__time_t	time_t;
+@@ -43,10 +43,7 @@
  #define	_TIME_T_DECLARED
  #endif
  

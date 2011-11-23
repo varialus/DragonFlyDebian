@@ -16,7 +16,7 @@
  	unsigned sd_type:5 ;		/* segment type */
  	unsigned sd_dpl:2 ;		/* segment descriptor priority level */
  	unsigned sd_p:1 ;		/* segment descriptor present */
-@@ -156,7 +156,7 @@ struct	soft_segment_descriptor	{
+@@ -156,7 +156,7 @@
   */
  struct region_descriptor {
  	unsigned rd_limit:16;		/* segment extent */
@@ -42,7 +42,7 @@
  typedef uint64_t	Elf32_Lword;
  
  typedef Elf32_Word	Elf32_Hashelt;
-@@ -48,198 +46,4 @@ typedef Elf32_Word	Elf32_Hashelt;
+@@ -48,198 +46,4 @@
  typedef Elf32_Word	Elf32_Size;
  typedef Elf32_Sword	Elf32_Ssize;
  
@@ -261,7 +261,7 @@
  
  /*
   * Types of dynamic symbol hash table bucket and chain elements.
-@@ -57,192 +53,4 @@ typedef Elf64_Word	Elf64_Hashelt;
+@@ -57,192 +53,4 @@
  typedef Elf64_Xword	Elf64_Size;
  typedef Elf64_Sxword	Elf64_Ssize;
  
@@ -454,27 +454,3 @@
 -} Elf64_Syminfo;
 -
  #endif /* !_SYS_ELF64_H_ */
---- a/sys/sys/elf_common.h
-+++ b/sys/sys/elf_common.h
-@@ -29,6 +29,8 @@
- #ifndef _SYS_ELF_COMMON_H_
- #define	_SYS_ELF_COMMON_H_ 1
- 
-+#include <stdint.h>
-+
- /*
-  * ELF definitions that are independent of architecture or word size.
-  */
-@@ -43,9 +45,9 @@
-  */
- 
- typedef struct {
--	u_int32_t	n_namesz;	/* Length of name. */
--	u_int32_t	n_descsz;	/* Length of descriptor. */
--	u_int32_t	n_type;		/* Type of this note. */
-+	uint32_t	n_namesz;	/* Length of name. */
-+	uint32_t	n_descsz;	/* Length of descriptor. */
-+	uint32_t	n_type;		/* Type of this note. */
- } Elf_Note;
- 
- /*

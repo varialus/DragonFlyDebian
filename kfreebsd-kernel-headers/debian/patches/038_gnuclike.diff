@@ -36,7 +36,7 @@
  #define	ATOMIC_ASM(NAME, TYPE, OP, CONS, V)			\
  void atomic_##NAME##_##TYPE(volatile u_##TYPE *p, u_##TYPE v);	\
  void atomic_##NAME##_barr_##TYPE(volatile u_##TYPE *p, u_##TYPE v)
-@@ -303,7 +303,7 @@ ATOMIC_STORE_LOAD(long,	"cmpxchgq %0,%1"
+@@ -303,7 +303,7 @@
  #ifndef WANT_FUNCTIONS
  
  /* Read the current value and store a zero in the destination. */
@@ -47,7 +47,7 @@
  atomic_readandclear_int(volatile u_int *addr)
 --- a/sys/amd64/include/bus.h
 +++ b/sys/amd64/include/bus.h
-@@ -272,7 +272,7 @@ bus_space_read_multi_1(bus_space_tag_t t
+@@ -272,7 +272,7 @@
  	if (tag == AMD64_BUS_SPACE_IO)
  		insb(bsh + offset, addr, count);
  	else {
@@ -56,7 +56,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	movb (%2),%%al				\n\
-@@ -293,7 +293,7 @@ bus_space_read_multi_2(bus_space_tag_t t
+@@ -293,7 +293,7 @@
  	if (tag == AMD64_BUS_SPACE_IO)
  		insw(bsh + offset, addr, count);
  	else {
@@ -65,7 +65,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	movw (%2),%%ax				\n\
-@@ -314,7 +314,7 @@ bus_space_read_multi_4(bus_space_tag_t t
+@@ -314,7 +314,7 @@
  	if (tag == AMD64_BUS_SPACE_IO)
  		insl(bsh + offset, addr, count);
  	else {
@@ -74,7 +74,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	movl (%2),%%eax				\n\
-@@ -359,7 +359,7 @@ bus_space_read_region_1(bus_space_tag_t
+@@ -359,7 +359,7 @@
  
  	if (tag == AMD64_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -83,7 +83,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	inb %w2,%%al				\n\
-@@ -372,7 +372,7 @@ bus_space_read_region_1(bus_space_tag_t
+@@ -372,7 +372,7 @@
  #endif
  	} else {
  		bus_space_handle_t _port_ = bsh + offset;
@@ -92,7 +92,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -391,7 +391,7 @@ bus_space_read_region_2(bus_space_tag_t
+@@ -391,7 +391,7 @@
  
  	if (tag == AMD64_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -101,7 +101,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	inw %w2,%%ax				\n\
-@@ -404,7 +404,7 @@ bus_space_read_region_2(bus_space_tag_t
+@@ -404,7 +404,7 @@
  #endif
  	} else {
  		bus_space_handle_t _port_ = bsh + offset;
@@ -110,7 +110,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -423,7 +423,7 @@ bus_space_read_region_4(bus_space_tag_t
+@@ -423,7 +423,7 @@
  
  	if (tag == AMD64_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -119,7 +119,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	inl %w2,%%eax				\n\
-@@ -436,7 +436,7 @@ bus_space_read_region_4(bus_space_tag_t
+@@ -436,7 +436,7 @@
  #endif
  	} else {
  		bus_space_handle_t _port_ = bsh + offset;
@@ -128,7 +128,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -536,7 +536,7 @@ bus_space_write_multi_1(bus_space_tag_t
+@@ -536,7 +536,7 @@
  	if (tag == AMD64_BUS_SPACE_IO)
  		outsb(bsh + offset, addr, count);
  	else {
@@ -137,7 +137,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsb					\n\
-@@ -557,7 +557,7 @@ bus_space_write_multi_2(bus_space_tag_t
+@@ -557,7 +557,7 @@
  	if (tag == AMD64_BUS_SPACE_IO)
  		outsw(bsh + offset, addr, count);
  	else {
@@ -146,7 +146,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsw					\n\
-@@ -578,7 +578,7 @@ bus_space_write_multi_4(bus_space_tag_t
+@@ -578,7 +578,7 @@
  	if (tag == AMD64_BUS_SPACE_IO)
  		outsl(bsh + offset, addr, count);
  	else {
@@ -155,7 +155,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsl					\n\
-@@ -624,7 +624,7 @@ bus_space_write_region_1(bus_space_tag_t
+@@ -624,7 +624,7 @@
  
  	if (tag == AMD64_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -164,7 +164,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsb					\n\
-@@ -637,7 +637,7 @@ bus_space_write_region_1(bus_space_tag_t
+@@ -637,7 +637,7 @@
  #endif
  	} else {
  		bus_space_handle_t _port_ = bsh + offset;
@@ -173,7 +173,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -656,7 +656,7 @@ bus_space_write_region_2(bus_space_tag_t
+@@ -656,7 +656,7 @@
  
  	if (tag == AMD64_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -182,7 +182,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsw					\n\
-@@ -669,7 +669,7 @@ bus_space_write_region_2(bus_space_tag_t
+@@ -669,7 +669,7 @@
  #endif
  	} else {
  		bus_space_handle_t _port_ = bsh + offset;
@@ -191,7 +191,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -688,7 +688,7 @@ bus_space_write_region_4(bus_space_tag_t
+@@ -688,7 +688,7 @@
  
  	if (tag == AMD64_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -200,7 +200,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsl					\n\
-@@ -701,7 +701,7 @@ bus_space_write_region_4(bus_space_tag_t
+@@ -701,7 +701,7 @@
  #endif
  	} else {
  		bus_space_handle_t _port_ = bsh + offset;
@@ -209,7 +209,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -996,7 +996,7 @@ static __inline void
+@@ -996,7 +996,7 @@
  bus_space_barrier(bus_space_tag_t tag __unused, bus_space_handle_t bsh __unused,
  		  bus_size_t offset __unused, bus_size_t len __unused, int flags)
  {
@@ -220,7 +220,7 @@
  	else
 --- a/sys/amd64/include/cpufunc.h
 +++ b/sys/amd64/include/cpufunc.h
-@@ -55,7 +55,7 @@ struct region_descriptor;
+@@ -57,7 +57,7 @@
  #define writel(va, d)	(*(volatile u_int32_t *) (va) = (d))
  #define writeq(va, d)	(*(volatile u_int64_t *) (va) = (d))
  
@@ -231,7 +231,7 @@
  breakpoint(void)
 --- a/sys/amd64/include/endian.h
 +++ b/sys/amd64/include/endian.h
-@@ -67,7 +67,7 @@ extern "C" {
+@@ -67,7 +67,7 @@
  #define	BYTE_ORDER	_BYTE_ORDER
  #endif
  
@@ -242,7 +242,7 @@
  __extension__ ({ register __uint32_t __X = (x); \
 --- a/sys/amd64/include/ieeefp.h
 +++ b/sys/amd64/include/ieeefp.h
-@@ -122,7 +122,7 @@ typedef enum {
+@@ -122,7 +122,7 @@
  #define	SSE_RND_OFF	13	/* rounding control offset */
  #define	SSE_FZ_OFF	15	/* flush to zero offset */
  
@@ -251,7 +251,7 @@
  
  #define	__fldcw(addr)	__asm __volatile("fldcw %0" : : "m" (*(addr)))
  #define	__fldenv(addr)	__asm __volatile("fldenv %0" : : "m" (*(addr)))
-@@ -277,7 +277,7 @@ __fpgetsticky(void)
+@@ -277,7 +277,7 @@
  
  #endif /* __GNUCLIKE_ASM */
  
@@ -262,7 +262,7 @@
  #define	fpgetprec()	__fpgetprec()
 --- a/sys/amd64/include/pcpu.h
 +++ b/sys/amd64/include/pcpu.h
-@@ -91,7 +91,7 @@ extern struct pcpu *pcpup;
+@@ -93,7 +93,7 @@
  #define	PCPU_PTR(member)	(&pcpup->pc_ ## member)
  #define	PCPU_SET(member, val)	(pcpup->pc_ ## member = (val))
  
@@ -273,7 +273,7 @@
   * Evaluates to the byte offset of the per-cpu variable name.
 --- a/sys/amd64/include/profile.h
 +++ b/sys/amd64/include/profile.h
-@@ -57,7 +57,7 @@
+@@ -59,7 +59,7 @@
  #define	MCOUNT_DECL(s)
  #define	MCOUNT_ENTER(s)
  #define	MCOUNT_EXIT(s)
@@ -282,7 +282,7 @@
  #define	MCOUNT_OVERHEAD(label)						\
  	__asm __volatile("pushq %0; call __mcount; popq %%rcx"		\
  			 :						\
-@@ -112,7 +112,7 @@ void user(void);
+@@ -114,7 +114,7 @@
  static void _mcount(uintfptr_t frompc, uintfptr_t selfpc) __used; \
  static void _mcount
  
@@ -291,7 +291,7 @@
  #define	MCOUNT __asm("			\n\
  	.text				\n\
  	.p2align 4,0x90			\n\
-@@ -191,7 +191,7 @@ void	mcount(uintfptr_t frompc, uintfptr_
+@@ -193,7 +193,7 @@
  #include <sys/cdefs.h>
  
  __BEGIN_DECLS
@@ -313,7 +313,7 @@
  	__builtin_va_start((ap), (last))
 --- a/sys/amd64/include/_types.h
 +++ b/sys/amd64/include/_types.h
-@@ -110,7 +110,7 @@ typedef	__uint64_t	__vm_size_t;
+@@ -110,7 +110,7 @@
  /*
   * Unusual type definitions.
   */
@@ -333,7 +333,7 @@
  
  #include <sys/_types.h>
  
-@@ -71,7 +71,7 @@ typedef char *va_list;
+@@ -71,7 +71,7 @@
  #define	__va_size(type) \
  	(((sizeof(type) + sizeof(int) - 1) / sizeof(int)) * sizeof(int))
  
@@ -353,7 +353,7 @@
  #define	ATOMIC_ASM(NAME, TYPE, OP, CONS, V)			\
  void atomic_##NAME##_##TYPE(volatile u_##TYPE *p, u_##TYPE v);	\
  void atomic_##NAME##_barr_##TYPE(volatile u_##TYPE *p, u_##TYPE v)
-@@ -307,7 +307,7 @@ atomic_fetchadd_long(volatile u_long *p,
+@@ -307,7 +307,7 @@
  }
  
  /* Read the current value and store a zero in the destination. */
@@ -364,7 +364,7 @@
  atomic_readandclear_int(volatile u_int *addr)
 --- a/sys/i386/include/bus.h
 +++ b/sys/i386/include/bus.h
-@@ -276,7 +276,7 @@ bus_space_read_multi_1(bus_space_tag_t t
+@@ -276,7 +276,7 @@
  	if (tag == I386_BUS_SPACE_IO)
  		insb(bsh + offset, addr, count);
  	else {
@@ -373,7 +373,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	movb (%2),%%al				\n\
-@@ -301,7 +301,7 @@ bus_space_read_multi_2(bus_space_tag_t t
+@@ -301,7 +301,7 @@
  	if (tag == I386_BUS_SPACE_IO)
  		insw(bsh + offset, addr, count);
  	else {
@@ -382,7 +382,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	movw (%2),%%ax				\n\
-@@ -326,7 +326,7 @@ bus_space_read_multi_4(bus_space_tag_t t
+@@ -326,7 +326,7 @@
  	if (tag == I386_BUS_SPACE_IO)
  		insl(bsh + offset, addr, count);
  	else {
@@ -391,7 +391,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	movl (%2),%%eax				\n\
-@@ -375,7 +375,7 @@ bus_space_read_region_1(bus_space_tag_t
+@@ -375,7 +375,7 @@
  
  	if (tag == I386_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -400,7 +400,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	inb %w2,%%al				\n\
-@@ -392,7 +392,7 @@ bus_space_read_region_1(bus_space_tag_t
+@@ -392,7 +392,7 @@
  #endif
  	} else {
  		int _port_ = bsh + offset;
@@ -409,7 +409,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -415,7 +415,7 @@ bus_space_read_region_2(bus_space_tag_t
+@@ -415,7 +415,7 @@
  
  	if (tag == I386_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -418,7 +418,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	inw %w2,%%ax				\n\
-@@ -432,7 +432,7 @@ bus_space_read_region_2(bus_space_tag_t
+@@ -432,7 +432,7 @@
  #endif
  	} else {
  		int _port_ = bsh + offset;
@@ -427,7 +427,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -455,7 +455,7 @@ bus_space_read_region_4(bus_space_tag_t
+@@ -455,7 +455,7 @@
  
  	if (tag == I386_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -436,7 +436,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	inl %w2,%%eax				\n\
-@@ -472,7 +472,7 @@ bus_space_read_region_4(bus_space_tag_t
+@@ -472,7 +472,7 @@
  #endif
  	} else {
  		int _port_ = bsh + offset;
@@ -445,7 +445,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -576,7 +576,7 @@ bus_space_write_multi_1(bus_space_tag_t
+@@ -576,7 +576,7 @@
  	if (tag == I386_BUS_SPACE_IO)
  		outsb(bsh + offset, addr, count);
  	else {
@@ -454,7 +454,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsb					\n\
-@@ -601,7 +601,7 @@ bus_space_write_multi_2(bus_space_tag_t
+@@ -601,7 +601,7 @@
  	if (tag == I386_BUS_SPACE_IO)
  		outsw(bsh + offset, addr, count);
  	else {
@@ -463,7 +463,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsw					\n\
-@@ -626,7 +626,7 @@ bus_space_write_multi_4(bus_space_tag_t
+@@ -626,7 +626,7 @@
  	if (tag == I386_BUS_SPACE_IO)
  		outsl(bsh + offset, addr, count);
  	else {
@@ -472,7 +472,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsl					\n\
-@@ -676,7 +676,7 @@ bus_space_write_region_1(bus_space_tag_t
+@@ -676,7 +676,7 @@
  
  	if (tag == I386_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -481,7 +481,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsb					\n\
-@@ -693,7 +693,7 @@ bus_space_write_region_1(bus_space_tag_t
+@@ -693,7 +693,7 @@
  #endif
  	} else {
  		int _port_ = bsh + offset;
@@ -490,7 +490,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -716,7 +716,7 @@ bus_space_write_region_2(bus_space_tag_t
+@@ -716,7 +716,7 @@
  
  	if (tag == I386_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -499,7 +499,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsw					\n\
-@@ -733,7 +733,7 @@ bus_space_write_region_2(bus_space_tag_t
+@@ -733,7 +733,7 @@
  #endif
  	} else {
  		int _port_ = bsh + offset;
@@ -508,7 +508,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -756,7 +756,7 @@ bus_space_write_region_4(bus_space_tag_t
+@@ -756,7 +756,7 @@
  
  	if (tag == I386_BUS_SPACE_IO) {
  		int _port_ = bsh + offset;
@@ -517,7 +517,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  		1:	lodsl					\n\
-@@ -773,7 +773,7 @@ bus_space_write_region_4(bus_space_tag_t
+@@ -773,7 +773,7 @@
  #endif
  	} else {
  		int _port_ = bsh + offset;
@@ -526,7 +526,7 @@
  		__asm __volatile("				\n\
  			cld					\n\
  			repne					\n\
-@@ -1072,7 +1072,7 @@ static __inline void
+@@ -1072,7 +1072,7 @@
  bus_space_barrier(bus_space_tag_t tag __unused, bus_space_handle_t bsh __unused,
  		  bus_size_t offset __unused, bus_size_t len __unused, int flags)
  {
@@ -537,7 +537,7 @@
  	else
 --- a/sys/i386/include/cpufunc.h
 +++ b/sys/i386/include/cpufunc.h
-@@ -65,7 +65,7 @@ struct region_descriptor;
+@@ -69,7 +69,7 @@
  #define writew(va, d)	(*(volatile u_int16_t *) (va) = (d))
  #define writel(va, d)	(*(volatile u_int32_t *) (va) = (d))
  
@@ -548,7 +548,7 @@
  breakpoint(void)
 --- a/sys/i386/include/endian.h
 +++ b/sys/i386/include/endian.h
-@@ -67,7 +67,7 @@ extern "C" {
+@@ -67,7 +67,7 @@
  #define	BYTE_ORDER	_BYTE_ORDER
  #endif
  
@@ -559,7 +559,7 @@
  __extension__ ({ register __uint32_t __X = (x); \
 --- a/sys/i386/include/ieeefp.h
 +++ b/sys/i386/include/ieeefp.h
-@@ -104,7 +104,7 @@ typedef enum {
+@@ -104,7 +104,7 @@
   */
  #define FP_STKY_OFF	0	/* sticky flags offset */
  
@@ -579,7 +579,7 @@
  static __inline u_int
  in_cksum_hdr(const struct ip *ip)
  {
-@@ -131,7 +131,7 @@ in_pseudo(u_int sum, u_int b, u_int c)
+@@ -131,7 +131,7 @@
  #endif
  
  #ifdef _KERNEL
@@ -590,7 +590,7 @@
  u_short in_pseudo(u_int sum, u_int b, u_int c);
 --- a/sys/i386/include/pcpu.h
 +++ b/sys/i386/include/pcpu.h
-@@ -103,7 +103,7 @@ extern struct pcpu *pcpup;
+@@ -103,7 +103,7 @@
  #define	PCPU_PTR(member)	(&pcpup->pc_ ## member)
  #define	PCPU_SET(member, val)	(pcpup->pc_ ## member = (val))
  
@@ -601,7 +601,7 @@
   * Evaluates to the byte offset of the per-cpu variable name.
 --- a/sys/i386/include/profile.h
 +++ b/sys/i386/include/profile.h
-@@ -57,7 +57,7 @@
+@@ -59,7 +59,7 @@
  #define	MCOUNT_DECL(s)
  #define	MCOUNT_ENTER(s)
  #define	MCOUNT_EXIT(s)
@@ -610,7 +610,7 @@
  #define	MCOUNT_OVERHEAD(label)						\
  	__asm __volatile("pushl %0; call __mcount; popl %%ecx"		\
  			 :						\
-@@ -110,7 +110,7 @@ void user(void);
+@@ -112,7 +112,7 @@
  
  #define	_MCOUNT_DECL static __inline void _mcount
  
@@ -619,7 +619,7 @@
  #define	MCOUNT								\
  void									\
  mcount()								\
-@@ -165,7 +165,7 @@ void	mcount(uintfptr_t frompc, uintfptr_
+@@ -167,7 +167,7 @@
  #include <sys/cdefs.h>
  
  __BEGIN_DECLS
@@ -639,7 +639,7 @@
  
  #define	va_start(ap, last) \
  	__builtin_va_start((ap), (last))
-@@ -67,7 +67,7 @@ typedef	__va_list	va_list;
+@@ -67,7 +67,7 @@
  #define	__va_size(type) \
  	(((sizeof(type) + sizeof(int) - 1) / sizeof(int)) * sizeof(int))
  
@@ -650,7 +650,7 @@
  #else	/* !__GNUCLIKE_BUILTIN_NEXT_ARG */
 --- a/sys/i386/include/_types.h
 +++ b/sys/i386/include/_types.h
-@@ -63,7 +63,7 @@ typedef	unsigned int		__uint32_t;
+@@ -63,7 +63,7 @@
  typedef	long long		__int64_t;
  /* LONGLONG */
  typedef	unsigned long long	__uint64_t;
@@ -659,7 +659,7 @@
  typedef	int __attribute__((__mode__(__DI__)))		__int64_t;
  typedef	unsigned int __attribute__((__mode__(__DI__)))	__uint64_t;
  #else
-@@ -126,7 +126,7 @@ typedef	__uint32_t	__vm_size_t;
+@@ -126,7 +126,7 @@
  /*
   * Unusual type definitions.
   */
@@ -679,7 +679,7 @@
  
  #include <sys/_types.h>
  
-@@ -67,7 +67,7 @@ typedef char *va_list;
+@@ -67,7 +67,7 @@
  #define	__va_size(type) \
  	(((sizeof(type) + sizeof(int) - 1) / sizeof(int)) * sizeof(int))
  
@@ -697,11 +697,11 @@
 -#ifdef __GNUCLIKE___SECTION
 +#ifdef __GNUC__
  #define __MAKE_SET(set, sym)						\
- 	static void const * const __set_##set##_sym_##sym 		\
- 	__section("set_" #set) __used = &sym
+ 	__GLOBL(__CONCAT(__start_set_,set));				\
+ 	__GLOBL(__CONCAT(__stop_set_,set));				\
 --- a/sys/mips/include/endian.h
 +++ b/sys/mips/include/endian.h
-@@ -68,7 +68,7 @@ extern "C" {
+@@ -68,7 +68,7 @@
  #endif
  
  #ifndef __ASSEMBLER__
@@ -712,7 +712,7 @@
  #define	__is_constant(x)	0
 --- a/sys/mips/include/_types.h
 +++ b/sys/mips/include/_types.h
-@@ -63,7 +63,7 @@ typedef	unsigned long		__uint64_t;
+@@ -63,7 +63,7 @@
  typedef	long long		__int64_t;
  /* LONGLONG */
  typedef	unsigned long long	__uint64_t;
@@ -721,7 +721,7 @@
  typedef	int __attribute__((__mode__(__DI__)))		__int64_t;
  typedef	unsigned int __attribute__((__mode__(__DI__)))	__uint64_t;
  #else
-@@ -154,11 +154,11 @@ typedef	__uint64_t	__vm_pindex_t;
+@@ -154,11 +154,11 @@
  /*
   * Unusual type definitions.
   */

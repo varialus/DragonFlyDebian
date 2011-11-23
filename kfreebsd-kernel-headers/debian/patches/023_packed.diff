@@ -15,7 +15,7 @@
   * Copyright (c) 2001 Atsushi Onoe
   * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
   * All rights reserved.
-@@ -47,7 +47,7 @@ struct ieee80211_plcp_hdr {
+@@ -47,7 +47,7 @@
  	uint8_t		i_service;
  	uint16_t	i_length;
  	uint16_t	i_crc;
@@ -24,7 +24,7 @@
  
  #define IEEE80211_PLCP_SFD      0xF3A0 
  #define IEEE80211_PLCP_SERVICE  0x00
-@@ -69,7 +69,7 @@ struct ieee80211_frame {
+@@ -69,7 +69,7 @@
  	uint8_t		i_seq[2];
  	/* possibly followed by addr4[IEEE80211_ADDR_LEN]; */
  	/* see below */
@@ -33,7 +33,7 @@
  
  struct ieee80211_qosframe {
  	uint8_t		i_fc[2];
-@@ -81,7 +81,7 @@ struct ieee80211_qosframe {
+@@ -81,7 +81,7 @@
  	uint8_t		i_qos[2];
  	/* possibly followed by addr4[IEEE80211_ADDR_LEN]; */
  	/* see below */
@@ -42,7 +42,7 @@
  
  struct ieee80211_qoscntl {
  	uint8_t		i_qos[2];
-@@ -95,7 +95,7 @@ struct ieee80211_frame_addr4 {
+@@ -95,7 +95,7 @@
  	uint8_t		i_addr3[IEEE80211_ADDR_LEN];
  	uint8_t		i_seq[2];
  	uint8_t		i_addr4[IEEE80211_ADDR_LEN];
@@ -51,7 +51,7 @@
  
  
  struct ieee80211_qosframe_addr4 {
-@@ -107,7 +107,7 @@ struct ieee80211_qosframe_addr4 {
+@@ -107,7 +107,7 @@
  	uint8_t		i_seq[2];
  	uint8_t		i_addr4[IEEE80211_ADDR_LEN];
  	uint8_t		i_qos[2];
@@ -60,7 +60,7 @@
  
  #define	IEEE80211_FC0_VERSION_MASK		0x03
  #define	IEEE80211_FC0_VERSION_SHIFT		0
-@@ -218,7 +218,7 @@ struct ieee80211_wme_info {
+@@ -218,7 +218,7 @@
  	uint8_t		wme_subtype;	/* OUI subtype */
  	uint8_t		wme_version;	/* spec revision */
  	uint8_t		wme_info;	/* QoS info */
@@ -69,7 +69,7 @@
  
  /*
   * WME/802.11e Tspec Element
-@@ -246,7 +246,7 @@ struct ieee80211_wme_tspec {
+@@ -246,7 +246,7 @@
  	uint8_t		ts_delay[4];
  	uint8_t		ts_surplus[2];
  	uint8_t		ts_medium_time[2];
@@ -78,7 +78,7 @@
  
  /*
   * WME AC parameter field
-@@ -255,7 +255,7 @@ struct ieee80211_wme_acparams {
+@@ -255,7 +255,7 @@
  	uint8_t		acp_aci_aifsn;
  	uint8_t		acp_logcwminmax;
  	uint16_t	acp_txop;
@@ -87,7 +87,7 @@
  
  #define WME_NUM_AC		4	/* 4 AC categories */
  #define	WME_NUM_TID		16	/* 16 tids */
-@@ -297,7 +297,7 @@ struct ieee80211_wme_param {
+@@ -297,7 +297,7 @@
  #define	WME_QOSINFO_COUNT	0x0f	/* Mask for param count field */
  	uint8_t		param_reserved;
  	struct ieee80211_wme_acparams	params_acParams[WME_NUM_AC];
@@ -96,7 +96,7 @@
  
  /*
   * Management Notification Frame
-@@ -307,7 +307,7 @@ struct ieee80211_mnf {
+@@ -307,7 +307,7 @@
  	uint8_t		mnf_action;
  	uint8_t		mnf_dialog;
  	uint8_t		mnf_status;
@@ -105,7 +105,7 @@
  #define	MNF_SETUP_REQ	0
  #define	MNF_SETUP_RESP	1
  #define	MNF_TEARDOWN	2
-@@ -319,7 +319,7 @@ struct ieee80211_mnf {
+@@ -319,7 +319,7 @@
  struct ieee80211_action {
  	uint8_t		ia_category;
  	uint8_t		ia_action;
@@ -114,7 +114,7 @@
  
  #define	IEEE80211_ACTION_CAT_SM		0	/* Spectrum Management */
  #define	IEEE80211_ACTION_CAT_QOS	1	/* QoS */
-@@ -335,7 +335,7 @@ struct ieee80211_action {
+@@ -335,7 +335,7 @@
  struct ieee80211_action_ht_txchwidth {
  	struct ieee80211_action	at_header;
  	uint8_t		at_chwidth;	
@@ -123,7 +123,7 @@
  
  #define	IEEE80211_A_HT_TXCHWIDTH_20	0
  #define	IEEE80211_A_HT_TXCHWIDTH_2040	1
-@@ -344,7 +344,7 @@ struct ieee80211_action_ht_txchwidth {
+@@ -344,7 +344,7 @@
  struct ieee80211_action_ht_mimopowersave {
  	struct ieee80211_action am_header;
  	uint8_t		am_control;
@@ -132,7 +132,7 @@
  
  #define	IEEE80211_A_HT_MIMOPWRSAVE_ENA		0x01	/* PS enabled */
  #define	IEEE80211_A_HT_MIMOPWRSAVE_MODE		0x02
-@@ -388,7 +388,7 @@ struct ieee80211_action_ba_addbarequest
+@@ -388,7 +388,7 @@
  	uint16_t	rq_baparamset;
  	uint16_t	rq_batimeout;		/* in TUs */
  	uint16_t	rq_baseqctl;
@@ -141,7 +141,7 @@
  
  /* BA - ADDBA response */
  struct ieee80211_action_ba_addbaresponse {
-@@ -397,14 +397,14 @@ struct ieee80211_action_ba_addbaresponse
+@@ -397,14 +397,14 @@
  	uint16_t	rs_statuscode;
  	uint16_t	rs_baparamset; 
  	uint16_t	rs_batimeout;		/* in TUs */
@@ -158,7 +158,7 @@
  
  /* BAR Control */
  #define	IEEE80211_BAR_TID	0xf000		/* TID */
-@@ -420,7 +420,7 @@ struct ieee80211_action_ba_delba {
+@@ -420,7 +420,7 @@
  struct ieee80211_ba_request {
  	uint16_t	rq_barctl;
  	uint16_t	rq_barseqctl;
@@ -167,7 +167,7 @@
  
  /*
   * Control frames.
-@@ -431,7 +431,7 @@ struct ieee80211_frame_min {
+@@ -431,7 +431,7 @@
  	uint8_t		i_addr1[IEEE80211_ADDR_LEN];
  	uint8_t		i_addr2[IEEE80211_ADDR_LEN];
  	/* FCS */
@@ -176,7 +176,7 @@
  
  struct ieee80211_frame_rts {
  	uint8_t		i_fc[2];
-@@ -439,21 +439,21 @@ struct ieee80211_frame_rts {
+@@ -439,21 +439,21 @@
  	uint8_t		i_ra[IEEE80211_ADDR_LEN];
  	uint8_t		i_ta[IEEE80211_ADDR_LEN];
  	/* FCS */
@@ -201,7 +201,7 @@
  
  struct ieee80211_frame_pspoll {
  	uint8_t		i_fc[2];
-@@ -461,7 +461,7 @@ struct ieee80211_frame_pspoll {
+@@ -461,7 +461,7 @@
  	uint8_t		i_bssid[IEEE80211_ADDR_LEN];
  	uint8_t		i_ta[IEEE80211_ADDR_LEN];
  	/* FCS */
@@ -210,7 +210,7 @@
  
  struct ieee80211_frame_cfend {		/* NB: also CF-End+CF-Ack */
  	uint8_t		i_fc[2];
-@@ -469,7 +469,7 @@ struct ieee80211_frame_cfend {		/* NB: a
+@@ -469,7 +469,7 @@
  	uint8_t		i_ra[IEEE80211_ADDR_LEN];
  	uint8_t		i_bssid[IEEE80211_ADDR_LEN];
  	/* FCS */
@@ -219,7 +219,7 @@
  
  struct ieee80211_frame_bar {
  	uint8_t		i_fc[2];
-@@ -479,7 +479,7 @@ struct ieee80211_frame_bar {
+@@ -479,7 +479,7 @@
  	uint16_t	i_ctl;
  	uint16_t	i_seq;
  	/* FCS */
@@ -228,7 +228,7 @@
  
  /*
   * BEACON management packets
-@@ -536,7 +536,7 @@ struct ieee80211_ie_wpa {
+@@ -536,7 +536,7 @@
  	uint16_t	wpa_caps;	/* 802.11i capabilities */
  	uint16_t	wpa_pmkidcnt;	/* 802.11i pmkid count */
  	uint16_t	wpa_pmkids[8];	/* 802.11i pmkids */
@@ -237,7 +237,7 @@
  
  /*
   * 802.11n HT Capability IE
-@@ -551,7 +551,7 @@ struct ieee80211_ie_htcap {
+@@ -551,7 +551,7 @@
  	uint16_t	hc_extcap;		/* extended HT capabilities */
  	uint32_t	hc_txbf;		/* txbf capabilities */
  	uint8_t		hc_antenna;		/* antenna capabilities */
@@ -246,7 +246,7 @@
  
  /* HT capability flags (ht_cap) */
  #define	IEEE80211_HTCAP_LDPC		0x0001	/* LDPC supported */
-@@ -631,7 +631,7 @@ struct ieee80211_ie_htinfo {
+@@ -631,7 +631,7 @@
  	uint8_t		hi_byte3;		/* ht ie byte 3 */
  	uint16_t	hi_byte45;		/* ht ie bytes 4+5 */
  	uint8_t 	hi_basicmcsset[16]; 	/* basic MCS set */
@@ -255,7 +255,7 @@
  
  /* byte1 */
  #define	IEEE80211_HTINFO_2NDCHAN	0x03	/* secondary/ext chan offset */
-@@ -740,7 +740,7 @@ struct ieee80211_tim_ie {
+@@ -740,7 +740,7 @@
  	uint8_t		tim_period;		/* DTIM period */
  	uint8_t		tim_bitctl;		/* bitmap control */
  	uint8_t		tim_bitmap[1];		/* variable-length bitmap */
@@ -264,7 +264,7 @@
  
  struct ieee80211_country_ie {
  	uint8_t		ie;			/* IEEE80211_ELEMID_COUNTRY */
-@@ -750,8 +750,8 @@ struct ieee80211_country_ie {
+@@ -750,8 +750,8 @@
  		uint8_t schan;			/* starting channel */
  		uint8_t nchan;			/* number channels */
  		uint8_t maxtxpwr;		/* tx power cap */
@@ -275,7 +275,7 @@
  
  #define	IEEE80211_COUNTRY_MAX_BANDS	84	/* max possible bands */
  #define	IEEE80211_COUNTRY_MAX_SIZE \
-@@ -766,7 +766,7 @@ struct ieee80211_csa_ie {
+@@ -766,7 +766,7 @@
  	uint8_t		csa_mode;		/* Channel Switch Mode */
  	uint8_t		csa_newchan;		/* New Channel Number */
  	uint8_t		csa_count;		/* Channel Switch Count */
@@ -286,7 +286,7 @@
   * Note the min acceptable CSA count is used to guard against
 --- a/sys/sys/ata.h
 +++ b/sys/sys/ata.h
-@@ -185,7 +185,7 @@ struct ata_params {
+@@ -185,7 +185,7 @@
  #define ATA_SUPPORT_WRITEDMAQFUAEXT	0x0080
  #define ATA_SUPPORT_64BITWWN		0x0100
  #define ATA_SUPPORT_UNLOAD		0x2000
@@ -295,7 +295,7 @@
  
  /*088*/ u_int16_t       udmamodes;              /* UltraDMA modes */
  /*089*/ u_int16_t       erase_time;
-@@ -258,7 +258,7 @@ struct ata_params {
+@@ -258,7 +258,7 @@
  /*223*/ u_int16_t       transport_minor;
  	u_int16_t       reserved224[31];
  /*255*/ u_int16_t       integrity;
@@ -304,7 +304,7 @@
  
  
  /* ATA transfer modes */
-@@ -474,7 +474,7 @@ struct atapi_sense {
+@@ -474,7 +474,7 @@
  	
      u_int8_t	specific1;		/* sense key specific */
      u_int8_t	specific2;		/* sense key specific */
@@ -315,7 +315,7 @@
      union {
 --- a/sys/dev/ata/atapi-cd.h
 +++ b/sys/dev/ata/atapi-cd.h
-@@ -267,7 +267,7 @@ struct write_param {
+@@ -267,7 +267,7 @@
      u_int8_t    vendor_specific_byte1;
      u_int8_t    vendor_specific_byte2;
      u_int8_t    vendor_specific_byte3;
@@ -326,7 +326,7 @@
  struct acd_track_info {
 --- a/sys/dev/ciss/cissio.h
 +++ b/sys/dev/ciss/cissio.h
-@@ -108,18 +108,18 @@ typedef union {
+@@ -109,18 +109,18 @@
  	u_int8_t	Dev;
  	u_int8_t	Bus:6;
  	u_int8_t	Mode:2;
@@ -348,7 +348,7 @@
  } SCSI3Addr_struct;
  
  typedef struct {
-@@ -127,20 +127,20 @@ typedef struct {
+@@ -128,20 +128,20 @@
      u_int32_t		Bus:6;
      u_int32_t		Mode:2;
      SCSI3Addr_struct	Target[2];
@@ -372,7 +372,7 @@
  
  typedef struct {
      u_int8_t	CDBLen;
-@@ -148,24 +148,24 @@ typedef struct {
+@@ -149,24 +149,24 @@
  	u_int8_t	Type:3;
  	u_int8_t	Attribute:3;
  	u_int8_t	Direction:2;
@@ -402,7 +402,7 @@
  
  typedef struct {
      u_int8_t		ScsiStatus;
-@@ -174,7 +174,7 @@ typedef struct {
+@@ -175,7 +175,7 @@
      u_int32_t		ResidualCnt;
      MoreErrInfo_struct	MoreErrInfo;
      u_int8_t		SenseInfo[SENSEINFOBYTES];
@@ -411,7 +411,7 @@
  
  typedef struct {
      LUNAddr_struct	LUN_info;	/* 8 */
-@@ -182,7 +182,7 @@ typedef struct {
+@@ -183,7 +183,7 @@
      ErrorInfo_struct	error_info;	/* 48 */
      u_int16_t		buf_size;	/* 2 */
      u_int8_t		*buf;		/* 4 */
@@ -420,7 +420,7 @@
  
  #ifdef __amd64__
  typedef struct {
-@@ -191,7 +191,7 @@ typedef struct {
+@@ -192,7 +192,7 @@
      ErrorInfo_struct	error_info;	/* 48 */
      u_int16_t		buf_size;	/* 2 */
      u_int32_t		buf;		/* 4 */
@@ -431,7 +431,7 @@
  /************************************************************************
 --- a/sys/amd64/include/segments.h
 +++ b/sys/amd64/include/segments.h
-@@ -72,7 +72,7 @@ struct	user_segment_descriptor {
+@@ -72,7 +72,7 @@
  	u_int64_t sd_def32:1;		/* default 32 vs 16 bit size */
  	u_int64_t sd_gran:1;		/* limit granularity (byte/page units)*/
  	u_int64_t sd_hibase:8;		/* segment base address  (msb) */
@@ -440,7 +440,7 @@
  
  /*
   * System segment descriptors (128 bit wide)
-@@ -86,11 +86,11 @@ struct	system_segment_descriptor {
+@@ -86,11 +86,11 @@
  	u_int64_t sd_hilimit:4;		/* segment extent (msb) */
  	u_int64_t sd_xx0:3;		/* unused */
  	u_int64_t sd_gran:1;		/* limit granularity (byte/page units)*/
@@ -454,7 +454,7 @@
  
  /*
   * Gate descriptors (e.g. indirect descriptors, trap, interrupt etc. 128 bit)
-@@ -104,9 +104,9 @@ struct	gate_descriptor {
+@@ -104,9 +104,9 @@
  	u_int64_t gd_type:5;		/* segment type */
  	u_int64_t gd_dpl:2;		/* segment descriptor priority level */
  	u_int64_t gd_p:1;		/* segment descriptor present */
@@ -466,7 +466,7 @@
  
  /*
   * Generic descriptor
-@@ -167,15 +167,15 @@ struct	soft_segment_descriptor {
+@@ -167,15 +167,15 @@
  	unsigned long ssd_long:1;	/* long mode (for %cs) */
  	unsigned long ssd_def32:1;	/* default 32 vs 16 bit size */
  	unsigned long ssd_gran:1;	/* limit granularity (byte/page units)*/
@@ -487,7 +487,7 @@
   * Size of IDT table
 --- a/sys/net80211/ieee80211_ioctl.h
 +++ b/sys/net80211/ieee80211_ioctl.h
-@@ -321,7 +321,7 @@ enum {
+@@ -321,7 +321,7 @@
  
  struct ieee80211req_maclist {
  	uint8_t		ml_macaddr[IEEE80211_ADDR_LEN];
