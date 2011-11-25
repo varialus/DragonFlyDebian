@@ -2324,3 +2324,14 @@ on all source files.
  {
    int pid, status;
    pid = wait4(-1, &status, WNOHANG, (struct rusage*)0);
+--- a/usr.sbin/powerd/powerd.c
++++ b/usr.sbin/powerd/powerd.c
+@@ -419,7 +419,7 @@
+ }
+ 
+ static void
+-handle_sigs(int __unused sig)
++handle_sigs(int __attribute__((unused)) sig)
+ {
+ 
+ 	exit_requested = 1;

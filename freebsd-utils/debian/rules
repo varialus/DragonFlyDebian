@@ -90,7 +90,7 @@ lib-stamp:
 	$(MAKE) -C lib
 	touch $@
 
-build-arch: freebsd-utils gbde geli kbdcontrol vidcontrol kldutils freebsd-net-tools freebsd-nfs-utils freebsd-ppp
+build-arch: freebsd-utils gbde geli kbdcontrol vidcontrol kldutils freebsd-net-tools freebsd-nfs-utils freebsd-ppp powerd
 
 freebsd-utils: freebsd-utils-stamp
 freebsd-utils-stamp: $(RPCHDRS)
@@ -194,6 +194,11 @@ freebsd-nfs-utils-stamp: lib-stamp
 	$(PMAKE) -C usr.sbin/nfsd
 	touch $@
 
+powerd: powerd-stamp
+powerd-stamp:
+	$(PMAKE) -C usr.sbin/powerd
+	touch $@
+
 build-indep: build-indep-stamp
 build-indep-stamp:
 	touch $@
@@ -271,6 +276,7 @@ clean:
 	$(PMAKE) -C usr.sbin/rpc.lockd clean
 	$(PMAKE) -C usr.sbin/mountd clean
 	$(PMAKE) -C usr.sbin/nfsd clean
+	$(PMAKE) -C usr.sbin/powerd clean
 
 	$(RM) $(RPCHDRS)
 
@@ -310,6 +316,7 @@ binary-arch: build install
 	dh_installinit -pdevd -- start 03 S . stop 01 0 1 6 .
 	dh_installinit -pkldutils --no-start -- start 12 S .
 	dh_installinit -pkbdcontrol -- start 20 S .
+	dh_installinit -ppowerd -- start 20 2 3 4 5 S . stop 80 0 1 6 .
 	dh_installinit -pfreebsd-ppp -- start 20 2 3 4 5 . stop 80 0 1 6 .
 	dh_installinit -pfreebsd-nfs-common --name=rpc.statd -- start 20 2 3 4 5 S . stop 20 0 1 6 .
 	dh_installinit -pfreebsd-nfs-common --name=rpc.lockd -- start 20 2 3 4 5 S . stop 20 0 1 6 .
