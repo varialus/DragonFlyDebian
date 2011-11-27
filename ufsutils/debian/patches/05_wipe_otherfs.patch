@@ -1,0 +1,39 @@
+--- a/sbin/newfs/mkfs.c
++++ b/sbin/newfs/mkfs.c
+@@ -505,21 +505,23 @@
+ 		    sblock.fs_size * sblock.fs_fsize - sblock.fs_sblockloc);
+ 	}
+ 	/*
+-	 * Wipe out old UFS1 superblock(s) if necessary.
++	 * Wipe out other file systems. For now we erase first and last 512 kiB
++	 * (this works for at least UFS1 and ZFS).
+ 	 */
+-	if (!Nflag && Oflag != 1) {
+-		i = bread(&disk, part_ofs + SBLOCK_UFS1 / disk.d_bsize, chdummy, SBLOCKSIZE);
+-		if (i == -1)
+-			err(1, "can't read old UFS1 superblock: %s", disk.d_error);
++	if (!Eflag && !Nflag) {
++		off_t mediasize = get_block_device_size(disk.d_fd);
+ 
+-		if (fsdummy.fs_magic == FS_UFS1_MAGIC) {
+-			fsdummy.fs_magic = 0;
+-			bwrite(&disk, part_ofs + SBLOCK_UFS1 / disk.d_bsize,
+-			    chdummy, SBLOCKSIZE);
+-			for (cg = 0; cg < fsdummy.fs_ncg; cg++)
+-				bwrite(&disk, part_ofs + fsbtodb(&fsdummy,
+-				  cgsblock(&fsdummy, cg)), chdummy, SBLOCKSIZE);
+-		}
++		printf("Erasing sectors [%jd...%jd]\n", 
++		    sblock.fs_sblockloc / disk.d_bsize,
++		    fsbtodb(&sblock, sblock.fs_size) - 1);
++		berase(&disk, sblock.fs_sblockloc / disk.d_bsize,
++		    1024 * disk.d_bsize - sblock.fs_sblockloc);
++
++		printf("Erasing sectors [%jd...%jd]\n", 
++		    (mediasize - 1024 * 512) / disk.d_bsize,
++		    (mediasize / disk.d_bsize) - 1);
++		berase(&disk, (mediasize - 1024 * 512) / disk.d_bsize,
++		    1024 * 512);
+ 	}
+ 	if (!Nflag)
+ 		do_sbwrite(&disk);

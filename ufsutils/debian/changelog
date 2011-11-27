@@ -6,7 +6,14 @@ ufsutils (8.2-2) UNRELEASED; urgency=low
   * Fix 02_fsdb.ufs.patch to make ufsutils buildable with --as-needed. 
     Closes: #632564.
 
- -- Aurelien Jarno <aurel32@debian.org>  Sat, 23 Jul 2011 19:23:51 +0200
+  [ Robert Millan ]
+  * Remove remnants of ZFS when creating a new file system.  (Closes: #635272)
+    - 04_portable_berase.patch: Fix berase().
+    - 05_wipe_otherfs.patch: Wipe out other filesystems by erasing first and
+      last 512 kiB of disk (this works for at least ZFS, in addition to UFS1
+      which was already taken care of).
+
+ -- Robert Millan <rmh@debian.org>  Sun, 27 Nov 2011 18:05:37 +0100
 
 ufsutils (8.2-1) unstable; urgency=low
 
