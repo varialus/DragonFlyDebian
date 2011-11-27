@@ -1,0 +1,14 @@
+
+Reported by Vladimir Serbinenko.  Fixed in upstream SVN r227382.
+
+--- a/sys/ufs/ffs/fs.h
++++ b/sys/ufs/ffs/fs.h
+@@ -333,7 +333,7 @@
+ 	ufs2_daddr_t fs_csaddr;		/* blk addr of cyl grp summary area */
+ 	int64_t	 fs_pendingblocks;	/* (u) blocks being freed */
+ 	u_int32_t fs_pendinginodes;	/* (u) inodes being freed */
+-	ino_t	 fs_snapinum[FSMAXSNAP];/* list of snapshot inode numbers */
++	uint32_t fs_snapinum[FSMAXSNAP];/* list of snapshot inode numbers */
+ 	u_int32_t fs_avgfilesize;	/* expected average file size */
+ 	u_int32_t fs_avgfpdir;		/* expected # of files per directory */
+ 	int32_t	 fs_save_cgsize;	/* save real cg size to use fs_bsize */
