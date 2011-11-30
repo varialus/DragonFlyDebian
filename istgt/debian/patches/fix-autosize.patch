@@ -1,0 +1,41 @@
+Description: support symlinks as device names
+ This patch adds support for symlinks as device store in the backend. 
+Author: Michal Suchanek <hramrach@centrum.cz>
+Forwarded: yes
+
+
+Index: istgt-0.4~20111008/src/istgt_lu.c
+===================================================================
+--- istgt-0.4~20111008.orig/src/istgt_lu.c	2011-11-27 21:48:45.000000000 +0100
++++ istgt-0.4~20111008/src/istgt_lu.c	2011-11-27 22:14:12.000000000 +0100
+@@ -606,7 +606,7 @@
+ 	int rc;
+ 
+ 	val = 0ULL;
+-	rc = lstat(file, &st);
++	rc = stat(file, &st);
+ 	if (rc != 0)
+ 		return val;
+ 	if (!S_ISCHR(st.st_mode) && !S_ISBLK(st.st_mode))
+@@ -689,11 +689,9 @@
+ 	int rc;
+ 
+ 	val = 0ULL;
+-	rc = lstat(file, &st);
++	rc = stat(file, &st);
+ 	if (rc < 0)
+ 		return val;
+-	if (S_ISLNK(st.st_mode))
+-		return val;
+ 
+ 	if (S_ISCHR(st.st_mode)) {
+ 		val = istgt_lu_get_devsize(file);
+@@ -702,7 +700,7 @@
+ 	} else if (S_ISREG(st.st_mode)) {
+ 		val = st.st_size;
+ 	} else {
+-		ISTGT_ERRLOG("lstat is neither REG, CHR nor BLK\n");
++		ISTGT_ERRLOG("stat is neither REG, CHR nor BLK\n");
+ 		val = 0ULL;
+ 	}
+ 	return val;
