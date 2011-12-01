@@ -197,7 +197,7 @@ install-common-stamp: src
 
 	touch install-common-stamp
 
-install-arch: $(foreach flavor,$(flavours),install-flavor-$(flavor)-stamp)
+install-arch: $(foreach flavor,$(flavours),install-flavor-$(flavor)-stamp) install-udeb-stamp
 install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	dh_testdir
 	dh_testroot
@@ -249,10 +249,6 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	install -p -o root -g root -m 644 \
 		debian/kfreebsd-image.overrides \
 		$(IMAGE_PACKAGE)-$*/usr/share/lintian/overrides/kfreebsd-image-$(version)-$(abiname)-$*
-	mkdir -p $(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-$*-di/usr/share/lintian/overrides
-	install -p -o root -g root -m 644 \
-		debian/zlib-modules.overrides \
-		$(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-$*-di/usr/share/lintian/overrides/zlib-modules-$(version)-$(abiname)-$*-di
 
 	# scripts
 	for script in preinst prerm postinst postrm ; do \
@@ -274,13 +270,31 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	done
 	ln -s $(kfreebsd_cpu)/include $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/machine
 
+	touch install-flavor-$*-stamp
+
+install-udeb-stamp: $(foreach flavor,$(flavours),install-flavor-$(flavor)-stamp)
 ifeq ($(DEB_HOST_ARCH_OS), kfreebsd)
+	dh_testdir
+	dh_testroot
+	dh_clean -k -pkernel-image-$(version)-$(abiname)-$*-di
+
 	KW_CONFIG_DIR=debian/arch/$(DEB_HOST_ARCH_CPU)/installer kernel-wedge install-files \
 		$(version)-$(abiname) debian/arch/$(DEB_HOST_ARCH_CPU)/installer
-	mv $(CURDIR)/debian/kernel-image-$(version)-$(abiname)-$*-di/boot/kfreebsd{,-$(major)}.gz
-endif
 
-	touch install-flavor-$*-stamp
+	# override file
+	mkdir -p $(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-*-di/usr/share/lintian/overrides
+	install -p -o root -g root -m 644 \
+		debian/zlib-modules.overrides \
+		$(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-*-di/usr/share/lintian/overrides/zlib-modules-$(version)-$(abiname)-$*-di
+
+	# fixup kernel path (so that this udeb can be installed alongside
+	# other major versions of kfreebsd)
+	for i in debian/arch/$(DEB_HOST_ARCH_CPU)/*.installer ; do \
+		subarch=`basename $$i .installer` ; \
+		mv debian/kernel-image-$(version)-$(abiname)-$${subarch}-di/boot/kfreebsd{,-$(major)}.gz ; \
+	done
+endif
+	touch $@
 
 
 # Build architecture-independent files here.
