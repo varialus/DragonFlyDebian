@@ -281,16 +281,15 @@ ifeq ($(DEB_HOST_ARCH_OS), kfreebsd)
 	KW_CONFIG_DIR=debian/arch/$(DEB_HOST_ARCH_CPU)/installer kernel-wedge install-files \
 		$(version)-$(abiname) debian/arch/$(DEB_HOST_ARCH_CPU)/installer
 
-	# override file
-	mkdir -p $(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-*-di/usr/share/lintian/overrides
-	install -p -o root -g root -m 644 \
-		debian/zlib-modules.overrides \
-		$(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-*-di/usr/share/lintian/overrides/zlib-modules-$(version)-$(abiname)-$*-di
-
-	# fixup kernel path (so that this udeb can be installed alongside
-	# other major versions of kfreebsd)
 	for i in debian/arch/$(DEB_HOST_ARCH_CPU)/*.installer ; do \
 		subarch=`basename $$i .installer` ; \
+		# override file \n\
+		mkdir -p $(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-$${subarch}-di/usr/share/lintian/overrides ; \
+		install -p -o root -g root -m 644 \
+			debian/zlib-modules.overrides \
+			$(CURDIR)/debian/zlib-modules-$(version)-$(abiname)-$${subarch}-di/usr/share/lintian/overrides/zlib-modules-$(version)-$(abiname)-$${subarch}-di ; \
+		\
+		# fixup kernel path (so that this udeb can be installed alongside other major versions of kfreebsd) \n\
 		mv debian/kernel-image-$(version)-$(abiname)-$${subarch}-di/boot/kfreebsd{,-$(major)}.gz ; \
 	done
 endif
