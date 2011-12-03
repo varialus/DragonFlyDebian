@@ -5,9 +5,9 @@ Fixed in HEAD in svn r223182.
 
 --- a/sys/compat/linprocfs/linprocfs.c
 +++ b/sys/compat/linprocfs/linprocfs.c
-@@ -1077,6 +1077,15 @@
+@@ -1082,6 +1082,15 @@
  		PROC_UNLOCK(p);
- 		return (ret);
+ 		return (0);
  	}
 +
 +	/*
@@ -21,12 +21,10 @@ Fixed in HEAD in svn r223182.
  	if (p->p_args != NULL) {
  		sbuf_bcpy(sb, p->p_args->ar_args, p->p_args->ar_length);
  		PROC_UNLOCK(p);
-@@ -1101,6 +1110,15 @@
- 		PROC_UNLOCK(p);
- 		return (ret);
+@@ -1108,6 +1117,15 @@
  	}
-+
-+	/*
+ 
+ 	/*
 +	 * Mimic linux behavior and pass only processes with usermode
 +	 * address space as valid.  Return zero silently otherwize.
 +	 */
@@ -34,6 +32,8 @@ Fixed in HEAD in svn r223182.
 +		PROC_UNLOCK(p);
 +		return (0);
 +	}
- 	PROC_UNLOCK(p);
- 
- 	ret = linprocfs_doargv(td, p, sb, ps_string_env);
++
++	/*
+ 	 * Mimic linux behavior and pass only processes with usermode
+ 	 * address space as valid.  Return zero silently otherwize.
+ 	 */

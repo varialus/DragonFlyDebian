@@ -4,7 +4,7 @@
 
 --- a/sys/kern/vfs_mount.c
 +++ b/sys/kern/vfs_mount.c
-@@ -559,10 +559,10 @@
+@@ -582,10 +582,10 @@
  	struct vfsopt *opt, *noro_opt, *tmp_opt;
  	char *fstype, *fspath, *errmsg;
  	int error, fstypelen, fspathlen, errmsg_len, errmsg_pos;
@@ -17,7 +17,7 @@
  	errmsg_pos = -1;
  
  	error = vfs_buildopts(fsoptions, &optlist);
-@@ -659,10 +659,8 @@
+@@ -682,10 +682,8 @@
  			fsflags &= ~MNT_RDONLY;
  			has_noro = 1;
  		}
@@ -29,7 +29,7 @@
  		else if (strcmp(opt->name, "ro") == 0)
  			fsflags |= MNT_RDONLY;
  		else if (strcmp(opt->name, "rdonly") == 0) {
-@@ -684,7 +682,7 @@
+@@ -707,7 +705,7 @@
  	 * we need a mount option "noro", since in vfs_mergeopts(),
  	 * "noro" will cancel "ro", but "rw" will not do anything.
  	 */

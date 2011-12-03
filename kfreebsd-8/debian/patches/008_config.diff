@@ -41,18 +41,6 @@ Status: gotta uncomment WARNS (see #351366), and find a portable way to add
  #include <assert.h>
  #include <ctype.h>
  #include <err.h>
-@@ -622,7 +627,11 @@
- 	if ((dirp = opendir(p)) == NULL)
- 		err(EX_OSERR, "opendir %s", p);
- 	while ((dp = readdir(dirp)) != NULL) {
-+#ifdef _DIRENT_HAVE_D_NAMLEN
- 		i = dp->d_namlen - 2;
-+#else
-+		i = strlen (dp->d_name) - 2;
-+#endif
- 		/* Skip non-headers */
- 		if (dp->d_name[i] != '.' || dp->d_name[i + 1] != 'h')
- 			continue;
 --- a/usr.sbin/config/Makefile
 +++ b/usr.sbin/config/Makefile
 @@ -9,11 +9,11 @@
