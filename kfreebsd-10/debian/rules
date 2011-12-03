@@ -276,7 +276,10 @@ install-udeb-stamp: $(foreach flavor,$(flavours),install-flavor-$(flavor)-stamp)
 ifeq ($(DEB_HOST_ARCH_OS), kfreebsd)
 	dh_testdir
 	dh_testroot
-	dh_clean -k -pkernel-image-$(version)-$(abiname)-$*-di
+	for i in debian/arch/$(DEB_HOST_ARCH_CPU)/*.installer ; do \
+		subarch=`basename $$i .installer` ; \
+			dh_clean -k -pkernel-image-$(version)-$(abiname)-$${subarch}-di ; \
+	done
 
 	KW_CONFIG_DIR=debian/arch/$(DEB_HOST_ARCH_CPU)/installer kernel-wedge install-files \
 		$(version)-$(abiname) debian/arch/$(DEB_HOST_ARCH_CPU)/installer
