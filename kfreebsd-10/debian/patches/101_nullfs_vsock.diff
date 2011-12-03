@@ -1,0 +1,54 @@
+
+Obtained from kern/159663
+
+--- a/sys/fs/nullfs/null_vnops.c
++++ b/sys/fs/nullfs/null_vnops.c
+@@ -365,16 +365,38 @@
+ 			vrele(lvp);
+ 		} else {
+ 			error = null_nodeget(dvp->v_mount, lvp, &vp);
+-			if (error)
++			if (error) {
+ 				vput(lvp);
+-			else
++			} else if (vp->v_type == VSOCK) {
++				vref(lvp);
++				vrele(vp);
++				*ap->a_vpp = lvp;
++			} else {
+ 				*ap->a_vpp = vp;
++			}
+ 		}
+ 	}
+ 	return (error);
+ }
+ 
+ static int
++null_create(struct vop_create_args *ap)
++{
++	struct vnode *vp, *lvp;
++	int retval;
++
++	retval = null_bypass(&ap->a_gen);
++	vp = *ap->a_vpp;
++	if (retval == 0 && vp->v_type == VSOCK) {
++		lvp = NULLVPTOLOWERVP(vp);
++		vref(lvp);
++		vrele(vp);
++		*ap->a_vpp = lvp;
++	}
++	return (retval);
++}
++
++static int
+ null_open(struct vop_open_args *ap)
+ {
+ 	int retval;
+@@ -825,6 +847,7 @@
+ 	.vop_accessx =		null_accessx,
+ 	.vop_advlockpurge =	vop_stdadvlockpurge,
+ 	.vop_bmap =		VOP_EOPNOTSUPP,
++	.vop_create =		null_create,
+ 	.vop_getattr =		null_getattr,
+ 	.vop_getwritemount =	null_getwritemount,
+ 	.vop_inactive =		null_inactive,
