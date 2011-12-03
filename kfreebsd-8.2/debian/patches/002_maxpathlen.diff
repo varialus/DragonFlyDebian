@@ -1,0 +1,52 @@
+--- a/usr.sbin/config/main.c
++++ b/usr.sbin/config/main.c
+@@ -60,6 +60,10 @@
+ #include "config.h"
+ #include "configvers.h"
+ 
++#ifndef MAXPATHLEN
++#define MAXPATHLEN 4096
++#endif
++
+ #ifndef TRUE
+ #define TRUE	(1)
+ #endif
+--- a/usr.sbin/config/mkmakefile.c
++++ b/usr.sbin/config/mkmakefile.c
+@@ -50,6 +50,10 @@
+ #include "config.h"
+ #include "configvers.h"
+ 
++#ifndef MAXPATHLEN
++#define MAXPATHLEN 4096
++#endif
++
+ #define next_word(fp, wd) \
+ 	{ char *word = get_word(fp); \
+ 	  if (word == (char *)EOF) \
+--- a/usr.sbin/config/mkoptions.c
++++ b/usr.sbin/config/mkoptions.c
+@@ -48,6 +48,10 @@
+ #include "config.h"
+ #include "y.tab.h"
+ 
++#ifndef MAXPATHLEN
++#define MAXPATHLEN 4096
++#endif
++
+ static	struct users {
+ 	int	u_default;
+ 	int	u_min;
+--- a/sys/dev/aic7xxx/aicasm/aicasm_scan.l
++++ b/sys/dev/aic7xxx/aicasm/aicasm_scan.l
+@@ -69,6 +69,10 @@
+ static int  quote_count;
+ static char msgbuf[255];
+ 
++#ifndef PATH_MAX
++#define PATH_MAX 4096
++#endif
++
+ extern int yylex(void);
+ extern int mmlex(void);
+ extern int mmparse(void);

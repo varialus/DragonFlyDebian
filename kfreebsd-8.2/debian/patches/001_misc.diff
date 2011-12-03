@@ -1,0 +1,51 @@
+
+Status: chflags is BSD-specific.  We could add it to freebsd-utils.
+  The rest has been rejected (kern/93502)
+
+---
+ sys/conf/kern.mk |   18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+--- a/sys/conf/kern.mk
++++ b/sys/conf/kern.mk
+@@ -1,5 +1,9 @@
+ # $FreeBSD$
+ 
++.if !defined(OPSYS)
++OPSYS!=		uname -s
++.endif
++
+ #
+ # Warning flags for compiling the kernel and components of the kernel.
+ #
+@@ -9,10 +13,14 @@
+ .if ${CC} == "icc"
+ #CWARNFLAGS=	-w2	# use this if you are terribly bored
+ CWARNFLAGS=
+-.else
++elif !defined(CWARNFLAGS)
+ CWARNFLAGS?=	-Wall -Wredundant-decls -Wnested-externs -Wstrict-prototypes \
+ 		-Wmissing-prototypes -Wpointer-arith -Winline -Wcast-qual \
+-		${_wundef} ${_Wno_pointer_sign} -fformat-extensions
++		${_wundef} ${_Wno_pointer_sign}
++.if ${OPSYS} == "FreeBSD"
++# FreeBSD extensions, not available in upstream GCC
++CWARNFLAGS+=  -fformat-extensions
++.endif
+ .if !defined(WITH_GCC3)
+ _Wno_pointer_sign=-Wno-pointer-sign
+ .endif
+@@ -36,8 +44,12 @@
+ # reserved for user applications.
+ #
+ .if ${MACHINE_ARCH} == "i386" && ${CC} != "icc"
+-CFLAGS+=	-mno-align-long-strings -mpreferred-stack-boundary=2 \
++CFLAGS+=	-mpreferred-stack-boundary=2 \
+ 		-mno-mmx -mno-3dnow -mno-sse -mno-sse2 -mno-sse3
++.if ${OPSYS} == "FreeBSD"
++# FreeBSD extensions, not available in upstream GCC
++CFLAGS+=      -mno-align-long-strings
++.endif
+ INLINE_LIMIT?=	8000
+ .endif
+ 

@@ -1,0 +1,39 @@
+Source: kfreebsd-@major@
+Section: kernel
+Priority: optional
+Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
+Uploaders: Aurelien Jarno <aurel32@debian.org>, Guillem Jover <guillem@debian.org>, Robert Millan <rmh@debian.org>
+Vcs-Browser: http://svn.debian.org/wsvn/glibc-bsd/trunk/kfreebsd-@major@/
+Vcs-Svn: svn://svn.debian.org/glibc-bsd/trunk/kfreebsd-@major@/
+Build-Depends: debhelper (>= 5.0.0), bzip2, sharutils, flex-old | flex,
+ freebsd-buildutils (>= 8.1-2) [!kfreebsd-any] | freebsd-buildutils (>= 7) [kfreebsd-any],
+ gcc-@gcc_version@, libdb-dev,
+ libbsd-dev,
+ libsbuf-dev, libsbuf-dev (>= 8.2-2) | kfreebsd-kernel-headers (<< 0.56),
+ freebsd-buildutils (>= 8.2-4) [any-mipsel],
+ kernel-wedge (>= 2.79) [kfreebsd-any],
+Standards-Version: 3.9.2
+
+Package: kfreebsd-source-@version@
+Architecture: all
+Depends: ${misc:Depends}
+Recommends: freebsd-buildutils (>= 7)
+Provides: kfreebsd-source-@major@, kfreebsd-source
+Description: source code for kernel of FreeBSD @version@ with Debian patches
+ This package provides the source code for kernel of FreeBSD @version@, base of
+ a GNU/kFreeBSD system.
+
+Package: kfreebsd-headers-@version@-@abiname@
+Architecture: any
+Depends: ${misc:Depends}
+Description: Common architecture-specific header files for kernel of FreeBSD @version@
+ This package provides the architecture-specific common kernel header files for
+ kernel of FreeBSD @version@, generally used for building out-of-tree kernel
+ modules. To obtain a complete set of headers you also need to install the
+ kfreebsd-headers-@version@-@abiname@-(flavour) package, matching the flavour of the
+ kernel you intend the build for. To obtain such a set for the currently running
+ kernel it is sufficient to run a command
+ .
+ apt-get install kfreebsd-headers-$(uname -r)
+ .
+ and it will be unpacked in /usr/src/kfreebsd-headers-@version@-@abiname@-(flavour)
