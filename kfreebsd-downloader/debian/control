@@ -1,0 +1,30 @@
+Source: kfreebsd-downloader
+Section: contrib/kernel
+Priority: extra
+Maintainer: GNU/kFreeBSD Maintainers <debian-bsd@lists.debian.org>
+Uploaders: Robert Millan <rmh@debian.org>
+Vcs-Browser: http://svn.debian.org/wsvn/glibc-bsd/trunk/kfreebsd-downloader/
+Vcs-Svn: svn://svn.debian.org/glibc-bsd/trunk/kfreebsd-downloader/
+Standards-Version: 3.9.2
+
+Package: kfreebsd-downloader
+Architecture: all
+Depends: ${misc:Depends},
+ freebsd-utils (>= 8.1-5), kldutils (>= 7.1),
+ devd | freebsd-utils (<< 8.2+ds2-9),
+ wget, xz-utils,
+Breaks:
+# grub-probe versions prior to ada(4) support break postinst
+ grub-common (<< 1.98+20100804-14+squeeze1),
+# AT_* macros break LD_PRELOAD (see #630695)
+# Missing support for RFTSIGZMB (see 007_clone_signals.diff)
+ libc0.1 (<< 2.13-11),
+# Require ZFS v28 userland
+ zfsutils (<< 8.3~),
+Provides: kfreebsd-image-9, kfreebsd-image
+Description: kernel of FreeBSD (upstream version)
+ This package automatically downloads the latest upstream version of the
+ kernel of FreeBSD, and installs it on your system.
+ .
+ Be warned that the upstream version of the kernel is NOT expected to work
+ correctly on a Debian system. It is only provided for testing purposes.
