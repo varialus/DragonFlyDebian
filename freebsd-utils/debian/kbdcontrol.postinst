@@ -21,7 +21,9 @@ EOF
       fi
 
       # TEKEN_XTERM transition
-      sed -i /etc/inittab -e "s/cons25$/xterm/"
+      if test -e /etc/inittab ; then
+        sed -i /etc/inittab -e "s/cons25$/xterm/"
+      fi
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)
     ;;
