@@ -24,14 +24,14 @@
  #include <sys/param.h>
  #include <sys/disklabel.h>
  #include <sys/mount.h>
-@@ -774,3 +777,4 @@ gjournal_check(const char *filesys)
+@@ -774,3 +777,4 @@
  	/* Write back updated statistics and super-block. */
  	putdisk();
  }
 +#endif
 --- a/sbin/fsck_ffs/ea.c
 +++ b/sbin/fsck_ffs/ea.c
-@@ -38,7 +38,7 @@ __FBSDID("$FreeBSD$");
+@@ -38,7 +38,7 @@
  
  #include <sys/param.h>
  #include <sys/time.h>
@@ -57,7 +57,7 @@
  .Nd file system consistency check and interactive repair
  .Sh SYNOPSIS
  .Nm
-@@ -349,5 +349,4 @@ are fully enumerated and explained in Ap
+@@ -349,5 +349,4 @@
  .Xr fstab 5 ,
  .Xr fsck 8 ,
  .Xr fsdb 8 ,
@@ -65,7 +65,7 @@
  .Xr reboot 8
 --- a/sbin/fsck_ffs/fsutil.c
 +++ b/sbin/fsck_ffs/fsutil.c
-@@ -38,7 +38,9 @@ __FBSDID("$FreeBSD$");
+@@ -38,7 +38,9 @@
  #include <sys/param.h>
  #include <sys/time.h>
  #include <sys/types.h>
@@ -75,7 +75,7 @@
  #include <sys/disklabel.h>
  #include <sys/stat.h>
  #include <sys/disklabel.h>
-@@ -55,6 +57,7 @@ __FBSDID("$FreeBSD$");
+@@ -55,6 +57,7 @@
  #include <stdint.h>
  #include <stdio.h>
  #include <stdlib.h>
@@ -83,7 +83,7 @@
  #include <unistd.h>
  
  #include "fsck.h"
-@@ -277,11 +280,13 @@ ckfini(int markclean)
+@@ -277,11 +280,13 @@
  	if (bkgrdflag) {
  		unlink(snapname);
  		if ((!(sblock.fs_flags & FS_UNCLEAN)) != markclean) {
@@ -97,7 +97,7 @@
  			if (!preen) {
  				printf("\n***** FILE SYSTEM MARKED %s *****\n",
  				    markclean ? "CLEAN" : "DIRTY");
-@@ -639,7 +644,7 @@ getpathname(char *namebuf, ino_t curdir,
+@@ -639,7 +644,7 @@
  }
  
  void
@@ -106,7 +106,7 @@
  {
  
  	ckfini(0);
-@@ -652,7 +657,7 @@ catch(int sig __unused)
+@@ -652,7 +657,7 @@
   * so that reboot sequence may be interrupted.
   */
  void
@@ -115,7 +115,7 @@
  {
  	printf("returning to single-user after file system check\n");
  	returntosingle = 1;
-@@ -721,11 +726,13 @@ pfatal(const char *fmt, ...)
+@@ -721,11 +726,13 @@
  		 * Force foreground fsck to clean up inconsistency.
  		 */
  		if (bkgrdflag) {
@@ -129,7 +129,7 @@
  			fprintf(stdout, "CANNOT RUN IN BACKGROUND\n");
  			ckfini(0);
  			exit(EEXIT);
-@@ -742,6 +749,7 @@ pfatal(const char *fmt, ...)
+@@ -742,6 +749,7 @@
  	/*
  	 * Force foreground fsck to clean up inconsistency.
  	 */
@@ -137,7 +137,7 @@
  	if (bkgrdflag) {
  		cmd.value = FS_NEEDSFSCK;
  		cmd.size = 1;
-@@ -749,6 +757,7 @@ pfatal(const char *fmt, ...)
+@@ -749,6 +757,7 @@
  		    &cmd, sizeof cmd) == -1)
  			pwarn("CANNOT SET FS_NEEDSFSCK FLAG\n");
  	}
@@ -147,7 +147,7 @@
  }
 --- a/sbin/fsck_ffs/inode.c
 +++ b/sbin/fsck_ffs/inode.c
-@@ -36,7 +36,7 @@ static const char sccsid[] = "@(#)inode.
+@@ -36,7 +36,7 @@
  __FBSDID("$FreeBSD$");
  
  #include <sys/param.h>
@@ -156,7 +156,7 @@
  #include <sys/time.h>
  #include <sys/sysctl.h>
  
-@@ -47,6 +47,7 @@ __FBSDID("$FreeBSD$");
+@@ -47,6 +47,7 @@
  #include <err.h>
  #include <pwd.h>
  #include <string.h>
@@ -166,7 +166,7 @@
  
 --- a/sbin/fsck_ffs/main.c
 +++ b/sbin/fsck_ffs/main.c
-@@ -45,9 +45,17 @@ __FBSDID("$FreeBSD$");
+@@ -45,9 +45,17 @@
  #include <sys/stat.h>
  #include <sys/file.h>
  #include <sys/time.h>
@@ -184,7 +184,7 @@
  #include <sys/uio.h>
  #include <sys/disklabel.h>
  
-@@ -62,14 +70,18 @@ __FBSDID("$FreeBSD$");
+@@ -62,14 +70,18 @@
  #include <paths.h>
  #include <stdint.h>
  #include <string.h>
@@ -204,7 +204,7 @@
  
  int
  main(int argc, char *argv[])
-@@ -79,10 +91,12 @@ main(int argc, char *argv[])
+@@ -79,10 +91,12 @@
  	struct itimerval itimerval;
  	int ret = 0;
  
@@ -218,7 +218,7 @@
  		switch (ch) {
  		case 'b':
  			skipclean = 0;
-@@ -126,6 +140,7 @@ main(int argc, char *argv[])
+@@ -126,6 +140,7 @@
  			yflag = 0;
  			break;
  
@@ -226,7 +226,7 @@
  		case 'p':
  			preen++;
  			/*FALLTHROUGH*/
-@@ -157,7 +172,9 @@ main(int argc, char *argv[])
+@@ -157,7 +172,9 @@
  		(void)signal(SIGINT, catch);
  	if (ckclean)
  		(void)signal(SIGQUIT, catchquit);
@@ -236,7 +236,7 @@
  	if (bkgrdflag) {
  		signal(SIGALRM, alarmhandler);
  		itimerval.it_interval.tv_sec = 5;
-@@ -204,8 +221,10 @@ checkfilesys(char *filesys)
+@@ -204,8 +221,10 @@
  	ufs2_daddr_t n_ffree, n_bfree;
  	struct dups *dp;
  	struct statfs *mntp;
@@ -247,7 +247,7 @@
  	ufs2_daddr_t blks;
  	struct iovec *iov;
  	char errmsg[255];
-@@ -226,10 +245,14 @@ checkfilesys(char *filesys)
+@@ -226,10 +245,14 @@
  	 * if it is listed among the mounted file systems. Failing that
  	 * check to see if it is listed in /etc/fstab.
  	 */
@@ -262,7 +262,7 @@
  		filesys = blockcheck(filesys);
  	/*
  	 * If -F flag specified, check to see whether a background check
-@@ -247,8 +270,10 @@ checkfilesys(char *filesys)
+@@ -247,8 +270,10 @@
  		if ((sblock.fs_flags & FS_DOSOFTDEP) == 0)
  			exit(5);	/* Not running soft updates */
  		size = MIBSIZE;
@@ -273,7 +273,7 @@
  		if ((mntp == NULL && sblock.fs_clean == 1) ||
  		    (mntp != NULL && (sblock.fs_flags & FS_UNCLEAN) == 0))
  			exit(7);	/* Filesystem clean, report it now */
-@@ -261,6 +286,7 @@ checkfilesys(char *filesys)
+@@ -261,6 +286,7 @@
  		if ((fsreadfd = open(filesys, O_RDONLY)) < 0 || readsb(0) == 0)
  			exit(3);	/* Cannot read superblock */
  		close(fsreadfd);
@@ -281,7 +281,7 @@
  		if ((sblock.fs_flags & FS_GJOURNAL) != 0) {
  			//printf("GJournaled file system detected on %s.\n",
  			//    filesys);
-@@ -278,6 +304,7 @@ checkfilesys(char *filesys)
+@@ -278,6 +304,7 @@
  				    "CANNOT RUN FAST FSCK\n");
  			}
  		}
@@ -289,7 +289,7 @@
  	}
  	/*
  	 * If we are to do a background check:
-@@ -286,6 +313,7 @@ checkfilesys(char *filesys)
+@@ -286,6 +313,7 @@
  	 *	return created snapshot file
  	 *	if not found, clear bkgrdflag and proceed with normal fsck
  	 */
@@ -297,7 +297,7 @@
  	if (bkgrdflag) {
  		if (mntp == NULL) {
  			bkgrdflag = 0;
-@@ -368,6 +396,7 @@ checkfilesys(char *filesys)
+@@ -368,6 +396,7 @@
  				filesys = snapname;
  		}
  	}
@@ -305,7 +305,7 @@
  
  	switch (setup(filesys)) {
  	case 0:
-@@ -375,7 +404,9 @@ checkfilesys(char *filesys)
+@@ -375,7 +404,9 @@
  			pfatal("CAN'T CHECK FILE SYSTEM.");
  		return (0);
  	case -1:
@@ -315,7 +315,7 @@
  		pwarn("clean, %ld free ", (long)(sblock.fs_cstotal.cs_nffree +
  		    sblock.fs_frag * sblock.fs_cstotal.cs_nbfree));
  		printf("(%lld frags, %lld blocks, %.1f%% fragmentation)\n",
-@@ -395,8 +426,10 @@ checkfilesys(char *filesys)
+@@ -395,8 +426,10 @@
  	 */
  	if (preen == 0) {
  		printf("** Last Mounted on %s\n", sblock.fs_fsmnt);
@@ -326,7 +326,7 @@
  		printf("** Phase 1 - Check Blocks and Sizes\n");
  	}
  	pass1();
-@@ -495,8 +528,13 @@ checkfilesys(char *filesys)
+@@ -495,8 +528,13 @@
  	/*
  	 * Check to see if the file system is mounted read-write.
  	 */
@@ -340,7 +340,7 @@
  	ckfini(resolved);
  
  	for (cylno = 0; cylno < sblock.fs_ncg; cylno++)
-@@ -537,6 +575,8 @@ chkdoreload(struct statfs *mntp)
+@@ -537,6 +575,8 @@
  	 * it unless it is read-write, so we can continue using it
  	 * as safely as possible.
  	 */
@@ -349,7 +349,7 @@
  	if (mntp->f_flags & MNT_RDONLY) {
  		build_iovec(&iov, &iovlen, "fstype", "ffs", 4);
  		build_iovec(&iov, &iovlen, "from", mntp->f_mntfromname,
-@@ -560,8 +600,12 @@ chkdoreload(struct statfs *mntp)
+@@ -560,8 +600,12 @@
  		return (1);
  	}
  	return (0);
@@ -362,7 +362,7 @@
  /*
   * Get the mount point information for name.
   */
-@@ -601,6 +645,7 @@ getmntpt(const char *name)
+@@ -601,6 +645,7 @@
  	statfsp = NULL;
  	return (statfsp);
  }
@@ -372,7 +372,7 @@
  usage(void)
 --- a/sbin/fsck_ffs/pass1.c
 +++ b/sbin/fsck_ffs/pass1.c
-@@ -357,9 +357,11 @@ checkinode(ino_t inumber, struct inodesc
+@@ -357,9 +357,11 @@
  	inoinfo(inumber)->ino_type = IFTODT(mode);
  	badblk = dupblk = 0;
  	idesc->id_number = inumber;
@@ -386,7 +386,7 @@
  	if (sblock.fs_magic == FS_UFS2_MAGIC && dp->dp2.di_extsize > 0) {
 --- a/sbin/fsck_ffs/setup.c
 +++ b/sbin/fsck_ffs/setup.c
-@@ -36,11 +36,14 @@ static const char sccsid[] = "@(#)setup.
+@@ -36,11 +36,14 @@
  __FBSDID("$FreeBSD$");
  
  #include <sys/param.h>
@@ -401,7 +401,7 @@
  
  #include <ufs/ufs/dinode.h>
  #include <ufs/ffs/fs.h>
-@@ -51,6 +54,7 @@ __FBSDID("$FreeBSD$");
+@@ -51,6 +54,7 @@
  #include <limits.h>
  #include <stdint.h>
  #include <string.h>
@@ -409,7 +409,7 @@
  
  #include "fsck.h"
  
-@@ -87,6 +91,7 @@ setup(char *dev)
+@@ -87,6 +91,7 @@
  		}
  		return (0);
  	}
@@ -417,7 +417,7 @@
  	if ((statb.st_mode & S_IFMT) != S_IFCHR &&
  	    (statb.st_mode & S_IFMT) != S_IFBLK) {
  		if (bkgrdflag != 0 && (statb.st_flags & SF_SNAPSHOT) == 0) {
-@@ -121,6 +126,7 @@ setup(char *dev)
+@@ -121,6 +126,7 @@
  			}
  		}
  	}
@@ -425,7 +425,7 @@
  	if ((fsreadfd = open(dev, O_RDONLY)) < 0) {
  		if (bkgrdflag) {
  			unlink(snapname);
-@@ -131,6 +137,7 @@ setup(char *dev)
+@@ -131,6 +137,7 @@
  	}
  	if (bkgrdflag) {
  		unlink(snapname);
@@ -433,7 +433,7 @@
  		size = MIBSIZE;
  		if (sysctlnametomib("vfs.ffs.adjrefcnt", adjrefcnt, &size) < 0||
  		    sysctlnametomib("vfs.ffs.adjblkcnt", adjblkcnt, &size) < 0||
-@@ -160,6 +167,7 @@ setup(char *dev)
+@@ -160,6 +167,7 @@
  		}
  		cmd.version = FFS_CMD_VERSION;
  		cmd.handle = fsreadfd;
@@ -441,7 +441,7 @@
  		fswritefd = -1;
  	}
  	if (preen == 0)
-@@ -471,6 +479,8 @@ calcsb(char *dev, int devfd, struct fs *
+@@ -471,6 +479,8 @@
  		return (0);
  	}
  	lp = getdisklabel(dev, devfd);
@@ -450,7 +450,7 @@
  	if (isdigit(*cp))
  		pp = &lp->d_partitions[0];
  	else
-@@ -521,13 +531,17 @@ calcsb(char *dev, int devfd, struct fs *
+@@ -521,13 +531,17 @@
  static struct disklabel *
  getdisklabel(char *s, int fd)
  {
@@ -470,7 +470,7 @@
  }
 --- a/sbin/fsck_ffs/utilities.c
 +++ b/sbin/fsck_ffs/utilities.c
-@@ -108,14 +108,16 @@ retry:
+@@ -108,14 +108,16 @@
  	return (origname);
  }
  

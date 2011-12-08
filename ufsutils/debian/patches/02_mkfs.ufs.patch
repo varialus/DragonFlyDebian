@@ -7,7 +7,7 @@
 
 --- a/sbin/newfs/mkfs.c
 +++ b/sbin/newfs/mkfs.c
-@@ -53,6 +53,7 @@ __FBSDID("$FreeBSD$");
+@@ -53,6 +53,7 @@
  #include <stdint.h>
  #include <stdio.h>
  #include <unistd.h>
@@ -17,7 +17,7 @@
  #include <sys/types.h>
 --- a/sbin/newfs/newfs.c
 +++ b/sbin/newfs/newfs.c
-@@ -55,7 +55,9 @@ __FBSDID("$FreeBSD$");
+@@ -55,7 +55,9 @@
   */
  #include <sys/param.h>
  #include <sys/stat.h>
@@ -27,7 +27,7 @@
  #include <sys/disklabel.h>
  #include <sys/file.h>
  #include <sys/mount.h>
-@@ -133,6 +135,8 @@ main(int argc, char *argv[])
+@@ -133,6 +135,8 @@
  	off_t mediasize;
  	char part_name;		/* partition name, default to full disk */
  
@@ -36,7 +36,7 @@
  	part_name = 'c';
  	reserved = 0;
  	while ((ch = getopt(argc, argv,
-@@ -303,8 +307,9 @@ main(int argc, char *argv[])
+@@ -303,8 +307,9 @@
  	}
  	if (fstat(disk.d_fd, &st) < 0)
  		err(1, "%s", special);
@@ -48,7 +48,7 @@
  		is_file = 1;	/* assume it is a file */
  		dkname = special;
  		if (sectorsize == 0)
-@@ -312,10 +317,15 @@ main(int argc, char *argv[])
+@@ -312,10 +317,15 @@
  		mediasize = st.st_size;
  		/* set fssize from the partition */
  	} else {
@@ -65,7 +65,7 @@
  		getfssize(&fssize, special, mediasize / sectorsize, reserved);
  	}
  	pp = NULL;
-@@ -370,7 +380,7 @@ main(int argc, char *argv[])
+@@ -370,7 +380,7 @@
  			pp->p_size *= secperblk;
  	}
  	mkfs(pp, special);
@@ -74,7 +74,7 @@
  		if (realsectorsize != DEV_BSIZE)
  			pp->p_size /= realsectorsize / DEV_BSIZE;
  		if (!Nflag && bcmp(pp, &oldpartition, sizeof(oldpartition)))
-@@ -415,8 +425,10 @@ getdisklabel(char *s)
+@@ -415,8 +425,10 @@
  		return &lab;
  	}
  
@@ -85,7 +85,7 @@
  	unlabeled++;
  	if (disktype) {
  		lp = getdiskbyname(disktype);
-@@ -441,8 +453,10 @@ rewritelabel(char *s, struct disklabel *
+@@ -441,8 +453,10 @@
  			errx(1, "cannot write label");
  		return;
  	}
@@ -131,7 +131,7 @@
  	echo All Tests Passed
 --- a/sbin/newfs/newfs.8
 +++ b/sbin/newfs/newfs.8
-@@ -78,10 +78,10 @@ The following options define the general
+@@ -78,10 +78,10 @@
  .It Fl E
  Erase the content of the disk before making the filesystem.
  The reserved area in front of the superblock (for bootcode) will not be erased.

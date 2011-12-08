@@ -9,7 +9,7 @@
 
 --- a/lib/libufs/type.c
 +++ b/lib/libufs/type.c
-@@ -111,7 +111,7 @@ again:	if ((ret = stat(name, &st)) < 0)
+@@ -111,7 +111,7 @@
  	if (ret >= 0 && S_ISREG(st.st_mode)) {
  		/* Possibly a disk image, give it a try.  */
  		;
@@ -18,7 +18,7 @@
  		/* This is what we need, do nothing. */
  		;
  	} else if ((fs = getfsfile(name)) != NULL) {
-@@ -134,8 +134,10 @@ again:	if ((ret = stat(name, &st)) < 0)
+@@ -134,8 +134,10 @@
  			ERROR(disk, "could not find special device");
  			return (-1);
  		}
@@ -41,7 +41,7 @@
  /*
   * Each disk drive contains some number of filesystems.
   * A filesystem consists of a number of cylinder groups.
-@@ -504,7 +507,7 @@ struct cg {
+@@ -504,7 +507,7 @@
   * Turn filesystem block numbers into disk block addresses.
   * This maps filesystem blocks to device size blocks.
   */
@@ -114,7 +114,7 @@
 +include ../../Makefile.common
 --- a/lib/libufs/block.c
 +++ b/lib/libufs/block.c
-@@ -30,7 +30,9 @@ __FBSDID("$FreeBSD$");
+@@ -30,7 +30,9 @@
  
  #include <sys/param.h>
  #include <sys/mount.h>
@@ -124,14 +124,3 @@
  #include <sys/disklabel.h>
  #include <sys/stat.h>
  
-@@ -151,8 +153,10 @@ berase(struct uufsd *disk, ufs2_daddr_t
- 		ERROR(disk, "failed to open disk for writing");
- 		return(rv);
- 	}
-+#ifdef HAVE_BSD_DISKLABEL
- 	ioarg[0] = blockno * disk->d_bsize;
- 	ioarg[1] = size;
- 	rv = ioctl(disk->d_fd, DIOCGDELETE, ioarg);
-+#endif
- 	return (rv);
- }

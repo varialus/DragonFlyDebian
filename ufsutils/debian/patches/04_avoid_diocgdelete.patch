@@ -1,0 +1,15 @@
+
+DIOCGDELETE needs to be avoided for now, even on GNU/kFreeBSD (see
+PR kern/162905).
+
+--- a/lib/libufs/block.c
++++ b/lib/libufs/block.c
+@@ -141,7 +141,7 @@
+ 	return (cnt);
+ }
+ 
+-#ifdef __FreeBSD_kernel__
++#if 0
+ 
+ static int
+ berase_helper(struct uufsd *disk, ufs2_daddr_t blockno, ufs2_daddr_t size)
