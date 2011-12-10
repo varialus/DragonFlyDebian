@@ -3,7 +3,7 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
 
 --- a/sys/modules/Makefile
 +++ b/sys/modules/Makefile
-@@ -363,12 +363,11 @@
+@@ -362,12 +362,11 @@
  .endif
  .endif
  
@@ -18,7 +18,7 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
  _if_carp=	if_carp
  .endif
  
-@@ -376,7 +375,7 @@
+@@ -375,7 +374,7 @@
  _ipfilter=	ipfilter
  .endif
  
@@ -27,7 +27,7 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
  _ipfw=		ipfw
  .endif
  
-@@ -384,11 +383,10 @@
+@@ -383,11 +382,10 @@
  _netgraph=	netgraph
  .endif
  
@@ -41,7 +41,7 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
  _pfsync=	pfsync
  .endif
  .endif
-@@ -444,7 +442,7 @@
+@@ -442,7 +440,7 @@
  _linsysfs=	linsysfs
  _linux=		linux
  _mse=		mse
@@ -50,7 +50,7 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
  _mlx4=		mlx4
  _mlx4ib=	mlx4ib
  _mlxen=		mlxen
-@@ -597,7 +595,7 @@
+@@ -595,7 +593,7 @@
  _linsysfs=	linsysfs
  _linux=		linux
  _mly=		mly
@@ -125,3 +125,25 @@ freebsd-buildutils 8.2 doesn't support MK_INET_SUPPORT nor MK_OFED.
  opt_inet.h:
  	echo "#define INET 1" > ${.TARGET}
  .endif
+--- a/sys/conf/kern.post.mk
++++ b/sys/conf/kern.post.mk
+@@ -94,7 +94,7 @@
+ 	@rm -f ${.TARGET}
+ 	@echo linking ${.TARGET}
+ 	${SYSTEM_LD}
+-.if ${MK_CTF} != "no"
++.if 0
+ 	${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${SYSTEM_OBJS} vers.o
+ .endif
+ .if !defined(DEBUG)
+--- a/sys/conf/kern.pre.mk
++++ b/sys/conf/kern.pre.mk
+@@ -128,7 +128,7 @@
+ NORMAL_M= ${AWK} -f $S/tools/makeobjops.awk ${.IMPSRC} -c ; \
+ 	  ${CC} -c ${CFLAGS} ${WERROR} ${PROF} ${.PREFIX}.c
+ 
+-.if ${MK_CTF} != "no"
++.if 0
+ NORMAL_CTFCONVERT=	${CTFCONVERT} ${CTFFLAGS} ${.TARGET}
+ .elif ${MAKE_VERSION} >= 5201111300
+ NORMAL_CTFCONVERT=
