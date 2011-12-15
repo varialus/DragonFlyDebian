@@ -49,7 +49,7 @@ for fs in $AUTOSNAP_FILESYSTEMS ; do
 
 	# Remove any snapshots in the same class as today's addition.
 	LANG=C zfs list -r ${fs} -t snapshot -H -o name,creation \
-	| grep @autosnap- \
+	| grep "^${fs}@autosnap-" \
 	| while read name creation_human ; do
 		creation="$(LANG=C date +%s -d "${creation_human}")"
 		echo "$(classify "${creation}") ${creation} ${name}"
