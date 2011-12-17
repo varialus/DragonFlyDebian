@@ -44,7 +44,6 @@ classify ()
 
 for fs in $AUTOSNAP_FILESYSTEMS ; do
 	# Create today's snapshot.
-	echo zfs snapshot ${fs}@autosnap-$(date +%F)
 	zfs snapshot ${fs}@autosnap-$(date +%F)
 
 	# Remove any snapshots in the same class as today's addition.
@@ -56,9 +55,7 @@ for fs in $AUTOSNAP_FILESYSTEMS ; do
 		done \
 	| sort -nr \
 	| while read class creation name ; do
-		echo ${class} ${name}
 		if [ ${class} == "${previous_class}" ] ; then
-			echo zfs destroy "${name}"
 			zfs destroy "${name}"
 		fi
 		previous_class="${class}"
