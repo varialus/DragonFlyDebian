@@ -1,3 +1,7 @@
+ifeq ($(subdir),linuxthreads)
+CFLAGS-pt-initfini.s += -fno-asynchronous-unwind-tables
+endif
+
 # Additional header files to be installed in $prefix/include:
 
 ifeq ($(subdir),misc)
