@@ -1,56 +1,3 @@
---- a/sys/conf/files.i386
-+++ b/sys/conf/files.i386
-@@ -46,27 +46,6 @@
- 	no-obj no-implicit-rule before-depend				\
- 	clean		"ukbdmap.h"
- #
--nvenetlib.o			optional	nve pci			\
--	dependency	"$S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu"	\
--	compile-with	"uudecode $S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
--	no-implicit-rule
--#
--os+%DIKED-nve.h		optional	nve pci				\
--	dependency	"$S/contrib/dev/nve/os.h"			\
--	compile-with	"sed -e 's/^.*#include.*phy\.h.*$$//' $S/contrib/dev/nve/os.h > os+%DIKED-nve.h" \
--	no-implicit-rule no-obj before-depend				\
--	clean		"os+%DIKED-nve.h"
--#
--hptmvraid.o			optional	hptmv			\
--	dependency	"$S/dev/hptmv/i386-elf.raid.o.uu"		\
--	compile-with	"uudecode < $S/dev/hptmv/i386-elf.raid.o.uu"	\
--	no-implicit-rule
--#
--hptrr_lib.o			optional	hptrr			\
--	dependency	"$S/dev/hptrr/i386-elf.hptrr_lib.o.uu"		\
--	compile-with	"uudecode < $S/dev/hptrr/i386-elf.hptrr_lib.o.uu" \
--	no-implicit-rule
--#
- compat/linprocfs/linprocfs.c	optional linprocfs
- compat/linsysfs/linsysfs.c	optional linsysfs
- compat/linux/linux_emul.c	optional compat_linux
-@@ -174,14 +153,6 @@
- dev/glxiic/glxiic.c		optional glxiic
- dev/glxsb/glxsb.c		optional glxsb
- dev/glxsb/glxsb_hash.c		optional glxsb
--dev/hptmv/entry.c		optional hptmv
--dev/hptmv/mv.c			optional hptmv
--dev/hptmv/gui_lib.c		optional hptmv
--dev/hptmv/hptproc.c		optional hptmv
--dev/hptmv/ioctl.c		optional hptmv
--dev/hptrr/hptrr_os_bsd.c	optional hptrr
--dev/hptrr/hptrr_osm_bsd.c	optional hptrr
--dev/hptrr/hptrr_config.c	optional hptrr
- dev/hwpmc/hwpmc_amd.c		optional hwpmc
- dev/hwpmc/hwpmc_intel.c		optional hwpmc
- dev/hwpmc/hwpmc_core.c		optional hwpmc
-@@ -214,7 +185,6 @@
- dev/mse/mse.c			optional mse
- dev/mse/mse_isa.c		optional mse isa
- dev/nfe/if_nfe.c		optional nfe pci
--dev/nve/if_nve.c		optional nve pci
- dev/nvram/nvram.c		optional nvram isa
- dev/pcf/pcf_isa.c		optional pcf
- dev/random/nehemiah.c		optional random
 --- a/sys/i386/conf/GENERIC
 +++ b/sys/i386/conf/GENERIC
 @@ -144,8 +144,6 @@
@@ -64,16 +11,18 @@
  device		mly		# Mylex AcceleRAID/eXtremeRAID
 --- a/sys/modules/Makefile
 +++ b/sys/modules/Makefile
-@@ -108,8 +108,6 @@
+@@ -108,10 +108,7 @@
+ 	hatm \
  	hifn \
  	hme \
+-	${_hpt27xx} \
  	${_hptiop} \
 -	${_hptmv} \
 -	${_hptrr} \
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -229,7 +227,6 @@
+@@ -230,7 +227,6 @@
  	ntfs \
  	ntfs_iconv \
  	nullfs \
@@ -81,40 +30,6 @@
  	${_nvram} \
  	${_nwfs} \
  	${_nxge} \
-@@ -507,8 +504,6 @@
- _dpt=		dpt
- _ex=		ex
- _hptiop=	hptiop
--_hptmv=		hptmv
--_hptrr=		hptrr
- _ichwd=		ichwd
- _ida=		ida
- _iir=		iir
-@@ -524,7 +519,6 @@
- _ixgbe=		ixgbe
- _mly=		mly
- _nfe=		nfe
--_nve=		nve
- _nvram=		nvram
- _nxge=		nxge
- _tpm=		tpm
-@@ -581,8 +575,6 @@
- _exca=		exca
- _ext2fs=	ext2fs
- _hptiop=	hptiop
--_hptmv=		hptmv
--_hptrr=		hptrr
- _i2c=		i2c
- _ichwd=		ichwd
- _ida=		ida
-@@ -613,7 +605,6 @@
- .endif
- _ndis=		ndis
- _nfe=		nfe
--_nve=		nve
- _nvram=		nvram
- _nxge=		nxge
- .if ${MK_CDDL} != "no" || defined(ALL_MODULES)
 --- a/sys/amd64/conf/GENERIC
 +++ b/sys/amd64/conf/GENERIC
 @@ -138,8 +138,6 @@
@@ -128,7 +43,7 @@
  device		mly		# Mylex AcceleRAID/eXtremeRAID
 --- a/sys/conf/files.amd64
 +++ b/sys/conf/files.amd64
-@@ -47,26 +47,6 @@
+@@ -47,30 +47,6 @@
  	no-obj no-implicit-rule before-depend				\
  	clean		"ukbdmap.h"
  #
@@ -143,6 +58,10 @@
 -	no-implicit-rule no-obj before-depend				\
 -	clean		"os+%DIKED-nve.h"
 -#
+-hpt27xx_lib.o			optional	hpt27xx			\
+-	dependency	"$S/dev/hpt27xx/amd64-elf.hpt27xx_lib.o.uu"	\
+-	compile-with	"uudecode < $S/dev/hpt27xx/amd64-elf.hpt27xx_lib.o.uu" \
+-	no-implicit-rule
 -hptmvraid.o			optional	hptmv			\
 -	dependency	"$S/dev/hptmv/amd64-elf.raid.o.uu"	\
 -	compile-with	"uudecode < $S/dev/hptmv/amd64-elf.raid.o.uu" \
@@ -155,10 +74,13 @@
  amd64/acpica/acpi_machdep.c	optional	acpi
  amd64/acpica/acpi_switch.S	optional	acpi
  acpi_wakecode.o			optional	acpi			\
-@@ -187,14 +167,6 @@
+@@ -191,17 +167,6 @@
  dev/fdc/fdc_acpi.c		optional	fdc
  dev/fdc/fdc_isa.c		optional	fdc isa
  dev/fdc/fdc_pccard.c		optional	fdc pccard
+-dev/hpt27xx/os_bsd.c		optional	hpt27xx
+-dev/hpt27xx/osm_bsd.c		optional	hpt27xx
+-dev/hpt27xx/hpt27xx_config.c	optional	hpt27xx
 -dev/hptmv/entry.c		optional	hptmv
 -dev/hptmv/mv.c			optional	hptmv
 -dev/hptmv/gui_lib.c		optional	hptmv
@@ -170,7 +92,7 @@
  dev/hwpmc/hwpmc_amd.c		optional	hwpmc
  dev/hwpmc/hwpmc_intel.c		optional	hwpmc
  dev/hwpmc/hwpmc_core.c		optional	hwpmc
-@@ -206,7 +178,6 @@
+@@ -213,7 +178,6 @@
  dev/lindev/full.c		optional	lindev
  dev/lindev/lindev.c		optional	lindev
  dev/nfe/if_nfe.c		optional	nfe pci
@@ -178,3 +100,81 @@
  dev/nvram/nvram.c		optional	nvram isa
  dev/qlxgb/qla_dbg.c		optional	qlxgb pci
  dev/qlxgb/qla_hw.c		optional	qlxgb pci
+--- a/sys/conf/files.i386
++++ b/sys/conf/files.i386
+@@ -46,31 +46,6 @@
+ 	no-obj no-implicit-rule before-depend				\
+ 	clean		"ukbdmap.h"
+ #
+-nvenetlib.o			optional	nve pci			\
+-	dependency	"$S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu"	\
+-	compile-with	"uudecode $S/contrib/dev/nve/i386/nvenetlib.o.bz2.uu ; bzip2 -df nvenetlib.o.bz2" \
+-	no-implicit-rule
+-#
+-os+%DIKED-nve.h		optional	nve pci				\
+-	dependency	"$S/contrib/dev/nve/os.h"			\
+-	compile-with	"sed -e 's/^.*#include.*phy\.h.*$$//' $S/contrib/dev/nve/os.h > os+%DIKED-nve.h" \
+-	no-implicit-rule no-obj before-depend				\
+-	clean		"os+%DIKED-nve.h"
+-#
+-hpt27xx_lib.o			optional	hpt27xx			\
+-	dependency	"$S/dev/hpt27xx/i386-elf.hpt27xx_lib.o.uu"	\
+-	compile-with	"uudecode < $S/dev/hpt27xx/i386-elf.hpt27xx_lib.o.uu" \
+-	no-implicit-rule
+-hptmvraid.o			optional	hptmv			\
+-	dependency	"$S/dev/hptmv/i386-elf.raid.o.uu"		\
+-	compile-with	"uudecode < $S/dev/hptmv/i386-elf.raid.o.uu"	\
+-	no-implicit-rule
+-#
+-hptrr_lib.o			optional	hptrr			\
+-	dependency	"$S/dev/hptrr/i386-elf.hptrr_lib.o.uu"		\
+-	compile-with	"uudecode < $S/dev/hptrr/i386-elf.hptrr_lib.o.uu" \
+-	no-implicit-rule
+-#
+ compat/linprocfs/linprocfs.c	optional linprocfs
+ compat/linsysfs/linsysfs.c	optional linsysfs
+ compat/linux/linux_emul.c	optional compat_linux
+@@ -146,17 +121,9 @@
+ dev/atkbdc/atkbdc_isa.c		optional atkbdc isa
+ dev/atkbdc/atkbdc_subr.c	optional atkbdc
+ dev/atkbdc/psm.c		optional psm atkbdc
+-dev/ce/ceddk.c			optional ce
+-dev/ce/if_ce.c			optional ce
+-dev/ce/tau32-ddk.c		optional ce
+ dev/cm/if_cm_isa.c		optional cm isa
+ dev/coretemp/coretemp.c		optional coretemp
+-dev/cp/cpddk.c			optional cp
+-dev/cp/if_cp.c			optional cp
+ dev/cpuctl/cpuctl.c		optional cpuctl
+-dev/ctau/ctau.c			optional ctau
+-dev/ctau/ctddk.c		optional ctau
+-dev/ctau/if_ct.c		optional ctau
+ dev/cx/csigma.c			optional cx
+ dev/cx/cxddk.c			optional cx
+ dev/cx/if_cx.c			optional cx
+@@ -178,17 +145,6 @@
+ dev/glxiic/glxiic.c		optional glxiic
+ dev/glxsb/glxsb.c		optional glxsb
+ dev/glxsb/glxsb_hash.c		optional glxsb
+-dev/hpt27xx/os_bsd.c		optional hpt27xx
+-dev/hpt27xx/osm_bsd.c		optional hpt27xx
+-dev/hpt27xx/hpt27xx_config.c	optional hpt27xx
+-dev/hptmv/entry.c		optional hptmv
+-dev/hptmv/mv.c			optional hptmv
+-dev/hptmv/gui_lib.c		optional hptmv
+-dev/hptmv/hptproc.c		optional hptmv
+-dev/hptmv/ioctl.c		optional hptmv
+-dev/hptrr/hptrr_os_bsd.c	optional hptrr
+-dev/hptrr/hptrr_osm_bsd.c	optional hptrr
+-dev/hptrr/hptrr_config.c	optional hptrr
+ dev/hwpmc/hwpmc_amd.c		optional hwpmc
+ dev/hwpmc/hwpmc_intel.c		optional hwpmc
+ dev/hwpmc/hwpmc_core.c		optional hwpmc
+@@ -221,7 +177,6 @@
+ dev/mse/mse.c			optional mse
+ dev/mse/mse_isa.c		optional mse isa
+ dev/nfe/if_nfe.c		optional nfe pci
+-dev/nve/if_nve.c		optional nve pci
+ dev/nvram/nvram.c		optional nvram isa
+ dev/pcf/pcf_isa.c		optional pcf
+ dev/random/nehemiah.c		optional random
