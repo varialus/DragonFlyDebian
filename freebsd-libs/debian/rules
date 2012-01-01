@@ -30,7 +30,7 @@ TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
 
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
-PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS)" NO_WERROR=1 NOGCCERROR=1 \
+PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) -I$(CURDIR)/debian/local/include" NO_WERROR=1 NOGCCERROR=1 \
         NOSHARED=NO NO_SHARED=NO NO_PROFILE=1 DESTDIR=$(DESTDIR) make
 export SHLIB_MAJOR = 0
 kernel = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
@@ -44,6 +44,7 @@ get-orig-source:
 	         lib/libkiconv lib/libnetgraph lib/libjail \
 	         lib/libkvm lib/libmemstat lib/libsbuf lib/libusb \
 	         lib/libusbhid sys/cam \
+		lib/libalias sys/netinet/libalias sys/modules/libalias \
 	         sys/kern/subr_sbuf.c \
 	         sys/sys/sbuf.h \
 	         share/misc/usb_hid_usages ; do \
@@ -57,7 +58,7 @@ get-orig-source:
 	rm -rf $(ORIGDIR)
 
 ifeq ($(kernel), kfreebsd)
-build: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-usb build-devstat build-memstat build-netgraph build-jail
+build: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-usb build-devstat build-memstat build-netgraph build-jail build-alias
 else
 build: build-sbuf
 endif
@@ -122,6 +123,11 @@ build-jail-stamp:
 	$(PMAKE) -C $(CURDIR)/lib/libjail SHLIBDIR=./
 	touch $@
 
+build-alias: build-alias-stamp
+build-alias-stamp:
+	$(PMAKE) -C $(CURDIR)/lib/libalias SHLIBDIR=./
+	touch $@
+
 clean:
 	dh_testdir
 	dh_testroot
@@ -138,6 +144,7 @@ ifeq ($(kernel), kfreebsd)
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid clean
 	$(PMAKE) -C $(CURDIR)/lib/libusb clean
 	$(PMAKE) -C $(CURDIR)/lib/libjail clean
+	$(PMAKE) -C $(CURDIR)/lib/libalias clean
 endif
 	rm -f *stamp
 	dh_clean
@@ -162,6 +169,7 @@ ifeq ($(kernel), kfreebsd)
 	$(PMAKE) -C $(CURDIR)/lib/libusbhid install SHLIBDIR=/usr/lib
 	$(PMAKE) -C $(CURDIR)/lib/libusb install SHLIBDIR=/lib
 	$(PMAKE) -C $(CURDIR)/lib/libjail install SHLIBDIR=/lib
+	$(PMAKE) -C $(CURDIR)/lib/libalias install SHLIBDIR=/usr/lib
 
 	mkdir -p $(CURDIR)/debian/tmp/usr/lib/pkgconfig
 	install -m644 debian/libusb*.pc $(CURDIR)/debian/tmp/usr/lib/pkgconfig
