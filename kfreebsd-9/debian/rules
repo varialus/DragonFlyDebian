@@ -20,7 +20,7 @@ cpu		:= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 config_files	:= $(wildcard debian/arch/$(cpu)/*.config)
 flavours	:= $(config_files:debian/arch/$(cpu)/%.config=%)
 configfile	:= DEBCUSTOM
-abiname		:= 0
+abiname		:= 1
 ld_target	:= $(shell ld --help | sed -ne "s/[^ :]*: supported targets: \([^ ]*\) .*/\1/p")
 gcc_version	:= 4.4
 
@@ -30,8 +30,8 @@ else
 kfreebsd_cpu	:= $(cpu)
 endif
 
-#SVN		:= http://svn.freebsd.org/base/release/$(version).0
-SVN		:= http://svn.freebsd.org/base/releng/$(version)
+SVN		:= http://svn.freebsd.org/base/release/$(version).0
+#SVN		:= http://svn.freebsd.org/base/releng/$(version)
 #SVN		:= http://svn.freebsd.org/base/stable/$(major)
 #SVN		:= http://svn.freebsd.org/base/head
 SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
@@ -49,7 +49,7 @@ PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 get-orig-source:
 	rm -rf $(ORIG_DIR)
 	for i in sys usr.sbin/config ; do \
-		svn export -r $(svn_revision) $(SVN)/$$i $(ORIG_DIR)/$$i ; \
+		svn export $(SVN)/$$i $(ORIG_DIR)/$$i ; \
 	done
 	cd $(ORIG_DIR) && $(CURDIR)/debian/prune.sh
 	tar --numeric-owner --owner 0 --group 0 -czf ../$(ORIG_TAR) $(ORIG_DIR)
