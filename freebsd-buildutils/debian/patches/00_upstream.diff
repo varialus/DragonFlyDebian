@@ -1,55 +1,21 @@
 --- a/src/usr.bin/make/main.c
 +++ b/src/usr.bin/make/main.c
-@@ -63,7 +63,9 @@
- 
- #include <sys/param.h>
- #include <sys/stat.h>
-+#ifdef __FreeBSD__
- #include <sys/sysctl.h>
-+#endif
- #include <sys/time.h>
- #include <sys/queue.h>
- #include <sys/resource.h>
-@@ -914,6 +916,7 @@
+@@ -929,6 +929,7 @@
  	}
  #endif
  
 +#ifdef __FreeBSD__
  	/*
- 	 * Prior to 7.0, FreeBSD/pc98 kernel used to set the
- 	 * utsname.machine to "i386", and MACHINE was defined as
-@@ -933,6 +936,7 @@
- 				machine = "pc98";
- 		}
+ 	 * Get the name of this type of MACHINE from utsname
+ 	 * so we can share an executable for similar machines.
+@@ -952,6 +953,7 @@
+ 		machine_arch = "unknown";
+ #endif
  	}
 +#endif
  
  	/*
- 	 * Get the name of this type of MACHINE from utsname
---- a/src/usr.sbin/config/main.c
-+++ b/src/usr.sbin/config/main.c
-@@ -56,6 +56,9 @@
- #include <sysexits.h>
- #include <unistd.h>
- #include <dirent.h>
-+#ifndef _DIRENT_HAVE_D_NAMLEN
-+#include <string.h> /* strlen */
-+#endif
- #include "y.tab.h"
- #include "config.h"
- #include "configvers.h"
-@@ -618,7 +621,11 @@
- 	if ((dirp = opendir(p)) == NULL)
- 		err(EX_OSERR, "opendir %s", p);
- 	while ((dp = readdir(dirp)) != NULL) {
-+#ifdef _DIRENT_HAVE_D_NAMLEN
- 		i = dp->d_namlen - 2;
-+#else
-+		i = strlen (dp->d_name) - 2;
-+#endif
- 		/* Skip non-headers */
- 		if (dp->d_name[i] != '.' || dp->d_name[i + 1] != 'h')
- 			continue;
+ 	 * Set machine_cpu to the minumum supported CPU revision based
 --- a/src/usr.sbin/mtree/compare.c
 +++ b/src/usr.sbin/mtree/compare.c
 @@ -176,21 +176,22 @@
@@ -62,17 +28,16 @@
  	 * Catches nano-second differences, but doesn't display them.
  	 */
  	if ((s->flags & F_TIME) &&
--	     ((s->st_mtimespec.tv_sec != p->fts_statp->st_mtimespec.tv_sec) ||
--	     (s->st_mtimespec.tv_nsec != p->fts_statp->st_mtimespec.tv_nsec))) {
-+	     ((s->ST_MTIM.tv_sec != p->fts_statp->ST_MTIM.tv_sec) ||
-+	     (s->ST_MTIM.tv_nsec != p->fts_statp->ST_MTIM.tv_nsec))) {
+-	     ((s->st_mtimespec.tv_sec != p->fts_statp->st_mtim.tv_sec) ||
+-	     (s->st_mtimespec.tv_nsec != p->fts_statp->st_mtim.tv_nsec))) {
++	     ((s->ST_MTIM.tv_sec != p->fts_statp->st_mtim.tv_sec) ||
++	     (s->ST_MTIM.tv_nsec != p->fts_statp->st_mtim.tv_nsec))) {
  		LABEL;
  		(void)printf("%smodification time expected %.24s ",
 -		    tab, ctime(&s->st_mtimespec.tv_sec));
 +		    tab, ctime(&s->ST_MTIM.tv_sec));
  		(void)printf("found %.24s",
--		    ctime(&p->fts_statp->st_mtimespec.tv_sec));
-+		    ctime(&p->fts_statp->ST_MTIM.tv_sec));
+ 		    ctime(&p->fts_statp->st_mtim.tv_sec));
  		if (uflag) {
 -			tv[0].tv_sec = s->st_mtimespec.tv_sec;
 -			tv[0].tv_usec = s->st_mtimespec.tv_nsec / 1000;
@@ -107,22 +72,7 @@
  		char *new_digest, buf[33];
 --- a/src/usr.sbin/mtree/create.c
 +++ b/src/usr.sbin/mtree/create.c
-@@ -211,10 +211,12 @@
- 	if (keys & F_SIZE)
- 		output(indent, &offset, "size=%jd",
- 		    (intmax_t)p->fts_statp->st_size);
-+#ifdef ST_MTIM
- 	if (keys & F_TIME)
- 		output(indent, &offset, "time=%ld.%09ld",
--		    (long)p->fts_statp->st_mtimespec.tv_sec,
--		    p->fts_statp->st_mtimespec.tv_nsec);
-+		    (long)p->fts_statp->ST_MTIM.tv_sec,
-+		    p->fts_statp->ST_MTIM.tv_nsec);
-+#endif
- 	if (keys & F_CKSUM && S_ISREG(p->fts_statp->st_mode)) {
- 		if ((fd = open(p->fts_accpath, O_RDONLY, 0)) < 0 ||
- 		    crc(fd, &val, &len))
-@@ -265,11 +267,13 @@
+@@ -265,11 +265,13 @@
  	if (keys & F_SLINK &&
  	    (p->fts_info == FTS_SL || p->fts_info == FTS_SLNONE))
  		output(indent, &offset, "link=%s", rlink(p->fts_accpath));
@@ -136,7 +86,7 @@
  	(void)putchar('\n');
  }
  
-@@ -328,6 +332,7 @@
+@@ -328,6 +330,7 @@
  				maxuid = u[suid];
  			}
  
@@ -144,7 +94,7 @@
  			/*
  			 * XXX
  			 * note that the below will break when file flags
-@@ -341,6 +346,7 @@
+@@ -341,6 +344,7 @@
  				saveflags = sflags;
  				maxflags = f[FLAGS2IDX(sflags)];
  			}
@@ -152,7 +102,7 @@
  		}
  	}
  	/*
-@@ -384,11 +390,13 @@
+@@ -384,11 +388,13 @@
  			(void)printf(" mode=%#o", savemode);
  		if (keys & F_NLINK)
  			(void)printf(" nlink=1");

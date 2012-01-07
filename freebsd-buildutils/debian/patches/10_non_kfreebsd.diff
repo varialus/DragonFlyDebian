@@ -1,23 +1,41 @@
----
- src/usr.bin/make/main.c |   10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
 --- a/src/usr.bin/make/main.c
 +++ b/src/usr.bin/make/main.c
-@@ -950,11 +950,11 @@
+@@ -932,7 +932,10 @@
+ 	}
+ #endif
+ 
+-#ifdef __FreeBSD__
++#ifndef MACHINE_ARCH
++#define MACHINE_ARCH "unknown"
++#endif
++
+ 	/*
+ 	 * Get the name of this type of MACHINE from utsname
+ 	 * so we can share an executable for similar machines.
+@@ -942,21 +945,21 @@
  	 * run-time.
  	 */
- 	if (machine == NULL) {
--		static struct utsname utsname;
--
--		if (uname(&utsname) == -1)
--			err(2, "uname");
--		machine = utsname.machine;
-+#ifdef MACHINE_ARCH
-+		machine = MACHINE_ARCH;
+ 	if ((machine = getenv("MACHINE")) == NULL) {
++// __FreeBSD_kernel__
++#ifdef __FreeBSD__
+ 		static struct utsname utsname;
+ 
+ 		if (uname(&utsname) == -1)
+ 			err(2, "uname");
+ 		machine = utsname.machine;
 +#else
-+		machine = "unknown";
++		machine = MACHINE_ARCH;
 +#endif
  	}
  
  	if ((machine_arch = getenv("MACHINE_ARCH")) == NULL) {
+-#ifdef MACHINE_ARCH
+ 		machine_arch = MACHINE_ARCH;
+-#else
+-		machine_arch = "unknown";
+-#endif
+ 	}
+-#endif
+ 
+ 	/*
+ 	 * Set machine_cpu to the minumum supported CPU revision based

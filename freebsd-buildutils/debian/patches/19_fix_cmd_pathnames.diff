@@ -59,16 +59,15 @@
  MOUNT_DEVFS?=	${MOUNT} -t devfs devfs
  # XXX: this is a work-around for an obscure bug where
  # mount -t nullfs returns zero status on errors within
-@@ -67,53 +67,36 @@
+@@ -67,27 +67,27 @@
  OBJCOPY?=	/usr/bin/objcopy
  OBJDUMP?=	/usr/bin/objdump
  PASTE?=		/usr/bin/paste
 -PAX?=		/bin/pax
 +PAX?=		/usr/bin/pax
  PRINTF?=	/usr/bin/printf
--PW?=		/usr/sbin/pw
+ PW?=		/usr/sbin/pw
 -REALPATH?=	/bin/realpath
-+
 +REALPATH?=	/bin/readlink -f
  RM?=		/bin/rm
  RMDIR?=		/bin/rmdir
@@ -79,10 +78,9 @@
  SORT?=		/usr/bin/sort
  STRIP_CMD?=	/usr/bin/strip
  # Command to run commands as privileged user
--# Example: "/usr/local/bin/sudo sh -c" to use "sudo" instead of "su"
+ # Example: "/usr/local/bin/sudo sh -c" to use "sudo" instead of "su"
 -SU_CMD?=	/usr/bin/su root -c
 -SYSCTL?=	/sbin/sysctl
-+# Example: "/bin/sudo sh -c" to use "sudo" instead of "su"
 +SU_CMD?=	/bin/su root -c
 +SYSCTL?=	/bin/sysctl
  TAIL?=		/usr/bin/tail
@@ -91,40 +89,11 @@
  TRUE?=		true				# Shell builtin
  UMOUNT?=	/sbin/umount
 -UNAME?=		/usr/bin/uname
--UNMAKESELF_CMD?=	${LOCALBASE}/bin/unmakeself
--UNZIP_CMD?=	${LOCALBASE}/bin/unzip
 +UNAME?=		/bin/uname
-+
-+UNZIP_CMD?=	/usr/bin/unzip
+ UNMAKESELF_CMD?=	${LOCALBASE}/bin/unmakeself
+ UNZIP_CMD?=	${LOCALBASE}/bin/unzip
  WHICH?=		/usr/bin/which
- XARGS?=		/usr/bin/xargs
--XMKMF?=		${LOCALBASE}/bin/xmkmf -a
-+XMKMF?=		/usr/bin/xmkmf -a
- YACC?=		/usr/bin/yacc
- 
- XZ?=	-Mmax
--.if exists(/usr/bin/xz)
- XZ_CMD?=	/usr/bin/xz ${XZ}
--.else
--XZ_CMD?=	${LOCALBASE}/bin/xz ${XZ}
--.endif
--
--.if exists(/sbin/md5)
--MD5?=		/sbin/md5
--.else
--MD5?=		md5
--.endif
--.if exists(/sbin/sha256)
--SHA256?=	/sbin/sha256
--.elif exists(${LOCALBASE}/sbin/sha256)
--SHA256?=	${LOCALBASE}/sbin/sha256
--.else
--SHA256?=	NO
--.endif
- 
- # ECHO is defined in /usr/share/mk/sys.mk, which can either be "echo",
- # or "true" if the make flag -s is given.  Use ECHO_CMD where you mean
-@@ -123,18 +106,4 @@
+@@ -113,18 +113,4 @@
  # Used to print all the '===>' style prompts - override this to turn them off.
  ECHO_MSG?=	${ECHO_CMD}
  
@@ -143,3 +112,25 @@
 -.endif
 -
  .endif
+--- a/ports/Mk/bsd.port.mk
++++ b/ports/Mk/bsd.port.mk
+@@ -1121,7 +1121,7 @@
+ # tree we are and thus can't go relative.  They can, of course, be overridden
+ # by individual Makefiles or local system make configuration.
+ PORTSDIR?=		/usr/ports
+-LOCALBASE?=		/usr/local
++LOCALBASE?=		/usr
+ X11BASE?=		${LOCALBASE}
+ LINUXBASE?=		/compat/linux
+ DISTDIR?=		${PORTSDIR}/distfiles
+--- a/src/usr.bin/make/Makefile
++++ b/src/usr.bin/make/Makefile
+@@ -39,7 +39,7 @@
+ #	  not the trailing '\0', via the -l flag in emitc and some editing
+ #	  (only for directive_hash).
+ 
+-LOCALBASE ?= /usr/local
++LOCALBASE ?= /usr
+ MPH	?= ${LOCALBASE}/bin/mph
+ EMITC	?= ${LOCALBASE}/bin/emitc
+ 

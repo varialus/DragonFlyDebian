@@ -7,25 +7,17 @@ for command-line assignment parameters.
 
 --- a/src/usr.bin/make/main.c
 +++ b/src/usr.bin/make/main.c
-@@ -68,6 +68,7 @@
- #endif
- #include <sys/time.h>
- #include <bsd/sys/queue.h>
-+#include <bsd/sys/endian.h>
- #include <bsd/err.h>
- #include <sys/resource.h>
- #include <sys/utsname.h>
-@@ -865,6 +866,7 @@
+@@ -873,6 +873,7 @@
+ 	const char *machine;
  	const char *machine_arch;
- 	const char *machine_multiarch;
  	const char *machine_cpu;
 +	int machine_endian_little;
  	Boolean outOfDate = TRUE;	/* FALSE if all targets up to date */
  	const char *p;
  	const char *pathp;
-@@ -1021,6 +1023,16 @@
+@@ -1002,6 +1003,16 @@
+ 	Var_SetGlobal("MACHINE", machine);
  	Var_SetGlobal("MACHINE_ARCH", machine_arch);
- 	Var_SetGlobal("MACHINE_MULTIARCH", machine_multiarch);
  	Var_SetGlobal("MACHINE_CPU", machine_cpu);
 +	if (!Var_Exists("TARGET_BIG_ENDIAN", VAR_GLOBAL) && !Var_Exists("TARGET_LITTLE_ENDIAN", VAR_GLOBAL)) {
 +		/*

@@ -23,7 +23,7 @@
   * Arch_ParseArchive --
 --- a/src/usr.bin/make/main.c
 +++ b/src/usr.bin/make/main.c
-@@ -250,6 +250,9 @@
+@@ -247,6 +247,9 @@
  {
  	char *fname, *fnamesave;	/* makefile to read */
  	FILE *stream;
@@ -33,45 +33,6 @@
  	char *name, path[MAXPATHLEN];
  	char *MAKEFILE;
  	int setMAKEFILE;
---- a/src/usr.sbin/config/main.c
-+++ b/src/usr.sbin/config/main.c
-@@ -71,6 +71,10 @@
- #define FALSE	(0)
- #endif
- 
-+#ifndef MAXPATHLEN
-+#  define MAXPATHLEN 4096
-+#endif
-+  
- #define	CDIR	"../compile/"
- 
- char *	PREFIX;
---- a/src/usr.sbin/config/mkmakefile.c
-+++ b/src/usr.sbin/config/mkmakefile.c
-@@ -65,6 +65,10 @@
- 		wd = word; \
- 	}
- 
-+#ifndef MAXPATHLEN
-+#  define MAXPATHLEN 4096
-+#endif
-+  
- static char *tail(char *);
- static void do_clean(FILE *);
- static void do_rules(FILE *);
---- a/src/usr.sbin/config/mkoptions.c
-+++ b/src/usr.sbin/config/mkoptions.c
-@@ -48,6 +48,10 @@
- #include "config.h"
- #include "y.tab.h"
- 
-+#ifndef MAXPATHLEN
-+#  define MAXPATHLEN 4096
-+#endif
-+  
- static	struct users {
- 	int	u_default;
- 	int	u_min;
 --- a/src/usr.sbin/mtree/create.c
 +++ b/src/usr.sbin/mtree/create.c
 @@ -67,6 +67,10 @@

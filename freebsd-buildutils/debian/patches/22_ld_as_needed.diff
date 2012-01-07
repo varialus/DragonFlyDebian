@@ -1,5 +1,5 @@
---- freebsd-buildutils-8.2.orig/src/usr.bin/make/Makefile
-+++ freebsd-buildutils-8.2/src/usr.bin/make/Makefile
+--- a/src/usr.bin/make/Makefile
++++ b/src/usr.bin/make/Makefile
 @@ -4,6 +4,7 @@
  
  PROG=	make
@@ -8,13 +8,49 @@
  SRCS=	arch.c buf.c cond.c dir.c for.c hash.c hash_tables.c job.c	\
  	lst.c main.c make.c parse.c proc.c shell.c str.c suff.c targ.c	\
  	util.c var.c
---- freebsd-buildutils-8.2.orig/src/usr.sbin/mtree/Makefile
-+++ freebsd-buildutils-8.2/src/usr.sbin/mtree/Makefile
-@@ -7,6 +7,7 @@ PROG=	mtree
+--- a/src/usr.sbin/mtree/Makefile
++++ b/src/usr.sbin/mtree/Makefile
+@@ -7,5 +7,6 @@
  MAN=	mtree.8 mtree.5
  SRCS=	compare.c crc.c create.c excludes.c misc.c mtree.c spec.c verify.c
  SRCS+=	specspec.c
 +LDADD+=	-lbsd
  
- WARNS?=	4
+ .include <bsd.prog.mk>
+--- a/src/usr.bin/brandelf/Makefile
++++ b/src/usr.bin/brandelf/Makefile
+@@ -1,5 +1,6 @@
+ # $FreeBSD$
  
+ PROG=	brandelf
++LDADD=	-lbsd
+ 
+ .include <bsd.prog.mk>
+--- a/src/usr.bin/cksum/Makefile
++++ b/src/usr.bin/cksum/Makefile
+@@ -3,6 +3,7 @@
+ 
+ PROG=	cksum
+ SRCS=	cksum.c crc.c print.c sum1.c sum2.c crc32.c
++LDADD+=	-lbsd
+ SIMLINKS=	${BINDIR}/cksum ${BINDIR}/sum
+ MLINKS=	cksum.1 sum.1
+ 
+--- a/src/usr.bin/file2c/Makefile
++++ b/src/usr.bin/file2c/Makefile
+@@ -1,4 +1,5 @@
+ # $FreeBSD$
+ 
+ PROG=	file2c
++LDADD+=	-lbsd
+ .include <bsd.prog.mk>
+--- a/src/usr.bin/yacc/Makefile
++++ b/src/usr.bin/yacc/Makefile
+@@ -4,6 +4,7 @@
+ PROG=	yacc
+ SRCS=	closure.c error.c lalr.c lr0.c main.c mkpar.c output.c reader.c \
+ 	skeleton.c symtab.c verbose.c warshall.c
++LDADD+=	-lbsd
+ SCRIPTS=yyfix.sh
+ MAN=	yacc.1 yyfix.1
+ SIMLINKS=	${BINDIR}/yacc ${BINDIR}/byacc
