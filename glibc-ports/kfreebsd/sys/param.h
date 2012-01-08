@@ -94,6 +94,7 @@
 #else
 # define roundup(x, y)	((((x) + ((y) - 1)) / (y)) * (y))
 #endif
+#define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1))) /* if y is powers of two */
 #define powerof2(x)	((((x) - 1) & (x)) == 0)
 
 /* Macros for min/max.  */
