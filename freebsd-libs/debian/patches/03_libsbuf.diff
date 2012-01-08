@@ -24,9 +24,9 @@
 +#include <sys/types.h>
 +#include <stdarg.h>
  
- /*
-  * Structure definition
-@@ -64,10 +65,8 @@
+ struct sbuf;
+ struct sbuf_drain_data;
+@@ -68,10 +69,8 @@
  int		 sbuf_bcpy(struct sbuf *, const void *, size_t);
  int		 sbuf_cat(struct sbuf *, const char *);
  int		 sbuf_cpy(struct sbuf *, const char *);
@@ -37,5 +37,5 @@
 +int		 sbuf_printf(struct sbuf *, const char *, ...);
 +int		 sbuf_vprintf(struct sbuf *, const char *, va_list);
  int		 sbuf_putc(struct sbuf *, int);
+ void		 sbuf_set_drain(struct sbuf *, sbuf_drain_func *, void *);
  int		 sbuf_trim(struct sbuf *);
- int		 sbuf_overflowed(struct sbuf *);

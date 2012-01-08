@@ -10,6 +10,13 @@ SHELL = bash
 # This has to be exported to make some magic below work.
 export DH_OPTIONS
 
+full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
+tar_version	:= $(shell echo $(full_version) | sed -e 's/-.*//g')
+svn_revision	:= $(shell echo $(full_version) | sed -e 's/.*~svn\([0-9]*\)-[0-9]*/\1/g')
+version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
+major		:= $(shell echo $(version) | sed -e 's/\..*//g')
+revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
+
 CFLAGS = -Wall -g -pipe -fPIC -I. -I$(CURDIR)/sys -D_GNU_SOURCE \
          $(shell pkg-config --cflags libbsd-overlay) \
          -D__va_list=__builtin_va_list
@@ -21,16 +28,16 @@ else
 endif
 
 SOURCE = freebsd-libs
-VERSION = $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)-[^-]*$$/\1/p')
-SVN_REL = $(shell echo $(VERSION) | sed -ne 's/+[^+]*$$//p')
-SVN = http://svn.freebsd.org/base/release/$(SVN_REL).0
-#SVN = http://svn.freebsd.org/base/releng/8.1
-ORIGDIR = $(SOURCE)-$(VERSION)
-TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
+#SVN		:= http://svn.freebsd.org/base/release/$(version).0
+#SVN		:= http://svn.freebsd.org/base/releng/$(version)
+SVN		:= http://svn.freebsd.org/base/stable/$(major)
+#SVN		:= http://svn.freebsd.org/base/head
+ORIGDIR = $(SOURCE)-$(tar_version)
+TARNAME = $(SOURCE)_$(tar_version).orig.tar.gz
 
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
-PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) -I$(CURDIR)/debian/local/include" NO_WERROR=1 NOGCCERROR=1 \
+PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) -isystem /usr/include/freebsd -I$(CURDIR)/debian/local/include" NO_WERROR=1 NOGCCERROR=1 \
         NOSHARED=NO NO_SHARED=NO NO_PROFILE=1 DESTDIR=$(DESTDIR) make
 export SHLIB_MAJOR = 0
 kernel = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
@@ -48,7 +55,7 @@ get-orig-source:
 	         sys/kern/subr_sbuf.c \
 	         sys/sys/sbuf.h \
 	         share/misc/usb_hid_usages ; do \
-	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
+	    svn export -r $(svn_revision) $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
 	# Remove unused files with non GPL compatible license (eg BSD 4 clauses)
 	rm -f $(ORIGDIR)/sys/cam/scsi/scsi_ch.*
