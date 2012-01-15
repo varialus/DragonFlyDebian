@@ -1,6 +1,6 @@
 --- a/sys/i386/conf/GENERIC
 +++ b/sys/i386/conf/GENERIC
-@@ -144,8 +144,6 @@
+@@ -147,8 +147,6 @@
  device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -11,7 +11,7 @@
  device		mly		# Mylex AcceleRAID/eXtremeRAID
 --- a/sys/modules/Makefile
 +++ b/sys/modules/Makefile
-@@ -108,10 +108,7 @@
+@@ -109,10 +109,7 @@
  	hatm \
  	hifn \
  	hme \
@@ -22,7 +22,7 @@
  	hwpmc \
  	${_i2c} \
  	${_ibcs2} \
-@@ -230,7 +227,6 @@
+@@ -231,7 +228,6 @@
  	ntfs \
  	ntfs_iconv \
  	nullfs \
@@ -32,7 +32,7 @@
  	${_nxge} \
 --- a/sys/amd64/conf/GENERIC
 +++ b/sys/amd64/conf/GENERIC
-@@ -138,8 +138,6 @@
+@@ -141,8 +141,6 @@
  #device		asr		# DPT SmartRAID V, VI and Adaptec SCSI RAID
  device		ciss		# Compaq Smart RAID 5*
  device		dpt		# DPT Smartcache III, IV - See NOTES for options
@@ -98,8 +98,8 @@
  dev/nfe/if_nfe.c		optional	nfe pci
 -dev/nve/if_nve.c		optional	nve pci
  dev/nvram/nvram.c		optional	nvram isa
+ dev/random/nehemiah.c		optional	random
  dev/qlxgb/qla_dbg.c		optional	qlxgb pci
- dev/qlxgb/qla_hw.c		optional	qlxgb pci
 --- a/sys/conf/files.i386
 +++ b/sys/conf/files.i386
 @@ -46,31 +46,6 @@
@@ -134,13 +134,14 @@
  compat/linprocfs/linprocfs.c	optional linprocfs
  compat/linsysfs/linsysfs.c	optional linsysfs
  compat/linux/linux_emul.c	optional compat_linux
-@@ -146,17 +121,9 @@
+@@ -146,18 +121,9 @@
  dev/atkbdc/atkbdc_isa.c		optional atkbdc isa
  dev/atkbdc/atkbdc_subr.c	optional atkbdc
  dev/atkbdc/psm.c		optional psm atkbdc
 -dev/ce/ceddk.c			optional ce
 -dev/ce/if_ce.c			optional ce
--dev/ce/tau32-ddk.c		optional ce
+-dev/ce/tau32-ddk.c		optional ce \
+-	compile-with "${NORMAL_C} ${NO_WCONSTANT_CONVERSION}"
  dev/cm/if_cm_isa.c		optional cm isa
  dev/coretemp/coretemp.c		optional coretemp
 -dev/cp/cpddk.c			optional cp
@@ -152,7 +153,7 @@
  dev/cx/csigma.c			optional cx
  dev/cx/cxddk.c			optional cx
  dev/cx/if_cx.c			optional cx
-@@ -178,17 +145,6 @@
+@@ -179,17 +145,6 @@
  dev/glxiic/glxiic.c		optional glxiic
  dev/glxsb/glxsb.c		optional glxsb
  dev/glxsb/glxsb_hash.c		optional glxsb
@@ -170,7 +171,7 @@
  dev/hwpmc/hwpmc_amd.c		optional hwpmc
  dev/hwpmc/hwpmc_intel.c		optional hwpmc
  dev/hwpmc/hwpmc_core.c		optional hwpmc
-@@ -221,7 +177,6 @@
+@@ -222,7 +177,6 @@
  dev/mse/mse.c			optional mse
  dev/mse/mse_isa.c		optional mse isa
  dev/nfe/if_nfe.c		optional nfe pci

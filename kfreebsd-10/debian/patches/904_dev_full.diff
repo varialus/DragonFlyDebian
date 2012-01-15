@@ -4,7 +4,7 @@ Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
 
 --- a/sys/dev/null/null.c
 +++ b/sys/dev/null/null.c
-@@ -45,9 +45,11 @@
+@@ -46,9 +46,11 @@
  
  /* For use with destroy_dev(9). */
  static struct cdev *null_dev;
@@ -14,9 +14,9 @@ Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
  static d_write_t null_write;
 +static d_write_t full_write;
  static d_ioctl_t null_ioctl;
+ static d_ioctl_t zero_ioctl;
  static d_read_t zero_read;
- 
-@@ -59,6 +61,14 @@
+@@ -61,6 +63,14 @@
  	.d_name =	"null",
  };
  
@@ -31,7 +31,7 @@ Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
  static struct cdevsw zero_cdevsw = {
  	.d_version =	D_VERSION,
  	.d_read =	zero_read,
-@@ -78,11 +88,25 @@
+@@ -81,6 +91,15 @@
  
  /* ARGSUSED */
  static int
@@ -42,26 +42,16 @@ Status: FIONBIO/FIOASYNC is in http://www.freebsd.org/cgi/query-pr.cgi?pr=138526
 +	return (ENOSPC);
 +}
 +
-+#include <sys/filio.h>
 +/* ARGSUSED */
 +static int
  null_ioctl(struct cdev *dev __unused, u_long cmd, caddr_t data __unused,
      int flags __unused, struct thread *td)
  {
- 	int error;
- 
-+	if (cmd == FIONBIO)
-+		return 0;
-+	if ((cmd == FIOASYNC) && ((*(int *)data) == 0))
-+		return 0;
- 	if (cmd != DIOCSKERNELDUMP)
- 		return (ENOIOCTL);
- 	error = priv_check(td, PRIV_SETDUMPER);
-@@ -122,12 +146,15 @@
+@@ -158,12 +177,15 @@
  			printf("null: <null device, zero device>\n");
  		null_dev = make_dev_credf(MAKEDEV_ETERNAL_KLD, &null_cdevsw, 0,
  		    NULL, UID_ROOT, GID_WHEEL, 0666, "null");
-+		null_dev = make_dev_credf(MAKEDEV_ETERNAL_KLD, &full_cdevsw, 0,
++		full_dev = make_dev_credf(MAKEDEV_ETERNAL_KLD, &full_cdevsw, 0,
 +		    NULL, UID_ROOT, GID_WHEEL, 0666, "full");
  		zero_dev = make_dev_credf(MAKEDEV_ETERNAL_KLD, &zero_cdevsw, 0,
  		    NULL, UID_ROOT, GID_WHEEL, 0666, "zero");
