@@ -1,6 +1,6 @@
 --- a/sys/mips/include/_types.h
 +++ b/sys/mips/include/_types.h
-@@ -40,10 +40,13 @@
+@@ -40,49 +40,23 @@
  #ifndef _MACHINE__TYPES_H_
  #define	_MACHINE__TYPES_H_
  
@@ -8,88 +8,77 @@
 +#include <sys/cdefs.h>
  #ifndef _SYS_CDEFS_H_
 -#error this file needs sys/cdefs.h as a prerequisite
+-#endif
+-
+-/*
+- * Basic types upon which most other types are built.
+- */
+-typedef	__signed char		__int8_t;
+-typedef	unsigned char		__uint8_t;
+-typedef	short			__int16_t;
+-typedef	unsigned short		__uint16_t;
+-typedef	int			__int32_t;
+-typedef	unsigned int		__uint32_t;
+-#ifdef __mips_n64
+-typedef	long			__int64_t;
+-typedef	unsigned long		__uint64_t;
+-#else
+-#ifndef lint
+-__extension__
+-#endif
+-/* LONGLONG */
+-typedef	long long		__int64_t;
+-#ifndef lint
+-__extension__
+-#endif
+-/* LONGLONG */
+-typedef	unsigned long long	__uint64_t;
 +#include <sys/param.h>
  #endif
- 
-+#ifndef __GLIBC__
- /*
-  * Basic types upon which most other types are built.
-  */
-@@ -73,11 +76,14 @@
- typedef	unsigned long long	__uint64_t;
- #endif
- #endif
-+#endif
  
  /*
   * Standard type definitions.
   */
-+#ifndef __GLIBC__
- typedef	__int32_t	__clock_t;		/* clock()... */
-+#endif
- typedef	unsigned int	__cpumask_t;
- #ifdef __mips_n64
- typedef	__int64_t	__critical_t;
-@@ -88,11 +94,15 @@
+-typedef	__int32_t	__clock_t;		/* clock()... */
+ typedef	double		__double_t;
  typedef	double		__float_t;
  #ifdef __mips_n64
+ typedef	__int64_t	__critical_t;
  typedef	__int64_t	__intfptr_t;
-+#ifndef __GLIBC__
- typedef	__int64_t	__intptr_t;
-+#endif
+-typedef	__int64_t	__intptr_t;
  #else
+ typedef	__int32_t	__critical_t;
  typedef	__int32_t	__intfptr_t;
-+#ifndef __GLIBC__
- typedef	__int32_t	__intptr_t;
+-typedef	__int32_t	__intptr_t;
  #endif
-+#endif
  typedef	__int64_t	__intmax_t;
  typedef	__int32_t	__int_fast8_t;
- typedef	__int32_t	__int_fast16_t;
-@@ -103,28 +113,46 @@
+@@ -94,28 +68,17 @@
  typedef	__int32_t	__int_least32_t;
  typedef	__int64_t	__int_least64_t;
  #if defined(__mips_n64) || defined(__mips_n32)
-+#ifndef __GLIBC__
- typedef	__int64_t	__register_t;
-+#endif
+-typedef	__int64_t	__register_t;
  typedef	__int64_t	f_register_t;
  #else
-+#ifndef __GLIBC__
- typedef	__int32_t	__register_t;
-+#endif
+-typedef	__int32_t	__register_t;
  typedef	__int32_t	f_register_t;
  #endif
  #ifdef __mips_n64
-+#ifndef __GLIBC__
- typedef	__int64_t	__ptrdiff_t;
-+#endif
+-typedef	__int64_t	__ptrdiff_t;
  typedef	__int64_t	__segsz_t;
-+#ifndef __GLIBC__
- typedef	__uint64_t	__size_t;
- typedef	__int64_t	__ssize_t;
-+#endif
+-typedef	__uint64_t	__size_t;
+-typedef	__int64_t	__ssize_t;
  typedef	__uint64_t	__uintfptr_t;
-+#ifndef __GLIBC__
- typedef	__uint64_t	__uintptr_t;
-+#endif
+-typedef	__uint64_t	__uintptr_t;
  #else
-+#ifndef __GLIBC__
- typedef	__int32_t	__ptrdiff_t;		/* ptr1 - ptr2 */
-+#endif
+-typedef	__int32_t	__ptrdiff_t;		/* ptr1 - ptr2 */
  typedef	__int32_t	__segsz_t;		/* segment size (in pages) */
-+#ifndef __GLIBC__
- typedef	__uint32_t	__size_t;		/* sizeof() */
- typedef	__int32_t	__ssize_t;		/* byte count or error */
-+#endif
+-typedef	__uint32_t	__size_t;		/* sizeof() */
+-typedef	__int32_t	__ssize_t;		/* byte count or error */
  typedef	__uint32_t	__uintfptr_t;
-+#ifndef __GLIBC__
- typedef	__uint32_t	__uintptr_t;
+-typedef	__uint32_t	__uintptr_t;
  #endif
-+#endif
-+#ifndef __GLIBC__
- typedef	__int64_t	__time_t;		/* time()... */
-+#endif
+-typedef	__int64_t	__time_t;		/* time()... */
  typedef	__uint64_t	__uintmax_t;
  typedef	__uint32_t	__uint_fast8_t;
  typedef	__uint32_t	__uint_fast16_t;

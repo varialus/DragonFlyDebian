@@ -4,11 +4,11 @@
 
 --- a/sys/ufs/ufs/quota.h
 +++ b/sys/ufs/ufs/quota.h
-@@ -205,7 +205,6 @@
- int	quotaon(struct thread *td, struct mount *, int, void *);
+@@ -237,7 +237,6 @@
  int	setquota(struct thread *, struct mount *, u_long, int, void *);
  int	setuse(struct thread *, struct mount *, u_long, int, void *);
+ int	getquotasize(struct thread *, struct mount *, u_long, int, void *);
 -vfs_quotactl_t ufs_quotactl;
  
- #else /* !_KERNEL */
- 
+ #ifdef SOFTUPDATES
+ int	quotaref(struct vnode *, struct dquot **);

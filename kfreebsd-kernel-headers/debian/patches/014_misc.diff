@@ -204,7 +204,7 @@
  typedef struct usb_hub_status usb_hub_status_t;
  
  struct usb_port_status {
-@@ -702,7 +702,7 @@
+@@ -703,7 +703,7 @@
  #define	UPS_C_BH_PORT_RESET		0x0020
  #define	UPS_C_PORT_LINK_STATE		0x0040
  #define	UPS_C_PORT_CONFIG_ERROR		0x0080
@@ -224,31 +224,27 @@
  #ifndef _SYS_CDEFS_H_
  #error this file needs sys/cdefs.h as a prerequisite
  #endif
-@@ -687,16 +689,11 @@
+@@ -697,11 +699,6 @@
+ void	enable_intr(void);
  void	halt(void);
  void	ia32_pause(void);
- u_char	inb(u_int port);
+-u_char	inb(u_int port);
 -u_int	inl(u_int port);
--void	insb(u_int port, void *addr, size_t cnt);
--void	insl(u_int port, void *addr, size_t cnt);
--void	insw(u_int port, void *addr, size_t cnt);
+-void	insb(u_int port, void *addr, size_t count);
+-void	insl(u_int port, void *addr, size_t count);
+-void	insw(u_int port, void *addr, size_t count);
  register_t	intr_disable(void);
  void	intr_restore(register_t ef);
  void	invd(void);
- void	invlpg(u_int addr);
- void	invltlb(void);
--u_short	inw(u_int port);
- void	lidt(struct region_descriptor *addr);
- void	lldt(u_short sel);
- void	load_cr0(u_int cr0);
-@@ -714,11 +711,6 @@
- void	load_gs(u_int sel);
+@@ -724,12 +721,6 @@
+ void	load_fs(u_short sel);
+ void	load_gs(u_short sel);
  void	ltr(u_short sel);
- void	outb(u_int port, u_char data);
+-void	outb(u_int port, u_char data);
 -void	outl(u_int port, u_int data);
--void	outsb(u_int port, const void *addr, size_t cnt);
--void	outsl(u_int port, const void *addr, size_t cnt);
--void	outsw(u_int port, const void *addr, size_t cnt);
+-void	outsb(u_int port, const void *addr, size_t count);
+-void	outsl(u_int port, const void *addr, size_t count);
+-void	outsw(u_int port, const void *addr, size_t count);
 -void	outw(u_int port, u_short data);
  u_int	rcr0(void);
  u_int	rcr2(void);
@@ -263,9 +259,9 @@
  
  /*
   * Standard type definitions.
-@@ -39,10 +40,14 @@
- typedef	__int64_t	__blkcnt_t;	/* file block count */
+@@ -40,10 +41,14 @@
  typedef	__int32_t	__clockid_t;	/* clock_gettime()... */
+ typedef	__uint64_t	__cap_rights_t;	/* capability rights */
  typedef	__uint32_t	__fflags_t;	/* file flags */
 +#ifndef __GLIBC__
  typedef	__uint64_t	__fsblkcnt_t;
@@ -278,7 +274,7 @@
  typedef	__uint32_t	__ino_t;	/* inode number */
  typedef	long		__key_t;	/* IPC key (for Sys V IPC) */
  typedef	__int32_t	__lwpid_t;	/* Thread ID (a.k.a. LWP) */
-@@ -93,13 +98,4 @@
+@@ -94,13 +99,4 @@
  
  typedef	__uint32_t	__fixpt_t;	/* fixed point number */
  

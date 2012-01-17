@@ -33,7 +33,7 @@
 +++ b/sys/net/if_media.h
 @@ -38,6 +38,8 @@
  #ifndef _NET_IF_MEDIA_H_
- #define _NET_IF_MEDIA_H_
+ #define	_NET_IF_MEDIA_H_
  
 +#include <stdint.h>
 +
@@ -51,26 +51,6 @@
  #include <sys/endian.h>
  
  /*
---- a/sys/amd64/include/apm_bios.h
-+++ b/sys/amd64/include/apm_bios.h
-@@ -20,6 +20,7 @@
- 
- #ifndef _KERNEL
- #include <sys/types.h>
-+#include <stdint.h>
- #endif
- #include <sys/ioccom.h>
- 
---- a/sys/i386/include/apm_bios.h
-+++ b/sys/i386/include/apm_bios.h
-@@ -20,6 +20,7 @@
- 
- #ifndef _KERNEL
- #include <sys/types.h>
-+#include <stdint.h>
- #endif
- #include <sys/ioccom.h>
- 
 --- a/linux/videodev.h
 +++ b/linux/videodev.h
 @@ -12,6 +12,7 @@
@@ -98,9 +78,9 @@
  
  #include <sys/cdefs.h>
 +#include <stdint.h>
+ #include <machine/stdarg.h>
  
  #ifdef _KERNEL
- /*
 --- a/sys/dev/acpica/acpiio.h
 +++ b/sys/dev/acpica/acpiio.h
 @@ -30,6 +30,8 @@
@@ -176,7 +156,7 @@
   * XXX: Should really be SPECNAMELEN
 --- a/sys/sys/elf_common.h
 +++ b/sys/sys/elf_common.h
-@@ -29,6 +29,8 @@
+@@ -30,6 +30,8 @@
  #ifndef _SYS_ELF_COMMON_H_
  #define	_SYS_ELF_COMMON_H_ 1
  
@@ -185,7 +165,7 @@
  /*
   * ELF definitions that are independent of architecture or word size.
   */
-@@ -43,9 +45,9 @@
+@@ -44,9 +46,9 @@
   */
  
  typedef struct {
@@ -210,12 +190,22 @@
  #define EVFILT_READ		(-1)
 --- a/sys/sys/pcpu.h
 +++ b/sys/sys/pcpu.h
-@@ -42,6 +42,8 @@
- #include <sys/resource.h>
- #include <machine/pcpu.h>
+@@ -48,6 +48,8 @@
+ 
+ #ifdef _KERNEL
  
 +#include <stdint.h>
 +
  /*
   * Define a set for pcpu data.
   */
+--- a/sys/x86/include/apm_bios.h
++++ b/sys/x86/include/apm_bios.h
+@@ -20,6 +20,7 @@
+ 
+ #ifndef _KERNEL
+ #include <sys/types.h>
++#include <stdint.h>
+ #endif
+ #include <sys/ioccom.h>
+ 

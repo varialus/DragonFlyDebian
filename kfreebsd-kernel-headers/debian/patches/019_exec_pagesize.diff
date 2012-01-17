@@ -5,27 +5,27 @@
 
 --- a/sys/amd64/include/param.h
 +++ b/sys/amd64/include/param.h
-@@ -55,6 +55,10 @@
- #define	_ALIGN(p)	(((u_long)(p) + _ALIGNBYTES) &~ _ALIGNBYTES)
- #endif
+@@ -81,6 +81,10 @@
+  */
+ #define	ALIGNED_POINTER(p, t)	1
  
 +#ifndef EXEC_PAGESIZE
 +#define EXEC_PAGESIZE   4096
 +#endif
 +
- #ifndef _NO_NAMESPACE_POLLUTION
- 
- #define __HAVE_ACPI
+ /*
+  * CACHE_LINE_SIZE is the compile-time maximum cache line size for an
+  * architecture.  It should be used with appropriate caution.
 --- a/sys/i386/include/param.h
 +++ b/sys/i386/include/param.h
-@@ -49,6 +49,10 @@
- #define _ALIGN(p)	(((unsigned)(p) + _ALIGNBYTES) & ~_ALIGNBYTES)
- #endif
+@@ -85,6 +85,10 @@
+  */
+ #define	ALIGNED_POINTER(p, t)	1
  
 +#ifndef EXEC_PAGESIZE
 +#define EXEC_PAGESIZE   4096
 +#endif
 +
- #ifndef _NO_NAMESPACE_POLLUTION
- 
- #define __HAVE_ACPI
+ /*
+  * CACHE_LINE_SIZE is the compile-time maximum cache line size for an
+  * architecture.  It should be used with appropriate caution.

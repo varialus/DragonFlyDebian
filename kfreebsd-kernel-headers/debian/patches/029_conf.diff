@@ -12,7 +12,7 @@
  #include <sys/queue.h>
  #endif
  
-@@ -268,10 +269,10 @@
+@@ -259,10 +260,10 @@
  void	dev_rel(struct cdev *dev);
  void	dev_strategy(struct cdev *dev, struct buf *bp);
  struct cdev *make_dev(struct cdevsw *_devsw, int _unit, uid_t _uid, gid_t _gid,
@@ -22,10 +22,10 @@
  		struct ucred *_cr, uid_t _uid, gid_t _gid, int _perms,
 -		const char *_fmt, ...) __printflike(7, 8);
 +		const char *_fmt, ...);
- #define	MAKEDEV_REF     0x01
- #define	MAKEDEV_WHTOUT	0x02
- #define	MAKEDEV_NOWAIT	0x04
-@@ -280,12 +281,11 @@
+ #define	MAKEDEV_REF		0x01
+ #define	MAKEDEV_WHTOUT		0x02
+ #define	MAKEDEV_NOWAIT		0x04
+@@ -272,14 +273,14 @@
  struct cdev *make_dev_credf(int _flags,
  		struct cdevsw *_devsw, int _unit,
  		struct ucred *_cr, uid_t _uid, gid_t _gid, int _mode,
@@ -34,10 +34,12 @@
  int	make_dev_p(int _flags, struct cdev **_cdev, struct cdevsw *_devsw,
  		struct ucred *_cr, uid_t _uid, gid_t _gid, int _mode,
 -		const char *_fmt, ...) __printflike(8, 9);
--struct cdev *make_dev_alias(struct cdev *_pdev, const char *_fmt, ...)
--		__printflike(2, 3);
 +		const char *_fmt, ...);
-+struct cdev *make_dev_alias(struct cdev *_pdev, const char *_fmt, ...);
- void	dev_lock(void);
- void	dev_unlock(void);
- void	setconf(void);
+ struct cdev *make_dev_alias(struct cdev *_pdev, const char *_fmt, ...)
+ 		__printflike(2, 3);
+ int	make_dev_alias_p(int _flags, struct cdev **_cdev, struct cdev *_pdev,
+-		const char *_fmt, ...) __printflike(4, 5);
++		const char *_fmt, ...);
+ int	make_dev_physpath_alias(int _flags, struct cdev **_cdev,
+ 	        struct cdev *_pdev, struct cdev *_old_alias,
+                 const char *_physpath);
