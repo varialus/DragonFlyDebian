@@ -13,27 +13,27 @@
  void	enable_intr(void);
  void	halt(void);
  void	ia32_pause(void);
--u_char	inb(u_int port);
--u_int	inl(u_int port);
--void	insb(u_int port, void *addr, size_t count);
--void	insl(u_int port, void *addr, size_t count);
--void	insw(u_int port, void *addr, size_t count);
+-unsigned char	inb(unsigned int port);
+-unsigned int	inl(unsigned int port);
+-void	insb(unsigned int port, void *addr, size_t count);
+-void	insl(unsigned int port, void *addr, size_t count);
+-void	insw(unsigned int port, void *addr, size_t count);
  register_t	intr_disable(void);
  void	intr_restore(register_t ef);
  void	invd(void);
 @@ -724,12 +721,6 @@
- void	load_fs(u_short sel);
- void	load_gs(u_short sel);
- void	ltr(u_short sel);
--void	outb(u_int port, u_char data);
--void	outl(u_int port, u_int data);
--void	outsb(u_int port, const void *addr, size_t count);
--void	outsl(u_int port, const void *addr, size_t count);
--void	outsw(u_int port, const void *addr, size_t count);
--void	outw(u_int port, u_short data);
- u_int	rcr0(void);
- u_int	rcr2(void);
- u_int	rcr3(void);
+ void	load_fs(unsigned short sel);
+ void	load_gs(unsigned short sel);
+ void	ltr(unsigned short sel);
+-void	outb(unsigned int port, unsigned char data);
+-void	outl(unsigned int port, unsigned int data);
+-void	outsb(unsigned int port, const void *addr, size_t count);
+-void	outsl(unsigned int port, const void *addr, size_t count);
+-void	outsw(unsigned int port, const void *addr, size_t count);
+-void	outw(unsigned int port, unsigned short data);
+ unsigned int	rcr0(void);
+ unsigned int	rcr2(void);
+ unsigned int	rcr3(void);
 --- a/sys/sys/_types.h
 +++ b/sys/sys/_types.h
 @@ -31,6 +31,7 @@

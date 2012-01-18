@@ -1,13 +1,3 @@
----
- sys/net/if_dl.h        |   14 +++++++-------
- sys/net/if_var.h       |   20 +++++++++++++++++---
- sys/net/route.h        |    2 ++
- sys/netinet/in_var.h   |    2 ++
- sys/netinet/ip_var.h   |    2 ++
- sys/netinet6/in6_var.h |    3 +++
- sys/sys/fnv_hash.h     |    4 +++-
- 7 files changed, 36 insertions(+), 11 deletions(-)
-
 --- a/sys/net/route.h
 +++ b/sys/net/route.h
 @@ -33,6 +33,8 @@
@@ -19,29 +9,6 @@
  /*
   * Kernel resident routing tables.
   *
---- a/sys/net/if_dl.h
-+++ b/sys/net/if_dl.h
-@@ -59,13 +59,13 @@
-  * Structure of a Link-Level sockaddr:
-  */
- struct sockaddr_dl {
--	u_char	sdl_len;	/* Total length of sockaddr */
--	u_char	sdl_family;	/* AF_LINK */
--	u_short	sdl_index;	/* if != 0, system given index for interface */
--	u_char	sdl_type;	/* interface type */
--	u_char	sdl_nlen;	/* interface name length, no trailing 0 reqd. */
--	u_char	sdl_alen;	/* link level address length */
--	u_char	sdl_slen;	/* link layer selector length */
-+	unsigned char	sdl_len;	/* Total length of sockaddr */
-+	unsigned char	sdl_family;	/* AF_LINK */
-+	unsigned short	sdl_index;	/* if != 0, system given index for interface */
-+	unsigned char	sdl_type;	/* interface type */
-+	unsigned char	sdl_nlen;	/* interface name length, no trailing 0 reqd. */
-+	unsigned char	sdl_alen;	/* link level address length */
-+	unsigned char	sdl_slen;	/* link layer selector length */
- 	char	sdl_data[46];	/* minimum work area, can be larger;
- 				   contains both if name and ll address */
- };
 --- a/sys/net/if_var.h
 +++ b/sys/net/if_var.h
 @@ -33,6 +33,9 @@
