@@ -74,6 +74,10 @@ install-arch: build-arch
 
 ifneq ($(filter i386 amd64, $(kfreebsd_cpu)),)
 	sh debian/generate-asm.sh $(kfreebsd_cpu) $(CURDIR)/sys $(HEADERS_PACKAGE)/usr/include
+	# Install "x86" directory (only on i386 and amd64).
+	mkdir -p $(HEADERS_PACKAGE)/usr/include/x86
+	cd $(CURDIR)/sys/x86/include \
+		&& find . -type f -name "*.h" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/include/x86 \;
 else
 	mkdir -p $(HEADERS_PACKAGE)/usr/include/machine
 	cd $(CURDIR)/sys/$(kfreebsd_cpu)/include \
