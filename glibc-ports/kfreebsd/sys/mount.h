@@ -192,6 +192,20 @@ struct fhandle {
 typedef struct fhandle	fhandle_t;
 
 /*
+ * Old export arguments without security flavor list
+ */
+struct oexport_args {
+	int	ex_flags;		/* export related flags */
+	uid_t	ex_root;		/* mapping for root uid */
+	struct	xucred ex_anon;		/* mapping for anonymous user */
+	struct	sockaddr *ex_addr;	/* net address to which exported */
+	__u_char ex_addrlen;		/* and the net address length */
+	struct	sockaddr *ex_mask;	/* mask of valid bits in saddr */
+	__u_char ex_masklen;		/* and the smask length */
+	char	*ex_indexfile;		/* index file for WebNFS URLs */
+};
+
+/*
  * Export arguments for local filesystem mount calls.
  */
 struct export_args {
