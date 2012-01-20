@@ -13,10 +13,14 @@
  typedef	struct __mq	*__mqd_t;	/* mq_open()... */
  typedef	__uint32_t	__uid_t;
  typedef	unsigned int	__useconds_t;	/* microseconds (unsigned) */
-@@ -99,4 +98,61 @@
+@@ -99,4 +98,66 @@
  
  typedef	__uint32_t	__fixpt_t;	/* fixed point number */
  
++/* Types below are defined in <sys/types.h> on FreeBSD.  We have to define them
++   here because <sys/types.h> is GNU-owned (some of them are also GNU types, but
++   thanks to _GNU_SOURCE non-sense they can't be used unconditionally).  */
++
 +#ifndef _CLOCK_T_DECLARED
 +typedef	__clock_t	clock_t;
 +#define	_CLOCK_T_DECLARED
@@ -65,6 +69,7 @@
 +typedef	__cpuwhich_t	cpuwhich_t;
 +typedef	__cpulevel_t	cpulevel_t;
 +typedef	__cpusetid_t	cpusetid_t;
++typedef	__cap_rights_t  cap_rights_t;
 +
 +#ifndef bintime 
 +#define bintime bintime 
