@@ -2176,9 +2176,9 @@ Backport from 9-STABLE (r226626)
 +static void scsuspend(void *);
 +static void scresume(void *);
  static u_int scgetc(sc_softc_t *sc, u_int flags);
+ static void sc_puts(scr_stat *scp, u_char *buf, int len, int kernel);
  #define SCGETC_CN	1
- #define SCGETC_NONBLOCK	2
-@@ -348,7 +361,9 @@
+@@ -349,7 +362,9 @@
  sc_set_vesa_mode(scr_stat *scp, sc_softc_t *sc, int unit)
  {
  	video_info_t info;
@@ -2188,7 +2188,7 @@ Backport from 9-STABLE (r226626)
  	int i;
  	int vmode;
  
-@@ -377,9 +392,37 @@
+@@ -378,9 +393,37 @@
  		vidd_get_info(sc->adp, vmode, &info);
  	}
  
@@ -2228,7 +2228,7 @@ Backport from 9-STABLE (r226626)
  #endif
  #ifdef DEV_SPLASH
  	if ((sc->flags & SC_SPLASH_SCRN) != 0)
-@@ -398,16 +441,12 @@
+@@ -399,16 +442,12 @@
  	scp->xpixel = info.vi_width;
  	scp->ypixel = info.vi_height;
  	scp->xsize = scp->xpixel / 8;
@@ -2248,7 +2248,7 @@ Backport from 9-STABLE (r226626)
  	scp->font_width = 8;
  	scp->start = scp->xsize * scp->ysize - 1;
  	scp->end = 0;
-@@ -475,7 +514,7 @@
+@@ -476,7 +515,7 @@
      scrn_timer(sc);
  
      /* set up the keyboard */
@@ -2257,7 +2257,7 @@ Backport from 9-STABLE (r226626)
      update_kbd_state(scp, scp->status, LOCK_MASK);
  
      printf("%s%d: %s <%d virtual consoles, flags=0x%x>\n",
-@@ -492,10 +531,15 @@
+@@ -493,10 +532,15 @@
  	printf("\n");
      }
  
@@ -2277,7 +2277,7 @@ Backport from 9-STABLE (r226626)
  
      for (vc = 0; vc < sc->vtys; vc++) {
  	if (sc->dev[vc] == NULL) {
-@@ -584,7 +628,7 @@
+@@ -585,7 +629,7 @@
  #ifndef __sparc64__
  	if (sc->kbd != NULL) {
  	    key.keynum = KEYCODE_BS;
@@ -2286,7 +2286,7 @@ Backport from 9-STABLE (r226626)
              tp->t_termios.c_cc[VERASE] = key.key.map[0];
  	}
  #endif
-@@ -643,7 +687,7 @@
+@@ -644,7 +688,7 @@
  #endif
  	scp->kbd_mode = K_XLATE;
  	if (scp == scp->sc->cur_scp)
@@ -2295,7 +2295,7 @@ Backport from 9-STABLE (r226626)
  	DPRINTF(5, ("done.\n"));
      }
  }
-@@ -665,7 +709,7 @@
+@@ -666,7 +710,7 @@
      struct tty *cur_tty;
      int c, error = 0; 
      size_t len;
@@ -2304,7 +2304,7 @@ Backport from 9-STABLE (r226626)
  
      sc = (sc_softc_t *)arg;
      /* assert(thiskbd == sc->kbd) */
-@@ -704,24 +748,21 @@
+@@ -705,24 +749,21 @@
  	    ttydisc_rint(cur_tty, KEYCHAR(c), 0);
  	    break;
  	case FKEY:  /* function key, return string */
@@ -2336,7 +2336,7 @@ Backport from 9-STABLE (r226626)
  	    break;
  	}
  
-@@ -1225,7 +1266,7 @@
+@@ -1226,7 +1267,7 @@
  	case K_CODE: 		/* switch to CODE mode */
  	    scp->kbd_mode = *(int *)data;
  	    if (scp == sc->cur_scp)
@@ -2345,7 +2345,7 @@ Backport from 9-STABLE (r226626)
  	    return 0;
  	default:
  	    return EINVAL;
-@@ -1339,7 +1380,7 @@
+@@ -1340,7 +1381,7 @@
  		    }
  		    sc->kbd = kbd_get_keyboard(i); /* sc->kbd == newkbd */
  		    sc->keyboard = i;
@@ -2354,7 +2354,7 @@ Backport from 9-STABLE (r226626)
  			      (caddr_t)&sc->cur_scp->kbd_mode);
  		    update_kbd_state(sc->cur_scp, sc->cur_scp->status,
  				     LOCK_MASK);
-@@ -1618,7 +1659,7 @@
+@@ -1619,7 +1660,7 @@
      static struct fkeytab fkey;
      static int fkeycp;
      scr_stat *scp;
@@ -2363,7 +2363,7 @@ Backport from 9-STABLE (r226626)
      int cur_mode;
      int s = spltty();	/* block sckbdevent and scrn_timer while we poll */
      int c;
-@@ -1652,14 +1693,14 @@
+@@ -1653,14 +1694,14 @@
      /* we shall always use the keyboard in the XLATE mode here */
      cur_mode = scp->kbd_mode;
      scp->kbd_mode = K_XLATE;
@@ -2380,7 +2380,7 @@ Backport from 9-STABLE (r226626)
      kbdd_disable(scp->sc->kbd);
      splx(s);
  
-@@ -1667,6 +1708,13 @@
+@@ -1668,6 +1709,13 @@
      case 0:	/* normal char */
  	return KEYCHAR(c);
      case FKEY:	/* function key */
@@ -2394,7 +2394,7 @@ Backport from 9-STABLE (r226626)
  	p = kbdd_get_fkeystr(scp->sc->kbd, KEYCHAR(c), (size_t *)&fkeycp);
  	fkey.len = fkeycp;
  	if ((p != NULL) && (fkey.len > 0)) {
-@@ -1688,7 +1736,7 @@
+@@ -1689,7 +1737,7 @@
  {
      /* this is a cut-down version of scrn_timer()... */
  
@@ -2403,7 +2403,7 @@ Backport from 9-STABLE (r226626)
  	return;
  
      if (debugger > 0 || panicstr || shutdown_in_progress) {
-@@ -1738,7 +1786,7 @@
+@@ -1739,7 +1787,7 @@
  	return;
  
      /* don't do anything when we are performing some I/O operations */
@@ -2412,7 +2412,7 @@ Backport from 9-STABLE (r226626)
  	if (again)
  	    timeout(scrn_timer, sc, hz / 10);
  	return;
-@@ -1752,7 +1800,7 @@
+@@ -1753,7 +1801,7 @@
  	    sc->keyboard = sc_allocate_keyboard(sc, -1);
  	    if (sc->keyboard >= 0) {
  		sc->kbd = kbd_get_keyboard(sc->keyboard);
@@ -2421,7 +2421,7 @@ Backport from 9-STABLE (r226626)
  			  (caddr_t)&sc->cur_scp->kbd_mode);
  		update_kbd_state(sc->cur_scp, sc->cur_scp->status,
  				 LOCK_MASK);
-@@ -2547,7 +2595,7 @@
+@@ -2548,7 +2596,7 @@
  
      /* set up the keyboard for the new screen */
      if (sc->old_scp->kbd_mode != scp->kbd_mode)
@@ -2430,7 +2430,7 @@ Backport from 9-STABLE (r226626)
      update_kbd_state(scp, scp->status, LOCK_MASK);
  
      mark_all(scp);
-@@ -2977,16 +3025,64 @@
+@@ -2978,16 +3026,64 @@
  }
  
  static void
@@ -2503,7 +2503,7 @@ Backport from 9-STABLE (r226626)
  }
  
  int
-@@ -3089,27 +3185,18 @@
+@@ -3090,27 +3186,18 @@
  	scp->ypixel = scp->ysize*info.vi_cheight;
      }
  
@@ -2540,7 +2540,7 @@ Backport from 9-STABLE (r226626)
  
      sc_vtb_init(&scp->vtb, VTB_MEMORY, 0, 0, NULL, FALSE);
  #ifndef __sparc64__
-@@ -3330,7 +3417,7 @@
+@@ -3331,7 +3418,7 @@
  	    case NLK: case CLK: case ALK:
  		break;
  	    case SLK:
@@ -2549,7 +2549,7 @@ Backport from 9-STABLE (r226626)
  		if (f & SLKED) {
  		    scp->status |= SLKED;
  		} else {
-@@ -3473,6 +3560,10 @@
+@@ -3474,6 +3561,10 @@
  	    /* goto next_code */
  	} else {
  	    /* regular keys (maybe MKEY is set) */
@@ -2560,7 +2560,7 @@ Backport from 9-STABLE (r226626)
  	    if (!(sc->flags & SC_SCRN_BLANKED))
  		return c;
  	}
-@@ -3482,7 +3573,8 @@
+@@ -3483,7 +3574,8 @@
  }
  
  static int
@@ -2570,7 +2570,7 @@ Backport from 9-STABLE (r226626)
  {
      scr_stat *scp;
  
-@@ -3653,19 +3745,18 @@
+@@ -3654,19 +3746,18 @@
  }
  
  void
@@ -2596,7 +2596,7 @@ Backport from 9-STABLE (r226626)
  }
  
  void
-@@ -3760,7 +3851,7 @@
+@@ -3761,7 +3852,7 @@
  			strcpy(ki.kb_name, k->kb_name);
  			ki.kb_unit = k->kb_unit;
  
@@ -2649,7 +2649,7 @@ Backport from 9-STABLE (r226626)
  } sc_term_sw_t;
  
  #define SCTERM_MODULE(name, sw)					\
-@@ -568,7 +573,8 @@
+@@ -567,7 +572,8 @@
  void		sc_alloc_scr_buffer(scr_stat *scp, int wait, int discard);
  int		sc_init_emulator(scr_stat *scp, char *name);
  void		sc_paste(scr_stat *scp, const u_char *p, int count);
