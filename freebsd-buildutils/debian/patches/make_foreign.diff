@@ -1,0 +1,42 @@
+
+Map foreign architecture names to FreeBSD naming convention.
+
+Patch from upstream (SVN rev 230392).
+
+--- a/src/usr.bin/make/main.c
++++ b/src/usr.bin/make/main.c
+@@ -146,6 +146,14 @@
+ time_t		now;		/* Time at start of make */
+ struct GNode	*DEFAULT;	/* .DEFAULT node */
+ 
++static struct {
++	const char *foreign_name;
++	const char *freebsd_name;
++} arch_aliases[] = {
++	{ "x86_64", "amd64" },
++	{ "mipsel", "mips" },
++};
++
+ /**
+  * Exit with usage message.
+  */
+@@ -942,10 +950,19 @@
+ 	 */
+ 	if ((machine = getenv("MACHINE")) == NULL) {
+ 		static struct utsname utsname;
++		unsigned int i;
+ 
+ 		if (uname(&utsname) == -1)
+ 			err(2, "uname");
+ 		machine = utsname.machine;
++
++		/* Canonicalize non-FreeBSD naming conventions */
++		for (i = 0; i < sizeof(arch_aliases)
++		     / sizeof(arch_aliases[0]); i++)
++			if (!strcmp(machine, arch_aliases[i].foreign_name)) {
++				machine = arch_aliases[i].freebsd_name;
++				break;
++			}
+ 	}
+ 
+ 	if ((machine_arch = getenv("MACHINE_ARCH")) == NULL) {
