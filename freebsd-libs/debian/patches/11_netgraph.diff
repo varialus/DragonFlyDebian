@@ -1,6 +1,6 @@
 --- a/lib/libnetgraph/netgraph.h
 +++ b/lib/libnetgraph/netgraph.h
-@@ -43,14 +43,15 @@
+@@ -43,6 +43,7 @@
  #ifndef _NETGRAPH_H_
  #define _NETGRAPH_H_
  
@@ -8,16 +8,6 @@
  #include <sys/types.h>
  #include <netgraph/ng_message.h>
  
- __BEGIN_DECLS
- int	NgMkSockNode(const char *, int *, int *);
--int	NgNameNode(int, const char *, const char *, ...) __printflike(3, 4);
-+int	NgNameNode(int, const char *, const char *, ...);
- int	NgSendMsg(int, const char *, int, int, const void *, size_t);
--int	NgSendAsciiMsg(int, const char *, const char *, ...) __printflike(3, 4);
-+int	NgSendAsciiMsg(int, const char *, const char *, ...);
- int	NgSendReplyMsg(int, const char *,
- 		const struct ng_mesg *, const void *, size_t);
- int	NgRecvMsg(int, struct ng_mesg *, size_t, char *);
 --- a/lib/libnetgraph/sock.c
 +++ b/lib/libnetgraph/sock.c
 @@ -44,6 +44,8 @@
