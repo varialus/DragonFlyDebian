@@ -1,0 +1,123 @@
+--- a/sys/i386/include/_types.h
++++ b/sys/i386/include/_types.h
+@@ -68,7 +68,12 @@
+ /*
+  * Standard type definitions.
+  */
++#if defined(__GLIBC__) && !defined(_KERNEL)
++/* This divergence is probably accidental, but it can't be fixed now. */
++typedef	__int32_t	__clock_t;
++#else
+ typedef	unsigned long	__clock_t;		/* clock()... */
++#endif
+ typedef	__int32_t	__critical_t;
+ typedef	long double	__double_t;
+ typedef	long double	__float_t;
+--- a/sys/sys/_types.h
++++ b/sys/sys/_types.h
+@@ -40,10 +40,19 @@
+ typedef	__int32_t	__clockid_t;	/* clock_gettime()... */
+ typedef	__uint64_t	__cap_rights_t;	/* capability rights */
+ typedef	__uint32_t	__fflags_t;	/* file flags */
++#if defined(__GLIBC__) && !defined(_KERNEL)
++/* User-selectable types. Leave them to Glibc headers. */
++#else
+ typedef	__uint64_t	__fsblkcnt_t;
+ typedef	__uint64_t	__fsfilcnt_t;
++#endif
+ typedef	__uint32_t	__gid_t;
++#if defined(__GLIBC__) && !defined(_KERNEL)
++/* This divergence is probably accidental, but it can't be fixed now. */
++typedef	__uint32_t	__id_t;
++#else
+ typedef	__int64_t	__id_t;		/* can hold a gid_t, pid_t, or uid_t */
++#endif
+ typedef	__uint32_t	__ino_t;	/* inode number */
+ typedef	long		__key_t;	/* IPC key (for Sys V IPC) */
+ typedef	__int32_t	__lwpid_t;	/* Thread ID (a.k.a. LWP) */
+@@ -59,7 +68,11 @@
+ typedef	__uint8_t	__sa_family_t;
+ typedef	__uint32_t	__socklen_t;
+ typedef	long		__suseconds_t;	/* microseconds (signed) */
++#if defined(__GLIBC__) && !defined(_KERNEL)
++typedef	__int32_t	__timer_t;
++#else
+ typedef	struct __timer	*__timer_t;	/* timer_gettime()... */
++#endif
+ typedef	struct __mq	*__mqd_t;	/* mq_open()... */
+ typedef	__uint32_t	__uid_t;
+ typedef	unsigned int	__useconds_t;	/* microseconds (unsigned) */
+@@ -98,9 +111,13 @@
+  * mbstate_t is an opaque object to keep conversion state during multibyte
+  * stream conversions.
+  */
++#if defined(__GLIBC__) && !defined(_KERNEL)
++/* Defined in <wchar.h> */
++#else
+ typedef union {
+ 	char		__mbstate8[128];
+ 	__int64_t	_mbstateL;	/* for alignment */
+ } __mbstate_t;
++#endif
+ 
+ #endif /* !_SYS__TYPES_H_ */
+--- a/sys/amd64/include/_types.h
++++ b/sys/amd64/include/_types.h
+@@ -76,7 +76,9 @@
+ typedef	__int32_t	__int_least32_t;
+ typedef	__int64_t	__int_least64_t;
+ typedef	__int64_t	__ptrdiff_t;		/* ptr1 - ptr2 */
++#ifndef __GLIBC__
+ typedef	__int64_t	__register_t;
++#endif
+ typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
+ typedef	__uint64_t	__size_t;		/* sizeof() */
+ typedef	__int64_t	__ssize_t;		/* byte count or error */
+--- a/sys/ia64/include/_types.h
++++ b/sys/ia64/include/_types.h
+@@ -74,7 +74,9 @@
+ typedef	__int32_t	__int_least32_t;
+ typedef	__int64_t	__int_least64_t;
+ typedef	__int64_t	__ptrdiff_t;		/* ptr1 - ptr2 */
++#ifndef __GLIBC__
+ typedef	__int64_t	__register_t;
++#endif
+ typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
+ typedef	__uint64_t	__size_t;		/* sizeof() */
+ typedef	__int64_t	__ssize_t;		/* byte count or error */
+--- a/sys/mips/include/_types.h
++++ b/sys/mips/include/_types.h
+@@ -94,7 +94,9 @@
+ typedef	__int32_t	__int_least32_t;
+ typedef	__int64_t	__int_least64_t;
+ #if defined(__mips_n64) || defined(__mips_n32)
++# ifndef __GLIBC__
+ typedef	__int64_t	__register_t;
++# endif
+ typedef	__int64_t	f_register_t;
+ #else
+ typedef	__int32_t	__register_t;
+--- a/sys/powerpc/include/_types.h
++++ b/sys/powerpc/include/_types.h
+@@ -94,7 +94,9 @@
+ typedef	__int64_t	__int_least64_t;
+ #ifdef __LP64__
+ typedef	__int64_t	__ptrdiff_t;		/* ptr1 - ptr2 */
++#ifndef __GLIBC__
+ typedef	__int64_t	__register_t;
++#endif
+ typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
+ typedef	__uint64_t	__size_t;		/* sizeof() */
+ typedef	__int64_t	__ssize_t;		/* byte count or error */
+--- a/sys/sparc64/include/_types.h
++++ b/sys/sparc64/include/_types.h
+@@ -70,7 +70,9 @@
+ typedef	__int32_t	__int_least32_t;
+ typedef	__int64_t	__int_least64_t;
+ typedef	__int64_t	__ptrdiff_t;		/* ptr1 - ptr2 */
++#ifndef __GLIBC__
+ typedef	__int64_t	__register_t;
++#endif
+ typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
+ typedef	__uint64_t	__size_t;		/* sizeof() */
+ typedef	__int64_t	__ssize_t;		/* byte count or error */
