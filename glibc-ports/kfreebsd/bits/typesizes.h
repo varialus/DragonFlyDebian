@@ -1,5 +1,5 @@
 /* bits/typesizes.h -- underlying types for *_t.  kFreeBSD version.
-   Copyright (C) 2002, 2003, 2010 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2003, 2010, 2012 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -46,7 +46,15 @@
 #define	__FSFILCNT_T_TYPE	__ULONGWORD_TYPE
 #define	__FSFILCNT64_T_TYPE	__UQUAD_TYPE
 #define	__ID_T_TYPE		__U32_TYPE
+
+#if defined(__arm__) || defined(__powerpc__)
+#define __CLOCK_T_TYPE		__U32_TYPE
+#elif defined(__i386__)
+/* clock_t is unsigned in FreeBSD/i386, but it's too late to fix that now... */
 #define __CLOCK_T_TYPE		__S32_TYPE
+#else
+#define __CLOCK_T_TYPE		__S32_TYPE
+#endif
 
 /*
  * This one is a bit tricky.  It needs to match the size
