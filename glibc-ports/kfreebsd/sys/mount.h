@@ -208,6 +208,7 @@ struct oexport_args {
 /*
  * Export arguments for local filesystem mount calls.
  */
+#define	MAXSECFLAVORS	5
 struct export_args {
 	int		ex_flags;		/* export related flags */
 	uid_t		ex_root;		/* mapping for root uid */
@@ -217,6 +218,8 @@ struct export_args {
 	struct		sockaddr *ex_mask;	/* mask of valid bits in saddr */
 	__u_char	ex_masklen;		/* and the smask length */
 	char		*ex_indexfile;		/* index file for WebNFS URLs */
+	int		ex_numsecflavors;	/* security flavor count */
+	int		ex_secflavors[MAXSECFLAVORS]; /* list of security flavors */
 };
 
 /*
