@@ -55,6 +55,10 @@ build-arch-stamp:
 		-e 's/__packed\(\s\|;\)/ __attribute__((__packed__))\1/g' \
 		-e 's/__aligned(\([0-9]*\))/ __attribute__((aligned(\1)))/g' \
 		-e 's/\(\s\|^\|(\)u_\(char\|int\|short\|long\)\(\s\)/\1unsigned \2\3/g' \
+		\
+		-e 's/defined\s*(\s*_SYS_CDEFS_H_\s*)/defined(_SYS_CDEFS_H)/g' \
+		-e 's/#\s*ifdef\s*_SYS_CDEFS_H_\(\s\|$$\)/#ifdef _SYS_CDEFS_H/g' \
+		-e 's/#\s*ifndef\s*_SYS_CDEFS_H_\(\s\|$$\)/#ifndef _SYS_CDEFS_H/g' \
 	; done)
 
 	QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a || test $$? = 2
