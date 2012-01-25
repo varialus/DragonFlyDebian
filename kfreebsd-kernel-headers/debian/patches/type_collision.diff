@@ -13,6 +13,18 @@
  typedef	__int32_t	__critical_t;
  typedef	long double	__double_t;
  typedef	long double	__float_t;
+@@ -88,7 +93,11 @@
+ typedef	__int32_t	__segsz_t;		/* segment size (in pages) */
+ typedef	__uint32_t	__size_t;		/* sizeof() */
+ typedef	__int32_t	__ssize_t;		/* byte count or error */
++#if defined(__GLIBC__) && !defined(_KERNEL)
++typedef	long int	__time_t;
++#else
+ typedef	__int32_t	__time_t;		/* time()... */
++#endif
+ typedef	__uint32_t	__uintfptr_t;
+ typedef	__uint64_t	__uintmax_t;
+ typedef	__uint32_t	__uintptr_t;
 --- a/sys/sys/_types.h
 +++ b/sys/sys/_types.h
 @@ -40,10 +40,19 @@
@@ -63,7 +75,7 @@
  #endif /* !_SYS__TYPES_H_ */
 --- a/sys/amd64/include/_types.h
 +++ b/sys/amd64/include/_types.h
-@@ -76,7 +76,9 @@
+@@ -76,11 +76,17 @@
  typedef	__int32_t	__int_least32_t;
  typedef	__int64_t	__int_least64_t;
  typedef	__int64_t	__ptrdiff_t;		/* ptr1 - ptr2 */
@@ -73,6 +85,14 @@
  typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
  typedef	__uint64_t	__size_t;		/* sizeof() */
  typedef	__int64_t	__ssize_t;		/* byte count or error */
++#if defined(__GLIBC__) && !defined(_KERNEL)
++typedef	long int	__time_t;
++#else
+ typedef	__int64_t	__time_t;		/* time()... */
++#endif
+ typedef	__uint64_t	__uintfptr_t;
+ typedef	__uint64_t	__uintmax_t;
+ typedef	__uint64_t	__uintptr_t;
 --- a/sys/ia64/include/_types.h
 +++ b/sys/ia64/include/_types.h
 @@ -74,7 +74,9 @@
