@@ -66,12 +66,13 @@
  * necessary to implement function overload), so it must stay
  * with __SLONGWORD_TYPE.
  */
-#if defined(__i386__) || defined(__amd64__) || defined(__powerpc__)
+#if defined(__i386__) || defined(__amd64__)
 #define __TIME_T_TYPE		__SLONGWORD_TYPE
+#elif defined(__powerpc__) && !defined(__LP64__)
+#define __TIME_T_TYPE		__S32_TYPE
 #else
 #define __TIME_T_TYPE		__S64_TYPE
 #endif
-
 #define __USECONDS_T_TYPE	__U32_TYPE
 #define __SUSECONDS_T_TYPE	__SLONGWORD_TYPE
 #define __DADDR_T_TYPE		__SQUAD_TYPE
