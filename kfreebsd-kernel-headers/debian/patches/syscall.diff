@@ -1,0 +1,68 @@
+--- a/sys/sys/syscall.h
++++ b/sys/sys/syscall.h
+@@ -1,3 +1,6 @@
++#ifndef _SYSCALL_H
++#define _SYSCALL_H	1
++
+ /*
+  * System call numbers.
+  *
+@@ -306,6 +309,7 @@
+ #define	SYS_extattr_get_fd	372
+ #define	SYS_extattr_delete_fd	373
+ #define	SYS___setugid	374
++#define SYS_nfsclnt	375
+ #define	SYS_eaccess	376
+ #define	SYS_afs3_syscall	377
+ #define	SYS_nmount	378
+@@ -427,8 +431,8 @@
+ #define	SYS_jail_remove	508
+ #define	SYS_closefrom	509
+ #define	SYS___semctl	510
+-#define	SYS_msgctl	511
+-#define	SYS_shmctl	512
++#define	SYS_msgctl	SYS_freebsd7_msgctl
++#define	SYS_shmctl	SYS_freebsd7_shmctl
+ #define	SYS_lpathconf	513
+ #define	SYS_cap_new	514
+ #define	SYS_cap_getrights	515
+@@ -446,4 +450,39 @@
+ #define	SYS_rctl_add_rule	528
+ #define	SYS_rctl_remove_rule	529
+ #define	SYS_posix_fallocate	530
++#define SYS_posix_fadvise	531
+ #define	SYS_MAXSYSCALL	532
++
++/* FIXME: some of these might not be needed anymore. */
++
++#define SYS_obreak	SYS_break
++#define SYS_sysctl	SYS___sysctl
++#define SYS_getcwd	SYS___getcwd
++#define SYS_setugid	SYS___setugid
++#define SYS_semctl	SYS_freebsd7___semctl
++
++#define SYS_acl_get_file	SYS___acl_get_file
++#define SYS_acl_set_file	SYS___acl_set_file
++#define SYS_acl_get_fd		SYS___acl_get_fd
++#define SYS_acl_set_fd		SYS___acl_set_fd
++#define SYS_acl_delete_file	SYS___acl_delete_file
++#define SYS_acl_delete_fd	SYS___acl_delete_fd
++#define SYS_acl_aclcheck_file	SYS___acl_aclcheck_file
++#define SYS_acl_aclcheck_fd	SYS___acl_aclcheck_fd
++#define SYS_acl_get_link	SYS___acl_get_link
++#define SYS_acl_set_link	SYS___acl_set_link
++#define SYS_acl_delete_link	SYS___acl_delete_link
++#define SYS_acl_aclcheck_link	SYS___acl_aclcheck_link
++
++#define SYS_mac_get_proc	SYS___mac_get_proc
++#define SYS_mac_set_proc	SYS___mac_set_proc
++#define SYS_mac_get_fd		SYS___mac_get_fd
++#define SYS_mac_get_file	SYS___mac_get_file
++#define SYS_mac_set_fd		SYS___mac_set_fd
++#define SYS_mac_set_file	SYS___mac_set_file
++#define SYS_mac_get_pid		SYS___mac_get_pid
++#define SYS_mac_get_link	SYS___mac_get_link
++#define SYS_mac_set_link	SYS___mac_set_link
++#define SYS_mac_execve		SYS___mac_execve
++
++#endif
