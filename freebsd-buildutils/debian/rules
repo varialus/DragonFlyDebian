@@ -28,16 +28,25 @@ ifneq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
     export STRIPFLAG=
 endif
 
+full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
+tar_version	:= $(shell echo $(full_version) | sed -e 's/-.*//g')
+svn_revision	:= $(shell echo $(full_version) | sed -e 's/.*~svn\([0-9]*\)-[0-9]*/\1/g')
+version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
+pversion	:= $(shell echo $(version) | sed -e 's/\./_/g')
+major           := $(shell echo $(version) | sed -e 's/\..*//g')
+revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
+
+SVN		:= http://svn.freebsd.org/base/release/$(version).0
+#SVN		:= http://svn.freebsd.org/base/releng/$(version)
+#SVN		:= http://svn.freebsd.org/base/stable/$(major)
+#SVN		:= http://svn.freebsd.org/base/head
+
 SOURCE = freebsd-buildutils
-VERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g')
-SVN = http://svn.freebsd.org/base/release/$(VERSION).0
+ORIGDIR = $(SOURCE)-$(tar_version)
+TARNAME = $(SOURCE)_$(tar_version).orig.tar.gz
 
-PVERSION = $(shell dpkg-parsechangelog | sed -e '/^Version:/!d' -e 's/^Version: //g' -e 's/-.*//g' -e 's/\./_/g')
 PCVS = anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
-PTAG = RELEASE_$(PVERSION)_0
-
-ORIGDIR = $(SOURCE)-$(VERSION)
-TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
+PTAG = RELEASE_$(pversion)_0
 
 export CFLAGS = -O2 -g -Wall -D_GNU_SOURCE \
          -DMACHINE_ARCH='"$(MACHINE_ARCH)"' \
