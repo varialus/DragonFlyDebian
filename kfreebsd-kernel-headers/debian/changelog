@@ -7,8 +7,11 @@ kfreebsd-kernel-headers (0.70) UNRELEASED; urgency=low
   * Generate osreldate.h dynamically with up-to-date information.
   * Add sys/syscall.h and sys/errno.h.
   * Add net/netisr_internal.h.
+  * Stop disabling __size_t in <machine/types.h>. The real problem is
+    <stddef.h> defining it as an empty macro, thus all headers using
+    __size_t are affected. Fix by regex.
 
- -- Robert Millan <rmh@debian.org>  Sat, 28 Jan 2012 22:15:59 +0100
+ -- Robert Millan <rmh@debian.org>  Sun, 29 Jan 2012 00:12:51 +0100
 
 kfreebsd-kernel-headers (0.69) unstable; urgency=low
 

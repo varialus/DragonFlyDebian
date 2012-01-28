@@ -13,15 +13,9 @@
  typedef	__int32_t	__critical_t;
  typedef	long double	__double_t;
  typedef	long double	__float_t;
-@@ -86,9 +91,17 @@
- typedef	__int32_t	__ptrdiff_t;		/* ptr1 - ptr2 */
- typedef	__int32_t	__register_t;
+@@ -88,7 +93,11 @@
  typedef	__int32_t	__segsz_t;		/* segment size (in pages) */
-+#if defined(__GLIBC__) && !defined(_KERNEL)
-+/* Glibc defines __size_t using macros. Avoid collision. */
-+#else
- typedef	__uint32_t	__size_t;		/* sizeof() */
-+#endif
+ typedef	__uint32_t	size_t;		/* sizeof() */
  typedef	__int32_t	__ssize_t;		/* byte count or error */
 +#if defined(__GLIBC__) && !defined(_KERNEL)
 +typedef	long int	__time_t;
@@ -81,7 +75,7 @@
  #endif /* !_SYS__TYPES_H_ */
 --- a/sys/amd64/include/_types.h
 +++ b/sys/amd64/include/_types.h
-@@ -76,11 +76,23 @@
+@@ -76,11 +76,19 @@
  typedef	__int32_t	__int_least32_t;
  typedef	__int64_t	__int_least64_t;
  typedef	__int64_t	__ptrdiff_t;		/* ptr1 - ptr2 */
@@ -91,11 +85,7 @@
  typedef	__int64_t	__register_t;
 +#endif
  typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
-+#if defined(__GLIBC__) && !defined(_KERNEL)
-+/* Glibc defines __size_t using macros. Avoid collision. */
-+#else
- typedef	__uint64_t	__size_t;		/* sizeof() */
-+#endif
+ typedef	__uint64_t	size_t;		/* sizeof() */
  typedef	__int64_t	__ssize_t;		/* byte count or error */
 +#if defined(__GLIBC__) && !defined(_KERNEL)
 +typedef	long int	__time_t;
@@ -107,7 +97,7 @@
  typedef	__uint64_t	__uintptr_t;
 --- a/sys/ia64/include/_types.h
 +++ b/sys/ia64/include/_types.h
-@@ -74,9 +74,17 @@
+@@ -74,7 +74,11 @@
  typedef	__int32_t	__int_least32_t;
  typedef	__int64_t	__int_least64_t;
  typedef	__int64_t	__ptrdiff_t;		/* ptr1 - ptr2 */
@@ -117,14 +107,8 @@
  typedef	__int64_t	__register_t;
 +#endif
  typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
-+#if defined(__GLIBC__) && !defined(_KERNEL)
-+/* Glibc defines __size_t using macros. Avoid collision. */
-+#else
- typedef	__uint64_t	__size_t;		/* sizeof() */
-+#endif
+ typedef	__uint64_t	size_t;		/* sizeof() */
  typedef	__int64_t	__ssize_t;		/* byte count or error */
- typedef	__int64_t	__time_t;		/* time()... */
- typedef	__uint64_t	__uintfptr_t;
 --- a/sys/mips/include/_types.h
 +++ b/sys/mips/include/_types.h
 @@ -94,7 +94,11 @@
@@ -139,32 +123,9 @@
  typedef	__int64_t	f_register_t;
  #else
  typedef	__int32_t	__register_t;
-@@ -103,14 +107,22 @@
- #ifdef __mips_n64
- typedef	__int64_t	__ptrdiff_t;
- typedef	__int64_t	__segsz_t;
-+#if defined(__GLIBC__) && !defined(_KERNEL)
-+/* Glibc defines __size_t using macros. Avoid collision. */
-+#else
- typedef	__uint64_t	__size_t;
-+#endif
- typedef	__int64_t	__ssize_t;
- typedef	__uint64_t	__uintfptr_t;
- typedef	__uint64_t	__uintptr_t;
- #else
- typedef	__int32_t	__ptrdiff_t;		/* ptr1 - ptr2 */
- typedef	__int32_t	__segsz_t;		/* segment size (in pages) */
-+#if defined(__GLIBC__) && !defined(_KERNEL)
-+/* Glibc defines __size_t using macros. Avoid collision. */
-+#else
- typedef	__uint32_t	__size_t;		/* sizeof() */
-+#endif
- typedef	__int32_t	__ssize_t;		/* byte count or error */
- typedef	__uint32_t	__uintfptr_t;
- typedef	__uint32_t	__uintptr_t;
 --- a/sys/powerpc/include/_types.h
 +++ b/sys/powerpc/include/_types.h
-@@ -94,9 +94,17 @@
+@@ -94,7 +94,11 @@
  typedef	__int64_t	__int_least64_t;
  #ifdef __LP64__
  typedef	__int64_t	__ptrdiff_t;		/* ptr1 - ptr2 */
@@ -174,29 +135,11 @@
  typedef	__int64_t	__register_t;
 +#endif
  typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
-+#if defined(__GLIBC__) && !defined(_KERNEL)
-+/* Glibc defines __size_t using macros. Avoid collision. */
-+#else
- typedef	__uint64_t	__size_t;		/* sizeof() */
-+#endif
+ typedef	__uint64_t	size_t;		/* sizeof() */
  typedef	__int64_t	__ssize_t;		/* byte count or error */
- typedef	__int64_t	__time_t;		/* time()... */
- typedef	__uint64_t	__uintfptr_t;
-@@ -105,7 +113,11 @@
- typedef	__int32_t	__ptrdiff_t;		/* ptr1 - ptr2 */
- typedef	__int32_t	__register_t;
- typedef	__int32_t	__segsz_t;		/* segment size (in pages) */
-+#if defined(__GLIBC__) && !defined(_KERNEL)
-+/* Glibc defines __size_t using macros. Avoid collision. */
-+#else
- typedef	__uint32_t	__size_t;		/* sizeof() */
-+#endif
- typedef	__int32_t	__ssize_t;		/* byte count or error */
- typedef	__int32_t	__time_t;		/* time()... */
- typedef	__uint32_t	__uintfptr_t;
 --- a/sys/sparc64/include/_types.h
 +++ b/sys/sparc64/include/_types.h
-@@ -70,9 +70,17 @@
+@@ -70,7 +70,11 @@
  typedef	__int32_t	__int_least32_t;
  typedef	__int64_t	__int_least64_t;
  typedef	__int64_t	__ptrdiff_t;		/* ptr1 - ptr2 */
@@ -206,25 +149,5 @@
  typedef	__int64_t	__register_t;
 +#endif
  typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
-+#if defined(__GLIBC__) && !defined(_KERNEL)
-+/* Glibc defines __size_t using macros. Avoid collision. */
-+#else
- typedef	__uint64_t	__size_t;		/* sizeof() */
-+#endif
+ typedef	__uint64_t	size_t;		/* sizeof() */
  typedef	__int64_t	__ssize_t;		/* byte count or error */
- typedef	__int64_t	__time_t;		/* time()... */
- typedef	__uint64_t	__uintfptr_t;
---- a/sys/arm/include/_types.h
-+++ b/sys/arm/include/_types.h
-@@ -84,7 +84,11 @@
- typedef	__int32_t	__ptrdiff_t;		/* ptr1 - ptr2 */
- typedef	__int32_t	__register_t;
- typedef	__int32_t	__segsz_t;		/* segment size (in pages) */
-+#if defined(__GLIBC__) && !defined(_KERNEL)
-+/* Glibc defines __size_t using macros. Avoid collision. */
-+#else
- typedef	__uint32_t	__size_t;		/* sizeof() */
-+#endif
- typedef	__int32_t	__ssize_t;		/* byte count or error */
- typedef	__int64_t	__time_t;		/* time()... */
- typedef	__uint32_t	__uintfptr_t;

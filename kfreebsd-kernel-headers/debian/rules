@@ -60,6 +60,8 @@ build-arch-stamp:
 		-e 's/defined\s*(\s*_SYS_CDEFS_H_\s*)/defined(_SYS_CDEFS_H)/g' \
 		-e 's/#\s*ifdef\s*_SYS_CDEFS_H_\(\s\|$$\)/#ifdef _SYS_CDEFS_H/g' \
 		-e 's/#\s*ifndef\s*_SYS_CDEFS_H_\(\s\|$$\)/#ifndef _SYS_CDEFS_H/g' \
+		\
+		-e 's/__size_t/size_t/g' \
 	; done) ; \
 	echo "#define __FreeBSD_kernel_version $$fbsd_version" > misc/osreldate.h
 
