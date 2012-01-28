@@ -43,22 +43,8 @@
 #define __printflike(fmtarg, firstvararg) \
 	__attribute__((__format__ (__printf__, fmtarg, firstvararg)))
 
-#ifndef __FBSDID
-#if !defined(lint) && !defined(STRIP_FBSDID)
-#define __FBSDID(s)     __IDSTRING(__CONCAT(__rcsid_,__LINE__),s)
-#else
-#define __FBSDID(s)     struct __hack
-#endif
-#endif
-
-#ifndef __RCSID
-#ifndef NO__RCSID
-#define __RCSID(s)      __IDSTRING(__CONCAT(__rcsid_,__LINE__),s)
-#else
-#define __RCSID(s)      struct __hack
-#endif
-#endif
-
+#define __FBSDID(s)		struct __hack
+#define __RCSID(s)		struct __hack
 #define __RCSID_SOURCE(s)	struct __hack
 #define __SCCSID(s)		struct __hack
 #define __COPYRIGHT(s)		struct __hack
