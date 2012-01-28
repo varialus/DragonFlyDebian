@@ -24,7 +24,7 @@ clean:
 	dh_testroot
 	rm -rf .pc
 	rm -f *-stamp
-	rm -rf sys usr.sbin linux
+	rm -rf sys usr.sbin misc
 	dh_clean
 
 .PHONY: clean
@@ -36,6 +36,7 @@ build-arch-stamp:
 	dh_testdir
 
 	tar xfJ $(SRC_TAR) --wildcards --strip-components=1 "*.h"
+	mkdir -p misc
 
 	set -e ; \
 	fbsd_version=$$(sed sys/sys/param.h -ne "s/^#\s*define\s\+__FreeBSD_version\s\+\([0-9]*\)\s.*/\1/p") ; \
@@ -59,7 +60,8 @@ build-arch-stamp:
 		-e 's/defined\s*(\s*_SYS_CDEFS_H_\s*)/defined(_SYS_CDEFS_H)/g' \
 		-e 's/#\s*ifdef\s*_SYS_CDEFS_H_\(\s\|$$\)/#ifdef _SYS_CDEFS_H/g' \
 		-e 's/#\s*ifndef\s*_SYS_CDEFS_H_\(\s\|$$\)/#ifndef _SYS_CDEFS_H/g' \
-	; done)
+	; done) ; \
+	echo "#define __FreeBSD_kernel_version $$fbsd_version" > misc/osreldate.h
 
 	QUILT_PATCHES=$(CURDIR)/debian/patches quilt push -a || test $$? = 2
 
