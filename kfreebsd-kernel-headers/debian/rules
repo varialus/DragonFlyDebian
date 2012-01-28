@@ -54,7 +54,7 @@ build-arch-stamp:
 		-e 's/#\s*ifndef\s*__GNUCLIKE_[A-Z_]\+\(\s\|$$\)/#if 0/g' \
 		\
 		-e 's/__packed\(\s\|;\)/ __attribute__((__packed__))\1/g' \
-		-e 's/__aligned(\([0-9]*\))/ __attribute__((aligned(\1)))/g' \
+		-e 's/__aligned(\([^)]*\?\))/ __attribute__((aligned(\1)))/g' \
 		-e 's/\(\s\|^\|(\)u_\(char\|int\|short\|long\)\(\s\)/\1unsigned \2\3/g' \
 		\
 		-e 's/defined\s*(\s*_SYS_CDEFS_H_\s*)/defined(_SYS_CDEFS_H)/g' \
