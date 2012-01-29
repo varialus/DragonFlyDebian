@@ -40,6 +40,7 @@
 
 #define __dead2		__attribute__((__noreturn__))
 #define __unused	__attribute__((__unused__))
+#define __offsetof(type, field)	__builtin_offsetof(type, field)
 #define __printflike(fmtarg, firstvararg) \
 	__attribute__((__format__ (__printf__, fmtarg, firstvararg)))
 
