@@ -81,23 +81,23 @@ struct fid {
 /*
  * NFS export related mount flags.
  */
-#define	MNT_EXRDONLY	0x00000080	/* exported read only */
-#define	MNT_EXPORTED	0x00000100	/* filesystem is exported */
-#define	MNT_DEFEXPORTED	0x00000200	/* exported to the world */
-#define	MNT_EXPORTANON	0x00000400	/* use anon uid mapping for everyone */
-#define	MNT_EXKERB	0x00000800	/* exported with Kerberos uid mapping */
-#define	MNT_EXPUBLIC	0x20000000	/* public export (WebNFS) */
+#define	MNT_EXRDONLY	0x0000000000000080ULL	/* exported read only */
+#define	MNT_EXPORTED	0x0000000000000100ULL	/* filesystem is exported */
+#define	MNT_DEFEXPORTED	0x0000000000000200ULL	/* exported to the world */
+#define	MNT_EXPORTANON	0x0000000000000400ULL	/* anon uid mapping for all */
+#define	MNT_EXKERB	0x0000000000000800ULL	/* exported with Kerberos */
+#define	MNT_EXPUBLIC	0x0000000020000000ULL	/* public export (WebNFS) */
 
 /*
  * Flags set by internal operations,
  * but visible to the user.
  * XXX some of these are not quite right.. (I've never seen the root flag set)
  */
-#define	MNT_LOCAL	0x00001000	/* filesystem is stored locally */
-#define	MNT_QUOTA	0x00002000	/* quotas are enabled on filesystem */
-#define	MNT_ROOTFS	0x00004000	/* identifies the root filesystem */
-#define	MNT_USER	0x00008000	/* mounted by a user */
-#define	MNT_IGNORE	0x00800000	/* do not show entry in df */
+#define	MNT_LOCAL	0x0000000000001000ULL /* filesystem is stored locally */
+#define	MNT_QUOTA	0x0000000000002000ULL /* quotas are enabled on fs */
+#define	MNT_ROOTFS	0x0000000000004000ULL /* identifies the root fs */
+#define	MNT_USER	0x0000000000008000ULL /* mounted by a user */
+#define	MNT_IGNORE	0x0000000000800000ULL /* do not show entry in df */
 
 /*
  * Mask of flags that are visible to statfs().
@@ -105,22 +105,23 @@ struct fid {
  * but the 'mount' program may need changing to handle this.
  */
 #define	MNT_VISFLAGMASK	(MNT_RDONLY	| MNT_SYNCHRONOUS | MNT_NOEXEC	| \
-			MNT_NOSUID	| MNT_NODEV	| MNT_UNION	| \
+			MNT_NOSUID	| MNT_UNION	| MNT_SUJ	| \
 			MNT_ASYNC	| MNT_EXRDONLY	| MNT_EXPORTED	| \
 			MNT_DEFEXPORTED	| MNT_EXPORTANON| MNT_EXKERB	| \
 			MNT_LOCAL	| MNT_USER	| MNT_QUOTA	| \
 			MNT_ROOTFS	| MNT_NOATIME	| MNT_NOCLUSTERR| \
 			MNT_NOCLUSTERW	| MNT_SUIDDIR	| MNT_SOFTDEP	| \
 			MNT_IGNORE	| MNT_EXPUBLIC	| MNT_NOSYMFOLLOW | \
-			MNT_JAILDEVFS	| MNT_MULTILABEL | MNT_ACLS)
+			MNT_GJOURNAL	| MNT_MULTILABEL | MNT_ACLS	| \
+			MNT_NFS4ACLS)
 
 /* Mask of flags that can be updated. */
-#define	MNT_UPDATEMASK (MNT_NOSUID	| MNT_NOEXEC	| MNT_NODEV	| \
+#define	MNT_UPDATEMASK (MNT_NOSUID	| MNT_NOEXEC	| \
 			MNT_SYNCHRONOUS	| MNT_UNION	| MNT_ASYNC	| \
 			MNT_NOATIME | \
-			MNT_NOSYMFOLLOW	| MNT_IGNORE	| MNT_JAILDEVFS	| \
+			MNT_NOSYMFOLLOW	| MNT_IGNORE	| \
 			MNT_NOCLUSTERR	| MNT_NOCLUSTERW | MNT_SUIDDIR	| \
-			MNT_ACLS	| MNT_USER)
+			MNT_ACLS	| MNT_USER | MNT_NFS4ACLS)
 
 /*
  * External filesystem command modifier flags.
