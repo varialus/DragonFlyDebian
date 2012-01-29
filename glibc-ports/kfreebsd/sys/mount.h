@@ -60,24 +60,23 @@ struct fid {
 /*
  * User specifiable flags.
  */
-#define	MNT_RDONLY	0x00000001	/* read only filesystem */
-#define	MNT_SYNCHRONOUS	0x00000002	/* filesystem written synchronously */
-#define	MNT_NOEXEC	0x00000004	/* can't exec from filesystem */
-#define	MNT_NOSUID	0x00000008	/* don't honor setuid bits on fs */
-#define	MNT_NODEV	0x00000010	/* don't interpret special files */
-#define	MNT_UNION	0x00000020	/* union with underlying filesystem */
-#define	MNT_ASYNC	0x00000040	/* filesystem written asynchronously */
-#define	MNT_SUIDDIR	0x00100000	/* special handling of SUID on dirs */
-#define	MNT_SOFTDEP	0x00200000	/* soft updates being done */
-#define	MNT_NOSYMFOLLOW	0x00400000	/* do not follow symlinks */
-#define	MNT_GJOURNAL	0x02000000	/* GEOM journal support enabled */
-#define	MNT_JAILDEVFS	0x02000000	/* jail-friendly DEVFS behaviour */
-#define	MNT_MULTILABEL	0x04000000	/* MAC support for individual objects */
-#define	MNT_ACLS	0x08000000	/* ACL support enabled */
-#define	MNT_NOATIME	0x10000000	/* disable update of file access time */
-#define	MNT_NOCLUSTERR	0x40000000	/* disable cluster read */
-#define	MNT_NOCLUSTERW	0x80000000	/* disable cluster write */
-#define	MNT_NFS4ACLS	0x00000010
+#define	MNT_RDONLY	0x0000000000000001ULL /* read only filesystem */
+#define	MNT_SYNCHRONOUS	0x0000000000000002ULL /* fs written synchronously */
+#define	MNT_NOEXEC	0x0000000000000004ULL /* can't exec from filesystem */
+#define	MNT_NOSUID	0x0000000000000008ULL /* don't honor setuid fs bits */
+#define	MNT_NFS4ACLS	0x0000000000000010ULL /* enable NFS version 4 ACLs */
+#define	MNT_UNION	0x0000000000000020ULL /* union with underlying fs */
+#define	MNT_ASYNC	0x0000000000000040ULL /* fs written asynchronously */
+#define	MNT_SUIDDIR	0x0000000000100000ULL /* special SUID dir handling */
+#define	MNT_SOFTDEP	0x0000000000200000ULL /* using soft updates */
+#define	MNT_NOSYMFOLLOW	0x0000000000400000ULL /* do not follow symlinks */
+#define	MNT_GJOURNAL	0x0000000002000000ULL /* GEOM journal support enabled */
+#define	MNT_MULTILABEL	0x0000000004000000ULL /* MAC support for objects */
+#define	MNT_ACLS	0x0000000008000000ULL /* ACL support enabled */
+#define	MNT_NOATIME	0x0000000010000000ULL /* dont update file access time */
+#define	MNT_NOCLUSTERR	0x0000000040000000ULL /* disable cluster read */
+#define	MNT_NOCLUSTERW	0x0000000080000000ULL /* disable cluster write */
+#define	MNT_SUJ		0x0000000100000000ULL /* using journaled soft updates */
 
 /*
  * NFS export related mount flags.
