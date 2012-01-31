@@ -19,7 +19,7 @@
  
 --- a/sbin/devd/Makefile
 +++ b/sbin/devd/Makefile
-@@ -10,7 +10,7 @@
+@@ -9,7 +9,7 @@
  NO_SHARED?=YES
  
  DPADD=	${LIBL} ${LIBUTIL}
@@ -39,21 +39,15 @@
  
  # NB: All regular expressions have an implicit ^$ around them.
  # NB: device-name is shorthand for 'match device-name'
-@@ -13,202 +10,12 @@
- 	# are returned from readdir(3).  The rule-sets are combined to
- 	# create a DFA that's used to match events to actions.
+@@ -13,7 +10,6 @@
+ 	# that they are returned from readdir(3).  The rule-sets are combined
+ 	# to create a DFA that's used to match events to actions.
  	directory "/etc/devd";
 -	directory "/usr/local/etc/devd";
  	pid-file "/var/run/devd.pid";
--
--	# Setup some shorthand for regex that we use later in the file.
--	#XXX Yes, these are gross -- imp
--	set scsi-controller-regex
--		"(aac|adv|adw|aha|ahb|ahc|ahd|aic|amd|amr|asr|bt|ciss|ct|dpt|\
--		esp|ida|iir|ips|isp|mlx|mly|mpt|ncr|ncv|nsp|stg|sym|trm|wds)\
--		[0-9]+";
- };
  
+ 	# Setup some shorthand for regex that we use later in the file.
+@@ -27,54 +23,6 @@
  # Note that the attach/detach with the highest value wins, so that one can
  # override these general rules.
  
@@ -62,8 +56,8 @@
 -# script is called pccard_ether.
 -#
 -# NB: DETACH events are ignored; the kernel should handle all cleanup
--#     (routes, arp cache) if you need to do something beware of races
--#     against immediate create of a device w/ the same name; e.g.
+-#     (routes, arp cache).  Beware of races against immediate create
+-#     of a device with the same name; e.g.
 -#	ifconfig bridge0 destroy; ifconfig bridge0 create
 -#
 -notify 0 {
@@ -73,9 +67,9 @@
 -};
 -
 -#
--# Try to start dhclient on Ethernet like interfaces when the link comes
+-# Try to start dhclient on Ethernet-like interfaces when the link comes
 -# up.  Only devices that are configured to support DHCP will actually
--# run it.  No link down rule exists because dhclient automaticly exits
+-# run it.  No link down rule exists because dhclient automatically exits
 -# when the link goes down.
 -#
 -notify 0 {
@@ -105,19 +99,14 @@
 -	action "/etc/rc.d/dhclient quietstart $subsystem";
 -};
 -
--# An entry like this might be in a different file, but is included here
--# as an example of how to override things.  Normally 'ed50' would match
--# the above attach/detach stuff, but the value of 100 makes it
--# hard wired to 1.2.3.4.
--attach 100 {
--	device-name "ed50";
--	action "ifconfig $device-name inet 1.2.3.4 netmask 0xffff0000";
--};
--detach 100 {
--	device-name "ed50";
--};
--
--# When a USB Bluetooth dongle appears activate it
+ # An entry like this might be in a different file, but is included here
+ # as an example of how to override things.  Normally 'ed50' would match
+ # the above attach/detach stuff, but the value of 100 makes it
+@@ -87,74 +35,6 @@
+ 	device-name "ed50";
+ };
+ 
+-# When a USB Bluetooth dongle appears, activate it
 -attach 100 {
 -	device-name "ubt[0-9]+";
 -	action "/etc/rc.d/bluetooth quietstart $device-name";
@@ -155,7 +144,7 @@
 -};
 -
 -# Firmware download into the ActiveWire board. After the firmware download is
--# done the device detaches and reappears as something new and shiny
+-# done, the device detaches and reappears as something new and shiny
 -# automatically.
 -attach 100 {
 -	match "vendor"	"0x0854";
@@ -185,53 +174,13 @@
 -	action "/usr/local/bin/coldsync -md -p /dev/$cdev -t usb";
 -};
 -
--#
--# Rescan scsi device-names on attach, but not detach.  However, it is
--# disabled by default due to reports of problems.
--#
--attach 0 {
--	device-name "$scsi-controller-regex";
--//	action "camcontrol rescan all";
--};
--
--# Don't even try to second guess what to do about drivers that don't
--# match here.  Instead, pass it off to syslog.  Commented out for the
--# moment, as the pnpinfo variable isn't set in devd yet.  Individual
--# variables within the bus supplied pnpinfo are set.
--nomatch 0 {
--#	action "logger Unknown device: $pnpinfo $location $bus";
--};
--
--# Various logging of unknown devices.
--nomatch 10 {
--	match "bus" "uhub[0-9]+";
--	action "logger Unknown USB device: vendor $vendor product $product \
--		bus $bus";
--};
--
--# Some PC-CARDs don't offer numerical manufacturer/product IDs, just
--# show the CIS info there.
--nomatch 20 {
--	match "bus" "pccard[0-9]+";
--	match "manufacturer" "0xffffffff";
--	match "product" "0xffffffff";
--	action "logger Unknown PCCARD device: CISproduct $cisproduct \
--		CIS-vendor $cisvendor bus $bus";
--};
--
--nomatch 10 {
--	match "bus" "pccard[0-9]+";
--	action "logger Unknown PCCARD device: manufacturer $manufacturer \
--		product $product CISproduct $cisproduct CIS-vendor \
--		$cisvendor bus $bus";
--};
--
--nomatch 10 {
--	match "bus" "cardbus[0-9]+";
--	action "logger Unknown Cardbus device: device $device class $class \
--		vendor $vendor bus $bus";
--};
--
+ #
+ # Rescan scsi device-names on attach, but not detach.  However, it is
+ # disabled by default due to reports of problems.
+@@ -202,13 +82,6 @@
+ 		vendor $vendor bus $bus";
+ };
+ 
 -# Switch power profiles when the AC line state changes.
 -notify 10 {
 -	match "system"		"ACPI";
@@ -242,11 +191,10 @@
  # Notify all users before beginning emergency shutdown when we get
  # a _CRT or _HOT thermal event and we're going to power down the system
  # very soon.
-@@ -249,68 +56,3 @@
- 	match "type"		"checksum";
+@@ -250,19 +123,6 @@
  	action "logger -p kern.warn 'ZFS: checksum mismatch, zpool=$pool path=$vdev_path offset=$zio_offset size=$zio_size'";
  };
--
+ 
 -# User requested suspend, so perform preparation steps and then execute
 -# the actual suspend process.
 -notify 10 {
@@ -260,54 +208,6 @@
 -	action "/etc/rc.resume acpi $notify";
 -};
 -
--/* EXAMPLES TO END OF FILE
--
--# The following might be an example of something that a vendor might
--# install if you were to add their device.  This might reside in
--# /usr/local/etc/devd/deqna.conf.  A deqna is, in this hypothetical
--# example, a pccard ethernet-like device.  Students of history may
--# know other devices by this name, and will get the in-jokes in this
--# entry.
--nomatch 10 {
--	match "bus" "pccard[0-9]+";
--	match "manufacturer" "0x1234";
--	match "product" "0x2323";
--	action "kldload if_deqna";
--};
--attach 10 {
--	device-name "deqna[0-9]+";
--	action "/etc/pccard_ether $device-name start";
--};
--detach 10 {
--	device-name "deqna[0-9]+";
--	action "/etc/pccard_ether $device-name stop";
--};
--
--# Examples of notify hooks.  A notify is a generic way for a kernel
--# subsystem to send event notification to userland.
--#
--# Here are some examples of ACPI notify handlers.  ACPI subsystems that
--# generate notifies include the AC adapter, power/sleep buttons,
--# control method batteries, lid switch, and thermal zones.
--#
--# Information returned is not always the same as the ACPI notify
--# events.  See the ACPI specification for more information about
--# notifies.  Here is the information returned for each subsystem:
--#
--# ACAD:		AC line state (0 is offline, 1 is online)
--# Button:	Button pressed (0 for power, 1 for sleep)
--# CMBAT:	ACPI battery events
--# Lid:		Lid state (0 is closed, 1 is open)
--# Suspend, Resume: Suspend and resume notification
--# Thermal:	ACPI thermal zone events
--#
--# This example calls a script when the AC state changes, passing the
--# notify value as the first argument.  If the state is 0x00, it might
--# call some sysctls to implement economy mode.  If 0x01, it might set
--# the mode to performance.
--notify 10 {
--	match "system"		"ACPI";
--	match "subsystem"	"ACAD";
--	action			"/etc/acpi_ac $notify";
--};
--*/
+ /* EXAMPLES TO END OF FILE
+ 
+ # An example of something that a vendor might install if you were to

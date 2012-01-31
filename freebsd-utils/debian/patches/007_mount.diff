@@ -21,7 +21,7 @@
  #define MOPT_NOATIME		{ "atime",	1, MNT_NOATIME, 0 }
 --- a/sbin/mount/mount.c
 +++ b/sbin/mount/mount.c
-@@ -160,6 +160,7 @@
+@@ -161,6 +161,7 @@
  static int
  exec_mountprog(const char *name, const char *execname, char *const argv[])
  {
@@ -29,7 +29,7 @@
  	pid_t pid;
  	int status;
  
-@@ -168,13 +169,11 @@
+@@ -169,13 +170,11 @@
  		warn("fork");
  		exit (1);
  	case 0:					/* Child. */
@@ -46,7 +46,7 @@
  		}
  		exit(1);
  	default:				/* Parent. */
-@@ -251,7 +250,7 @@
+@@ -252,7 +251,7 @@
  	options = NULL;
  	vfslist = NULL;
  	vfstype = "ufs";
@@ -55,7 +55,7 @@
  		switch (ch) {
  		case 'a':
  			all = 1;
-@@ -259,9 +258,6 @@
+@@ -260,9 +259,6 @@
  		case 'd':
  			debug = 1;
  			break;
@@ -65,7 +65,7 @@
  		case 'f':
  			init_flags |= MNT_FORCE;
  			break;
-@@ -646,11 +642,13 @@
+@@ -656,11 +652,13 @@
  			(void)printf(", reads: sync %ju async %ju",
  			    (uintmax_t)sfp->f_syncreads,
  			    (uintmax_t)sfp->f_asyncreads);
@@ -79,7 +79,7 @@
  	}
  	(void)printf(")\n");
  }
-@@ -840,7 +838,7 @@
+@@ -858,7 +856,7 @@
  {
  
  	(void)fprintf(stderr, "%s\n%s\n%s\n",
@@ -88,7 +88,7 @@
  "       mount [-dfpruvw] special | node",
  "       mount [-dfpruvw] [-o options] [-t ufs | external_type] special node");
  	exit(1);
-@@ -865,7 +863,7 @@
+@@ -883,7 +881,7 @@
  
  	if (strncmp(ent->f_mntfromname, "<below>", 7) == 0 ||
  	    strncmp(ent->f_mntfromname, "<above>", 7) == 0) {
@@ -99,7 +99,7 @@
  
 --- a/sbin/mount/Makefile
 +++ b/sbin/mount/Makefile
-@@ -8,6 +8,6 @@
+@@ -7,6 +7,6 @@
  # We do NOT install the getmntopts.3 man page.
  
  DPADD=	${LIBUTIL}

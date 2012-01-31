@@ -1,10 +1,3 @@
----
- sbin/devfs/Makefile |    1 +
- sbin/devfs/devfs.c  |    2 +-
- sbin/devfs/extern.h |    2 +-
- sbin/devfs/rule.c   |   20 +++++++++++---------
- 4 files changed, 14 insertions(+), 11 deletions(-)
-
 --- a/sbin/devfs/extern.h
 +++ b/sbin/devfs/extern.h
 @@ -50,7 +50,7 @@
@@ -18,11 +11,11 @@
  
 --- a/sbin/devfs/Makefile
 +++ b/sbin/devfs/Makefile
-@@ -4,5 +4,6 @@
+@@ -3,5 +3,6 @@
+ PROG=	devfs
  SRCS=	devfs.c rule.c
  MAN=	devfs.8
- WARNS?=	5
-+LDADD=  -lbsd
++LDADD+= -lbsd
  
  .include <bsd.prog.mk>
 --- a/sbin/devfs/rule.c
@@ -38,69 +31,6 @@
  		switch (ch) {
  		case 's':
  			in_rsnum = eatonum(optarg);
-@@ -125,7 +125,7 @@
- }
- 
- static int
--rule_apply(int ac __attribute__((unused)), char **av __attribute__((unused)))
-+rule_apply(int ac, char **av)
- {
- 	struct devfs_rule dr;
- 	devfs_rnum rnum;
-@@ -153,7 +153,7 @@
- }
- 
- static int
--rule_applyset(int ac, char **av __attribute__((unused)))
-+rule_applyset(int ac, char **av)
- {
- 	int rv;
- 
-@@ -166,7 +166,7 @@
- }
- 
- static int
--rule_del(int ac __attribute__((unused)), char **av)
-+rule_del(int ac, char **av)
- {
- 	devfs_rid rid;
- 	int rv;
-@@ -181,7 +181,7 @@
- }
- 
- static int
--rule_delset(int ac, char **av __attribute__((unused)))
-+rule_delset(int ac, char **av)
- {
- 	struct devfs_rule dr;
- 	int rv;
-@@ -202,7 +202,7 @@
- }
- 
- static int
--rule_show(int ac __attribute__((unused)), char **av)
-+rule_show(int ac, char **av)
- {
- 	struct devfs_rule dr;
- 	devfs_rnum rnum;
-@@ -229,7 +229,7 @@
- }
- 
- static int
--rule_showsets(int ac, char **av __attribute__((unused)))
-+rule_showsets(int ac, char **av)
- {
- 	devfs_rsnum rsnum;
- 
-@@ -307,7 +307,7 @@
-  * Construct a /struct devfs_rule/ from ac and av.
-  */
- static void
--rulespec_intok(struct devfs_rule *dr, int ac __attribute__((unused)), char **av,
-+rulespec_intok(struct devfs_rule *dr, int ac, char **av,
-     devfs_rsnum rsnum)
- {
- 	struct intstr *is;
 --- a/sbin/devfs/devfs.c
 +++ b/sbin/devfs/devfs.c
 @@ -62,7 +62,7 @@

@@ -7,7 +7,7 @@
 
 CFLAGS = -Wall -g -pipe -fPIC -I. -D_GNU_SOURCE -D__va_list=__builtin_va_list \
 	$(shell pkg-config --cflags libbsd-overlay) -isystem /usr/include/tirpc \
-	-D__FreeBSD_version=802000
+	-D__FreeBSD_version=__FreeBSD_kernel_version
 CXXFLAGS = $(CFLAGS)
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
@@ -18,18 +18,26 @@ else
 	CXXFLAGS += -O2
 endif
 
+full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
+tar_version	:= $(shell echo $(full_version) | sed -e 's/-.*//g')
+svn_revision	:= $(shell echo $(full_version) | sed -e 's/.*~svn\([0-9]*\)-[0-9]*/\1/g')
+version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
+major           := $(shell echo $(version) | sed -e 's/\..*//g')
+revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
+
+SVN		:= http://svn.freebsd.org/base/release/$(version).0
+#SVN		:= http://svn.freebsd.org/base/releng/$(version)
+#SVN		:= http://svn.freebsd.org/base/stable/$(major)
+#SVN		:= http://svn.freebsd.org/base/head
+
 SOURCE = freebsd-utils
-VERSION = $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)-[^-]*$$/\1/p')
-SVN_REL = $(shell echo $(VERSION) | sed -ne 's/+[^+]*$$//p')
-SVN = http://svn.freebsd.org/base/release/$(SVN_REL).0
-#SVN = http://svn.freebsd.org/base/releng/$(SVN_REL)
-ORIGDIR = $(SOURCE)-$(VERSION)
-TARNAME = $(SOURCE)_$(VERSION).orig.tar.gz
+ORIGDIR = $(SOURCE)-$(tar_version)
+TARNAME = $(SOURCE)_$(tar_version).orig.tar.gz
 
 PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
 PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) \
-        -I$(CURDIR)/debian/local/include -I$(CURDIR)/include -lbsd" \
+        -isystem /usr/include/freebsd -I$(CURDIR)/debian/local/include -I$(CURDIR)/include -lbsd" \
         NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO \
         DESTDIR=$(DESTDIR) make
 
@@ -46,10 +54,23 @@ build: build-arch build-indep
 
 get-orig-source:
 	rm -rf $(ORIGDIR)
-	mkdir -p $(ORIGDIR)/sys/kern $(ORIGDIR)/sys/dev/usb $(ORIGDIR)/etc \
+	mkdir -p \
+		$(ORIGDIR)/sys/kern \
+		$(ORIGDIR)/sys/amd64/linux32 \
+		$(ORIGDIR)/sys/i386/linux \
+		$(ORIGDIR)/sys/dev/usb \
+		$(ORIGDIR)/etc \
 		$(ORIGDIR)/include/rpcsvc \
 		$(ORIGDIR)/sys/kgssapi
-	for i in sbin/dmesg sbin/sysctl usr.bin/kdump usr.bin/ktrace \
+	for i in sbin/dmesg sbin/sysctl \
+		\
+		usr.bin/kdump \
+		usr.bin/ktrace \
+		sys/kern/syscalls.c \
+		sys/kern/makesyscalls.sh \
+		sys/amd64/linux32/syscalls.master \
+		sys/i386/linux/syscalls.master \
+		\
 		 usr.sbin/jail bin/chflags \
 		 sbin/devd etc/devd.conf etc/devd sys/dev/usb/usbdevs \
 		 usr.sbin/acpi/acpiconf \
@@ -59,7 +80,7 @@ get-orig-source:
 		 sbin/route usr.bin/netstat usr.sbin/rpc.umntall \
 		 usr.sbin/ppp usr.sbin/pppctl usr.sbin/arp usr.bin/mkuzip \
 		 sbin/ipfw contrib/pf sbin/pfctl usr.sbin/authpf sys/contrib/pf/net \
-		 sbin/mount_std sbin/umount sbin/mount_autofs sbin/mount_cd9660 \
+		 sbin/mount_std sbin/umount sbin/mount_cd9660 \
 		 sbin/mount_ext2fs sbin/mount_hpfs sbin/mount_msdosfs \
 		 sbin/mount_ntfs sbin/mount_nullfs sbin/mount_udf sbin/mount_unionfs \
 		 sbin/mount_reiserfs sbin/mount \
@@ -68,7 +89,7 @@ get-orig-source:
 		 sbin/geom sys/geom/eli sys/crypto/sha2 \
 		 usr.sbin/kbdcontrol usr.sbin/vidcontrol share/syscons \
 		 sbin/savecore sbin/dumpon \
-		 sys/kern/syscalls.c etc/pf.os \
+		etc/pf.os \
 		 usr.sbin/mountd usr.sbin/rpc.statd usr.sbin/rpc.lockd \
 		 usr.sbin/gssd usr.sbin/nfsd usr.sbin/nfscbd \
 		 usr.sbin/nfsdumpstate usr.sbin/nfsuserd usr.sbin/nfsrevoke \
@@ -107,7 +128,6 @@ freebsd-utils-stamp: $(RPCHDRS)
 	$(PMAKE) -C sbin/geom
 	$(PMAKE) -C sbin/mdconfig
 	$(PMAKE) -C sbin/mount
-	$(PMAKE) -C sbin/mount_autofs
 	$(PMAKE) -C sbin/mount_cd9660
 	$(PMAKE) -C sbin/mount_ext2fs
 	$(PMAKE) -C sbin/mount_hpfs
@@ -164,7 +184,7 @@ kldutils-stamp:
 
 freebsd-net-tools: freebsd-net-tools-stamp
 freebsd-net-tools-stamp: lib-stamp
-	$(PMAKE) -C sbin/ifconfig
+	$(PMAKE) -C sbin/ifconfig -DWITHOUT_JAIL
 	$(PMAKE) -C sbin/pfctl
 	$(PMAKE) -C sbin/route
 	$(PMAKE) -C usr.bin/netstat
@@ -222,7 +242,6 @@ clean:
 	$(PMAKE) -C sbin/geom clean
 	$(PMAKE) -C sbin/mdconfig clean
 	$(PMAKE) -C sbin/mount clean
-	$(PMAKE) -C sbin/mount_autofs clean
 	$(PMAKE) -C sbin/mount_cd9660 clean
 	$(PMAKE) -C sbin/mount_ext2fs clean
 	$(PMAKE) -C sbin/mount_hpfs clean

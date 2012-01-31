@@ -7,31 +7,15 @@
 
 --- a/usr.bin/kdump/kdump.c
 +++ b/usr.bin/kdump/kdump.c
-@@ -45,20 +45,18 @@
- #include <sys/cdefs.h>
- __FBSDID("$FreeBSD$");
- 
--#define _KERNEL
--extern int errno;
- #include <sys/errno.h>
--#undef _KERNEL
-+#define ERESTART        (-1)            /* restart syscall */
-+#define EJUSTRETURN     (-2)            /* don't modify regs, just return */
- #include <sys/param.h>
- #include <sys/errno.h>
--#define _KERNEL
- #include <sys/time.h>
--#undef _KERNEL
- #include <sys/uio.h>
- #include <sys/ktrace.h>
+@@ -55,6 +55,7 @@
  #include <sys/ioctl.h>
  #include <sys/socket.h>
  #include <sys/stat.h>
 +#include "stat16.h"
+ #include <sys/sysent.h>
  #include <sys/un.h>
- #ifdef IPX
- #include <sys/types.h>
-@@ -71,6 +69,8 @@
+ #include <sys/queue.h>
+@@ -69,6 +70,8 @@
  #include <netinet/in.h>
  #include <ctype.h>
  #include <dlfcn.h>
@@ -40,7 +24,7 @@
  #include <err.h>
  #include <grp.h>
  #include <inttypes.h>
-@@ -97,7 +97,7 @@
+@@ -97,7 +100,7 @@
  void ktrcsw(struct ktr_csw *);
  void ktruser(int, unsigned char *);
  void ktrsockaddr(struct sockaddr *);
@@ -49,9 +33,9 @@
  void ktrstruct(char *, size_t);
  void usage(void);
  void sockfamilyname(int);
-@@ -111,6 +111,9 @@
- #define TIME_FORMAT	"%b %e %T %Y"
- #define eqs(s1, s2)	(strcmp((s1), (s2)) == 0)
+@@ -155,6 +158,9 @@
+ 
+ TAILQ_HEAD(trace_procs, proc_info) trace_procs;
  
 +timevaladd(struct timeval *t1, const struct timeval *t2);
 +timevalsub(struct timeval *t1, const struct timeval *t2);
@@ -59,7 +43,7 @@
  int
  main(int argc, char *argv[])
  {
-@@ -653,7 +656,7 @@
+@@ -788,7 +794,7 @@
  				ip++;
  				narg--;
  				c = ',';
@@ -68,38 +52,7 @@
  				print_number(ip,narg,c);
  				print_number(ip,narg,c);
  				(void)putchar(',');
-@@ -745,18 +748,18 @@
- 				ip++;
- 				narg--;
- 				c = ',';
--			} else if (ktr->ktr_code == SYS___acl_get_file ||
--				   ktr->ktr_code == SYS___acl_set_file ||
--				   ktr->ktr_code == SYS___acl_get_fd ||
--				   ktr->ktr_code == SYS___acl_set_fd ||
--				   ktr->ktr_code == SYS___acl_delete_file ||
--				   ktr->ktr_code == SYS___acl_delete_fd ||
--				   ktr->ktr_code == SYS___acl_aclcheck_file ||
--				   ktr->ktr_code == SYS___acl_aclcheck_fd ||
--				   ktr->ktr_code == SYS___acl_get_link ||
--				   ktr->ktr_code == SYS___acl_set_link ||
--				   ktr->ktr_code == SYS___acl_delete_link ||
--				   ktr->ktr_code == SYS___acl_aclcheck_link) {
-+			} else if (ktr->ktr_code == SYS_acl_get_file ||
-+				   ktr->ktr_code == SYS_acl_set_file ||
-+				   ktr->ktr_code == SYS_acl_get_fd ||
-+				   ktr->ktr_code == SYS_acl_set_fd ||
-+				   ktr->ktr_code == SYS_acl_delete_file ||
-+				   ktr->ktr_code == SYS_acl_delete_fd ||
-+				   ktr->ktr_code == SYS_acl_aclcheck_file ||
-+				   ktr->ktr_code == SYS_acl_aclcheck_fd ||
-+				   ktr->ktr_code == SYS_acl_get_link ||
-+				   ktr->ktr_code == SYS_acl_set_link ||
-+				   ktr->ktr_code == SYS_acl_delete_link ||
-+				   ktr->ktr_code == SYS_acl_aclcheck_link) {
- 				print_number(ip,narg,c);
- 				(void)putchar(',');
- 				acltypename((int)*ip);
-@@ -1246,7 +1249,7 @@
+@@ -1379,7 +1385,7 @@
  }
  
  void
@@ -108,37 +61,49 @@
  {
  	char mode[12], timestr[PATH_MAX + 4];
  	struct passwd *pwd;
-@@ -1351,7 +1354,7 @@
- 	if (strcmp(name, "stat") == 0) {
- 		if (datalen != sizeof(struct stat))
- 			goto invalid;
--		ktrstat((struct stat *)data);
-+		ktrstat((struct stat16 *)data);
- 	} else if (strcmp(name, "sockaddr") == 0) {
- 		if (datalen < sizeof(struct sockaddr) ||
- 		    datalen != ((struct sockaddr *)(data))->sa_len)
 --- a/usr.bin/kdump/Makefile
 +++ b/usr.bin/kdump/Makefile
-@@ -6,13 +6,14 @@
+@@ -10,6 +10,7 @@
  PROG=		kdump
  SRCS=		kdump.c ioctl.c kdump_subr.c subr.c
  CFLAGS+=	-I${.CURDIR}/../ktrace -I${.CURDIR} -I${.CURDIR}/../..
 +LDADD+=		-lbsd
  
- CLEANFILES=	ioctl.c kdump_subr.c
+ .if ${MACHINE_ARCH} == "amd64" || ${MACHINE_ARCH} == "i386"
+ SRCS+=		linux_syscalls.c
+@@ -20,10 +21,10 @@
+ CLEANFILES=	ioctl.c kdump_subr.c linux_syscalls.c
  
  ioctl.c: mkioctls
 -	sh ${.CURDIR}/mkioctls ${DESTDIR}/usr/include > ${.TARGET}
-+	sh ${.CURDIR}/mkioctls /usr/include > ${.TARGET}
++	sh ${.CURDIR}/mkioctls /usr/include /usr/include/*-kfreebsd-gnu > ${.TARGET}
  
  kdump_subr.c: mksubr
 -	sh ${.CURDIR}/mksubr ${DESTDIR}/usr/include > ${.TARGET}
-+	sh ${.CURDIR}/mksubr /usr/include > ${.TARGET}
++	sh ${.CURDIR}/mksubr /usr/include /usr/include/*-kfreebsd-gnu > ${.TARGET}
  
- .include <bsd.prog.mk>
+ linux_syscalls.c:
+ 	/bin/sh ${.CURDIR}/../../sys/kern/makesyscalls.sh \
 --- a/usr.bin/kdump/mksubr
 +++ b/usr.bin/kdump/mksubr
-@@ -56,7 +56,9 @@
+@@ -50,7 +50,7 @@
+ 	echo "usage: sh $0 include-dir"
+ 	exit 1
+ fi
+-include_dir=$1
++include_dirs="$*"
+ 
+ #
+ # Automatically generates a C function that will print out the
+@@ -74,13 +74,16 @@
+ 	int	or = 0;
+ 	printf("%#x<", arg);
+ _EOF_
++	for include_dir in $include_dirs ; do if test -e $include_dir/$file ; then \
+ 	egrep "^#[[:space:]]*define[[:space:]]+"${grep}"[[:space:]]*" \
+-		$include_dir/$file | \
++		$include_dir/$file ; fi ; done | \
+ 	awk '{ for (i = 1; i <= NF; i++) \
  		if ($i ~ /define/) \
  			break; \
  		++i; \
@@ -147,9 +112,31 @@
 +		sub("__", "", n); \
 +		printf "\tif(!((arg>0)^((%s)>0)))\n\t\tif_print_or(arg, %s, or);\n", $i, n }'
  cat <<_EOF_
+ 	printf(">");
  	if (or == 0)
- 		(void)printf("<invalid>%ld", (long)arg);
-@@ -135,6 +137,7 @@
+@@ -107,8 +110,9 @@
+ {
+ 	switch (arg) {
+ _EOF_
++	for include_dir in $include_dirs ; do if test -e $include_dir/$file ; then \
+ 	egrep "^#[[:space:]]*define[[:space:]]+"${grep}"[[:space:]]*" \
+-		$include_dir/$file | \
++		$include_dir/$file ; fi ; done | \
+ 	awk '{ for (i = 1; i <= NF; i++) \
+ 		if ($i ~ /define/) \
+ 			break; \
+@@ -139,8 +143,9 @@
+ $name (int arg)
+ {
+ _EOF_
++	for include_dir in $include_dirs ; do if test -e $include_dir/$file ; then \
+ 	egrep "^#[[:space:]]*define[[:space:]]+"${grep}"[[:space:]]*" \
+-		$include_dir/$file | \
++		$include_dir/$file ; fi ; done | \
+ 	awk '{ printf "\t"; \
+ 		if (NR > 1) \
+ 			printf "else " ; \
+@@ -160,6 +165,7 @@
  #include <sys/fcntl.h>
  #include <sys/stat.h>
  #include <sys/unistd.h>
@@ -157,7 +144,7 @@
  #include <sys/mman.h>
  #include <sys/wait.h>
  #define _KERNEL
-@@ -148,21 +151,30 @@
+@@ -173,21 +179,30 @@
  #include <sys/reboot.h>
  #include <sched.h>
  #include <sys/linker.h>
@@ -193,38 +180,8 @@
  /*
   * These are simple support macros. print_or utilizes a variable
   * defined in the calling function to track whether or not it should
-@@ -304,45 +316,72 @@
- 	}
- }
+@@ -331,43 +346,43 @@
  
-+/*
-+ * MANUAL
-+ */
-+
-+void
-+acltypename (int arg)
-+{
-+	switch (arg) {
-+	case 0x00000000:
-+		(void)printf("ACL_TYPE_ACCESS_OLD");
-+		break;
-+	case 0x00000001:
-+		(void)printf("ACL_TYPE_ACCESS_OLD");
-+		break;
-+	case 0x00000002:
-+		(void)printf("ACL_TYPE_ACCESS");
-+		break;
-+	case 0x00000003:
-+		(void)printf("ACL_TYPE_DEFAULT");
-+		break;
-+	case 0x00000004:
-+		(void)printf("ACL_TYPE_NFS4");
-+	 	break;
-+	default: /* Should not reach */
-+		(void)printf("<invalid=%ld>", (long)arg);
-+	}
-+}
-+
  _EOF_
  
 -auto_or_type "modename" "S_[A-Z]+[[:space:]]+[0-6]{7}" "sys/stat.h"
@@ -234,8 +191,8 @@
 -auto_or_type "mmapflagsname" "MAP_[A-Z]+[[:space:]]+0x[0-9A-Fa-f]+" "sys/mman.h"
 -auto_or_type "wait4optname" "W[A-Z]+[[:space:]]+[0-9]+" "sys/wait.h"
 +auto_or_type "modename" "__S_[A-Z]+[[:space:]]+[0-6]{7}" "bits/stat.h"
-+auto_or_type "flagsname" "O_[A-Z]+[[:space:]]+[0-9]+" "bits/fcntl.h"
-+auto_or_type "accessmodename" "[A-Z]_OK[[:space:]]+[0-9]+" "fcntl.h"
++auto_or_type "flagsname" "O_[A-Z]+[[:space:]]+0x[0-9A-Fa-f]+" "bits/fcntl.h"
++auto_or_type "accessmodename" "[A-Z]_OK[[:space:]]+0?x?[0-9A-Fa-f]+" "fcntl.h"
 +auto_or_type "mmapprotname" "PROT_[A-Z]+[[:space:]]+0x[0-9A-Fa-f]+" "bits/mman.h"
 +auto_or_type "mmapflagsname" "MAP_[A-Z]+[[:space:]]+0x[0-9A-Fa-f]+" "bits/mman.h"
 +auto_or_type "wait4optname" "W[A-Z]+[[:space:]]+[0-9]+" "bits/waitflags.h"
@@ -243,34 +200,32 @@
  auto_or_type "mountflagsname" "MNT_[A-Z]+[[:space:]]+0x[0-9]+" "sys/mount.h"
  auto_or_type "rebootoptname" "RB_[A-Z]+[[:space:]]+0x[0-9]+" "sys/reboot.h"
 -auto_or_type "flockname" "LOCK_[A-Z]+[[:space:]]+0x[0-9]+" "sys/fcntl.h"
-+auto_or_type "flockname" "LOCK_[A-Z]+[[:space:]]+[0-9]+" "bits/fcntl.h"
++auto_or_type "flockname" "LOCK_[A-Z]+[[:space:]]+0x[0-9]+" "bits/fcntl.h"
  auto_or_type "thrcreateflagsname" "THR_[A-Z]+[[:space:]]+0x[0-9]+" "sys/thr.h"
 -auto_or_type "mlockallname" "MCL_[A-Z]+[[:space:]]+0x[0-9]+" "sys/mman.h"
 -auto_or_type "shmatname" "SHM_[A-Z]+[[:space:]]+[0-9]{6}+" "sys/shm.h"
 -auto_or_type "rforkname" "RF[A-Z]+[[:space:]]+\([0-9]+<<[0-9]+\)" "sys/unistd.h"
-+auto_or_type "mlockallname" "MCL_[A-Z]+[[:space:]]+[0-9]+" "bits/mman.h"
++auto_or_type "mlockallname" "MCL_[A-Z]+[[:space:]]+0x[0-9]+" "bits/mman.h"
 +auto_or_type "shmatname" "SHM_[A-Z]+[[:space:]]+[0-9]{6}+" "bits/shm.h"
 +auto_or_type "rforkname" "RF[A-Z]+[[:space:]]+\([0-9]+<<[0-9]+\)" "sys/rfork.h"
  auto_or_type "nfssvcname" "NFSSVC_[A-Z]+[[:space:]]+0x[0-9]+" "nfsserver/nfs.h"
  
 -auto_switch_type "whencename" "SEEK_[A-Z]+[[:space:]]+[0-9]+" "sys/unistd.h"
--auto_switch_type "rlimitname" "RLIMIT_[A-Z]+[[:space:]]+[0-9]+" "sys/resource.h"
--auto_switch_type "shutdownhowname" "SHUT_[A-Z]+[[:space:]]+0x[0-9]+" "sys/socket.h"
++auto_switch_type "whencename" "SEEK_[A-Z]+[[:space:]]+[0-9]+" "stdio.h"
+ auto_switch_type "rlimitname" "RLIMIT_[A-Z]+[[:space:]]+[0-9]+" "sys/resource.h"
+ auto_switch_type "shutdownhowname" "SHUT_[A-Z]+[[:space:]]+[0-9]+" "sys/socket.h"
 -auto_switch_type "prioname" "PRIO_[A-Z]+[[:space:]]+[0-9]" "sys/resource.h"
 -auto_switch_type "madvisebehavname" "_?MADV_[A-Z]+[[:space:]]+[0-9]+" "sys/mman.h"
 -auto_switch_type "msyncflagsname" "MS_[A-Z]+[[:space:]]+0x[0-9]+" "sys/mman.h"
-+auto_switch_type "whencename" "SEEK_[A-Z]+[[:space:]]+[0-9]+" "stdio.h"
-+auto_switch_type "rlimitname" "RLIMIT_[A-Z]++[[:space:]]+" "bits/resource.h"
-+auto_switch_type "shutdownhowname" "SHUT_[A-Z]+[[:space:]]+" "sys/socket.h"
-+auto_switch_type "prioname" "PRIO_[A-Z]+[[:space:]]+" "bits/resource.h"
++auto_switch_type "prioname" "PRIO_[A-Z]+[[:space:]]+[0-9]" "bits/resource.h"
 +auto_switch_type "madvisebehavname" "_?MADV_[A-Z]+[[:space:]]+[0-9]+" "bits/mman.h"
-+auto_switch_type "msyncflagsname" "MS_[A-Z]+[[:space:]]+[0-9]+" "bits/mman.h"
++auto_switch_type "msyncflagsname" "MS_[A-Z]+[[:space:]]+0x[0-9]+" "bits/mman.h"
  auto_switch_type "schedpolicyname" "SCHED_[A-Z]+[[:space:]]+[0-9]+" "sched.h"
  auto_switch_type "kldunloadfflagsname" "LINKER_UNLOAD_[A-Z]+[[:space:]]+[0-9]+" "sys/linker.h"
  auto_switch_type "extattrctlname" "EXTATTR_NAMESPACE_[A-Z]+[[:space:]]+0x[0-9]+" "sys/extattr.h"
  auto_switch_type "kldsymcmdname" "KLDSYM_[A-Z]+[[:space:]]+[0-9]+" "sys/linker.h"
  auto_switch_type "sendfileflagsname" "SF_[A-Z]+[[:space:]]+[0-9]+" "sys/socket.h"
--auto_switch_type "acltypename" "ACL_TYPE_[A-Z]+[[:space:]]+0x[0-9]+" "sys/acl.h"
+ auto_switch_type "acltypename" "ACL_TYPE_[A-Z4_]+[[:space:]]+0x[0-9]+" "sys/acl.h"
 -auto_switch_type "sigprocmaskhowname" "SIG_[A-Z]+[[:space:]]+[0-9]+" "sys/signal.h"
 -auto_switch_type "lio_listioname" "LIO_(NO)?WAIT[[:space:]]+[0-9]+" "aio.h"
 -auto_switch_type "minheritname" "INHERIT_[A-Z]+[[:space:]]+[0-9]+" "sys/mman.h"
@@ -286,25 +241,40 @@
 -auto_switch_type "sockoptname" "SO_[A-Z]+[[:space:]]+0x[0-9]+" "sys/socket.h"
 -auto_switch_type "socktypename" "SOCK_[A-Z]+[[:space:]]+[1-9]+[0-9]*" "sys/socket.h"
 +auto_switch_type "sockoptname" "SO_[A-Z]+[[:space:]]+0x[0-9]+" "bits/socket.h"
-+auto_switch_type "socktypename" "SOCK_[A-Z]+[[:space:]]+" "bits/socket.h"
- auto_switch_type "ptraceopname" "PT_[[:alnum:]]+[[:space:]]+[0-9]+" "sys/ptrace.h"
++auto_switch_type "socktypename" "SOCK_[A-Z]+[[:space:]]+[1-9]+[0-9]*" "bits/socket.h"
+ auto_switch_type "ptraceopname" "PT_[[:alnum:]_]+[[:space:]]+[0-9]+" "sys/ptrace.h"
  
  cat <<_EOF_
-@@ -405,7 +444,7 @@
+@@ -381,8 +396,9 @@
+ {
+ 	switch (cmd) {
+ _EOF_
++	for include_dir in $include_dirs ; do if test -e $include_dir/$file ; then \
+ egrep "^#[[:space:]]*define[[:space:]]+F_[A-Z]+[[:space:]]+[0-9]+[[:space:]]*" \
+-	$include_dir/sys/fcntl.h | \
++	$include_dir/sys/fcntl.h ; fi ; done | \
+ 	awk 'BEGIN { o=0 } { for (i = 1; i <= NF; i++) \
+ 		if ($i ~ /define/) \
+ 			break; \
+@@ -430,8 +446,9 @@
  {
  	switch (func) {
  _EOF_
 -egrep "^#[[:space:]]*define[[:space:]]+RTP_[A-Z]+[[:space:]]+0x[0-9]+[[:space:]]*" \
+-	$include_dir/sys/rtprio.h | grep -v RTP_PRIO | \
++	for include_dir in $include_dirs ; do if test -e $include_dir/$file ; then \
 +egrep "^#[[:space:]]*define[[:space:]]+RTP_[A-Z]+[[:space:]]+[0-9]+[[:space:]]*" \
- 	$include_dir/sys/rtprio.h | grep -v RTP_PRIO | \
++	$include_dir/sys/rtprio.h ; fi ; done | grep -v RTP_PRIO | \
  	awk '{ for (i = 1; i <= NF; i++) \
  		if ($i ~ /define/) \
-@@ -435,7 +474,7 @@
- 		return;
- 	}
+ 			break; \
+@@ -462,7 +479,8 @@
+ 
+ 	printf("%#x<", flags);
  _EOF_
 -egrep "^#[[:space:]]*define[[:space:]]+MSG_[A-Z]+[[:space:]]+0x[0-9]+[[:space:]]*" $include_dir/sys/socket.h | \
-+egrep "^#[[:space:]]*define[[:space:]]+MSG_[A-Z]*" $include_dir/bits/socket.h | \
++	for include_dir in $include_dirs ; do if test -e $include_dir/$file ; then \
++egrep "^#[[:space:]]*define[[:space:]]+MSG_[A-Z]*" $include_dir/bits/socket.h ; fi ; done | \
  	awk '{ for (i = 1; i <= NF; i++) \
  		if ($i ~ /define/) \
  			break; \
@@ -345,9 +315,9 @@
 +
 +    __dev_t st_rdev;		/* Device number, if device.  */
 +
-+    struct  timespec st_atimespec;  /* time of last access */
-+    struct  timespec st_mtimespec;  /* time of last data modification */
-+    struct  timespec st_ctimespec;  /* time of last file status change */
++    struct  timespec st_atim;  /* time of last access */
++    struct  timespec st_mtim;  /* time of last data modification */
++    struct  timespec st_ctim;  /* time of last file status change */
 +
 +    __off_t st_size;		/* Size of file, in bytes.  */
 +
@@ -361,8 +331,37 @@
 +
 +    __uint32_t __dummy1;
 +
-+    struct timespec st_birthtimespec; /* time of file creation */
++    struct timespec st_birthtim; /* time of file creation */
 +
 +#define _BIRTH_PADSIZE     (2*(8 - sizeof (long)))
 +    char __birth_padding[_BIRTH_PADSIZE];
 +  };
+--- a/usr.bin/kdump/mkioctls
++++ b/usr.bin/kdump/mkioctls
+@@ -15,21 +15,23 @@
+ 	echo "usage: sh $0 [-s] include-dir"
+ 	exit 1
+ fi
++include_dirs="$*"
+ 
+ LC_ALL=C; export LC_ALL
+ 
+ # Build a list of headers that have ioctls in them.
+ # XXX should we use an ANSI cpp?
+ ioctl_includes=`
+-	cd $1
+-	find -H -s * -name '*.h' |
++	for include_dir in $include_dirs ; do \
++	cd $include_dir
++	find -H -s * -name '*.h' ; done |
+ 		xargs egrep -l \
+ '^#[ 	]*define[ 	]+[A-Za-z_][A-Za-z0-9_]*[ 	]+_IO[^a-z0-9_]' |
+ 		awk '{printf("#include <%s>\\\\n", $1)}'
+ `
+ 
+ awk -v x="$ioctl_includes" 'BEGIN {print x}' |
+-	gcc -E -I$1 -dM -DCOMPAT_43TTY - |
++	gcc -E -dM -DCOMPAT_43TTY - |
+ 	awk -v ioctl_includes="$ioctl_includes" -v use_switch="$use_switch" '
+ BEGIN {
+ 	print "/* XXX obnoxious prerequisites. */"

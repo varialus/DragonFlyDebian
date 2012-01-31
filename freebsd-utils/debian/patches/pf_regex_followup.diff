@@ -1,0 +1,156 @@
+--- a/contrib/pf/authpf/authpf.c
++++ b/contrib/pf/authpf/authpf.c
+@@ -19,6 +19,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <sys/param.h>
+ #include <sys/types.h>
+ #include <sys/file.h>
+ #include <sys/ioctl.h>
+@@ -155,7 +156,7 @@
+ 	else
+ 		shell = pw->pw_shell;
+ 
+-#ifndef __FreeBSD_kernel__
++#ifndef __FreeBSD__
+ 	login_close(lc);
+ #endif
+ 
+@@ -163,7 +164,7 @@
+ 	    strcmp(shell, PATH_AUTHPF_SHELL_NOIP)) {
+ 		syslog(LOG_ERR, "wrong shell for user %s, uid %u",
+ 		    pw->pw_name, pw->pw_uid);
+-#ifdef __FreeBSD_kernel__
++#ifdef __FreeBSD__
+ 	login_close(lc);
+ #else
+ 		if (shell != pw->pw_shell)
+@@ -172,7 +173,7 @@
+ 		goto die;
+ 	}
+ 
+-#ifdef __FreeBSD_kernel__
++#ifdef __FreeBSD__
+ 	login_close(lc);
+ #else
+ 	if (shell != pw->pw_shell)
+--- a/contrib/pf/ftp-proxy/ftp-proxy.c
++++ b/contrib/pf/ftp-proxy/ftp-proxy.c
+@@ -19,6 +19,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <sys/param.h>
+ #include <sys/queue.h>
+ #include <sys/types.h>
+ #include <sys/time.h>
+@@ -585,7 +586,7 @@
+ 
+ 		/* We don't care about truncation. */
+ 		vsnprintf(buf, sizeof buf, message, ap);
+-#ifdef __FreeBSD_kernel__
++#ifdef __FreeBSD__
+ 		strvis(visbuf, buf, VIS_CSTYLE | VIS_NL);
+ #else
+ 		strnvis(visbuf, buf, sizeof visbuf, VIS_CSTYLE | VIS_NL);
+--- a/contrib/pf/libevent/kqueue.c
++++ b/contrib/pf/libevent/kqueue.c
+@@ -30,6 +30,7 @@
+ #include "config.h"
+ #endif
+ 
++#include <sys/param.h>
+ #include <sys/types.h>
+ #ifdef HAVE_SYS_TIME_H
+ #include <sys/time.h>
+--- a/contrib/pf/pfctl/parse.y
++++ b/contrib/pf/pfctl/parse.y
+@@ -30,6 +30,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <sys/param.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #include <sys/stat.h>
+--- a/contrib/pf/pfctl/pf_print_state.c
++++ b/contrib/pf/pfctl/pf_print_state.c
+@@ -33,6 +33,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <sys/param.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ #ifdef __FreeBSD_kernel__
+--- a/contrib/pf/pfctl/pfctl.c
++++ b/contrib/pf/pfctl/pfctl.c
+@@ -34,6 +34,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <sys/param.h>
+ #include <sys/types.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+--- a/contrib/pf/pfctl/pfctl_altq.c
++++ b/contrib/pf/pfctl/pfctl_altq.c
+@@ -21,6 +21,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <sys/param.h>
+ #include <sys/types.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+--- a/contrib/pf/pfctl/pfctl_optimize.c
++++ b/contrib/pf/pfctl/pfctl_optimize.c
+@@ -19,6 +19,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <sys/param.h>
+ #include <sys/types.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+--- a/contrib/pf/pfctl/pfctl_qstats.c
++++ b/contrib/pf/pfctl/pfctl_qstats.c
+@@ -19,6 +19,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <sys/param.h>
+ #include <sys/types.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+--- a/contrib/pf/pflogd/pflogd.c
++++ b/contrib/pf/pflogd/pflogd.c
+@@ -33,6 +33,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <sys/param.h>
+ #include <sys/types.h>
+ #include <sys/ioctl.h>
+ #include <sys/file.h>
+--- a/contrib/pf/pflogd/privsep.c
++++ b/contrib/pf/pflogd/privsep.c
+@@ -20,6 +20,7 @@
+ #include <sys/cdefs.h>
+ __FBSDID("$FreeBSD$");
+ 
++#include <sys/param.h>
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include <sys/socket.h>
+--- a/contrib/pf/tftp-proxy/filter.c
++++ b/contrib/pf/tftp-proxy/filter.c
+@@ -20,6 +20,7 @@
+ #include <syslog.h>
+ 
+ #include <sys/ioctl.h>
++#include <sys/param.h>
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ 

@@ -1,61 +1,33 @@
----
- sbin/ifconfig/Makefile      |   23 ++++++++++++-----------
- sbin/ifconfig/af_atalk.c    |    6 +++---
- sbin/ifconfig/af_inet.c     |    4 ++--
- sbin/ifconfig/af_inet6.c    |   17 +++++++++--------
- sbin/ifconfig/af_ipx.c      |    4 ++--
- sbin/ifconfig/af_link.c     |    4 +++-
- sbin/ifconfig/af_nd6.c      |    4 ++--
- sbin/ifconfig/ifcarp.c      |    1 +
- sbin/ifconfig/ifclone.c     |    3 ++-
- sbin/ifconfig/ifconfig.c    |   37 ++++++++++++++++++++++++-------------
- sbin/ifconfig/ifgre.c       |    2 +-
- sbin/ifconfig/ifieee80211.c |    4 ++++
- sbin/ifconfig/ifvlan.c      |    2 ++
- 13 files changed, 67 insertions(+), 44 deletions(-)
-
 --- a/sbin/ifconfig/Makefile
 +++ b/sbin/ifconfig/Makefile
-@@ -21,22 +21,23 @@
- SRCS+=	af_nd6.c		# ND6 support
+@@ -27,20 +27,17 @@
+ .endif
  
  SRCS+=	ifclone.c		# clone device support
 -SRCS+=	ifmac.c			# MAC support
-+#SRCS+=	ifmac.c			# MAC support
  SRCS+=	ifmedia.c		# SIOC[GS]IFMEDIA support
+-SRCS+=	iffib.c			# non-default FIB support
  SRCS+=	ifvlan.c		# SIOC[GS]ETVLAN support
--SRCS+=	ifgre.c			# GRE keys etc
-+#SRCS+=	ifgre.c			# GRE keys etc
+ SRCS+=	ifgre.c			# GRE keys etc
  SRCS+=	ifgif.c			# GIF reversed header workaround
  
  SRCS+=	ifieee80211.c regdomain.c # SIOC[GS]IEEE80211 support
--DPADD+=	${LIBBSDXML} ${LIBSBUF} ${LIBJAIL}
+ DPADD+=	${LIBBSDXML} ${LIBJAIL} ${LIBSBUF}
 -LDADD+=	-lbsdxml -ljail -lsbuf
-+#DPADD+=	${LIBBSDXML} ${LIBSBUF} ${LIBJAIL}
-+#LDADD+=	-lbsdxml -ljail -lsbuf
-+LDADD+=	-lexpat -lsbuf
-+
-+#SRCS+=	ifcarp.c		# SIOC[GS]VH support
-+#SRCS+=	ifgroup.c		# ...
-+#SRCS+=	ifpfsync.c		# pfsync(4) support
++LDADD+=	-lexpat -ljail -lsbuf
  
--SRCS+=	ifcarp.c		# SIOC[GS]VH support
--SRCS+=	ifgroup.c		# ...
+ SRCS+=	ifcarp.c		# SIOC[GS]VH support
+ SRCS+=	ifgroup.c		# ...
 -SRCS+=	ifpfsync.c		# pfsync(4) support
--
--SRCS+=	ifbridge.c		# bridge support
--SRCS+=	iflagg.c		# lagg support
-+#SRCS+=	ifbridge.c		# bridge support
-+#SRCS+=	iflagg.c		# lagg support
  
- .if ${MK_IPX_SUPPORT} != "no" && !defined(RELEASE_CRUNCH)
- SRCS+=	af_ipx.c		# IPX support
-@@ -47,6 +48,7 @@
+ SRCS+=	ifbridge.c		# bridge support
+ SRCS+=	iflagg.c		# lagg support
+@@ -60,6 +57,7 @@
  MAN=	ifconfig.8
  
  CFLAGS+= -Wall -Wmissing-prototypes -Wcast-qual -Wwrite-strings -Wnested-externs
 +LDADD+= -lbsd ../../lib/linkaddr.o
- WARNS?=	0
+ WARNS?=	2
  
  .include <bsd.prog.mk>
 --- a/sbin/ifconfig/ifconfig.c
@@ -71,15 +43,6 @@
  #include <net/ethernet.h>
  #include <net/if.h>
  #include <net/if_var.h>
-@@ -66,7 +70,7 @@
- #include <err.h>
- #include <errno.h>
- #include <fcntl.h>
--#include <jail.h>
-+#include <sys/jail.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
 @@ -156,7 +160,7 @@
  	all = downonly = uponly = namesonly = noload = verbose = 0;
  
@@ -89,105 +52,7 @@
  	for (p = opts; p != NULL; p = p->next)
  		strlcat(options, p->opt, sizeof(options));
  	while ((c = getopt(argc, argv, options)) != -1) {
-@@ -643,8 +647,9 @@
- 		err(1, "SIOCDIFPHYADDR");
- }
- 
-+#if 0
- static void
--setifvnet(const char *jname, int dummy __attribute__((unused)), int s,
-+setifvnet(const char *jname, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	struct ifreq my_ifr;
-@@ -658,7 +663,7 @@
- }
- 
- static void
--setifrvnet(const char *jname, int dummy __attribute__((unused)), int s,
-+setifrvnet(const char *jname, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	struct ifreq my_ifr;
-@@ -671,8 +676,10 @@
- 		err(1, "SIOCSIFRVNET(%d, %s)", my_ifr.ifr_jid, my_ifr.ifr_name);
- }
- 
-+#endif
-+
- static void
--setifnetmask(const char *addr, int dummy __attribute__((unused)), int s,
-+setifnetmask(const char *addr, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	if (afp->af_getaddr != NULL) {
-@@ -682,7 +689,7 @@
- }
- 
- static void
--setifbroadaddr(const char *addr, int dummy __attribute__((unused)), int s,
-+setifbroadaddr(const char *addr, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	if (afp->af_getaddr != NULL)
-@@ -690,7 +697,7 @@
- }
- 
- static void
--setifipdst(const char *addr, int dummy __attribute__((unused)), int s,
-+setifipdst(const char *addr, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	const struct afswtch *inet;
-@@ -723,7 +730,7 @@
- 
- /*ARGSUSED*/
- static void
--setifdstaddr(const char *addr, int param __attribute__((unused)), int s, 
-+setifdstaddr(const char *addr, int param, int s,
-     const struct afswtch *afp)
- {
- 	if (afp->af_getaddr != NULL)
-@@ -783,7 +790,7 @@
- }
- 
- static void
--setifmetric(const char *val, int dummy __attribute__((unused)), int s, 
-+setifmetric(const char *val, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	strncpy(ifr.ifr_name, name, sizeof (ifr.ifr_name));
-@@ -793,7 +800,7 @@
- }
- 
- static void
--setifmtu(const char *val, int dummy __attribute__((unused)), int s, 
-+setifmtu(const char *val, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	strncpy(ifr.ifr_name, name, sizeof (ifr.ifr_name));
-@@ -803,7 +810,7 @@
- }
- 
- static void
--setifname(const char *val, int dummy __attribute__((unused)), int s, 
-+setifname(const char *val, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	char *newname;
-@@ -825,9 +832,10 @@
- 
- /* ARGSUSED */
- static void
--setifdescr(const char *val, int dummy __attribute__((unused)), int s, 
-+setifdescr(const char *val, int dummy, int s,
-     const struct afswtch *afp)
- {
-+
- 	char *newdescr;
- 
- 	ifr.ifr_buffer.length = strlen(val) + 1;
-@@ -902,7 +910,7 @@
+@@ -947,7 +951,7 @@
  	putchar('\n');
  
  	for (;;) {
@@ -196,17 +61,6 @@
  			ifr.ifr_buffer.buffer = descr;
  			ifr.ifr_buffer.length = descrlen;
  			if (ioctl(s, SIOCGIFDESCR, &ifr) == 0) {
-@@ -1113,8 +1121,10 @@
- 	DEF_CMD_ARG2("tunnel",			settunnel),
- 	DEF_CMD("-tunnel", 0,			deletetunnel),
- 	DEF_CMD("deletetunnel", 0,		deletetunnel),
-+#if 0
- 	DEF_CMD_ARG("vnet",			setifvnet),
- 	DEF_CMD_ARG("-vnet",			setifrvnet),
-+#endif
- 	DEF_CMD("link0",	IFF_LINK0,	setifflags),
- 	DEF_CMD("-link0",	-IFF_LINK0,	setifflags),
- 	DEF_CMD("link1",	IFF_LINK1,	setifflags),
 --- a/sbin/ifconfig/af_inet6.c
 +++ b/sbin/ifconfig/af_inet6.c
 @@ -42,7 +42,6 @@
@@ -226,81 +80,9 @@
  
  #include "ifconfig.h"
  
-@@ -73,7 +74,7 @@
- static	char addr_buf[MAXHOSTNAMELEN *2 + 1];	/*for getnameinfo()*/
- 
- static void
--setifprefixlen(const char *addr, int dummy __attribute__((unused)), int s,
-+setifprefixlen(const char *addr, int dummy, int s,
-     const struct afswtch *afp)
- {
-         if (afp->af_getprefix != NULL)
-@@ -82,7 +83,7 @@
- }
- 
- static void
--setip6flags(const char *dummyaddr __attribute__((unused)), int flag, int dummysoc __attribute__((unused)),
-+setip6flags(const char *dummyaddr, int flag, int dummysoc,
-     const struct afswtch *afp)
- {
- 	if (afp->af_af != AF_INET6)
-@@ -117,21 +118,21 @@
- }
- 
- static void
--setip6pltime(const char *seconds, int dummy __attribute__((unused)), int s, 
-+setip6pltime(const char *seconds, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	setip6lifetime("pltime", seconds, s, afp);
- }
- 
- static void
--setip6vltime(const char *seconds, int dummy __attribute__((unused)), int s, 
-+setip6vltime(const char *seconds, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	setip6lifetime("vltime", seconds, s, afp);
- }
- 
- static void
--setip6eui64(const char *cmd, int dummy __attribute__((unused)), int s,
-+setip6eui64(const char *cmd, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	struct ifaddrs *ifap, *ifa;
-@@ -177,7 +178,7 @@
- }
- 
- static void
--in6_status(int s __attribute__((unused)), const struct ifaddrs *ifa)
-+in6_status(int s, const struct ifaddrs *ifa)
- {
- 	struct sockaddr_in6 *sin, null_sin;
- 	struct in6_ifreq ifr6;
-@@ -527,7 +528,7 @@
- };
- 
- static void
--in6_Lopt_cb(const char *optarg __attribute__((unused)))
-+in6_Lopt_cb(const char *optarg)
- {
- 	ip6lifetime++;	/* print IPv6 address lifetime */
- }
---- a/sbin/ifconfig/ifclone.c
-+++ b/sbin/ifconfig/ifclone.c
-@@ -174,7 +174,7 @@
- };
- 
- static void
--clone_Copt_cb(const char *optarg __attribute__((unused)))
-+clone_Copt_cb(const char *optarg)
- {
- 	list_cloners();
- 	exit(0);
 --- a/sbin/ifconfig/af_link.c
 +++ b/sbin/ifconfig/af_link.c
-@@ -46,13 +46,15 @@
+@@ -46,6 +46,8 @@
  #include <net/if_dl.h>
  #include <net/if_types.h>
  #include <net/ethernet.h>
@@ -309,17 +91,9 @@
  
  #include "ifconfig.h"
  
- static struct ifreq link_ridreq;
- 
- static void
--link_status(int s __attribute__((unused)), const struct ifaddrs *ifa)
-+link_status(int s, const struct ifaddrs *ifa)
- {
- 	/* XXX no const 'cuz LLADDR is defined wrong */
- 	struct sockaddr_dl *sdl = (struct sockaddr_dl *) ifa->ifa_addr;
 --- a/sbin/ifconfig/ifieee80211.c
 +++ b/sbin/ifconfig/ifieee80211.c
-@@ -90,6 +90,9 @@
+@@ -83,6 +83,9 @@
  #include <fcntl.h>
  #include <inttypes.h>
  #include <stdio.h>
@@ -329,35 +103,6 @@
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
---- a/sbin/ifconfig/af_atalk.c
-+++ b/sbin/ifconfig/af_atalk.c
-@@ -55,7 +55,7 @@
- 
- /* XXX  FIXME -- should use strtoul for better parsing. */
- static void
--setatrange(const char *range, int dummy __attribute__((unused)), int s, 
-+setatrange(const char *range, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	u_int	first = 123, last = 123;
-@@ -69,7 +69,7 @@
- }
- 
- static void
--setatphase(const char *phase, int dummy __attribute__((unused)), int s, 
-+setatphase(const char *phase, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	if (!strcmp(phase, "1"))
-@@ -81,7 +81,7 @@
- }
- 
- static void
--at_status(int s __attribute__((unused)), const struct ifaddrs *ifa)
-+at_status(int s, const struct ifaddrs *ifa)
- {
- 	struct sockaddr_at *sat, null_sat;
- 	struct netrange *nr;
 --- a/sbin/ifconfig/af_inet.c
 +++ b/sbin/ifconfig/af_inet.c
 @@ -43,13 +43,13 @@
@@ -375,15 +120,6 @@
  
  #include "ifconfig.h"
  
-@@ -57,7 +57,7 @@
- static struct ifreq in_ridreq;
- 
- static void
--in_status(int s __attribute__((unused)), const struct ifaddrs *ifa)
-+in_status(int s, const struct ifaddrs *ifa)
- {
- 	struct sockaddr_in *sin, null_sin;
- 	
 --- a/sbin/ifconfig/af_ipx.c
 +++ b/sbin/ifconfig/af_ipx.c
 @@ -41,9 +41,9 @@
@@ -397,43 +133,3 @@
  #define IPTUNNEL
  #include <netipx/ipx.h>
  #include <netipx/ipx_if.h>
-@@ -54,7 +54,7 @@
- static struct ifreq ipx_ridreq;
- 
- static void
--ipx_status(int s __attribute__((unused)), const struct ifaddrs *ifa)
-+ipx_status(int s, const struct ifaddrs *ifa)
- {
- 	struct sockaddr_ipx *sipx, null_sipx;
- 
---- a/sbin/ifconfig/ifgre.c
-+++ b/sbin/ifconfig/ifgre.c
-@@ -65,7 +65,7 @@
- }
- 
- static void
--setifgrekey(const char *val, int dummy __attribute__((unused)), int s, 
-+setifgrekey(const char *val, int dummy, int s,
-     const struct afswtch *afp)
- {
- 	uint32_t grekey = atol(val);
---- a/sbin/ifconfig/af_nd6.c
-+++ b/sbin/ifconfig/af_nd6.c
-@@ -65,7 +65,7 @@
- void setnd6defif(const char *, int, int, const struct afswtch *);
- 
- void
--setnd6flags(const char *dummyaddr __attribute__((unused)),
-+setnd6flags(const char *dummyaddr,
- 	int d, int s,
- 	const struct afswtch *afp)
- {
-@@ -89,7 +89,7 @@
- }
- 
- void
--setnd6defif(const char *dummyaddr __attribute__((unused)),
-+setnd6defif(const char *dummyaddr,
- 	int d, int s,
- 	const struct afswtch *afp)
- {

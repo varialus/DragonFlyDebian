@@ -5,8 +5,8 @@
 
 --- a/sbin/umount/umount.c
 +++ b/sbin/umount/umount.c
-@@ -94,7 +94,7 @@
- 	sync();
+@@ -91,7 +91,7 @@
+ 	struct addrinfo hints;
  
  	all = errs = 0;
 -	while ((ch = getopt(argc, argv, "AaF:fh:t:v")) != -1)
@@ -14,7 +14,7 @@
  		switch (ch) {
  		case 'A':
  			all = 2;
-@@ -102,9 +102,6 @@
+@@ -99,9 +99,6 @@
  		case 'a':
  			all = 1;
  			break;
@@ -24,7 +24,7 @@
  		case 'f':
  			fflag = MNT_FORCE;
  			break;
-@@ -160,7 +157,7 @@
+@@ -163,7 +160,7 @@
  		break;
  	case 1:
  		if (setfsent() == 0)
@@ -33,17 +33,7 @@
  		errs = umountall(typelist);
  		break;
  	case 0:
-@@ -199,9 +196,6 @@
- 		    strcmp(fs->fs_type, FSTAB_RO) &&
- 		    strcmp(fs->fs_type, FSTAB_RQ))
- 			continue;
--		/* Ignore unknown file system types. */
--		if (getvfsbyname(fs->fs_vfstype, &vfc) == -1)
--			continue;
- 		if (checkvfsname(fs->fs_vfstype, typelist))
- 			continue;
- 
-@@ -358,24 +352,12 @@
+@@ -361,24 +358,12 @@
  
  	if (!namematch(ai))
  		return (1);
@@ -70,7 +60,7 @@
  	/* Mark this this file system as unmounted. */
  	getmntentry(NULL, NULL, &sfs->f_fsid, REMOVE);
  	if (vflag)
-@@ -392,7 +374,7 @@
+@@ -395,7 +380,7 @@
  			    clnt_spcreateerror("MOUNTPROG"));
  			return (1);
  		}
@@ -79,10 +69,10 @@
  		try.tv_sec = 20;
  		try.tv_usec = 0;
  		clnt_stat = clnt_call(clp, MOUNTPROC_UMNT, (xdrproc_t)xdr_dir,
-@@ -600,6 +582,6 @@
+@@ -603,6 +588,6 @@
  
  	(void)fprintf(stderr, "%s\n%s\n",
- 	    "usage: umount [-fv] special | node | fsid",
+ 	    "usage: umount [-fv] special ... | node ... | fsid ...",
 -	    "       umount -a | -A [-F fstab] [-fv] [-h host] [-t type]");
 +	    "       umount -a | -A [-fv] [-h host] [-t type]");
  	exit(1);
@@ -90,7 +80,7 @@
 --- a/sbin/umount/umount.8
 +++ b/sbin/umount/umount.8
 @@ -40,7 +40,6 @@
- .Ar special | node | fsid
+ .Ar special ... | node ... | fsid ...
  .Nm
  .Fl a | A
 -.Op Fl F Ar fstab

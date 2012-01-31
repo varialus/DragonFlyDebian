@@ -1,39 +1,27 @@
---- a/sbin/kldconfig/kldconfig.c
-+++ b/sbin/kldconfig/kldconfig.c
-@@ -208,7 +208,7 @@
- 
- /* Remove a path component from the module search path */
- static void
--rempath(struct pathhead *pathq, char *path, int force, int insert __attribute__((unused)))
-+rempath(struct pathhead *pathq, char *path, int force, int insert)
- {
- 	char pathbuf[MAXPATHLEN+1];
- 	struct pathentry *pe;
 --- a/sbin/kldconfig/Makefile
 +++ b/sbin/kldconfig/Makefile
-@@ -29,5 +29,6 @@
+@@ -29,4 +29,6 @@
  PROG=		kldconfig
  MAN=		kldconfig.8
- WARNS?=		5
-+LDADD=		-lbsd
  
++LDADD=		-lbsd
++
  .include <bsd.prog.mk>
 --- a/sbin/kldload/Makefile
 +++ b/sbin/kldload/Makefile
-@@ -29,5 +29,6 @@
+@@ -29,4 +29,6 @@
  PROG=	kldload
  MAN=	kldload.8
- WARNS?=	5
-+LDADD=         -lbsd
  
++LDADD= -lbsd
++
  .include <bsd.prog.mk>
 --- a/sbin/kldunload/Makefile
 +++ b/sbin/kldunload/Makefile
-@@ -28,6 +28,7 @@
- 
+@@ -29,4 +29,6 @@
  PROG=	kldunload
  MAN=	kldunload.8
-+LDADD=         -lbsd
- WARNS?=	6
  
++LDADD+= -lbsd
++
  .include <bsd.prog.mk>

@@ -8,7 +8,7 @@
  #include <netdb.h>
  #include <paths.h>
  #include <pwd.h>
-@@ -93,9 +92,6 @@
+@@ -99,9 +98,6 @@
  		else							\
  			errx(1, "%s: no such user", username);		\
  	}								\
@@ -18,7 +18,7 @@
  	ngroups = ngroups_max;						\
  	if (getgrouplist(username, pwd->pw_gid, groups, &ngroups) != 0)	\
  		err(1, "getgrouplist: %s", username);			\
-@@ -104,7 +100,6 @@
+@@ -110,7 +106,6 @@
  int
  main(int argc, char **argv)
  {
@@ -26,7 +26,7 @@
  	struct passwd *pwd = NULL;
  	gid_t *groups;
  	size_t sysvallen;
-@@ -326,10 +321,6 @@
+@@ -350,10 +345,6 @@
  			err(1, "setgroups");
  		if (setgid(pwd->pw_gid) != 0)
  			err(1, "setgid");

@@ -9,16 +9,16 @@
 
 --- a/sbin/mdconfig/mdconfig.c
 +++ b/sbin/mdconfig/mdconfig.c
-@@ -41,6 +41,7 @@
+@@ -42,6 +42,7 @@
  static int md_find(char *, const char *);
  static int md_query(char *name);
  static int md_list(char *units, int opt);
 +static void mdmaybeload(void);
- static char *geom_config_get(struct gconf *g, char *name);
+ static char *geom_config_get(struct gconf *g, const char *name);
  static void md_prthumanval(char *length);
  
-@@ -269,9 +270,7 @@
- 	}
+@@ -267,9 +268,7 @@
+ 
  	mdio.md_version = MDIOVERSION;
  
 -	if (!kld_isloaded("g_md") && kld_load("geom_md") == -1)
@@ -28,7 +28,7 @@
  	fd = open("/dev/" MDCTL_NAME, O_RDWR, 0);
  	if (fd < 0)
  		err(1, "open(/dev/%s)", MDCTL_NAME);
-@@ -471,3 +470,21 @@
+@@ -492,3 +491,21 @@
  {
  	return (md_list(name, OPT_UNIT));
  }

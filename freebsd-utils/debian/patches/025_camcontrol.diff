@@ -1,10 +1,3 @@
----
- sbin/camcontrol/Makefile     |    2 +-
- sbin/camcontrol/camcontrol.c |    9 ++++-----
- sbin/camcontrol/modeedit.c   |    6 +++---
- sbin/camcontrol/util.c       |    4 ++--
- 4 files changed, 10 insertions(+), 11 deletions(-)
-
 --- a/sbin/camcontrol/camcontrol.c
 +++ b/sbin/camcontrol/camcontrol.c
 @@ -30,7 +30,7 @@
@@ -15,21 +8,27 @@
 +#include <stdint.h>
  #include <sys/types.h>
  #include <sys/endian.h>
- 
-@@ -123,9 +123,9 @@
+ #include <sys/sbuf.h>
+@@ -132,12 +132,12 @@
  };
  
  #ifndef MINIMALISTIC
 -static const char scsicmd_opts[] = "a:c:dfi:o:r";
 -static const char readdefect_opts[] = "f:GP";
 -static const char negotiate_opts[] = "acD:M:O:qR:T:UW:";
+-static const char smprg_opts[] = "l";
+-static const char smppc_opts[] = "a:A:d:lm:M:o:p:s:S:T:";
+-static const char smpphylist_opts[] = "lq";
 +static const char scsicmd_opts[] = "+a:c:dfi:o:r";
 +static const char readdefect_opts[] = "+f:GP";
 +static const char negotiate_opts[] = "+acD:M:O:qR:T:UW:";
++static const char smprg_opts[] = "+l";
++static const char smppc_opts[] = "+a:A:d:lm:M:o:p:s:S:T:";
++static const char smpphylist_opts[] = "+lq";
  #endif
  
  struct camcontrol_opts option_table[] = {
-@@ -4709,7 +4709,6 @@
+@@ -6036,7 +6036,6 @@
  	 * the arguments again.
  	 */
  	optind = optstart;
@@ -37,35 +36,6 @@
  
  	switch(cmdlist) {
  #ifndef MINIMALISTIC
---- a/sbin/camcontrol/modeedit.c
-+++ b/sbin/camcontrol/modeedit.c
-@@ -140,7 +140,7 @@
- 
- 
- static void
--editentry_create(void *hook __attribute__((unused)), int letter, void *arg, int count,
-+editentry_create(void *hook, int letter, void *arg, int count,
- 		 char *name)
- {
- 	struct editentry *newentry;	/* Buffer to hold new entry. */
-@@ -162,7 +162,7 @@
- }
- 
- static void
--editentry_update(void *hook __attribute__((unused)), int letter, void *arg, int count,
-+editentry_update(void *hook, int letter, void *arg, int count,
- 		 char *name)
- {
- 	struct editentry *dest;		/* Buffer to hold entry to update. */
-@@ -190,7 +190,7 @@
- }
- 
- static int
--editentry_save(void *hook __attribute__((unused)), char *name)
-+editentry_save(void *hook, char *name)
- {
- 	struct editentry *src;		/* Entry value to save. */
- 
 --- a/sbin/camcontrol/util.c
 +++ b/sbin/camcontrol/util.c
 @@ -46,7 +46,7 @@
@@ -77,19 +47,10 @@
  #include <sys/types.h>
  
  #include <stdlib.h>
-@@ -107,7 +107,7 @@
- /* arg_put: "put argument" callback
-  */
- void
--arg_put(void *hook __attribute__((unused)), int letter, void *arg, int count, char *name)
-+arg_put(void *hook, int letter, void *arg, int count, char *name)
- {
- 	if (verbose && name && *name)
- 		printf("%s:  ", name);
 --- a/sbin/camcontrol/Makefile
 +++ b/sbin/camcontrol/Makefile
-@@ -13,7 +13,7 @@
- WARNS?=	6
+@@ -12,7 +12,7 @@
+ WARNS?= 3
  .endif
  DPADD=	${LIBCAM} ${LIBSBUF} ${LIBUTIL}
 -LDADD=	-lcam -lsbuf -lutil

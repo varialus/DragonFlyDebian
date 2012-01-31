@@ -1,0 +1,64 @@
+--- a/sbin/ifconfig/Makefile
++++ b/sbin/ifconfig/Makefile
+@@ -33,8 +33,8 @@
+ SRCS+=	ifgif.c			# GIF reversed header workaround
+ 
+ SRCS+=	ifieee80211.c regdomain.c # SIOC[GS]IEEE80211 support
+-DPADD+=	${LIBBSDXML} ${LIBJAIL} ${LIBSBUF}
+-LDADD+=	-lexpat -ljail -lsbuf
++DPADD+=	${LIBBSDXML} ${LIBSBUF}
++LDADD+=	-lexpat -lsbuf
+ 
+ SRCS+=	ifcarp.c		# SIOC[GS]VH support
+ SRCS+=	ifgroup.c		# ...
+@@ -53,6 +53,11 @@
+ DPADD+=	${LIBIPX}
+ LDADD+=	-lipx
+ .endif
++.if ${MK_JAIL} != "no"
++CFLAGS+= -DJAIL
++DPADD+= ${LIBJAIL}
++LDADD+= -ljail
++.endif
+ 
+ MAN=	ifconfig.8
+ 
+--- a/sbin/ifconfig/ifconfig.c
++++ b/sbin/ifconfig/ifconfig.c
+@@ -70,7 +70,9 @@
+ #include <err.h>
+ #include <errno.h>
+ #include <fcntl.h>
++#ifdef JAIL
+ #include <jail.h>
++#endif
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -692,6 +694,7 @@
+ 		err(1, "SIOCDIFPHYADDR");
+ }
+ 
++#ifdef JAIL
+ static void
+ setifvnet(const char *jname, int dummy __unused, int s,
+     const struct afswtch *afp)
+@@ -719,6 +722,7 @@
+ 	if (ioctl(s, SIOCSIFRVNET, &my_ifr) < 0)
+ 		err(1, "SIOCSIFRVNET(%d, %s)", my_ifr.ifr_jid, my_ifr.ifr_name);
+ }
++#endif
+ 
+ static void
+ setifnetmask(const char *addr, int dummy __unused, int s,
+@@ -1162,8 +1166,10 @@
+ 	DEF_CMD_ARG2("tunnel",			settunnel),
+ 	DEF_CMD("-tunnel", 0,			deletetunnel),
+ 	DEF_CMD("deletetunnel", 0,		deletetunnel),
++#ifdef JAIL
+ 	DEF_CMD_ARG("vnet",			setifvnet),
+ 	DEF_CMD_ARG("-vnet",			setifrvnet),
++#endif
+ 	DEF_CMD("link0",	IFF_LINK0,	setifflags),
+ 	DEF_CMD("-link0",	-IFF_LINK0,	setifflags),
+ 	DEF_CMD("link1",	IFF_LINK1,	setifflags),

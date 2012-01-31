@@ -7,6 +7,10 @@
 #undef export_args
 #undef oexport_args
 
+#ifndef MNT_SUJ
+#define     MNT_SUJ         0x0000000100000000ULL /* using journaled soft updates */
+#endif
+
 /*
  * Old export arguments without security flavor list
  */

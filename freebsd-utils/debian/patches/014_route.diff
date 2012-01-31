@@ -5,7 +5,7 @@
 
 --- a/sbin/route/route.c
 +++ b/sbin/route/route.c
-@@ -63,10 +63,13 @@
+@@ -64,10 +64,13 @@
  #include <paths.h>
  #include <stdio.h>
  #include <stdlib.h>
@@ -18,19 +18,10 @@
 +#include "../../lib/linkaddr.h"
  
  struct keytab {
- 	char	*kt_cp;
-@@ -110,7 +113,7 @@
- int	prefixlen();
- extern	char *iso_ntoa();
- 
--void usage(const char *) __dead2;
-+void usage(const char *);
- 
- void
- usage(cp)
-@@ -134,7 +137,7 @@
+ 	const char	*kt_cp;
+@@ -148,7 +151,7 @@
  	if (argc < 2)
- 		usage((char *)NULL);
+ 		usage(NULL);
  
 -	while ((ch = getopt(argc, argv, "nqdtv")) != -1)
 +	while ((ch = getopt(argc, argv, "+nqdtv")) != -1)
@@ -42,7 +33,7 @@
 @@ -7,6 +7,7 @@
  MAN=	route.8
  SRCS=	route.c keywords.h
- WARNS?=	0
+ WARNS?=	3
 +LDADD= ../../lib/linkaddr.o
  CLEANFILES+=keywords.h _keywords.tmp
  

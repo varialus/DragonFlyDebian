@@ -16,7 +16,7 @@
  	char *name, *p, *spec, *fstype;
  	char mntpath[MAXPATHLEN], errmsg[255];
  	char hostname[MAXHOSTNAMELEN + 1], *gssname, gssn[MAXHOSTNAMELEN + 50];
-@@ -421,25 +419,14 @@
+@@ -417,25 +415,14 @@
  	build_iovec(&iov, &iovlen, "fspath", mntpath, (size_t)-1);
  	build_iovec(&iov, &iovlen, "errmsg", errmsg, sizeof(errmsg));
  
@@ -44,7 +44,7 @@
  static int
  findopt(struct iovec *iov, int iovlen, const char *name,
      char **valuep, int *lenp)
-@@ -661,16 +648,23 @@
+@@ -657,16 +644,23 @@
  
  	return nmount(newiov, newiovlen, mntflags);
  }
@@ -68,7 +68,7 @@
  	if (!strcmp(sec, "sys"))
  		return (AUTH_SYS);
  	return (-1);
-@@ -680,12 +674,18 @@
+@@ -676,12 +670,18 @@
  sec_num_to_name(int flavor)
  {
  	switch (flavor) {
@@ -87,7 +87,7 @@
  	case AUTH_SYS:
  		return ("sys");
  	}
-@@ -830,9 +830,11 @@
+@@ -826,9 +826,11 @@
  	freeaddrinfo(ai_nfs);
  
  	build_iovec(iov, iovlen, "hostname", nam, (size_t)-1);
@@ -107,7 +107,7 @@
  SRCS=	mount_nfs.c getmntopts.c mounttab.c
 +LDADD=	-ltirpc
  MAN=	mount_nfs.8
- MLINKS=	mount_nfs.8 mount_newnfs.8
+ MLINKS=	mount_nfs.8 mount_oldnfs.8
  
 --- a/usr.sbin/mountd/Makefile
 +++ b/usr.sbin/mountd/Makefile
@@ -128,7 +128,7 @@
  .include <bsd.prog.mk>
 --- a/usr.sbin/mountd/mountd.c
 +++ b/usr.sbin/mountd/mountd.c
-@@ -1926,12 +1926,18 @@
+@@ -2066,12 +2066,18 @@
  
  		if (!strcmp(seclist, "sys"))
  			flavor = AUTH_SYS;
@@ -149,70 +149,32 @@
  				*cp = savedc;
 --- a/usr.sbin/nfsd/Makefile
 +++ b/usr.sbin/nfsd/Makefile
-@@ -3,6 +3,8 @@
+@@ -3,5 +3,7 @@
  
  PROG=	nfsd
  MAN=	nfsd.8 nfsv4.4 stablerestart.5
 +CFLAGS+= -I${.CURDIR}/../../sys
 +LDADD=   -ltirpc -lbsd
  
- WARNS?=	6
- 
---- a/usr.sbin/nfsd/nfsd.c
-+++ b/usr.sbin/nfsd/nfsd.c
-@@ -849,13 +849,13 @@
- }
- 
- void
--nonfs(__attribute__((unused)) int signo)
-+nonfs(int signo)
- {
- 	syslog(LOG_ERR, "missing system call: NFS not available");
- }
- 
- void
--reapchild(__attribute__((unused)) int signo)
-+reapchild(int signo)
- {
- 	pid_t pid;
- 	int i;
-@@ -890,7 +890,7 @@
-  * Cleanup master after SIGUSR1.
-  */
- void
--cleanup(__attribute__((unused)) int signo)
-+cleanup(int signo)
- {
- 	nfsd_exit(0);
- }
-@@ -899,7 +899,7 @@
-  * Cleanup child after SIGUSR1.
-  */
- void
--child_cleanup(__attribute__((unused)) int signo)
-+child_cleanup(int signo)
- {
- 	exit(0);
- }
+ .include <bsd.prog.mk>
 --- a/usr.sbin/rpc.lockd/Makefile
 +++ b/usr.sbin/rpc.lockd/Makefile
-@@ -4,24 +4,26 @@
- PROG=	rpc.lockd
+@@ -5,23 +5,27 @@
  MAN=	rpc.lockd.8
  MLINKS=	rpc.lockd.8 lockd.8
--SRCS=	kern.c nlm_prot_svc.c lockd.c lock_proc.c lockd_lock.c
-+SRCS=	kern.c nlm_prot_svc.c nlm_prot_xdr.c lockd.c lock_proc.c lockd_lock.c sm_inter_xdr.c
+ SRCS=	kern.c nlm_prot_svc.c lockd.c lock_proc.c lockd_lock.c
++SRCS+=	nlm_prot_xdr.c sm_inter_xdr.c
  
 -CFLAGS+= -I. -I${DESTDIR}/usr/include/rpcsvc
 +CFLAGS+= -I. -I${.CURDIR}/../../include/rpcsvc
- #WARNS?= 2
+ WARNS?= 3
  
  DPADD=	${LIBRPCSVC} ${LIBUTIL}
 -LDADD=	-lrpcsvc -lutil
 +LDADD=	-ltirpc -lbsd
  
--CLEANFILES= nlm_prot_svc.c nlm_prot.h test
-+CLEANFILES= nlm_prot_svc.c nlm_prot_xdr.c nlm_prot.h test
+ CLEANFILES= nlm_prot_svc.c nlm_prot.h test
++CLEANFILES+= nlm_prot_xdr.c
  
 -RPCSRC= ${DESTDIR}/usr/include/rpcsvc/nlm_prot.x
 +RPCSRC= ${.CURDIR}/../../include/rpcsvc/nlm_prot.x
@@ -232,7 +194,7 @@
  	cc -o test ${.CURDIR}/test.c -lrpcsvc
 --- a/usr.sbin/rpc.lockd/lockd.c
 +++ b/usr.sbin/rpc.lockd/lockd.c
-@@ -187,8 +187,7 @@
+@@ -198,8 +198,7 @@
  		kernel_lockd = TRUE;
  	}
  	if (kernel_lockd) {
@@ -242,7 +204,7 @@
  	}
  
  	(void)rpcb_unset(NLM_PROG, NLM_SM, NULL);
-@@ -807,7 +806,7 @@
+@@ -997,7 +996,7 @@
  		ret = callrpc("localhost", SM_PROG, SM_VERS, SM_UNMON_ALL,
  		    (xdrproc_t)xdr_my_id, &id, (xdrproc_t)xdr_sm_stat, &stat);
  		if (ret == RPC_PROGUNAVAIL) {
@@ -251,7 +213,7 @@
  			    clnt_sperrno(ret));
  			sleep(2);
  			continue;
-@@ -816,7 +815,7 @@
+@@ -1006,7 +1005,7 @@
  	} while (0);
  
  	if (ret != 0) {
@@ -260,120 +222,6 @@
  		exit(1);
  	}
  
---- a/usr.sbin/rpc.lockd/lock_proc.c
-+++ b/usr.sbin/rpc.lockd/lock_proc.c
-@@ -770,7 +770,7 @@
-  */
- void *
- nlm_cancel_res_1_svc(arg, rqstp)
--	nlm_res *arg __attribute__((unused));
-+	nlm_res *arg;
- 	struct svc_req *rqstp;
- {
- 	if (debug_level)
-@@ -803,7 +803,7 @@
-  */
- void *
- nlm_granted_res_1_svc(arg, rqstp)
--	nlm_res *arg __attribute__((unused));
-+	nlm_res *arg;
- 	struct svc_req *rqstp;
- {
- 	if (debug_level)
-@@ -902,7 +902,7 @@
-  */
- void *
- nlm_free_all_3_svc(arg, rqstp)
--	nlm_notify *arg __attribute__((unused));
-+	nlm_notify *arg;
- 	struct svc_req *rqstp;
- {
- 	static char dummy;
-@@ -1260,7 +1260,7 @@
-  */
- void *
- nlm4_cancel_res_4_svc(arg, rqstp)
--	nlm4_res *arg __attribute__((unused));
-+	nlm4_res *arg;
- 	struct svc_req *rqstp;
- {
- 	if (debug_level)
-@@ -1275,7 +1275,7 @@
-  */
- void *
- nlm4_unlock_res_4_svc(arg, rqstp)
--	nlm4_res *arg __attribute__((unused));
-+	nlm4_res *arg;
- 	struct svc_req *rqstp;
- {
- 	if (debug_level)
-@@ -1290,7 +1290,7 @@
-  */
- void *
- nlm4_granted_res_4_svc(arg, rqstp)
--	nlm4_res *arg __attribute__((unused));
-+	nlm4_res *arg;
- 	struct svc_req *rqstp;
- {
- 	if (debug_level)
-@@ -1389,7 +1389,7 @@
-  */
- void *
- nlm4_free_all_4_svc(arg, rqstp)
--	struct nlm4_notify *arg __attribute__((unused));
-+	struct nlm4_notify *arg;
- 	struct svc_req *rqstp;
- {
- 	static char dummy;
-@@ -1407,7 +1407,7 @@
- void *
- nlm_sm_notify_0_svc(arg, rqstp)
- 	struct nlm_sm_status *arg;
--	struct svc_req *rqstp __attribute__((unused));
-+	struct svc_req *rqstp;
- {
- 	static char dummy;
- 	notify(arg->mon_name, arg->state);
---- a/usr.sbin/rpc.lockd/lockd_lock.c
-+++ b/usr.sbin/rpc.lockd/lockd_lock.c
-@@ -1176,8 +1176,8 @@
- 
- enum hwlock_status
- test_hwlock(fl, conflicting_fl)
--	const struct file_lock *fl __attribute__((unused));
--	struct file_lock **conflicting_fl __attribute__((unused));
-+	const struct file_lock *fl;
-+	struct file_lock **conflicting_fl;
- {
- 
- 	/*
-@@ -1891,7 +1891,7 @@
-  */
- 
- struct nlm4_holder *
--testlock(struct nlm4_lock *lock, bool_t exclusive, int flags __attribute__((unused)))
-+testlock(struct nlm4_lock *lock, bool_t exclusive, int flags)
- {
- 	struct file_lock test_fl, *conflicting_fl;
- 
-@@ -1991,7 +1991,7 @@
- 
- /* unlock a filehandle */
- enum nlm_stats
--unlock(nlm4_lock *lock, const int flags __attribute__((unused)))
-+unlock(nlm4_lock *lock, const int flags)
- {
- 	struct file_lock fl;
- 	enum nlm_stats err;
-@@ -2187,7 +2187,7 @@
- void
- send_granted(fl, opcode)
- 	struct file_lock *fl;
--	int opcode __attribute__((unused));
-+	int opcode;
- {
- 	CLIENT *cli;
- 	static char dummy;
 --- a/usr.sbin/rpc.lockd/kern.c
 +++ b/usr.sbin/rpc.lockd/kern.c
 @@ -51,8 +51,9 @@
@@ -387,24 +235,54 @@
  #include <nfs/nfsproto.h>
  #include <nfs/nfs_lock.h>
  
+--- a/usr.sbin/rpc.statd/statd.c
++++ b/usr.sbin/rpc.statd/statd.c
+@@ -58,6 +58,8 @@
+ 
+ #define	GETPORT_MAXTRY	20	/* Max tries to get a port # */
+ 
++extern void sm_prog_1(struct svc_req *rqstp, register SVCXPRT *transp);
++
+ int debug = 0;		/* Controls syslog() calls for debug messages	*/
+ 
+ char **hosts, *svcport_str = NULL;
+@@ -281,7 +283,7 @@
+   	free(port_list);
+   }
+ 
+-  init_file("/var/db/statd.status");
++  init_file("/var/lib/misc/statd.status");
+ 
+   /* Note that it is NOT sensible to run this program from inetd - the 	*/
+   /* protocol assumes that it will run immediately at boot time.	*/
+--- a/usr.sbin/rpc.statd/rpc.statd.8
++++ b/usr.sbin/rpc.statd/rpc.statd.8
+@@ -110,7 +110,7 @@
+ after the network has been started.
+ .Sh FILES
+ .Bl -tag -width /usr/include/rpcsvc/sm_inter.x -compact
+-.It Pa /var/db/statd.status
++.It Pa /var/lib/misc/statd.status
+ non-volatile record of currently monitored hosts.
+ .It Pa /usr/include/rpcsvc/sm_inter.x
+ RPC protocol specification used by local applications to register monitoring requests.
 --- a/usr.sbin/rpc.statd/Makefile
 +++ b/usr.sbin/rpc.statd/Makefile
-@@ -2,22 +2,25 @@
- 
+@@ -3,21 +3,26 @@
  PROG=	rpc.statd
  MAN=	rpc.statd.8
--SRCS=	file.c sm_inter_svc.c sm_inter.h statd.c procs.c
-+SRCS=	file.c sm_inter_svc.c sm_inter_xdr.c sm_inter.h statd.c procs.c
+ SRCS=	file.c sm_inter_svc.c sm_inter.h statd.c procs.c
++SRCS+=	sm_inter_xdr.c
  
  CFLAGS+= -I.
- #WARNS?= 2
+ WARNS?= 2
  
  DPADD=	${LIBRPCSVC}
 -LDADD=	-lrpcsvc
 +LDADD=	-ltirpc -lbsd
  
--CLEANFILES= sm_inter_svc.c sm_inter.h
-+CLEANFILES= sm_inter_svc.c sm_inter_xdr.c sm_inter.h
+ CLEANFILES= sm_inter_svc.c sm_inter.h
++CLEANFILES+= sm_inter_xdr.c
  
 -RPCSRC= ${DESTDIR}/usr/include/rpcsvc/sm_inter.x
 +RPCSRC= ${.CURDIR}/../../include/rpcsvc/sm_inter.x
@@ -419,81 +297,3 @@
  sm_inter.h: ${RPCSRC}
  	${RPCGEN} -h -o ${.TARGET} ${RPCSRC}
  
---- a/usr.sbin/rpc.statd/procs.c
-+++ b/usr.sbin/rpc.statd/procs.c
-@@ -257,7 +257,7 @@
- 		earlier call to sm_mon_1
- */
- 
--struct sm_stat *sm_unmon_1_svc(mon_id *arg, struct svc_req *req __attribute__((unused)))
-+struct sm_stat *sm_unmon_1_svc(mon_id *arg, struct svc_req *req)
- {
-   static sm_stat res;
-   HostInfo *hp;
-@@ -295,7 +295,7 @@
- 		host and program number.
- */
- 
--struct sm_stat *sm_unmon_all_1_svc(my_id *arg, struct svc_req *req __attribute__((unused)))
-+struct sm_stat *sm_unmon_all_1_svc(my_id *arg, struct svc_req *req)
- {
-   static sm_stat res;
-   HostInfo *hp;
-@@ -332,7 +332,7 @@
- 		and inform all hosts on the monitor list.
- */
- 
--void *sm_simu_crash_1_svc(void *v __attribute__((unused)), struct svc_req *req __attribute__((unused)))
-+void *sm_simu_crash_1_svc(void *v, struct svc_req *req)
- {
-   static char dummy;
-   int work_to_do;
-@@ -377,7 +377,7 @@
- 		that modify the list.
- */
- 
--void *sm_notify_1_svc(stat_chge *arg, struct svc_req *req __attribute__((unused)))
-+void *sm_notify_1_svc(stat_chge *arg, struct svc_req *req)
- {
-   struct timeval timeout = { 20, 0 };	/* 20 secs timeout		*/
-   CLIENT *cli;
---- a/usr.sbin/rpc.statd/statd.c
-+++ b/usr.sbin/rpc.statd/statd.c
-@@ -55,6 +55,8 @@
- #include <unistd.h>
- #include "statd.h"
- 
-+extern void sm_prog_1(struct svc_req *rqstp, register SVCXPRT *transp);
-+
- int debug = 0;		/* Controls syslog() calls for debug messages	*/
- 
- char **hosts, *svcport_str = NULL;
-@@ -189,7 +191,7 @@
- 	  }
-   }
-   endnetconfig(nc_handle);
--  init_file("/var/db/statd.status");
-+  init_file("/var/lib/misc/statd.status");
- 
-   /* Note that it is NOT sensible to run this program from inetd - the 	*/
-   /* protocol assumes that it will run immediately at boot time.	*/
-@@ -446,7 +448,7 @@
- 		children to exit when they have done their work.
- */
- 
--static void handle_sigchld(int sig __attribute__((unused)))
-+static void handle_sigchld(int sig)
- {
-   int pid, status;
-   pid = wait4(-1, &status, WNOHANG, (struct rusage*)0);
---- a/usr.sbin/rpc.statd/rpc.statd.8
-+++ b/usr.sbin/rpc.statd/rpc.statd.8
-@@ -110,7 +110,7 @@
- after the network has been started.
- .Sh FILES
- .Bl -tag -width /usr/include/rpcsvc/sm_inter.x -compact
--.It Pa /var/db/statd.status
-+.It Pa /var/lib/misc/statd.status
- non-volatile record of currently monitored hosts.
- .It Pa /usr/include/rpcsvc/sm_inter.x
- RPC protocol specification used by local applications to register monitoring requests.
