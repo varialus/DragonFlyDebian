@@ -32,7 +32,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)errno.h	8.5 (Berkeley) 1/21/94
- * based on $FreeBSD: src/sys/sys/errno.h,v 1.28 2005/04/02 12:33:28 das Exp $
+ * $FreeBSD$
  */
 
 #ifdef _ERRNO_H
@@ -149,15 +149,26 @@
 #define	EILSEQ		86		/* Illegal byte sequence */
 #define	ENOATTR		87		/* Attribute not found */
 
-#define EDOOFUS		88		/* Programming error */
+#define	EDOOFUS		88		/* Programming error */
 
 #define	EBADMSG		89		/* Bad message */
 #define	EMULTIHOP	90		/* Multihop attempted */
 #define	ENOLINK		91		/* Link has been severed */
 #define	EPROTO		92		/* Protocol error */
+
 #define	ENOTCAPABLE	93		/* Capabilities insufficient */
 
 #define	ELAST		93		/* Must be equal largest errno */
+
+#ifdef _KERNEL
+/* pseudo-errors returned inside kernel to modify return to process */
+#define	ERESTART	(-1)		/* restart syscall */
+#define	EJUSTRETURN	(-2)		/* don't modify regs, just return */
+#define	ENOIOCTL	(-3)		/* ioctl not handled by this layer */
+#define	EDIRIOCTL	(-4)		/* do direct ioctl in GEOM */
+#endif
+
+#endif
 
 # ifndef __ASSEMBLER__
 /* Function to get address of global `errno' variable.  */
