@@ -28,9 +28,9 @@ else
 endif
 
 SOURCE = freebsd-libs
-#SVN		:= http://svn.freebsd.org/base/release/$(version).0
+SVN		:= http://svn.freebsd.org/base/release/$(version).0
 #SVN		:= http://svn.freebsd.org/base/releng/$(version)
-SVN		:= http://svn.freebsd.org/base/stable/$(major)
+#SVN		:= http://svn.freebsd.org/base/stable/$(major)
 #SVN		:= http://svn.freebsd.org/base/head
 ORIGDIR = $(SOURCE)-$(tar_version)
 TARNAME = $(SOURCE)_$(tar_version).orig.tar.gz
@@ -39,7 +39,6 @@ PATH := /usr/lib/freebsd:$(PATH)
 DESTDIR = $(CURDIR)/debian/tmp
 PMAKE = COPTS="$(CFLAGS)" CFLAGS="$(CFLAGS) -isystem /usr/include/freebsd -I$(CURDIR)/debian/local/include" NO_WERROR=1 NOGCCERROR=1 \
         NOSHARED=NO NO_SHARED=NO NO_PROFILE=1 DESTDIR=$(DESTDIR) make
-export SHLIB_MAJOR = 0
 kernel = $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
 get-orig-source:
@@ -55,7 +54,7 @@ get-orig-source:
 	         sys/kern/subr_sbuf.c \
 	         sys/sys/sbuf.h \
 	         share/misc/usb_hid_usages ; do \
-	    svn export -r $(svn_revision) $(SVN)/$$i $(ORIGDIR)/$$i ; \
+	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
 	# Remove unused files with non GPL compatible license (eg BSD 4 clauses)
 	rm -f $(ORIGDIR)/sys/cam/scsi/scsi_ch.*
@@ -221,8 +220,8 @@ binary-arch: build install
 ifeq ($(kernel), kfreebsd)
 	dh_makeshlibs -plibgeom1 --add-udeb=libgeom1-udeb
 	dh_makeshlibs -plibipx2 --add-udeb=libipx2-udeb
-	dh_makeshlibs -plibsbuf0 --add-udeb=libsbuf0-udeb
-	dh_makeshlibs -plibusb2 --add-udeb=libusb2-udeb
+	dh_makeshlibs -plibsbuf6 --add-udeb=libsbuf6-udeb
+	dh_makeshlibs -plibusb2debian --add-udeb=libusb2debian-udeb
 endif
 	dh_installdeb -a
 	dh_shlibdeps -a

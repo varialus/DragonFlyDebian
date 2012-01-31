@@ -1,0 +1,26 @@
+
+This happened because of "downgrading" 8.3-STABLE to 9.0-RELEASE,
+some commits which hadn't made it to 9.0-RELEASE were MFC'ed to
+8.3-STABLE, adding new symbols. Upgrading to 9.0 removed them.
+
+--- a/lib/libusb/Makefile
++++ b/lib/libusb/Makefile
+@@ -6,7 +6,7 @@
+ 
+ LIB=		usb
+ SHLIB_MAJOR=	2
+-SHLIB_MINOR=	0
++SHLIB_MINOR=	1
+ SRCS=		libusb20.c
+ SRCS+=		libusb20_desc.c
+ SRCS+=		libusb20_ugen20.c
+--- a/lib/libusbhid/Makefile
++++ b/lib/libusbhid/Makefile
+@@ -6,6 +6,7 @@
+ 
+ LDADD= -lbsd
+ SHLIB_MAJOR= 4
++SHLIB_MINOR= 1
+ 
+ MLINKS=	usbhid.3 libusbhid.3 usbhid.3 hid_get_report_desc.3 \
+ 	usbhid.3 hid_dispose_report_desc.3 \

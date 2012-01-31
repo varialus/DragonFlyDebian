@@ -1,0 +1,22 @@
+--- a/lib/libmemstat/memstat_uma.c
++++ b/lib/libmemstat/memstat_uma.c
+@@ -305,6 +305,7 @@
+ 	char name[MEMTYPE_MAXNAME];
+ 	cpuset_t all_cpus;
+ 	long cpusetsize;
++	size_t len;
+ 	kvm_t *kvm;
+ 
+ 	kvm = (kvm_t *)kvm_handle;
+@@ -328,8 +329,9 @@
+ 		list->mtl_error = ret;
+ 		return (-1);
+ 	}
+-	cpusetsize = sysconf(_SC_CPUSET_SIZE);
+-	if (cpusetsize == -1 || (u_long)cpusetsize > sizeof(cpuset_t)) {
++	len = sizeof(cpusetsize);
++	if (sysctlbyname("kern.sched.cpusetsize", &cpusetsize, &len, NULL,
++	    0) == -1 || (u_long)cpusetsize > sizeof(cpuset_t)) {
+ 		list->mtl_error = MEMSTAT_ERROR_KVM_NOSYMBOL;
+ 		return (-1);
+ 	}

@@ -1,12 +1,12 @@
 --- a/lib/libsbuf/Makefile
 +++ b/lib/libsbuf/Makefile
-@@ -4,6 +4,7 @@
- SHLIBDIR?= /lib
- SRCS=	subr_sbuf.c 
- WARNS?= 2
-+CFLAGS+= -I${.CURDIR}/../../sys
+@@ -3,6 +3,7 @@
+ LIB=		sbuf
+ SHLIBDIR?= 	/lib
+ SRCS=		subr_sbuf.c 
++CFLAGS+=	-I${.CURDIR}/../../sys
  
- .PATH:	${.CURDIR}/../../sys/kern
+ SHLIB_MAJOR	= 6
  
 --- a/sys/sys/sbuf.h
 +++ b/sys/sys/sbuf.h
@@ -19,4 +19,4 @@
 +#include <stdarg.h>
  
  struct sbuf;
- struct sbuf_drain_data;
+ typedef int (sbuf_drain_func)(void *, const char *, int);

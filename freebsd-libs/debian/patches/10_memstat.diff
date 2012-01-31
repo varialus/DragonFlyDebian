@@ -18,8 +18,8 @@
 +#include <stdint.h>
 +
  /*
-  * Number of CPU slots in library-internal data structures.  This should be
-  * at least the value of MAXCPU from param.h.
+  * Amount of caller data to maintain for each caller data slot.  Applications
+  * must not request more than this number of caller save data, or risk
 --- a/lib/libmemstat/memstat_malloc.c
 +++ b/lib/libmemstat/memstat_malloc.c
 @@ -44,10 +44,10 @@
@@ -36,7 +36,7 @@
  };
  
  /*
-@@ -253,6 +253,10 @@
+@@ -242,6 +242,10 @@
  	return (0);
  }
  
@@ -49,7 +49,7 @@
  {
 --- a/lib/libmemstat/memstat_uma.c
 +++ b/lib/libmemstat/memstat_uma.c
-@@ -49,12 +49,12 @@
+@@ -51,12 +51,12 @@
  
  static struct nlist namelist[] = {
  #define	X_UMA_KEGS	0

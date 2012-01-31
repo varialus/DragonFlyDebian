@@ -44,25 +44,16 @@ they're used by external programs.  Manual patching is required...
  int	NgRecvMsg(int, struct ng_mesg *, size_t, char *);
 --- a/lib/libusb/libusb.h
 +++ b/lib/libusb/libusb.h
-@@ -242,7 +242,7 @@
+@@ -228,7 +228,7 @@
  	uint8_t	bSynchAddress;
  	uint8_t *extra;
  	int	extra_length;
 -}	libusb_endpoint_descriptor __aligned(sizeof(void *));
 +}	libusb_endpoint_descriptor __attribute__((__aligned__(sizeof(void *))));
  
- typedef struct libusb_ss_endpoint_companion_descriptor {
- 	uint8_t bLength;
-@@ -250,7 +250,7 @@
- 	uint8_t bMaxBurst;
- 	uint8_t bmAttributes;
- 	uint16_t wBytesPerInterval;
--}	libusb_ss_endpoint_companion_descriptor __aligned(sizeof(void *));
-+}	libusb_ss_endpoint_companion_descriptor __attribute__((__aligned__(sizeof(void *))));
- 
  typedef struct libusb_interface_descriptor {
  	uint8_t	bLength;
-@@ -265,12 +265,12 @@
+@@ -243,12 +243,12 @@
  	struct libusb_endpoint_descriptor *endpoint;
  	uint8_t *extra;
  	int	extra_length;
@@ -77,43 +68,16 @@ they're used by external programs.  Manual patching is required...
  
  typedef struct libusb_config_descriptor {
  	uint8_t	bLength;
-@@ -284,7 +284,7 @@
+@@ -262,7 +262,7 @@
  	struct libusb_interface *interface;
  	uint8_t *extra;
  	int	extra_length;
 -}	libusb_config_descriptor __aligned(sizeof(void *));
 +}	libusb_config_descriptor __attribute__((__aligned__(sizeof(void *))));
  
- typedef struct libusb_usb_2_0_device_capability_descriptor {
- 	uint8_t bLength;
-@@ -292,7 +292,7 @@
- 	uint8_t bDevCapabilityType;
- 	uint32_t bmAttributes;
- #define LIBUSB_USB_2_0_CAPABILITY_LPM_SUPPORT  (1 << 1)
--}	libusb_usb_2_0_device_capability_descriptor __aligned(sizeof(void *));
-+}	libusb_usb_2_0_device_capability_descriptor __attribute__((__aligned__(sizeof(void *))));
- 
- typedef struct libusb_ss_usb_device_capability_descriptor {
- 	uint8_t bLength;
-@@ -308,7 +308,7 @@
- 	uint8_t bFunctionalitySupport;
- 	uint8_t bU1DevExitLat;
- 	uint16_t wU2DevExitLat;
--}	libusb_ss_usb_device_capability_descriptor __aligned(sizeof(void *));
-+}	libusb_ss_usb_device_capability_descriptor __attribute__((__aligned__(sizeof(void *))));
- 
- typedef struct libusb_bos_descriptor {
- 	uint8_t bLength;
-@@ -317,7 +317,7 @@
- 	uint8_t bNumDeviceCapabilities;
- 	struct libusb_usb_2_0_device_capability_descriptor *usb_2_0_ext_cap;
- 	struct libusb_ss_usb_device_capability_descriptor *ss_usb_cap;
--}	libusb_bos_descriptor __aligned(sizeof(void *));
-+}	libusb_bos_descriptor __attribute__((__aligned__(sizeof(void *))));
- 
  typedef struct libusb_control_setup {
  	uint8_t	bmRequestType;
-@@ -333,7 +333,7 @@
+@@ -278,7 +278,7 @@
  	uint32_t length;
  	uint32_t actual_length;
  	enum libusb_transfer_status status;
@@ -122,7 +86,7 @@ they're used by external programs.  Manual patching is required...
  
  typedef void (*libusb_transfer_cb_fn) (struct libusb_transfer *transfer);
  
-@@ -352,7 +352,7 @@
+@@ -297,7 +297,7 @@
  	void *os_priv;
  	int	num_iso_packets;
  	struct libusb_iso_packet_descriptor iso_packet_desc[0];
@@ -151,7 +115,7 @@ they're used by external programs.  Manual patching is required...
  
  #define	LIBUSB20_ME_UINT8_T(n, field, arg, ismeta) \
    LIBUSB20_ME_INTEGER(n, field, ismeta, UN, u, 8, , 1)
-@@ -557,7 +557,7 @@
+@@ -498,7 +498,7 @@
  struct libusb20_endpoint {
  	struct LIBUSB20_ENDPOINT_DESC_DECODED desc;
  	struct libusb20_me_struct extra;
@@ -160,7 +124,7 @@ they're used by external programs.  Manual patching is required...
  
  struct libusb20_interface {
  	struct LIBUSB20_INTERFACE_DESC_DECODED desc;
-@@ -566,14 +566,14 @@
+@@ -507,14 +507,14 @@
  	struct libusb20_endpoint *endpoints;
  	uint8_t	num_altsetting;
  	uint8_t	num_endpoints;

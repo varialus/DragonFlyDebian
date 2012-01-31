@@ -14,11 +14,11 @@
  #include <stdlib.h>
 +#include <stdint.h>
  #include <stdio.h>
+ #include <string.h>
  #include <camlib.h>
- #endif /* _KERNEL */
 --- a/sys/cam/cam_xpt.c
 +++ b/sys/cam/cam_xpt.c
-@@ -221,7 +221,7 @@
+@@ -230,7 +230,7 @@
  static void	 xpt_run_dev_allocq(struct cam_eb *bus);
  static void	 xpt_run_dev_sendq(struct cam_eb *bus);
  static timeout_t xpt_release_devq_timeout;
@@ -29,7 +29,7 @@
  		    u_int count, int run_queue);
 --- a/sys/cam/scsi/scsi_all.c
 +++ b/sys/cam/scsi/scsi_all.c
-@@ -41,6 +41,7 @@
+@@ -43,6 +43,7 @@
  #include <sys/sysctl.h>
  #else
  #include <errno.h>
@@ -39,7 +39,7 @@
  #include <string.h>
 --- a/sys/cam/scsi/scsi_all.h
 +++ b/sys/cam/scsi/scsi_all.h
-@@ -32,6 +32,8 @@
+@@ -33,6 +33,8 @@
   * bus reset.
   */
  extern int scsi_delay;

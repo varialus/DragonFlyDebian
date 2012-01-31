@@ -23,11 +23,11 @@
  SHLIBDIR?= /lib
 -CFLAGS+=-DLIBC_SCCS -I${.CURDIR}
  
- .if ${MACHINE} == "sun4v"
- CFLAGS+=-DSUN4V
+ .if exists(${.CURDIR}/kvm_${MACHINE_ARCH}.c)
+ KVM_ARCH=${MACHINE_ARCH}
 --- a/lib/libkvm/kvm.c
 +++ b/lib/libkvm/kvm.c
-@@ -70,6 +70,10 @@
+@@ -71,6 +71,10 @@
  #include <strings.h>
  #include <unistd.h>
  
@@ -38,15 +38,15 @@
  #include "kvm_private.h"
  
  /* from src/lib/libc/gen/nlist.c */
-@@ -151,6 +155,7 @@
- 	char *errout;
+@@ -144,6 +148,7 @@
+ _kvm_open(kvm_t *kd, const char *uf, const char *mf, int flag, char *errout)
  {
  	struct stat st;
 +	static char name[MAXPATHLEN];
  
  	kd->vmfd = -1;
  	kd->pmfd = -1;
-@@ -160,8 +165,17 @@
+@@ -153,8 +158,17 @@
  	kd->argspc = 0;
  	kd->argv = 0;
  
@@ -66,24 +66,6 @@
  	else if (strlen(uf) >= MAXPATHLEN) {
  		_kvm_err(kd, kd->program, "exec file name too long");
  		goto failed;
-@@ -244,7 +258,7 @@
- kvm_openfiles(uf, mf, sf, flag, errout)
- 	const char *uf;
- 	const char *mf;
--	const char *sf __unused;
-+	const char *sf;
- 	int flag;
- 	char *errout;
- {
-@@ -262,7 +276,7 @@
- kvm_open(uf, mf, sf, flag, errstr)
- 	const char *uf;
- 	const char *mf;
--	const char *sf __unused;
-+	const char *sf;
- 	int flag;
- 	const char *errstr;
- {
 --- a/lib/libkvm/kvm_file.c
 +++ b/lib/libkvm/kvm_file.c
 @@ -59,7 +59,7 @@
@@ -95,15 +77,15 @@
  #include <paths.h>
  #include <stdlib.h>
  
-@@ -80,6 +80,7 @@
- 	int op, arg, nprocs;
- 	long allproc_o;
+@@ -78,6 +78,7 @@
+ kvm_deadfiles(kvm_t *kd, int op __unused, int arg __unused, long allproc_o,
+     int nprocs __unused)
  {
 +#if 0
  	struct proc proc;
  	struct filedesc filed;
  	int buflen = kd->arglen, ocnt = 0, n = 0, once = 0, i;
-@@ -151,6 +152,7 @@
+@@ -149,6 +150,7 @@
  	return (n);
  fail:
  	free(ofiles);
@@ -111,7 +93,7 @@
  	return (0);
  	
  }
-@@ -166,6 +168,7 @@
+@@ -161,6 +163,7 @@
  
  	_kvm_syserr(kd, kd->program, "kvm_getfiles has been broken for years");
  	return (0);
@@ -119,7 +101,7 @@
  	if (ISALIVE(kd)) {
  		size = 0;
  		mib[0] = CTL_KERN;
-@@ -228,4 +231,6 @@
+@@ -223,4 +226,6 @@
  	}
  	*cnt = nfiles;
  	return (kd->argspc);
@@ -128,47 +110,22 @@
  }
 --- a/lib/libkvm/kvm_getloadavg.c
 +++ b/lib/libkvm/kvm_getloadavg.c
-@@ -44,15 +44,21 @@
- #include <limits.h>
- #include <nlist.h>
- #include <kvm.h>
+@@ -55,6 +55,12 @@
+ 	{ .n_name = "" },
+ };
+ 
 +#include <sys/_types.h>
- 
- #include "kvm_private.h"
- 
- static struct nlist nl[] = {
--	{ "_averunnable" },
-+	{ { "_averunnable" } },
- #define	X_AVERUNNABLE	0
--	{ "_fscale" },
-+	{ { "_fscale" } },
- #define	X_FSCALE	1
--	{ "" },
-+	{ { "" } },
-+};
-+
 +struct loadavg {
 +	__fixpt_t       ldavg[3];
 +	long            fscale;
- };
- 
++};
++
  /*
+  * kvm_getloadavg() -- Get system load averages, from live or dead kernels.
+  *
 --- a/lib/libkvm/kvm_getswapinfo.c
 +++ b/lib/libkvm/kvm_getswapinfo.c
-@@ -51,9 +51,9 @@
- #include "kvm_private.h"
- 
- static struct nlist kvm_swap_nl[] = {
--	{ "_swtailq" },		/* list of swap devices and sizes */
--	{ "_dmmax" },		/* maximum size of a swap block */
--	{ NULL }
-+	{ { "_swtailq" } },		/* list of swap devices and sizes */
-+	{ { "_dmmax" } },		/* maximum size of a swap block */
-+	{ { NULL } }
- };
- 
- #define NL_SWTAILQ	0
-@@ -210,8 +210,10 @@
+@@ -200,8 +200,10 @@
  			swap_ary[unswdev].ksw_total = ttl;
  			swap_ary[unswdev].ksw_used = xsd.xsw_used;
  			swap_ary[unswdev].ksw_flags = xsd.xsw_flags;
@@ -238,15 +195,15 @@
  #include <sys/user.h>
  #include <sys/proc.h>
  #define	_WANT_PRISON	/* make jail.h give us 'struct prison' */
-@@ -101,6 +101,7 @@
- 	struct kinfo_proc *bp;
- 	int maxcnt;
+@@ -116,6 +116,7 @@
+ kvm_proclist(kvm_t *kd, int what, int arg, struct proc *p,
+     struct kinfo_proc *bp, int maxcnt)
  {
 +#if 0
  	int cnt = 0;
  	struct kinfo_proc kinfo_proc, *kp;
  	struct pgrp pgrp;
-@@ -427,6 +428,8 @@
+@@ -440,6 +441,8 @@
  		++cnt;
  	}
  	return (cnt);
@@ -255,37 +212,9 @@
  }
  
  /*
---- a/lib/libkvm/kvm_cptime.c
-+++ b/lib/libkvm/kvm_cptime.c
-@@ -44,8 +44,8 @@
- #include "kvm_private.h"
- 
- static struct nlist kvm_cp_time_nl[] = {
--	{ "_cp_time" },			/* (deprecated) */
--	{ NULL },
-+	{ { "_cp_time" } },			/* (deprecated) */
-+	{ { NULL } },
- };
- 
- #define	NL_CP_TIME		0
---- a/lib/libkvm/kvm_pcpu.c
-+++ b/lib/libkvm/kvm_pcpu.c
-@@ -48,9 +48,9 @@
- #include "kvm_private.h"
- 
- static struct nlist kvm_pcpu_nl[] = {
--	{ "_cpuid_to_pcpu" },
--	{ "_mp_maxcpus" },
--	{ NULL },
-+	{ { "_cpuid_to_pcpu" } },
-+	{ { "_mp_maxcpus" } },
-+	{ { NULL } },
- };
- 
- /*
 --- a/lib/libkvm/kvm_vnet.c
 +++ b/lib/libkvm/kvm_vnet.c
-@@ -69,18 +69,18 @@
+@@ -68,18 +68,18 @@
  		 * here to __{start,stop}_set_vnet.
  		 */
  #define	NLIST_START_VNET	0
@@ -309,5 +238,5 @@
 +		{ "proc0" },
 +		{ NULL },
  	};
- 	uintptr_t procp, tdp, credp;
- 	lwpid_t dumptid;
+ 	uintptr_t procp, credp;
+ #define	VMCORE_VNET_OF_PROC0

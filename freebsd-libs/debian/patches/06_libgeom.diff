@@ -1,10 +1,3 @@
----
- lib/libgeom/Makefile        |    3 ++-
- lib/libgeom/geom_ctl.c      |    3 +++
- lib/libgeom/geom_stats.c    |    2 +-
- lib/libgeom/geom_xml2tree.c |    2 +-
- 4 files changed, 7 insertions(+), 3 deletions(-)
-
 --- a/lib/libgeom/Makefile
 +++ b/lib/libgeom/Makefile
 @@ -1,6 +1,7 @@
@@ -24,18 +17,6 @@
  
  MAN=	libgeom.3
  
---- a/lib/libgeom/geom_ctl.c
-+++ b/lib/libgeom/geom_ctl.c
-@@ -167,6 +167,9 @@
- 	if (ap->name == NULL)
- 		return;
- 	ap->nlen = strlen(ap->name) + 1;
-+#ifndef __DECONST
-+#define __DECONST(type, var)	((type)(uintptr_t)(const void *)(var))
-+#endif
- 	ap->value = __DECONST(void *, value);
- 	ap->flag = GCTL_PARAM_RD;
- 	if (len >= 0)
 --- a/lib/libgeom/geom_stats.c
 +++ b/lib/libgeom/geom_stats.c
 @@ -34,11 +34,11 @@
