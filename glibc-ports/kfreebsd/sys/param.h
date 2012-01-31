@@ -42,6 +42,9 @@
 #include <sys/types.h>
 #include <stdint.h>
 
+/* FreeBSD code expects that this file implicitly defines SIG* macros.  */
+#include <signal.h>
+
 /*
  * Machine-independent constants (some used in following include files).
  * Redefined constants are from POSIX 1003.1 limits file.
