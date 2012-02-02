@@ -22,7 +22,7 @@
 
 /* Read or write system parameters.  */
 int
-__sysctlbyname (const char *name, void *oldval, size_t *oldlenp, void *newval, size_t newlen)
+__sysctlbyname (const char *name, void *oldval, size_t *oldlenp, const void *newval, size_t newlen)
 {
   int request[CTL_MAXNAME+2];
   size_t requestlen = CTL_MAXNAME+2;
