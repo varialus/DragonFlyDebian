@@ -387,9 +387,7 @@ int	unmount(const char *, int);
  * and if it is resident, return its xvfsconf structure.
  */
 static inline int
-getvfsbyname(fsname, vfcp)
-	const char *fsname;
-	struct xvfsconf *vfcp;
+getvfsbyname(const char *fsname, struct xvfsconf *vfcp)
 {
 	struct xvfsconf *xvfsp;
 	size_t buflen;
