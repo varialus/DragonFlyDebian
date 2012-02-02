@@ -123,27 +123,6 @@ Temporary patch, may hopefully be removed after glibc update.
  
  DPADD=	${LIBUTIL}
  LDADD=	-ltirpc -lbsd
---- a/usr.bin/kdump/kdump.c
-+++ b/usr.bin/kdump/kdump.c
-@@ -43,7 +43,7 @@
- 
- #define _KERNEL
- extern int errno;
--#include <sys/errno.h>
-+#include "/usr/include/sys/errno.h"
- #undef _KERNEL
- #include <sys/param.h>
- #include <sys/errno.h>
-@@ -484,7 +484,8 @@
- 	(void)printf("%s  ", type);
- }
- 
--#include <sys/syscall.h>
-+#undef _SYSCALL_H
-+#include "/usr/include/sys/syscall.h"
- #define KTRACE
- #include <sys/kern/syscalls.c>
- #undef KTRACE
 --- a/sbin/ifconfig/ifconfig.c
 +++ b/sbin/ifconfig/ifconfig.c
 @@ -311,7 +311,7 @@
