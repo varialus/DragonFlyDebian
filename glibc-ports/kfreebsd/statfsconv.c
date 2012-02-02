@@ -162,7 +162,6 @@ statfs5_to_statvfs (const struct statfs_fbsd5 *pk, struct statvfs *p32)
   p32->f_flag		=
       (pk->f_flags & MNT_RDONLY ? ST_RDONLY : 0)
     | (pk->f_flags & MNT_NOSUID ? ST_NOSUID : 0)
-    | (pk->f_flags & MNT_NODEV ? ST_NODEV : 0)
     | (pk->f_flags & MNT_NOEXEC ? ST_NOEXEC : 0)
     | (pk->f_flags & MNT_SYNCHRONOUS ? ST_SYNCHRONOUS : 0)
     | (pk->f_flags & MNT_NOATIME ? ST_NOATIME : 0);
@@ -195,7 +194,6 @@ statfs5_to_statvfs64 (const struct statfs_fbsd5 *pk, struct statvfs64 *p64)
   p64->f_flag		=
       (pk->f_flags & MNT_RDONLY ? ST_RDONLY : 0)
     | (pk->f_flags & MNT_NOSUID ? ST_NOSUID : 0)
-    | (pk->f_flags & MNT_NODEV ? ST_NODEV : 0)
     | (pk->f_flags & MNT_NOEXEC ? ST_NOEXEC : 0)
     | (pk->f_flags & MNT_SYNCHRONOUS ? ST_SYNCHRONOUS : 0)
     | (pk->f_flags & MNT_NOATIME ? ST_NOATIME : 0);
