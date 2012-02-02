@@ -168,8 +168,6 @@
 #define	EDIRIOCTL	(-4)		/* do direct ioctl in GEOM */
 #endif
 
-#endif
-
 # ifndef __ASSEMBLER__
 /* Function to get address of global `errno' variable.  */
 extern int *__errno_location (void) __THROW __attribute__ ((__const__));
