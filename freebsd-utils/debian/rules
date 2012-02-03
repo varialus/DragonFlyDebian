@@ -337,6 +337,7 @@ binary-arch: build install
 	dh_installinit -pfreebsd-nfs-common --name=nfsiod -- start 20 2 3 4 5 S . stop 20 0 1 6 .
 	dh_installinit -pfreebsd-nfs-server --name=mountd -- start 20 2 3 4 5 S . stop 80 0 1 6 .
 	dh_installinit -pfreebsd-nfs-server --name=nfsd -- start 20 2 3 4 5 S . stop 80 0 1 6 .
+	dh_installinit -pgeom --no-restart-on-upgrade --name=geli -- start 26 S . stop 50 0 6 .
 #	dh_installcron
 #	dh_installinfo
 	dh_installman
