@@ -1,0 +1,26 @@
+#!/usr/bin/make -f
+
+SHELL = bash
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
+version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
+major           := $(shell echo $(version) | sed -e 's/\..*//g')
+
+%:
+	dh $@
+
+control: clean
+	sed -e "s/@major@/$(major)/g" -e "s/@flavor@/$$flavor/g" \
+		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
+	echo >> $(CURDIR)/debian/control
+	for arch in `ls $(CURDIR)/debian/arch/` ; do \
+		for config in `ls $(CURDIR)/debian/arch/$$arch/ | grep \.config` ; do \
+			flavor=$${config/.config/} ; \
+			sed -e "s/@major@/$(major)/g" -e "s/@flavor@/$$flavor/g" -e "s/@arch@/$$arch/g" \
+				$(CURDIR)/debian/control.flavor.in ; \
+			echo ; \
+		done ; \
+	done >> $(CURDIR)/debian/control
