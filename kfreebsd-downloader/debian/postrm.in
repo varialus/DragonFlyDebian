@@ -20,11 +20,10 @@ set -e
 
 PATH="/sbin:/bin:/usr/sbin:/usr/bin"
 KERNEL_IMG_CONF="/etc/kernel-img.conf"
-RELEASE="9.0-RELEASE"
 
 case "$1" in
     remove|purge|upgrade)
-	rm -rf /lib/modules/${RELEASE} /boot/kfreebsd-${RELEASE}.gz
+	rm -rf /lib/modules/@RELEASE@ /boot/kfreebsd-@RELEASE@.gz
 
 	case "$1" in purge)
 		rm -rf /var/cache/kfreebsd-downloader ;;

@@ -19,18 +19,16 @@ set -e
 
 PATH="/sbin:/bin:/usr/sbin:/usr/bin"
 KERNEL_IMG_CONF="/etc/kernel-img.conf"
-RELEASE="9.0-RELEASE"
-ARCH="$(dpkg --print-architecture | sed -e "s/^kfreebsd-//")"
-MANIFEST="/usr/share/kfreebsd-downloader/MANIFEST.${ARCH}"
+MANIFEST="/usr/share/kfreebsd-downloader/MANIFEST.@ARCH@"
 
 case "$1" in
     configure)
-	cachedir="/var/cache/kfreebsd-downloader/${RELEASE}"
-	moduledir="/lib/modules/${RELEASE}"
+	cachedir="/var/cache/kfreebsd-downloader/@RELEASE@"
+	moduledir="/lib/modules/@RELEASE@"
 
 	# Download
 	mkdir -p ${cachedir}
-	wget http://ftp.freebsd.org/pub/FreeBSD/releases/${ARCH}/${ARCH}/${RELEASE}/kernel.txz \
+	wget http://ftp.freebsd.org/pub/FreeBSD/releases/@ARCH@/@ARCH@/@RELEASE@/kernel.txz \
 		-c -O ${cachedir}/kernel.txz
 
 	# Verify
@@ -39,12 +37,12 @@ case "$1" in
 	# Unpack
 	rm -rf ${moduledir}
 	mkdir -p ${moduledir}
-	echo "Unpacking kFreeBSD ${RELEASE} ..." >&2
+	echo "Unpacking kFreeBSD @RELEASE@ ..." >&2
 	tar --strip-components=3 -C ${moduledir} -xJf ${cachedir}/kernel.txz
 
 	# Install kernel image
-	gzip -9 < ${moduledir}/kernel > /boot/kfreebsd-${RELEASE}.gz
-	rm -f ${moduledir}/${RELEASE}/kernel
+	gzip -9 < ${moduledir}/kernel > /boot/kfreebsd-@RELEASE@.gz
+	rm -f ${moduledir}/@RELEASE@/kernel
 
 	########################################################################
 

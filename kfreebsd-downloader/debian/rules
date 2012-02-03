@@ -3,5 +3,19 @@
 
 #export DH_VERBOSE=1
 
+DEB_HOST_ARCH_CPU ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
+RELEASE = "9.0-RELEASE"
+
 %:
 	dh $@
+
+debian/%: debian/%.in
+	sed \
+		-e "s/@RELEASE@/$(RELEASE)/g" \
+		-e "s/@ARCH@/$(DEB_HOST_ARCH_CPU)/g" \
+	< $^ > $@
+
+override_dh_auto_build: debian/postinst debian/postrm
+
+override_dh_auto_clean:
+	rm -f debian/postinst debian/postrm
