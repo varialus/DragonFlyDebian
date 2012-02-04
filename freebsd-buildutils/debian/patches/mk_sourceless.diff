@@ -1,0 +1,27 @@
+
+Cherry-picked from upstream SVN rev 230972
+
+--- a/src/share/mk/bsd.own.mk
++++ b/src/share/mk/bsd.own.mk
+@@ -316,6 +316,9 @@
+     BOOT \
+     BSD_CPIO \
+     BSNMP \
++    SOURCELESS \
++    SOURCELESS_HOST \
++    SOURCELESS_UCODE \
+     BZIP2 \
+     CALENDAR \
+     CDDL \
+@@ -504,6 +507,11 @@
+ MK_BIND_ETC:=	no
+ .endif
+ 
++.if ${MK_SOURCELESS} == "no"
++MK_SOURCELESS_HOST:=	no
++MK_SOURCELESS_UCODE:= no
++.endif
++
+ .if ${MK_CDDL} == "no"
+ MK_ZFS:=	no
+ .endif
