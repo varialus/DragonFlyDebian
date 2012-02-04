@@ -56,6 +56,15 @@ enum __socket_type
 #define SOCK_SEQPACKET SOCK_SEQPACKET
 };
 
+/*
+ * Structure used by kernel to pass protocol
+ * information in raw sockets.
+ */
+struct sockproto {
+	unsigned short	sp_family;		/* address family */
+	unsigned short	sp_protocol;		/* protocol */
+};
+
 /* Protocol families.  */
 #define	PF_UNSPEC	0	/* Unspecified.  */
 #define	PF_LOCAL	1	/* Local to host (pipes and file-domain).  */
