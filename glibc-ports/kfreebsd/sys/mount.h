@@ -395,7 +395,7 @@ getvfsbyname(const char *fsname, struct xvfsconf *vfcp)
 
 	if (sysctlbyname("vfs.conflist", NULL, &buflen, NULL, 0) < 0)
 		return (-1);
-	xvfsp = malloc(buflen);
+	xvfsp = (struct xvfsconf *) malloc(buflen);
 	if (xvfsp == NULL)
 		return (-1);
 	if (sysctlbyname("vfs.conflist", xvfsp, &buflen, NULL, 0) < 0) {
