@@ -15,7 +15,7 @@
  
  SRCS=	deviceid.c \
  	fsshare.c \
-@@ -57,5 +58,6 @@
+@@ -58,5 +59,6 @@
  CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/lib/libnvpair
  CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/lib/libuutil/common
  CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/lib/libzfs/common
@@ -24,20 +24,20 @@
  .include <bsd.lib.mk>
 --- a/cddl/lib/libzpool/Makefile
 +++ b/cddl/lib/libzpool/Makefile
-@@ -54,13 +54,15 @@
- CFLAGS+=	-I${.CURDIR}/../../../lib/libpthread/thread
- CFLAGS+=	-I${.CURDIR}/../../../lib/libpthread/sys
- CFLAGS+=	-I${.CURDIR}/../../../lib/libthr/arch/${MACHINE_ARCH}/include
-+CFLAGS+=	-I${.CURDIR}/../../../lib/libmd
+@@ -57,12 +57,15 @@
+ CFLAGS+=	-I${.CURDIR}/../../../lib/libthr/arch/${MACHINE_CPUARCH}/include
  
  DPADD=		${LIBMD} ${LIBPTHREAD} ${LIBZ}
 -LDADD=		-lmd -lpthread -lz -lumem -lnvpair -lbsd -lrt
-+LDADD=		-lpthread -lz -lumem -lnvpair -lbsd -lrt
++LDADD=		     -lpthread -lz -lumem -lnvpair -lbsd -lrt
  
  LDADD+= -L${.CURDIR}/../../../cddl/lib/libumem
  LDADD+= -L${.CURDIR}/../../../cddl/lib/libnvpair
  LDADD+= ${.CURDIR}/../../../cddl/lib/libavl/libavl.a
-+LDADD+= ${.CURDIR}/../../../lib/libmd/libmd.a
  
++CFLAGS+= -I${.CURDIR}/../../../lib/libmd
++LDADD+= ${.CURDIR}/../../../lib/libmd/libmd.a
++
  # atomic.S doesn't like profiling.
  NO_PROFILE=
+ 

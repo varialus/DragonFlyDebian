@@ -6,9 +6,9 @@
  
 +LDADD= -lpthread -lrt -lbsd
 +
+ WARNS?=	0
  CFLAGS+= -DNATIVE_BUILD
  CFLAGS+= -I${.CURDIR}/../../../cddl/contrib/opensolaris/lib/libuutil/common
- CFLAGS+= -I${.CURDIR}/../../../sys/cddl/compat/opensolaris
 --- a/cddl/lib/libzfs/Makefile
 +++ b/cddl/lib/libzfs/Makefile
 @@ -7,7 +7,12 @@
@@ -27,8 +27,8 @@
  	fsshare.c \
 --- a/cddl/lib/libzpool/Makefile
 +++ b/cddl/lib/libzpool/Makefile
-@@ -56,7 +56,11 @@
- CFLAGS+=	-I${.CURDIR}/../../../lib/libthr/arch/${MACHINE_ARCH}/include
+@@ -57,7 +57,11 @@
+ CFLAGS+=	-I${.CURDIR}/../../../lib/libthr/arch/${MACHINE_CPUARCH}/include
  
  DPADD=		${LIBMD} ${LIBPTHREAD} ${LIBZ}
 -LDADD=		-lmd -lpthread -lz -lumem -lnvpair -lavl
@@ -42,7 +42,7 @@
  NO_PROFILE=
 --- a/cddl/sbin/zfs/Makefile
 +++ b/cddl/sbin/zfs/Makefile
-@@ -22,6 +22,12 @@
+@@ -23,6 +23,12 @@
  
  DPADD=	${LIBBSDXML} ${LIBGEOM} ${LIBM} ${LIBNVPAIR} ${LIBSBUF} ${LIBUMEM} \
  	${LIBUTIL} ${LIBUUTIL} ${LIBZFS}
@@ -58,7 +58,7 @@
  .include <bsd.prog.mk>
 --- a/cddl/sbin/zpool/Makefile
 +++ b/cddl/sbin/zpool/Makefile
-@@ -27,6 +27,12 @@
+@@ -28,6 +28,12 @@
  
  DPADD=	${LIBAVL} ${LIBBSDXML} ${LIBGEOM} ${LIBM} ${LIBNVPAIR} ${LIBSBUF} \
  	${LIBUMEM} ${LIBUTIL} ${LIBUUTIL} ${LIBZFS}
@@ -74,24 +74,21 @@
  .include <bsd.prog.mk>
 --- a/cddl/usr.bin/zinject/Makefile
 +++ b/cddl/usr.bin/zinject/Makefile
-@@ -20,6 +20,13 @@
+@@ -23,4 +23,11 @@
+ 	${LIBZFS} ${LIBZPOOL}
+ LDADD=	      -lgeom -lm -lnvpair -lumem -luutil -lzfs -lzpool
  
- DPADD=	${LIBAVL} ${LIBGEOM} ${LIBM} ${LIBNVPAIR} ${LIBUMEM} ${LIBUUTIL} \
- 	${LIBZFS} ${LIBZPOOL} ${LIBUUTIL}
--LDADD= -lgeom -lm -lnvpair -lumem -luutil -lzfs -lzpool
-+LDADD=	-lgeom -lm -lnvpair -lumem -luutil -lzfs -lzpool -lbsd
-+
++LDADD+= -lbsd
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libnvpair
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libumem
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libuutil
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libzfs
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libzpool
 +
- 
  .include <bsd.prog.mk>
 --- a/cddl/usr.bin/ztest/Makefile
 +++ b/cddl/usr.bin/ztest/Makefile
-@@ -18,7 +18,12 @@
+@@ -19,7 +19,12 @@
  
  DPADD=	${LIBM} ${LIBNVPAIR} ${LIBUMEM} ${LIBZPOOL} \
  	${LIBPTHREAD} ${LIBZ} ${LIBAVL}
@@ -107,16 +104,15 @@
  
 --- a/cddl/usr.sbin/zdb/Makefile
 +++ b/cddl/usr.sbin/zdb/Makefile
-@@ -24,6 +24,12 @@
+@@ -27,5 +27,11 @@
  	${LIBUUTIL} ${LIBZ} ${LIBZFS} ${LIBZPOOL}
  LDADD=	-lgeom -lm -lnvpair -lpthread -lumem -luutil -lzfs -lzpool
  
++LDADD+= -lbsd
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libnvpair
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libumem
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libuutil
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libzfs
 +LDADD+= -L${.CURDIR}/../../../cddl/lib/libzpool
-+
- CSTD=	c99
  
  .include <bsd.prog.mk>

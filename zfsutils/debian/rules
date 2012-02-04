@@ -10,8 +10,9 @@ SHELL=bash
 export DH_OPTIONS
 
 CFLAGS = -Wall -Wno-unknown-pragmas -g -pipe -fPIC -I. \
-         -D_GNU_SOURCE -DNEED_SOLARIS_BOOLEAN -D'__FBSDID(string)=' \
-         -D__va_list=__builtin_va_list
+         -D_GNU_SOURCE -DNEED_SOLARIS_BOOLEAN \
+	-isystem /usr/include/freebsd \
+	-D__va_list=__builtin_va_list
 
 ifneq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
 	CFLAGS += -O0
@@ -26,9 +27,9 @@ version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 
-#SVN		:= http://svn.freebsd.org/base/release/$(version).0
+SVN		:= http://svn.freebsd.org/base/release/$(version).0
 #SVN		:= http://svn.freebsd.org/base/releng/$(version)
-SVN		:= http://svn.freebsd.org/base/stable/$(major)
+#SVN		:= http://svn.freebsd.org/base/stable/$(major)
 #SVN		:= http://svn.freebsd.org/base/head
 
 SOURCE = zfsutils
@@ -72,7 +73,7 @@ get-orig-source:
 	         cddl/usr.bin/ztest \
 	         cddl/usr.sbin/zdb \
 	         ; do \
-	    svn export $(SVN)/$$i -r $(svn_revision) $(ORIGDIR)/$$i ; \
+	    svn export $(SVN)/$$i $(ORIGDIR)/$$i ; \
 	done
 	rm -f $(ORIGDIR)/cddl/compat/opensolaris/include/alloca.h
 	rm -f $(ORIGDIR)/cddl/compat/opensolaris/include/stdlib.h
