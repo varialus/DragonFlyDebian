@@ -44,15 +44,7 @@
  # ATA controllers
  device		ahci		# AHCI-compatible SATA controllers
  device		ata		# Legacy ATA/SATA controllers
-@@ -116,7 +115,6 @@
- device		trm		# Tekram DC395U/UW/F DC315U adapters
- 
- device		adv		# Advansys SCSI adapters
--device		adw		# Advansys wide SCSI adapters
- device		aic		# Adaptec 15[012]x SCSI adapters, AIC-6[23]60.
- device		bt		# Buslogic/Mylex MultiMaster SCSI adapters
- device		isci		# Intel C600 SAS controller
-@@ -185,10 +183,6 @@
+@@ -185,10 +184,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -63,7 +55,7 @@
  
  device		puc		# Multi I/O cards and multi-channel UARTs
  
-@@ -279,11 +268,8 @@
+@@ -279,11 +274,8 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
@@ -75,7 +67,7 @@
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -298,39 +284,9 @@
+@@ -298,39 +290,9 @@
  device		ehci		# EHCI PCI->USB interface (USB 2.0)
  device		xhci		# XHCI PCI->USB interface (USB 3.0)
  device		usb		# USB Bus (required)
@@ -115,7 +107,7 @@
  
  # FireWire support
  device		firewire	# FireWire bus code
-@@ -341,15 +297,15 @@
+@@ -341,15 +303,15 @@
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
  
@@ -198,15 +190,7 @@
  # ATA controllers
  device		ahci		# AHCI-compatible SATA controllers
  device		ata		# Legacy ATA/SATA controllers
-@@ -118,7 +119,6 @@
- device		trm		# Tekram DC395U/UW/F DC315U adapters
- 
- device		adv		# Advansys SCSI adapters
--device		adw		# Advansys wide SCSI adapters
- device		aha		# Adaptec 154x SCSI adapters
- device		aic		# Adaptec 15[012]x SCSI adapters, AIC-6[23]60.
- device		bt		# Buslogic/Mylex MultiMaster SCSI adapters
-@@ -195,10 +195,6 @@
+@@ -195,10 +196,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -217,7 +201,7 @@
  
  device		puc		# Multi I/O cards and multi-channel UARTs
  
-@@ -292,11 +283,8 @@
+@@ -292,11 +289,8 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
@@ -229,7 +213,7 @@
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -311,39 +299,9 @@
+@@ -311,39 +305,9 @@
  device		ehci		# EHCI PCI->USB interface (USB 2.0)
  device		xhci		# XHCI PCI->USB interface (USB 3.0)
  device		usb		# USB Bus (required)
@@ -269,7 +253,7 @@
  
  # FireWire support
  device		firewire	# FireWire bus code
-@@ -354,15 +312,15 @@
+@@ -354,15 +318,15 @@
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
  
@@ -293,3 +277,23 @@
 +options		ALTQ_RIO	# RED In/Out
 +options		ALTQ_HFSC	# Hierarchical Packet Scheduler (HFSC)
 +options		ALTQ_PRIQ	# Priority Queuing (PRIQ)
+--- a/sys/amd64/conf/WITHOUT_SOURCELESS_UCODE
++++ b/sys/amd64/conf/WITHOUT_SOURCELESS_UCODE
+@@ -4,6 +4,7 @@
+ #
+ # $FreeBSD$
+ 
++nodevice	adw
+ nodevice	bce
+ nodevice	fatm
+ nodevice	fxp
+--- a/sys/i386/conf/WITHOUT_SOURCELESS_UCODE
++++ b/sys/i386/conf/WITHOUT_SOURCELESS_UCODE
+@@ -4,6 +4,7 @@
+ #
+ # $FreeBSD$
+ 
++nodevice	adw
+ nodevice	bce
+ nodevice	fatm
+ nodevice	fxp
