@@ -12,9 +12,9 @@
  SRCS+=	ifgif.c			# GIF reversed header workaround
  
  SRCS+=	ifieee80211.c regdomain.c # SIOC[GS]IEEE80211 support
- DPADD+=	${LIBBSDXML} ${LIBJAIL} ${LIBSBUF}
--LDADD+=	-lbsdxml -ljail -lsbuf
-+LDADD+=	-lexpat -ljail -lsbuf
+ DPADD+=	${LIBBSDXML} ${LIBSBUF}
+-LDADD+=	-lbsdxml -lsbuf
++LDADD+=	-lexpat -lsbuf
  
  SRCS+=	ifcarp.c		# SIOC[GS]VH support
  SRCS+=	ifgroup.c		# ...
@@ -22,7 +22,7 @@
  
  SRCS+=	ifbridge.c		# bridge support
  SRCS+=	iflagg.c		# lagg support
-@@ -60,6 +57,7 @@
+@@ -65,6 +62,7 @@
  MAN=	ifconfig.8
  
  CFLAGS+= -Wall -Wmissing-prototypes -Wcast-qual -Wwrite-strings -Wnested-externs
@@ -43,7 +43,7 @@
  #include <net/ethernet.h>
  #include <net/if.h>
  #include <net/if_var.h>
-@@ -156,7 +160,7 @@
+@@ -158,7 +162,7 @@
  	all = downonly = uponly = namesonly = noload = verbose = 0;
  
  	/* Parse leading line options */
@@ -52,7 +52,7 @@
  	for (p = opts; p != NULL; p = p->next)
  		strlcat(options, p->opt, sizeof(options));
  	while ((c = getopt(argc, argv, options)) != -1) {
-@@ -947,7 +951,7 @@
+@@ -953,7 +957,7 @@
  	putchar('\n');
  
  	for (;;) {

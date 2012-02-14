@@ -1,21 +1,24 @@
+
+Merged in SVN (rev 231642).
+
 --- a/sbin/ifconfig/Makefile
 +++ b/sbin/ifconfig/Makefile
-@@ -33,8 +33,8 @@
+@@ -35,8 +35,8 @@
  SRCS+=	ifgif.c			# GIF reversed header workaround
  
  SRCS+=	ifieee80211.c regdomain.c # SIOC[GS]IEEE80211 support
 -DPADD+=	${LIBBSDXML} ${LIBJAIL} ${LIBSBUF}
--LDADD+=	-lexpat -ljail -lsbuf
+-LDADD+=	-lbsdxml -ljail -lsbuf
 +DPADD+=	${LIBBSDXML} ${LIBSBUF}
-+LDADD+=	-lexpat -lsbuf
++LDADD+=	-lbsdxml -lsbuf
  
  SRCS+=	ifcarp.c		# SIOC[GS]VH support
  SRCS+=	ifgroup.c		# ...
-@@ -53,6 +53,11 @@
+@@ -56,6 +56,11 @@
  DPADD+=	${LIBIPX}
  LDADD+=	-lipx
  .endif
-+.if ${MK_JAIL} != "no"
++.if ${MK_JAIL} != "no" && !defined(RELEASE_CRUNCH) && !defined(RESCUE)
 +CFLAGS+= -DJAIL
 +DPADD+= ${LIBJAIL}
 +LDADD+= -ljail
@@ -25,7 +28,7 @@
  
 --- a/sbin/ifconfig/ifconfig.c
 +++ b/sbin/ifconfig/ifconfig.c
-@@ -70,7 +70,9 @@
+@@ -66,7 +66,9 @@
  #include <err.h>
  #include <errno.h>
  #include <fcntl.h>
@@ -35,7 +38,23 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <string.h>
-@@ -692,6 +694,7 @@
+@@ -255,6 +257,7 @@
+ 				ifconfig(argc, argv, 1, NULL);
+ 				exit(0);
+ 			}
++#ifdef JAIL
+ 			/*
+ 			 * NOTE:  We have to special-case the `-vnet' command
+ 			 * right here as we would otherwise fail when trying
+@@ -268,6 +271,7 @@
+ 				ifconfig(argc, argv, 0, NULL);
+ 				exit(0);
+ 			}
++#endif
+ 			errx(1, "interface %s does not exist", ifname);
+ 		}
+ 	}
+@@ -688,6 +692,7 @@
  		err(1, "SIOCDIFPHYADDR");
  }
  
@@ -43,7 +62,7 @@
  static void
  setifvnet(const char *jname, int dummy __unused, int s,
      const struct afswtch *afp)
-@@ -719,6 +722,7 @@
+@@ -715,6 +720,7 @@
  	if (ioctl(s, SIOCSIFRVNET, &my_ifr) < 0)
  		err(1, "SIOCSIFRVNET(%d, %s)", my_ifr.ifr_jid, my_ifr.ifr_name);
  }
@@ -51,7 +70,7 @@
  
  static void
  setifnetmask(const char *addr, int dummy __unused, int s,
-@@ -1162,8 +1166,10 @@
+@@ -1158,8 +1164,10 @@
  	DEF_CMD_ARG2("tunnel",			settunnel),
  	DEF_CMD("-tunnel", 0,			deletetunnel),
  	DEF_CMD("deletetunnel", 0,		deletetunnel),
