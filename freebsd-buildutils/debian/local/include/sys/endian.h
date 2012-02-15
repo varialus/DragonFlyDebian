@@ -4,6 +4,6 @@
 #else
 # ifndef _SYS_ENDIAN_H_
 #  define _SYS_ENDIAN_H_
-#  include_next <machine/endian.h>
+#  include <machine/endian.h>
 # endif
 #endif
