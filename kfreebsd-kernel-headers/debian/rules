@@ -25,6 +25,9 @@ clean:
 	rm -rf .pc
 	rm -f *-stamp
 	rm -rf sys usr.sbin misc
+
+	$(MAKE) -C test clean
+
 	dh_clean
 
 .PHONY: clean
@@ -93,6 +96,9 @@ else
 	cd $(CURDIR)/sys/$(kfreebsd_cpu)/include \
 		&& find . -type f -name "*.h" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/include/machine \;
 endif
+
+	# headers must be tested after they're installed
+	$(MAKE) -C test
 
 install: install-indep install-arch
 
