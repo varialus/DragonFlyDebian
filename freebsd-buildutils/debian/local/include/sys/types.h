@@ -4,9 +4,9 @@
 #include <sys/cdefs.h>
 #include <stdint.h> /* uintXX_t */
 
-#ifdef __FreeBSD_kernel__
 /* Emulate implicit includes on FreeBSD */
 #include <machine/endian.h>
+#ifdef __FreeBSD_kernel__
 #include <sys/_types.h>
 #endif
 

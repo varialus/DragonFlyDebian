@@ -7,7 +7,15 @@ for command-line assignment parameters.
 
 --- a/src/usr.bin/make/main.c
 +++ b/src/usr.bin/make/main.c
-@@ -881,6 +881,7 @@
+@@ -61,6 +61,7 @@
+  *			the .MFLAGS target.
+  */
+ 
++#include <sys/endian.h>
+ #include <sys/param.h>
+ #include <sys/stat.h>
+ #include <sys/time.h>
+@@ -881,6 +882,7 @@
  	const char *machine;
  	const char *machine_arch;
  	const char *machine_cpu;
@@ -15,7 +23,7 @@ for command-line assignment parameters.
  	Boolean outOfDate = TRUE;	/* FALSE if all targets up to date */
  	const char *p;
  	const char *pathp;
-@@ -1014,6 +1015,16 @@
+@@ -1014,6 +1016,16 @@
  	Var_SetGlobal("MACHINE", machine);
  	Var_SetGlobal("MACHINE_ARCH", machine_arch);
  	Var_SetGlobal("MACHINE_CPU", machine_cpu);
