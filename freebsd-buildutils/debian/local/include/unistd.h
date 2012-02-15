@@ -5,6 +5,7 @@
 
 #ifdef __FreeBSD_kernel__
 #include <sys/syscall.h>
+#include <stdlib.h>		/* setenv */
 #endif
 
 #define getopt(argc, argv, options) bsd_getopt(argc, argv, options)
@@ -92,6 +93,13 @@ feature_present(const char *feature)
 	if (len != sizeof(i))
 		return (0);
 	return (i != 0);
+}
+
+static inline int
+execvP(const char *name, const char *path, char * const argv[])
+{
+	setenv ("PATH", path, 1);
+	return execvp(name, argv);
 }
 
 #endif /* __FreeBSD_kernel__ */
