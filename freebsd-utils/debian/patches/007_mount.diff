@@ -1,11 +1,3 @@
----
- sbin/mount/Makefile   |    2 +-
- sbin/mount/mntopts.h  |    4 ++++
- sbin/mount/mount.8    |    5 -----
- sbin/mount/mount.c    |   22 +++++++++++-----------
- sbin/mount/mount_fs.c |    2 +-
- 5 files changed, 17 insertions(+), 18 deletions(-)
-
 --- a/sbin/mount/mntopts.h
 +++ b/sbin/mount/mntopts.h
 @@ -37,6 +37,10 @@
@@ -21,32 +13,7 @@
  #define MOPT_NOATIME		{ "atime",	1, MNT_NOATIME, 0 }
 --- a/sbin/mount/mount.c
 +++ b/sbin/mount/mount.c
-@@ -161,6 +161,7 @@
- static int
- exec_mountprog(const char *name, const char *execname, char *const argv[])
- {
-+	char buf[256];
- 	pid_t pid;
- 	int status;
- 
-@@ -169,13 +170,11 @@
- 		warn("fork");
- 		exit (1);
- 	case 0:					/* Child. */
--		/* Go find an executable. */
--		execvP(execname, _PATH_SYSPATH, argv);
-+		/* Mount programs are located in /sbin. */
-+		snprintf(buf, sizeof(buf), "/sbin/%s", execname);
-+		execv(buf, argv);
- 		if (errno == ENOENT) {
- 			warn("exec %s not found", execname);
--			if (execname[0] != '/') {
--				warnx("in path: %s", _PATH_SYSPATH);
--			}
- 		}
- 		exit(1);
- 	default:				/* Parent. */
-@@ -252,7 +251,7 @@
+@@ -252,7 +252,7 @@
  	options = NULL;
  	vfslist = NULL;
  	vfstype = "ufs";
@@ -55,7 +22,7 @@
  		switch (ch) {
  		case 'a':
  			all = 1;
-@@ -260,9 +259,6 @@
+@@ -260,9 +260,6 @@
  		case 'd':
  			debug = 1;
  			break;
@@ -65,7 +32,7 @@
  		case 'f':
  			init_flags |= MNT_FORCE;
  			break;
-@@ -656,11 +652,13 @@
+@@ -656,11 +653,13 @@
  			(void)printf(", reads: sync %ju async %ju",
  			    (uintmax_t)sfp->f_syncreads,
  			    (uintmax_t)sfp->f_asyncreads);
@@ -79,7 +46,7 @@
  	}
  	(void)printf(")\n");
  }
-@@ -858,7 +856,7 @@
+@@ -858,7 +857,7 @@
  {
  
  	(void)fprintf(stderr, "%s\n%s\n%s\n",
@@ -88,7 +55,7 @@
  "       mount [-dfpruvw] special | node",
  "       mount [-dfpruvw] [-o options] [-t ufs | external_type] special node");
  	exit(1);
-@@ -883,7 +881,7 @@
+@@ -883,7 +882,7 @@
  
  	if (strncmp(ent->f_mntfromname, "<below>", 7) == 0 ||
  	    strncmp(ent->f_mntfromname, "<above>", 7) == 0) {
