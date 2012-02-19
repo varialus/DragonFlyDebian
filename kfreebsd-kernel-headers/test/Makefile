@@ -1,6 +1,7 @@
 TESTS = \
-	usb.o \
+	cpufunc.o \
 	soundcard.o \
+	usb.o \
 	$()
 
 CFLAGS = -isystem=../debian/kfreebsd-kernel-headers/usr/include

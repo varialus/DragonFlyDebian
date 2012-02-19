@@ -1,6 +1,9 @@
---- a/sys/i386/include/cpufunc.h
-+++ b/sys/i386/include/cpufunc.h
-@@ -42,6 +42,8 @@
+
+See #660396
+
+--- a/sys/amd64/include/cpufunc.h
++++ b/sys/amd64/include/cpufunc.h
+@@ -41,6 +41,8 @@
  
  #include <sys/types.h>
  
@@ -9,28 +12,263 @@
  #ifndef _SYS_CDEFS_H
  #error this file needs sys/cdefs.h as a prerequisite
  #endif
-@@ -697,11 +699,6 @@
- void	enable_intr(void);
- void	halt(void);
- void	ia32_pause(void);
--unsigned char	inb(unsigned int port);
--unsigned int	inl(unsigned int port);
--void	insb(unsigned int port, void *addr, size_t count);
--void	insl(unsigned int port, void *addr, size_t count);
--void	insw(unsigned int port, void *addr, size_t count);
- register_t	intr_disable(void);
- void	intr_restore(register_t ef);
- void	invd(void);
-@@ -724,12 +721,6 @@
- void	load_fs(unsigned short sel);
- void	load_gs(unsigned short sel);
- void	ltr(unsigned short sel);
--void	outb(unsigned int port, unsigned char data);
--void	outl(unsigned int port, unsigned int data);
--void	outsb(unsigned int port, const void *addr, size_t count);
--void	outsl(unsigned int port, const void *addr, size_t count);
--void	outsw(unsigned int port, const void *addr, size_t count);
--void	outw(unsigned int port, unsigned short data);
- unsigned int	rcr0(void);
- unsigned int	rcr2(void);
- unsigned int	rcr3(void);
+@@ -173,108 +175,6 @@
+ 	__asm __volatile("hlt");
+ }
+ 
+-static __inline u_char
+-inb(unsigned int port)
+-{
+-	unsigned char	data;
+-
+-	__asm __volatile("inb %w1, %0" : "=a" (data) : "Nd" (port));
+-	return (data);
+-}
+-
+-static __inline u_int
+-inl(unsigned int port)
+-{
+-	unsigned int	data;
+-
+-	__asm __volatile("inl %w1, %0" : "=a" (data) : "Nd" (port));
+-	return (data);
+-}
+-
+-static __inline void
+-insb(unsigned int port, void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; insb"
+-			 : "+D" (addr), "+c" (count)
+-			 : "d" (port)
+-			 : "memory");
+-}
+-
+-static __inline void
+-insw(unsigned int port, void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; insw"
+-			 : "+D" (addr), "+c" (count)
+-			 : "d" (port)
+-			 : "memory");
+-}
+-
+-static __inline void
+-insl(unsigned int port, void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; insl"
+-			 : "+D" (addr), "+c" (count)
+-			 : "d" (port)
+-			 : "memory");
+-}
+-
+-static __inline void
+-invd(void)
+-{
+-	__asm __volatile("invd");
+-}
+-
+-static __inline u_short
+-inw(unsigned int port)
+-{
+-	unsigned short	data;
+-
+-	__asm __volatile("inw %w1, %0" : "=a" (data) : "Nd" (port));
+-	return (data);
+-}
+-
+-static __inline void
+-outb(unsigned int port, unsigned char data)
+-{
+-	__asm __volatile("outb %0, %w1" : : "a" (data), "Nd" (port));
+-}
+-
+-static __inline void
+-outl(unsigned int port, unsigned int data)
+-{
+-	__asm __volatile("outl %0, %w1" : : "a" (data), "Nd" (port));
+-}
+-
+-static __inline void
+-outsb(unsigned int port, const void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; outsb"
+-			 : "+S" (addr), "+c" (count)
+-			 : "d" (port));
+-}
+-
+-static __inline void
+-outsw(unsigned int port, const void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; outsw"
+-			 : "+S" (addr), "+c" (count)
+-			 : "d" (port));
+-}
+-
+-static __inline void
+-outsl(unsigned int port, const void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; outsl"
+-			 : "+S" (addr), "+c" (count)
+-			 : "d" (port));
+-}
+-
+-static __inline void
+-outw(unsigned int port, unsigned short data)
+-{
+-	__asm __volatile("outw %0, %w1" : : "a" (data), "Nd" (port));
+-}
+-
+ static __inline void
+ mfence(void)
+ {
+--- a/sys/mips/include/cpufunc.h
++++ b/sys/mips/include/cpufunc.h
+@@ -60,6 +60,7 @@
+ #define	_MACHINE_CPUFUNC_H_
+ 
+ #include <sys/types.h>
++#include <stdint.h>
+ #include <machine/cpuregs.h>
+ 
+ /* 
+--- a/sys/powerpc/include/cpufunc.h
++++ b/sys/powerpc/include/cpufunc.h
+@@ -29,6 +29,8 @@
+ #ifndef _MACHINE_CPUFUNC_H_
+ #define	_MACHINE_CPUFUNC_H_
+ 
++#include <stdint.h>
++
+ /*
+  * Required for user-space atomic.h includes
+  */
+--- a/sys/sparc64/include/cpufunc.h
++++ b/sys/sparc64/include/cpufunc.h
+@@ -29,6 +29,7 @@
+ #ifndef	_MACHINE_CPUFUNC_H_
+ #define	_MACHINE_CPUFUNC_H_
+ 
++#include <stdint.h>
+ #include <machine/asi.h>
+ #include <machine/pstate.h>
+ 
+--- a/sys/i386/include/cpufunc.h
++++ b/sys/i386/include/cpufunc.h
+@@ -40,6 +40,8 @@
+ 
+ #include <sys/types.h>
+ 
++#include <stdint.h>
++
+ #ifndef _SYS_CDEFS_H
+ #error this file needs sys/cdefs.h as a prerequisite
+ #endif
+@@ -188,108 +190,6 @@
+ 	__asm __volatile("hlt");
+ }
+ 
+-static __inline u_char
+-inb(unsigned int port)
+-{
+-	unsigned char	data;
+-
+-	__asm __volatile("inb %w1, %0" : "=a" (data) : "Nd" (port));
+-	return (data);
+-}
+-
+-static __inline u_int
+-inl(unsigned int port)
+-{
+-	unsigned int	data;
+-
+-	__asm __volatile("inl %w1, %0" : "=a" (data) : "Nd" (port));
+-	return (data);
+-}
+-
+-static __inline void
+-insb(unsigned int port, void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; insb"
+-			 : "+D" (addr), "+c" (count)
+-			 : "d" (port)
+-			 : "memory");
+-}
+-
+-static __inline void
+-insw(unsigned int port, void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; insw"
+-			 : "+D" (addr), "+c" (count)
+-			 : "d" (port)
+-			 : "memory");
+-}
+-
+-static __inline void
+-insl(unsigned int port, void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; insl"
+-			 : "+D" (addr), "+c" (count)
+-			 : "d" (port)
+-			 : "memory");
+-}
+-
+-static __inline void
+-invd(void)
+-{
+-	__asm __volatile("invd");
+-}
+-
+-static __inline u_short
+-inw(unsigned int port)
+-{
+-	unsigned short	data;
+-
+-	__asm __volatile("inw %w1, %0" : "=a" (data) : "Nd" (port));
+-	return (data);
+-}
+-
+-static __inline void
+-outb(unsigned int port, unsigned char data)
+-{
+-	__asm __volatile("outb %0, %w1" : : "a" (data), "Nd" (port));
+-}
+-
+-static __inline void
+-outl(unsigned int port, unsigned int data)
+-{
+-	__asm __volatile("outl %0, %w1" : : "a" (data), "Nd" (port));
+-}
+-
+-static __inline void
+-outsb(unsigned int port, const void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; outsb"
+-			 : "+S" (addr), "+c" (count)
+-			 : "d" (port));
+-}
+-
+-static __inline void
+-outsw(unsigned int port, const void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; outsw"
+-			 : "+S" (addr), "+c" (count)
+-			 : "d" (port));
+-}
+-
+-static __inline void
+-outsl(unsigned int port, const void *addr, size_t count)
+-{
+-	__asm __volatile("cld; rep; outsl"
+-			 : "+S" (addr), "+c" (count)
+-			 : "d" (port));
+-}
+-
+-static __inline void
+-outw(unsigned int port, unsigned short data)
+-{
+-	__asm __volatile("outw %0, %w1" : : "a" (data), "Nd" (port));
+-}
+-
+ static __inline void
+ ia32_pause(void)
+ {
