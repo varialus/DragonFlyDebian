@@ -1,55 +1,6 @@
 --- a/sbin/mount_nfs/mount_nfs.c
 +++ b/sbin/mount_nfs/mount_nfs.c
-@@ -130,7 +130,6 @@
- 	TRYRET_LOCALERR		/* Local failure. */
- };
- 
--static int	fallback_mount(struct iovec *iov, int iovlen, int mntflags);
- static int	sec_name_to_num(char *sec);
- static char	*sec_num_to_name(int num);
- static int	getnfsargs(char *, struct iovec **iov, int *iovlen);
-@@ -150,7 +149,6 @@
- 	int c;
- 	struct iovec *iov;
- 	int mntflags, num, iovlen;
--	int osversion;
- 	char *name, *p, *spec, *fstype;
- 	char mntpath[MAXPATHLEN], errmsg[255];
- 	char hostname[MAXHOSTNAMELEN + 1], *gssname, gssn[MAXHOSTNAMELEN + 50];
-@@ -417,25 +415,14 @@
- 	build_iovec(&iov, &iovlen, "fspath", mntpath, (size_t)-1);
- 	build_iovec(&iov, &iovlen, "errmsg", errmsg, sizeof(errmsg));
- 
--	/*
--	 * XXX:
--	 * Backwards compatibility routines for older kernels.
--	 * Remove this and fallback_mount() code when we do not need to support
--	 * NFS mounts against older kernels which still need
--	 * struct nfs_args to be passed in via nmount().
--	 */
--	osversion = getosreldate();
--	if (osversion >= 702100) {
--		if (nmount(iov, iovlen, mntflags))
--			err(1, "%s, %s", mntpath, errmsg);
--	} else {
--		if (fallback_mount(iov, iovlen, mntflags))
-+        if (nmount(iov, iovlen, mntflags)) {
- 			err(1, "%s, %s", mntpath, errmsg);
- 	}
- 
- 	exit(0);
- }
- 
-+#if 0
- static int
- findopt(struct iovec *iov, int iovlen, const char *name,
-     char **valuep, int *lenp)
-@@ -657,16 +644,23 @@
- 
- 	return nmount(newiov, newiovlen, mntflags);
- }
-+#endif
- 
+@@ -661,12 +661,18 @@
  static int
  sec_name_to_num(char *sec)
  {
@@ -68,7 +19,7 @@
  	if (!strcmp(sec, "sys"))
  		return (AUTH_SYS);
  	return (-1);
-@@ -676,12 +670,18 @@
+@@ -676,12 +682,18 @@
  sec_num_to_name(int flavor)
  {
  	switch (flavor) {
@@ -87,7 +38,7 @@
  	case AUTH_SYS:
  		return ("sys");
  	}
-@@ -826,9 +826,11 @@
+@@ -826,9 +838,11 @@
  	freeaddrinfo(ai_nfs);
  
  	build_iovec(iov, iovlen, "hostname", nam, (size_t)-1);
