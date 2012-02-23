@@ -135,6 +135,9 @@ feature_present(const char *feature)
 	size_t len;
 	int i;
 
+	if ((!strcmp(feature, "inet") || !strcmp(feature, "inet6")) && getosreldate() <= 900038)
+		return (1);
+
 	if (asprintf(&mib, "kern.features.%s", feature) < 0)
 		return (0);
 	len = sizeof(i);
