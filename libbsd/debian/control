@@ -6,7 +6,7 @@ Uploaders: Hector Garcia <hector@debian.org>,
  Guillem Jover <guillem@debian.org>, Aurelien Jarno <aurel32@debian.org>
 Vcs-Browser: http://svn.debian.org/wsvn/glibc-bsd/trunk/libbsd/
 Vcs-Svn: svn://svn.debian.org/glibc-bsd/trunk/libbsd/
-Build-Depends: dpkg-dev (>= 1.15.7), debhelper (>= 7)
+Build-Depends: dpkg-dev (>= 1.15.7), debhelper (>= 8.1.3)
 Standards-Version: 3.9.2
 Homepage: http://libbsd.freedesktop.org/
 
@@ -46,6 +46,8 @@ Description: utility functions from BSD systems - development files
 
 Package: libbsd0
 Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Conflicts: net-tools (<< 7.0-2) [kfreebsd-any]
 Description: utility functions from BSD systems - shared library
@@ -65,6 +67,7 @@ Package: libbsd0-dbg
 Section: debug
 Priority: extra
 Architecture: any
+Multi-Arch: same
 Depends: libbsd0 (= ${binary:Version}), ${misc:Depends}
 Description: utility functions from BSD systems - debugging symbols
  This library provides some functions commonly available on BSD systems

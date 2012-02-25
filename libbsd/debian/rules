@@ -3,6 +3,8 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
 CPPFLAGS := $(shell dpkg-buildflags --get CPPFLAGS)
 CFLAGS := -Wall $(shell dpkg-buildflags --get CFLAGS)
 LDFLAGS := $(shell dpkg-buildflags --get LDFLAGS)
@@ -36,7 +38,9 @@ install-arch: build-arch
 	dh_prep
 	dh_installdirs
 
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp \
+		libdir=/lib/$(DEB_HOST_MULTIARCH) \
+		usrlibdir=/usr/lib/$(DEB_HOST_MULTIARCH)
 
 binary-indep:
 # Nothing to do.
