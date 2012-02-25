@@ -4,7 +4,7 @@ TESTS = \
 	usb.o \
 	$()
 
-CFLAGS = -isystem=../debian/kfreebsd-kernel-headers/usr/include
+CFLAGS = -I../debian/kfreebsd-kernel-headers/usr/include
 
 all: $(TESTS)
 
