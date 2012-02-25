@@ -1,17 +1,20 @@
+
+Co-authored by Nali Toja
+
 --- a/sys/conf/kern.mk
 +++ b/sys/conf/kern.mk
 @@ -1,11 +1,20 @@
  # $FreeBSD$
  
 +.if ${CC:T:Mclang} != "clang"
-+FREEBSD_GCC!=  ${CC} --version | grep FreeBSD || true
++FREEBSD_CC!=   ${CC} -dM -E -</dev/null | awk '/__FreeBSD_cc_version/ { print $$3 }' || true
 +.endif
 +
  #
  # Warning flags for compiling the kernel and components of the kernel:
  #
-+.if ${FREEBSD_GCC}
-+# FreeBSD extensions, not available in upstream GCC
++.if ${FREEBSD_CC}
++# FreeBSD extensions
 +format_extensions=     -fformat-extensions
 +no_align_long_strings= -mno-align-long-strings
 +.endif
