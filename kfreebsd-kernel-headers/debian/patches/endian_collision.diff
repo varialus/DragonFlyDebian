@@ -1,0 +1,25 @@
+
+bswapXX collides with glibc definitions, which uses __bswap_XX instead of
+__bswapXX.
+
+--- a/sys/sys/endian.h
++++ b/sys/sys/endian.h
+@@ -53,6 +53,10 @@
+ #define	_UINT64_T_DECLARED
+ #endif
+  
++#if !defined(_KERNEL) && defined(__GLIBC__)
++/* Avoid conflicting (but functionally equivalent) definitions below. */
++#include <endian.h>
++#else
+ /*
+  * General byte order swapping functions.
+  */
+@@ -93,6 +97,7 @@
+ #define	le32toh(x)	bswap32((x))
+ #define	le64toh(x)	bswap64((x))
+ #endif /* _BYTE_ORDER == _LITTLE_ENDIAN */
++#endif
+ 
+ /* Alignment-agnostic encode/decode bytestream to/from little/big endian. */
+ 
