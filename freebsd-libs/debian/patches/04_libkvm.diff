@@ -136,43 +136,6 @@
  		}
  		tot.ksw_total += ttl;
  		tot.ksw_used += xsd.xsw_used;
---- a/lib/libkvm/kvm_minidump_amd64.c
-+++ b/lib/libkvm/kvm_minidump_amd64.c
-@@ -100,6 +100,15 @@
- 	return (-1);
- }
- 
-+__inline__ u_long
-+bsfq(u_long mask)
-+{
-+	u_long  result;
-+
-+	__asm __volatile("bsfq %1,%0" : "=r" (result) : "rm" (mask));
-+	return (result);
-+}
-+
- static int
- inithash(kvm_t *kd, uint64_t *base, int len, off_t off)
- {
---- a/lib/libkvm/kvm_minidump_i386.c
-+++ b/lib/libkvm/kvm_minidump_i386.c
-@@ -102,6 +102,16 @@
- 	return (-1);
- }
- 
-+__inline__ u_int
-+bsfl(u_int mask)
-+{
-+	u_int   result;
-+
-+	__asm __volatile("bsfl %1,%0" : "=r" (result) : "rm" (mask));
-+	return (result);
-+}
-+
-+
- static int
- inithash(kvm_t *kd, uint32_t *base, int len, off_t off)
- {
 --- a/lib/libkvm/kvm_private.h
 +++ b/lib/libkvm/kvm_private.h
 @@ -34,6 +34,8 @@
