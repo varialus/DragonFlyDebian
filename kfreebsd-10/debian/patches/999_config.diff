@@ -107,7 +107,7 @@
  
  # FireWire support
  device		firewire	# FireWire bus code
-@@ -341,15 +303,15 @@
+@@ -341,14 +303,6 @@
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
  
@@ -122,15 +122,6 @@
  # MMC/SD
  device		mmc		# MMC/SD bus
  device		mmcsd		# MMC/SD memory card
- device		sdhci		# Generic PCI SD Host Controller
-+
-+# Alternate queueing
-+options		ALTQ
-+options		ALTQ_CBQ	# Class Bases Queuing (CBQ)
-+options		ALTQ_RED	# Random Early Detection (RED)
-+options		ALTQ_RIO	# RED In/Out
-+options		ALTQ_HFSC	# Hierarchical Packet Scheduler (HFSC)
-+options		ALTQ_PRIQ	# Priority Queuing (PRIQ)
 --- a/sys/i386/conf/GENERIC
 +++ b/sys/i386/conf/GENERIC
 @@ -18,12 +18,14 @@
@@ -279,7 +270,7 @@
 +options		ALTQ_PRIQ	# Priority Queuing (PRIQ)
 --- /dev/null
 +++ b/sys/conf/DEBIAN
-@@ -0,0 +1,16 @@
+@@ -0,0 +1,25 @@
 +# Common options to all Debian GNU/kFreeBSD kernels
 +
 +options		LINPROCFS
@@ -287,12 +278,21 @@
 +options		FDESCFS
 +options		TMPFS
 +options         QUOTA
++options		KTRACE
 +
 +# Network options
 +device		carp
 +device		pf
 +device		pfsync
 +device		pflog
++
++# Alternate queueing
++options		ALTQ
++options		ALTQ_CBQ	# Class Bases Queuing (CBQ)
++options		ALTQ_RED	# Random Early Detection (RED)
++options		ALTQ_RIO	# RED In/Out
++options		ALTQ_HFSC	# Hierarchical Packet Scheduler (HFSC)
++options		ALTQ_PRIQ	# Priority Queuing (PRIQ)
 +
 +# Disable binary blobs
 +include		WITHOUT_SOURCELESS
