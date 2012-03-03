@@ -145,17 +145,7 @@
  	cc -o test ${.CURDIR}/test.c -lrpcsvc
 --- a/usr.sbin/rpc.lockd/lockd.c
 +++ b/usr.sbin/rpc.lockd/lockd.c
-@@ -198,8 +198,7 @@
- 		kernel_lockd = TRUE;
- 	}
- 	if (kernel_lockd) {
--		if (getosreldate() >= 800040)
--			kernel_lockd_client = TRUE;
-+                kernel_lockd_client = TRUE;
- 	}
- 
- 	(void)rpcb_unset(NLM_PROG, NLM_SM, NULL);
-@@ -997,7 +996,7 @@
+@@ -997,7 +997,7 @@
  		ret = callrpc("localhost", SM_PROG, SM_VERS, SM_UNMON_ALL,
  		    (xdrproc_t)xdr_my_id, &id, (xdrproc_t)xdr_sm_stat, &stat);
  		if (ret == RPC_PROGUNAVAIL) {
@@ -164,7 +154,7 @@
  			    clnt_sperrno(ret));
  			sleep(2);
  			continue;
-@@ -1006,7 +1005,7 @@
+@@ -1006,7 +1006,7 @@
  	} while (0);
  
  	if (ret != 0) {
