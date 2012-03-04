@@ -3,6 +3,8 @@
 # distributed under the terms of the Artistic Licence 2.0
 #
 
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
 # By default, run at 00:57 on every Sunday, but do nothing unless the day of
 # the month is less than or equal to 7. Thus, only run on the first Sunday of
 # each month. crontab(5) sucks, unfortunately, in this regard; therefore this
