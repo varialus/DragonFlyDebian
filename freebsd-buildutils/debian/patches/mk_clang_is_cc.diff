@@ -1,0 +1,24 @@
+
+Cherry-picked from upstream SVN rev 232322
+
+--- a/src/share/mk/bsd.own.mk
++++ b/src/share/mk/bsd.own.mk
+@@ -413,6 +413,7 @@
+     BIND_LIBS \
+     BIND_SIGCHASE \
+     BIND_XML \
++    CLANG_IS_CC \
+     HESIOD \
+     ICONV \
+     IDEA \
+@@ -561,6 +562,10 @@
+ MK_GDB:=	no
+ .endif
+ 
++.if ${MK_CLANG} == "no"
++MK_CLANG_IS_CC:= no
++.endif
++
+ #
+ # Set defaults for the MK_*_SUPPORT variables.
+ #
