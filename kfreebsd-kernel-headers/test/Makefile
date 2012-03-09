@@ -1,6 +1,7 @@
 TESTS = \
 	cpufunc.o \
 	soundcard.o \
+	ppp.o \
 	usb.o \
 	$()
 
