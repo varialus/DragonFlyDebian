@@ -28,7 +28,7 @@ Co-authored by Nali Toja
 @@ -51,7 +60,7 @@
  #
  .if ${MACHINE_CPUARCH} == "i386"
- .if ${CC:T:Mclang} != "clang"
+ .if ${MK_CLANG_IS_CC} == "no" && ${CC:T:Mclang} != "clang"
 -CFLAGS+=	-mno-align-long-strings -mpreferred-stack-boundary=2 -mno-sse
 +CFLAGS+=	${no_align_long_strings} -mpreferred-stack-boundary=2 -mno-sse
  .else
