@@ -1,0 +1,12 @@
+--- a/sys/conf/kmod.mk
++++ b/sys/conf/kmod.mk
+@@ -281,7 +281,8 @@
+ _kmodinstall:
+ 	${INSTALL} -o ${KMODOWN} -g ${KMODGRP} -m ${KMODMODE} \
+ 	    ${_INSTALLFLAGS} ${PROG} ${DESTDIR}${KMODDIR}
+-.if defined(DEBUG_FLAGS) && !defined(INSTALL_NODEBUG)
++.if defined(DEBUG_FLAGS) && !defined(INSTALL_NODEBUG) && \
++    (defined(MK_KERNEL_SYMBOLS) && ${MK_KERNEL_SYMBOLS} != "no")
+ 	${INSTALL} -o ${KMODOWN} -g ${KMODGRP} -m ${KMODMODE} \
+ 	    ${_INSTALLFLAGS} ${PROG}.symbols ${DESTDIR}${KMODDIR}
+ .endif

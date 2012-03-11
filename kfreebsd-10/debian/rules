@@ -46,6 +46,10 @@ ORIG_TAR	:= kfreebsd-$(major)_$(tar_version).orig.tar.gz
 MAKE		:= make MACHINE_ARCH=$(kfreebsd_cpu) CC=gcc-$(gcc_version) WERROR= -DWITHOUT_SOURCELESS
 PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 
+# Disable install of *.ko.symbols files (their presence would trigger an
+# "unstripped-binary-or-object" lintian error).
+MAKE += -DWITHOUT_KERNEL_SYMBOLS	
+
 get-orig-source:
 	rm -rf $(ORIG_DIR)
 	for i in sys usr.sbin/config ; do \
