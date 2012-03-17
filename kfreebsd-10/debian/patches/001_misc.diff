@@ -3,12 +3,10 @@ Co-authored by Nali Toja
 
 --- a/sys/conf/kern.mk
 +++ b/sys/conf/kern.mk
-@@ -1,11 +1,20 @@
+@@ -1,11 +1,18 @@
  # $FreeBSD$
  
-+.if ${CC:T:Mclang} != "clang"
 +FREEBSD_CC!=   ${CC} -dM -E -</dev/null | awk '/__FreeBSD_cc_version/ { print $$3 }' || true
-+.endif
 +
  #
  # Warning flags for compiling the kernel and components of the kernel:
@@ -25,7 +23,7 @@ Co-authored by Nali Toja
  		-Wmissing-include-dirs -fdiagnostics-show-option \
  		${CWARNEXTRA}
  #
-@@ -51,7 +60,7 @@
+@@ -51,7 +58,7 @@
  #
  .if ${MACHINE_CPUARCH} == "i386"
  .if ${MK_CLANG_IS_CC} == "no" && ${CC:T:Mclang} != "clang"

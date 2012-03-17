@@ -22,7 +22,7 @@ flavours	:= $(config_files:debian/arch/$(cpu)/%.config=%)
 configfile	:= DEBCUSTOM
 abiname		:= 0
 ld_target	:= $(shell ld --help | sed -ne "s/[^ :]*: supported targets: \([^ ]*\) .*/\1/p")
-gcc_version	:= 4.6
+kernel_cc	:= gcc-4.6
 
 ifeq ($(cpu), mipsel)
 kfreebsd_cpu	:= mips
@@ -43,7 +43,7 @@ HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
 FLAVOR_DIR	:= flavor-$(version)-$(abiname)
 ORIG_DIR	:= kfreebsd-$(major)-$(tar_version)
 ORIG_TAR	:= kfreebsd-$(major)_$(tar_version).orig.tar.gz
-MAKE		:= make MACHINE_ARCH=$(kfreebsd_cpu) CC=gcc-$(gcc_version) WERROR= -DWITHOUT_SOURCELESS
+MAKE		:= make MACHINE_ARCH=$(kfreebsd_cpu) WERROR= -DWITHOUT_SOURCELESS
 PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 
 # Disable install of *.ko.symbols files (their presence would trigger an
@@ -80,7 +80,7 @@ control: clean
 		fi ; \
 		echo ; \
 	done
-	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@gcc_version@/$(gcc_version)/g" \
+	sed -e "s/@major@/$(major)/g" -e "s/@version@/$(version)/g" -e "s/@abiname@/$(abiname)/g" -e "s/@flavor@/$$flavor/g" -e "s/@kernel_cc@/$(kernel_cc)/g" \
 		$(CURDIR)/debian/control.in > $(CURDIR)/debian/control
 	echo >> $(CURDIR)/debian/control
 	for arch in `ls $(CURDIR)/debian/arch/` ; do \
@@ -145,7 +145,7 @@ config: config-stamp
 config-stamp: src
 	rm -rf config
 	cp -af src/usr.sbin/config config
-	CFLAGS="-D__va_list=__builtin_va_list $(shell pkg-config --cflags libbsd-overlay) -lbsd" $(MAKE) -C config
+	CFLAGS="$(shell pkg-config --cflags libbsd-overlay) -lbsd" $(MAKE) -C config
 	touch $@
 
 build-arch: $(foreach flavor,$(flavours),build-flavor-$(flavor)-stamp)
@@ -179,8 +179,8 @@ build-flavor-%-stamp: src-flavor-%-stamp
 		&& config $(configfile)
 
 	# Build it
-	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/compile/$(configfile)/ depend
-	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/compile/$(configfile)/
+	$(MAKE) CC=$(kernel_cc) -C $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/compile/$(configfile)/ depend
+	$(MAKE) CC=$(kernel_cc) -C $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/compile/$(configfile)/
 
 	touch build-flavor-$*-stamp
 
@@ -235,7 +235,7 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 		$(IMAGE_PACKAGE)-$*/boot/config-$(version)-$(abiname)-$*
 
 	# now install the kernel
-	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/compile/$(configfile) DESTDIR=$(IMAGE_PACKAGE)-$* install
+	$(MAKE) CC=$(kernel_cc) -C $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/compile/$(configfile) DESTDIR=$(IMAGE_PACKAGE)-$* install
 	mv $(IMAGE_PACKAGE)-$*/lib/modules/$(version)-$(abiname)-$*/kernel $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
 	chmod 644 $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
 	gzip -9 $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
