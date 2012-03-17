@@ -1,0 +1,21 @@
+--- a/sbin/devd/Makefile
++++ b/sbin/devd/Makefile
+@@ -11,6 +11,18 @@
+ DPADD=	${LIBL} ${LIBUTIL}
+ LDADD=	-ll -lutil -lbsd
+ 
++LIBSTDC++ != \
++	g++ -print-file-name=crt1.o ; \
++	g++ -print-file-name=crti.o ; \
++	g++ -print-file-name=crtn.o ; \
++	g++ -print-file-name=crtbegin.o ; \
++	g++ -print-file-name=crtend.o ; \
++	g++ -print-file-name=libstdc++.a
++
++LDADD+= -nostdlib \
++	${LIBSTDC++} \
++	-lgcc_s -lgcc -lc
++
+ YFLAGS+=-v
+ CFLAGS+=-I. -I${.CURDIR}
+ 
