@@ -191,6 +191,8 @@ enum
     && !defined __have_sigevent_t
 # define __have_sigevent_t	1
 
+#include <sys/_types.h>		/* __lwpid_t */
+
 /* Structure to transport application-defined values with signals.  */
 
 typedef struct sigevent
@@ -198,12 +200,21 @@ typedef struct sigevent
     int sigev_notify;
     int sigev_signo;
     sigval_t sigev_value;
-    /* Not yet supported by the kernel.  */
-    void (*sigev_notify_function) (sigval_t);	/* Function to start.  */
-    void *sigev_notify_attributes;		/* Really pthread_attr_t.  */
+    union
+    {
+      __lwpid_t threadid;
+      struct
+      {
+	void (*function) (sigval_t);	/* Function to start.  */
+	void *attributes;		/* Really pthread_attr_t.  */
+      } thread;
+    } un;
   } sigevent_t;
 
 #define sigev_notify_kqueue	sigev_signo
+#define sigev_notify_function	un.thread.function
+#define sigev_notify_attributes	un.thread.attributes
+#define sigev_notify_thread_id	un.threadid
 
 /* `sigev_notify' values.  */
 enum
