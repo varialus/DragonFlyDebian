@@ -68,6 +68,8 @@
 #define	SIGTHR		32	/* Reserved by thread library. */
 #define	SIGLWP		SIGTHR
 #define	SIGLIBRT	33	/* Reserved by real-time library. */
+/* Signal 34 is used (but not reserved) by thread library.
+   See PTHREAD_SIGBASE in kernel-features.h.  */
 
 #define	_NSIG		129	/* Biggest signal number + 1
 				   (including real-time signals).  */
