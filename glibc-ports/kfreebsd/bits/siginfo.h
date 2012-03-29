@@ -69,6 +69,10 @@ enum
 # define SI_QUEUE	SI_QUEUE
   SI_USER = 0x10001,		/* Sent by kill, sigsend, raise.  */
 # define SI_USER	SI_USER
+  SI_KERNEL = 0x10006,
+# define SI_KERNEL	SI_KERNEL
+  SI_LWP = 0x10007,		/* Sent by thr_kill.  */
+# define SI_LWP		SI_LWP
   SI_UNDEFINED = 0
 # define SI_UNDEFINED	SI_UNDEFINED
 };
