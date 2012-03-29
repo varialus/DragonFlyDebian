@@ -65,6 +65,9 @@
 #define SIGINFO		29	/* Information request (4.4 BSD).  */
 #define	SIGUSR1		30	/* User-defined signal 1 (POSIX).  */
 #define	SIGUSR2		31	/* User-defined signal 2 (POSIX).  */
+#define	SIGTHR		32	/* Reserved by thread library. */
+#define	SIGLWP		SIGTHR
+#define	SIGLIBRT	33	/* Reserved by real-time library. */
 
 #define	_NSIG		129	/* Biggest signal number + 1
 				   (including real-time signals).  */
