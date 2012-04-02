@@ -1,4 +1,4 @@
-/* Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
+/* Copyright (C) 2003, 2004, 2005, 2006, 2007, 2012 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -22,10 +22,16 @@
 #include <signal.h>
 #include <stdbool.h>
 #include <sysdep.h>
+#include <sys/_types.h> /* __lwpid_t */
+#include <atomic.h>
 #include <kernel-features.h>
 #include <nptl/pthreadP.h>
 #include "kernel-posix-timers.h"
 
+/* NPTL/Linux simply casts "timer_t" to "struct timer *", but on
+   kFreeBSD timer_t may not be large enough to hold a pointer.
+   So we store the pointers here... (sigh) */
+struct timer *__all_timers[TIMER_MAX];
 
 /* List of active SIGEV_THREAD timers.  */
 struct timer *__active_timer_sigev_thread;
@@ -40,7 +46,7 @@ struct thread_start_data
 };
 
 
-#ifdef __NR_timer_create
+#ifdef SYS_ktimer_create
 /* Helper thread to call the user-provided function.  */
 static void *
 timer_sigev_thread (void *arg)
@@ -50,8 +56,7 @@ timer_sigev_thread (void *arg)
      signals.  */
   sigset_t ss;
   sigemptyset (&ss);
-  INTERNAL_SYSCALL_DECL (err);
-  INTERNAL_SYSCALL (rt_sigprocmask, err, 4, SIG_SETMASK, &ss, NULL, _NSIG / 8);
+  sigprocmask (SIG_SETMASK, &ss, NULL);
 
   struct thread_start_data *td = (struct thread_start_data *) arg;
 
@@ -91,8 +96,7 @@ timer_helper_thread (void *arg)
 
       /* XXX The size argument hopefully will have to be changed to the
 	 real size of the user-level sigset_t.  */
-      int result = INLINE_SYSCALL (rt_sigtimedwait, 4, &ss, &si, NULL,
-				   _NSIG / 8);
+      int result = sigtimedwait (&ss, &si, NULL);
 
       LIBC_CANCEL_RESET (oldtype);
 
@@ -100,7 +104,7 @@ timer_helper_thread (void *arg)
 	{
 	  if (si.si_code == SI_TIMER)
 	    {
-	      struct timer *tk = (struct timer *) si.si_ptr;
+	      struct timer *tk = (struct timer *) si.si_value.sival_ptr;
 
 	      /* Check the timer is still used and will not go away
 		 while we are reading the values here.  */
@@ -132,7 +136,9 @@ timer_helper_thread (void *arg)
 
 	      pthread_mutex_unlock (&__active_timer_sigev_thread_lock);
 	    }
-	  else if (si.si_code == SI_TKILL)
+	  else if (si.si_code == SI_LWP
+		   /* Backward compatibility (see rev 211732 in -CURRENT).  */
+		   || si.si_code == SI_USER)
 	    /* The thread is canceled.  */
 	    pthread_exit (NULL);
 	}
@@ -145,7 +151,7 @@ pthread_once_t __helper_once attribute_hidden;
 
 
 /* TID of the helper thread.  */
-pid_t __helper_tid attribute_hidden;
+__lwpid_t __helper_tid attribute_hidden;
 
 
 /* Reset variables so that after a fork a new helper thread gets started.  */
@@ -176,8 +182,7 @@ __start_helper_thread (void)
   sigset_t oss;
   sigfillset (&ss);
   __sigaddset (&ss, SIGCANCEL);
-  INTERNAL_SYSCALL_DECL (err);
-  INTERNAL_SYSCALL (rt_sigprocmask, err, 4, SIG_SETMASK, &ss, &oss, _NSIG / 8);
+  sigprocmask (SIG_SETMASK, &ss, &oss);
 
   /* Create the helper thread for this timer.  */
   pthread_t th;
@@ -187,8 +192,7 @@ __start_helper_thread (void)
     __helper_tid = ((struct pthread *) th)->tid;
 
   /* Restore the signal mask.  */
-  INTERNAL_SYSCALL (rt_sigprocmask, err, 4, SIG_SETMASK, &oss, NULL,
-		    _NSIG / 8);
+  sigprocmask (SIG_SETMASK, &oss, NULL);
 
   /* No need for the attribute anymore.  */
   (void) pthread_attr_destroy (&attr);

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003 Free Software Foundation, Inc.
+/* Copyright (C) 2003, 2012 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -25,7 +25,7 @@
 #include "kernel-posix-timers.h"
 
 
-#ifdef __NR_timer_gettime
+#ifdef SYS_ktimer_gettime
 # ifndef __ASSUME_POSIX_TIMERS
 static int compat_timer_gettime (timer_t timerid, struct itimerspec *value);
 #  define timer_gettime static compat_timer_gettime
@@ -48,10 +48,12 @@ timer_gettime (timerid, value)
   if (__no_posix_timers >= 0)
 # endif
     {
-      struct timer *kt = (struct timer *) timerid;
+      struct timer *kt = __kfreebsd_timer_id2ptr (timerid);
+      if (! kt)
+	return -1;
 
       /* Delete the kernel timer object.  */
-      int res = INLINE_SYSCALL (timer_gettime, 2, kt->ktimerid, value);
+      int res = INLINE_SYSCALL (ktimer_gettime, 2, kt->ktimerid, value);
 
 # ifndef __ASSUME_POSIX_TIMERS
       if (res != -1 || errno != ENOSYS)

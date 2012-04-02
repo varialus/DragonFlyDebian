@@ -1,4 +1,4 @@
-/* Copyright (C) 2003 Free Software Foundation, Inc.
+/* Copyright (C) 2003, 2012 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -24,7 +24,7 @@
 #include "kernel-posix-timers.h"
 
 
-#ifdef __NR_timer_getoverrun
+#ifdef SYS_ktimer_getoverrun
 # ifndef __ASSUME_POSIX_TIMERS
 static int compat_timer_getoverrun (timer_t timerid);
 #  define timer_getoverrun static compat_timer_getoverrun
@@ -46,10 +46,12 @@ timer_getoverrun (timerid)
   if (__no_posix_timers >= 0)
 # endif
     {
-      struct timer *kt = (struct timer *) timerid;
+      struct timer *kt = __kfreebsd_timer_id2ptr (timerid);
+      if (! kt)
+	return -1;
 
       /* Get the information from the kernel.  */
-      int res = INLINE_SYSCALL (timer_getoverrun, 1, kt->ktimerid);
+      int res = INLINE_SYSCALL (ktimer_getoverrun, 1, kt->ktimerid);
 
 # ifndef __ASSUME_POSIX_TIMERS
       if (res != -1 || errno != ENOSYS)

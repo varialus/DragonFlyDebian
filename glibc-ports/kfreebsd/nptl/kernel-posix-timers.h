@@ -1,4 +1,4 @@
-/* Copyright (C) 2003, 2007 Free Software Foundation, Inc.
+/* Copyright (C) 2003, 2007, 2012 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -21,6 +21,7 @@
 #include <setjmp.h>
 #include <signal.h>
 #include <sys/types.h>
+#include <sys/_types.h>
 
 
 /* Nonzero if the system calls are not available.  */
@@ -33,7 +34,7 @@ extern void __start_helper_thread (void) attribute_hidden;
 extern pthread_once_t __helper_once attribute_hidden;
 
 /* TID of the helper thread.  */
-extern pid_t __helper_tid attribute_hidden;
+extern __lwpid_t __helper_tid attribute_hidden;
 
 /* List of active SIGEV_THREAD timers.  */
 extern struct timer *__active_timer_sigev_thread attribute_hidden;
@@ -66,3 +67,53 @@ struct timer
   /* Next element in list of active SIGEV_THREAD timers.  */
   struct timer *next;
 };
+
+extern struct timer *__all_timers[TIMER_MAX];
+
+static inline struct timer *
+__kfreebsd_timer_alloc ()
+{
+  unsigned int i;
+  struct timer *timer = malloc (sizeof (struct timer));
+
+  /* Find a free slot (and reserve it atomically).  */
+  for (i = 0; i < TIMER_MAX; i++)
+    if (atomic_compare_and_exchange_val_acq (&__all_timers[i],
+					     timer, NULL) == NULL)
+      return timer;
+
+  errno = EAGAIN;
+  return NULL;
+}
+
+static inline struct timer *
+__kfreebsd_timer_id2ptr (timer_t id)
+{
+  void *ret = NULL;
+
+  if (id >= 0 && id < TIMER_MAX)
+    ret = __all_timers[id];
+
+  if (! ret)
+    errno = EINVAL;
+
+  return ret;
+}
+
+static inline timer_t
+__kfreebsd_timer_ptr2id (struct timer *ptr)
+{
+  unsigned int i;
+  for (i = 0; i < TIMER_MAX; i++)
+    if (__all_timers[i] == ptr)
+      return i;
+
+  return -1;
+}
+
+void static inline
+__kfreebsd_timer_free (struct timer *ptr)
+{
+  __all_timers[__kfreebsd_timer_ptr2id (ptr)] = NULL;
+  free (ptr);
+}

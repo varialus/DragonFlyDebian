@@ -1,4 +1,4 @@
-/* Copyright (C) 2003,2004, 2007, 2009 Free Software Foundation, Inc.
+/* Copyright (C) 2003,2004, 2007, 2009, 2012 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -31,7 +31,7 @@
 #include "kernel-posix-cpu-timers.h"
 
 
-#ifdef __NR_timer_create
+#ifdef SYS_ktimer_create
 # ifndef __ASSUME_POSIX_TIMERS
 static int compat_timer_create (clockid_t clock_id, struct sigevent *evp,
 				timer_t *timerid);
@@ -59,12 +59,6 @@ timer_create (clock_id, evp, timerid)
   if  (__no_posix_timers >= 0)
 # endif
     {
-      clockid_t syscall_clockid = (clock_id == CLOCK_PROCESS_CPUTIME_ID
-				   ? MAKE_PROCESS_CPUCLOCK (0, CPUCLOCK_SCHED)
-				   : clock_id == CLOCK_THREAD_CPUTIME_ID
-				   ? MAKE_THREAD_CPUCLOCK (0, CPUCLOCK_SCHED)
-				   : clock_id);
-
       /* If the user wants notification via a thread we need to handle
 	 this special.  */
       if (evp == NULL
@@ -72,12 +66,8 @@ timer_create (clock_id, evp, timerid)
 	{
 	  struct sigevent local_evp;
 
-	  /* We avoid allocating too much memory by basically
-	     using struct timer as a derived class with the
-	     first two elements being in the superclass.  We only
-	     need these two elements here.  */
-	  struct timer *newp = (struct timer *) malloc (offsetof (struct timer,
-								  thrfunc));
+	  struct timer *newp = __kfreebsd_timer_alloc ();
+
 	  if (newp == NULL)
 	    /* No more memory.  */
 	    return -1;
@@ -95,7 +85,7 @@ timer_create (clock_id, evp, timerid)
 	    }
 
 	  kernel_timer_t ktimerid;
-	  int retval = INLINE_SYSCALL (timer_create, 3, syscall_clockid, evp,
+	  int retval = INLINE_SYSCALL (ktimer_create, 3, clock_id, evp,
 				       &ktimerid);
 
 # ifndef __ASSUME_POSIX_TIMERS
@@ -112,19 +102,19 @@ timer_create (clock_id, evp, timerid)
 					? evp->sigev_notify : SIGEV_SIGNAL);
 		  newp->ktimerid = ktimerid;
 
-		  *timerid = (timer_t) newp;
+		  *timerid = __kfreebsd_timer_ptr2id (newp);
 		}
 	      else
 		{
 		  /* Cannot allocate the timer, fail.  */
-		  free (newp);
+		  __kfreebsd_timer_free (newp);
 		  retval = -1;
 		}
 
 	      return retval;
 	    }
 
-	  free (newp);
+	  __kfreebsd_timer_free (newp);
 
 # ifndef __ASSUME_POSIX_TIMERS
 	  /* When we come here the syscall does not exist.  Make sure we
@@ -138,13 +128,11 @@ timer_create (clock_id, evp, timerid)
 	  /* Make sure we have the necessary kernel support.  */
 	  if (__no_posix_timers == 0)
 	    {
-	      INTERNAL_SYSCALL_DECL (err);
 	      struct timespec ts;
 	      int res;
-	      res = INTERNAL_SYSCALL (clock_getres, err, 2,
-				      CLOCK_REALTIME, &ts);
-	      __no_posix_timers = (INTERNAL_SYSCALL_ERROR_P (res, err)
-				   ? -1 : 1);
+	      res = INLINE_SYSCALL (clock_getres, 2,
+				    CLOCK_REALTIME, &ts);
+	      __no_posix_timers = (res == -1 ? -1 : 1);
 	    }
 
 	  if (__no_posix_timers > 0)
@@ -160,7 +148,7 @@ timer_create (clock_id, evp, timerid)
 		}
 
 	      struct timer *newp;
-	      newp = (struct timer *) malloc (sizeof (struct timer));
+	      newp = __kfreebsd_timer_alloc ();
 	      if (newp == NULL)
 		return -1;
 
@@ -197,15 +185,15 @@ timer_create (clock_id, evp, timerid)
 	      struct sigevent sev =
 		{ .sigev_value.sival_ptr = newp,
 		  .sigev_signo = SIGTIMER,
-		  .sigev_notify = SIGEV_SIGNAL | SIGEV_THREAD_ID,
-		  ._sigev_un = { ._pad = { [0] = __helper_tid } } };
+		  .sigev_notify = SIGEV_THREAD_ID,
+		  .sigev_notify_thread_id = __helper_tid,
+		};
 
 	      /* Create the timer.  */
-	      INTERNAL_SYSCALL_DECL (err);
 	      int res;
-	      res = INTERNAL_SYSCALL (timer_create, err, 3,
-				      syscall_clockid, &sev, &newp->ktimerid);
-	      if (! INTERNAL_SYSCALL_ERROR_P (res, err))
+	      res = INLINE_SYSCALL (ktimer_create, 3,
+				      clock_id, &sev, &newp->ktimerid);
+	      if (res != -1)
 		{
 		  /* Add to the queue of active timers with thread
 		     delivery.  */
@@ -214,14 +202,12 @@ timer_create (clock_id, evp, timerid)
 		  __active_timer_sigev_thread = newp;
 		  pthread_mutex_unlock (&__active_timer_sigev_thread_lock);
 
-		  *timerid = (timer_t) newp;
+		  *timerid = __kfreebsd_timer_ptr2id (newp);
 		  return 0;
 		}
 
 	      /* Free the resources.  */
-	      free (newp);
-
-	      __set_errno (INTERNAL_SYSCALL_ERRNO (res, err));
+	      __kfreebsd_timer_free (newp);
 
 	      return -1;
 	    }
