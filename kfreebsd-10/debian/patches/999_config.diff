@@ -25,7 +25,7 @@
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -87,9 +89,6 @@
+@@ -96,9 +98,6 @@
  device		acpi
  device		pci
  
@@ -35,7 +35,7 @@
  # ATA controllers
  device		ahci		# AHCI-compatible SATA controllers
  device		ata		# Legacy ATA/SATA controllers
-@@ -186,10 +185,6 @@
+@@ -195,10 +194,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -46,7 +46,7 @@
  
  device		puc		# Multi I/O cards and multi-channel UARTs
  
-@@ -280,11 +275,8 @@
+@@ -289,11 +284,8 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
@@ -58,7 +58,7 @@
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -311,13 +303,6 @@
+@@ -320,13 +312,6 @@
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
  
@@ -112,7 +112,7 @@
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -89,9 +93,6 @@
+@@ -98,9 +102,6 @@
  device		eisa
  device		pci
  
@@ -122,7 +122,7 @@
  # ATA controllers
  device		ahci		# AHCI-compatible SATA controllers
  device		ata		# Legacy ATA/SATA controllers
-@@ -196,10 +197,6 @@
+@@ -205,10 +206,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -133,7 +133,7 @@
  
  device		puc		# Multi I/O cards and multi-channel UARTs
  
-@@ -293,11 +290,8 @@
+@@ -302,11 +299,8 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
@@ -145,7 +145,7 @@
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -324,13 +318,6 @@
+@@ -333,13 +327,6 @@
  device		dcons		# Dumb console driver
  device		dcons_crom	# Configuration ROM for dcons
  
@@ -161,7 +161,7 @@
  device		mmcsd		# MMC/SD memory card
 --- /dev/null
 +++ b/sys/conf/DEBIAN
-@@ -0,0 +1,25 @@
+@@ -0,0 +1,48 @@
 +# Common options to all Debian GNU/kFreeBSD kernels
 +
 +options		LINPROCFS
@@ -176,6 +176,29 @@
 +device		pf
 +device		pfsync
 +device		pflog
++
++# Full debugger support is disabled by upstream when a branch is close to
++# release.  Unfortunately this can trigger the appearance of heisenbugs
++# which were previously hidden (we've been hit by this already, see #651624).
++#
++# This disables full debugger support in advance, so that the build
++# configuration which is going to be used for release is tested during the
++# whole release cycle.  If you need a debug kernel, simply remove/comment
++# the following lines:
++
++nooption 	DDB			# Support DDB.
++nooption 	GDB			# Support remote GDB.
++nooption 	DEADLKRES		# Enable the deadlock resolver
++nooption 	INVARIANTS		# Enable calls of extra sanity checking
++nooption 	INVARIANT_SUPPORT	# Extra sanity checks of internal structures, required by INVARIANTS
++nooption 	WITNESS			# Enable checks to detect deadlocks and cycles
++nooption 	WITNESS_SKIPSPIN	# Don't run witness on spinlocks for speed
++nooption 	MALLOC_DEBUG_MAXZONES=8	# Separate malloc(9) zones
++
++# Usually when full debugger is enabled, minimum debugger support is disabled.
++# Bring it back:
++
++options 	KDB_TRACE		# Print a stack trace for a panic.
 +
 +# Alternate queueing
 +options		ALTQ
