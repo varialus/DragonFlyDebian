@@ -25,12 +25,11 @@ Partially sent to freebsd-hackers (2011-07-02)
  
  # Correct path for kernel builds
  # Don't rely on the kernel's .depend file
-@@ -24,8 +29,15 @@
+@@ -24,8 +29,14 @@
  DEPENDFILE=	.depend_aicasm
  .endif
  
-+LIBBSD_CFLAGS!=	pkg-config --cflags libbsd-overlay
-+CFLAGS+=	${LIBBSD_CFLAGS}
++CFLAGS+=	-D_GNU_SOURCE -isystem /usr/include/freebsd
 +
 +# This would discard implicit include flags in upstream GCC
 +.if ${OPSYS} == "FreeBSD"
@@ -41,25 +40,3 @@ Partially sent to freebsd-hackers (2011-07-02)
  .ifdef MAKESRCPATH
  CFLAGS+= -I${MAKESRCPATH}
  .endif
---- a/sys/dev/aic7xxx/aicasm/aicasm_gram.y
-+++ b/sys/dev/aic7xxx/aicasm/aicasm_gram.y
-@@ -1529,7 +1529,7 @@
- }
- 
- static void
--add_macro_arg(const char *argtext, int argnum __unused)
-+add_macro_arg(const char *argtext, int argnum)
- {
- 	struct macro_arg *marg;
- 	int retval;
---- a/sys/dev/aic7xxx/aicasm/aicasm_symbol.c
-+++ b/sys/dev/aic7xxx/aicasm/aicasm_symbol.c
-@@ -44,7 +44,7 @@
- 
- #include <sys/types.h>
- #include <sys/param.h>
--#ifdef BSD
-+#if defined(BSD) && !defined(__GNU__)
- #include <db.h>
- #else
- #include <db_185.h>

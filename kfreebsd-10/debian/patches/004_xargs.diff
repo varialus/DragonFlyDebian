@@ -30,3 +30,19 @@ http://savannah.gnu.org/patch/?4916
  
  # canonify include paths
  for H in ${src_headers}; do
+--- a/sys/conf/kern.post.mk
++++ b/sys/conf/kern.post.mk
+@@ -168,12 +168,9 @@
+ 	rm -f .newdep
+ 	${MAKE} -V CFILES_NOZFS -V SYSTEM_CFILES -V GEN_CFILES | \
+ 	    MKDEP_CPP="${CC} -E" CC="${CC}" xargs mkdep -a -f .newdep ${CFLAGS}
+-	${MAKE} -V CFILES_ZFS | \
+-	    MKDEP_CPP="${CC} -E" CC="${CC}" xargs mkdep -a -f .newdep ${ZFS_CFLAGS}
++	# GNU xargs behaves differently when given a single newline character.
+ 	${MAKE} -V SFILES_NOZFS | \
+ 	    MKDEP_CPP="${CC} -E" xargs mkdep -a -f .newdep ${ASM_CFLAGS}
+-	${MAKE} -V SFILES_ZFS | \
+-	    MKDEP_CPP="${CC} -E" xargs mkdep -a -f .newdep ${ZFS_ASM_CFLAGS}
+ 	rm -f .depend
+ 	mv .newdep .depend
+ 

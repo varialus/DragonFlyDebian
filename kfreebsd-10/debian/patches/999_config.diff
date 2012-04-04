@@ -46,32 +46,17 @@
  
  device		puc		# Multi I/O cards and multi-channel UARTs
  
-@@ -289,11 +284,8 @@
+@@ -292,10 +287,7 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
 -device		tun		# Packet tunnel.
- device		pty		# BSD-style compatibility pseudo ttys
  device		md		# Memory "disks"
 -device		gif		# IPv6 and IPv4 tunneling
 -device		faith		# IPv6-to-IPv4 relaying (translation)
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -320,13 +312,6 @@
- device		dcons		# Dumb console driver
- device		dcons_crom	# Configuration ROM for dcons
- 
--# Sound support
--device		sound		# Generic sound driver (required)
--device		snd_es137x	# Ensoniq AudioPCI ES137x
--device		snd_hda		# Intel High Definition Audio
--device		snd_ich		# Intel, NVidia and other ICH AC'97 Audio
--device		snd_via8233	# VIA VT8233x Audio
--
- # MMC/SD
- device		mmc		# MMC/SD bus
- device		mmcsd		# MMC/SD memory card
 --- a/sys/i386/conf/GENERIC
 +++ b/sys/i386/conf/GENERIC
 @@ -18,12 +18,14 @@
@@ -133,32 +118,17 @@
  
  device		puc		# Multi I/O cards and multi-channel UARTs
  
-@@ -302,11 +299,8 @@
+@@ -305,10 +302,7 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
 -device		tun		# Packet tunnel.
- device		pty		# BSD-style compatibility pseudo ttys
  device		md		# Memory "disks"
 -device		gif		# IPv6 and IPv4 tunneling
 -device		faith		# IPv6-to-IPv4 relaying (translation)
  device		firmware	# firmware assist module
  
  # The `bpf' device enables the Berkeley Packet Filter.
-@@ -333,13 +327,6 @@
- device		dcons		# Dumb console driver
- device		dcons_crom	# Configuration ROM for dcons
- 
--# Sound support
--device		sound		# Generic sound driver (required)
--device		snd_es137x	# Ensoniq AudioPCI ES137x
--device		snd_hda		# Intel High Definition Audio
--device		snd_ich		# Intel, NVidia and other ICH AC'97 Audio
--device		snd_via8233	# VIA VT8233x Audio
--
- # MMC/SD
- device		mmc		# MMC/SD bus
- device		mmcsd		# MMC/SD memory card
 --- /dev/null
 +++ b/sys/conf/DEBIAN
 @@ -0,0 +1,48 @@
@@ -193,7 +163,7 @@
 +nooption 	INVARIANT_SUPPORT	# Extra sanity checks of internal structures, required by INVARIANTS
 +nooption 	WITNESS			# Enable checks to detect deadlocks and cycles
 +nooption 	WITNESS_SKIPSPIN	# Don't run witness on spinlocks for speed
-+nooption 	MALLOC_DEBUG_MAXZONES=8	# Separate malloc(9) zones
++nooption 	MALLOC_DEBUG_MAXZONES	# Separate malloc(9) zones
 +
 +# Usually when full debugger is enabled, minimum debugger support is disabled.
 +# Bring it back:
