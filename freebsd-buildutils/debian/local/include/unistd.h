@@ -12,7 +12,7 @@
 
 __BEGIN_DECLS
 
-int bsd_getopt(int, char **, char *);
+int bsd_getopt(int argc, char *const *argv, const char *options);
 extern int optreset;
 
 #ifdef __FreeBSD_kernel__
