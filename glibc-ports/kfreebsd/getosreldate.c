@@ -30,6 +30,26 @@
 #include <stddef.h>
 #include <sys/sysctl.h>
 #include <stdlib.h>
+#include <getosreldate.h>
+
+int
+__kernel_getosreldate(void)
+{
+    static int osreldate;
+
+    int mib[2];
+    size_t size;
+
+    if (osreldate == 0)
+    {
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_OSRELDATE;
+	size = sizeof osreldate;
+	if (__sysctl(mib, 2, &osreldate, &size, NULL, 0) == -1)
+		return (-1);
+    }		
+    return (osreldate);
+}
 
 int
 __getosreldate(void)
@@ -47,11 +67,7 @@ __getosreldate(void)
 		return (osreldate);
 	}
 
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_OSRELDATE;
-	size = sizeof osreldate;
-	if (__sysctl(mib, 2, &osreldate, &size, NULL, 0) == -1)
-		return (-1);
+	osreldate = __kernel_getosreldate ();
     }		
     return (osreldate);
 }

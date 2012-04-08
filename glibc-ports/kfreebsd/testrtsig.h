@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include <kernel-features.h>
+#include <getosreldate.h>
 
 static int
 kernel_has_rtsig (void)
@@ -29,15 +30,7 @@ kernel_has_rtsig (void)
 #if __ASSUME_REALTIME_SIGNALS
   return 1;
 #else
-
-  int request[2] = { CTL_KERN, KERN_OSRELDATE};
-  size_t len;
-  int val;
-
-  len = sizeof (val);
-  if (__sysctl (request, 2, &val, &len, NULL, 0) < 0)
-      return 0;
-  if ( val < 700050) /* FreeBSD 7.0 is 700055 */
+  if (__kernel_getosreldate () < 700050) /* FreeBSD 7.0 is 700055 */
       return 0;
   return 1;
 #endif

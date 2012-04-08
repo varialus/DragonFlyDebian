@@ -58,7 +58,7 @@ sysdep_routines += kenv
 # For <sched.h>.
 sysdep_routines += clone start_thread
 # For <unistd.h>.
-sysdep_routines += sys_ftruncate sys_freebsd6_ftruncate sys_truncate sys_freebsd6_truncate
+sysdep_routines += sys_ftruncate sys_freebsd6_ftruncate sys_truncate sys_freebsd6_truncate getosreldate
 # For <sys/acl.h>.
 sysdep_routines += acl_aclcheck_fd acl_aclcheck_file acl_delete_fd acl_delete_file acl_get_fd acl_get_file acl_set_fd acl_set_file
 # For <sys/extattr.h>.

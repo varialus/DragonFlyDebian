@@ -24,29 +24,8 @@
 #include <errno.h>
 #include <signal.h>
 #include <stddef.h>
+#include <getosreldate.h>
 #undef __clone
-
-
-#include <sys/sysctl.h>
-
-static inline int
-__kernel_osreldate(void)
-{
-    static int osreldate;
-
-    int mib[2];
-    size_t size;
-
-    if (osreldate == 0)
-    {
-	mib[0] = CTL_KERN;
-	mib[1] = KERN_OSRELDATE;
-	size = sizeof osreldate;
-	if (__sysctl(mib, 2, &osreldate, &size, NULL, 0) == -1)
-		return (-1);
-    }		
-    return (osreldate);
-}
 
 /* __start_thread (flags, child_stack, fn, arg)
    is roughly equivalent to
@@ -86,7 +65,7 @@ int __clone (int (*fn) (void *), void *child_stack, int flags, void *arg)
 
   if ((flags & CSIGNAL) != SIGCHLD)
   {
-    if (__kernel_osreldate() >= 802510)
+    if (__kernel_getosreldate() >= 802510)
                 /* we slightly cheat here, */
                 /* the 9.x snapshot prior to r223966 does not support it too */
     {
