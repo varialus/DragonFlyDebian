@@ -1,0 +1,22 @@
+
+From SVN rev 234070.
+
+--- a/usr.sbin/powerd/powerd.c
++++ b/usr.sbin/powerd/powerd.c
+@@ -44,6 +44,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <sysexits.h>
+ #include <unistd.h>
+ 
+ #ifdef __i386__
+@@ -536,7 +537,7 @@
+ 		err(1, "lookup kern.cp_times");
+ 	len = 4;
+ 	if (sysctlnametomib("dev.cpu.0.freq", freq_mib, &len))
+-		err(1, "lookup freq");
++		err(EX_UNAVAILABLE, "no cpufreq(4) support -- aborting");
+ 	len = 4;
+ 	if (sysctlnametomib("dev.cpu.0.freq_levels", levels_mib, &len))
+ 		err(1, "lookup freq_levels");
