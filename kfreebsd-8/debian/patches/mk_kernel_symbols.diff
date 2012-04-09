@@ -10,3 +10,15 @@
  	${INSTALL} -o ${KMODOWN} -g ${KMODGRP} -m ${KMODMODE} \
  	    ${_INSTALLFLAGS} ${PROG}.symbols ${DESTDIR}${KMODDIR}
  .endif
+--- a/sys/conf/kern.post.mk
++++ b/sys/conf/kern.post.mk
+@@ -218,7 +218,8 @@
+ .endif
+ 	mkdir -p ${DESTDIR}${KODIR}
+ 	${INSTALL} -p -m 555 -o ${KMODOWN} -g ${KMODGRP} ${KERNEL_KO} ${DESTDIR}${KODIR}
+-.if defined(DEBUG) && !defined(INSTALL_NODEBUG)
++.if defined(DEBUG) && !defined(INSTALL_NODEBUG) && \
++    (defined(MK_KERNEL_SYMBOLS) && ${MK_KERNEL_SYMBOLS} != "no")
+ 	${INSTALL} -p -m 555 -o ${KMODOWN} -g ${KMODGRP} ${KERNEL_KO}.symbols ${DESTDIR}${KODIR}
+ .endif
+ .if defined(KERNEL_EXTRA_INSTALL)
