@@ -76,6 +76,10 @@ do_stop()
 	[ "$?" = 2 ] && return 2
 	# Many daemons don't delete their pidfiles when they exit.
 	rm -f $PIDFILE
+
+	# Restore default CPU frequency
+	sysctl dev.cpu.0.freq=$(sysctl -n dev.cpu.0.freq_levels | sed -e 's:/.*::') > /dev/null
+
 	return "$RETVAL"
 }
 
