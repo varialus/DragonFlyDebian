@@ -17,12 +17,12 @@
  	options = NULL;
  	vfslist = NULL;
  	vfstype = "ufs";
--	while ((ch = getopt(argc, argv, "adF:flo:prt:uvw")) != -1)
-+	while ((ch = getopt(argc, argv, "adflo:prt:uvw")) != -1)
+-	while ((ch = getopt(argc, argv, "adF:flo:prt:uvwnO:")) != -1)
++	while ((ch = getopt(argc, argv, "adflo:prt:uvwnO:")) != -1)
  		switch (ch) {
- 		case 'a':
- 			all = 1;
-@@ -260,9 +260,6 @@
+ 		case 'n':
+ 		case 'O':
+@@ -264,9 +264,6 @@
  		case 'd':
  			debug = 1;
  			break;
@@ -32,7 +32,7 @@
  		case 'f':
  			init_flags |= MNT_FORCE;
  			break;
-@@ -656,11 +653,13 @@
+@@ -660,11 +657,13 @@
  			(void)printf(", reads: sync %ju async %ju",
  			    (uintmax_t)sfp->f_syncreads,
  			    (uintmax_t)sfp->f_asyncreads);
@@ -46,7 +46,7 @@
  	}
  	(void)printf(")\n");
  }
-@@ -858,7 +857,7 @@
+@@ -867,7 +866,7 @@
  {
  
  	(void)fprintf(stderr, "%s\n%s\n%s\n",
@@ -55,7 +55,7 @@
  "       mount [-dfpruvw] special | node",
  "       mount [-dfpruvw] [-o options] [-t ufs | external_type] special node");
  	exit(1);
-@@ -883,7 +882,7 @@
+@@ -892,7 +891,7 @@
  
  	if (strncmp(ent->f_mntfromname, "<below>", 7) == 0 ||
  	    strncmp(ent->f_mntfromname, "<above>", 7) == 0) {

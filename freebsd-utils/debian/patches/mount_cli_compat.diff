@@ -1,0 +1,28 @@
+--- a/sbin/mount/mount.c
++++ b/sbin/mount/mount.c
+@@ -252,8 +252,12 @@
+ 	options = NULL;
+ 	vfslist = NULL;
+ 	vfstype = "ufs";
+-	while ((ch = getopt(argc, argv, "adF:flo:prt:uvw")) != -1)
++	while ((ch = getopt(argc, argv, "adF:flo:prt:uvwnO:")) != -1)
+ 		switch (ch) {
++		case 'n':
++		case 'O':
++			/* Compatibility glue. */
++			break;
+ 		case 'a':
+ 			all = 1;
+ 			break;
+@@ -761,6 +765,11 @@
+ 			} else if (strncmp(p, groupquotaeq,
+ 			    sizeof(groupquotaeq) - 1) == 0) {
+ 				continue;
++			} else if (strcmp(p, "remount") == 0) {
++				/* Compatibility glue. */
++				append_arg(a, strdup("-o"));
++				append_arg(a, strdup("update"));
++				continue;
+ 			} else if (*p == '-') {
+ 				append_arg(a, p);
+ 				p = strchr(p, '=');
