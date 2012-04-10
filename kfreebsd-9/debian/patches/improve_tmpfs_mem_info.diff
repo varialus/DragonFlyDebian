@@ -1,0 +1,21 @@
+
+Cherry-pick from 9-STABLE (SVN rev 233769).
+
+http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=666747
+http://www.freebsd.org/cgi/query-pr.cgi?pr=kern/155411
+
+--- a/sys/fs/tmpfs/tmpfs.h
++++ b/sys/fs/tmpfs/tmpfs.h
+@@ -483,11 +483,8 @@
+ static __inline size_t
+ tmpfs_mem_info(void)
+ {
+-	size_t size;
+ 
+-	size = swap_pager_avail + cnt.v_free_count + cnt.v_inactive_count;
+-	size -= size > cnt.v_wire_count ? cnt.v_wire_count : size;
+-	return size;
++	return (swap_pager_avail + cnt.v_free_count + cnt.v_cache_count);
+ }
+ 
+ /* Returns the maximum size allowed for a tmpfs file system.  This macro
