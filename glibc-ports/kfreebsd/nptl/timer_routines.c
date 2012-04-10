@@ -56,7 +56,7 @@ timer_sigev_thread (void *arg)
      signals.  */
   sigset_t ss;
   sigemptyset (&ss);
-  pthread_sigmask (SIG_SETMASK, &ss, NULL);
+  sigprocmask (SIG_SETMASK, &ss, NULL);
 
   struct thread_start_data *td = (struct thread_start_data *) arg;
 
@@ -182,7 +182,7 @@ __start_helper_thread (void)
   sigset_t oss;
   sigfillset (&ss);
   __sigaddset (&ss, SIGCANCEL);
-  pthread_sigmask (SIG_SETMASK, &ss, &oss);
+  sigprocmask (SIG_SETMASK, &ss, &oss);
 
   /* Create the helper thread for this timer.  */
   pthread_t th;
@@ -192,7 +192,7 @@ __start_helper_thread (void)
     __helper_tid = ((struct pthread *) th)->tid;
 
   /* Restore the signal mask.  */
-  pthread_sigmask (SIG_SETMASK, &oss, NULL);
+  sigprocmask (SIG_SETMASK, &oss, NULL);
 
   /* No need for the attribute anymore.  */
   (void) pthread_attr_destroy (&attr);
