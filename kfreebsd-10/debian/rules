@@ -69,7 +69,7 @@ get-orig-source:
 
 control: clean
 	for arch in `ls $(CURDIR)/debian/arch/` ; do \
-		KW_CONFIG_DIR=debian/arch/$$arch/installer ; \
+		KW_CONFIG_DIR=debian/installer/$$arch ; \
 		if test -e $$KW_CONFIG_DIR ; then \
 			for config in `ls $(CURDIR)/debian/arch/$$arch/ | grep \.config` ; do \
 				flavor=$${config/.config/} ; \
@@ -92,7 +92,8 @@ control: clean
 				$(CURDIR)/debian/control.flavor.in ; \
 			echo ; \
 		done ; \
-		export KW_CONFIG_DIR=debian/arch/$$arch/installer ; \
+		export KW_DEFCONFIG_DIR=debian/installer ; \
+		export KW_CONFIG_DIR=debian/installer/$$arch ; \
 		if test -e $$KW_CONFIG_DIR/kernel-versions ; then \
 			kernel-wedge gen-control ; \
 		fi ; \
@@ -293,8 +294,9 @@ ifeq ($(DEB_HOST_ARCH_OS), kfreebsd)
 			dh_clean -k -pkernel-image-$(version)-$(abiname)-$${subarch}-di ; \
 	done
 
-	KW_CONFIG_DIR=debian/arch/$(DEB_HOST_ARCH_CPU)/installer kernel-wedge install-files \
-		$(version)-$(abiname) debian/arch/$(DEB_HOST_ARCH_CPU)/installer
+	export KW_DEFCONFIG_DIR=debian/installer ; \
+	KW_CONFIG_DIR=debian/installer/$(DEB_HOST_ARCH_CPU) kernel-wedge install-files \
+		$(version)-$(abiname) debian/installer/$(DEB_HOST_ARCH_CPU)
 
 	for i in debian/arch/$(DEB_HOST_ARCH_CPU)/*.installer ; do \
 		subarch=`basename $$i .installer` ; \
