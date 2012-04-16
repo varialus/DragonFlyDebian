@@ -1,0 +1,50 @@
+
+This patch is just a safety check to detect when newer kernels introduce
+incompatibilities with our userland.  When a possible problem happens, it
+will either stop applying or cause build failure.
+
+It handles two situations:
+
+  - If the kernel attempts to use SIGTHR, SIGLWP or SIGLIBRT (build failure).
+
+  - When signal 34 is used by the kernel (patch will stop applying).
+
+--- a/sys/sys/signal.h
++++ b/sys/sys/signal.h
+@@ -108,11 +108,7 @@
+ #define	SIGUSR1		30	/* user defined signal 1 */
+ #define	SIGUSR2		31	/* user defined signal 2 */
+ #endif
+-#if __BSD_VISIBLE
+-#define	SIGTHR		32	/* reserved by thread library. */
+-#define	SIGLWP		SIGTHR
+-#define	SIGLIBRT	33	/* reserved by real-time library. */
+-#endif
++/* Signals 32, 33 and 34 are reserved by Glibc. */
+ 
+ #define	SIGRTMIN	65
+ #define	SIGRTMAX	126
+--- a/sys/kern/kern_prot.c
++++ b/sys/kern/kern_prot.c
+@@ -1557,8 +1557,8 @@
+ 	 * pretty safe to do since the only way to create two processes
+ 	 * with the same p_leader is via rfork(2).
+ 	 */
+-	if (td->td_proc->p_leader != NULL && signum >= SIGTHR &&
+-	    signum < SIGTHR + 4 && td->td_proc->p_leader == p->p_leader)
++	if (td->td_proc->p_leader != NULL && signum >= 32 &&
++	    signum < 32 + 4 && td->td_proc->p_leader == p->p_leader)
+ 		return (0);
+ 
+ 	return (cr_cansignal(td->td_ucred, p, signum));
+--- a/sys/sys/rctl.h
++++ b/sys/sys/rctl.h
+@@ -124,7 +124,7 @@
+ #define	RCTL_ACTION_SIGINFO		SIGINFO
+ #define	RCTL_ACTION_SIGUSR1		SIGUSR1
+ #define	RCTL_ACTION_SIGUSR2		SIGUSR2
+-#define	RCTL_ACTION_SIGTHR		SIGTHR
++#define	RCTL_ACTION_SIGTHR		32
+ #define	RCTL_ACTION_SIGNAL_MAX		RCTL_ACTION_SIGTHR
+ #define	RCTL_ACTION_DENY		(RCTL_ACTION_SIGNAL_MAX + 1)
+ #define	RCTL_ACTION_LOG			(RCTL_ACTION_SIGNAL_MAX + 2)
