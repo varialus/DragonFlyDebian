@@ -65,9 +65,8 @@
 #define SIGINFO		29	/* Information request (4.4 BSD).  */
 #define	SIGUSR1		30	/* User-defined signal 1 (POSIX).  */
 #define	SIGUSR2		31	/* User-defined signal 2 (POSIX).  */
-#define	SIGTHR		32	/* Reserved by thread library. */
-#define	SIGLWP		SIGTHR
-#define	SIGLIBRT	33	/* Reserved by real-time library. */
+/* Signals 32 and 33 are reserved for system libraries. */
+
 /* Signal 34 is used (but not reserved) by thread library.
    See PTHREAD_SIGBASE in kernel-features.h.  */
 
