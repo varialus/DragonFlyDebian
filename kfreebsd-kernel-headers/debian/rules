@@ -65,6 +65,8 @@ build-arch-stamp:
 		-e 's/\(\s\|^\|(\)u_\(char\|int\|short\|long\)\(\s\)/\1unsigned \2\3/g' \
 		-e 's/__printflike(\([0-9]\+\),\s*\([0-9]\+\))/__attribute__((__format__ (__printf__, \1, \2)))/g' \
 		\
+		-e 's/\(\s\|^\|(\)\(out[bwl]\)\(\s*(\)/\1__bsd_\2\3/g' \
+		\
 		-e 's/defined\s*(\s*_SYS_CDEFS_H_\s*)/defined(_SYS_CDEFS_H)/g' \
 		-e 's/#\s*ifdef\s*_SYS_CDEFS_H_\(\s\|$$\)/#ifdef _SYS_CDEFS_H/g' \
 		-e 's/#\s*ifndef\s*_SYS_CDEFS_H_\(\s\|$$\)/#ifndef _SYS_CDEFS_H/g' \
