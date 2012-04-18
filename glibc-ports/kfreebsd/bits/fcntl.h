@@ -65,6 +65,11 @@ enum { O_NOATIME = 0};          /* Do not set atime.  */
 # define O_RSYNC	O_SYNC	/* Synchronize read operations.	 */
 #endif
 
+#if _POSIX_C_SOURCE >= 200809L
+#define O_TTY_INIT	0x00080000	/* Restore default termios attributes */
+#define O_CLOEXEC	0x00100000
+#endif
+
 /* Since 'off_t' is 64-bit, O_LARGEFILE is a no-op.  */
 #define O_LARGEFILE	0
 
