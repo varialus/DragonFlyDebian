@@ -1,0 +1,48 @@
+--- a/sys/amd64/include/_bus.h
++++ b/sys/amd64/include/_bus.h
+@@ -31,16 +31,18 @@
+ #ifndef AMD64_INCLUDE__BUS_H
+ #define AMD64_INCLUDE__BUS_H
+ 
++#include <sys/_types.h>
++
+ /*
+  * Bus address and size types
+  */
+-typedef uint64_t bus_addr_t;
+-typedef uint64_t bus_size_t;
++typedef __uint64_t bus_addr_t;
++typedef __uint64_t bus_size_t;
+ 
+ /*
+  * Access methods for bus resources and address space.
+  */
+-typedef	uint64_t bus_space_tag_t;
+-typedef	uint64_t bus_space_handle_t;
++typedef	__uint64_t bus_space_tag_t;
++typedef	__uint64_t bus_space_handle_t;
+ 
+ #endif /* AMD64_INCLUDE__BUS_H */
+--- a/sys/i386/include/_bus.h
++++ b/sys/i386/include/_bus.h
+@@ -31,15 +31,17 @@
+ #ifndef I386_INCLUDE__BUS_H
+ #define I386_INCLUDE__BUS_H
+ 
++#include <sys/_types.h>
++
+ /*
+  * Bus address and size types
+  */
+ #ifdef PAE
+-typedef uint64_t bus_addr_t;
++typedef __uint64_t bus_addr_t;
+ #else
+-typedef uint32_t bus_addr_t;
++typedef __uint32_t bus_addr_t;
+ #endif
+-typedef uint32_t bus_size_t;
++typedef __uint32_t bus_size_t;
+ 
+ /*
+  * Access methods for bus resources and address space.

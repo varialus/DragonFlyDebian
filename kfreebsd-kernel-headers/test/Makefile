@@ -1,4 +1,5 @@
 TESTS = \
+	bus.o \
 	cpufunc.o \
 	in_pcb.o \
 	ppp.o \
