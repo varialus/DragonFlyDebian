@@ -22,6 +22,7 @@
 #endif
 
 #include <bits/types.h>
+#include <sys/_types.h>
 
 /* Transmute defines to enumerations.  The macro re-definitions are
    necessary because some programs want to test for operating system
@@ -117,6 +118,16 @@ struct rlimit64
     rlim64_t rlim_max;
  };
 #endif
+
+struct orlimit {
+	__int32_t	rlim_cur;	/* current (soft) limit */
+	__int32_t	rlim_max;	/* maximum value for rlim_cur */
+};
+
+struct loadavg {
+	__fixpt_t	ldavg[3];
+	long		fscale;
+};
 
 #define	CP_USER		0
 #define	CP_NICE		1
