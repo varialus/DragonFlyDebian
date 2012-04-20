@@ -59,7 +59,7 @@
  typedef	struct __mq	*__mqd_t;	/* mq_open()... */
  typedef	__uint32_t	__uid_t;
  typedef	unsigned int	__useconds_t;	/* microseconds (unsigned) */
-@@ -98,9 +111,13 @@
+@@ -98,10 +111,14 @@
   * mbstate_t is an opaque object to keep conversion state during multibyte
   * stream conversions.
   */
@@ -72,7 +72,8 @@
  } __mbstate_t;
 +#endif
  
- #endif /* !_SYS__TYPES_H_ */
+ /* Types below are defined in <sys/types.h> on FreeBSD.  We have to define them
+    here because <sys/types.h> is GNU-owned (some of them are also GNU types, but
 --- a/sys/amd64/include/_types.h
 +++ b/sys/amd64/include/_types.h
 @@ -76,11 +76,19 @@
@@ -151,3 +152,34 @@
  typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
  typedef	__uint64_t	size_t;		/* sizeof() */
  typedef	__int64_t	__ssize_t;		/* byte count or error */
+--- a/sys/sys/types.h
++++ b/sys/sys/types.h
+@@ -44,7 +44,18 @@
+ #include <machine/endian.h>
+ #include <sys/_types.h>
+ 
+-#include <sys/_pthreadtypes.h>
++/* Allow conflicting declarations in glibc <sys/types.h> to override us.  */
++#include <sys/types.h>
++#define _CLOCK_T_DECLARED
++#define _FSBLKCNT_T_DECLARED
++#define _ID_T_DECLARED
++#define _TIME_T_DECLARED
++#define _TIMER_T_DECLARED
++
++/* We can't declare size_t directly because of s/__size_t/size_t/g in
++   debian/rules (see rev 184135 in GCC SVN).  */
++#include <stddef.h>
++#define _SIZE_T_DECLARED
+ 
+ #if __BSD_VISIBLE
+ typedef	unsigned char	u_char;
+@@ -182,8 +193,6 @@
+ #define	_PID_T_DECLARED
+ #endif
+ 
+-typedef	__register_t	register_t;
+-
+ #ifndef _RLIM_T_DECLARED
+ typedef	__rlim_t	rlim_t;		/* resource limit */
+ #define	_RLIM_T_DECLARED

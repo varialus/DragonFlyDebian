@@ -1,63 +1,10 @@
 --- a/sys/sys/_types.h
 +++ b/sys/sys/_types.h
-@@ -120,4 +120,66 @@
+@@ -103,4 +103,13 @@
+ 	__int64_t	_mbstateL;	/* for alignment */
  } __mbstate_t;
- #endif
  
-+/* Types below are defined in <sys/types.h> on FreeBSD.  We have to define them
-+   here because <sys/types.h> is GNU-owned (some of them are also GNU types, but
-+   thanks to _GNU_SOURCE non-sense they can't be used unconditionally).  */
-+
-+#ifndef _CLOCK_T_DECLARED
-+typedef	__clock_t	clock_t;
-+#define	_CLOCK_T_DECLARED
-+#endif
-+
-+#ifndef _FFLAGS_T_DECLARED
-+typedef	__fflags_t	fflags_t;	/* file flags */
-+#define	_FFLAGS_T_DECLARED
-+#endif
-+
-+typedef	__fixpt_t	fixpt_t;	/* fixed point number */
-+
-+#ifndef _IN_ADDR_T_DECLARED
-+typedef	__uint32_t	in_addr_t;	/* base type for internet address */
-+#define	_IN_ADDR_T_DECLARED
-+#endif
-+
-+#ifndef _IN_PORT_T_DECLARED
-+typedef	__uint16_t	in_port_t;
-+#define	_IN_PORT_T_DECLARED
-+#endif
-+
-+#ifndef _LWPID_T_DECLARED
-+typedef	__lwpid_t	lwpid_t;	/* Thread ID (a.k.a. LWP) */
-+#define	_LWPID_T_DECLARED
-+#endif
-+
-+#ifndef _NLINK_T_DECLARED
-+typedef	__nlink_t	nlink_t;	/* link count */
-+#define	_NLINK_T_DECLARED
-+#endif
-+
-+#ifndef _RLIM_T_DECLARED
-+typedef	__rlim_t	rlim_t;		/* resource limit */
-+#define	_RLIM_T_DECLARED
-+#endif
-+
-+typedef	__segsz_t	segsz_t;	/* segment size (in pages) */
-+
-+typedef	__u_register_t	u_register_t;
-+typedef	__vm_offset_t	vm_offset_t;
-+typedef	__vm_ooffset_t	vm_ooffset_t;
-+typedef	__vm_paddr_t	vm_paddr_t;
-+typedef	__vm_pindex_t	vm_pindex_t;
-+typedef	__vm_size_t	vm_size_t;
-+typedef	__cpuwhich_t	cpuwhich_t;
-+typedef	__cpulevel_t	cpulevel_t;
-+typedef	__cpusetid_t	cpusetid_t;
-+typedef	__cap_rights_t  cap_rights_t;
-+
++/* FIXME: this belongs in <sys/time.h>.   */
 +#ifndef bintime 
 +#define bintime bintime 
 +struct bintime { 
@@ -67,13 +14,3 @@
 +#endif 
 +                
  #endif /* !_SYS__TYPES_H_ */
---- a/sys/sys/proc.h
-+++ b/sys/sys/proc.h
-@@ -38,6 +38,7 @@
- #ifndef _SYS_PROC_H_
- #define	_SYS_PROC_H_
- 
-+#include <sys/_types.h> 
- #include <sys/callout.h>		/* For struct callout. */
- #include <sys/event.h>			/* For struct klist. */
- #include <sys/condvar.h>

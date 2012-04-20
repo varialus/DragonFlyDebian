@@ -1,4 +1,7 @@
 TESTS = \
+	type_collision.o \
+	uintXX_t.o \
+	\
 	bus.o \
 	cpufunc.o \
 	in_pcb.o \
@@ -7,7 +10,7 @@ TESTS = \
 	usb.o \
 	$()
 
-CFLAGS = -I../debian/kfreebsd-kernel-headers/usr/include
+CFLAGS = -Iinclude -I../debian/kfreebsd-kernel-headers/usr/include
 
 all: $(TESTS)
 

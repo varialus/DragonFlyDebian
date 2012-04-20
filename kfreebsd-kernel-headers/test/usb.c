@@ -1,3 +1,3 @@
-#include <sys/types.h>
+#include <kern/types.h>
 #include <dev/usb/usb.h>
 #include <dev/usb/usbhid.h>

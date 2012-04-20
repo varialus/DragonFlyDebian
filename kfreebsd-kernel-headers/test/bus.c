@@ -1,3 +1,3 @@
 #include <sys/cdefs.h>
-#include <sys/types.h>
+#include <kern/types.h>
 #include <machine/bus.h>
