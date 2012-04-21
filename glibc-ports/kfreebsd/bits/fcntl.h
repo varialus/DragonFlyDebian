@@ -67,7 +67,8 @@ enum { O_NOATIME = 0};          /* Do not set atime.  */
 
 #if _POSIX_C_SOURCE >= 200809L
 #define O_TTY_INIT	0x00080000	/* Restore default termios attributes */
-#define O_CLOEXEC	0x00100000
+/* Defining O_CLOEXEC would break kfreebsd 8.1, see #635192 */
+/* #define O_CLOEXEC	0x00100000 */
 #endif
 
 /* Since 'off_t' is 64-bit, O_LARGEFILE is a no-op.  */
