@@ -1,6 +1,7 @@
 TESTS = \
 	type_collision.o \
 	time_collision.o \
+	param_collision.o \
 	uintXX_t.o \
 	\
 	bus.o \
