@@ -1,0 +1,42 @@
+--- a/sys/sys/time.h
++++ b/sys/sys/time.h
+@@ -46,7 +46,7 @@
+ #define	DST_EET		5	/* Eastern European dst */
+ #define	DST_CAN		6	/* Canada */
+ 
+-#if __BSD_VISIBLE
++#ifdef __USE_BSD
+ struct bintime {
+ 	time_t	sec;
+ 	uint64_t frac;
+--- a/sys/sys/limits.h
++++ b/sys/sys/limits.h
+@@ -34,7 +34,9 @@
+ 
+ #include <sys/cdefs.h>
+ #include <machine/_limits.h>
++#include <limits.h>
+ 
++#if 0
+ #define	CHAR_BIT	__CHAR_BIT	/* number of bits in a char */
+ 
+ #define	SCHAR_MAX	__SCHAR_MAX	/* max value for a signed char */
+@@ -71,15 +73,16 @@
+ #if __POSIX_VISIBLE || __XSI_VISIBLE
+ #define	SSIZE_MAX	__SSIZE_MAX	/* max value for an ssize_t */
+ #endif
++#endif /* 0 */
+ 
+-#if __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE
++#if _POSIX_C_SOURCE >= 200112
+ #define	SIZE_T_MAX	__SIZE_T_MAX	/* max value for a size_t */
+ 
+ #define	OFF_MAX		__OFF_MAX	/* max value for an off_t */
+ #define	OFF_MIN		__OFF_MIN	/* min value for an off_t */
+ #endif
+ 
+-#if __BSD_VISIBLE
++#ifdef __USE_BSD
+ #define	GID_MAX		UINT_MAX	/* max value for a gid_t */
+ #define	UID_MAX		UINT_MAX	/* max value for a uid_t */
+ 
