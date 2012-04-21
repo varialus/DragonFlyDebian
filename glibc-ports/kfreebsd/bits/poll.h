@@ -31,16 +31,13 @@
 /* These values are defined in XPG4.2.  */
 # define POLLRDNORM	0x0040		/* Normal data may be read.  */
 # define POLLRDBAND	0x0080		/* Priority data may be read.  */
-# define POLLWRNORM	0x0004		/* Writing now will not block.  */
+# define POLLWRNORM	POLLOUT		/* Writing now will not block.  */
 # define POLLWRBAND	0x0100		/* Priority data may be written.  */
 #endif
 
 #ifdef __USE_BSD
-/* These are extensions for FreeBSD.  */
-# define POLLEXTEND	0x0200		/* File size may have grown.  */
-# define POLLATTRIB	0x0400		/* File attributes may have changed.  */
-# define POLLNLINK	0x0800		/* File may have been moved/removed.  */
-# define POLLWRITE	0x1000		/* File's contents may have changed.  */
+/* General FreeBSD extension (currently only supported for sockets): */
+# define POLLINIGNEOF	0x2000		/* like POLLIN, except ignore EOF */
 #endif
 
 /* Event types always implicitly polled for.  These bits need not be set in
@@ -49,3 +46,17 @@
 #define POLLERR		0x0008		/* Error condition.  */
 #define POLLHUP		0x0010		/* Hung up.  */
 #define POLLNVAL	0x0020		/* Invalid polling request.  */
+
+#ifdef __USE_BSD
+
+# define POLLSTANDARD	(POLLIN|POLLPRI|POLLOUT|POLLRDNORM|POLLRDBAND|\
+			POLLWRBAND|POLLERR|POLLHUP|POLLNVAL)
+
+/*
+ * Request that poll() wait forever.
+ * XXX in SYSV, this is defined in stropts.h, which is not included
+ * by poll.h.
+ */
+#define INFTIM		(-1)
+
+#endif
