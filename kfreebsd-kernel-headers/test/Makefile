@@ -7,6 +7,7 @@ TESTS = \
 	in_pcb.o \
 	ppp.o \
 	soundcard.o \
+	sys_sysctl.o \
 	usb.o \
 	$()
 

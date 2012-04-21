@@ -460,7 +460,7 @@
  	siginfo_t		ksi_info;
 --- a/sys/sys/sysctl.h
 +++ b/sys/sys/sysctl.h
-@@ -36,7 +36,105 @@
+@@ -36,7 +36,106 @@
  #ifndef _SYS_SYSCTL_H_
  #define	_SYS_SYSCTL_H_
  
@@ -468,6 +468,7 @@
 +#include <features.h>
 +#define __need_size_t
 +#include <stddef.h>
++#include <kern/types.h>	/* required by <vm/vm_param.h> */
 +#include <vm/vm_param.h>
 +
 +/****************************************  Stolen from sys/mount.h */
@@ -567,7 +568,7 @@
  
  struct thread;
  /*
-@@ -790,9 +888,15 @@
+@@ -790,9 +889,15 @@
  #include <sys/cdefs.h>
  
  __BEGIN_DECLS
