@@ -177,7 +177,7 @@
 +#include <stddef.h>
 +#define _SIZE_T_DECLARED
  
- #if __USE_BSD
+ #if __BSD_VISIBLE
  typedef	unsigned char	u_char;
 @@ -182,8 +195,6 @@
  #define	_PID_T_DECLARED
@@ -188,6 +188,23 @@
  #ifndef _RLIM_T_DECLARED
  typedef	__rlim_t	rlim_t;		/* resource limit */
  #define	_RLIM_T_DECLARED
+@@ -273,6 +284,7 @@
+ 
+ #include <sys/select.h>
+ 
++#if 0
+ /*
+  * minor() gives a cookie instead of an index since we don't want to
+  * change the meanings of bits 0-15 or waste time and space shifting
+@@ -308,6 +320,8 @@
+ __END_DECLS
+ #endif /* !_KERNEL */
+ 
++#endif
++
+ #endif /* __BSD_VISIBLE */
+ 
+ #endif /* !_SYS_TYPES_H_ */
 --- a/sys/sys/time.h
 +++ b/sys/sys/time.h
 @@ -36,11 +36,8 @@
@@ -203,7 +220,16 @@
  #define	DST_NONE	0	/* not on dst */
  #define	DST_USA		1	/* USA style dst */
  #define	DST_AUST	2	/* Australian style dst */
-@@ -199,7 +191,7 @@
+@@ -49,7 +46,7 @@
+ #define	DST_EET		5	/* Eastern European dst */
+ #define	DST_CAN		6	/* Canada */
+ 
+-#if __BSD_VISIBLE
++#if 1
+ struct bintime {
+ 	time_t	sec;
+ 	uint64_t frac;
+@@ -199,7 +196,7 @@
  
  #endif /* _KERNEL */
  
@@ -212,7 +238,7 @@
  
  #define	timerclear(tvp)		((tvp)->tv_sec = (tvp)->tv_usec = 0)
  #define	timerisset(tvp)		((tvp)->tv_sec || (tvp)->tv_usec)
-@@ -227,6 +219,7 @@
+@@ -227,6 +224,7 @@
  	} while (0)
  #endif
  
@@ -220,26 +246,15 @@
  /*
   * Names of the interval timers, and structure
   * defining a timer setting.
-@@ -239,17 +232,7 @@
- 	struct	timeval it_interval;	/* timer interval */
- 	struct	timeval it_value;	/* current value */
+@@ -250,6 +248,7 @@
+ 	int	stathz;		/* statistics clock frequency */
+ 	int	profhz;		/* profiling clock frequency */
  };
--
--/*
-- * Getkerninfo clock information structure
-- */
--struct clockinfo {
--	int	hz;		/* clock frequency */
--	int	tick;		/* micro-seconds per hz tick */
--	int	spare;
--	int	stathz;		/* statistics clock frequency */
--	int	profhz;		/* profiling clock frequency */
--};
 +#endif
  
  /* These macros are also in time.h. */
  #ifndef CLOCK_REALTIME
-@@ -338,6 +321,7 @@
+@@ -338,6 +337,7 @@
  #include <sys/cdefs.h>
  #include <sys/select.h>
  
@@ -247,7 +262,7 @@
  __BEGIN_DECLS
  int	setitimer(int, const struct itimerval *, struct itimerval *);
  int	utimes(const char *, const struct timeval *);
-@@ -356,6 +340,7 @@
+@@ -356,6 +356,7 @@
  #endif
  
  __END_DECLS
@@ -259,7 +274,7 @@
 +++ b/sys/sys/timespec.h
 @@ -51,6 +51,7 @@
  
- #endif /* __USE_BSD */
+ #endif /* __BSD_VISIBLE */
  
 +#if 0
  /*
