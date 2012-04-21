@@ -1,2 +1,2 @@
-#include <kern/types.h>
+#include <sys/kern/types.h>
 #include <net/ppp_defs.h>
