@@ -12,3 +12,58 @@
  
  /* 
   * __FreeBSD_kernel_version numbers are documented in the Porter's Handbook.
+@@ -79,11 +76,15 @@
+ #include <sys/syslimits.h>
+ 
+ #define	MAXCOMLEN	19		/* max command name remembered */
++#if 0
+ #define	MAXINTERP	PATH_MAX	/* max interpreter file name length */
++#endif
+ #define	MAXLOGNAME	17		/* max login name length (incl. NUL) */
+ #define	MAXUPRC		CHILD_MAX	/* max simultaneous processes */
+ #define	NCARGS		ARG_MAX		/* max bytes for an exec function */
++#if 0
+ #define	NGROUPS		(NGROUPS_MAX+1)	/* max number groups */
++#endif
+ #define	NOFILE		OPEN_MAX	/* max open files per process */
+ #define	NOGROUP		65535		/* marker for empty group set member */
+ #define MAXHOSTNAMELEN	256		/* max hostname size */
+@@ -199,7 +200,9 @@
+ 
+ #define	NZERO	0		/* default "nice" */
+ 
++#if 0
+ #define	NBBY	8		/* number of bits in a byte */
++#endif
+ #define	NBPW	sizeof(int)	/* number of bytes per word (integer) */
+ 
+ #define	CMASK	022		/* default file mask: S_IWGRP|S_IWOTH */
+@@ -245,6 +248,7 @@
+ #define	MAXPATHLEN	PATH_MAX
+ #define MAXSYMLINKS	32
+ 
++#if 0
+ /* Bit map related macros. */
+ #define	setbit(a,i)	(((unsigned char *)(a))[(i)/NBBY] |= 1<<((i)%NBBY))
+ #define	clrbit(a,i)	(((unsigned char *)(a))[(i)/NBBY] &= ~(1<<((i)%NBBY)))
+@@ -252,15 +256,20 @@
+ 	(((const unsigned char *)(a))[(i)/NBBY] & (1<<((i)%NBBY)))
+ #define	isclr(a,i)							\
+ 	((((const unsigned char *)(a))[(i)/NBBY] & (1<<((i)%NBBY))) == 0)
++#endif
+ 
+ /* Macros for counting and rounding. */
+ #ifndef howmany
+ #define	howmany(x, y)	(((x)+((y)-1))/(y))
+ #endif
+ #define	rounddown(x, y)	(((x)/(y))*(y))
++#if 0
+ #define	roundup(x, y)	((((x)+((y)-1))/(y))*(y))  /* to any y */
++#endif
+ #define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1))) /* if y is powers of two */
++#if 0
+ #define powerof2(x)	((((x)-1)&(x))==0)
++#endif
+ 
+ /* Macros for min/max. */
+ #define	MIN(a,b) (((a)<(b))?(a):(b))
