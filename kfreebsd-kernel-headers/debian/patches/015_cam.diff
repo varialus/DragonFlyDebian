@@ -54,30 +54,12 @@
 -};
 -
  #endif /* !_SYS__TIMEVAL_H_ */
---- a/sys/sys/bio.h
-+++ b/sys/sys/bio.h
-@@ -41,6 +41,15 @@
- #include <sys/queue.h>
- #include <stdint.h>
- 
-+/* FIXME: this struct is copied from BSDish sys/time.h.  It should be somewhere else. (maybe Glibc?) */
-+#ifndef bintime
-+#define bintime bintime
-+struct bintime {
-+	time_t  sec;
-+	uint64_t frac;
-+};
-+#endif
-+
- /* bio_cmd */
- #define BIO_READ	0x01
- #define BIO_WRITE	0x02
 --- a/sys/sys/devicestat.h
 +++ b/sys/sys/devicestat.h
 @@ -33,6 +33,8 @@
  
  #include <sys/queue.h>
- #include <sys/time.h>
+ #include <sys/kern/time.h>
 +#include <sys/_types.h>
 +#include <sys/resource.h>
  #include <stdint.h>

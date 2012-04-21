@@ -59,7 +59,7 @@
  typedef	struct __mq	*__mqd_t;	/* mq_open()... */
  typedef	__uint32_t	__uid_t;
  typedef	unsigned int	__useconds_t;	/* microseconds (unsigned) */
-@@ -98,10 +111,14 @@
+@@ -98,9 +111,13 @@
   * mbstate_t is an opaque object to keep conversion state during multibyte
   * stream conversions.
   */
@@ -72,8 +72,7 @@
  } __mbstate_t;
 +#endif
  
- /* FIXME: this belongs in <sys/time.h>.   */
- #ifndef bintime 
+ #endif /* !_SYS__TYPES_H_ */
 --- a/sys/amd64/include/_types.h
 +++ b/sys/amd64/include/_types.h
 @@ -76,11 +76,19 @@
@@ -183,3 +182,83 @@
  #ifndef _RLIM_T_DECLARED
  typedef	__rlim_t	rlim_t;		/* resource limit */
  #define	_RLIM_T_DECLARED
+--- a/sys/sys/time.h
++++ b/sys/sys/time.h
+@@ -36,11 +36,8 @@
+ #include <sys/_timeval.h>
+ #include <sys/kern/types.h>
+ #include <sys/timespec.h>
++#include <sys/time.h>
+ 
+-struct timezone {
+-	int	tz_minuteswest;	/* minutes west of Greenwich */
+-	int	tz_dsttime;	/* type of dst correction */
+-};
+ #define	DST_NONE	0	/* not on dst */
+ #define	DST_USA		1	/* USA style dst */
+ #define	DST_AUST	2	/* Australian style dst */
+@@ -50,11 +47,6 @@
+ #define	DST_CAN		6	/* Canada */
+ 
+ #if __BSD_VISIBLE
+-struct bintime {
+-	time_t	sec;
+-	uint64_t frac;
+-};
+-
+ static __inline void
+ bintime_addx(struct bintime *bt, uint64_t x)
+ {
+@@ -199,7 +191,7 @@
+ 
+ #endif /* _KERNEL */
+ 
+-#ifndef _KERNEL			/* NetBSD/OpenBSD compatible interfaces */
++#if 0
+ 
+ #define	timerclear(tvp)		((tvp)->tv_sec = (tvp)->tv_usec = 0)
+ #define	timerisset(tvp)		((tvp)->tv_sec || (tvp)->tv_usec)
+@@ -227,6 +219,7 @@
+ 	} while (0)
+ #endif
+ 
++#if 0
+ /*
+  * Names of the interval timers, and structure
+  * defining a timer setting.
+@@ -239,17 +232,7 @@
+ 	struct	timeval it_interval;	/* timer interval */
+ 	struct	timeval it_value;	/* current value */
+ };
+-
+-/*
+- * Getkerninfo clock information structure
+- */
+-struct clockinfo {
+-	int	hz;		/* clock frequency */
+-	int	tick;		/* micro-seconds per hz tick */
+-	int	spare;
+-	int	stathz;		/* statistics clock frequency */
+-	int	profhz;		/* profiling clock frequency */
+-};
++#endif
+ 
+ /* These macros are also in time.h. */
+ #ifndef CLOCK_REALTIME
+--- a/sys/sys/timespec.h
++++ b/sys/sys/timespec.h
+@@ -51,6 +51,7 @@
+ 
+ #endif /* __BSD_VISIBLE */
+ 
++#if 0
+ /*
+  * Structure defined by POSIX.1b to be like a itimerval, but with
+  * timespecs. Used in the timer_*() system calls.
+@@ -59,5 +60,6 @@
+ 	struct timespec  it_interval;
+ 	struct timespec  it_value;
+ };
++#endif
+ 
+ #endif /* _SYS_TIMESPEC_H_ */
