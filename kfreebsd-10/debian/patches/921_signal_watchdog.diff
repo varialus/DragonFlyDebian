@@ -3,11 +3,13 @@ This patch is just a safety check to detect when newer kernels introduce
 incompatibilities with our userland.  When a possible problem happens, it
 will either stop applying or cause build failure.
 
-It handles two situations:
+It handles three situations:
 
   - If the kernel attempts to use SIGTHR, SIGLWP or SIGLIBRT (build failure).
 
   - When signal 34 is used by the kernel (patch will stop applying).
+
+  - The spares in struct sigevent are claimed by upstream (see #666454).
 
 --- a/sys/sys/signal.h
 +++ b/sys/sys/signal.h
@@ -24,6 +26,15 @@ It handles two situations:
  
  #define	SIGRTMIN	65
  #define	SIGRTMAX	126
+@@ -171,6 +167,8 @@
+ 			void *_attribute; /* pthread_attr_t * */
+ 		} _sigev_thread;
+ 		unsigned short _kevent_flags;
++		/* This comment is a safety check to detect when the spares
++		   below are claimed by upstream (see #666454) */
+ 		long __spare__[8];
+ 	} _sigev_un;
+ };
 --- a/sys/kern/kern_prot.c
 +++ b/sys/kern/kern_prot.c
 @@ -1557,8 +1557,8 @@
