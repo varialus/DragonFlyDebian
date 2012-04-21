@@ -1,18 +1,3 @@
----
- lib/libkvm/Makefile             |    2 +-
- lib/libkvm/kvm.c                |   23 +++++++++++++++++++----
- lib/libkvm/kvm_cptime.c         |    4 ++--
- lib/libkvm/kvm_file.c           |    7 ++++++-
- lib/libkvm/kvm_getloadavg.c     |   12 +++++++++---
- lib/libkvm/kvm_getswapinfo.c    |    8 +++++---
- lib/libkvm/kvm_minidump_amd64.c |    9 +++++++++
- lib/libkvm/kvm_minidump_i386.c  |   10 ++++++++++
- lib/libkvm/kvm_pcpu.c           |    6 +++---
- lib/libkvm/kvm_private.h        |    6 ++++--
- lib/libkvm/kvm_proc.c           |    5 ++++-
- lib/libkvm/kvm_vnet.c           |   14 +++++++-------
- 12 files changed, 79 insertions(+), 27 deletions(-)
-
 --- a/lib/libkvm/Makefile
 +++ b/lib/libkvm/Makefile
 @@ -2,8 +2,8 @@
@@ -108,21 +93,6 @@
 +#endif
 +	return 0;
  }
---- a/lib/libkvm/kvm_getloadavg.c
-+++ b/lib/libkvm/kvm_getloadavg.c
-@@ -55,6 +55,12 @@
- 	{ .n_name = "" },
- };
- 
-+#include <sys/_types.h>
-+struct loadavg {
-+	__fixpt_t       ldavg[3];
-+	long            fscale;
-+};
-+
- /*
-  * kvm_getloadavg() -- Get system load averages, from live or dead kernels.
-  *
 --- a/lib/libkvm/kvm_getswapinfo.c
 +++ b/lib/libkvm/kvm_getswapinfo.c
 @@ -200,8 +200,10 @@
