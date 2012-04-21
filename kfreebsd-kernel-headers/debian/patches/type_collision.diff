@@ -27,7 +27,7 @@
  typedef	__uint32_t	__uintptr_t;
 --- a/sys/sys/_types.h
 +++ b/sys/sys/_types.h
-@@ -40,10 +40,19 @@
+@@ -40,11 +40,20 @@
  typedef	__int32_t	__clockid_t;	/* clock_gettime()... */
  typedef	__uint64_t	__cap_rights_t;	/* capability rights */
  typedef	__uint32_t	__fflags_t;	/* file flags */
@@ -43,11 +43,13 @@
 +typedef	__uint32_t	__id_t;
 +#else
  typedef	__int64_t	__id_t;		/* can hold a gid_t, pid_t, or uid_t */
+-typedef	__uint32_t	__ino_t;	/* inode number */
 +#endif
- typedef	__uint32_t	__ino_t;	/* inode number */
++typedef	__uint32_t	__kernel_ino_t;	/* inode number */
  typedef	long		__key_t;	/* IPC key (for Sys V IPC) */
  typedef	__int32_t	__lwpid_t;	/* Thread ID (a.k.a. LWP) */
-@@ -59,7 +68,11 @@
+ typedef	__uint16_t	__mode_t;	/* permissions */
+@@ -59,8 +68,12 @@
  typedef	__uint8_t	__sa_family_t;
  typedef	__uint32_t	__socklen_t;
  typedef	long		__suseconds_t;	/* microseconds (signed) */
@@ -55,10 +57,12 @@
 +typedef	__int32_t	__timer_t;
 +#else
  typedef	struct __timer	*__timer_t;	/* timer_gettime()... */
+-typedef	struct __mq	*__mqd_t;	/* mq_open()... */
 +#endif
- typedef	struct __mq	*__mqd_t;	/* mq_open()... */
++typedef	struct __mq	*__kernel_mqd_t;	/* mq_open()... */
  typedef	__uint32_t	__uid_t;
  typedef	unsigned int	__useconds_t;	/* microseconds (unsigned) */
+ typedef	int		__cpuwhich_t;	/* which parameter for cpuset. */
 @@ -98,9 +111,13 @@
   * mbstate_t is an opaque object to keep conversion state during multibyte
   * stream conversions.
@@ -153,7 +157,7 @@
  typedef	__int64_t	__ssize_t;		/* byte count or error */
 --- a/sys/sys/types.h
 +++ b/sys/sys/types.h
-@@ -44,7 +44,18 @@
+@@ -44,7 +44,20 @@
  #include <machine/endian.h>
  #include <sys/_types.h>
  
@@ -165,15 +169,17 @@
 +#define _ID_T_DECLARED
 +#define _TIME_T_DECLARED
 +#define _TIMER_T_DECLARED
++#define _MQD_T_DECLARED
++#define _INO_T_DECLARED
 +
 +/* We can't declare size_t directly because of s/__size_t/size_t/g in
 +   debian/rules (see rev 184135 in GCC SVN).  */
 +#include <stddef.h>
 +#define _SIZE_T_DECLARED
  
- #if __BSD_VISIBLE
+ #if __USE_BSD
  typedef	unsigned char	u_char;
-@@ -182,8 +193,6 @@
+@@ -182,8 +195,6 @@
  #define	_PID_T_DECLARED
  #endif
  
@@ -197,18 +203,6 @@
  #define	DST_NONE	0	/* not on dst */
  #define	DST_USA		1	/* USA style dst */
  #define	DST_AUST	2	/* Australian style dst */
-@@ -50,11 +47,6 @@
- #define	DST_CAN		6	/* Canada */
- 
- #if __BSD_VISIBLE
--struct bintime {
--	time_t	sec;
--	uint64_t frac;
--};
--
- static __inline void
- bintime_addx(struct bintime *bt, uint64_t x)
- {
 @@ -199,7 +191,7 @@
  
  #endif /* _KERNEL */
@@ -265,7 +259,7 @@
 +++ b/sys/sys/timespec.h
 @@ -51,6 +51,7 @@
  
- #endif /* __BSD_VISIBLE */
+ #endif /* __USE_BSD */
  
 +#if 0
  /*
