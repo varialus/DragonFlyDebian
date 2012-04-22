@@ -67,11 +67,25 @@ get-orig-source:
 	tar --numeric-owner --owner 0 --group 0 -czf ../$(TARNAME) $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
+BUILD_TARGETS = build-sbuf
+
 ifeq ($(kernel), kfreebsd)
-build: build-cam build-geom build-sbuf build-ipx build-kiconv build-kvm build-usbhid build-usb build-devstat build-memstat build-netgraph build-jail build-alias
-else
-build: build-sbuf
+BUILD_TARGETS += \
+	build-cam \
+	build-geom \
+	build-ipx \
+	build-kiconv \
+	build-kvm \
+	build-usbhid \
+	build-usb \
+	build-devstat \
+	build-memstat \
+	build-netgraph \
+	build-jail \
+	build-alias
 endif
+
+build: $(BUILD_TARGETS)
 
 build-cam: build-cam-stamp
 build-cam-stamp: build-sbuf
