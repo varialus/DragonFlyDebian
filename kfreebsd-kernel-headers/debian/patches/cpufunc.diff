@@ -3,8 +3,14 @@ See #660396
 
 --- a/sys/amd64/include/cpufunc.h
 +++ b/sys/amd64/include/cpufunc.h
-@@ -41,6 +41,9 @@
+@@ -39,8 +39,15 @@
+ #ifndef _MACHINE_CPUFUNC_H_
+ #define	_MACHINE_CPUFUNC_H_
  
++#ifdef _SYS_IO_H
++#error "This header must not be used in combination with <sys/io.h>."
++#endif
++
  #include <sys/types.h>
  
 +#include <stdint.h>
@@ -46,8 +52,14 @@ See #660396
  
 --- a/sys/i386/include/cpufunc.h
 +++ b/sys/i386/include/cpufunc.h
-@@ -40,6 +40,9 @@
+@@ -38,8 +38,15 @@
+ #ifndef _MACHINE_CPUFUNC_H_
+ #define	_MACHINE_CPUFUNC_H_
  
++#ifdef _SYS_IO_H
++#error "This header must not be used in combination with <sys/io.h>."
++#endif
++
  #include <sys/types.h>
  
 +#include <stdint.h>
