@@ -102,12 +102,13 @@ geli_make_list()
 
 geli_start()
 {
-	log_begin_msg "Starting GELI subsystem..."
+	log_begin_msg "Starting GELI subsystem:"
 
 	devices=`geli_make_list`
 	if [ -z "${devices}" ]; then
-		log_failure_msg "UNCONFIGURED. See /etc/default/geli"
-		exit 1
+		log_progress_msg "not configured; see /etc/default/geli"
+		log_end_msg 255 # (warning)
+		exit 0
 	fi
 
 	log_progress_msg "geom_eli"
@@ -151,7 +152,7 @@ geli_start()
 
 geli_stop()
 {
-	log_begin_msg "Stopping GELI subsystem..."
+	log_begin_msg "Stopping GELI subsystem:"
 
 	devices=`geli_make_list`
 
