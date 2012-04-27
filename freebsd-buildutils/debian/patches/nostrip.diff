@@ -1,0 +1,48 @@
+
+By default, install without -s.  Let dh_strip, etc handle stripping
+(and honor DEB_BUILD_OPTIONS=nostrip, etc).
+
+--- a/ports/Mk/bsd.port.subdir.mk
++++ b/ports/Mk/bsd.port.subdir.mk
+@@ -55,7 +55,7 @@
+ .MAIN: all
+ 
+ .if !defined(DEBUG_FLAGS)
+-STRIP?=	-s
++#STRIP?=	-s
+ .endif
+ 
+ # These are variables that are invariant for the lifetime of a recursive port traversal
+--- a/src/share/mk/bsd.lib.mk
++++ b/src/share/mk/bsd.lib.mk
+@@ -42,7 +42,7 @@
+ .endif
+ 
+ .if !defined(DEBUG_FLAGS)
+-STRIP?=	-s
++#STRIP?=	-s
+ .endif
+ 
+ .include <bsd.libnames.mk>
+--- a/src/share/mk/bsd.own.mk
++++ b/src/share/mk/bsd.own.mk
+@@ -183,7 +183,7 @@
+ 
+ # Common variables
+ .if !defined(DEBUG_FLAGS)
+-STRIP?=		-s
++#STRIP?=		-s
+ .endif
+ 
+ COMPRESS_CMD?=	gzip -cn -9
+--- a/src/share/mk/bsd.prog.mk
++++ b/src/share/mk/bsd.prog.mk
+@@ -29,7 +29,7 @@
+ .endif
+ 
+ .if !defined(DEBUG_FLAGS)
+-STRIP?=	-s
++#STRIP?=	-s
+ .endif
+ 
+ .if defined(NO_SHARED) && (${NO_SHARED} != "no" && ${NO_SHARED} != "NO")
