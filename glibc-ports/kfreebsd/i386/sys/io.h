@@ -19,6 +19,10 @@
 #ifndef	_SYS_IO_H
 #define	_SYS_IO_H	1
 
+#ifdef _MACHINE_CPUFUNC_H_
+#error "This header must not be used in combination with <machine/cpufunc.h>."
+#endif
+
 #include <features.h>
 
 __BEGIN_DECLS
