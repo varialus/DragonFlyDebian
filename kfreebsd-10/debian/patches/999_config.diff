@@ -1,6 +1,6 @@
 --- a/sys/amd64/conf/GENERIC
 +++ b/sys/amd64/conf/GENERIC
-@@ -18,10 +18,12 @@
+@@ -18,11 +18,11 @@
  #
  # $FreeBSD$
  
@@ -10,13 +10,13 @@
 +#ident		GENERIC
  
 -makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
-+hints          "GENERIC.hints"         # Default places to look for devices.
-+
+-makeoptions	WITH_CTF=1		# Run ctfconvert(1) for DTrace support
 +#makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
++#makeoptions	WITH_CTF=1		# Run ctfconvert(1) for DTrace support
  
  options 	SCHED_ULE		# ULE scheduler
  options 	PREEMPTION		# Enable kernel thread preemption
-@@ -49,7 +51,7 @@
+@@ -50,7 +50,7 @@
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
  options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
@@ -25,7 +25,7 @@
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -96,9 +98,6 @@
+@@ -98,9 +98,6 @@
  device		acpi
  device		pci
  
@@ -35,7 +35,7 @@
  # ATA controllers
  device		ahci		# AHCI-compatible SATA controllers
  device		ata		# Legacy ATA/SATA controllers
-@@ -195,10 +194,6 @@
+@@ -197,10 +194,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -46,7 +46,7 @@
  
  device		puc		# Multi I/O cards and multi-channel UARTs
  
-@@ -292,10 +287,7 @@
+@@ -294,10 +287,7 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
@@ -59,7 +59,7 @@
  # The `bpf' device enables the Berkeley Packet Filter.
 --- a/sys/i386/conf/GENERIC
 +++ b/sys/i386/conf/GENERIC
-@@ -18,12 +18,14 @@
+@@ -18,13 +18,13 @@
  #
  # $FreeBSD$
  
@@ -73,13 +73,13 @@
 +#ident		GENERIC
  
 -makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
-+hints          "GENERIC.hints"         # Default places to look for devices.
-+
+-makeoptions	WITH_CTF=1		# Run ctfconvert(1) for DTrace support
 +#makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
++#makeoptions	WITH_CTF=1		# Run ctfconvert(1) for DTrace support
  
  options 	SCHED_ULE		# ULE scheduler
  options 	PREEMPTION		# Enable kernel thread preemption
-@@ -43,6 +45,8 @@
+@@ -44,6 +44,8 @@
  options 	MSDOSFS			# MSDOS Filesystem
  options 	CD9660			# ISO 9660 Filesystem
  options 	PROCFS			# Process filesystem (requires PSEUDOFS)
@@ -88,7 +88,7 @@
  options 	PSEUDOFS		# Pseudo-filesystem framework
  options 	GEOM_PART_GPT		# GUID Partition Tables.
  options 	GEOM_LABEL		# Provides labelization
-@@ -50,7 +54,7 @@
+@@ -51,7 +53,7 @@
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
  options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
@@ -97,7 +97,7 @@
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -98,9 +102,6 @@
+@@ -100,9 +102,6 @@
  device		eisa
  device		pci
  
@@ -107,7 +107,7 @@
  # ATA controllers
  device		ahci		# AHCI-compatible SATA controllers
  device		ata		# Legacy ATA/SATA controllers
-@@ -205,10 +206,6 @@
+@@ -207,10 +206,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -118,7 +118,7 @@
  
  device		puc		# Multi I/O cards and multi-channel UARTs
  
-@@ -305,10 +302,7 @@
+@@ -307,10 +302,7 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
