@@ -167,3 +167,77 @@ See #594940
  SUBDIR += usfs umass urio
  SUBDIR += quirk template
  
+--- /dev/null
++++ b/sys/conf/DEBIAN
+@@ -0,0 +1,4 @@
++# Common options to all Debian GNU/kFreeBSD kernels
++
++# Disable binary blobs
++include		WITHOUT_SOURCELESS
+--- /dev/null
++++ b/sys/conf/WITHOUT_SOURCELESS
+@@ -0,0 +1,7 @@
++#
++# WITHOUT_SOURCELESS -- Disable drivers that include sourceless code.
++#
++# $FreeBSD$
++
++include WITHOUT_SOURCELESS_HOST
++include WITHOUT_SOURCELESS_UCODE
+--- /dev/null
++++ b/sys/conf/WITHOUT_SOURCELESS_HOST
+@@ -0,0 +1,10 @@
++#
++# WITHOUT_SOURCELESS_HOST -- Disable drivers that include sourceless
++# native code for host CPU.
++#
++# $FreeBSD$
++
++nodevice	hpt27xx
++nodevice	hptmv
++nodevice	hptrr
++nodevice	nve
+--- /dev/null
++++ b/sys/conf/WITHOUT_SOURCELESS_UCODE
+@@ -0,0 +1,41 @@
++#
++# WITHOUT_SOURCELESS_UCODE -- Disable drivers that include sourceless
++# microcode.
++#
++# $FreeBSD$
++
++nodevice	adw
++nodevice	bce
++nodevice	fatm
++nodevice	fxp
++nodevice	ispfw
++nodevice	mwlfw
++nodevice	ralfw
++nodevice	runfw
++nodevice	sf
++nodevice	sn
++nodevice	ti
++nodevice	txp
++nodevice	ce
++nodevice	cp
++nodevice	ctau
++nodevice	ipwfw
++nodevice	iwifw
++nodevice	iwnfw
++nodevice	wpifw
++
++# drm
++nodevice	mga
++nodevice	r128
++nodevice	radeon
++
++# sound
++nodevice	csa
++nodevice	ds1
++nodevice	maestro3
++
++# usb
++nodevice	rum
++nodevice	uath
++nodevice	zyd
++nodevice	kue
