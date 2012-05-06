@@ -21,8 +21,9 @@ do_start() {
 		which ${i} >/dev/null || exit 1
 	done
 
-	# This syctl is (supposedly) correct in kernel, but kfreebsd-loader enjoys messing with it
-	sysctl "kern.module_path=/lib/modules/`uname -r`;/boot/kernel"
+	# Override /boot/kernel default (we do this in userland to support
+	# upstream kernels)
+	sysctl "kern.module_path=/lib/modules/$(uname -r)"
 
 	# Load modules
 	for file in /etc/modules /etc/modules.d/* ; do
