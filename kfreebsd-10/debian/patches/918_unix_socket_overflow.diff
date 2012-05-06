@@ -3,6 +3,9 @@ See #645527.
 Our former userspace allows 108 bytes in sun_path,
 but kernel restrict it to 104 bytes.
 
+Userland compatibility was added in glibc 2.13-22 (glibc-bsd r3739). This
+patch can be removed when we no longer care about supporting older glibc.
+
 --- a/sys/kern/uipc_usrreq.c
 +++ b/sys/kern/uipc_usrreq.c
 @@ -464,7 +464,12 @@
