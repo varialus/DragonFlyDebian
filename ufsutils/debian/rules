@@ -43,10 +43,16 @@ get-orig-source:
 	tar --numeric-owner --owner 0 --group 0 -czf ../$(TARNAME) $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
-build:
+build-indep:
+
+build-arch:
 	dh_testdir
 
 	CPPFLAGS="$(CPPFLAGS)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" $(MAKE)
+
+build: build-indep build-arch
+
+.PHONY: build-indep build-arch build
 
 clean:
 	dh_testdir
@@ -56,7 +62,7 @@ clean:
 
 	dh_clean
 
-install: build
+install-arch: build-arch
 	dh_testdir
 	dh_testroot
 	dh_prep
@@ -68,12 +74,14 @@ install: build
 
 	$(MAKE) install DESTDIR=$(DESTDIR) prefix=/usr exec_prefix=/
 
+.PHONY: clean install-arch
+
 # Build architecture-independent files here.
 binary-indep:
 	# Nothing to do.
 
 # Build architecture-dependent files here.
-binary-arch: install
+binary-arch: install-arch
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs -s
@@ -92,4 +100,4 @@ binary-arch: install
 
 binary: binary-indep binary-arch
 
-.PHONY: build clean binary-indep binary-arch binary install
+.PHONY: binary-indep binary-arch binary
