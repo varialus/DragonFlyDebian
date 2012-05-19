@@ -15,7 +15,7 @@
  typedef	long double	__float_t;
 @@ -88,7 +93,11 @@
  typedef	__int32_t	__segsz_t;		/* segment size (in pages) */
- typedef	__uint32_t	size_t;		/* sizeof() */
+ typedef	__uint32_t	__this_is_a_temporary_kludge__size_t;		/* sizeof() */
  typedef	__int32_t	__ssize_t;		/* byte count or error */
 +#if defined(__GLIBC__) && !defined(_KERNEL)
 +typedef	long int	__time_t;
@@ -89,7 +89,7 @@
  typedef	__int64_t	__register_t;
 +#endif
  typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
- typedef	__uint64_t	size_t;		/* sizeof() */
+ typedef	__uint64_t	__this_is_a_temporary_kludge__size_t;		/* sizeof() */
  typedef	__int64_t	__ssize_t;		/* byte count or error */
 +#if defined(__GLIBC__) && !defined(_KERNEL)
 +typedef	long int	__time_t;
@@ -111,7 +111,7 @@
  typedef	__int64_t	__register_t;
 +#endif
  typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
- typedef	__uint64_t	size_t;		/* sizeof() */
+ typedef	__uint64_t	__this_is_a_temporary_kludge__size_t;		/* sizeof() */
  typedef	__int64_t	__ssize_t;		/* byte count or error */
 --- a/sys/mips/include/_types.h
 +++ b/sys/mips/include/_types.h
@@ -139,7 +139,7 @@
  typedef	__int64_t	__register_t;
 +#endif
  typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
- typedef	__uint64_t	size_t;		/* sizeof() */
+ typedef	__uint64_t	__this_is_a_temporary_kludge__size_t;		/* sizeof() */
  typedef	__int64_t	__ssize_t;		/* byte count or error */
 --- a/sys/sparc64/include/_types.h
 +++ b/sys/sparc64/include/_types.h
@@ -153,11 +153,11 @@
  typedef	__int64_t	__register_t;
 +#endif
  typedef	__int64_t	__segsz_t;		/* segment size (in pages) */
- typedef	__uint64_t	size_t;		/* sizeof() */
+ typedef	__uint64_t	__this_is_a_temporary_kludge__size_t;		/* sizeof() */
  typedef	__int64_t	__ssize_t;		/* byte count or error */
 --- a/sys/sys/types.h
 +++ b/sys/sys/types.h
-@@ -44,7 +44,20 @@
+@@ -44,7 +44,15 @@
  #include <machine/endian.h>
  #include <sys/_types.h>
  
@@ -171,15 +171,10 @@
 +#define _TIMER_T_DECLARED
 +#define _MQD_T_DECLARED
 +#define _INO_T_DECLARED
-+
-+/* We can't declare size_t directly because of s/__size_t/size_t/g in
-+   debian/rules (see rev 184135 in GCC SVN).  */
-+#include <stddef.h>
-+#define _SIZE_T_DECLARED
  
  #if __BSD_VISIBLE
  typedef	unsigned char	u_char;
-@@ -182,8 +195,6 @@
+@@ -182,8 +190,6 @@
  #define	_PID_T_DECLARED
  #endif
  
@@ -188,7 +183,7 @@
  #ifndef _RLIM_T_DECLARED
  typedef	__rlim_t	rlim_t;		/* resource limit */
  #define	_RLIM_T_DECLARED
-@@ -273,6 +284,7 @@
+@@ -273,6 +279,7 @@
  
  #include <sys/select.h>
  
@@ -196,7 +191,7 @@
  /*
   * minor() gives a cookie instead of an index since we don't want to
   * change the meanings of bits 0-15 or waste time and space shifting
-@@ -308,6 +320,8 @@
+@@ -308,6 +315,8 @@
  __END_DECLS
  #endif /* !_KERNEL */
  
