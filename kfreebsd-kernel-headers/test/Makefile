@@ -7,6 +7,7 @@ TESTS = \
 	\
 	bus.o \
 	cpufunc.o \
+	devicestat.o \
 	elf.o \
 	in_pcb.o \
 	ppp.o \
