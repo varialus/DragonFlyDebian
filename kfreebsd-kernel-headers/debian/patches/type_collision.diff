@@ -183,23 +183,18 @@
  #ifndef _RLIM_T_DECLARED
  typedef	__rlim_t	rlim_t;		/* resource limit */
  #define	_RLIM_T_DECLARED
-@@ -273,6 +279,7 @@
- 
+@@ -269,10 +275,8 @@
+  * The following are all things that really shouldn't exist in this header,
+  * since its purpose is to provide typedefs, not miscellaneous doodads.
+  */
+-#if __BSD_VISIBLE
+-
  #include <sys/select.h>
- 
+-
 +#if 0
  /*
   * minor() gives a cookie instead of an index since we don't want to
   * change the meanings of bits 0-15 or waste time and space shifting
-@@ -308,6 +315,8 @@
- __END_DECLS
- #endif /* !_KERNEL */
- 
-+#endif
-+
- #endif /* __BSD_VISIBLE */
- 
- #endif /* !_SYS_TYPES_H_ */
 --- a/sys/sys/time.h
 +++ b/sys/sys/time.h
 @@ -36,11 +36,14 @@
