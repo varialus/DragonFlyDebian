@@ -202,20 +202,22 @@
  #endif /* !_SYS_TYPES_H_ */
 --- a/sys/sys/time.h
 +++ b/sys/sys/time.h
-@@ -36,11 +36,8 @@
+@@ -36,11 +36,14 @@
  #include <sys/_timeval.h>
  #include <sys/kern/types.h>
  #include <sys/timespec.h>
 +#include <sys/time.h>
  
--struct timezone {
--	int	tz_minuteswest;	/* minutes west of Greenwich */
--	int	tz_dsttime;	/* type of dst correction */
--};
++#if 0
+ struct timezone {
+ 	int	tz_minuteswest;	/* minutes west of Greenwich */
+ 	int	tz_dsttime;	/* type of dst correction */
+ };
++#endif
  #define	DST_NONE	0	/* not on dst */
  #define	DST_USA		1	/* USA style dst */
  #define	DST_AUST	2	/* Australian style dst */
-@@ -199,7 +196,7 @@
+@@ -199,7 +202,7 @@
  
  #endif /* _KERNEL */
  
@@ -224,7 +226,7 @@
  
  #define	timerclear(tvp)		((tvp)->tv_sec = (tvp)->tv_usec = 0)
  #define	timerisset(tvp)		((tvp)->tv_sec || (tvp)->tv_usec)
-@@ -227,6 +224,7 @@
+@@ -227,6 +230,7 @@
  	} while (0)
  #endif
  
@@ -232,15 +234,16 @@
  /*
   * Names of the interval timers, and structure
   * defining a timer setting.
-@@ -250,6 +248,7 @@
- 	int	stathz;		/* statistics clock frequency */
- 	int	profhz;		/* profiling clock frequency */
- };
-+#endif
+@@ -273,6 +277,8 @@
+ #define TIMER_ABSTIME	0x1	/* absolute timer */
+ #endif
  
- /* These macros are also in time.h. */
- #ifndef CLOCK_REALTIME
-@@ -338,6 +337,7 @@
++#endif
++
+ #ifdef _KERNEL
+ 
+ /*
+@@ -338,6 +344,7 @@
  #include <sys/cdefs.h>
  #include <sys/select.h>
  
@@ -248,7 +251,7 @@
  __BEGIN_DECLS
  int	setitimer(int, const struct itimerval *, struct itimerval *);
  int	utimes(const char *, const struct timeval *);
-@@ -356,6 +356,7 @@
+@@ -356,6 +363,7 @@
  #endif
  
  __END_DECLS
