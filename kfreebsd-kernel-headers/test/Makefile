@@ -8,18 +8,20 @@ TESTS = \
 	bus.o \
 	cpufunc.o \
 	devicestat.o \
-	elf.o \
 	in_pcb.o \
 	ppp.o \
 	soundcard.o \
 	sys_sysctl.o \
+	stdarg.o \
 	usb.o \
 	$()
+
+#	elf.o
 
 CFLAGS = -Iinclude -I../debian/kfreebsd-kernel-headers/usr/include
 
 # Enable all the stuff in glibc to probe for collisions
-CFLAGS += -D_GNU_SOURCE -Werror
+CFLAGS += -D_GNU_SOURCE -Werror -Wsystem-headers
 
 all: $(TESTS)
 
