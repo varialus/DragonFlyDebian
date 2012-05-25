@@ -122,6 +122,7 @@ getosreldate(void)
 #include <sys/sysctl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*
  * Returns true if the named feature is present in the currently
