@@ -71,4 +71,6 @@ __getosreldate(void)
     }		
     return (osreldate);
 }
+libc_hidden_def (__kernel_getosreldate)
+libc_hidden_def (__getosreldate)
 weak_alias (__getosreldate, getosreldate)
