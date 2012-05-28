@@ -14,9 +14,12 @@ Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends},
  original-awk,
  make,
- freebsd-buildutils,
  libbsd-dev,
  libexpat-dev,
+Recommends:
+# Can't put this in Depends because it would introduce a circular dependency
+# (see #674806).
+ freebsd-buildutils,
 Conflicts: kfreebsd-kernel-headers (<< 0.80)
 Replaces: freebsd-buildutils (<< 9.0-10)
 Breaks: freebsd-buildutils (<< 9.0-10)
