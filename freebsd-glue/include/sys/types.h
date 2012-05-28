@@ -11,7 +11,6 @@
 
 /* Emulate implicit includes on FreeBSD */
 #  include <machine/endian.h>
-#  include <sys/_types.h>
 #  include <sys/select.h>
 # endif
 
