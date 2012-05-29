@@ -1,0 +1,23 @@
+#!/bin/sh -e
+
+pkg_installed()
+{
+  local pkg="$1"
+
+  dpkg-query -f '${Status}' -W $pkg 2>/dev/null | \
+    grep -qE '[^ ]* ok (unpacked|triggers-awaited|triggers-pending|installed)'
+}
+
+case "$1" in
+  configure)
+    # If either libelf-dev or libelfg0-dev is installed, then we took over
+    # nlist.h from them, restore a copy from the functional one.
+    if pkg_installed libelf-dev || pkg_installed libelfg0-dev; then
+      cp /usr/include/bsd/nlist.h /usr/include/nlist.h
+    fi
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0
