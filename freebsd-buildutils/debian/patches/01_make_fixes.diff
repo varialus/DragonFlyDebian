@@ -65,7 +65,7 @@
  .PHONY: ${INSTALLINFODIRS}
 --- a/src/share/mk/bsd.lib.mk
 +++ b/src/share/mk/bsd.lib.mk
-@@ -146,9 +146,9 @@
+@@ -151,9 +151,9 @@
  	@${ECHO} building static ${LIB} library
  	@rm -f ${.TARGET}
  .if !defined(NM)
@@ -77,7 +77,7 @@
  .endif
  	${RANLIB} ${.TARGET}
  .endif
-@@ -163,9 +163,9 @@
+@@ -168,9 +168,9 @@
  	@${ECHO} building profiled ${LIB} library
  	@rm -f ${.TARGET}
  .if !defined(NM)
@@ -89,7 +89,7 @@
  .endif
  	${RANLIB} ${.TARGET}
  .endif
-@@ -186,16 +186,16 @@
+@@ -191,16 +191,16 @@
  	@${ECHO} building shared library ${SHLIB_NAME}
  	@rm -f ${.TARGET} ${SHLIB_LINK}
  .if defined(SHLIB_LINK)
@@ -107,9 +107,9 @@
 -	    `NM='${NM}' lorder ${SOBJS} | tsort -q` ${LDADD}
 +	    `NM='${NM}' lorder ${SOBJS} | tsort` ${LDADD}
  .endif
- .if ${MK_CTF} != "no"
- 	${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${SOBJS}
-@@ -265,11 +265,11 @@
+ 	@[ -z "${CTFMERGE}" -o -n "${NO_CTF}" ] || \
+ 		(${ECHO} ${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${SOBJS} && \
+@@ -270,11 +270,11 @@
  .ORDER: beforeinstall _libinstall
  _libinstall:
  .if defined(LIB) && !empty(LIB) && ${MK_INSTALLLIB} != "no"
@@ -205,3 +205,13 @@
  
  .if !defined(%POSIX)
  #
+@@ -68,9 +67,6 @@
+ # C Type Format data is required for DTrace
+ CTFFLAGS	?=	-L VERSION
+ 
+-CTFCONVERT	?=	ctfconvert
+-CTFMERGE	?=	ctfmerge
+-DTRACE		?=	dtrace
+ .if defined(CFLAGS) && (${CFLAGS:M-g} != "")
+ CTFFLAGS	+=	-g
+ .else
