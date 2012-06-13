@@ -1,0 +1,32 @@
+Description:
+ Correct a privilege escalation when returning from kernel if
+ running FreeBSD/amd64 on non-AMD processors. [12:04]
+Origin: vendor, http://security.freebsd.org/patches/SA-12:04/sysret.patch
+Bug: http://security.freebsd.org/advisories/FreeBSD-SA-12:04.sysret.asc
+Bug-Debian: http://bugs.debian.org/677297
+Applied-Upstream: http://svnweb.freebsd.org/base/stable/9/sys/amd64/amd64/trap.c?revision=236953&view=markup
+
+--- a/sys/amd64/amd64/trap.c.orig
++++ b/sys/amd64/amd64/trap.c	(working copy)
+@@ -972,4 +972,21 @@
+ 	     syscallname(td->td_proc, sa.code)));
+ 
+ 	syscallret(td, error, &sa);
++
++	/*
++	 * If the user-supplied value of %rip is not a canonical
++	 * address, then some CPUs will trigger a ring 0 #GP during
++	 * the sysret instruction.  However, the fault handler would
++	 * execute with the user's %gs and %rsp in ring 0 which would
++	 * not be safe.  Instead, preemptively kill the thread with a
++	 * SIGBUS.
++	 */
++	if (td->td_frame->tf_rip >= VM_MAXUSER_ADDRESS) {
++		ksiginfo_init_trap(&ksi);
++		ksi.ksi_signo = SIGBUS;
++		ksi.ksi_code = BUS_OBJERR;
++		ksi.ksi_trapno = T_PROTFLT;
++		ksi.ksi_addr = (void *)td->td_frame->tf_rip;
++		trapsignal(td, &ksi);
++	}
+ }
