@@ -52,12 +52,12 @@ build-arch-stamp:
 		-e "s/__FreeBSD_version/__FreeBSD_kernel_version/g" \
 		\
 		-e 's/defined\s*(\s*__GNUCLIKE_[A-Z_]\+\s*)/1/g' \
-		-e 's/#\s*ifdef\s*__GNUCLIKE_[A-Z_]\+\(\s\|$$\)/#if 1/g' \
-		-e 's/#\s*ifndef\s*__GNUCLIKE_[A-Z_]\+\(\s\|$$\)/#if 0/g' \
+		-e 's/#\s*ifdef\s*__GNUCLIKE_[A-Z_]\+\(\s\|$$\)/#if defined(__GNUC__)/g' \
+		-e 's/#\s*ifndef\s*__GNUCLIKE_[A-Z_]\+\(\s\|$$\)/#if !defined(__GNUC__)/g' \
 		\
-		-e 's/defined\s*(\s*__CC_SUPPORTS_\(INLINE\|__INLINE\|__INLINE__\|__FUNC__\|WARNING\|VARADIC_XXX\|DYNAMIC_ARRAY_INIT\)\s*)/1/g' \
-		-e 's/#\s*ifdef\s*__CC_SUPPORTS_\(INLINE\|__INLINE\|__INLINE__\|__FUNC__\|WARNING\|VARADIC_XXX\|DYNAMIC_ARRAY_INIT\)\(\s\|$$\)/#if 1/g' \
-		-e 's/#\s*ifndef\s*__CC_SUPPORTS_\(INLINE\|__INLINE\|__INLINE__\|__FUNC__\|WARNING\|VARADIC_XXX\|DYNAMIC_ARRAY_INIT\)\(\s\|$$\)/#if 0/g' \
+		-e 's/defined\s*(\s*__CC_SUPPORTS_\(INLINE\|__INLINE\|__INLINE__\|__FUNC__\|WARNING\|VARADIC_XXX\|DYNAMIC_ARRAY_INIT\)\s*)/defined(__GNUC__)/g' \
+		-e 's/#\s*ifdef\s*__CC_SUPPORTS_\(INLINE\|__INLINE\|__INLINE__\|__FUNC__\|WARNING\|VARADIC_XXX\|DYNAMIC_ARRAY_INIT\)\(\s\|$$\)/#if defined(__GNUC__)/g' \
+		-e 's/#\s*ifndef\s*__CC_SUPPORTS_\(INLINE\|__INLINE\|__INLINE__\|__FUNC__\|WARNING\|VARADIC_XXX\|DYNAMIC_ARRAY_INIT\)\(\s\|$$\)/#if !defined(__GNUC__)/g' \
 		\
 		-e 's/__unused/__attribute__((__unused__))/g' \
 		-e 's/__packed\(\s\|;\)/ __attribute__((__packed__))\1/g' \
