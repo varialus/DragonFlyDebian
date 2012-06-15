@@ -1,0 +1,120 @@
+
+Backport from upstream rev 228158.
+
+--- a/src/share/mk/bsd.own.mk
++++ b/src/share/mk/bsd.own.mk
+@@ -203,6 +203,7 @@
+ # regardless of user's setting).
+ #
+ .for var in \
++    CTF \
+     INSTALLLIB \
+     MAN \
+     PROFILE
+@@ -410,6 +411,7 @@
+     BIND_LIBS \
+     BIND_SIGCHASE \
+     BIND_XML \
++    CTF \
+     HESIOD \
+     ICONV \
+     IDEA \
+@@ -506,6 +508,7 @@
+ 
+ .if ${MK_CDDL} == "no"
+ MK_ZFS:=	no
++MK_CTF:=	no
+ .endif
+ 
+ .if ${MK_CRYPT} == "no"
+@@ -606,6 +609,12 @@
+ .endif
+ .endfor
+ 
++.if ${MK_CTF} != "no"
++CTFCONVERT_CMD=		${CTFCONVERT} ${CTFFLAGS} ${.TARGET}
++.else
++CTFCONVERT_CMD=		@:
++.endif
++
+ .endif # !_WITHOUT_SRCCONF
+ 
+ .endif	# !target(__<bsd.own.mk>__)
+--- a/src/share/mk/bsd.lib.mk
++++ b/src/share/mk/bsd.lib.mk
+@@ -33,15 +33,10 @@
+ NO_WERROR=
+ .endif
+ 
+-# Enable CTF conversion on request.
+-.if defined(WITH_CTF)
+-.undef NO_CTF
+-.endif
+-
+ .if defined(DEBUG_FLAGS)
+ CFLAGS+= ${DEBUG_FLAGS}
+ 
+-.if !defined(NO_CTF) && (${DEBUG_FLAGS:M-g} != "")
++.if ${MK_CTF} != "no" && ${DEBUG_FLAGS:M-g} != ""
+ CTFFLAGS+= -g
+ .endif
+ .endif
+@@ -202,9 +197,9 @@
+ 	    -o ${.TARGET} -Wl,-soname,${SONAME} \
+ 	    `NM='${NM}' lorder ${SOBJS} | tsort -q` ${LDADD}
+ .endif
+-	@[ -z "${CTFMERGE}" -o -n "${NO_CTF}" ] || \
+-		(${ECHO} ${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${SOBJS} && \
+-		${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${SOBJS})
++.if ${MK_CTF} != "no"
++	${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${SOBJS}
++.endif
+ .endif
+ 
+ .if defined(INSTALL_PIC_ARCHIVE) && defined(LIB) && !empty(LIB) && ${MK_TOOLCHAIN} != "no"
+--- a/src/share/mk/bsd.prog.mk
++++ b/src/share/mk/bsd.prog.mk
+@@ -15,16 +15,11 @@
+ NO_WERROR=
+ .endif
+ 
+-# Enable CTF conversion on request.
+-.if defined(WITH_CTF)
+-.undef NO_CTF
+-.endif
+-
+ .if defined(DEBUG_FLAGS)
+ CFLAGS+=${DEBUG_FLAGS}
+ CXXFLAGS+=${DEBUG_FLAGS}
+ 
+-.if !defined(NO_CTF) && (${DEBUG_FLAGS:M-g} != "")
++.if ${MK_CTF} != "no" && ${DEBUG_FLAGS:M-g} != ""
+ CTFFLAGS+= -g
+ .endif
+ .endif
+@@ -60,9 +55,9 @@
+ .else
+ 	${CC} ${CFLAGS} ${LDFLAGS} -o ${.TARGET} ${OBJS} ${LDADD}
+ .endif
+-	@[ -z "${CTFMERGE}" -o -n "${NO_CTF}" ] || \
+-		(${ECHO} ${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${OBJS} && \
+-		${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${OBJS})
++.if ${MK_CTF} != "no"
++	${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${OBJS}
++.endif
+ 
+ .else	# !defined(SRCS)
+ 
+@@ -90,9 +85,9 @@
+ .else
+ 	${CC} ${CFLAGS} ${LDFLAGS} -o ${.TARGET} ${OBJS} ${LDADD}
+ .endif
+-	@[ -z "${CTFMERGE}" -o -n "${NO_CTF}" ] || \
+-		(${ECHO} ${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${OBJS} && \
+-		${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${OBJS})
++.if ${MK_CTF} != "no"
++	${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${OBJS}
++.endif
+ .endif
+ 
+ .endif
