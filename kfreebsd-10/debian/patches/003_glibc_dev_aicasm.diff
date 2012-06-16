@@ -3,40 +3,13 @@ Partially sent to freebsd-hackers (2011-07-02)
 
 --- a/sys/dev/aic7xxx/aicasm/Makefile
 +++ b/sys/dev/aic7xxx/aicasm/Makefile
-@@ -3,6 +3,10 @@
- #
- # $FreeBSD$
- 
-+.if !defined(OPSYS)
-+OPSYS!=	uname -s
-+.endif
-+
- PROG=	aicasm
- 
- CSRCS=	aicasm.c aicasm_symbol.c
-@@ -14,8 +18,9 @@
- SRCS=	${GENHDRS} ${CSRCS} ${YSRCS} ${LSRCS}
- CLEANFILES+= ${GENHDRS} ${YSRCS:R:C/(.*)/\1.output/g}
+@@ -16,6 +16,9 @@
  DPADD=	${LIBL}
--LDADD=	-ll
-+LDADD=	-ll -ldb -lbsd
+ LDADD=	-ll
  WARNS?=	5
 +NO_WERROR?=	1
++LDADD+= -ldb -lbsd
++CFLAGS+= -D_GNU_SOURCE -isystem /usr/include/freebsd
  
  # Correct path for kernel builds
  # Don't rely on the kernel's .depend file
-@@ -24,8 +29,14 @@
- DEPENDFILE=	.depend_aicasm
- .endif
- 
-+CFLAGS+=	-D_GNU_SOURCE -isystem /usr/include/freebsd
-+
-+# This would discard implicit include flags in upstream GCC
-+.if ${OPSYS} == "FreeBSD"
- NOSTDINC=	-nostdinc
- CFLAGS+= ${NOSTDINC} -I/usr/include -I.
-+.endif
-+
- .ifdef MAKESRCPATH
- CFLAGS+= -I${MAKESRCPATH}
- .endif

@@ -16,7 +16,7 @@
  
  options 	SCHED_ULE		# ULE scheduler
  options 	PREEMPTION		# Enable kernel thread preemption
-@@ -50,7 +50,7 @@
+@@ -51,7 +51,7 @@
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
  options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
@@ -25,27 +25,20 @@
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -69,8 +69,8 @@
+@@ -70,9 +70,9 @@
  options 	CAPABILITY_MODE		# Capsicum capability mode
  options 	CAPABILITIES		# Capsicum capabilities
  options 	MAC			# TrustedBSD MAC Framework
 -options 	KDTRACE_FRAME		# Ensure frames are compiled in
 -options 	KDTRACE_HOOKS		# Kernel DTrace hooks
+-options 	DDB_CTF			# Kernel ELF linker loads CTF data
 +#options 	KDTRACE_FRAME		# Ensure frames are compiled in
 +#options 	KDTRACE_HOOKS		# Kernel DTrace hooks
++#options 	DDB_CTF			# Kernel ELF linker loads CTF data
  options 	INCLUDE_CONFIG_FILE     # Include this file in kernel
  
  # Debugging support.  Always need this:
-@@ -80,7 +80,7 @@
- # For full debugger support use this instead:
- options 	DDB			# Support DDB.
- options 	GDB			# Support remote GDB.
--options 	DDB_CTF			# kernel ELF linker loads CTF data
-+#options 	DDB_CTF			# kernel ELF linker loads CTF data
- options 	DEADLKRES		# Enable the deadlock resolver
- options 	INVARIANTS		# Enable calls of extra sanity checking
- options 	INVARIANT_SUPPORT	# Extra sanity checks of internal structures, required by INVARIANTS
-@@ -98,9 +98,6 @@
+@@ -99,9 +99,6 @@
  device		acpi
  device		pci
  
@@ -55,7 +48,7 @@
  # ATA controllers
  device		ahci		# AHCI-compatible SATA controllers
  device		ata		# Legacy ATA/SATA controllers
-@@ -197,10 +194,6 @@
+@@ -198,10 +195,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -66,7 +59,7 @@
  
  device		puc		# Multi I/O cards and multi-channel UARTs
  
-@@ -294,10 +287,7 @@
+@@ -297,10 +290,7 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
@@ -107,8 +100,8 @@
 +options		COMPAT_LINUX		# Needed by LINPROCFS
  options 	PSEUDOFS		# Pseudo-filesystem framework
  options 	GEOM_PART_GPT		# GUID Partition Tables.
- options 	GEOM_LABEL		# Provides labelization
-@@ -51,7 +53,7 @@
+ options 	GEOM_RAID		# Soft RAID functionality.
+@@ -52,7 +54,7 @@
  options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
  options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
  options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
@@ -117,25 +110,18 @@
  options 	KTRACE			# ktrace(1) support
  options 	STACK			# stack(9) support
  options 	SYSVSHM			# SYSV-style shared memory
-@@ -70,7 +72,7 @@
+@@ -71,8 +73,8 @@
  options 	CAPABILITY_MODE		# Capsicum capability mode
  options 	CAPABILITIES		# Capsicum capabilities
  options 	MAC			# TrustedBSD MAC Framework
 -options 	KDTRACE_HOOKS		# Kernel DTrace hooks
+-options 	DDB_CTF			# Kernel ELF linker loads CTF data
 +#options 	KDTRACE_HOOKS		# Kernel DTrace hooks
++#options 	DDB_CTF			# Kernel ELF linker loads CTF data
  options 	INCLUDE_CONFIG_FILE     # Include this file in kernel
  
  # Debugging support.  Always need this:
-@@ -80,7 +82,7 @@
- # For full debugger support use this instead:
- options 	DDB			# Support DDB.
- options 	GDB			# Support remote GDB.
--options 	DDB_CTF			# kernel ELF linker loads CTF data
-+#options 	DDB_CTF			# kernel ELF linker loads CTF data
- options 	DEADLKRES		# Enable the deadlock resolver
- options 	INVARIANTS		# Enable calls of extra sanity checking
- options 	INVARIANT_SUPPORT	# Extra sanity checks of internal structures, required by INVARIANTS
-@@ -100,9 +102,6 @@
+@@ -101,9 +103,6 @@
  device		eisa
  device		pci
  
@@ -145,7 +131,7 @@
  # ATA controllers
  device		ahci		# AHCI-compatible SATA controllers
  device		ata		# Legacy ATA/SATA controllers
-@@ -207,10 +206,6 @@
+@@ -208,10 +207,6 @@
  # Parallel port
  device		ppc
  device		ppbus		# Parallel port bus (required)
@@ -156,7 +142,7 @@
  
  device		puc		# Multi I/O cards and multi-channel UARTs
  
-@@ -307,10 +302,7 @@
+@@ -310,10 +305,7 @@
  device		random		# Entropy device
  device		ether		# Ethernet support
  device		vlan		# 802.1Q VLAN support
