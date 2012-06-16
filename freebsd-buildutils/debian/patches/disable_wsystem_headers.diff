@@ -1,11 +1,12 @@
 --- a/src/share/mk/bsd.sys.mk
 +++ b/src/share/mk/bsd.sys.mk
-@@ -27,7 +27,7 @@
- #CFLAGS		+= -pedantic
- . if defined(WARNS)
- .  if ${WARNS} >= 1
--CWARNFLAGS	+=	-Wsystem-headers
+@@ -27,7 +27,8 @@
+ #CFLAGS+=	-pedantic
+ .if defined(WARNS)
+ .if ${WARNS} >= 1
+-CWARNFLAGS+=	-Wsystem-headers
 +# Disabled (see #664242)
- .   if !defined(NO_WERROR)
- CWARNFLAGS	+=	-Werror
- .   endif
++#CWARNFLAGS+=	-Wsystem-headers
+ .if !defined(NO_WERROR) && ((${MK_CLANG_IS_CC} == "no" && \
+     ${CC:T:Mclang} != "clang") || !defined(NO_WERROR.clang))
+ CWARNFLAGS+=	-Werror

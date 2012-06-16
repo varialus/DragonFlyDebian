@@ -36,17 +36,14 @@ pversion	:= $(shell echo $(version) | sed -e 's/\./_/g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 
-SVN		:= http://svn.freebsd.org/base/release/$(version).0
+#SVN		:= http://svn.freebsd.org/base/release/$(version).0
 #SVN		:= http://svn.freebsd.org/base/releng/$(version)
 #SVN		:= http://svn.freebsd.org/base/stable/$(major)
-#SVN		:= http://svn.freebsd.org/base/head
+SVN		:= http://svn.freebsd.org/base/head
 
 SOURCE = freebsd-buildutils
 ORIGDIR = $(SOURCE)-$(tar_version)
 TARNAME = $(SOURCE)_$(tar_version).orig.tar.gz
-
-PCVS = anoncvs@anoncvs.fr.freebsd.org:/home/ncvs
-PTAG = RELEASE_$(pversion)_0
 
 export CFLAGS = -O2 -g -Wall -D_GNU_SOURCE \
          -DMACHINE_ARCH='"$(MACHINE_ARCH)"' \
@@ -60,7 +57,7 @@ MAKE_BUILD_FLAGS = CC=gcc NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
 PMAKE_FLAGS = -m $(CURDIR)/src/share/mk
 PMAKE_BOOTSTRAP = $(CURDIR)/build-tree/src/usr.bin/make/pmake $(PMAKE_FLAGS)
 PMAKE = $(CURDIR)/build-tree/src/usr.bin/make/make $(PMAKE_FLAGS)
-YACC = $(CURDIR)/build-tree/src/usr.bin/yacc/yacc
+YACC = byacc
 
 package = $(SOURCE)
 
@@ -74,32 +71,20 @@ get-orig-source:
 		usr.bin/lex \
 		usr.bin/make \
 		usr.bin/mkdep \
-		usr.bin/yacc \
 		usr.bin/brandelf \
 		usr.sbin/btxld \
 		usr.sbin/kgzip \
 		usr.sbin/mtree \
 	; do \
-		svn export $(SVN)/$$i $(ORIGDIR)/src/$$i ; \
+		svn export -r $(svn_revision) $(SVN)/$$i $(ORIGDIR)/src/$$i ; \
 	done
-	cd $(ORIGDIR); cvs -d $(PCVS) export -r $(PTAG) ports/Mk ; cd ..
 	tar --numeric-owner --owner 0 --group 0 -czf ../$(TARNAME) $(ORIGDIR)
 	rm -rf $(ORIGDIR)
 
 unpack: unpack-stamp
 unpack-stamp:
 	mkdir build-tree
-	cp -a src ports build-tree/
-	set -e ; for i in \
-		build-tree/ports/Mk/bsd.port.mk \
-		build-tree/ports/Mk/bsd.port.subdir.mk \
-	; do sed -i $$i \
-		-e "s,/usr/bin/,,g" \
-		-e "s,/usr/sbin/,,g" \
-		-e "s,/bin/,,g" \
-		-e "s,/sbin/,,g" \
-		-e "s,/usr/ports,/usr/share/$(package)/ports,g" \
-	; done
+	cp -a src build-tree/
 
 	touch unpack-stamp
 
@@ -111,8 +96,6 @@ build-stamp: unpack-stamp
 	$(MAKE) -C build-tree/src/usr.bin/make -f Makefile.dist
 	$(MAKE) -C build-tree/src/usr.bin/make -f Makefile.dist mostlyclean
 	$(PMAKE_BOOTSTRAP) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/make
-
-	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/yacc
 
 	$(PMAKE) $(MAKE_BUILD_FLAGS) -C build-tree/src/usr.bin/cksum
 
@@ -134,7 +117,7 @@ install: build
 	dh_prep
 	dh_installdirs
 
-	for i in cksum lex make mkdep yacc file2c brandelf ; do \
+	for i in cksum lex make mkdep file2c brandelf ; do \
 	  $(PMAKE) -C $(CURDIR)/build-tree/src/usr.bin/$$i install \
 		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/lib/freebsd ; \
 	done
@@ -144,9 +127,6 @@ install: build
 	done
 	$(PMAKE) -C build-tree/src/share/mk install \
 		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/share
-
-	cp -af $(CURDIR)/build-tree/ports/Mk \
-		$(CURDIR)/debian/$(package)/usr/share/
 
 	# remove trash
 	rm -rf 	$(CURDIR)/debian/$(package)/usr/include \

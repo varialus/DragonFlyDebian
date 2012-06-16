@@ -1,0 +1,11 @@
+--- a/src/share/mk/bsd.own.mk
++++ b/src/share/mk/bsd.own.mk
+@@ -639,7 +639,7 @@
+ 
+ .if ${MK_CTF} != "no"
+ CTFCONVERT_CMD=	${CTFCONVERT} ${CTFFLAGS} ${.TARGET}
+-.elif ${MAKE_VERSION} >= 5201111300
++.elif defined(MAKE_VERSION) && ${MAKE_VERSION} >= 5201111300
+ CTFCONVERT_CMD=
+ .else
+ CTFCONVERT_CMD=	@:

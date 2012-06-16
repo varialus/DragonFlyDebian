@@ -65,7 +65,7 @@
  .PHONY: ${INSTALLINFODIRS}
 --- a/src/share/mk/bsd.lib.mk
 +++ b/src/share/mk/bsd.lib.mk
-@@ -146,9 +146,9 @@
+@@ -135,9 +135,9 @@
  	@${ECHO} building static ${LIB} library
  	@rm -f ${.TARGET}
  .if !defined(NM)
@@ -77,7 +77,7 @@
  .endif
  	${RANLIB} ${.TARGET}
  .endif
-@@ -163,9 +163,9 @@
+@@ -152,9 +152,9 @@
  	@${ECHO} building profiled ${LIB} library
  	@rm -f ${.TARGET}
  .if !defined(NM)
@@ -89,27 +89,27 @@
  .endif
  	${RANLIB} ${.TARGET}
  .endif
-@@ -186,16 +186,16 @@
+@@ -180,16 +180,16 @@
  	@${ECHO} building shared library ${SHLIB_NAME}
  	@rm -f ${.TARGET} ${SHLIB_LINK}
  .if defined(SHLIB_LINK)
 -	@ln -fs ${.TARGET} ${SHLIB_LINK}
-+	@ln -fs ${SHLIBDIR}${.TARGET} ${SHLIB_LINK}
++	@ln -fs ${SHLIBDIR}/${.TARGET} ${SHLIB_LINK}
  .endif
  .if !defined(NM)
- 	@${CC} ${LDFLAGS} ${SSP_CFLAGS} -shared -Wl,-x \
+ 	@${CC} ${LDFLAGS} ${SSP_CFLAGS} ${SOLINKOPTS} \
  	    -o ${.TARGET} -Wl,-soname,${SONAME} \
 -	    `lorder ${SOBJS} | tsort -q` ${LDADD}
 +	    `lorder ${SOBJS} | tsort` ${LDADD}
  .else
- 	@${CC} ${LDFLAGS} ${SSP_CFLAGS} -shared -Wl,-x \
+ 	@${CC} ${LDFLAGS} ${SSP_CFLAGS} ${SOLINKOPTS} \
  	    -o ${.TARGET} -Wl,-soname,${SONAME} \
 -	    `NM='${NM}' lorder ${SOBJS} | tsort -q` ${LDADD}
 +	    `NM='${NM}' lorder ${SOBJS} | tsort` ${LDADD}
  .endif
  .if ${MK_CTF} != "no"
  	${CTFMERGE} ${CTFFLAGS} -o ${.TARGET} ${SOBJS}
-@@ -265,11 +265,11 @@
+@@ -259,11 +259,11 @@
  .ORDER: beforeinstall _libinstall
  _libinstall:
  .if defined(LIB) && !empty(LIB) && ${MK_INSTALLLIB} != "no"
