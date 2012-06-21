@@ -94,18 +94,8 @@ alter_to_native_keymap () {
 }
 
 
-do_start() {
-	if test -e /etc/kbdcontrol.conf ; then
-		echo -n "Loading console keymap..."
-		kbdcontrol -l `grep -v ^# /etc/kbdcontrol.conf` < /dev/console
-		echo "done."
-	fi
-}
-
-
 case "$1" in
   start|"")
-	do_start
 	if [ $FLAVOUR = debian ]
 	then
 		alter_to_debian_keymap < /dev/console
