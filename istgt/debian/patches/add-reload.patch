@@ -15,9 +15,9 @@ Origin: other, http://www.freebsd.org/cgi/query-pr.cgi?pr=165844
 Forwarded: no
 Last-Update: 2012-06-26
 
---- istgt-0.4~20111008.orig/src/istgt_lu.h
-+++ istgt-0.4~20111008/src/istgt_lu.h
-@@ -236,6 +236,9 @@ typedef struct istgt_lu_t {
+--- a/src/istgt_lu.h
++++ b/src/istgt_lu.h
+@@ -236,6 +236,9 @@
  	ISTGT_LU_TSIH tsih[MAX_LU_TSIH];
  	int maxmap;
  	ISTGT_LU_MAP map[MAX_LU_MAP];
@@ -27,9 +27,9 @@ Last-Update: 2012-06-26
  } ISTGT_LU;
  typedef ISTGT_LU *ISTGT_LU_Ptr;
  
---- istgt-0.4~20111008.orig/src/istgt_proto.h
-+++ istgt-0.4~20111008/src/istgt_proto.h
-@@ -85,10 +85,10 @@ int istgt_lu_parse_media_flags(const cha
+--- a/src/istgt_proto.h
++++ b/src/istgt_proto.h
+@@ -85,10 +85,10 @@
  uint64_t istgt_lu_parse_media_size(const char *file, const char *size, int *flags);
  PORTAL *istgt_lu_find_portalgroup(ISTGT_Ptr istgt, int tag);
  INITIATOR_GROUP *istgt_lu_find_initiatorgroup(ISTGT_Ptr istgt, int tag);
@@ -43,9 +43,9 @@ Last-Update: 2012-06-26
  int istgt_lu_islun2lun(uint64_t islun);
  uint64_t istgt_lu_lun2islun(int lun, int maxlun);
  int istgt_lu_reset(ISTGT_LU_Ptr lu, uint64_t lun);
---- istgt-0.4~20111008.orig/src/istgt_lu_disk.c
-+++ istgt-0.4~20111008/src/istgt_lu_disk.c
-@@ -794,6 +794,7 @@ istgt_lu_disk_shutdown(ISTGT_Ptr istgt,
+--- a/src/istgt_lu_disk.c
++++ b/src/istgt_lu_disk.c
+@@ -794,6 +794,7 @@
  		xfree(spec);
  		lu->lun[i].spec = NULL;
  	}
@@ -53,9 +53,9 @@ Last-Update: 2012-06-26
  
  	return 0;
  }
---- istgt-0.4~20111008.orig/src/istgt_lu_ctl.c
-+++ istgt-0.4~20111008/src/istgt_lu_ctl.c
-@@ -965,6 +965,113 @@ istgt_uctl_cmd_change(UCTL_Ptr uctl)
+--- a/src/istgt_lu_ctl.c
++++ b/src/istgt_lu_ctl.c
+@@ -965,6 +965,113 @@
  	return UCTL_CMD_OK;
  }
  
@@ -169,7 +169,7 @@ Last-Update: 2012-06-26
  static int
  istgt_uctl_cmd_reset(UCTL_Ptr uctl)
  {
-@@ -1183,6 +1290,7 @@ static ISTGT_UCTL_CMD_TABLE istgt_uctl_c
+@@ -1183,6 +1290,7 @@
  	{ "UNLOAD",  istgt_uctl_cmd_unload },
  	{ "LOAD",    istgt_uctl_cmd_load },
  	{ "CHANGE",  istgt_uctl_cmd_change },
@@ -177,9 +177,9 @@ Last-Update: 2012-06-26
  	{ "RESET",   istgt_uctl_cmd_reset },
  	{ "INFO",    istgt_uctl_cmd_info },
  	{ NULL,      NULL },
---- istgt-0.4~20111008.orig/src/istgtcontrol.c
-+++ istgt-0.4~20111008/src/istgtcontrol.c
-@@ -494,6 +494,36 @@ exec_change(UCTL_Ptr uctl)
+--- a/src/istgtcontrol.c
++++ b/src/istgtcontrol.c
+@@ -494,6 +494,36 @@
  }
  
  static int
@@ -216,7 +216,7 @@ Last-Update: 2012-06-26
  exec_reset(UCTL_Ptr uctl)
  {
  	const char *delim = ARGS_DELIM;
-@@ -591,6 +621,7 @@ static EXEC_TABLE exec_table[] =
+@@ -591,6 +621,7 @@
  	{ "UNLOAD",  exec_unload,   0, 1 },
  	{ "LOAD",    exec_load,     0, 1 },
  	{ "CHANGE",  exec_change,   1, 1 },
@@ -224,7 +224,7 @@ Last-Update: 2012-06-26
  	{ "RESET",   exec_reset,    0, 1 },
  	{ "INFO",    exec_info,     0, 0 },
  	{ NULL,      NULL,          0, 0 },
-@@ -1054,6 +1085,7 @@ usage(void)
+@@ -1054,6 +1085,7 @@
  	printf(" load       load media to specified unit\n");
  	printf(" unload     unload media from specified unit\n");
  	printf(" change     change media with <file> at specified unit\n");
@@ -232,9 +232,9 @@ Last-Update: 2012-06-26
  	printf(" reset      reset specified lun of target\n");
  	printf(" info       show connections of target\n");
  }
---- istgt-0.4~20111008.orig/src/istgt_lu.c
-+++ istgt-0.4~20111008/src/istgt_lu.c
-@@ -1202,7 +1202,7 @@ istgt_lu_set_local_settings(ISTGT_Ptr is
+--- a/src/istgt_lu.c
++++ b/src/istgt_lu.c
+@@ -1200,7 +1200,7 @@
  }
  
  static int
@@ -243,7 +243,7 @@ Last-Update: 2012-06-26
  {
  	char buf[MAX_TMPBUF], buf2[MAX_TMPBUF];
  	ISTGT_LU_Ptr lu;
-@@ -1222,21 +1222,40 @@ istgt_lu_add_unit(ISTGT_Ptr istgt, CF_SE
+@@ -1220,21 +1220,40 @@
  	int i, j, k;
  	int rc;
  
@@ -286,7 +286,7 @@ Last-Update: 2012-06-26
  	istgt_lu_set_state(lu, ISTGT_STATE_INVALID);
  	nbs64 = istgt_lu_get_nbserial(istgt->nodebase);
  #if 0
-@@ -1944,12 +1963,15 @@ istgt_lu_del_unit(ISTGT_Ptr istgt, ISTGT
+@@ -1942,12 +1961,15 @@
  static void *luworker(void *arg);
  
  int
@@ -303,7 +303,7 @@ Last-Update: 2012-06-26
  
  	ISTGT_TRACELOG(ISTGT_TRACE_DEBUG, "istgt_lu_init\n");
  	sp = istgt_find_cf_section(istgt->config, "Global");
-@@ -1969,11 +1991,12 @@ istgt_lu_init(ISTGT_Ptr istgt)
+@@ -1967,11 +1989,12 @@
  				ISTGT_ERRLOG("tag %d is invalid\n", sp->num);
  				return -1;
  			}
@@ -317,7 +317,7 @@ Last-Update: 2012-06-26
  		}
  		sp = sp->next;
  	}
-@@ -1982,6 +2005,22 @@ istgt_lu_init(ISTGT_Ptr istgt)
+@@ -1980,6 +2003,22 @@
  		lu = istgt->logical_unit[i];
  		if (lu == NULL)
  			continue;
@@ -340,7 +340,7 @@ Last-Update: 2012-06-26
  
  		rc = pthread_mutex_init(&lu->mutex, NULL);
  		if (rc != 0) {
-@@ -2069,7 +2108,7 @@ istgt_lu_set_all_state(ISTGT_Ptr istgt,
+@@ -2067,7 +2106,7 @@
  }
  
  int
@@ -349,7 +349,7 @@ Last-Update: 2012-06-26
  {
  #ifdef HAVE_PTHREAD_SET_NAME_NP
  	char buf[MAX_TMPBUF];
-@@ -2084,6 +2123,10 @@ istgt_lu_create_threads(ISTGT_Ptr istgt)
+@@ -2082,6 +2121,10 @@
  		lu = istgt->logical_unit[i];
  		if (lu == NULL)
  			continue;
@@ -360,7 +360,7 @@ Last-Update: 2012-06-26
  
  		if (lu->queue_depth != 0) {
  			/* create LU thread */
-@@ -2114,18 +2157,22 @@ istgt_lu_create_threads(ISTGT_Ptr istgt)
+@@ -2112,18 +2155,22 @@
  }
  
  int
@@ -385,8 +385,8 @@ Last-Update: 2012-06-26
  		istgt_lu_set_state(lu, ISTGT_STATE_SHUTDOWN);
  
  		switch (lu->type) {
---- istgt-0.4~20111008.orig/src/istgt.c
-+++ istgt-0.4~20111008/src/istgt.c
+--- a/src/istgt.c
++++ b/src/istgt.c
 @@ -71,6 +71,7 @@
  #define PORTNUMLEN 32
  
@@ -395,7 +395,7 @@ Last-Update: 2012-06-26
  
  #if 0
  void
-@@ -1598,6 +1599,7 @@ main(int argc, char **argv)
+@@ -1598,6 +1599,7 @@
  
  	/* read config files */
  	config = istgt_allocate_config();
@@ -403,7 +403,7 @@ Last-Update: 2012-06-26
  	rc = istgt_read_config(config, config_file);
  	if (rc < 0) {
  		fprintf(stderr, "config error\n");
-@@ -1662,7 +1664,7 @@ main(int argc, char **argv)
+@@ -1662,7 +1664,7 @@
  		istgt_free_config(config);
  		exit(EXIT_FAILURE);
  	}
@@ -412,7 +412,7 @@ Last-Update: 2012-06-26
  	if (rc < 0) {
  		ISTGT_ERRLOG("istgt_lu_init() failed\n");
  		goto initialize_error;
-@@ -1772,7 +1774,7 @@ main(int argc, char **argv)
+@@ -1772,7 +1774,7 @@
  #endif
  
  	/* create LUN threads for command queuing */
@@ -421,7 +421,7 @@ Last-Update: 2012-06-26
  	if (rc < 0) {
  		ISTGT_ERRLOG("lu_create_threads() failed\n");
  		goto initialize_error;
-@@ -1809,7 +1811,7 @@ main(int argc, char **argv)
+@@ -1809,7 +1811,7 @@
  		istgt_close_portal(istgt);
  		istgt_close_uctl_portal(istgt);
  		istgt_iscsi_shutdown(istgt);
@@ -430,7 +430,7 @@ Last-Update: 2012-06-26
  		istgt_destory_initiator_group_array(istgt);
  		istgt_destroy_portal_array(istgt);
  		istgt_destroy_uctl_portal(istgt);
-@@ -1837,7 +1839,7 @@ main(int argc, char **argv)
+@@ -1837,7 +1839,7 @@
  	istgt_close_portal(istgt);
  	istgt_close_uctl_portal(istgt);
  	istgt_iscsi_shutdown(istgt);
