@@ -89,8 +89,7 @@ do_stop()
 # Function that sends a SIGHUP to the daemon/service
 #
 do_reload() {
-	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name $NAME
-	return 0
+	istgtcontrol refresh
 }
 
 case "$1" in
@@ -110,14 +109,18 @@ case "$1" in
 		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
 	esac
 	;;
+  reload)
+    [ "$VERBOSE" != no ] && log_daemon_msg "Reloading $DESC " "$NAME"
+    do_reload
+    case "$?" in
+		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+	esac
+  ;;
   status)
        status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
        ;;
-  restart|force-reload)
-	#
-	# If the "reload" option is implemented then remove the
-	# 'force-reload' alias
-	#
+  restart)
 	log_daemon_msg "Restarting $DESC" "$NAME"
 	do_stop
 	case "$?" in
