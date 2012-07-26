@@ -47,6 +47,7 @@
 #define	__FSFILCNT64_T_TYPE	__UQUAD_TYPE
 #define	__ID_T_TYPE		__U32_TYPE
 #define __CLOCK_T_TYPE		__S32_TYPE
+#define	__FSWORD_T_TYPE		__SWORD_TYPE
 
 /*
  * This one is a bit tricky.  It needs to match the size
@@ -74,6 +75,9 @@
 #define __BLKSIZE_T_TYPE	__U32_TYPE
 #define __FSID_T_TYPE		union { int __val[2]; int val[2]; }
 #define __SSIZE_T_TYPE		__SWORD_TYPE
+#define __SNSECONDS_T_TYPE	__SLONGWORD_TYPE
+#define __SYSCALL_SLONG_TYPE	__SLONGWORD_TYPE
+#define __SYSCALL_ULONG_TYPE	__ULONGWORD_TYPE
 
 /* Number of descriptors that can fit in an `fd_set'.  */
 #define	__FD_SETSIZE		1024
