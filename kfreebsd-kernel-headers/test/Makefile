@@ -10,6 +10,7 @@ TESTS = \
 	devicestat.o \
 	in_pcb.o \
 	ppp.o \
+	sctp.o \
 	soundcard.o \
 	sys_sysctl.o \
 	stdarg.o \
