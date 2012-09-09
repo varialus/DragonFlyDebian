@@ -8,18 +8,18 @@ Author: Arno Töll <debian@toell.net>
 
 --- a/src/Makefile.in
 +++ b/src/Makefile.in
-@@ -83,11 +83,11 @@
- 	$(CC) $(LDFLAGS) $(LIBS) -o $@ $(ISTGTCONTROL)
+@@ -88,11 +88,11 @@
+ 	$(CC) $(LDFLAGS) -o $@ $(ISTGTCONTROL) $(LIBS)
  
  install: install-dirs
--	install -c -m 0755 istgt $(DESTDIR)$(bindir)
--	install -c -m 0755 istgtcontrol $(DESTDIR)$(bindir)
-+	install -c -m 0755 istgt $(DESTDIR)$(sbindir)
-+	install -c -m 0755 istgtcontrol $(DESTDIR)$(sbindir)
+-	$(INSTALL) -m 0755 istgt $(DESTDIR)$(bindir)
+-	$(INSTALL) -m 0755 istgtcontrol $(DESTDIR)$(bindir)
++	$(INSTALL) -m 0755 istgt $(DESTDIR)$(sbindir)
++	$(INSTALL) -m 0755 istgtcontrol $(DESTDIR)$(sbindir)
  
  install-dirs:
--	mkdir -p $(DESTDIR)$(bindir)
-+	mkdir -p $(DESTDIR)$(sbindir)
+-	$(MKDIR_P) $(DESTDIR)$(bindir)
++	$(MKDIR_P) $(DESTDIR)$(sbindir)
  
+ .PHONY: dist clean distclean depend
  dist: $(DISTFILES)
- 	mkdir $(DISTDIR)/$(subdir)
