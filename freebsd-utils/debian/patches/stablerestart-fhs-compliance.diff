@@ -1,0 +1,45 @@
+--- a/usr.sbin/nfsd/nfsd.c
++++ b/usr.sbin/nfsd/nfsd.c
+@@ -80,8 +80,8 @@
+ int	debug = 0;
+ #endif
+ 
+-#define	NFSD_STABLERESTART	"/var/db/nfs-stablerestart"
+-#define	NFSD_STABLEBACKUP	"/var/db/nfs-stablerestart.bak"
++#define	NFSD_STABLERESTART	"/var/lib/freebsd-nfs-server/nfs-stablerestart"
++#define	NFSD_STABLEBACKUP	"/var/lib/freebsd-nfs-server/nfs-stablerestart.bak"
+ #define	MAXNFSDCNT	256
+ #define	DEFNFSDCNT	 4
+ pid_t	children[MAXNFSDCNT];	/* PIDs of children */
+--- a/usr.sbin/nfsd/nfsv4.4
++++ b/usr.sbin/nfsd/nfsv4.4
+@@ -288,10 +288,10 @@
+ .Xr rc.conf 5
+ variables.
+ .Sh FILES
+-.Bl -tag -width /var/db/nfs-stablerestart.bak -compact
+-.It Pa /var/db/nfs-stablerestart
++.Bl -tag -width /var/lib/freebsd-nfs-server/nfs-stablerestart.bak -compact
++.It Pa /var/lib/freebsd-nfs-server/nfs-stablerestart
+ NFS V4 stable restart file
+-.It Pa /var/db/nfs-stablerestart.bak
++.It Pa /var/lib/freebsd-nfs-server/nfs-stablerestart.bak
+ backup copy of the file
+ .El
+ .Sh SEE ALSO
+--- a/usr.sbin/nfsd/stablerestart.5
++++ b/usr.sbin/nfsd/stablerestart.5
+@@ -75,10 +75,10 @@
+ has returned. This might require hardware level caching to be disabled for
+ a local disk drive that holds the file, or similar.
+ .Sh FILES
+-.Bl -tag -width /var/db/nfs-stablerestart.bak -compact
+-.It Pa /var/db/nfs-stablerestart
++.Bl -tag -width /var/lib/freebsd-nfs-server/nfs-stablerestart.bak -compact
++.It Pa /var/lib/freebsd-nfs-server/nfs-stablerestart
+ NFSv4 stable restart file
+-.It Pa /var/db/nfs-stablerestart.bak
++.It Pa /var/lib/freebsd-nfs-server/nfs-stablerestart.bak
+ backup copy of the file
+ .El
+ .Sh SEE ALSO
