@@ -1,0 +1,45 @@
+ToDo
+
+ - Make the kernel source package download and extract automatically.
+ - Make the kernel compile.
+ - Make related packages compile, including the Hammer and Hammer2 file systems.
+ - Try to use the kernel with the Hammer or Hammer2 filesystem.
+ - Fix any issues that arise.
+ - Port VirtualBox.
+ - Take over the world because the DragonFly kernel plus the Hammer file system with block level deduplication plus Debian usability and administration plus VirtualBox virtualization would blow everything else away.
+
+Instructions
+
+ - These instructions are probably not perfect, so please submit improvements.
+ - Download and install GNU/kFreeBSD in VirtualBox or some other environment.
+
+http://ftp.nl.debian.org/debian/dists/squeeze/main/installer-kfreebsd-i386/current/images/netboot/mini.iso
+
+http://ftp.nl.debian.org/debian/dists/squeeze/main/installer-kfreebsd-amd64/current/images/netboot/mini.iso
+
+ - I'm using the 64-bit version of kFreeBSD Wheezy and the FreeBSD OS type in VirtualBox.
+ - The desktop package didn't work for me in kFreeBSD Wheezy.
+ - My commands below use sudo rather than su because I disabled root logins in the expert installer.
+ - The installer doesn't set the keyboard layout correctly. This is how I set the layout to dvorak.
+ - kbdcontrol -l “us.dvorak”
+ - sudo aptitude
+ - I selected console-setup-freebsd and then console-setup and then installed them.
+ - If you're not familiar with aptitude, you could also run the following.
+ - sudo apt-get install console-setup-freebsd console-setup
+ - Optionally build the kFreeBSD kernel. Instructions continued toward the bottom.
+ - The following steps may require dependencies that can be installed by setting up to build the kFreeBSD kernel.
+ - I'm using the kFreeBSD package as a template for kDragonFlyBSD.
+ - Install git.
+ - git clone git://github.com/varialus/DragonFlyDebian.git
+ - cd DragonFlyBSD/kdragonflybsd-3/
+ - ./debian/rules
+ - nano ./debian/rules
+ - Fix errors.
+ - Commit to git and push to github.
+
+ - Optionally build the kFreeBSD kernel. Continued from above.
+ - sudo apt-get build-dep kfreebsd-9
+ - sudo apt-get install fakeroot
+ - sudo apt-get source kfreebsd-9
+ - cd kfreebsd-9-9.0/
+ - dpkg-buildpackage
