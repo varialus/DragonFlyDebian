@@ -1,0 +1,55 @@
+Index: kdragonflybsd-9-9.0/sys/contrib/pf/net/pf_ioctl.c
+===================================================================
+--- kdragonflybsd-9-9.0.orig/sys/contrib/pf/net/pf_ioctl.c	2011-10-26 19:09:09.000000000 +0200
++++ kdragonflybsd-9-9.0/sys/contrib/pf/net/pf_ioctl.c	2012-09-19 01:17:56.000000000 +0200
+@@ -308,7 +308,7 @@
+ 	V_pf_altq_pl = V_pf_pooladdr_pl = NULL;
+ 	V_pf_frent_pl = V_pf_frag_pl = V_pf_cache_pl = V_pf_cent_pl = NULL;
+ 	V_pf_state_scrub_pl = NULL;
+-	V_pfr_ktable_pl = V_pfr_kentry_pl = NULL;
++	V_pfr_ktable_pl = V_pfr_kentry_pl = V_pfr_kcounters_pl = NULL;
+ }
+ 
+ void
+@@ -327,6 +327,7 @@
+ 	UMA_DESTROY(V_pf_cent_pl);
+ 	UMA_DESTROY(V_pfr_ktable_pl);
+ 	UMA_DESTROY(V_pfr_kentry_pl);
++	UMA_DESTROY(V_pfr_kcounters_pl);
+ 	UMA_DESTROY(V_pf_state_scrub_pl);
+ 	UMA_DESTROY(V_pfi_addr_pl);
+ }
+@@ -347,6 +348,7 @@
+ 		UMA_CREATE(V_pf_pooladdr_pl,	struct pf_pooladdr, "pfpooladdrpl");
+ 		UMA_CREATE(V_pfr_ktable_pl,	struct pfr_ktable, "pfrktable");
+ 		UMA_CREATE(V_pfr_kentry_pl,	struct pfr_kentry, "pfrkentry");
++		UMA_CREATE(V_pfr_kcounters_pl,	struct pfr_kcounters, "pfrkcounters");
+ 		UMA_CREATE(V_pf_frent_pl,	struct pf_frent, "pffrent");
+ 		UMA_CREATE(V_pf_frag_pl,	struct pf_fragment, "pffrag");
+ 		UMA_CREATE(V_pf_cache_pl,	struct pf_fragment, "pffrcache");
+Index: kdragonflybsd-9-9.0/sys/contrib/pf/net/pfvar.h
+===================================================================
+--- kdragonflybsd-9-9.0.orig/sys/contrib/pf/net/pfvar.h	2011-10-26 19:09:09.000000000 +0200
++++ kdragonflybsd-9-9.0/sys/contrib/pf/net/pfvar.h	2012-09-19 01:17:56.000000000 +0200
+@@ -1871,6 +1871,8 @@
+ #define	V_pfr_ktable_pl			 VNET(pfr_ktable_pl)
+ VNET_DECLARE(uma_zone_t,		 pfr_kentry_pl);
+ #define	V_pfr_kentry_pl			 VNET(pfr_kentry_pl)
++VNET_DECLARE(uma_zone_t,		 pfr_kcounters_pl);
++#define	V_pfr_kcounters_pl		 VNET(pfr_kcounters_pl)
+ VNET_DECLARE(uma_zone_t,		 pf_cache_pl);
+ #define	V_pf_cache_pl			 VNET(pf_cache_pl)
+ VNET_DECLARE(uma_zone_t,		 pf_cent_pl);
+Index: kdragonflybsd-9-9.0/sys/contrib/pf/net/pf_table.c
+===================================================================
+--- kdragonflybsd-9-9.0.orig/sys/contrib/pf/net/pf_table.c	2011-10-26 19:09:09.000000000 +0200
++++ kdragonflybsd-9-9.0/sys/contrib/pf/net/pf_table.c	2012-09-19 01:17:56.000000000 +0200
+@@ -179,7 +179,6 @@
+ VNET_DEFINE(uma_zone_t,			pfr_ktable_pl);
+ VNET_DEFINE(uma_zone_t,			pfr_kentry_pl);
+ VNET_DEFINE(uma_zone_t,			pfr_kcounters_pl);
+-#define	V_pfr_kcounters_pl		VNET(pfr_kcounters_pl)
+ VNET_DEFINE(struct sockaddr_in,		pfr_sin);
+ #define	V_pfr_sin			VNET(pfr_sin)
+ VNET_DEFINE(struct sockaddr_in6,	pfr_sin6);
+
