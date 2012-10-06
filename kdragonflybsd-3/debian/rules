@@ -10,9 +10,8 @@ export DH_VERBOSE=1
 DEB_HOST_ARCH_OS	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 DEB_HOST_ARCH_CPU	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
-full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
-tar_version	:= $(shell echo $(full_version) | sed -e 's/-.*//g')
-svn_revision	:= $(shell echo $(full_version) | sed -e 's/.*~svn\([0-9]*\)-[0-9]*/\1/g')
+full_version	:= $(shell /usr/bin/dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
+tag_version	:= $(shell echo $(full_version) | sed -e 's/-.*//g')
 version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
@@ -30,22 +29,19 @@ else
 kbsd_cpu	:= $(cpu)
 endif
 
-SVN		:= http://avalon.dragonflybsd.org/packages/x86_64/DragonFly-$(version)
-#SVN		:= http://avalon.dragonflybsd.org/packages/amd64/
-#SVN		:= http://avalon.dragonflybsd.org/packages/i386/
-#SVN		:= http://svn.dragonflybsd.org/base/release/$(version).0
-#SVN		:= http://svn.dragonflybsd.org/base/releng/$(version)
-#SVN		:= http://svn.dragonflybsd.org/base/stable/$(major)
-#SVN		:= http://svn.dragonflybsd.org/base/head
-SOURCE_PACKAGE	:= $(CURDIR)/debian/kdragonflybsd-source-$(version)
-IMAGE_PACKAGE	:= $(CURDIR)/debian/kdragonflybsd-image-$(version)-$(abiname)
-HEADERS_PACKAGE	:= $(CURDIR)/debian/kdragonflybsd-headers-$(version)-$(abiname)
-SRC_TAR		:= kdragonflybsd-source-$(version).tar.xz
-SRC_DIR		:= kdragonflybsd-source-$(version)
-HEADERS_DIR	:= kdragonflybsd-headers-$(version)-$(abiname)
-FLAVOR_DIR	:= flavor-$(version)-$(abiname)
-ORIG_DIR	:= kdragonflybsd-$(major)-$(tar_version)
-ORIG_TAR	:= kdragonflybsd-$(major)_$(tar_version).orig.tar.gz
+# Debianized
+SOURCE_PACKAGE	:= $(CURDIR)/debian/kdragonflybsd-source-$(full_version)
+IMAGE_PACKAGE	:= $(CURDIR)/debian/kdragonflybsd-image-$(full_version)-$(abiname)
+HEADERS_PACKAGE	:= $(CURDIR)/debian/kdragonflybsd-headers-$(full_version)-$(abiname)
+
+# Non-Debianized
+SRC_TAR		:= kdragonflybsd-source-$(full_version).tar.xz
+SRC_DIR		:= kdragonflybsd-source-$(full_version)
+HEADERS_DIR	:= kdragonflybsd-headers-$(full_version)-$(abiname)
+FLAVOR_DIR	:= flavor-$(full_version)-$(abiname)
+ORIG_DIR	:= kdragonflybsd-$(full_version)
+ORIG_TAR	:= kdragonflybsd-$(full_version).orig.tar.gz
+
 MAKE		:= make MACHINE_ARCH=$(kdragonflybsd_cpu) CC=gcc-$(gcc_version) WERROR=
 PATH		:= $(CURDIR)/config:/usr/lib/dragonflybsd:$(PATH)
 
@@ -53,14 +49,32 @@ PATH		:= $(CURDIR)/config:/usr/lib/dragonflybsd:$(PATH)
 # "unstripped-binary-or-object" lintian error).
 MAKE += -DWITHOUT_KERNEL_SYMBOLS	
 
+# United States, California
+dfly_git	:= git://avalon.dragonflybsd.org/dragonfly.git
+# (NOTE: slow)
+# dfly_git	:= git://crater.dragonflybsd.org/dragonfly.git
+# United States, Maryland
+# dfly_git	:= git://batman.acm.jhu.edu/dragonfly.git
+# Europe, Estonia
+# dfly_git	:= git://anoncvs.estpak.ee/dragonfly.git
+# Europe, France
+# dfly_git	:= git://island.quantumachine.net/dragonfly.git
+# Europe, Norway
+# dfly_git	:= git://koan.bondconsult.net/dragonfly.git
+
 get-orig-source:
 	rm -rf $(ORIG_DIR)
-	for i in sys usr.sbin/config ; do \
-		svn export $(SVN)/$$i $(ORIG_DIR)/$$i ; \
-	done
-	cd $(ORIG_DIR) && $(CURDIR)/debian/prune.sh
-	tar --numeric-owner --owner 0 --group 0 -czf ../$(ORIG_TAR) $(ORIG_DIR)
-	rm -rf $(ORIG_DIR)
+	mkdir $(ORIG_DIR)
+	cd $(ORIG_DIR)
+	git init
+	git remote add dragonfly $(dfly_git)
+	git config core.sparsecheckout true
+	echo sys >> .git/info/sparse-checkout
+	git checkout $(version)
+	git pull $(dfly_git)
+	git archive $(version) | gzip > $(CURDIR)/$(ORIG_TAR)
+	$(CURDIR)/debian/prune.sh
+	chown 0:0 $(CURDIR)/$(ORIG_TAR)
 
 control: clean
 	for arch in `ls $(CURDIR)/debian/arch/` ; do \
