@@ -1,9 +1,13 @@
 ToDo:
+ - Find out whether the clean task of debian/rules really needs to be run as root.
  - Make the kernel source package extract and apply debian patches automatically.
  - Make the kernel compile.
  - Make related packages compile, including the Hammer and Hammer2 file systems.
  - Try to use the kernel with the Hammer or Hammer2 filesystem.
  - Fix any issues that arise.
+ - If 'apt-get build-dep' is supposed to include dependencies for building the source package, then add packages fakeroot subversion kernel_wedge to 'apt-get build-dep' for kfreebsd-9.
+ - If 'apt-get build-dep' is supposed to include dependencies for building the source package, then add packages fakeroot git kernel_wedge to 'apt-get build-dep' for kdragonflybsd-3.
+ - Send kFreeBSD fixes upstream.
  - Port VirtualBox.
  - Take over the world because the DragonFly kernel plus the Hammer file system with low memory block level deduplication plus Debian usability and administration plus VirtualBox virtualization would blow everything else away.
 
@@ -19,7 +23,10 @@ http://ftp.nl.debian.org/debian/dists/squeeze/main/installer-kfreebsd-amd64/curr
  - I use sudo rather than su because I prefer it. You can disable root logins within the expert option of the debian installer.
  - Using aptitude is preferred over 'apt-get install' for binary package management but apt-get lends itself to written instructions.
  - sudo apt-get build-dep kfreebsd-9
- - sudo apt-get install fakeroot git subversion
+ - Only do the following 'apt-get install' until 'apt-get build-dep' for kfreebsd-9 includes them, the fix for which is on my ToDo list above.
+ - sudo apt-get install fakeroot subversion kernel_wedge
+ - Only do the following 'apt-get install' until 'apt-get build-dep' for kdragonflybsd-3 includes them, the fix for which is on my ToDo list above.
+ - sudo apt-get install fakeroot git kernel_wedge
  - mkdir ~/kbsd-build-comparison
  - cd kbsd-build-comparison
  - mkdir freebsd
@@ -30,10 +37,18 @@ In one of two console terminals:
  - svn checkout svn://svn.debian.org/glibc-bsd/trunk
  - cd trunk/kfreebsd-9/
  - ./debian/rules get-orig-source
- - ./debian/rules control
- - Fix errors.
+ - Get fix from varialus.
+ - Commit to git and push to github.
  - Send fix upstream.
+ - ./debian/rules control
+ - Get fix from varialus.
+ - Commit to git and push to github.
+ - Send fix upstream.
+ - Figure out what prerequisites need to be run before running dpkg-buildpackage.
  - dpkg-buildpackage
+ - Fix errors.
+ - Commit to git and push to github.
+ - Send fix upstream.
  - Install kFreeBSD.
  - Build and install kernel.
 
@@ -43,6 +58,7 @@ In the other console terminal:
  - cd DragonFlyBSD/kdragonflybsd-3/
  - ./debian/rules get-orig-source
  - ./debian/rules control
+ - Figure out what prerequisites need to be run before running dpkg-buildpackage.
  - Fix errors.
  - Commit to git and push to github.
  - dpkg-buildpackage
