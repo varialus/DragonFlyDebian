@@ -18,7 +18,7 @@ http://ftp.nl.debian.org/debian/dists/squeeze/main/installer-kfreebsd-amd64/curr
  - At the bottom of this page there is a a workaround for setting the kFreeBSD keyboard layout.
  - I use sudo rather than su because I prefer it. You can disable root logins within the expert option of the debian installer.
  - Using aptitude is preferred over 'apt-get install' for binary package management but apt-get lends itself to written instructions.
- - sudo build-dep kfreebsd-9
+ - sudo apt-get build-dep kfreebsd-9
  - sudo apt-get install fakeroot git subversion
  - mkdir ~/kbsd-build-comparison
  - cd kbsd-build-comparison
@@ -29,7 +29,10 @@ In one of two console terminals:
  - cd ~/kbsd-build-comparison/freebsd
  - svn checkout svn://svn.debian.org/glibc-bsd/trunk
  - cd trunk/kfreebsd-9/
- - ./debian/rules
+ - ./debian/rules get-orig-source
+ - ./debian/rules control
+ - Fix errors.
+ - Send fix upstream.
  - dpkg-buildpackage
  - Install kFreeBSD.
  - Build and install kernel.
@@ -38,7 +41,10 @@ In the other console terminal:
  - cd ~/kbsd-build-comparison/dragonflybsd
  - git clone git://github.com/varialus/DragonFlyDebian.git
  - cd DragonFlyBSD/kdragonflybsd-3/
- - ./debian/rules
+ - ./debian/rules get-orig-source
+ - ./debian/rules control
+ - Fix errors.
+ - Commit to git and push to github.
  - dpkg-buildpackage
  - Fix errors.
  - Commit to git and push to github.

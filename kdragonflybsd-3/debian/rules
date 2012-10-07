@@ -59,6 +59,8 @@ get-orig-source:
 	cd $(ORIG_DIR) ; echo sys >> .git/info/sparse-checkout
 	cd $(ORIG_DIR) ; echo usr.sbin >> .git/info/sparse-checkout
 	cd $(ORIG_DIR) ; git fetch --depth=1 origin tag v$(version)
+	# ToDo: Look into whether the following can be improved with this.
+	# http://www.kernel.org/pub/software/scm/git/docs/git-bundle.html
 	cd $(ORIG_DIR) ; mv .git/HEAD .git/HEAD.orig
 	cd $(ORIG_DIR) ; cp .git/FETCH_HEAD .git/HEAD
 	cd $(ORIG_DIR) ; git reset --hard
