@@ -1,5 +1,4 @@
 ToDo:
- - Make the kernel source package extract and apply debian patches automatically.
  - Make the kernel compile.
  - Make related packages compile, including the Hammer and Hammer2 file systems.
  - Try to use the kernel with the Hammer or Hammer2 filesystem.
@@ -23,9 +22,9 @@ http://ftp.nl.debian.org/debian/dists/squeeze/main/installer-kfreebsd-amd64/curr
  - Using aptitude is preferred over 'apt-get install' for binary package management but apt-get lends itself to written instructions.
  - sudo apt-get build-dep kfreebsd-9
  - Only do the following 'apt-get install' until 'apt-get build-dep' for kfreebsd-9 includes them, the fix for which is on my ToDo list above.
- - sudo apt-get install fakeroot subversion kernel_wedge
+ - sudo apt-get install fakeroot subversion kernel_wedge devscripts
  - Only do the following 'apt-get install' until 'apt-get build-dep' for kdragonflybsd-3 includes them, the fix for which is on my ToDo list above.
- - sudo apt-get install fakeroot git kernel_wedge
+ - sudo apt-get install fakeroot git kernel_wedge devscripts
  - mkdir ~/kbsd-build-comparison
  - cd kbsd-build-comparison
  - mkdir freebsd
@@ -38,7 +37,8 @@ In one of two console terminals:
  - ./debian/rules get-orig-source
  - touch ./debian/control
  - fakeroot ./debian/rules control
- - Figure out what prerequisites need to be run before running dpkg-buildpackage.
+ - Copy contents of kfreebsd-9_9.0.orig.tar.gz into kfreebsd-9/debian/
+ - debuild -S -us -uc
  - dpkg-buildpackage
  - Fix errors.
  - Commit to git and push to github.
@@ -52,9 +52,8 @@ In the other console terminal:
  - cd DragonFlyBSD/kdragonflybsd-3/
  - ./debian/rules get-orig-source
  - fakeroot ./debian/rules control
- - Figure out what prerequisites need to be run before running dpkg-buildpackage.
- - Fix errors.
- - Commit to git and push to github.
+ - Copy contents of kdragonflybsd-3_3.0.3.orig.tar.gz into kdragonflybsd-9/debian/
+ - debuild -S -us -uc
  - dpkg-buildpackage
  - Fix errors.
  - Commit to git and push to github.
