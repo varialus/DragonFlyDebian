@@ -12,7 +12,7 @@ DEB_HOST_ARCH_CPU	?= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 full_version	:= $(shell dpkg-parsechangelog | grep ^Version: | sed -e 's/^.*: //g')
 tar_version	:= $(shell echo $(full_version) | sed -e 's/-.*//g')
-svn_revision	:= $(shell echo $(full_version) | sed -e 's/.*~svn\([0-9]*\)-[0-9]*/\1/g')
+vcs_revision	:= $(shell echo $(full_version) | sed -e 's/.*~svn\([0-9]*\)-[0-9]*/\1/g')
 version		:= $(shell echo $(full_version) | sed -e 's/[~+-].*//g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
@@ -25,15 +25,15 @@ ld_target	:= $(shell ld --help | sed -ne "s/[^ :]*: supported targets: \([^ ]*\)
 gcc_version	:= 4.6
 
 ifeq ($(cpu), mipsel)
-kfreebsd_cpu	:= mips
+kbsd_cpu	:= mips
 else
-kfreebsd_cpu	:= $(cpu)
+kbsd_cpu	:= $(cpu)
 endif
 
-SVN		:= http://svn.freebsd.org/base/release/$(version).0
-#SVN		:= http://svn.freebsd.org/base/releng/$(version)
-#SVN		:= http://svn.freebsd.org/base/stable/$(major)
-#SVN		:= http://svn.freebsd.org/base/head
+VCS		:= http://svn.freebsd.org/base/release/$(version).0
+#VCS		:= http://svn.freebsd.org/base/releng/$(version)
+#VCS		:= http://svn.freebsd.org/base/stable/$(major)
+#VCS		:= http://svn.freebsd.org/base/head
 SOURCE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-source-$(version)
 IMAGE_PACKAGE	:= $(CURDIR)/debian/kfreebsd-image-$(version)-$(abiname)
 HEADERS_PACKAGE	:= $(CURDIR)/debian/kfreebsd-headers-$(version)-$(abiname)
@@ -43,7 +43,7 @@ HEADERS_DIR	:= kfreebsd-headers-$(version)-$(abiname)
 FLAVOR_DIR	:= flavor-$(version)-$(abiname)
 ORIG_DIR	:= kfreebsd-$(major)-$(tar_version)
 ORIG_TAR	:= kfreebsd-$(major)_$(tar_version).orig.tar.gz
-MAKE		:= make MACHINE_ARCH=$(kfreebsd_cpu) CC=gcc-$(gcc_version) WERROR=
+MAKE		:= make MACHINE_ARCH=$(kbsd_cpu) CC=gcc-$(gcc_version) WERROR=
 PATH		:= $(CURDIR)/config:/usr/lib/freebsd:$(PATH)
 
 # Disable install of *.ko.symbols files (their presence would trigger an
@@ -53,7 +53,7 @@ MAKE += -DWITHOUT_KERNEL_SYMBOLS
 get-orig-source:
 	rm -rf $(ORIG_DIR)
 	for i in sys usr.sbin/config ; do \
-		svn export $(SVN)/$$i $(ORIG_DIR)/$$i ; \
+		svn export $(VCS)/$$i $(ORIG_DIR)/$$i ; \
 	done
 	cd $(ORIG_DIR) && $(CURDIR)/debian/prune.sh
 	tar --numeric-owner --owner 0 --group 0 -czf ../$(ORIG_TAR) $(ORIG_DIR)
@@ -92,6 +92,7 @@ control: clean
 	done >> $(CURDIR)/debian/control
 
 clean:
+	if [ ! -f $(CURDIR)/debian/control ]; then touch $(CURDIR)/debian/control ; fi
 	dh_testdir
 	dh_testroot
 	rm -rf src kfreebsd-source-* flavor-* config
@@ -174,17 +175,17 @@ build-flavor-%-stamp: src-flavor-%-stamp
 		-e 's/elf64-x86-64-freebsd/$(ld_target)/g' \
 		-e 's/elf32-tradlittlemips-freebsd/$(ld_target)/g' \
 		-e 's/elf32-tradbigmips-freebsd/$(ld_target)/g' \
-	$(FLAVOR_DIR)-$*/sys/conf/ldscript.$(kfreebsd_cpu)
+	$(FLAVOR_DIR)-$*/sys/conf/ldscript.$(kbsd_cpu)
 
 	# Configure the kernel
-	cp debian/arch/$(cpu)/$*.config $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/conf/
-	ln -sf $*.config $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/conf/$(configfile)
-	cd $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/conf \
+	cp debian/arch/$(cpu)/$*.config $(FLAVOR_DIR)-$*/sys/$(kbsd_cpu)/conf/
+	ln -sf $*.config $(FLAVOR_DIR)-$*/sys/$(kbsd_cpu)/conf/$(configfile)
+	cd $(FLAVOR_DIR)-$*/sys/$(kbsd_cpu)/conf \
 		&& config $(configfile)
 
 	# Build it
-	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/compile/$(configfile)/ depend
-	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/compile/$(configfile)/
+	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(kbsd_cpu)/compile/$(configfile)/ depend
+	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(kbsd_cpu)/compile/$(configfile)/
 
 	touch build-flavor-$*-stamp
 
@@ -193,7 +194,7 @@ install-common-stamp: src
 	dh_testroot
 	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)
 	cd src \
-		&& find . -type f -name "*.h" -not -regex ".*modules.*" -not -regex ".*sys/$(kfreebsd_cpu)/.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \;
+		&& find . -type f -name "*.h" -not -regex ".*modules.*" -not -regex ".*sys/$(kbsd_cpu)/.*" -exec cp --parents {} $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR) \;
 
 	mkdir -p $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)/conf
 	cd src && cp --parents \
@@ -223,7 +224,7 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 
 	# make the install target happy
 	install -o root -g root -m 644 \
-		$(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/conf/GENERIC.hints \
+		$(FLAVOR_DIR)-$*/sys/$(kbsd_cpu)/conf/GENERIC.hints \
 		$(IMAGE_PACKAGE)-$*/boot/device.hints || touch $(IMAGE_PACKAGE)-$*/boot/device.hints
 	install -o root -g root -m 644 \
 		$(FLAVOR_DIR)-$*/sys/boot/forth/loader.conf \
@@ -235,11 +236,11 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 
 	# install the config file
 	install -o root -g root -m 644 \
-		$(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/conf/$*.config \
+		$(FLAVOR_DIR)-$*/sys/$(kbsd_cpu)/conf/$*.config \
 		$(IMAGE_PACKAGE)-$*/boot/config-$(version)-$(abiname)-$*
 
 	# now install the kernel
-	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu)/compile/$(configfile) DESTDIR=$(IMAGE_PACKAGE)-$* install
+	$(MAKE) -C $(FLAVOR_DIR)-$*/sys/$(kbsd_cpu)/compile/$(configfile) DESTDIR=$(IMAGE_PACKAGE)-$* install
 	mv $(IMAGE_PACKAGE)-$*/lib/modules/$(version)-$(abiname)-$*/kernel $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
 	chmod 644 $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
 	gzip -9 $(IMAGE_PACKAGE)-$*/boot/kfreebsd-$(version)-$(abiname)-$*
@@ -275,16 +276,16 @@ install-flavor-%-stamp: install-common-stamp build-flavor-%-stamp
 	done
 
 	# headers package
-	mkdir -p $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(kfreebsd_cpu)
-	cd $(FLAVOR_DIR)-$*/sys/$(kfreebsd_cpu) \
-		&& find . -type f -name "*.h" -not -regex ".*modules.*" -exec cp --parents {} $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(kfreebsd_cpu) \; \
-		&& cp -d --parents compile/$(configfile)/machine $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(kfreebsd_cpu) \
-		&& cp -d --parents conf/$(configfile) $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(kfreebsd_cpu)
-	find $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(kfreebsd_cpu) -type f -exec chmod 644 {} \;
+	mkdir -p $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(kbsd_cpu)
+	cd $(FLAVOR_DIR)-$*/sys/$(kbsd_cpu) \
+		&& find . -type f -name "*.h" -not -regex ".*modules.*" -exec cp --parents {} $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(kbsd_cpu) \; \
+		&& cp -d --parents compile/$(configfile)/machine $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(kbsd_cpu) \
+		&& cp -d --parents conf/$(configfile) $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(kbsd_cpu)
+	find $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$(kbsd_cpu) -type f -exec chmod 644 {} \;
 	for dir in `ls $(HEADERS_PACKAGE)/usr/src/$(HEADERS_DIR)/sys` ; do \
 		ln -s ../../$(HEADERS_DIR)/sys/$$dir $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/$$dir ; \
 	done
-	ln -s $(kfreebsd_cpu)/include $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/machine
+	ln -s $(kbsd_cpu)/include $(HEADERS_PACKAGE)-$*/usr/src/$(HEADERS_DIR)-$*/sys/machine
 
 	touch install-flavor-$*-stamp
 
