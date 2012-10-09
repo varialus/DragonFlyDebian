@@ -102,7 +102,9 @@ control: clean
 	done >> $(CURDIR)/debian/control
 
 clean:
-	if [ -f $(CURDIR)/debian/control ] ; then dh_testdir ; fi
+	if [ ! -f $(CURDIR)/debian/control ] ; then touch $(CURDIR)/debian/control ; fi
+	dh_testdir
+	dh_testroot # Use root or fakeroot
 	rm -rf src kdragonflybsd-source-* flavor-* config
 	rm -f debian/kdragonflybsd-image-*.preinst
 	rm -f debian/kdragonflybsd-image-*.prerm
@@ -110,7 +112,7 @@ clean:
 	rm -f debian/kdragonflybsd-image-*.postrm
 
 	rm -f *-stamp
-	if [ -f $(CURDIR)/debian/control ] ; then dh_clean ; fi
+	dh_clean
 
 src: src-stamp
 src-stamp:
