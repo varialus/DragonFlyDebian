@@ -36,12 +36,11 @@ pversion	:= $(shell echo $(version) | sed -e 's/\./_/g')
 major           := $(shell echo $(version) | sed -e 's/\..*//g')
 revision	:= $(shell echo $(full_version) | sed -e 's/^[^+-]*//g')
 
-#SVN		:= http://svn.freebsd.org/base/release/$(version).0
-#SVN		:= http://svn.freebsd.org/base/releng/$(version)
-#SVN		:= http://svn.freebsd.org/base/stable/$(major)
-SVN		:= http://svn.freebsd.org/base/head
-
-SOURCE = freebsd-buildutils
+# DragonFly Download Sites
+# This is a list of all official mirrors of the DragonFly BSD project.
+# http://www.dragonflybsd.org/mirrors/
+VCS		:= git://avalon.dragonflybsd.org/dragonfly.git
+SOURCE = dragonflybsd-buildutils
 ORIGDIR = $(SOURCE)-$(tar_version)
 TARNAME = $(SOURCE)_$(tar_version).orig.tar.gz
 
@@ -49,7 +48,7 @@ export CFLAGS = -O2 -g -Wall -D_GNU_SOURCE \
          -DMACHINE_ARCH='"$(MACHINE_ARCH)"' \
          -DMACHINE_MULTIARCH='"$(MACHINE_MULTIARCH)"' \
          -I$(CURDIR)/build-tree/src/sys \
-	-D_GNU_SOURCE=1 -isystem /usr/include/freebsd
+	-D_GNU_SOURCE=1 -isystem /usr/include/dragonflybsd
 # disabled due to #630907 (see also 20_libbsd_overlay.diff)
 # $(shell pkg-config --cflags libbsd-overlay)
 MAKE_BUILD_FLAGS = CC=gcc NO_WERROR=1 NOGCCERROR=1 NOSHARED=NO NO_SHARED=NO
@@ -76,7 +75,7 @@ get-orig-source:
 		usr.sbin/kgzip \
 		usr.sbin/mtree \
 	; do \
-		svn export -r $(svn_revision) $(SVN)/$$i $(ORIGDIR)/src/$$i ; \
+		svn export -r $(svn_revision) $(VCS)/$$i $(ORIGDIR)/src/$$i ; \
 	done
 	tar --numeric-owner --owner 0 --group 0 -czf ../$(TARNAME) $(ORIGDIR)
 	rm -rf $(ORIGDIR)
@@ -119,11 +118,11 @@ install: build
 
 	for i in cksum lex make mkdep file2c brandelf ; do \
 	  $(PMAKE) -C $(CURDIR)/build-tree/src/usr.bin/$$i install \
-		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/lib/freebsd ; \
+		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/lib/dragonflybsd ; \
 	done
 	for i in mtree ; do \
 	  $(PMAKE) -C $(CURDIR)/build-tree/src/usr.sbin/$$i install \
-		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/lib/freebsd ; \
+		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/lib/dragonflybsd ; \
 	done
 	$(PMAKE) -C build-tree/src/share/mk install \
 		DESTDIR=$(CURDIR)/debian/$(package) BINDIR=/usr/share
@@ -136,11 +135,11 @@ install: build
 
 	# relocate files
 	for m in `find $(CURDIR)/debian/$(package)/usr/share/man -type f`; do \
-		mv $$m `echo $$m | sed -e 's:\(man[0-9]/\):\1freebsd-:'` ; \
+		mv $$m `echo $$m | sed -e 's:\(man[0-9]/\):\1dragonflybsd-:'` ; \
 	done
-	for i in `cd $(CURDIR)/debian/$(package)/usr/lib/freebsd && ls` ; do \
-		ln -s ../lib/freebsd/$$i \
-		$(CURDIR)/debian/$(package)/usr/bin/freebsd-$$i ; \
+	for i in `cd $(CURDIR)/debian/$(package)/usr/lib/dragonflybsd && ls` ; do \
+		ln -s ../lib/dragonflybsd/$$i \
+		$(CURDIR)/debian/$(package)/usr/bin/dragonflybsd-$$i ; \
 	done
 	rmdir $(CURDIR)/debian/$(package)/usr/sbin
 
